@@ -1,5 +1,15 @@
 # Cambios
 
+## 1.43.7 · 15 de octubre de 2026
+
+Las extracciones se venden donde los cogollos (lo pidió el usuario: «las extracciones se deberían de poder vender al por mayor, en clubes y donde se pueda vender cogollos»). Solo Godot (0.37.7), con `Datos.CAL`.
+
+- **Al por mayor:** Iñaki y la lonja de Puerto Viejo te compran también las extracciones que llevas encima, desde 10 g (`VENTA_EXTR.min`), a la mitad de lo que pagan los catadores en la calle (`precio_rosin` × el `px` de cada extracción × `VENTA_EXTR.mayor`; la lonja, con su 15 % más). La carga del día cuenta en gramos de flor (1 g de extracción = 5 g de flor, `ROSIN.rend`), y el calor también.
+- **En los clubs:** el lote del día puede ser una extracción, de 10, 25 o 50 g (`VENTA_EXTR.club_g`), a tres cuartos del precio de la calle (`VENTA_EXTR.club`).
+- **El dispensario de la asociación:** se le puede dejar una extracción; los socios retiran 5 g al día en vez de 20 (`VENTA_EXTR.dia`).
+- En la calle siguen comprándolas los catadores, como antes. El curado cuenta en todos los precios (`calidad`).
+- Prueba nueva `tests/extr_venta.gd` (27 comprobaciones).
+
 ## 1.43.6 · 15 de octubre de 2026
 
 El camarote de arriba, de almacén (lo pidió el usuario: «habilitar el camarote de arriba, el piso de arriba, como almacén», con «botes más grandes de cristal con bóvedas de humedad»). Solo Godot (0.37.6), con `Datos.CAL`.

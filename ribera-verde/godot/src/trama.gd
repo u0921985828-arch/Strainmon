@@ -398,44 +398,50 @@ func venta_mayor(N: String) -> void:
 	if S.mDay == S.day:
 		await say("Hoy ya he cargado. Mañana sale otro barco.", N)
 		return
-	var lots := bud_lots(100)
+	var VX: Dictionary = D.VENTA_EXTR
+	var lots := lotes_venta(100, VX.min)
 	if lots.is_empty():
-		await say("Al por mayor, de 100 g para arriba. Pago entre %s y %s € el gramo, según lo bueno que sea. Hasta %s por carga." % [_dos(precio_mayor(12)), _dos(precio_mayor(30)), _kg(mayor_dia())], N)
+		await say("Al por mayor, de 100 g para arriba. Pago entre %s y %s € el gramo, según lo bueno que sea. Hasta %s por carga." % [_dos(precio_mayor(12)), _dos(precio_mayor(30)), _kg(mayor_dia())] + (" Extracciones, de %d g para arriba." % int(VX.min) if Datos.CAL else ""), N)
 		return
-	var it := lots.map(lot_item)
+	var it := lots.map(venta_item)
 	it.append({"label": "Nada"})
 	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
 	if i < 0 or i >= lots.size():
 		await say("Otro día.", N)
 		return
-	var k: String = lots[i][0]
-	var b: Dictionary = lots[i][1]
-	var pg := Datos.jsround(precio_mayor(b.thc) * calidad(b) * (1.05 if rel("inaki") >= D.REL.amigo else 1.0) * 100) / 100.0   # 1.15: con confianza, un 5 % más
-	var tope := mini(int(floor(b.g)), mayor_dia())
+	var l: Array = lots[i]
+	var x := es_extr(l)
+	var k: String = l[0]
+	var b: Dictionary = l[1]
+	var pg := Datos.jsround((precio_extr(k, b.thc, "mayor") if x else precio_mayor(b.thc)) * calidad(b) * (1.05 if rel("inaki") >= D.REL.amigo else 1.0) * 100) / 100.0   # 1.15: con confianza, un 5 % más
 	var ops := []
-	for g in [100, 250, 500, 1000, 2000, 5000, 10000]:
-		if g < tope:
-			ops.append(g)
-	ops.append(tope)
+	if x:   # 1.43.7: la carga, en gramos de flor (1 g de extracción ↔ 1 / ROSIN.rend)
+		ops = ops_extr(b, mayor_dia() * D.ROSIN.rend, VX.g)
+	else:
+		var tope := mini(int(floor(b.g)), mayor_dia())
+		for g in [100, 250, 500, 1000, 2000, 5000, 10000]:
+			if g < tope:
+				ops.append(g)
+		ops.append(tope)
 	var o := []
 	for g in ops:
 		o.append("%s · %s" % [_kg(g), Datos.eur(g * pg)])
 	o.append("Nada")
-	var j: int = await ask("%s a %s € el gramo. ¿Cuánto cargas?" % [lot_nombre(k), _dos(pg)], o, N)
+	var j: int = await ask("%s a %s € el gramo. ¿Cuánto cargas?" % [venta_nombre(l), _dos(pg)], o, N)
 	if j < 0 or j >= ops.size():
 		return
 	var g: int = ops[j]
 	var e := Datos.jsround(g * pg)
-	use_buds(k, g)
+	usa_lote(l, g)
 	S.money += e
 	S.sales += e
 	S.mDay = S.day
-	S.heat = min(100, S.heat + 2 + g / 100.0)   # 1.10: antes, por cada 250 g
+	S.heat = min(100, S.heat + 2 + (g / D.ROSIN.rend if x else g) / 100.0)   # 1.10: antes, por cada 250 g
 	S.rep += 1
 	confia("inaki", 1)
 	sfx("coin")
 	await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
-	toast("+%s · %s al por mayor" % [Datos.eur(e), _kg(g)], 1600)
+	toast("+%s · %s %sal por mayor" % [Datos.eur(e), _kg(g), (extr_nombre(k, true).get_slice(" de ", 0) + " ") if x else ""], 1600)
 	await say("Cargado. Esta noche sale en el barco.", N)
 	heat_warn()
 	await check_story()
@@ -512,39 +518,45 @@ func talk_nerea():
 	if S.get("lonja") and S.day < int(S.lonja) + int(L.dias):
 		await say("Los barcos de fuera vuelven el %s. Tráelo entonces." % Datos.fd(int(S.lonja) + int(L.dias), S.day), N)
 		return
-	var lots := bud_lots(100)
+	var VX: Dictionary = D.VENTA_EXTR
+	var lots := lotes_venta(100, VX.min)
 	if lots.is_empty():
-		await say("Cargo para los barcos de fuera: de 100 a %d g, un %d %% por encima de lo que paga Iñaki. Cada %d días." % [int(L.g), Datos.jsround((L.f - 1) * 100), int(L.dias)], N)
+		await say("Cargo para los barcos de fuera: de 100 a %d g, un %d %% por encima de lo que paga Iñaki. Cada %d días." % [int(L.g), Datos.jsround((L.f - 1) * 100), int(L.dias)] + (" Extracciones, de %d g para arriba." % int(VX.min) if Datos.CAL else ""), N)
 		return
-	var it := lots.map(lot_item)
+	var it := lots.map(venta_item)
 	it.append({"label": "Nada"})
 	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
 	if i < 0 or i >= lots.size():
 		await say("Otro día.", N)
 		return
-	var k: String = lots[i][0]
-	var b: Dictionary = lots[i][1]
-	var pg := Datos.jsround(precio_mayor(b.thc) * calidad(b) * L.f * 100) / 100.0
-	var tope := mini(int(floor(b.g)), int(L.g))
+	var l: Array = lots[i]
+	var x := es_extr(l)
+	var k: String = l[0]
+	var b: Dictionary = l[1]
+	var pg := Datos.jsround((precio_extr(k, b.thc, "mayor") if x else precio_mayor(b.thc)) * calidad(b) * L.f * 100) / 100.0
 	var ops := []
-	for g in [100, 250]:
-		if g < tope:
-			ops.append(g)
-	ops.append(tope)
+	if x:
+		ops = ops_extr(b, L.g * D.ROSIN.rend, VX.g)
+	else:
+		var tope := mini(int(floor(b.g)), int(L.g))
+		for g in [100, 250]:
+			if g < tope:
+				ops.append(g)
+		ops.append(tope)
 	var o := []
 	for g in ops:
 		o.append("%s · %s" % [_kg(g), Datos.eur(g * pg)])
 	o.append("Nada")
-	var j: int = await ask("%s a %s € el gramo. ¿Cuánto cargas?" % [lot_nombre(k), _dos(pg)], o, N)
+	var j: int = await ask("%s a %s € el gramo. ¿Cuánto cargas?" % [venta_nombre(l), _dos(pg)], o, N)
 	if j < 0 or j >= ops.size():
 		return
 	var g: int = ops[j]
 	var e := Datos.jsround(g * pg)
-	use_buds(k, g)
+	usa_lote(l, g)
 	S.money += e
 	S.sales += e
 	S.lonja = S.day
-	S.heat = min(100, S.heat + 2 + g / 100.0)
+	S.heat = min(100, S.heat + 2 + (g / D.ROSIN.rend if x else g) / 100.0)
 	S.rep += 1
 	sfx("coin")
 	await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
@@ -3043,32 +3055,35 @@ func vender_club(k: String) -> void:
 	if S.clubDia.get(k) == S.day:
 		await say("Hoy ya hemos cerrado caja. Mañana.", N)
 		return
-	var lots := bud_lots(D.CLUB.g[0])
+	var VX: Dictionary = D.VENTA_EXTR
+	var lots := lotes_venta(D.CLUB.g[0], VX.club_g[0])
 	if lots.is_empty():
-		await say("De %d g para arriba, entre %s y %s € el gramo según el THC. Una entrega al día." % [int(D.CLUB.g[0]), _dos(precio_club(12)), _dos(precio_club(30))], N)
+		await say("De %d g para arriba, entre %s y %s € el gramo según el THC. Una entrega al día." % [int(D.CLUB.g[0]), _dos(precio_club(12)), _dos(precio_club(30))] + (" Extracciones, de %d g para arriba." % int(VX.club_g[0]) if Datos.CAL else ""), N)
 		return
-	var it := lots.map(lot_item)
+	var it := lots.map(venta_item)
 	it.append({"label": "Nada"})
 	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
 	if i < 0 or i >= lots.size():
 		return
-	var kk: String = lots[i][0]
-	var b: Dictionary = lots[i][1]
-	var pg := Datos.jsround(precio_club(b.thc) * calidad(b) * (1.05 if b.get("ana") else 1.0) * 100) / 100.0
+	var l: Array = lots[i]
+	var x := es_extr(l)
+	var kk: String = l[0]
+	var b: Dictionary = l[1]
+	var pg := Datos.jsround((precio_extr(kk, b.thc, "club") if x else precio_club(b.thc)) * calidad(b) * (1.05 if b.get("ana") else 1.0) * 100) / 100.0
 	var ops := []
-	for g in D.CLUB.g:
+	for g in (VX.club_g if x else D.CLUB.g):
 		if g <= floor(b.g):
 			ops.append(int(g))
 	var o := []
 	for g in ops:
 		o.append("%d g · %s" % [g, Datos.eur(g * pg)])
 	o.append("Nada")
-	var j: int = await ask("%s a %s € el gramo%s. ¿Cuánto?" % [lot_nombre(kk), _dos(pg), " (analizado)" if b.get("ana") else ""], o, N)
+	var j: int = await ask("%s a %s € el gramo%s. ¿Cuánto?" % [venta_nombre(l), _dos(pg), " (analizado)" if b.get("ana") else ""], o, N)
 	if j < 0 or j >= ops.size():
 		return
 	var g: int = ops[j]
 	var e := Datos.jsround(g * pg)
-	use_buds(kk, g)
+	usa_lote(l, g)
 	S.money += e
 	S.sales += e
 	S.heat = min(100, S.heat + D.CLUB.calor)
@@ -3077,7 +3092,7 @@ func vender_club(k: String) -> void:
 	confia(k, 2)
 	sfx("coin")
 	await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
-	toast("+%s · %d g al club" % [Datos.eur(e), g], 1600)
+	toast("+%s · %d g %sal club" % [Datos.eur(e), g, ("de " + extr_nombre(kk, true).get_slice(" de ", 0) + " ") if x else ""], 1600)
 	await say("Por la puerta de atrás, como siempre. Gracias.", N)
 	await check_story()
 
@@ -5108,35 +5123,40 @@ func dispensario_aso() -> void:
 	var O: Dictionary = D.ASO
 	var L = A.lote
 	if L is Dictionary:
-		await say("En el dispensario quedan %s de %s, a %s € el gramo. Llevas %s." % [g_txt(L.g), lot_nombre(L.k), _dos(L.pg), Datos.eur(L.tot)], N)
+		await say("En el dispensario quedan %s de %s, a %s € el gramo. Llevas %s." % [g_txt(L.g), extr_nombre(L.k, true) if L.get("x") else lot_nombre(L.k), _dos(L.pg), Datos.eur(L.tot)], N)
 		return
-	var lots := bud_lots(O.g[0])
+	var VX: Dictionary = D.VENTA_EXTR
+	var lots := lotes_venta(O.g[0], VX.club_g[0])
 	if lots.is_empty():
 		await say("Déjame %d g o más y los socios lo retiran, %d g al día. El dinero, a tu buzón." % [int(O.g[0]), int(O.dia)], N)
 		return
-	var it := lots.map(lot_item)
+	var it := lots.map(venta_item)
 	it.append({"label": "Nada"})
 	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
 	if i < 0 or i >= lots.size():
 		return
-	var k: String = lots[i][0]
-	var b: Dictionary = lots[i][1]
-	var pg := Datos.jsround(precio_club(b.thc) * calidad(b) * float(O.f) * 100) / 100.0
+	var l: Array = lots[i]
+	var x := es_extr(l)
+	var k: String = l[0]
+	var b: Dictionary = l[1]
+	var pg := Datos.jsround((precio_extr(k, b.thc, "club") if x else precio_club(b.thc)) * calidad(b) * float(O.f) * 100) / 100.0
 	var ops := []
-	for g in O.g:
+	for g in (VX.club_g if x else O.g):
 		if g <= floor(b.g):
 			ops.append(int(g))
 	var o := []
 	for g in ops:
 		o.append("%d g · %s" % [g, Datos.eur(g * pg)])
 	o.append("Nada")
-	var j: int = await ask("%s a %s € el gramo para los socios. ¿Cuánto dejas?" % [lot_nombre(k), _dos(pg)], o, N)
+	var j: int = await ask("%s a %s € el gramo para los socios. ¿Cuánto dejas?" % [venta_nombre(l), _dos(pg)], o, N)
 	if j < 0 or j >= ops.size():
 		return
-	use_buds(k, ops[j])
+	usa_lote(l, ops[j])
 	A.lote = {"k": k, "g": ops[j], "pg": pg, "tot": 0}
+	if x:   # 1.43.7: de una extracción retiran VENTA_EXTR.dia de lo de la flor
+		A.lote.x = true
 	sfx("sel")
-	await say("Al dispensario. Cada mañana, %d g para los socios." % int(O.dia), N)
+	await say("Al dispensario. Cada mañana, %s para los socios." % g_txt(O.dia * (VX.dia if x else 1.0)), N)
 
 # al amanecer (curro_dia): la asamblea, si toca, y lo que retiran los socios del dispensario
 func aso_dia() -> void:
@@ -5157,7 +5177,7 @@ func aso_dia() -> void:
 	var L = A.lote
 	if not A.pres or not (L is Dictionary):
 		return
-	var g = min(L.g, O.dia)
+	var g = min(L.g, O.dia * (D.VENTA_EXTR.dia if L.get("x") else 1.0))
 	var e := Datos.jsround(g * L.pg)
 	L.g -= g
 	L.tot += e

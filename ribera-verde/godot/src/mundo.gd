@@ -530,6 +530,44 @@ func base_extr(k: String) -> String:
 func kief_lots(mn: float) -> Array:
 	return rosin_lots(mn).filter(func(l): return D.EXTR[tipo_extr(l[0])].get("kief"))
 
+# 1.43.7 (lo pidió el usuario: «las extracciones se deberían poder vender al por mayor, en clubs y donde se pueda vender cogollos»;
+# con Datos.CAL): los lotes que se venden, los cogollos [k, b] y detrás las extracciones de encima [k, b, true], a precio_rosin × su
+# px × VENTA_EXTR[canal] (al por mayor la mitad, en el club tres cuartos: lo que pagan por la flor frente a la calle)
+func lotes_venta(mn: float, mnx: float) -> Array:
+	var o := bud_lots(mn)
+	if Datos.CAL:
+		for l in rosin_lots(mnx):
+			o.append([l[0], l[1], true])
+	return o
+
+func es_extr(l: Array) -> bool:
+	return l.size() > 2 and l[2] == true
+
+func venta_item(l: Array) -> Dictionary:
+	return rosin_item(l) if es_extr(l) else lot_item(l)
+
+func venta_nombre(l: Array) -> String:
+	return extr_nombre(l[0]) if es_extr(l) else lot_nombre(l[0])
+
+func precio_extr(k: String, thc: float, canal: String) -> float:
+	return precio_rosin(thc) * float(D.EXTR[tipo_extr(k)].px) * float(D.VENTA_EXTR[canal])
+
+func usa_lote(l: Array, g: float) -> void:
+	if es_extr(l):
+		use_rosin(l[0], g)
+	else:
+		use_buds(l[0], g)
+
+# las cantidades de una extracción: las de VENTA_EXTR que caben y, al final, lo que hay (hasta el tope)
+func ops_extr(b: Dictionary, tope: float, gs: Array) -> Array:
+	var t: int = int(floor(minf(b.g, tope)))
+	var o := []
+	for g in gs:
+		if g < t:
+			o.append(int(g))
+	o.append(t)
+	return o
+
 func mayor_lote(l: Array):
 	var a = null
 	for x in l:
