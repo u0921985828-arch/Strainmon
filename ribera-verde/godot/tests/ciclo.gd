@@ -440,7 +440,7 @@ func titulo_e_intro() -> void:
 	if not oye:
 		print("  en silencio: ", mudos, " · ", mudos.map(func(k): return pico(so.efectos[k] if so.efectos.has(k) else so.temas[k])))
 	var ogg: int = so.temas.values().filter(func(w): return w is AudioStreamOggVorbis).size()
-	check("sonido: %d efectos y %d canciones (%d grabadas, todas las de musica/), ninguno en silencio" % [so.efectos.size(), so.temas.size(), ogg], so.listo and so.efectos.size() == 12 and so.temas.size() == so.total and ogg == so.grabadas.size() and ogg >= 40 and oye)
+	check("sonido: %d efectos y %d canciones (%d grabadas, todas las de musica/), ninguno en silencio" % [so.efectos.size(), so.temas.size(), ogg], so.listo and so.efectos.size() == 15 and so.temas.size() == so.total and ogg == so.grabadas.size() and ogg >= 40 and oye)
 	# (la del título se apaga en 0,3 s y la nueva entra a los 0,4 s)
 	await hasta(func(): return so.actual == "home" and so.musica.playing and so.musica.stream == so.temas.home, 120)
 	check("en la intro suena la música de casa, tras el fundido", so.actual == "home" and so.musica.playing and so.musica.stream == so.temas.home)

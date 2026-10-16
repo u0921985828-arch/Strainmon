@@ -2520,6 +2520,7 @@ func diploma_action():
 	var j: int = await ask("¿Qué combinación pruebas?", ops + ["Dejarlo"])
 	if j < 0 or j >= ops.size():
 		return
+	await acceso("rueda", ops[j], int(ops[j]) == int(D.CAJA_ANIO))   # 1.53: las cuatro ruedas
 	if int(ops[j]) != int(D.CAJA_ANIO):
 		sfx("bump")
 		await say("Clac. No se abre.")
@@ -2574,6 +2575,10 @@ func _hueco(C: Dictionary) -> float:
 
 # 1.36 (lo pidió el usuario): al abrirla, la caja por dentro (rects_almacen): los billetes abren el menú de siempre y un tarro, sacarlo
 func caja_action():
+	if int(S.caja.nivel) == 1:   # 1.53: la rueda de la tía o, la empotrada, su teclado
+		await acceso("rueda", "%04d" % int(D.CAJA_ANIO))
+	else:
+		await acceso("clave", cifras_acceso("caja"))
 	if not S.flags.get("cajaSem"):
 		await sobre_caja()
 	var i := 0
@@ -4466,6 +4471,17 @@ func entra_local(d: Dictionary):
 			atras_puerta()
 			if not await entrada_disco():
 				return
+	match t:   # 1.53: lo tuyo se abre con su llave, su candado o su clave
+		"nave":
+			await acceso("candado")
+			await acceso("clave", cifras_acceso("nave"))
+		"setas":
+			await acceso("candado")
+		"neg", "franco":
+			await acceso("llave")
+		"club":
+			if D.CLUBS[gk[1]].get("tuyo"):
+				await acceso("llave")
 	await warp(d)
 
 func atras_puerta() -> void:
@@ -8834,3 +8850,230 @@ func vender_legal(N: String) -> void:
 	update_hud()
 	queue("historia", check_story)
 	await say("%s de %s, con factura: %s a la cuenta." % [_kg(int(g)), lot_nombre(l[0]), Datos.eur(e)], N)
+
+# ---------- abrir con llave, candado, teclado o rueda (1.53, lo pidió el usuario: «simulando teclear una clave o meter una llave, como
+# animación… que ese toque a la A sea más realista o acompañado de algo gráfico»). Con CAL: un momento en el centro de la pantalla
+# (rects_acceso, pinta.gd) con su sonido; A o B lo pasan. Tipos: llave (cerradura de una puerta), candado (persiana o puerta con
+# candado), clave (teclado de alarma o de la caja empotrada), pin (cajero: la tarjeta y el PIN) y rueda (la caja de la tía, 4 cifras)
+var ACCESO_V = null   # {k: tipo, c: las cifras, ok, t0}
+var gancho_acceso := Callable()   # (tipo, cifras, ok) · las pruebas lo apuntan sin esperar
+const ACC_W := 104
+const ACC_H := 84
+const ACC_TECLA := 230   # ms por cifra
+const ACC_GLIFO := {"0": "111101101101111", "1": "010110010010111", "2": "111001111100111", "3": "111001111001111",
+	"4": "101101111001001", "5": "111100111001111", "6": "111100111101111", "7": "111001010010010", "8": "111101111101111",
+	"9": "111101111001111", "*": "101010111010101", "#": "0101011111010101111101010", "·": "111111111"}
+
+# las cifras de una cerradura de teclado (siempre las mismas para cada cosa y cada partida)
+func cifras_acceso(k: String) -> String:
+	return "%04d" % (absi(("%s|%s" % [S.name, k]).hash()) % 10000)
+
+# cuándo acaba cada parte: [la llave entra o la tarjeta, la primera cifra, la última cifra, el clic, el final]
+func tiempos_acceso(V: Dictionary) -> Dictionary:
+	var k: String = V.k
+	var n: int = maxi(1, str(V.c).length())
+	match k:
+		"llave", "candado":
+			return {"entra": 420.0, "gira": 760.0, "fin": 1000.0}
+		"clave":
+			return {"t1": 150.0, "clic": 150.0 + n * ACC_TECLA + 60, "fin": 150.0 + n * ACC_TECLA + 360}
+		"pin":
+			return {"entra": 400.0, "t1": 450.0, "clic": 450.0 + n * ACC_TECLA + 60, "fin": 450.0 + n * ACC_TECLA + 360}
+		"rueda":
+			return {"para": 350.0, "cada": 220.0, "clic": 350.0 + (n - 1) * 220 + 60, "fin": 350.0 + (n - 1) * 220 + 400}
+	return {"fin": 600.0}
+
+func acceso(k: String, c := "", ok := true) -> void:
+	if not Datos.CAL:
+		return
+	if gancho_acceso.is_valid():
+		gancho_acceso.call(k, c, ok)
+		return
+	var V := {"k": k, "c": c, "ok": ok, "t0": M.reloj}
+	var T := tiempos_acceso(V)
+	var pr := Motor.Prom.new()
+	var st := {"fuera": false}
+	var cierra := func():
+		if not st.fuera:
+			st.fuera = true
+			pop()
+		pr.res(0)
+	var suena := func(ms: float, s: String):
+		M.timeout(func():
+			if not pr.listo:
+				sfx(s), ms)
+	match k:
+		"llave", "candado":
+			suena.call(T.entra, "tick")
+			suena.call(T.gira, "llave")
+		"clave", "pin":
+			for i in str(c).length():
+				suena.call(T.t1 + i * ACC_TECLA, "tecla")
+			suena.call(T.clic, "sel" if ok else "bad")
+		"rueda":
+			for i in str(c).length():
+				suena.call(T.para + i * T.cada, "tick")
+			suena.call(T.clic, "llave" if ok else "clac")
+	ACCESO_V = V
+	push(func(b: String):
+		if b == "A" or b == "B":
+			cierra.call())
+	M.timeout(cierra, T.fin + 250)
+	await Motor.espera(pr)
+	ACCESO_V = null
+
+func _glifo(R: Array, ch: String, x: int, y: int, s: int, col: String) -> void:
+	var g: String = ACC_GLIFO.get(ch, "")
+	var w: int = 5 if g.length() == 25 else 3
+	if w == 5:
+		x -= s
+	for i in g.length():
+		if g[i] == "1":
+			R.append([x + (i % w) * s, y + (i / w) * s, s, s, col])
+
+static func _suave(a: float) -> float:
+	a = clampf(a, 0, 1)
+	return a * a * (3 - 2 * a)
+
+# los rectángulos [x, y, w, h, color] del momento t (ms desde que empezó)
+func rects_acceso(V: Dictionary, now: float) -> Array:
+	var R := []
+	var t: float = now - float(V.t0)
+	var T := tiempos_acceso(V)
+	var x0: int = (SW - ACC_W) >> 1
+	var y0: int = (SH - ACC_H) >> 1
+	var cx: int = x0 + (ACC_W >> 1)
+	var cy: int = y0 + (ACC_H >> 1)
+	var k: String = V.k
+	var c: String = str(V.c)
+	R.append([x0 - 2, y0 - 2, ACC_W + 4, ACC_H + 4, "#26262e"])
+	match k:
+		"llave":   # la puerta de madera, el escudo de latón y la llave que entra por la derecha y gira
+			R.append([x0, y0, ACC_W, ACC_H, "#6a4a30"])
+			for xx in range(x0 + 11, x0 + ACC_W, 12):
+				R.append([xx, y0, 1, ACC_H, "#5a3c26"])
+			R.append([cx - 8, cy - 22, 16, 44, "#b08a3a"])
+			R.append([cx - 8, cy - 22, 16, 1, "#d8b860"])
+			R.append([cx - 8, cy - 22, 1, 44, "#d8b860"])
+			R.append([cx - 8, cy + 21, 16, 1, "#7a5a20"])
+			R.append([cx + 7, cy - 22, 1, 44, "#7a5a20"])
+			R.append([cx - 5, cy - 18, 10, 6, "#8a6a28"])   # el pomo, encima
+			R.append([cx - 3, cy - 6, 6, 5, "#101010"])
+			R.append([cx - 1, cy - 2, 2, 7, "#101010"])
+			_llave_h(R, t, T, cx + 2, cy - 4, "#6a4a30")
+		"candado":   # la persiana de chapa y el candado: la llave sube por debajo, gira y salta el arco
+			R.append([x0, y0, ACC_W, ACC_H, "#7a7e86"])
+			for yy in range(y0 + 3, y0 + ACC_H, 5):
+				R.append([x0, yy, ACC_W, 1, "#5e626a"])
+			R.append([x0, cy - 6, ACC_W, 4, "#9a9ea6"])   # el pasador
+			var lift: int = Datos.jsround(_suave((t - T.gira) / 160.0) * 6) if V.ok else 0
+			R.append([cx - 8, cy - 15 - lift, 16, 3, "#b8bcc4"])
+			R.append([cx - 8, cy - 15 - lift, 3, 13, "#b8bcc4"])
+			R.append([cx + 5, cy - 15 - lift, 3, 13 + (lift if lift else 0), "#b8bcc4"])
+			R.append([cx - 7, cy - 15 - lift, 1, 13, "#e0e4ec"])
+			R.append([cx - 10, cy - 2, 20, 18, "#c09838"])
+			R.append([cx - 10, cy - 2, 20, 2, "#e0c060"])
+			R.append([cx - 10, cy + 14, 20, 2, "#806020"])
+			R.append([cx - 1, cy + 7, 3, 5, "#101010"])
+			_llave_v(R, t, T, cx - 1, cy + 12, "#7a7e86")
+		"clave", "pin":
+			_teclado(R, V, t, T, cx, y0 + (14 if k == "pin" else 6))
+		"rueda":   # la puerta de la caja: cuatro ruedas que se paran en su cifra y la manilla que gira
+			R.append([x0, y0, ACC_W, ACC_H, "#3a4048"])
+			R.append([x0 + 5, y0 + 5, ACC_W - 10, ACC_H - 10, "#5a6068"])
+			R.append([x0 + 5, y0 + 5, ACC_W - 10, 1, "#7a8088"])
+			R.append([x0 + 5, y0 + 5, 1, ACC_H - 10, "#7a8088"])
+			var n := c.length()
+			var wx: int = cx - (n * 16 - 4) / 2
+			for i in n:
+				var para: float = T.para + i * T.cada
+				var d: int = int(c[i])
+				if t < para:
+					d = (d + int((para - t) / 60.0) + 1) % 10
+				R.append([wx + i * 16, cy - 22, 12, 16, "#101418"])
+				R.append([wx + i * 16, cy - 22, 12, 1, "#000000"])
+				_glifo(R, str(d), wx + i * 16 + 3, cy - 19, 2, "#e8e0c0" if t >= para else "#a09880")
+			var led: String = "#c03030"
+			if t >= T.clic:
+				led = "#40e060" if V.ok else ("#ff4040" if int(t / 120.0) % 2 == 0 else "#601010")
+			R.append([x0 + ACC_W - 16, y0 + 10, 5, 5, led])
+			var gi: float = _suave((t - T.clic) / 220.0) if V.ok else 0.0
+			var mx: int = cx + (Datos.jsround(sin(t / 30.0)) if not V.ok and t >= T.clic and t < T.clic + 300 else 0)
+			R.append([mx - 5, cy + 6, 10, 10, "#a0a4ac"])
+			R.append([mx - 3, cy + 8, 6, 6, "#7a8088"])
+			if gi < .34:   # la manilla, de pie
+				R.append([mx - 1, cy - 1, 3, 24, "#c8ccd4"])
+			elif gi < .67:   # en diagonal
+				for q in 6:
+					R.append([mx - 8 + q * 3, cy + 18 - q * 3, 3, 3, "#c8ccd4"])
+			else:   # tumbada: abierta
+				R.append([mx - 12, cy + 10, 24, 3, "#c8ccd4"])
+	if (k == "llave" or k == "candado") and t >= T.gira and t < T.gira + 220:   # el clic
+		var py: int = cy - 4 if k == "llave" else cy + 9
+		for q in [[-8, 0, 3, 1], [6, 0, 3, 1], [0, -8, 1, 3], [0, 6, 1, 3], [-6, -6, 2, 2], [5, -6, 2, 2]]:
+			R.append([cx + q[0], py + q[1], q[2], q[3], "#f8e070"])
+	return R
+
+# la llave de lado: entra hasta la punta (px) y la cabeza gira (se ve de canto)
+func _llave_h(R: Array, t: float, T: Dictionary, px: int, py: int, fondo: String) -> void:
+	var kx: int = px + Datos.jsround((1 - _suave(t / T.entra)) * 18)
+	var a: float = _suave((t - T.entra) / (T.gira - T.entra)) * PI / 2
+	var bx: int = kx + 20
+	R.append([maxi(kx, px), py, bx - maxi(kx, px), 3, "#c8ccd4"])
+	R.append([maxi(kx, px), py + 2, bx - maxi(kx, px), 1, "#8a8e98"])
+	if a < PI / 4:
+		for o in [3, 7, 11, 15]:
+			if kx + o >= px:
+				R.append([kx + o, py + 3, 2, 2, "#a8acb4"])
+	var bw: int = maxi(2, Datos.jsround(10 * cos(a)))
+	R.append([bx + 5 - (bw >> 1), py - 4, bw, 11, "#c8ccd4"])
+	if bw > 5:
+		R.append([bx + 5 - 2, py, 4, 3, fondo])
+
+# la llave de abajo arriba (el candado)
+func _llave_v(R: Array, t: float, T: Dictionary, px: int, py: int, fondo: String) -> void:
+	var ky: int = py + Datos.jsround((1 - _suave(t / T.entra)) * 7) - 4
+	var a: float = _suave((t - T.entra) / (T.gira - T.entra)) * PI / 2
+	var by: int = ky + 14
+	R.append([px, maxi(ky, py), 3, by - maxi(ky, py), "#c8ccd4"])
+	var bw: int = maxi(2, Datos.jsround(9 * cos(a)))
+	R.append([px + 1 - (bw >> 1), by, bw, 9, "#c8ccd4"])
+	if bw > 5:
+		R.append([px - 1, by + 3, 4, 3, fondo])
+
+# el teclado: pantalla con asteriscos, el piloto y 12 teclas; con la tarjeta (pin), la ranura arriba
+func _teclado(R: Array, V: Dictionary, t: float, T: Dictionary, cx: int, ty: int) -> void:
+	var x0: int = (SW - ACC_W) >> 1
+	var y0: int = (SH - ACC_H) >> 1
+	R.append([x0, y0, ACC_W, ACC_H, "#4a4e56" if V.k == "pin" else "#8a7e6a"])
+	R.append([cx - 24, ty, 48, 62, "#d0d0c8"])
+	R.append([cx - 24, ty, 48, 1, "#f0f0e8"])
+	R.append([cx - 24, ty + 61, 48, 1, "#909088"])
+	var c: String = str(V.c)
+	if V.k == "pin":   # la tarjeta entra por la ranura
+		var vis: int = Datos.jsround(14 - _suave(t / T.entra) * 11)
+		R.append([cx - 14, ty + 1, 28, 2, "#101010"])
+		R.append([cx - 12, ty + 1 - vis, 24, vis, "#3070c0"])
+		if vis > 6:
+			R.append([cx - 8, ty + 1 - vis + 2, 5, 4, "#d0b040"])
+	R.append([cx - 20, ty + 5, 32, 11, "#183018"])
+	var hechas: int = clampi(int(floor((t - T.t1) / ACC_TECLA)) + 1, 0, c.length()) if t >= T.t1 else 0
+	for i in hechas:
+		_glifo(R, "·", cx - 18 + i * 6, ty + 9, 1, "#80f080")
+	var led: String = "#c03030"
+	if t >= T.clic:
+		led = "#40e060" if V.ok else ("#ff4040" if int(t / 120.0) % 2 == 0 else "#601010")
+	R.append([cx + 15, ty + 8, 5, 5, led])
+	var pulsa := ""
+	if t >= T.t1 and t < T.t1 + c.length() * ACC_TECLA and fmod(t - T.t1, ACC_TECLA) < 150:
+		pulsa = c[int((t - T.t1) / ACC_TECLA)]
+	var teclas := "123456789*0#"
+	for i in 12:
+		var bx: int = cx - 19 + (i % 3) * 14
+		var by: int = ty + 20 + (i / 3) * 10
+		var ch: String = teclas[i]
+		var p: bool = ch == pulsa
+		R.append([bx, by + (1 if p else 0), 11, 8, "#58d080" if p else "#b8b8c0"])
+		if not p:
+			R.append([bx, by + 7, 11, 1, "#80808a"])
+		_glifo(R, ch, bx + 4, by + 2 + (1 if p else 0), 1, "#303038")

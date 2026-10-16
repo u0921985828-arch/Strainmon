@@ -1684,6 +1684,7 @@ func cantidad(t: String, mx: int) -> int:
 	return v[i] if i >= 0 and i < v.size() else 0
 
 func cajero() -> void:
+	await acceso("pin", cifras_acceso("pin"))   # 1.53: la tarjeta y el PIN
 	while true:
 		var ops := ["Sacar", "Ingresar", "Movimientos", "Salir"]
 		var oi: int = await ask("CAJERO · en la cuenta tienes %s." % Datos.eur(S.banco), ops)

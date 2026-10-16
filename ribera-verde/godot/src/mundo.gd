@@ -1690,7 +1690,10 @@ func on_step_end() -> void:
 		if door.get("gate"):   # 1.30: la puerta de un local (entra_local, trama.gd)
 			run(func(): await entra_local(door))
 		else:
-			run(func(): await warp(door))
+			run(func():
+				if door.to == "home" and S.map != "home":   # 1.53: la llave del piso
+					await acceso("llave")
+				await warp(door))
 		return
 	if (S.map == "disco" or S.map == "disco-vip") and not disco_abierta():
 		run(func(): await echar_disco())
@@ -3280,6 +3283,12 @@ func montar_club(mapa: String) -> void:
 
 func ordenar(_mapa: String) -> void:   # trama
 	pass
+
+func acceso(_k: String, _c := "", _ok := true) -> void:   # trama (1.53)
+	pass
+
+func cifras_acceso(_k: String) -> String:   # trama
+	return ""
 
 # el marco de la pieza en el cursor: verde si cabe, rojo si no; y la casilla de su gente, en azul
 func rects_orden() -> Array:

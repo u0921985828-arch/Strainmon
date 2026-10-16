@@ -1,5 +1,17 @@
 # Cambios
 
+## 1.53.0 · Godot 0.45.0
+
+Lo que pidió el usuario tras la 1.52.1 («que funcionen con una clave o simulando teclear una clave o meter una llave, como animación… que ese toque a la A sea más realista o acompañado de algo gráfico»). Solo Godot, con `Datos.CAL`.
+
+- **Abrir lo tuyo se ve**: al pulsar A en lo que se abre con llave o con clave, un momento en el centro de la pantalla con su sonido (A o B lo pasan):
+  - el portal del piso, los locales alquilados, el piso franco y el club KAIA: la puerta de madera con su escudo de latón, la llave que entra, gira y hace clic;
+  - la nave: el candado de la persiana (la llave sube, gira y salta el arco) y el teclado de la alarma, con sus 4 cifras;
+  - el bajo de Txomin: su candado;
+  - el cajero: la tarjeta entra por la ranura y se teclea el PIN, con el piloto rojo y luego verde;
+  - la caja fuerte de la tía: las cuatro ruedas que giran y se paran en su cifra, el piloto y la manilla que gira (con una combinación mala, el piloto parpadea en rojo y la manilla no se mueve); la empotrada, con su teclado.
+- Dibujado en código, en píxeles (`rects_acceso`, `_teclado`, `_llave_h`, `_llave_v` y una letra de 3 × 5 para las cifras, `ACC_GLIFO`), y tres sonidos nuevos: la tecla, la llave y el «clac» (`sonido.gd`). Las cifras de cada teclado son siempre las mismas en cada partida (`cifras_acceso`). Prueba `tests/acceso.gd`.
+
 ## 1.52.1 · Godot 0.45.0
 
 Lo que pidió el usuario tras probar la 1.52 («cómo va a estar el mueble de ordenar una sala en otra»). Solo Godot, con `Datos.CAL`.

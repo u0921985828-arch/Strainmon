@@ -55,7 +55,7 @@ func init() -> void:
 		var v := AudioStreamPlayer.new()
 		add_child(v)
 		voces.append(v)
-	for k in ["blip", "tick", "sel", "back", "bump", "door", "coin", "get", "hit", "hurt", "enc", "bad"]:
+	for k in ["blip", "tick", "sel", "back", "bump", "door", "coin", "get", "hit", "hurt", "enc", "bad", "tecla", "llave", "clac"]:
 		efectos[k] = _efecto(k)
 	for k in [1, 2, 3]:
 		var g := PackedFloat32Array()
@@ -174,6 +174,16 @@ func _efecto(k: String) -> AudioStreamWAV:
 		"bad":
 			_tono(b, 220, t, .18, "square", .15)
 			_tono(b, 160, t + .18, .35, "square", .15)
+		"tecla":   # 1.53: una tecla del teclado
+			_tono(b, 1560, t, .035, "square", .07)
+		"llave":   # 1.53: el pestillo, dos chasquidos de metal
+			_ruido(b, t, .025, .25)
+			_tono(b, 2400, t, .02, "square", .06)
+			_ruido(b, t + .07, .035, .3)
+			_tono(b, 1800, t + .07, .025, "square", .07)
+		"clac":   # 1.53: no abre
+			_tono(b, 160, t, .07, "triangle", .3)
+			_ruido(b, t, .04, .2)
 	var fin := b.size()
 	while fin > 1 and absf(b[fin - 1]) < 1e-5:
 		fin -= 1
