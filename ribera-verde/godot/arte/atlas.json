@@ -2844,272 +2844,278 @@
    "w": 32,
    "h": 48
   },
-  "detalle-alto/d-counter-comisaria-0/unica/00": {
+  "detalle-alto/d-bench-loc-ibar/unica/00": {
    "x": 512,
+   "y": 2296,
+   "w": 32,
+   "h": 48
+  },
+  "detalle-alto/d-counter-comisaria-0/unica/00": {
+   "x": 544,
    "y": 2296,
    "w": 32,
    "h": 48
   },
   "detalle-alto/d-counter-comisaria-1/unica/00": {
-   "x": 544,
+   "x": 576,
    "y": 2296,
    "w": 32,
    "h": 48
   },
   "detalle-alto/d-counter-comisaria-2/unica/00": {
-   "x": 576,
+   "x": 608,
    "y": 2296,
    "w": 32,
    "h": 48
   },
   "detalle-alto/d-counter-growcity-0/unica/00": {
-   "x": 608,
+   "x": 640,
    "y": 2296,
    "w": 32,
    "h": 48
   },
   "detalle-alto/d-counter-growcity-1/unica/00": {
-   "x": 640,
+   "x": 672,
    "y": 2296,
    "w": 32,
    "h": 48
   },
   "detalle-alto/d-counter-growcity-2/unica/00": {
-   "x": 672,
+   "x": 704,
    "y": 2296,
    "w": 32,
    "h": 48
   },
   "detalle-alto/d-counter-shop-0/unica/00": {
-   "x": 704,
+   "x": 736,
    "y": 2296,
    "w": 32,
    "h": 48
   },
   "detalle-alto/d-counter-shop-1/unica/00": {
-   "x": 736,
+   "x": 768,
    "y": 2296,
    "w": 32,
    "h": 48
   },
   "detalle-alto/d-counter-shop-2/unica/00": {
-   "x": 768,
+   "x": 800,
    "y": 2296,
    "w": 32,
    "h": 48
   },
   "detalle-alto/d-crate-astilleros/unica/00": {
-   "x": 800,
-   "y": 2296,
-   "w": 32,
-   "h": 48
-  },
-  "detalle-alto/d-crate-puerto/unica/00": {
    "x": 832,
    "y": 2296,
    "w": 32,
    "h": 48
   },
-  "detalle-alto/d-crate/unica/00": {
+  "detalle-alto/d-crate-puerto/unica/00": {
    "x": 864,
    "y": 2296,
    "w": 32,
    "h": 48
   },
-  "detalle-alto/d-display-0/unica/00": {
+  "detalle-alto/d-crate/unica/00": {
    "x": 896,
    "y": 2296,
    "w": 32,
    "h": 48
   },
-  "detalle-alto/d-display-1/unica/00": {
+  "detalle-alto/d-display-0/unica/00": {
    "x": 928,
    "y": 2296,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-barcounter/unica/00": {
+  "detalle-alto/d-display-1/unica/00": {
    "x": 960,
    "y": 2296,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-barraD/unica/00": {
+  "escala-alto/e-barcounter/unica/00": {
    "x": 992,
    "y": 2296,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-barrilT/unica/00": {
+  "escala-alto/e-barraD/unica/00": {
    "x": 0,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-bench/unica/00": {
+  "escala-alto/e-barrilT/unica/00": {
    "x": 32,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-btable/unica/00": {
+  "escala-alto/e-bench/unica/00": {
    "x": 64,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-cajaL/unica/00": {
+  "escala-alto/e-btable/unica/00": {
    "x": 96,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-cambioL/unica/00": {
+  "escala-alto/e-cajaL/unica/00": {
    "x": 128,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-counter/unica/00": {
+  "escala-alto/e-cambioL/unica/00": {
    "x": 160,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-display/unica/00": {
+  "escala-alto/e-counter/unica/00": {
    "x": 192,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-jukebox/unica/00": {
+  "escala-alto/e-display/unica/00": {
    "x": 224,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-lab/unica/00": {
+  "escala-alto/e-jukebox/unica/00": {
    "x": 256,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-lab2/unica/00": {
+  "escala-alto/e-lab/unica/00": {
    "x": 288,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-lavaL/unica/00": {
+  "escala-alto/e-lab2/unica/00": {
    "x": 320,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-mesaC/unica/00": {
+  "escala-alto/e-lavaL/unica/00": {
    "x": 352,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-mesita-ensanche/unica/00": {
+  "escala-alto/e-mesaC/unica/00": {
    "x": 384,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-mesita-fundicion/unica/00": {
+  "escala-alto/e-mesita-ensanche/unica/00": {
    "x": 416,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-mesita-itsaso/unica/00": {
+  "escala-alto/e-mesita-fundicion/unica/00": {
    "x": 448,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-mesita-kalea/unica/00": {
+  "escala-alto/e-mesita-itsaso/unica/00": {
    "x": 480,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-mesita/unica/00": {
+  "escala-alto/e-mesita-kalea/unica/00": {
    "x": 512,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-pc/unica/00": {
+  "escala-alto/e-mesita/unica/00": {
    "x": 544,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-secaL/unica/00": {
+  "escala-alto/e-pc/unica/00": {
    "x": 576,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-table/unica/00": {
+  "escala-alto/e-secaL/unica/00": {
    "x": 608,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-vitrina-ensanche/unica/00": {
+  "escala-alto/e-table/unica/00": {
    "x": 640,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-vitrina-fundicion/unica/00": {
+  "escala-alto/e-vitrina-ensanche/unica/00": {
    "x": 672,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-vitrina-itsaso/unica/00": {
+  "escala-alto/e-vitrina-fundicion/unica/00": {
    "x": 704,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-vitrina-kalea/unica/00": {
+  "escala-alto/e-vitrina-itsaso/unica/00": {
    "x": 736,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-alto/e-vitrina/unica/00": {
+  "escala-alto/e-vitrina-kalea/unica/00": {
    "x": 768,
    "y": 2344,
    "w": 32,
    "h": 48
   },
-  "escala-ancho/e-sofaB-ensanche/unica/00": {
+  "escala-alto/e-vitrina/unica/00": {
    "x": 800,
+   "y": 2344,
+   "w": 32,
+   "h": 48
+  },
+  "escala-ancho/e-sofaB-ensanche/unica/00": {
+   "x": 832,
    "y": 2344,
    "w": 48,
    "h": 48
   },
   "escala-ancho/e-sofaB-fundicion/unica/00": {
-   "x": 848,
+   "x": 880,
    "y": 2344,
    "w": 48,
    "h": 48
   },
   "escala-ancho/e-sofaB-itsaso/unica/00": {
-   "x": 896,
+   "x": 928,
    "y": 2344,
    "w": 48,
    "h": 48
   },
   "escala-ancho/e-sofaB-kalea/unica/00": {
-   "x": 944,
+   "x": 976,
    "y": 2344,
    "w": 48,
    "h": 48
@@ -18936,6 +18942,15 @@
     "dirs": {
      "unica": [
       "detalle-alto/d-barraD-2/unica/00"
+     ]
+    }
+   },
+   "d-bench-loc-ibar": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "detalle-alto/d-bench-loc-ibar/unica/00"
      ]
     }
    },

@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.49 · en curso (sin APK hasta cerrar la tanda)
+
+Los muebles del taller, la panadería, el bar y la lavandería, de frente (lo pidió el usuario: «recuerda cómo deben ser los sprites», con la skill del director de sprites y fotos de la lavandería y de una cafetera de dos grupos). Solo Godot, con `Datos.CAL`.
+
+- **Rehechos en PixelLab de frente**, nunca girados ni isométricos: los de una casilla en alzado recto (vista sidescroller) y los de dos en 3/4 de frente; solo con texto, sin subir las fotos ni poner marcas. La spec está en `tools/sprites/director/negocios-frente/spec.yaml` y el QA en `tools/sprite_qa.py` (0 semitransparencias, 0 huérfanos, ≤ 32 colores).
+- **A escala por su alto real** (`PIEZAS` en `pixellab_negocios.py`, en px a 16 px/m): la lavadora de 14 kg (1,4 m), la secadora de 18 kg (1,6 m), el cambiador de monedas colgado en la pared, la mesa alta de patas negras con el cesto y la papelera al lado, el horno de pisos y el botellero (1,8–1,9 m), los taburetes (75 cm)…
+- **La bancada metálica de tres asientos** de la foto en la lavandería, en lugar del banco (`d-bench-loc-ibar`, por mapa con `_detalle_obj`; se sigue pudiendo sentar).
+- **La cafetera de dos grupos** encima de su mueble bajo (`CAFE`), en el bar y en el taller.
+
 ## 1.48.0 · 16 de octubre de 2026
 
 La calle más como un RPG clásico y los muebles con lo que traen (lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más pokemon» y «la calidad de los otros sprites también, que se note que es el sprite y lo que trae»). Solo Godot (0.42.0), con `Datos.CAL`: sin CAL, las pantallas del oráculo no cambian. Todo a mano y de frente a 3/4, sin marcas (`tools/sprites/a-mano/detalle.py`).

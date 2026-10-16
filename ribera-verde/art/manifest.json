@@ -9713,7 +9713,7 @@
    "origen": "PixelLab (create_1_direction_object, solo con texto; las fotos de referencia llevan marcas y no se subieron), guardado en tools/sprites/pixellab-negocios/ y ajustado a 16 px/m: python3 -I tools/sprites/a-mano/pixellab_negocios.py",
    "descripcion": "1.47: los muebles de una casilla del taller, la panadería, el bar y la lavandería (lavadoras y secadoras industriales, la caja de pago, el carro de la ropa, el carro de bandejas, la recogedora de aceite, el carro de herramientas, las cajas, la cafetera, la mesa de pino con sillas y el taburete), de PixelLab y ajustados a 16 px/m; solo con Datos.CAL",
    "estilo_ref": "los muebles a escala del piso (props-escala)",
-   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API de PixelLab?».",
+   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API de PixelLab?». 1.49 (lo pidió el usuario: «recuerda cómo deben ser los sprites», skill del director de sprites, fotos de la lavandería y de una cafetera): todos rehechos de frente (alzado recto / 3/4 de frente, nunca isométricos), a escala por su alto real; spec en tools/sprites/director/negocios-frente/spec.yaml.",
    "cubre": [
     "obj:aceiteT",
     "obj:cafeT",
@@ -9755,7 +9755,7 @@
    "origen": "PixelLab (create_1_direction_object, solo con texto; las fotos de referencia llevan marcas y no se subieron), guardado en tools/sprites/pixellab-negocios/ y ajustado a 16 px/m: python3 -I tools/sprites/a-mano/pixellab_negocios.py",
    "descripcion": "1.47: los muebles de dos casillas (el horno de pisos, la estantería de recambios, la barra de pintxos, el botellero, el estante del pan, el mostrador de la panadería, la mesa de doblar y la mesa de acero con la masa), de PixelLab y ajustados a 16 px/m; solo con Datos.CAL",
    "estilo_ref": "los muebles a escala del piso (props-escala)",
-   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API de PixelLab?».",
+   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API de PixelLab?». 1.49 (lo pidió el usuario: «recuerda cómo deben ser los sprites», skill del director de sprites, fotos de la lavandería y de una cafetera): todos rehechos de frente (alzado recto / 3/4 de frente, nunca isométricos), a escala por su alto real; spec en tools/sprites/director/negocios-frente/spec.yaml.",
    "cubre": [
     "obj:barraN",
     "obj:botN",
