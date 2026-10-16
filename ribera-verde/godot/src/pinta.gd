@@ -255,7 +255,9 @@ func _mundo() -> void:
 			list.append([t.y * 16, _carpa_mapa.bind(t)])
 		for ci in J.D.SITIOS.size():
 			if J.sitio_visible(ci):
-				_sitio(J.D.SITIOS[ci])
+				_sitio(J.sitio(ci))
+		if Datos.CAL:   # 1.55: el tubo de extracción de cada carpa a una ventana, detrás de lo de la fila 2
+			list.append([2 * 16 - 1, _tubos_casa.bind(m)])
 		if not S.flags.get("letter"):
 			var mp: Array = J.pos_pieza("home", "mesa")   # 1.37: la carta, en la mesa redonda, donde esté
 			var lx: int = mp[0] * 16 - cam.x
@@ -969,6 +971,59 @@ func _carpa_mapa(t: Dictionary) -> void:
 	if J.plantas_vivas(t.ci):
 		var tipo: String = J.D.FOCOS[J.S.carpas[t.ci].foco].tipo
 		_rect(xc - 3, yb + 1, 6, 1, css(J.D.FOCO_LUZ[tipo] + ".6)"))
+
+# 1.55 (lo pidió el usuario: «debería salir un tubo de extracción de cada carpa hacia una de las ventanas»): con el extractor puesto,
+# el tubo flexible de aluminio sale por arriba de la carpa, corre por lo alto de la pared y baja a una rejilla en la ventana más
+# cercana que no tape la propia carpa
+func _tubos_casa(m: Dictionary) -> void:
+	var win := []
+	for x in int(m.w):
+		if m.o[1][x] == "iwin":
+			win.append(x * 16 + 8)
+	for t in m.get("carpas", []):
+		if Cultivo.kit_de(J.S.carpas[t.ci]) == "":
+			continue
+		var xc: int = (t.x0 + t.x1 + 1) * 8
+		var half: int = Datos.jsround(J.D.CARPAS[t.t].cm[0] * .16) >> 1
+		var wx := -1
+		for w in win:
+			if (w < xc - half - 4 or w > xc + half + 4) and (wx < 0 or absi(w - xc) < absi(wx - xc)):
+				wx = w
+		if wx < 0:
+			continue
+		# sube de la boca del techo de la carpa, corre por arriba de la pared (por encima de las puertas) y baja a la rejilla de la ventana
+		var f = Atlas.foto_misc("carpa-" + t.t + "-mapa")
+		var arriba: int = t.y * 16 + 15 - (48 - (f.c.get_used_rect().position.y if f else 8))
+		var yc: int = 2 - cam.y
+		var yv: int = t.y * 16 - 23 - cam.y   # a la altura del cristal de la ventana
+		var xa: int = xc - cam.x
+		var xb: int = wx - cam.x
+		_tubo(xa - 2, yc, 5, arriba - cam.y - yc, false)
+		_tubo(mini(xa, xb) - 2, yc, absi(xb - xa) + 5, 5, true)
+		_tubo(xb - 2, yc, 5, yv - yc, false)
+		_rect(xa - 3, arriba - cam.y - 2, 7, 2, css("#5a5e66"))   # la abrazadera en la boca de la carpa
+		_rect(xb - 5, yv - 3, 10, 10, css("#2a2a34"))   # la rejilla en la ventana
+		_rect(xb - 4, yv - 2, 8, 8, css("#c8ccd2"))
+		for k in 3:
+			_rect(xb - 3, yv - 1 + k * 2 + 1, 6, 1, css("#7a7e86"))
+
+# un tramo de tubo flexible de aluminio (5 px de grueso: contorno, luz, cuerpo, sombra, contorno) con sus aros cada 3 px
+func _tubo(x: int, y: int, w: int, h: int, horiz: bool) -> void:
+	if w <= 0 or h <= 0:
+		return
+	_rect(x, y, w, h, css("#2a2a34"))
+	if horiz:
+		_rect(x + 1, y + 1, w - 2, 1, css("#e4e8ee"))
+		_rect(x + 1, y + 2, w - 2, 1, css("#b4b8c0"))
+		_rect(x + 1, y + 3, w - 2, 1, css("#8a8e98"))
+		for xx in range(x + 2, x + w - 1, 3):
+			_rect(xx, y + 1, 1, 3, css("#9aa0a8"))
+	else:
+		_rect(x + 1, y + 1, 1, h - 2, css("#e4e8ee"))
+		_rect(x + 2, y + 1, 1, h - 2, css("#b4b8c0"))
+		_rect(x + 3, y + 1, 1, h - 2, css("#8a8e98"))
+		for yy in range(y + 2, y + h - 1, 3):
+			_rect(x + 1, yy, 3, 1, css("#9aa0a8"))
 
 # el sitio libre: rectángulo de trazos [3, 2] en medio píxel (strokeRect con antialias), rgba(60,70,90,.45). El canvas pinta cada
 # trazo por separado (en una esquina donde acaba uno y empieza otro, los dos se mezclan uno encima del otro): cada trazo, su

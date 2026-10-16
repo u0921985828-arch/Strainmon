@@ -726,7 +726,7 @@ func montar_casa() -> void:
 	h.carpas = []
 	for ci in S.carpas.size():
 		var c = S.carpas[ci]
-		if not c:
+		if not c or Datos.CAL:   # 1.55: con CAL, las carpas son piezas de ORDENAR LA CASA (aplica_orden)
 			continue
 		var s: Dictionary = D.SITIOS[ci]
 		var x0: int = s.x
@@ -734,7 +734,14 @@ func montar_casa() -> void:
 		for x in range(x0, x1 + 1):
 			h.o[s.y][x] = "carpa"
 		h.carpas.append({"ci": ci, "t": c.t, "x0": x0, "x1": x1, "y": int(s.y)})
+	if Datos.CAL:   # 1.55: cada carpa ocupa lo que mide la suya (1 o 2 casillas)
+		for ci in S.carpas.size():
+			var P_ := pieza_de("home", "carpa%d" % ci)
+			if not P_.is_empty() and S.carpas[ci]:
+				P_.o = [[0, 0, "carpa"]] + ([[1, 0, "carpa"]] if int(D.CARPAS[S.carpas[ci].t].w) > 1 else [])
 	aplica_orden("home")   # la nevera, la mesa, las plantas, el taller y los muebles del salón (con la silla gaming)
+	if Datos.CAL:
+		carpas_casa(h)
 	montar_puertas("home")   # 1.51: la puerta del pasillo del sótano
 	if puertas_int("home").size():
 		var dl := delante_puertas("home")
@@ -1102,9 +1109,29 @@ func deco_sprite(o: String) -> String:
 func sitio_visible(ci: int) -> bool:
 	return not (ci < S.carpas.size() and S.carpas[ci]) and (ci < 2 or (S.carpas.size() > 1 and S.carpas[1] != null))
 
+# 1.55 (lo pidió el usuario: «la puerta del sótano está inaccesible porque hay una carpa delante» y «poder ordenar las carpas al
+# gusto»): con CAL, el sitio de cada carpa es una pieza de ORDENAR LA CASA (carpa0..2, en la fila de la pared); la C, de serie junto
+# a la cama (1, 2), fuera de delante de la puerta del pasillo
+func sitio(ci: int) -> Dictionary:
+	var s: Dictionary = D.SITIOS[ci]
+	if not Datos.CAL or S == null or pieza_de("home", "carpa%d" % ci).is_empty():
+		return s
+	var p := pos_pieza("home", "carpa%d" % ci)
+	return {"x": p[0], "y": p[1], "w": int(s.w)}
+
+# las carpas del mapa (para pintarlas y abrirlas) donde las dejó aplica_orden
+func carpas_casa(h: Dictionary) -> void:
+	h.carpas = []
+	for ci in S.carpas.size():
+		var c = S.carpas[ci]
+		if not c or not h.get("opos", {}).has("carpa%d" % ci):
+			continue
+		var p: Array = h.opos["carpa%d" % ci]
+		h.carpas.append({"ci": ci, "t": c.t, "x0": int(p[0]), "x1": int(p[0]) + int(D.CARPAS[c.t].w) - 1, "y": int(p[1])})
+
 func sitio_libre(x: int, y: int) -> int:
 	for ci in D.SITIOS.size():
-		var s: Dictionary = D.SITIOS[ci]
+		var s: Dictionary = sitio(ci)
 		if sitio_visible(ci) and x >= s.x and x < s.x + s.w and y == s.y:
 			return ci
 	return -1
@@ -2980,6 +3007,9 @@ func pieza_ya(P_: Dictionary) -> bool:
 			return P_.k in muebles_ya()
 		"riego":
 			return S.get("nave") != null and int(S.nave.get("rg", 0)) >= 1
+		"carpa":   # 1.55: la carpa que tengas, con CAL
+			var ci := int(str(P_.k).substr(5))
+			return Datos.CAL and ci < S.carpas.size() and S.carpas[ci] is Dictionary
 	return true
 
 func piezas_ya(mapa: String) -> Array:
@@ -3026,7 +3056,7 @@ func hueco_carpa(mapa: String) -> Array:
 		return l
 	for ci in D.SITIOS.size():
 		if sitio_visible(ci):
-			var s: Dictionary = D.SITIOS[ci]
+			var s: Dictionary = sitio(ci)
 			for j in int(s.w):
 				l.append([int(s.x) + j, int(s.y)])
 	return l
@@ -3193,7 +3223,7 @@ func quita_orden(mapa: String) -> void:
 	if not m.has("opos"):
 		m.opos = {}
 		for P_ in D.ORDEN_P[mapa].piezas:
-			if P_.get("suelo"):
+			if P_.get("suelo") or P_.get("si") == "carpa":   # 1.55: las carpas las pone montar_casa
 				continue
 			var ok := true
 			for o in P_.o:

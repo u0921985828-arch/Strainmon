@@ -7175,6 +7175,12 @@ func _vista_orden(m: Dictionary, P_: Dictionary, O: Array, G: Array) -> void:
 	for c in celdas_p(P_, ORDEN.x, ORDEN.y):
 		if c[2] and c[1] >= 0 and c[1] < int(m.h) and c[0] >= 0 and c[0] < int(m.w):
 			m.o[c[1]][c[0]] = c[2]
+	if str(P_.get("si", "")) == "carpa":   # 1.55: la carpa se pinta donde la llevas
+		for t in m.get("carpas", []):
+			if "carpa%d" % int(t.ci) == P_.k:
+				t.x1 = int(ORDEN.x) + int(t.x1) - int(t.x0)
+				t.x0 = int(ORDEN.x)
+				t.y = int(ORDEN.y)
 
 func mover_pieza(mapa: String, k: String) -> bool:
 	var m: Dictionary = MAPS[mapa]

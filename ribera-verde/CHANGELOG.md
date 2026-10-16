@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.55.0 · Godot 0.45.0
+
+Lo que pidió el usuario («la puerta del sótano está inaccesible porque hay una carpa delante», «debería salir un tubo de extracción de cada carpa hacia una de las ventanas» y «poder ordenar las carpas al gusto»). Solo Godot, con `Datos.CAL`.
+
+- **La puerta del sótano, libre**: la carpa C, de serie junto a la cama (casillas 1-2), ya no tapa la puerta del pasillo; la planta del dormitorio pasa a (12, 2) si no cabe y la nevera, a su sitio de reserva.
+- **Ordenar las carpas**: ORDENAR LA CASA trae las tres carpas que tengas (A, B y C), en la fila de la pared, como cualquier mueble: ocupan lo que mide la suya (1 o 2 casillas), no se dejan delante de una puerta ni cortando el paso.
+- **El tubo de extracción**: con el extractor puesto, el tubo flexible de aluminio sale por arriba de la carpa, corre por lo alto de la pared (por encima de las puertas) y baja a una rejilla en la ventana más cercana que no tape la propia carpa; se mueve con la carpa.
+- Prueba nueva `tests/carpas_casa.gd`.
+
 ## 1.54.1 · Godot 0.45.0
 
 Lo que pidió el usuario al ver la 1.54 («eso no son sprites en condiciones en el mismo estilo que los muebles del juego»). Solo Godot, con `Datos.CAL`.
