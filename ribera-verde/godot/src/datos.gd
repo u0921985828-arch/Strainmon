@@ -7,7 +7,23 @@ static var D := {}
 static func carga() -> Dictionary:
 	if D.is_empty():
 		D = JSON.parse_string(FileAccess.get_file_as_string("res://datos/datos.json"))
+	if _cal_d != CAL:
+		_aplica_auto()
 	return D
+
+# 1.52: las autoflorecientes (AUTO) entran en la Genoteca, las recetas y el banco solo con CAL (las pruebas contra el HTML, sin ellas)
+static var _cal_d = null
+static func _aplica_auto() -> void:
+	_cal_d = CAL
+	if not D.has("_base"):
+		D._base = {"DEX": D.DEX.duplicate(), "RECIPES": D.RECIPES.duplicate(), "BANCO": D.BANCO.duplicate()}
+	D.DEX = D._base.DEX.duplicate()
+	D.RECIPES = D._base.RECIPES.duplicate()
+	D.BANCO = D._base.BANCO.duplicate()
+	if CAL:
+		D.DEX.append_array(D.AUTO.dex)
+		D.RECIPES.merge(D.AUTO.recipes)
+		D.BANCO.append_array(D.AUTO.banco)
 
 # Math.round de JavaScript: la mitad, hacia arriba (round() de Godot la aleja del cero)
 # ---------- el calendario (1.42, lo pidió el usuario: la partida empieza el lunes 20 de abril de 2026 y cada día suma uno) ----------
@@ -464,6 +480,8 @@ static func cross_result(S: Dictionary, a: String, b: String) -> String:
 		C.d = jsround(((A.d + B.d) / 2.0 + R.sig() * .6 - .3) * 2) / 2.0
 		C.r = int(clamp_js(jsround((A.r + B.r) / 2.0 + R.sig() * 10 - 5), 20, 95))
 		C.o = A.n + " × " + B.n + " · híbrido propio"
+		if CAL and A.get("auto") and B.get("auto"):   # 1.52: la auto es recesiva; solo sale auto de dos autos
+			C.auto = 1
 		S.custom[id] = C
 		var m := 30 + int(floor(R.sig() * 41))
 		C.m = m

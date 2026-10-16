@@ -246,8 +246,13 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 	g *= 1 + abo_de(p.get("fo")).crec * fq(p)
 	if float(p.get("fv", 0) if p.get("fv") != null else 0) > 0 and p.prog < .65:
 		g *= 1 + abo_de(p.get("fvo")).veg * float(p.fv)
+	var auto: bool = Datos.CAL and s.get("auto")
+	if auto and f.get("ciclo") == "flor":   # 1.52: la auto florece por la edad; a 12/12 tiene menos luz y crece menos
+		g *= float(Datos.carga().AUTO.rinde_1212)
 	if p.prog < 1:
-		if f.get("ciclo") == "veg" and p.prog < .65:   # madre: no pasa de vegetativo (si ya florece, sigue)
+		if auto:
+			p.prog = minf(1, p.prog + g)
+		elif f.get("ciclo") == "veg" and p.prog < .65:   # madre: no pasa de vegetativo (si ya florece, sigue)
 			g = maxf(0, minf(g, Datos.carga().VEG_TOPE - p.prog))
 		elif f.get("ciclo") == "flor" and p.prog >= .35 and p.prog < .65:   # 12/12 en vegetativo: crece al doble y lo que se salta la acorta
 			var e := minf(g, (.65 - p.prog) / 2)

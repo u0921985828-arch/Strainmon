@@ -327,7 +327,7 @@ func pot_action(i: int) -> void:
 		opts.append("Abonar")
 	if p.pest:
 		opts.append("Tratar plaga")
-	if p.prog >= .2 and p.prog < .65:
+	if p.prog >= .2 and p.prog < .65 and not (Datos.CAL and s.get("auto")):   # 1.52: las autos no se clonan
 		opts.append("Sacar esqueje")
 	opts.append_array(["Nombrar", "Arrancar", "Salir"])
 	var c: int = await ask("%s%s · %s %d%%\nAgua %d%% · Salud %d%%%s" % [s.n, etiq(p.get("f")), stage_name(p), int(floor(p.prog * 100)), Datos.jsround(p.water),

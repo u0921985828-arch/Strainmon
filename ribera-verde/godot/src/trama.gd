@@ -1885,7 +1885,8 @@ func desc_ficha(V: Dictionary) -> String:
 	var st = strain(k)
 	var p := Hoja.params(D, S, k)
 	var land: bool = st.get("tipo") == "landrace"
-	return "%s\n%s %s" % [Hoja.grupo(p.ind, land), Hoja.como(p), (st.get("o", "") + ".") if st.get("o") else ""]
+	var au := "Autofloreciente: florece por la edad, sin cambiar la luz. " if Datos.CAL and st.get("auto") else ""   # 1.52
+	return "%s\n%s%s %s" % [Hoja.grupo(p.ind, land), au, Hoja.como(p), (st.get("o", "") + ".") if st.get("o") else ""]
 
 func ficha_variedad(lista: Array, i0: int) -> void:
 	if lista.is_empty() or i0 < 0:
@@ -5278,6 +5279,9 @@ func carpa_madres() -> void:
 		if i >= N.ma.size():
 			var p = await elegir_planta("¿QUÉ MADRE METES?", false)
 			if p == null:
+				continue
+			if Datos.CAL and strain(p.sid).get("auto"):   # 1.52
+				await say("La %s es autofloreciente: florece por la edad y no se queda de madre. Sus esquejes florecerían enanos." % strain(p.sid).n)
 				continue
 			N.ma.append({"k": p.sid + ("*" if Cultivo.clase_feno(p.f) == "estrella" else ""), "f": p.f, "v": 100, "e": 0})
 			sfx("sel")
