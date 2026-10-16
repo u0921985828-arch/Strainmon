@@ -1328,6 +1328,39 @@ func ent_at(x: int, y: int):
 			return e
 	return null
 
+# 1.51 (lo pidió el usuario: «la casa de Txaro es la casa con menos atrezo que hay en el mundo… que en casi todos los lugares donde
+# puedes interactuar con alguien, que tenga un poquito de atrezo»): lo que se añade, con CAL, en las casillas que estén libres; cada
+# cosa con su texto (ATREZO_TXT). Nada corta el paso (lo comprueba tests/atrezo.gd)
+const ATREZO := {
+	"txaro": [[3, 2, "tv"], [4, 2, "tv2"], [6, 1, "cuadro"], [8, 2, "libreria"], [3, 4, "sillon"], [4, 4, "sillon2"], [5, 5, "silla"], [8, 6, "mesita"], [5, 1, "cartel"]],
+	"casa-ama": [[4, 1, "cuadro"], [3, 2, "libreria"], [7, 2, "sillon"], [8, 2, "sillon2"], [5, 5, "silla"], [8, 6, "mesita"]],
+	"comisaria": [[6, 2, "escritorio"], [7, 2, "escritorio2"], [3, 1, "cuadro"]],
+	"almacen": [[3, 2, "sacos"], [2, 1, "red"], [7, 2, "estanteN"], [8, 4, "barrilT"]],
+}
+const ATREZO_TXT := {
+	"txaro": {"tv": "La tele, con un tapete de ganchillo encima del mueble. Echan un concurso.", "tv2": "La tele, con un tapete de ganchillo encima del mueble. Echan un concurso.",
+		"cuadro": "Una lámina de la ría. La enmarcó su Paco en el sesenta y ocho.", "libreria": "Novelas de bolsillo, un misal y un álbum de fotos de un viaje a las montañas.",
+		"mesita": "Un costurero abierto y unas gafas de cerca.", "cartel": "Un póster del faro de Puerto Viejo. Paco trabajó allí de joven."},
+	"casa-ama": {"cuadro": "Una lámina del monte, con el marco descolorido por el sol.", "libreria": "Los libros de aitona: el monte, los pájaros y una enciclopedia por fascículos.",
+		"mesita": "Una radio vieja con la emisora de la comarca."},
+	"comisaria": {"escritorio": "Una mesa con un ordenador viejo y una montaña de atestados.", "escritorio2": "Una mesa con un ordenador viejo y una montaña de atestados.",
+		"cuadro": "Una lámina de la ría, torcida. Nadie la endereza."},
+	"almacen": {"sacos": "Sacos de sal gorda de la conservera.", "red": "Una red de pesca vieja, colgada de un clavo.", "estanteN": "Una estantería con latas oxidadas y cuerdas.",
+		"barrilT": "Un bidón azul. Huele a gasoil."},
+}
+const ASIENTO_FUERA := {"sofa": "Un sofá.", "sillon": "Un sillón.", "silla": "Una silla."}
+
+func montar_atrezo(k: String) -> void:
+	if not Datos.CAL or not ATREZO.has(k) or not MAPS.has(k):
+		return
+	var m: Dictionary = MAPS[k]
+	if m.get("atrezo"):
+		return
+	m.atrezo = true
+	for a in ATREZO[k]:
+		if m.o[a[1]][a[0]] == null:
+			m.o[a[1]][a[0]] = a[2]
+
 func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	SENT = null   # 1.49: al cambiar de sitio, de pie
 	S.map = name_
@@ -1355,6 +1388,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 			MAPS[name_].o[cj[0][1]][cj[0][0]] = null
 			MAPS[name_].o[cj[1][1]][cj[1][0]] = "cajero"
 	montar_club(name_)
+	montar_atrezo(name_)
 	P.x = x
 	P.y = y
 	P.px = x * 16.0
@@ -1635,12 +1669,15 @@ func asiento_de(o) -> String:
 func asiento(x: int, y: int) -> void:
 	var k := asiento_de(MAPS[S.map].o[y][x])
 	var ops := ["Sentarte"]
-	if k in ["silla", "sillaG"]:
+	var fuera: bool = Datos.CAL and S.map != "home" and ASIENTO_FUERA.has(k)   # 1.51: el sillón y la silla de otras casas no son los tuyos
+	if fuera:
+		pass
+	elif k in ["silla", "sillaG"]:
 		ops.append("Usar el ordenador")
 	elif k in ["sofa", "sillon", "sofaF", "sofaB", "sofaV"]:
 		ops.append("Otra cosa")
 	ops.append("Nada")
-	var j: int = await ask(ASIENTO_TXT[k], ops)
+	var j: int = await ask(ASIENTO_FUERA[k] if fuera else ASIENTO_TXT[k], ops)
 	var c: String = ops[j] if j >= 0 and j < ops.size() else "Nada"
 	if c == "Nada":
 		return
@@ -1994,6 +2031,8 @@ func object_action(x: int, y: int) -> void:
 		txt = {"iwin": "Por la ventana se ve la plaza del Ensanche.", "shelfW": "Archivadores con expedientes. Hay uno con tu calle.", "counter": "El mostrador de denuncias. No hay nadie detrás."}.get(o, "")
 	elif S.map == "almacen":
 		txt = {"crate": "Cajas precintadas con el sello de una conservera que cerró hace años.", "btable": "Una mesa con una báscula y rollos de film transparente."}.get(o, "")
+	if not txt and Datos.CAL and ATREZO_TXT.has(S.map):   # 1.51
+		txt = ATREZO_TXT[S.map].get(o, "")
 	if txt:
 		await say(txt)
 		return
