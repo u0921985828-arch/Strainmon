@@ -196,6 +196,8 @@ func camara() -> Vector2i:
 func story_mark(id: String) -> bool:
 	var S: Dictionary = J.S
 	var F: Dictionary = S.flags
+	if id.begins_with("sec_") or id.begins_with("secb_"):   # 1.51: los recados
+		return J.sec_marca(id)
 	match id:
 		"kiko": return not F.get("kiko1") or (S.ch == 4 and not F.get("lab"))
 		"baltasar": return (S.ch == 3 and not F.get("metB")) or (S.due > 0 and S.money >= S.due) or (S.ch >= 8 and not S.get("encargo") and not (S.get("encVeto", 0) > S.day))

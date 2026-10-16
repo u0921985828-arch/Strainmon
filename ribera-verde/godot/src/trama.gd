@@ -1175,6 +1175,9 @@ func objetivo_menu():
 		if iti and itin_sig() != null:
 			ini = 1
 		var plazo := ("Plazo: %s antes de que acabe el %s. Llevas %s.\n" % [Datos.eur(S.due), Datos.fd(S.deadline, S.day), Datos.eur(S.money + caja_e())]) if S.due > 0 else ""
+		if Datos.CAL:   # 1.51
+			var rv := recados_ver()
+			it.append({"label": "RECADOS", "right": "%d/%d" % [rv.filter(func(sc): return sec_estado(sc.id) == 2).size(), rv.size()], "desc": "Lo que te piden por la comarca, según el capítulo. Pulsa A para verlos."})
 		it.append({"label": "LOGROS", "right": "%d/%d" % [logros_n(), D.LOGROS.size()], "desc": "Lo que llevas conseguido en la partida. Pulsa A para verlos."})   # 1.27
 		it.append({"label": "DEUDA", "right": Datos.eur(S.debt), "desc": plazo + "Ventas %s · Reputación %s · Calor %d %%" % [Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)]})
 		it.append({"label": "Volver", "desc": ""})
@@ -1185,7 +1188,131 @@ func objetivo_menu():
 		if i == it.size() - 3:   # 1.27
 			await logros_menu()
 			continue
+		if Datos.CAL and i == it.size() - 4:   # 1.51
+			await recados_menu()
+			continue
 		return
+
+# ---------- los recados (1.51, lo pidió el usuario: «que haya misiones por el mapa, dependiendo del capítulo en el que estés») ----------
+# D.SECUNDARIAS: gente con su «!» por la comarca desde su capítulo; piden gramos (con un THC, una índica o una landrace), extracto,
+# algo de la mochila o llevar un paquete a otra persona (b). S.sec[id]: 1 en marcha (el paquete encima), 2 hecho
+const ZONA_N := {"town": "Ribera Verde", "alto": "el barrio alto", "astilleros": "los astilleros", "puerto": "Puerto Viejo", "valdehierro": "Valdehierro",
+	"mendialde": "Mendialde", "errotabarri": "Errotabarri", "ibarbide": "el Casco Viejo", "ensanche": "el Ensanche", "callejon": "la Kale Zaharra"}
+
+func sec_estado(id: String) -> int:
+	return int(S.get("sec", {}).get(id, 0)) if S.get("sec") is Dictionary else 0
+
+func sec_def(id: String):
+	for sc in D.get("SECUNDARIAS", []):
+		if sc.id == id:
+			return sc
+	return null
+
+func sec_marca(eid: String) -> bool:
+	var b := eid.begins_with("secb_")
+	var st := sec_estado(eid.substr(5 if b else 4))
+	return st == 1 if b else st == 0
+
+func sec_pon(id: String, v: int) -> void:
+	if not (S.get("sec") is Dictionary):
+		S.sec = {}
+	S.sec[id] = v
+
+func sec_lotes(sc: Dictionary) -> Array:
+	var P_: Dictionary = sc.pide
+	if P_.tipo == "extr":
+		return rosin_lots(float(P_.g))
+	var l := bud_lots(float(P_.g), float(P_.get("thc", 0)))
+	if P_.get("ind"):
+		l = l.filter(func(x): return Datos.ind_de(S, lot_sid(x[0])) >= int(P_.ind))
+	if P_.get("land"):
+		l = l.filter(func(x): return D.STRAINS.has(lot_sid(x[0])) and D.STRAINS[lot_sid(x[0])].get("tipo") == "landrace")
+	return l
+
+func sec_premio(sc: Dictionary) -> void:
+	var R: Dictionary = sc.premio
+	S.money += float(R.get("e", 0))
+	S.rep += int(R.get("rep", 0))
+	S.heat = minf(100, S.heat + float(R.get("calor", 0)))
+	sfx("coin")
+	await got(Datos.eur(R.get("e", 0)))
+	if R.has("seeds"):
+		add_seeds(R.seeds[0], int(R.seeds[1]))
+		await got("%d semillas de %s" % [int(R.seeds[1]), D.STRAINS[R.seeds[0]].n.to_upper()])
+	sec_pon(sc.id, 2)
+	toast("Recado hecho: " + sc.t, 1600)
+
+func talk_sec(eid: String) -> void:
+	var b := eid.begins_with("secb_")
+	var sc = sec_def(eid.substr(5 if b else 4))
+	if sc == null:
+		return
+	var st := sec_estado(sc.id)
+	var N: String = (sc.b if b else sc.a).n
+	if st == 2:
+		await say(sc.ya, N)
+		return
+	if b:   # el que recibe el paquete
+		await talk(N, sc.get("txtb", ["Trae."]))
+		await talk(N, sc.fin)
+		await sec_premio(sc)
+		update_hud()
+		return
+	if st == 1:
+		await say("Ya sabes: a %s, en %s. Date prisa." % [sc.b.n.to_lower(), ZONA_N.get(sc.b.map, sc.b.map)], N)
+		return
+	await talk(N, sc.txt)
+	var P_: Dictionary = sc.pide
+	if P_.tipo == "lleva":
+		if await ask("¿Llevas el paquete?", ["Sí, dámelo", "Ahora no"], N) != 0:
+			await say("Tú verás. Aquí sigo.", N)
+			return
+		sec_pon(sc.id, 1)
+		await got("el paquete para " + sc.b.n.to_lower())
+		return
+	if P_.tipo == "item":
+		if int(S.items.get(P_.item, 0)) < int(P_.n):
+			await say("No llevas nada. Si vuelves con algo, aquí estaré.", N)
+			return
+		if await ask("¿Se lo das?", ["Sí", "Ahora no"], N) != 0:
+			return
+		S.items[P_.item] = int(S.items[P_.item]) - int(P_.n)
+		await talk(N, sc.fin)
+		await sec_premio(sc)
+		update_hud()
+		return
+	var L := sec_lotes(sc)
+	if L.is_empty():
+		await say("Cuando tengas lo que te pido, vuelve.", N)
+		return
+	var items: Array = L.map(rosin_item if P_.tipo == "extr" else lot_item)
+	items.append({"label": "Ahora no"})
+	var i: int = await menu(items, {"cls": "right", "title": "¿Qué le das?"})
+	if i < 0 or i >= L.size():
+		await say("No pasa nada. Aquí estaré.", N)
+		return
+	if P_.tipo == "extr":
+		use_rosin(L[i][0], float(P_.g))
+	else:
+		use_buds(L[i][0], float(P_.g))
+	await talk(N, sc.fin)
+	await sec_premio(sc)
+	update_hud()
+
+# en START → OBJETIVO: los de tu capítulo y los hechos
+func recados_ver() -> Array:
+	return D.get("SECUNDARIAS", []).filter(func(sc): return int(S.ch) >= int(sc.ch))
+
+func recados_menu() -> void:
+	var it := []
+	for sc in recados_ver():
+		var st := sec_estado(sc.id)
+		var donde: String = ZONA_N.get(sc.a.map if st != 1 else sc.b.map, "")
+		it.append({"label": sc.t, "right": "HECHO" if st == 2 else ("EN MARCHA" if st == 1 else donde), "desc": sc.d + (("\nLleva el paquete a %s (%s)." % [sc.b.n.to_lower(), donde]) if st == 1 else "")})
+	if it.is_empty():
+		it.append({"label": "Nada todavía", "desc": "Los recados salen por la comarca según el capítulo: busca a la gente con el «!»."})
+	it.append({"label": "Volver", "desc": ""})
+	await menu(it, {"cls": "full", "title": "RECADOS", "desc": true})
 
 # ---------- Julen y el itinerario (1.23, 11h-guia.js): textos del HTML (D.ITINERARIO, D.JULEN, D.MINERAL_ORG); aquí, lo que mira cada paso ----------
 var itin_aviso: Array = []

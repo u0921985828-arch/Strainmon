@@ -1089,6 +1089,9 @@ func npc_cond(d: Dictionary) -> bool:
 	return true
 
 func npc_talk(d: Dictionary) -> void:
+	if d.id.begins_with("sec_") or d.id.begins_with("secb_"):   # 1.51: los recados
+		await talk_sec(d.id)
+		return
 	if d.get("look") == "cop" and d.id.begins_with("pat"):   # las patrullas (1.10)
 		await say(pick(["«Circule.»", "«Buenas. Nada que ver aquí.»", "«¿Todo bien? Siga.»"]), "AGENTE")
 		return
@@ -1209,6 +1212,16 @@ func build_ents() -> void:
 		if d.map != S.map or not npc_cond(d):
 			continue
 		ents.append(old[d.id] if old.has(d.id) and is_same(old[d.id].def, d) else mk_ent(d))
+	if Datos.CAL:   # 1.51: la gente de los recados (D.SECUNDARIAS), desde su capítulo
+		for sc in D.get("SECUNDARIAS", []):
+			if int(S.ch) < int(sc.ch):
+				continue
+			for ab in ["a", "b"]:
+				if not sc.has(ab) or sc[ab].map != S.map or (ab == "b" and sec_estado(sc.id) != 1):
+					continue
+				var dd: Dictionary = sc[ab].duplicate()
+				dd.id = ("sec_" if ab == "a" else "secb_") + sc.id
+				ents.append(old[dd.id] if old.has(dd.id) else mk_ent(dd))
 	for c in S.clients:
 		if c.get("map", "town") == S.map:
 			ents.append(old[c.id] if old.has(c.id) else mk_ent({"id": c.id, "x": c.x, "y": c.y, "wander": 2, "lookObj": c.look, "client": c}))
@@ -2628,6 +2641,10 @@ func talk_patxi():
 	pass
 func talk_txaro():
 	pass
+func talk_sec(_id: String) -> void:   # 1.51 (trama.gd)
+	pass
+func sec_estado(_id: String) -> int:
+	return 0
 func talk_inaki():
 	pass
 func talk_cop():
