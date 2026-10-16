@@ -10,6 +10,7 @@ Lo que pidió el usuario tras probar la 1.49. Solo Godot, con `Datos.CAL`.
 - **Menos de 10 g con su décima** en la caja fuerte y el camarote: un lote de 0,4 g ya no sale como «0 g» (`g_lote`).
 - **Los estancos con estanquero**: en Valdehierro, Errotabarri e Ibarbide no salía nadie detrás del mostrador porque su muñeco (`cliente4`, `cliente6`, `cliente2`) no estaba en `LOOKS`; ya están (`datos.json`). Repasados todos los `look` de `NPCDEF`: no falta ninguno más (la gente de los negocios sale cuando el local está alquilado).
 - **Los menús de comprar y vender enseñan todo**: el de la derecha se ensancha hasta casi toda la pantalla antes de cortar; a toda pantalla, una fila larga ya no estira la ventana fuera de la pantalla; y si el nombre de lo elegido aún no cabe, sale entero debajo, encima de su ficha (`_desc_sel`, `maxw` en `_pinta_menu`).
+- **Las mesitas de los clubs, desde arriba**: el tablero ocupa toda la casilla (30 × 11 px, de una casilla a la otra) visto de frente y desde bastante arriba, con el canto y las patas apenas asomando, y lo de encima visto desde arriba (cenicero, grinder, librillo, mechero; la vela, el baúl con la botella, el tablón sobre los bidones, el cristal con la revista). Sentado en el sofá de abajo, de espaldas, solo te asoma la cabeza por encima del respaldo y la mesa se sigue viendo (`mesa_ancha`, `w-mesita-*` en `tools/sprites/a-mano/ocio.py`).
 - La prueba de los créditos de `ciclo.gd` lee la versión de `project.godot`, no una fija.
 
 ## 1.49.0 · Godot 0.43.0

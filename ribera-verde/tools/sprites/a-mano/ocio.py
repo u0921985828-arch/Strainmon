@@ -164,64 +164,84 @@ def vitrinaP():
     L.contorno(K); suelo(L, x0, x1, K)
     return L
 
-def mesa_ancha(W, extra):
-    """la mesa baja de los sofás (1,4 m × 45 cm) de frente a 3/4, como los sofás: el tablero visto un poco desde arriba, el canto y
-    las patas; y lo de encima"""
-    L = Lienzo(48, 48); x0, x1 = 13, 34; T0, T1, T2, T3 = W
-    L.r(x0, 38, 22, 4, T2); L.hl(x0, x1, 38, T3)                                                      # el tablero, en perspectiva
-    L.r(x0, 42, 22, 2, T1); L.hl(x0, x1, 43, T0)                                                      # el canto
-    for x in (x0 + 1, x1 - 1): L.vl(x, 44, 46, T0)                                                    # las patas
+# 1.50 (lo pidió el usuario: «el tablero bastante más grande, que ocupe la baldosa por encima… en 3D, de frente y la vista bastante
+# subida»): las mesitas de los clubs vistas desde arriba y de frente (nunca en isométrica): el tablero llena la casilla (y 33-43, de
+# x 9 a 38, las dos casillas), el canto debajo y las patas apenas asoman; lo de encima, visto desde arriba
+X0, X1, TY0, TY1 = 9, 38, 33, 43
+
+def mesa_ancha(W, extra, veta=True):
+    """la mesa baja de los sofás (1,6 m × 45 cm) vista desde arriba y de frente: el tablero, el canto, las patas; y lo de encima"""
+    L = Lienzo(48, 48); T0, T1, T2, T3 = W
+    L.r(X0, TY0, X1 - X0 + 1, TY1 - TY0 + 1, T2); L.hl(X0, X1, TY0, T3); L.vl(X0, TY0, TY1, T3)        # el tablero
+    if veta:                                                                                         # la veta, a trozos
+        for y, a, b in ((35, 12, 22), (37, 26, 35), (39, 11, 19), (41, 21, 33), (36, 30, 36)):
+            L.hl(a, b, y, T1)
+    L.r(X0, TY1 + 1, X1 - X0 + 1, 2, T1); L.hl(X0, X1, TY1 + 2, T0)                                   # el canto
+    for x in (X0 + 1, X0 + 2, X1 - 2, X1 - 1): L.vl(x, TY1 + 3, 46, T0)                               # las patas
     extra(L)
-    L.contorno(K); suelo(L, x0, x1, K)
+    L.contorno(K); suelo(L, X0, X1, K)
     return L
 
+def cenicero(L, x, y, c=CROMOD, d='#3a3a40'):
+    """el cenicero redondo visto desde arriba (6 × 4) con la colilla"""
+    L.hl(x + 1, x + 4, y, c); L.r(x, y + 1, 6, 2, c); L.hl(x + 1, x + 4, y + 3, c); L.r(x + 1, y + 1, 4, 2, d)
+    L.p(x + 2, y + 1, '#f4f4ee'); L.p(x + 3, y + 1, '#d89a5a')
+
 def cosas_club(L):
-    L.r(16, 37, 4, 2, CROMOD); L.p(17, 37, '#3a3a40')                                                 # el cenicero
-    L.r(22, 36, 3, 3, '#3f8a46'); L.hl(22, 24, 36, '#84cc6c')                                          # el grinder
-    L.r(28, 38, 3, 1, '#f4f4ee'); L.p(31, 38, '#b83a2c')                                               # el librillo
+    cenicero(L, 12, 35)
+    L.hl(21, 23, 34, '#84cc6c'); L.r(20, 35, 5, 3, '#3f8a46'); L.hl(21, 23, 38, '#3a3a40')   # el grinder
+    L.r(27, 37, 5, 3, '#f4f4ee'); L.hl(27, 31, 37, '#b83a2c'); L.vl(31, 38, 39, CROMOD)            # el librillo
+    L.r(34, 34, 2, 4, '#3a7ad0'); L.p(34, 34, '#c8ccd0')                                              # el mechero
 
 def w_mesita():
     return mesa_ancha(('#4a2e1c', '#62402a', '#74502e', '#a87646'), cosas_club)
 
 def w_mesita_kalea():
     def e(L):
-        L.r(17, 35, 2, 3, '#f0e8d0'); L.p(17, 34, '#f0d070'); L.p(17, 33, '#ffb040')                   # la vela
-        L.r(22, 36, 4, 2, '#a85a3a'); L.p(23, 36, '#6a3a24')                                            # el cenicero de barro
-        L.r(28, 36, 2, 2, '#3f8a46')
-    L = mesa_ancha(('#2e1e12', '#4a3020', '#6a4a30', '#8a6440'), e)
-    return L
+        L.r(13, 35, 3, 3, '#f0e8d0'); L.p(14, 34, '#ffb040'); L.p(14, 33, '#f0d070')                   # la vela
+        cenicero(L, 20, 36, '#a85a3a', '#6a3a24')                                                       # el cenicero de barro
+        L.r(29, 35, 4, 3, '#3f8a46'); L.hl(29, 32, 35, '#84cc6c')                                       # el grinder
+    return mesa_ancha(('#2e1e12', '#4a3020', '#6a4a30', '#8a6440'), e)
 
 def w_mesita_itsaso():
-    """el baúl de marinero de mesa: madera con los flejes de latón y una botella con un barco dentro"""
-    L = Lienzo(48, 48); x0, x1 = 13, 34; B0, B1, B2 = '#5a3a20', '#8a5e34', '#a87646'
-    L.r(x0, 37, 22, 3, B2); L.hl(x0, x1, 37, '#c8955a')                                               # la tapa, vista desde arriba
-    L.r(x0, 40, 22, 6, B1); L.hl(x0, x1, 45, B0); L.hl(x0, x1, 40, B0)
-    for x in (x0 + 3, x1 - 3): L.vl(x, 37, 45, '#c8a040')                                             # los flejes
-    L.r(23, 42, 2, 2, '#c8a040')                                                                       # el cierre
-    L.r(19, 34, 7, 3, VID); L.hl(19, 25, 34, VIDL); L.p(26, 35, B1); L.p(21, 35, '#f4f4ee'); L.p(22, 35, B0)  # la botella y el barco
-    L.contorno(K); suelo(L, x0, x1, K)
+    """el baúl de marinero de mesa, visto desde arriba: la tapa con los flejes de latón, el frente y una botella con un barco"""
+    L = Lienzo(48, 48); B0, B1, B2 = '#5a3a20', '#8a5e34', '#a87646'
+    L.r(X0, TY0, X1 - X0 + 1, 10, B2); L.hl(X0, X1, TY0, '#c8955a')                                  # la tapa
+    for y in (36, 39): L.hl(X0 + 1, X1 - 1, y, '#96683a')
+    L.r(X0, TY0 + 10, X1 - X0 + 1, 4, B1); L.hl(X0, X1, TY0 + 10, B0); L.hl(X0, X1, 46, B0)           # el frente
+    for x in (X0 + 4, X1 - 4): L.vl(x, TY0, 46, '#c8a040')                                            # los flejes
+    L.r(23, 44, 2, 2, '#c8a040')                                                                       # el cierre
+    L.r(17, 35, 9, 4, VID); L.hl(17, 25, 35, VIDL); L.r(26, 36, 2, 2, B1)                              # la botella, tumbada
+    L.p(20, 37, '#f4f4ee'); L.p(21, 36, '#f4f4ee'); L.hl(19, 22, 38, B0)                               # el barco
+    cenicero(L, 30, 37, '#c8a040', '#5a3a20')
+    L.contorno(K); suelo(L, X0, X1, K)
     return L
 
 def w_mesita_fundicion():
-    """dos bidones de 200 L con un tablón encima"""
-    L = Lienzo(48, 48); x0, x1 = 12, 35; B0, B1, B2 = '#5a2418', '#8a3a24', '#a84e30'
-    for bx in (14, 27):
-        L.r(bx, 39, 7, 8, B1); L.vl(bx, 39, 46, B2); L.vl(bx + 6, 39, 46, B0); L.hl(bx, bx + 6, 42, B0); L.p(bx + 3, 44, '#c88a4a')
-    L.r(x0, 36, 24, 3, '#a87646'); L.hl(x0, x1, 36, '#c8955a'); L.hl(x0, x1, 38, '#5a3a24')            # el tablón
-    L.r(19, 34, 3, 2, CROMOD); L.p(20, 34, '#3a3a40')                                                  # el cenicero de lata
-    L.r(27, 33, 2, 3, '#8a5a2a'); L.p(27, 32, '#c8a040')                                               # la botella
-    L.contorno(K); suelo(L, x0, x1, K)
+    """un tablón ancho encima de dos bidones de 200 L"""
+    L = Lienzo(48, 48); B0, B1, B2 = '#5a2418', '#8a3a24', '#a84e30'
+    for bx in (12, 29):                                                                                # los bidones, debajo
+        L.r(bx, 43, 7, 4, B1); L.vl(bx, 43, 46, B2); L.vl(bx + 6, 43, 46, B0); L.hl(bx, bx + 6, 45, B0)
+    L.r(X0, TY0, X1 - X0 + 1, 10, '#a87646'); L.hl(X0, X1, TY0, '#c8955a')                           # el tablón
+    for y in (36, 39): L.hl(X0, X1, y, '#8a5e34')                                                      # las juntas de las tablas
+    L.r(X0, TY0 + 10, X1 - X0 + 1, 1, B0)                                                       # el canto
+    cenicero(L, 13, 34, CROMOD, '#3a3a40')                                                             # el cenicero de lata
+    L.r(23, 37, 3, 3, '#8a5a2a'); L.p(24, 37, '#c8a040')                       # la botella, desde arriba
+    L.r(30, 34, 5, 3, '#f4f4ee'); L.hl(30, 34, 34, '#c83a2c')                                          # el librillo
+    L.contorno(K); suelo(L, X0, X1, K)
     return L
 
 def w_mesita_ensanche():
-    """la mesa de centro de cristal con patas de acero, una revista y una planta"""
-    L = Lienzo(48, 48); x0, x1 = 13, 34
-    L.r(x0, 38, 22, 3, VID); L.hl(x0, x1, 38, VIDL); L.hl(x0, x1, 41, '#8ab4c0')
-    for x in (x0 + 1, x1 - 1): L.vl(x, 42, 46, CROMOD)
-    L.hl(x0 + 2, x1 - 2, 44, CROMO)                                                                    # la balda de abajo
-    L.r(17, 36, 6, 2, '#e8e4d8'); L.hl(17, 22, 36, '#c04848')                                          # la revista
-    L.r(27, 36, 3, 2, '#f4f4ee'); L.p(27, 35, '#3f8a46'); L.p(28, 34, '#5aa04a'); L.p(29, 35, '#3f8a46')
-    L.contorno(K); suelo(L, x0, x1, K)
+    """la mesa de centro de cristal con patas de acero, una revista y una planta, vista desde arriba"""
+    L = Lienzo(48, 48)
+    L.r(X0, TY0, X1 - X0 + 1, TY1 - TY0 + 1, VID); L.hl(X0, X1, TY0, VIDL)                            # el cristal
+    for k in range(4): L.p(X0 + 3 + k, TY0 + 4 - k, VIDL); L.p(X0 + 5 + k, TY0 + 5 - k, VIDL)          # el brillo
+    L.hl(X0, X1, TY1, '#8ab4c0'); L.hl(X0, X1, TY1 + 1, CROMOD)                                        # el canto
+    for x in (X0 + 1, X1 - 1): L.vl(x, TY1 + 2, 46, CROMOD)
+    L.hl(X0 + 2, X1 - 2, 45, CROMO)                                                                    # la balda de abajo
+    L.r(16, 36, 8, 5, '#e8e4d8'); L.hl(16, 23, 36, '#c04848'); L.hl(17, 22, 38, '#a8a49a'); L.hl(17, 21, 39, '#a8a49a')  # la revista
+    L.r(29, 35, 5, 4, '#f4f4ee'); L.r(30, 34, 3, 3, '#3f8a46'); L.p(31, 34, '#84cc6c'); L.p(29, 35, '#5aa04a'); L.p(33, 36, '#5aa04a')
+    L.contorno(K); suelo(L, X0, X1, K)
     return L
 
 def escaleraD():
