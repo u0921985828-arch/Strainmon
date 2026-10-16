@@ -3398,6 +3398,9 @@ func carne_club(k: String) -> bool:
 # el encargado de cada club; 1.30: dentro, detrás de la vitrina del dispensario
 func talk_club(k: String):
 	var N: String = D.CLUBS[k].n
+	if D.CLUBS[k].get("tuyo"):   # 1.52: el club KAIA, el tuyo
+		await talk_kaia(N)
+		return
 	if not S.clubs.get(k):
 		if not await carne_club(k):
 			return
@@ -4415,7 +4418,7 @@ func entra_local(d: Dictionary):
 			atras_puerta()
 			await say("Una puerta sin rótulo, con un timbre. No abre nadie.")
 			return
-		if not S.clubs.get(k):
+		if not S.clubs.get(k) and not D.CLUBS[k].get("tuyo"):
 			atras_puerta()
 			if not await carne_club(k):
 				return
@@ -8303,6 +8306,10 @@ func talk_koldo() -> void:
 	while true:
 		var M_: Dictionary = S.mar
 		var ops := ["Los envíos en el mar", "El pedido de la semana", "Las rutas", "Comprar un barco"]
+		if R.has("obras"):
+			ops.append("Las obras del muelle")
+		if int(M_.get("ley", 0)) > 0:
+			ops.append("La distribuidora" if M_.get("lic") else "La licencia")
 		var gran: bool = not M_.get("fin") and float(M_.rep) >= float(R.gran.rep) and ("pesquero" in M_.b or "atunero" in M_.b)
 		if gran:
 			ops.append("El último trabajo")
@@ -8335,6 +8342,12 @@ func talk_koldo() -> void:
 			await talk(N, L)
 		elif l == "Comprar un barco":
 			await comprar_barco(N)
+		elif l == "Las obras del muelle":
+			await obras_muelle(N)
+		elif l == "La licencia":
+			await licencia_mar(N)
+		elif l == "La distribuidora":
+			await vender_legal(N)
 		elif l == "El último trabajo":
 			await say("Un armador de %s quiere %s en un solo viaje, y lo paga como nadie. Es el trabajo que tu tía y yo nunca nos atrevimos a hacer. Si sale, el muelle es tuyo." % [R.rutas[int(R.gran.ruta)].n, _kg(int(R.gran.kg) * 1000)], N)
 			M_.gr = 1
@@ -8354,6 +8367,9 @@ func comprar_barco(N: String) -> void:
 	if j < 0 or j >= bs.size():
 		return
 	var B: Dictionary = bs[j]
+	if B.get("req") and not obra_ya(B.req):
+		await say("%s no cabe en el muelle tal como está. Antes, %s: %s" % [may1(B.n), obra_k(B.req).n, obra_k(B.req).txt], N)
+		return
 	if not await confirm("%s: %s, carga hasta %s, %d días de viaje. ¿Lo compras?" % [may1(B.n), Datos.eur(B.p), _kg(int(B.kg) * 1000), int(B.dias)]):
 		return
 	if not cobro_banco(float(B.p), "Compra · " + B.n):
@@ -8436,7 +8452,10 @@ func cargar_envio(B: Dictionary) -> void:
 	if ped:
 		e *= float(R.ped.bonus)
 		S.mar.ped = null
-	var mal: bool = Cultivo.azar() < float(B.r) + float(rt.r) + float(S.heat) / 1000.0 and not gr
+	var pm: float = float(B.r) + float(rt.r) + float(S.heat) / 1000.0
+	if obra_ya("caseta"):   # 1.52: la caseta de la cofradía vigila el muelle
+		pm *= float(obra_k("caseta").r)
+	var mal: bool = Cultivo.azar() < pm and not gr
 	S.mar.env.append({"b": B.k, "r": ri_, "g": tot, "e": Datos.jsround(e), "d": S.day + int(B.dias) + int(rt.d), "mal": mal, "ped": ped, "gr": gr})
 	sfx("get")
 	update_hud()
@@ -8475,6 +8494,7 @@ func mar_dia() -> void:
 			lin.append("Maite estaría orgullosa. Y un poco celosa.")
 		queue("mar" + e.b, func(): await talk("SMS · KOLDO", lin))
 	M_.env = quedan
+	obras_dia()
 	# el pedido de la semana: desde el primer viaje, cada 7 días
 	if int(M_.paso) >= 1 and S.day >= int(M_.get("pd", 0)):
 		var rs := rutas_mar()
@@ -8619,3 +8639,186 @@ func franco_dia() -> void:
 		F.caja = 0
 		F.cal = float(FR.cal.vuelve)
 		queue("franco", func(): await talk("SMS · GORKA", ["Han entrado en el piso. Yo estaba fuera. Se han llevado %s y %s de la caja. Habrá que aflojar." % [_kg(int(perdido)), Datos.eur(caja)]]))
+
+# ---------- 1.52: las obras del muelle, el club KAIA y la ley ----------
+# (lo pidió el usuario: «el barrio del puerto viejo… comenzar destartalado… ir reformándolo poco a poco, edificio por edificio… para
+# meter un barco más grande se tiene que reformar el espacio… montar otro club ahí… una legalización del cannabis en España que
+# abriría un mercado mucho mayor»). Las obras (MAR.obras) se pagan por el banco y se acaban a los d días (S.mar.ob: el día en que
+# acaba cada una; S.mar.oba: las ya avisadas); el pesquero pide el pantalán y el atunero, el dique; las casas dan alquiler cada
+# semana; el club KAIA despacha lo que le dejas (S.mar.kaia); MAR.legal.dias después de abrirlo, la ley (S.mar.ley): con la
+# licencia (S.mar.lic), la distribuidora compra hasta MAR.legal.dia al día, sin calor y por el banco, y KAIA despacha más.
+
+func obra_k(k: String) -> Dictionary:
+	for O in D.MAR.get("obras", []):
+		if O.k == k:
+			return O
+	return {}
+
+func obras_muelle(N: String) -> void:
+	var R: Dictionary = D.MAR
+	var M_: Dictionary = S.mar
+	if not (M_.get("ob") is Dictionary):
+		M_.ob = {}
+	while true:
+		var it := []
+		for O in R.obras:
+			var r: String = "hecha" if obra_ya(O.k) else ("en obras" if M_.ob.has(O.k) else Datos.eur(O.p))
+			var falta: String = (" Antes, %s." % obra_k(O.req).n) if O.get("req") and not obra_ya(O.req) else ""
+			it.append({"label": may1(O.n), "right": r, "desc": O.txt + falta})
+		it.append({"label": "Nada"})
+		var i: int = await menu(it, {"cls": "right", "title": "Las obras del muelle", "desc": true})
+		if i < 0 or i >= R.obras.size():
+			return
+		var O: Dictionary = R.obras[i]
+		if obra_ya(O.k):
+			await say("%s ya está como nueva." % may1(O.n), N)
+			continue
+		if M_.ob.has(O.k):
+			await say("Los de la obra acaban %s el %s." % [O.n, Datos.fd(int(M_.ob[O.k]), S.day)], N)
+			continue
+		if O.get("req") and not obra_ya(O.req):
+			await say("Primero %s. Sin eso, aquí no entra ni el camión." % obra_k(O.req).n, N)
+			continue
+		if not await confirm("%s: %s por transferencia, %d días de obra. ¿Adelante?" % [may1(O.n), Datos.eur(O.p), int(O.d)]):
+			continue
+		if not cobro_banco(float(O.p), "Obra · " + O.n):
+			await say("En la cuenta no llega. Los de la obra cobran por adelantado.", N)
+			continue
+		M_.ob[O.k] = int(S.day) + int(O.d)
+		sfx("coin")
+		update_hud()
+		await say("Mañana mismo empiezan con %s. Acaban el %s." % [O.n, Datos.fd(int(M_.ob[O.k]), S.day)], N)
+
+# al amanecer (mar_dia): las obras que acaban, los alquileres, lo que despacha KAIA y la ley
+func obras_dia() -> void:
+	var R: Dictionary = D.MAR
+	var M_: Dictionary = S.mar
+	if not R.has("obras") or not (M_.get("ob") is Dictionary):
+		return
+	if not (M_.get("oba") is Dictionary):
+		M_.oba = {}
+	var nueva := false
+	for O in R.obras:
+		if obra_ya(O.k) and not M_.oba.has(O.k):
+			M_.oba[O.k] = int(S.day)
+			nueva = true
+			if O.k == "casas":
+				M_.alq = int(S.day) + 7
+			var t: String = "Terminada %s. %s" % [O.n, O.txt]
+			queue("obra" + O.k, func(): await talk("SMS · KOLDO", [t]))
+	if nueva and S.map == "muelle":
+		montar_muelle("muelle")
+		build_ents()
+	if obra_ya("casas") and int(S.day) >= int(M_.get("alq", 0)):
+		abono_banco(float(obra_k("casas").alq), "Alquileres · muelle")
+		M_.alq = int(S.day) + 7
+	var L = M_.get("kaia")
+	if L is Dictionary:
+		var g = min(L.g, kaia_dia() * (D.VENTA_EXTR.dia if L.get("x") else 1.0))
+		var e := Datos.jsround(g * L.pg)
+		L.g -= g
+		L.tot += e
+		if M_.get("lic"):
+			abono_banco(e, "KAIA · dispensario")
+		else:
+			S.money += e
+		S.sales += e
+		queue("historia", check_story)
+		if L.g < 1:
+			M_.kaia = null
+			var tot = L.tot
+			queue("kaia", func(): await talk("SMS · KAIA", ["Se acabó lo del dispensario: %s en total." % Datos.eur(tot)]))
+	var LG: Dictionary = R.legal
+	if M_.oba.has("club") and not M_.get("ley") and int(S.day) >= int(M_.oba.club) + int(LG.dias):
+		M_.ley = int(S.day)
+		queue("ley", func(): await talk("SMS · KOLDO", [LG.txt, "Ya es otra película, sobrino: con la licencia, %s te compra hasta %s al día, sin patrulleras y por el banco. Ven a verme." % [LG.n, _kg(int(LG.dia))]]))
+
+func kaia_dia() -> float:
+	return float(D.MAR.kaia.dia) * (float(D.MAR.legal.kaia) if S.mar.get("lic") else 1.0)
+
+# el club KAIA, el tuyo: la encargada y el dispensario que llenas tú
+func talk_kaia(N: String) -> void:
+	var K: Dictionary = D.MAR.kaia
+	var M_: Dictionary = S.mar
+	var L = M_.get("kaia")
+	if L is Dictionary:
+		await say("Tu club, jefe. En el dispensario quedan %s de %s, a %s € el gramo. Llevamos %s." % [g_txt(L.g), extr_nombre(L.k, true) if L.get("x") else lot_nombre(L.k), _dos(L.pg), Datos.eur(L.tot)], N)
+		return
+	var VX: Dictionary = D.VENTA_EXTR
+	var lots := lotes_venta(K.g[0], VX.club_g[0])
+	if lots.is_empty():
+		await say("Bienvenido a KAIA. Aquí el dispensario lo llenas tú: déjame %d g o más y los socios retiran %s al día." % [int(K.g[0]), g_txt(kaia_dia())], N)
+		return
+	var it := lots.map(venta_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
+	if i < 0 or i >= lots.size():
+		return
+	var l: Array = lots[i]
+	var x := es_extr(l)
+	var k: String = l[0]
+	var b: Dictionary = l[1]
+	var pg := Datos.jsround((precio_extr(k, b.thc, "club") if x else precio_club(b.thc)) * calidad(b) * float(K.f) * 100) / 100.0
+	var ops := []
+	for g in (VX.club_g if x else K.g):
+		if g <= floor(b.g):
+			ops.append(int(g))
+	var o := []
+	for g in ops:
+		o.append("%d g · %s" % [g, Datos.eur(g * pg)])
+	o.append("Nada")
+	var j: int = await ask("%s a %s € el gramo para los socios. ¿Cuánto dejas?" % [venta_nombre(l), _dos(pg)], o, N)
+	if j < 0 or j >= ops.size():
+		return
+	usa_lote(l, ops[j])
+	M_.kaia = {"k": k, "g": ops[j], "pg": pg, "tot": 0}
+	if x:
+		M_.kaia.x = true
+	sfx("sel")
+	await say("Al dispensario. Cada mañana, %s para los socios." % g_txt(kaia_dia() * (VX.dia if x else 1.0)), N)
+
+# la licencia, cuando ya hay ley
+func licencia_mar(N: String) -> void:
+	var LG: Dictionary = D.MAR.legal
+	if not await confirm("La licencia de cultivo y distribución: %s por transferencia. Con ella, %s te compra hasta %s al día, sin calor. ¿La sacas?" % [Datos.eur(LG.lic), LG.n, _kg(int(LG.dia))]):
+		return
+	if not cobro_banco(float(LG.lic), "Licencia · cannabis"):
+		await say("En la cuenta no llega. El ministerio no fía.", N)
+		return
+	S.mar.lic = int(S.day)
+	sfx("get")
+	await say("Con papeles. Treinta años escondiéndonos y ahora te dan un sello. Maite se partiría de risa.", N)
+
+# la distribuidora legal: hasta MAR.legal.dia al día, por el banco y sin calor
+func vender_legal(N: String) -> void:
+	var LG: Dictionary = D.MAR.legal
+	var M_: Dictionary = S.mar
+	if int(M_.get("lgd", -1)) != int(S.day):
+		M_.lgd = int(S.day)
+		M_.lgg = 0
+	var resto: int = int(LG.dia) - int(M_.lgg)
+	if resto < 100:
+		await say("Por hoy, %s no quiere más. Mañana, otros %s." % [LG.n, _kg(int(LG.dia))], N)
+		return
+	var lots := bud_lots(100)
+	if lots.is_empty():
+		await say("%s compra de 100 g para arriba, en cogollo curado o sin curar." % LG.n, N)
+		return
+	var it := lots.map(venta_item)
+	it.append({"label": "Nada"})
+	var i: int = await menu(it, {"cls": "right", "title": "%s · hoy, hasta %s" % [LG.n, _kg(resto)]})
+	if i < 0 or i >= lots.size():
+		return
+	var l: Array = lots[i]
+	var g = await cuanto("¿Cuánto de %s?" % lot_nombre(l[0]), mini(int(floor(l[1].g)), resto), [100, 250, 500, 1000, 2000, 5000], func(v): return _kg(int(v)))
+	if g <= 0:
+		return
+	var e := Datos.jsround(precio_mayor(float(l[1].thc)) * calidad(l[1]) * float(LG.f) * int(g))
+	use_buds(l[0], int(g))
+	M_.lgg = int(M_.lgg) + int(g)
+	abono_banco(e, "Venta · " + LG.n)
+	S.sales += e
+	sfx("coin")
+	update_hud()
+	queue("historia", check_story)
+	await say("%s de %s, con factura: %s a la cuenta." % [_kg(int(g)), lot_nombre(l[0]), Datos.eur(e)], N)

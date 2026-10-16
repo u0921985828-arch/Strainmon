@@ -1005,6 +1005,24 @@ func montar_muelle(mapa: String) -> void:
 	for j in 2:
 		mu.g[int(F.dy)][int(F.x) + j] = F.tile
 		mu.doors["%d,%d" % [int(F.x) + j, int(F.dy)]] = {"to": "franco", "x": int(F.mat[j]), "y": int(MAPS.franco.h) - 2, "dir": "up", "gate": "franco"}
+	# 1.52 (lo pidió el usuario: «comenzar destartalado… ir reformándolo poco a poco, edificio por edificio»): cada casa, en ruina hasta
+	# su obra (MAR.obras); el pantalán, podrido hasta el suyo; la casa blanca reformada es el club KAIA, con su puerta
+	for b in mu.blds:
+		b.erase("fachada")
+		for O in R.get("obras", []):
+			if b.id in O.get("b", []):
+				if not obra_ya(O.k):
+					b.fachada = b.id + "-ruina"
+				elif O.k == "club":
+					b.fachada = R.kaia.fach
+	if R.has("obras") and not obra_ya("pantalan"):
+		for x in R.podrido:
+			if mu.g[10][int(x)] == "dock":
+				mu.g[10][int(x)] = "dockR"
+	if R.has("kaia") and obra_ya("club"):
+		var K: Dictionary = R.kaia
+		mu.g[int(K.door[1])][int(K.door[0])] = K.tile
+		mu.doors["%d,%d" % [int(K.door[0]), int(K.door[1])]] = {"to": "club-muelle", "x": 7, "y": 8, "dir": "up", "gate": "club:muelle"}
 	var mar = S.get("mar")
 	for B in R.barcos:
 		if mar is Dictionary and B.k in mar.get("b", []):
@@ -1012,6 +1030,11 @@ func montar_muelle(mapa: String) -> void:
 			for j in range(1, int(B.L)):
 				if int(B.x) + j < int(mu.w):
 					mu.o[int(B.y)][int(B.x) + j] = B.o + "2"
+
+# 1.52: una obra del muelle, terminada (S.mar.ob: el día en que se acaba cada una)
+func obra_ya(k: String) -> bool:
+	var mar = S.get("mar") if S else null
+	return mar is Dictionary and mar.get("ob") is Dictionary and mar.ob.has(k) and int(S.day) >= int(mar.ob[k])
 
 func cruzar_puerta(e: Dictionary) -> void:
 	sfx("door")

@@ -24,6 +24,16 @@ static func _aplica_auto() -> void:
 		D.DEX.append_array(D.AUTO.dex)
 		D.RECIPES.merge(D.AUTO.recipes)
 		D.BANCO.append_array(D.AUTO.banco)
+	# 1.52: el club KAIA del muelle, el tuyo (solo con CAL: las pruebas contra el HTML recorren D.CLUBS)
+	var K: Dictionary = D.get("KAIA", {})
+	if K.is_empty():
+		return
+	var tablas := [[D.CLUBS, K.CLUBS], [D.MUEBLE_CLUB, K.MUEBLE_CLUB], [D.LUZ_CLUB, K.LUZ_CLUB], [D.GENERO.enc, K.enc], [D.SOCIO.n, K.SOCIO], [D.BILLAR.n, K.BILLAR_N], [D.BILLAR.hab, K.BILLAR_HAB]]
+	for t in tablas:
+		if CAL:
+			t[0]["muelle"] = t[1]
+		else:
+			t[0].erase("muelle")
 
 # Math.round de JavaScript: la mitad, hacia arriba (round() de Godot la aleja del cero)
 # ---------- el calendario (1.42, lo pidió el usuario: la partida empieza el lunes 20 de abril de 2026 y cada día suma uno) ----------

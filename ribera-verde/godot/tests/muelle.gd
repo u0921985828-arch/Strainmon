@@ -277,6 +277,9 @@ func _corre() -> void:
 	# 8 · comprar un barco
 	b0 = S.banco
 	QUIERO = ["Comprar un barco", "El pesquero", "Sí"]
+	chk(corre(func(): await J.talk_koldo()) and not "pesquero" in S.mar.b and S.banco == b0, "1.52: el pesquero, sin pantalán, no")
+	S.mar.ob = {"pantalan": S.day}   # 1.52: con el pantalán reformado
+	QUIERO = ["Comprar un barco", "El pesquero", "Sí"]
 	chk(corre(func(): await J.talk_koldo()) and "pesquero" in S.mar.b and absf(b0 - S.banco - float(R.barcos[1].p)) < 1, "el pesquero, por transferencia")
 	entra("muelle", 12, 9)
 	chk(mu.o[int(R.barcos[1].y)][int(R.barcos[1].x)] == "barcoP" and mu.o[int(R.barcos[1].y)][int(R.barcos[1].x) + 1] == "barcoP2", "el pesquero, amarrado")
