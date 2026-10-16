@@ -778,7 +778,9 @@ func montar_setas() -> void:
 # los negocios por dentro (1.45, lo pidió el usuario: «que tú puedas acceder a ese sitio y controlarlo desde ahí»; con Datos.CAL):
 # en la calle, la puerta del local (NEGOCIO.k[k]: x, puerta, ancha, dx, tile; gate «neg:k»); dentro (loc-<k>), lo que ponen las mejoras
 # compradas (S.loc[k].mj); sin Datos.CAL, la calle y el local como estaban (la copia _neg0)
-const NEG_ANCHO := ["elevT", "fosoT", "fosoB", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL"]
+const NEG_ANCHO := ["elevT", "fosoT", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL"]
+# 1.46: el elevador y el foso, a escala con los coches del concesionario (5 casillas, como la exposición)
+const NEG_LARGO := {"elevT": 5, "fosoT": 5}
 var _neg0 := {}
 func montar_locales(mapa: String) -> void:
 	if not D.has("NEGOCIO"):
@@ -823,7 +825,8 @@ func montar_locales(mapa: String) -> void:
 				for q in N.mj[i].o:
 					m.o[int(q[1])][int(q[0])] = q[2]
 					if q[2] in NEG_ANCHO:
-						m.o[int(q[1])][int(q[0]) + 1] = q[2] + "2"
+						for j in range(1, int(NEG_LARGO.get(q[2], 2))):
+							m.o[int(q[1])][int(q[0]) + j] = q[2] + "2"
 
 func montar_camarote() -> void:
 	var m: Dictionary = MAPS.camarote

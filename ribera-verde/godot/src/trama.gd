@@ -5508,6 +5508,175 @@ func fase_seta(b: Dictionary) -> String:
 	var d: int = int(S.day - b.d)
 	return "colonizando" if d < D.SETAS.colon else ("fructificando" if d < D.SETAS.colon + D.SETAS.fruto else "lista")
 
+# las cepas (1.46, lo pidió el usuario: «diferentes panes… juntar esos micelios y crear nuevas variedades… en un libro de recetas…
+# que no se permita hacer ciertos cruces»; con Datos.CAL): cepas inventadas (CEPAS.v, cada una con su forma: cúpula, campana, plato o
+# racimo), los panes de micelio (S.setas.panes {k: n}), lo descubierto (S.setas.cd) y lo seco por cepa (S.setas.gv {k: g}, que suma
+# S.setas.g; lo que no tiene cepa es Txuria). Juntar dos panes solo prende si la pareja está en el cuaderno (CEPAS.r); unas formas
+# se repelen (CEPAS.veta). Nada de método ni de dosis.
+func cepa_de(b) -> String:
+	var v = b.get("v") if b is Dictionary else null
+	return str(v) if v != null and D.CEPAS.v.has(str(v)) else "txuria"
+
+func receta_cepa(a: String, b: String) -> String:
+	for r in D.CEPAS.r:
+		if (r[0] == a and r[1] == b) or (r[0] == b and r[1] == a):
+			return r[2]
+	return ""
+
+func veta_cepa(a: String, b: String) -> bool:
+	var fa: String = D.CEPAS.v[a].f
+	var fb: String = D.CEPAS.v[b].f
+	for v in D.CEPAS.veta:
+		if (v[0] == fa and v[1] == fb) or (v[0] == fb and v[1] == fa):
+			return true
+	return false
+
+func gv_setas(L: Dictionary) -> Dictionary:
+	var gv: Dictionary = L.get("gv", {}).duplicate() if L.get("gv") is Dictionary else {}
+	var s := 0.0
+	for k in gv:
+		s += float(gv[k])
+	if float(L.g) - s > 0.001:
+		gv["txuria"] = float(gv.get("txuria", 0)) + float(L.g) - s
+	return gv
+
+func suma_gv(L: Dictionary, k: String, g: float) -> void:   # antes de sumarlo a L.g
+	var gv := gv_setas(L)
+	gv[k] = float(gv.get(k, 0)) + g
+	L.gv = gv
+
+func quita_gv(L: Dictionary, g: float) -> void:   # después de restarlo de L.g: de la cepa que más hay
+	var gv := gv_setas(L)
+	var t := 0.0
+	for k in gv:
+		t += float(gv[k])
+	g = t - float(L.g)
+	var ks: Array = gv.keys()
+	ks.sort_custom(func(a, b): return gv[a] > gv[b] or (gv[a] == gv[b] and a < b))
+	for k in ks:
+		var q: float = minf(g, float(gv[k]))
+		gv[k] = float(gv[k]) - q
+		g -= q
+		if gv[k] <= 0.001:
+			gv.erase(k)
+	L.gv = gv
+
+func nom_cepa(k: String) -> String:
+	return D.CEPAS.v[k].n
+
+func cepa_ya(L: Dictionary, k: String) -> bool:
+	return k == "txuria" or k in L.get("cd", [])
+
+func descubre_cepa(L: Dictionary, k: String) -> void:
+	if not L.get("cd") is Array:
+		L.cd = []
+	if not k in L.cd:
+		L.cd.append(k)
+
+# los panes de micelio que vende Txomin (CEPAS.v[k].pan)
+func panes_txomin(T: String) -> void:
+	var L: Dictionary = S.setas
+	while true:
+		var ks := []
+		var ops := []
+		for k in D.CEPAS.v:
+			var c: Dictionary = D.CEPAS.v[k]
+			if c.has("pan"):
+				ks.append(k)
+				ops.append("%s · %s (%s)" % [c.n, D.CEPAS.fam[c.f], Datos.eur(c.pan)])
+		ops.append("Nada")
+		var oi: int = await ask("Panes de micelio, cada uno de su cepa. Con uno, te preparo una bandeja de esa cepa; juntando dos en la mesa, sale otra si está en el cuaderno.", ops, T)
+		if oi < 0 or oi >= ks.size():
+			return
+		var k: String = ks[oi]
+		var pz: int = int(D.CEPAS.v[k].pan)
+		if S.money < pz:
+			sfx("bad")
+			await say("Sin %s no hay pan." % Datos.eur(pz), T)
+			continue
+		S.money -= pz
+		if not L.get("panes") is Dictionary:
+			L.panes = {}
+		L.panes[k] = int(L.panes.get(k, 0)) + 1
+		descubre_cepa(L, k)
+		sfx("coin")
+		await say("Un pan de %s: %s" % [nom_cepa(k), D.CEPAS.v[k].d], T)
+
+# los panes que tienes, para elegir uno (sin el excluido): [[k, "Nombre (n)"]]
+func mis_panes(L: Dictionary, sin := "") -> Array:
+	var o := []
+	var P: Dictionary = L.get("panes", {}) if L.get("panes") is Dictionary else {}
+	for k in D.CEPAS.v:
+		if int(P.get(k, 0)) > 0 and k != sin:
+			o.append([k, "%s (%d)" % [nom_cepa(k), int(P[k])]])
+	return o
+
+# juntar dos micelios en la mesa de trabajo: solo si la pareja está en el cuaderno; sin gastar nada si no prende
+func juntar_micelios() -> void:
+	var L: Dictionary = S.setas
+	var A := mis_panes(L)
+	if A.is_empty():
+		await say("No tienes panes de micelio. Txomin los vende en la puerta.")
+		return
+	var oa: int = await ask("Juntar micelios: el primer pan.", A.map(func(x): return x[1]) + ["Nada"])
+	if oa < 0 or oa >= A.size():
+		return
+	var a: String = A[oa][0]
+	var B := mis_panes(L, a)
+	if B.is_empty():
+		await say("Hace falta un pan de otra cepa para juntarlo con el de %s." % nom_cepa(a))
+		return
+	var ob: int = await ask("Juntar %s con…" % nom_cepa(a), B.map(func(x): return x[1]) + ["Nada"])
+	if ob < 0 or ob >= B.size():
+		return
+	var b: String = B[ob][0]
+	if veta_cepa(a, b):
+		sfx("bad")
+		await say("%s y %s no se juntan: un %s y una %s se repelen, las hifas no se tocan. No gastas nada." % [nom_cepa(a), nom_cepa(b), D.CEPAS.fam[D.CEPAS.v[a].f], D.CEPAS.fam[D.CEPAS.v[b].f]])
+		return
+	var r: String = receta_cepa(a, b)
+	if r == "":
+		sfx("bad")
+		await say("No prende: %s con %s no está en el cuaderno. No gastas nada." % [nom_cepa(a), nom_cepa(b)])
+		return
+	L.panes[a] = int(L.panes[a]) - 1
+	L.panes[b] = int(L.panes[b]) - 1
+	L.panes[r] = int(L.panes.get(r, 0)) + int(D.CEPAS.sale)
+	var nueva: bool = not cepa_ya(L, r)
+	descubre_cepa(L, r)
+	advance_time(int(D.CEPAS.min))
+	update_hud()
+	sfx("get")
+	await say("Juntas los dos micelios en un pan nuevo y, al rato, prende: %d panes de %s.%s" % [int(D.CEPAS.sale), nom_cepa(r), (" ¡Nueva en tu cuaderno! " + D.CEPAS.v[r].d) if nueva else ""])
+
+# el cuaderno de las cepas: cada una con su forma, de dónde sale y si ya la tienes; y lo que no se junta
+func cuaderno_setas() -> void:
+	var L: Dictionary = S.setas
+	var ks: Array = D.CEPAS.v.keys()
+	while true:
+		var ops := []
+		for k in ks:
+			ops.append("%s%s · %s" % ["✓ " if cepa_ya(L, k) else "", nom_cepa(k), D.CEPAS.fam[D.CEPAS.v[k].f]])
+		ops.append("Lo que no se junta")
+		ops.append("Nada")
+		var n_ya: int = ks.filter(func(k): return cepa_ya(L, k)).size()
+		var oi: int = await ask("El cuaderno de las cepas: %d de %d." % [n_ya, ks.size()], ops)
+		if oi < 0 or oi >= ks.size() + 1:
+			return
+		if oi == ks.size():
+			var t := []
+			for v in D.CEPAS.veta:
+				t.append("un %s con una %s" % [D.CEPAS.fam[v[0]], D.CEPAS.fam[v[1]]] if v[1] == "campana" or v[1] == "cupula" else "%s con %s" % [D.CEPAS.fam[v[0]], D.CEPAS.fam[v[1]]])
+			await say("No se juntan: %s; se repelen. Y lo que no está en el cuaderno no prende." % " ni ".join(PackedStringArray(t)))
+			continue
+		var k: String = ks[oi]
+		var c: Dictionary = D.CEPAS.v[k]
+		var de := "La vende Txomin (%s el pan)." % Datos.eur(c.pan) if c.has("pan") else ""
+		for r in D.CEPAS.r:
+			if r[2] == k:
+				de = "Sale de juntar %s con %s." % [nom_cepa(r[0]), nom_cepa(r[1])]
+		await say("%s · %s · %d.ª generación. %s %s Rinde ×%s y se paga ×%s." % [c.n, D.CEPAS.fam[c.f], int(c.gen), c.d if cepa_ya(L, k) else "Aún no la has tenido.", de, str(c.g), str(c.p)])
+
 func setas_dia() -> void:
 	var L = S.get("setas")
 	if L == null:
@@ -5604,6 +5773,8 @@ func bajo_menu(T: String) -> void:
 		var ops := []
 		if T != "" and B.size() < Z.max:
 			ops.append("Comprar bandeja (%s)" % Datos.eur(Z.bandeja))
+		if T != "" and Datos.CAL:   # 1.46: los panes de micelio
+			ops.append("Panes de micelio")
 		if hum.size():
 			ops.append("Pulverizar")
 		if cnt.lista:
@@ -5639,26 +5810,49 @@ func bajo_menu(T: String) -> void:
 				sfx("bad")
 				await say("Sin dinero no hay bandeja.", T)
 				continue
+			var v := "txuria"
+			if Datos.CAL:   # 1.46: de qué cepa (Txuria, la de Txomin, o uno de tus panes)
+				var P := mis_panes(L)
+				var oc: int = 0
+				if P.size():
+					oc = await ask("¿De qué cepa? La Txuria la pongo yo; si no, uno de tus panes.", ["Txuria (la de Txomin)"] + P.map(func(x): return x[1]) + ["Nada"], T)
+					if oc < 0 or oc > P.size():
+						continue
+				if oc > 0:
+					v = P[oc - 1][0]
+					L.panes[v] = int(L.panes[v]) - 1
 			S.money -= int(Z.bandeja)
-			B.append({"d": S.day, "hum": 100})
+			B.append({"d": S.day, "hum": 100, "v": v} if Datos.CAL else {"d": S.day, "hum": 100})
 			sfx("coin")
 			await say("Lista para colonizar. En %d días la habrá cogido el micelio; %d más y a recoger." % [int(Z.colon), int(Z.fruto)], T)
+		elif op == "Panes de micelio":
+			await panes_txomin(T)
 		elif op == "Pulverizar":
 			if not await pulverizar_bajo():   # si pasa de medianoche, setas_dia puede cerrar el bajo
 				return
 		elif op == "Recoger":
 			var g := 0
 			var quedan := []
+			var pv := {}   # 1.46: lo recogido por cepa (rinde CEPAS.v[k].g)
 			for b in B:
 				if fase_seta(b) != "lista":
 					quedan.append(b)
 				else:
-					g += ri(int(Z.g[0]), int(Z.g[1]))
+					var x: int = ri(int(Z.g[0]), int(Z.g[1]))
+					if Datos.CAL:
+						x = roundi(x * float(D.CEPAS.v[cepa_de(b)].g))
+						pv[cepa_de(b)] = int(pv.get(cepa_de(b), 0)) + x
+					g += x
 			L.bandejas = quedan
 			sfx("get")
 			if Datos.CAL:   # 1.44: frescas, a secar; secas, al armario (secar_setas)
-				L.fr = L.get("fr", []) + [{"g": g, "d": S.day}]
-				await say("Recoges %d g de setas y las tiendes en %s: en %s, al armario." % [g, "el deshidratador" if L.get("dh") else "la malla del secadero", "un día" if dias_secar(L) == 1 else "%d días" % dias_secar(L)])
+				var nf := []
+				var tx := []
+				for k in pv:
+					nf.append({"g": pv[k], "d": S.day, "v": k})
+					tx.append("%s %d g" % [nom_cepa(k), pv[k]])
+				L.fr = L.get("fr", []) + nf
+				await say("Recoges %d g de setas%s y las tiendes en %s: en %s, al armario." % [g, (" (" + ", ".join(PackedStringArray(tx)) + ")") if pv.size() > 1 or not pv.has("txuria") else "", "el deshidratador" if L.get("dh") else "la malla del secadero", "un día" if dias_secar(L) == 1 else "%d días" % dias_secar(L)])
 			else:
 				L.g += g
 				await say("Recoges las setas y las dejas secando en el bajo: %d g." % g)
@@ -5694,7 +5888,15 @@ func bajo_menu(T: String) -> void:
 		elif op.begins_with("Venderle"):
 			var g: int = int(floor(L.g))
 			var e: int = g * int(Z.precio)
+			if Datos.CAL:   # 1.46: cada cepa a su precio (CEPAS.v[k].p)
+				var gv := gv_setas(L)
+				var ev := 0.0
+				for k in gv:
+					ev += float(gv[k]) * float(Z.precio) * float(D.CEPAS.v[k].p if D.CEPAS.v.has(k) else 1)
+				e = roundi(ev * g / maxf(float(L.g), 0.001))
 			L.g -= g
+			if Datos.CAL:
+				quita_gv(L, g)
 			S.money += e
 			S.sales += e
 			S.heat = min(100, S.heat + Z.calor)
@@ -6668,7 +6870,7 @@ func desc_bajo(V: Dictionary) -> String:
 		"seca":
 			q = "seca: hay que tirarla"
 	var dd: String = (" · día %d de %d" % [mini(int(S.day - b.d) + 1, tot), tot]) if not b.get("mala") else ""
-	return "Bandeja %d · %s%s · humedad %d %%.\nA: pulverizar, recoger o tirar · B: cerrar." % [V.i + 1, q, dd, Datos.jsround(b.hum)]
+	return "Bandeja %d%s · %s%s · humedad %d %%.\nA: pulverizar, recoger o tirar · B: cerrar." % [V.i + 1, (" · " + nom_cepa(cepa_de(b))) if Datos.CAL else "", q, dd, Datos.jsround(b.hum)]
 
 func elegir_bajo(i0 := 0):
 	if gancho_bajo.is_valid():
@@ -6748,6 +6950,13 @@ func _bandeja_seta(o: Array, b, x: int, y: int, u: int, sid: int) -> void:
 		# las setas: cinco, cada una a su ritmo; primordio (punto), tallo y sombrero que se abre
 		var fr: float = 1.0 if f == "lista" else clampf((t - Z.colon) / Z.fruto, 0, 1) if f == "fructificando" else -1.0
 		if fr >= 0:
+			# 1.46: cada cepa con su forma y sus colores (CEPAS.v): cúpula (la de siempre), campana, plato o racimo
+			var cp: Dictionary = D.CEPAS.v[cepa_de(b)] if Datos.CAL else D.CEPAS.v.txuria
+			var C0: String = cp.c[0]
+			var C1: String = cp.c[1]
+			var C2: String = cp.c[2]
+			var PI: String = cp.pie
+			var fm: String = cp.f
 			for k in 5:
 				var cx: int = 2 + k * 3 + int(_hs(sid, k, 1) * 3)
 				var dl: float = _hs(sid, k, 2) * 0.3
@@ -6756,12 +6965,40 @@ func _bandeja_seta(o: Array, b, x: int, y: int, u: int, sid: int) -> void:
 				if g < 0.15:
 					R.call(cx, 9, 1, 1, "#e8dcc0")
 					continue
-				R.call(cx, 10 - hs, 1, hs, "#e8e0d0")
 				var cw: int = 1 if g < 0.4 else (3 if g < 0.8 else 5)
-				R.call(cx - (cw >> 1), 9 - hs, cw, 1, "#9a6a3a")
-				R.call(cx - maxi(0, (cw >> 1) - 1), 8 - hs, maxi(1, cw - 2), 1, "#7a4a2a")
-				if cw >= 3:
-					R.call(cx - (cw >> 1), 9 - hs, 1, 1, "#b8865a")
+				if fm == "campana":   # pie largo y fino, sombrero estrecho y alto
+					hs += 2
+					R.call(cx, 10 - hs, 1, hs, PI)
+					var bw: int = mini(cw, 3)
+					R.call(cx - (bw >> 1), 9 - hs, bw, 1, C0)
+					R.call(cx - (bw >> 1), 8 - hs, bw, 1, C0)
+					R.call(cx, 7 - hs, 1, 1, C1)
+					if bw >= 3:
+						R.call(cx - 1, 8 - hs, 1, 1, C2)
+				elif fm == "plano":   # pie corto, plato ancho
+					hs = maxi(1, hs - 1)
+					R.call(cx, 10 - hs, 1, hs, PI)
+					var pw: int = 1 if g < 0.4 else (3 if g < 0.7 else 5 if g < 0.9 else 7)
+					R.call(cx - (pw >> 1), 9 - hs, pw, 1, C0)
+					if pw >= 3:
+						R.call(cx - (pw >> 1) + 1, 8 - hs, pw - 2, 1, C1)
+						R.call(cx - (pw >> 1), 9 - hs, 1, 1, C2)
+				elif fm == "racimo":   # tres sombreritos de un mismo pie, a distintas alturas
+					hs = maxi(1, hs - 1)
+					R.call(cx, 10 - hs, 1, hs, PI)
+					R.call(cx, 9 - hs, 1, 1, C0)
+					if g >= 0.4:
+						R.call(cx - 1, 10 - hs, 1, 1, C2)
+						R.call(cx + 1, 11 - hs, 1, 1, C0)
+					if g >= 0.8:
+						R.call(cx - 1, 9 - hs, 1, 1, C1)
+						R.call(cx + 1, 10 - hs, 1, 1, C1)
+				else:   # cúpula: la de siempre
+					R.call(cx, 10 - hs, 1, hs, PI)
+					R.call(cx - (cw >> 1), 9 - hs, cw, 1, C0)
+					R.call(cx - maxi(0, (cw >> 1) - 1), 8 - hs, maxi(1, cw - 2), 1, C1)
+					if cw >= 3:
+						R.call(cx - (cw >> 1), 9 - hs, 1, 1, C2)
 	# las gotas de la tapa: más cuanto más húmeda
 	var nd: int = int(round(float(b.hum) / 100.0 * 9))
 	for k in nd:
@@ -6827,6 +7064,8 @@ func secar_setas() -> int:
 	for f in L.fr:
 		if int(S.day - f.d) >= dias_secar(L):
 			g += int(f.g)
+			if Datos.CAL:
+				suma_gv(L, cepa_de(f), int(f.g))   # 1.46: lo seco, por cepa
 		else:
 			q.append(f)
 	L.fr = q
@@ -6866,6 +7105,8 @@ func mesa_setas() -> void:
 			ops.append("Microdosis (%d g)" % int(Z.lote))
 		if L.get("mol"):
 			ops.append("Comestibles (%d g + %s)" % [int(Z.lote), Datos.eur(Z.choco)])
+		if Datos.CAL:   # 1.46: juntar micelios y el cuaderno de las cepas
+			ops.append_array(["Juntar micelios", "El cuaderno"])
 		if ops.is_empty():
 			await say("La mesa de trabajo, con la báscula. Para las microdosis falta la encapsuladora y para los comestibles, los moldes: te los consigue Txomin, en la puerta.")
 			return
@@ -6874,6 +7115,12 @@ func mesa_setas() -> void:
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "" or op == "Nada":
 			return
+		if op == "Juntar micelios":
+			await juntar_micelios()
+			continue
+		if op == "El cuaderno":
+			await cuaderno_setas()
+			continue
 		var mc: bool = op.begins_with("Micro")
 		if L.g < Z.lote:
 			sfx("bad")
@@ -6884,6 +7131,8 @@ func mesa_setas() -> void:
 			await say("Sin %s no hay chocolate." % Datos.eur(Z.choco))
 			continue
 		L.g -= Z.lote
+		if Datos.CAL:
+			quita_gv(L, Z.lote)
 		if not mc:
 			S.money -= int(Z.choco)
 		var kk: String = "mc" if mc else "cc"
@@ -6899,7 +7148,15 @@ func desc_armario() -> String:
 	var g := 0
 	for f in fr:
 		g += int(f.g)
-	return "Setas secas: %s · microdosis: %d · comestibles: %d.%s\nB: cerrar." % [g_txt(L.g), int(L.get("mc", 0)), int(L.get("cc", 0)), (" Secándose, %s." % g_txt(g)) if g else ""]
+	var cv := ""
+	if Datos.CAL and L.g >= 1:   # 1.46: lo seco, por cepa
+		var gv := gv_setas(L)
+		var t := []
+		for k in gv:
+			if gv[k] >= 1:
+				t.append("%s %s" % [nom_cepa(k), g_txt(gv[k])])
+		cv = " (" + ", ".join(PackedStringArray(t)) + ")"
+	return "Setas secas: %s%s · microdosis: %d · comestibles: %d.%s\nB: cerrar." % [g_txt(L.g), cv, int(L.get("mc", 0)), int(L.get("cc", 0)), (" Secándose, %s." % g_txt(g)) if g else ""]
 
 func vista_armario() -> void:
 	if gancho_bajo.is_valid():

@@ -3,7 +3,7 @@
  "imagen": "atlas.png",
  "tamano": [
   1024,
-  3668
+  3672
  ],
  "frames": {
   "carpa-c-fondo/carpa-c-luz-led/unica/00": {
@@ -3084,68 +3084,62 @@
    "w": 48,
    "h": 48
   },
-  "negocios-ancho/elevT/unica/00": {
+  "negocios-ancho/hornoP/unica/00": {
    "x": 528,
    "y": 2392,
    "w": 48,
    "h": 48
   },
-  "negocios-ancho/fosoB/unica/00": {
+  "negocios-ancho/mostrP/unica/00": {
    "x": 576,
    "y": 2392,
    "w": 48,
    "h": 48
   },
-  "negocios-ancho/fosoT/unica/00": {
+  "negocios-ancho/mostrQ/unica/00": {
    "x": 624,
    "y": 2392,
    "w": 48,
    "h": 48
   },
-  "negocios-ancho/hornoP/unica/00": {
+  "negocios-coche/elevT/unica/00": {
    "x": 672,
    "y": 2392,
-   "w": 48,
+   "w": 80,
    "h": 48
   },
-  "negocios-ancho/mostrP/unica/00": {
-   "x": 720,
+  "negocios-coche/fosoT/unica/00": {
+   "x": 752,
    "y": 2392,
-   "w": 48,
-   "h": 48
-  },
-  "negocios-ancho/mostrQ/unica/00": {
-   "x": 768,
-   "y": 2392,
-   "w": 48,
+   "w": 80,
    "h": 48
   },
   "prop-monte/monte/unica/00": {
-   "x": 816,
+   "x": 832,
    "y": 2392,
    "w": 48,
    "h": 48
   },
   "prop-monte/monte2/unica/00": {
-   "x": 864,
+   "x": 880,
    "y": 2392,
    "w": 48,
    "h": 48
   },
   "prop-parada/parada/unica/00": {
-   "x": 912,
+   "x": 928,
    "y": 2392,
    "w": 16,
    "h": 48
   },
   "props-escala/crate/unica/00": {
-   "x": 928,
+   "x": 944,
    "y": 2392,
    "w": 32,
    "h": 48
   },
   "props-escala/fridge/unica/00": {
-   "x": 960,
+   "x": 976,
    "y": 2392,
    "w": 32,
    "h": 48
@@ -7104,5216 +7098,5228 @@
    "w": 32,
    "h": 32
   },
-  "negocios-alto/panP/unica/00": {
+  "negocios-alto/diagT/unica/00": {
    "x": 800,
+   "y": 3096,
+   "w": 32,
+   "h": 32
+  },
+  "negocios-alto/equiT/unica/00": {
+   "x": 832,
+   "y": 3096,
+   "w": 32,
+   "h": 32
+  },
+  "negocios-alto/panP/unica/00": {
+   "x": 864,
    "y": 3096,
    "w": 32,
    "h": 32
   },
   "negocios-alto/prodL/unica/00": {
-   "x": 832,
+   "x": 896,
    "y": 3096,
    "w": 32,
    "h": 32
   },
   "negocios-alto/recambT/unica/00": {
-   "x": 864,
+   "x": 928,
    "y": 3096,
    "w": 32,
    "h": 32
   },
   "negocios-alto/tabique/unica/00": {
-   "x": 896,
+   "x": 960,
    "y": 3096,
    "w": 32,
    "h": 32
   },
   "patxi/base/east/00": {
-   "x": 928,
+   "x": 992,
    "y": 3096,
    "w": 32,
    "h": 32
   },
   "patxi/base/north/00": {
-   "x": 960,
-   "y": 3096,
+   "x": 0,
+   "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/base/south/00": {
-   "x": 992,
-   "y": 3096,
+   "x": 32,
+   "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/base/west/00": {
-   "x": 0,
+   "x": 64,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/idle/south/00": {
-   "x": 32,
+   "x": 96,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/idle/south/01": {
-   "x": 64,
+   "x": 128,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/idle/south/02": {
-   "x": 96,
+   "x": 160,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/idle/south/03": {
-   "x": 128,
+   "x": 192,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/north/00": {
-   "x": 160,
+   "x": 224,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/north/01": {
-   "x": 192,
+   "x": 256,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/north/02": {
-   "x": 224,
+   "x": 288,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/north/03": {
-   "x": 256,
+   "x": 320,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/north/04": {
-   "x": 288,
+   "x": 352,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/north/05": {
-   "x": 320,
+   "x": 384,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/north/06": {
-   "x": 352,
+   "x": 416,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/north/07": {
-   "x": 384,
+   "x": 448,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/south/00": {
-   "x": 416,
+   "x": 480,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/south/01": {
-   "x": 448,
+   "x": 512,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/south/02": {
-   "x": 480,
+   "x": 544,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/south/03": {
-   "x": 512,
+   "x": 576,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/south/04": {
-   "x": 544,
+   "x": 608,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/south/05": {
-   "x": 576,
+   "x": 640,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/south/06": {
-   "x": 608,
+   "x": 672,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "patxi/palomas/south/07": {
-   "x": 640,
+   "x": 704,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "player/base/east/00": {
-   "x": 672,
+   "x": 736,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "player/base/north/00": {
-   "x": 704,
+   "x": 768,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "player/base/south/00": {
-   "x": 736,
+   "x": 800,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "player/base/west/00": {
-   "x": 768,
+   "x": 832,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "player/cosechar/east/00": {
-   "x": 800,
+   "x": 864,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "player/cosechar/east/01": {
-   "x": 832,
+   "x": 896,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "player/cosechar/east/02": {
-   "x": 864,
+   "x": 928,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "player/cosechar/east/03": {
-   "x": 896,
+   "x": 960,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "player/cosechar/east/04": {
-   "x": 928,
+   "x": 992,
    "y": 3128,
    "w": 32,
    "h": 32
   },
   "player/cosechar/east/05": {
-   "x": 960,
-   "y": 3128,
+   "x": 0,
+   "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/north/00": {
-   "x": 992,
-   "y": 3128,
+   "x": 32,
+   "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/north/01": {
-   "x": 0,
+   "x": 64,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/north/02": {
-   "x": 32,
+   "x": 96,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/north/03": {
-   "x": 64,
+   "x": 128,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/north/04": {
-   "x": 96,
+   "x": 160,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/north/05": {
-   "x": 128,
+   "x": 192,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/south/00": {
-   "x": 160,
+   "x": 224,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/south/01": {
-   "x": 192,
+   "x": 256,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/south/02": {
-   "x": 224,
+   "x": 288,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/south/03": {
-   "x": 256,
+   "x": 320,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/south/04": {
-   "x": 288,
+   "x": 352,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/south/05": {
-   "x": 320,
+   "x": 384,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/west/00": {
-   "x": 352,
+   "x": 416,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/west/01": {
-   "x": 384,
+   "x": 448,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/west/02": {
-   "x": 416,
+   "x": 480,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/west/03": {
-   "x": 448,
+   "x": 512,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/west/04": {
-   "x": 480,
+   "x": 544,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cosechar/west/05": {
-   "x": 512,
+   "x": 576,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cruzar/north/00": {
-   "x": 544,
+   "x": 608,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cruzar/north/01": {
-   "x": 576,
+   "x": 640,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cruzar/north/02": {
-   "x": 608,
+   "x": 672,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cruzar/north/03": {
-   "x": 640,
+   "x": 704,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cruzar/north/04": {
-   "x": 672,
+   "x": 736,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cruzar/north/05": {
-   "x": 704,
+   "x": 768,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cruzar/north/06": {
-   "x": 736,
+   "x": 800,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/cruzar/north/07": {
-   "x": 768,
+   "x": 832,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/idle/east/00": {
-   "x": 800,
+   "x": 864,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/idle/east/01": {
-   "x": 832,
+   "x": 896,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/idle/east/02": {
-   "x": 864,
+   "x": 928,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/idle/east/03": {
-   "x": 896,
+   "x": 960,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/idle/north/00": {
-   "x": 928,
+   "x": 992,
    "y": 3160,
    "w": 32,
    "h": 32
   },
   "player/idle/north/01": {
-   "x": 960,
-   "y": 3160,
+   "x": 0,
+   "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/idle/north/02": {
-   "x": 992,
-   "y": 3160,
+   "x": 32,
+   "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/idle/north/03": {
-   "x": 0,
+   "x": 64,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/idle/south/00": {
-   "x": 32,
+   "x": 96,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/idle/south/01": {
-   "x": 64,
+   "x": 128,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/idle/south/02": {
-   "x": 96,
+   "x": 160,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/idle/south/03": {
-   "x": 128,
+   "x": 192,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/idle/west/00": {
-   "x": 160,
+   "x": 224,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/idle/west/01": {
-   "x": 192,
+   "x": 256,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/idle/west/02": {
-   "x": 224,
+   "x": 288,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/idle/west/03": {
-   "x": 256,
+   "x": 320,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/oler/south/00": {
-   "x": 288,
+   "x": 352,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/oler/south/01": {
-   "x": 320,
+   "x": 384,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/oler/south/02": {
-   "x": 352,
+   "x": 416,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/oler/south/03": {
-   "x": 384,
+   "x": 448,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/oler/south/04": {
-   "x": 416,
+   "x": 480,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/oler/south/05": {
-   "x": 448,
+   "x": 512,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/oler/south/06": {
-   "x": 480,
+   "x": 544,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/oler/south/07": {
-   "x": 512,
+   "x": 576,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/east/00": {
-   "x": 544,
+   "x": 608,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/east/01": {
-   "x": 576,
+   "x": 640,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/east/02": {
-   "x": 608,
+   "x": 672,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/east/03": {
-   "x": 640,
+   "x": 704,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/east/04": {
-   "x": 672,
+   "x": 736,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/east/05": {
-   "x": 704,
+   "x": 768,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/north/00": {
-   "x": 736,
+   "x": 800,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/north/01": {
-   "x": 768,
+   "x": 832,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/north/02": {
-   "x": 800,
+   "x": 864,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/north/03": {
-   "x": 832,
+   "x": 896,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/north/04": {
-   "x": 864,
+   "x": 928,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/north/05": {
-   "x": 896,
+   "x": 960,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/south/00": {
-   "x": 928,
+   "x": 992,
    "y": 3192,
    "w": 32,
    "h": 32
   },
   "player/plantar/south/01": {
-   "x": 960,
-   "y": 3192,
+   "x": 0,
+   "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/plantar/south/02": {
-   "x": 992,
-   "y": 3192,
+   "x": 32,
+   "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/plantar/south/03": {
-   "x": 0,
+   "x": 64,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/plantar/south/04": {
-   "x": 32,
+   "x": 96,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/plantar/south/05": {
-   "x": 64,
+   "x": 128,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/plantar/west/00": {
-   "x": 96,
+   "x": 160,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/plantar/west/01": {
-   "x": 128,
+   "x": 192,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/plantar/west/02": {
-   "x": 160,
+   "x": 224,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/plantar/west/03": {
-   "x": 192,
+   "x": 256,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/plantar/west/04": {
-   "x": 224,
+   "x": 288,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/plantar/west/05": {
-   "x": 256,
+   "x": 320,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/east/00": {
-   "x": 288,
+   "x": 352,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/east/01": {
-   "x": 320,
+   "x": 384,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/east/02": {
-   "x": 352,
+   "x": 416,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/east/03": {
-   "x": 384,
+   "x": 448,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/east/04": {
-   "x": 416,
+   "x": 480,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/east/05": {
-   "x": 448,
+   "x": 512,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/east/06": {
-   "x": 480,
+   "x": 544,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/east/07": {
-   "x": 512,
+   "x": 576,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/north/00": {
-   "x": 544,
+   "x": 608,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/north/01": {
-   "x": 576,
+   "x": 640,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/north/02": {
-   "x": 608,
+   "x": 672,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/north/03": {
-   "x": 640,
+   "x": 704,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/north/04": {
-   "x": 672,
+   "x": 736,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/north/05": {
-   "x": 704,
+   "x": 768,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/north/06": {
-   "x": 736,
+   "x": 800,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/north/07": {
-   "x": 768,
+   "x": 832,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/south/00": {
-   "x": 800,
+   "x": 864,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/south/01": {
-   "x": 832,
+   "x": 896,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/south/02": {
-   "x": 864,
+   "x": 928,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/south/03": {
-   "x": 896,
+   "x": 960,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/south/04": {
-   "x": 928,
+   "x": 992,
    "y": 3224,
    "w": 32,
    "h": 32
   },
   "player/regar/south/05": {
-   "x": 960,
-   "y": 3224,
+   "x": 0,
+   "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/regar/south/06": {
-   "x": 992,
-   "y": 3224,
+   "x": 32,
+   "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/regar/south/07": {
-   "x": 0,
+   "x": 64,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/regar/west/00": {
-   "x": 32,
+   "x": 96,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/regar/west/01": {
-   "x": 64,
+   "x": 128,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/regar/west/02": {
-   "x": 96,
+   "x": 160,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/regar/west/03": {
-   "x": 128,
+   "x": 192,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/regar/west/04": {
-   "x": 160,
+   "x": 224,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/regar/west/05": {
-   "x": 192,
+   "x": 256,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/regar/west/06": {
-   "x": 224,
+   "x": 288,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/regar/west/07": {
-   "x": 256,
+   "x": 320,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/east/00": {
-   "x": 288,
+   "x": 352,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/east/01": {
-   "x": 320,
+   "x": 384,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/east/02": {
-   "x": 352,
+   "x": 416,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/east/03": {
-   "x": 384,
+   "x": 448,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/east/04": {
-   "x": 416,
+   "x": 480,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/east/05": {
-   "x": 448,
+   "x": 512,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/north/00": {
-   "x": 480,
+   "x": 544,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/north/01": {
-   "x": 512,
+   "x": 576,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/north/02": {
-   "x": 544,
+   "x": 608,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/north/03": {
-   "x": 576,
+   "x": 640,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/north/04": {
-   "x": 608,
+   "x": 672,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/north/05": {
-   "x": 640,
+   "x": 704,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/south/00": {
-   "x": 672,
+   "x": 736,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/south/01": {
-   "x": 704,
+   "x": 768,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/south/02": {
-   "x": 736,
+   "x": 800,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/south/03": {
-   "x": 768,
+   "x": 832,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/south/04": {
-   "x": 800,
+   "x": 864,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/south/05": {
-   "x": 832,
+   "x": 896,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/west/00": {
-   "x": 864,
+   "x": 928,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/west/01": {
-   "x": 896,
+   "x": 960,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/west/02": {
-   "x": 928,
+   "x": 992,
    "y": 3256,
    "w": 32,
    "h": 32
   },
   "player/run/west/03": {
-   "x": 960,
-   "y": 3256,
+   "x": 0,
+   "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/run/west/04": {
-   "x": 992,
-   "y": 3256,
+   "x": 32,
+   "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/run/west/05": {
-   "x": 0,
+   "x": 64,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/telefono/south/00": {
-   "x": 32,
+   "x": 96,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/telefono/south/01": {
-   "x": 64,
+   "x": 128,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/telefono/south/02": {
-   "x": 96,
+   "x": 160,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/telefono/south/03": {
-   "x": 128,
+   "x": 192,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/telefono/south/04": {
-   "x": 160,
+   "x": 224,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/telefono/south/05": {
-   "x": 192,
+   "x": 256,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/east/00": {
-   "x": 224,
+   "x": 288,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/east/01": {
-   "x": 256,
+   "x": 320,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/east/02": {
-   "x": 288,
+   "x": 352,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/east/03": {
-   "x": 320,
+   "x": 384,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/east/04": {
-   "x": 352,
+   "x": 416,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/east/05": {
-   "x": 384,
+   "x": 448,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/east/06": {
-   "x": 416,
+   "x": 480,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/east/07": {
-   "x": 448,
+   "x": 512,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/north/00": {
-   "x": 480,
+   "x": 544,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/north/01": {
-   "x": 512,
+   "x": 576,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/north/02": {
-   "x": 544,
+   "x": 608,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/north/03": {
-   "x": 576,
+   "x": 640,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/north/04": {
-   "x": 608,
+   "x": 672,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/north/05": {
-   "x": 640,
+   "x": 704,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/north/06": {
-   "x": 672,
+   "x": 736,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/north/07": {
-   "x": 704,
+   "x": 768,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/south/00": {
-   "x": 736,
+   "x": 800,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/south/01": {
-   "x": 768,
+   "x": 832,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/south/02": {
-   "x": 800,
+   "x": 864,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/south/03": {
-   "x": 832,
+   "x": 896,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/south/04": {
-   "x": 864,
+   "x": 928,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/south/05": {
-   "x": 896,
+   "x": 960,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/south/06": {
-   "x": 928,
+   "x": 992,
    "y": 3288,
    "w": 32,
    "h": 32
   },
   "player/vender/south/07": {
-   "x": 960,
-   "y": 3288,
+   "x": 0,
+   "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/vender/west/00": {
-   "x": 992,
-   "y": 3288,
+   "x": 32,
+   "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/vender/west/01": {
-   "x": 0,
+   "x": 64,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/vender/west/02": {
-   "x": 32,
+   "x": 96,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/vender/west/03": {
-   "x": 64,
+   "x": 128,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/vender/west/04": {
-   "x": 96,
+   "x": 160,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/vender/west/05": {
-   "x": 128,
+   "x": 192,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/vender/west/06": {
-   "x": 160,
+   "x": 224,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/vender/west/07": {
-   "x": 192,
+   "x": 256,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/east/00": {
-   "x": 224,
+   "x": 288,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/east/01": {
-   "x": 256,
+   "x": 320,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/east/02": {
-   "x": 288,
+   "x": 352,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/east/03": {
-   "x": 320,
+   "x": 384,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/north/00": {
-   "x": 352,
+   "x": 416,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/north/01": {
-   "x": 384,
+   "x": 448,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/north/02": {
-   "x": 416,
+   "x": 480,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/north/03": {
-   "x": 448,
+   "x": 512,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/south/00": {
-   "x": 480,
+   "x": 544,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/south/01": {
-   "x": 512,
+   "x": 576,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/south/02": {
-   "x": 544,
+   "x": 608,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/south/03": {
-   "x": 576,
+   "x": 640,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/west/00": {
-   "x": 608,
+   "x": 672,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/west/01": {
-   "x": 640,
+   "x": 704,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/west/02": {
-   "x": 672,
+   "x": 736,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "player/walk/west/03": {
-   "x": 704,
+   "x": 768,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "prop-arbol/tree/unica/00": {
-   "x": 736,
+   "x": 800,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "prop-farola/lamp/unica/00": {
-   "x": 768,
+   "x": 832,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "prop-fuente/agua/unica/00": {
-   "x": 800,
+   "x": 864,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "prop-fuente/agua/unica/01": {
-   "x": 832,
+   "x": 896,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "prop-fuente/agua/unica/02": {
-   "x": 864,
+   "x": 928,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "prop-fuente/agua/unica/03": {
-   "x": 896,
+   "x": 960,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "prop-fuente/agua/unica/04": {
-   "x": 928,
+   "x": 992,
    "y": 3320,
    "w": 32,
    "h": 32
   },
   "prop-fuente/agua/unica/05": {
-   "x": 960,
-   "y": 3320,
+   "x": 0,
+   "y": 3352,
    "w": 32,
    "h": 32
   },
   "prop-fuente/fountain/unica/00": {
-   "x": 992,
-   "y": 3320,
+   "x": 32,
+   "y": 3352,
    "w": 32,
    "h": 32
   },
   "prop-gramola-alta/jukebox/unica/00": {
-   "x": 0,
+   "x": 64,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "props-32/bedB/unica/00": {
-   "x": 32,
+   "x": 96,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "props-32/bedT/unica/00": {
-   "x": 64,
+   "x": 128,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "props-32/fridge/unica/00": {
-   "x": 96,
+   "x": 160,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/agua/unica/00": {
-   "x": 128,
+   "x": 192,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/agua/unica/01": {
-   "x": 160,
+   "x": 224,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/agua/unica/02": {
-   "x": 192,
+   "x": 256,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/agua/unica/03": {
-   "x": 224,
+   "x": 288,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/flores/unica/00": {
-   "x": 256,
+   "x": 320,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/flores/unica/01": {
-   "x": 288,
+   "x": 352,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/flores/unica/02": {
-   "x": 320,
+   "x": 384,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/flores/unica/03": {
-   "x": 352,
+   "x": 416,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/hierba-pisada/unica/00": {
-   "x": 384,
+   "x": 448,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/hierba-pisada/unica/01": {
-   "x": 416,
+   "x": 480,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/hierba-pisada/unica/02": {
-   "x": 448,
+   "x": 512,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tiles-exterior/hierba-pisada/unica/03": {
-   "x": 480,
+   "x": 544,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/base/east/00": {
-   "x": 512,
+   "x": 576,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/base/north/00": {
-   "x": 544,
+   "x": 608,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/base/south/00": {
-   "x": 576,
+   "x": 640,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/base/west/00": {
-   "x": 608,
+   "x": 672,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/fumar/south/00": {
-   "x": 640,
+   "x": 704,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/fumar/south/01": {
-   "x": 672,
+   "x": 736,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/fumar/south/02": {
-   "x": 704,
+   "x": 768,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/fumar/south/03": {
-   "x": 736,
+   "x": 800,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/fumar/south/04": {
-   "x": 768,
+   "x": 832,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/fumar/south/05": {
-   "x": 800,
+   "x": 864,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/fumar/south/06": {
-   "x": 832,
+   "x": 896,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/fumar/south/07": {
-   "x": 864,
+   "x": 928,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/idle/east/00": {
-   "x": 896,
+   "x": 960,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/idle/east/01": {
-   "x": 928,
+   "x": 992,
    "y": 3352,
    "w": 32,
    "h": 32
   },
   "tono/idle/east/02": {
-   "x": 960,
-   "y": 3352,
+   "x": 0,
+   "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/idle/east/03": {
-   "x": 992,
-   "y": 3352,
+   "x": 32,
+   "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/idle/north/00": {
-   "x": 0,
+   "x": 64,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/idle/north/01": {
-   "x": 32,
+   "x": 96,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/idle/north/02": {
-   "x": 64,
+   "x": 128,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/idle/north/03": {
-   "x": 96,
+   "x": 160,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/idle/south/00": {
-   "x": 128,
+   "x": 192,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/idle/south/01": {
-   "x": 160,
+   "x": 224,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/idle/south/02": {
-   "x": 192,
+   "x": 256,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/idle/south/03": {
-   "x": 224,
+   "x": 288,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/nudillos/south/00": {
-   "x": 256,
+   "x": 320,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/nudillos/south/01": {
-   "x": 288,
+   "x": 352,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/nudillos/south/02": {
-   "x": 320,
+   "x": 384,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/nudillos/south/03": {
-   "x": 352,
+   "x": 416,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/nudillos/south/04": {
-   "x": 384,
+   "x": 448,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "tono/nudillos/south/05": {
-   "x": 416,
+   "x": 480,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/base/east/00": {
-   "x": 448,
+   "x": 512,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/base/north/00": {
-   "x": 480,
+   "x": 544,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/base/south/00": {
-   "x": 512,
+   "x": 576,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/base/west/00": {
-   "x": 544,
+   "x": 608,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/idle/south/00": {
-   "x": 576,
+   "x": 640,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/idle/south/01": {
-   "x": 608,
+   "x": 672,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/idle/south/02": {
-   "x": 640,
+   "x": 704,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/idle/south/03": {
-   "x": 672,
+   "x": 736,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/punto/south/00": {
-   "x": 704,
+   "x": 768,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/punto/south/01": {
-   "x": 736,
+   "x": 800,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/punto/south/02": {
-   "x": 768,
+   "x": 832,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/punto/south/03": {
-   "x": 800,
+   "x": 864,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/punto/south/04": {
-   "x": 832,
+   "x": 896,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/punto/south/05": {
-   "x": 864,
+   "x": 928,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/punto/south/06": {
-   "x": 896,
+   "x": 960,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "txaro/punto/south/07": {
-   "x": 928,
+   "x": 992,
    "y": 3384,
    "w": 32,
    "h": 32
   },
   "unai/base/east/00": {
-   "x": 960,
-   "y": 3384,
+   "x": 0,
+   "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/base/north/00": {
-   "x": 992,
-   "y": 3384,
+   "x": 32,
+   "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/base/south/00": {
-   "x": 0,
+   "x": 64,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/base/west/00": {
-   "x": 32,
+   "x": 96,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/idle/south/00": {
-   "x": 64,
+   "x": 128,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/idle/south/01": {
-   "x": 96,
+   "x": 160,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/idle/south/02": {
-   "x": 128,
+   "x": 192,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/idle/south/03": {
-   "x": 160,
+   "x": 224,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/pelota/south/00": {
-   "x": 192,
+   "x": 256,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/pelota/south/01": {
-   "x": 224,
+   "x": 288,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/pelota/south/02": {
-   "x": 256,
+   "x": 320,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/pelota/south/03": {
-   "x": 288,
+   "x": 352,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/pelota/south/04": {
-   "x": 320,
+   "x": 384,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/pelota/south/05": {
-   "x": 352,
+   "x": 416,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/pelota/south/06": {
-   "x": 384,
+   "x": 448,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/pelota/south/07": {
-   "x": 416,
+   "x": 480,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/east/00": {
-   "x": 448,
+   "x": 512,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/east/01": {
-   "x": 480,
+   "x": 544,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/east/02": {
-   "x": 512,
+   "x": 576,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/east/03": {
-   "x": 544,
+   "x": 608,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/north/00": {
-   "x": 576,
+   "x": 640,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/north/01": {
-   "x": 608,
+   "x": 672,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/north/02": {
-   "x": 640,
+   "x": 704,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/north/03": {
-   "x": 672,
+   "x": 736,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/south/00": {
-   "x": 704,
+   "x": 768,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/south/01": {
-   "x": 736,
+   "x": 800,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/south/02": {
-   "x": 768,
+   "x": 832,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "unai/walk/south/03": {
-   "x": 800,
+   "x": 864,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-atras/east/00": {
-   "x": 832,
+   "x": 896,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-atras/east/01": {
-   "x": 864,
+   "x": 928,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-atras/north/00": {
-   "x": 896,
+   "x": 960,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-atras/north/01": {
-   "x": 928,
+   "x": 992,
    "y": 3416,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-atras/south/00": {
-   "x": 960,
-   "y": 3416,
+   "x": 0,
+   "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-atras/south/01": {
-   "x": 992,
-   "y": 3416,
+   "x": 32,
+   "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-delante/east/00": {
-   "x": 0,
+   "x": 64,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-delante/east/01": {
-   "x": 32,
+   "x": 96,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-delante/north/00": {
-   "x": 64,
+   "x": 128,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-delante/north/01": {
-   "x": 96,
+   "x": 160,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-delante/south/00": {
-   "x": 128,
+   "x": 192,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/berlina-delante/south/01": {
-   "x": 160,
+   "x": 224,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-atras/east/00": {
-   "x": 192,
+   "x": 256,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-atras/east/01": {
-   "x": 224,
+   "x": 288,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-atras/north/00": {
-   "x": 256,
+   "x": 320,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-atras/north/01": {
-   "x": 288,
+   "x": 352,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-atras/south/00": {
-   "x": 320,
+   "x": 384,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-atras/south/01": {
-   "x": 352,
+   "x": 416,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-delante/east/00": {
-   "x": 384,
+   "x": 448,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-delante/east/01": {
-   "x": 416,
+   "x": 480,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-delante/north/00": {
-   "x": 448,
+   "x": 512,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-delante/north/01": {
-   "x": 480,
+   "x": 544,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-delante/south/00": {
-   "x": 512,
+   "x": 576,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/bici-delante/south/01": {
-   "x": 544,
+   "x": 608,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-atras/east/00": {
-   "x": 576,
+   "x": 640,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-atras/east/01": {
-   "x": 608,
+   "x": 672,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-atras/north/00": {
-   "x": 640,
+   "x": 704,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-atras/north/01": {
-   "x": 672,
+   "x": 736,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-atras/south/00": {
-   "x": 704,
+   "x": 768,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-atras/south/01": {
-   "x": 736,
+   "x": 800,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-delante/east/00": {
-   "x": 768,
+   "x": 832,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-delante/east/01": {
-   "x": 800,
+   "x": 864,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-delante/north/00": {
-   "x": 832,
+   "x": 896,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-delante/north/01": {
-   "x": 864,
+   "x": 928,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-delante/south/00": {
-   "x": 896,
+   "x": 960,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/deportivo-delante/south/01": {
-   "x": 928,
+   "x": 992,
    "y": 3448,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-atras/east/00": {
-   "x": 960,
-   "y": 3448,
+   "x": 0,
+   "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-atras/east/01": {
-   "x": 992,
-   "y": 3448,
+   "x": 32,
+   "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-atras/north/00": {
-   "x": 0,
+   "x": 64,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-atras/north/01": {
-   "x": 32,
+   "x": 96,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-atras/south/00": {
-   "x": 64,
+   "x": 128,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-atras/south/01": {
-   "x": 96,
+   "x": 160,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-delante/east/00": {
-   "x": 128,
+   "x": 192,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-delante/east/01": {
-   "x": 160,
+   "x": 224,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-delante/north/00": {
-   "x": 192,
+   "x": 256,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-delante/north/01": {
-   "x": 224,
+   "x": 288,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-delante/south/00": {
-   "x": 256,
+   "x": 320,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/moto-delante/south/01": {
-   "x": 288,
+   "x": 352,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-atras/east/00": {
-   "x": 320,
+   "x": 384,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-atras/east/01": {
-   "x": 352,
+   "x": 416,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-atras/north/00": {
-   "x": 384,
+   "x": 448,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-atras/north/01": {
-   "x": 416,
+   "x": 480,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-atras/south/00": {
-   "x": 448,
+   "x": 512,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-atras/south/01": {
-   "x": 480,
+   "x": 544,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-delante/east/00": {
-   "x": 512,
+   "x": 576,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-delante/east/01": {
-   "x": 544,
+   "x": 608,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-delante/north/00": {
-   "x": 576,
+   "x": 640,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-delante/north/01": {
-   "x": 608,
+   "x": 672,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-delante/south/00": {
-   "x": 640,
+   "x": 704,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/patinete-delante/south/01": {
-   "x": 672,
+   "x": 736,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-atras/east/00": {
-   "x": 704,
+   "x": 768,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-atras/east/01": {
-   "x": 736,
+   "x": 800,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-atras/north/00": {
-   "x": 768,
+   "x": 832,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-atras/north/01": {
-   "x": 800,
+   "x": 864,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-atras/south/00": {
-   "x": 832,
+   "x": 896,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-atras/south/01": {
-   "x": 864,
+   "x": 928,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-delante/east/00": {
-   "x": 896,
+   "x": 960,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-delante/east/01": {
-   "x": 928,
+   "x": 992,
    "y": 3480,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-delante/north/00": {
-   "x": 960,
-   "y": 3480,
+   "x": 0,
+   "y": 3512,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-delante/north/01": {
-   "x": 992,
-   "y": 3480,
+   "x": 32,
+   "y": 3512,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-delante/south/00": {
-   "x": 0,
+   "x": 64,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vehiculos/utilitario-delante/south/01": {
-   "x": 32,
+   "x": 96,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/00": {
-   "x": 64,
+   "x": 128,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/01": {
-   "x": 96,
+   "x": 160,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/02": {
-   "x": 128,
+   "x": 192,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/03": {
-   "x": 160,
+   "x": 224,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/04": {
-   "x": 192,
+   "x": 256,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/05": {
-   "x": 224,
+   "x": 288,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/06": {
-   "x": 256,
+   "x": 320,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-nube-vaper/efecto/unica/07": {
-   "x": 288,
+   "x": 352,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/00": {
-   "x": 320,
+   "x": 384,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/01": {
-   "x": 352,
+   "x": 416,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/02": {
-   "x": 384,
+   "x": 448,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/03": {
-   "x": 416,
+   "x": 480,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/04": {
-   "x": 448,
+   "x": 512,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "vfx-spray/efecto/unica/05": {
-   "x": 480,
+   "x": 544,
    "y": 3512,
    "w": 32,
    "h": 32
   },
   "almacen/alm-mas-xl/unica/00": {
-   "x": 512,
+   "x": 576,
    "y": 3512,
    "w": 22,
    "h": 31
   },
   "almacen/alm-tarro-xl-s/unica/00": {
-   "x": 534,
+   "x": 598,
    "y": 3512,
    "w": 22,
    "h": 31
   },
   "almacen/alm-tarro-xl/unica/00": {
-   "x": 556,
+   "x": 620,
    "y": 3512,
    "w": 22,
    "h": 31
   },
   "almacen/alm-cog-p-1-xl/unica/00": {
-   "x": 578,
+   "x": 642,
    "y": 3512,
    "w": 20,
    "h": 26
   },
   "almacen/alm-cog-p-2-xl/unica/00": {
-   "x": 598,
+   "x": 662,
    "y": 3512,
    "w": 20,
    "h": 26
   },
   "almacen/alm-cog-p-3-xl/unica/00": {
-   "x": 618,
+   "x": 682,
    "y": 3512,
    "w": 20,
    "h": 26
   },
   "almacen/alm-cog-p-4-xl/unica/00": {
-   "x": 638,
+   "x": 702,
    "y": 3512,
    "w": 20,
    "h": 26
   },
   "almacen/alm-cog-s-1-xl/unica/00": {
-   "x": 658,
+   "x": 722,
    "y": 3512,
    "w": 20,
    "h": 26
   },
   "almacen/alm-cog-s-2-xl/unica/00": {
-   "x": 678,
+   "x": 742,
    "y": 3512,
    "w": 20,
    "h": 26
   },
   "almacen/alm-cog-s-3-xl/unica/00": {
-   "x": 698,
+   "x": 762,
    "y": 3512,
    "w": 20,
    "h": 26
   },
   "almacen/alm-cog-s-4-xl/unica/00": {
-   "x": 718,
+   "x": 782,
    "y": 3512,
    "w": 20,
    "h": 26
   },
   "almacen/alm-mas/unica/00": {
-   "x": 738,
+   "x": 802,
    "y": 3512,
    "w": 18,
    "h": 25
   },
   "almacen/alm-tarro-s/unica/00": {
-   "x": 756,
+   "x": 820,
    "y": 3512,
    "w": 18,
    "h": 25
   },
   "almacen/alm-tarro/unica/00": {
-   "x": 774,
+   "x": 838,
    "y": 3512,
    "w": 18,
    "h": 25
   },
   "almacen/alm-bote-g/unica/00": {
-   "x": 792,
+   "x": 856,
    "y": 3512,
    "w": 24,
    "h": 24
   },
   "macetas-vista/maceta-vista-plastico18/unica/00": {
-   "x": 816,
+   "x": 880,
    "y": 3512,
    "w": 32,
    "h": 24
   },
   "macetas-vista/maceta-vista-plastico7/unica/00": {
-   "x": 848,
+   "x": 912,
    "y": 3512,
    "w": 32,
    "h": 24
   },
   "macetas-vista/maceta-vista-tela11/unica/00": {
-   "x": 880,
+   "x": 944,
    "y": 3512,
    "w": 32,
    "h": 24
   },
   "macetas-vista/maceta-vista-tela25/unica/00": {
-   "x": 912,
+   "x": 976,
    "y": 3512,
    "w": 32,
    "h": 24
   },
   "almacen/alm-cog-p-1/unica/00": {
-   "x": 944,
+   "x": 1008,
    "y": 3512,
    "w": 16,
    "h": 20
   },
   "almacen/alm-cog-p-2/unica/00": {
-   "x": 960,
-   "y": 3512,
+   "x": 0,
+   "y": 3544,
    "w": 16,
    "h": 20
   },
   "almacen/alm-cog-p-3/unica/00": {
-   "x": 976,
-   "y": 3512,
+   "x": 16,
+   "y": 3544,
    "w": 16,
    "h": 20
   },
   "almacen/alm-cog-p-4/unica/00": {
-   "x": 992,
-   "y": 3512,
+   "x": 32,
+   "y": 3544,
    "w": 16,
    "h": 20
   },
   "almacen/alm-cog-s-1/unica/00": {
-   "x": 1008,
-   "y": 3512,
+   "x": 48,
+   "y": 3544,
    "w": 16,
    "h": 20
   },
   "almacen/alm-cog-s-2/unica/00": {
-   "x": 0,
+   "x": 64,
    "y": 3544,
    "w": 16,
    "h": 20
   },
   "almacen/alm-cog-s-3/unica/00": {
-   "x": 16,
+   "x": 80,
    "y": 3544,
    "w": 16,
    "h": 20
   },
   "almacen/alm-cog-s-4/unica/00": {
-   "x": 32,
+   "x": 96,
    "y": 3544,
    "w": 16,
    "h": 20
   },
   "almacen/alm-fajo-g/unica/00": {
-   "x": 48,
+   "x": 112,
    "y": 3544,
    "w": 30,
    "h": 16
   },
   "bajo-16/deshidS-0/unica/00": {
-   "x": 78,
-   "y": 3544,
-   "w": 16,
-   "h": 16
-  },
-  "bajo-16/deshidS-1/unica/00": {
-   "x": 94,
-   "y": 3544,
-   "w": 16,
-   "h": 16
-  },
-  "camarote-16/deshumC/unica/00": {
-   "x": 110,
-   "y": 3544,
-   "w": 16,
-   "h": 16
-  },
-  "camarote-tiles/floorCam/unica/00": {
-   "x": 126,
-   "y": 3544,
-   "w": 16,
-   "h": 16
-  },
-  "camarote-tiles/iwB_cam/unica/00": {
    "x": 142,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "camarote-tiles/iwT_cam/unica/00": {
+  "bajo-16/deshidS-1/unica/00": {
    "x": 158,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "camarote-tiles/iwT_camV/unica/00": {
+  "camarote-16/deshumC/unica/00": {
    "x": 174,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "camarote-tiles/trampC/unica/00": {
+  "camarote-tiles/floorCam/unica/00": {
    "x": 190,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "carpa-c-focos-cfl/foco-c-cfl-36/unica/00": {
+  "camarote-tiles/iwB_cam/unica/00": {
    "x": 206,
+   "y": 3544,
+   "w": 16,
+   "h": 16
+  },
+  "camarote-tiles/iwT_cam/unica/00": {
+   "x": 222,
+   "y": 3544,
+   "w": 16,
+   "h": 16
+  },
+  "camarote-tiles/iwT_camV/unica/00": {
+   "x": 238,
+   "y": 3544,
+   "w": 16,
+   "h": 16
+  },
+  "camarote-tiles/trampC/unica/00": {
+   "x": 254,
+   "y": 3544,
+   "w": 16,
+   "h": 16
+  },
+  "carpa-c-focos-cfl/foco-c-cfl-36/unica/00": {
+   "x": 270,
    "y": 3544,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos-led-ancho/foco-c-led480-47/unica/00": {
-   "x": 254,
+   "x": 318,
    "y": 3544,
    "w": 80,
    "h": 16
   },
   "carpa-c-focos-led-ancho/foco-c-led720-78/unica/00": {
-   "x": 334,
+   "x": 398,
    "y": 3544,
    "w": 80,
    "h": 16
   },
   "carpa-c-focos-led/foco-c-cfl-25/unica/00": {
-   "x": 414,
+   "x": 478,
    "y": 3544,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos-led/foco-c-led100-20/unica/00": {
-   "x": 462,
+   "x": 526,
    "y": 3544,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos-led/foco-c-led100-26/unica/00": {
-   "x": 510,
+   "x": 574,
    "y": 3544,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos-led/foco-c-led200-24/unica/00": {
-   "x": 558,
+   "x": 622,
    "y": 3544,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos-led/foco-c-led200-30/unica/00": {
-   "x": 606,
+   "x": 670,
    "y": 3544,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos/foco-c-40/unica/00": {
-   "x": 654,
+   "x": 718,
    "y": 3544,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos/foco-c-44/unica/00": {
-   "x": 702,
+   "x": 766,
    "y": 3544,
    "w": 48,
    "h": 16
   },
   "carpa-c-focos/foco-c-46/unica/00": {
-   "x": 750,
+   "x": 814,
    "y": 3544,
    "w": 48,
    "h": 16
   },
   "casa-reforma/alf0a-1/unica/00": {
-   "x": 798,
-   "y": 3544,
-   "w": 16,
-   "h": 16
-  },
-  "casa-reforma/alf0a-2/unica/00": {
-   "x": 814,
-   "y": 3544,
-   "w": 16,
-   "h": 16
-  },
-  "casa-reforma/alf0a-3/unica/00": {
-   "x": 830,
-   "y": 3544,
-   "w": 16,
-   "h": 16
-  },
-  "casa-reforma/alf0a/unica/00": {
-   "x": 846,
-   "y": 3544,
-   "w": 16,
-   "h": 16
-  },
-  "casa-reforma/alf0b-1/unica/00": {
    "x": 862,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "casa-reforma/alf0b-2/unica/00": {
+  "casa-reforma/alf0a-2/unica/00": {
    "x": 878,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "casa-reforma/alf0b-3/unica/00": {
+  "casa-reforma/alf0a-3/unica/00": {
    "x": 894,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "casa-reforma/alf0b/unica/00": {
+  "casa-reforma/alf0a/unica/00": {
    "x": 910,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "casa-reforma/alf0c-1/unica/00": {
+  "casa-reforma/alf0b-1/unica/00": {
    "x": 926,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "casa-reforma/alf0c-2/unica/00": {
+  "casa-reforma/alf0b-2/unica/00": {
    "x": 942,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "casa-reforma/alf0c-3/unica/00": {
+  "casa-reforma/alf0b-3/unica/00": {
    "x": 958,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "casa-reforma/alf0c/unica/00": {
+  "casa-reforma/alf0b/unica/00": {
    "x": 974,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "casa-reforma/alf0d-1/unica/00": {
+  "casa-reforma/alf0c-1/unica/00": {
    "x": 990,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "casa-reforma/alf0d-2/unica/00": {
+  "casa-reforma/alf0c-2/unica/00": {
    "x": 1006,
    "y": 3544,
    "w": 16,
    "h": 16
   },
-  "casa-reforma/alf0d-3/unica/00": {
+  "casa-reforma/alf0c-3/unica/00": {
    "x": 0,
+   "y": 3564,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf0c/unica/00": {
+   "x": 16,
+   "y": 3564,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf0d-1/unica/00": {
+   "x": 32,
+   "y": 3564,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf0d-2/unica/00": {
+   "x": 48,
+   "y": 3564,
+   "w": 16,
+   "h": 16
+  },
+  "casa-reforma/alf0d-3/unica/00": {
+   "x": 64,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf0d/unica/00": {
-   "x": 16,
+   "x": 80,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1a-1/unica/00": {
-   "x": 32,
+   "x": 96,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1a-2/unica/00": {
-   "x": 48,
+   "x": 112,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1a-3/unica/00": {
-   "x": 64,
+   "x": 128,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1a/unica/00": {
-   "x": 80,
+   "x": 144,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1b-1/unica/00": {
-   "x": 96,
+   "x": 160,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1b-2/unica/00": {
-   "x": 112,
+   "x": 176,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1b-3/unica/00": {
-   "x": 128,
+   "x": 192,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1b/unica/00": {
-   "x": 144,
+   "x": 208,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1c-1/unica/00": {
-   "x": 160,
+   "x": 224,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1c-2/unica/00": {
-   "x": 176,
+   "x": 240,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1c-3/unica/00": {
-   "x": 192,
+   "x": 256,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1c/unica/00": {
-   "x": 208,
+   "x": 272,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1d-1/unica/00": {
-   "x": 224,
+   "x": 288,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1d-2/unica/00": {
-   "x": 240,
+   "x": 304,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1d-3/unica/00": {
-   "x": 256,
+   "x": 320,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf1d/unica/00": {
-   "x": 272,
+   "x": 336,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2a-1/unica/00": {
-   "x": 288,
+   "x": 352,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2a-2/unica/00": {
-   "x": 304,
+   "x": 368,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2a-3/unica/00": {
-   "x": 320,
+   "x": 384,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2a/unica/00": {
-   "x": 336,
+   "x": 400,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2b-1/unica/00": {
-   "x": 352,
+   "x": 416,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2b-2/unica/00": {
-   "x": 368,
+   "x": 432,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2b-3/unica/00": {
-   "x": 384,
+   "x": 448,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2b/unica/00": {
-   "x": 400,
+   "x": 464,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2c-1/unica/00": {
-   "x": 416,
+   "x": 480,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2c-2/unica/00": {
-   "x": 432,
+   "x": 496,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2c-3/unica/00": {
-   "x": 448,
+   "x": 512,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2c/unica/00": {
-   "x": 464,
+   "x": 528,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2d-1/unica/00": {
-   "x": 480,
+   "x": 544,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2d-2/unica/00": {
-   "x": 496,
+   "x": 560,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2d-3/unica/00": {
-   "x": 512,
+   "x": 576,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/alf2d/unica/00": {
-   "x": 528,
+   "x": 592,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/floor-1/unica/00": {
-   "x": 544,
+   "x": 608,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/floor-2/unica/00": {
-   "x": 560,
+   "x": 624,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/floor-3/unica/00": {
-   "x": 576,
+   "x": 640,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/iwB_home-1/unica/00": {
-   "x": 592,
+   "x": 656,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/iwB_home-2/unica/00": {
-   "x": 608,
+   "x": 672,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/iwB_home-3/unica/00": {
-   "x": 624,
+   "x": 688,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/iwT_home-1/unica/00": {
-   "x": 640,
+   "x": 704,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/iwT_home-2/unica/00": {
-   "x": 656,
+   "x": 720,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "casa-reforma/iwT_home-3/unica/00": {
-   "x": 672,
+   "x": 736,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "gaviota/idle/unica/00": {
-   "x": 688,
+   "x": 752,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "gaviota/idle/unica/01": {
-   "x": 704,
+   "x": 768,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "gaviota/idle/unica/02": {
-   "x": 720,
+   "x": 784,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "gaviota/idle/unica/03": {
-   "x": 736,
+   "x": 800,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/armario/unica/00": {
-   "x": 752,
+   "x": 816,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/carpa/unica/00": {
-   "x": 768,
+   "x": 832,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/filtro/unica/00": {
-   "x": 784,
+   "x": 848,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/garrafa/unica/00": {
-   "x": 800,
+   "x": 864,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/goteo/unica/00": {
-   "x": 816,
+   "x": 880,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/led/unica/00": {
-   "x": 832,
+   "x": 896,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-equipo/ventilador/unica/00": {
-   "x": 848,
+   "x": 912,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-menu/altavoz/unica/00": {
-   "x": 864,
+   "x": 928,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-menu/cogollo/unica/00": {
-   "x": 880,
+   "x": 944,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-menu/guardar/unica/00": {
-   "x": 896,
+   "x": 960,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-menu/movil/unica/00": {
-   "x": 912,
+   "x": 976,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos-menu/salir/unica/00": {
-   "x": 928,
+   "x": 992,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos/abono/unica/00": {
-   "x": 944,
+   "x": 1008,
    "y": 3564,
    "w": 16,
    "h": 16
   },
   "iconos/billetes/unica/00": {
-   "x": 960,
-   "y": 3564,
+   "x": 0,
+   "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/bocadillo/unica/00": {
-   "x": 976,
-   "y": 3564,
+   "x": 16,
+   "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/bolsa/unica/00": {
-   "x": 992,
-   "y": 3564,
+   "x": 32,
+   "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/cogollo/unica/00": {
-   "x": 1008,
-   "y": 3564,
+   "x": 48,
+   "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/insecticida/unica/00": {
-   "x": 0,
+   "x": 64,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/lampara/unica/00": {
-   "x": 16,
+   "x": 80,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/maceta/unica/00": {
-   "x": 32,
+   "x": 96,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/monedas/unica/00": {
-   "x": 48,
+   "x": 112,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/polinizador/unica/00": {
-   "x": 64,
+   "x": 128,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/semillas/unica/00": {
-   "x": 80,
+   "x": 144,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/spray/unica/00": {
-   "x": 96,
+   "x": 160,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "iconos/trofeo/unica/00": {
-   "x": 112,
+   "x": 176,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-baile/baile/unica/00": {
-   "x": 128,
+   "x": 192,
    "y": 3580,
    "w": 64,
    "h": 16
   },
   "interior-bar/floorB/unica/00": {
-   "x": 192,
+   "x": 256,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-bar/iwB_bar/unica/00": {
-   "x": 208,
+   "x": 272,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-bar/iwT_bar/unica/00": {
-   "x": 224,
+   "x": 288,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-home/floor/unica/00": {
-   "x": 240,
+   "x": 304,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-home/iwB_home/unica/00": {
-   "x": 256,
+   "x": 320,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-home/iwT_home/unica/00": {
-   "x": 272,
+   "x": 336,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/floorC_ensanche/unica/00": {
-   "x": 288,
+   "x": 352,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/floorC_fundicion/unica/00": {
-   "x": 304,
+   "x": 368,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/floorC_itsaso/unica/00": {
-   "x": 320,
+   "x": 384,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/floorC_kalea/unica/00": {
-   "x": 336,
+   "x": 400,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/floorC/unica/00": {
-   "x": 352,
+   "x": 416,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/floorD/unica/00": {
-   "x": 368,
+   "x": 432,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/floorG/unica/00": {
-   "x": 384,
+   "x": 448,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/floorK/unica/00": {
-   "x": 400,
+   "x": 464,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/floorN/unica/00": {
-   "x": 416,
+   "x": 480,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/floorSe/unica/00": {
-   "x": 432,
+   "x": 496,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwB_bajo/unica/00": {
-   "x": 448,
+   "x": 512,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwB_club_ensanche/unica/00": {
-   "x": 464,
+   "x": 528,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwB_club_fundicion/unica/00": {
-   "x": 480,
+   "x": 544,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwB_club_itsaso/unica/00": {
-   "x": 496,
+   "x": 560,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwB_club_kalea/unica/00": {
-   "x": 512,
+   "x": 576,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwB_club/unica/00": {
-   "x": 528,
+   "x": 592,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwB_conce/unica/00": {
-   "x": 544,
+   "x": 608,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwB_disco/unica/00": {
-   "x": 560,
+   "x": 624,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwB_grow/unica/00": {
-   "x": 576,
+   "x": 640,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwB_nave/unica/00": {
-   "x": 592,
+   "x": 656,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwT_bajo/unica/00": {
-   "x": 608,
+   "x": 672,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwT_club_ensanche/unica/00": {
-   "x": 624,
+   "x": 688,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwT_club_fundicion/unica/00": {
-   "x": 640,
+   "x": 704,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwT_club_itsaso/unica/00": {
-   "x": 656,
+   "x": 720,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwT_club_kalea/unica/00": {
-   "x": 672,
+   "x": 736,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwT_club/unica/00": {
-   "x": 688,
+   "x": 752,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwT_conce/unica/00": {
-   "x": 704,
+   "x": 768,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwT_disco/unica/00": {
-   "x": 720,
+   "x": 784,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwT_grow/unica/00": {
-   "x": 736,
+   "x": 800,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-locales/iwT_nave/unica/00": {
-   "x": 752,
+   "x": 816,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-shop/floorS/unica/00": {
-   "x": 768,
+   "x": 832,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-shop/iwB_shop/unica/00": {
-   "x": 784,
+   "x": 848,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "interior-shop/iwT_shop/unica/00": {
-   "x": 800,
+   "x": 864,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "locales-16/barraD/unica/00": {
-   "x": 816,
+   "x": 880,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "locales-16/botesW/unica/00": {
-   "x": 832,
+   "x": 896,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "locales-16/cartelC/unica/00": {
-   "x": 848,
+   "x": 912,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "locales-16/catalogoK/unica/00": {
-   "x": 864,
+   "x": 928,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "locales-16/copas/unica/00": {
-   "x": 880,
+   "x": 944,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "locales-16/cordon/unica/00": {
-   "x": 896,
+   "x": 960,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "locales-16/cordonF/unica/00": {
-   "x": 912,
+   "x": 976,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "locales-16/ctrlN/unica/00": {
-   "x": 928,
+   "x": 992,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "locales-16/cuboS/unica/00": {
-   "x": 944,
+   "x": 1008,
    "y": 3580,
    "w": 16,
    "h": 16
   },
   "locales-16/diana/unica/00": {
-   "x": 960,
-   "y": 3580,
+   "x": 0,
+   "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/engranaje/unica/00": {
-   "x": 976,
-   "y": 3580,
+   "x": 16,
+   "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/extrG/unica/00": {
-   "x": 992,
-   "y": 3580,
+   "x": 32,
+   "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/extrN/unica/00": {
-   "x": 1008,
-   "y": 3580,
+   "x": 48,
+   "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/filtroN/unica/00": {
-   "x": 0,
+   "x": 64,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/focoN-lec-0/unica/00": {
-   "x": 16,
+   "x": 80,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/focoN-lec-1/unica/00": {
-   "x": 32,
+   "x": 96,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/focoN-led-0/unica/00": {
-   "x": 48,
+   "x": 112,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/focoN-led-1/unica/00": {
-   "x": 64,
+   "x": 128,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/focoN-sodio-0/unica/00": {
-   "x": 80,
+   "x": 144,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/focoN-sodio-1/unica/00": {
-   "x": 96,
+   "x": 160,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/fotoK/unica/00": {
-   "x": 112,
+   "x": 176,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/fotoMaite/unica/00": {
-   "x": 128,
+   "x": 192,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/humidS/unica/00": {
-   "x": 144,
+   "x": 208,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/macetasP/unica/00": {
-   "x": 160,
+   "x": 224,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/mesaV/unica/00": {
-   "x": 176,
+   "x": 240,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/mesita-ensanche/unica/00": {
-   "x": 192,
+   "x": 256,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/mesita-fundicion/unica/00": {
-   "x": 208,
+   "x": 272,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/mesita-itsaso/unica/00": {
-   "x": 224,
+   "x": 288,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/mesita-kalea/unica/00": {
-   "x": 240,
+   "x": 304,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/mesita/unica/00": {
-   "x": 256,
+   "x": 320,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/neon/unica/00": {
-   "x": 272,
+   "x": 336,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/neonG/unica/00": {
-   "x": 288,
+   "x": 352,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/neonH/unica/00": {
-   "x": 304,
+   "x": 368,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/ojoBuey/unica/00": {
-   "x": 320,
+   "x": 384,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/pizarra/unica/00": {
-   "x": 336,
+   "x": 400,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/preciosK/unica/00": {
-   "x": 352,
+   "x": 416,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/red/unica/00": {
-   "x": 368,
+   "x": 432,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/rotuloL-0/unica/00": {
-   "x": 384,
+   "x": 448,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/rotuloL-1/unica/00": {
-   "x": 400,
+   "x": 464,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/ruedasK/unica/00": {
-   "x": 416,
+   "x": 480,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/sacos/unica/00": {
-   "x": 432,
+   "x": 496,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/semillero/unica/00": {
-   "x": 448,
+   "x": 512,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/tacos/unica/00": {
-   "x": 464,
+   "x": 528,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/tarros/unica/00": {
-   "x": 480,
+   "x": 544,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/timon/unica/00": {
-   "x": 496,
+   "x": 560,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/tuboS/unica/00": {
-   "x": 512,
+   "x": 576,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/vitrina-ensanche/unica/00": {
-   "x": 528,
+   "x": 592,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/vitrina-fundicion/unica/00": {
-   "x": 544,
+   "x": 608,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/vitrina-itsaso/unica/00": {
-   "x": 560,
+   "x": 624,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/vitrina-kalea/unica/00": {
-   "x": 576,
+   "x": 640,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "locales-16/vitrina/unica/00": {
-   "x": 592,
+   "x": 656,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/amasaP/unica/00": {
-   "x": 608,
+   "x": 672,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/aspiraL/unica/00": {
-   "x": 624,
+   "x": 688,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/barrilT/unica/00": {
-   "x": 640,
+   "x": 704,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/cajaL/unica/00": {
-   "x": 656,
+   "x": 720,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/cambioL/unica/00": {
-   "x": 672,
+   "x": 736,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/compT/unica/00": {
-   "x": 688,
+   "x": 752,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/fichasL/unica/00": {
-   "x": 704,
+   "x": 768,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/fregona/unica/00": {
-   "x": 720,
+   "x": 784,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/lavaL/unica/00": {
-   "x": 736,
+   "x": 800,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/mesaC/unica/00": {
-   "x": 752,
+   "x": 816,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/neumT/unica/00": {
-   "x": 768,
+   "x": 832,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/prensaQ/unica/00": {
-   "x": 784,
+   "x": 848,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "negocios-16/secaL/unica/00": {
-   "x": 800,
+   "x": 864,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "paloma/idle/unica/00": {
-   "x": 816,
+   "x": 880,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "paloma/idle/unica/01": {
-   "x": 832,
+   "x": 896,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "paloma/idle/unica/02": {
-   "x": 848,
+   "x": 912,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "paloma/idle/unica/03": {
-   "x": 864,
+   "x": 928,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "prop-seto/seto/unica/00": {
-   "x": 880,
+   "x": 944,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "props-16/barcounter/unica/00": {
-   "x": 896,
+   "x": 960,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "props-16/bench/unica/00": {
-   "x": 912,
+   "x": 976,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "props-16/bottles/unica/00": {
-   "x": 928,
+   "x": 992,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "props-16/btable/unica/00": {
-   "x": 944,
+   "x": 1008,
    "y": 3596,
    "w": 16,
    "h": 16
   },
   "props-16/bush/unica/00": {
-   "x": 960,
-   "y": 3596,
+   "x": 0,
+   "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/counter/unica/00": {
-   "x": 976,
-   "y": 3596,
+   "x": 16,
+   "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/crate/unica/00": {
-   "x": 992,
-   "y": 3596,
+   "x": 32,
+   "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/display/unica/00": {
-   "x": 1008,
-   "y": 3596,
+   "x": 48,
+   "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/fence/unica/00": {
-   "x": 0,
+   "x": 64,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/iwin/unica/00": {
-   "x": 16,
+   "x": 80,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/jukebox/unica/00": {
-   "x": 32,
+   "x": 96,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/lab/unica/00": {
-   "x": 48,
+   "x": 112,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/lab2/unica/00": {
-   "x": 64,
+   "x": 128,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/luces/unica/00": {
-   "x": 80,
+   "x": 144,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/luces/unica/01": {
-   "x": 96,
+   "x": 160,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/luces/unica/02": {
-   "x": 112,
+   "x": 176,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/luces/unica/03": {
-   "x": 128,
+   "x": 192,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/pc/unica/00": {
-   "x": 144,
+   "x": 208,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/plantDeco/unica/00": {
-   "x": 160,
+   "x": 224,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/poster/unica/00": {
-   "x": 176,
+   "x": 240,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/shelfW/unica/00": {
-   "x": 192,
+   "x": 256,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/sign/unica/00": {
-   "x": 208,
+   "x": 272,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/stool/unica/00": {
-   "x": 224,
+   "x": 288,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-16/table/unica/00": {
-   "x": 240,
+   "x": 304,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-altura/barcounter/unica/00": {
-   "x": 256,
+   "x": 320,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "props-altura/counter/unica/00": {
-   "x": 272,
+   "x": 336,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "salon-pared/cartel-1/unica/00": {
-   "x": 288,
+   "x": 352,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "salon-pared/cartel-2/unica/00": {
-   "x": 304,
+   "x": 368,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "salon-pared/cartel-3/unica/00": {
-   "x": 320,
+   "x": 384,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "salon-pared/cartel/unica/00": {
-   "x": 336,
+   "x": 400,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "salon-pared/cuadro-1/unica/00": {
-   "x": 352,
+   "x": 416,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "salon-pared/cuadro-2/unica/00": {
-   "x": 368,
+   "x": 432,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "salon-pared/cuadro/unica/00": {
-   "x": 384,
+   "x": 448,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/bridgeB/unica/00": {
-   "x": 400,
+   "x": 464,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/bridgeT/unica/00": {
-   "x": 416,
+   "x": 480,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/dirt/unica/00": {
-   "x": 432,
+   "x": 496,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/dock/unica/00": {
-   "x": 448,
+   "x": 512,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/flowers/unica/00": {
-   "x": 464,
+   "x": 528,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/grass/unica/00": {
-   "x": 480,
+   "x": 544,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/plaza/unica/00": {
-   "x": 496,
+   "x": 560,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/roadB/unica/00": {
-   "x": 512,
+   "x": 576,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/roadT/unica/00": {
-   "x": 528,
+   "x": 592,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/tallgrass/unica/00": {
-   "x": 544,
+   "x": 608,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/walk/unica/00": {
-   "x": 560,
+   "x": 624,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-exterior/water/unica/00": {
-   "x": 576,
+   "x": 640,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tiles-firmes/hormigon/unica/00": {
-   "x": 592,
+   "x": 656,
    "y": 3612,
    "w": 64,
    "h": 16
   },
   "tiles-firmes/pista/unica/00": {
-   "x": 656,
+   "x": 720,
    "y": 3612,
    "w": 64,
    "h": 16
   },
   "tiles-firmes/rotoB/unica/00": {
-   "x": 720,
+   "x": 784,
    "y": 3612,
    "w": 64,
    "h": 16
   },
   "tiles-firmes/rotoT/unica/00": {
-   "x": 784,
+   "x": 848,
    "y": 3612,
    "w": 64,
    "h": 16
   },
   "tiles-interior-extra/mat/unica/00": {
-   "x": 848,
+   "x": 912,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-01/unica/00": {
-   "x": 864,
+   "x": 928,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-02/unica/00": {
-   "x": 880,
+   "x": 944,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-03/unica/00": {
-   "x": 896,
+   "x": 960,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-04/unica/00": {
-   "x": 912,
+   "x": 976,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-05/unica/00": {
-   "x": 928,
+   "x": 992,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-06/unica/00": {
-   "x": 944,
+   "x": 1008,
    "y": 3612,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-07/unica/00": {
-   "x": 960,
-   "y": 3612,
+   "x": 0,
+   "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-08/unica/00": {
-   "x": 976,
-   "y": 3612,
+   "x": 16,
+   "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-09/unica/00": {
-   "x": 992,
-   "y": 3612,
+   "x": 32,
+   "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-10/unica/00": {
-   "x": 1008,
-   "y": 3612,
+   "x": 48,
+   "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-11/unica/00": {
-   "x": 0,
+   "x": 64,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-12/unica/00": {
-   "x": 16,
+   "x": 80,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-13/unica/00": {
-   "x": 32,
+   "x": 96,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/agua-14/unica/00": {
-   "x": 48,
+   "x": 112,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-01/unica/00": {
-   "x": 64,
+   "x": 128,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-02/unica/00": {
-   "x": 80,
+   "x": 144,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-03/unica/00": {
-   "x": 96,
+   "x": 160,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-04/unica/00": {
-   "x": 112,
+   "x": 176,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-05/unica/00": {
-   "x": 128,
+   "x": 192,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-06/unica/00": {
-   "x": 144,
+   "x": 208,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-07/unica/00": {
-   "x": 160,
+   "x": 224,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-08/unica/00": {
-   "x": 176,
+   "x": 240,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-09/unica/00": {
-   "x": 192,
+   "x": 256,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-10/unica/00": {
-   "x": 208,
+   "x": 272,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-11/unica/00": {
-   "x": 224,
+   "x": 288,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-12/unica/00": {
-   "x": 240,
+   "x": 304,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-13/unica/00": {
-   "x": 256,
+   "x": 320,
    "y": 3628,
    "w": 16,
    "h": 16
   },
   "tileset-transiciones/plaza-14/unica/00": {
-   "x": 272,
-   "y": 3628,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-01/unica/00": {
-   "x": 288,
-   "y": 3628,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-02/unica/00": {
-   "x": 304,
-   "y": 3628,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-03/unica/00": {
-   "x": 320,
-   "y": 3628,
-   "w": 16,
-   "h": 16
-  },
-  "tileset-transiciones/tierra-04/unica/00": {
    "x": 336,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "tileset-transiciones/tierra-05/unica/00": {
+  "tileset-transiciones/tierra-01/unica/00": {
    "x": 352,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "tileset-transiciones/tierra-06/unica/00": {
+  "tileset-transiciones/tierra-02/unica/00": {
    "x": 368,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "tileset-transiciones/tierra-07/unica/00": {
+  "tileset-transiciones/tierra-03/unica/00": {
    "x": 384,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "tileset-transiciones/tierra-08/unica/00": {
+  "tileset-transiciones/tierra-04/unica/00": {
    "x": 400,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "tileset-transiciones/tierra-09/unica/00": {
+  "tileset-transiciones/tierra-05/unica/00": {
    "x": 416,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "tileset-transiciones/tierra-10/unica/00": {
+  "tileset-transiciones/tierra-06/unica/00": {
    "x": 432,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "tileset-transiciones/tierra-11/unica/00": {
+  "tileset-transiciones/tierra-07/unica/00": {
    "x": 448,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "tileset-transiciones/tierra-12/unica/00": {
+  "tileset-transiciones/tierra-08/unica/00": {
    "x": 464,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "tileset-transiciones/tierra-13/unica/00": {
+  "tileset-transiciones/tierra-09/unica/00": {
    "x": 480,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "tileset-transiciones/tierra-14/unica/00": {
+  "tileset-transiciones/tierra-10/unica/00": {
    "x": 496,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-acaros/efecto/unica/00": {
+  "tileset-transiciones/tierra-11/unica/00": {
    "x": 512,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-acaros/efecto/unica/01": {
+  "tileset-transiciones/tierra-12/unica/00": {
    "x": 528,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-acaros/efecto/unica/02": {
+  "tileset-transiciones/tierra-13/unica/00": {
    "x": 544,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-acaros/efecto/unica/03": {
+  "tileset-transiciones/tierra-14/unica/00": {
    "x": 560,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-brillo/efecto/unica/00": {
+  "vfx-acaros/efecto/unica/00": {
    "x": 576,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-brillo/efecto/unica/01": {
+  "vfx-acaros/efecto/unica/01": {
    "x": 592,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-brillo/efecto/unica/02": {
+  "vfx-acaros/efecto/unica/02": {
    "x": 608,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-brillo/efecto/unica/03": {
+  "vfx-acaros/efecto/unica/03": {
    "x": 624,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-golpe/efecto/unica/00": {
+  "vfx-brillo/efecto/unica/00": {
    "x": 640,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-golpe/efecto/unica/01": {
+  "vfx-brillo/efecto/unica/01": {
    "x": 656,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-golpe/efecto/unica/02": {
+  "vfx-brillo/efecto/unica/02": {
    "x": 672,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-golpe/efecto/unica/03": {
+  "vfx-brillo/efecto/unica/03": {
    "x": 688,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-gotas/efecto/unica/00": {
+  "vfx-golpe/efecto/unica/00": {
    "x": 704,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-gotas/efecto/unica/01": {
+  "vfx-golpe/efecto/unica/01": {
    "x": 720,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-gotas/efecto/unica/02": {
+  "vfx-golpe/efecto/unica/02": {
    "x": 736,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-gotas/efecto/unica/03": {
+  "vfx-golpe/efecto/unica/03": {
    "x": 752,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/00": {
+  "vfx-gotas/efecto/unica/00": {
    "x": 768,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/01": {
+  "vfx-gotas/efecto/unica/01": {
    "x": 784,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/02": {
+  "vfx-gotas/efecto/unica/02": {
    "x": 800,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/03": {
+  "vfx-gotas/efecto/unica/03": {
    "x": 816,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/04": {
+  "vfx-humo-cigarro/efecto/unica/00": {
    "x": 832,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-cigarro/efecto/unica/05": {
+  "vfx-humo-cigarro/efecto/unica/01": {
    "x": 848,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/00": {
+  "vfx-humo-cigarro/efecto/unica/02": {
    "x": 864,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/01": {
+  "vfx-humo-cigarro/efecto/unica/03": {
    "x": 880,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/02": {
+  "vfx-humo-cigarro/efecto/unica/04": {
    "x": 896,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/03": {
+  "vfx-humo-cigarro/efecto/unica/05": {
    "x": 912,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/04": {
+  "vfx-humo-pipa/efecto/unica/00": {
    "x": 928,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-pipa/efecto/unica/05": {
+  "vfx-humo-pipa/efecto/unica/01": {
    "x": 944,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/00": {
+  "vfx-humo-pipa/efecto/unica/02": {
    "x": 960,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/01": {
+  "vfx-humo-pipa/efecto/unica/03": {
    "x": 976,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/02": {
+  "vfx-humo-pipa/efecto/unica/04": {
    "x": 992,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/03": {
+  "vfx-humo-pipa/efecto/unica/05": {
    "x": 1008,
    "y": 3628,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/04": {
+  "vfx-humo-porro/efecto/unica/00": {
    "x": 0,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-porro/efecto/unica/05": {
+  "vfx-humo-porro/efecto/unica/01": {
    "x": 16,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/00": {
+  "vfx-humo-porro/efecto/unica/02": {
    "x": 32,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/01": {
+  "vfx-humo-porro/efecto/unica/03": {
    "x": 48,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/02": {
+  "vfx-humo-porro/efecto/unica/04": {
    "x": 64,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/03": {
+  "vfx-humo-porro/efecto/unica/05": {
    "x": 80,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/04": {
+  "vfx-humo-puro/efecto/unica/00": {
    "x": 96,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-humo-puro/efecto/unica/05": {
+  "vfx-humo-puro/efecto/unica/01": {
    "x": 112,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/00": {
+  "vfx-humo-puro/efecto/unica/02": {
    "x": 128,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/01": {
+  "vfx-humo-puro/efecto/unica/03": {
    "x": 144,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/02": {
+  "vfx-humo-puro/efecto/unica/04": {
    "x": 160,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/03": {
+  "vfx-humo-puro/efecto/unica/05": {
    "x": 176,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/04": {
+  "vfx-monedas/efecto/unica/00": {
    "x": 192,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-monedas/efecto/unica/05": {
+  "vfx-monedas/efecto/unica/01": {
    "x": 208,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/00": {
+  "vfx-monedas/efecto/unica/02": {
    "x": 224,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/01": {
+  "vfx-monedas/efecto/unica/03": {
    "x": 240,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/02": {
+  "vfx-monedas/efecto/unica/04": {
    "x": 256,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/03": {
+  "vfx-monedas/efecto/unica/05": {
    "x": 272,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/04": {
+  "vfx-polen/efecto/unica/00": {
    "x": 288,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "vfx-polen/efecto/unica/05": {
+  "vfx-polen/efecto/unica/01": {
    "x": 304,
    "y": 3644,
    "w": 16,
    "h": 16
   },
-  "almacen/alm-x-charas-1-g/unica/00": {
+  "vfx-polen/efecto/unica/02": {
    "x": 320,
+   "y": 3644,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/03": {
+   "x": 336,
+   "y": 3644,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/04": {
+   "x": 352,
+   "y": 3644,
+   "w": 16,
+   "h": 16
+  },
+  "vfx-polen/efecto/unica/05": {
+   "x": 368,
+   "y": 3644,
+   "w": 16,
+   "h": 16
+  },
+  "almacen/alm-x-charas-1-g/unica/00": {
+   "x": 384,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-charas-2-g/unica/00": {
-   "x": 340,
+   "x": 404,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-charas-3-g/unica/00": {
-   "x": 360,
+   "x": 424,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-charas-4-g/unica/00": {
-   "x": 380,
+   "x": 444,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-hash-1-g/unica/00": {
-   "x": 400,
+   "x": 464,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-hash-2-g/unica/00": {
-   "x": 420,
+   "x": 484,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-hash-3-g/unica/00": {
-   "x": 440,
+   "x": 504,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-hash-4-g/unica/00": {
-   "x": 460,
+   "x": 524,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-ice-1-g/unica/00": {
-   "x": 480,
+   "x": 544,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-ice-2-g/unica/00": {
-   "x": 500,
+   "x": 564,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-ice-3-g/unica/00": {
-   "x": 520,
+   "x": 584,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-ice-4-g/unica/00": {
-   "x": 540,
+   "x": 604,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-moon-1-g/unica/00": {
-   "x": 560,
+   "x": 624,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-moon-2-g/unica/00": {
-   "x": 580,
+   "x": 644,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-moon-3-g/unica/00": {
-   "x": 600,
+   "x": 664,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-moon-4-g/unica/00": {
-   "x": 620,
+   "x": 684,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-rosin-1-g/unica/00": {
-   "x": 640,
+   "x": 704,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-rosin-2-g/unica/00": {
-   "x": 660,
+   "x": 724,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-rosin-3-g/unica/00": {
-   "x": 680,
+   "x": 744,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-rosin-4-g/unica/00": {
-   "x": 700,
+   "x": 764,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-rosin-cu-1-g/unica/00": {
-   "x": 720,
+   "x": 784,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-rosin-cu-2-g/unica/00": {
-   "x": 740,
+   "x": 804,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-rosin-cu-3-g/unica/00": {
-   "x": 760,
+   "x": 824,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-rosin-cu-4-g/unica/00": {
-   "x": 780,
+   "x": 844,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-seco-1-g/unica/00": {
-   "x": 800,
+   "x": 864,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-seco-2-g/unica/00": {
-   "x": 820,
+   "x": 884,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-seco-3-g/unica/00": {
-   "x": 840,
+   "x": 904,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-seco-4-g/unica/00": {
-   "x": 860,
+   "x": 924,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-stat-1-g/unica/00": {
-   "x": 880,
+   "x": 944,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-stat-2-g/unica/00": {
-   "x": 900,
+   "x": 964,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-stat-3-g/unica/00": {
-   "x": 920,
+   "x": 984,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-x-stat-4-g/unica/00": {
-   "x": 940,
+   "x": 1004,
    "y": 3644,
    "w": 20,
    "h": 14
   },
   "almacen/alm-bote/unica/00": {
-   "x": 960,
-   "y": 3644,
+   "x": 0,
+   "y": 3660,
    "w": 12,
    "h": 12
   },
   "almacen/alm-guardar/unica/00": {
-   "x": 972,
-   "y": 3644,
+   "x": 12,
+   "y": 3660,
    "w": 44,
    "h": 11
   },
   "almacen/alm-etiqueta-g/unica/00": {
-   "x": 0,
+   "x": 56,
    "y": 3660,
    "w": 20,
    "h": 8
   },
   "almacen/alm-fajo/unica/00": {
-   "x": 20,
+   "x": 76,
    "y": 3660,
    "w": 15,
    "h": 8
   },
   "detalles-hierba/detalles/unica/00": {
-   "x": 35,
+   "x": 91,
    "y": 3660,
    "w": 40,
    "h": 8
   },
   "almacen/alm-ic-cu/unica/00": {
-   "x": 75,
+   "x": 131,
    "y": 3660,
    "w": 7,
    "h": 7
   },
   "almacen/alm-ic-eur/unica/00": {
-   "x": 82,
+   "x": 138,
    "y": 3660,
    "w": 7,
    "h": 7
   },
   "almacen/alm-ic-g/unica/00": {
-   "x": 89,
+   "x": 145,
    "y": 3660,
    "w": 7,
    "h": 7
   },
   "almacen/alm-ic-hr/unica/00": {
-   "x": 96,
+   "x": 152,
    "y": 3660,
    "w": 7,
    "h": 7
   },
   "almacen/alm-ic-mc/unica/00": {
-   "x": 103,
+   "x": 159,
    "y": 3660,
    "w": 7,
    "h": 7
   },
   "almacen/alm-ic-thc/unica/00": {
-   "x": 110,
+   "x": 166,
    "y": 3660,
    "w": 7,
    "h": 7
   },
   "almacen/alm-x-charas-1/unica/00": {
-   "x": 117,
+   "x": 173,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-charas-2/unica/00": {
-   "x": 127,
+   "x": 183,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-charas-3/unica/00": {
-   "x": 137,
+   "x": 193,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-charas-4/unica/00": {
-   "x": 147,
+   "x": 203,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-hash-1/unica/00": {
-   "x": 157,
+   "x": 213,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-hash-2/unica/00": {
-   "x": 167,
+   "x": 223,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-hash-3/unica/00": {
-   "x": 177,
+   "x": 233,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-hash-4/unica/00": {
-   "x": 187,
+   "x": 243,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-ice-1/unica/00": {
-   "x": 197,
+   "x": 253,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-ice-2/unica/00": {
-   "x": 207,
+   "x": 263,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-ice-3/unica/00": {
-   "x": 217,
+   "x": 273,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-ice-4/unica/00": {
-   "x": 227,
+   "x": 283,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-moon-1/unica/00": {
-   "x": 237,
+   "x": 293,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-moon-2/unica/00": {
-   "x": 247,
+   "x": 303,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-moon-3/unica/00": {
-   "x": 257,
+   "x": 313,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-moon-4/unica/00": {
-   "x": 267,
+   "x": 323,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-rosin-1/unica/00": {
-   "x": 277,
+   "x": 333,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-rosin-2/unica/00": {
-   "x": 287,
+   "x": 343,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-rosin-3/unica/00": {
-   "x": 297,
+   "x": 353,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-rosin-4/unica/00": {
-   "x": 307,
+   "x": 363,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-rosin-cu-1/unica/00": {
-   "x": 317,
+   "x": 373,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-rosin-cu-2/unica/00": {
-   "x": 327,
+   "x": 383,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-rosin-cu-3/unica/00": {
-   "x": 337,
+   "x": 393,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-rosin-cu-4/unica/00": {
-   "x": 347,
+   "x": 403,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-seco-1/unica/00": {
-   "x": 357,
+   "x": 413,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-seco-2/unica/00": {
-   "x": 367,
+   "x": 423,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-seco-3/unica/00": {
-   "x": 377,
+   "x": 433,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-seco-4/unica/00": {
-   "x": 387,
+   "x": 443,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-stat-1/unica/00": {
-   "x": 397,
+   "x": 453,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-stat-2/unica/00": {
-   "x": 407,
+   "x": 463,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-stat-3/unica/00": {
-   "x": 417,
+   "x": 473,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-x-stat-4/unica/00": {
-   "x": 427,
+   "x": 483,
    "y": 3660,
    "w": 10,
    "h": 7
   },
   "almacen/alm-etiqueta/unica/00": {
-   "x": 437,
+   "x": 493,
    "y": 3660,
    "w": 10,
    "h": 4
@@ -12789,6 +12795,14 @@
    "h": 48,
    "ancla": [
     16,
+    47
+   ]
+  },
+  "negocios-coche": {
+   "w": 80,
+   "h": 48,
+   "ancla": [
+    8,
     47
    ]
   },
@@ -18395,33 +18409,6 @@
      ]
     }
    },
-   "elevT": {
-    "fps": 0,
-    "bucle": false,
-    "dirs": {
-     "unica": [
-      "negocios-ancho/elevT/unica/00"
-     ]
-    }
-   },
-   "fosoB": {
-    "fps": 0,
-    "bucle": false,
-    "dirs": {
-     "unica": [
-      "negocios-ancho/fosoB/unica/00"
-     ]
-    }
-   },
-   "fosoT": {
-    "fps": 0,
-    "bucle": false,
-    "dirs": {
-     "unica": [
-      "negocios-ancho/fosoT/unica/00"
-     ]
-    }
-   },
    "hornoP": {
     "fps": 0,
     "bucle": false,
@@ -18446,6 +18433,26 @@
     "dirs": {
      "unica": [
       "negocios-ancho/mostrQ/unica/00"
+     ]
+    }
+   }
+  },
+  "negocios-coche": {
+   "elevT": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "negocios-coche/elevT/unica/00"
+     ]
+    }
+   },
+   "fosoT": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "negocios-coche/fosoT/unica/00"
      ]
     }
    }
@@ -20621,6 +20628,24 @@
     "dirs": {
      "unica": [
       "negocios-alto/curaQ/unica/00"
+     ]
+    }
+   },
+   "diagT": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "negocios-alto/diagT/unica/00"
+     ]
+    }
+   },
+   "equiT": {
+    "fps": 0,
+    "bucle": false,
+    "dirs": {
+     "unica": [
+      "negocios-alto/equiT/unica/00"
      ]
     }
    },
@@ -24923,12 +24948,11 @@
   "obj:boxL": "negocios-ancho",
   "obj:cubaQ": "negocios-ancho",
   "obj:doblaL": "negocios-ancho",
-  "obj:elevT": "negocios-ancho",
-  "obj:fosoB": "negocios-ancho",
-  "obj:fosoT": "negocios-ancho",
   "obj:hornoP": "negocios-ancho",
   "obj:mostrP": "negocios-ancho",
   "obj:mostrQ": "negocios-ancho",
+  "obj:elevT": "negocios-coche",
+  "obj:fosoT": "negocios-coche",
   "obj:monte": "prop-monte",
   "obj:monte2": "prop-monte",
   "obj:parada": "prop-parada",
@@ -25062,6 +25086,8 @@
   "obj:prodL": "negocios-alto",
   "obj:recambT": "negocios-alto",
   "obj:tabique": "negocios-alto",
+  "obj:diagT": "negocios-alto",
+  "obj:equiT": "negocios-alto",
   "look:oldman": "patxi",
   "npc:patxi": "patxi",
   "look:andoni": "patxi",

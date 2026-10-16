@@ -1,5 +1,24 @@
 # Cambios
 
+## 1.46.0 · 16 de octubre de 2026
+
+Las cepas de setas y el taller a escala (lo pidió el usuario: «que se puedan comprar diferentes panes… diferentes micelios… como razas… juntar esos micelios y crear nuevas variedades… preestablecidas en un libro de recetas… que no se permita hacer ciertos cruces… son diferentes formas de las setas»; y «ya hay sprites de coches del concesionario, usa esas medidas para crear los fosos con las máquinas de levantar… a escala»). Solo Godot (0.40.0), con `Datos.CAL`. Las cepas son inventadas y genéricas: nada de método ni de dosis.
+
+- **Doce cepas en cuatro formas** (`CEPAS` en `datos.json`): cúpula, campana, plato y racimo, cada una con sus colores, su rendimiento (×0,85 a ×1,35) y su precio (×0,9 a ×2,4).
+  - Cinco panes de micelio que vende Txomin en la puerta (Txuria, Urrezko, Iluna, Adartxo y Gaztain; 20–40 €, `panes_txomin`).
+  - Cinco de 2.ª generación (Ilargi, Ekaitz, Errota, Orri y Gautxori) y dos de 3.ª (Izar, la última del cuaderno, y Basoa).
+- **La bandeja de tu cepa:** al comprar una bandeja, Txomin pone la Txuria o uno de tus panes (`S.setas.panes`). La bandeja dice su cepa y sus setas salen con su forma y su color.
+- **Juntar micelios** en la mesa de trabajo (`juntar_micelios`, 2 h): dos panes dan dos de la cepa nueva, pero solo si la pareja está en el cuaderno (`CEPAS.r`).
+  - El racimo no se junta con la cúpula ni con la campana: se repelen (`CEPAS.veta`).
+  - Lo que no está en el cuaderno no prende. En los dos casos no se gasta nada.
+- **El cuaderno de las cepas** en la mesa (`cuaderno_setas`): todas, con ✓ las que has tenido, su forma, de qué sale cada una y lo que no se junta.
+- **Por cepa hasta la venta:** lo recogido se seca por cepa (`fr[].v`), el armario dice cuánto hay de cada una (`S.setas.gv`) y Txomin paga cada cepa a su precio. Los lotes de la mesa salen de la cepa de la que más hay.
+- **El taller, a escala con los coches del concesionario** (16 px/m, 5 casillas como la exposición; grupo `negocios-coche`):
+  - el elevador es de cuatro columnas, de 5 m, con las rampas a 1,2 m y el utilitario de 4 m subido;
+  - el foso mide 5 m de largo, con la berlina de 4,8 m encima, la escalera y la lámpara;
+  - el local pasa a 20 × 10. La segunda mejora pone la cabina de diagnosis y la equilibradora (`diagT`, `equiT`).
+- Prueba nueva `tests/cepas.gd` (68 comprobaciones; con `--pintar`, las doce cepas en las baldas). `tests/negocios.gd` (287) comprueba el taller a escala.
+
 ## 1.45.0 · 15 de octubre de 2026
 
 Los negocios por dentro y los mercados que compran y venden (lo pidió el usuario: «que tú puedas acceder a ese sitio y controlarlo desde ahí… tanto el taller como los demás negocios»; «un cuartucho donde haya una cama pequeña…»; «en el club se tiene que poder tanto comprar como vender extracciones y diferentes tipos de hierba… a todos los mercados»). Solo Godot (0.39.0), con `Datos.CAL`.

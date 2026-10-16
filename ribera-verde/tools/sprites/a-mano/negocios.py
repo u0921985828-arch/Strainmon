@@ -19,6 +19,7 @@
 import os, sys, glob
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lienzo import Lienzo, P
+from concesionario import utilitario, berlina
 
 K = '#2a2a34'   # el contorno de los muebles (el de salon.py)
 SAL = {}
@@ -114,34 +115,73 @@ def almC(n):
 
 # ---------- el taller (Valdehierro) ----------
 def elevT():
-    """el elevador de dos columnas (3 t): las columnas rojas, los brazos y un utilitario subido a 1,2 m"""
-    L = Lienzo(48, 48)
-    for x in (8, 37):
-        L.r(x, 8, 3, 39, RJ[1]); L.vl(x, 8, 46, RJ[2]); L.vl(x + 2, 8, 46, RJ[0])
-        L.hl(x - 1, x + 3, 46, AC[0])
-    L.hl(8, 39, 8, RJ[0])                                                             # el travesaño de arriba
-    L.hl(11, 36, 30, AC[1]); L.hl(11, 36, 31, AC[0])                                  # los brazos
-    coche(L, 10, 17)
-    L.r(20, 42, 8, 2, AM[1]); L.hl(20, 27, 42, AM[2])                                 # la marca del suelo
+    """1.46 (lo pidió el usuario: «usa esas medidas… a escala»): el elevador de cuatro columnas a 16 px/m, de 5 m (80 px), con
+    las rampas a 1,2 m (19 px) y el utilitario de 4 m del concesionario (concesionario.py) subido encima"""
+    L = Lienzo(80, 48); sube = 19
+    c = utilitario()
+    for y in range(0, 48 - sube):
+        for x in range(80):
+            v = c.g(x, y + sube)
+            if v is not None and v[3] and y + sube < 46: L.p(x, y, '#%02x%02x%02x' % v[:3])
+    for x in (2, 74):                                                                # las columnas de 2,1 m (34 px)
+        L.r(x, 12, 4, 34, RJ[1]); L.vl(x, 12, 45, RJ[2]); L.vl(x + 3, 12, 45, RJ[0])
+        L.r(x - 1, 45, 6, 2, AC[0]); L.hl(x - 1, x + 4, 12, RJ[0])
+    L.r(0, 30, 4, 7, AC[1]); L.hl(0, 3, 30, AC[3])                                   # el motor con el grupo hidráulico
+    L.r(1, 32, 2, 2, AM[1])
+    for x0, x1 in ((2, 77),):                                                        # la rampa (pista) y su travesaño
+        L.r(x0, 27, x1 - x0 + 1, 3, AC[1]); L.hl(x0, x1, 27, AC[3]); L.hl(x0, x1, 29, AC[0])
+        L.r(x0, 30, 6, 2, AC[0]); L.r(x1 - 5, 30, 6, 2, AC[0])
+    L.vl(5, 30, 44, '#2a2a30')                                                       # la manguera del hidráulico
+    L.hl(10, 69, 46, AM[1])                                                          # la marca amarilla del suelo
+    for x in range(10, 70, 4): L.p(x, 46, '#1a1a1e')
     L.contorno(K)
     return L
 
-def foso(arriba):
-    """el foso de 1,2 m: el hueco oscuro con el borde amarillo y negro; arriba, la escalera; abajo, la lámpara de mano"""
-    L = Lienzo(48, 48); x0, x1, y0, y1 = 10, 37, 32, 47
+def fosoT():
+    """1.46: el foso a 16 px/m, de 5 m de largo (80 px) y 1,2 m de hondo, con el borde amarillo y negro, la escalera, la lámpara
+    y la berlina de 4,8 m del concesionario aparcada encima, con una rueda a cada lado"""
+    L = Lienzo(80, 48); x0, x1, y0, y1 = 1, 78, 37, 47
     L.r(x0, y0, x1 - x0 + 1, y1 - y0 + 1, '#2a2a30')
-    L.r(x0 + 2, y0, x1 - x0 - 3, y1 - y0 + 1, '#16161a')
+    L.r(x0 + 2, y0 + 2, x1 - x0 - 3, y1 - y0 - 1, '#16161a')
+    for x in range(x0, x1 + 1):
+        c = AM[1] if (x // 3) % 2 else '#1a1a1e'
+        L.p(x, y0, c); L.p(x, y0 + 1, c); L.p(x, y1, c)
     for y in range(y0, y1 + 1):
         c = AM[1] if (y // 2) % 2 else '#1a1a1e'
-        L.p(x0, y, c); L.p(x0 + 1, y, c); L.p(x1, y, c); L.p(x1 - 1, y, c)
-    if arriba:
-        for x in range(x0, x1 + 1): L.p(x, y0, AM[1] if (x // 2) % 2 else '#1a1a1e')
-        for y in range(y0 + 3, y1, 3): L.hl(x0 + 4, x0 + 9, y, AC[1])                  # los peldaños
-        L.vl(x0 + 4, y0 + 2, y1, AC[2]); L.vl(x0 + 9, y0 + 2, y1, AC[2])
-    else:
-        for x in range(x0, x1 + 1): L.p(x, y1, AM[1] if (x // 2) % 2 else '#1a1a1e')
-        L.r(26, 38, 3, 2, '#f4e8a0'); L.vl(27, 40, 44, '#e0b030')                     # la lámpara de mano
-        L.r(16, 42, 4, 2, '#3a3a40')                                                  # la bandeja del aceite
+        L.p(x0, y, c); L.p(x1, y, c)
+    for y in range(y0 + 3, y1, 2): L.hl(x0 + 3, x0 + 7, y, AC[1])                     # la escalera
+    L.vl(x0 + 3, y0 + 2, y1 - 1, AC[2]); L.vl(x0 + 7, y0 + 2, y1 - 1, AC[2])
+    c = berlina(); baja = 6                                                           # el coche, sobre los bordes del foso
+    for y in range(0, 46 - baja):
+        for x in range(80):
+            v = c.g(x, y + baja)
+            if v is not None and v[3]: L.p(x, y, '#%02x%02x%02x' % v[:3])
+    L.r(40, 42, 3, 2, '#f4e8a0'); L.p(41, 44, '#e0b030')                              # la lámpara de mano, al fondo
+    L.r(58, 44, 7, 2, '#3a3a40'); L.hl(58, 64, 44, '#5a5a62')                         # la bandeja del aceite
+    return L
+
+def diagT():
+    """1.46: la cabina de diagnosis en su carro (el ordenador, la pantalla y el cable al coche), sin marcas"""
+    L = Lienzo(32, 32); x0, x1 = 9, 22
+    L.r(x0, 14, 14, 15, AC[1]); L.vl(x0, 14, 28, AC[2]); L.vl(x1, 14, 28, AC[0])
+    for y in (19, 24): L.hl(x0 + 1, x1 - 1, y, AC[0])
+    L.r(x0 + 1, 3, 12, 9, '#2a2a30'); L.r(x0 + 2, 4, 10, 6, '#2a5a7a')                 # la pantalla
+    L.hl(x0 + 3, x0 + 8, 6, '#7ad0e0'); L.hl(x0 + 3, x0 + 6, 8, '#58c070')
+    L.vl(x0 + 6, 12, 13, AC[0])
+    L.r(x0 + 2, 15, 8, 2, '#3a3a42')                                                   # el teclado
+    L.vl(x1 + 1, 16, 26, '#1a1a1e'); L.p(x1 + 2, 26, '#e0b030')                        # el cable OBD
+    for x in (x0 + 1, x1 - 1): L.p(x, 29, '#1a1a1e'); L.p(x, 30, '#1a1a1e')            # las ruedas
+    L.contorno(K); sombra(L, x0, x1 + 2, 31)
+    return L
+
+def equiT():
+    """1.46: la equilibradora de ruedas (0,9 m de alto): la caja, el eje con una rueda puesta y la tapa"""
+    L = Lienzo(32, 32); x0, x1 = 8, 23
+    L.r(x0, 17, 16, 13, AC[2]); L.hl(x0, x1, 17, AC[3]); L.vl(x1, 17, 29, AC[0])
+    L.r(x0 + 2, 19, 5, 3, '#2a2a30'); L.p(x0 + 3, 20, '#e04040'); L.p(x0 + 5, 20, '#58c070')
+    L.r(x0 + 3, 7, 10, 10, '#1e1e22'); L.r(x0 + 5, 9, 6, 6, '#3a3a40'); L.r(x0 + 7, 11, 2, 2, AC[3])   # la rueda en el eje
+    L.r(x1 - 6, 5, 7, 3, RJ[1]); L.hl(x1 - 6, x1, 5, RJ[2])                             # la tapa levantada
+    L.contorno(K); sombra(L, x0, x1, 31)
     return L
 
 def bancoT():
@@ -362,15 +402,15 @@ for n, f in (('cajaL', cajaL), ('fregona', fregona), ('mesaC', mesaC), ('neumT',
              ('lavaL', lavaL), ('cambioL', cambioL)):
     sale(n, f(), 'negocios-16')
 sale('secaL', lavaL(True), 'negocios-16')
-for n, f in (('armR', armR), ('tabique', tabique), ('recambT', recambT), ('prodL', prodL), ('curaQ', curaQ), ('panP', panP)):
+for n, f in (('armR', armR), ('tabique', tabique), ('recambT', recambT), ('diagT', diagT), ('equiT', equiT), ('prodL', prodL), ('curaQ', curaQ), ('panP', panP)):
     sale(n, f(), 'negocios-alto')
 for i in range(3):
     sale(f'almC-{i}', almC(i), 'negocios-alto')
-for n, f in (('elevT', elevT), ('bancoT', bancoT), ('boxL', boxL), ('cubaQ', cubaQ), ('mostrQ', mostrQ), ('hornoP', hornoP),
+for n, f in (('bancoT', bancoT), ('boxL', boxL), ('cubaQ', cubaQ), ('mostrQ', mostrQ), ('hornoP', hornoP),
              ('mostrP', mostrP), ('doblaL', doblaL)):
     sale(n, f(), 'negocios-ancho')
-sale('fosoT', foso(True), 'negocios-ancho')
-sale('fosoB', foso(False), 'negocios-ancho')
+sale('elevT', elevT(), 'negocios-coche')
+sale('fosoT', fosoT(), 'negocios-coche')
 
 def escribe(raiz=None):
     for g, S in SAL.items():

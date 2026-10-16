@@ -9408,7 +9408,9 @@
     "obj:panP",
     "obj:prodL",
     "obj:recambT",
-    "obj:tabique"
+    "obj:tabique",
+    "obj:diagT",
+    "obj:equiT"
    ],
    "ajuste_por_sprite": {
     "almC-0": "exacto",
@@ -9419,7 +9421,9 @@
     "panP": "exacto",
     "prodL": "exacto",
     "recambT": "exacto",
-    "tabique": "exacto"
+    "tabique": "exacto",
+    "diagT": "exacto",
+    "equiT": "exacto"
    },
    "descripcion": "1.45: los muebles de los seis locales alquilables, el cuartucho y el almacén del club, a 16 px/m, sin marcas"
   },
@@ -9442,9 +9446,6 @@
     "obj:boxL",
     "obj:cubaQ",
     "obj:doblaL",
-    "obj:elevT",
-    "obj:fosoB",
-    "obj:fosoT",
     "obj:hornoP",
     "obj:mostrP",
     "obj:mostrQ"
@@ -9454,14 +9455,35 @@
     "boxL": "exacto",
     "cubaQ": "exacto",
     "doblaL": "exacto",
-    "elevT": "exacto",
-    "fosoB": "exacto",
-    "fosoT": "exacto",
     "hornoP": "exacto",
     "mostrP": "exacto",
     "mostrQ": "exacto"
    },
    "descripcion": "1.45: los muebles de los seis locales alquilables, el cuartucho y el almacén del club, a 16 px/m, sin marcas"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/negocios.py",
+   "notas": "1.46, pedido por el usuario: «usa esas medidas para crear los fosos con las máquinas de levantar… a escala».",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "negocios-coche",
+   "celda": "vehiculo_expo",
+   "estilo_ref": "los coches de la exposición del concesionario (conce-expo)",
+   "cubre": [
+    "obj:elevT",
+    "obj:fosoT"
+   ],
+   "ajuste_por_sprite": {
+    "elevT": "exacto",
+    "fosoT": "exacto"
+   },
+   "descripcion": "1.46: el taller a escala con los coches del concesionario (16 px/m, 5 casillas): el elevador de cuatro columnas de 5 m con las rampas a 1,2 m y el utilitario de 4 m subido, y el foso de 5 m con la berlina de 4,8 m encima"
   },
   {
    "id": "edificio-ladrillo-pu",

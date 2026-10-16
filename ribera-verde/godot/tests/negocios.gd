@@ -203,36 +203,54 @@ func _corre() -> void:
 		S.loc.erase(k)
 	# 4 · la caja: meter efectivo (hasta el tope), el género, una mejora; la fregona
 	alquila("valde")
-	J.enter_map("loc-valde", 7, 7, "up")
+	J.enter_map("loc-valde", 7, 8, "up")
 	var o: Dictionary = S.loc.valde
 	var N: Dictionary = NG.k.valde
 	var L: Dictionary = D.LOCALES.valde
 	var m0: int = S.money
 	QUIERO = ["Meter efectivo", Datos.eur(J.neg_tope("valde")), "Nada"]
-	chk(corre(func(): await J.obj_local(9, 5, "cajaL")), "caja bloqueada")
+	chk(corre(func(): await J.obj_local(11, 9, "cajaL")), "caja bloqueada")
 	chk(o.caja == J.neg_tope("valde") and m0 - S.money == int(L.tope) and int(o.dia) == int(S.day), "meter: %s %d" % [o, m0 - S.money])
 	var b0: float = S.banco
 	QUIERO = ["Reponer género", "Pedirlo", "Nada"]
-	chk(corre(func(): await J.obj_local(9, 5, "cajaL")), "género bloqueado")
+	chk(corre(func(): await J.obj_local(11, 9, "cajaL")), "género bloqueado")
 	chk(int(o.st) == int(NG.st) and b0 - S.banco == int(N.gen) * int(NG.st), "género: %s %d" % [o.st, b0 - S.banco])
 	b0 = S.banco
 	QUIERO = ["Pedirlo"]
-	chk(corre(func(): await J.obj_local(1, 2, "recambT")), "género por el estante")
+	chk(corre(func(): await J.obj_local(7, 2, "recambT")), "género por el estante")
 	chk(int(o.st) == 2 * int(NG.st), "género del estante: %s" % o.st)
 	QUIERO = ["Mejora", "Hacerla", "Nada"]
 	b0 = S.banco
-	chk(corre(func(): await J.obj_local(9, 5, "cajaL")), "mejora bloqueada")
-	chk(int(o.mj) == 1 and b0 - S.banco == int(N.mj[0].p) and J.MAPS["loc-valde"].o[6][2] == "elevT", "mejora: %s %d" % [o.mj, b0 - S.banco])
+	chk(corre(func(): await J.obj_local(11, 9, "cajaL")), "mejora bloqueada")
+	chk(int(o.mj) == 1 and b0 - S.banco == int(N.mj[0].p) and J.MAPS["loc-valde"].o[7][8] == "elevT" and J.MAPS["loc-valde"].o[7][12] == "elevT2", "mejora: %s %d" % [o.mj, b0 - S.banco])
 	chk(J.neg_tope("valde") == roundi(float(L.tope) * (1 + float(NG.mjT))), "el tope con mejora")
 	o.cu = 30
 	var t0: int = int(S.min) + 1440 * int(S.day)
 	QUIERO = ["Limpiar"]
-	chk(corre(func(): await J.obj_local(0, 7, "fregona")), "fregona bloqueada")
+	chk(corre(func(): await J.obj_local(0, 9, "fregona")), "fregona bloqueada")
 	chk(int(o.cu) == 100 and int(S.min) + 1440 * int(S.day) - t0 == int(NG.limpia), "limpio: %s" % o.cu)
 	LOG = []
 	QUIERO = ["La caja", "Las cuentas", "Nada"]
 	chk(corre(func(): await J.talk_neg("valde")) and LOG.any(func(t): return t.contains("Ayer hicimos")) and LOG.any(func(t): return t.contains("Ayer vendió")), "la gente y las cuentas: %s" % [LOG])
-	chk(corre(func(): await J.obj_local(2, 3, "elevT2")) and LOG[-1] == N.txt.elevT, "la mitad del elevador")
+	chk(corre(func(): await J.obj_local(5, 4, "elevT2")) and LOG[-1] == N.txt.elevT, "la mitad del elevador")
+	# 4b · 1.46: el elevador y el foso a escala con los coches del concesionario (16 px/m, 5 casillas como la exposición)
+	var mv: Dictionary = J.MAPS["loc-valde"]
+	for q in [["elevT", 4], ["fosoT", 8]]:
+		var fr = Atlas.frame_de("negocios-coche", q[0], "unica", 0, {"i": 0})
+		chk(fr != null and fr.c.get_width() == 80 and fr.c.get_height() == 48, "%s: 80 × 48 (5 m)" % q[0])
+		chk(mv.o[q[1]][1] == q[0] and range(2, 6).all(func(x): return mv.o[q[1]][x] == q[0] + "2") and mv.o[q[1]][6] == null, "%s: 5 casillas" % q[0])
+	var fu = Atlas.frame_de("conce-expo", "expoU", "unica", 0, {"i": 0})
+	var fe = Atlas.frame_de("negocios-coche", "elevT", "unica", 0, {"i": 0})
+	if fu != null and fe != null:
+		var bu: Rect2i = fu.c.get_used_rect()
+		var ancho_coche := 0
+		for x in 80:   # en el elevador, lo blanco del utilitario: tan largo como en la exposición
+			for y in 26:   # por encima de la rampa
+				var c: Color = fe.c.get_pixel(x, y)
+				if c.a > 0 and c.r > 0.8 and c.g > 0.8 and c.b > 0.8:
+					ancho_coche += 1
+					break
+		chk(ancho_coche >= 56 and ancho_coche <= bu.size.x, "el utilitario subido, a escala: %d de %d px" % [ancho_coche, bu.size.x])
 	# 5 · lo que vende cada mañana: cuidado > descuidado > sin género; a la cuenta, con lo lavado
 	o.cu = 100
 	var v1: int = J.neg_venta("valde")
@@ -266,10 +284,10 @@ func _corre() -> void:
 	# 6 · dormir en el cuartucho del taller, cambiarse en su armario
 	var d0: int = S.day
 	QUIERO = ["Dormir"]
-	chk(corre(func(): await J.obj_local(15, 2, "bedT")) and S.day == d0 + 1, "la cama del cuartucho: %d" % S.day)
+	chk(corre(func(): await J.obj_local(19, 2, "bedT")) and S.day == d0 + 1, "la cama del cuartucho: %d" % S.day)
 	MENUS = []
 	QUIERO = ["Nada"]
-	chk(corre(func(): await J.obj_local(15, 6, "armR")) and MENUS[0].has("Cambiarte de ropa"), "el armario: %s" % [MENUS])
+	chk(corre(func(): await J.obj_local(19, 8, "armR")) and MENUS[0].has("Cambiarte de ropa"), "el armario: %s" % [MENUS])
 	# 7 · el rótulo, con el local alquilado, manda dentro; dejarlo devuelve la fianza
 	LOG = []
 	chk(corre(func(): await J.rotulo_local("valde")) and LOG.any(func(t): return t.contains("Entra por la puerta")), "rótulo: %s" % [LOG])
