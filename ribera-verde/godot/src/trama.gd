@@ -2902,6 +2902,9 @@ func desc_movil(V: Dictionary) -> String:
 		"Mensajes": ("%d mensaje%s." % [ns, "s" if ns > 1 else ""]) if ns else "No hay mensajes.", "Gente": "La confianza con cada persona.",
 		"Plantilla": "Tu gente: la calle, la casa y la nave.", "Banca": "En la cuenta, %s. Movimientos y recibos." % Datos.eur(S.get("banco", 0)),
 		"Tienda online": "Con tarjeta; llega al día siguiente.", "Calendario": "El mes, con los días señalados.", "Mapa": "La comarca y las líneas de autobús."}.get(op, "")
+	if Datos.CAL:   # 1.52: el tiempo de hoy
+		var Ti := Datos.tiempo(int(S.day), int(S.min))
+		return "%s · %s, %s\n%s · Fuera: %s, %d °C (máx. %d, mín. %d), %s.\nA: abrir · B: colgar." % [op, Datos.fd_hud(S.day).to_lower(), reloj_txt(), d, Ti.n.to_lower(), Ti.t, Ti.max, Ti.min, Ti.est]
 	return "%s · %s, %s\n%s · A: abrir · B: colgar." % [op, Datos.fd_hud(S.day).to_lower(), reloj_txt(), d]
 
 func mueve_movil(V: Dictionary, b: String) -> bool:
@@ -2938,8 +2941,36 @@ func elegir_movil(ops: Array, i0 := 0) -> int:
 		dlg_nm.hide()
 	return int(e)
 
+func _ancho_cifras(t: String, k := 1) -> int:
+	var w := 0
+	for ch in t:
+		w += (2 if ch == ":" else 4) * k
+	return w
+
+# 1.52: el dibujo del tiempo, 13 × 9 (. vacío, s sol, n nube, m sombra de la nube, g gota, r rayo, b nieve, f niebla)
+const ICONO_TIEMPO := {
+	"sol": ["......s......", "..s...s...s..", "....sssss....", "...sssssss...", "ssssssssssss.", "...sssssss...", "....sssss....", "..s...s...s..", "......s......"],
+	"nubes": ["...s..s......", ".....sss.....", "..ssssnnn....", "...ssnnnnn...", ".ssnnnnnnnnn.", "..nnnnnnnnnnn", "..nnnnnnnnnnn", "...mmmmmmmmm.", "............."],
+	"lluvia": [".....nnn.....", "...nnnnnnn...", "..nnnnnnnnnn.", ".nnnnnnnnnnnn", ".nnnnnnnnnnnn", "..mmmmmmmmmm.", "..g..g..g..g.", ".g..g..g..g..", "............."],
+	"niebla": ["....nnnnn....", "..nnnnnnnnn..", "..mmmmmmmmm..", ".............", "ffffffffffff.", ".............", ".ffffffffffff", ".............", "fffffffffff.."],
+	"tormenta": [".....mmm.....", "...mmmmmmm...", "..mmmmmmmmmm.", ".mmmmmmmmmmmm", "..mmmmrmmmmm.", "....g.rr..g..", "...g..rrr.g..", "........r....", "........r...."],
+	"nieve": [".....nnn.....", "...nnnnnnn...", "..nnnnnnnnnn.", ".nnnnnnnnnnnn", "..mmmmmmmmmm.", ".b...b...b...", "...b...b...b.", ".b...b...b...", "............."]}
+const COLOR_TIEMPO := {"s": "#f8c030", "n": "#e4ecf4", "m": "#9aa8b8", "g": "#6ab0f0", "r": "#f8e060", "b": "#ffffff", "f": "#b8c4cc"}
+
+func _icono_tiempo(o: Array, x: int, y: int, k: String) -> void:
+	var F: Array = ICONO_TIEMPO.get(k, ICONO_TIEMPO.sol)
+	for j in F.size():
+		for i in F[j].length():
+			var c: String = F[j][i]
+			if c != ".":
+				o.append([x + i, y + j, 1, 1, COLOR_TIEMPO[c]])
+
 func _cifras(o: Array, x: int, y: int, t: String, c: String, k := 1) -> int:
 	for ch in t:
+		if ch == "-":
+			o.append([x, y + 2 * k, 3 * k, k, c])
+			x += 4 * k
+			continue
 		if ch == ":":
 			o.append_array([[x, y + k, k, k, c], [x, y + 3 * k, k, k, c]])
 			x += 2 * k
@@ -2962,8 +2993,17 @@ func rects_movil(V: Dictionary) -> Array:
 	for q in 4:   # la cobertura y la batería
 		o.append([sx + 47 + q * 2, sy + 6 - q, 1, q + 1, "#d8f0e0"])
 	o.append_array([[sx + 57, sy + 2, 9, 5, "#d8f0e0"], [sx + 58, sy + 3, 7, 3, "#0a1e14"], [sx + 58, sy + 3, 5, 3, "#7cd08a"], [sx + 66, sy + 3, 1, 3, "#d8f0e0"]])
-	var hh := reloj_txt()
-	_cifras(o, sx + ((70 - 34) >> 1), sy + 10, hh, "#e8f8ec", 2)
+	if Datos.CAL:   # 1.52: la hora ya está en el HUD; en grande, el tiempo de fuera con su dibujo
+		var Ti := Datos.tiempo(int(S.day), int(S.min))
+		var tt := str(Ti.t)
+		var w := 13 + 4 + _ancho_cifras(tt, 2) + 5
+		var x := sx + ((70 - w) >> 1)
+		_icono_tiempo(o, x, sy + 11, Ti.k)
+		x = _cifras(o, x + 17, sy + 10, tt, "#e8f8ec", 2)
+		o.append_array([[x, sy + 10, 3, 1, "#e8f8ec"], [x, sy + 12, 3, 1, "#e8f8ec"], [x, sy + 11, 1, 1, "#e8f8ec"], [x + 2, sy + 11, 1, 1, "#e8f8ec"]])   # °
+	else:
+		var hh := reloj_txt()
+		_cifras(o, sx + ((70 - 34) >> 1), sy + 10, hh, "#e8f8ec", 2)
 	var ns: int = S.sms.size()
 	for q in V.ops.size():
 		var x: int = sx + 4 + (q % 3) * 22

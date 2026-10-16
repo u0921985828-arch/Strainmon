@@ -303,12 +303,43 @@ func _mundo() -> void:
 		var h: float = S.min / 60.0
 		if h >= 17.5 and h < 20.5:
 			_rect(0, 0, J.SW, SH, Color8(255, 130, 50, Datos.jsround(.13 * sin((h - 17.5) / 3 * PI) * 255)))
+		if Datos.CAL:
+			_tiempo(now)
 		var a := noche()
 		if a > 0:
 			_rect(0, 0, J.SW, SH, Color8(14, 20, 72, Datos.jsround(a * 255)))
 	var LZ = _luz_local()   # los locales (1.30): el fondo, encima de todo; sus luces, en _farolas
 	if LZ and LZ.get("fondo"):
 		_rect(0, 0, J.SW, SH, css(LZ.fondo))
+
+# el tiempo en la calle (1.52): nubes que apagan, lluvia y nieve que caen, niebla y algún relámpago con tormenta
+func _tiempo(now: float) -> void:
+	var k: String = Datos.tiempo(int(J.S.day), int(J.S.min)).k
+	if k == "sol":
+		return
+	var gris := {"nubes": 30, "lluvia": 55, "tormenta": 85, "niebla": 0, "nieve": 35}
+	if gris[k]:
+		_rect(0, 0, J.SW, SH, Color8(40, 48, 60, gris[k]))
+	if k == "niebla":
+		_rect(0, 0, J.SW, SH, Color8(200, 208, 214, 90))
+		return
+	if k == "nubes":
+		return
+	var n := 110 if k == "nieve" else 170
+	for i in n:
+		var hx := Datos.hash_str("ll%d" % i)
+		if k == "nieve":
+			var y := fposmod((hx >> 9) % SH + now / 40.0, SH)
+			var x := fposmod(hx % J.SW + 3.0 * sin(now / 600.0 + i), J.SW)
+			_rect(int(x), int(y), 1 + (hx >> 3) % 2, 1 + (hx >> 3) % 2, Color8(255, 255, 255, 235))
+		else:
+			var v := 0.35 + float((hx >> 5) % 10) / 40.0
+			var y := fposmod((hx >> 9) % SH + now * v, SH)
+			var x := fposmod(hx % J.SW - y / 3.0, J.SW)
+			_rect(int(x), int(y), 1, 3, Color8(200, 220, 240, 200))   # la gota inclinada: dos trazos
+			_rect(int(x) - 1, int(y) + 3, 1, 3, Color8(200, 220, 240, 200))
+	if k == "tormenta" and fposmod(now, 7000.0) < 120.0:
+		_rect(0, 0, J.SW, SH, Color8(255, 255, 240, 110))
 
 func noche() -> float:
 	var h: float = J.S.min / 60.0

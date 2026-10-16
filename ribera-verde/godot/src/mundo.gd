@@ -2311,6 +2311,10 @@ func remove_client(id: String) -> void:
 	S.clients = S.clients.filter(func(c): return c.id != id)
 	ents = ents.filter(func(e): return e.id != id)
 
+# 1.52: con lluvia, tormenta o nieve hay menos gente en la calle: el calor de cada venta, por esto
+func calle_tiempo() -> float:
+	return float(D.TIEMPO.calle.get(Datos.tiempo(int(S.day), int(S.min)).k, 1.0)) if Datos.CAL else 1.0
+
 # el catador (1.10) solo compra rosin: a precio_rosin, y el «caro» cuela según lo que pase del 50 % de THC
 func talk_client(c: Dictionary) -> void:
 	var ct: Dictionary = D.CTYPES[c.type]
@@ -2353,7 +2357,8 @@ func talk_client(c: Dictionary) -> void:
 			use_buds(sid, c.want)
 		S.money += pr[j]
 		S.sales += pr[j]
-		S.heat = minf(100, Datos.jsround((S.heat + D.CALOR_CALLE.base + c.want * (D.CALOR_CALLE.rosin if ext else D.CALOR_CALLE.g)) * 10) / 10.0)
+		var fc := calle_tiempo()
+		S.heat = minf(100, Datos.jsround((S.heat + (D.CALOR_CALLE.base + c.want * (D.CALOR_CALLE.rosin if ext else D.CALOR_CALLE.g)) * fc) * 10) / 10.0)
 		S.rep += [3, 2, 1][j]
 		sfx("coin")
 		await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})

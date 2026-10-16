@@ -85,6 +85,41 @@ static func fd_larga(dia: int) -> String:
 	var f := fecha(dia)
 	return "%s, %d de %s de %d" % [DIA_SEM[f.s], f.d, MES_N[f.m - 1], f.y]
 
+# ---------- el tiempo de fuera (1.52): por mes del calendario, uno por día ----------
+static func estacion(dia: int) -> String:
+	var f := fecha(dia)
+	var E: Array = carga().TIEMPO.est
+	var e: String = E[E.size() - 1][2]
+	for x in E:
+		if int(f.m) > int(x[0]) or (int(f.m) == int(x[0]) and int(f.d) >= int(x[1])):
+			e = x[2]
+	return e
+
+# {k: sol/nubes/lluvia/niebla/tormenta/nieve, n, max, min, t (a esa hora), est}
+static func tiempo(dia: int, minuto: int) -> Dictionary:
+	var T: Dictionary = carga().TIEMPO
+	var m: int = int(fecha(dia).m) - 1
+	var h := hash_str("tiempo%d" % dia)
+	var r := h % 100
+	var k: String = T.k[0]
+	for i in T.k.size():
+		r -= int(T.p[m][i])
+		if r < 0:
+			k = T.k[i]
+			break
+	var v: int = int((h >> 8) % (2 * int(T.var) + 1)) - int(T.var)
+	var mx: int = int(T.t[m][0]) + v + int(T.dt[k])
+	var mn: int = mini(int(T.t[m][1]) + v + mini(0, int(T.dt[k])), mx - 3)
+	# la mínima a las 6 y la máxima a las 15
+	var hh := float(minuto) / 60.0
+	var u := (hh - 6.0) / 9.0 if hh >= 6.0 and hh <= 15.0 else (1.0 - (fposmod(hh - 15.0, 24.0)) / 15.0)
+	var t := mn + (mx - mn) * (0.5 - 0.5 * cos(PI * clampf(u, 0.0, 1.0)))
+	if k == "nieve":
+		mx = mini(mx, 3)
+		mn = mini(mn, 0)
+		t = minf(t, 2.0)
+	return {"k": k, "n": T.n[k], "max": mx, "min": mn, "t": jsround(t), "est": estacion(dia)}
+
 static func jsround(x: float) -> int:
 	return int(floor(x + 0.5))
 
