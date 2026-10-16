@@ -1,0 +1,21 @@
+{
+  "grupo": "edificio-ladrillo-pu",
+  "celda": [
+    128,
+    96
+  ],
+  "tope_colores": 15,
+  "secuencias": 1,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 25,
+  "distancia_media": 0,
+  "colores_finales": 10,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "puerta/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

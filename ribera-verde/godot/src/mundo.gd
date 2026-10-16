@@ -631,6 +631,13 @@ func montar_nave() -> void:
 	if S != null and S.get("nave") != null and S.nave.has("bc") and n.o[2][8] == null and n.o[2][9] == null:
 		n.o[2][8] = "clonN"
 		n.o[2][9] = "clonN2"
+	# 1.45 (lo pidió el usuario: «en la nave en la que cultivas, lo mismo»): el camastro del rincón, para dormir allí
+	for y in [6, 7]:
+		if n.o[y][17] in ["bedT", "bedB"]:
+			n.o[y][17] = null
+	if S != null and S.get("nave") != null and Datos.CAL and n.o[6][17] == null and n.o[7][17] == null:
+		n.o[6][17] = "bedT"
+		n.o[7][17] = "bedB"
 
 # el concesionario del barrio alto (1.43, lo pidió el usuario): con AUTOS RIBERA abierto (S.flags.conce), su edificio (D.CONCE.bld),
 # sin los árboles de donde va (CONCE.quita), con la acera, las banderas y la puerta; sin él, el barrio alto como estaba
@@ -767,6 +774,56 @@ func montar_setas() -> void:
 	m.o[int(X.mesaS[1])][int(X.mesaS[0])] = "mesaS"
 	if S != null and S.get("setas") is Dictionary and S.setas.get("dh"):
 		m.o[int(X.deshidS[1])][int(X.deshidS[0])] = "deshidS"
+
+# los negocios por dentro (1.45, lo pidió el usuario: «que tú puedas acceder a ese sitio y controlarlo desde ahí»; con Datos.CAL):
+# en la calle, la puerta del local (NEGOCIO.k[k]: x, puerta, ancha, dx, tile; gate «neg:k»); dentro (loc-<k>), lo que ponen las mejoras
+# compradas (S.loc[k].mj); sin Datos.CAL, la calle y el local como estaban (la copia _neg0)
+const NEG_ANCHO := ["elevT", "fosoT", "fosoB", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL"]
+var _neg0 := {}
+func montar_locales(mapa: String) -> void:
+	if not D.has("NEGOCIO"):
+		return
+	for k in D.NEGOCIO.k:
+		var N: Dictionary = D.NEGOCIO.k[k]
+		var L: Dictionary = D.LOCALES[k]
+		var dentro: String = "loc-" + k
+		if mapa != L.map and mapa != dentro:
+			continue
+		var m = MAPS.get(mapa)
+		if m == null:
+			continue
+		if not _neg0.has(mapa):
+			_neg0[mapa] = {"g": m.g.duplicate(true), "o": m.o.duplicate(true), "doors": m.doors.duplicate(true), "blds": m.blds.duplicate(true)}
+		var c: Dictionary = _neg0[mapa]
+		if mapa == L.map:
+			for y in int(m.h):
+				m.g[y] = c.g[y].duplicate()
+			m.doors.clear()
+			m.doors.merge(c.doors.duplicate(true))
+			m.blds.clear()
+			m.blds.append_array(c.blds.duplicate(true))
+		else:
+			for y in int(m.h):
+				m.o[y] = c.o[y].duplicate()
+		if not Datos.CAL:
+			continue
+		if mapa == L.map:
+			for b in m.blds:
+				if int(b.x0) == int(N.bld) and int(b.y0) + int(b.h) - 1 == int(N.dy):
+					b.doorX = int(N.x)
+					b.puerta = N.puerta
+					if N.ancha:
+						b.ancha = 1
+					b.dx = int(N.dx)
+			for j in (2 if N.ancha else 1):
+				m.g[int(N.dy)][int(N.x) + j] = N.tile
+				m.doors["%d,%d" % [int(N.x) + j, int(N.dy)]] = {"to": dentro, "x": int(N.mat[mini(j, N.mat.size() - 1)]), "y": int(MAPS[dentro].h) - 2, "dir": "up", "gate": "neg:" + k}
+		elif S != null and S.get("loc") is Dictionary and S.loc.has(k):
+			for i in mini(int(S.loc[k].get("mj", 0)), N.mj.size()):
+				for q in N.mj[i].o:
+					m.o[int(q[1])][int(q[0])] = q[2]
+					if q[2] in NEG_ANCHO:
+						m.o[int(q[1])][int(q[0]) + 1] = q[2] + "2"
 
 func montar_camarote() -> void:
 	var m: Dictionary = MAPS.camarote
@@ -929,6 +986,8 @@ func npc_cond(d: Dictionary) -> bool:
 			return S.ch == 6
 		"julen":   # 1.23: en el piso hasta la primera cosecha; después, en el growshop
 			return (S.flags.get("kiko1") and not S.flags.get("harvest1")) if d.map == "home" else (true if S.flags.get("harvest1") else false)
+	if d.id.begins_with("neg_"):   # 1.45: la gente de los negocios alquilados
+		return Datos.CAL and S.get("loc") is Dictionary and S.loc.has(d.id.substr(4))
 	if d.id == "delroy":   # 1.32: en la asociación, desde la segunda visita
 		return delroy_aqui()
 	if d.id.begins_with("club_") or d.id.begins_with("pres_"):   # los clubs (1.15) y sus presidentes (1.34), desde su capítulo
@@ -947,6 +1006,9 @@ func npc_cond(d: Dictionary) -> bool:
 func npc_talk(d: Dictionary) -> void:
 	if d.get("look") == "cop" and d.id.begins_with("pat"):   # las patrullas (1.10)
 		await say(pick(["«Circule.»", "«Buenas. Nada que ver aquí.»", "«¿Todo bien? Siga.»"]), "AGENTE")
+		return
+	if d.id.begins_with("neg_"):   # 1.45
+		await talk_neg(d.id.substr(4))
 		return
 	match d.id:
 		"kiko":
@@ -1186,6 +1248,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_camarote()
 	if name_ == "setas":
 		montar_setas()
+	montar_locales(name_)   # 1.45: la puerta de los negocios y sus mejoras
 	montar_club(name_)
 	P.x = x
 	P.y = y
@@ -2273,6 +2336,8 @@ func nevera_action():
 	pass
 func camarote_action():   # 1.43.6, en trama.gd
 	pass
+func talk_neg(_k: String):   # 1.45, en granja.gd
+	pass
 func letter_action():
 	pass
 func parada_action():
@@ -2596,6 +2661,17 @@ func coloca_gente(mapa: String) -> void:
 func montar_club(mapa: String) -> void:
 	if mapa.begins_with("club-") and D.ORDEN_P.has(mapa):
 		aplica_orden(mapa)
+	if mapa == "club-rv":   # 1.45 (lo pidió el usuario): el almacén del club, de presidente (MERCADO.alm)
+		var m: Dictionary = MAPS[mapa]
+		for y in int(m.h):
+			for x in int(m.w):
+				if m.o[y][x] == "almC":
+					m.o[y][x] = null
+		if Datos.CAL and S != null and S.get("aso") is Dictionary and S.aso.get("pres"):
+			for q in [[9, 2], [12, 2], [13, 2], [11, 2]]:
+				if m.o[q[1]][q[0]] == null and m.o[q[1] + 1][q[0]] == null:
+					m.o[q[1]][q[0]] = "almC"
+					break
 
 func ordenar(_mapa: String) -> void:   # trama
 	pass

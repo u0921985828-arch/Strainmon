@@ -1,5 +1,18 @@
 # Cambios
 
+## 1.45.0 · 15 de octubre de 2026
+
+Los negocios por dentro y los mercados que compran y venden (lo pidió el usuario: «que tú puedas acceder a ese sitio y controlarlo desde ahí… tanto el taller como los demás negocios»; «un cuartucho donde haya una cama pequeña…»; «en el club se tiene que poder tanto comprar como vender extracciones y diferentes tipos de hierba… a todos los mercados»). Solo Godot (0.39.0), con `Datos.CAL`.
+
+- **Cada local alquilado se entra por su puerta** (gate `neg:<k>`, `montar_locales`): el taller de Valdehierro, el lavadero de los astilleros, la taberna del puerto, la quesería de Mendialde, la panadería de Errotabarri y la lavandería de Ibarbide (`MAPS.loc-<k>`). La puerta es la que ya está dibujada en la fachada, con su estilo, su tamaño y en su sitio (lo pidió el usuario): la animación se recorta de la propia base (`edificio-ladrillo-pu`, `edificio-marinera-pu` y `edificio-casco-pu`, en `puertas_neg` de `mundo.py`; los caseríos, con la suya), y la prueba comprueba que, cerrada, calca la fachada píxel a píxel. Sin alquilar, «Cerrado: SE TRASPASA». El rótulo de la calle sigue para alquilarlo y, ya tuyo, manda dentro.
+- **Por dentro, con su atrezo** (arte a mano en `tools/sprites/a-mano/negocios.py`): el taller con el elevador y el coche subido, el foso con la escalera, el banco de trabajo, el compresor, los recambios y los neumáticos; los boxes de lavado, los aspiradores y la máquina de fichas; la barra, los barriles y las mesas de la taberna; la cuba, la prensa, la cámara de curación y el mostrador de la quesería; el horno de leña, la amasadora y los estantes del pan; las lavadoras, las secadoras y la mesa de doblar. En cada uno, su empleado (Iker, Unai, Pello, Antxon, Itziar e Idoia).
+- **Se lleva desde dentro:** la caja (meter efectivo, las cuentas, reponer género, las mejoras y dejar el local), el género en su estante y la fregona.
+- **Un negocio que funciona** (`NEGOCIO`, `neg_venta`, cada mañana en `recibos_dia`): vende su base × la limpieza (baja 5 al día; la fregona, una hora, la deja en 100) × las mejoras (+30 % cada una) × el género (sin género, al 30 %) ± 15 %, y entra en la cuenta como ventas, además de lo que laves por la caja. Dos mejoras por local (se ven dentro), que suben también el tope de la caja un 50 % cada una.
+- **Dormir fuera de casa:** el cuartucho del taller, detrás de un tabique, con cama, mesilla, escritorio y armario (cambiarte de ropa); y el camastro de la nave, al fondo.
+- **El almacén del club** (asociación, de presidente; `almC`): guardas cogollos y extracciones hasta 2 kg y los socios retiran 40 g al día a precio de dispensario.
+- **Mercados que compran y venden** (`MERCADO`, `comprar_mercado`, `mercado_lista`): los clubs, Iñaki y la lonja tienen cada día tres variedades y dos extracciones (rosin, dry sift, ice, charas o static) con sus gramos; y compran varios lotes al día hasta su tope (los clubs, 200 g; Iñaki, su carga; la lonja, sus 500 g el día que carga).
+- Prueba nueva `tests/negocios.gd` (284 comprobaciones; con `--pintar`, cada local por dentro y su puerta en la calle).
+
 ## 1.44.0 · 15 de octubre de 2026
 
 El bajo de las setas entero (lo pidió el usuario: «los sprites y todo para crear el piso bajo, donde se cultivan, se secan, almacenan y se crean microdosis y comestibles»). Solo Godot (0.38.0), con `Datos.CAL`. Nada de método ni de dosis: lotes y cajas, como el resto del bajo.

@@ -9340,6 +9340,203 @@
     "deshidS-1": "exacto"
    },
    "descripcion": "1.44: el deshidratador del bajo, apagado o con setas."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/negocios.py",
+   "notas": "1.45, pedido por el usuario: los negocios alquilados por dentro (el taller con el foso), el cuartucho para dormir y el almacén del club.",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "negocios-16",
+   "celda": "objeto_1x1",
+   "estilo_ref": "props-16",
+   "cubre": [
+    "obj:amasaP",
+    "obj:aspiraL",
+    "obj:barrilT",
+    "obj:cajaL",
+    "obj:cambioL",
+    "obj:compT",
+    "obj:fichasL",
+    "obj:fregona",
+    "obj:lavaL",
+    "obj:mesaC",
+    "obj:neumT",
+    "obj:prensaQ",
+    "obj:secaL"
+   ],
+   "ajuste_por_sprite": {
+    "amasaP": "exacto",
+    "aspiraL": "exacto",
+    "barrilT": "exacto",
+    "cajaL": "exacto",
+    "cambioL": "exacto",
+    "compT": "exacto",
+    "fichasL": "exacto",
+    "fregona": "exacto",
+    "lavaL": "exacto",
+    "mesaC": "exacto",
+    "neumT": "exacto",
+    "prensaQ": "exacto",
+    "secaL": "exacto"
+   },
+   "descripcion": "1.45: los muebles de los seis locales alquilables, el cuartucho y el almacén del club, a 16 px/m, sin marcas"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/negocios.py",
+   "notas": "1.45, pedido por el usuario: los negocios alquilados por dentro (el taller con el foso), el cuartucho para dormir y el almacén del club.",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "negocios-alto",
+   "celda": "objeto_alto",
+   "estilo_ref": "los muebles a escala del piso (props-escala)",
+   "cubre": [
+    "obj:almC",
+    "obj:armR",
+    "obj:curaQ",
+    "obj:panP",
+    "obj:prodL",
+    "obj:recambT",
+    "obj:tabique"
+   ],
+   "ajuste_por_sprite": {
+    "almC-0": "exacto",
+    "almC-1": "exacto",
+    "almC-2": "exacto",
+    "armR": "exacto",
+    "curaQ": "exacto",
+    "panP": "exacto",
+    "prodL": "exacto",
+    "recambT": "exacto",
+    "tabique": "exacto"
+   },
+   "descripcion": "1.45: los muebles de los seis locales alquilables, el cuartucho y el almacén del club, a 16 px/m, sin marcas"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/negocios.py",
+   "notas": "1.45, pedido por el usuario: los negocios alquilados por dentro (el taller con el foso), el cuartucho para dormir y el almacén del club.",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "negocios-ancho",
+   "celda": "mueble_ancho",
+   "estilo_ref": "los muebles a escala del piso (props-escala)",
+   "cubre": [
+    "obj:bancoT",
+    "obj:boxL",
+    "obj:cubaQ",
+    "obj:doblaL",
+    "obj:elevT",
+    "obj:fosoB",
+    "obj:fosoT",
+    "obj:hornoP",
+    "obj:mostrP",
+    "obj:mostrQ"
+   ],
+   "ajuste_por_sprite": {
+    "bancoT": "exacto",
+    "boxL": "exacto",
+    "cubaQ": "exacto",
+    "doblaL": "exacto",
+    "elevT": "exacto",
+    "fosoB": "exacto",
+    "fosoT": "exacto",
+    "hornoP": "exacto",
+    "mostrP": "exacto",
+    "mostrQ": "exacto"
+   },
+   "descripcion": "1.45: los muebles de los seis locales alquilables, el cuartucho y el almacén del club, a 16 px/m, sin marcas"
+  },
+  {
+   "id": "edificio-ladrillo-pu",
+   "tipo": "puerta",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "celda": "edificio_8x6",
+   "origen": "tools/sprites/a-mano/mundo.py (puertas_neg): recortada de la base de edificio-ladrillo",
+   "descripcion": "el portal de aluminio y cristal del bloque de ladrillo, abriéndose: solo la animación de la puerta de los negocios alquilados",
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de mundo.py",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.45, pedido por el usuario: la puerta con el estilo, el tamaño y el sitio de la de la fachada."
+  },
+  {
+   "id": "edificio-marinera-pu",
+   "tipo": "puerta",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "celda": "edificio_8x6",
+   "origen": "tools/sprites/a-mano/mundo.py (puertas_neg): recortada de la base de edificio-marinera",
+   "descripcion": "la puerta de la casa marinera, abriéndose: solo la animación de la puerta de los negocios alquilados",
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de mundo.py",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.45, pedido por el usuario: la puerta con el estilo, el tamaño y el sitio de la de la fachada."
+  },
+  {
+   "id": "edificio-casco-pu",
+   "tipo": "puerta",
+   "fase": "F4",
+   "herramienta": "importado",
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "paleta": "propia",
+   "celda": "edificio_8x6",
+   "origen": "tools/sprites/a-mano/mundo.py (puertas_neg): recortada de la base de edificio-casco",
+   "descripcion": "el portal de madera de la casa del Casco Viejo, abriéndose: solo la animación de la puerta de los negocios alquilados",
+   "animaciones": [
+    {
+     "nombre": "puerta",
+     "fps": 12,
+     "bucle": false,
+     "frames": 4,
+     "celda": "puerta",
+     "notas": "0 = recorte de la base (cerrada); 1-3 abriéndose (interior #26262e), de mundo.py",
+     "herramienta": "importado"
+    }
+   ],
+   "notas": "1.45, pedido por el usuario: la puerta con el estilo, el tamaño y el sitio de la de la fachada."
   }
  ],
  "familias": {

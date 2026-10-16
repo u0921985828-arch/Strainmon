@@ -1123,6 +1123,26 @@ SPRITES['casco'] = lambda: [guarda_edificio('edificio-casco', casco('casco', 4, 
 SPRITES['growcity'] = lambda: guarda_edificio('edificio-growcity', *growcity())
 SPRITES['bloque'] = lambda: [guarda_edificio('edificio-' + k, bloque(k)) for k in BLOQUES]
 
+# 1.45: las puertas de los negocios alquilados (lo pidió el usuario: «las puertas deben coincidir con el estilo y tamaño y con el
+# lugar donde está en el diseño del edificio»): la animación de la puerta que ya está dibujada en cada fachada, recortada de su
+# base (el 0, cerrada, igual que la base), en grupos aparte (edificio-<k>-pu) para no tocar las fachadas que no se entran
+def puertas_neg():
+    sale_p('edificio-ladrillo-pu', puertas(ladrillo(), 48, 64, (8, 0, 18, 32), 'doble'))   # el portal de aluminio y cristal (x 54-75), casillas 3-4
+    sale_p('edificio-marinera-pu', puertas(marinera('marinera'), 16, 64, (9, 5, 14, 27), 'simple'))   # casillas 1-2
+    pc = puertas(casco('casco', 4, 6, 91), 32, 64, (16, 7, 10, 25), 'simple')   # el portal (x 48-57)
+    for p in pc:
+        p.cambia({'#e0b040': '#c89a52'})            # el pomo, al tono que le da a la base la paleta del atlas
+    sale_p('edificio-casco-pu', pc)
+
+
+def sale_p(grupo, ps):
+    for i, p in enumerate(ps):
+        sale(p, grupo, 'puerta', i)
+
+
+SPRITES['puertas-neg'] = puertas_neg
+
+
 if __name__ == '__main__':
     pedidos = sys.argv[1:] or list(SPRITES)
     for k in pedidos:

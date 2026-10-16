@@ -1766,6 +1766,15 @@ func recibos_dia() -> void:
 	for k in S.loc.keys():
 		var L: Dictionary = D.LOCALES[k]
 		var o: Dictionary = S.loc[k]
+		if Datos.CAL:   # 1.45: lo que ha vendido el negocio (neg_venta), a la cuenta; la limpieza baja y el género se gasta
+			neg_o(k)
+			var v := neg_venta(k)
+			o.ay = v
+			o.vt = int(o.vt) + v
+			if v > 0:
+				abono_banco(v, "Ventas · " + L.n)
+			o.cu = maxi(0, int(o.cu) - int(D.NEGOCIO.cu[1]))
+			o.st = maxi(0, int(o.st) - 1)
 		if o.caja > 0:   # lo de ayer, ya limpio
 			var nt: int = roundi(o.caja * (1 - L.com))
 			abono_banco(nt, "Ingresos · " + L.n)
@@ -1809,10 +1818,18 @@ func rotulo_local(k: String) -> void:
 		if not await tarjeta(L.fianza + L.sem, "Fianza · " + L.n):
 			return
 		S.loc[k] = {"r": S.day + D.RECIBO.dias, "caja": 0, "dia": 0, "tot": 0}
+		if Datos.CAL:
+			neg_o(k)
 		sfx("coin")
 		update_hud()
 		await got("las llaves " + del_neg(L))
 		await say("%s: el negocio sigue con su gente. Tú metes el efectivo en la caja y, a la mañana siguiente, sale en el banco como lo que ha hecho." % L.n)
+		if Datos.CAL:
+			montar_locales(S.map)
+			await say("Por dentro se lleva todo: la caja, el género, la limpieza y las mejoras. Lo que venda, si lo cuidas, también entra en la cuenta.")
+		return
+	if Datos.CAL:   # 1.45: el negocio se lleva desde dentro
+		await say("%s es tuyo: la caja, el género y la gente están dentro. Entra por la puerta." % mayus(L.neg))
 		return
 	var o: Dictionary = S.loc[k]
 	while true:
@@ -1846,6 +1863,126 @@ func rotulo_local(k: String) -> void:
 			return
 		else:
 			return
+
+# ---------- los negocios por dentro (1.45, lo pidió el usuario; con Datos.CAL) ----------
+# «que también funcione… dependiendo de cómo cuides el local»: S.loc[k] gana cu (la limpieza, 0-100: baja NEGOCIO.cu[1] al día),
+# st (los días de género que quedan), mj (las mejoras compradas, 0-2), ay (lo que vendió ayer) y vt (lo vendido en total).
+# Cada mañana, el negocio vende su base × limpieza × mejoras × género (sin género, NEGOCIO.sinGen) ± NEGOCIO.azar, y entra limpio
+func neg_o(k: String) -> Dictionary:
+	var o: Dictionary = S.loc[k]
+	for c in [["cu", int(D.NEGOCIO.cu[0])], ["st", 0], ["mj", 0], ["ay", 0], ["vt", 0]]:
+		if not o.has(c[0]):
+			o[c[0]] = c[1]
+	return o
+
+func neg_tope(k: String) -> int:
+	return roundi(float(D.LOCALES[k].tope) * (1 + float(D.NEGOCIO.mjT) * int(neg_o(k).mj)))
+
+func neg_venta(k: String) -> int:
+	var N: Dictionary = D.NEGOCIO.k[k]
+	var o := neg_o(k)
+	var f: float = (0.4 + 0.6 * int(o.cu) / 100.0) * (1 + float(D.NEGOCIO.mjF) * int(o.mj)) * (1.0 if int(o.st) > 0 else float(D.NEGOCIO.sinGen))
+	var a: float = 1 + float(D.NEGOCIO.azar) * ((absi(hash("%s|%d" % [k, int(S.day)])) % 201) / 100.0 - 1)
+	return roundi(float(N.base) * f * a)
+
+func neg_cuidado(k: String) -> String:
+	for c in D.NEGOCIO.cuTxt:
+		if int(neg_o(k).cu) >= int(c[0]):
+			return c[1]
+	return ""
+
+func neg_caja(k: String) -> void:
+	var L: Dictionary = D.LOCALES[k]
+	var N: Dictionary = D.NEGOCIO.k[k]
+	var T: String = String(L.n).to_upper()
+	while S.loc.has(k):
+		var o := neg_o(k)
+		var hoy: float = metido(o)
+		var ops := ["Meter efectivo", "Las cuentas", "Reponer género"]
+		if int(o.mj) < N.mj.size():
+			ops.append("Mejora: " + N.mj[int(o.mj)].n)
+		ops += ["Dejar el local", "Nada"]
+		var oi: int = await ask("LA CAJA · hoy, %s de %s metidos · ayer vendió %s." % [Datos.eur(hoy), Datos.eur(neg_tope(k)), Datos.eur(int(o.ay))], ops, T)
+		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		if op == "Meter efectivo":
+			var mx := int(floorf(minf(S.money, neg_tope(k) - hoy)))
+			if mx < 1:
+				sfx("bad")
+				await say("No llevas efectivo." if S.money < 1 else "Hoy ya hay %s en la caja: más, y Hacienda se fija." % Datos.eur(neg_tope(k)))
+				continue
+			var e: int = await cantidad("¿Cuánto metes en la caja? Hoy, hasta %s." % Datos.eur(mx), mx)
+			if not e:
+				continue
+			o.caja = hoy + e
+			o.dia = S.day
+			S.money -= e
+			sfx("coin")
+			update_hud()
+			await say("Mañana entran en la cuenta %s como ingresos %s." % [Datos.eur(roundi(o.caja * (1 - L.com))), del_neg(L)])
+		elif op == "Las cuentas":
+			await say("Ayer vendió %s; en total, %s. Por la caja has lavado %s." % [Datos.eur(int(o.ay)), Datos.eur(int(o.vt)), Datos.eur(int(o.tot))], T)
+			await say("El local %s (%d %%). Género para %d días. Mejoras: %d de %d. El recibo, %s el %s." % [neg_cuidado(k), int(o.cu), int(o.st), int(o.mj), N.mj.size(), Datos.eur(L.sem), Datos.fd(o.r, S.day)], T)
+		elif op == "Reponer género":
+			await neg_genero(k)
+		elif op.begins_with("Mejora"):
+			var M: Dictionary = N.mj[int(o.mj)]
+			if await ask("%s: %s, con tarjeta. Vende un %d %% más y por la caja pasa un %d %% más al día." % [M.n, Datos.eur(M.p), roundi(float(D.NEGOCIO.mjF) * 100), roundi(float(D.NEGOCIO.mjT) * 100)], ["Hacerla", "No"], T) != 0:
+				continue
+			if not await tarjeta(M.p, "Obra · " + L.n):
+				continue
+			o.mj = int(o.mj) + 1
+			montar_locales(S.map)
+			build_ents()
+			sfx("get")
+			await say("Hecho: %s." % M.n.to_lower())
+		elif op == "Dejar el local":
+			if await ask("¿Dejas %s? Te devuelven la fianza a la cuenta; las mejoras se quedan." % L.neg, ["Dejarlo", "No"]) != 0:
+				continue
+			S.loc.erase(k)
+			abono_banco(L.fianza, "Fianza · " + L.n)
+			sfx("coin")
+			update_hud()
+			await say("Has dejado %s. Devuelves las llaves al salir." % L.neg)
+			return
+		else:
+			return
+
+func neg_genero(k: String) -> void:
+	var L: Dictionary = D.LOCALES[k]
+	var N: Dictionary = D.NEGOCIO.k[k]
+	var o := neg_o(k)
+	var dias := int(D.NEGOCIO.st)
+	var e: int = roundi(float(N.gen) * dias)
+	if await ask("Género (%s): queda para %d días. Sin género vende un %d %% de lo normal. ¿Pides para %d días por %s, con tarjeta?" % [N.gn, int(o.st), roundi(float(D.NEGOCIO.sinGen) * 100), dias, Datos.eur(e)], ["Pedirlo", "No"]) != 0:
+		return
+	if not await tarjeta(e, "Género · " + L.n):
+		return
+	o.st = int(o.st) + dias
+	sfx("coin")
+	update_hud()
+	toast("Género para %d días" % int(o.st), 1400)
+
+func neg_limpiar(k: String) -> void:
+	var o := neg_o(k)
+	if await ask("El local %s (%d %%). ¿Lo friegas y lo ordenas? Es una hora." % [neg_cuidado(k), int(o.cu)], ["Limpiar", "Nada"]) != 0:
+		return
+	await fade(1)
+	advance_time(int(D.NEGOCIO.limpia))
+	o.cu = 100
+	update_hud()
+	await wait(300)
+	await fade(0)
+	sfx("get")
+	toast("El local reluce", 1400)
+
+func talk_neg(k: String) -> void:
+	var N: Dictionary = D.NEGOCIO.k[k]
+	var o := neg_o(k)
+	var T: String = N.emp[2]
+	var q: String = ("Ayer hicimos %s. " % Datos.eur(int(o.ay))) + ("El local %s." % neg_cuidado(k)) + (" Y nos estamos quedando sin %s." % N.gn if int(o.st) <= 1 else "")
+	var c: int = await ask(q, ["La caja", "Nada"], T)
+	if c == 0:
+		await neg_caja(k)
 
 func sprite_rotulo() -> String:
 	for k in D.LOCALES:

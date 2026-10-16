@@ -110,12 +110,12 @@ func _corre() -> void:
 	S.lonja = null
 	S.ch = maxi(int(S.ch), int(D.LONJA.ch))
 	MENUS = []
-	QUIERO = ["Rosin", "100 g"]
+	QUIERO = ["Venderle", "Rosin", "100 g"]   # 1.45: con Datos.CAL, Nerea pregunta antes si vendes o compras
 	m0 = S.money
 	b = S.rosin[sid].duplicate()
 	p = pg(sid, b, "mayor", D.LONJA.f)
 	chk(corre(J.talk_nerea), "lonja bloqueada")
-	chk(MENUS.size() >= 2 and MENUS[1][MENUS[1].size() - 2].begins_with("100 g"), "tope de la lonja (%d g de flor): %s" % [int(D.LONJA.g), MENUS])
+	chk(MENUS.size() >= 3 and MENUS[2][MENUS[2].size() - 2].begins_with("100 g"), "tope de la lonja (%d g de flor): %s" % [int(D.LONJA.g), MENUS])
 	chk(S.money - m0 == Datos.jsround(100 * p), "la lonja paga %d, no %d" % [S.money - m0, Datos.jsround(100 * p)])
 	chk(J.calidad(b) > 1.0 and absf(S.rosin[sid].g - 50.0) < 1e-6 and S.lonja == S.day, "lonja: %s" % [S.rosin])
 	# 4 · el club: tres cuartos de precio_rosin × px, de 10, 25 o 50 g, una entrega al día
