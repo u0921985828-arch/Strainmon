@@ -20,7 +20,6 @@ ALTO = {
     'counter': ('props-altura', 5, 0, 'mostrador de 100 cm'),
     'barcounter': ('props-altura', 5, 0, 'barra de 100 cm'),
     'btable': ('props-16', 8, 0, 'mesa alta de bar de 105 cm'),
-    'bench': ('props-16', 5, 0, 'banco con respaldo de 80 cm'),
     'display': ('props-16', 6, 0, 'vitrina de 100 cm'),
     'vitrina': ('locales-16', 6, 0, 'vitrina del dispensario de 100 cm'),
     'barraD': ('locales-16', 7, 0, 'barra de la discoteca de 110 cm'),
@@ -103,7 +102,32 @@ def sale(grupo, n, im):
     d = P('art', 'crudo', grupo, n, 'unica'); os.makedirs(d, exist_ok=True)
     im.save(os.path.join(d, '00.png'))
 
+def banco():
+    """1.50 (lo pidió el usuario: «los bancos, que uno se pueda sentar bien»): el banco del parque dibujado a mano, de 1,6 m (26 px,
+    más ancho que su casilla, para que se vea a los dos lados del que se sienta), de frente y desde arriba: el asiento a 45 cm (7 px),
+    el respaldo a 80 (13), tres listones en cada uno y los costados de hierro con el brazo"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from lienzo import Lienzo
+    L = Lienzo(32, 48); x0, x1 = 3, 28
+    M0, M1, M2, M3 = '#74502e', '#a46e40', '#c48a52', '#dcac6c'
+    H0, H1 = '#202024', '#3a3a44'
+    for y in (34, 36):                                                                       # el respaldo: los listones
+        L.hl(x0 + 1, x1 - 1, y, M2); L.hl(x0 + 1, x1 - 1, y + 1, M1)
+    L.hl(x0 + 1, x1 - 1, 34, M3)
+    for y in (39, 41):                                                                       # el asiento, visto desde arriba
+        L.hl(x0 + 1, x1 - 1, y, M2); L.hl(x0 + 1, x1 - 1, y + 1, M1)
+    L.hl(x0 + 1, x1 - 1, 39, M3); L.hl(x0 + 1, x1 - 1, 43, M0)                                # el canto del asiento
+    for x in (x0, x0 + 1, x1 - 1, x1):                                                       # los costados de hierro
+        L.vl(x, 33, 46, H1 if x in (x0, x1 - 1) else H0)
+    for x in (x0, x1 - 1): L.hl(x, x + 1, 38, H1)                                            # el brazo
+    for x in (x0 + 12, x0 + 13): L.vl(x, 44, 46, H0)                                         # la pata del medio
+    L.contorno('#2a2a34')
+    for x in range(x0 - 1, x1 + 2):                                                          # apoyado en el suelo
+        if L.lleno(x, 46) and not L.lleno(x, 47): L.p(x, 47, '#2a2a34')
+    return L.im
+
 if __name__ == '__main__':
+    sale('escala-alto', 'e-bench', banco()); print('escala-alto e-bench (a mano)')
     for T, grupo, celda in ((ALTO, 'escala-alto', (32, 48)), (ANCHO, 'escala-ancho', (48, 48))):
         for k, (g, n, q, _, *fi) in T.items():
             for src in sorted(glob.glob(P('art', 'procesado', g, k, 'unica', '00.png')) + glob.glob(P('art', 'procesado', g, k + '-*', 'unica', '00.png'))):

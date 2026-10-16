@@ -637,6 +637,8 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	if f == null:
 		return
 	var xp: int = tx * 16 + 8 + d.dx - cam.x
+	if Datos.CAL and o == "bench":   # 1.50: el banco de 1,6 m sobresale de su casilla; pegado al borde del mapa, hacia dentro
+		xp += 5 if tx == 0 else (-5 if tx == int(J.MAPS[J.S.map].w) - 1 else 0)
 	var yp: int = ty * 16 + 15 + d.dy + int(ALZA.get(o, 0)) - cam.y
 	if o in SOMBRA_OBJ:
 		var m: Dictionary = J.MAPS[J.S.map]
