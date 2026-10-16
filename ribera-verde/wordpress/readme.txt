@@ -1,10 +1,10 @@
 === Landrace Hunters ===
-Version: 1.4.4
+Version: 1.5.0
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.4.4.zip → Activar.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.5.0.zip → Activar.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -13,6 +13,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
+1.5.0 — El juego de hoy (Landrace Hunters 1.52.0, Godot 0.45.0): todo lo de la 1.44 a la 1.52 —el bajo de las setas entero, los negocios por dentro, sentarse y fumar, los locales a escala, el muelle de Puerto Viejo con los barcos, el piso franco y las obras, el club KAIA y la ley, el sótano, el tiempo y las estaciones en el móvil, la Ruderalis y las autoflorecientes—.
 1.4.4 — Landrace Hunters 1.43.5 (Godot 0.37.5): cada nombre de chica con personaje chica y cada chico con chico (presidentes de los clubs, agenda, naveros, rivales y encargadas); exportar e importar la partida, escondidos en OPCIONES → COPIA DE SEGURIDAD.
 1.4.3 — Lo probado en la web (1.2.1) en el plugin de hoy: la caché de página (Kuboplay Shield) ya no guarda la página del juego y se vacía al actualizar; al desactivar, la dirección deja de responder sin guardar los enlaces permanentes; al borrarlo no deja ajustes; el aviso de instalar se va solo a los 15 s. La música de la versión web, más ligera (el zip baja de 30 MB).
 1.4.2 — Landrace Hunters 1.43.2 (Godot 0.37.2): con tu vehículo no pagas autobús, solo gasolina; el seguro y el impuesto de circulación al año y el taller por km (revisión y neumáticos).
