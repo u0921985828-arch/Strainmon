@@ -4662,6 +4662,11 @@ func obj_local(x: int, y: int, o) -> bool:
 			"clonN", "clonN2":   # 1.43
 				await bandejas_nave()
 				return true
+			"tanqueN", "riegoN", "ctrlN":   # 1.52.1: el riego, que también se mueve desde aquí
+				if puertas_int("nave").size():
+					if await ask("El riego de la nave: %s." % D.RIEGO_NAVE[int(S.nave.rg)].n, ["Ordenar la nave", "Nada"]) == 0:
+						await ordenar("nave")
+					return true
 			"crate":
 				txt = "Sacos de sustrato y macetas apiladas."
 	if S.map == "setas" or S.map == "sotano":   # 1.34: el bajo de las setas por dentro (1.51: y el sótano de casa)
@@ -5386,6 +5391,8 @@ func estante_nave() -> void:
 		ops.append("Dejar MEATZA ×%d" % int(S.items.fert))
 	if S.items.get("ofert", 0):
 		ops.append("Dejar ORTUA BIO ×%d" % int(S.items.ofert))
+	if S.map == "nave" and puertas_int("nave").size():   # 1.52.1: el escritorio está en el despacho; la nave se ordena desde la nave
+		ops.append("Ordenar la nave")
 	ops.append("Nada")
 	var oi: int = await ask("La estantería de los abonos: MEATZA FLORACIÓN ×%s · ORTUA BIO FLORACIÓN ×%s. Cada mesa con abono gasta %suna dosis al día." % [dosis_txt(N.ab.m), dosis_txt(N.ab.o), "menos de " if int(N.rg) >= 2 else ""], ops)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
@@ -5397,6 +5404,8 @@ func estante_nave() -> void:
 		N.ab.o += S.items.ofert
 		S.items.ofert = 0
 		sfx("sel")
+	elif op == "Ordenar la nave":
+		await ordenar("nave")
 
 # descolgar del secadero lo que quepa en la mochila, mesa por mesa (cada una, su lote, sin curar y con el día de su cosecha, Me.cd: 1.31)
 func secadero_nave() -> void:
@@ -5438,7 +5447,8 @@ func _filas_escritorio() -> Array:
 	var E: Dictionary = D.EXTR_NAVE[int(N.ex)]
 	var so := sofoco_nave()
 	rows.append({"label": "Clima", "right": "%s de %s" % [n(calor_nave()), n(E.cap)], "desc": "El calor de los focos encendidos y lo que saca la extracción (%s)." % E.n + ((" Hace demasiado calor: las mesas dan un %d %% menos." % Datos.jsround((1 - so) * 100)) if so < 1 else "")})
-	rows.append({"label": "Ordenar la nave", "right": "", "desc": "Mover las mesas y el tanque del riego: la manguera va del tanque a cada mesa por el suelo libre. Pulsa A."})   # 1.37 (12d-orden)
+	if S.map == "nave":   # 1.52.1 (lo pidió el usuario): solo con el escritorio en la nave; con el despacho, desde la estantería o el riego de la nave
+		rows.append({"label": "Ordenar la nave", "right": "", "desc": "Mover las mesas y el tanque del riego: la manguera va del tanque a cada mesa por el suelo libre. Pulsa A."})   # 1.37 (12d-orden)
 	rows.append({"label": "La gente", "right": "%d aquí" % de_la_nave().size(), "desc": "Quién cuida cada mesa y las madres: cambiarlos de mesa, una prima o un curso. Pulsa A."})   # 1.34
 	rows.append({"label": "Mejoras", "right": "Nave " + nivel_nave(), "desc": "Extracción: %s. Riego: %s. Pulsa A para mejorarlas." % [E.n, D.RIEGO_NAVE[int(N.rg)].n]})
 	return rows
@@ -7234,6 +7244,8 @@ func rehace_orden(mapa: String) -> void:
 
 # ORDENAR: la lista de lo que se puede mover, hasta Terminar
 func ordenar(mapa: String) -> void:
+	if not D.ORDEN_P.has(mapa) or S.map != mapa:   # 1.52.1 (lo pidió el usuario): una sala solo se ordena desde dentro de ella
+		return
 	var i := 0
 	while true:
 		var L := piezas_ya(mapa)

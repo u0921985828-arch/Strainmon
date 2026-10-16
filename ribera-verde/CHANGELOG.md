@@ -1,5 +1,12 @@
 # Cambios
 
+## 1.52.1 · Godot 0.45.0
+
+Lo que pidió el usuario tras probar la 1.52 («cómo va a estar el mueble de ordenar una sala en otra»). Solo Godot, con `Datos.CAL`.
+
+- **Cada sala se ordena desde dentro de ella**: desde la 1.51 el escritorio está en el despacho y desde allí se movían las mesas y el tanque de la nave, que está al otro lado de la pared. Ahora ORDENAR LA NAVE sale en la nave: en la estantería de los abonos y en el riego (tanque, bomba y controlador); el escritorio del despacho ya no lo ofrece (sin CAL, con el escritorio en la nave, como antes). Y `ordenar(mapa)` no abre nada si no estás en ese mapa.
+- Repaso de todos los sitios: la casa (la mesa redonda, en el piso; el pasillo y el sótano no ordenan nada), el local de la asociación (las mesitas, dentro) y las salas de al lado (el cuartucho del taller, el despacho y la habitación de la nave). Prueba `tests/orden_sala.gd`: en cada mapa ordenable y en sus salas de al lado, A en cada mueble; el menú de ordenar un mapa solo sale dentro de ese mapa y cada mapa ordenable tiene dentro un mueble que lo ordena.
+
 ## 1.52.0 · Godot 0.45.0
 
 Lo que pidió el usuario tras la 1.51 (el tiempo en el móvil, las autoflorecientes, la skill de sprites, las proporciones de las puertas y el muelle por obras). Solo Godot, con `Datos.CAL`.
