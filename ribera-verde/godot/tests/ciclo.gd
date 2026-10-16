@@ -562,8 +562,8 @@ func menu_start() -> void:
 	# OBJETIVO (1.11): una lista con el capítulo, las misiones (ninguna antes de conocer a Kiko) y la deuda
 	await elige("OBJETIVO")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OBJETIVO", 60)
-	check("Objetivo: el capítulo y la carta, el itinerario (1.23) al principio, sin misiones hasta conocer a Kiko, los logros (1.27) y la deuda", etiquetas() == ["CAPÍTULO 1", "ITINERARIO", "LOGROS", "DEUDA", "Volver"]
-		and str(J.m_items[0].desc).contains("carta") and J.m_i == 1 and str(J.m_items[1].right) == "1/14" and str(J.m_items[2].right) == "%d/%d" % [J.logros_n(), J.D.LOGROS.size()] and str(J.m_items[3].right) == Datos.eur(30000))
+	check("Objetivo: el capítulo y la carta, el itinerario (1.23) al principio, sin misiones hasta conocer a Kiko, los logros (1.27) y la deuda", etiquetas() == (["CAPÍTULO 1", "ITINERARIO", "RECADOS", "LOGROS", "DEUDA", "Volver"] if Datos.CAL else ["CAPÍTULO 1", "ITINERARIO", "LOGROS", "DEUDA", "Volver"])
+		and str(J.m_items[0].desc).contains("carta") and J.m_i == 1 and str(J.m_items[1].right) == "1/14" and str(J.m_items[-3].right) == "%d/%d" % [J.logros_n(), J.D.LOGROS.size()] and str(J.m_items[-2].right) == Datos.eur(30000))
 	await pulsa("A")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "ITINERARIO", 60)
 	check("ITINERARIO: los 14 pasos y Volver; hecho el autobús, ahora la carta", J.m_items.size() == 15 and J.m_items[0].get("right") == "HECHO" and J.m_items[1].get("right") == "AHORA" and J.m_i == 1)
