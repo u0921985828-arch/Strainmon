@@ -274,6 +274,8 @@ func _corre() -> void:
 	J.P.y = 2
 	chk(corre(func(): await J.object_action(1, 1)) and S.map == "loc-valde" and J.P.x == 18, "y al taller")
 	# 6 · la nave: el despacho y la habitación
+	if S.plantilla.size() and not S.plantilla.any(func(w): return w.get("rol") == "madres"):   # 1.55.2: uno a las madres
+		S.plantilla[-1].rol = "madres"
 	entra("nave", 6, 6)
 	var nv: Dictionary = J.MAPS.nave
 	chk(nv.o[1][12] == "puertaM" and nv.o[1][14] == "puertaM", "las dos puertas de la nave")
@@ -281,6 +283,10 @@ func _corre() -> void:
 	chk(J.reserva_orden("nave").has([12, 2]) and J.reserva_orden("nave").has([14, 2]), "ordenar la nave no las tapa")
 	mal = At.accesos(J, "nave").filter(func(t): return not t.begins_with("filtroN"))   # los filtros cuelgan de la pared, no se usan
 	chk(mal.is_empty(), "en la nave se llega a todo: %s" % [mal])
+	var gen = J.ents.filter(func(q): return q.id.begins_with("nv") or q.id == "pres_nave")
+	chk(gen.all(func(q): return not J.delante_puertas("nave").has([int(q.x), int(q.y)])), "nadie de la nave delante de una puerta: %s" % [gen.map(func(q): return [q.id, q.x, q.y])])
+	var nm = J.ents.filter(func(q): return q.id == "nvm")
+	chk(nm.size() == 1 and (int(nm[0].x) == 16 and int(nm[0].y) == 3 and nm[0].dir == "up"), "el de las madres, delante de su carpa: %s" % [nm.map(func(q): return [q.x, q.y, q.dir])])
 	await foto(dir, "nave")
 	J.P.x = 12
 	J.P.y = 2

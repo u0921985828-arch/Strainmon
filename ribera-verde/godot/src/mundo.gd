@@ -1405,6 +1405,10 @@ func build_ents() -> void:
 		coloca_gente(S.map)   # 1.37: la gente de los sofás y del billar, donde estén (12d-orden)
 	if S.map == "nave":
 		coloca_naveros()   # 1.35
+		if Datos.CAL and puertas_int("nave").size():   # 1.55.2: el de las madres, delante de su carpa y no de la puerta de la habitación
+			for e in ents:
+				if e.id == "nvm" and not MAPS.nave.o[3][16]:
+					e.x = 16; e.y = 3; e.px = 256.0; e.py = 48.0; e.hx = 16; e.hy = 3; e.fx = 16; e.fy = 3; e.dir = "up"; e.moving = false
 		for e in ents:   # 1.43.3: el muñeco de cada uno, del sexo de su nombre
 			if e.id.length() == 3 and e.id.begins_with("nv"):
 				var w = cuida_madres() if e.id == "nvm" else navero_de(int(e.id[2]))

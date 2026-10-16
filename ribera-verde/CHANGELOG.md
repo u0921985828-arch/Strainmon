@@ -1,5 +1,9 @@
 # Cambios
 
+## 1.55.2 · Godot 0.46.0
+
+- El de las madres de la nave ya no tapa la puerta de la habitación (lo pidió el usuario): con CAL y las puertas de dentro, se pone en (16, 3), delante de su carpa y mirando a ella (`build_ents` en `mundo.gd`); `tests/sotano.gd` comprueba que nadie de la nave está delante de una puerta (93 comprobaciones).
+
 ## 1.55.1 · Godot 0.46.0
 
 Lo que pidió el usuario tras la 1.55 («no parece el personaje tumbado en la cama», «la pipa no parece de una sola pieza» y «que se pueda ordenar cualquier mueble de la casa; delante de la puerta y donde la escalera del camarote, libre siempre»). Solo Godot, con `Datos.CAL`.
