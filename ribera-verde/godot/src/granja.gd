@@ -1035,6 +1035,11 @@ func tienda_online() -> void:
 		items.append({"label": "Reformas: suelo y paredes", "desc": "El suelo y las paredes del piso: el instalador o el pintor vienen al día siguiente."})   # 1.27
 		if Datos.CAL:   # 1.43.6: el camarote
 			items.append({"label": "El camarote: almacén", "desc": "Habilitar el camarote de arriba como almacén, las estanterías de tarros de cristal de 10 L y los sobres de humedad."})
+		var SO: Dictionary = D.SOTANO
+		var sot_ok: bool = Datos.CAL and S.ch >= int(SO.ch)   # 1.51: el sótano de casa, para setas
+		if sot_ok:
+			var sd = S.sot.get("d") if S.get("sot") is Dictionary else null
+			items.append({"label": SO.obra.n + (" · hecho" if sd != null and float(sd) <= S.day else " · mañana" if sd != null else ""), "right": Datos.eur(SO.obra.p), "disabled": sd != null, "desc": SO.obra.d})
 		items.append({"label": "Salir", "desc": "Con tarjeta, de la cuenta del banco."})
 		i = await menu(items, {"cls": "full", "title": "TIENDA ONLINE", "title2": "Muebles y transporte · en la cuenta " + Datos.eur(S.banco), "desc": true, "initial": i})
 		if i == ks.size() + vs.size():
@@ -1048,6 +1053,12 @@ func tienda_online() -> void:
 			continue
 		if Datos.CAL and i == ks.size() + vs.size() + 2:
 			await camarote_tienda()
+			continue
+		if sot_ok and i == ks.size() + vs.size() + 3:
+			if not (S.get("sot") is Dictionary) and await tarjeta(SO.obra.p, "Tienda online · " + SO.obra.n):
+				S.sot = {"d": S.day + 1, "bandejas": [], "g": 0, "fr": []}
+				sfx("coin")
+				toast("Pedido: " + SO.obra.n + " · los obreros vienen mañana", 1400)
 			continue
 		if i < 0 or i >= ks.size() + vs.size():
 			return
@@ -1128,6 +1139,10 @@ func llega_camarote() -> void:
 
 func llega_mueble() -> void:
 	llega_camarote()   # 1.43.6
+	if Datos.CAL and S.get("sot") is Dictionary and int(S.sot.get("d", -1)) == S.day:   # 1.51: el sótano
+		queue("sotano", func():
+			sfx("get")
+			await say("Los obreros acaban el sótano: sin trastos, impermeabilizado, con luz, desagüe y tres estanterías de rejilla. Se baja por la puerta del dormitorio. Las bandejas te las prepara Txomin."))
 	if S.get("nevera") != null and S.nevera.get("arcon") != null and S.nevera.arcon != 1 and -int(S.nevera.arcon) <= S.day:   # el arcón (1.39)
 		S.nevera.arcon = 1
 		queue("arcon", func():
@@ -1712,7 +1727,8 @@ func recibo_nave() -> float:
 	return D.RECIBO.dias * D.NAVE.dia
 
 func recibo_setas() -> float:
-	return D.RECIBO.dias * D.SETAS.dia
+	var ay: float = float(D.SETAS_AY.sueldo) if Datos.CAL and S != null and S.get("setas") is Dictionary and S.setas.get("ay") else 0.0   # 1.51: el ayudante
+	return D.RECIBO.dias * D.SETAS.dia + ay
 
 func recibos() -> Array:
 	var r := []

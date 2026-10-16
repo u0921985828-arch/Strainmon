@@ -65,7 +65,8 @@ const ZONA := {"town": "town", "alto": "town", "astilleros": "town", "home": "to
 	"valdehierro": "valdehierro", "club-valde": "valdehierro", "nave": "valdehierro", "mendialde": "mendialde", "casa-ama": "mendialde",
 	"errotabarri": "errotabarri", "ibarbide": "ibarbide", "ensanche": "ibarbide", "callejon": "ibarbide", "growcity": "ibarbide",
 	"club-ibar": "ibarbide", "club-ens": "ibarbide", "disco": "ibarbide", "setas": "ibarbide",
-	"disco-vip": "ibarbide", "est-rv": "town", "est-puerto": "puerto", "est-valde": "valdehierro", "est-mendi": "mendialde", "est-erro": "errotabarri", "est-ibar": "ibarbide"}   # 1.47
+	"disco-vip": "ibarbide", "est-rv": "town", "est-puerto": "puerto", "est-valde": "valdehierro", "est-mendi": "mendialde", "est-erro": "errotabarri", "est-ibar": "ibarbide",   # 1.47
+	"pasillo": "town", "sotano": "town", "cuarto-t": "valdehierro", "nave-d": "valdehierro", "nave-h": "valdehierro"}   # 1.51
 
 static func pueblo_de(mapa: String) -> String:
 	return ZONA.get(mapa, "town")

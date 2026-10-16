@@ -303,11 +303,14 @@ func _corre() -> void:
 	S = J.S
 	J.enter_map("nave", 7, 6, "up")
 	var mn: Dictionary = J.MAPS.nave
-	chk(mn.o[6][17] == "bedT" and mn.o[7][17] == "bedB", "el camastro: %s %s" % [mn.o[6][17], mn.o[7][17]])
-	chk(llega("nave", [7, 6], [17, 6]), "se llega al camastro")
+	chk(mn.o[1][14] == "puertaM" and mn.o[6][17] != "bedT", "1.51: el camastro, en la habitación de la puerta: %s" % mn.o[1][14])
+	J.enter_map("nave-h", 1, 2, "down")
+	var mh: Dictionary = J.MAPS["nave-h"]
+	chk(mh.o[2][6] == "bedT" and mh.o[3][6] == "bedB", "la cama: %s %s" % [mh.o[2][6], mh.o[3][6]])
+	chk(llega("nave-h", [1, 2], [5, 3]), "se llega a la cama")
 	d0 = S.day
 	QUIERO = ["Dormir"]
-	chk(corre(func(): await J.obj_local(17, 7, "bedB")) and S.day == d0 + 1, "dormir en la nave")
+	chk(corre(func(): await J.obj_local(6, 3, "bedB")) and S.day == d0 + 1, "dormir en la nave")
 	Datos.CAL = false
 	J.enter_map("nave", 7, 6, "up")
 	chk(mn.o[6][17] != "bedT", "sin CAL, sin camastro")

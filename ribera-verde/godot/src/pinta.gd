@@ -370,7 +370,7 @@ func _luz_local():
 		return J.luz_club(J.S.map.substr(5))   # 1.37: la de la asociación, sobre el billar donde esté
 	if Datos.CAL and J.S.map in ["disco", "disco-vip"]:   # 1.47: GAUA grande, los focos sobre la pista nueva (y, arriba, por el cristal)
 		return J.D.DISCO_CAL.luz
-	return J.D.LUZ_DISCO if J.S.map == "disco" else (J.D.LUZ_BAJO if J.S.map == "setas" else null)   # 1.34: el bajo, con su bombilla
+	return J.D.LUZ_DISCO if J.S.map == "disco" else ((J.D.LUZ_BAJO_G if int(J.MAPS.setas.w) > 10 else J.D.LUZ_BAJO) if J.S.map == "setas" else (J.D.LUZ_BAJO if J.S.map == "sotano" else null))   # 1.34: el bajo, con su bombilla
 
 # la nave (1.31, luzNave de 11j-locales): bajo cada uno de los dos focos de una mesa plantada, su luz en las plantas (1.33: del color del foco)
 func _luz_nave() -> Dictionary:

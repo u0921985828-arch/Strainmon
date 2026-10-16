@@ -635,9 +635,10 @@ func montar_nave() -> void:
 	for y in [6, 7]:
 		if n.o[y][17] in ["bedT", "bedB"]:
 			n.o[y][17] = null
-	if S != null and S.get("nave") != null and Datos.CAL and n.o[6][17] == null and n.o[7][17] == null:
+	if S != null and S.get("nave") != null and Datos.CAL and n.o[6][17] == null and n.o[7][17] == null and puertas_int("nave").is_empty():
 		n.o[6][17] = "bedT"
 		n.o[7][17] = "bedB"
+	montar_puertas("nave")   # 1.51: el despacho y la habitación, detrás de sus puertas
 
 # el concesionario del barrio alto (1.43, lo pidió el usuario): con AUTOS RIBERA abierto (S.flags.conce), su edificio (D.CONCE.bld),
 # sin los árboles de donde va (CONCE.quita), con la acera, las banderas y la puerta; sin él, el barrio alto como estaba
@@ -734,6 +735,20 @@ func montar_casa() -> void:
 			h.o[s.y][x] = "carpa"
 		h.carpas.append({"ci": ci, "t": c.t, "x0": x0, "x1": x1, "y": int(s.y)})
 	aplica_orden("home")   # la nevera, la mesa, las plantas, el taller y los muebles del salón (con la silla gaming)
+	montar_puertas("home")   # 1.51: la puerta del pasillo del sótano
+	if puertas_int("home").size():
+		var dl := delante_puertas("home")
+		var quita := false
+		for Q in piezas_ya("home"):
+			var q := pos_pieza("home", Q.k)
+			for c in celdas_p(Q, q[0], q[1]) + gente_p(Q, q[0], q[1]):
+				if [int(c[0]), int(c[1])] in dl and S.get("coloca") is Dictionary and S.coloca.get("home") is Dictionary and S.coloca.home.has(Q.k):
+					S.coloca.home.erase(Q.k)
+					quita = true
+		if quita:
+			h.carpasK = ""
+			montar_casa()
+			return
 	# 1.43.6: la escalera escamoteable del camarote, entre las carpas A y B, bajo la ventana; se sube desde la casilla de delante
 	# (CAMAROTE.vuelta); ninguna de las dos se ocupa al ordenar
 	var CM: Dictionary = D.CAMAROTE
@@ -759,10 +774,18 @@ func montar_casa() -> void:
 # el bajo de las setas entero (1.44, con Datos.CAL): el armario de almacén, la mesa de trabajo y, si se lo has comprado a Txomin,
 # el deshidratador (SETAS_PRO.x); sin Datos.CAL, el bajo de antes
 var _setas0 = null
+var _setas_g := false
 func montar_setas() -> void:
 	var m = MAPS.get("setas")
 	if m == null:
 		return
+	if Datos.CAL and not _setas_g and MAPS.has("setas-g"):   # 1.51 (lo pidió el usuario: «que sea más grande y que se cultive como la nave»)
+		_setas_g = true
+		var G: Dictionary = MAPS["setas-g"]
+		m.w = int(G.w)
+		m.g = G.g.duplicate(true)
+		m.o = G.o.duplicate(true)
+		_setas0 = null
 	if _setas0 == null:
 		_setas0 = m.o.duplicate(true)
 	for y in int(m.h):
@@ -774,6 +797,8 @@ func montar_setas() -> void:
 	m.o[int(X.mesaS[1])][int(X.mesaS[0])] = "mesaS"
 	if S != null and S.get("setas") is Dictionary and S.setas.get("dh"):
 		m.o[int(X.deshidS[1])][int(X.deshidS[0])] = "deshidS"
+	if S != null and S.get("setas") is Dictionary and S.setas.get("ay") and int(m.w) > 10:   # 1.51: la mesa del ayudante
+		m.o[int(D.SETAS_AY.mesa[1])][int(D.SETAS_AY.mesa[0])] = "mesita"
 
 # los negocios por dentro (1.45, lo pidió el usuario: «que tú puedas acceder a ese sitio y controlarlo desde ahí»; con Datos.CAL):
 # en la calle, la puerta del local (NEGOCIO.k[k]: x, puerta, ancha, dx, tile; gate «neg:k»); dentro (loc-<k>), lo que ponen las mejoras
@@ -915,7 +940,40 @@ func montar_camarote() -> void:
 
 # lo que no se puede ocupar al ordenar (12d-orden): delante de la escalera del camarote (1.43.6)
 func reserva_orden(mapa: String) -> Array:
-	return D.ORDEN_RESERVA.get(mapa, []) + ([[D.CAMAROTE.x, D.CAMAROTE.y], D.CAMAROTE.vuelta] if mapa == "home" and cam_ya() else [])
+	return D.ORDEN_RESERVA.get(mapa, []) + ([[D.CAMAROTE.x, D.CAMAROTE.y], D.CAMAROTE.vuelta] if mapa == "home" and cam_ya() else []) + delante_puertas(mapa)
+
+# 1.51 (lo pidió el usuario: «una puerta en la casa, luego un mapa pequeño como un mini pasillito»; y en el taller y en la nave): las
+# puertas de dentro (PUERTAS_INT, con Datos.CAL), en la fila de la pared; se abren con A desde la casilla de delante, que no se ocupa
+func puertas_int(mapa: String) -> Array:
+	return D.PUERTAS_INT.get(mapa, []) if Datos.CAL and D.has("PUERTAS_INT") else []
+
+func delante_puertas(mapa: String) -> Array:
+	return puertas_int(mapa).map(func(e): return [int(e.x), int(e.y) + 1])
+
+func puerta_int(mapa: String, x: int, y: int):
+	for e in puertas_int(mapa):
+		if int(e.x) == x and int(e.y) == y:
+			return e
+	return null
+
+func montar_puertas(mapa: String) -> void:
+	var m = MAPS.get(mapa)
+	if m == null:
+		return
+	for e in puertas_int(mapa):
+		m.o[int(e.y)][int(e.x)] = e.o
+	if mapa == "nave" and puertas_int(mapa).size():   # el escritorio, al despacho
+		for x in [12, 13]:
+			if m.o[2][x] in ["escritorio", "escritorio2"]:
+				m.o[2][x] = null
+
+func cruzar_puerta(e: Dictionary) -> void:
+	sfx("door")
+	await fade(1)
+	enter_map(e.to, int(e.tx), int(e.ty), e.dir)
+	update_hud()
+	await wait(80)
+	await fade(0)
 
 # el salón (1.10, 12c-salon): los muebles comprados que ya han llegado, y de qué mueble es un objeto (k o su mitad k + "2")
 func muebles_ya() -> Array:
@@ -1095,6 +1153,9 @@ func npc_talk(d: Dictionary) -> void:
 	if d.get("look") == "cop" and d.id.begins_with("pat"):   # las patrullas (1.10)
 		await say(pick(["«Circule.»", "«Buenas. Nada que ver aquí.»", "«¿Todo bien? Siga.»"]), "AGENTE")
 		return
+	if d.id == "setero":   # 1.51
+		await talk_setero()
+		return
 	if d.id.begins_with("neg_"):   # 1.45
 		await talk_neg(d.id.substr(4))
 		return
@@ -1222,6 +1283,9 @@ func build_ents() -> void:
 				var dd: Dictionary = sc[ab].duplicate()
 				dd.id = ("sec_" if ab == "a" else "secb_") + sc.id
 				ents.append(old[dd.id] if old.has(dd.id) else mk_ent(dd))
+	if Datos.CAL and S.map == "setas" and S.get("setas") is Dictionary and S.setas.get("ay") and int(MAPS.setas.w) > 10:   # 1.51: el ayudante del bajo
+		var A: Dictionary = D.SETAS_AY
+		ents.append(old["setero"] if old.has("setero") else mk_ent({"id": "setero", "map": "setas", "x": int(A.x), "y": int(A.y), "look": A.look, "dir": "down", "wander": 0}))
 	for c in S.clients:
 		if c.get("map", "town") == S.map:
 			ents.append(old[c.id] if old.has(c.id) else mk_ent({"id": c.id, "x": c.x, "y": c.y, "wander": 2, "lookObj": c.look, "client": c}))
@@ -1402,6 +1466,8 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 			MAPS[name_].o[cj[1][1]][cj[1][0]] = "cajero"
 	montar_club(name_)
 	montar_atrezo(name_)
+	if name_ != "home" and name_ != "nave":
+		montar_puertas(name_)
 	P.x = x
 	P.y = y
 	P.px = x * 16.0
@@ -1921,6 +1987,10 @@ func marca_cata(_k: String, _r: bool, _sid: String, _thc: float) -> void:   # tr
 func object_action(x: int, y: int) -> void:
 	var m: Dictionary = MAPS[S.map]
 	var o = m.o[y][x] if y >= 0 and y < m.h and x >= 0 and x < m.w else null
+	var pi_ = puerta_int(S.map, x, y)
+	if pi_ != null and o == pi_.o:   # 1.51: las puertas de dentro
+		await cruzar_puerta(pi_)
+		return
 	if await obj_local(x, y, o):   # los locales (1.30)
 		return
 	if S.map == "home":
@@ -2643,6 +2713,8 @@ func talk_txaro():
 	pass
 func talk_sec(_id: String) -> void:   # 1.51 (trama.gd)
 	pass
+func talk_setero() -> void:   # 1.51 (trama.gd)
+	pass
 func sec_estado(_id: String) -> int:
 	return 0
 func talk_inaki():
@@ -2862,7 +2934,12 @@ func pisable(m: Dictionary, x: int, y: int) -> bool:
 func andable(m: Dictionary, O: Array, B := {}) -> Dictionary:
 	var v := {}
 	var q := []
-	for k in m.exits:
+	var semillas: Array = m.exits.keys()
+	for mp in (D.PUERTAS_INT if Datos.CAL and D.has("PUERTAS_INT") else {}):   # 1.51: las puertas de dentro también son entradas
+		if is_same(MAPS.get(mp), m):
+			for e in D.PUERTAS_INT[mp]:
+				semillas.append("%d,%d" % [int(e.x), int(e.y)])
+	for k in semillas:
 		var p: PackedStringArray = k.split(",")
 		var x := int(p[0])
 		var y := int(p[1])

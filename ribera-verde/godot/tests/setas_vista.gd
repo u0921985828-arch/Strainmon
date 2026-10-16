@@ -132,14 +132,17 @@ func _corre() -> void:
 	chk(J.mueve_bajo(V, "up") and V.i == 1, "arriba: %s" % V)
 	chk(not J.mueve_bajo(V, "up") and V.i == 1, "por arriba no se sale")
 	chk(J.mueve_bajo(V, "right") and V.i == 3 and J.mueve_bajo(V, "right") and V.i == 5, "a la derecha: %s" % V)
-	chk(not J.mueve_bajo(V, "right") and J.mueve_bajo(V, "down") and V.i == 4, "borde derecho y abajo: %s" % V)
-	chk(not J.mueve_bajo(V, "down") and J.mueve_bajo(V, "left") and V.i == 2, "abajo no se sale; izquierda: %s" % V)
+	while J.mueve_bajo(V, "right"):   # 1.51: el bajo grande tiene más estanterías (n_baldas)
+		pass
+	var nb: int = J.n_baldas()
+	chk(V.i == 2 * nb - 1 and J.mueve_bajo(V, "down") and V.i == 2 * nb - 2, "borde derecho y abajo: %s" % V)
+	chk(not J.mueve_bajo(V, "down") and J.mueve_bajo(V, "left") and V.i == 2 * nb - 4, "abajo no se sale; izquierda: %s" % V)
 	# 2 · los textos, por fase (pantalla setas: día 20, bandejas de los días 18, 12, 9, 8 contaminada y 15)
 	chk(J.desc_bajo({"i": 0}).contains("micelio cubre el") and J.desc_bajo({"i": 0}).contains("día 3 de 10"), "colonizando: %s" % J.desc_bajo({"i": 0}))
 	chk(J.desc_bajo({"i": 1}).contains("las setas crecen"), "fructificando: %s" % J.desc_bajo({"i": 1}))
 	chk(J.desc_bajo({"i": 2}).contains("lista para recoger"), "lista: %s" % J.desc_bajo({"i": 2}))
 	chk(J.desc_bajo({"i": 3}).contains("contaminada") and not J.desc_bajo({"i": 3}).contains("día "), "contaminada: %s" % J.desc_bajo({"i": 3}))
-	chk(J.desc_bajo({"i": 5}).contains("Hueco libre") and J.desc_bajo({"i": 5}).contains("5 de 6"), "hueco: %s" % J.desc_bajo({"i": 5}))
+	chk(J.desc_bajo({"i": 5}).contains("Hueco libre") and J.desc_bajo({"i": 5}).contains("5 de %d" % J.max_bandejas()), "hueco: %s" % J.desc_bajo({"i": 5}))
 	# 3 · se ve crecer: el micelio, día a día y hora a hora; los tallos, mientras fructifica; lista, como el último
 	var m0 := 0
 	var crece := true
@@ -174,7 +177,7 @@ func _corre() -> void:
 	chk(g.call(100) > g.call(40) and g.call(0) == 0, "gotas: %d %d %d" % [g.call(100), g.call(40), g.call(0)])
 	# 5 · las baldas: el marco amarillo, en la elegida
 	var R: Array = J.rects_bajo({"i": 3})
-	var am: Array = R.filter(func(r): return r[4] == "#f8d040")
+	var am: Array = R.filter(func(r): return r[4] == "#f8d040" and r[3] != 2)   # sin los puntos de las páginas (1.51)
 	var x0: int = (J.SW - J.BAJO_W) >> 1
 	chk(am.size() == 4 and am[0][0] == x0 + 4 + 46 + 3 - 2 and am[0][1] == 4 + 52 - 31 - 2, "marco de la 4.ª: %s" % [am.slice(0, 1)])
 	# 6 · A en la estantería 1: la vista sale en su bandeja de abajo (2); A abre el menú de las bandejas y se vuelve; B cierra

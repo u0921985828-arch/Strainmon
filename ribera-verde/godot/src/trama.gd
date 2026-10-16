@@ -1635,6 +1635,15 @@ func raid_event():
 	await say("%s. Multa: %s%s." % [("Se llevan " + _lista(lo)) if lo.size() else "No encuentran nada que llevarse", Datos.eur(multa), (" (pagas %s: no tienes más)" % Datos.eur(fine)) if fine < multa else ""])
 	if eq.size():
 		await say("Y el equipo de las carpas con plantas: " + ", ".join(eq) + ".")
+	if sot_ya() and (S.sot.bandejas.size() or float(S.sot.g) >= 1 or S.sot.get("fr", []).size()):   # 1.51: el sótano, también
+		var gs: float = float(S.sot.g)
+		for f in S.sot.get("fr", []):
+			gs += float(f.g)
+		S.sot.bandejas = []
+		S.sot.g = 0
+		S.sot.fr = []
+		S.sot.erase("gv")
+		await say("Bajan al sótano: se llevan las bandejas%s." % ((" y " + g_txt(gs) + " de setas") if gs >= 1 else ""))
 	await say("La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan." if S.get("caja") != null else "Las semillas no son delito: se quedan.")
 	await say("Toca empezar de nuevo. Y vender menos una temporada.")
 	music(map_music())
@@ -4372,6 +4381,18 @@ func entra_local(d: Dictionary):
 			atras_puerta()
 			await say("La persiana está echada con un candado. La llave la tiene Arrieta, el dueño.")
 			return
+	elif t == "sot":   # 1.51: la escalera del sótano
+		if not sot_ya():
+			P.x = int(P.fx)
+			P.y = int(P.fy)
+			P.px = P.x * 16.0
+			P.py = P.y * 16.0
+			P.dir = "left"
+			S.x = P.x
+			S.y = P.y
+			S.dir = "left"
+			await say(D.SOTANO.txt.cerrado)
+			return
 	elif t == "setas":   # 1.34: el bajo de Txomin
 		if S.get("setas") == null:
 			atras_puerta()
@@ -4430,6 +4451,50 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = "Un altavoz: aquí arriba la música llega más limpia."
 			"sofaV", "sofaV2", "mesaV":
 				txt = "Tu mesa: sofá de terciopelo, cubitera y botella. Desde aquí se ve toda la pista por el cristal."
+	if S.map == "cuarto-t":   # 1.51: el cuartucho del taller, detrás de su puerta
+		if not S.loc.has("valde"):
+			await say("Ya no es tuyo: devuelve las llaves al salir.")
+			return true
+		match o:
+			"bedT", "bedB":
+				await bed_action("La cama del cuartucho: un somier de 90, una manta de cuadros y la radio en la mesilla.")
+				return true
+			"armR":
+				if await ask(D.NEGOCIO.k.valde.txt.armR, ["Cambiarte de ropa", "Nada"]) == 0:
+					await vestirte()
+				return true
+			"mesaC":
+				txt = "Una mesa de camping con un hornillo y una cafetera italiana."
+			"mesita":
+				txt = "La mesilla: la radio, un despertador y una revista de coches."
+			"cuadro":
+				txt = "Un calendario de un taller de neumáticos, de hace años."
+	if S.map == "nave-h" or S.map == "nave-d":   # 1.51: la habitación y el despacho de la nave
+		if S.get("nave") == null:
+			await say("La nave ya no es tuya.")
+			return true
+		match o:
+			"bedT", "bedB":
+				await bed_action("La cama de la habitación de la nave: se oyen los extractores al otro lado de la pared.")
+				return true
+			"armR":
+				if await ask("Un armario con ropa de faena y una muda limpia.", ["Cambiarte de ropa", "Nada"]) == 0:
+					await vestirte()
+				return true
+			"escritorio", "escritorio2":
+				await escritorio_nave()
+				return true
+			"estanteN":
+				await estante_nave()
+				return true
+			"mesita":
+				txt = "La mesilla, con un flexo y el cargador del móvil."
+			"perchero":
+				txt = "La percha: un mono de trabajo y un chubasquero."
+			"cuadro":
+				txt = "El plano de la nave, con las mesas, las tomas de agua y la luz."
+			"crate":
+				txt = "Cajas de archivo: facturas de la luz, del agua y del sustrato."
 	if S.map.begins_with("loc-") and Datos.CAL:   # 1.45: los negocios por dentro
 		var k: String = S.map.substr(4)
 		var N: Dictionary = D.NEGOCIO.k[k]
@@ -4536,19 +4601,19 @@ func obj_local(x: int, y: int, o) -> bool:
 				return true
 			"crate":
 				txt = "Sacos de sustrato y macetas apiladas."
-	if S.map == "setas":   # 1.34: el bajo de las setas por dentro
-		if S.get("setas") == null:
-			await say("El bajo ya no es tuyo. Txomin cambiará la cerradura.")
+	if S.map == "setas" or S.map == "sotano":   # 1.34: el bajo de las setas por dentro (1.51: y el sótano de casa)
+		if SL() == null:
+			await say("El sótano está a medio hacer: mañana acaban los obreros." if S.map == "sotano" else "El bajo ya no es tuyo. Txomin cambiará la cerradura.")
 			return true
 		match o:
 			"baldaS":
 				if Datos.CAL:   # 1.43.9: las baldas a la vista, con las setas creciendo
-					await vista_bajo(2 * x)
+					await vista_bajo(2 * balda_i(x))
 				else:
 					await bajo_menu("")
 				return true
 			"humidS":
-				if S.setas.bandejas.any(func(b): return not b.get("mala")):
+				if SL().bandejas.any(func(b): return not b.get("mala")):
 					await pulverizar_bajo()
 				else:
 					await say("El pulverizador de mochila de Txomin. Con él se tienen húmedas las bandejas.")
@@ -4557,7 +4622,7 @@ func obj_local(x: int, y: int, o) -> bool:
 				if Datos.CAL:   # 1.44: lo que se seca, y cuándo pasa al armario
 					txt = txt_secando(o)
 				else:
-					txt = ("En el secadero, %s de setas secas. Txomin te las compra en la puerta." % g_txt(S.setas.g)) if S.setas.g >= 1 else "El secadero está vacío. Lo que recojas se seca aquí."
+					txt = ("En el secadero, %s de setas secas. Txomin te las compra en la puerta." % g_txt(SL().g)) if SL().g >= 1 else "El secadero está vacío. Lo que recojas se seca aquí."
 			"armS":   # 1.44: el armario de almacén, por dentro
 				await vista_armario()
 				return true
@@ -4624,10 +4689,10 @@ func talk_gente_club(k: String, j: int):
 func sprite_local(o: String) -> String:
 	if o == "secaS":
 		if Datos.CAL:   # 1.44: con setas tendidas mientras se secan en la malla (sin deshidratador)
-			return "secaS-%d" % (1 if S.get("setas") != null and not S.setas.get("dh") and S.setas.get("fr", []).size() else 0)
-		return "secaS-%d" % (1 if S.get("setas") != null and S.setas.g >= 1 else 0)
+			return "secaS-%d" % (1 if SL() != null and not SL().get("dh") and SL().get("fr", []).size() else 0)
+		return "secaS-%d" % (1 if SL() != null and SL().g >= 1 else 0)
 	if o == "deshidS":
-		return "deshidS-%d" % (1 if S.get("setas") != null and S.setas.get("fr", []).size() else 0)
+		return "deshidS-%d" % (1 if SL() != null and SL().get("fr", []).size() else 0)
 	if o == "armS":
 		return "armS-%d-%d-%d" % [lleno_arm("g"), lleno_arm("mc"), lleno_arm("cc")]
 	if o == "mesaS":
@@ -4645,12 +4710,13 @@ func sprite_local(o: String) -> String:
 # las bandejas de la balda x del bajo (1.34, bandejasBalda): las dos que le tocan (2x abajo, 2x + 1 arriba), en su fase
 func bandejas_balda(x: int) -> Array:
 	var r := []
-	if S.get("setas") == null:
+	if SL() == null:
 		return r
-	var B: Array = S.setas.bandejas
+	var B: Array = SL().bandejas
+	var bi := balda_i(x)
 	for j in 2:
-		if 2 * x + j < B.size():
-			r.append("bandejaS-%s-%d" % [fase_seta(B[2 * x + j]), j])
+		if 2 * bi + j < B.size():
+			r.append("bandejaS-%s-%d" % [fase_seta(B[2 * bi + j]), j])
 	return r
 
 # ---------- el club: el socio y el billar ----------
@@ -5929,6 +5995,46 @@ func aso_dia() -> void:
 		queue("asoLote", func(): await talk("SMS · DELROY", ["Se acabó lo del dispensario: %s en total, en tu buzón." % Datos.eur(L.tot)]))
 
 # ---------- el bajo de las setas (1.20, 11g-setas): el local clandestino de la Kale Zaharra ----------
+# 1.51 (lo pidió el usuario: «antes de… alquilar el bajo… habilitar el sótano de la casa»): las setas, en el bajo de Txomin
+# (S.setas) o en el sótano de casa (S.sot, la misma forma sin recibo); SL() es el de donde estás (o, con Txomin, el que eliges: _SOT)
+var _SOT := false
+func es_sot() -> bool:
+	return S.map == "sotano" or _SOT
+
+func sot_ya() -> bool:
+	return Datos.CAL and S.get("sot") is Dictionary and float(S.sot.get("d", 1e9)) <= S.day
+
+func SL():
+	if es_sot():
+		return S.sot if sot_ya() else null
+	return S.get("setas")
+
+# las estanterías del sitio (cada una, dos bandejas) en el orden del mapa, de arriba abajo y de izquierda a derecha
+func _baldas() -> Array:
+	var m = MAPS.get("sotano" if es_sot() else "setas")
+	var r := []
+	if m == null:
+		return r
+	for y in int(m.h):
+		for x in int(m.w):
+			if m.o[y][x] == "baldaS":
+				r.append(x + 1000 * y)
+	return r
+
+func n_baldas() -> int:
+	return maxi(1, _baldas().size())
+
+func balda_i(x: int) -> int:
+	for i in _baldas().size():
+		if _baldas()[i] % 1000 == x:
+			return i
+	return 0
+
+func max_bandejas() -> int:
+	if es_sot():
+		return int(D.SOTANO.max)
+	return 2 * n_baldas() if Datos.CAL else int(D.SETAS.max)
+
 func fase_seta(b: Dictionary) -> String:
 	if b.get("mala"):
 		return b.mala
@@ -6002,7 +6108,7 @@ func descubre_cepa(L: Dictionary, k: String) -> void:
 
 # los panes de micelio que vende Txomin (CEPAS.v[k].pan)
 func panes_txomin(T: String) -> void:
-	var L: Dictionary = S.setas
+	var L: Dictionary = SL()
 	while true:
 		var ks := []
 		var ops := []
@@ -6105,6 +6211,9 @@ func cuaderno_setas() -> void:
 		await say("%s · %s · %d.ª generación. %s %s Rinde ×%s y se paga ×%s." % [c.n, D.CEPAS.fam[c.f], int(c.gen), c.d if cepa_ya(L, k) else "Aún no la has tenido.", de, str(c.g), str(c.p)])
 
 func setas_dia() -> void:
+	if Datos.CAL and sot_ya():   # 1.51: el sótano de casa, sin recibo ni redada propia (la de casa se lo lleva)
+		secar_setas(S.sot)
+		_setas_bandejas(S.sot, "SMS · TXOMIN")
 	var L = S.get("setas")
 	if L == null:
 		return
@@ -6114,7 +6223,9 @@ func setas_dia() -> void:
 		queue("setas", func(): await talk("SMS · TXOMIN", ["No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí."]))
 		return
 	if Datos.CAL:
-		secar_setas()   # 1.44: lo seco, al armario
+		secar_setas(L)   # 1.44: lo seco, al armario
+		if L.get("ay") and int(L.ay) < S.day:   # 1.51: el ayudante, como un navero: pulveriza y recoge lo listo
+			ayudante_setas(L)
 	var vivas: Array = L.bandejas.filter(func(b): return not b.get("mala"))
 	if vivas.is_empty():
 		return
@@ -6125,8 +6236,13 @@ func setas_dia() -> void:
 		sfx("bad")
 		queue("setas", func(): await say("La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas%s." % ((" y " + g_txt(gg) + " de setas") if gg >= 1 else "")))
 		return
+	_setas_bandejas(L, "SMS · TXOMIN")
+
+# lo que pasa cada noche en unas bandejas (el bajo o el sótano): se secan y alguna se echa a perder
+func _setas_bandejas(L: Dictionary, quien: String) -> void:
+	var Z: Dictionary = D.SETAS
 	var malas := []
-	for b in vivas:
+	for b in L.bandejas.filter(func(b): return not b.get("mala")):
 		b.hum = maxf(0, b.hum - Z.seca)
 		if not b.hum:
 			b.mala = "seca"
@@ -6137,7 +6253,45 @@ func setas_dia() -> void:
 			malas.append("contaminada")
 	if malas.size():
 		var t: String = ("Se te han echado a perder %d bandejas. Tíralas." % malas.size()) if malas.size() > 1 else ("Una bandeja se te ha %s. Tírala." % ("secado" if malas[0] == "seca" else "contaminado"))
-		queue("setas", func(): await talk("SMS · TXOMIN", [t]))
+		if L == S.get("sot"):
+			t = t.replace("Tíralas.", "Las del sótano: tíralas.").replace("Tírala.", "La del sótano: tírala.")
+		queue("setas", func(): await talk(quien, [t]))
+
+# 1.51 (lo pidió el usuario: «que se cultive como la nave»): Unai, el ayudante del bajo grande, cada mañana: todo húmedo y lo listo, a secar
+func ayudante_setas(L: Dictionary) -> void:
+	var Z: Dictionary = D.SETAS
+	var g := 0
+	var quedan := []
+	for b in L.bandejas:
+		if b.get("mala"):
+			continue   # las malas las deja: las tiras tú
+		if fase_seta(b) == "lista":
+			var x: int = roundi(ri(int(Z.g[0]), int(Z.g[1])) * float(D.CEPAS.v[cepa_de(b)].g))
+			L.fr = L.get("fr", []) + [{"g": x, "d": S.day, "v": cepa_de(b)}]
+			g += x
+		else:
+			b.hum = 100
+			quedan.append(b)
+	L.bandejas = quedan + L.bandejas.filter(func(b): return b.get("mala"))
+	if g:
+		queue("setas", func(): await talk("SMS · " + str(D.SETAS_AY.n).to_upper(), ["Bandejas pulverizadas. He recogido %d g y están secándose." % g]))
+
+func talk_setero() -> void:
+	var A: Dictionary = D.SETAS_AY
+	var N: String = str(A.n).to_upper()
+	if S.get("setas") == null:
+		await say("Sin bajo no hay faena. Me vuelvo con mi tío.", N)
+		return
+	var L: Dictionary = S.setas
+	var vivas: Array = L.bandejas.filter(func(b): return not b.get("mala"))
+	var c: int = await ask("Todo en orden: %d bandejas vivas de %d. Cada mañana las pulverizo y recojo lo que esté listo." % [vivas.size(), max_bandejas()], ["Seguir así", "Despedirlo", "Nada"], N)
+	if c == 1:
+		if await ask("¿Seguro? Txomin no se lo va a tomar bien.", ["Despedirlo", "No"], N) == 0:
+			L.erase("ay")
+			build_ents()
+			await say("Vale. Ahí te quedas con las bandejas.", N)
+	elif c == 0:
+		await say("Lo que tú digas, jefe.", N)
 
 func talk_txomin() -> void:
 	var T := "TXOMIN"
@@ -6145,9 +6299,18 @@ func talk_txomin() -> void:
 	if S.ch < int(Z.ch):
 		await say("¿Setas? Eso era antes, chaval. Ahora solo paseo.", T)
 		return
+	if sot_ya():   # 1.51: las bandejas para el sótano de casa
+		var cs: int = await ask("¿Para el sótano de tu casa o para mi bajo?", ["Para el sótano", "El bajo", "Nada"], T)
+		if cs == 0:
+			_SOT = true
+			await bajo_menu(T)
+			_SOT = false
+			return
+		if cs != 1:
+			return
 	if S.get("setas") == null:
 		var e: float = Z.fianza + recibo_setas()
-		if await ask("El bajo de mi casa: oscuro, húmedo y nadie pregunta. %s de fianza y %s cada %s días, en efectivo; el primero, ahora. Las bandejas te las preparo yo." % [Datos.eur(Z.fianza), Datos.eur(recibo_setas()), n(D.RECIBO.dias)], ["Alquilarlo", "No"], T) != 0:
+		if await ask("El bajo de mi casa: oscuro, húmedo y nadie pregunta. %s de fianza y %s cada %s días, en efectivo; el primero, ahora. Las bandejas te las preparo yo." % [Datos.eur(Z.fianza), Datos.eur(recibo_setas()), n(D.RECIBO.dias)] + (" Caben %d." % (2 * maxi(1, MAPS["setas-g"].o[2].filter(func(o): return o == "baldaS").size())) if Datos.CAL and MAPS.has("setas-g") else ""), ["Alquilarlo", "No"], T) != 0:
 			return
 		if S.money < e:
 			sfx("bad")
@@ -6163,13 +6326,13 @@ func talk_txomin() -> void:
 
 # pulverizar las bandejas vivas (SETAS.min): false si, pasada la medianoche, setas_dia ha cerrado el bajo (1.34, pulverizarBajo)
 func pulverizar_bajo() -> bool:
-	var L: Dictionary = S.setas
+	var L: Dictionary = SL()
 	for b in L.bandejas:
 		if not b.get("mala"):
 			b.hum = 100
 	advance_time(int(D.SETAS.min))
 	update_hud()
-	if S.get("setas") == null:
+	if SL() == null:
 		return false
 	sfx("sel")
 	var v: Array = L.bandejas.filter(func(b): return not b.get("mala"))   # pasada la medianoche, setas_dia ya las ha secado (o echado a perder)
@@ -6183,7 +6346,7 @@ func pulverizar_bajo() -> bool:
 # comprar (las prepara él), ni venderle, ni dejar el bajo
 func bajo_menu(T: String) -> void:
 	var Z: Dictionary = D.SETAS
-	var L: Dictionary = S.setas
+	var L: Dictionary = SL()
 	while true:
 		var B: Array = L.bandejas
 		var cnt := {}
@@ -6198,7 +6361,7 @@ func bajo_menu(T: String) -> void:
 				partes.append("%d %s" % [cnt[k], D.FASES_SETA[k][1 if cnt[k] > 1 else 0]])
 		var est: String = ", ".join(PackedStringArray(partes)) if B.size() else "sin bandejas"
 		var ops := []
-		if T != "" and B.size() < Z.max:
+		if T != "" and B.size() < max_bandejas():
 			ops.append("Comprar bandeja (%s)" % Datos.eur(Z.bandeja))
 		if T != "" and Datos.CAL:   # 1.46: los panes de micelio
 			ops.append("Panes de micelio")
@@ -6210,7 +6373,7 @@ func bajo_menu(T: String) -> void:
 			ops.append("Tirar las malas")
 		if T != "" and L.g >= 1:
 			ops.append("Venderle " + g_txt(L.g))
-		if T != "" and Datos.CAL:   # 1.44: el equipo del bajo y lo que haces en la mesa
+		if T != "" and Datos.CAL and not es_sot():   # 1.44: el equipo del bajo y lo que haces en la mesa
 			var ZP: Dictionary = D.SETAS_PRO
 			if L.get("mc", 0):
 				ops.append("Microdosis: %d %s" % [L.mc, "caja" if L.mc == 1 else "cajas"])
@@ -6222,13 +6385,15 @@ func bajo_menu(T: String) -> void:
 				ops.append("Encapsuladora (%s)" % Datos.eur(ZP.encap))
 			if not L.get("mol"):
 				ops.append("Moldes (%s)" % Datos.eur(ZP.moldes))
-		if T != "":
+		if T != "" and Datos.CAL and not es_sot() and not L.get("ay"):   # 1.51: el ayudante, como los de la nave
+			ops.append("Contratar a %s (%s)" % [D.SETAS_AY.n, Datos.eur(D.SETAS_AY.sueldo)])
+		if T != "" and not es_sot():
 			ops.append("Dejar el bajo")
 		ops.append("Nada")
 		var hm := 0.0
 		for b in hum:
 			hm += b.hum
-		var oi: int = await ask("El bajo: %s%s." % [est, (" · humedad %d %%" % Datos.jsround(hm / hum.size())) if hum.size() else ""] + ("" if T != "" or B.size() else " Las bandejas las prepara Txomin, en la puerta."), ops, T)
+		var oi: int = await ask(("El sótano: %s%s." if es_sot() else "El bajo: %s%s.") % [est, (" · humedad %d %%" % Datos.jsround(hm / hum.size())) if hum.size() else ""] + ("" if T != "" or B.size() else " Las bandejas las prepara Txomin, en la puerta."), ops, T)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "" or op == "Nada":
 			return
@@ -6252,6 +6417,13 @@ func bajo_menu(T: String) -> void:
 			B.append({"d": S.day, "hum": 100, "v": v} if Datos.CAL else {"d": S.day, "hum": 100})
 			sfx("coin")
 			await say("Lista para colonizar. En %d días la habrá cogido el micelio; %d más y a recoger." % [int(Z.colon), int(Z.fruto)], T)
+		elif op.begins_with("Contratar"):
+			var A: Dictionary = D.SETAS_AY
+			if await ask("%s Cada %s días, %s más en el recibo del bajo." % [A.d, n(D.RECIBO.dias), Datos.eur(A.sueldo)], ["Contratarlo", "No"], T) != 0:
+				continue
+			L.ay = S.day
+			sfx("coin")
+			await say("Mañana empieza. Es de fiar: lo he criado yo.", T)
 		elif op == "Panes de micelio":
 			await panes_txomin(T)
 		elif op == "Pulverizar":
@@ -7270,16 +7442,16 @@ func mueve_bajo(V: Dictionary, b: String) -> bool:
 	elif b == "down":
 		j = 0
 	var n2: int = 2 * r + j
-	if r < 0 or r > 2 or n2 == V.i:
+	if r < 0 or r >= n_baldas() or n2 == V.i:
 		return false
 	V.i = n2
 	return true
 
 func desc_bajo(V: Dictionary) -> String:
 	var Z: Dictionary = D.SETAS
-	var B: Array = S.setas.bandejas
+	var B: Array = SL().bandejas
 	if V.i >= B.size():
-		return "Hueco libre en la balda · %d de %d bandejas. Las prepara Txomin, en la puerta.\nB: cerrar." % [B.size(), int(Z.max)]
+		return "Hueco libre en la balda · %d de %d bandejas. Las prepara Txomin, en la puerta.\nB: cerrar." % [B.size(), max_bandejas()]
 	var b: Dictionary = B[V.i]
 	var f: String = fase_seta(b)
 	var t := t_seta(b)
@@ -7302,8 +7474,9 @@ func desc_bajo(V: Dictionary) -> String:
 func elegir_bajo(i0 := 0):
 	if gancho_bajo.is_valid():
 		return gancho_bajo.call(i0)
-	SETAS_V = {"i": clampi(i0, 0, 5)}
-	_dlg_fijo(desc_bajo(SETAS_V), "EL BAJO")
+	SETAS_V = {"i": clampi(i0, 0, 2 * n_baldas() - 1)}
+	var tit := "EL SÓTANO" if es_sot() else "EL BAJO"
+	_dlg_fijo(desc_bajo(SETAS_V), tit)
 	var pr := Motor.Prom.new()
 	push(func(b: String):
 		if b == "B":
@@ -7316,7 +7489,7 @@ func elegir_bajo(i0 := 0):
 			return
 		if mueve_bajo(SETAS_V, b):
 			sfx("sel")
-			_dlg_fijo(desc_bajo(SETAS_V), "EL BAJO"))
+			_dlg_fijo(desc_bajo(SETAS_V), tit))
 	var e = await Motor.espera(pr)
 	SETAS_V = null
 	if not oraculo:
@@ -7327,14 +7500,14 @@ func elegir_bajo(i0 := 0):
 # la vista hasta B: con A sobre una bandeja, el menú de las bandejas (y se vuelve a las baldas); sobre un hueco, que las prepara Txomin
 func vista_bajo(i0 := 0) -> void:
 	var i := i0
-	while S.get("setas") != null:
+	while SL() != null:
 		var r = await elegir_bajo(i)
 		if r == null:
 			return
 		i = int(r)
-		if S.get("setas") == null:
+		if SL() == null:
 			return
-		if i < S.setas.bandejas.size():
+		if i < SL().bandejas.size():
 			await bajo_menu("")
 		else:
 			await say("En ese hueco no hay bandeja. Las prepara Txomin: se las compras en la puerta.")
@@ -7435,11 +7608,18 @@ func rects_bajo(V: Dictionary) -> Array:
 	var o := []
 	var x0: int = (SW - BAJO_W) >> 1
 	var y0 := 4
-	var B: Array = S.setas.bandejas if S.get("setas") != null else []
+	var B: Array = SL().bandejas if SL() != null else []
 	# la pared del bajo y la bombilla
 	o.append_array([[x0, y0, BAJO_W, BAJO_H, "#1a1814"], [x0 + 1, y0 + 1, BAJO_W - 2, BAJO_H - 2, "#24211c"],
 		[x0 + 1, y0 + 1, 140, 30, "rgba(255,214,140,0.06)"], [x0 + 70, y0 + 1, 2, 3, "#3a3a40"], [x0 + 68, y0 + 4, 6, 4, "#ffe6a8"]])
+	var nb := n_baldas()
+	var pg: int = (V.i >> 1) / 3   # 1.51: de tres en tres estanterías (el bajo grande tiene nueve)
+	if nb > 3:
+		for q in ceili(nb / 3.0):
+			o.append([x0 + 70 - 3 * ceili(nb / 3.0) + 6 * q, y0 + BAJO_H - 3, 4, 2, "#f8d040" if q == pg else "#5a5e66"])
 	for r in 3:
+		if 3 * pg + r >= nb:
+			continue
 		var rx: int = x0 + 4 + r * 46
 		# la estantería: dos patas, la barra de arriba y dos baldas de rejilla
 		o.append_array([[rx, y0 + 8, 2, 98, "#5a5e66"], [rx + 42, y0 + 8, 2, 98, "#5a5e66"], [rx + 1, y0 + 8, 1, 98, "#8a8e96"], [rx + 43, y0 + 8, 1, 98, "#8a8e96"],
@@ -7449,7 +7629,7 @@ func rects_bajo(V: Dictionary) -> Array:
 			o.append_array([[rx, sy, 44, 2, "#b8bcc4"], [rx, sy + 2, 44, 1, "#5a5e66"]])
 			for gx in range(rx + 2, rx + 42, 3):
 				o.append([gx, sy + 2, 1, 1, "#8a8e96"])
-			var i: int = 2 * r + j
+			var i: int = 2 * (3 * pg + r) + j
 			var bx: int = rx + 3
 			var by: int = sy - 31
 			_bandeja_seta(o, B[i] if i < B.size() else null, bx, by, 2, i * 131 + (int(B[i].d) if i < B.size() else 0))
@@ -7482,8 +7662,9 @@ var ARM_V = null   # {}: el armario abierto
 func dias_secar(L: Dictionary) -> int:
 	return int(D.SETAS_PRO.sech if L.get("dh") else D.SETAS_PRO.seca)
 
-func secar_setas() -> int:
-	var L = S.get("setas")
+func secar_setas(L = null) -> int:
+	if L == null:
+		L = SL()
 	if L == null or not L.has("fr"):
 		return 0
 	var q := []
@@ -7500,7 +7681,7 @@ func secar_setas() -> int:
 	return g
 
 func txt_secando(o: String) -> String:
-	var L: Dictionary = S.setas
+	var L: Dictionary = SL()
 	var dh: bool = L.get("dh", false)
 	if o == "secaS" and dh:
 		return "La malla del secadero, sin usar: ahora secas en el deshidratador."

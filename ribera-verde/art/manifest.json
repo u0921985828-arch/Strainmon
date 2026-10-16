@@ -10058,6 +10058,58 @@
     "misc:mv-mapa"
    ],
    "descripcion": "1.51: el móvil por dentro (la carcasa y el fondo) y los iconos de sus aplicaciones."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/sotano.py",
+   "notas": "1.51, pedido por el usuario: «habilitar el sótano de la casa… unas escaleras… una puerta en la casa, luego un mapa pequeño como un mini pasillito» y la misma puerta en el taller y en la nave.",
+   "max_colores": 32,
+   "tipo": "tiles",
+   "id": "sotano-tiles",
+   "celda": "tile",
+   "estilo_ref": "las paredes y suelos de serie (interior-home)",
+   "cubre": [
+    "tile:bajS1",
+    "tile:bajS2",
+    "tile:escS"
+   ],
+   "ajuste_por_sprite": {
+    "bajS1": "exacto",
+    "bajS2": "exacto",
+    "escS": "exacto"
+   },
+   "descripcion": "1.51: el hueco de la escalera del pasillo que baja al sótano y los peldaños de hormigón del sótano."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/sotano.py",
+   "notas": "1.51, pedido por el usuario: «habilitar el sótano de la casa… unas escaleras… una puerta en la casa, luego un mapa pequeño como un mini pasillito» y la misma puerta en el taller y en la nave.",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "sotano-alto",
+   "celda": "objeto_alto",
+   "estilo_ref": "los muebles a escala del piso (props-escala)",
+   "cubre": [
+    "obj:puertaI",
+    "obj:puertaM",
+    "obj:perchero"
+   ],
+   "ajuste_por_sprite": {
+    "puertaI": "exacto",
+    "puertaM": "exacto",
+    "perchero": "exacto"
+   },
+   "descripcion": "1.51: la puerta de madera del piso, la puerta metálica de los locales y la percha de pared del pasillo."
   }
  ],
  "familias": {
