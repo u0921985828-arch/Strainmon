@@ -17,6 +17,7 @@ const Vista = preload("res://src/vista.gd")
 const Arte = preload("res://src/arte.gd")
 const Escena = preload("res://src/escena_extr.gd")
 const Croquis = preload("res://src/croquis.gd")
+const Hoja = preload("res://src/hoja.gd")
 
 const SH := 180   # 1.12 (ui.gd); las escenas de 240 × 160 van abajo: OY
 const DIR4 := {"down": "south", "up": "north", "left": "west", "right": "east"}
@@ -444,6 +445,14 @@ func _encima() -> void:
 	if J.CAL_V != null:   # 1.42: la hoja del mes
 		for e in Croquis.rects_cal(J.SW, J.CAL_V, int(J.S.day), J.marcas_cal(), J.alto_libre()):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+	if J.FICHA_V != null:   # 1.51: la ficha de la variedad, con su hoja (hoja.gd)
+		for e in J.rects_ficha(J.FICHA_V):
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+		var hk: String = "hoja|" + str(J.FICHA_V.l[J.FICHA_V.i])
+		if not cache.has(hk):
+			cache[hk] = Hoja.imagen(Hoja.params(J.D, J.S, J.FICHA_V.l[J.FICHA_V.i]))
+		var hp: Vector2i = J.hoja_xy()
+		_img(cache[hk], hp.x, hp.y)
 	if J.ALMACEN != null or J.MOVIL_V != null:   # la caja fuerte y la nevera por dentro (1.36); 1.51, el móvil
 		for e in (J.rects_almacen(J.ALMACEN) if J.ALMACEN != null else J.rects_movil(J.MOVIL_V)):
 			if typeof(e[0]) == TYPE_STRING:   # ['@', sprite, x, y]: un sprite de misc por su esquina

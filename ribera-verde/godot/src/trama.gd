@@ -3,6 +3,7 @@
 extends "res://src/granja.gd"
 
 const Croquis = preload("res://src/croquis.gd")
+const Hoja = preload("res://src/hoja.gd")
 
 var cap_hasta := 0.0       # el rótulo del capítulo dura 2,8 s: el objetivo que se pida mientras tanto sale al acabar
 var endcard_on := false
@@ -1826,7 +1827,7 @@ func menu_genoteca(i0: int) -> int:
 		var s: Dictionary = D.STRAINS[k]
 		var nn := "%02d" % (j + 1)
 		if S.disc.get(k):
-			items.append({"label": "%s %s" % [nn, s.n], "right": Datos.pct(s.thc) + "%", "sw": s.c, "ic": ic_cog(k), "desc": strain_line(k) + (("\n" + s.h) if s.get("h") else "") + (("\nCata: " + S.catas[k]) if S.catas.has(k) else "")})
+			items.append({"label": "%s %s" % [nn, s.n], "right": Datos.pct(s.thc) + "%", "sw": s.c, "ic": ic_cog(k), "k": k, "desc": strain_line(k) + (("\n" + s.h) if s.get("h") else "") + (("\nCata: " + S.catas[k]) if S.catas.has(k) else "")})
 		else:
 			items.append({"label": nn + " ??????", "desc": "Sin descubrir."})
 	var cust := []
@@ -1841,11 +1842,89 @@ func menu_genoteca(i0: int) -> int:
 		if S.disc.get(k):
 			nd += 1
 	var i: int = await menu(items, {"cls": "full", "title": "GENOTECA", "title2": "%d/%d · %d propias" % [nd, DEX.size(), cust.size()], "desc": true, "initial": i0})
+	var vistas := []   # 1.51: la ficha de cada variedad con su hoja, en el orden de la lista
+	for k in DEX:
+		if S.disc.get(k):
+			vistas.append(k)
+	vistas.append_array(cust)
 	if i >= 0 and i < items.size() and items[i].get("diario"):
 		await recetario()
 	elif i >= 0 and i < items.size() and items[i].get("c"):
-		await renombrar_variedad(items[i].c)
+		if not Datos.CAL or await ask(S.custom[items[i].c].n, ["Ver la hoja", "Cambiar el nombre"]) == 1:
+			await renombrar_variedad(items[i].c)
+		else:
+			await ficha_variedad(vistas, vistas.find(items[i].c))
+	elif Datos.CAL and i >= 0 and i < items.size() and items[i].get("k"):
+		await ficha_variedad(vistas, vistas.find(items[i].k))
 	return i
+
+# ---------- la ficha de la variedad (1.51, lo pidió el usuario: «dependiendo de la variedad o linaje, las hojas son diferentes») ----------
+# una lámina con la hoja de abanico de la variedad (hoja.gd), su nombre y su grupo (sativa, híbrido de dominancia sativa,
+# equilibrado, de dominancia índica, índica); izquierda y derecha pasan a la anterior y la siguiente; A o B cierran. FICHA_V = {l, i}
+var FICHA_V = null
+const COLOR_GRUPO := ["#c07a1e", "#8a9a2a", "#5a8a5a", "#7a4a8a", "#5a2a7a"]
+
+func grupo_n(ind: float) -> int:
+	var p := roundi(ind * 100)
+	return 0 if p <= 10 else (1 if p < 40 else (2 if p <= 60 else (3 if p < 90 else 4)))
+
+func desc_ficha(V: Dictionary) -> String:
+	var k: String = V.l[V.i]
+	var st = strain(k)
+	var p := Hoja.params(D, S, k)
+	var land: bool = st.get("tipo") == "landrace"
+	return "%s\n%s %s" % [Hoja.grupo(p.ind, land), Hoja.como(p), (st.get("o", "") + ".") if st.get("o") else ""]
+
+func ficha_variedad(lista: Array, i0: int) -> void:
+	if lista.is_empty() or i0 < 0:
+		return
+	FICHA_V = {"l": lista, "i": i0}
+	var nom := func(): return str(strain(FICHA_V.l[FICHA_V.i]).n).to_upper()
+	_dlg_fijo(desc_ficha(FICHA_V), nom.call())
+	if gancho_menu.is_valid():   # las pruebas: se ve y se cierra
+		FICHA_V = null
+		return
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "A" or b == "B":
+			pop()
+			pr.res(null)
+			return
+		var d: int = {"left": -1, "right": 1}.get(b, 0)
+		if d and FICHA_V.l.size() > 1:
+			FICHA_V.i = (FICHA_V.i + d + FICHA_V.l.size()) % FICHA_V.l.size()
+			sfx("sel")
+			_dlg_fijo(desc_ficha(FICHA_V), nom.call()))
+	await Motor.espera(pr)
+	FICHA_V = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+
+# la lámina (128 × 100): el papel, la hoja (Hoja.W × Hoja.H, la pinta pinta.gd en hoja_xy), el nombre y la franja del grupo
+func rects_ficha(V: Dictionary) -> Array:
+	var o := []
+	var k: String = V.l[V.i]
+	var x0: int = (SW - 128) >> 1
+	var y0: int = maxi(2, (alto_libre() - 100) >> 1)
+	o.append_array([[x0, y0, 128, 100, "#5a5040"], [x0 + 1, y0 + 1, 126, 98, "#f4f2ea"], [x0 + 3, y0 + 3, 122, 94, "#e8e4d6"], [x0 + 4, y0 + 4, 120, 92, "#f8f6ee"]])
+	var g := grupo_n(Hoja.params(D, S, k).ind)
+	o.append([x0 + 4, y0 + 4, 3, 92, COLOR_GRUPO[g]])
+	var t: String = str(strain(k).n)
+	if t.length() > 28:
+		t = t.left(27) + "."
+	Croquis.texto(o, x0 + 64 - (Croquis.ancho(t) >> 1), y0 + 74, t, "#22261e")
+	var gt: String = ["SATIVA", "HIBRIDO SATIVA", "EQUILIBRADO", "HIBRIDO INDICA", "INDICA"][g]
+	Croquis.texto(o, x0 + 64 - (Croquis.ancho(gt) >> 1), y0 + 83, gt, COLOR_GRUPO[g])
+	if V.l.size() > 1:   # las flechas
+		o.append_array([[x0 + 9, y0 + 36, 1, 5, "#8a8070"], [x0 + 8, y0 + 37, 1, 3, "#8a8070"], [x0 + 7, y0 + 38, 1, 1, "#8a8070"],
+			[x0 + 118, y0 + 36, 1, 5, "#8a8070"], [x0 + 119, y0 + 37, 1, 3, "#8a8070"], [x0 + 120, y0 + 38, 1, 1, "#8a8070"]])
+	return o
+
+func hoja_xy() -> Vector2i:
+	return Vector2i(((SW - 128) >> 1) + 32, maxi(2, (alto_libre() - 100) >> 1) + 6)
+
+
 
 func mochila() -> void:
 	var i := 0

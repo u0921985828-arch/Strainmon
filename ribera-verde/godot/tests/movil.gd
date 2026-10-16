@@ -72,6 +72,11 @@ func _corre() -> void:
 	var x0: int = (J.SW - 80) >> 1
 	chk(R.all(func(r): return typeof(r[0]) == TYPE_STRING or (int(r[0]) >= x0 and int(r[0]) + int(r[2]) <= x0 + 80)), "todo dentro del móvil")
 	chk(J.desc_movil(V).begins_with("Mensajes") and J.desc_movil(V).contains("2 mensajes"), "la descripción: %s" % J.desc_movil(V))
+	# la ficha de la variedad (1.51): el grupo, la hoja y la lámina
+	var Vf := {"l": ["thai", "rif"], "i": 0}
+	chk(J.desc_ficha(Vf).begins_with("Sativa") and J.desc_ficha(Vf).contains("caídas"), "la ficha de la Thai: %s" % J.desc_ficha(Vf))
+	Vf.i = 1
+	chk(J.desc_ficha(Vf).begins_with("Índica") and J.rects_ficha(Vf).any(func(r): return r[4] == J.COLOR_GRUPO[4]), "la ficha del Afghani")
 	var dir := arg("--pintar")
 	if dir != "":
 		J.set_process(false)
@@ -81,6 +86,11 @@ func _corre() -> void:
 		J._dlg_fijo(J.desc_movil(J.MOVIL_V), "MÓVIL")
 		await foto(dir, "pantalla")
 		J.MOVIL_V = null
+		for k in ["thai", "rif", "hawai"]:   # 1.51: la ficha de la variedad con su hoja (Genoteca)
+			J.FICHA_V = {"l": [k], "i": 0}
+			J._dlg_fijo(J.desc_ficha(J.FICHA_V), str(J.D.STRAINS[k].n).to_upper())
+			await foto(dir, "ficha-" + k)
+		J.FICHA_V = null
 		J.set_process(true)
 	print("movil: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:
