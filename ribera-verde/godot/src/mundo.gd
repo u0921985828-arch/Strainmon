@@ -2046,6 +2046,7 @@ func fumar_sentado() -> void:
 		if tab:
 			S.items.tabaco = snappedf(float(S.items.tabaco) - 0.7, 0.1)
 	marca_cata(lk, r, lot_sid(lk), thc)   # fumarlo es catarlo
+	await gesto("fumar", {"m": mk})   # 1.54
 	var b := boca_sentado()
 	for n in 3:
 		lanzar_vfx("vfx-humo-porro", b.x, b.y, M.reloj, S.map, true)
@@ -2248,6 +2249,15 @@ func object_action(x: int, y: int) -> void:
 # ---------- acciones y efectos del atlas (01b-arte accion, lanzarVfx) ----------
 func accion(nn: String, vf = null) -> void:
 	var g = Atlas.grupo_look(D.LOOKS.player)
+	if Datos.CAL and GESTO_DE.has(nn):   # 1.54: y el plano de detalle (gesto, trama.gd)
+		if g != null and Atlas.anim_de(g, nn) != null:
+			P.act = {"n": nn, "t0": M.reloj}
+		if vf:
+			lanzar_vfx(vf.id, vf.x, vf.y, M.reloj, S.map, false)
+		await gesto(GESTO_DE[nn])
+		if P.act and P.act.n == nn:
+			P.act = null
+		return
 	if g == null or Atlas.anim_de(g, nn) == null:
 		return
 	P.act = {"n": nn, "t0": M.reloj}
@@ -3285,6 +3295,10 @@ func ordenar(_mapa: String) -> void:   # trama
 	pass
 
 func acceso(_k: String, _c := "", _ok := true) -> void:   # trama (1.53)
+	pass
+
+const GESTO_DE := {"regar": "regar", "plantar": "plantar", "cosechar": "cosechar", "cruzar": "polen", "vender": "vender"}   # accion() → gesto (1.54)
+func gesto(_k: String, _o := {}) -> void:   # trama (1.54)
 	pass
 
 func cifras_acceso(_k: String) -> String:   # trama

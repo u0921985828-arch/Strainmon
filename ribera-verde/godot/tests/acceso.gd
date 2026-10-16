@@ -149,16 +149,35 @@ func _corre() -> void:
 	chk(dentro(J.rects_acceso(V, 0)) and tiene(J.rects_acceso(V, T.fin), "#40e060"), "la rueda: dentro y abre")
 	V = {"k": "candado", "c": "", "ok": true, "t0": 0.0}
 	chk(dentro(J.rects_acceso(V, 0)) and J.rects_acceso(V, 0) != J.rects_acceso(V, 1000), "el candado: dentro y se abre")
+	# 3b · 1.54: cada acción de cerca. accion() lleva su gesto; catar, el porro; todos los dibujos, dentro y en movimiento
+	VIO.clear()
+	for q in [["regar", "regar"], ["plantar", "plantar"], ["cosechar", "cosechar"], ["cruzar", "polen"], ["vender", "vender"]]:
+		VIO.clear()
+		chk(corre(func(): await J.accion(q[0])) and tipos() == [q[1]], "accion(%s) → %s: %s" % [q[0], q[1], VIO])
+	var lk = S.buds.keys()[0] if S.buds.size() else null
+	if lk != null and float(S.buds[lk].g) >= 1:
+		VIO.clear()
+		chk(corre(func(): await J.catar(lk, 0.5)) and VIO.size() and VIO[0] == ["fumar", "porro", true], "catar → el porro: %s" % [VIO])
+	for gk in J.GESTOS:
+		for m in (["porro", "pipa", "bong", "vapo"] if gk == "fumar" else (["", "siesta"] if gk == "dormir" else [""])):
+			var W := {"k": gk, "c": m, "ok": true, "t0": 0.0}
+			var fin: float = J.tiempos_acceso(W).fin
+			var a0: Array = J.rects_acceso(W, 0)
+			var a1: Array = J.rects_acceso(W, fin * .4)
+			var a2: Array = J.rects_acceso(W, fin)
+			chk(dentro(a0) and dentro(a1) and dentro(a2), "%s %s: dentro de la pantalla" % [gk, m])
+			chk(a0 != a1 and a1 != a2, "%s %s: se mueve" % [gk, m])
 	# 4 · de verdad (sin gancho): A lo pasa y se cierra
 	J.gancho_acceso = Callable()
 	var t0: float = M.reloj
 	chk(corre(func(): await J.acceso("clave", "1234")) and J.ACCESO_V == null, "A lo pasa")
 	chk(M.reloj - t0 < 1000, "sin esperar al final (%d ms)" % int(M.reloj - t0))
 	if dir != "":
-		for k in ["llave", "candado", "clave", "pin", "rueda"]:
-			var W := {"k": k, "c": "1998" if k == "rueda" else "4271", "ok": true, "t0": 0.0}
+		for k in ["llave", "candado", "clave", "pin", "rueda"] + J.GESTOS.keys() + ["fumar:pipa", "fumar:bong", "fumar:vapo", "dormir:siesta"]:
+			var kk: String = k.split(":")[0]
+			var W := {"k": kk, "c": k.split(":")[1] if ":" in k else ("1998" if k == "rueda" else ("" if J.GESTOS.has(k) else "4271")), "ok": true, "t0": 0.0}
 			var TT: Dictionary = J.tiempos_acceso(W)
-			for ms in [0.0, (TT.get("entra", TT.get("t1", TT.get("para", 0.0))) as float) + 80, float(TT.fin)]:
+			for ms in ([0.0, (TT.get("entra", TT.get("t1", TT.get("para", 0.0))) as float) + 80, float(TT.fin)] if not J.GESTOS.has(kk) else [150.0, float(TT.fin) * .5, float(TT.fin) * .85]):
 				J.ACCESO_V = W.duplicate()
 				J.ACCESO_V.t0 = M.reloj - ms
 				for q in 2:
@@ -166,7 +185,7 @@ func _corre() -> void:
 					J.pintor.redibuja(M.reloj)
 					for r in 4:
 						await RenderingServer.frame_post_draw
-				root.get_texture().get_image().save_png(dir.path_join("acceso-%s-%04d.png" % [k, int(ms)]))
+				root.get_texture().get_image().save_png(dir.path_join("acceso-%s-%04d.png" % [k.replace(":", "-"), int(ms)]))
 		J.ACCESO_V = null
 	print("acceso: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:

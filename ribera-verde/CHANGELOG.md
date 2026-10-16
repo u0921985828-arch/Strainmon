@@ -1,5 +1,24 @@
 # Cambios
 
+## 1.54.0 · Godot 0.45.0
+
+Lo que pidió el usuario tras la 1.53 («que todas las acciones del juego sean más realistas, acompañadas de algo gráfico»). Solo Godot, con `Datos.CAL`.
+
+- **Cada acción, de cerca**: como la llave de la 1.53, al hacerla sale un plano de detalle en el centro de la pantalla, con su sonido (A o B lo pasan):
+  - **regar**: la regadera se inclina, cae el agua y la tierra se oscurece;
+  - **tratar la plaga**: el pulverizador echa dos nubes y los bichos caen de la hoja;
+  - **abonar**: la botella llena el vaso medidor;
+  - **plantar**: la mano hace el hoyo con el dedo, cae la semilla y se tapa;
+  - **sacar un esqueje**: las tijeras cortan la punta y cae en su taco;
+  - **cosechar**: las tijeras cortan la cola y cae en la bandeja, con los tricomas brillando;
+  - **manicurar**: cuatro tijeretazos y las hojitas caen a la rejilla;
+  - **polinizar**: el pincel con polen sobre los pelos de la flor;
+  - **fumar y catar**: con papel, el mechero, la brasa y el humo; la pipa; el bong, con sus burbujas; el vaporizador, con su piloto y el vapor;
+  - **vender**: la bolsita va hacia el cliente y los billetes hacia ti;
+  - **pagar a Toño**: los billetes caen uno a uno sobre la mesa;
+  - **dormir**: la ventana con la luna (o el sol en la siesta), la almohada y las zetas.
+- Las extracciones ya tenían su escena desde la 1.38. Tres sonidos nuevos: el agua, la tijera y el mechero. Dibujado en código, en píxeles (`gesto`, `GESTOS`, `_gesto_rects`, `_gesto_fumar` en `trama.gd`); `accion()` de `mundo.gd` lo lanza para regar, plantar, cosechar, cruzar y vender. Prueba `tests/acceso.gd`.
+
 ## 1.53.0 · Godot 0.45.0
 
 Lo que pidió el usuario tras la 1.52.1 («que funcionen con una clave o simulando teclear una clave o meter una llave, como animación… que ese toque a la A sea más realista o acompañado de algo gráfico»). Solo Godot, con `Datos.CAL`.

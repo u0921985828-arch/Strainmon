@@ -108,6 +108,9 @@ func _capa(ci: CanvasItem, n: int) -> void:
 		L.draw_set_transform(Vector2(OX(), OY()))
 		_vfx({"x": 0, "y": 0}, "home")
 	L.draw_set_transform(Vector2.ZERO)
+	if n == 2 and J.ACCESO_V != null and modo != "title" and modo != "battle":   # 1.53: la llave, el teclado…; 1.54: cada acción de cerca
+		for e in J.rects_acceso(J.ACCESO_V, J.M.reloj):
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 
 # ---------- utilidades de dibujo ----------
 func OX() -> int:
@@ -449,9 +452,6 @@ func _encima() -> void:
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.TIRO != null:
 		_tiro()
-	if J.ACCESO_V != null:   # 1.53: la llave, el candado, el teclado o la rueda
-		for e in J.rects_acceso(J.ACCESO_V, J.M.reloj):
-			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.ORDEN != null and J.ORDEN.mapa == J.S.map:   # 1.37: el marco de la pieza que mueves (12d-orden)
 		var cm := camara()
 		for e in J.rects_orden():

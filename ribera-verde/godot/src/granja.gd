@@ -282,6 +282,7 @@ func sacar_esqueje(i: int) -> void:
 	if not p.get("f"):
 		p.f = S.esquejes[-1].f
 	p.health = max(1, p.health - 5)
+	await gesto("esqueje")   # 1.54
 	sfx("sel")
 	await say("Cortas una punta de la %s%s y la pones a enraizar.\nPlántala antes del %s: es la misma planta." % [s.n, nom_planta(p.f), Datos.fd(S.day + D.ESQUEJE_DIAS + 1, S.day)])
 	if carro_ya():
@@ -346,6 +347,7 @@ func pot_action(i: int) -> void:
 		if S.items.insect > 0:
 			S.items.insect -= 1
 			p.pest = false
+			await gesto("tratar")   # 1.54
 			sfx("sel")
 			await say("Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.")
 		else:
@@ -504,6 +506,7 @@ func abonar(p: Dictionary, veg_k: Array) -> void:
 		if bio:
 			p.fo = 1
 		S.flags.gFlor = 1
+	await gesto("abonar")   # 1.54
 	sfx("sel")
 	var t := "Echas una dosis de %s. %s" % [String(D.PRODUCTOS[k].n).to_upper(), "Crecerá más deprisa." if veg else "Dará más cosecha."]
 	if ph != null:
@@ -727,6 +730,7 @@ func bed_action(txt := ""):
 		return
 	if c > 1:
 		return
+	await gesto("dormir", {"m": "siesta" if c == 1 else ""})   # 1.54
 	await fade(1)
 	var mins := 180 if c == 1 else Cultivo.minutos_cama(S, 0)
 	var antes := []
