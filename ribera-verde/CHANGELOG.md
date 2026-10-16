@@ -1,5 +1,26 @@
 # Cambios
 
+## 1.48.0 · 16 de octubre de 2026
+
+La calle más como un RPG clásico y los muebles con lo que traen (lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más pokemon» y «la calidad de los otros sprites también, que se note que es el sprite y lo que trae»). Solo Godot (0.42.0), con `Datos.CAL`: sin CAL, las pantallas del oráculo no cambian. Todo a mano y de frente a 3/4, sin marcas (`tools/sprites/a-mano/detalle.py`).
+
+- **Los firmes, sin la rejilla de 16 en 16** (`exterior-pk`, celda `tile_mosaico`): cada firme es un mosaico de 64 × 64 cortado en 16 casillas, y el juego coge la que le toca por su posición (`PK_TILE` en `pinta.gd`).
+  - La hierba, con sus matitas repartidas; las flores, en ramilletes de cuatro pétalos; la hierba alta, en matas redondas.
+  - La acera, de losas grandes de 2 × 1 m a matajuntas, con su luz y su sombra; la plaza, de losas de piedra de varios tamaños.
+  - La calzada, con el bordillo de piedra (juntas cada metro y la sombra en el asfalto) y la raya discontinua.
+  - El camino de tierra, liso, con alguna piedrecita.
+  - La hierba, la plaza y la tierra conservan el color de fondo, así que las orillas de siempre siguen casando.
+- **El canto de la hierba** (`_canto_hierba`): donde la hierba toca acera, calzada u hormigón, dos píxeles más oscuros hacen de borde, en vez del corte seco de casilla a casilla.
+- **El seto, en matas redondas** (`d-seto`), con el borde oscuro, la luz arriba y la sombra del pie.
+- **Los muebles, con lo que traen** (`_detalle_obj`: `d-<mueble>-<mapa>-<tramo>`, por mapa y alternando tres tramos por casilla):
+  - El mostrador del grow de Kiko y el de GROW IBARBIDE: la caja registradora, los botes de abono y el expositor de los sobres de semillas.
+  - El de la comisaría: los papeles con el sello, el monitor y la bandeja de documentos.
+  - La barra del bar: los grifos de cerveza, las cañas con el servilletero y una fuente de pintxos; la de GAUA, con el neón del canto, la cubitera con la botella, los cócteles y la coctelera.
+  - La vitrina del grow, iluminada, con los sobres, un grinder, los botes, el medidor de pH y los tamices dentro.
+  - Las cajas: en el puerto y los astilleros, las de pescado (con hielo y el pescado); en los demás sitios, de madera, abiertas, con una pieza y una bolsa sobre la paja.
+  - Las baldas del grow, con los botes de abono; las de la comisaría, con los archivadores; los sacos de sustrato con la hoja en la etiqueta; las botellas del bar, de cada clase.
+- Prueba `tests/detalle.gd`.
+
 ## 1.47.0 · 16 de octubre de 2026
 
 Muebles a escala, sentarse a fumar, catar lo que quieras, estancos, la vitrina del grow, GAUA con el reservado arriba y cuatro locales como en las fotos (lo pidió el usuario: «el mobiliario debe de ser a escala realista para con el personaje, también en los clubs, casas y demás»; «que se pueda sentarse a fumarse uno, y opción de levantarse, lo mismo en los asientos de casa»; las fotos del taller, la panadería, el bar y la lavandería, y «¿por qué no estás usando la API de PixelLab?»). Solo Godot (0.41.0), con `Datos.CAL`: sin CAL, las pantallas del oráculo no cambian.

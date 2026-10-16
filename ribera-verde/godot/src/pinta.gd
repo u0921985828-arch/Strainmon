@@ -494,6 +494,15 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 				else:
 					_img(f.c, sx, sy)
 				return true
+	if Datos.CAL and PK_TILE.has(k):   # 1.48 (lo pidió el usuario: «más pokemon»): el mosaico de 64 × 64, sin la rejilla de 16
+		var fp = Atlas.frame_de("exterior-pk", "pk-" + k, "unica", 0, {"i": 0})
+		if fp:
+			L.draw_texture_rect_region(Atlas.tex(fp.c), Rect2(sx, sy, 16, 16), Rect2(((tx & 3) + 4 * (ty & 3)) * 16, 0, 16, 16))
+			if HIERBA.has(k):
+				_canto_hierba(tx, ty, sx, sy)
+				if k == "grass":
+					_detalle(tx, ty, sx, sy)
+			return true
 	var f = Atlas.frame_de(Atlas.cubre("tile:" + k), k, "unica", 0, {"i": 0})
 	if f == null:
 		return false
@@ -505,6 +514,28 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 	if k == "grass":
 		_detalle(tx, ty, sx, sy)
 	return true
+
+# 1.48: los firmes en mosaico (exterior-pk) y el canto de la hierba donde toca acera, calzada u hormigón: dos píxeles más oscuros,
+# como un borde, en vez del corte seco de casilla a casilla
+const PK_TILE := {"grass": 1, "flowers": 1, "tallgrass": 1, "dirt": 1, "walk": 1, "plaza": 1, "roadT": 1, "roadB": 1}
+const DURO := {"walk": 1, "roadT": 1, "roadB": 1, "hormigon": 1, "rotoT": 1, "rotoB": 1}
+func _canto_hierba(tx: int, ty: int, sx: int, sy: int) -> void:
+	var m: Dictionary = J.MAPS[J.S.map]
+	var c1 := Color8(0x5a, 0xa0, 0x4e)
+	var c2 := Color8(0x72, 0xbc, 0x5e)
+	for q in [[0, -1], [0, 1], [-1, 0], [1, 0]]:
+		var nx: int = tx + q[0]
+		var ny: int = ty + q[1]
+		if nx < 0 or ny < 0 or nx >= m.w or ny >= m.h or not DURO.has(m.g[ny][nx]):
+			continue
+		if q[1] == -1:
+			_rect(sx, sy, 16, 1, c1); _rect(sx, sy + 1, 16, 1, c2)
+		elif q[1] == 1:
+			_rect(sx, sy + 15, 16, 1, c1); _rect(sx, sy + 14, 16, 1, c2)
+		elif q[0] == -1:
+			_rect(sx, sy, 1, 16, c1); _rect(sx + 1, sy, 1, 16, c2)
+		else:
+			_rect(sx + 15, sy, 1, 16, c1); _rect(sx + 14, sy, 1, 16, c2)
 
 # orgánico (1.10, 01b-arte.js): el mismo hash de casilla que el HTML (hashT) para que nada vaya a compás de la rejilla: qué
 # variante de un firme sale (la 0, la lisa, la que más), qué detalle lleva la hierba y dónde, y cuánto se corre (y si va en
@@ -574,6 +605,10 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var sp: String = ("mesaN-%d" % mini(fm, 1)) if o == "mesaN" else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)
 	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
 	var ge = Atlas.cubre("obj:e-" + o) if Datos.CAL and not an else null   # 1.47: a escala con el protagonista (escala.py), solo con CAL
+	var fd = _detalle_obj(o, tx) if Datos.CAL and not an else null   # 1.48: con lo que trae encima (detalle.py)
+	if fd != null:
+		f = fd
+		ge = null
 	if ge:
 		var fe = Atlas.frame_de(ge, "e-" + sp, "unica", 0, {"i": 0, "esp": d.esp})
 		if fe == null:
@@ -626,6 +661,22 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl, J.mesa_idx(tx, ty) if o == "mesaN" else -1, fm, ex)])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
 		_pinta_mesa(f, xp, yp, pl, J.mesa_idx(tx, ty) if o == "mesaN" else -1, fm, ex)
+
+# 1.48 (lo pidió el usuario: «que se note que es el sprite y lo que trae»): d-<objeto>-<mapa>-<tramo>, d-<objeto>-<mapa>,
+# d-<objeto>-<tramo> o d-<objeto>, de detalle.py (grupos detalle-alto y detalle-16); el tramo, por la columna (los mostradores)
+var _det_c := {}
+func _detalle_obj(o: String, tx: int):
+	var mp: String = J.S.map
+	var key := "%s|%s|%d" % [o, mp, tx % 3]
+	if _det_c.has(key):
+		return _det_c[key]
+	var r = null
+	for g in ["detalle-alto", "detalle-16"]:
+		for n in ["d-%s-%s-%d" % [o, mp, tx % 3], "d-%s-%s" % [o, mp], "d-%s-%d" % [o, tx % 3], "d-" + o]:
+			if r == null:
+				r = Atlas.frame_de(g, n, "unica", 0, {"i": 0})
+	_det_c[key] = r
+	return r
 
 func _pinta_mesa(f, xp: float, yp: float, pl, i := -1, fm := 0, ex := []) -> void:
 	_pinta(f, xp, yp)

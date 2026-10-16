@@ -712,6 +712,16 @@
    ],
    "ajuste": "exacto",
    "nota": "1.43.6: lo de dentro de los tarros de 10 L (almacen.py)"
+  },
+  "tile_mosaico": {
+   "w": 256,
+   "h": 16,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.48: un mosaico de 64 × 64 cortado en 16 casillas en tira; el juego coge la (tx & 3) + 4 (ty & 3)"
   }
  },
  "fases": [
@@ -9908,6 +9918,57 @@
    "ajuste_por_sprite": {
     "rotuloE": "exacto"
    }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/detalle.py",
+   "notas": "1.48, lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más pokemon» y «la calidad de los otros sprites también, que se note que es el sprite y lo que trae». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "estilo_ref": "los muebles a escala (escala-alto) y los firmes de mundo.py",
+   "id": "exterior-pk",
+   "tipo": "tiles",
+   "celda": "tile_mosaico",
+   "cubre": [],
+   "descripcion": "1.48: los firmes de la calle en mosaicos de 64 × 64 (hierba con matitas, flores, hierba alta en matas, tierra, acera de losas grandes, plaza de losas de varios tamaños, asfalto con bordillo de piedra)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/detalle.py",
+   "notas": "1.48, lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más pokemon» y «la calidad de los otros sprites también, que se note que es el sprite y lo que trae». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "estilo_ref": "los muebles a escala (escala-alto) y los firmes de mundo.py",
+   "id": "detalle-alto",
+   "tipo": "objeto",
+   "celda": "mueble_escala",
+   "cubre": [],
+   "descripcion": "1.48: mostradores y barras con lo que llevan encima, en tres tramos; la vitrina del grow con lo que se vende; las cajas de madera y las de pescado"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/detalle.py",
+   "notas": "1.48, lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más pokemon» y «la calidad de los otros sprites también, que se note que es el sprite y lo que trae». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "estilo_ref": "los muebles a escala (escala-alto) y los firmes de mundo.py",
+   "id": "detalle-16",
+   "tipo": "objeto",
+   "celda": "objeto_1x1",
+   "cubre": [],
+   "descripcion": "1.48: el seto redondeado, las baldas con botes de abono y archivadores, los sacos de sustrato y las botellas del bar"
   }
  ],
  "familias": {
