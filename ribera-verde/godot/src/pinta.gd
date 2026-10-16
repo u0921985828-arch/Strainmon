@@ -1021,6 +1021,9 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 
 # sentado (1.47): el fotograma quieto sin SENT_CORTA filas de piernas (los pies, en el suelo), en la casilla del asiento
 var _sent_img := {}
+# 1.50: de frente, sentado: los muslos encima del asiento (vistos desde arriba), las rodillas, las espinillas colgando
+# delante del canto (entre ellas se ve el banco) y las zapatillas en el suelo; de x 9 a 22 del fotograma, bajo el torso
+const SENT_PIERNAS := ["anooonaanooona", "anonnnaannnona", ".annna..annna.", ".annna..annna.", ".ahhha..ahhha.", "..aaa....aaa.."]
 func _pj_sentado() -> void:
 	var gr = Atlas.grupo_look(J.D.LOOKS.player)
 	if not gr:
@@ -1035,8 +1038,20 @@ func _pj_sentado() -> void:
 		var n: int = J.SENT_CORTA
 		var y0: int = int(f.cel.ancla[1])   # la fila de los pies: se quitan las n de encima
 		im = Image.create(c.get_width(), c.get_height(), false, c.get_format())
-		im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - n), Vector2i(0, n))
-		im.blit_rect(c, Rect2i(0, y0, c.get_width(), c.get_height() - y0), Vector2i(0, y0))
+		if J.SENT.d == "sur":
+			# 1.50 (lo pidió el usuario: «está sentado en el suelo, no en el banco»): de frente, el culo en el asiento (45 cm)
+			# y las piernas dobladas de SENT_PIERNAS
+			im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - 5), Vector2i(0, 6 - SENT_PIERNAS.size()))   # 6: las filas de pierna de pie
+			# los colores, del propio fotograma (la ropa los cambia): contorno, pantalón, su brillo y zapatilla
+			var col := {"a": c.get_pixel(9, y0 - 5), "n": c.get_pixel(12, y0 - 5), "o": c.get_pixel(13, y0 - 5), "h": c.get_pixel(12, y0 - 2)}
+			for i in SENT_PIERNAS.size():
+				var r: String = SENT_PIERNAS[i]
+				for x in r.length():
+					if r[x] != ".":
+						im.set_pixel(9 + x, y0 - SENT_PIERNAS.size() + 1 + i, col[r[x]])
+		else:
+			im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - n), Vector2i(0, n))
+			im.blit_rect(c, Rect2i(0, y0, c.get_width(), c.get_height() - y0), Vector2i(0, y0))
 		_sent_img[c] = im
 	var xp: int = J.SENT.x * 16 - Datos.jsround(cam.x) + 8
 	var yp: int = J.SENT.y * 16 - Datos.jsround(cam.y) + 15 - (J.SENT_SUBE if J.SENT.d == "norte" else 0)

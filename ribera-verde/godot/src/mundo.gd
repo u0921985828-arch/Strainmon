@@ -1618,6 +1618,7 @@ const ASIENTOS := {"sofaF": "sur", "sofaV": "sur", "bench": "sur", "sofaB": "nor
 const ASIENTO_TXT := {"sofaF": "Un sofá del club.", "sofaB": "Un sofá del club.", "sofaV": "El sofá del reservado.", "bench": "Un banco.", "stool": "Un taburete.",
 	"sofa": "Tu sofá.", "sillon": "Tu sillón de lectura.", "silla": "La silla del ordenador de la tía.", "sillaG": "Tu silla gaming."}
 const SENT_CORTA := 5   # las filas de piernas que no se ven sentado
+const SENT_CORTA_SUR := 0   # 1.50: de frente, en el asiento, a la altura de pie (6 filas de piernas dobladas, SENT_PIERNAS en pinta.gd)
 const SENT_SUBE := 6    # de espaldas, el culo en medio del asiento: la cabeza asoma por encima del respaldo
 const SENT_PORRO := 0.5
 var SENT = null   # {x, y, d}
@@ -1772,7 +1773,7 @@ func boca_sentado() -> Vector2:
 	if SENT == null:   # de pie
 		return Vector2(P.px + 8, P.py - 4)
 	var sur: bool = SENT.d == "sur"
-	return Vector2(SENT.x * 16 + 8 + (4 if sur else 0), SENT.y * 16 + 15 - (18 if sur else 22 + SENT_SUBE) + SENT_CORTA)
+	return Vector2(SENT.x * 16 + 8 + (4 if sur else 0), SENT.y * 16 + 15 - (18 if sur else 22 + SENT_SUBE) + (SENT_CORTA_SUR if sur else SENT_CORTA))
 
 # 1.47 (lo pidió el usuario): con qué se fuma. El papel, el tabaco, las boquillas y el mechero, del estanco (ESTANCO); la pipa,
 # el bong, el vaporizador y el grinder, del grow (PARAFERNALIA). g: cogollos por vez (el porro, con tabaco, gt); gr: extracto
