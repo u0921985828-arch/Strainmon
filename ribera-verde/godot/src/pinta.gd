@@ -442,8 +442,8 @@ func _encima() -> void:
 	if J.CAL_V != null:   # 1.42: la hoja del mes
 		for e in Croquis.rects_cal(J.SW, J.CAL_V, int(J.S.day), J.marcas_cal(), J.alto_libre()):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
-	if J.ALMACEN != null:   # la caja fuerte y la nevera por dentro (1.36)
-		for e in J.rects_almacen(J.ALMACEN):
+	if J.ALMACEN != null or J.MOVIL_V != null:   # la caja fuerte y la nevera por dentro (1.36); 1.51, el móvil
+		for e in (J.rects_almacen(J.ALMACEN) if J.ALMACEN != null else J.rects_movil(J.MOVIL_V)):
 			if typeof(e[0]) == TYPE_STRING:   # ['@', sprite, x, y]: un sprite de misc por su esquina
 				var f = Atlas.foto_misc(e[1])
 				if f:

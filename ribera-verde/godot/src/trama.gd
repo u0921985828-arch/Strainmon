@@ -2624,6 +2624,7 @@ func reloj_txt() -> String:
 	return "%02d:%02d" % [int(S.min) / 60, int(S.min) % 60]
 
 func movil_menu():
+	ult_app = ""
 	while true:
 		var ops := ["Llamar"]
 		if S.flags.get("kiko1"):
@@ -2633,7 +2634,14 @@ func movil_menu():
 			ops.append("Plantilla")
 		ops.append_array(["Banca", "Tienda online", "Calendario", "Mapa", "Colgar"])   # 1.35: la banca (granja.gd); 1.42: el calendario y el mapa (croquis.gd)
 		var ns: int = S.sms.size()
-		var oi: int = await ask("MÓVIL · %s, %s%s" % [Datos.fd_hud(S.day).to_lower(), reloj_txt(), (" · %d mensaje%s" % [ns, "s" if ns > 1 else ""]) if ns else ""], ops)
+		var oi: int
+		if Datos.CAL:   # 1.51 (lo pidió el usuario): la pantalla del móvil con sus aplicaciones, como la caja fuerte por dentro
+			ops.pop_back()
+			oi = await elegir_movil(ops, ops.find(ult_app))
+			if oi >= 0:
+				ult_app = ops[oi]
+		else:
+			oi = await ask("MÓVIL · %s, %s%s" % [Datos.fd_hud(S.day).to_lower(), reloj_txt(), (" · %d mensaje%s" % [ns, "s" if ns > 1 else ""]) if ns else ""], ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "" or op == "Colgar":
 			return
@@ -2658,6 +2666,97 @@ func movil_menu():
 			await plantilla()
 		else:
 			await mensajes()
+
+# ---------- la pantalla del móvil (1.51, lo pidió el usuario: «que fuese una pantalla de un móvil, con el diseño del juego, estilo a
+# cuando abres la caja fuerte»): la carcasa y las aplicaciones a mano (tools/sprites/a-mano/movil.py, misc:mv-*), arriba la hora, la
+# cobertura y la batería, la hora en grande y una rejilla de 3 × 3; flechas, A abre y B cuelga. MOVIL_V = {ops, i}
+var MOVIL_V = null
+var ult_app := ""
+const APP_MOVIL := {"Llamar": "llamar", "Pedir a Kiko": "kiko", "Mensajes": "sms", "Gente": "gente", "Plantilla": "plantilla", "Banca": "banca",
+	"Tienda online": "tienda", "Calendario": "cal", "Mapa": "mapa"}
+const CIFRAS := ["111101101101111", "010110010010111", "111001111100111", "111001111001111", "101101111001001", "111100111001111",
+	"111100111101111", "111001010010010", "111101111101111", "111101111001111"]
+
+func desc_movil(V: Dictionary) -> String:
+	var op: String = V.ops[V.i]
+	var ns: int = S.sms.size()
+	var d: String = {"Llamar": "La agenda: Kiko, Toño, Iñaki y los clientes que te han comprado.", "Pedir a Kiko": "Lo del growshop, a casa mañana por la mañana (+%d %%)." % Datos.jsround((D.ENVIO - 1) * 100),
+		"Mensajes": ("%d mensaje%s." % [ns, "s" if ns > 1 else ""]) if ns else "No hay mensajes.", "Gente": "La confianza con cada persona.",
+		"Plantilla": "Tu gente: la calle, la casa y la nave.", "Banca": "En la cuenta, %s. Movimientos y recibos." % Datos.eur(S.get("banco", 0)),
+		"Tienda online": "Con tarjeta; llega al día siguiente.", "Calendario": "El mes, con los días señalados.", "Mapa": "La comarca y las líneas de autobús."}.get(op, "")
+	return "%s · %s, %s\n%s · A: abrir · B: colgar." % [op, Datos.fd_hud(S.day).to_lower(), reloj_txt(), d]
+
+func mueve_movil(V: Dictionary, b: String) -> bool:
+	var n: int = V.ops.size()
+	var j: int = V.i + {"left": -1, "right": 1, "up": -3, "down": 3}.get(b, 0)
+	if j < 0 or j >= n or j == V.i:
+		return false
+	V.i = j
+	return true
+
+func elegir_movil(ops: Array, i0 := 0) -> int:
+	if gancho_menu.is_valid():   # las pruebas eligen por la etiqueta, como en el menú de siempre
+		var i: int = await menu(ops + ["Colgar"], {"cls": "right", "cancel": true, "title": "MÓVIL"})
+		return i if i >= 0 and i < ops.size() else -1
+	MOVIL_V = {"ops": ops, "i": clampi(i0, 0, ops.size() - 1)}
+	_dlg_fijo(desc_movil(MOVIL_V), "MÓVIL")
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "B" or b == "start":
+			pop()
+			pr.res(-1)
+			return
+		if b == "A":
+			pop()
+			pr.res(MOVIL_V.i)
+			return
+		if mueve_movil(MOVIL_V, b):
+			sfx("sel")
+			_dlg_fijo(desc_movil(MOVIL_V), "MÓVIL"))
+	var e = await Motor.espera(pr)
+	MOVIL_V = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+	return int(e)
+
+func _cifras(o: Array, x: int, y: int, t: String, c: String, k := 1) -> int:
+	for ch in t:
+		if ch == ":":
+			o.append_array([[x, y + k, k, k, c], [x, y + 3 * k, k, k, c]])
+			x += 2 * k
+			continue
+		var f: String = CIFRAS[int(ch)]
+		for q in 15:
+			if f[q] == "1":
+				o.append([x + (q % 3) * k, y + (q / 3) * k, k, k, c])
+		x += 4 * k
+	return x
+
+func rects_movil(V: Dictionary) -> Array:
+	var o := []
+	var x0: int = (SW - 80) >> 1
+	var y0: int = maxi(2, (alto_libre() - 120) >> 1)
+	o.append(["@", "mv-movil", x0, y0])
+	var sx := x0 + 5
+	var sy := y0 + 9
+	_cifras(o, sx + 3, sy + 2, reloj_txt(), "#d8f0e0")
+	for q in 4:   # la cobertura y la batería
+		o.append([sx + 47 + q * 2, sy + 6 - q, 1, q + 1, "#d8f0e0"])
+	o.append_array([[sx + 57, sy + 2, 9, 5, "#d8f0e0"], [sx + 58, sy + 3, 7, 3, "#0a1e14"], [sx + 58, sy + 3, 5, 3, "#7cd08a"], [sx + 66, sy + 3, 1, 3, "#d8f0e0"]])
+	var hh := reloj_txt()
+	_cifras(o, sx + ((70 - 34) >> 1), sy + 10, hh, "#e8f8ec", 2)
+	var ns: int = S.sms.size()
+	for q in V.ops.size():
+		var x: int = sx + 4 + (q % 3) * 22
+		var y: int = sy + 23 + (q / 3) * 23
+		o.append(["@", "mv-" + str(APP_MOVIL.get(V.ops[q], "sms")), x, y])
+		if V.ops[q] == "Mensajes" and ns:
+			o.append_array([[x + 12, y - 2, 7, 7, "#2a2a34"], [x + 13, y - 1, 5, 5, "#e03838"]])
+			_cifras(o, x + 14, y - 1, str(mini(ns, 9)), "#ffffff")
+		if q == V.i:
+			_marco(o, x - 2, y - 2, 22, 22)
+	return o
 
 # devuelve true si ha venido un cliente (el móvil se cierra)
 func llamar() -> bool:

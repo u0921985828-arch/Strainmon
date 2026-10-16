@@ -722,6 +722,26 @@
    ],
    "ajuste": "exacto",
    "nota": "1.48: un mosaico de 64 × 64 cortado en 16 casillas en tira; el juego coge la (tx & 3) + 4 (ty & 3)"
+  },
+  "mv_movil": {
+   "w": 80,
+   "h": 120,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.51: el móvil por dentro (movil.py)"
+  },
+  "mv_app": {
+   "w": 18,
+   "h": 18,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.51: los iconos de las aplicaciones del móvil (movil.py)"
   }
  },
  "fases": [
@@ -9969,6 +9989,75 @@
    "celda": "objeto_1x1",
    "cubre": [],
    "descripcion": "1.48: el seto redondeado, las baldas con botes de abono y archivadores, los sacos de sustrato y las botellas del bar"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/movil.py",
+   "notas": "1.51, pedido por el usuario: «cuando le das al móvil no aparece ningún icono… que fuese una pantalla de un móvil, con el diseño del juego».",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "movil",
+   "celda": "mv_app",
+   "animaciones": [
+    {
+     "nombre": "mv-movil",
+     "celda": "mv_movil"
+    },
+    {
+     "nombre": "mv-llamar",
+     "celda": "mv_app"
+    },
+    {
+     "nombre": "mv-kiko",
+     "celda": "mv_app"
+    },
+    {
+     "nombre": "mv-sms",
+     "celda": "mv_app"
+    },
+    {
+     "nombre": "mv-gente",
+     "celda": "mv_app"
+    },
+    {
+     "nombre": "mv-plantilla",
+     "celda": "mv_app"
+    },
+    {
+     "nombre": "mv-banca",
+     "celda": "mv_app"
+    },
+    {
+     "nombre": "mv-tienda",
+     "celda": "mv_app"
+    },
+    {
+     "nombre": "mv-cal",
+     "celda": "mv_app"
+    },
+    {
+     "nombre": "mv-mapa",
+     "celda": "mv_app"
+    }
+   ],
+   "cubre": [
+    "misc:mv-movil",
+    "misc:mv-llamar",
+    "misc:mv-kiko",
+    "misc:mv-sms",
+    "misc:mv-gente",
+    "misc:mv-plantilla",
+    "misc:mv-banca",
+    "misc:mv-tienda",
+    "misc:mv-cal",
+    "misc:mv-mapa"
+   ],
+   "descripcion": "1.51: el móvil por dentro (la carcasa y el fondo) y los iconos de sus aplicaciones."
   }
  ],
  "familias": {
