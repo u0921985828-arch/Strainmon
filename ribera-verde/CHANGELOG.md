@@ -8,6 +8,8 @@ Lo que pidió el usuario tras probar la 1.49. Solo Godot, con `Datos.CAL`.
 - **Los nombres enteros en los mercados**: «Hoy tenemos» de los clubs, Iñaki y la lonja salía en la columna de la derecha y cortaba las variedades («Beldi», «Zam», «Dry s»); ahora es un menú a lo ancho con la ficha de cada lote debajo (`comprar_mercado`).
 - **Sin hueco al final de los menús largos**: al pasar a una fila con la descripción más corta caben más filas y la lista se quedaba corrida, con el ▲ arriba y un hueco debajo (la tienda de Kiko); ahora se ajusta (`m_top` en `menu`).
 - **Menos de 10 g con su décima** en la caja fuerte y el camarote: un lote de 0,4 g ya no sale como «0 g» (`g_lote`).
+- **Los estancos con estanquero**: en Valdehierro, Errotabarri e Ibarbide no salía nadie detrás del mostrador porque su muñeco (`cliente4`, `cliente6`, `cliente2`) no estaba en `LOOKS`; ya están (`datos.json`). Repasados todos los `look` de `NPCDEF`: no falta ninguno más (la gente de los negocios sale cuando el local está alquilado).
+- **Los menús de comprar y vender enseñan todo**: el de la derecha se ensancha hasta casi toda la pantalla antes de cortar; a toda pantalla, una fila larga ya no estira la ventana fuera de la pantalla; y si el nombre de lo elegido aún no cabe, sale entero debajo, encima de su ficha (`_desc_sel`, `maxw` en `_pinta_menu`).
 - La prueba de los créditos de `ciclo.gd` lee la versión de `project.godot`, no una fija.
 
 ## 1.49.0 · Godot 0.43.0

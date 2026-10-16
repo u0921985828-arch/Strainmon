@@ -1100,8 +1100,8 @@ func _pinta_menu(rows: int) -> void:
 		var alto := R.size.y - 6 * us - 14 * us - 10 * us
 		if o.get("title"):
 			alto -= 8.5 * us * 1.3 + 5 * us
-		if o.get("desc"):
-			var dsc: String = m_items[m_i].get("desc", "")
+		if o.get("desc") or (Datos.CAL and _desc_sel(fs) != ""):   # 1.50: sin descripción, el nombre que no cabe
+			var dsc: String = _desc_sel(fs)
 			var dw := R.size.x - 6 * us - 18 * us
 			var nl := letra.get_multiline_string_size(dsc, HORIZONTAL_ALIGNMENT_LEFT, dw, roundi(8.5 * us)).y
 			var lineas := maxf(1, roundf(nl / letra.get_height(roundi(8.5 * us))))
@@ -1110,6 +1110,10 @@ func _pinta_menu(rows: int) -> void:
 			vis -= 1
 	elif not g:
 		vis = filas_menu(m_items.size(), o)
+		if Datos.CAL and cls == "right" and not o.get("desc") and _desc_sel(fs) != "":   # 1.50: el nombre entero debajo ocupa unas dos filas
+			var d: float = ui_rect().size.y / us - 52 - 14 - (19.5 if o.get("title") else 0.0) - 31
+			if vis * 14.5 > d + .01:
+				vis = maxi(1, floori((d - 10) / 14.5 + .01))
 	else:
 		vis = m_items.size()
 	var fl := full or vis < m_items.size()
@@ -1150,6 +1154,10 @@ func _pinta_menu(rows: int) -> void:
 	if full:
 		lista.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var maxw := (170 - 14 - 4) * us if cls == "right" else 1e9
+	if Datos.CAL and cls == "right":   # 1.50: el menú de la derecha se ensancha hasta casi toda la pantalla antes de cortar
+		maxw = maxf(maxw, ui_rect().size.x * .9 - 18 * us)
+	elif Datos.CAL and full:   # 1.50: a toda pantalla, la fila no la ensancha (el nombre entero va abajo, en la descripción)
+		maxw = ui_rect().size.x - 6 * us - 18 * us
 	for k in range(m_top, mini(m_items.size(), m_top + vis)):
 		var it: Dictionary = m_items[k]
 		var f := HBoxContainer.new()
@@ -1201,7 +1209,7 @@ func _pinta_menu(rows: int) -> void:
 		if full or lw + rw + 22 * us > maxw:
 			l.clip_text = true
 			l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-			l.custom_minimum_size = Vector2(minf(lw, maxf(20 * us, maxw - rw - 22 * us)), 0)
+			l.custom_minimum_size = Vector2(minf(lw, maxf(20 * us, maxw - rw - 22 * us - (12 * us if it.get("ic") or it.get("sw") else 0.0))), 0)
 		f.add_child(l)
 		if r:
 			var e := Control.new()
@@ -1219,7 +1227,7 @@ func _pinta_menu(rows: int) -> void:
 	menu_col.add_child(lista)
 	if fl:
 		menu_col.add_child(_flecha("▼" if m_top + vis < m_items.size() else "", "down"))
-	if o.get("desc"):
+	if o.get("desc") or ((full or cls == "right") and Datos.CAL and _desc_sel(fs) != ""):
 		var raya := ColorRect.new()
 		raya.color = LINEA2
 		raya.custom_minimum_size = Vector2(0, maxf(1, us))
@@ -1228,13 +1236,28 @@ func _pinta_menu(rows: int) -> void:
 		hueco.custom_minimum_size = Vector2(0, 3 * us)
 		menu_col.add_child(hueco)
 		var dl := Label.new()
-		dl.text = m_items[m_i].get("desc", "")
+		dl.text = _desc_sel(fs)
 		dl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		dl.custom_minimum_size = Vector2(0, 24 * us)
 		pon_letra(dl, letra, 8.5 * us, INK, 11.5 * us)
 		menu_col.add_child(dl)
 	menu_box.set_meta("cls", cls)
 	_coloca.call_deferred()
+
+# la descripción de la fila elegida; 1.50: si su nombre no cabe en la fila, entero delante
+func _desc_sel(fs: float) -> String:
+	var it: Dictionary = m_items[m_i]
+	var dsc: String = it.get("desc", "")
+	var cls: String = m_o.get("cls", "right")
+	if not Datos.CAL or not cls in ["full", "right"]:
+		return dsc
+	var lab := str(it.get("label", ""))
+	var rt := str(it.right) if it.get("right") != null else ""
+	var w := letra.get_string_size(lab, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(fs)).x + 2 + (letra.get_string_size(rt, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(fs)).x + 12 * us if rt != "" else 0.0)
+	var hay: float = (ui_rect().size.x - 6 * us - 18 * us if cls == "full" else maxf((170 - 14 - 4) * us, ui_rect().size.x * .9 - 18 * us)) - 10 * us - (12 * us if it.get("ic") or it.get("sw") else 0.0)
+	if w <= hay:
+		return dsc
+	return lab + ("\n" + dsc if dsc != "" else "")
 
 func _flecha(t: String, b := "") -> Label:
 	var a := Label.new()
