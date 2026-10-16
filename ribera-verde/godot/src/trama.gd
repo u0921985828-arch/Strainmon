@@ -8952,10 +8952,12 @@ func rects_acceso(V: Dictionary, now: float) -> Array:
 	var cy: int = y0 + (ACC_H >> 1)
 	var k: String = V.k
 	var c: String = str(V.c)
-	R.append([x0 - 2, y0 - 2, ACC_W + 4, ACC_H + 4, "#26262e"])
-	if GESTOS.has(k):   # 1.54: el plano de detalle de cada acción
-		_gesto_rects(R, V, t, x0, y0, cx, cy)
+	if GESTOS.has(k):   # 1.54: el plano de detalle de cada acción; 1.54.1, de sprites, a 144 × 96
+		_gs = Rect2i((SW - GS_W) >> 1, (SH - GS_H) >> 1, GS_W, GS_H)
+		R.append([_gs.position.x - 2, _gs.position.y - 2, GS_W + 4, GS_H + 4, "#26262e"])
+		_gesto_rects(R, V, t)
 		return R
+	R.append([x0 - 2, y0 - 2, ACC_W + 4, ACC_H + 4, "#26262e"])
 	match k:
 		"llave":   # la puerta de madera, el escudo de latón y la llave que entra por la derecha y gira
 			R.append([x0, y0, ACC_W, ACC_H, "#6a4a30"])
@@ -9124,266 +9126,176 @@ func gesto(k: String, o := {}) -> void:
 	await Motor.espera(pr)
 	ACCESO_V = null
 
-# las tijeras: el eje en (x, y), las hojas hacia la izquierda; c de 0 (abiertas) a 1 (cerradas)
-func _tijeras(R: Array, x: int, y: int, c: float) -> void:
-	var a: float = (1 - clampf(c, 0, 1)) * 5
-	for i in 14:
-		var d: int = Datos.jsround(a * i / 13.0)
-		R.append([x - i, y - d - 1, 1, 1, "#d8dce4"])
-		R.append([x - i, y + d + 1, 1, 1, "#a8acb4"])
-	R.append([x - 1, y - 1, 3, 3, "#606470"])
-	for q in [[2, -7], [2, 3]]:
-		R.append([x + q[0], y + q[1], 7, 5, "#c03030"])
-		R.append([x + q[0] + 2, y + q[1] + 1, 3, 3, "#26262e"])
+# ---------- 1.54.1 (lo pidió el usuario: «eso no son sprites en condiciones en el mismo estilo que los muebles del juego»): el plano de
+# cerca, 144 × 96 a escala de la vista C, compuesto con los sprites de tools/sprites/a-mano/gestos.py (la planta, la maceta y la pared
+# de la carpa, de la vista C); entradas ['@', sprite, x, y, recorte] que pinta.gd recorta al panel
+const GS_W := 144
+const GS_H := 96
+var _gs := Rect2i()
 
-func _maceta(R: Array, cx: int, by: int, w: int, h: int, tierra: String) -> void:
-	for r in h:
-		var ww: int = w - Datos.jsround(4.0 * r / h)
-		R.append([cx - (ww >> 1), by - h + r, ww, 1, "#2a2a2e" if r > 1 else "#44444c"])
-	R.append([cx - (w >> 1) + 2, by - h + 1, w - 4, 2, tierra])
+func _gsp(R: Array, n: String, x: float, y: float) -> void:
+	R.append(["@", n, _gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), _gs])
 
-func _planta_peq(R: Array, cx: int, y: int) -> void:   # y: el suelo
-	R.append([cx, y - 12, 1, 12, "#3a8a3a"])
-	for q in [[-6, -8, 6, 2], [1, -9, 6, 2], [-4, -13, 4, 2], [1, -14, 4, 2], [-1, -16, 3, 2]]:
-		R.append([cx + q[0], y + q[1], q[2], q[3], "#4aa04a"])
+func _gsr(R: Array, x: float, y: float, w: int, h: int, c: String) -> void:
+	var r := Rect2i(_gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), w, h).intersection(_gs)
+	if r.size.x > 0 and r.size.y > 0:
+		R.append([r.position.x, r.position.y, r.size.x, r.size.y, c])
 
-# un cogollo: c, el centro; w × h; hojas: cuántas hojitas le quedan (0-1)
-func _cogollo(R: Array, cx: int, cy: int, w: int, h: int, hojas: float) -> void:
-	for r in h:
-		var f: float = sin(PI * (r + .5) / h)
-		var ww: int = maxi(2, Datos.jsround(w * pow(f, .7)))
-		R.append([cx - (ww >> 1), cy - (h >> 1) + r, ww, 1, "#7ab04a" if r % 3 else "#6a9a3e"])
-	for i in 14:
-		var px: int = cx - (w >> 1) + 2 + (i * 7) % maxi(1, w - 4)
-		var py: int = cy - (h >> 1) + 2 + (i * 11) % maxi(1, h - 4)
-		R.append([px, py, 1, 1, "#e08a3a" if i % 3 == 0 else "#f0f0e0"])
-	var n: int = Datos.jsround(hojas * 6)
-	for i in n:
-		var lado: int = -1 if i % 2 == 0 else 1
-		var py: int = cy - (h >> 1) + 3 + (i >> 1) * maxi(2, (h - 6) / 3)
-		R.append([cx + lado * ((w >> 1) - 1) + (lado * 2 if lado > 0 else -5), py, 4, 2, "#3a7a2a"])
+static func _mv(a: float, b: float, f: float) -> float:
+	return a + (b - a) * _suave(f)
 
-func _billete(R: Array, x: int, y: int, c: String) -> void:
-	R.append([x, y, 14, 7, "#3a4a32"])
-	R.append([x + 1, y + 1, 12, 5, c])
-	R.append([x + 5, y + 2, 4, 3, "#f0f0d8"])
+# la maceta de tela con su planta (v: vegetativa, f: en flor, "": sin planta) en el suelo de la carpa
+func _gs_maceta(R: Array, pl: String, moja := false) -> void:
+	if pl != "":
+		_gsp(R, "gs-planta-" + pl, 36, -29)
+	_gsp(R, "gs-maceta-m" if moja else "gs-maceta", 40, 60)
 
-func _gesto_rects(R: Array, V: Dictionary, t: float, x0: int, y0: int, cx: int, cy: int) -> void:
+func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 	var k: String = V.k
-	var fondo: String = {"manicurar": "#8a6a48", "pagar": "#7a5a3a", "fumar": "#2a2a36", "vender": "#5a5a62", "dormir": "#7ab0e0" if V.c == "siesta" else "#1a2040"}.get(k, "#c8ccd0")
-	R.append([x0, y0, ACC_W, ACC_H, fondo])
-	if fondo == "#c8ccd0":   # la tela plateada de la carpa
-		for xx in range(x0 + 5, x0 + ACC_W, 9):
-			R.append([xx, y0, 1, ACC_H, "#b4b8be"])
-	var by: int = y0 + ACC_H - 6
+	var c: String = str(V.c)
 	match k:
-		"regar":
-			var moja: float = _suave((t - 500) / 400.0)
-			_maceta(R, cx + 8, by, 30, 16, "#4a2e1a" if moja > .5 else "#8a6a4a")
-			_planta_peq(R, cx + 8, by - 15)
-			var inc: int = Datos.jsround(_suave(t / 200.0) * 4)   # la regadera se inclina
-			R.append([cx - 38, y0 + 12 + inc, 18, 13, "#3a8ad0"])
-			R.append([cx - 38, y0 + 12 + inc, 18, 2, "#5aa8f0"])
-			R.append([cx - 42, y0 + 9 + inc, 4, 10, "#2a6aa8"])   # el asa
-			for i in 6:
-				R.append([cx - 20 + i * 2, y0 + 16 + inc + i * (1 + inc / 3), 2, 2, "#3a8ad0"])   # el pitorro
-			var px: int = cx - 8
-			var py: int = y0 + 16 + inc + 5 * (1 + inc / 3) + 2
-			if t > 150 and t < 1000:
-				for d in 7:
-					var f: float = fmod((t - 150) / 260.0 + d / 7.0, 1.0)
-					R.append([px + Datos.jsround(f * 10) + (d % 3), py + Datos.jsround(f * (by - 15 - py)), 1, 2, "#8ac8f8"])
-		"tratar":
-			for r in 22:   # la hoja grande
-				var ww: int = Datos.jsround(46 * sin(PI * (r + .5) / 22))
-				R.append([cx - 10 - (ww >> 1), cy - 11 + r, ww, 1, "#4aa04a"])
-			R.append([cx - 33, cy, 46, 1, "#3a8a3a"])
-			var caen: float = _suave((t - 700) / 300.0)
-			for i in 9:
-				var bx: int = cx - 28 + (i * 9) % 38
-				var bym: int = cy - 7 + (i * 5) % 14 + Datos.jsround(caen * (30 + i * 2))
-				if bym < y0 + ACC_H - 2:
-					R.append([bx, bym, 2, 2, "#f0f0f0" if i % 2 else "#303030"])
-			R.append([cx + 26, cy - 14, 10, 26, "#e8e8f0"])   # el pulverizador
-			R.append([cx + 24, cy - 20, 12, 6, "#c03030"])
-			R.append([cx + 20, cy - 18, 5, 2, "#c03030"])
-			for s in [250.0, 600.0]:
-				if t > s and t < s + 350:
-					var f: float = (t - s) / 350.0
-					for i in 10:
-						R.append([cx + 18 - Datos.jsround(f * (12 + i * 2)), cy - 18 + (i - 5) * Datos.jsround(1 + f * 2), 1, 1, "#ffffff"])
-		"abonar":
-			var nivel: float = _suave((t - 200) / 800.0)
-			var bx: int = cx + 6
-			R.append([bx - 9, by - 26, 18, 26, "#e8eef0"])   # el vaso medidor
-			R.append([bx - 8, by - 25, 16, 24, "#d0dce0"])
-			for i in 4:
-				R.append([bx + 4, by - 6 - i * 5, 4, 1, "#8a9aa0"])
-			var hl: int = Datos.jsround(nivel * 18)
-			R.append([bx - 8, by - 1 - hl, 16, hl, "#6ab04a"])
-			var inc: int = Datos.jsround(_suave(t / 200.0) * 5)
-			R.append([cx - 34, y0 + 10 + inc, 14, 22, "#3a6a2a"])   # la botella
-			R.append([cx - 31, y0 + 16 + inc, 8, 8, "#e8e0b0"])
-			R.append([cx - 20, y0 + 12 + inc, 8, 4, "#3a6a2a"])
-			if t > 200 and t < 1000:
-				R.append([cx - 12, y0 + 16 + inc, 2, by - 1 - hl - (y0 + 16 + inc), "#6ab04a"])
-		"plantar":
-			_maceta(R, cx, by, 44, 22, "#6a4a2e")
-			var dedo: float = _suave(t / 350.0) - _suave((t - 350) / 200.0)
-			var hoyo: bool = t > 300 and t < 850
-			if hoyo:
-				R.append([cx - 2, by - 21, 5, 3, "#3a2414"])
-			R.append([cx - 9, y0 + 2, 16, 8, "#e0b088"])   # la mano
-			R.append([cx - 9, y0 + 9, 16, 1, "#c09068"])
-			R.append([cx - 3, y0 + 4, 7, Datos.jsround(dedo * 28) + 6, "#e0b088"])   # el dedo
-			R.append([cx - 2, y0 + 4 + Datos.jsround(dedo * 28) + 3, 5, 3, "#f0d0b0"])
-			if t > 400 and t < 700:
-				var f: float = (t - 400) / 300.0
-				R.append([cx - 1, y0 + 10 + Datos.jsround(f * (by - 21 - y0 - 10)), 3, 2, "#8a6a3a"])
-			if t > 850:
-				R.append([cx - 4, by - 21, 9, 1, "#7a5a3a"])
-		"esqueje", "cosechar":
-			var cos: bool = k == "cosechar"
-			var corte: float = _suave((t - 200) / 250.0)
-			var cae: float = _suave((t - 450) / 400.0)
-			var tx: int = cx - 6
-			var sy: int = y0 + 30   # la altura del corte
-			R.append([tx, sy + 2, 2, 40, "#3a7a2a"])   # el tallo que queda
-			var dy: int = Datos.jsround(cae * ((by - 14) - (y0 + 6) - (24 if cos else 14)))
-			var top: int = y0 + 6 + dy
-			if cos:
-				R.append([cx - 22, by - 6, 38, 6, "#e8e8f0"])   # la bandeja
-				R.append([cx - 22, by - 6, 38, 1, "#ffffff"])
-				_cogollo(R, tx + 1, top + 12, 16, 22, 1.0)
-				R.append([tx, top + 22, 2, 4, "#3a7a2a"])
-				if t > 900:
-					for i in 4:
-						var ft: float = fmod(t / 300.0 + i * .25, 1.0)
-						R.append([tx - 8 + i * 5, top + 2 + Datos.jsround(ft * 10), 1, 1, "#ffffff"])
-			else:
-				R.append([cx - 22, by - 8, 38, 8, "#1a1a1e"])   # la bandeja de alvéolos, con su taco
-				R.append([tx - 4, by - 12, 10, 8, "#6a4a2a"])
-				R.append([tx, top, 2, 22 - (6 if cae >= 1 else 0), "#3a7a2a"])
-				for q in [[-7, 4, 7, 2], [2, 3, 7, 2], [-5, 8, 5, 2], [2, 9, 5, 2]]:
-					R.append([tx + q[0], top + q[1], q[2], q[3], "#4aa04a"])
-			_tijeras(R, tx + 18, sy + 1, corte if t < 700 else 1.0 - _suave((t - 700) / 200.0))
-		"manicurar":
-			var quedan: float = 1.0 - clampf(floor((t - 150) / 250.0) / 4.0, 0, 1)
-			R.append([cx - 30, by - 8, 60, 8, "#c0c4c8"])   # la bandeja de rejilla
-			for xx in range(cx - 28, cx + 30, 4):
-				R.append([xx, by - 8, 1, 8, "#9a9ea2"])
-			_cogollo(R, cx, cy - 4, 22, 30, quedan)
-			var paso: int = clampi(int((t - 150) / 250.0), 0, 3)
-			var ty_: int = cy - 14 + paso * 7
-			var ab: float = fmod(maxf(t - 150, 0) / 250.0, 1.0)
-			_tijeras(R, cx + 30, ty_, 1.0 - absf(ab * 2 - 1))
-			for i in 4:   # las hojitas que caen a la rejilla
-				var s: float = 250.0 * (i + 1)
-				if t > s:
-					var f: float = _suave((t - s) / 300.0)
-					R.append([cx + (8 if i % 2 else -12) + i, cy - 12 + i * 7 + Datos.jsround(f * (by - 10 - (cy - 12 + i * 7))), 4, 2, "#3a7a2a"])
-		"polen":
-			for q in [[-14, 4], [0, 0], [12, 6]]:   # la flor hembra: cálices y pelos blancos
-				R.append([cx + q[0] - 5, cy + q[1], 10, 12, "#5a9a3a"])
-				for i in 4:
-					R.append([cx + q[0] - 4 + i * 3, cy + q[1] - 6 + (i % 2) * 2, 1, 6, "#f8f8f0"])
-			var mx: float = _suave(t / 400.0)
-			var dab: int = Datos.jsround(sin(maxf(t - 400, 0) / 70.0) * 2) if t > 400 and t < 950 else 0
-			var bx: int = cx + 40 - Datos.jsround(mx * 38)
-			var byy: int = cy - 22 + Datos.jsround(mx * 10) + dab
-			R.append([bx, byy, 22, 2, "#a07040"])   # el pincel
-			R.append([bx - 5, byy - 1, 5, 4, "#f0d040"])
-			if t > 400:
-				var n: int = clampi(int((t - 400) / 60.0), 0, 12)
-				for i in n:
-					R.append([cx - 18 + (i * 13) % 36, cy - 6 + (i * 7) % 10 + Datos.jsround(fmod(t / 400.0 + i * .3, 1.0) * 6), 1, 1, "#f8e040"])
-		"fumar":
-			_gesto_fumar(R, V, t, x0, y0, cx, cy)
-		"vender":
-			var f: float = _suave((t - 100) / 900.0)
-			var lx: int = x0 + 6 + Datos.jsround(f * (ACC_W - 40))
-			var rx: int = x0 + ACC_W - 34 - Datos.jsround(f * (ACC_W - 40))
-			R.append([lx, cy - 18, 12, 14, "#e8eef0"])   # la bolsita, con el cogollo
-			R.append([lx, cy - 18, 12, 2, "#c03030"])
-			_cogollo(R, lx + 6, cy - 10, 8, 8, 0.0)
-			R.append([lx - 8, cy - 8, 8, 6, "#e0b088"])
-			_billete(R, rx + 10, cy + 6, "#7ab070")
-			_billete(R, rx + 13, cy + 9, "#e0a050")
-			R.append([rx + 26, cy + 8, 8, 6, "#c09068"])
-		"dormir":   # la ventana con la luna (o el sol de la siesta), la almohada y las zetas que suben
-			var sies: bool = V.c == "siesta"
-			R.append([x0 + 10, y0 + 8, 30, 24, "#c8ccd0"])
-			R.append([x0 + 12, y0 + 10, 26, 20, "#5a8ad0" if sies else "#0a1028"])
-			var my: int = y0 + 24 - Datos.jsround(_suave(t / 1000.0) * 8)
-			R.append([x0 + 16, my, 7, 7, "#f8e070" if sies else "#e8e8d0"])
-			if not sies:
-				R.append([x0 + 19, my, 4, 5, "#0a1028"])
-			R.append([x0 + 24, y0 + 10, 1, 20, "#c8ccd0"])
-			R.append([x0, by - 14, ACC_W, 20, "#5a3a7a"])   # la manta
-			R.append([x0, by - 14, ACC_W, 2, "#7a5a9a"])
-			R.append([cx + 6, by - 24, 30, 12, "#f0f0f0"])   # la almohada
-			R.append([cx + 12, by - 22, 12, 10, "#4a3020"])   # el pelo, asomando
+		"regar":   # la regadera entra, se inclina y el agua cae del pitorro a la tierra, que se oscurece
+			_gsp(R, "gs-f-carpa", 0, 0)
+			_gs_maceta(R, "v", t > 600)
+			var x: float = _mv(150, 70, t / 300.0) if t < 1000 else _mv(70, 150, (t - 1000) / 200.0)
+			_gsp(R, "gs-regadera-1" if t >= 300 and t < 1000 else "gs-regadera-0", x, 18)
+			if t > 320 and t < 1000:   # del pitorro (76, 48) a la tierra
+				for d in 9:
+					var f: float = fmod((t - 320) / 280.0 + d / 9.0, 1.0)
+					_gsr(R, 75 - f * 8 + (d % 3), 48 + f * 15, 1, 2, "#8ac8f8" if d % 2 else "#5aa0e0")
+		"tratar":   # el pulverizador: dos apretones, la bruma hacia la planta y los bichos que caen
+			_gsp(R, "gs-f-carpa", 0, 0)
+			_gs_maceta(R, "v")
 			for i in 3:
-				var f: float = fmod(t / 1100.0 + i / 3.0, 1.0)
-				_glifo(R, "Z", cx + 10 + Datos.jsround(f * 18) + i * 3, by - 30 - Datos.jsround(f * 34), 1 + (1 if f > .5 else 0), "#ffffff" if f < .7 else "#9aa0c0")
-		"pagar":
-			R.append([x0, by - 2, ACC_W, 8, "#5a3e26"])   # el canto de la mesa
-			var n: int = clampi(int(t / 200.0), 0, 5)
-			for i in n:
-				_billete(R, cx - 7 + (i % 2), by - 9 - i * 2, "#e0a050" if i % 2 else "#7ab070")
-			if n < 5:
-				var f: float = fmod(t / 200.0, 1.0)
-				_billete(R, cx - 7 + Datos.jsround((1 - f) * 30), y0 + 6 + Datos.jsround(f * (by - 9 - n * 2 - y0 - 6)), "#7ab070")
+				if t < 650 + i * 120:
+					_gsp(R, "gs-bicho", [46, 60, 42][i], [26, 38, 46][i])
+			var apr: bool = (t > 250 and t < 450) or (t > 600 and t < 800)
+			_gsp(R, "gs-spray-1" if apr else "gs-spray-0", _mv(150, 80, t / 220.0), 14)
+			for p in [250.0, 600.0]:
+				var f: float = (t - p) / 500.0
+				if f > 0 and f < 1:
+					_gsp(R, "gs-bruma-%d" % mini(2, int(f * 3)), 70 - f * 24, 16 + f * 6)
+		"abonar":   # la botella baja, se inclina y el chorro ámbar cae a la tierra
+			_gsp(R, "gs-f-carpa", 0, 0)
+			_gs_maceta(R, "v")
+			if t < 250:
+				_gsp(R, "gs-botella-0", 34, _mv(-24, 30, t / 250.0))
+			elif t < 1000:
+				_gsp(R, "gs-botella-1", 30, 39)
+				if t > 300:
+					var largo: int = mini(12, int((t - 300) / 25.0))
+					_gsr(R, 51, 50, 1, largo, "#d89a3a")
+					_gsr(R, 52, 51, 1, maxi(0, largo - 2), "#a86a1a")
+			else:
+				_gsp(R, "gs-botella-0", 34, _mv(30, -24, (t - 1000) / 200.0))
+		"plantar":   # la plántula baja a la maceta, la tierra se aprieta con la mano
+			_gsp(R, "gs-f-carpa", 0, 0)
+			_gsp(R, "gs-brote", 36, _mv(-90, -29, t / 600.0))
+			_gsp(R, "gs-maceta", 40, 60)
+			if t > 600:
+				for i in 6:
+					_gsr(R, 47 + i * 3, 63 - (i % 2), 2, 1, "#5a3a22")
+			if t > 750:
+				_gsp(R, "gs-mano", 58, 38 + Datos.jsround(sin((t - 750) / 90.0) * 2))
+		"esqueje":   # las tijeras cortan una rama y el esqueje va al vaso de agua
+			_gsp(R, "gs-f-carpa", 0, 0)
+			_gs_maceta(R, "v")
+			_gsp(R, "gs-vaso", 104, 62)
+			if t < 500:
+				_gsp(R, "gs-tijeras-1" if t > 420 else "gs-tijeras-0", _mv(150, 66, t / 300.0), 30)
+			else:
+				var f: float = (t - 500) / 500.0
+				_gsp(R, "gs-esqueje", _mv(56, 102, f), _mv(26, 48, f) - sin(clampf(f, 0, 1) * PI) * 10)
+				_gsp(R, "gs-tijeras-1", _mv(66, 150, f), 30)
+		"cosechar":   # las tijeras cortan la cola de arriba y se la llevan
+			_gsp(R, "gs-f-carpa", 0, 0)
+			_gs_maceta(R, "f")
+			if t < 500:
+				_gsp(R, "gs-tijeras-1" if t > 420 else "gs-tijeras-0", _mv(150, 60, t / 300.0), 12)
+			else:
+				var f: float = (t - 500) / 600.0
+				_gsp(R, "gs-cola", _mv(40, 100, f), _mv(2, 8, f) - sin(clampf(f, 0, 1) * PI) * 6)
+				_gsp(R, "gs-tijeras-1", _mv(60, 150, f), 12)
+		"manicurar":   # la cola en la mesa, cuatro tijeretazos, las hojitas caen y queda pelada
+			_gsp(R, "gs-f-mesa", 0, 0)
+			_gsp(R, "gs-cola-p" if t > 650 else "gs-cola", 56, 34)
+			var P := [[78, 36], [34, 44], [80, 50], [32, 32]]
+			for i in 4:
+				var ts: float = 250 + i * 250
+				if t > ts:
+					_gsp(R, "gs-hojita", P[i][0] + 2 - i, minf(74, P[i][1] + 8 + (t - ts) * .08))
+			var j: int = clampi(int((t - 125) / 250.0), 0, 3)
+			var cerr: bool = absf(t - (250 + j * 250)) < 60
+			_gsp(R, "gs-tijeras-1" if cerr else "gs-tijeras-0", P[j][0] - 8, P[j][1] - 4)
+		"polen":   # el pincel da vueltas sobre la cola de arriba y suelta el polen
+			_gsp(R, "gs-f-carpa", 0, 0)
+			_gs_maceta(R, "f")
+			for i in 10:
+				var ti: float = 150 + i * 90
+				if t > ti:
+					_gsr(R, 48 + (i * 7) % 16, minf(60, 18 + (t - ti) * .03 + (i % 3)), 1, 1, "#f0d040" if i % 2 else "#e0b020")
+			_gsp(R, "gs-pincel", 55 + cos(t / 150.0) * 8, -4 + sin(t / 150.0) * 4)
+		"fumar":
+			_gesto_fumar(R, c, t)
+		"vender":   # la mano del cliente con el billete y la tuya con la bolsita; se cambian y se van
+			_gsp(R, "gs-f-calle", 0, 0)
+			if t < 650:
+				_gsp(R, "gs-mano-billete", _mv(-48, 28, t / 400.0), 30)
+				_gsp(R, "gs-bolsita", _mv(144, 70, t / 400.0), 40)
+			else:
+				var f: float = (t - 700) / 400.0
+				_gsp(R, "gs-bolsita-c", _mv(28, -48, f), 30)
+				_gsp(R, "gs-billete-m", _mv(70, 144, f), 40)
+		"pagar":   # del fajo salen cinco billetes, uno a uno, al montón, y la mano lo empuja
+			_gsp(R, "gs-f-mesa", 0, 0)
+			_gsp(R, "gs-fajo", 14, 40)
+			for i in 5:
+				var ti: float = 150 + i * 200
+				if t > ti:
+					var f: float = (t - ti) / 180.0
+					_gsp(R, "gs-billete", _mv(16, 84 + (i % 2) * 3, f), _mv(38, 42 - i * 2, f))
+			if t > 1000:
+				_gsp(R, "gs-mano", _mv(144, 104, (t - 1000) / 200.0), 28)
+		"dormir":   # en la cama, de noche (o la siesta, de día); respira y suben las zetas
+			_gsp(R, "gs-f-cama-d" if c == "siesta" else "gs-f-cama-n", 0, 0)
+			_gsp(R, "gs-dormido", 18, 34 + (1 if fmod(t, 1000) > 500 else 0))
+			for i in 3:
+				var f: float = fmod(t / 900.0 + i / 3.0, 1.0)
+				_gsp(R, "gs-z", 44 + f * 16 + sin(f * 6) * 2, 34 - f * 28)
 
-# fumar: el porro (el mechero lo enciende, la brasa y el humo), la pipa, el bong (burbujas) o el vaporizador (el piloto y el vapor)
-func _gesto_fumar(R: Array, V: Dictionary, t: float, x0: int, y0: int, cx: int, cy: int) -> void:
-	var m: String = V.c if V.c != "" else "porro"
-	var punta := Vector2i(cx - 10, cy - 2)
+# fumar: el porro, la pipa o el bong, el mechero los enciende, la brasa y el humo; el vaporizador, su piloto y el vapor
+func _gesto_fumar(R: Array, m: String, t: float) -> void:
+	if m == "":
+		m = "porro"
+	_gsp(R, "gs-f-cuarto", 0, 0)
+	var x: float = _mv(144, 60, t / 150.0)
+	var punta := Vector2(x + 4, 55)   # la punta del porro o la cazoleta de la pipa, que entran con la mano
 	match m:
+		"porro":
+			_gsp(R, "gs-porro", x, 44)
 		"pipa":
-			R.append([cx - 4, cy - 2, 34, 4, "#7a4a2a"])
-			R.append([cx - 14, cy - 10, 12, 14, "#8a5a32"])
-			R.append([cx - 12, cy - 10, 8, 3, "#3a2a1a"])
-			punta = Vector2i(cx - 8, cy - 11)
-		"bong":
-			R.append([cx - 6, cy - 30, 10, 46, "#b8e0e8"])
-			R.append([cx - 12, cy + 4, 22, 14, "#a8d4e0"])
-			R.append([cx - 10, cy + 10, 18, 7, "#6aa0c0"])   # el agua
-			R.append([cx + 8, cy - 2, 12, 3, "#9ab0b8"])
-			R.append([cx + 18, cy - 6, 6, 5, "#8a8e98"])
-			if t > 300:
-				for i in 5:
-					var f: float = fmod(t / 300.0 + i * .2, 1.0)
-					R.append([cx - 6 + (i * 3) % 12, cy + 16 - Datos.jsround(f * 8), 2, 2, "#e0f4f8"])
-			punta = Vector2i(cx + 20, cy - 7)
+			punta = Vector2(x + 10, 55)
+			_gsp(R, "gs-pipa", x, 49)
 		"vapo":
-			R.append([cx - 8, cy - 12, 16, 30, "#3a3e46"])
-			R.append([cx - 4, cy - 18, 8, 6, "#5a5e66"])
-			R.append([cx - 2, cy - 2, 4, 4, "#40e060" if t > 300 else "#c03030"])
-			punta = Vector2i(cx, cy - 19)
-		_:
-			for i in 30:   # el porro, en diagonal, más grueso en la punta
-				var gr: int = 2 + (i / 12)
-				R.append([cx - 10 + i, cy - 2 + (i / 3), 1, gr, "#f4f0e6"])
-			R.append([cx + 20, cy + 8, 3, 3, "#d0a060"])   # el filtro
-			punta = Vector2i(cx - 11, cy - 3)
-	var enc: bool = m != "vapo" and m != "bong"
-	if enc and t > 100 and t < 650:   # el mechero
-		R.append([punta.x - 6, punta.y + 6, 8, 14, "#d03030"])
-		R.append([punta.x - 5, punta.y + 4, 6, 2, "#a0a4ac"])
-		var fl: int = int(t / 60.0) % 2
-		R.append([punta.x - 3, punta.y - 1 + fl, 3, 5 - fl, "#f8a020"])
-		R.append([punta.x - 2, punta.y + 1, 1, 3, "#fff0a0"])
-	if m == "bong" and t > 100 and t < 650:
-		R.append([punta.x + 2, punta.y + 2, 8, 14, "#d03030"])
-		R.append([punta.x + 3, punta.y - 3 + int(t / 60.0) % 2, 3, 5, "#f8a020"])
-	if m != "vapo" and t > 400:   # la brasa
-		R.append([punta.x, punta.y, 3, 3, "#ff6020" if int(t / 150.0) % 2 else "#e04010"])
-	if t > 500:   # el humo (o el vapor) sube y se abre
-		for i in 6:
-			var f: float = fmod((t - 500) / 900.0 + i / 6.0, 1.0)
-			var s: int = 2 + Datos.jsround(f * 6)
-			var c: String = "#c8c8d0" if f < .4 else ("#9a9aa6" if f < .75 else "#6a6a78")
-			var sy_: int = punta.y - 4 - Datos.jsround(f * 34)
-			if sy_ >= y0 + 2:
-				R.append([punta.x - (s >> 1) + Datos.jsround(sin(f * 6 + i) * 4), sy_, s, s, c])
+			_gsp(R, "gs-vapo-1" if t > 300 and int(t / 250.0) % 2 else "gs-vapo-0", x, 44)
+		"bong":
+			punta = Vector2(63, 64)
+			_gsp(R, "gs-bong", 56, 40)
+			if t > 450:
+				for i in 4:
+					var f: float = fmod(t / 400.0 + i / 4.0, 1.0)
+					_gsp(R, "gs-burbuja", 74 + (i * 3) % 9, 82 - f * 8)
+	if m != "vapo":
+		if t > 150 and t < 500:
+			_gsp(R, "gs-mechero-1", punta.x - 11, punta.y + 1)
+		elif t <= 150:
+			_gsp(R, "gs-mechero-0", punta.x - 11, _mv(100, punta.y + 1, t / 150.0))
+		if t > 300:   # la brasa
+			_gsr(R, punta.x - 1, punta.y - 1, 2, 2, "#ffb040" if int(t / 150.0) % 2 else "#f86a20")
+	var sale := Vector2(80, 44) if m == "bong" else punta   # el humo del bong sale por arriba del tubo
+	for i in 3:
+		var ti: float = 450 + i * 300
+		if t > ti:
+			var f: float = (t - ti) / 900.0
+			if f < 1:
+				_gsp(R, "gs-humo-%d" % mini(2, int(f * 3)), sale.x - 12 - f * 6, sale.y - 14 - f * 36)

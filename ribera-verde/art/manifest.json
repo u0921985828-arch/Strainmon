@@ -772,6 +772,76 @@
    ],
    "ajuste": "exacto",
    "nota": "1.51: el atunero de 14 m (puerto.py): 15 casillas"
+  },
+  "gs_fondo": {
+   "w": 144,
+   "h": 96,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.54.1: el plano de cerca de cada acción (gestos.py)"
+  },
+  "gs_planta": {
+   "w": 40,
+   "h": 96,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.54.1: el plano de cerca de cada acción (gestos.py)"
+  },
+  "gs_g": {
+   "w": 48,
+   "h": 48,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.54.1: el plano de cerca de cada acción (gestos.py)"
+  },
+  "gs_l": {
+   "w": 48,
+   "h": 24,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.54.1: el plano de cerca de cada acción (gestos.py)"
+  },
+  "gs_c": {
+   "w": 32,
+   "h": 32,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.54.1: el plano de cerca de cada acción (gestos.py)"
+  },
+  "gs_m": {
+   "w": 24,
+   "h": 24,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.54.1: el plano de cerca de cada acción (gestos.py)"
+  },
+  "gs_s": {
+   "w": 8,
+   "h": 8,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "1.54.1: el plano de cerca de cada acción (gestos.py)"
   }
  },
  "fases": [
@@ -10339,6 +10409,275 @@
    },
    "estilo_ref": "el pantalán (tiles-exterior/dock)",
    "descripcion": "1.52: el pantalán podrido, con tablones rotos y el agua por el hueco"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/gestos.py (la planta, la maceta y la pared, de la vista C ya procesada)",
+   "notas": "1.54.1, pedido por el usuario: «eso no son sprites en condiciones en el mismo estilo que los muebles del juego».",
+   "max_colores": 64,
+   "tipo": "objeto",
+   "id": "gestos",
+   "celda": "gs_m",
+   "animaciones": [
+    {
+     "nombre": "gs-bicho",
+     "celda": "gs_s"
+    },
+    {
+     "nombre": "gs-billete",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-billete-m",
+     "celda": "gs_l"
+    },
+    {
+     "nombre": "gs-bolsita",
+     "celda": "gs_l"
+    },
+    {
+     "nombre": "gs-bolsita-c",
+     "celda": "gs_l"
+    },
+    {
+     "nombre": "gs-bong",
+     "celda": "gs_g"
+    },
+    {
+     "nombre": "gs-botella-0",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-botella-1",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-brote",
+     "celda": "gs_planta"
+    },
+    {
+     "nombre": "gs-bruma-0",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-bruma-1",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-bruma-2",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-burbuja",
+     "celda": "gs_s"
+    },
+    {
+     "nombre": "gs-cola",
+     "celda": "gs_c"
+    },
+    {
+     "nombre": "gs-cola-p",
+     "celda": "gs_c"
+    },
+    {
+     "nombre": "gs-dormido",
+     "celda": "gs_l"
+    },
+    {
+     "nombre": "gs-esqueje",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-f-calle",
+     "celda": "gs_fondo"
+    },
+    {
+     "nombre": "gs-f-cama-d",
+     "celda": "gs_fondo"
+    },
+    {
+     "nombre": "gs-f-cama-n",
+     "celda": "gs_fondo"
+    },
+    {
+     "nombre": "gs-f-carpa",
+     "celda": "gs_fondo"
+    },
+    {
+     "nombre": "gs-f-cuarto",
+     "celda": "gs_fondo"
+    },
+    {
+     "nombre": "gs-f-mesa",
+     "celda": "gs_fondo"
+    },
+    {
+     "nombre": "gs-fajo",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-gota",
+     "celda": "gs_s"
+    },
+    {
+     "nombre": "gs-hojita",
+     "celda": "gs_s"
+    },
+    {
+     "nombre": "gs-humo-0",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-humo-1",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-humo-2",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-maceta",
+     "celda": "gs_c"
+    },
+    {
+     "nombre": "gs-maceta-m",
+     "celda": "gs_c"
+    },
+    {
+     "nombre": "gs-mano",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-mano-billete",
+     "celda": "gs_l"
+    },
+    {
+     "nombre": "gs-mechero-0",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-mechero-1",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-pincel",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-pipa",
+     "celda": "gs_l"
+    },
+    {
+     "nombre": "gs-planta-f",
+     "celda": "gs_planta"
+    },
+    {
+     "nombre": "gs-planta-v",
+     "celda": "gs_planta"
+    },
+    {
+     "nombre": "gs-porro",
+     "celda": "gs_l"
+    },
+    {
+     "nombre": "gs-regadera-0",
+     "celda": "gs_g"
+    },
+    {
+     "nombre": "gs-regadera-1",
+     "celda": "gs_g"
+    },
+    {
+     "nombre": "gs-spray-0",
+     "celda": "gs_g"
+    },
+    {
+     "nombre": "gs-spray-1",
+     "celda": "gs_g"
+    },
+    {
+     "nombre": "gs-tijeras-0",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-tijeras-1",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-vapo-0",
+     "celda": "gs_l"
+    },
+    {
+     "nombre": "gs-vapo-1",
+     "celda": "gs_l"
+    },
+    {
+     "nombre": "gs-vaso",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-z",
+     "celda": "gs_s"
+    }
+   ],
+   "cubre": [
+    "misc:gs-bicho",
+    "misc:gs-billete",
+    "misc:gs-billete-m",
+    "misc:gs-bolsita",
+    "misc:gs-bolsita-c",
+    "misc:gs-bong",
+    "misc:gs-botella-0",
+    "misc:gs-botella-1",
+    "misc:gs-brote",
+    "misc:gs-bruma-0",
+    "misc:gs-bruma-1",
+    "misc:gs-bruma-2",
+    "misc:gs-burbuja",
+    "misc:gs-cola",
+    "misc:gs-cola-p",
+    "misc:gs-dormido",
+    "misc:gs-esqueje",
+    "misc:gs-f-calle",
+    "misc:gs-f-cama-d",
+    "misc:gs-f-cama-n",
+    "misc:gs-f-carpa",
+    "misc:gs-f-cuarto",
+    "misc:gs-f-mesa",
+    "misc:gs-fajo",
+    "misc:gs-gota",
+    "misc:gs-hojita",
+    "misc:gs-humo-0",
+    "misc:gs-humo-1",
+    "misc:gs-humo-2",
+    "misc:gs-maceta",
+    "misc:gs-maceta-m",
+    "misc:gs-mano",
+    "misc:gs-mano-billete",
+    "misc:gs-mechero-0",
+    "misc:gs-mechero-1",
+    "misc:gs-pincel",
+    "misc:gs-pipa",
+    "misc:gs-planta-f",
+    "misc:gs-planta-v",
+    "misc:gs-porro",
+    "misc:gs-regadera-0",
+    "misc:gs-regadera-1",
+    "misc:gs-spray-0",
+    "misc:gs-spray-1",
+    "misc:gs-tijeras-0",
+    "misc:gs-tijeras-1",
+    "misc:gs-vapo-0",
+    "misc:gs-vapo-1",
+    "misc:gs-vaso",
+    "misc:gs-z"
+   ],
+   "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta) y piezas (manos, herramientas, plantas, humo, billetes)."
   }
  ],
  "familias": {

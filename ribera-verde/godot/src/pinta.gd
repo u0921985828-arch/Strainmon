@@ -110,6 +110,13 @@ func _capa(ci: CanvasItem, n: int) -> void:
 	L.draw_set_transform(Vector2.ZERO)
 	if n == 2 and J.ACCESO_V != null and modo != "title" and modo != "battle":   # 1.53: la llave, el teclado…; 1.54: cada acción de cerca
 		for e in J.rects_acceso(J.ACCESO_V, J.M.reloj):
+			if typeof(e[0]) == TYPE_STRING:   # 1.54.1: ['@', sprite, x, y, recorte]: el sprite de misc dentro del panel
+				var f = Atlas.foto_misc(e[1])
+				if f:
+					var im: Image = f.c
+					var cl: Rect2i = e[4] if e.size() > 4 else Rect2i(0, 0, J.SW, SH)
+					_img_clip(im, int(e[2]), int(e[3]), Rect2i(0, 0, im.get_width(), im.get_height()), cl, Color.WHITE)
+				continue
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 
 # ---------- utilidades de dibujo ----------

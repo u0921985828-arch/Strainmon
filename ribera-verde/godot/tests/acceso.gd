@@ -4,6 +4,7 @@
 #   $GODOT --headless --path godot --script res://tests/acceso.gd   → «acceso: N comprobaciones, 0 fallos»
 #   con -- --sin-arranque --pintar <dir> (y xvfb, --rendering-driver opengl3) deja también acceso-<tipo>-<ms>.png
 extends SceneTree
+const Atlas = preload("res://src/atlas.gd")
 
 const Datos = preload("res://src/datos.gd")
 const Juego = preload("res://src/juego.gd")
@@ -63,10 +64,15 @@ func tipos() -> Array:
 	return VIO.map(func(v): return v[0])
 
 func dentro(R: Array) -> bool:
-	return R.all(func(e): return e[0] >= 0 and e[1] >= 0 and e[0] + e[2] <= J.SW and e[1] + e[3] <= J.SH)
+	return R.all(func(e): return dentro1(e))
+
+func dentro1(e: Array) -> bool:
+	if typeof(e[0]) == TYPE_STRING:   # 1.54.1: un sprite ['@', n, x, y, recorte]
+		return Atlas.foto_misc(e[1]) != null and Rect2i(0, 0, J.SW, J.SH).encloses(e[4])
+	return e[0] >= 0 and e[1] >= 0 and e[0] + e[2] <= J.SW and e[1] + e[3] <= J.SH
 
 func tiene(R: Array, col: String) -> bool:
-	return R.any(func(e): return e[4] == col)
+	return R.any(func(e): return typeof(e[4]) == TYPE_STRING and e[4] == col)
 
 func _corre() -> void:
 	Juego.GUARDADO = "user://prueba-acceso.json"

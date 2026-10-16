@@ -1,5 +1,17 @@
 # Cambios
 
+## 1.54.1 · Godot 0.45.0
+
+Lo que pidió el usuario al ver la 1.54 («eso no son sprites en condiciones en el mismo estilo que los muebles del juego»). Solo Godot, con `Datos.CAL`.
+
+- **Los planos de cerca, de sprites**: cada acción se compone con sprites dibujados a mano en el estilo de los muebles (contorno `#2a2a34`, luz de arriba a la izquierda, 3–4 tonos por material) en un panel de 144 × 96 a la escala de la vista C:
+  - la planta (vegetativa y en flor), la plántula, la maceta de tela (seca y mojada) y la pared plateada de la carpa salen de la vista C;
+  - regadera, pulverizador, botella de abono, tijeras, esqueje y vaso, pincel, cola (con hojas y pelada), bichos, bruma y gotas;
+  - porro, pipa, bong con burbujas, vaporizador con piloto, mechero con llama y humo;
+  - bolsita, billete, fajo y manos (la tuya y la del cliente), el que duerme y las zetas;
+  - fondos: la carpa, la mesa de madera, el salón de noche con el sofá, la calle de ladrillo y la cama de noche y de día.
+- Las cerraduras (llave, candado, teclado, PIN y rueda) siguen como en la 1.53.
+
 ## 1.54.0 · Godot 0.45.0
 
 Lo que pidió el usuario tras la 1.53 («que todas las acciones del juego sean más realistas, acompañadas de algo gráfico»). Solo Godot, con `Datos.CAL`.
