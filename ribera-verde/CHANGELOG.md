@@ -1,6 +1,6 @@
 # Cambios
 
-## 1.55.2 · Godot 0.46.0
+## 1.55.2 · Godot 0.46.1
 
 - El de las madres de la nave ya no tapa la puerta de la habitación (lo pidió el usuario): con CAL y las puertas de dentro, se pone en (16, 3), delante de su carpa y mirando a ella (`build_ents` en `mundo.gd`); `tests/sotano.gd` comprueba que nadie de la nave está delante de una puerta (93 comprobaciones).
 
