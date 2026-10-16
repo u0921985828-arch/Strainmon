@@ -247,8 +247,15 @@ func _mundo() -> void:
 			var mp: Array = J.pos_pieza("home", "mesa")   # 1.37: la carta, en la mesa redonda, donde esté
 			var lx: int = mp[0] * 16 - cam.x
 			var ly: int = mp[1] * 16 - cam.y
-			_rect(lx + 5, ly + 5, 7, 5, css("#fafaf2"))
-			_rect(lx + 8, ly + 7, 2, 1, css("#c04040"))
+			if Datos.CAL:   # 1.50 (lo pidió el usuario): encima del tablero de la mesa a escala (e-table, de 3 px por encima de su
+				# casilla a 2 px dentro), después de la mesa para que no la tape
+				list.append([mp[1] * 16 + 1, func():
+					_rect(lx + 5, ly - 2, 6, 3, css("#fafaf2"))
+					_rect(lx + 5, ly + 1, 6, 1, css("#d8d4c4"))
+					_rect(lx + 7, ly - 1, 2, 1, css("#c04040"))])
+			else:
+				_rect(lx + 5, ly + 5, 7, 5, css("#fafaf2"))
+				_rect(lx + 8, ly + 7, 2, 1, css("#c04040"))
 	if S.map == "nave":
 		list.append([2 * 16 - 1, _manguera_nave])   # 1.33: la manguera del riego, detrás de lo de la fila 2
 	if Atlas.ok and ambiente_on:
