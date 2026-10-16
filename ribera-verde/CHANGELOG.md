@@ -1,6 +1,6 @@
 # Cambios
 
-## 1.55.1 · Godot 0.45.0
+## 1.55.1 · Godot 0.46.0
 
 Lo que pidió el usuario tras la 1.55 («no parece el personaje tumbado en la cama», «la pipa no parece de una sola pieza» y «que se pueda ordenar cualquier mueble de la casa; delante de la puerta y donde la escalera del camarote, libre siempre»). Solo Godot, con `Datos.CAL`.
 
@@ -9,7 +9,7 @@ Lo que pidió el usuario tras la 1.55 («no parece el personaje tumbado en la ca
 - **Ordenar cualquier mueble de la casa**: también la cama, el ordenador de la tía con su silla y la mesa de cruces (`si: "cal"`).
 - **Siempre libres**: la casilla de delante de la puerta del pasillo y la de la escalera del camarote y la de delante, aunque el camarote no esté hecho; ningún mueble ni carpa se puede dejar ahí.
 
-## 1.55.0 · Godot 0.45.0
+## 1.55.0 · Godot 0.46.0
 
 Lo que pidió el usuario («la puerta del sótano está inaccesible porque hay una carpa delante», «debería salir un tubo de extracción de cada carpa hacia una de las ventanas» y «poder ordenar las carpas al gusto»). Solo Godot, con `Datos.CAL`.
 
@@ -18,7 +18,7 @@ Lo que pidió el usuario («la puerta del sótano está inaccesible porque hay u
 - **El tubo de extracción**: con el extractor puesto, el tubo flexible de aluminio sale por arriba de la carpa, corre por lo alto de la pared (por encima de las puertas) y baja a una rejilla en la ventana más cercana que no tape la propia carpa; se mueve con la carpa.
 - Prueba nueva `tests/carpas_casa.gd`.
 
-## 1.54.1 · Godot 0.45.0
+## 1.54.1 · Godot 0.46.0
 
 Lo que pidió el usuario al ver la 1.54 («eso no son sprites en condiciones en el mismo estilo que los muebles del juego»). Solo Godot, con `Datos.CAL`.
 
@@ -30,7 +30,7 @@ Lo que pidió el usuario al ver la 1.54 («eso no son sprites en condiciones en 
   - fondos: la carpa, la mesa de madera, el salón de noche con el sofá, la calle de ladrillo y la cama de noche y de día.
 - Las cerraduras (llave, candado, teclado, PIN y rueda) siguen como en la 1.53.
 
-## 1.54.0 · Godot 0.45.0
+## 1.54.0 · Godot 0.46.0
 
 Lo que pidió el usuario tras la 1.53 («que todas las acciones del juego sean más realistas, acompañadas de algo gráfico»). Solo Godot, con `Datos.CAL`.
 
@@ -49,7 +49,7 @@ Lo que pidió el usuario tras la 1.53 («que todas las acciones del juego sean m
   - **dormir**: la ventana con la luna (o el sol en la siesta), la almohada y las zetas.
 - Las extracciones ya tenían su escena desde la 1.38. Tres sonidos nuevos: el agua, la tijera y el mechero. Dibujado en código, en píxeles (`gesto`, `GESTOS`, `_gesto_rects`, `_gesto_fumar` en `trama.gd`); `accion()` de `mundo.gd` lo lanza para regar, plantar, cosechar, cruzar y vender. Prueba `tests/acceso.gd`.
 
-## 1.53.0 · Godot 0.45.0
+## 1.53.0 · Godot 0.46.0
 
 Lo que pidió el usuario tras la 1.52.1 («que funcionen con una clave o simulando teclear una clave o meter una llave, como animación… que ese toque a la A sea más realista o acompañado de algo gráfico»). Solo Godot, con `Datos.CAL`.
 
@@ -61,7 +61,7 @@ Lo que pidió el usuario tras la 1.52.1 («que funcionen con una clave o simulan
   - la caja fuerte de la tía: las cuatro ruedas que giran y se paran en su cifra, el piloto y la manilla que gira (con una combinación mala, el piloto parpadea en rojo y la manilla no se mueve); la empotrada, con su teclado.
 - Dibujado en código, en píxeles (`rects_acceso`, `_teclado`, `_llave_h`, `_llave_v` y una letra de 3 × 5 para las cifras, `ACC_GLIFO`), y tres sonidos nuevos: la tecla, la llave y el «clac» (`sonido.gd`). Las cifras de cada teclado son siempre las mismas en cada partida (`cifras_acceso`). Prueba `tests/acceso.gd`.
 
-## 1.52.1 · Godot 0.45.0
+## 1.52.1 · Godot 0.46.0
 
 Lo que pidió el usuario tras probar la 1.52 («cómo va a estar el mueble de ordenar una sala en otra»). Solo Godot, con `Datos.CAL`.
 
