@@ -146,22 +146,74 @@ func _corre() -> void:
 	J.enter_map("town", 16, 17, "up")
 	J.mode = "world"
 	chk(J.asiento_de("bench") == "bench" and J.asiento_de("sofaF2") == "sofaF" and J.asiento_de("sillaG2") == "sillaG" and J.asiento_de("bancoT") == "", "los asientos")
+	# 1.49 (lo pidió el usuario: «que te puedas sentar de verdad»): sentarte es quedarte sentado; con A, lo de sentado
 	LOG = []
-	QUIERO = ["Sentarte", "Fumarte uno", "Levantarte"]
+	QUIERO = ["Sentarte"]
 	var dir0: String = J.P.dir
-	chk(corre(func(): J.interact()) and is_equal_approx(float(S.buds.ak47.g), 9.5) and J.SENT == null and J.P.dir == dir0 and float(S.heat) == 3.0
-		and LOG.any(func(t): return t.contains("llama la atención")), "el banco: fumado y de pie (%s g, calor %s, %s)" % [S.buds.ak47.g, S.heat, LOG])
+	chk(corre(func(): J.interact()) and J.SENT != null and J.SENT.k == "bench" and J.P.dir == "down", "el banco: sentado y se queda (%s)" % [J.SENT])
+	chk(J.is_free(), "sentado, el mundo sigue (libre)")
+	QUIERO = ["Fumarte uno"]
+	chk(corre(func(): await J.menu_sentado()) and is_equal_approx(float(S.buds.ak47.g), 9.5) and J.SENT != null and float(S.heat) == 3.0
+		and LOG.any(func(t): return t.contains("llama la atención")), "el banco: fumado y sigues sentado (%s g, calor %s, %s)" % [S.buds.ak47.g, S.heat, LOG])
+	LOG = []
+	QUIERO = ["Quedarte un rato"]
+	var m0: int = int(S.min)
+	chk(corre(func(): await J.menu_sentado()) and float(S.heat) == 2.0 and int(S.min) != m0 and J.SENT != null, "un rato en el banco: calor 2 (%s)" % S.heat)
+	QUIERO = ["Levantarte"]
+	chk(corre(func(): await J.menu_sentado()) and J.SENT == null and J.P.dir == dir0, "levantarte desde el menú")
+	QUIERO = ["Sentarte"]
+	corre(func(): J.interact())
+	J.dir_order = ["left"]
+	J.update_player(16.0)
+	J.dir_order = []
+	chk(J.SENT == null and J.P.dir == "left" and not J.P.moving, "una flecha te levanta, sin dar el paso")
+	J.P.dir = "up"
+	QUIERO = ["Sentarte"]
+	corre(func(): J.interact())
+	J.levantarte()
+	chk(J.SENT == null and J.P.dir == "up", "B te levanta")
 	# sin nada encima: no se lía
 	S.buds = {}
 	LOG = []
-	QUIERO = ["Sentarte", "Fumarte uno", "Levantarte"]
-	chk(corre(func(): J.interact()) and LOG.any(func(t): return t.contains("No llevas")) and J.SENT == null, "sin hierba: %s" % [LOG])
-	# en el bar no se fuma; la silla de la tía sigue llevando al ordenador
+	QUIERO = ["Sentarte"]
+	corre(func(): J.interact())
+	QUIERO = ["Fumarte uno"]
+	chk(corre(func(): await J.menu_sentado()) and LOG.any(func(t): return t.contains("No llevas")) and J.SENT != null, "sin hierba: %s" % [LOG])
+	J.enter_map("town", 16, 17, "up")
+	chk(J.SENT == null, "al cambiar de mapa, de pie")
+	# en el bar no se fuma, pero se pide algo sentado en el taburete
 	S.buds = {"ak47": {"g": 10.0, "thc": 18.0, "dia": S.day}}
 	J.enter_map("bar", 1, 5, "up")
 	LOG = []
-	QUIERO = ["Sentarte", "Fumarte uno", "Levantarte"]
-	chk(corre(func(): J.interact()) and float(S.buds.ak47.g) == 10.0 and LOG.any(func(t): return t.contains("no se puede fumar")), "el bar: %s" % [LOG])
+	QUIERO = ["Sentarte"]
+	corre(func(): J.interact())
+	QUIERO = ["Fumarte uno"]
+	chk(corre(func(): await J.menu_sentado()) and float(S.buds.ak47.g) == 10.0 and LOG.any(func(t): return t.contains("no se puede fumar")), "el bar: %s" % [LOG])
+	S.money = 10.0
+	MENUS = []
+	QUIERO = ["Pedir algo", "Una caña"]
+	chk(corre(func(): await J.menu_sentado()) and is_equal_approx(float(S.money), 7.5) and J.SENT != null, "una caña en el taburete: %s € %s" % [S.money, MENUS.slice(0, 2)])
+	J.levantarte()
+	# en el club, en el sofá: hablar con el socio de al lado
+	var sc := []
+	var mc: Dictionary = J.MAPS["club-ibar"]
+	J.enter_map("club-ibar", 1, 6, "up")
+	var so = null
+	for en in J.ents:
+		if en.id == "socio":
+			so = en
+	for y in mc.h:
+		for x in mc.w:
+			if so and J.asiento_de(mc.o[y][x]) != "" and absi(so.x - x) <= 1 and absi(so.y - y) <= 1 and sc.is_empty():
+				sc = [x, y]
+	chk(so != null and sc.size() == 2, "el club: un sofá junto al socio (%s)" % [sc])
+	if sc.size() == 2:
+		J.sentado(sc[0], sc[1], J.asiento_de(mc.o[sc[1]][sc[0]]))
+		MENUS = []
+		QUIERO = ["Nada"]
+		corre(func(): await J.menu_sentado())
+		chk(MENUS.size() >= 1 and MENUS[0].any(func(t): return t.begins_with("Hablar con")) and MENUS[0].has("Pedir algo"), "el sofá del club: hablar y pedir %s" % [MENUS.slice(0, 1)])
+		J.levantarte()
 	J.enter_map("home", 4, 4, "up")
 	MENUS = []
 	QUIERO = ["Usar el ordenador"]

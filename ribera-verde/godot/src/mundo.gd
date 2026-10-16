@@ -1329,6 +1329,7 @@ func ent_at(x: int, y: int):
 	return null
 
 func enter_map(name_: String, x: int, y: int, dir = null) -> void:
+	SENT = null   # 1.49: al cambiar de sitio, de pie
 	S.map = name_
 	if name_ == "home":
 		montar_casa()
@@ -1414,6 +1415,11 @@ func update_player(dt: float) -> void:
 	if d == null:
 		P.chain = false
 		P.hold = 0.0
+		return
+	if SENT != null:   # 1.49: una flecha te levanta, mirando hacia ella, sin dar el paso todavía
+		levantarte(d)
+		P.chain = false
+		P.hold = 150.0
 		return
 	if d != P.dir:
 		P.dir = d
@@ -1561,7 +1567,11 @@ func world_press(b: String) -> void:
 		return
 	if not is_free() or P.moving:
 		return
-	if b == "A":
+	if SENT != null and b == "A":   # 1.49: sentado, lo que puedes hacer sin levantarte
+		run(menu_sentado)
+	elif SENT != null and b == "B":
+		levantarte()
+	elif b == "A":
 		interact()
 	elif b == "START":
 		run(start_menu)
@@ -1594,16 +1604,7 @@ func interact() -> void:
 	if e == null and ty >= 0 and ty < m.h and tx >= 0 and tx < m.w and m.o[ty][tx] in COUNTERS:
 		e = ent_at(tx + dv[0], ty + dv[1])
 	if e:
-		run(func():
-			if not e.moving:
-				e.dir = OPP[P.dir]
-			if e.def.get("client"):
-				await talk_client(e.def.client)
-			else:
-				await npc_talk(e.def)
-				var r = rel_de(e.id)
-				if not e.get("pat") and r:
-					saludo(r))
+		run(func(): await hablar_con(e))
 		return
 	var it = item_at(tx, ty)
 	if it:
@@ -1612,7 +1613,7 @@ func interact() -> void:
 	run(func(): await object_action(tx, ty))
 
 # sentarse (1.47, solo con CAL): en los asientos, mirando al sur (se ven de frente) o al norte (de espaldas); sentado, fumarte
-# uno de lo que lleves (medio gramo) o levantarte; no se guarda
+# uno de lo que lleves (medio gramo), pedir algo, hablar con el de al lado, el móvil, quedarte un rato o levantarte; no se guarda
 const ASIENTOS := {"sofaF": "sur", "sofaV": "sur", "bench": "sur", "sofaB": "norte", "sofa": "norte", "sillon": "norte", "silla": "norte", "sillaG": "norte", "stool": "norte"}
 const ASIENTO_TXT := {"sofaF": "Un sofá del club.", "sofaB": "Un sofá del club.", "sofaV": "El sofá del reservado.", "bench": "Un banco.", "stool": "Un taburete.",
 	"sofa": "Tu sofá.", "sillon": "Tu sillón de lectura.", "silla": "La silla del ordenador de la tía.", "sillaG": "Tu silla gaming."}
@@ -1649,16 +1650,122 @@ func asiento(x: int, y: int) -> void:
 	await sentado(x, y, k)
 
 func sentado(x: int, y: int, k: String) -> void:
-	var dir0: String = P.dir
-	SENT = {"x": x, "y": y, "d": ASIENTOS[k]}
+	SENT = {"x": x, "y": y, "d": ASIENTOS[k], "k": k, "dir0": P.dir}
 	P.dir = "down" if SENT.d == "sur" else "up"
-	while true:
-		var j: int = await ask("Estás sentado.", ["Fumarte uno", "Levantarte"])
-		if j != 0:
-			break
-		await fumar_sentado()
+
+# 1.49 (lo pidió el usuario: «que te puedas sentar de verdad»): sentado es un estado, no un menú; el mundo sigue (la gente
+# anda, el reloj corre, el móvil y START funcionan) y te quedas hasta que te levantas: con B o con una flecha. Con A, lo que
+# se puede hacer sentado (menu_sentado)
+func levantarte(d = null) -> void:
+	if SENT == null:
+		return
+	P.dir = d if d != null else SENT.dir0
 	SENT = null
-	P.dir = dir0
+
+# bebidas en la barra o en la mesa, por sitio (1.49): [texto, euros, minutos]
+const BEBIDAS := {
+	"bar": [["Un café", 1.5, 10], ["Una caña", 2.5, 15], ["Un refresco", 2.2, 15], ["Un vino", 2.0, 15]],
+	"club": [["Un café", 1.2, 10], ["Un refresco", 1.8, 15], ["Un zumo", 2.0, 15], ["Una cerveza", 2.2, 15]],
+	"disco": [["Un refresco", 5.0, 15], ["Una cerveza", 6.0, 15], ["Una copa", 9.0, 20]],
+}
+
+func bebidas_aqui() -> String:
+	if S.map in ["bar", "loc-puerto"]:
+		return "bar"
+	if S.map.begins_with("club-"):
+		return "club"
+	if S.map in ["disco", "disco-vip", "disco-g"]:
+		return "disco"
+	return ""
+
+# quien está a tu lado: junto al asiento o junto a la casilla donde estás (ni la policía de patrulla)
+func al_lado() -> Array:
+	var r := []
+	if SENT == null:
+		return r
+	for e in ents:
+		if e.get("pat") or e.moving:
+			continue
+		var d1: int = absi(e.x - SENT.x) + absi(e.y - SENT.y)
+		var d2: int = absi(e.x - P.x) + absi(e.y - P.y)
+		if d1 <= 1 or d2 <= 1 or (absi(e.x - SENT.x) <= 1 and absi(e.y - SENT.y) <= 1):
+			r.append(e)
+	return r
+
+func hablar_con(e) -> void:
+	if not e.moving:
+		e.dir = OPP[P.dir]
+	if e.def.get("client"):
+		await talk_client(e.def.client)
+	else:
+		await npc_talk(e.def)
+		var r = rel_de(e.id)
+		if not e.get("pat") and r:
+			saludo(r)
+
+func menu_sentado() -> void:
+	if SENT == null:
+		return
+	var ops := []   # [texto, clave]
+	ops.append(["Fumarte uno", "fumar"])
+	var bb := bebidas_aqui()
+	if bb != "":
+		ops.append(["Pedir algo", "beber"])
+	for e in al_lado():
+		ops.append(["Hablar con " + nombre_ent(e), e])
+	ops.append(["Mirar el móvil", "movil"])
+	ops.append(["Quedarte un rato", "rato"])
+	ops.append(["Levantarte", "fuera"])
+	var j: int = await ask("Estás sentado.", ops.map(func(o): return o[0]))
+	if j < 0 or j >= ops.size():
+		return
+	var c = ops[j][1]
+	if not (c is String):
+		await hablar_con(c)
+		return
+	match c:
+		"fumar":
+			await fumar_sentado()
+		"beber":
+			await beber_sentado(bb)
+		"movil":
+			await movil_menu()
+		"rato":
+			await rato_sentado()
+		"fuera":
+			levantarte()
+
+func nombre_ent(e) -> String:   # dónde está respecto al asiento
+	var dx: int = e.x - SENT.x
+	var dy: int = e.y - SENT.y
+	if dx < 0:
+		return "quien tienes a la izquierda"
+	if dx > 0:
+		return "quien tienes a la derecha"
+	return "quien tienes delante" if (dy > 0) == (SENT.d == "sur") else "quien tienes detrás"
+
+func beber_sentado(bb: String) -> void:
+	var L: Array = BEBIDAS[bb]
+	var j: int = await ask("¿Qué te pones?", L.map(func(b): return "%s · %s" % [b[0], Datos.eur(b[1])]) + ["Nada"])
+	if j < 0 or j >= L.size():
+		return
+	var b: Array = L[j]
+	if float(S.money) < float(b[1]):
+		await say("No llevas suelto ni para eso.")
+		return
+	S.money = snappedf(float(S.money) - float(b[1]), 0.01)
+	advance_time(int(b[2]))
+	update_hud()
+	await say("%s. Te lo tomas sentado, sin prisa." % b[0])
+
+func rato_sentado() -> void:
+	advance_time(30)
+	var t := "Pasas media hora mirando a la gente."
+	if D.ZONAS.has(S.map) and float(S.heat) > 0 and not is_night():
+		S.heat = maxf(0, float(S.heat) - 1)   # sentado y quieto en un banco, pasas desapercibido
+		t += " Sentado en un banco no llamas la atención."
+	update_hud()
+	await say(t)
 
 # dónde echa el humo sentado (la boca, o encima de la cabeza si está de espaldas)
 func boca_sentado() -> Vector2:
