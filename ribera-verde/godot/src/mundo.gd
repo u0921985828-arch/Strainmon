@@ -1773,7 +1773,7 @@ func boca_sentado() -> Vector2:
 	if SENT == null:   # de pie
 		return Vector2(P.px + 8, P.py - 4)
 	var sur: bool = SENT.d == "sur"
-	return Vector2(SENT.x * 16 + 8 + (4 if sur else 0), SENT.y * 16 + 15 - (18 if sur else 22 + SENT_SUBE) + (SENT_CORTA_SUR if sur else SENT_CORTA))
+	return Vector2(SENT.x * 16 + 8 + (4 if sur else 0), SENT.y * 16 + 15 - (18 if sur else 22 + SENT_SUBE) + (SENT_CORTA_SUR if sur else SENT_CORTA) - (4 if SENT.get("k") == "stool" else 0))   # en el taburete, 4 más arriba
 
 # 1.47 (lo pidió el usuario): con qué se fuma. El papel, el tabaco, las boquillas y el mechero, del estanco (ESTANCO); la pipa,
 # el bong, el vaporizador y el grinder, del grow (PARAFERNALIA). g: cogollos por vez (el porro, con tabaco, gt); gr: extracto

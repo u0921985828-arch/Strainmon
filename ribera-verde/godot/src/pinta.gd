@@ -259,7 +259,7 @@ func _mundo() -> void:
 	for e in J.ents:
 		list.append([e.py, _pj.bind(e, e.look, false, float(e.get("dur", 320.0)))])
 	if J.SENT != null:   # 1.47: sentado, delante del asiento si se ve de frente y detrás si se ve de espaldas
-		list.append([J.SENT.y * 16 + (1 if J.SENT.d == "sur" else -1), _pj_sentado])
+		list.append([J.SENT.y * 16 + (1 if J.SENT.d == "sur" or J.SENT.get("k") == "stool" else -1), _pj_sentado])
 	else:
 		list.append([P.py, _pj.bind(P, J.D.LOOKS.player, true, P.dur)])
 	var bolsa = Atlas.foto_misc("bolsa")
@@ -1024,6 +1024,11 @@ var _sent_img := {}
 # 1.50: de frente, sentado: los muslos encima del asiento (vistos desde arriba), las rodillas, las espinillas colgando
 # delante del canto (entre ellas se ve el banco) y las zapatillas en el suelo; de x 9 a 22 del fotograma, bajo el torso
 const SENT_PIERNAS := ["anooonaanooona", "anonnnaannnona", ".annna..annna.", ".annna..annna.", ".ahhha..ahhha.", "..aaa....aaa.."]
+# 1.50: de espaldas en el taburete de la barra (asiento a 72 cm, 11 px): el culo encima del asiento y, a los lados del pie,
+# las espinillas colgando hasta el reposapiés con las zapatillas; delante del taburete. TABURETE_SUBE: lo que sube del suelo
+# la fila de los pies del fotograma; las zapatillas, en el reposapiés, y el culo, 6 filas más arriba, en el asiento
+const SENT_TABURETE := [".akka....akka.", ".akka....akka.", ".akla....alka.", ".akka....akka.", ".akka....akka.", ".ahha....ahha.", ".aaaa....aaaa."]
+const TABURETE_SUBE := 5
 func _pj_sentado() -> void:
 	var gr = Atlas.grupo_look(J.D.LOOKS.player)
 	if not gr:
@@ -1033,7 +1038,9 @@ func _pj_sentado() -> void:
 		return
 	f = J.ropa_c(f, gr)
 	var c: Image = f.c
-	var im: Image = _sent_img.get(c)
+	var tab: bool = J.SENT.d == "norte" and J.SENT.get("k") == "stool"
+	var clave := "%d|%s" % [c.get_instance_id(), tab]
+	var im: Image = _sent_img.get(clave)
 	if im == null:
 		var n: int = J.SENT_CORTA
 		var y0: int = int(f.cel.ancla[1])   # la fila de los pies: se quitan las n de encima
@@ -1049,12 +1056,22 @@ func _pj_sentado() -> void:
 				for x in r.length():
 					if r[x] != ".":
 						im.set_pixel(9 + x, y0 - SENT_PIERNAS.size() + 1 + i, col[r[x]])
+		elif tab:
+			# de espaldas: el torso con el culo en la fila del asiento y las piernas de SENT_TABURETE debajo (el pie del
+			# taburete, entre ellas), todo TABURETE_SUBE más arriba (en yp)
+			var col := {"a": c.get_pixel(9, y0 - 5), "k": c.get_pixel(12, y0 - 5), "l": c.get_pixel(13, y0 - 5), "h": c.get_pixel(12, y0 - 1)}
+			im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - 5), Vector2i(0, 0))
+			for i in SENT_TABURETE.size():
+				var r: String = SENT_TABURETE[i]
+				for x in r.length():
+					if r[x] != ".":
+						im.set_pixel(9 + x, y0 - 5 + i, col[r[x]])
 		else:
 			im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - n), Vector2i(0, n))
 			im.blit_rect(c, Rect2i(0, y0, c.get_width(), c.get_height() - y0), Vector2i(0, y0))
-		_sent_img[c] = im
+		_sent_img[clave] = im
 	var xp: int = J.SENT.x * 16 - Datos.jsround(cam.x) + 8
-	var yp: int = J.SENT.y * 16 - Datos.jsround(cam.y) + 15 - (J.SENT_SUBE if J.SENT.d == "norte" else 0)
+	var yp: int = J.SENT.y * 16 - Datos.jsround(cam.y) + 15 - (TABURETE_SUBE if tab else (J.SENT_SUBE if J.SENT.d == "norte" else 0))
 	_img(im, Datos.jsround(xp - f.cel.ancla[0]), Datos.jsround(yp - f.cel.ancla[1]))
 
 # en coche con techo (1.43.1): el protagonista, solo donde hay cabina (lo que pinta <v>-atras), para que la visera no se salga

@@ -227,13 +227,13 @@ func _corre() -> void:
 	J.oraculo = false
 	if dir != "":
 		J.set_process(false)
-		for q in [["town", 16, 16, 17, "sur"], ["club-ibar", -1, -1, -1, "sur"], ["club-ibar", -2, -1, -1, "norte"], ["home", 4, 3, 4, "norte"]]:
+		for q in [["town", 16, 16, 17, "sur"], ["club-ibar", -1, -1, -1, "sur"], ["club-ibar", -2, -1, -1, "norte"], ["home", 4, 3, 4, "norte"], ["bar", -3, -1, -1, "norte"]]:
 			var mk: String = q[0]
 			var mm: Dictionary = J.MAPS[mk]
 			var sx: int = q[1]
 			var sy: int = q[2]
-			if sx < 0:   # el primer sofá de frente (-1) o de espaldas (-2) del club
-				var want := "sofaF" if sx == -1 else "sofaB"
+			if sx < 0:   # el primer sofá de frente (-1) o de espaldas (-2) del club, o el primer taburete (-3)
+				var want := "sofaF" if sx == -1 else ("sofaB" if sx == -2 else "stool")
 				for y in mm.h:
 					for x in mm.w:
 						if sx < 0 and mm.o[y][x] == want:
@@ -241,7 +241,7 @@ func _corre() -> void:
 							sy = y
 			J.enter_map(mk, sx, sy + 1, "up")
 			J.mode = "world"
-			J.SENT = {"x": sx, "y": sy, "d": q[4]}
+			J.SENT = {"x": sx, "y": sy, "d": q[4], "k": J.asiento_de(mm.o[sy][sx])}
 			J.vfx = []
 			J.P.dir = "down" if q[4] == "sur" else "up"
 			await foto(dir, "sentado-%s-%s" % [mk, q[4]])
