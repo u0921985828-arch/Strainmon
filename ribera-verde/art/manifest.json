@@ -742,6 +742,36 @@
    ],
    "ajuste": "exacto",
    "nota": "1.51: los iconos de las aplicaciones del móvil (movil.py)"
+  },
+  "barco_6": {
+   "w": 112,
+   "h": 64,
+   "ancla": [
+    8,
+    63
+   ],
+   "ajuste": "exacto",
+   "nota": "1.51: la txalupa de 6 m amarrada de costado a 16 px/m (puerto.py): 7 casillas, la flotación en la fila de abajo y la base en el centro de la de la izquierda; las demás (k + \"2\") no se pintan"
+  },
+  "barco_10": {
+   "w": 176,
+   "h": 64,
+   "ancla": [
+    8,
+    63
+   ],
+   "ajuste": "exacto",
+   "nota": "1.51: el pesquero de bajura de 10 m (puerto.py): 11 casillas"
+  },
+  "barco_14": {
+   "w": 240,
+   "h": 80,
+   "ancla": [
+    8,
+    79
+   ],
+   "ajuste": "exacto",
+   "nota": "1.51: el atunero de 14 m (puerto.py): 15 casillas"
   }
  },
  "fases": [
@@ -10110,6 +10140,98 @@
     "perchero": "exacto"
    },
    "descripcion": "1.51: la puerta de madera del piso, la puerta metálica de los locales y la percha de pared del pasillo."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/puerto.py",
+   "notas": "1.51, pedido por el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para hacer envíos… invertir en un barco, empezando por uno pequeño».",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "puerto-barcoT",
+   "celda": "barco_6",
+   "estilo_ref": "los coches del taller (negocios-coche)",
+   "cubre": [
+    "obj:barcoT"
+   ],
+   "ajuste_por_sprite": {
+    "barcoT": "exacto"
+   },
+   "descripcion": "1.51: la txalupa de 6 m de la tía Maite, de costado."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/puerto.py",
+   "notas": "1.51, pedido por el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para hacer envíos… invertir en un barco, empezando por uno pequeño».",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "puerto-barcoP",
+   "celda": "barco_10",
+   "estilo_ref": "los coches del taller (negocios-coche)",
+   "cubre": [
+    "obj:barcoP"
+   ],
+   "ajuste_por_sprite": {
+    "barcoP": "exacto"
+   },
+   "descripcion": "1.51: el pesquero de bajura de 10 m."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/puerto.py",
+   "notas": "1.51, pedido por el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para hacer envíos… invertir en un barco, empezando por uno pequeño».",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "puerto-barcoA",
+   "celda": "barco_14",
+   "estilo_ref": "los coches del taller (negocios-coche)",
+   "cubre": [
+    "obj:barcoA"
+   ],
+   "ajuste_por_sprite": {
+    "barcoA": "exacto"
+   },
+   "descripcion": "1.51: el atunero de 14 m."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/puerto.py",
+   "notas": "1.51, pedido por el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para hacer envíos… invertir en un barco, empezando por uno pequeño».",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "puerto-alto",
+   "celda": "objeto_alto",
+   "estilo_ref": "los coches del taller (negocios-coche)",
+   "cubre": [
+    "obj:noray",
+    "obj:redes",
+    "obj:nasas"
+   ],
+   "ajuste_por_sprite": {
+    "noray": "exacto",
+    "redes": "exacto",
+    "nasas": "exacto"
+   },
+   "descripcion": "1.51: el noray del amarre, las redes y las nasas del muelle."
   }
  ],
  "familias": {

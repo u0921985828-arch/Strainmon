@@ -245,7 +245,7 @@ func _corre() -> void:
 	for x in J.ents:
 		if x.id == "setero":
 			st = x
-	chk(st != null and corre(func(): await J.npc_talk(st.def)), "hablar con Unai")
+	chk(st != null and corre(func(): await J.npc_talk(st.def)), "hablar con Ekaitz")
 	# 5 · el taller: el cuartucho, detrás de su puerta
 	if not S.loc.has("valde"):
 		S.loc["valde"] = {}

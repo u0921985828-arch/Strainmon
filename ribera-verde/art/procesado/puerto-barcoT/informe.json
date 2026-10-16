@@ -1,0 +1,19 @@
+{
+  "grupo": "puerto-barcoT",
+  "celda": [
+    112,
+    64
+  ],
+  "tope_colores": 32,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 26.5,
+  "distancia_media": 0,
+  "colores_finales": 21,
+  "fundidos": [],
+  "huerfanos_quitados": 2,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

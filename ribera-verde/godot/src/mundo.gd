@@ -967,6 +967,52 @@ func montar_puertas(mapa: String) -> void:
 			if m.o[2][x] in ["escritorio", "escritorio2"]:
 				m.o[2][x] = null
 
+# 1.51 (lo pidió el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para los envíos»): desde el capítulo de MAR.ch, el paso
+# del final de la plaza de Puerto Viejo (a la derecha) al muelle; en el muelle, la puerta del piso franco y los barcos que tengas,
+# amarrados delante de su noray
+var _muelle0 := {}
+func montar_muelle(mapa: String) -> void:
+	if not Datos.CAL or not D.has("MAR") or S == null:
+		return
+	var R: Dictionary = D.MAR
+	if mapa == "puerto" and int(S.ch) >= int(R.ch):
+		var m: Dictionary = MAPS.puerto
+		var px: int = int(R.puerto.x)
+		var py: int = int(R.puerto.y)
+		for x in [px - 1, px]:   # el paso, con su hueco en el monte (las copas de abajo lo tapaban)
+			for y in range(py - 1, py + 4):
+				m.o[y][x] = null
+				m.g[y][x] = "plaza" if y == py else "grass"
+		if m.o[py + 3][px - 2] == "tree":   # y el árbol de la esquina, que tapaba el paso con su copa
+			m.o[py + 3][px - 2] = null
+		m.exits["%d,%d" % [px, py]] = {"to": "muelle", "x": int(R.puerto.a[0]), "y": int(R.puerto.a[1]), "dir": "right", "lado": "right"}
+	if mapa != "muelle":
+		return
+	var mu: Dictionary = MAPS.muelle
+	if not _muelle0.has("o"):
+		_muelle0 = {"o": mu.o.duplicate(true), "g": mu.g.duplicate(true)}
+	for y in int(mu.h):
+		mu.o[y] = _muelle0.o[y].duplicate()
+		mu.g[y] = _muelle0.g[y].duplicate()
+	var F: Dictionary = R.franco
+	for b in mu.blds:
+		if int(b.x0) == int(F.x) - 1 and int(b.y0) + int(b.h) - 1 == int(F.dy):
+			b.doorX = int(F.x)
+			b.puerta = F.puerta
+			b.ancha = 1
+			b.dx = int(F.dx)
+	mu.doors.clear()
+	for j in 2:
+		mu.g[int(F.dy)][int(F.x) + j] = F.tile
+		mu.doors["%d,%d" % [int(F.x) + j, int(F.dy)]] = {"to": "franco", "x": int(F.mat[j]), "y": int(MAPS.franco.h) - 2, "dir": "up", "gate": "franco"}
+	var mar = S.get("mar")
+	for B in R.barcos:
+		if mar is Dictionary and B.k in mar.get("b", []):
+			mu.o[int(B.y)][int(B.x)] = B.o
+			for j in range(1, int(B.L)):
+				if int(B.x) + j < int(mu.w):
+					mu.o[int(B.y)][int(B.x) + j] = B.o + "2"
+
 func cruzar_puerta(e: Dictionary) -> void:
 	sfx("door")
 	await fade(1)
@@ -1156,6 +1202,12 @@ func npc_talk(d: Dictionary) -> void:
 	if d.id == "setero":   # 1.51
 		await talk_setero()
 		return
+	if d.id == "koldo":   # 1.51: el muelle
+		await talk_koldo()
+		return
+	if d.id == "gorka":
+		await talk_gorka()
+		return
 	if d.id.begins_with("neg_"):   # 1.45
 		await talk_neg(d.id.substr(4))
 		return
@@ -1286,6 +1338,12 @@ func build_ents() -> void:
 	if Datos.CAL and S.map == "setas" and S.get("setas") is Dictionary and S.setas.get("ay") and int(MAPS.setas.w) > 10:   # 1.51: el ayudante del bajo
 		var A: Dictionary = D.SETAS_AY
 		ents.append(old["setero"] if old.has("setero") else mk_ent({"id": "setero", "map": "setas", "x": int(A.x), "y": int(A.y), "look": A.look, "dir": "down", "wander": 0}))
+	if Datos.CAL and D.has("MAR") and S.map == "muelle":   # 1.51: Koldo en el muelle y Gorka en el piso franco
+		var K: Dictionary = D.MAR.koldo
+		ents.append(old["koldo"] if old.has("koldo") else mk_ent({"id": "koldo", "map": "muelle", "x": int(K.x), "y": int(K.y), "look": K.look, "dir": "down", "wander": 0}))
+	if Datos.CAL and D.has("MAR") and S.map == "franco" and S.get("franco") is Dictionary:
+		var Gk: Dictionary = D.MAR.gorka
+		ents.append(old["gorka"] if old.has("gorka") else mk_ent({"id": "gorka", "map": "franco", "x": int(Gk.x), "y": int(Gk.y), "look": Gk.look, "dir": "down", "wander": 0}))
 	for c in S.clients:
 		if c.get("map", "town") == S.map:
 			ents.append(old[c.id] if old.has(c.id) else mk_ent({"id": c.id, "x": c.x, "y": c.y, "wander": 2, "lookObj": c.look, "client": c}))
@@ -1468,6 +1526,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	montar_atrezo(name_)
 	if name_ != "home" and name_ != "nave":
 		montar_puertas(name_)
+	montar_muelle(name_)
 	P.x = x
 	P.y = y
 	P.px = x * 16.0
@@ -1548,7 +1607,7 @@ func try_move(d: String) -> void:
 	var m: Dictionary = MAPS[S.map]
 	var dv: Array = DV[d]
 	var ex = m.exits.get("%d,%d" % [P.x, P.y])
-	if d == "down" and ex:
+	if ex and d == ex.get("lado", "down"):   # 1.51: las salidas de lado (al muelle), con su flecha
 		P.chain = false
 		run(func(): await warp(ex))
 		return
@@ -2713,6 +2772,12 @@ func talk_txaro():
 	pass
 func talk_sec(_id: String) -> void:   # 1.51 (trama.gd)
 	pass
+func talk_koldo() -> void:   # 1.51 (trama.gd)
+	pass
+
+func talk_gorka() -> void:   # 1.51 (trama.gd)
+	pass
+
 func talk_setero() -> void:   # 1.51 (trama.gd)
 	pass
 func sec_estado(_id: String) -> int:

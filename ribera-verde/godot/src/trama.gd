@@ -1501,6 +1501,9 @@ func check_story():
 	if Datos.CAL and S.ch >= int(D.SETAS.ch) and S.get("setas") == null and not S.flags.get("setasSms"):
 		S.flags.setasSms = S.day
 		await talk("SMS · JULEN", D.SETAS_SITIO.sms)
+	if Datos.CAL and D.has("MAR") and S.ch >= int(D.MAR.ch) and S.get("mar") == null and not S.flags.get("koldoSms"):   # 1.51: el muelle
+		S.flags.koldoSms = S.day
+		await talk("SMS · KOLDO", ["Soy Koldo, del muelle de Puerto Viejo. Fui amigo de tu tía Maite: tengo una cosa suya para ti.", "Al final de la plaza del puerto, a la derecha, el muelle de la cofradía. Estoy en la acera, delante de los barcos."])
 
 func penalty_event():
 	await say("TOÑO te estaba esperando.")
@@ -3161,6 +3164,8 @@ func curro_dia() -> void:
 		queue("historia", check_story)
 	plantilla_dia()   # la plantilla (1.19)
 	aso_dia()   # la asociación (1.32)
+	mar_dia()   # 1.51: los envíos por mar y el piso franco
+	franco_dia()
 
 # regar, tratar las plagas con tu insecticida y rellenar garrafas y depósitos (Begoña y el gerente de la plantilla)
 func cuidar_plantas() -> void:
@@ -4381,6 +4386,11 @@ func entra_local(d: Dictionary):
 			atras_puerta()
 			await say("La persiana está echada con un candado. La llave la tiene Arrieta, el dueño.")
 			return
+	elif t == "franco":   # 1.51: el piso franco de Gorka, desde el primer envío
+		if not mar_ok() or int(S.mar.paso) < 1:
+			atras_puerta()
+			await say("Un portal con el timbre sin nombre. No abre nadie.")
+			return
 	elif t == "sot":   # 1.51: la escalera del sótano
 		if not sot_ya():
 			P.x = int(P.fx)
@@ -4428,6 +4438,15 @@ func obj_local(x: int, y: int, o) -> bool:
 	if o == null:
 		return false
 	var txt := ""
+	if Datos.CAL and S.map == "muelle" and o == "noray":   # 1.51
+		await mar_noray(x)
+		return true
+	if Datos.CAL and S.map == "franco" and o == "crate":
+		await alijo_franco()
+		return true
+	if Datos.CAL and S.map == "muelle" and o in ["redes", "nasas"]:
+		await say("Redes de la cofradía, remendadas mil veces." if o == "redes" else "Nasas para el bogavante, apiladas a secar.")
+		return true
 	if Datos.CAL and o in ["escaleraD", "escaleraD2"]:   # 1.47: la escalera al reservado de GAUA
 		if not disco_abierta():
 			await echar_disco()
@@ -6257,7 +6276,7 @@ func _setas_bandejas(L: Dictionary, quien: String) -> void:
 			t = t.replace("Tíralas.", "Las del sótano: tíralas.").replace("Tírala.", "La del sótano: tírala.")
 		queue("setas", func(): await talk(quien, [t]))
 
-# 1.51 (lo pidió el usuario: «que se cultive como la nave»): Unai, el ayudante del bajo grande, cada mañana: todo húmedo y lo listo, a secar
+# 1.51 (lo pidió el usuario: «que se cultive como la nave»): Ekaitz, el ayudante del bajo grande, cada mañana: todo húmedo y lo listo, a secar
 func ayudante_setas(L: Dictionary) -> void:
 	var Z: Dictionary = D.SETAS
 	var g := 0
@@ -8171,3 +8190,388 @@ func control_trafico(k: String) -> void:
 	S.heat = mini(100, int(S.heat) + 10)
 	update_hud()
 	await say("«¿Y este olor?» Te registran %s: te requisan %s y te multan con %s." % [V.art, r[0], Datos.eur(r[1])], "AGENTE")
+
+# ---------- 1.51: el muelle de Puerto Viejo, los envíos por mar y el piso franco ----------
+# (lo pidió el usuario: «distribución a gran escala por un piso franco o una persona… un mini puerto para hacer envíos, invertir en un
+# barco, empezando por uno pequeño… algo adictivo cuando ya lo tienes todo, continuando la trama»). Desde el capítulo MAR.ch: Koldo, el
+# amigo de la tía Maite, te da su txalupa; los envíos zarpan del noray de cada barco hacia las rutas que abre la reputación; el
+# primero que llega abre el piso franco de Gorka, que reparte por tierra lo que le dejes; cada semana, un pedido con prima, y al
+# final, el último trabajo de Koldo. Lo de cada día, en mar_dia y franco_dia (desde curro_dia).
+
+func mar_ok() -> bool:
+	return Datos.CAL and D.has("MAR") and S.get("mar") is Dictionary
+
+# «la txalupa…» → «La txalupa…» (capitalize() pone en mayúscula cada palabra)
+static func may1(t: String) -> String:
+	return t.left(1).to_upper() + t.substr(1)
+
+func barco_k(k: String) -> Dictionary:
+	for B in D.MAR.barcos:
+		if B.k == k:
+			return B
+	return {}
+
+func rutas_mar() -> Array:
+	var o := []
+	for i in D.MAR.rutas.size():
+		if float(S.mar.rep) >= float(D.MAR.rutas[i].rep):
+			o.append(i)
+	return o
+
+func rango_mar() -> String:
+	var r: String = D.MAR.rangos[0][1]
+	for x in D.MAR.rangos:
+		if float(S.mar.kg) >= float(x[0]):
+			r = x[1]
+	return r
+
+func en_mar(k: String):
+	for e in S.mar.env:
+		if e.b == k:
+			return e
+	return null
+
+func cap_mar() -> int:
+	var c := 0
+	for k in S.mar.b:
+		c = maxi(c, int(barco_k(k).kg))
+	return c
+
+func _ped_txt(p: Dictionary) -> String:
+	return "%s a %s, de %d %% de THC o más, antes del %s" % [_kg(int(p.g)), D.MAR.rutas[int(p.r)].n, int(p.thc), Datos.fd(int(p.d), S.day)]
+
+func talk_koldo() -> void:
+	var R: Dictionary = D.MAR
+	var N := "KOLDO"
+	if S.get("mar") == null:
+		await talk(N, ["Tú eres el sobrino de Maite. Tienes su cara cuando se reía de los guardias.",
+			"En los ochenta, tu tía y yo traíamos semillas de fuera en mi txalupa. Las primeras landraces de la comarca llegaron por este muelle.",
+			"La txalupa sigue ahí, en el primer noray. Se llama Maite: se la puse yo. Ahora es tuya.",
+			"Cargas en el noray, eliges la ruta y zarpas. A la vuelta, te pagan por transferencia de una conservera, %s: limpio." % R.empresa,
+			"Pequeño al principio: %s como mucho. Y no menos de %s por viaje, que el gasoil no es gratis." % [_kg(int(barco_k("txalupa").kg) * 1000), _kg(int(R.min))]])
+		S.mar = {"b": ["txalupa"], "rep": 0, "kg": 0.0, "env": [], "ped": null, "pd": 0, "paso": 0, "fin": 0, "n": 0}
+		confia("koldo", 10)
+		montar_muelle(S.map)
+		build_ents()
+		sfx("get")
+		return
+	var i := 0
+	while true:
+		var M_: Dictionary = S.mar
+		var ops := ["Los envíos en el mar", "El pedido de la semana", "Las rutas", "Comprar un barco"]
+		var gran: bool = not M_.get("fin") and float(M_.rep) >= float(R.gran.rep) and ("pesquero" in M_.b or "atunero" in M_.b)
+		if gran:
+			ops.append("El último trabajo")
+		ops.append("Nada")
+		i = await ask("%s · %s exportados · reputación %d." % [rango_mar(), _kg(int(float(M_.kg) * 1000)), int(M_.rep)], ops, N)
+		var l: String = ops[i] if i >= 0 else "Nada"
+		if l == "Nada":
+			await say("Ondo ibili. Que el mar te sea leve.", N)
+			return
+		if l == "Los envíos en el mar":
+			if M_.env.is_empty():
+				await say("Ahora mismo no tienes nada en el mar. Se carga en el noray de cada barco.", N)
+			else:
+				var L := []
+				for e in M_.env:
+					L.append("%s, a %s con %s: llega el %s." % [may1(barco_k(e.b).n), R.rutas[int(e.r)].n, _kg(int(e.g)), Datos.fd(int(e.d), S.day)])
+				await talk(N, L)
+		elif l == "El pedido de la semana":
+			if M_.ped is Dictionary:
+				await say("Esta semana piden %s. Si lo cumples, pagan un %d %% más." % [_ped_txt(M_.ped), Datos.jsround((float(R.ped.bonus) - 1) * 100)], N)
+			elif int(M_.paso) < 1:
+				await say("Primero, un viaje que salga bien. Luego te presento a la gente de fuera.", N)
+			else:
+				await say("Esta semana no hay pedido. Los lunes suelen llamar.", N)
+		elif l == "Las rutas":
+			var L := []
+			for j in R.rutas.size():
+				var rt: Dictionary = R.rutas[j]
+				L.append(("%s: %d %s más de viaje, pagan ×%s." % [rt.n, int(rt.d), "día" if int(rt.d) == 1 else "días", Datos.coma(float(rt.px))]) if float(M_.rep) >= float(rt.rep) else ("%s: con reputación %d." % [rt.n, int(rt.rep)]))
+			await talk(N, L)
+		elif l == "Comprar un barco":
+			await comprar_barco(N)
+		elif l == "El último trabajo":
+			await say("Un armador de %s quiere %s en un solo viaje, y lo paga como nadie. Es el trabajo que tu tía y yo nunca nos atrevimos a hacer. Si sale, el muelle es tuyo." % [R.rutas[int(R.gran.ruta)].n, _kg(int(R.gran.kg) * 1000)], N)
+			M_.gr = 1
+
+func comprar_barco(N: String) -> void:
+	var ops := []
+	var bs := []
+	for B in D.MAR.barcos:
+		if not B.k in S.mar.b:
+			ops.append("%s · %s" % [may1(B.n), Datos.eur(B.p)])
+			bs.append(B)
+	if bs.is_empty():
+		await say("Ya tienes la flota entera. Ni la cofradía tiene tantos.", N)
+		return
+	ops.append("Nada")
+	var j: int = await ask("Barcos de segunda mano de la cofradía. Se pagan por transferencia.", ops, N)
+	if j < 0 or j >= bs.size():
+		return
+	var B: Dictionary = bs[j]
+	if not await confirm("%s: %s, carga hasta %s, %d días de viaje. ¿Lo compras?" % [may1(B.n), Datos.eur(B.p), _kg(int(B.kg) * 1000), int(B.dias)]):
+		return
+	if not cobro_banco(float(B.p), "Compra · " + B.n):
+		await say("En la cuenta no llega. Con el banco no se discute.", N)
+		return
+	S.mar.b.append(B.k)
+	montar_muelle("muelle")
+	sfx("get")
+	await say("Hecho. Lo amarro en su noray esta misma tarde.", N)
+
+func confirm(t: String) -> bool:
+	return await ask(t, ["Sí", "No"]) == 0
+
+# A en el noray: el barco de ese amarre
+func mar_noray(x: int) -> void:
+	var B := {}
+	for b in D.MAR.barcos:
+		if int(b.nor) == x:
+			B = b
+	if B.is_empty():
+		await say("Un noray de hierro, gastado por los cabos.")
+		return
+	if S.get("mar") == null:
+		await say("Un noray de la cofradía. Koldo, el viejo de la acera, sabe de quién es cada amarre.")
+		return
+	if not B.k in S.mar.b:
+		await say("Amarre libre. Aquí cabe %s: Koldo lo vende por %s." % [B.n, Datos.eur(B.p)])
+		return
+	var e = en_mar(B.k)
+	if e != null:
+		await say("%s está en el mar, camino de %s. Vuelve el %s." % [may1(B.n), D.MAR.rutas[int(e.r)].n, Datos.fd(int(e.d), S.day)])
+		return
+	await cargar_envio(B)
+
+func cargar_envio(B: Dictionary) -> void:
+	var R: Dictionary = D.MAR
+	var rs := rutas_mar()
+	var ops := []
+	for j in rs:
+		var rt: Dictionary = R.rutas[j]
+		ops.append({"label": rt.n, "right": "×" + Datos.coma(float(rt.px)), "desc": "%d días de viaje con %s." % [int(B.dias) + int(rt.d), B.n]})
+	ops.append({"label": "Nada"})
+	var ir: int = await menu(ops, {"cls": "right", "title": "¿A dónde?", "desc": true})
+	if ir < 0 or ir >= rs.size():
+		return
+	var ri_: int = rs[ir]
+	var carga := []   # [k, g, thc, calidad]
+	var tot := 0
+	var cap: int = int(B.kg) * 1000
+	while true:
+		var lots := bud_lots(1)
+		lots = lots.filter(func(l): return carga.all(func(c): return c[0] != l[0]))
+		var it := lots.map(venta_item)
+		if tot >= int(R.min):
+			it.append({"label": "Zarpar (%s)" % _kg(tot)})
+		it.append({"label": "Nada"})
+		var i: int = await menu(it, {"cls": "right", "title": "La carga · %s de %s" % [_kg(tot), _kg(cap)]})
+		if i >= 0 and i < lots.size():
+			var l: Array = lots[i]
+			var g = await cuanto("¿Cuánto de %s?" % lot_nombre(l[0]), mini(int(floor(l[1].g)), cap - tot), [250, 500, 1000, 2000, 5000, 10000, 20000], func(v): return _kg(int(v)))
+			if g > 0:
+				carga.append([l[0], int(g), float(l[1].thc), calidad(l[1])])
+				tot += int(g)
+			if tot >= cap:
+				await say("La bodega va llena.")
+			continue
+		if i == lots.size() and tot >= int(R.min):
+			break
+		return
+	if tot < int(R.min):
+		return
+	var rt: Dictionary = R.rutas[ri_]
+	var P_ = S.mar.ped
+	var ped: bool = P_ is Dictionary and int(P_.r) == ri_ and tot >= int(P_.g) and S.day <= int(P_.d) and carga.all(func(c): return c[2] >= float(P_.thc))
+	var gr: bool = S.mar.get("gr") and not S.mar.get("fin") and ri_ == int(R.gran.ruta) and tot >= int(R.gran.kg) * 1000
+	var e := 0.0
+	for c in carga:
+		e += precio_mayor(c[2]) * c[3] * float(rt.px) * c[1]
+		use_buds(c[0], c[1])
+	if ped:
+		e *= float(R.ped.bonus)
+		S.mar.ped = null
+	var mal: bool = Cultivo.azar() < float(B.r) + float(rt.r) + float(S.heat) / 1000.0 and not gr
+	S.mar.env.append({"b": B.k, "r": ri_, "g": tot, "e": Datos.jsround(e), "d": S.day + int(B.dias) + int(rt.d), "mal": mal, "ped": ped, "gr": gr})
+	sfx("get")
+	update_hud()
+	await say("Sueltas amarras. %s sale hacia %s con %s: llega el %s." % [may1(B.n), rt.n, _kg(tot), Datos.fd(S.day + int(B.dias) + int(rt.d), S.day)] + (" Es el pedido de la semana." if ped else "") + (" El último trabajo de Koldo." if gr else ""))
+
+func mar_dia() -> void:
+	if not mar_ok():
+		return
+	var R: Dictionary = D.MAR
+	var M_: Dictionary = S.mar
+	var quedan := []
+	for e in M_.env:
+		if S.day < int(e.d):
+			quedan.append(e)
+			continue
+		var B := barco_k(e.b)
+		var dest: String = R.rutas[int(e.r)].n
+		if e.mal:
+			S.heat = mini(100, int(S.heat) + int(R.calor))
+			queue("mar" + e.b, func(): await talk("SMS · KOLDO", ["Malas noticias: la patrullera paró a %s antes de %s. Se han quedado la carga; el barco lo saco yo con la cofradía. Tranquilo unos días." % [B.n, dest]]))
+			continue
+		abono_banco(float(e.e), "Transferencia · " + R.empresa)
+		S.sales += int(e.e)
+		M_.kg = float(M_.kg) + float(e.g) / 1000.0
+		M_.rep = float(M_.rep) + float(e.g) / 1000.0 + (float(R.ped.rep) if e.ped else 0.0)
+		M_.n = int(M_.n) + 1
+		var lin := ["%s ha llegado a %s. %s ha transferido %s." % [may1(B.n), dest, R.empresa, Datos.eur(e.e)] + (" Con la prima del pedido." if e.ped else "")]
+		if int(M_.paso) < 1:
+			M_.paso = 1
+			M_.pd = S.day
+			lin.append("Ya tienes nombre fuera. Mi sobrino Gorka mueve cantidad por tierra: tiene un piso franco en el muelle, la puerta de la casa amarilla. Pásate.")
+		if e.get("gr"):
+			M_.fin = S.day
+			abono_banco(float(R.gran.premio), "Prima · " + R.empresa)
+			lin.append("Lo has hecho. Treinta años soñándolo y lo has hecho tú. Me retiro: el muelle es tuyo, y la cofradía ya lo sabe.")
+			lin.append("Maite estaría orgullosa. Y un poco celosa.")
+		queue("mar" + e.b, func(): await talk("SMS · KOLDO", lin))
+	M_.env = quedan
+	# el pedido de la semana: desde el primer viaje, cada 7 días
+	if int(M_.paso) >= 1 and S.day >= int(M_.get("pd", 0)):
+		var rs := rutas_mar()
+		var r: int = rs[ri(0, rs.size() - 1)]
+		var g: int = clampi(ri(1, cap_mar()), 1, 40) * 1000
+		M_.ped = {"r": r, "g": maxi(g, int(R.min)), "thc": ri(int(R.ped.thc[0]), int(R.ped.thc[1])), "d": S.day + int(R.ped.dias)}
+		M_.pd = S.day + int(R.ped.dias)
+		var P_: Dictionary = M_.ped
+		queue("marPed", func(): await talk("SMS · KOLDO", ["Pedido de la semana: %s. Pagan un %d %% más." % [_ped_txt(P_), Datos.jsround((float(R.ped.bonus) - 1) * 100)]]))
+
+# el piso franco de Gorka: lo que dejas en el alijo, lo reparte por tierra cada mañana
+func talk_gorka() -> void:
+	var FR: Dictionary = D.FRANCO
+	var N := "GORKA"
+	var F = S.get("franco")
+	if not F is Dictionary:
+		await say("Así que tú eres el de la txalupa. Koldo dice que eres de fiar.", N)
+		var j: int = await ask("El piso es %s al mes, en efectivo. Lo que me dejes en las cajas, lo reparto yo por tierra, al por mayor: %s al día, y me quedo el %d %%." % [Datos.eur(FR.alq), _kg(int(FR.dia[0])), Datos.jsround(float(FR.com) * 100)], ["Alquilar el piso", "Nada"], N)
+		if j != 0:
+			return
+		if S.money < float(FR.alq):
+			await say("Sin el primer mes por delante, nada.", N)
+			return
+		S.money -= float(FR.alq)
+		S.franco = {"r": S.day + int(FR.per), "buds": {}, "caja": 0, "cal": 0.0, "niv": 0, "v": 0}
+		confia("gorka", 5)
+		update_hud()
+		sfx("get")
+		await say("Trato. Las cajas de la izquierda son el alijo: deja ahí el género y pasa a por la caja cuando quieras.", N)
+		return
+	while true:
+		var ops := ["Cómo va", "Recoger la caja (%s)" % Datos.eur(F.caja)]
+		var nv: int = int(F.niv)
+		if nv < FR.mej.size():
+			ops.append("%s · %s" % [FR.mej[nv].n, Datos.eur(FR.mej[nv].p)])
+		ops.append("Dejar el piso")
+		ops.append("Nada")
+		var i: int = await ask("Reparto hasta %s al día. En el alijo hay %s." % [_kg(int(FR.dia[nv])), _kg(int(stock_franco()))], ops, N)
+		var l: String = ops[i] if i >= 0 else "Nada"
+		if l == "Nada":
+			return
+		if l == "Cómo va":
+			var cal: int = int(F.cal)
+			await say("Ayer moví %s. La calle está %s. El alquiler, el %s." % [_kg(int(F.get("v", 0))), "tranquila" if cal < 40 else ("caliente" if cal < 70 else "que arde: afloja o nos cae una"), Datos.fd(int(F.r), S.day)], N)
+		elif l.begins_with("Recoger"):
+			if int(F.caja) < 1:
+				await say("Hoy no hay nada que recoger.", N)
+			else:
+				S.money += int(F.caja)
+				await say("Aquí tienes: %s, contados." % Datos.eur(F.caja), N)
+				F.caja = 0
+				update_hud()
+				sfx("get")
+		elif l == "Dejar el piso":
+			if await confirm("¿Dejas el piso franco? Lo que haya en el alijo y en la caja te lo llevas tú."):
+				for k in F.buds.keys():
+					mover_lote(F.buds, S.buds, k, F.buds[k].g)
+				S.money += int(F.caja)
+				S.franco = null
+				update_hud()
+				await say("Tú sabrás. Si vuelves, aquí estoy.", N)
+				return
+		elif nv < FR.mej.size():
+			var mj: Dictionary = FR.mej[nv]
+			if not await confirm("%s: %s. %s" % [mj.n, Datos.eur(mj.p), mj.d]):
+				continue
+			if S.money < float(mj.p):
+				await say("Eso va en efectivo, y no lo llevas.", N)
+				continue
+			S.money -= float(mj.p)
+			F.niv = nv + 1
+			update_hud()
+			sfx("get")
+			await say("Hecho. %s" % mj.d, N)
+
+func stock_franco() -> float:
+	var t := 0.0
+	var F = S.get("franco")
+	if F is Dictionary:
+		for k in F.buds:
+			t += float(F.buds[k].g)
+	return t
+
+# las cajas del alijo, en el piso franco
+func alijo_franco() -> void:
+	var F = S.get("franco")
+	if not F is Dictionary:
+		await say("Cajas de fruta vacías. Aquí se guarda el género, si alquilas el piso: habla con Gorka.")
+		return
+	var FR: Dictionary = D.FRANCO
+	while true:
+		var lots := bud_lots(1)
+		var it := lots.map(venta_item)
+		it.append({"label": "Nada"})
+		var i: int = await menu(it, {"cls": "right", "title": "Al alijo · %s de %s" % [_kg(int(stock_franco())), _kg(int(FR.cap))]})
+		if i < 0 or i >= lots.size():
+			return
+		var l: Array = lots[i]
+		var mx: int = mini(int(floor(l[1].g)), int(FR.cap - stock_franco()))
+		if mx < 1:
+			await say("El alijo está lleno.")
+			return
+		var g = await cuanto("¿Cuánto de %s dejas?" % lot_nombre(l[0]), mx, [100, 250, 500, 1000, 2000, 5000], func(v): return _kg(int(v)))
+		if g > 0:
+			mover_lote(S.buds, F.buds, l[0], g)
+			sfx("get")
+			update_hud()
+
+func franco_dia() -> void:
+	var F = S.get("franco")
+	if not Datos.CAL or not F is Dictionary:
+		return
+	var FR: Dictionary = D.FRANCO
+	if not cobra(F, float(FR.alq), "GORKA", false, "el piso franco", int(FR.per)):
+		S.franco = null
+		queue("franco", func(): await talk("SMS · GORKA", ["Sin alquiler no hay piso. Lo del alijo cubre lo que debes. Si vuelves con dinero, hablamos."]))
+		return
+	var cap: int = int(FR.dia[int(F.niv)])
+	var ks: Array = F.buds.keys()
+	ks.sort_custom(func(a, b): return float(F.buds[a].thc) > float(F.buds[b].thc))
+	var v := 0
+	for k in ks:
+		if v >= cap:
+			break
+		var b: Dictionary = F.buds[k]
+		var g: int = mini(int(floor(b.g)), cap - v)
+		if g < 1:
+			continue
+		var e := Datos.jsround(precio_mayor(b.thc) * calidad(b) * float(FR.px) * g * (1 - float(FR.com)))
+		F.caja = int(F.caja) + e
+		S.sales += e
+		b.g -= g
+		v += g
+		if b.g < .5:
+			F.buds.erase(k)
+	F.v = v
+	F.cal = maxf(0, minf(100, float(F.cal) + v * float(FR.cal.g)) - float(FR.cal.baja))
+	if F.cal >= float(FR.cal.redada):
+		var perdido: float = stock_franco()
+		var caja: int = int(F.caja)
+		F.buds = {}
+		F.caja = 0
+		F.cal = float(FR.cal.vuelve)
+		queue("franco", func(): await talk("SMS · GORKA", ["Han entrado en el piso. Yo estaba fuera. Se han llevado %s y %s de la caja. Habrá que aflojar." % [_kg(int(perdido)), Datos.eur(caja)]]))
