@@ -8,6 +8,7 @@ Clubs cannábicos, cata y analizador, vendedores a comisión, confianza con la g
 
 ## Lo que queda
 
-1. **Al final:** las dos APK.
+1. **Cierre de la tanda 1.52–1.53** (cuando el usuario la dé por cerrada): APK 0.46.0, plugin de WordPress 1.5.1 y el zip del código.
+2. **Siguiente tanda** (lo pidió el usuario: «que todas las acciones del juego sean más realistas, acompañadas de algo gráfico»): como la llave y el teclado de la 1.53, una animación corta para cada acción de A (regar, abonar, podar, cosechar, manicurar, catar, fumar, vender, pagar, cocinar las extracciones, dormir, etc.).
 
 OmniRoute no es del juego: es un enrutador local de modelos de IA para gastar menos tokens en el Claude Code de cada uno (con sus «mods»), y no se usa en las sesiones en la nube. Sin tarea en el juego.
