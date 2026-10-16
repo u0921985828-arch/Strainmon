@@ -234,6 +234,8 @@ func _mundo() -> void:
 				_arte_obj(o, tx, ty, list, sombras)
 	for r in sombras:
 		_rect(r[0], r[1], r[2], r[3], Color8(0, 0, 0, 56))
+	if S.map == "disco-vip":
+		_cristalera(m, tx0, ty0)
 	_arte_edificios(m)
 	if S.map == "home":
 		for t in m.get("carpas", []):
@@ -356,6 +358,8 @@ func _luz_local():
 		return _luz_nave()
 	if J.S.map.begins_with("club-"):   # 1.34: cada club, con la lámpara sobre su billar
 		return J.luz_club(J.S.map.substr(5))   # 1.37: la de la asociación, sobre el billar donde esté
+	if Datos.CAL and J.S.map in ["disco", "disco-vip"]:   # 1.47: GAUA grande, los focos sobre la pista nueva (y, arriba, por el cristal)
+		return J.D.DISCO_CAL.luz
 	return J.D.LUZ_DISCO if J.S.map == "disco" else (J.D.LUZ_BAJO if J.S.map == "setas" else null)   # 1.34: el bajo, con su bombilla
 
 # la nave (1.31, luzNave de 11j-locales): bajo cada uno de los dos focos de una mesa plantada, su luz en las plantas (1.33: del color del foco)
@@ -474,6 +478,9 @@ func _farola(a: float) -> Image:
 func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 	if not Atlas.ok:
 		return false
+	if k == "cristalV":   # 1.47: el suelo de cristal del reservado: debajo, la pista de GAUA (y encima, _cristalera)
+		var md: Dictionary = J.MAPS.disco
+		return _arte_tile(md.g[ty][tx] if ty < md.g.size() and tx < md.g[ty].size() else "floorD", tx, ty, sx, sy)
 	var an = Atlas.sobre.get("tile:" + k)
 	if an:
 		var a = Atlas.anim_de(an[0][0], an[0][1])
@@ -573,6 +580,23 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 			fe = Atlas.frame_de(ge, "e-" + o, "unica", 0, {"i": 0, "esp": d.esp})
 		if fe != null:
 			f = fe
+	if Datos.CAL and o == "mesita":   # 1.47 (lo pidió el usuario): las dos mesitas de los sofás, una mesa baja de frente a 3/4 como los sofás
+		var mo: Array = J.MAPS[J.S.map].o
+		var izq: bool = tx > 0 and mo[ty][tx - 1] == "mesita"
+		var der: bool = tx + 1 < mo[ty].size() and mo[ty][tx + 1] == "mesita"
+		var nl := 0   # en una fila de mesitas, de dos en dos desde la izquierda
+		var q := tx - 1
+		while q >= 0 and mo[ty][q] == "mesita":
+			nl += 1
+			q -= 1
+		if izq and nl % 2 == 1:
+			return
+		if der:
+			var fw = Atlas.frame_de("ocio-ancho", "w-" + sp, "unica", 0, {"i": 0})
+			if fw == null:
+				fw = Atlas.frame_de("ocio-ancho", "w-mesita", "unica", 0, {"i": 0})
+			if fw != null:
+				f = fw
 	if f == null and not an and sp != o:
 		f = Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})
 	if f == null:
@@ -694,6 +718,92 @@ func _arte_edificios(m: Dictionary) -> void:
 			var p = Atlas.frame_de(gp, "puerta", "unica", 0, {"i": -1 if abierta else 0})
 			if p:
 				_img(_sin_pared(p.c, "%s|%d" % [gp, p.i]) if b.get("mascara") else p.c, b.doorX * 16 - 8 + b.get("dx", 0) - cam.x, (dy + 1) * 16 - 32 - cam.y)
+		if b.get("rotulo") and Atlas.cubre("obj:" + b.rotulo):   # 1.47: la T del estanco, colgada encima de la puerta
+			var fr = Atlas.frame_de(Atlas.cubre("obj:" + b.rotulo), b.rotulo, "unica", 0, {"i": 0})
+			if fr:
+				_img(fr.c, _rotulo_x(b) - cam.x, (b.y0 + b.h - 1) * 16 - 31 - cam.y)
+
+# 1.47 (lo pidió el usuario: «desde el que se ve el piso de abajo, en la cristalera del suelo, transparente»): en el reservado, la gente
+# que baila abajo (en su sitio de la pista, con su vaivén) y, encima, el cristal: más oscuro que la pista, con sus juntas y el brillo
+var _bailan := []
+func _cristalera(m: Dictionary, tx0: int, ty0: int) -> void:
+	# 1.47 (lo pidió el usuario: «que se vea algo más que la pista»): por el cristal, lo de abajo entero en su sitio, recortado al
+	# cristal: la barra, los altavoces, la gente de la barra y de alrededor y los que bailan (los de baila*, moviéndose)
+	var g0 := Vector2i(m.w, m.h)
+	var g1 := Vector2i(-1, -1)
+	for ty in m.h:
+		for tx in m.w:
+			if m.g[ty][tx] == "cristalV":
+				g0 = Vector2i(mini(g0.x, tx), mini(g0.y, ty))
+				g1 = Vector2i(maxi(g1.x, tx), maxi(g1.y, ty))
+	if g1.x < 0:
+		return
+	var clip := Rect2i(g0.x * 16 - cam.x, g0.y * 16 - cam.y, (g1.x - g0.x + 1) * 16, (g1.y - g0.y + 1) * 16)
+	var abajo: Dictionary = J.MAPS.disco
+	var lista := []
+	for ty in range(g0.y, mini(int(abajo.h), g1.y + 3)):
+		for tx in range(maxi(0, g0.x - 1), mini(int(abajo.w), g1.x + 2)):
+			var o = abajo.o[ty][tx]
+			if not o:
+				continue
+			var gr = Atlas.cubre("obj:" + o)
+			if not gr:
+				continue
+			var f = Atlas.frame_de(gr, o, "unica", 0, {"i": 0})
+			var ge = Atlas.cubre("obj:e-" + o)
+			if ge:
+				var fe = Atlas.frame_de(ge, "e-" + o, "unica", 0, {"i": 0})
+				if fe != null:
+					f = fe
+			if f == null:
+				continue
+			var x0: int = Datos.jsround(tx * 16 + 8 - cam.x - f.cel.ancla[0])
+			var y0: int = Datos.jsround(ty * 16 + 15 - cam.y - f.cel.ancla[1])
+			lista.append([ty * 16, _img_clip.bind(f.c, x0, y0, Rect2i(0, 0, f.c.get_width(), f.c.get_height()), clip, Color.WHITE)])
+	if _bailan.is_empty():
+		for d in J.D.NPCDEF:
+			if d.map == "disco" and d.id != "gorila" and J.npc_cond(d):
+				_bailan.append(J.mk_ent(d))
+	for i in _bailan.size():
+		var e: Dictionary = _bailan[i]
+		if e.id.begins_with("baila"):
+			var t: float = now / 1000.0 + i * 1.7
+			e.px = e.def.x * 16.0 + Datos.jsround(sin(t * 1.3) * 6)
+			e.py = e.def.y * 16.0 + Datos.jsround(cos(t * .9) * 3)
+			e.dir = ["down", "left", "down", "right"][int(t * .8 + i) % 4]
+		var ex: int = Datos.jsround(e.px - cam.x) + 8
+		var ey: int = Datos.jsround(e.py - cam.y) + 15
+		if clip.has_point(Vector2i(ex, ey)):
+			lista.append([e.py, _pj.bind(e, e.look, false, 320.0)])
+	lista.sort_custom(func(a, b): return a[0] < b[0])
+	for q in lista:
+		q[1].call()
+	var fr := Color(0.86, 0.94, 1.0, 0.5)
+	for ty in range(maxi(0, ty0), mini(int(m.h), ty0 + ceili(SH / 16.0) + 1)):
+		for tx in range(maxi(0, floori(cam.x / 16.0)), mini(int(m.w), floori(cam.x / 16.0) + ceili(J.SW / 16.0) + 1)):
+			if m.g[ty][tx] != "cristalV":
+				continue
+			var sx: int = tx * 16 - cam.x
+			var sy: int = ty * 16 - cam.y
+			_rect(sx, sy, 16, 16, Color(0.03, 0.01, 0.08, 0.42))
+			_rect(sx, sy, 16, 16, Color(0.62, 0.84, 1.0, 0.12))
+			_rect(sx, sy, 16, 1, fr)
+			_rect(sx, sy, 1, 16, fr)
+			_rect(sx + 3, sy + 4, 4, 1, Color(1, 1, 1, 0.22))
+			_rect(sx + 3, sy + 5, 2, 1, Color(1, 1, 1, 0.22))
+			for q in [[0, -1, sx, sy - 1, 16, 1], [0, 1, sx, sy + 16, 16, 1], [-1, 0, sx - 1, sy, 1, 16], [1, 0, sx + 16, sy, 1, 16]]:   # el marco de cromo alrededor
+				var nx: int = tx + int(q[0])
+				var ny: int = ty + int(q[1])
+				if ny < 0 or ny >= m.h or nx < 0 or nx >= m.w or m.g[ny][nx] != "cristalV":
+					_rect(q[2], q[3], q[4], q[5], css("#c8ccd0"))
+
+# 1.47: el rótulo del estanco, centrado encima de su puerta
+func _rotulo_x(b: Dictionary) -> int:
+	var E: Dictionary = {}
+	for k in J.D.ESTANCO.k:
+		if J.D.ESTANCO.k[k].map == J.S.map:
+			E = J.D.ESTANCO.k[k]
+	return int(E.get("x", b.x0)) * 16 + (8 if E.get("ancha") else 0)
 
 # edificios grises con puerta (1.10): su fachada (b.fachada, con hueco para la puerta), la puerta de otra (b.puerta) y, con b.mascara,
 # sin su trozo de pared (PARED: los colores de la fachada del piso, quitados desde el borde del fotograma hacia dentro mientras sigan siendo pared; puertaSinPared)

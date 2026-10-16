@@ -9788,6 +9788,126 @@
    "ajuste_por_sprite": {
     "e-elevT": "exacto"
    }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "icono",
+   "id": "iconos-fumar",
+   "celda": "icono",
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/ocio.py",
+   "descripcion": "1.47: Iconos de 16 px de lo de fumar: librillo, filtros, tabaco de liar y mechero (estanco); grinder, pipa de cristal, bong y vaporizador (grow). Genéricos, sin marcas.",
+   "estilo_ref": "los muebles de los locales (locales-ancho) y los iconos del equipo",
+   "notas": "1.47, lo pidió el usuario: «Tiene que haber estanco también, uno en cada pueblo, para comprar, tabaco, papel y eso. La demás parafernalias o pipas y demás para fumar, se comprar en el grow, hay exposición en vitrinas», «la discoteca tiene que ser más grande, el piso de arriba reservado» y «las mesas de los sofás de los clubs, que no están en la misma vista que los sofás o el billar». De frente a 3/4, nunca en isométrica.",
+   "cubre": []
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "tiles",
+   "id": "interior-estanco",
+   "celda": "tile",
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/ocio.py",
+   "descripcion": "1.47: El estanco por dentro (terrazo crema, pared crema con la moldura granate, friso de madera) y la moqueta del reservado de GAUA.",
+   "estilo_ref": "los muebles de los locales (locales-ancho) y los iconos del equipo",
+   "notas": "1.47, lo pidió el usuario: «Tiene que haber estanco también, uno en cada pueblo, para comprar, tabaco, papel y eso. La demás parafernalias o pipas y demás para fumar, se comprar en el grow, hay exposición en vitrinas», «la discoteca tiene que ser más grande, el piso de arriba reservado» y «las mesas de los sofás de los clubs, que no están en la misma vista que los sofás o el billar». De frente a 3/4, nunca en isométrica.",
+   "cubre": [
+    "tile:floorE",
+    "tile:iwT_est",
+    "tile:iwB_est",
+    "tile:floorV"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "id": "ocio-ancho",
+   "celda": "mueble_ancho",
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/ocio.py",
+   "descripcion": "1.47: Muebles de dos casillas de frente a 3/4: la estantería de las cajetillas (colores lisos, sin marcas), el mostrador con la vitrina de los mecheros, la vitrina iluminada del grow, la mesa baja de los clubs en cada estilo y las escaleras de GAUA.",
+   "estilo_ref": "los muebles de los locales (locales-ancho) y los iconos del equipo",
+   "notas": "1.47, lo pidió el usuario: «Tiene que haber estanco también, uno en cada pueblo, para comprar, tabaco, papel y eso. La demás parafernalias o pipas y demás para fumar, se comprar en el grow, hay exposición en vitrinas», «la discoteca tiene que ser más grande, el piso de arriba reservado» y «las mesas de los sofás de los clubs, que no están en la misma vista que los sofás o el billar». De frente a 3/4, nunca en isométrica.",
+   "cubre": [
+    "obj:estanteE",
+    "obj:mostrE",
+    "obj:vitrinaP",
+    "obj:escaleraD",
+    "obj:escaleraDB"
+   ],
+   "ajuste_por_sprite": {
+    "estanteE": "exacto",
+    "mostrE": "exacto",
+    "vitrinaP": "exacto",
+    "w-mesita": "exacto",
+    "w-mesita-kalea": "exacto",
+    "w-mesita-itsaso": "exacto",
+    "w-mesita-fundicion": "exacto",
+    "w-mesita-ensanche": "exacto",
+    "escaleraD": "exacto",
+    "escaleraDB": "exacto"
+   }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "id": "ocio-alto",
+   "celda": "mueble_escala",
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/ocio.py",
+   "descripcion": "1.47: El humidificador de puros y el expositor giratorio del papel del estanco.",
+   "estilo_ref": "los muebles de los locales (locales-ancho) y los iconos del equipo",
+   "notas": "1.47, lo pidió el usuario: «Tiene que haber estanco también, uno en cada pueblo, para comprar, tabaco, papel y eso. La demás parafernalias o pipas y demás para fumar, se comprar en el grow, hay exposición en vitrinas», «la discoteca tiene que ser más grande, el piso de arriba reservado» y «las mesas de los sofás de los clubs, que no están en la misma vista que los sofás o el billar». De frente a 3/4, nunca en isométrica.",
+   "cubre": [
+    "obj:humidor",
+    "obj:papelE"
+   ],
+   "ajuste_por_sprite": {
+    "humidor": "exacto",
+    "papelE": "exacto"
+   }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "id": "ocio-16",
+   "celda": "objeto_1x1",
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/ocio.py",
+   "descripcion": "1.47: El rótulo del estanco: la placa granate con la T amarilla.",
+   "estilo_ref": "los muebles de los locales (locales-ancho) y los iconos del equipo",
+   "notas": "1.47, lo pidió el usuario: «Tiene que haber estanco también, uno en cada pueblo, para comprar, tabaco, papel y eso. La demás parafernalias o pipas y demás para fumar, se comprar en el grow, hay exposición en vitrinas», «la discoteca tiene que ser más grande, el piso de arriba reservado» y «las mesas de los sofás de los clubs, que no están en la misma vista que los sofás o el billar». De frente a 3/4, nunca en isométrica.",
+   "cubre": [
+    "obj:rotuloE"
+   ],
+   "ajuste_por_sprite": {
+    "rotuloE": "exacto"
+   }
   }
  ],
  "familias": {

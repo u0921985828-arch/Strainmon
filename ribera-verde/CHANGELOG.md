@@ -2,7 +2,7 @@
 
 ## 1.47.0 · 16 de octubre de 2026
 
-Muebles a escala, sentarse a fumar y cuatro locales como en las fotos (lo pidió el usuario: «el mobiliario debe de ser a escala realista para con el personaje, también en los clubs, casas y demás»; «que se pueda sentarse a fumarse uno, y opción de levantarse, lo mismo en los asientos de casa»; las fotos del taller, la panadería, el bar y la lavandería, y «¿por qué no estás usando la API de PixelLab?»). Solo Godot (0.41.0), con `Datos.CAL`: sin CAL, las pantallas del oráculo no cambian.
+Muebles a escala, sentarse a fumar, catar lo que quieras, estancos, la vitrina del grow, GAUA con el reservado arriba y cuatro locales como en las fotos (lo pidió el usuario: «el mobiliario debe de ser a escala realista para con el personaje, también en los clubs, casas y demás»; «que se pueda sentarse a fumarse uno, y opción de levantarse, lo mismo en los asientos de casa»; las fotos del taller, la panadería, el bar y la lavandería, y «¿por qué no estás usando la API de PixelLab?»). Solo Godot (0.41.0), con `Datos.CAL`: sin CAL, las pantallas del oráculo no cambian.
 
 - **Los muebles a escala con el protagonista** (27 px = 1,70 m, 16 px/m) en casas, clubs, grows, la nave, el bajo, la discoteca y los locales.
   - Los que se quedaban cortos salen otra vez a su alto real (`tools/sprites/a-mano/escala.py`): `e-<sprite>` en `escala-alto` (32 × 48) y `escala-ancho` (48 × 48).
@@ -12,7 +12,7 @@ Muebles a escala, sentarse a fumar y cuatro locales como en las fotos (lo pidió
 - **Sentarse** en sofás, sillones, sillas, bancos y taburetes, en casa, en los clubs y en la calle (A delante del asiento: `ASIENTOS`, `asiento`, `sentado`).
   - El protagonista se sienta de frente o de espaldas según el asiento (`_pj_sentado`).
   - Desde el asiento puedes fumarte uno o levantarte. En las sillas de los ordenadores, también usar el ordenador.
-  - **Fumarte uno** (`fumar_sentado`): gasta medio gramo del lote que elijas y pasa un cuarto de hora, con el humo.
+  - **Fumarte uno** (`fumar_sentado`): gasta lo que pida la forma de fumar (ver más abajo) del lote que elijas y pasa un cuarto de hora, con el humo.
   - En la calle, el calor sube 3. En comisaría no; en el bar, la discoteca y los locales tampoco: «Aquí dentro no se puede fumar».
 - **El taller, la panadería, el bar y la lavandería, como en las fotos del usuario:**
   - Los muebles salen de PixelLab (`create_1_direction_object`, solo con texto: las fotos llevan marcas y no se subieron). Están en `tools/sprites/pixellab-negocios/` y se ajustan a 16 px/m con `tools/sprites/a-mano/pixellab_negocios.py`, en los grupos `negocios-pl-alto`, `negocios-pl-ancho` y `negocios-pl-coche`.
@@ -22,6 +22,38 @@ Muebles a escala, sentarse a fumar y cuatro locales como en las fotos (lo pidió
   - **El bar:** suelo de pizarra, pared gris azulada y el machihembrado de pino. Tiene la barra de pintxos de mármol con la vitrina, el botellero con los vasos, la cafetera, taburetes de hierro negro (`e-stool`) y mesas de pino con sus sillas.
   - **La lavandería:** laminado gris y pared azul con burbujas. Tiene lavadoras y secadoras industriales de acero, la caja de pago (el género), la mesa de doblar y el carro de la ropa.
   - Las barras y los mostradores dejan hablar por encima (`COUNTERS`). Los de dos casillas están en `NEG_ANCHO`.
+- **Catar lo que sea** (lo pidió el usuario: «que se pueda probar todo tipo de cogollos y extracción (catar 0.5, o la cantidad que sea hasta un límite lógico claro)»):
+  - Desde la MOCHILA, cualquier lote de cogollos o de extracto: «Catar…» y la cantidad (`cata_cuanto`, `CATA_MAX`, `CATA_PASOS`).
+  - Cogollos: 0,1, 0,25, 0,5 o 1 g de una vez. Extracto: 0,1, 0,2, 0,3 o 0,5 g. Nunca más de lo que queda.
+  - Queda la nota de cata en el lote (`marca_cata`). Según los mg de THC, te deja tocado o mirando a la pared (`cata_efecto`).
+  - Fumar también es catar.
+- **Con qué se fuma** (`FUMAR`):
+  - El porro necesita papel y mechero. Con tabaco lleva 0,3 g de hierba y 0,7 de tabaco; con el grinder, 0,4 g en vez de 0,5.
+  - La pipa (0,2 g de cogollo o 0,1 de extracto) y el bong (0,3 g o 0,1) necesitan mechero.
+  - El vaporizador (0,2 g o 0,1) no necesita mechero y en la calle sube el calor 1 en vez de 3.
+  - Si tienes más de una forma, te pregunta «¿Cómo?»; si llevas más de un lote, «¿DE CUÁL?».
+- **Un estanco en cada pueblo** (lo pidió el usuario: «uno en cada pueblo, para comprar, tabaco, papel y eso»; `ESTANCO`, `montar_estancos`, `est-<pueblo>`):
+  - Están en una casa libre de cada pueblo, con la puerta de su fachada y el rótulo de la T colgado encima (`rotulo` en `blds`).
+  - En el barrio alto es una casa nueva del Casco, en (21, 5).
+  - Por dentro: terrazo, friso de madera, la estantería de las cajetillas (colores lisos, sin marcas), el mostrador con la vitrina de los mecheros, el humidificador de puros y el expositor del papel.
+  - Atiende un estanquero o una estanquera (`est_<pueblo>`, `talk_estanco`) que vende el librillo de papel (50 hojas), los filtros, el tabaco de liar y el mechero.
+- **Las pipas y demás, en el grow, en su vitrina** (`PARAFERNALIA`, una de cada):
+  - Se venden el grinder, la pipa de cristal, el bong y el vaporizador.
+  - Están en la vitrina iluminada de Kiko y en la de GROW IBARBIDE (`vitrinaP`).
+  - Aparecen en la MOCHILA y tienen sus iconos (`iconos-fumar`).
+- **Las mesas de los sofás de los clubs, de frente a 3/4 como los sofás y el billar** (lo pidió el usuario):
+  - Cada par de mesitas es ahora una mesa baja de dos casillas (`w-mesita` y `w-mesita-<estilo>`).
+  - Por estilo: la de siempre, el nogal con la vela (Kalea), el baúl de marinero (Itsaso), los dos bidones con el tablón (Fundición) y el cristal con las patas de acero (Ensanche).
+- **El cajero del pueblo, fuera de detrás de la farola** (lo pidió el usuario: «está detrás de la farola… muévelo una baldosa a la izquierda y asegúrate de que no haya pasado en otros pueblos»): a (30, 8) (`CAJERO_CAL`). `tests/ocio.gd` repasa todos los mapas de calle: ningún cajero ni puerta tiene una farola delante.
+- **GAUA, grande y con el reservado arriba** (lo pidió el usuario: «la discoteca tiene que ser más grande, el piso de arriba reservado, desde el que se ve el piso de abajo, en la cristalera del suelo, transparente»; `DISCO_CAL`, `montar_disco`):
+  - **La planta baja**, de 22 × 12: la barra larga, la cabina del DJ entre dos altavoces, la pista de 8 × 5, dos rincones con sofá y la escalera al reservado con su cordón.
+  - **El reservado, arriba** (`disco-vip`): moqueta, su barra con camarera, tres mesas con sofá, gente VIP y la escalera de bajada.
+  - **La cristalera**, en el suelo, de 14 × 7 casillas: tapa la pista entera y lo de alrededor (lo pidió el usuario: «se tiene que ver algo más que la pista de baile solamente»). A través del cristal se ve la planta baja en su sitio, recortada al cristal: la pista con sus luces, el final de la barra, los altavoces, la gente que baila y la de alrededor (`gentD1`–`gentD3`, con sus frases en `DISCO_CAL.gente`; `_cristalera`).
+  - Para subir hace falta la mesa del reservado de esa noche: la vende la RRPP y, al pagarla, te sube.
+  - A las 6, el portero también echa a la gente del reservado.
+  - Las escaleras están dibujadas a mano de frente (`escaleraD`, `escaleraDB`).
+- El arte nuevo está dibujado a mano y siempre de frente a 3/4, nunca en isométrica (`tools/sprites/a-mano/ocio.py`). Los grupos son `iconos-fumar`, `interior-estanco`, `ocio-ancho`, `ocio-alto` y `ocio-16`.
+- Prueba nueva `tests/ocio.gd` (61 comprobaciones; con `--pintar`, los estancos por dentro y por fuera, GAUA, el reservado, los clubs y los grows).
 - Prueba nueva `tests/escala.gd` (32 comprobaciones; con `--pintar`, cada sitio y la gente sentada). `tests/negocios.gd` pasa a 299.
 
 ## 1.46.0 · 16 de octubre de 2026

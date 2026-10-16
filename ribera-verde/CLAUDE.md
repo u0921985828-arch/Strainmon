@@ -74,6 +74,24 @@ Juego web de un solo archivo: HTML, CSS y JavaScript sin frameworks ni dependenc
   - Los muebles de PixelLab del taller, la panadería, el bar y la lavandería: los PNG originales están en `tools/sprites/pixellab-negocios/`. La escala de cada uno está en `PIEZAS` de `pixellab_negocios.py`. En el mapa van con nombre propio (`hornoN`, `barraN`, `lavaN`…) y sus textos en `NEGOCIO.k.<k>.txt`.
   - `NEGOCIO.k.<k>.o` tiene que ser lo que hay en `MAPS.loc-<k>.o`: `tests/negocios.gd` lo comprueba y mira que se llegue a todo.
   - El elevador `elevT` debe quedar en (1, 4) con las mitades hasta la x 5 y la (6, 4) libre.
+- **Catar, fumar, estancos y GAUA (1.47, con `Datos.CAL`):**
+  - `catar(k, g)` sigue aceptando `catar(k)` (historia.gd lo llama así). `marca_cata` está en trama, con un stub en mundo, igual que `talk_estanco` y `talk_vip`.
+  - `FUMAR` (mundo.gd): `con` es lo que hace falta en `S.items`. El papel, los filtros y el tabaco se cuentan por hojas, unidades y gramos.
+  - Las compras usan `S.items.get`: el papel y lo demás no vienen en las partidas viejas.
+  - **Estancos:**
+    - `ESTANCO.k.<pueblo>` lleva `map`, la casa (`bld` = x0, y0; o `nuevo`, en el barrio alto, que copia las casillas del `casco` de Ibarbide), la puerta (`x`, `ancha`, `dx`, `puerta`, `tile`) y `dy` (la fila de la puerta).
+    - `montar_estancos` va después de `montar_locales` y de `montar_alto`, porque estos dejan el mapa como estaba.
+    - El rótulo de la T se pinta encima de la puerta, después de ella (`_arte_edificios`, `_rotulo_x`).
+    - Por dentro, `est-<pueblo>`: 10 × 7, el estanquero en (2, 3) detrás de `mostrE` (en `COUNTERS`) y la salida por (4, 6) y (5, 6).
+  - **El grow:** `shop(T)` toma `D[T.lista].items` si la tienda lo trae (el estanco) y, con CAL, añade `PARAFERNALIA` en las demás. `uno: 1` hace que se venda una sola vez (`shop_cond`). La vitrina, `VITRINA_GROW`.
+  - **Mesitas:** en una fila de `mesita`, de dos en dos desde la izquierda. La izquierda pinta `w-<sprite_local>` (`ocio-ancho`, 48 × 48) y la derecha no se pinta. Si una queda sola, sale la de siempre.
+  - **GAUA:**
+    - Con CAL, `montar_disco` cambia una vez `MAPS.disco` por `MAPS.disco-g`. El nombre del mapa sigue siendo `disco`, así que todo lo de la discoteca sirve igual.
+    - También coloca a su gente (`DISCO_CAL.npc`) y la puerta del Ensanche (`DISCO_CAL.puerta`).
+    - `disco-vip` tiene `cristalV` en x 3..16, y 4..10, encima de toda la pista (`tests/ocio.gd` lo comprueba, y que nadie del reservado esté encima del cristal).
+    - `_arte_tile` pinta debajo la casilla de abajo. `_cristalera` pinta los muebles de abajo (recortados al rectángulo del cristal con `_img_clip`) y a la gente de abajo con `npc_cond` (con `mk_ent`; los `baila*`, con vaivén), y después el cristal con su marco.
+- **El cajero (1.47, con `Datos.CAL`):** `CAJERO_CAL` (mundo.gd) mueve en `enter_map` el cajero del pueblo de (31, 8), detrás de la farola, a (30, 8). `tests/ocio.gd` mira en todos los mapas de calle que ningún cajero ni puerta tenga una farola delante.
+    - Para subir, A en `escaleraD` con `noche_gaua().mesa`. Al pagar la mesa a la RRPP, también te sube (`subir_vip`).
 - **Bandejas de clones (1.43, solo Godot):** `S.nave.bc` = `[{m, k, f, d}]` (la crea `montar_nave` o `nave_dia` solo con `Datos.CAL`, así las pantallas del HTML siguen igual); `corta_bandeja` al pasar `FLOR_MESA`, una por mesa y `BANDEJAS_NAVE` como mucho; la cosecha quita la de su mesa; el carro `clonN`/`clonN2` en (8, 2) con `sprite_local` → `clonN-0..2`.
 - **WordPress (1.42):** `wordpress/` es el plugin (PHP, `lh-fs.js`, `.htaccess`, readme); `node tools/wordpress.js` exporta `index.pck` de `godot/` con el preset Web de un proyecto temporal (sin tocar `export_presets.cfg`), toma el motor web 4.3 sin hilos (`index.js`, `index.wasm`, `index.audio.worklet.js`, de `--motor <dir>`), pone `fileSizes` en `index.html` y deja `descargas/landrace-hunters-<v>.zip`.
 - **Reformas y logros (1.27, `12c-salon`, `11i-logros`; Godot, `granja.gd` y `trama.gd`):** el suelo y las paredes del piso son casillas, no objetos: `montarCasa` (Godot, `montar_casa`, con la clave de caché que lleva suelo, pared y alfombra) cambia `floor`, `iwT_home` e `iwB_home` por `floor-v`, `iwT_home-v` e `iwB_home-v` (`S.deco.suelo`/`pared`, 0 la de serie) y la alfombra pone `alfNa`…`alfNd` (+ `-v` del suelo) en sus 2 × 2 casillas; `SOLID_G` sigue viendo sólidas las paredes con sufijo. Las casillas se dibujan a mano (`tools/sprites/a-mano/casa.py`, asset `casa-reforma`) y `referencias.js` las mete en el inventario aunque no estén puestas. Los logros: `ok()` mira lo que tienes, como las misiones (Godot, `logro_ok`: si cambias uno, cambia el otro); `migrate()` apunta sin aviso (día 0) lo ya conseguido en una partida sin `S.logros`. El aviso no se pisa con los de la cola: si viene el del itinerario o el de la misión, el logro va debajo en el suyo (`conLogro`), y `avisoLogro` solo habla si no viene ninguno.

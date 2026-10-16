@@ -141,6 +141,8 @@ func _corre() -> void:
 	# 2 · sentarse (1.47): el banco de la calle, fumarse uno (medio gramo, calor +3) y levantarse
 	S.buds = {"ak47": {"g": 10.0, "thc": 18.0, "dia": S.day}}
 	S.heat = 0
+	S.items.papel = 50   # 1.47: el papel y el mechero, del estanco
+	S.items.mechero = 1
 	J.enter_map("town", 16, 17, "up")
 	J.mode = "world"
 	chk(J.asiento_de("bench") == "bench" and J.asiento_de("sofaF2") == "sofaF" and J.asiento_de("sillaG2") == "sillaG" and J.asiento_de("bancoT") == "", "los asientos")
@@ -153,7 +155,7 @@ func _corre() -> void:
 	S.buds = {}
 	LOG = []
 	QUIERO = ["Sentarte", "Fumarte uno", "Levantarte"]
-	chk(corre(func(): J.interact()) and LOG.any(func(t): return t.contains("No llevas nada")) and J.SENT == null, "sin hierba: %s" % [LOG])
+	chk(corre(func(): J.interact()) and LOG.any(func(t): return t.contains("No llevas")) and J.SENT == null, "sin hierba: %s" % [LOG])
 	# en el bar no se fuma; la silla de la tía sigue llevando al ordenador
 	S.buds = {"ak47": {"g": 10.0, "thc": 18.0, "dia": S.day}}
 	J.enter_map("bar", 1, 5, "up")

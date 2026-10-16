@@ -178,6 +178,8 @@ static func icono(n: String):
 			f = frame_de("iconos", n, "unica", 0, {"i": 0})
 		if f == null:
 			f = frame_de("iconos-equipo", n, "unica", 0, {"i": 0})
+		if f == null:
+			f = frame_de("iconos-fumar", n, "unica", 0, {"i": 0})   # 1.47: lo del estanco y lo del grow
 		ico[n] = tex(ico_centrado(f.c)) if f else null
 	return ico[n]
 

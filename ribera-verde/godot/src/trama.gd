@@ -9,6 +9,8 @@ var endcard_on := false
 
 # ---------- tienda ----------
 func shop_cond(it: Dictionary) -> bool:
+	if it.get("uno"):   # 1.47: el grinder, la pipa, el bong y el vaporizador, uno
+		return not S.items.get(it.item)
 	if it.get("item") == "prensa":   # la prensa de rosin (1.10), una
 		return not S.items.get("prensa")
 	if it.get("item") == "analizador":   # el analizador de cannabinoides y terpenos (1.15), uno
@@ -97,13 +99,25 @@ func tienda_ok(T: Dictionary, it: Dictionary) -> bool:
 func precio_t(T: Dictionary, it: Dictionary) -> int:
 	return Datos.jsround(it.p * T.f * (.95 if T.N == "KIKO" and rel("kiko") >= D.REL.amigo else 1.0))   # 1.15: con confianza, Kiko hace un 5 %
 
+# 1.47 (lo pidió el usuario): el estanco de cada pueblo, papel, filtros, tabaco y mecheros (D.ESTANCO)
+func talk_estanco(k: String) -> void:
+	var E: Dictionary = D.ESTANCO.k[k]
+	await say(pick(["Buenas. ¿Qué te pongo?", "Hola, majo. Dime.", "Buenas. Tabaco, papel, mecheros… lo que quieras."]), E.N)
+	var T: Dictionary = D.TIENDAS.est.duplicate()
+	T.t = E.t
+	T.N = E.N
+	await shop(T)
+
 func shop(T: Dictionary = {}) -> void:
 	if T.is_empty():
 		T = D.TIENDAS.kiko
 	var i := 0
 	while true:
 		var list := []
-		for it in D.SHOP:
+		var fuente: Array = D[T.lista].items if T.has("lista") else D.SHOP
+		if Datos.CAL and not T.has("lista"):   # 1.47 (lo pidió el usuario): las pipas y demás, en el grow, en sus vitrinas
+			fuente = fuente + D.PARAFERNALIA
+		for it in fuente:
 			if S.ch + T.ch >= it.ch and tienda_ok(T, it) and shop_cond(it):
 				list.append(it)
 		var items := []
@@ -151,7 +165,7 @@ func shop(T: Dictionary = {}) -> void:
 # lo comprado (en una tienda o en la chatarrería): a la mochila, a la sala o puesto en una carpa, si quieres
 func entregar(it: Dictionary, N: String) -> void:
 	if it.get("item"):
-		S.items[it.item] += int(it.get("n", 1))
+		S.items[it.item] = int(S.items.get(it.item, 0)) + int(it.get("n", 1))
 	if it.get("maceta"):
 		S.items["m_" + it.maceta] += 1
 	if it.get("bolsa"):
@@ -1753,10 +1767,18 @@ func mochila() -> void:
 		for k in S.rosin:
 			var b: Dictionary = S.rosin[k]
 			var ro := rosin_item([k, b])
-			ro.desc = D.EXTR[tipo_extr(k)].n + ": extracción sin disolventes. La compran los catadores.\n" + strain(lot_sid(k)).o + "\nPulsa A para tirarlo."
+			ro.desc = D.EXTR[tipo_extr(k)].n + ": extracción sin disolventes. La compran los catadores.\n" + ((S.catas["r:" + k] + "\n") if S.catas.has("r:" + k) else "") + strain(lot_sid(k)).o + ("\nPulsa A para catarlo o tirarlo." if Datos.CAL else "\nPulsa A para tirarlo.")
 			ro.k = "r"
 			ro.key = k
 			rows.append(ro)
+		if Datos.CAL:   # 1.47: lo de fumar (el estanco y el grow)
+			for q in [["papel", "Papel de liar", "hojas", "Una hoja por porro. En el estanco."], ["filtros", "Filtros", "", "Cada porro gasta uno. En el estanco."],
+					["tabaco", "Tabaco de liar", "g", "Para mezclar: 0,7 g por porro y el porro lleva menos hierba. En el estanco."], ["mechero", "Mechero", "", "Para el porro, la pipa y el bong."],
+					["grinder", "Grinder", "", "El porro te sale con 0,4 g de hierba en vez de 0,5."], ["pipa", "Pipa de cristal", "", "Sentado en un sofá o una silla: 0,2 g de cogollo o 0,1 de extracto."],
+					["bong", "Bong de cristal", "", "Sentado: 0,3 g de cogollo o 0,1 de extracto."], ["vapo", "Vaporizador", "", "Sentado: 0,2 g de cogollo o 0,1 de extracto, sin mechero; en la calle huele menos."]]:
+				var v := float(S.items.get(q[0], 0))
+				if v > 0:
+					rows.append({"label": q[1], "right": ("%s %s" % [n(floor(v * 10) / 10.0), q[2]]) if q[2] != "" else "×" + n(v), "ic": icono(q[0]), "desc": q[3]})
 		if S.items.get("prensa"):
 			rows.append({"label": "Prensa de rosin", "right": "en la mesa", "desc": "De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso."})
 		if S.items.get("tamiz"):
@@ -1784,8 +1806,11 @@ func mochila() -> void:
 			await esqueje_accion(rows[i].e, S.esquejes)
 		elif rows[i].get("k") == "b":   # la cata y el análisis (1.15)
 			await lote_accion(rows[i].key)
-		elif rows[i].get("k") == "r":   # 1.36: tirar un extracto
-			await tirar_lote(rows[i].key, true)
+		elif rows[i].get("k") == "r":   # 1.36: tirar un extracto; 1.47: o catarlo
+			if Datos.CAL:
+				await extr_accion(rows[i].key)
+			else:
+				await tirar_lote(rows[i].key, true)
 		elif rows[i].get("k") == "s":   # tirar semillas (1.11)
 			var sid: String = rows[i].sid
 			var ns: int = int(S.seeds[sid])
@@ -3240,21 +3265,66 @@ func aroma_de(sid: String) -> String:
 func cbd_de(sid: String) -> float:   # CBD del 0,2 al 1 % según el % índica
 	return Datos.jsround(20 + Datos.ind_de(S, sid) * 0.8) / 100.0
 
-func catar(k: String) -> void:
+func catar(k: String, g := -1.0) -> void:
 	var b = S.buds.get(k)
-	if b == null or b.g < D.CATA.g:
+	if g < 0:
+		g = D.CATA.g
+	if b == null or b.g < g:
 		return
 	var sid := lot_sid(k)
 	var thc: float = b.thc
 	var cu := float(b.get("cu", 0))
 	var fresca: bool = b.get("dia") != null
-	use_buds(k, D.CATA.g)
-	if S.buds.has(k):
-		S.buds[k].cata = true
-	S.catas[sid] = nota_cata(sid, thc)
+	use_buds(k, g)
+	marca_cata(k, false, sid, thc)
 	advance_time(int(D.CATA.min))
 	update_hud()
-	await say("Catas %s: %s." % [lot_nombre(k), S.catas[sid]] + (" Bien curada: suave y con todo el aroma." if cu >= 1 else (" Sin curar del todo: rasca y huele a verde." if cu or fresca else "")))   # 1.29
+	await say("Catas %s%s: %s." % [("" if g == D.CATA.g else (Datos.coma(g) + " g de ")), lot_nombre(k), S.catas[sid]] + (" Bien curada: suave y con todo el aroma." if cu >= 1 else (" Sin curar del todo: rasca y huele a verde." if cu or fresca else "")) + (cata_efecto(g, thc) if Datos.CAL else ""))   # 1.29
+
+# 1.47 (lo pidió el usuario: «que se pueda probar todo tipo de cogollos y extracción… hasta un límite lógico claro»): catar cualquier
+# lote, cogollos o extracto, en la cantidad que elijas hasta CATA_MAX de una vez (un porro bien cargado, 1 g; de extracto, 0,5 g)
+const CATA_MAX := {"b": 1.0, "r": 0.5}
+const CATA_PASOS := {"b": [0.1, 0.25, 0.5], "r": [0.1, 0.2, 0.3]}
+
+func marca_cata(k: String, r: bool, sid: String, thc: float) -> void:
+	var L: Dictionary = S.rosin if r else S.buds
+	if L.has(k):
+		L[k].cata = true
+	S.catas[("r:" + k) if r else sid] = nota_cata(sid, thc)
+
+func cata_efecto(g: float, thc: float) -> String:   # cuánto sube: los mg de THC que llevas encima
+	var mg := g * thc * 10
+	return "" if mg < 60 else (" Te deja tocado un buen rato." if mg < 150 else " Demasiado: te quedas un buen rato mirando a la pared.")
+
+func cata_cuanto(k: String, r: bool):
+	var b: Dictionary = (S.rosin if r else S.buds)[k]
+	var mx: float = floor(minf(float(CATA_MAX["r" if r else "b"]), float(b.g)) * 100) / 100.0
+	if mx < .1:
+		return 0
+	return await cuanto("¿Cuánto catas? (de una vez, %s g como mucho)" % Datos.coma(CATA_MAX["r" if r else "b"]), snappedf(mx, .01), CATA_PASOS["r" if r else "b"], func(q): return Datos.coma(q) + " g")
+
+func catar_extr(k: String, g: float) -> void:
+	var b = S.rosin.get(k)
+	if b == null or b.g < g:
+		return
+	var sid := lot_sid(k)
+	var thc: float = b.thc
+	use_rosin(k, g)
+	marca_cata(k, true, sid, thc)
+	advance_time(int(D.CATA.min))
+	update_hud()
+	await say("Catas %s g de %s: %s.%s" % [Datos.coma(g), extr_nombre(k, true), S.catas["r:" + k], (cata_efecto(g, thc) if Datos.CAL else "")])
+
+func extr_accion(k: String) -> void:
+	var b: Dictionary = S.rosin[k]
+	var ops := ["Catar…", "Tirar", "Nada"]
+	var oi: int = await ask("%s: %s g · %s %%%s" % [extr_nombre(k, true), Datos.coma(b.g), Datos.pct(b.thc), " · catado" if b.get("cata") else ""], ops)
+	if oi == 0:
+		var g = await cata_cuanto(k, true)
+		if g:
+			await catar_extr(k, g)
+	elif oi == 1:
+		await tirar_lote(k, true)
 
 func analizar(k: String) -> void:
 	var b = S.buds.get(k)
@@ -3267,13 +3337,17 @@ func analizar(k: String) -> void:
 
 func lote_accion(k: String) -> void:
 	var b: Dictionary = S.buds[k]
-	var ops := ["Catar %s g" % Datos.coma(D.CATA.g)]
+	var ops := ["Catar…" if Datos.CAL else "Catar %s g" % Datos.coma(D.CATA.g)]
 	if S.items.get("analizador") and not b.get("ana"):
 		ops.append("Analizar")
 	ops.append_array(["Tirar", "Nada"])
 	var oi: int = await ask("%s: %d g · %s %%%s%s%s" % [lot_nombre(k), int(floor(b.g)), Datos.pct(b.thc), cura_corto(b), " · catado" if b.get("cata") else "", " · analizado" if b.get("ana") else ""], ops)
 	var op: String = ops[oi]
-	if op.begins_with("Catar"):
+	if op == "Catar…":   # 1.47
+		var g = await cata_cuanto(k, false)
+		if g:
+			await catar(k, g)
+	elif op.begins_with("Catar"):
 		await catar(k)
 	elif op == "Analizar":
 		await analizar(k)
@@ -4022,6 +4096,29 @@ func obj_local(x: int, y: int, o) -> bool:
 	if o == null:
 		return false
 	var txt := ""
+	if Datos.CAL and o in ["escaleraD", "escaleraD2"]:   # 1.47: la escalera al reservado de GAUA
+		if not disco_abierta():
+			await echar_disco()
+		elif noche_gaua().mesa:
+			await subir_vip()
+		else:
+			await say("Arriba está el reservado, con la cristalera encima de la pista. Sin mesa, no se sube: la RRPP te la vende.", "RRPP")
+		return true
+	if Datos.CAL and o in ["escaleraDB", "escaleraDB2"]:
+		await bajar_vip()
+		return true
+	if S.map == "disco-vip":
+		match o:
+			"bottles":
+				txt = "Las botellas buenas, las del reservado."
+			"barraD":
+				txt = "La barra del reservado. Pídele a la camarera."
+			"neon":
+				txt = "El neón de %s, también arriba." % D.DISCO.n
+			"altavoz":
+				txt = "Un altavoz: aquí arriba la música llega más limpia."
+			"sofaV", "sofaV2", "mesaV":
+				txt = "Tu mesa: sofá de terciopelo, cubitera y botella. Desde aquí se ve toda la pista por el cristal."
 	if S.map.begins_with("loc-") and Datos.CAL:   # 1.45: los negocios por dentro
 		var k: String = S.map.substr(4)
 		var N: Dictionary = D.NEGOCIO.k[k]
@@ -5130,6 +5227,23 @@ func talk_rrpp():
 	S.fijos.append({"id": id, "n": nv, "t": "vip", "dia": 0})
 	sfx("get")
 	await say("Una hora en el reservado. La RRPP te presenta a %s: «Me han dicho que lo tuyo es de lo mejor. Llámame». Apuntas su número." % nv)
+	if Datos.CAL:   # 1.47: el reservado, arriba
+		await subir_vip()
+
+# 1.47 (lo pidió el usuario): el reservado, arriba; desde la cristalera del suelo se ve la pista de abajo
+func subir_vip() -> void:
+	var C: Dictionary = D.DISCO_CAL
+	await warp({"to": "disco-vip", "x": int(C.sube[0]), "y": int(C.sube[1]), "dir": "down"})
+
+func bajar_vip() -> void:
+	var C: Dictionary = D.DISCO_CAL
+	await warp({"to": "disco", "x": int(C.baja[0]), "y": int(C.baja[1]), "dir": "down"})
+
+func talk_vip(i: int) -> void:
+	if not disco_abierta():
+		await echar_disco()
+		return
+	await say(D.DISCO_CAL.vip[(i + S.day) % D.DISCO_CAL.vip.size()], "GENTE")
 
 func talk_baila(i: int):
 	await say(D.BAILA[i], "GENTE")

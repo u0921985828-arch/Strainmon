@@ -6,7 +6,7 @@ extends "res://src/ui.gd"
 const TS := 16
 const DV := {"up": [0, -1], "down": [0, 1], "left": [-1, 0], "right": [1, 0]}
 const OPP := {"up": "down", "down": "up", "left": "right", "right": "left"}
-const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2", "barraN", "barraN2", "mostrN", "mostrN2"]   # 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
+const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2", "barraN", "barraN2", "mostrN", "mostrN2", "mostrE", "mostrE2"]   # 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
 const SILLAS := ["silla", "sillaG", "sillaG2"]   # 1.27.1: delante de un ordenador; con A, el ordenador de encima (delante)
 var SOLID_G := RegEx.create_from_string("^(water|roof|wall|win|iwT|iwB|void)")
 
@@ -145,7 +145,7 @@ func rel_de(id: String):
 		return S.map.substr(5)
 	if id == "darko2":
 		return "darko"
-	if id in ["gorila", "camarera", "dj", "rrpp"] or (id.length() == 6 and id.begins_with("baila") and id[5].is_valid_int()):
+	if id in ["gorila", "camarera", "dj", "rrpp", "gentD1", "gentD2", "gentD3"] or (id.length() == 6 and id.begins_with("baila") and id[5].is_valid_int()):
 		return "gaua"
 	if id.length() == 3 and id.begins_with("nv") and (id[2].is_valid_int() or id[2] == "m"):   # 1.34: y el de las madres
 		return null
@@ -828,6 +828,86 @@ func montar_locales(mapa: String) -> void:
 						for j in range(1, int(NEG_LARGO.get(q[2], 2))):
 							m.o[int(q[1])][int(q[0]) + j] = q[2] + "2"
 
+# 1.47 (lo pidió el usuario: «la discoteca tiene que ser más grande, el piso de arriba reservado»), solo con Datos.CAL: GAUA, la planta
+# baja grande (disco-g en lugar de la de antes, con el mismo nombre de mapa), su gente en su sitio y la puerta del Ensanche a la entrada
+var _disco_cal := false
+func montar_disco() -> void:
+	if not Datos.CAL or _disco_cal or not MAPS.has("disco-g"):
+		return
+	_disco_cal = true
+	var m: Dictionary = MAPS.disco
+	var G: Dictionary = MAPS["disco-g"]
+	m.w = int(G.w)
+	m.h = int(G.h)
+	for k in ["g", "o", "exits"]:
+		m[k] = G[k].duplicate(true)
+	var C: Dictionary = D.DISCO_CAL
+	for d in D.NPCDEF:
+		if d.map == "disco" and C.npc.has(d.id):
+			d.x = int(C.npc[d.id][0])
+			d.y = int(C.npc[d.id][1])
+	for k in C.puerta:
+		if MAPS.ensanche.doors.has(k):
+			MAPS.ensanche.doors[k].x = int(C.puerta[k][0])
+			MAPS.ensanche.doors[k].y = int(C.puerta[k][1])
+
+const VITRINA_GROW := {"shop": [7, 6], "growcity": [9, 5]}
+const CAJERO_CAL := {"town": [[31, 8], [30, 8]]}   # 1.47 (lo pidió el usuario): el cajero que tapaba la farola, una casilla a la izquierda
+# 1.47 (lo pidió el usuario: «un estanco en cada pueblo»), solo con Datos.CAL: la puerta en una casa libre de cada pueblo (en el barrio
+# alto, una casa nueva del Casco), el rótulo de la T y el estanco por dentro (est-<k>); va después de montar_locales y de montar_alto,
+# que vuelven a poner el mapa como estaba
+func montar_estancos(mapa: String) -> void:
+	if not Datos.CAL or not D.has("ESTANCO"):
+		return
+	for k in D.ESTANCO.k:
+		var E: Dictionary = D.ESTANCO.k[k]
+		if mapa != E.map:
+			continue
+		var m = MAPS.get(mapa)
+		if m == null:
+			continue
+		var dy := int(E.dy)
+		var b = null
+		if E.has("nuevo"):
+			for q in m.blds:
+				if q.get("est") == k:
+					b = q
+			if b == null:
+				var nb: Dictionary = E.nuevo
+				var ib: Dictionary = MAPS.ibarbide
+				var src = null
+				for q in ib.blds:
+					if q.id == nb.id:
+						src = q
+						break
+				for q in E.quita:
+					m.o[int(q[1])][int(q[0])] = null
+				for y in int(nb.h):
+					for x in int(nb.w):
+						m.g[int(nb.y0) + y][int(nb.x0) + x] = ib.g[int(src.y0) + y][int(src.x0) + x]
+						m.o[int(nb.y0) + y][int(nb.x0) + x] = null
+				for x in range(int(E.acera[0]), int(E.acera[1]) + 1):
+					m.g[int(E.acera[2])][x] = "walk"
+					m.o[int(E.acera[2])][x] = null
+				b = {"id": nb.id, "x0": int(nb.x0), "y0": int(nb.y0), "w": int(nb.w), "h": int(nb.h), "est": k}
+				m.blds.append(b)
+		else:
+			for q in m.blds:
+				if int(q.x0) == int(E.bld[0]) and int(q.y0) == int(E.bld[1]):
+					b = q
+		if b == null:
+			continue
+		b.rotulo = "rotuloE"
+		if E.puerta != null:
+			b.doorX = int(E.x)
+			b.puerta = E.puerta
+			b.dx = int(E.dx)
+			if E.ancha:
+				b.ancha = 1
+		for j in (2 if E.ancha else 1):
+			m.g[dy][int(E.x) + j] = E.tile
+			m.doors["%d,%d" % [int(E.x) + j, dy]] = {"to": "est-" + k, "x": 4 + j, "y": int(MAPS["est-" + k].h) - 2, "dir": "up"}
+
 func montar_camarote() -> void:
 	var m: Dictionary = MAPS.camarote
 	for i in int(D.CAMAROTE.est.max):
@@ -989,6 +1069,8 @@ func npc_cond(d: Dictionary) -> bool:
 			return S.ch == 6
 		"julen":   # 1.23: en el piso hasta la primera cosecha; después, en el growshop
 			return (S.flags.get("kiko1") and not S.flags.get("harvest1")) if d.map == "home" else (true if S.flags.get("harvest1") else false)
+	if d.id.begins_with("est_") or d.id in ["camareraV", "vipA", "vipB", "gentD1", "gentD2", "gentD3"]:   # 1.47: el estanco, el reservado de GAUA y su gente de abajo
+		return Datos.CAL
 	if d.id.begins_with("neg_"):   # 1.45: la gente de los negocios alquilados
 		return Datos.CAL and S.get("loc") is Dictionary and S.loc.has(d.id.substr(4))
 	if d.id == "delroy":   # 1.32: en la asociación, desde la segunda visita
@@ -1012,6 +1094,9 @@ func npc_talk(d: Dictionary) -> void:
 		return
 	if d.id.begins_with("neg_"):   # 1.45
 		await talk_neg(d.id.substr(4))
+		return
+	if d.id.begins_with("est_"):   # 1.47
+		await talk_estanco(d.id.substr(4))
 		return
 	match d.id:
 		"kiko":
@@ -1065,8 +1150,12 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_presi(d.id.substr(5))
 		"gorila":
 			await talk_gorila()
-		"camarera":
+		"camarera", "camareraV":
 			await talk_barra()
+		"vipA", "vipB":   # 1.47
+			await talk_vip(0 if d.id == "vipA" else 1)
+		"gentD1", "gentD2", "gentD3":   # 1.47: la gente de la pista, la que se ve desde el cristal del reservado
+			await say(D.DISCO_CAL.gente[(int(d.id.substr(5)) + S.day) % D.DISCO_CAL.gente.size()], "GENTE")
 		"dj":
 			await talk_dj()
 		"rrpp":
@@ -1252,6 +1341,18 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	if name_ == "setas":
 		montar_setas()
 	montar_locales(name_)   # 1.45: la puerta de los negocios y sus mejoras
+	montar_estancos(name_)   # 1.47: el estanco de cada pueblo
+	if name_ in ["disco", "disco-vip", "ensanche"]:
+		montar_disco()
+	if Datos.CAL and VITRINA_GROW.has(name_):   # 1.47: la vitrina de las pipas y demás en los dos grows
+		var vg: Array = VITRINA_GROW[name_]
+		MAPS[name_].o[vg[1]][vg[0]] = "vitrinaP"
+		MAPS[name_].o[vg[1]][vg[0] + 1] = "vitrinaP2"
+	if Datos.CAL and CAJERO_CAL.has(name_):
+		var cj: Array = CAJERO_CAL[name_]
+		if MAPS[name_].o[cj[0][1]][cj[0][0]] == "cajero":
+			MAPS[name_].o[cj[0][1]][cj[0][0]] = null
+			MAPS[name_].o[cj[1][1]][cj[1][0]] = "cajero"
 	montar_club(name_)
 	P.x = x
 	P.y = y
@@ -1390,7 +1491,7 @@ func on_step_end() -> void:
 		else:
 			run(func(): await warp(door))
 		return
-	if S.map == "disco" and not disco_abierta():
+	if (S.map == "disco" or S.map == "disco-vip") and not disco_abierta():
 		run(func(): await echar_disco())
 		return
 	if not D.ZONAS.has(S.map):
@@ -1561,40 +1662,103 @@ func sentado(x: int, y: int, k: String) -> void:
 
 # dónde echa el humo sentado (la boca, o encima de la cabeza si está de espaldas)
 func boca_sentado() -> Vector2:
+	if SENT == null:   # de pie
+		return Vector2(P.px + 8, P.py - 4)
 	var sur: bool = SENT.d == "sur"
 	return Vector2(SENT.x * 16 + 8 + (4 if sur else 0), SENT.y * 16 + 15 - (18 if sur else 22 + SENT_SUBE) + SENT_CORTA)
+
+# 1.47 (lo pidió el usuario): con qué se fuma. El papel, el tabaco, las boquillas y el mechero, del estanco (ESTANCO); la pipa,
+# el bong, el vaporizador y el grinder, del grow (PARAFERNALIA). g: cogollos por vez (el porro, con tabaco, gt); gr: extracto
+# por vez (0 = el porro no lleva extracto); con: lo que hace falta en S.items
+const FUMAR := {
+	"porro": {"n": "Liarte un porro", "g": 0.5, "gt": 0.3, "gr": 0.0, "con": ["papel", "mechero"]},
+	"pipa": {"n": "Una pipa", "g": 0.2, "gr": 0.1, "con": ["pipa", "mechero"]},
+	"bong": {"n": "Un bong", "g": 0.3, "gr": 0.1, "con": ["bong", "mechero"]},
+	"vapo": {"n": "El vaporizador", "g": 0.2, "gr": 0.1, "con": ["vapo"]},
+}
+const NO_FUMAR := ["bar", "disco", "disco-vip", "shop", "growcity"]
 
 func fumar_sentado() -> void:
 	if S.map == "comisaria":
 		await say("¿Aquí, en comisaría? Mejor no.")
 		return
-	if S.map in ["bar", "disco"] or S.map.begins_with("loc-"):
+	if S.map in NO_FUMAR or S.map.begins_with("loc-") or S.map.begins_with("est-"):
 		await say("Aquí dentro no se puede fumar.")
 		return
-	var ls := bud_lots(SENT_PORRO)
+	var ms := []
+	for k in FUMAR:
+		if FUMAR[k].con.all(func(i): return float(S.items.get(i, 0)) > 0):
+			ms.append(k)
+	if ms.is_empty():
+		await say("No tienes con qué: el papel y el mechero, en el estanco; las pipas, el bong y el vaporizador, en el grow.")
+		return
+	var mk: String = ms[0]
+	if ms.size() > 1:
+		var j: int = await ask("¿Cómo?", ms.map(func(k): return FUMAR[k].n) + ["Nada"])
+		if j < 0 or j >= ms.size():
+			return
+		mk = ms[j]
+	var F: Dictionary = FUMAR[mk]
+	var gb: float = F.g
+	var tab := false
+	if mk == "porro":
+		if S.items.get("grinder"):
+			gb = 0.4   # desmenuzado con el grinder, se aprovecha más
+		if float(S.items.get("tabaco", 0)) >= 0.7:
+			var t: int = await ask("¿Con tabaco?", ["Con tabaco", "Solo hierba", "Nada"])
+			if t < 0 or t > 1:
+				return
+			if t == 0:
+				tab = true
+				gb = F.gt
+	var ls := bud_lots(gb).map(func(l): return [l[0], l[1], false])
+	if F.gr > 0:
+		ls += rosin_lots(F.gr).map(func(l): return [l[0], l[1], true])
 	if ls.is_empty():
-		await say("No llevas nada para liarte uno.")
+		await say("No llevas nada para fumar." if F.gr > 0 else "No llevas cogollos para liarte uno.")
 		return
 	var i := 0
 	if ls.size() > 1:
-		i = await menu(ls.map(lot_item), {"title": "¿DE CUÁL TE LÍAS UNO?"})
+		i = await menu(ls.map(func(l): return rosin_item([l[0], l[1]]) if l[2] else lot_item([l[0], l[1]])), {"title": "¿DE CUÁL?"})
 		if i < 0 or i >= ls.size():
 			return
 	var lk: String = ls[i][0]
-	var nom := lot_nombre(lk)
-	use_buds(lk, SENT_PORRO)
+	var r: bool = ls[i][2]
+	var thc: float = ls[i][1].thc
+	var nom: String = extr_nombre(lk, true) if r else lot_nombre(lk)
+	if r:
+		use_rosin(lk, F.gr)
+	else:
+		use_buds(lk, gb)
+	if mk == "porro":
+		S.items.papel = int(S.items.papel) - 1
+		if S.items.get("filtros"):
+			S.items.filtros = int(S.items.filtros) - 1
+		if tab:
+			S.items.tabaco = snappedf(float(S.items.tabaco) - 0.7, 0.1)
+	marca_cata(lk, r, lot_sid(lk), thc)   # fumarlo es catarlo
 	var b := boca_sentado()
 	for n in 3:
 		lanzar_vfx("vfx-humo-porro", b.x, b.y, M.reloj, S.map, true)
 		await wait(700)
 	advance_time(15)
-	var t := "Te lías uno de %s y te lo fumas sin prisa." % nom
+	var t := ("Te lías uno de %s%s y te lo fumas sin prisa." % [nom, " con tabaco" if tab else ""]) if mk == "porro" else \
+		("Cargas %s de %s y le das unas caladas." % [{"pipa": "la pipa", "bong": "el bong"}.get(mk, "el vaporizador"), nom])
 	if D.ZONAS.has(S.map):
-		S.heat = minf(100, S.heat + 3)
+		S.heat = minf(100, S.heat + (1 if mk == "vapo" else 3))
 		heat_warn()
 		t += " Fumar en la calle llama la atención."
 	update_hud()
 	await say(t)
+
+func talk_vip(_i: int) -> void:   # trama (1.47)
+	pass
+
+func talk_estanco(_k: String) -> void:   # trama (1.47)
+	pass
+
+func marca_cata(_k: String, _r: bool, _sid: String, _thc: float) -> void:   # trama (1.47)
+	pass
 
 func object_action(x: int, y: int) -> void:
 	var m: Dictionary = MAPS[S.map]
@@ -1748,6 +1912,16 @@ func object_action(x: int, y: int) -> void:
 			await say("Botes de abono, sustrato de coco y medidores de pH.")
 		"display":
 			await say("Sobres de semillas de bancos de todo el mundo, ordenados por tipo.")
+		"vitrinaP", "vitrinaP2":   # 1.47
+			await say("La vitrina iluminada: grinders, pipas de cristal, bongs y vaporizadores. Se piden en el mostrador.")
+		"estanteE", "estanteE2":
+			await say("Cajetillas de todos los colores, en filas. Lo de liar, en el mostrador.")
+		"humidor":
+			await say("El humidificador de los puros, con su higrómetro.")
+		"papelE":
+			await say("El expositor del papel de fumar: librillos de todos los tamaños.")
+		"mostrE", "mostrE2":
+			await say("Mecheros de colores en la vitrina del mostrador.")
 		"bottles":
 			await say("Txakoli, pacharán y orujo casero.")
 		"jukebox":
