@@ -947,7 +947,7 @@ func montar_camarote() -> void:
 
 # lo que no se puede ocupar al ordenar (12d-orden): delante de la escalera del camarote (1.43.6)
 func reserva_orden(mapa: String) -> Array:
-	return D.ORDEN_RESERVA.get(mapa, []) + ([[D.CAMAROTE.x, D.CAMAROTE.y], D.CAMAROTE.vuelta] if mapa == "home" and cam_ya() else []) + delante_puertas(mapa)
+	return D.ORDEN_RESERVA.get(mapa, []) + ([[D.CAMAROTE.x, D.CAMAROTE.y], D.CAMAROTE.vuelta] if mapa == "home" and (cam_ya() or Datos.CAL) else []) + delante_puertas(mapa)   # 1.55.1: con CAL, la escalera del camarote, libre siempre
 
 # 1.51 (lo pidió el usuario: «una puerta en la casa, luego un mapa pequeño como un mini pasillito»; y en el taller y en la nave): las
 # puertas de dentro (PUERTAS_INT, con Datos.CAL), en la fila de la pared; se abren con A desde la casilla de delante, que no se ocupa
@@ -3007,6 +3007,8 @@ func pieza_ya(P_: Dictionary) -> bool:
 			return P_.k in muebles_ya()
 		"riego":
 			return S.get("nave") != null and int(S.nave.get("rg", 0)) >= 1
+		"cal":   # 1.55.1: la cama, el ordenador de la tía y la mesa de cruces, con CAL
+			return Datos.CAL
 		"carpa":   # 1.55: la carpa que tengas, con CAL
 			var ci := int(str(P_.k).substr(5))
 			return Datos.CAL and ci < S.carpas.size() and S.carpas[ci] is Dictionary
@@ -3223,7 +3225,7 @@ func quita_orden(mapa: String) -> void:
 	if not m.has("opos"):
 		m.opos = {}
 		for P_ in D.ORDEN_P[mapa].piezas:
-			if P_.get("suelo") or P_.get("si") == "carpa":   # 1.55: las carpas las pone montar_casa
+			if P_.get("suelo") or P_.get("si") == "carpa" or (P_.get("si") == "cal" and not Datos.CAL):   # 1.55: las carpas las pone montar_casa
 				continue
 			var ok := true
 			for o in P_.o:

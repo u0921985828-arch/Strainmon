@@ -335,14 +335,31 @@ def porro():
 
 
 def pipa():
+    """la mano con la pipa de madera de una pieza (48 × 24): la cazoleta a la izquierda (la boca en (10, 5)), la caña que sale de su
+    pie y la boquilla negra; la pipa por delante de los dedos, de un solo contorno"""
     L = lz(48, 24)
-    ovalo(L, 10, 12, 6, 6, MAD)                                                 # la cazoleta
-    L.r(6, 6, 9, 2, '#2a1a10'); L.hl(6, 14, 6, MAD[0])                          # la boca, con lo de dentro
-    linea(L, 15, 15, 30, 12, MAD[1], 2); linea(L, 15, 14, 30, 11, MAD[2])       # la caña
-    L.r(30, 10, 4, 3, '#1a1a1e')
+    mano_puno(L, 18, 14)   # la mano la coge por debajo de la caña, junto a la cazoleta
     con(L)
-    mano_puno(L, 26, 8)
-    return con(L)
+    c = lz(48, 24)
+    for y in range(5, 18):   # la cazoleta: recta y con el culo redondo
+        f = (y - 5) / 12
+        rx = 5.2 if y <= 12 else 5.2 * math.sqrt(max(0, 1 - ((y - 12) / 5.6) ** 2))
+        for x in range(4, 17):
+            nx = (x + .5 - 10) / rx
+            if abs(nx) > 1: continue
+            c.p(x, y, tono(MAD, .72 - .35 * nx - .25 * f))
+    c.hl(5, 15, 5, '#2a1a10'); c.hl(6, 14, 6, '#1a100a')                         # la boca, con lo de dentro
+    c.p(6, 5, MAD[3]); c.p(14, 5, MAD[2])
+    for x in range(14, 30):   # la caña, que sale del pie de la cazoleta y sube un poco
+        y = 14 - (x - 14) * 2 // 16
+        c.p(x, y, MAD[3]); c.p(x, y + 1, MAD[2]); c.p(x, y + 2, MAD[1])
+    for x in range(30, 41):   # la boquilla negra, más fina, con su labio
+        y = 12 - (x - 30) // 6
+        c.p(x, y, '#4a4a54'); c.p(x, y + 1, '#1e1e24')
+    c.r(29, 12, 1, 3, '#c8935a')                                                  # el anillo entre la caña y la boquilla
+    c.p(41, 10, '#4a4a54'); c.p(41, 11, '#2a2a30')
+    L.pega(con(c), 0, 0)
+    return L
 
 
 def bong():
@@ -452,15 +469,52 @@ def mano_abierta():
 
 # ── dormir ──
 def dormido(resp):
-    """la cabeza en la almohada con los ojos cerrados y la gorra en la mesilla (48 × 24); resp: el pecho arriba"""
-    L = lz(48, 24)
-    ovalo(L, 18, 12, 7, 6.5, PIEL)
-    for x in (14, 15, 20, 21): L.p(x, 12, PIEL[0])                   # los ojos cerrados
-    L.p(18, 15, PIEL[1]); L.p(19, 16, '#a85a4a')
-    for x in range(11, 26):   # el pelo, castaño
-        for y in range(5, 9 - (1 if 14 < x < 22 else 0)):
-            L.p(x, y, '#5a3a24' if y > 5 else '#7a5236')
-    con(L)
+    """el protagonista dormido en la cama de cerca (128 × 66, en el panel en (16, 30)): de lado, la mejilla en la almohada, el pelo
+    hacia el cabecero, los ojos cerrados, la nariz y la oreja; el edredón tapado hasta la barbilla con la forma del cuerpo (el
+    hombro, la cintura, la cadera, las rodillas y los pies), el embozo de la sábana y el brazo por encima; resp: el pecho arriba"""
+    W, H = 128, 66
+    D = ('#22325a', '#2e4478', '#3e5a9a', '#5a78b8')                            # el mismo edredón que el fondo
+    PELO = ('#2a1a10', '#4a2e1a', '#6a4426', '#8a5c36')
+    cab = lz(W, H)
+    ovalo(cab, 20, 17, 9.5, 8.5, PELO)                                          # el pelo, hacia el cabecero
+    ovalo(cab, 24.5, 19, 7.5, 6.5, PIEL, luz=.05)                                # la cara, de lado sobre la almohada
+    for x in range(21, 30): cab.p(x, 13 - (1 if 23 < x < 28 else 0), PELO[2])   # el flequillo
+    for x in range(22, 27): cab.p(x, 14, PELO[1])
+    ovalo(cab, 20.5, 20, 2, 2.5, PIEL, luz=-.25); cab.p(20, 20, PIEL[0])         # la oreja
+    for (x, y) in ((25, 17), (26, 18), (27, 18), (28, 17)): cab.p(x, y, '#4a2e22')   # el ojo cerrado
+    cab.p(29, 16, '#4a2e22')
+    for x in range(25, 29): cab.p(x, 15, PELO[1])                               # la ceja
+    cab.p(32, 18, PIEL[2]); cab.p(32, 19, PIEL[1]); cab.p(31, 20, PIEL[0])      # la nariz
+    cab.p(28, 20, '#e0a080'); cab.p(27, 20, '#e8b090')                          # la mejilla
+    cab.p(29, 23, '#a85a4a'); cab.p(30, 23, '#8a4a3a')                          # la boca
+    con(cab)
+    sh = -1 if resp else 0
+    pts = [(0, 28), (26, 28), (30, 25), (36, 19 + sh), (42, 18 + sh), (50, 22 + sh), (58, 25), (66, 22), (75, 20), (84, 22), (96, 25),
+           (108, 26), (114, 24), (119, 23), (124, 26), (127, 28)]
+    def arriba(x):
+        for a, b in zip(pts, pts[1:]):
+            if a[0] <= x <= b[0]:
+                f = (x - a[0]) / max(1, b[0] - a[0])
+                f = (1 - math.cos(f * math.pi)) / 2
+                return a[1] + (b[1] - a[1]) * f
+        return 28
+    e = lz(W, H)
+    for x in range(2, W):
+        t = round(arriba(x)); d = arriba(x + 1) - arriba(x - 1)
+        for y in range(t, H):
+            v = .64 - max(0, y - 30) / 40 * .28 + (.12 if y - t < 2 else (.05 if y < 30 else 0))
+            e.p(x, y, tono(D, v))
+        e.p(x, t, D[3])
+        if x < 31:   # el embozo de la sábana, doblado sobre el edredón
+            for k in range(3): e.p(x, t + k, ('#ffffff', '#e4e8f0', '#b8bccc')[k])
+    con(e)
+    b = lz(W, H)   # el brazo por encima del edredón, del hombro a la cintura, con la mano
+    brazo(b, 37, 19 + sh, 55, 24 + sh, MANGA, g=5)
+    ovalo(b, 58.5, 26.5 + sh, 3.5, 2.6, PIEL)
+    for k in range(3): b.p(56 + k, 28 + sh, PIEL[1])
+    con(b)
+    L = lz(W, H)
+    L.pega(cab, 0, 0); L.pega(e, 0, 0); L.pega(b, 0, 0)
     return L
 
 
@@ -598,7 +652,7 @@ sale('gs-planta-v', planta()); sale('gs-planta-f', planta(True))
 sale('gs-regadera-0', regadera(0)); sale('gs-regadera-1', regadera(1))
 sale('gs-spray-0', spray(0)); sale('gs-spray-1', spray(1))
 sale('gs-bong', bong())
-sale('gs-dormido', dormido(0))
+sale('gs-dormido-0', dormido(0)); sale('gs-dormido-1', dormido(1))
 sale('gs-porro', porro()); sale('gs-pipa', pipa()); sale('gs-vapo-0', vapo(0)); sale('gs-vapo-1', vapo(1))
 sale('gs-bolsita', bolsita()); sale('gs-mano-billete', mano_billete())
 sale('gs-bolsita-c', bolsita(MANGA_C).espejo()); sale('gs-billete-m', mano_billete(MANGA).espejo())

@@ -87,6 +87,32 @@ func _corre() -> void:
 		chk(A_.size() == 1 and A_[0].x0 == libre, "la carpa A, movida a %d: %s" % [libre, A_])
 		chk(h.o[2][libre] == "carpa" and h.o[2][8] != "carpa", "el mapa la sigue")
 		chk(J.sitio(0).x == libre, "sitio(0) la sigue")
+	# 1.55.1: todos los muebles de la casa se ordenan; delante de la puerta y la escalera del camarote, nada
+	S.coloca = {}
+	monta()
+	var ks: Array = J.piezas_ya("home").map(func(P_): return P_.k)
+	for k in ["cama", "pc", "lab", "nevera", "mesa", "planta", "trim", "carpa0", "carpa1", "carpa2"]:
+		chk(k in ks, "se ordena: %s" % k)
+	var CM: Dictionary = J.D.CAMAROTE
+	var prohib := [[3, 2], [int(CM.x), int(CM.y)], [int(CM.vuelta[0]), int(CM.vuelta[1])]]
+	for P_ in J.piezas_ya("home"):
+		for c in prohib:
+			for o in P_.o:
+				var x: int = c[0] - int(o[0])
+				var y: int = c[1] - int(o[1])
+				chk(J.cabe_pieza("home", P_.k, x, y, null, false) != "", "%s no se puede dejar tapando (%d, %d)" % [P_.k, c[0], c[1]])
+	for c in prohib:
+		chk(h.o[c[1]][c[0]] == null, "(%d, %d), libre" % [c[0], c[1]])
+	var hueco := []
+	for x in range(1, 17):
+		if J.cabe_pieza("home", "cama", x, 4, null, false) == "":
+			hueco = [x, 4]
+			break
+	chk(hueco.size() == 2, "la cama cabe en otro sitio")
+	if hueco.size() == 2:
+		S.coloca.home = {"cama": hueco}
+		J.rehace_orden("home")
+		chk(h.o[4][hueco[0]] == "bedT" and h.o[5][hueco[0]] == "bedB" and h.o[2][0] != "bedT", "la cama, movida a %s" % [hueco])
 	# sin CAL, como antes
 	Datos.CAL = false
 	monta()

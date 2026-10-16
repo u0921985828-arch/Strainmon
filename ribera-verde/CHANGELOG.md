@@ -1,5 +1,14 @@
 # Cambios
 
+## 1.55.1 · Godot 0.45.0
+
+Lo que pidió el usuario tras la 1.55 («no parece el personaje tumbado en la cama», «la pipa no parece de una sola pieza» y «que se pueda ordenar cualquier mueble de la casa; delante de la puerta y donde la escalera del camarote, libre siempre»). Solo Godot, con `Datos.CAL`.
+
+- **Dormir**: el protagonista entero, de lado, con la mejilla en la almohada, el pelo, la oreja, los ojos cerrados y la nariz; tapado hasta la barbilla con el edredón marcando el hombro, la cadera y los pies, el embozo de la sábana y el brazo por encima; respira (`gs-dormido-0/1`, 128 × 66).
+- **La pipa**: de madera y de una pieza (cazoleta, caña y boquilla con un solo contorno), cogida por debajo de la caña.
+- **Ordenar cualquier mueble de la casa**: también la cama, el ordenador de la tía con su silla y la mesa de cruces (`si: "cal"`).
+- **Siempre libres**: la casilla de delante de la puerta del pasillo y la de la escalera del camarote y la de delante, aunque el camarote no esté hecho; ningún mueble ni carpa se puede dejar ahí.
+
 ## 1.55.0 · Godot 0.45.0
 
 Lo que pidió el usuario («la puerta del sótano está inaccesible porque hay una carpa delante», «debería salir un tubo de extracción de cada carpa hacia una de las ventanas» y «poder ordenar las carpas al gusto»). Solo Godot, con `Datos.CAL`.

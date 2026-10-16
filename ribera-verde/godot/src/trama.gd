@@ -9264,10 +9264,10 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 				_gsp(R, "gs-mano", _mv(144, 104, (t - 1000) / 200.0), 28)
 		"dormir":   # en la cama, de noche (o la siesta, de día); respira y suben las zetas
 			_gsp(R, "gs-f-cama-d" if c == "siesta" else "gs-f-cama-n", 0, 0)
-			_gsp(R, "gs-dormido", 18, 34 + (1 if fmod(t, 1000) > 500 else 0))
+			_gsp(R, "gs-dormido-%d" % (1 if fmod(t, 1000) > 500 else 0), 16, 30)   # 1.55.1: de lado, tapado, el pecho sube y baja
 			for i in 3:
 				var f: float = fmod(t / 900.0 + i / 3.0, 1.0)
-				_gsp(R, "gs-z", 44 + f * 16 + sin(f * 6) * 2, 34 - f * 28)
+				_gsp(R, "gs-z", 50 + f * 16 + sin(f * 6) * 2, 36 - f * 30)
 
 # fumar: el porro, la pipa o el bong, el mechero los enciende, la brasa y el humo; el vaporizador, su piloto y el vapor
 func _gesto_fumar(R: Array, m: String, t: float) -> void:
