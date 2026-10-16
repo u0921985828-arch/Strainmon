@@ -1,5 +1,21 @@
 # Cambios
 
+## 1.51.0 · Godot 0.45.0
+
+Lo que pidió el usuario tras la 1.50 (el final de partida, el atrezo, misiones secundarias, el móvil con iconos, el sótano, las puertas de dentro y las hojas por variedad). Solo Godot, con `Datos.CAL`.
+
+- **El muelle de Puerto Viejo** (lo pidió el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para hacer envíos, invertir en un barco, empezando por uno pequeño»): desde el capítulo 8, al final de la plaza, a la derecha, el paso al muelle de la cofradía (`MAPS.muelle`, 34 × 16; salidas de lado con `lado` en `exits`, `montar_muelle` en `mundo.gd`), con las casas marineras, la acera, el pantalán con sus norays, redes, nasas y cajas, y el agua. Koldo, el amigo de la tía Maite, te manda un SMS y te da su txalupa *Maite* (6 m); el pesquero *Itsaso* (10 m, 65.000 €) y el atunero *Maite Bi* (14 m, 180.000 €) se compran por transferencia y se amarran cada uno en su noray (arte a mano en `tools/sprites/a-mano/puerto.py`).
+- **Los envíos por mar**: en el noray de cada barco, la ruta (Burdeos, Brest, Cork y Róterdam, que abre la reputación), la carga por lotes hasta lo que cabe en la bodega (desde 500 g) y zarpar; a los días de viaje, la conservera paga por transferencia (limpio, a la cuenta) al por mayor por la ruta; la patrullera puede parar un barco (según el barco, la ruta y el calor) y quedarse la carga. Rango por kilos exportados (de Txalupero a Almirante del Cantábrico), un pedido cada semana con prima y, con reputación, **el último trabajo** de Koldo: 10 kg a Róterdam en un viaje, con prima de 50.000 € y el final de su historia (`MAR`, `S.mar`, `talk_koldo`, `cargar_envio`, `mar_dia`).
+- **El piso franco de Gorka** (lo pidió el usuario: «distribución a gran escala por un piso franco o una persona»): tras el primer envío, la puerta de la casa amarilla del muelle; se alquila (1.500 € al mes en efectivo), lo que dejas en el alijo lo reparte él al por mayor cada mañana (300 g al día; con la furgoneta, 700 g, y con la red de pisos, 1,5 kg) y se queda un 12 %; la caja se recoge en mano; si la calle se calienta, redada en el piso (`FRANCO`, `S.franco`, `talk_gorka`, `alijo_franco`, `franco_dia`).
+- **El sótano** (lo pidió el usuario): una puerta en el dormitorio del piso al pasillo de abajo y, con la obra de la tienda online, la escalera al sótano de la tía, con estanterías para bandejas de setas (`SOTANO`, `PUERTAS_INT`).
+- **El bajo de Txomin, más grande** (lo pidió el usuario: «que se cultive como la nave»): nueve estanterías en tres páginas y Ekaitz, el sobrino de Txomin, de ayudante: cada mañana pulveriza, recoge lo listo y lo tiende a secar (`SETAS_AY`).
+- **Puertas de dentro**: en el taller, al cuartucho con la cama; en la nave, al despacho (con el escritorio) y a la habitación (con la cama) (`PUERTAS_INT`, `puertas_int`).
+- **Las hojas por variedad** (lo pidió el usuario: «dependiendo de la variedad o linaje, las hojas son diferentes»): la hoja de abanico de cada una dibujada en código según su % índica (foliolos, ancho, abertura) y, en las landraces que se distinguen, su ficha propia (`HOJA`: las tailandesas de puntas caídas, la hawaiana ancha y clara…), en la ficha de la Genoteca (`src/hoja.gd`).
+- **Recados por la comarca**: diez misiones secundarias que aparecen según el capítulo (el jubilado de la rodilla, el bocata para la mar, el camión de Valdehierro…), con su premio en dinero y reputación (`SECUNDARIAS`, `recados_menu`).
+- **El atrezo** de la casa de Txaro, el caserío de ama, la comisaría y el almacén (`ATREZO`, `ATREZO_TXT`).
+- **El móvil con su pantalla**: la hora en grande y las aplicaciones en una rejilla con sus iconos, a mano (`tools/sprites/a-mano/movil.py`, `MOVIL_V`, `rects_movil`).
+- Pruebas: `tests/muelle.gd`, `sotano.gd`, `hojas.gd`, `recados.gd`, `atrezo.gd` y `movil.gd`.
+
 ## 1.50.0 · Godot 0.44.0
 
 Lo que pidió el usuario tras probar la 1.49. Solo Godot, con `Datos.CAL`.
