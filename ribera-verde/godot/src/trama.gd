@@ -2334,6 +2334,12 @@ func cuanto(txt: String, mx: float, pasos: Array, fmt: Callable):
 static func g_txt(g: float) -> String:
 	return "%d g" % int(floor(g))
 
+# 1.50: un lote de menos de 10 g, con su décima (0,4 g no es «0 g»); sin CAL, como g_txt
+func g_lote(g: float) -> String:
+	if Datos.CAL and g > 0 and g < 10 and absf(g - floor(g)) >= .05:
+		return Datos.coma(floor(g * 10 + 1e-9) / 10.0) + " g"
+	return g_txt(g)
+
 # «300 € y 50 g», «300 €, 50 g y 2 g de rosin» o, sin cogollos, «300 € y 2 g de rosin»
 func lo_que(e: float, g: float, r: float) -> String:
 	var L := [Datos.eur(e)]
@@ -5312,9 +5318,11 @@ func comprar_mercado(id: String, N: String, pool: Array) -> void:
 	if l.is_empty():
 		await say("Hoy ya está todo repartido. Mañana entra más.", N)
 		return
-	var it := l.map(func(q): return {"label": nombre_mer(q), "right": "%d g · %s %% · %s €/g" % [int(q.g), Datos.pct(q.thc), _dos(precio_mer(id, q))], "sw": "#d89a18" if q.x != "" else strain(q.k).c, "ic": ic_cog(q.k)})
-	it.append({"label": "Nada"})
-	var i: int = await menu(it, {"cls": "right", "title": "Hoy tenemos"})
+	var it := l.map(func(q): return {"label": nombre_mer(q), "right": "%d g · %s %% · %s €/g" % [int(q.g), Datos.pct(q.thc), _dos(precio_mer(id, q))], "sw": "#d89a18" if q.x != "" else strain(q.k).c, "ic": ic_cog(q.k),
+		"desc": "%s: %d g a %s %% de THC, a %s el gramo." % [nombre_mer(q), int(q.g), Datos.pct(q.thc), _dos(precio_mer(id, q)) + " €"]})
+	it.append({"label": "Nada", "desc": "No comprar nada hoy."})
+	# 1.50: a lo ancho, con el nombre entero (en la columna de la derecha se cortaba: «Beldi», «Zam»…)
+	var i: int = await menu(it, {"cls": "full", "title": "Hoy tenemos", "desc": true} if Datos.CAL else {"cls": "right", "title": "Hoy tenemos"})
 	if i < 0 or i >= l.size():
 		return
 	var q: Dictionary = l[i]
@@ -6135,7 +6143,7 @@ func desc_almacen(A: Dictionary) -> String:
 			return "GUARDAR: llevas %s de cogollos y en el camarote caben %s más (%d tarros de 10 L). %s\nA: guardar · B: cerrar." % [g_txt(total_buds()), g_txt(maxf(0, cam_cap() - cam_g())), cam_est() * int(CM.est.tarros), sob_t]
 		var tj: String = (" en %d tarros (este, el %d.º: %d g)" % [int(it.n), int(it.q) + 1, int(it.gj)]) if int(it.n) > 1 else ""
 		var af := float(it.b.get("af", 0))
-		return "%s: %d g%s · %s %% THC%s%s.\nA: sacarlo · B: cerrar." % [lot_nombre(it.k), int(floor(it.b.g)), tj, Datos.pct(it.b.thc), cura_corto(it.b),
+		return "%s: %s%s · %s %% THC%s%s.\nA: sacarlo · B: cerrar." % [lot_nombre(it.k), g_lote(it.b.g), tj, Datos.pct(it.b.thc), cura_corto(it.b),
 			(" · afinada al 62 %%" if af >= 1 else (" · afinándose (%d %%)" % Datos.jsround(af * 100))) if af else ""]
 	if A.t == "caja":
 		var C: Dictionary = D.CAJA[int(S.caja.nivel)]
@@ -6143,9 +6151,9 @@ func desc_almacen(A: Dictionary) -> String:
 		if it != null and it.k == "+":
 			return "GUARDAR: llevas %s de cogollos y en la caja caben %s más.%s\nA: guardar · B: cerrar." % [g_txt(total_buds()), g_txt(maxf(0, C.g - g)), (" Con los tarros se curan en %d días." % int(D.CURADO.dias)) if S.items.get("tarros") else ""]
 		if it == null or it.k == "$":
-			return "Dinero: %s de %s (%s). Tarros: %s de %s (%s).\nA: guardar o sacar · B: cerrar." % [Datos.eur(S.caja.money), Datos.eur(C.money), _pct_txt(S.caja.money / C.money), g_txt(g), _kg(int(C.g)), _pct_txt(g / C.g)]
+			return "Dinero: %s de %s (%s). Tarros: %s de %s (%s).\nA: guardar o sacar · B: cerrar." % [Datos.eur(S.caja.money), Datos.eur(C.money), _pct_txt(S.caja.money / C.money), g_lote(g), _kg(int(C.g)), _pct_txt(g / C.g)]
 		var tj: String = (" en %d tarros (este, el %d.º: %d g)" % [int(it.n), int(it.q) + 1, int(it.gj)]) if int(it.n) > 1 else ""
-		return "%s: %d g%s · %s %% THC%s.\nA: sacarlo · B: cerrar." % [lot_nombre(it.k), int(floor(it.b.g)), tj, Datos.pct(it.b.thc), cura_corto(it.b)]
+		return "%s: %s%s · %s %% THC%s.\nA: sacarlo · B: cerrar." % [lot_nombre(it.k), g_lote(it.b.g), tj, Datos.pct(it.b.thc), cura_corto(it.b)]
 	var r := nevera_r()
 	if it == null or it.k == "+":
 		return "GUARDAR: llevas %s g de extractos y en la nevera caben %s g más.%s\nA: guardar · B: cerrar." % [Datos.coma(Datos.jsround(total_rosin() * 10) / 10.0), Datos.coma(maxf(0, floor((nevera_cap() - r) * 10 + 1e-9) / 10.0)),

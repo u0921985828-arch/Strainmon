@@ -1,5 +1,15 @@
 # Cambios
 
+## 1.50 (en curso)
+
+Lo que pidió el usuario tras probar la 1.49. Solo Godot, con `Datos.CAL`.
+
+- **El recuadro del HUD**: debajo de la fecha y la hora, una tabla ordenada con EFECTIVO, BANCO (la cuenta), FLORES y ROSIN que llevas encima, la etiqueta a la izquierda y la cifra a la derecha, entre dos rayas (`hud_filas`, `_pinta_hud_tab` en `ui.gd`; `update_hud` en `juego.gd`). Encima de CALOR y SOSPECHA.
+- **Los nombres enteros en los mercados**: «Hoy tenemos» de los clubs, Iñaki y la lonja salía en la columna de la derecha y cortaba las variedades («Beldi», «Zam», «Dry s»); ahora es un menú a lo ancho con la ficha de cada lote debajo (`comprar_mercado`).
+- **Sin hueco al final de los menús largos**: al pasar a una fila con la descripción más corta caben más filas y la lista se quedaba corrida, con el ▲ arriba y un hueco debajo (la tienda de Kiko); ahora se ajusta (`m_top` en `menu`).
+- **Menos de 10 g con su décima** en la caja fuerte y el camarote: un lote de 0,4 g ya no sale como «0 g» (`g_lote`).
+- La prueba de los créditos de `ciclo.gd` lee la versión de `project.godot`, no una fija.
+
 ## 1.49.0 · Godot 0.43.0
 
 Los muebles del taller, la panadería, el bar y la lavandería, de frente (lo pidió el usuario: «recuerda cómo deben ser los sprites», con la skill del director de sprites y fotos de la lavandería y de una cafetera de dos grupos). Solo Godot, con `Datos.CAL`.

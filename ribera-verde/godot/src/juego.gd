@@ -562,5 +562,14 @@ func update_hud() -> void:
 	hud_visto = sosp_hud()
 	var r := total_rosin()
 	var ro := (" · " + Datos.coma(Datos.jsround(r * 10) / 10.0) + " g rosin") if r else ""
-	hud_pon("%s · %s:%s\n%s · %d g%s" % [Datos.fd_hud(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds())), ro], Datos.jsround(S.heat),
-		Datos.jsround(SOSP.v) if n_patrullas() else -1, SOSP.alarma != null, float(S.get("orden", 0)) > 0)
+	var sp := Datos.jsround(SOSP.v) if n_patrullas() else -1
+	var od := float(S.get("orden", 0)) > 0
+	if Datos.CAL:   # 1.50 (lo pidió el usuario): efectivo, cuenta, flores y extractos encima, en su recuadro
+		var gb := total_buds()
+		hud_pon("%s · %s:%s" % [Datos.fd_hud(S.day), hh, mm], Datos.jsround(S.heat), sp, SOSP.alarma != null, od, [
+			["EFECTIVO", Datos.eur(S.money), Color("#eef8f0")],
+			["BANCO", Datos.eur(float(S.get("banco", 0))), Color("#a8d8f0")],
+			["FLORES", ("%d g" % int(floor(gb))) if gb >= 10 or gb == floor(gb) else Datos.coma(floor(gb * 10 + 1e-9) / 10.0) + " g", Color("#9ee070")],
+			["ROSIN", Datos.coma(Datos.jsround(r * 10) / 10.0) + " g", Color("#f0c050")]])
+		return
+	hud_pon("%s · %s:%s\n%s · %d g%s" % [Datos.fd_hud(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds())), ro], Datos.jsround(S.heat), sp, SOSP.alarma != null, od)

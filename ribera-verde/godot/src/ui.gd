@@ -135,6 +135,9 @@ func _ready() -> void:
 	hud_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(hud_col)
 	hud_col.add_child(hud_txt)
+	hud_tab.mouse_filter = Control.MOUSE_FILTER_IGNORE   # 1.50: el recuadro del dinero y lo que llevas encima
+	hud_tab.draw.connect(_pinta_hud_tab)
+	hud_col.add_child(hud_tab)
 	hud_txt.bbcode_enabled = true
 	hud_txt.fit_content = true
 	hud_txt.autowrap_mode = TextServer.AUTOWRAP_OFF
@@ -1114,6 +1117,8 @@ func _pinta_menu(rows: int) -> void:
 		m_top = m_i
 	if m_i >= m_top + vis:
 		m_top = m_i - vis + 1
+	if Datos.CAL:   # 1.50: si caben más filas (la descripción de ahora es más corta), sin hueco debajo de la última
+		m_top = clampi(m_top, 0, maxi(0, m_items.size() - vis))
 	if o.get("title"):
 		var t := HBoxContainer.new()
 		var a := Label.new()
@@ -1416,10 +1421,15 @@ var hud_heat := 0
 var hud_sosp := -1   # la barra de sospecha (1.10): -1 sin patrullas en el mapa
 var hud_alarma := false
 var hud_orden := false   # (1.11) con la orden de registro, la barra dice ORDEN
-func hud_pon(t: String, heat: int, sosp := -1, alarma := false, orden := false) -> void:
+var hud_tab := Control.new()
+var hud_filas := []   # 1.50: [[etiqueta, valor, color]] del recuadro; vacío, sin recuadro (sin Datos.CAL)
+func hud_pon(t: String, heat: int, sosp := -1, alarma := false, orden := false, filas := []) -> void:
 	if oraculo:
 		return
 	hud_txt.text = t
+	hud_filas = filas
+	hud_tab.visible = not filas.is_empty()
+	hud_tab.queue_redraw()
 	hud_heat = heat
 	hud_orden = orden
 	hud_sosp = sosp
@@ -1438,6 +1448,31 @@ const HUD_R := 2.0
 const HUD_BW := 28.0  # barra
 const HUD_BH := 2.5
 const HUD_GAP := 2.5
+
+# 1.50: el recuadro, etiqueta a la izquierda y cifra a la derecha, con una raya arriba y abajo
+const HUD_TAB_SEP := 6.0   # entre la etiqueta más larga y la cifra más larga
+func _pinta_hud_tab() -> void:
+	var f := negrita
+	var fs := roundi(HUD_FS * u)
+	var lh := HUD_LH * u
+	var we := 0.0
+	var wv := 0.0
+	for r in hud_filas:
+		we = maxf(we, f.get_string_size(r[0], HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x)
+		wv = maxf(wv, f.get_string_size(r[1], HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x)
+	var w := maxf(we + HUD_TAB_SEP * u + wv, HUD_BW * u + 40 * u)
+	var pad := 1.5 * u
+	var raya := Color(1, 1, 1, .22)
+	hud_tab.draw_rect(Rect2(0, pad * .5, w, maxf(1, roundf(.5 * u))), raya)
+	var y := pad
+	for r in hud_filas:
+		var by := y + f.get_ascent(fs) + (lh - f.get_height(fs)) / 2
+		hud_tab.draw_string(f, Vector2(0, by), r[0], HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#9fc0ac"))
+		var vw := f.get_string_size(r[1], HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		hud_tab.draw_string(f, Vector2(w - vw, by), r[1], HORIZONTAL_ALIGNMENT_LEFT, -1, fs, r[2])
+		y += lh
+	hud_tab.draw_rect(Rect2(0, y + pad * .5 - maxf(1, roundf(.5 * u)), w, maxf(1, roundf(.5 * u))), raya)
+	hud_tab.custom_minimum_size = Vector2(w, y + pad)
 
 func _pinta_hud_bar() -> void:
 	var f := negrita
