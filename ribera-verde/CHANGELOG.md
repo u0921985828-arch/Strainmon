@@ -1,6 +1,6 @@
 # Cambios
 
-## 1.50 (en curso)
+## 1.50.0 · Godot 0.44.0
 
 Lo que pidió el usuario tras probar la 1.49. Solo Godot, con `Datos.CAL`.
 
