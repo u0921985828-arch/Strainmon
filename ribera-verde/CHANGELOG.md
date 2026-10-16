@@ -1,6 +1,6 @@
 # Cambios
 
-## 1.49 · en curso (sin APK hasta cerrar la tanda)
+## 1.49.0 · Godot 0.43.0
 
 Los muebles del taller, la panadería, el bar y la lavandería, de frente (lo pidió el usuario: «recuerda cómo deben ser los sprites», con la skill del director de sprites y fotos de la lavandería y de una cafetera de dos grupos). Solo Godot, con `Datos.CAL`.
 
