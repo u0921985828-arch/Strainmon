@@ -256,7 +256,10 @@ func _mundo() -> void:
 		_vistas()
 	for e in J.ents:
 		list.append([e.py, _pj.bind(e, e.look, false, float(e.get("dur", 320.0)))])
-	list.append([P.py, _pj.bind(P, J.D.LOOKS.player, true, P.dur)])
+	if J.SENT != null:   # 1.47: sentado, delante del asiento si se ve de frente y detrás si se ve de espaldas
+		list.append([J.SENT.y * 16 + (1 if J.SENT.d == "sur" else -1), _pj_sentado])
+	else:
+		list.append([P.py, _pj.bind(P, J.D.LOOKS.player, true, P.dur)])
 	var bolsa = Atlas.foto_misc("bolsa")
 	if bolsa:
 		for it in J.D.ITEMS:
@@ -563,6 +566,13 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var pl = _plantas_mesa(gr, J.mesa_idx(tx, ty), fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima
 	var sp: String = ("mesaN-%d" % mini(fm, 1)) if o == "mesaN" else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)
 	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
+	var ge = Atlas.cubre("obj:e-" + o) if Datos.CAL and not an else null   # 1.47: a escala con el protagonista (escala.py), solo con CAL
+	if ge:
+		var fe = Atlas.frame_de(ge, "e-" + sp, "unica", 0, {"i": 0, "esp": d.esp})
+		if fe == null:
+			fe = Atlas.frame_de(ge, "e-" + o, "unica", 0, {"i": 0, "esp": d.esp})
+		if fe != null:
+			f = fe
 	if f == null and not an and sp != o:
 		f = Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})
 	if f == null:
@@ -845,6 +855,29 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 	if a and a.get("humo") and not a.get("humoHecho") and f.i >= a.humo.frame:
 		a.humoHecho = 1
 		J.lanzar_vfx(a.humo.vfx, e.px + 8 + a.humo.off[0], e.py + 15 + a.humo.off[1], now, J.S.map, true)
+
+# sentado (1.47): el fotograma quieto sin SENT_CORTA filas de piernas (los pies, en el suelo), en la casilla del asiento
+var _sent_img := {}
+func _pj_sentado() -> void:
+	var gr = Atlas.grupo_look(J.D.LOOKS.player)
+	if not gr:
+		return
+	var f = Atlas.frame_de(gr, "base", DIR4[J.P.dir], 0, {"i": 0})
+	if f == null:
+		return
+	f = J.ropa_c(f, gr)
+	var c: Image = f.c
+	var im: Image = _sent_img.get(c)
+	if im == null:
+		var n: int = J.SENT_CORTA
+		var y0: int = int(f.cel.ancla[1])   # la fila de los pies: se quitan las n de encima
+		im = Image.create(c.get_width(), c.get_height(), false, c.get_format())
+		im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - n), Vector2i(0, n))
+		im.blit_rect(c, Rect2i(0, y0, c.get_width(), c.get_height() - y0), Vector2i(0, y0))
+		_sent_img[c] = im
+	var xp: int = J.SENT.x * 16 - Datos.jsround(cam.x) + 8
+	var yp: int = J.SENT.y * 16 - Datos.jsround(cam.y) + 15 - (J.SENT_SUBE if J.SENT.d == "norte" else 0)
+	_img(im, Datos.jsround(xp - f.cel.ancla[0]), Datos.jsround(yp - f.cel.ancla[1]))
 
 # en coche con techo (1.43.1): el protagonista, solo donde hay cabina (lo que pinta <v>-atras), para que la visera no se salga
 # del cristal; una vez por par de fotogramas

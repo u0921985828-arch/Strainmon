@@ -1,5 +1,29 @@
 # Cambios
 
+## 1.47.0 · 16 de octubre de 2026
+
+Muebles a escala, sentarse a fumar y cuatro locales como en las fotos (lo pidió el usuario: «el mobiliario debe de ser a escala realista para con el personaje, también en los clubs, casas y demás»; «que se pueda sentarse a fumarse uno, y opción de levantarse, lo mismo en los asientos de casa»; las fotos del taller, la panadería, el bar y la lavandería, y «¿por qué no estás usando la API de PixelLab?»). Solo Godot (0.41.0), con `Datos.CAL`: sin CAL, las pantallas del oráculo no cambian.
+
+- **Los muebles a escala con el protagonista** (27 px = 1,70 m, 16 px/m) en casas, clubs, grows, la nave, el bajo, la discoteca y los locales.
+  - Los que se quedaban cortos salen otra vez a su alto real (`tools/sprites/a-mano/escala.py`): `e-<sprite>` en `escala-alto` (32 × 48) y `escala-ancho` (48 × 48).
+  - Así salen mesas, mostradores, barras, vitrinas, el banco, la gramola, las lavadoras, la caja de los locales y los sofás.
+  - Con CAL, `_arte_obj` los cambia por los de siempre.
+  - El box del lavadero mide 5 m, como los coches (`boxL`, `NEG_LARGO`).
+- **Sentarse** en sofás, sillones, sillas, bancos y taburetes, en casa, en los clubs y en la calle (A delante del asiento: `ASIENTOS`, `asiento`, `sentado`).
+  - El protagonista se sienta de frente o de espaldas según el asiento (`_pj_sentado`).
+  - Desde el asiento puedes fumarte uno o levantarte. En las sillas de los ordenadores, también usar el ordenador.
+  - **Fumarte uno** (`fumar_sentado`): gasta medio gramo del lote que elijas y pasa un cuarto de hora, con el humo.
+  - En la calle, el calor sube 3. En comisaría no; en el bar, la discoteca y los locales tampoco: «Aquí dentro no se puede fumar».
+- **El taller, la panadería, el bar y la lavandería, como en las fotos del usuario:**
+  - Los muebles salen de PixelLab (`create_1_direction_object`, solo con texto: las fotos llevan marcas y no se subieron). Están en `tools/sprites/pixellab-negocios/` y se ajustan a 16 px/m con `tools/sprites/a-mano/pixellab_negocios.py`, en los grupos `negocios-pl-alto`, `negocios-pl-ancho` y `negocios-pl-coche`.
+  - Los suelos y las paredes están hechos a mano (`tools/sprites/a-mano/negocios2.py`, `interior-negocios`).
+  - **El taller:** suelo de resina azul y pared blanca con la franja azul, blanca y roja. El elevador tiene las columnas azules (`e-elevT`). Hay un carro de herramientas rojo, la recogedora de aceite, una estantería de recambios de 2 m y cajas azules.
+  - **La panadería:** baldosa gris clara y azulejo de metro. Tiene el horno de pisos, el carro de bandejas, el estante del pan con los cestos, la mesa de acero con la masa y el mostrador con las campanas y la cafetera.
+  - **El bar:** suelo de pizarra, pared gris azulada y el machihembrado de pino. Tiene la barra de pintxos de mármol con la vitrina, el botellero con los vasos, la cafetera, taburetes de hierro negro (`e-stool`) y mesas de pino con sus sillas.
+  - **La lavandería:** laminado gris y pared azul con burbujas. Tiene lavadoras y secadoras industriales de acero, la caja de pago (el género), la mesa de doblar y el carro de la ropa.
+  - Las barras y los mostradores dejan hablar por encima (`COUNTERS`). Los de dos casillas están en `NEG_ANCHO`.
+- Prueba nueva `tests/escala.gd` (32 comprobaciones; con `--pintar`, cada sitio y la gente sentada). `tests/negocios.gd` pasa a 299.
+
 ## 1.46.0 · 16 de octubre de 2026
 
 Las cepas de setas y el taller a escala (lo pidió el usuario: «que se puedan comprar diferentes panes… diferentes micelios… como razas… juntar esos micelios y crear nuevas variedades… preestablecidas en un libro de recetas… que no se permita hacer ciertos cruces… son diferentes formas de las setas»; y «ya hay sprites de coches del concesionario, usa esas medidas para crear los fosos con las máquinas de levantar… a escala»). Solo Godot (0.40.0), con `Datos.CAL`. Las cepas son inventadas y genéricas: nada de método ni de dosis.

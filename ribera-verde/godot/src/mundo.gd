@@ -6,7 +6,7 @@ extends "res://src/ui.gd"
 const TS := 16
 const DV := {"up": [0, -1], "down": [0, 1], "left": [-1, 0], "right": [1, 0]}
 const OPP := {"up": "down", "down": "up", "left": "right", "right": "left"}
-const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2"]   # 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
+const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2", "barraN", "barraN2", "mostrN", "mostrN2"]   # 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
 const SILLAS := ["silla", "sillaG", "sillaG2"]   # 1.27.1: delante de un ordenador; con A, el ordenador de encima (delante)
 var SOLID_G := RegEx.create_from_string("^(water|roof|wall|win|iwT|iwB|void)")
 
@@ -778,9 +778,9 @@ func montar_setas() -> void:
 # los negocios por dentro (1.45, lo pidió el usuario: «que tú puedas acceder a ese sitio y controlarlo desde ahí»; con Datos.CAL):
 # en la calle, la puerta del local (NEGOCIO.k[k]: x, puerta, ancha, dx, tile; gate «neg:k»); dentro (loc-<k>), lo que ponen las mejoras
 # compradas (S.loc[k].mj); sin Datos.CAL, la calle y el local como estaban (la copia _neg0)
-const NEG_ANCHO := ["elevT", "fosoT", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL"]
-# 1.46: el elevador y el foso, a escala con los coches del concesionario (5 casillas, como la exposición)
-const NEG_LARGO := {"elevT": 5, "fosoT": 5}
+const NEG_ANCHO := ["elevT", "fosoT", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL", "hornoN", "recambT", "barraN", "botN", "estP", "mostrN", "doblaN", "mesaP"]   # 1.47: los muebles de PixelLab de dos casillas
+# 1.46: el elevador y el foso, a escala con los coches del concesionario (5 casillas, como la exposición); 1.47, el box de lavado
+const NEG_LARGO := {"elevT": 5, "fosoT": 5, "boxL": 5}
 var _neg0 := {}
 func montar_locales(mapa: String) -> void:
 	if not D.has("NEGOCIO"):
@@ -1480,6 +1480,12 @@ func delante() -> Array:
 func interact() -> void:
 	var dv: Array = DV[P.dir]
 	var m: Dictionary = MAPS[S.map]
+	if Datos.CAL:   # 1.47: un asiento delante (sofá, sillón, silla, banco, taburete): sentarte
+		var sx: int = P.x + dv[0]
+		var sy: int = P.y + dv[1]
+		if sy >= 0 and sy < m.h and sx >= 0 and sx < m.w and asiento_de(m.o[sy][sx]) != "" and ent_at(sx, sy) == null:
+			run(func(): await asiento(sx, sy))
+			return
 	var de := delante()
 	var tx: int = de[0]
 	var ty: int = de[1]
@@ -1503,6 +1509,92 @@ func interact() -> void:
 		run(func(): await pick_item(it))
 		return
 	run(func(): await object_action(tx, ty))
+
+# sentarse (1.47, solo con CAL): en los asientos, mirando al sur (se ven de frente) o al norte (de espaldas); sentado, fumarte
+# uno de lo que lleves (medio gramo) o levantarte; no se guarda
+const ASIENTOS := {"sofaF": "sur", "sofaV": "sur", "bench": "sur", "sofaB": "norte", "sofa": "norte", "sillon": "norte", "silla": "norte", "sillaG": "norte", "stool": "norte"}
+const ASIENTO_TXT := {"sofaF": "Un sofá del club.", "sofaB": "Un sofá del club.", "sofaV": "El sofá del reservado.", "bench": "Un banco.", "stool": "Un taburete.",
+	"sofa": "Tu sofá.", "sillon": "Tu sillón de lectura.", "silla": "La silla del ordenador de la tía.", "sillaG": "Tu silla gaming."}
+const SENT_CORTA := 5   # las filas de piernas que no se ven sentado
+const SENT_SUBE := 6    # de espaldas, el culo en medio del asiento: la cabeza asoma por encima del respaldo
+const SENT_PORRO := 0.5
+var SENT = null   # {x, y, d}
+
+func asiento_de(o) -> String:
+	if not (o is String):
+		return ""
+	if ASIENTOS.has(o):
+		return o
+	if o.ends_with("2") and ASIENTOS.has(o.left(-1)):
+		return o.left(-1)
+	return ""
+
+func asiento(x: int, y: int) -> void:
+	var k := asiento_de(MAPS[S.map].o[y][x])
+	var ops := ["Sentarte"]
+	if k in ["silla", "sillaG"]:
+		ops.append("Usar el ordenador")
+	elif k in ["sofa", "sillon", "sofaF", "sofaB", "sofaV"]:
+		ops.append("Otra cosa")
+	ops.append("Nada")
+	var j: int = await ask(ASIENTO_TXT[k], ops)
+	var c: String = ops[j] if j >= 0 and j < ops.size() else "Nada"
+	if c == "Nada":
+		return
+	if c != "Sentarte":
+		var de := delante()
+		await object_action(de[0], de[1])
+		return
+	await sentado(x, y, k)
+
+func sentado(x: int, y: int, k: String) -> void:
+	var dir0: String = P.dir
+	SENT = {"x": x, "y": y, "d": ASIENTOS[k]}
+	P.dir = "down" if SENT.d == "sur" else "up"
+	while true:
+		var j: int = await ask("Estás sentado.", ["Fumarte uno", "Levantarte"])
+		if j != 0:
+			break
+		await fumar_sentado()
+	SENT = null
+	P.dir = dir0
+
+# dónde echa el humo sentado (la boca, o encima de la cabeza si está de espaldas)
+func boca_sentado() -> Vector2:
+	var sur: bool = SENT.d == "sur"
+	return Vector2(SENT.x * 16 + 8 + (4 if sur else 0), SENT.y * 16 + 15 - (18 if sur else 22 + SENT_SUBE) + SENT_CORTA)
+
+func fumar_sentado() -> void:
+	if S.map == "comisaria":
+		await say("¿Aquí, en comisaría? Mejor no.")
+		return
+	if S.map in ["bar", "disco"] or S.map.begins_with("loc-"):
+		await say("Aquí dentro no se puede fumar.")
+		return
+	var ls := bud_lots(SENT_PORRO)
+	if ls.is_empty():
+		await say("No llevas nada para liarte uno.")
+		return
+	var i := 0
+	if ls.size() > 1:
+		i = await menu(ls.map(lot_item), {"title": "¿DE CUÁL TE LÍAS UNO?"})
+		if i < 0 or i >= ls.size():
+			return
+	var lk: String = ls[i][0]
+	var nom := lot_nombre(lk)
+	use_buds(lk, SENT_PORRO)
+	var b := boca_sentado()
+	for n in 3:
+		lanzar_vfx("vfx-humo-porro", b.x, b.y, M.reloj, S.map, true)
+		await wait(700)
+	advance_time(15)
+	var t := "Te lías uno de %s y te lo fumas sin prisa." % nom
+	if D.ZONAS.has(S.map):
+		S.heat = minf(100, S.heat + 3)
+		heat_warn()
+		t += " Fumar en la calle llama la atención."
+	update_hud()
+	await say(t)
 
 func object_action(x: int, y: int) -> void:
 	var m: Dictionary = MAPS[S.map]
@@ -2252,6 +2344,8 @@ func naveros() -> Array:
 func navero_de(_i: int):
 	return null
 func entra_local(_d):
+	pass
+func advance_time(_mn: int) -> void:   # granja (1.47: fumar sentado)
 	pass
 func obj_local(_x: int, _y: int, _o) -> bool:
 	return false

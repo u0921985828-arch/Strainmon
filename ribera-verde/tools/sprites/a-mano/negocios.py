@@ -10,9 +10,10 @@
 #  · negocios-alto (objeto_alto, 32 × 32, pies en (16, 31)): armR (el armario ropero), recambT (la estantería de recambios),
 #    prodL (los bidones de productos), curaQ (la estantería de curación con los quesos), panP (el estante de los panes),
 #    tabique (el tabique de pladur del cuartucho, de canto), almC-<0|1|2> (el almacén del club por lo lleno)
+#  · negocios-coche (vehiculo_expo, 80 × 48, 5 casillas): elevT y fosoT (1.46) y boxL (1.47, el box de lavado con el utilitario)
 #  · negocios-ancho (mueble_ancho, 48 × 48, pies en (16, 47); la casilla de la derecha, <k>2, no se pinta): elevT (el elevador de
 #    dos columnas con un coche subido), fosoT / fosoB (el foso, la mitad de arriba y la de abajo), bancoT (el banco de trabajo con
-#    el tornillo y el panel de herramientas), boxL (el box de lavado con un coche y la espuma), cubaQ (la cuba de cuajar), mostrQ
+#    el tornillo y el panel de herramientas), cubaQ (la cuba de cuajar), mostrQ
 #    (el mostrador de los quesos), hornoP (el horno de leña), mostrP (el mostrador del pan), doblaL (la mesa de doblar)
 # Sale a art/crudo/<grupo>/<sprite>/unica/00.png (después, node tools/sprites/procesar.js negocios-16 negocios-alto
 # negocios-ancho --atlas --atlas-dir godot/arte)
@@ -37,17 +38,6 @@ def sombra(L, x0, x1, y):
         if L.g(x, y) is None or L.g(x, y)[3] == 0:
             L.p(x, y, SOMBRA)
 
-def coche(L, x0, y0, col=('#2a4a7a', '#3a64a0', '#6a94c8')):
-    """un utilitario de perfil, de juguete (28 × 12 px): carrocería, cristales y las ruedas gordas"""
-    C0, C1, C2 = col
-    L.r(x0 + 6, y0, 14, 5, C1); L.hl(x0 + 7, x0 + 18, y0, C2)                      # la cabina
-    L.r(x0 + 8, y0 + 1, 5, 3, '#a8d0e0'); L.r(x0 + 14, y0 + 1, 5, 3, '#a8d0e0')     # los cristales
-    L.r(x0, y0 + 5, 28, 5, C1); L.hl(x0, x0 + 27, y0 + 5, C2); L.hl(x0, x0 + 27, y0 + 9, C0)
-    L.p(x0 + 27, y0 + 6, '#f4e8a0'); L.p(x0, y0 + 6, '#c03030')                    # los faros
-    for cx in (x0 + 6, x0 + 21):
-        L.r(cx - 3, y0 + 8, 6, 5, '#1a1a1e'); L.r(cx - 1, y0 + 9, 2, 2, '#9a9ea8')
-
-# ---------- lo de todos ----------
 def cajaL():
     L = Lienzo(16, 16)
     L.r(1, 9, 14, 6, MA[1]); L.hl(1, 14, 9, MA[3]); L.hl(1, 14, 14, MA[0])           # el mostrador
@@ -230,16 +220,27 @@ def compT():
 
 # ---------- el lavadero (los astilleros) ----------
 def boxL():
-    """el box de lavado: el arco de la lanza, la pared de azulejo y un coche con la espuma rosa"""
-    L = Lienzo(48, 48)
-    L.r(8, 6, 32, 26, '#d0e0e8')
-    for y in range(8, 30, 4): L.hl(8, 39, y, '#b0c4cc')
-    L.r(10, 9, 4, 6, '#3a3a42'); L.vl(12, 15, 26, '#2a2a30'); L.r(11, 26, 3, 3, AC[2])   # la lanza colgada
-    coche(L, 11, 30, ('#7a2020', '#b83030', '#e06060'))
-    for (x, y) in ((14, 33), (18, 31), (24, 32), (30, 34), (35, 33), (20, 36)):        # la espuma
+    """1.47 (lo pidió el usuario: «el mobiliario debe de ser a escala realista»): el box de lavado a 16 px/m, de 5 m de largo
+    (80 px), con la pared de azulejo de 2,4 m (39 px), las mamparas de los lados, la lanza colgada de su brazo y el utilitario de
+    4 m del concesionario (concesionario.py) dentro, con la espuma rosa; la rejilla del suelo de punta a punta"""
+    L = Lienzo(80, 48)
+    L.r(2, 8, 76, 37, '#d0e0e8')                                                    # la pared de azulejo
+    for y in range(10, 44, 4): L.hl(2, 77, y, '#b0c4cc')
+    for x in range(6, 78, 8): L.vl(x, 9, 44, '#c0d2da')
+    for x in (0, 78):                                                               # las mamparas de los lados
+        L.r(x, 6, 2, 41, AC[1]); L.vl(x, 6, 46, AC[3])
+    L.hl(2, 77, 6, AC[2]); L.hl(2, 77, 7, AC[0])                                    # el perfil de arriba
+    L.r(70, 9, 6, 8, '#3a3a42'); L.r(71, 10, 4, 2, '#e04040'); L.r(71, 13, 4, 1, AM[1])   # el programador de fichas
+    L.hl(40, 69, 9, '#2a2a30'); L.vl(40, 9, 20, '#2a2a30'); L.r(39, 20, 3, 3, AC[2])     # el brazo giratorio y la lanza
+    c = utilitario()
+    for y in range(48):
+        for x in range(80):
+            v = c.g(x, y)
+            if v is not None and v[3]: L.p(x, y, '#%02x%02x%02x' % v[:3])
+    for (x, y) in ((14, 30), (20, 25), (28, 24), (36, 26), (46, 28), (54, 31), (62, 33), (24, 36), (40, 35), (58, 38)):   # la espuma
         L.r(x, y, 3, 2, '#f4d0e0'); L.p(x + 1, y, '#ffffff')
     L.contorno(K)
-    for x in range(8, 40): L.p(x, 47, '#6a8a9a')                                      # la rejilla del suelo
+    for x in range(2, 78, 2): L.p(x, 47, '#6a8a9a')                                 # la rejilla del suelo
     return L
 
 def aspiraL():
@@ -406,11 +407,12 @@ for n, f in (('armR', armR), ('tabique', tabique), ('recambT', recambT), ('diagT
     sale(n, f(), 'negocios-alto')
 for i in range(3):
     sale(f'almC-{i}', almC(i), 'negocios-alto')
-for n, f in (('bancoT', bancoT), ('boxL', boxL), ('cubaQ', cubaQ), ('mostrQ', mostrQ), ('hornoP', hornoP),
+for n, f in (('bancoT', bancoT), ('cubaQ', cubaQ), ('mostrQ', mostrQ), ('hornoP', hornoP),
              ('mostrP', mostrP), ('doblaL', doblaL)):
     sale(n, f(), 'negocios-ancho')
 sale('elevT', elevT(), 'negocios-coche')
 sale('fosoT', fosoT(), 'negocios-coche')
+sale('boxL', boxL(), 'negocios-coche')
 
 def escribe(raiz=None):
     for g, S in SAL.items():
