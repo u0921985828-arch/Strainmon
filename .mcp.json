@@ -6,6 +6,16 @@
       "headers": {
         "Authorization": "Bearer ${PIXELLAB_TOKEN}"
       }
+    },
+    "pixellab-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "pixellab-mcp"
+      ],
+      "env": {
+        "PIXELLAB_SECRET": "${PIXELLAB_SECRET}"
+      }
     }
   }
 }
