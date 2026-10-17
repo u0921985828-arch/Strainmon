@@ -1,4 +1,4 @@
-# Ribera Verde (Godot) — 1.48 (lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más pokemon» y «la
+# Ribera Verde (Godot) — 1.48 (lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más de RPG clásico» y «la
 # calidad de los otros sprites también, que se note que es el sprite y lo que trae»; con Datos.CAL): los firmes en mosaico, el canto
 # de la hierba y los muebles con lo que llevan encima (detalle.py).
 #   $GODOT --headless --path godot --script res://tests/detalle.gd   → «detalle: N comprobaciones, 0 fallos»
@@ -18,6 +18,7 @@ var n := 0
 var fallos := []
 
 func _initialize() -> void:
+	Datos.PLAY = false   # la versión entera (con PLAY, las de Google Play: tests/play.gd)
 	_corre.call_deferred()
 
 func arg(k: String, d := "") -> String:
@@ -105,14 +106,14 @@ func _corre() -> void:
 	J.gancho_toast = func(_h, _ms): pass
 	var Pt = J.pintor
 	# 1 · los firmes: un mosaico de 16 casillas por firme, y todas distintas de la de al lado
-	for k in Pt.PK_TILE:
-		var f = Atlas.frame_de("exterior-pk", "pk-" + k, "unica", 0, {"i": 0})
+	for k in Pt.MOSAICO_TILE:
+		var f = Atlas.frame_de("exterior-mosaico", "mo-" + k, "unica", 0, {"i": 0})
 		chk(f != null and f.c.get_width() == 256 and f.c.get_height() == 16, "el mosaico de %s" % k)
 		if f != null:
 			var a: Image = f.c.get_region(Rect2i(0, 0, 16, 16))
 			var b: Image = f.c.get_region(Rect2i(16, 0, 16, 16))
 			chk(a.get_data() != b.get_data() or k == "tallgrass", "%s: la casilla de al lado no es la misma" % k)
-	var hg: Image = Atlas.frame_de("exterior-pk", "pk-grass", "unica", 0, {"i": 0}).c
+	var hg: Image = Atlas.frame_de("exterior-mosaico", "mo-grass", "unica", 0, {"i": 0}).c
 	var hv: Image = Atlas.frame_de(Atlas.cubre("tile:grass"), "grass", "unica", 0, {"i": 0}).c
 	chk(hg.get_pixel(5, 5).is_equal_approx(hv.get_pixel(8, 8)) or hg.get_pixel(0, 0).is_equal_approx(Color8(0x84, 0xcc, 0x6c)), "la hierba, del mismo verde (las orillas casan)")
 	# 2 · los muebles con lo que traen: por mapa y por tramo

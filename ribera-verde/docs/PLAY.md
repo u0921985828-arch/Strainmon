@@ -1,5 +1,7 @@
 # Landrace Hunters en Google Play: ficha y lista de publicación
 
+> **Desde la 1.58 (plan de Google Play), lo vigente está en [`store/`](../store/)**: paquete `com.landracehunters.game`, fichas, privacidad, IARC, seguridad de los datos y gráficos. Lo de abajo es de la versión anterior.
+
 La app que se publica es la de Godot (`dist/ribera-verde-godot.apk`, `npm run godot:apk`). Lo que pide el juego por dentro está
 en [NORMAS-MOVIL.md](NORMAS-MOVIL.md); aquí va lo que pide la tienda. Los gráficos están en [`play/`](play/).
 

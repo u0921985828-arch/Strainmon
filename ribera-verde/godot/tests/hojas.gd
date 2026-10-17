@@ -30,6 +30,7 @@ func area(im: Image) -> int:
 	return a
 
 func _initialize() -> void:
+	Datos.PLAY = false   # la versión entera (con PLAY, las de Google Play: tests/play.gd)
 	var D: Dictionary = Datos.carga()
 	var S := {}
 	var ks: Array = D.STRAINS.keys()

@@ -511,11 +511,11 @@ func abonar(p: Dictionary, veg_k: Array) -> void:
 	sfx("sel")
 	var t := "Echas una dosis de %s. %s" % [String(D.PRODUCTOS[k].n).to_upper(), "Crecerá más deprisa." if veg else "Dará más cosecha."]
 	if ph != null:
-		t += ("\nCon el medidor, el pH al %s: lo aprovecha entero." % Datos.coma(D.ABONO.ph[2])) if S.items.get("medidor", 0) else "\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo."
+		t += ("\nCon el medidor, lo aprovecha entero." if Datos.PLAY else "\nCon el medidor, el pH al %s: lo aprovecha entero." % Datos.coma(D.ABONO.ph[2])) if S.items.get("medidor", 0) else "\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo."
 	elif bio:
 		t += "\nSin pH−, la tierra amortigua el agua del grifo: lo aprovecha al %d %%." % Datos.jsround(D.ABONO_BIO.q[0] * 100)
 	else:
-		t += "\nSin pH−, el agua del grifo (pH %s) bloquea %d %% del abono." % [Datos.coma(D.ABONO.ph[0]), Datos.jsround((1 - D.ABONO.q[0]) * 100)]
+		t += ("\nSin corrector, el agua del grifo bloquea %d %% del abono." % Datos.jsround((1 - D.ABONO.q[0]) * 100)) if Datos.PLAY else "\nSin pH−, el agua del grifo (pH %s) bloquea %d %% del abono." % [Datos.coma(D.ABONO.ph[0]), Datos.jsround((1 - D.ABONO.q[0]) * 100)]
 	await say(t)
 	if ph != null and (true if D.PRODUCTOS[ph].bio else false) != bio:
 		await say(("No te queda pH− de su marca: gastas una dosis de %s." % D.PRODUCTOS[ph].n) + (" Con el mineral, el sustrato ya no está vivo." if bio else ""))
@@ -536,7 +536,7 @@ func abono_txt(p: Dictionary) -> String:
 		var ec := Datos.jsround((.4 + ((.4 if p.get("fvo") else .7) if _fv(p) > 0 else 0.0) + ((.5 if p.get("fo") else .9) if p.fert else 0.0)) * 10) / 10.0
 		var iv := _ph_i(_fv(p), p.get("fvo")) if _fv(p) > 0 else 2   # cada dosis, con la q de su marca (phDe)
 		var ifl := _ph_i(Cultivo.fq(p), p.get("fo")) if p.fert else 2
-		t += " · EC %s · pH %s" % [Datos.coma(ec), Datos.coma(D.ABONO.ph[mini(iv, ifl)])]
+		t += (" · riego %s" % ["a ojo", "a medias", "bien"][mini(iv, ifl)]) if Datos.PLAY else " · EC %s · pH %s" % [Datos.coma(ec), Datos.coma(D.ABONO.ph[mini(iv, ifl)])]
 	return t
 
 func _ph_i(q: float, bio) -> int:
@@ -1041,7 +1041,7 @@ func tienda_online() -> void:
 		if Datos.CAL:   # 1.43.6: el camarote
 			items.append({"label": "El camarote: almacén", "desc": "Habilitar el camarote de arriba como almacén, las estanterías de tarros de cristal de 10 L y los sobres de humedad."})
 		var SO: Dictionary = D.SOTANO
-		var sot_ok: bool = Datos.CAL and S.ch >= int(SO.ch)   # 1.51: el sótano de casa, para setas
+		var sot_ok: bool = Datos.CAL and not Datos.PLAY and S.ch >= int(SO.ch)   # 1.51: el sótano de casa, para setas
 		if sot_ok:
 			var sd = S.sot.get("d") if S.get("sot") is Dictionary else null
 			items.append({"label": SO.obra.n + (" · hecho" if sd != null and float(sd) <= S.day else " · mañana" if sd != null else ""), "right": Datos.eur(SO.obra.p), "disabled": sd != null, "desc": SO.obra.d})

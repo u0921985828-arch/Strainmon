@@ -8,6 +8,17 @@
 - **Música e iconos versionados** (`godot/musica/`, `godot/icono/`): ya no hace falta regenerarlos para exportar.
 - **Batería entera** en `tools/tests.sh` (`npm run test:godot`), con las banderas de cada prueba (`mandos_geo` a 2600 × 1700 y `--sin-arranque`, `pantallas` con sus referencias, `ciclo` con `--fixed-fps 60`). Línea base en `.modo-absoluto/base.txt`.
 
+### Fase 2 · identidad y cumplimiento
+- **`Datos.PLAY`** (por defecto `true`, la versión de la tienda): los cambios de contenido van detrás de esta constante; con `false`, el juego entero de antes (lo usan todas las pruebas contra el HTML y las de la versión entera). `datos/play.json` (lo escribe `tools/play.py`) dice qué cambia: `Datos.carga` lo aplica en su sitio (las mismas listas y diccionarios, solo los textos) y lo deshace al volver a `false`; `Datos.tp()` hace lo mismo con los textos del código en los diálogos, menús y avisos.
+- **Sin cifras reales de cultivo** (C1/C2): ni °C, ni micras, ni µm, ni pH en lo que se ve. El pH pasa a «corrector», «riego» o «acidez»; las extracciones, el foro, los consejos de Kiko y la pizarra, con textos de juego; en la ficha de las plantas, «riego a ojo / a medias / bien» en vez de la EC y el pH.
+- **Los híbridos con nombre propio** (C5): 54 cruces con nombre de marca o de persona pasan a nombres inventados (Ría Uno, Ondarra, Ipar, Leyenda, Escarcha…), también dentro de los textos; las landraces, igual.
+- **Sin el bajo de las setas** (C3): ni Txomin, ni su SMS, ni la línea del mapa, ni el cartel; la puerta gris queda cerrada y el sótano no sale en la tienda online.
+- **El billar, sin apuestas** (C4): «Una partida» o «Nada», sin euros.
+- **Fuera los restos de otro juego** (C6): `pk-*` → `mo-*`, `exterior-pk` → `exterior-mosaico`, `PK_TILE` → `MOSAICO_TILE` (en el código, el atlas, el arte y los documentos), y con PLAY la cortinilla del combate en persiana de lamas verticales.
+- **El aviso de edad nuevo** (C7) y **la copia de seguridad de Android** (U8, `user_data_backup/allow=true`); el texto de PRIVACIDAD del juego lo dice.
+- **`store/`**: política de privacidad (es + en), formulario de seguridad de los datos, cuestionario IARC, fichas en español e inglés (`tools/ficha.py` las mide), icono de 512, gráfico destacado de 1024 × 500 y 8 capturas de 1920 × 1080 sacadas del juego con PLAY (`tests/capturas.gd`).
+- Prueba nueva `tests/play.gd` (27): ningún texto de los datos ni del código con cifras reales, los nombres nuevos y ninguno viejo, ida y vuelta de PLAY, sin setas, el billar, el aviso y la copia de seguridad.
+
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
 Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.
@@ -201,9 +212,9 @@ Los muebles del taller, la panadería, el bar y la lavandería, de frente (lo pi
 
 ## 1.48.0 · 16 de octubre de 2026
 
-La calle más como un RPG clásico y los muebles con lo que traen (lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más pokemon» y «la calidad de los otros sprites también, que se note que es el sprite y lo que trae»). Solo Godot (0.42.0), con `Datos.CAL`: sin CAL, las pantallas del oráculo no cambian. Todo a mano y de frente a 3/4, sin marcas (`tools/sprites/a-mano/detalle.py`).
+La calle más como un RPG clásico y los muebles con lo que traen (lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más de RPG clásico» y «la calidad de los otros sprites también, que se note que es el sprite y lo que trae»). Solo Godot (0.42.0), con `Datos.CAL`: sin CAL, las pantallas del oráculo no cambian. Todo a mano y de frente a 3/4, sin marcas (`tools/sprites/a-mano/detalle.py`).
 
-- **Los firmes, sin la rejilla de 16 en 16** (`exterior-pk`, celda `tile_mosaico`): cada firme es un mosaico de 64 × 64 cortado en 16 casillas, y el juego coge la que le toca por su posición (`PK_TILE` en `pinta.gd`).
+- **Los firmes, sin la rejilla de 16 en 16** (`exterior-mosaico`, celda `tile_mosaico`): cada firme es un mosaico de 64 × 64 cortado en 16 casillas, y el juego coge la que le toca por su posición (`MOSAICO_TILE` en `pinta.gd`).
   - La hierba, con sus matitas repartidas; las flores, en ramilletes de cuatro pétalos; la hierba alta, en matas redondas.
   - La acera, de losas grandes de 2 × 1 m a matajuntas, con su luz y su sombra; la plaza, de losas de piedra de varios tamaños.
   - La calzada, con el bordillo de piedra (juntas cada metro y la sombra en el asfalto) y la raya discontinua.

@@ -571,8 +571,8 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 				else:
 					_img(f.c, sx, sy)
 				return true
-	if Datos.CAL and PK_TILE.has(k):   # 1.48 (lo pidió el usuario: «más pokemon»): el mosaico de 64 × 64, sin la rejilla de 16
-		var fp = Atlas.frame_de("exterior-pk", "pk-" + k, "unica", 0, {"i": 0})
+	if Datos.CAL and MOSAICO_TILE.has(k):   # 1.48 (lo pidió el usuario: «más de RPG clásico»): el mosaico de 64 × 64, sin la rejilla de 16
+		var fp = Atlas.frame_de("exterior-mosaico", "mo-" + k, "unica", 0, {"i": 0})
 		if fp:
 			L.draw_texture_rect_region(Atlas.tex(fp.c), Rect2(sx, sy, 16, 16), Rect2(((tx & 3) + 4 * (ty & 3)) * 16, 0, 16, 16))
 			if HIERBA.has(k):
@@ -592,9 +592,9 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 		_detalle(tx, ty, sx, sy)
 	return true
 
-# 1.48: los firmes en mosaico (exterior-pk) y el canto de la hierba donde toca acera, calzada u hormigón: dos píxeles más oscuros,
+# 1.48: los firmes en mosaico (exterior-mosaico) y el canto de la hierba donde toca acera, calzada u hormigón: dos píxeles más oscuros,
 # como un borde, en vez del corte seco de casilla a casilla
-const PK_TILE := {"grass": 1, "flowers": 1, "tallgrass": 1, "dirt": 1, "walk": 1, "plaza": 1, "roadT": 1, "roadB": 1}
+const MOSAICO_TILE := {"grass": 1, "flowers": 1, "tallgrass": 1, "dirt": 1, "walk": 1, "plaza": 1, "roadT": 1, "roadB": 1}
 const DURO := {"walk": 1, "roadT": 1, "roadB": 1, "hormigon": 1, "rotoT": 1, "rotoB": 1}
 func _canto_hierba(tx: int, ty: int, sx: int, sy: int) -> void:
 	var m: Dictionary = J.MAPS[J.S.map]

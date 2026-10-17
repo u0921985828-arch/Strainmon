@@ -1,0 +1,188 @@
+{
+ "nombres": {
+  "Skunk #1": "Ría Uno",
+  "Lemon Haze": "Limonera",
+  "Super Skunk": "Txoko",
+  "Blueberry": "Niebla",
+  "Big Bud": "Mango",
+  "Lemon Skunk": "Citrus",
+  "Kali Mist": "Kalima",
+  "Cheese": "Curada",
+  "California Orange": "Naranjal",
+  "Chemdawg": "Química",
+  "Haze": "Ondarra",
+  "Northern Lights": "Ipar",
+  "Purple Thai": "Amanecer",
+  "Trainwreck": "Sol y Limón",
+  "AK-47": "Cuatro Tierras",
+  "Laughing Buddha": "Risueña",
+  "Cannalope Haze": "Melonera",
+  "Master Kush": "Cordillera",
+  "Purple Kush": "Púrpura Alta",
+  "Critical Mass": "Pesada",
+  "Shiva Skunk": "Robusta",
+  "NL5 × Haze": "Ipar × Ondarra",
+  "Neville's Haze": "Ondarra Triple",
+  "Silver Haze": "Ondarra Corta",
+  "Chocolope": "Cacaotera",
+  "Pineapple Express": "Oro Tropical",
+  "Tangie": "Bruma Dulce",
+  "Amnesia Haze": "Tormenta",
+  "Jack Herer": "Leyenda",
+  "Super Silver Haze": "Ondarra Mayor",
+  "Blue Dream": "Niebla Dulce",
+  "Blue Cheese": "Curada Azul",
+  "Sour Diesel": "Dragón",
+  "Kali 47": "Kalima Cuatro",
+  "Critical Kali Mist": "Reina",
+  "White Widow": "Escarcha",
+  "Purple Haze": "Ondarra Púrpura",
+  "White Russian": "Escarcha del Este",
+  "Blue Widow": "Escarcha Azul",
+  "Super Lemon Haze": "Limonera Mayor",
+  "Chronic": "Cosechera",
+  "White Rhino": "Escarcha Baja",
+  "White Shark": "Escarcha Fiera",
+  "Hawaiian Snow": "Nieve de Isla",
+  "Jack Flash": "Leyenda Rápida",
+  "Jack 47": "Leyenda Cuatro",
+  "Sour Tangie": "Dragón Dulce",
+  "Ice": "Helada",
+  "NL × Big Bud": "Ipar × Mango",
+  "Critical Jack": "Pesada Leyenda",
+  "Critical 47": "Pesada Cuatro",
+  "Critical Cheese": "Pesada Curada",
+  "Northern Light Blue": "Ipar Azul",
+  "Lowryder": "Rastrera",
+  "Critical": "Pesada",
+  "Northern Lights #5": "Ipar",
+  "NL5": "Ipar",
+  "Skunk": "Ría",
+  "Jack": "Leyenda",
+  "Amnesia": "Tormenta",
+  "Widow": "Escarcha",
+  "Kali": "Kalima",
+  "Sour": "Dragón",
+  "Diesel": "Dragón"
+ },
+ "letra": "A-Za-zÀ-ÿ0-9",
+ "rep": [
+  [
+   "baja el pH del agua del grifo \\(7,5\\) a 6,2",
+   "corrige el agua del grifo"
+  ],
+  [
+   "Mide el pH y la EC del riego",
+   "Mide el riego"
+  ],
+  [
+   "Mide el pH y la EC",
+   "Mide el riego"
+  ],
+  [
+   "la EC y el pH de cada maceta",
+   "cómo va cada maceta"
+  ],
+  [
+   "[Mm]edidor(es)? de pH( y EC)?",
+   "medidor\\1 de riego"
+  ],
+  [
+   "pH− MEATZA",
+   "Corrector MEATZA"
+  ],
+  [
+   "pH− ORTUA BIO",
+   "Corrector ORTUA BIO"
+  ],
+  [
+   "pH−",
+   "corrector"
+  ],
+  [
+   "con el pH corregido",
+   "con el riego corregido"
+  ],
+  [
+   "([Cc])orriges el pH",
+   "\\1orriges el riego"
+  ],
+  [
+   "perdona el pH",
+   "perdona el agua"
+  ],
+  [
+   "con el pH alto",
+   "sin corregir"
+  ],
+  [
+   "\\bel pH\\b",
+   "la acidez"
+  ],
+  [
+   "\\bpH\\b",
+   "acidez"
+  ],
+  [
+   " ?°C",
+   "°"
+  ],
+  [
+   " ?µm",
+   ""
+  ]
+ ],
+ "set": {
+  "EXTR.rosin.d": "La prensa: calor y presión sobre la flor, entre papel de horno.",
+  "EXTR.seco.d": "Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.",
+  "EXTR.seco.pasos.0.0": "El tamiz grueso: fuera el polvo verde y los trozos.",
+  "EXTR.seco.pasos.1.0": "El siguiente: sacude en el verde, sin frotar.",
+  "EXTR.seco.pasos.2.0": "Los finos: aquí se queda la resina.",
+  "EXTR.ice.d": "El cubo con las bolsas de malla: hielo, agua y la flor.",
+  "EXTR.ice.pasos.0.0": "El agua con hielo: para la barra en el verde.",
+  "EXTR.ice.pasos.1.0": "Remover suave, sin romper la hoja.",
+  "EXTR.ice.pasos.3.0": "Secar la resina sin que coja moho.",
+  "EXTR.charas.d": "A mano, como en el Himalaya: frotar, rascar y amasar.",
+  "EXTR.hash.d": "El kief, prensado en una placa: ni poco calor ni mucho.",
+  "EXTR.moon.d": "Lo más difícil: el cogollo con rosin y kief, sin que se apelmace.",
+  "EXTR.lava.d": "La lavadora de extracción: hielo, agua y la flor, a baja velocidad.",
+  "EXTR.lava.pasos.0.0": "Cargarla con agua y hielo.",
+  "EXTR.lava.pasos.1.0": "El lavado, a baja velocidad: la barra cambia de ritmo.",
+  "EXTR.lava.pasos.2.0": "Reposar y desaguar a las bolsas.",
+  "EXTR.lava.pasos.3.0": "Recoger cada bolsa aparte.",
+  "EXTR.stat.d": "La máquina electrostática: la placa cargada separa la resina de la hoja.",
+  "FORO.0": "El agua manda: con la barra azul por debajo del 30 %, la planta sufre y enferma antes.",
+  "FORO.1": "En floración, con la sala húmeda, sube el riesgo de moho. El extractor y el ventilador lo bajan.",
+  "FORO.2": "Las madres, siempre a 18/6. Un esqueje es un clon: el mismo fenotipo que la madre. Sácalos antes de pasarla a flor.",
+  "FORO.3": "La carpa, bien cerrada y el temporizador fijo: así no hay sorpresas en la floración.",
+  "FORO.4": "Cosecha a tiempo: cuando la barra dorada parpadea, está lista. Antes, menos cogollo.",
+  "FORO.5": "Lo cosechado sale sin curar: en tarros, dentro de la caja fuerte, se cura y se vende mejor.",
+  "FORO.6": "Con el abono, una dosis por fase. Y riega cuando lo pida la barra, no por calendario.",
+  "FORO.7": "El foco, a su distancia: en la carpa sube solo a medida que crecen.",
+  "KIKO_TIPS.0.4": "Un CFL da poco. Un LED, el triple.",
+  "PIZARRA_KIKO.2": "Corrector con cada abono. Siempre",
+  "JULEN.hola.2": "Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",
+  "SOTANO.txt.cerrado": "La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos."
+ },
+ "claves": [
+  "STRAINS",
+  "PRODUCTOS",
+  "APARATOS",
+  "SHOP",
+  "MISIONES",
+  "PREMIO_N",
+  "DIARIO",
+  "RECIPE_HINTS",
+  "FORO",
+  "KIKO_TIPS",
+  "LOGROS",
+  "RIEGO_NAVE",
+  "EXTR",
+  "PIZARRA_KIKO",
+  "ITINERARIO",
+  "JULEN",
+  "MINERAL_ORG",
+  "DESC_PROD",
+  "SOTANO"
+ ]
+}

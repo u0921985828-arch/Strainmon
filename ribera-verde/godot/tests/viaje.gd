@@ -19,6 +19,7 @@ var VIO := []
 var auto := {"a": true}
 
 func _initialize() -> void:
+	Datos.PLAY = false   # la versión entera (con PLAY, las de Google Play: tests/play.gd)
 	_corre.call_deferred()
 
 func arg(k: String, d := "") -> String:

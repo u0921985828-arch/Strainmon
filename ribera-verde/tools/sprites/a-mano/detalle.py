@@ -1,11 +1,11 @@
 # python3 -I tools/sprites/a-mano/detalle.py  (Python 3 + Pillow; no va en los scripts de npm)
-# 1.48 (lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más pokemon» y «la calidad de los otros
+# 1.48 (lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más de RPG clásico» y «la calidad de los otros
 # sprites también, que se note que es el sprite y lo que trae»): todo a mano, de frente a 3/4, sin marcas; el juego lo usa solo
 # con Datos.CAL (pinta.gd), así las pantallas del HTML no cambian.
-#  · exterior-pk (tile_mosaico, 256 × 16): los firmes de la calle en mosaicos de 64 × 64 cortados en 16 casillas (el juego coge
-#    la (tx & 3) + 4 (ty & 3)), para que no se vea la rejilla de 16 en 16: pk-grass (la hierba con sus matitas), pk-flowers,
-#    pk-tallgrass (la hierba alta en matas redondas), pk-walk (la acera de losas grandes), pk-plaza (las losas de la plaza, de
-#    varios tamaños), pk-dirt (el camino de tierra liso), pk-roadT y pk-roadB (el asfalto con el bordillo de piedra). La hierba,
+#  · exterior-mosaico (tile_mosaico, 256 × 16): los firmes de la calle en mosaicos de 64 × 64 cortados en 16 casillas (el juego coge
+#    la (tx & 3) + 4 (ty & 3)), para que no se vea la rejilla de 16 en 16: mo-grass (la hierba con sus matitas), mo-flowers,
+#    mo-tallgrass (la hierba alta en matas redondas), mo-walk (la acera de losas grandes), mo-plaza (las losas de la plaza, de
+#    varios tamaños), mo-dirt (el camino de tierra liso), mo-roadT y mo-roadB (el asfalto con el bordillo de piedra). La hierba,
 #    la plaza y la tierra con el mismo color de fondo que antes: las orillas (tileset-transiciones) siguen casando.
 #  · detalle-alto (mueble_escala, 32 × 48, base en (16, 47)): los mostradores y las barras con lo que llevan encima, en tres
 #    tramos (-0, -1, -2) que el juego alterna por la casilla: d-counter-shop y d-counter-growcity (la caja, los botes de abono y
@@ -15,7 +15,7 @@
 #    d-crate-puerto (las de pescado, de plástico, con hielo y pescado; también en los astilleros).
 #  · detalle-16 (objeto_1x1): d-shelfW-shop (la balda con los botes de abono), d-shelfW-comisaria (los archivadores), d-sacos (los
 #    sacos de sustrato con la hoja), d-bottles (la balda de las botellas del bar) y d-seto (el seto redondeado, con sus matas).
-# Sale a art/crudo/<grupo>/<sprite>/unica/00.png (después, node tools/sprites/procesar.js exterior-pk detalle-alto detalle-16
+# Sale a art/crudo/<grupo>/<sprite>/unica/00.png (después, node tools/sprites/procesar.js exterior-mosaico detalle-alto detalle-16
 # --atlas --atlas-dir godot/arte)
 import os, sys, glob
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -140,9 +140,9 @@ def m_roadB(L):
     asfalto(L)
     for f in range(4): bordillo(L, f * 16 + 13, False)
 
-for n, f in (('pk-grass', m_grass), ('pk-flowers', m_flowers), ('pk-tallgrass', m_tallgrass), ('pk-dirt', m_dirt),
-             ('pk-walk', m_walk), ('pk-plaza', m_plaza), ('pk-roadT', m_roadT), ('pk-roadB', m_roadB)):
-    sale(n, mosaico(f), 'exterior-pk')
+for n, f in (('mo-grass', m_grass), ('mo-flowers', m_flowers), ('mo-tallgrass', m_tallgrass), ('mo-dirt', m_dirt),
+             ('mo-walk', m_walk), ('mo-plaza', m_plaza), ('mo-roadT', m_roadT), ('mo-roadB', m_roadB)):
+    sale(n, mosaico(f), 'exterior-mosaico')
 
 # ---------------------------------------------------------------------------------------------------------- objetos 1 × 1
 def d_seto():

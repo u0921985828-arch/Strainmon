@@ -25,6 +25,7 @@ var J
 var fallos: Array = []
 
 func _initialize() -> void:
+	Datos.PLAY = false   # la versión entera (con PLAY, las de Google Play: tests/play.gd)
 	Datos.CAL = false   # 1.42: contra el HTML congelado, «día N» y un mes por día
 	_corre.call_deferred()
 

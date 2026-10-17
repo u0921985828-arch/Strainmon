@@ -999,7 +999,7 @@ func wait(ms: float) -> void:
 	await M.wait(ms)
 
 func nm(t: String) -> String:
-	return t.replace("{N}", S.name) if S else t
+	return Datos.tp(t.replace("{N}", S.name) if S else t)
 
 func type_text(text: String, name_ := "") -> void:
 	if gancho_texto.is_valid():
@@ -1085,6 +1085,17 @@ func menu(items_: Array, o := {}) -> int:
 	var items := []
 	for it in items_:
 		items.append({"label": it} if it is String else it)
+	if Datos.PLAY:   # la versión de Google Play: los textos que se ven, con sus cambios (Datos.tp)
+		for i in items.size():
+			var it: Dictionary = items[i].duplicate()
+			for k in ["label", "desc", "right"]:
+				if it.get(k) is String:
+					it[k] = Datos.tp(it[k])
+			items[i] = it
+		o = o.duplicate()
+		for k in ["title", "title2"]:
+			if o.get(k) is String:
+				o[k] = Datos.tp(o[k])
 	var p := Motor.Prom.new()
 	var st := {"i": clampi(int(o.get("initial", 0)), 0, items.size() - 1)}
 	var rows: int = o.get("rows", (5 if o.get("desc") else 8) if o.get("cls") == "full" else items.size())
@@ -1523,7 +1534,7 @@ func toast(html: String, ms := 2400.0) -> void:
 	if gancho_toast.is_valid():
 		gancho_toast.call(html, ms)
 	if not oraculo:
-		toast_txt.text = "[center]" + html_bb(html) + "[/center]"
+		toast_txt.text = "[center]" + html_bb(Datos.tp(html)) + "[/center]"
 		toast_box.show()
 		coloca_toast.call_deferred()
 	M.quita(toast_t)
@@ -1572,6 +1583,11 @@ func _pinta_wipe() -> void:
 		return
 	var k := minf(8, floorf((M.reloj - wipe_t0) / 450.0 * 8)) / 8.0
 	var h := wipe.size.y
+	if Datos.PLAY:   # fase 2 del plan (C6): la de la tienda, en persiana de 8 lamas verticales que se cierran a la vez
+		var w := wipe.size.x / 8.0
+		for i in 8:
+			wipe.draw_rect(Rect2(i * w, 0, ceilf(w * k), h), Color.BLACK)
+		return
 	wipe.draw_rect(Rect2(0, h / 2 * (1 - k), wipe.size.x, h * k), Color.BLACK)
 
 # ---------- HUD (14-render updateHUD) ----------

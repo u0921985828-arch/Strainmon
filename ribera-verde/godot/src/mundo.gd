@@ -1259,6 +1259,8 @@ func demo_sale(sv: Array) -> void:
 
 func npc_cond(d: Dictionary) -> bool:
 	match d.id:
+		"txomin":   # Google Play (Datos.PLAY): sin el bajo de las setas
+			return not Datos.PLAY
 		"tono":
 			return S.ch >= 3 and S.ch < 8
 		"inaki", "cop":
@@ -2333,7 +2335,7 @@ func object_action(x: int, y: int) -> void:
 	match o:
 		"sign":
 			var st: String = "%s:%d,%d" % [S.map, x, y]
-			await say(D.SIGNS.get(st, "Está tan desgastado que no se lee.") + (("\n" + D.SETAS_SITIO.cartel) if Datos.CAL and st == D.SETAS_SITIO.k else ""))   # 1.43.8
+			await say(D.SIGNS.get(st, "Está tan desgastado que no se lee.") + (("\n" + D.SETAS_SITIO.cartel) if Datos.CAL and not Datos.PLAY and st == D.SETAS_SITIO.k else ""))   # 1.43.8
 		"parada":
 			await parada_action()
 		"cajero":   # 1.35 (granja.gd)

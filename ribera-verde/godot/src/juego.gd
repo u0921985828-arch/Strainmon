@@ -286,7 +286,7 @@ func _titulo_entra() -> void:
 # el aviso de contenido, una vez (se guarda en los ajustes): mayores de 18 o salir
 func aviso_edad() -> void:
 	await say("Landrace Hunters es un juego de ficción para mayores de 18 años.", "AVISO")
-	var c: int = await ask("Trata del cultivo y la venta de cannabis, delito en muchos países. No anima a consumir ni a vender.", ["TENGO 18 O MÁS", "SALIR"], "AVISO")
+	var c: int = await ask("Ficción. No es una guía de cultivo. Trata del cannabis, que es delito en muchos países." if Datos.PLAY else "Trata del cultivo y la venta de cannabis, delito en muchos países. No anima a consumir ni a vender.", ["TENGO 18 O MÁS", "SALIR"], "AVISO")
 	if c != 0:
 		get_tree().quit()
 		return
@@ -480,9 +480,9 @@ Gracias por jugar."""
 const PRIVACIDAD := """Landrace Hunters no recoge, no envía y no comparte ningún dato.
 
 · No tiene cuentas, anuncios ni compras.
-· No usa internet ni pide permisos.
+· No usa internet ni pide permisos (salvo el de vibrar, para los mandos).
 · La partida y los ajustes se guardan solo en este móvil, en la carpeta privada de la app. Se borran al desinstalarla (o desde OPCIONES · BORRAR PARTIDA).
-· Tampoco se copian en la copia de seguridad de Google.
+· Si tienes activada la copia de seguridad de Android, el sistema la guarda en tu cuenta de Google (no pasa por nosotros) y la devuelve al reinstalar.
 
 Si tienes dudas, escribe a la dirección de contacto de la ficha de la tienda."""
 

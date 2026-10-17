@@ -11400,49 +11400,49 @@
    "w": 16,
    "h": 16
   },
-  "exterior-pk/pk-dirt/unica/00": {
+  "exterior-mosaico/mo-dirt/unica/00": {
    "x": 128,
    "y": 4026,
    "w": 256,
    "h": 16
   },
-  "exterior-pk/pk-flowers/unica/00": {
+  "exterior-mosaico/mo-flowers/unica/00": {
    "x": 384,
    "y": 4026,
    "w": 256,
    "h": 16
   },
-  "exterior-pk/pk-grass/unica/00": {
+  "exterior-mosaico/mo-grass/unica/00": {
    "x": 640,
    "y": 4026,
    "w": 256,
    "h": 16
   },
-  "exterior-pk/pk-plaza/unica/00": {
+  "exterior-mosaico/mo-plaza/unica/00": {
    "x": 0,
    "y": 4042,
    "w": 256,
    "h": 16
   },
-  "exterior-pk/pk-roadB/unica/00": {
+  "exterior-mosaico/mo-roadB/unica/00": {
    "x": 256,
    "y": 4042,
    "w": 256,
    "h": 16
   },
-  "exterior-pk/pk-roadT/unica/00": {
+  "exterior-mosaico/mo-roadT/unica/00": {
    "x": 512,
    "y": 4042,
    "w": 256,
    "h": 16
   },
-  "exterior-pk/pk-tallgrass/unica/00": {
+  "exterior-mosaico/mo-tallgrass/unica/00": {
    "x": 768,
    "y": 4042,
    "w": 256,
    "h": 16
   },
-  "exterior-pk/pk-walk/unica/00": {
+  "exterior-mosaico/mo-walk/unica/00": {
    "x": 0,
    "y": 4058,
    "w": 256,
@@ -15004,7 +15004,7 @@
     15
    ]
   },
-  "exterior-pk": {
+  "exterior-mosaico": {
    "w": 256,
    "h": 16,
    "ancla": [
@@ -26785,76 +26785,76 @@
     }
    }
   },
-  "exterior-pk": {
-   "pk-dirt": {
+  "exterior-mosaico": {
+   "mo-dirt": {
     "fps": 0,
     "bucle": false,
     "dirs": {
      "unica": [
-      "exterior-pk/pk-dirt/unica/00"
+      "exterior-mosaico/mo-dirt/unica/00"
      ]
     }
    },
-   "pk-flowers": {
+   "mo-flowers": {
     "fps": 0,
     "bucle": false,
     "dirs": {
      "unica": [
-      "exterior-pk/pk-flowers/unica/00"
+      "exterior-mosaico/mo-flowers/unica/00"
      ]
     }
    },
-   "pk-grass": {
+   "mo-grass": {
     "fps": 0,
     "bucle": false,
     "dirs": {
      "unica": [
-      "exterior-pk/pk-grass/unica/00"
+      "exterior-mosaico/mo-grass/unica/00"
      ]
     }
    },
-   "pk-plaza": {
+   "mo-plaza": {
     "fps": 0,
     "bucle": false,
     "dirs": {
      "unica": [
-      "exterior-pk/pk-plaza/unica/00"
+      "exterior-mosaico/mo-plaza/unica/00"
      ]
     }
    },
-   "pk-roadB": {
+   "mo-roadB": {
     "fps": 0,
     "bucle": false,
     "dirs": {
      "unica": [
-      "exterior-pk/pk-roadB/unica/00"
+      "exterior-mosaico/mo-roadB/unica/00"
      ]
     }
    },
-   "pk-roadT": {
+   "mo-roadT": {
     "fps": 0,
     "bucle": false,
     "dirs": {
      "unica": [
-      "exterior-pk/pk-roadT/unica/00"
+      "exterior-mosaico/mo-roadT/unica/00"
      ]
     }
    },
-   "pk-tallgrass": {
+   "mo-tallgrass": {
     "fps": 0,
     "bucle": false,
     "dirs": {
      "unica": [
-      "exterior-pk/pk-tallgrass/unica/00"
+      "exterior-mosaico/mo-tallgrass/unica/00"
      ]
     }
    },
-   "pk-walk": {
+   "mo-walk": {
     "fps": 0,
     "bucle": false,
     "dirs": {
      "unica": [
-      "exterior-pk/pk-walk/unica/00"
+      "exterior-mosaico/mo-walk/unica/00"
      ]
     }
    }

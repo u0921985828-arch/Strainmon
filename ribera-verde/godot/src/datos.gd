@@ -7,9 +7,95 @@ static var D := {}
 static func carga() -> Dictionary:
 	if D.is_empty():
 		D = JSON.parse_string(FileAccess.get_file_as_string("res://datos/datos.json"))
-	if _cal_d != CAL:
+	if _cal_d != CAL or _play_d != PLAY:
 		_aplica_auto()
+		_aplica_play()
 	return D
+
+# ---------- la versión de Google Play (PLAY): datos/play.json (lo escribe tools/play.py) ----------
+# Con PLAY, los textos de cultivo sin cifras reales (pH, °C, micras), los híbridos con nombre propio y fuera el bajo de las setas y
+# las apuestas del billar. Las pruebas contra el HTML (y las de la versión entera) ponen PLAY = false antes de cargar nada.
+# Solo cambia textos y en su sitio (las mismas listas y diccionarios), así que se puede ir y volver.
+static var PLAY := true
+static var _play_d = null
+static var _P := {}
+static var _rx_n: RegEx = null
+static var _rx_r := []
+static var _play0 := {}
+
+static func _aplica_play() -> void:
+	_play_d = PLAY
+	if _P.is_empty():
+		_P = JSON.parse_string(FileAccess.get_file_as_string("res://datos/play.json"))
+		var alt := []
+		var ks: Array = _P.nombres.keys()
+		ks.sort_custom(func(a, b): return a.length() > b.length() or (a.length() == b.length() and a < b))
+		for k in ks:
+			alt.append(_esc(k))
+		var L: String = _P.letra
+		_rx_n = RegEx.create_from_string("(?<![%s])(%s)(?![%s\\-])" % [L, "|".join(alt), L])
+		for r in _P.rep:
+			_rx_r.append([RegEx.create_from_string(r[0]), r[1].replace("\\1", "$1")])
+		for k in _P.claves:
+			_play0[k] = D[k].duplicate(true)
+	for k in _play0:
+		_vuelve(D[k], _play0[k])
+	if PLAY:
+		for k in _play0:
+			_cambia(D[k], k)
+
+static func _esc(t: String) -> String:
+	var r := ""
+	for c in t:
+		r += ("\\" + c) if "\\^$.|?*+()[]{}#-".contains(c) else c
+	return r
+
+# lo de antes, hoja a hoja (sin cambiar las listas ni los diccionarios)
+static func _vuelve(v, o) -> void:
+	if v is Dictionary:
+		for k in o:
+			if not v.has(k):
+				continue
+			if o[k] is String:
+				v[k] = o[k]
+			else:
+				_vuelve(v[k], o[k])
+	elif v is Array:
+		for i in mini(v.size(), o.size()):
+			if o[i] is String:
+				v[i] = o[i]
+			else:
+				_vuelve(v[i], o[i])
+
+static func _cambia(v, ruta: String) -> void:
+	if v is Dictionary:
+		for k in v:
+			if v[k] is String:
+				v[k] = _hoja(v[k], ruta + "." + str(k))
+			else:
+				_cambia(v[k], ruta + "." + str(k))
+	elif v is Array:
+		for i in v.size():
+			if v[i] is String:
+				v[i] = _hoja(v[i], ruta + "." + str(i))
+			else:
+				_cambia(v[i], ruta + "." + str(i))
+
+static func _hoja(s: String, ruta: String) -> String:
+	return _P.set[ruta] if _P.set.has(ruta) else tp(s)
+
+# el texto que se ve (diálogos, menús, avisos): con PLAY, los mismos cambios que en los datos
+static func tp(s: String) -> String:
+	if not PLAY or _rx_n == null or s == "":
+		return s
+	for r in _rx_r:
+		s = r[0].sub(s, r[1], true)
+	var o := ""
+	var i := 0
+	for m in _rx_n.search_all(s):
+		o += s.substr(i, m.get_start() - i) + str(_P.nombres[m.get_string(1)])
+		i = m.get_end()
+	return o + s.substr(i)
 
 # 1.52: las autoflorecientes (AUTO) entran en la Genoteca, las recetas y el banco solo con CAL (las pruebas contra el HTML, sin ellas)
 static var _cal_d = null

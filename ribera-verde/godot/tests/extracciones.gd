@@ -12,6 +12,7 @@ const Juego = preload("res://src/juego.gd")
 var J
 
 func _initialize() -> void:
+	Datos.PLAY = false   # la versión entera (con PLAY, las de Google Play: tests/play.gd)
 	_corre.call_deferred()
 
 func arg(k: String, d := "") -> String:

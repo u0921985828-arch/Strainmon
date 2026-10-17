@@ -1499,7 +1499,7 @@ func check_story():
 		show_objective()
 	# 1.43.8 (lo pidió el usuario: «no existe mapa y sitio del bajo de las setas»; con Datos.CAL): nada te decía dónde estaba. Con
 	# Ibarbide abierta, una vez, el SMS de Julen con el sitio (también en MÓVIL → Mapa y en el cartel de la Kale Zaharra)
-	if Datos.CAL and S.ch >= int(D.SETAS.ch) and S.get("setas") == null and not S.flags.get("setasSms"):
+	if Datos.CAL and not Datos.PLAY and S.ch >= int(D.SETAS.ch) and S.get("setas") == null and not S.flags.get("setasSms"):
 		S.flags.setasSms = S.day
 		await talk("SMS · JULEN", D.SETAS_SITIO.sms)
 	if Datos.CAL and D.has("MAR") and S.ch >= int(D.MAR.ch) and S.get("mar") == null and not S.flags.get("koldoSms"):   # 1.51: el muelle
@@ -4456,9 +4456,9 @@ func entra_local(d: Dictionary):
 			await say(D.SOTANO.txt.cerrado)
 			return
 	elif t == "setas":   # 1.34: el bajo de Txomin
-		if S.get("setas") == null:
+		if S.get("setas") == null or Datos.PLAY:
 			atras_puerta()
-			await say("La puerta del bajo de Txomin, con un candado. La llave te la da él, si lo alquilas.")
+			await say("Una puerta gris con un candado. No es la tuya." if Datos.PLAY else "La puerta del bajo de Txomin, con un candado. La llave te la da él, si lo alquilas.")
 			return
 	elif t == "neg":   # 1.45: los negocios alquilados
 		if not S.loc.has(gk[1]):
@@ -4649,7 +4649,7 @@ func obj_local(x: int, y: int, o) -> bool:
 			"sofaF", "sofaF2", "sofaB", "sofaB2":
 				txt = D.MUEBLE_CLUB[k].sofa
 			"billar", "billar2":
-				txt = "La mesa de billar, con el tapete recién cepillado. %s juega con apuesta." % D.BILLAR.n[k]
+				txt = "La mesa de billar, con el tapete recién cepillado. %s %s." % [D.BILLAR.n[k], "echa partidas" if Datos.PLAY else "juega con apuesta"]
 			"poster":
 				txt = "Un cartel antiguo de una feria del cáñamo."
 			"fotoMaite", "fotoMaite2":   # 1.32 (1.33: de 2 casillas)
@@ -4983,12 +4983,12 @@ func talk_billar(k: String):
 	if Db.n >= B.dia:
 		await say("Por hoy ya está bien. Mañana te doy la revancha.", N)
 		return
-	var ops: Array = B.apuestas.map(func(e): return "A " + Datos.eur(e))
+	var ops: Array = ["Una partida"] if Datos.PLAY else B.apuestas.map(func(e): return "A " + Datos.eur(e))   # Google Play: sin apuestas
 	ops.append("Nada")
-	var c: int = await ask("¿Una a la bola 8? %d lisas para ti, %d rayadas para mí y la negra al final: quien la meta se lleva la apuesta." % [int(B.bolas), int(B.bolas)], ops, N)
-	if c < 0 or c >= B.apuestas.size():
+	var c: int = await ask(("¿Una a la bola 8? %d lisas para ti, %d rayadas para mí y la negra al final: quien la meta, gana." if Datos.PLAY else "¿Una a la bola 8? %d lisas para ti, %d rayadas para mí y la negra al final: quien la meta se lleva la apuesta.") % [int(B.bolas), int(B.bolas)], ops, N)
+	if c < 0 or c >= ops.size() - 1:
 		return
-	var e: int = int(B.apuestas[c])
+	var e: int = 0 if Datos.PLAY else int(B.apuestas[c])
 	if S.money < e:
 		sfx("bad")
 		await say("Sin dinero encima no se juega.", N)
@@ -5091,7 +5091,9 @@ func talk_billar(k: String):
 		sfx("bad")
 	advance_time(int(B.min))
 	update_hud()
-	if fin == "yo":
+	if Datos.PLAY:
+		await say(("Ganas tú. %s: «La próxima, la revancha»." % nb) if fin == "yo" else ("Gana %s." % nb) if fin == "el" else "Se hace tarde y lo dejáis en tablas.")
+	elif fin == "yo":
 		await say("Ganas tú. %s te paga %s: «La próxima, la revancha»." % [nb, Datos.eur(e)])
 	elif fin == "el":
 		await say("Gana %s. Le pagas %s." % [nb, Datos.eur(e)])

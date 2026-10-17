@@ -72,6 +72,7 @@ func filas(im: Image) -> Dictionary:
 	return o
 
 func _initialize() -> void:
+	Datos.PLAY = false   # la versión entera (con PLAY, las de Google Play: tests/play.gd)
 	Datos.CAL = false   # 1.42: contra el HTML congelado, «día N» y un mes por día
 	var D := Datos.carga()
 	Arte.carga()

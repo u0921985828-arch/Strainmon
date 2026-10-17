@@ -1,5 +1,7 @@
 # Política de privacidad · Ribera Verde
 
+> **Sustituida por [`store/privacy-policy.md`](../store/privacy-policy.md)** desde la 1.58 (paquete `com.landracehunters.game`, con la copia de seguridad de Android).
+
 Última revisión: 9 de octubre de 2026 · App: Ribera Verde (Android, `com.riberaverde.godot`) · Autor: Eddie
 
 Ribera Verde es un juego para un solo jugador que funciona sin conexión.
