@@ -203,10 +203,13 @@ def recambT():
     return L
 
 def neumT():
+    """tres ruedas de 63 cm (10 px) tumbadas, una encima de otra (20 cm, 3 px cada una), con el agujero de la llanta arriba"""
     L = Lienzo(16, 16)
-    for i, y in enumerate((11, 8, 5, 2)):
-        L.r(2, y, 12, 3, '#1e1e22'); L.hl(3, 12, y, '#3a3a40'); L.hl(5, 10, y + 1, '#0e0e10')
-    L.contorno(K); sombra(L, 2, 13, 15)
+    for y in (11, 8, 5):
+        L.r(3, y, 10, 3, '#2e2e36'); L.hl(3, 12, y, '#44444e'); L.hl(3, 12, y + 2, '#1e1e22')
+        for x in (4, 7, 10): L.p(x, y + 1, '#1e1e22')                                    # el dibujo de la banda
+    L.hl(5, 10, 3, '#44444e'); L.r(3, 4, 10, 2, '#3a3a42'); L.r(6, 4, 4, 2, '#0e0e10')    # la de arriba, con su hueco
+    L.contorno(K); sombra(L, 3, 12, 15)
     return L
 
 def compT():

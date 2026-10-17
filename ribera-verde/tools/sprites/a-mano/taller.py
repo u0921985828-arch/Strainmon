@@ -101,72 +101,78 @@ def mangT():
     return L
 
 def calT():
-    """el calendario de pared (40 × 60 cm): la foto de un coche de rally de los noventa, sin marca, y la hoja del mes"""
+    """el calendario de pared (40 × 60 cm, 7 × 10 px): la foto de un coche de rally de los noventa, sin marca, y la hoja del mes"""
     L = Lienzo(32, 48)
-    L.vl(16, 18, 19, AC[0])                                                                    # el clavo
-    L.r(12, 20, 9, 14, '#f4f4ee')
-    L.r(13, 21, 7, 5, '#8ab4d8'); L.r(13, 24, 7, 2, '#6a8a4a')                                 # el cielo y el monte de la foto
-    L.r(14, 23, 5, 2, RJ[1]); L.p(14, 25, NG[0]); L.p(18, 25, NG[0])                           # el coche
-    for y in (28, 30, 32):
-        for x in range(13, 20, 2): L.p(x, y, '#9a9ea4')
-    L.p(17, 30, RJ[1])                                                                         # un día en rojo
+    L.p(16, 21, AC[0])                                                                         # el clavo
+    L.r(13, 22, 7, 10, '#f4f4ee')
+    L.r(14, 23, 5, 3, '#8ab4d8'); L.hl(14, 18, 25, '#6a8a4a')                                  # el cielo y el monte de la foto
+    L.r(15, 24, 3, 1, RJ[1])                                                                   # el coche
+    for y in (27, 29):
+        for x in range(14, 19, 2): L.p(x, y, '#9a9ea4')
+    L.p(16, 29, RJ[1])                                                                         # un día en rojo
     L.contorno(K)
     return L
 
 def lavabT():
-    """el lavabo de acero de taller (90 cm): la pila honda en su pie, el grifo de codo, el jabón y el papel en la pared"""
+    """el lavabo de acero de taller (60 cm de ancho, 10 px; el borde a 90 cm, 15 px): la pila en su pie, el grifo de codo, el
+    jabón y el papel en la pared"""
     L = Lienzo(32, 48)
-    L.r(9, 32, 14, 4, AC[2]); L.hl(9, 22, 32, AC[3]); L.r(10, 33, 12, 2, AC[1])               # la pila
-    L.r(14, 36, 4, 10, AC[1]); L.vl(14, 36, 45, AC[2])                                         # el pie
-    L.vl(15, 28, 31, AC[3]); L.hl(15, 18, 28, AC[3]); L.p(18, 29, AC[1])                       # el grifo
-    L.r(19, 25, 3, 6, '#3f8a46'); L.hl(19, 21, 25, '#5aa060')                                 # el jabón de taller
-    L.r(9, 19, 6, 6, '#2e5aa8'); L.hl(9, 14, 19, '#4a7ad0'); L.r(10, 25, 4, 3, '#4a7ad0')      # el rollo de papel azul
+    L.r(11, 32, 10, 3, AC[2]); L.hl(11, 20, 32, AC[3]); L.hl(12, 19, 33, AC[1])               # la pila
+    L.r(14, 35, 4, 11, AC[1]); L.vl(14, 35, 45, AC[2])                                         # el pie
+    L.vl(16, 28, 31, AC[3]); L.hl(16, 18, 28, AC[3]); L.p(18, 29, AC[1])                       # el grifo
+    L.r(19, 27, 2, 4, '#3f8a46'); L.p(19, 27, '#5aa060')                                       # el jabón de taller
+    L.r(11, 23, 4, 4, '#2e5aa8'); L.hl(11, 14, 23, '#4a7ad0'); L.r(12, 27, 2, 2, '#4a7ad0')    # el rollo de papel azul
     L.contorno(K); suelo(L, 13, 18, K)
     return L
 
 def rackT():
-    """la estantería de ruedas nuevas (1,8 m): dos baldas de tubo con las ruedas de pie, de canto"""
+    """la estantería de ruedas nuevas (1 m × 1,8 m, 16 × 29 px): tres baldas de tubo con cuatro ruedas de 63 cm (10 px) de pie,
+    de canto (20 cm, 3 px), como las del coche del elevador"""
     L = Lienzo(32, 48)
-    L.vl(6, 18, 46, AC[1]); L.vl(25, 18, 46, AC[1]); L.vl(7, 18, 46, AC[0]); L.vl(26, 18, 46, AC[0])
+    x0, x1 = 7, 24
+    L.vl(x0, 18, 46, AC[1]); L.vl(x1, 18, 46, AC[0])
+    for y in (19, 32, 46):
+        L.hl(x0, x1, y, AC[2])
     for y in (31, 45):
-        L.hl(6, 26, y, AC[2])
-        for x in (8, 14, 20):
-            L.r(x, y - 12, 5, 12, NG[1]); L.vl(x, y - 12, y - 1, NG[0]); L.vl(x + 4, y - 12, y - 1, NG[0])
-            for j in range(y - 11, y - 1, 2): L.hl(x + 1, x + 3, j, NG[2])                     # el dibujo de la banda
-            L.r(x + 1, y - 9, 3, 2, '#f4f4ee')                                                 # la etiqueta de medida
-    L.contorno(K); suelo(L, 6, 26, K)
+        for x in (9, 13, 17, 21):
+            L.r(x, y - 9, 3, 9, NG[1]); L.vl(x, y - 8, y - 2, NG[2]); L.p(x, y - 9, NG[0]); L.p(x + 2, y - 9, NG[0])
+            for j in range(y - 7, y - 1, 2): L.p(x + 1, j, NG[0])                              # el dibujo de la banda
+            L.p(x + 1, y - 5, '#f4f4ee')                                                       # la etiqueta de medida
+    L.contorno(K); suelo(L, x0, x1, K)
     return L
 
 def extinT():
-    """el extintor rojo de 6 kg colgado en su soporte, con la placa cuadrada encima"""
+    """el extintor rojo de 6 kg (50 cm × 16 cm, 8 × 3 px) colgado a 1 m en su soporte, con la placa cuadrada de 20 cm encima"""
     L = Lienzo(32, 48)
-    L.r(12, 18, 8, 8, RJ[1]); L.r(13, 19, 6, 6, '#f4f4ee'); L.r(15, 20, 2, 4, RJ[1])           # la placa
-    L.r(13, 31, 6, 13, RJ[1]); L.vl(13, 31, 43, RJ[2]); L.vl(18, 31, 43, RJ[0])                # la botella
-    L.r(14, 29, 4, 2, NG[1]); L.hl(13, 18, 28, NG[2]); L.vl(19, 29, 38, NG[1])                 # la válvula y la manguera
-    L.r(14, 35, 4, 4, '#f4f4ee')                                                               # la etiqueta
+    L.r(14, 19, 4, 4, '#f4f4ee'); L.r(15, 20, 2, 2, RJ[1])                                     # la placa
+    L.r(15, 26, 3, 6, RJ[1]); L.vl(15, 26, 31, RJ[2]); L.p(16, 29, '#f4f4ee')                  # la botella y su etiqueta
+    L.hl(15, 17, 25, NG[2]); L.p(16, 24, NG[1]); L.vl(18, 25, 29, NG[1])                       # la válvula y la manguera
+    L.hl(14, 18, 27, AC[0])                                                                    # el soporte
     L.contorno(K)
     return L
 
 def bidonT():
-    """el bidón de 200 L (90 cm): negro, con los dos aros, la tapa y el embudo"""
+    """el bidón de 200 L (58 cm × 88 cm, 9 × 14 px): azul, con los dos aros, la tapa y el embudo"""
     L = Lienzo(32, 48)
-    L.r(9, 32, 14, 14, '#2e3a5a'); L.vl(9, 32, 45, '#465a86'); L.vl(22, 32, 45, '#1e2840')
-    for y in (36, 41): L.hl(9, 22, y, '#1e2840'); L.hl(9, 22, y - 1, '#5a6e9a')
-    L.r(9, 29, 14, 3, '#3a4a70'); L.hl(9, 22, 29, '#5a6e9a')                                   # la tapa
-    L.r(17, 26, 3, 3, AC[1]); L.hl(16, 20, 26, AC[2])                                           # el embudo
-    L.r(11, 37, 5, 3, AM[1])                                                                   # la etiqueta de residuo
-    L.contorno(K); suelo(L, 9, 22, K)
+    x0, x1 = 12, 20
+    L.r(x0, 34, 9, 12, '#2e3a5a'); L.vl(x0, 34, 45, '#465a86'); L.vl(x1, 34, 45, '#1e2840')
+    for y in (38, 42): L.hl(x0, x1, y, '#1e2840'); L.hl(x0, x1, y - 1, '#5a6e9a')
+    L.r(x0, 32, 9, 2, '#3a4a70'); L.hl(x0 + 1, x1 - 1, 32, '#5a6e9a')                          # la tapa
+    L.r(17, 30, 2, 2, AC[1]); L.hl(16, 19, 30, AC[2])                                           # el embudo
+    L.r(13, 39, 3, 2, AM[1])                                                                   # la etiqueta de residuo
+    L.contorno(K); suelo(L, x0, x1, K)
     return L
 
 def gatoT():
-    """el gato de carretilla (90 cm × 30 cm de alto): el chasis rojo bajo, el brazo con el plato, las ruedas y la palanca"""
+    """el gato de carretilla (90 cm × 30 cm de alto, 14 × 5 px): el chasis rojo bajo, el brazo con el plato, las ruedas y la
+    palanca de 1 m levantada"""
     L = Lienzo(32, 48)
-    L.r(6, 40, 18, 5, RJ[1]); L.hl(6, 23, 40, RJ[2]); L.hl(6, 23, 44, RJ[0])
-    L.r(18, 36, 6, 4, RJ[1]); L.r(19, 35, 5, 1, AC[2])                                          # el brazo y el plato
-    L.r(7, 45, 3, 2, NG[1]); L.r(20, 45, 3, 2, NG[1])
-    for i in range(10): L.p(6 - i // 2, 39 - i, AC[1])                                          # la palanca, de pie
-    L.r(1, 28, 3, 2, NG[1])
-    L.contorno(K); suelo(L, 1, 24, K)
+    L.r(9, 42, 14, 3, RJ[1]); L.hl(9, 22, 42, RJ[2]); L.hl(9, 22, 44, RJ[0])
+    L.r(19, 40, 4, 2, RJ[1]); L.hl(19, 23, 39, AC[2])                                           # el brazo y el plato
+    L.r(10, 45, 2, 2, NG[1]); L.r(20, 45, 2, 2, NG[1])
+    for i in range(12): L.p(9 - i // 3, 41 - i, AC[1])                                          # la palanca, de pie
+    L.hl(4, 6, 29, NG[1])
+    L.contorno(K); suelo(L, 4, 23, K)
     return L
 
 def gruaT():
@@ -183,37 +189,41 @@ def gruaT():
     return L
 
 def cajonT():
-    """el armario de herramientas (70 cm × 1,1 m): siete cajones rojos con tirador de aluminio y la caja de encima abierta"""
+    """el armario de herramientas (68 cm × 1 m, 11 × 16 px): seis cajones rojos con tirador de aluminio y la caja de encima"""
     L = Lienzo(32, 48)
-    L.r(8, 29, 16, 16, RJ[1]); L.vl(8, 29, 44, RJ[2]); L.vl(23, 29, 44, RJ[0])
-    for i, y in enumerate((30, 32, 34, 36, 38, 41)):
-        L.hl(9, 22, y + (1 if i == 5 else 0), RJ[0]); L.hl(12, 19, y + 1, AC[3])                 # las juntas y los tiradores
-    L.r(8, 45, 2, 2, NG[1]); L.r(22, 45, 2, 2, NG[1])                                           # las ruedas
-    L.r(9, 23, 14, 6, RJ[1]); L.hl(9, 22, 23, RJ[2]); L.hl(9, 22, 28, RJ[0])                    # la caja de encima
-    L.r(10, 21, 12, 2, AC[1]); L.p(12, 20, AC[2]); L.p(15, 20, AC[2]); L.p(19, 20, AC[2])       # las llaves que asoman
-    L.contorno(K); suelo(L, 8, 23, K)
+    x0, x1 = 11, 21
+    L.r(x0, 33, 11, 12, RJ[1]); L.vl(x0, 33, 44, RJ[2]); L.vl(x1, 33, 44, RJ[0])
+    for y in (34, 36, 38, 40, 42):
+        L.hl(x0 + 1, x1 - 1, y + 1, RJ[0]); L.hl(x0 + 3, x1 - 3, y, AC[3])                        # las juntas y los tiradores
+    L.r(x0, 45, 2, 2, NG[1]); L.r(x1 - 1, 45, 2, 2, NG[1])                                      # las ruedas
+    L.r(x0 + 1, 29, 9, 4, RJ[1]); L.hl(x0 + 1, x1 - 1, 29, RJ[2]); L.hl(x0 + 1, x1 - 1, 32, RJ[0])   # la caja de encima
+    L.p(13, 28, AC[2]); L.p(16, 28, AC[2]); L.p(19, 28, AC[2])                                  # las llaves que asoman
+    L.contorno(K); suelo(L, x0, x1, K)
     return L
 
 def sillaT():
-    """dos sillas de la espera de plástico gris sobre la viga de acero (45 cm de asiento), con una revista"""
+    """dos sillas de la espera de plástico gris (asiento de 45 cm, 7 px; respaldo a 85 cm) sobre la viga de acero, con una
+    revista"""
     L = Lienzo(32, 48)
     for x in (6, 17):
-        L.r(x, 28, 9, 9, '#8a96a6'); L.hl(x, x + 8, 28, '#a6b2c2')                              # el respaldo
-        L.r(x, 37, 9, 3, '#76828f'); L.hl(x, x + 8, 37, '#a6b2c2')                              # el asiento
-    L.hl(6, 25, 41, AC[1]); L.vl(9, 41, 46, AC[0]); L.vl(22, 41, 46, AC[0])                    # la viga y las patas
-    L.r(19, 35, 5, 2, '#e0e4e8'); L.p(20, 35, RJ[1])                                            # la revista
-    L.contorno(K); suelo(L, 6, 25, K)
+        L.r(x, 33, 8, 6, '#8a96a6'); L.hl(x, x + 7, 33, '#a6b2c2')                              # el respaldo
+        L.r(x, 39, 8, 2, '#76828f'); L.hl(x, x + 7, 39, '#a6b2c2')                              # el asiento
+    L.hl(6, 24, 42, AC[1]); L.vl(9, 42, 46, AC[0]); L.vl(21, 42, 46, AC[0])                    # la viga y las patas
+    L.r(19, 38, 4, 1, '#e0e4e8'); L.p(20, 38, RJ[1])                                            # la revista
+    L.contorno(K); suelo(L, 6, 24, K)
     return L
 
 def cafeM():
-    """la máquina de café de 1,8 m: el frente negro con la foto de la taza, los botones, el panel y el hueco del vaso"""
+    """la máquina de café (80 cm × 1,8 m, 13 × 29 px): el frente negro con la foto de la taza, los botones, el panel y el hueco
+    del vaso"""
     L = Lienzo(32, 48)
-    L.r(8, 18, 16, 28, '#2e2e36'); L.vl(8, 18, 45, '#44444e'); L.vl(23, 18, 45, NG[0])
-    L.r(10, 20, 9, 9, '#6a3a1e'); L.r(12, 23, 5, 4, '#f4f4ee'); L.hl(12, 16, 23, '#c89a5a')     # la foto de la taza de café
-    for y in range(21, 29, 2): L.r(20, y, 2, 1, '#e0b030')                                       # los botones
-    L.r(10, 31, 12, 3, '#3a6a4a'); L.r(11, 32, 4, 1, '#8ae0a0')                                 # el visor
-    L.r(12, 37, 8, 5, NG[0]); L.r(15, 40, 2, 2, '#f4f4ee')                                       # el hueco del vaso con uno
-    L.contorno(K); suelo(L, 8, 23, K)
+    x0, x1 = 10, 22
+    L.r(x0, 18, 13, 28, '#2e2e36'); L.vl(x0, 18, 45, '#44444e'); L.vl(x1, 18, 45, NG[0])
+    L.r(11, 20, 7, 8, '#6a3a1e'); L.r(12, 23, 4, 3, '#f4f4ee'); L.hl(12, 15, 23, '#c89a5a')     # la foto de la taza de café
+    for y in range(21, 29, 2): L.r(19, y, 2, 1, '#e0b030')                                       # los botones
+    L.r(11, 31, 10, 3, '#3a6a4a'); L.r(12, 32, 4, 1, '#8ae0a0')                                 # el visor
+    L.r(13, 37, 6, 5, NG[0]); L.r(15, 40, 2, 2, '#f4f4ee')                                       # el hueco del vaso con uno
+    L.contorno(K); suelo(L, x0, x1, K)
     return L
 
 for f in (floorTc, floorTc2, floorTc3, floorTcR, floorTcT, floorTd, floorTg, floorTr):

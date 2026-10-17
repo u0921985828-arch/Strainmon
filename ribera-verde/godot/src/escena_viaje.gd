@@ -230,15 +230,14 @@ const PEATONES := [[0, 1, 0.040, 0.05, ""], [0, -1, 0.034, 0.40, ""], [0, 1, 0.0
 # 1.57.2 (lo pidió el usuario: «que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el
 # cultivo en exterior»): en la hierba de detrás, un bancal con tres plantas de exterior por la fecha del sistema (la carga y el título no
 # tienen partida): (mes, hasta el día, fase: -1 nada, 0 plántula, 1-2 vegetativo, 3 prefloración, 4 floración,
-# 5 madura, 6 cortada). Las plantas, las de cada variedad que ya hay (plantas-vista, sm<NN>-<1..5>, sin maceta), una por variedad
-# (HUERTO_SM); cortada, el bancal vacío. Calendario del norte: se siembra a mediados de abril, florece en agosto y se corta en octubre
+# 5 madura, 6 cortada). Las plantas, dibujadas a mano con contorno como el árbol y el seto (huerto-pl, hp<variedad>-<1..5>: índica,
+# sativa e híbrida); cortada, el bancal vacío. Calendario del norte: se siembra a mediados de abril, florece en agosto y se corta en octubre
 const HUERTO := [[3, 31, -1], [4, 14, -1], [4, 30, 0], [5, 15, 0], [5, 31, 1], [6, 15, 1], [6, 30, 2], [7, 31, 2], [8, 24, 3],
 	[8, 31, 4], [9, 20, 4], [9, 30, 5], [10, 20, 5], [10, 31, 6], [12, 31, -1]]
 const HUERTO_X := 0.55    # dónde empieza el bancal, por el ancho de la pantalla
 const HUERTO_N := 3
 const HUERTO_PASO := 24   # 1,5 m entre plantas
-const HUERTO_SM := [0, 5, 10]   # las variedades del bancal (sm<NN> de plantas-vista)
-const HUERTO_FASE := [1, 2, 3, 4, 4, 5]   # fase del bancal → la de plantas-vista (1 plántula … 5 cosecha); 6, cortada: nada
+const HUERTO_FASE := [1, 2, 3, 4, 4, 5]   # fase del bancal → la de huerto-pl (1 plántula … 5 madura); 6, cortada: nada
 static var FECHA := []    # [mes, día] para las pruebas; vacío, la del sistema
 
 static func fase_huerto(mes: int, dia: int) -> int:
@@ -264,8 +263,8 @@ static func _huerto(P, sw: int, fy: int, list: Array) -> void:
 		var fi := fase
 		if i == 1 and fi in [4, 5]:   # la del medio, una sativa que va más tarde
 			fi -= 1
-		var sm := "sm%02d-%d" % [HUERTO_SM[i % HUERTO_SM.size()], HUERTO_FASE[fi]] if fi >= 0 and fi < HUERTO_FASE.size() else ""
-		var f = Atlas.frame_de(Atlas.cubre("misc:planta-vista"), sm, "unica", 0, {"i": 0, "esp": i % 2 == 1}) if sm != "" else null
+		var sm := "hp%d-%d" % [i % 3, HUERTO_FASE[fi]] if fi >= 0 and fi < HUERTO_FASE.size() else ""
+		var f = Atlas.frame_de(Atlas.cubre("obj:" + sm), sm, "unica", 0, {"i": 0, "esp": i % 2 == 1}) if sm != "" else null
 		if f:
 			list.append([fy, f, x0 + 8 + i * HUERTO_PASO, fy])
 

@@ -208,7 +208,14 @@ func _corre() -> void:
 				ok_f = false
 			fz = f if f >= 0 else fz
 	chk(ok_f, "el bancal: las fases no van hacia atrás en el año")
-	chk(EscViaje.HUERTO_SM.all(func(v): return range(1, 6).all(func(i): return EscViaje.Atlas.frame_de(EscViaje.Atlas.cubre("misc:planta-vista"), "sm%02d-%d" % [v, i], "unica", 0, {"i": 0}) != null)), "el bancal: las plantas de cada variedad que ya había (plantas-vista)")
+	chk(range(3).all(func(v): return range(1, 6).all(func(i): var k := "hp%d-%d" % [v, i]; return EscViaje.Atlas.cubre("obj:" + k) == "huerto-pl" and EscViaje.Atlas.frame_de("huerto-pl", k, "unica", 0, {"i": 0}) != null)), "el bancal: las tres variedades en sus cinco fases, con contorno (huerto-pl)")
+	var alt := []   # 16 px/m: la plántula, de 20 cm; la madura, de 1,4 a 2 m (la sativa, la más alta); cada fase, más alta que la de antes
+	for v in 3:
+		var hs := []
+		for i in range(1, 6):
+			hs.append(EscViaje.Atlas.frame_de("huerto-pl", "hp%d-%d" % [v, i], "unica", 0, {"i": 0}).c.get_used_rect().size.y)
+		alt.append(hs)
+	chk(alt.all(func(hs): return hs[0] <= 6 and hs[4] >= 22 and hs[4] <= 32 and range(4).all(func(j): return hs[j] < hs[j + 1])), "el bancal: a 16 px/m y creciendo %s" % [alt])
 	# 7 · los dibujos
 	if dir != "":
 		J.hud.hide()

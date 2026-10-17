@@ -191,6 +191,9 @@ func _corre() -> void:
 		for q in N.mj:
 			obs += q.o
 		for q in obs:
+			if k == "valde" and q[2] == "neumT" and int(q[1]) == 3:   # 1.57.2: una pila de ruedas por sitio (montar_taller)
+				chk(m.o[int(q[1])][int(q[0])] == null, "valde: sin la segunda pila de ruedas en %s" % [q])
+				continue
 			chk(m.o[int(q[1])][int(q[0])] == q[2], "%s: %s en %s" % [k, q[2], q])
 			if q[2] != "tabique":   # la cama se coge por los pies (bedB)
 				chk(llega("loc-" + k, de, [int(q[0]), int(q[1]) + (1 if q[2] == "bedT" else 0)]), "%s: se llega a %s" % [k, q])
@@ -401,6 +404,20 @@ func _corre() -> void:
 	MENUS = []
 	QUIERO = ["Comprarle", "Nada"]
 	chk(corre(J.talk_nerea) and MENUS.size() >= 2 and MENUS[1].size() == int(D.MERCADO.mayor.n) + int(D.MERCADO.mayor.nx) + 1, "la lonja vende: %s" % [MENUS])
+	# 1.57.2 (lo pidió el usuario: «si tú ves el coche, eso tendría que ser como referencia de dimensiones… No pueden ser unos
+	# neumáticos igual de grandes que el capó»): el atrezo del taller a 16 px/m, como la rueda del coche (63 cm, unos 10 px)
+	if Atlas.ok:
+		var med := {}
+		for q in [["negocios-16", "neumT"], ["taller-alto", "rackT"], ["taller-alto", "bidonT"], ["taller-alto", "extinT"], ["taller-alto", "cajonT"], ["taller-alto", "lavabT"], ["taller-alto", "cafeM"]]:
+			var fr = Atlas.frame_de(q[0], q[1], "unica", 0, {"i": 0})
+			med[q[1]] = fr.c.get_used_rect().size if fr else Vector2i.ZERO
+		chk(med.neumT.x <= 12 and med.neumT.y <= 14, "taller: la pila de tres ruedas, de 63 cm (%s)" % [med.neumT])
+		chk(med.rackT.y >= 28 and med.rackT.y <= 32, "taller: la estantería de ruedas, de 1,8 m (%s)" % [med.rackT])
+		chk(med.bidonT.x <= 12 and med.bidonT.y <= 19, "taller: el bidón de 200 L, de 58 × 88 cm (%s)" % [med.bidonT])
+		chk(med.extinT.y <= 16, "taller: el extintor de 6 kg con su placa (%s)" % [med.extinT])
+		chk(med.cajonT.x <= 14, "taller: el armario de herramientas, de 68 cm (%s)" % [med.cajonT])
+		chk(med.lavabT.x <= 13, "taller: el lavabo, de 60 cm (%s)" % [med.lavabT])
+		chk(med.cafeM.x <= 15 and med.cafeM.y >= 28, "taller: la máquina de café, de 80 cm × 1,8 m (%s)" % [med.cafeM])
 	for x in fallos:
 		print("  FALLO ", x)
 	print("negocios: %d comprobaciones, %d fallos" % [n, fallos.size()])

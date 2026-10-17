@@ -989,6 +989,9 @@ func montar_taller(mapa: String) -> void:
 				if t == "floorTc":   # el hormigón, con alguna mancha de aceite o una rodada
 					t = ["floorTc", "floorTc", "floorTc", "floorTc2", "floorTc", "floorTc3"][_hash_t(x, y) % 6]
 				m.g[y][x] = t
+	for q in [[0, 3], [16, 3]]:   # una pila de tres ruedas por sitio: dos seguidas, de fondo, parecían una torre más alta que el coche
+		if m.o[q[1]][q[0]] == "neumT":
+			m.o[q[1]][q[0]] = null
 	m.atrezo = false
 	montar_atrezo(mapa)
 
@@ -1931,7 +1934,7 @@ const ASIENTO_TXT := {"sofaF": "Un sofá del club.", "sofaB": "Un sofá del club
 # de pie, en la 9. De espaldas, la cabeza asoma por encima del respaldo (en la silla gaming, alto, la cadera por encima
 # del cojín para que se vea la cabeza; lo de debajo lo tapa el respaldo). El taburete, con SENT_TABURETE en pinta.gd
 const SENT_GEO := {"silla": [0, 5], "sillaG": [8, 2], "sillon": [0, 7], "sofa": [0, 8], "sofaB": [0, 9], "sofaF": [2, 7], "sofaV": [2, 7], "bench": [0, 9], "stool": [0, 4],
-	"sillaTs": [0, 8], "sillaTn": [0, 5], "taburTb": [0, 4], "sillaT": [-5, 6]}
+	"sillaTs": [0, 8], "sillaTn": [0, 5], "taburTb": [0, 4], "sillaT": [-6, 8]}
 const TABURETES := ["stool", "taburTb"]   # 1.57.2: con las piernas de SENT_TABURETE (pinta.gd)
 func sent_geo(k) -> Array:
 	return SENT_GEO.get(k, [0, 9])
