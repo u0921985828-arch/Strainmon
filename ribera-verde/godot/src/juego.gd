@@ -418,6 +418,7 @@ func opciones(desde_titulo := false) -> void:
 		if desde_titulo and FileAccess.file_exists(GUARDADO):
 			it.append({"label": "BORRAR PARTIDA"})
 		if Datos.CAL:
+			it.insert(4, {"label": "VIBRACIÓN", "right": "SÍ" if aj.vibra else "NO"})   # 1.57
 			it.append({"label": "COPIA DE SEGURIDAD"})
 		it.append({"label": "VOLVER"})
 		i = await menu(it, {"cls": "start", "initial": i, "title": "OPCIONES"})
@@ -441,6 +442,9 @@ func opciones(desde_titulo := false) -> void:
 				aj.texto = (aj.texto + 1) % 3
 			"SONIDO":
 				aj.sonido = not aj.sonido
+			"VIBRACIÓN":
+				aj.vibra = not aj.vibra
+				vibra()
 			"BORRAR PARTIDA":
 				if await ask("¿Borrar la partida guardada? No se puede deshacer.", ["Sí, borrarla", "No"]) == 0:
 					DirAccess.remove_absolute(ProjectSettings.globalize_path(GUARDADO))

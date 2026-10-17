@@ -1667,6 +1667,7 @@ func update_player(dt: float) -> void:
 		P.moving = false
 		P.px = P.x * 16.0
 		P.py = P.y * 16.0
+		paso_sobra = minf(P.t - P.dur, P.dur * 0.5) if Datos.CAL else 0.0
 		on_step_end()
 		P.chain = true
 	if not is_free():
@@ -1692,6 +1693,7 @@ func update_player(dt: float) -> void:
 		return
 	try_move(d)
 
+var paso_sobra := 0.0
 func try_move(d: String) -> void:
 	var m: Dictionary = MAPS[S.map]
 	var dv: Array = DV[d]
@@ -1712,7 +1714,8 @@ func try_move(d: String) -> void:
 	P.fy = P.y
 	P.x = nx
 	P.y = ny
-	P.t = 0.0
+	P.t = paso_sobra if P.chain else 0.0   # 1.57: andando seguido, lo que sobró del paso anterior (sin tirones entre casillas)
+	paso_sobra = 0.0
 	P.moving = true
 	P.pisT = M.reloj
 	P.dur = paso_ms()

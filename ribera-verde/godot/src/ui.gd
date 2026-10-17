@@ -606,6 +606,11 @@ func _input(e: InputEvent) -> void:
 	if e.pressed:
 		if zona_cruz.has_point(e.position):
 			get_viewport().set_input_as_handled()
+			if Datos.CAL:   # 1.57: un dedo nuevo en la cruceta manda; el que se quedó colgado (sin soltar) se suelta
+				for d0 in dedos_cruz.keys():
+					if dedos_cruz[d0] != "":
+						aprieta(dedos_cruz[d0], false)
+				dedos_cruz.clear()
 			if dedos_cruz.is_empty():
 				dedos_cruz[dedo] = ""
 				_cruz_a(dedo, e.position)
@@ -613,6 +618,15 @@ func _input(e: InputEvent) -> void:
 		var k := mando_en(e.position)
 		if k != "":
 			get_viewport().set_input_as_handled()
+			if Datos.CAL:   # 1.57: el mismo dedo (Android repite los números) o el mismo mando colgados, fuera
+				if dedos.has(dedo) and dedos[dedo] != k:
+					var k0: String = dedos[dedo]
+					dedos.erase(dedo)
+					if not dedos.values().has(k0):
+						aprieta(k0, false)
+				for d0 in dedos.keys():
+					if dedos[d0] == k:
+						dedos.erase(d0)
 			dedos[dedo] = k
 			aprieta(k, true)
 	elif dedos_cruz.has(dedo):
@@ -628,11 +642,21 @@ func _input(e: InputEvent) -> void:
 		if not dedos.values().has(k):
 			aprieta(k, false)
 
+# 1.57: al deslizar de una flecha a la de al lado, la nueva tiene que ganar por CRUZ_HISTERESIS (unos 11° pasada la diagonal):
+# el pulgar sobre la diagonal ya no hace zigzag
+const CRUZ_HISTERESIS := 1.4
 func dir_cruz(p: Vector2, actual: String) -> String:
 	var v := p - cruz.get_center()
 	if v.length() < cruz.size.x / 3 * .42:
 		return actual
-	if absf(v.x) > absf(v.y):
+	var h := absf(v.x) > absf(v.y)
+	if Datos.CAL and actual != "":
+		var ah: bool = actual == "left" or actual == "right"
+		if ah and not h and absf(v.y) < absf(v.x) * CRUZ_HISTERESIS:
+			h = true
+		elif not ah and h and absf(v.x) < absf(v.y) * CRUZ_HISTERESIS:
+			h = false
+	if h:
 		return "left" if v.x < 0 else "right"
 	return "up" if v.y < 0 else "down"
 
@@ -677,6 +701,7 @@ func aprieta(k: String, on: bool) -> void:
 		return
 	set_held(k, on)
 	if on:
+		vibra()
 		press(k)
 		if k in DIRS:
 			var r := [0, 0]
@@ -689,6 +714,11 @@ func aprieta(k: String, on: bool) -> void:
 		M.quita(rep[k][0])
 		M.quita(rep[k][1])
 		rep.erase(k)
+
+# 1.57: un toque corto del vibrador al apretar un mando (OPCIONES → VIBRACIÓN), en el móvil
+func vibra() -> void:
+	if Datos.CAL and aj.get("vibra", true) and not oraculo and OS.has_feature("mobile"):
+		Input.vibrate_handheld(12)
 
 func suelta_todo() -> void:
 	for d in dedos:
@@ -770,7 +800,7 @@ func set_sound(on: bool, guarda := true) -> void:
 # de 25 en 25 %), la velocidad del texto y SONIDO; en un archivo aparte de la partida, que no los borra ----------
 static var AJUSTES := "user://ajustes.json"   # las pruebas usan otro
 const TEXTO_VEL := ["NORMAL", "RÁPIDO", "AL MOMENTO"]
-var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true}
+var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true, "vibra": true}
 
 func ajustes_carga() -> void:
 	if oraculo:

@@ -337,6 +337,8 @@ func _corre() -> void:
 	await ciclo()
 	await patrulla()
 	await continuar()
+	if Datos.CAL:
+		await mandos()
 	print("ciclo: %d fallos" % fallos.size())
 	quit(1 if fallos.size() else 0)
 
@@ -404,7 +406,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("OPCIONES"), 60)
 	await elige("OPCIONES")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
-	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
+	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
 	await elige("MÚSICA")
 	await hasta(func(): return J.menu_box.visible, 60)
 	var so0 = J.sonido
@@ -1026,3 +1028,51 @@ func continuar() -> void:
 	if hay != esperado:
 		print("  guardado: ", esperado, "\n  cargado:  ", hay)
 	await foto("11-continuar")
+
+# ---------- 1.57: los mandos, para jugar horas ----------
+func mandos() -> void:
+	await libre()
+	# un dedo que se quedó colgado en la cruceta (Android no mandó el soltar): el siguiente manda y el colgado se suelta
+	await toque(0, "left", true)
+	await toque(2, "up", true)
+	var manda: bool = J.held.up and not J.held.left and not J.botones.left.button_pressed and J.botones.up.button_pressed
+	await toque(2, "up", false)
+	await toque(0, "left", false)
+	await hasta(func(): return not J.P.moving, 120)
+	check("un dedo colgado en la cruceta no la bloquea: el nuevo manda y al soltarlo nada queda apretado", manda and J.dir_order.is_empty() and J.dedos_cruz.is_empty() and J.rep.is_empty())
+	# y en B: con uno colgado, otro dedo lo aprieta y al soltarlo, suelto
+	await toque(3, "B", true)
+	await toque(4, "B", true)
+	await toque(4, "B", false)
+	check("un dedo colgado en B no lo deja apretado", not J.held.B and not J.botones.B.button_pressed and J.dedos.is_empty())
+	# la cruceta, con histéresis: de la derecha, pasada la diagonal unos grados, sigue la derecha; bien pasada, arriba
+	var c: Vector2 = J.cruz.get_center()
+	var a: float = J.cruz.size.x / 3
+	var en := func(g: float) -> Vector2: return c + Vector2(cos(deg_to_rad(g)), -sin(deg_to_rad(g))) * a
+	check("la cruceta: en la diagonal no hace zigzag (50° desde la derecha sigue a la derecha; 60°, arriba; sin flecha, 50° es arriba)",
+		J.dir_cruz(en.call(50.0), "right") == "right" and J.dir_cruz(en.call(60.0), "right") == "up" and J.dir_cruz(en.call(50.0), "") == "up"
+		and J.dir_cruz(en.call(40.0), "up") == "up" and J.dir_cruz(en.call(30.0), "up") == "right" and J.dir_cruz(en.call(180.0), "right") == "left")
+	# andando seguido, cada casilla dura lo suyo (240 ms), sin perder el pico de cada fotograma
+	var m: Dictionary = J.MAPS[J.S.map]
+	var mejor := ["", 0]
+	for d in ["left", "right", "up", "down"]:
+		var k := 0
+		while k < 8 and not J.tile_solid(m, J.P.x + DV[d].x * (k + 1), J.P.y + DV[d].y * (k + 1)) and J.ent_at(J.P.x + DV[d].x * (k + 1), J.P.y + DV[d].y * (k + 1)) == null:
+			k += 1
+		if k > mejor[1]:
+			mejor = [d, k]
+	var d: String = mejor[0]
+	if mejor[1] >= 4:
+		await mira(d)
+		var x0 := Vector2i(J.P.x, J.P.y)
+		await toque(0, d, true)
+		await hasta(func(): return J.P.moving, 60)
+		var t0: float = J.M.reloj - J.P.t
+		await hasta(func(): return Vector2i(J.P.x, J.P.y) == x0 + DV[d] * 4, 600)
+		var t1: float = J.M.reloj - J.P.t
+		await toque(0, d, false)
+		await hasta(func(): return not J.P.moving, 120)
+		var ms: float = (t1 - t0) / 3.0
+		check("andando seguido, %.1f ms por casilla (240)" % ms, absf(ms - 240.0) < 8.0)
+	else:
+		check("andando seguido: sin sitio para 4 casillas en %s" % J.S.map, false)

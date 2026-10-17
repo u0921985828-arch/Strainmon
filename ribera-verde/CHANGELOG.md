@@ -6,7 +6,13 @@ Lo que pidió el usuario tras la 1.56 («estos recursos se podrían usar antes d
 
 - **La carga del juego** (`arranque` en `juego.gd`, `pinta_carga` en `escena_viaje.gd`, modo `carga` en `pinta.gd`): al abrir, la carretera del viaje de día, sin letras ni botones, con el utilitario, el scooter y el superdeportivo por este carril y el autobús y la berlina por el de enfrente (al revés y un poco más oscuros), cada carril a su marcha y sin montarse (`CARGA_V`, `MARCHA`, `HUECO`), las ruedas girando y, abajo, la barra que se llena en 3,6 s (`CARGA`); A, B o START la pasan; después, fundido al título. `--sin-carga` va directo al título; las pruebas que ponen `oraculo`, al título de antes (`_arranca`).
 - **El título con más atrezo** (`DEMO_CAL`, `demo_coche` en `mundo.gd`): el protagonista y el poli por las aceras, dos personas más andando y el utilitario, la berlina, el scooter y el superdeportivo con su conductor por la calzada, cada uno en su carril, que entran por un lado y salen por el otro (`e.veh` en `_pj`).
-- Pruebas: `tests/viaje.gd` (91) y `tests/ciclo.gd` (arranca con la carga y acaba sola en el título).
+- **Los tubos llegan a las carpas** (lo pidió el usuario: «los tubos no llegan a las carpas, falta 1 o 2 píxeles»): la boca se calcula con el ancla del dibujo de la carpa, como la pinta `_carpa_mapa`, y el tubo entra un píxel en el techo (`_tubos_casa`).
+- **Los mandos, para jugar horas** (lo pidió el usuario: «los controles tienen que ser perfectos, para poder jugar horas»):
+  - un dedo que se queda colgado (Android no manda el soltar: una notificación, un gesto del sistema) ya no bloquea la cruceta ni deja A o B apretados: el toque nuevo manda y el viejo se suelta;
+  - la cruceta con histéresis (`CRUZ_HISTERESIS`): al deslizar el pulgar, la flecha de al lado tiene que ganar por unos 11° pasada la diagonal, sin zigzag;
+  - andando seguido, cada paso arranca con lo que sobró del anterior (`paso_sobra`): 240 ms por casilla exactos, sin tirones entre casillas (antes, 250 a 60 fps);
+  - un toque de vibración al apretar cada mando (`vibra`), con OPCIONES → VIBRACIÓN (sí por defecto; permiso `vibrate` en el APK).
+- Pruebas: `tests/viaje.gd` (91) y `tests/ciclo.gd` (arranca con la carga y acaba sola en el título; los dedos colgados, la histéresis y los 240 ms por casilla).
 
 ## 1.56 · Godot 0.47.0
 

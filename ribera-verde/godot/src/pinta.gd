@@ -992,7 +992,9 @@ func _tubos_casa(m: Dictionary) -> void:
 		# encima de cuadros y puertas) y baja a la ventana, donde entra por una placa de chapa que sustituye la hoja de arriba; la
 		# de abajo sigue siendo cristal
 		var f = Atlas.foto_misc("carpa-" + t.t + "-mapa")
-		var arriba: int = t.y * 16 + 15 - (48 - (f.c.get_used_rect().position.y if f else 8))
+		# 1.57 (lo pidió el usuario: «los tubos no llegan a las carpas, falta 1 o 2 píxeles»): la boca, en la primera fila opaca del
+		# dibujo de la carpa tal como lo pinta _carpa_mapa (por su ancla), y el tubo un píxel dentro del techo
+		var arriba: int = (t.y * 16 + 15 - int(f.cel.ancla[1]) + f.c.get_used_rect().position.y if f else t.y * 16 + 15 - 40) + 1
 		var yc: int = -cam.y   # el techo
 		var yw: int = 16 + 15 + int(ALZA.iwin) - 15 - cam.y   # la fila de arriba del dibujo de la ventana (iwin, en la fila 1)
 		var xa: int = xc - cam.x
