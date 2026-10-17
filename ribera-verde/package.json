@@ -18,7 +18,9 @@
     "test:arte": "node tools/test-arte.js",
     "apk": "node tools/build.js && node tools/build-apk.js",
     "godot:html": "node tools/build.js && node tools/godot.js && node tools/godot-pantallas.js && RV_ORACULO=godot/tests/historia.json node tools/test-historia.js",
-    "godot:apk": "node tools/godot-apk.js",
+    "godot:apk": "node tools/godot-aab.js",
+    "godot:aab": "node tools/godot-aab.js",
+    "test:godot": "bash tools/tests.sh",
     "musica": "node tools/musica.js"
   },
   "devDependencies": {

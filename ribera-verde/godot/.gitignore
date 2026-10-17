@@ -1,4 +1,4 @@
 .godot/
 *.tmp
-icono/
-musica/
+# la plantilla Gradle de Godot: la instala tools/godot-aab.js
+android/

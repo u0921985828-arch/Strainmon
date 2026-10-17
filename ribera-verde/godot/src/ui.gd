@@ -963,14 +963,24 @@ static func paginas(texto: String, tope := 3500) -> Array[String]:
 		if par.length() > tope:
 			trozos = []
 			var t := ""
-			for l in par.split("\n"):
-				if t != "" and t.length() + l.length() > tope:
+			var lineas: Array[String] = []
+			for l0 in par.split("\n"):
+				# una línea sola más larga que la página (las licencias de Godot 4.7) se corta por el último espacio
+				var l: String = l0
+				while l.length() > tope:
+					var c := l.rfind(" ", tope)
+					c = c if c > 0 else tope
+					lineas.append(l.substr(0, c))
+					l = l.substr(c).strip_edges(true, false)
+				lineas.append(l)
+			for l in lineas:
+				if t != "" and t.length() + l.length() + 1 > tope:
 					trozos.append(t)
 					t = ""
 				t += ("\n" if t != "" else "") + l
 			trozos.append(t)
 		for tr in trozos:
-			if pag != "" and pag.length() + tr.length() > tope:
+			if pag != "" and pag.length() + tr.length() + 2 > tope:
 				out.append(pag)
 				pag = ""
 			pag += ("\n\n" if pag != "" else "") + tr

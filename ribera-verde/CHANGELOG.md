@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.58 · Google Play (en curso, por fases del plan)
+
+### Fase 1 · plataforma
+- **Godot 4.7** (antes 4.3): el proyecto, las pruebas y la exportación; `.uid` de los scripts en el repo. Arreglos por el cambio de versión: `prueba.gd` compara los números por su valor (4.4+ escribe `1.0` donde 4.3 escribía `1`) y `paginas()` de `ui.gd` cuenta los saltos de línea y parte las líneas de más de 3.500 letras (una página de las licencias salía de 3.501).
+- **AAB con la plantilla Gradle** (`tools/godot-aab.js`, `npm run godot:aab`; sustituye a `godot-apk.js`): paquete `com.landracehunters.game`, targetSdk 36, minSdk 24, arm64-v8a y armeabi-v7a, icono monocromo de Android 13, iconos por vecino más próximo dentro del AAB, firma con la upload key (variables `LH_KEYSTORE*` o `LH_ENV`, la keystore fuera del repo; se niega a usar una dentro) y comprobaciones: páginas de 16 KB (`zipalign -P 16` y `readelf` en las `.so` de 64 bits) y targetSdk 36 en el manifiesto. Saca también el APK universal con bundletool para probar en el móvil.
+- **Música e iconos versionados** (`godot/musica/`, `godot/icono/`): ya no hace falta regenerarlos para exportar.
+- **Batería entera** en `tools/tests.sh` (`npm run test:godot`), con las banderas de cada prueba (`mandos_geo` a 2600 × 1700 y `--sin-arranque`, `pantallas` con sus referencias, `ciclo` con `--fixed-fps 60`). Línea base en `.modo-absoluto/base.txt`.
+
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
 Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.

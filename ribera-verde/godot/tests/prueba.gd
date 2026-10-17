@@ -23,6 +23,12 @@ func arg(k: String, d := "") -> String:
 	var i := a.find(k)
 	return a[i + 1] if i >= 0 and i + 1 < a.size() else d
 
+# un valor del diccionario: los números por su valor (Godot 4.4+ escribe 1.0 donde 4.3 escribía 1), lo demás por su texto
+func _mismo(x, y) -> bool:
+	if (x is float or x is int) and (y is float or y is int):
+		return float(x) == float(y)
+	return str(x) == str(y)
+
 func igual(que: String, a, b, tol := 0.0) -> void:
 	var ok: bool
 	if (a is float or a is int) and (b is float or b is int):
@@ -30,7 +36,7 @@ func igual(que: String, a, b, tol := 0.0) -> void:
 	elif a is Dictionary and b is Dictionary:
 		ok = a.size() == b.size()
 		for k in a:
-			ok = ok and b.has(k) and str(a[k]) == str(b[k])
+			ok = ok and b.has(k) and _mismo(a[k], b[k])
 	else:
 		ok = (a == null and b == null) or (a != null and b != null and str(a) == str(b))
 	if ok:

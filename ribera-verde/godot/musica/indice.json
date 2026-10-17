@@ -1,0 +1,202 @@
+{
+ "town": {
+  "h": "ea8eaaa06d840cd12780",
+  "bucle": 8,
+  "dur": 88
+ },
+ "night": {
+  "h": "ea8eaaa06dd09ed8be9b",
+  "bucle": 9.411768707482993,
+  "dur": 84.706
+ },
+ "alto": {
+  "h": "ea8eaaa06d2333c1eddb",
+  "bucle": 9.23077097505669,
+  "dur": 83.077
+ },
+ "alto_n": {
+  "h": "ea8eaaa06dc693a3eed5",
+  "bucle": 10.909092970521542,
+  "dur": 76.364
+ },
+ "astilleros": {
+  "h": "ea8eaaa06d469616e82d",
+  "bucle": 7.741927437641723,
+  "dur": 69.677
+ },
+ "astilleros_n": {
+  "h": "ea8eaaa06da0e427d505",
+  "bucle": 9.142857142857142,
+  "dur": 64
+ },
+ "puerto": {
+  "h": "ea8eaaa06d284a446aa1",
+  "bucle": 4.8,
+  "dur": 52.8
+ },
+ "puerto_n": {
+  "h": "ea8eaaa06d3ef87446b4",
+  "bucle": 5.6250113378684805,
+  "dur": 39.375
+ },
+ "valdehierro": {
+  "h": "ea8eaaa06d7379efae0c",
+  "bucle": 8.275873015873016,
+  "dur": 74.483
+ },
+ "valdehierro_n": {
+  "h": "ea8eaaa06df8a5d76bc5",
+  "bucle": 9.696961451247166,
+  "dur": 67.879
+ },
+ "mendialde": {
+  "h": "ea8eaaa06d37c38ccf4e",
+  "bucle": 4.285714285714286,
+  "dur": 38.571
+ },
+ "mendialde_n": {
+  "h": "ea8eaaa06d89909451ca",
+  "bucle": 5.034965986394558,
+  "dur": 35.245
+ },
+ "errotabarri": {
+  "h": "ea8eaaa06d48282b6566",
+  "bucle": 10.434784580498865,
+  "dur": 93.913
+ },
+ "errotabarri_n": {
+  "h": "ea8eaaa06dc912c43e2d",
+  "bucle": 12.307687074829932,
+  "dur": 86.154
+ },
+ "ibarbide": {
+  "h": "ea8eaaa06da4e70bc169",
+  "bucle": 8.88888888888889,
+  "dur": 80
+ },
+ "ibarbide_n": {
+  "h": "ea8eaaa06d1ed4f1c8a5",
+  "bucle": 10.434784580498865,
+  "dur": 73.043
+ },
+ "ensanche": {
+  "h": "ea8eaaa06dfcb58cd704",
+  "bucle": 7.741927437641723,
+  "dur": 69.677
+ },
+ "ensanche_n": {
+  "h": "ea8eaaa06da281c496b3",
+  "bucle": 9.142857142857142,
+  "dur": 64
+ },
+ "callejon": {
+  "h": "ea8eaaa06da1f33b3a16",
+  "bucle": 5.714285714285714,
+  "dur": 97.143
+ },
+ "callejon_n": {
+  "h": "ea8eaaa06d9a565161e9",
+  "bucle": 6.760566893424036,
+  "dur": 87.887
+ },
+ "home": {
+  "h": "ea8eaaa06de6e4e4f1cf",
+  "bucle": 5.714285714285714,
+  "dur": 97.143
+ },
+ "home_n": {
+  "h": "ea8eaaa06d61d7bdf891",
+  "bucle": 6.31578231292517,
+  "dur": 107.368
+ },
+ "shop": {
+  "h": "ea8eaaa06dc3b362edf4",
+  "bucle": 12.307687074829932,
+  "dur": 110.769
+ },
+ "growcity": {
+  "h": "ea8eaaa06d024872a393",
+  "bucle": 5.333333333333333,
+  "dur": 90.667
+ },
+ "bar": {
+  "h": "ea8eaaa06d8d0eb75902",
+  "bucle": 4,
+  "dur": 68
+ },
+ "txaro": {
+  "h": "ea8eaaa06def2713b54c",
+  "bucle": 5.45453514739229,
+  "dur": 92.727
+ },
+ "comisaria": {
+  "h": "ea8eaaa06d1c0c00dc8c",
+  "bucle": 5,
+  "dur": 85
+ },
+ "almacen": {
+  "h": "ea8eaaa06d289396b90f",
+  "bucle": 4.8,
+  "dur": 81.6
+ },
+ "casa_ama": {
+  "h": "ea8eaaa06ddbefd614bf",
+  "bucle": 10,
+  "dur": 90
+ },
+ "club": {
+  "h": "ea8eaaa06d2946bc023a",
+  "bucle": 8.571428571428571,
+  "dur": 77.143
+ },
+ "nave": {
+  "h": "ea8eaaa06ddce964a0a1",
+  "bucle": 4.8,
+  "dur": 81.6
+ },
+ "disco": {
+  "h": "ea8eaaa06d720f205181",
+  "bucle": 7.619047619047619,
+  "dur": 91.429
+ },
+ "title": {
+  "h": "ea8eaaa06d8cab4fd158",
+  "bucle": 8.571428571428571,
+  "dur": 77.143
+ },
+ "battle": {
+  "h": "ea8eaaa06d5ec9544eb2",
+  "bucle": 0,
+  "dur": 48
+ },
+ "battle_police": {
+  "h": "ea8eaaa06db363e965bb",
+  "bucle": 0,
+  "dur": 51.2
+ },
+ "battle_rival": {
+  "h": "ea8eaaa06da4c8a7edff",
+  "bucle": 0,
+  "dur": 58.182
+ },
+ "battle_darko": {
+  "h": "ea8eaaa06d1597ebc342",
+  "bucle": 0,
+  "dur": 45.714
+ },
+ "alarma": {
+  "h": "ea8eaaa06db04ea98a91",
+  "bucle": 0,
+  "dur": 51.2
+ },
+ "redada": {
+  "h": "ea8eaaa06d1f8c02d281",
+  "bucle": 0,
+  "dur": 96
+ },
+ "final": {
+  "h": "ea8eaaa06d16f0747356",
+  "bucle": 12.631587301587302,
+  "dur": 113.684
+ }
+}
