@@ -21,7 +21,52 @@ func _ready() -> void:
 	name_in.text_submitted.connect(func(_t): if name_box.visible: press("A"))
 	if OS.get_cmdline_user_args().has("--sin-arranque"):
 		return
+	if Datos.CAL and not OS.get_cmdline_user_args().has("--sin-carga"):
+		_arranca.call_deferred()   # las pruebas que ponen oraculo al añadir el juego, al título de antes
+	else:
+		show_title()
+
+func _arranca() -> void:
+	if oraculo:
+		show_title()
+	else:
+		run(arranque)
+
+# 1.57 (lo pidió el usuario: «estos recursos se podrían usar antes de la pantalla de inicio, como de carga del juego, en una carretera
+# sin texto, los vehículos andando y la barra cargándose; luego aparece la pantalla de inicio»): la carretera con los vehículos y la barra
+# (EscViaje.pinta_carga) durante CARGA ms, sin botones; A, B o START la pasan; después, el título
+var carga_t0 := 0.0
+func arranque() -> void:
+	mode = "carga"
+	carga_t0 = M.reloj
+	hud.hide()
+	titulo.hide()
+	var vis := {}
+	for k in botones:
+		vis[k] = botones[k].visible
+		botones[k].visible = false
+	music("title")
+	var st := {"ok": false}
+	var prom := Motor.Prom.new()
+	var cierra := func():
+		if not st.ok:
+			st.ok = true
+			prom.res(0)
+	push(func(b):
+		if b == "A" or b == "B" or b == "START":
+			cierra.call())
+	M.timeout(cierra, EscViaje.CARGA)
+	await Motor.espera(prom)
+	pop()
+	if mode != "carga":   # otra cosa la cambió (las pruebas)
+		for k in vis:
+			botones[k].visible = vis[k]
+		return
+	await fade(1)
+	for k in vis:
+		botones[k].visible = vis[k]
 	show_title()
+	await fade(0)
 
 func _process(dt: float) -> void:
 	if oraculo:

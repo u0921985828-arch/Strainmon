@@ -65,6 +65,8 @@ func redibuja(t: float) -> void:
 		modo = "demo"   # 1.35: la partida de fondo (demo_entra, mundo.gd)
 	elif m == "intro":
 		modo = "title"
+	elif m == "carga":
+		modo = "carga"   # 1.57: la carga del juego, en la carretera (escena_viaje.gd)
 	else:
 		return
 	now = t
@@ -105,13 +107,16 @@ func _capa(ci: CanvasItem, n: int) -> void:
 			_titulo()
 	elif modo == "carpa":
 		[_carpa_fondo, _cono, _carpa_encima][n].call()
+	elif modo == "carga":
+		if n == 0:
+			EscViaje.pinta_carga(self, now - float(J.carga_t0))
 	elif modo == "carpaC" and n == 2:
 		L.draw_set_transform(Vector2(OX(), OY()))
 		_vfx({"x": 0, "y": 0}, "home")
 	L.draw_set_transform(Vector2.ZERO)
-	if n == 2 and J.VIAJE_V != null and modo != "title" and modo != "battle":   # 1.56: el viaje, de perfil
+	if n == 2 and J.VIAJE_V != null and modo != "title" and modo != "battle" and modo != "carga":   # 1.56: el viaje, de perfil
 		EscViaje.pinta(self, J.VIAJE_V, now)
-	if n == 2 and J.ACCESO_V != null and modo != "title" and modo != "battle":   # 1.53: la llave, el teclado…; 1.54: cada acción de cerca
+	if n == 2 and J.ACCESO_V != null and modo != "title" and modo != "battle" and modo != "carga":   # 1.53: la llave, el teclado…; 1.54: cada acción de cerca
 		for e in J.rects_acceso(J.ACCESO_V, J.M.reloj):
 			if typeof(e[0]) == TYPE_STRING:   # 1.54.1: ['@', sprite, x, y, recorte]: el sprite de misc dentro del panel
 				var f = Atlas.foto_misc(e[1])
@@ -1133,7 +1138,7 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 	var gr = Atlas.grupo_look(look)
 	if not gr:
 		return
-	var v = J.vehiculo() if isP else null   # en la calle, con el patinete o la bici: detrás, él (subido) y delante (dibujarPJ)
+	var v = J.vehiculo() if isP else e.get("veh")   # 1.57: los coches de la demo del título, con su conductor; en la calle, con el patinete o la bici: detrás, él (subido) y delante (dibujarPJ)
 	if v and not Atlas.anim_de("vehiculos", v + "-atras"):
 		v = null
 	var f = _monta_frame(e, gr, v, dur) if v else _pj_frame(e, gr, isP, dur)

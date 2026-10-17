@@ -342,6 +342,14 @@ func _corre() -> void:
 
 # ---------- título, intro y nombre ----------
 func titulo_e_intro() -> void:
+	if Datos.CAL:   # 1.57: antes del título, la carga en la carretera, sin botones ni HUD; sola, al título
+		var nb := 0
+		for k in J.botones:
+			nb += 1 if J.botones[k].visible else 0
+		check("arranca con la carga (%s, %s, %d botones)" % [J.mode, J.pintor.modo, nb], J.mode == "carga" and J.pintor.modo == "carga" and nb == 0 and not J.hud.visible and not J.titulo.visible)
+		await foto("00-carga")
+		check("la carga acaba sola en el título", await hasta(func(): return J.mode == "title", 900))
+		await espera(20)
 	check("arranca en el título", J.mode == "title" and J.titulo.visible and J.pintor.modo == "demo" and not J.hud.visible)
 	# el primer arranque: el aviso de edad (+18) con su pregunta; aceptado, se guarda en los ajustes y no vuelve a salir
 	textos.clear()
@@ -1005,7 +1013,10 @@ func continuar() -> void:
 	J = load("res://juego.tscn").instantiate()
 	root.add_child(J)
 	await espera(10)
-	await hasta(func(): return J.menu_box.visible, 120)
+	if Datos.CAL:   # 1.57: otra vez la carga; A la pasa
+		await hasta(func(): return J.mode == "carga", 60)
+		await pulsa("A")
+	await hasta(func(): return J.menu_box.visible, 300)
 	check("con partida guardada, el título pregunta, sin el aviso de edad otra vez (%s)" % ", ".join(etiquetas()), etiquetas() == ["CONTINUAR", "NUEVA PARTIDA", "OPCIONES", "CRÉDITOS"] and not J.dlg.visible)
 	await pulsa("A")
 	await libre()

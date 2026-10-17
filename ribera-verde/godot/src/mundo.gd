@@ -1192,10 +1192,45 @@ func demo_entra(now_: float) -> Array:
 				demo_e.append(quieto.call(d.id, int(d.x), int(d.y), d.dir if d.get("dir") else "down", d.get("lookObj") if d.get("lookObj") else D.LOOKS.get(d.get("look", "")), d))
 		demo_e.append(quieto.call("demo1", int(DM.cliente[0]), int(DM.cliente[1]), "down", Datos.rand_look("demo1", "client"), {"client": {"type": "cur"}}))
 		demo_e.append(quieto.call("demo2", 0, 0, "left", D.LOOKS.cop, {}))
+		if Datos.CAL:   # 1.57: el atrezo del título, detrás del poli
+			for i in DEMO_CAL.gente.size():
+				demo_e.insert(demo_e.size() - 1, quieto.call("demoG%d" % i, 0, 0, "left", Datos.rand_look("demoG%d" % i, "client"), {}))
+			for i in DEMO_CAL.coches.size():
+				var c: Array = DEMO_CAL.coches[i]
+				var ce: Dictionary = quieto.call("demoC%d" % i, 0, int(c[1]), "right" if int(c[2]) > 0 else "left", Datos.rand_look("demoC%d" % i, "client"), {})
+				ce.veh = c[0]
+				demo_e.insert(demo_e.size() - 1, ce)
 	ents = demo_e
-	demo_e[-1].merge(demo_en(DM.poli, now_), true)
-	P.merge(demo_en(DM.P, now_), true)
+	var cal: bool = Datos.CAL
+	demo_e[-1].merge(demo_en(DEMO_CAL.poli if cal else DM.poli, now_), true)
+	P.merge(demo_en(DEMO_CAL.P if cal else DM.P, now_), true)
+	if cal:
+		for e in demo_e:
+			if e.id.begins_with("demoG"):
+				e.merge(demo_en(DEMO_CAL.gente[int(e.id.substr(5))], now_), true)
+			elif e.id.begins_with("demoC"):
+				e.merge(demo_coche(DEMO_CAL.coches[int(e.id.substr(5))], now_), true)
 	return sv
+
+# 1.57 (lo pidió el usuario: «luego aparece la pantalla de inicio START con más atrezo»): en el título, con CAL, el protagonista y el
+# poli por las aceras (no por la calzada), más gente andando y coches y una moto por la carretera, cada uno en su carril; los coches
+# entran por un lado del mapa y salen por el otro, y vuelven al rato (coches: vehículo, fila, sentido, ms por casilla, desfase en ms)
+const DEMO_CAL := {
+	"P": {"dur": 320, "ruta": [[5, 9, 700, "down"], [11, 9, 1600, "right"], [5, 9, 500, "up"]]},
+	"poli": {"dur": 420, "ruta": [[36, 12], [22, 12, 900, "up"]]},
+	"gente": [{"dur": 360, "ruta": [[14, 9, 500, "up"], [37, 9, 800, "down"]]}, {"dur": 400, "ruta": [[2, 12, 700, "down"], [18, 12, 1100, "up"]]}],
+	"coches": [["utilitario", 11, 1, 120, 0], ["berlina", 10, -1, 105, 2600], ["moto", 11, 1, 90, 4700], ["deportivo", 10, -1, 70, 7900]],
+	"ancho": 64,   # casillas de vuelta: el mapa (40) y lo de fuera, para que no vayan pegados
+}
+
+func demo_coche(c: Array, T: float) -> Dictionary:
+	var dur := float(c[3])
+	var L: float = DEMO_CAL.ancho * dur
+	var t := fmod(T + float(c[4]), L)
+	var k := t / dur
+	var x: float = -6.0 + k if int(c[2]) > 0 else 46.0 - k
+	return {"x": int(round(x)), "y": int(c[1]), "px": x * 16, "py": float(c[1]) * 16, "dir": "right" if int(c[2]) > 0 else "left", "moving": true,
+		"t": fmod(t, dur), "dur": dur, "parity": int(k) & 1}
 
 func demo_sale(sv: Array) -> void:
 	S = sv[0]

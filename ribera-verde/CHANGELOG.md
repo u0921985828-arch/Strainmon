@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.57 · Godot 0.47.0
+
+Lo que pidió el usuario tras la 1.56 («estos recursos se podrían usar antes de la pantalla de inicio, usarlo como de carga del juego, en una carretera sin texto, los vehículos andando y la barra cargándose. Luego aparece la pantalla de inicio START con más atrezo»). Solo Godot, con `Datos.CAL`.
+
+- **La carga del juego** (`arranque` en `juego.gd`, `pinta_carga` en `escena_viaje.gd`, modo `carga` en `pinta.gd`): al abrir, la carretera del viaje de día, sin letras ni botones, con el utilitario, el scooter y el superdeportivo por este carril y el autobús y la berlina por el de enfrente (al revés y un poco más oscuros), cada carril a su marcha y sin montarse (`CARGA_V`, `MARCHA`, `HUECO`), las ruedas girando y, abajo, la barra que se llena en 3,6 s (`CARGA`); A, B o START la pasan; después, fundido al título. `--sin-carga` va directo al título; las pruebas que ponen `oraculo`, al título de antes (`_arranca`).
+- **El título con más atrezo** (`DEMO_CAL`, `demo_coche` en `mundo.gd`): el protagonista y el poli por las aceras, dos personas más andando y el utilitario, la berlina, el scooter y el superdeportivo con su conductor por la calzada, cada uno en su carril, que entran por un lado y salen por el otro (`e.veh` en `_pj`).
+- Pruebas: `tests/viaje.gd` (91) y `tests/ciclo.gd` (arranca con la carga y acaba sola en el título).
+
 ## 1.56 · Godot 0.47.0
 
 Lo que pidió el usuario tras la 1.55.3 («en el autobús no hay animación como tampoco en los demás vehículos, como una pantalla de carga, pero que sea el vehículo andando recto desde una vista de perfil»). Solo Godot, con `Datos.CAL`.

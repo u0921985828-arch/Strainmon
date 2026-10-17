@@ -70,24 +70,7 @@ static func pinta(P, V: Dictionary, now: float) -> void:
 	var e := clampf(now - float(V.t0), 0.0, DUR)
 	var lz := luz(int(V.get("h", 720)))
 	var tin: Color = TINTE[lz]
-	# el cielo, en bandas
-	var c0 := Color(CIELO[lz][0])
-	var c1 := Color(CIELO[lz][1])
-	for i in 12:
-		P._rect(0, i * 10, sw, 10, c0.lerp(c1, i / 11.0))
-	if lz == 2:   # estrellas fijas y la luna
-		for i in 40:
-			var hs := (i * 2654435761 + 977) & 0xffffff
-			var sx := hs % sw
-			var sy := 4 + (hs >> 9) % 58
-			P._rect(sx, sy, 1, 1, Color("#e8ecff") if i % 3 else Color("#9aa4d0"))
-		P._rect(sw - 46, 14, 10, 10, Color("#f0ecd0"))
-		P._rect(sw - 47, 16, 12, 6, Color("#f0ecd0"))
-		P._rect(sw - 44, 13, 6, 12, Color("#f0ecd0"))
-		P._rect(sw - 42, 15, 3, 3, Color("#d8d2b0"))
-	elif lz == 0:   # el sol, arriba a la derecha
-		P._rect(sw - 44, 12, 12, 12, Color("#fff4c0"))
-		P._rect(sw - 46, 15, 16, 6, Color("#fff4c0"))
+	_cielo(P, sw, lz)
 	var k := clave(String(V.veh))
 	var m: Dictionary = META[k]
 	var cuerpo: Image = R[k]
@@ -95,22 +78,7 @@ static func pinta(P, V: Dictionary, now: float) -> void:
 	var vel: float = VEL.get(k, 0.15)
 	var p := pos(e, sw, w, vel)
 	var corre := p.y
-	# las capas de fondo, repetidas
-	for c in CAPAS:
-		var im: Image = R[c[0]]
-		var cw := im.get_width()
-		var dx := -int(fposmod(corre * float(c[2]), cw))
-		var x := dx
-		while x < sw:
-			P._img(im, x, int(c[1]), tin)
-			x += cw
-	# la carretera
-	var ca: Image = R.carretera
-	var x2 := -int(fposmod(corre, ca.get_width()))
-	while x2 < sw:
-		P._img(ca, x2, Y_CARRETERA, tin)
-		x2 += ca.get_width()
-	P._rect(0, Y_CARRETERA + ca.get_height(), sw, sh, Color("#3a4a30") * tin)
+	_fondo(P, sw, sh, corre, tin)
 	# el vehículo: de noche, el haz de los faros delante
 	var suelo := Y_CARRETERA + CARRIL
 	var bote := 1 if int(e / 90.0) % 4 == 0 and e > 60.0 else 0
@@ -139,6 +107,104 @@ static func pinta(P, V: Dictionary, now: float) -> void:
 	var bw := sw - 40
 	P._rect(20, sh - 6, bw, 3, Color(0, 0, 0, 0.5))
 	P._rect(20, sh - 6, int(bw * e / DUR), 3, Color("#8bd448"))
+
+static func _cielo(P, sw: int, lz: int) -> void:
+	# el cielo, en bandas
+	var c0 := Color(CIELO[lz][0])
+	var c1 := Color(CIELO[lz][1])
+	for i in 12:
+		P._rect(0, i * 10, sw, 10, c0.lerp(c1, i / 11.0))
+	if lz == 2:   # estrellas fijas y la luna
+		for i in 40:
+			var hs := (i * 2654435761 + 977) & 0xffffff
+			var sx := hs % sw
+			var sy := 4 + (hs >> 9) % 58
+			P._rect(sx, sy, 1, 1, Color("#e8ecff") if i % 3 else Color("#9aa4d0"))
+		P._rect(sw - 46, 14, 10, 10, Color("#f0ecd0"))
+		P._rect(sw - 47, 16, 12, 6, Color("#f0ecd0"))
+		P._rect(sw - 44, 13, 6, 12, Color("#f0ecd0"))
+		P._rect(sw - 42, 15, 3, 3, Color("#d8d2b0"))
+	elif lz == 0:   # el sol, arriba a la derecha
+		P._rect(sw - 44, 12, 12, 12, Color("#fff4c0"))
+		P._rect(sw - 46, 15, 16, 6, Color("#fff4c0"))
+
+static func _fondo(P, sw: int, sh: int, corre: float, tin: Color) -> void:
+	# las capas de fondo, repetidas
+	for c in CAPAS:
+		var im: Image = R[c[0]]
+		var cw := im.get_width()
+		var dx := -int(fposmod(corre * float(c[2]), cw))
+		var x := dx
+		while x < sw:
+			P._img(im, x, int(c[1]), tin)
+			x += cw
+	# la carretera
+	var ca: Image = R.carretera
+	var x2 := -int(fposmod(corre, ca.get_width()))
+	while x2 < sw:
+		P._img(ca, x2, Y_CARRETERA, tin)
+		x2 += ca.get_width()
+	P._rect(0, Y_CARRETERA + ca.get_height(), sw, sh, Color("#3a4a30") * tin)
+
+# 1.57 (lo pidió el usuario: «estos recursos se podrían usar antes de la pantalla de inicio, como de carga del juego, en una carretera
+# sin texto, los vehículos andando y la barra cargándose»): al abrir el juego, de día, la carretera quieta con los vehículos que pasan
+# por los dos carriles (en el de enfrente, al revés y un poco más oscuros) y, abajo, la barra; sin letras
+const CARGA := 3600.0
+const CARRIL_LEJOS := 13
+# por carril, todos a la misma marcha (no se adelantan ni se montan): vehículo, carril (0 este lado, hacia la derecha; 1 el de enfrente,
+# hacia la izquierda) y dónde va en la vuelta (0..1)
+const CARGA_V := [["utilitario", 0, 0.0], ["moto", 0, 0.36], ["deportivo", 0, 0.68], ["bus", 1, 0.1], ["berlina", 1, 0.55]]
+const MARCHA := [0.2, 0.14]   # px/ms por carril
+const HUECO := 300            # la vuelta: la pantalla, el vehículo más largo y este hueco
+static var VUELTA := {}   # los vehículos del carril de enfrente, al revés (nombre → Image)
+
+static func _al_reves(k: String) -> Image:
+	if not VUELTA.has(k):
+		var im: Image = R[k].duplicate()
+		im.flip_x()
+		VUELTA[k] = im
+	return VUELTA[k]
+
+static func pinta_carga(P, e: float) -> void:
+	if not carga():
+		return
+	var sw: int = P.J.SW
+	var sh: int = P.SH
+	_cielo(P, sw, 0)
+	_fondo(P, sw, sh, 0.0, Color(1, 1, 1))
+	for carril in [1, 0]:
+		for v in CARGA_V:
+			if int(v[1]) != carril:
+				continue
+			var k: String = v[0]
+			var m: Dictionary = META[k]
+			var w: int = R[k].get_width()
+			var vuelta := float(sw + 170 + HUECO)
+			var anda := e * float(MARCHA[carril]) + float(v[2]) * vuelta
+			var x := fposmod(anda, vuelta) - w
+			if carril == 1:
+				x = sw - x - w
+			var suelo := Y_CARRETERA + (CARRIL if carril == 0 else CARRIL_LEJOS)
+			var bote := 1 if int(anda / 18.0) % 4 == 0 else 0
+			var vx := int(x)
+			var vy := suelo - int(m.suelo) - bote
+			var tv := Color(1, 1, 1) if carril == 0 else Color(0.82, 0.84, 0.9)
+			P._rect(vx + 3, suelo - 1, w - 6, 2, Color(0, 0, 0, 0.35))
+			P._img(R[k] if carril == 0 else _al_reves(k), vx, vy, tv)
+			for r in m.ruedas:
+				var d := int(r[2])
+				var f := posmod(int(floor(anda / (PI * d) * 4.0)), 4)
+				var rx := int(r[0]) if carril == 0 else w - int(r[0])
+				var rim: Image = R["rueda-%d-%d" % [d, f if carril == 0 else 3 - f]]
+				P._img(rim, vx + rx - d / 2, vy + bote + int(r[1]) - d / 2, tv)
+	# la barra, con su marco
+	var bw := sw - 80
+	var bx := 40
+	var by := sh - 8
+	P._rect(bx - 1, by - 1, bw + 2, 5, Color("#1a1420"))
+	P._rect(bx, by, bw, 3, Color("#3a3446"))
+	P._rect(bx, by, int(bw * clampf(e / CARGA, 0.0, 1.0)), 3, Color("#8bd448"))
+	P._rect(bx, by, int(bw * clampf(e / CARGA, 0.0, 1.0)), 1, Color("#c4f088"))
 
 static func _texto(P, x: int, y: int, t: String, s: int) -> void:
 	for q in Croquis.letras(t):
