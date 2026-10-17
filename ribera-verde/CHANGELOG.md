@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.56 · Godot 0.47.0
+
+Lo que pidió el usuario tras la 1.55.3 («en el autobús no hay animación como tampoco en los demás vehículos, como una pantalla de carga, pero que sea el vehículo andando recto desde una vista de perfil»). Solo Godot, con `Datos.CAL`.
+
+- **El viaje, de perfil** (`escena_viaje.gd`, `anim_viaje` y `VIAJE_V` en `granja.gd`): al coger el autobús en una parada o salir en tu vehículo del concesionario, una pantalla de carga con el autobús (los pasajeros, el conductor y tú en la ventanilla), el scooter, el utilitario, la berlina o el superdeportivo de perfil, que entra por la izquierda, rueda por la carretera con las ruedas girando y sale por la derecha, mientras el monte, los caseríos con los postes de la luz y el guardarraíl pasan por detrás a distinta velocidad. El cielo, por la hora (día con sol, atardecer, noche con estrellas, luna y los faros encendidos); arriba, de dónde a dónde y los minutos; abajo, la barra. Unos 3 s; A o B lo pasan.
+- Arte a mano en `tools/sprites/a-mano/viaje.py` (`godot/arte/viaje.png` + `viaje.json`: recortes, ruedas, suelo y faro de cada vehículo).
+- Prueba: `tests/viaje.gd` (77).
+
 ## 1.55.3 · Godot 0.46.2
 
 Lo que pidió el usuario tras la 1.55.2 («fallos de arquitectura notables y todavía no has configurado bien en todos los muebles donde se puede sentar, la altura correcta»). Solo Godot, con `Datos.CAL`.

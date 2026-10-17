@@ -8225,6 +8225,7 @@ func conducir(k):
 	var taller := kilometros(k, int(t.km))
 	sfx("door")
 	await fade(1)
+	await anim_viaje(k, aqui, x, int(t.min))
 	advance_time(t.min)
 	var a: Array = D.PARADAS[x].a
 	enter_map(x, int(a[0]), int(a[1]), a[2])

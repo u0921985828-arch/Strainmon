@@ -4,6 +4,7 @@
 extends "res://src/mundo.gd"
 
 const Vista = preload("res://src/vista.gd")
+const EscViaje = preload("res://src/escena_viaje.gd")
 
 var VC = null    # carpa abierta: {ci, sel: plaza (índice de huecos) o −1 = el foco, ocupado}
 var vc_texto := ""   # lo que se lee en la ficha (textContent de #vcInfo); "" si está oculta
@@ -1308,6 +1309,33 @@ func letter_action():
 func viaje(a: String, b: String) -> Dictionary:
 	return {"min": int(D.PARADAS[a].min + D.PARADAS[b].min), "eur": D.PARADAS[a].eur + D.PARADAS[b].eur}
 
+# 1.56: el viaje, de perfil, como pantalla de carga (escena_viaje.gd): el autobús o tu vehículo por la carretera; A o B lo pasan
+var VIAJE_V = null   # {veh, de, a, min, h, t0}
+var gancho_viaje := Callable()   # (vehículo, de, a) · las pruebas lo apuntan sin esperar
+func anim_viaje(veh: String, de: String, a: String, mins: int) -> void:
+	if not Datos.CAL:
+		return
+	if gancho_viaje.is_valid():
+		gancho_viaje.call(veh, de, a)
+		return
+	VIAJE_V = {"veh": veh, "de": String(D.PARADAS[de].n) if D.PARADAS.has(de) else de, "a": String(D.PARADAS[a].n) if D.PARADAS.has(a) else a, "min": mins, "h": int(S.min), "t0": M.reloj}
+	hud.hide()
+	await fade(0)
+	var pr := Motor.Prom.new()
+	var st := {"fuera": false}
+	var cierra := func():
+		if not st.fuera:
+			st.fuera = true
+			pop()
+		pr.res(0)
+	push(func(b: String):
+		if b == "A" or b == "B":
+			cierra.call())
+	M.timeout(cierra, EscViaje.DUR + 200)
+	await Motor.espera(pr)
+	await fade(1)
+	VIAJE_V = null
+
 func parada_action():
 	var aqui: String = S.map
 	var pa: Dictionary = D.PARADAS[aqui]
@@ -1358,6 +1386,7 @@ func parada_action():
 		S.money -= v.eur
 	sfx("door")
 	await fade(1)
+	await anim_viaje("bus", aqui, k, int(v.min))
 	advance_time(v.min)
 	var a: Array = D.PARADAS[k].a
 	enter_map(k, int(a[0]), int(a[1]), a[2])

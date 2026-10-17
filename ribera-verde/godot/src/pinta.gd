@@ -17,6 +17,7 @@ const Vista = preload("res://src/vista.gd")
 const Arte = preload("res://src/arte.gd")
 const Escena = preload("res://src/escena_extr.gd")
 const Croquis = preload("res://src/croquis.gd")
+const EscViaje = preload("res://src/escena_viaje.gd")
 const Hoja = preload("res://src/hoja.gd")
 
 const SH := 180   # 1.12 (ui.gd); las escenas de 240 × 160 van abajo: OY
@@ -108,6 +109,8 @@ func _capa(ci: CanvasItem, n: int) -> void:
 		L.draw_set_transform(Vector2(OX(), OY()))
 		_vfx({"x": 0, "y": 0}, "home")
 	L.draw_set_transform(Vector2.ZERO)
+	if n == 2 and J.VIAJE_V != null and modo != "title" and modo != "battle":   # 1.56: el viaje, de perfil
+		EscViaje.pinta(self, J.VIAJE_V, now)
 	if n == 2 and J.ACCESO_V != null and modo != "title" and modo != "battle":   # 1.53: la llave, el teclado…; 1.54: cada acción de cerca
 		for e in J.rects_acceso(J.ACCESO_V, J.M.reloj):
 			if typeof(e[0]) == TYPE_STRING:   # 1.54.1: ['@', sprite, x, y, recorte]: el sprite de misc dentro del panel
