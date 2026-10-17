@@ -64,16 +64,66 @@ func run(fn: Callable) -> void:
 	lock += 1
 	await fn.call()
 	lock -= 1
+	if lock == 0 and get("relanza"):   # E10: la partida importada, con los menús ya cerrados
+		call("relanzar")
 	if lock == 0 and S and S.has("misiones"):   # 1.11: las misiones guiadas, al acabar cada guion (trama.gd)
 		revisa_misiones()
 
-func queue(key: String, fn: Callable) -> void:
+# av (E7, fase 3): lo que dice el aviso, [[quien, [líneas]], …] (quien "": say), para guardarlo con la partida (cola_guardar)
+func queue(key: String, fn: Callable, av := []) -> void:
 	if queued.has(key):
 		return
-	queued[key] = true
+	queued[key] = av if av.size() else true
 	pending.append(func():
+		cola_ya[key] = true
 		await fn.call()
+		cola_ya.erase(key)
 		queued.erase(key))
+
+var cola_ya := {}   # los avisos que ya están saliendo (no se guardan)
+
+# los avisos que se rehacen al cargar con su función (los de la policía y el plazo vencido los rehace enter_game)
+func cola_deriva() -> Dictionary:
+	# por nombre: aviso_mision y los demás están en trama.gd
+	var o := {}
+	var f := {"plazo": "recuerdo_plazo", "calor": "heat_warn", "historia": "check_story", "mision": "aviso_mision", "logro": "aviso_logro", "itin": "aviso_itin"}
+	for k in f:
+		o[k] = Callable(self, f[k])
+	return o
+
+func cola_guardar() -> Array:
+	var o := []
+	var dv := cola_deriva()
+	for k in queued:
+		if cola_ya.has(k):
+			continue
+		if queued[k] is Array:
+			o.append({"k": k, "av": queued[k]})
+		elif dv.has(k):
+			o.append({"k": k})
+	return o
+
+func cola_cargar() -> void:
+	var c = S.get("_cola")
+	S.erase("_cola")
+	if not c is Array:
+		return
+	var dv := cola_deriva()
+	for e in c:
+		if not e is Dictionary or not e.get("k") is String:
+			continue
+		var av = e.get("av")
+		if av is Array and av.size():
+			queue(e.k, func():
+				for x in av:
+					if x is Array and x.size() == 2 and x[1] is Array:
+						if x[0] == "":
+							for l in x[1]:
+								await say(str(l))
+						else:
+							await talk(str(x[0]), x[1]), av)
+		elif dv.has(e.k):
+			queue(e.k, dv[e.k])
 
 func total_buds() -> float:
 	var t := 0.0
@@ -1885,6 +1935,8 @@ func world_press(b: String) -> void:
 	elif b == "A":
 		interact()
 	elif b == "START":
+		if not oraculo:   # E4 (fase 3): la pausa guarda antes de abrir el menú (al salir de la app con él abierto ya no se guarda)
+			call("save")
 		run(start_menu)
 	elif b == "MOVIL":
 		run(movil_menu)

@@ -104,7 +104,8 @@ func new_day() -> void:
 	# la cuota de Molina (1.10): pasado el último día pagado, se acaba la protección (antes de la redada de esta noche)
 	if S.protect and S.get("protHasta") and S.day > S.protHasta:
 		S.protect = false
-		queue("cuota", func(): await talk("SMS · MOLINA", ["Se acabó lo pagado.", "Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría."]))
+		var L := ["Se acabó lo pagado.", "Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría."]
+		queue("cuota", func(): await talk("SMS · MOLINA", L), [["SMS · MOLINA", L]])
 	# la policía (1.11, NIVEL_POLI): con la orden de ayer, la redada; con 90 o más, la orden (y el aviso), o Molina la para
 	if S.get("orden") and S.day > S.orden:
 		queue("raid", raid_event)
@@ -832,7 +833,7 @@ func pc_action():
 	elif c == "Caja empotrada":
 		await pedir_caja()
 	elif c == "Guardar partida":
-		await say("Partida guardada." if save() else "No se ha podido guardar en este navegador.")
+		await say("Partida guardada." if save() else "No se ha podido guardar la partida.")
 
 # ---------- salón (12c-salon, 1.10): los muebles se compran por internet y llegan al día siguiente ----------
 func por_hora(l: Array) -> String:
@@ -1140,19 +1141,21 @@ func llega_camarote() -> void:
 		queue("camarote", func():
 			sfx("get")
 			for t in av:
-				await say(t))
+				await say(t), [["", av]])
 
 func llega_mueble() -> void:
 	llega_camarote()   # 1.43.6
 	if Datos.CAL and S.get("sot") is Dictionary and int(S.sot.get("d", -1)) == S.day:   # 1.51: el sótano
+		var L := ["Los obreros acaban el sótano: sin trastos, impermeabilizado, con luz, desagüe y tres estanterías de rejilla. Se baja por la puerta del dormitorio. Las bandejas te las prepara Txomin."]
 		queue("sotano", func():
 			sfx("get")
-			await say("Los obreros acaban el sótano: sin trastos, impermeabilizado, con luz, desagüe y tres estanterías de rejilla. Se baja por la puerta del dormitorio. Las bandejas te las prepara Txomin."))
+			await say(L[0]), [["", L]])
 	if S.get("nevera") != null and S.nevera.get("arcon") != null and S.nevera.arcon != 1 and -int(S.nevera.arcon) <= S.day:   # el arcón (1.39)
 		S.nevera.arcon = 1
+		var L := ["Llega el mensajero con el arcón congelador: te lo dejan enchufado al lado de la nevera. En frío caben ahora %s." % (Datos.coma(nevera_cap() / 1000.0) + " kg")]
 		queue("arcon", func():
 			sfx("get")
-			await say("Llega el mensajero con el arcón congelador: te lo dejan enchufado al lado de la nevera. En frío caben ahora %s." % (Datos.coma(nevera_cap() / 1000.0) + " kg")))
+			await say(L[0]), [["", L]])
 	var ob := []   # las reformas (1.27)
 	if S.get("obra") is Dictionary:
 		for k in S.obra.keys():
@@ -1174,9 +1177,10 @@ func llega_mueble() -> void:
 			if S.veh.get(k) == S.day:
 				vs.append(D.VEHICULOS[k].art)
 	if vs.size():
+		var L := ["Llega el mensajero con %s. En la calle vas montado; con B, aún más rápido." % _lista(vs)]
 		queue("vehiculo", func():
 			sfx("get")
-			await say("Llega el mensajero con %s. En la calle vas montado; con B, aún más rápido." % _lista(vs)))
+			await say(L[0]), [["", L]])
 	var l := []
 	var on := []
 	var gr := []
@@ -1288,10 +1292,11 @@ func recibir_pedido() -> void:
 		S.seeds[k] = S.seeds.get(k, 0) + c[k]
 		discover(k)
 		nl.append("%s ×%d" % [D.STRAINS[k].n, c[k]])
+	var L := ["Llega el paquete del banco de semillas:\n%s semillas." % ", ".join(nl)]
 	queue("pedido", func():
 		sfx("get")
-		await say("Llega el paquete del banco de semillas:\n%s semillas." % ", ".join(nl))
-		await check_story())
+		await say(L[0])
+		await check_story(), [["", L]])
 
 func letter_action():
 	if S.flags.get("letter"):
@@ -1799,7 +1804,7 @@ func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String, per :
 	var N := "SMS · " + quien
 	if S.day == o[f] - D.RECIBO.aviso:
 		var tx: String = ("El %s se carga el recibo de %s: %s. Saldo: %s." % [Datos.fd(o[f], S.day), t, Datos.eur(e), Datos.eur(S.banco)]) if banco else ("El %s paso a cobrar: %s, en efectivo. Tenlo preparado." % [Datos.fd(o[f], S.day), Datos.eur(e)])
-		queue("av" + t, func(): await talk(N, [tx]))
+		queue("av" + t, func(): await talk(N, [tx]), [[N, [tx]]])
 	if S.day < o[f]:
 		return true
 	var ok: bool = cobro_banco(e, "Recibo · " + t) if banco else (S.money + caja_e() >= e and pagar_casa(e) == 0)
@@ -1808,7 +1813,7 @@ func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String, per :
 		return true
 	if S.day < o[f] + (D.RECIBO.graciaB if banco else D.RECIBO.gracia):
 		var tx: String = ("Recibo de %s devuelto: %s. Si el %s no hay saldo, %s." % [t, Datos.eur(e), Datos.fd(o[f] + D.RECIBO.graciaB, S.day), "se cobra por apremio, con recargo" if f == "iv" else "se rescinde el contrato"]) if banco else "He pasado a cobrar y no había nada. Vuelvo mañana; como no esté, cambio la cerradura."
-		queue("dv" + t, func(): await talk(N, [tx]))
+		queue("dv" + t, func(): await talk(N, [tx]), [[N, [tx]]])
 		return true
 	return false
 
@@ -1833,10 +1838,10 @@ func recibos_dia() -> void:
 		if not cobra(o, L.sem, "BANCO", true, L.n):
 			S.loc.erase(k)
 			var tx: String = "Contrato de %s rescindido por impago. La fianza no se devuelve." % L.n
-			queue("loc" + k, func(): await talk("SMS · BANCO", [tx]))
+			queue("loc" + k, func(): await talk("SMS · BANCO", [tx]), [["SMS · BANCO", [tx]]])
 	if S.protect and S.protHasta - S.day == D.RECIBO.aviso:
 		var tx: String = "Lo nuestro se acaba el %s. Si quieres seguir, ya sabes dónde está la comisaría." % Datos.fd(S.protHasta, S.day)
-		queue("avMolina", func(): await talk("SMS · MOLINA", [tx]))
+		queue("avMolina", func(): await talk("SMS · MOLINA", [tx]), [["SMS · MOLINA", [tx]]])
 
 # los locales (LOCALES): uno por pueblo, por lo pagado de la deuda; meter efectivo en la caja del negocio, que sale limpio mañana
 func pagado_deuda() -> float:

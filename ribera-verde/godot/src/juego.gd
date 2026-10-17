@@ -91,8 +91,7 @@ func _notification(w: int) -> void:
 			get_tree().quit()
 	elif w == NOTIFICATION_APPLICATION_PAUSED or w == NOTIFICATION_WM_CLOSE_REQUEST:
 		suelta_todo()
-		if S and (mode == "world" or mode == "carpa" or mode == "battle"):
-			save()
+		guarda_al_salir()
 	elif w == NOTIFICATION_APPLICATION_RESUMED:
 		# al volver a la app, andando por el mapa, en pausa: el menú START
 		if mode == "world" and is_free() and not P.moving:
@@ -101,25 +100,57 @@ func _notification(w: int) -> void:
 		suelta_todo()
 
 # ---------- guardado (a un archivo aparte y luego se cambia de nombre; sin ordenar las claves y con todos los decimales) ----------
+# E4 y E6 (fase 3): al salir de la app solo se guarda sin un guion a medias (lock) y fuera del combate: si no, se queda la última
+# partida guardada (la de antes del guion; la pausa con START guarda antes de abrir el menú)
+func guarda_al_salir() -> bool:
+	if S == null or lock > 0 or not (mode == "world" or mode == "carpa"):
+		return false
+	return save()
+
+# E1 (fase 3): el .tmp se relee entero antes de ponerlo en su sitio (con el disco lleno sale cortado y la partida buena se queda) y
+# la anterior pasa a partida.json.bak. E7: los avisos en cola van con la partida (cola_guardar), no en S
 func save():
 	if S == null:
 		return false
 	S.x = P.x
 	S.y = P.y
 	S.dir = P.dir
+	var o: Dictionary = S
+	var cola := cola_guardar()
+	if cola.size():
+		o = S.duplicate()
+		o["_cola"] = cola
+	return escribe_partida(JSON.stringify(o, "", false, true))
+
+static func escribe_partida(t: String) -> bool:
 	var tmp := GUARDADO + ".tmp"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)
 	if f == null:
 		return false
-	f.store_string(JSON.stringify(S, "", false, true))
+	f.store_string(t)
+	var err := f.get_error()
 	f.close()
+	if err != OK or FileAccess.get_file_as_string(tmp) != t:
+		DirAccess.remove_absolute(tmp)
+		return false
+	if FileAccess.file_exists(GUARDADO):
+		DirAccess.remove_absolute(GUARDADO + ".bak")
+		if DirAccess.rename_absolute(GUARDADO, GUARDADO + ".bak") != OK:
+			return false
 	return DirAccess.rename_absolute(tmp, GUARDADO) == OK
 
+# E2: solo una partida válida (partida_valida); si no, la .bak
 func load_save():
-	if not FileAccess.file_exists(GUARDADO):
-		return null
-	var j = JSON.parse_string(FileAccess.get_file_as_string(GUARDADO))
-	return Datos.enteros(j) if j is Dictionary else null
+	for r in [GUARDADO, GUARDADO + ".bak"]:
+		if not FileAccess.file_exists(r):
+			continue
+		var js := JSON.new()   # (JSON.parse_string avisa en la consola si no es JSON)
+		if js.parse(FileAccess.get_file_as_string(r)) != OK or not js.data is Dictionary:
+			continue
+		var j = Datos.enteros(js.data)
+		if partida_valida(j):
+			return j
+	return null
 
 func migrate() -> void:
 	if not S.get("carpas"):   # antes de la 1.6: macetas extra → carpa de 100; lámpara LED → LED en cada carpa
@@ -332,11 +363,28 @@ func _title_press() -> void:
 # importar la partida (1.22, importar de 12-menus): la exportada, pegada en la caja de texto (lo que haya en el portapapeles sale ya
 # escrito); sustituye a la de ahora (migrate, como CONTINUAR) y se guarda; la cola de avisos de la otra partida se vacía. Desde el
 # título no hay partida en marcha: se guarda tal cual y el título ofrece CONTINUAR
-const IMPORTA_MAX := 2000000
 
+# E8 (fase 3): cada clave de new_state() con su tipo (los números, finitos; la hora, el día y el capítulo, enteros y en su rango)
+const VAL_ENTEROS := {"day": [1, 1e9], "min": [0, 1439], "ch": [0, 8]}
 func partida_valida(s) -> bool:
-	return s is Dictionary and s.get("name") is String and (s.get("day") is int or s.get("day") is float) and (s.get("ch") is int or s.get("ch") is float) \
-		and s.get("map") is String and MAPS.has(s.map) and s.get("pots") is Array and s.get("flags") is Dictionary
+	if not (s is Dictionary and s.get("name") is String and s.get("map") is String and MAPS.has(s.map) and s.get("pots") is Array and s.get("flags") is Dictionary):
+		return false
+	for k in VAL_ENTEROS:
+		var v = s.get(k)
+		if not (v is int or v is float) or not is_finite(float(v)) or float(v) != floorf(float(v)) or float(v) < VAL_ENTEROS[k][0] or float(v) > VAL_ENTEROS[k][1]:
+			return false
+	var base := new_state()
+	for k in base:
+		if not s.has(k) or base[k] == null or s[k] == null:
+			continue
+		var a = base[k]
+		var v = s[k]
+		if a is int or a is float:
+			if not (v is int or v is float) or not is_finite(float(v)):
+				return false
+		elif typeof(a) != typeof(v) and not (a is bool and (v is int or v is float)):
+			return false
+	return true
 
 # lo pegado no trae <, >, " ni ` (como en el HTML, donde los nombres van a menús y avisos)
 static func limpia_import(v):
@@ -354,11 +402,12 @@ static func limpia_import(v):
 		return o
 	return v
 
+# E9 (fase 3): sin leer el portapapeles al abrir (PEGAR en la caja). E10: en partida, no cambia S con los menús abiertos: se guarda
+# y, al cerrarse todo (run, lock 0), se carga como CONTINUAR (relanza)
+var relanza := false
+
 func importar(desde_titulo := false) -> void:
-	var ini := DisplayServer.clipboard_get().strip_edges() if DisplayServer.has_feature(DisplayServer.FEATURE_CLIPBOARD) else ""
-	if ini.length() > IMPORTA_MAX:
-		ini = ""
-	var t = await pedir_texto("Pega aquí la partida exportada", ini, IMPORTA_MAX, false, true, true)
+	var t = await pedir_partida("Pega aquí la partida exportada")
 	if t == null:
 		return
 	var js := JSON.new()   # (JSON.parse_string avisa en la consola si no es JSON)
@@ -370,25 +419,39 @@ func importar(desde_titulo := false) -> void:
 	if await ask("¿Cargar la partida de %s, %s?%s" % [s.name, Datos.fd(int(s.day)), pierde], ["Cargar", "No"]) != 0:
 		return
 	if desde_titulo:
-		var tmp := GUARDADO + ".tmp"   # como save(): a un .tmp y, entero, en su sitio
-		var f := FileAccess.open(tmp, FileAccess.WRITE)
-		if f != null:
-			f.store_string(JSON.stringify(s, "", false, true))
-			f.close()
-		if f == null or DirAccess.rename_absolute(tmp, GUARDADO) != OK:
+		if not escribe_partida(JSON.stringify(s, "", false, true)):   # como save()
 			await say("No se ha podido guardar la partida.")
 			return
 		sfx("coin")
 		await say("Partida cargada.")
 		return
-	S = s
+	if not Datos.CAL:   # contra el HTML congelado (historia.gd): en caliente, como en la 1.22
+		S = s
+		pending.clear()
+		queued.clear()
+		migrate()
+		enter_game()
+		var ok = save()
+		sfx("coin")
+		await say("Partida cargada." if ok else "Partida cargada, pero no se ha podido guardar.")
+		return
+	if not escribe_partida(JSON.stringify(s, "", false, true)):
+		await say("No se ha podido guardar la partida.")
+		return
+	sfx("coin")
+	relanza = true
+	await say("Partida cargada. Se abre al cerrar el menú.")
+
+func relanzar() -> void:
+	relanza = false
+	var sv = load_save()
+	if sv == null:
+		return
+	S = sv
 	pending.clear()
 	queued.clear()
 	migrate()
 	enter_game()
-	var ok = save()
-	sfx("coin")
-	await say("Partida cargada." if ok else "Partida cargada, pero no se ha podido guardar.")
 
 # 1.43.4 (lo pidió el usuario: exportar e importar, más escondidos): al final de OPCIONES, en su submenú y con su aviso
 func copia_seguridad(desde_titulo: bool) -> void:
@@ -426,12 +489,16 @@ func opciones(desde_titulo := false) -> void:
 			return
 		if it[i].label == "COPIA DE SEGURIDAD":
 			await copia_seguridad(desde_titulo)
+			if relanza:
+				return
 			continue
 		if it[i].label == "EXPORTAR PARTIDA":
 			await exportar()
 			continue
 		if it[i].label == "IMPORTAR PARTIDA":
 			await importar(desde_titulo)
+			if relanza:
+				return
 			continue
 		match it[i].label:
 			"MÚSICA":
@@ -555,11 +622,9 @@ func new_game() -> void:
 func enter_game() -> void:
 	mode = "world"
 	enter_map(S.map, S.x, S.y, S.dir)
-	if tile_solid(MAPS[S.map], P.x, P.y):   # partidas viejas: la casilla puede ser ahora una carpa
-		if S.map == "home":
-			enter_map(S.map, 2, 4, "down")
-		else:
-			enter_map(S.map, 5, 9, "down")
+	var cl := casilla_libre(MAPS[S.map], P.x, P.y)   # partidas viejas: la casilla puede ser ahora una carpa o un mueble (E3: la libre más cercana)
+	if cl != Vector2i(P.x, P.y):
+		enter_map(S.map, cl.x, cl.y, "down")
 	if S.clientsDay != S.day:
 		spawn_clients()
 	# 1.13: lo que se quedó en la cola al guardar (la cama guarda antes de que salgan los avisos de la noche)
@@ -569,7 +634,46 @@ func enter_game() -> void:
 		queue("orden", aviso_orden)
 	if S.due > 0 and S.day > S.deadline:
 		queue("penalty", penalty_event)
+	cola_cargar()
 	update_hud()
+
+# E3 (fase 3): la casilla libre más cercana (BFS) dentro del mapa y a la que se llega andando desde sus salidas (no la de detrás
+# de una barra); sin salidas, la libre más cercana
+func casilla_libre(m: Dictionary, x: int, y: int) -> Vector2i:
+	var w := int(m.w)
+	var h := int(m.h)
+	var x0 := clampi(x, 0, w - 1)
+	var y0 := clampi(y, 0, h - 1)
+	var sal := {}
+	for k in m.get("exits", {}).keys() + m.get("doors", {}).keys():
+		var xy: PackedStringArray = String(k).split(",")
+		sal[Vector2i(int(xy[0]), int(xy[1]))] = true
+	var llega := {}   # lo que se anda desde las salidas
+	var q := sal.keys()
+	for c in q:
+		llega[c] = true
+	while q.size():
+		var c: Vector2i = q.pop_front()
+		for d in [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]:
+			var v: Vector2i = c + d
+			if not llega.has(v) and not tile_solid(m, v.x, v.y):
+				llega[v] = true
+				q.append(v)
+	var vale := func(c: Vector2i) -> bool: return not tile_solid(m, c.x, c.y) and not sal.has(c) and (llega.has(c) or sal.is_empty())
+	if x == x0 and y == y0 and not tile_solid(m, x, y):   # libre: donde estaba, como siempre
+		return Vector2i(x, y)
+	var visto := {Vector2i(x0, y0): true}
+	var cola := [Vector2i(x0, y0)]
+	while cola.size():
+		var c: Vector2i = cola.pop_front()
+		if vale.call(c):
+			return c
+		for d in [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]:
+			var v: Vector2i = c + d
+			if v.x >= 0 and v.y >= 0 and v.x < w and v.y < h and not visto.has(v):
+				visto[v] = true
+				cola.append(v)
+	return Vector2i(x0, y0)
 
 # ---------- bucle ----------
 func update(dt: float) -> void:

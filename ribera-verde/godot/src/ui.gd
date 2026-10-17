@@ -74,6 +74,11 @@ var name_box := PanelContainer.new()
 var name_in := LineEdit.new()
 var name_lbl := Label.new()
 var name_small := Label.new()
+# E9 (fase 3): la caja de importar la partida, de varias líneas y con PEGAR (el portapapeles, solo al tocarlo)
+var import_box := PanelContainer.new()
+var import_te := TextEdit.new()
+var import_pegar := Button.new()
+var import_small := Label.new()
 var name_mayus := false
 var lector := PanelContainer.new()   # textos largos con scroll (créditos, licencias, privacidad): leer()
 var lector_ttl := Label.new()
@@ -208,6 +213,23 @@ func _ready() -> void:
 		if name_box.visible:
 			name_in.grab_focus.call_deferred())
 	add_child(name_box)
+	var ic := VBoxContainer.new()
+	import_box.add_child(ic)
+	var it := Label.new()
+	it.text = "Pega aquí la partida exportada"
+	ic.add_child(it)
+	import_te.wrap_mode = TextEdit.LINE_WRAPPING_NONE
+	ic.add_child(import_te)
+	var ih := HBoxContainer.new()
+	ic.add_child(ih)
+	import_pegar.text = "PEGAR"
+	import_pegar.focus_mode = Control.FOCUS_NONE
+	import_pegar.pressed.connect(pegar_partida)
+	ih.add_child(import_pegar)
+	import_small.text = "A: cargar · B: cancelar"
+	ih.add_child(import_small)
+	import_box.hide()
+	add_child(import_box)
 	var lc := VBoxContainer.new()
 	var lt := HBoxContainer.new()
 	lector.add_child(lc)
@@ -570,6 +592,15 @@ func _estilos() -> void:
 	pon_letra(name_in, letra, 12 * us, INK, 0, false)
 	name_in.custom_minimum_size = Vector2(110 * us, 0)
 	pon_letra(nc.get_child(2), letra, 7 * us, GRIS, 0, false)
+	import_box.add_theme_stylebox_override("panel", caja(us, 8, 10))
+	var ic: VBoxContainer = import_box.get_child(0)
+	ic.add_theme_constant_override("separation", roundi(5 * us))
+	pon_letra(ic.get_child(0), letra, 9 * us, INK)
+	pon_letra(import_te, letra, 7 * us, INK, 0, false)
+	import_te.custom_minimum_size = Vector2(160 * us, 40 * us)
+	pon_letra(import_pegar, letra, 8 * us, INK, 0, false)
+	import_pegar.custom_minimum_size = Vector2(48 * us, 16 * us)
+	pon_letra(import_small, letra, 7 * us, GRIS, 0, false)
 	lector.add_theme_stylebox_override("panel", caja(us, 5, 7))
 	lector.get_child(0).add_theme_constant_override("separation", roundi(4 * us))
 	pon_letra(lector_ttl, negrita, 9 * us, LINEA, 0, false)
@@ -650,7 +681,7 @@ func set_held(b: String, v: bool) -> void:
 func _unhandled_input(e: InputEvent) -> void:
 	if not (e is InputEventKey) or not TECLAS.has(e.keycode):
 		return
-	if name_box.visible and name_in.has_focus():
+	if (name_box.visible and name_in.has_focus()) or (import_box.visible and import_te.has_focus()):
 		return
 	var b: String = TECLAS[e.keycode]
 	get_viewport().set_input_as_handled()
@@ -671,7 +702,7 @@ var dedos_cruz := {}   # dedo en la cruceta → flecha que aprieta ("" en la zon
 var rep := {}     # mando → [id del retardo, id del intervalo]
 
 func _input(e: InputEvent) -> void:
-	if name_box.visible and e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_ESCAPE:   # Esc = B en la caja de texto
+	if (name_box.visible or import_box.visible) and e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_ESCAPE:   # Esc = B en la caja de texto
 		get_viewport().set_input_as_handled()
 		press("B")
 		return
@@ -847,11 +878,50 @@ func pedir_texto(txt: String, ini := "", mx := 12, mayus := false, cancela := tr
 			pr.res(v))
 	return await Motor.espera(pr)
 
+const IMPORTA_MAX := 1000000   # E9: una partida guardada no llega a 1 MB
+
+# E9: el texto de la partida que se importa, en una caja de varias líneas; A carga, B cancela (null)
+func pedir_partida(txt: String):
+	if gancho_pedir.is_valid():
+		return gancho_pedir.call(txt, "", IMPORTA_MAX, true)
+	var pr := Motor.Prom.new()
+	import_te.text = ""
+	import_small.text = "A: cargar · B: cancelar"
+	import_box.show()
+	_coloca()
+	import_te.grab_focus.call_deferred()
+	push(func(b: String):
+		if b == "A" or b == "B":
+			var v = import_te.text.strip_edges() if b == "A" else null
+			if v != null and v.length() > IMPORTA_MAX:
+				import_small.text = "Demasiado largo para ser una partida."
+				return
+			import_box.hide()
+			import_te.release_focus()
+			import_te.text = ""
+			pop()
+			pr.res(v))
+	return await Motor.espera(pr)
+
+# PEGAR: el portapapeles, solo al tocarlo (Android 12+ avisa de cada lectura)
+func pegar_partida() -> void:
+	if not DisplayServer.has_feature(DisplayServer.FEATURE_CLIPBOARD):
+		return
+	var t := DisplayServer.clipboard_get().strip_edges()
+	if t.length() > IMPORTA_MAX:
+		import_small.text = "Demasiado largo para ser una partida."
+		return
+	import_te.text = t
+
 func push(fn: Callable) -> void:
 	handlers.append(fn)
 
-func pop() -> void:
-	handlers.pop_back()
+# pop(fn): quita ese manejador aunque otro se haya puesto encima (E13); sin fn, el de arriba
+func pop(fn := Callable()) -> void:
+	if fn.is_valid() and handlers.has(fn):
+		handlers.erase(fn)
+	else:
+		handlers.pop_back()
 
 func press(b: String) -> void:
 	audio_init()
@@ -1006,7 +1076,7 @@ func type_text(text: String, name_ := "") -> void:
 		gancho_texto.call(text, name_)
 	var p := Motor.Prom.new()
 	var full := nm(text)
-	var st := {"i": 0, "n": 0, "done": false, "iv": 0}
+	var st := {"i": 0, "n": 0, "done": false, "iv": 0, "h": Callable()}
 	var paso: int = [1, 3, 100000][aj.texto]   # OPCIONES · TEXTO: normal, rápido (3 letras cada vez) o al momento
 	if not oraculo:
 		dlg.show()
@@ -1020,7 +1090,7 @@ func type_text(text: String, name_ := "") -> void:
 		if not oraculo:
 			dlg_txt.text = full
 		st.done = true
-		pop()
+		pop(st.h)
 		p.res()
 	st.iv = M.intervalo(func():
 		st.i = mini(st.i + paso, full.length())
@@ -1031,9 +1101,10 @@ func type_text(text: String, name_ := "") -> void:
 			sfx("blip")
 		if st.i >= full.length():
 			fin.call(), 20)
-	push(func(b):
+	st.h = func(b):
 		if (b == "A" or b == "B") and not st.done:
-			fin.call())
+			fin.call()
+	push(st.h)
 	await Motor.espera(p)
 
 func say(text: String, name_ := "", keep := false) -> void:
@@ -1467,6 +1538,9 @@ func _coloca() -> void:
 	if name_box.visible:
 		name_box.reset_size()
 		name_box.position = R.get_center() - name_box.size / 2
+	if import_box.visible:
+		import_box.reset_size()
+		import_box.position = R.get_center() - import_box.size / 2
 	if hud.visible:
 		hud.reset_size()
 		hud.position = scr.position + Vector2(HUD_M * u, HUD_M * u)

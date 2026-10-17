@@ -414,6 +414,7 @@ static func avanza(S: Dictionary, minutos: int) -> int:
 			var b: float = minf(float(S.get("banco", 0)), e)   # 1.35: domiciliada, de la cuenta y, si no llega, del efectivo
 			if b > 0:
 				S.banco -= b
-			S.money = maxi(0, S.money - int(e - b))
+			var nm := maxf(0.0, float(S.money) - (e - b))   # E12 (fase 3): sin perder los céntimos (entero si lo es, como antes)
+			S.money = int(nm) if nm == floorf(nm) else nm
 			luz += e
 	return luz

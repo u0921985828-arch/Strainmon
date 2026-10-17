@@ -19,6 +19,16 @@
 - **`store/`**: política de privacidad (es + en), formulario de seguridad de los datos, cuestionario IARC, fichas en español e inglés (`tools/ficha.py` las mide), icono de 512, gráfico destacado de 1024 × 500 y 8 capturas de 1920 × 1080 sacadas del juego con PLAY (`tests/capturas.gd`).
 - Prueba nueva `tests/play.gd` (27): ningún texto de los datos ni del código con cifras reales, los nombres nuevos y ninguno viejo, ida y vuelta de PLAY, sin setas, el billar, el aviso y la copia de seguridad.
 
+### Fase 3 · bugs E1–E14
+- **Guardado seguro** (E1, E2): `escribe_partida` escribe el `.tmp`, comprueba el error de escritura y lo vuelve a leer antes de cambiarlo por la partida; la de antes pasa a `.bak`. `load_save` prueba la partida y, si está rota, cortada o no pasa `partida_valida`, la `.bak`.
+- **La casilla al cargar** (E3): `casilla_libre` busca por BFS la casilla libre más cercana dentro del mapa y que se llegue andando desde una salida (nunca la salida misma); si la guardada está libre, se queda.
+- **Sin guardar a medias** (E4–E6): `guarda_al_salir` (al pausar o cerrar la app) no guarda con un guion en marcha (`lock > 0`) ni fuera del mapa o la carpa (el combate); la redada y el plazo vencido (con el embargo, `embargo_aplica`) cambian `S` antes del primer aviso, así que cerrar a mitad no los repite ni los pierde.
+- **Los avisos de la cola se guardan** (E7): `queue(k, fn, av)` guarda el texto de cada aviso (`_cola` en la partida, `cola_guardar`/`cola_cargar`); los que se calculan (plazo, calor, historia, misión, logro, itinerario) se vuelven a encolar por su nombre.
+- **Importar** (E8–E10): `partida_valida` mira el tipo de cada clave de `new_state()` y los rangos de `day`, `min` y `ch`; la caja de texto es de varias líneas con PEGAR (el portapapeles solo al tocarlo), con tope de 1 MB (`IMPORTA_MAX`); importada en partida, se abre al cerrar los menús (`relanza`, `relanzar`), como CONTINUAR (con `Datos.CAL`; sin él, en caliente como en la 1.22, para la historia contra el HTML).
+- **START cierra el móvil** (E11), **los céntimos no se pierden** al pagar la luz (E12), **`pop(fn)` quita su manejador** y no el de arriba (E13, `type_text`) y **fuera «en este navegador»** (E14).
+- START (la pausa) guarda antes de abrir el menú.
+- Prueba nueva `tests/bugs.gd` (29 comprobaciones: una o más por bug, que fallaban antes del arreglo).
+
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
 Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.

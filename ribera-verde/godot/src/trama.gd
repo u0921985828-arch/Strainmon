@@ -1506,20 +1506,24 @@ func check_story():
 		S.flags.koldoSms = S.day
 		await talk("SMS · KOLDO", ["Soy Koldo, del muelle de Puerto Viejo. Fui amigo de tu tía Maite: tengo una cosa suya para ti.", "Al final de la plaza del puerto, a la derecha, el muelle de la cofradía. Estoy en la acera, delante de los barcos."])
 
+# E5 (fase 3): todo lo que cambia, antes del primer aviso (guardada a medias, no se cuenta dos veces)
 func penalty_event():
-	await say("TOÑO te estaba esperando.")
 	var it := Datos.jsround(S.due * D.INTERES / 100) * 100
 	S.vencidos += 1
-	await talk("TOÑO", ["Don Baltasar dice que llegas tarde.", "Son %s más de intereses. Y esto, para que no se te olvide." % Datos.eur(it)])
-	sfx("hurt")
 	S.hp = maxi(1, S.hp - 15)
 	S.due += it
 	S.debt += it
 	S.deadline = S.day + 5
-	await say("La deuda del plazo sube a %s. Nuevo límite: %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)])
+	var embarga = null
 	if S.vencidos >= 3:
 		S.vencidos = 0
-		await embargo()
+		embarga = embargo_aplica()
+	await say("TOÑO te estaba esperando.")
+	await talk("TOÑO", ["Don Baltasar dice que llegas tarde.", "Son %s más de intereses. Y esto, para que no se te olvide." % Datos.eur(it)])
+	sfx("hurt")
+	await say("La deuda del plazo sube a %s. Nuevo límite: %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)])
+	if embarga != null:
+		await embargo(embarga)
 
 # al tercer plazo vencido (1.10), Toño se lleva la carpa más grande del fondo o de junto a la cama (B o C), con su foco, sus
 # extras y sus plantas; sin ninguna de las dos, la mitad del dinero que llevas encima
@@ -1544,22 +1548,28 @@ func quitar_carpa(ci: int) -> void:
 	S.macetas = nm
 	montar_casa()
 
-func embargo() -> void:
+func embargo_aplica() -> Dictionary:   # E5: lo que se lleva, antes de decirlo
 	var ci := -1
 	for c in [1, 2]:
 		if c < S.carpas.size() and S.carpas[c] and (ci < 0 or area_carpa(c) > area_carpa(ci)):
 			ci = c
-	await talk("TOÑO", ["Tres plazos tarde. Don Baltasar se cobra en especie."])
 	if ci >= 0:
 		var nc: String = D.CARPAS[S.carpas[ci].t].n
 		quitar_carpa(ci)
-		sfx("bad")
-		await say("TOÑO se lleva tu %s, con su foco y sus plantas." % nc)
+		return {"nc": nc}
+	var e := int(floor(S.money / 2.0))
+	S.money -= e
+	return {"e": e}
+
+func embargo(em = null) -> void:
+	if em == null:
+		em = embargo_aplica()
+	await talk("TOÑO", ["Tres plazos tarde. Don Baltasar se cobra en especie."])
+	sfx("bad")
+	if em.has("nc"):
+		await say("TOÑO se lleva tu %s, con su foco y sus plantas." % em.nc)
 	else:
-		var e := int(floor(S.money / 2.0))
-		S.money -= e
-		sfx("bad")
-		await say("TOÑO te vacía los bolsillos: se lleva %s." % Datos.eur(e))
+		await say("TOÑO te vacía los bolsillos: se lleva %s." % Datos.eur(em.e))
 
 # el aviso de la orden de registro (1.11): un día antes de la redada
 func aviso_orden():
@@ -1577,9 +1587,7 @@ func raid_event():
 		S.heat = 50
 		await talk("SMS · MOLINA", ["Esta noche había orden de entrada en tu piso. La he parado.", "Baja el ritmo."])
 		return
-	music("redada")
-	sfx("bad")
-	await say("REDADA. La policía entra en tu piso con una orden de registro.")
+	# E4 (fase 3): todo lo que se llevan, antes del primer aviso (si se cierra la app a medias, la redada ya ha pasado)
 	var casa: bool = S.map == "home" or S.map == "camarote"
 	var ne: int = S.esquejes.size() + S.bandejas.size()
 	var gc := int(floor(cam_g()))   # 1.43.6: el camarote no está escondido: se lo llevan
@@ -1627,6 +1635,18 @@ func raid_event():
 	S.heat = D.CALOR_REDADA
 	var multa := multa_redada(npl, g + Datos.jsround(ro / D.ROSIN.rend))   # el rosin, como la flor de la que sale
 	var fine: float = multa - pagar_casa(multa)
+	var gs := -1.0
+	if sot_ya() and (S.sot.bandejas.size() or float(S.sot.g) >= 1 or S.sot.get("fr", []).size()):   # 1.51: el sótano, también
+		gs = float(S.sot.g)
+		for f in S.sot.get("fr", []):
+			gs += float(f.g)
+		S.sot.bandejas = []
+		S.sot.g = 0
+		S.sot.fr = []
+		S.sot.erase("gv")
+	music("redada")
+	sfx("bad")
+	await say("REDADA. La policía entra en tu piso con una orden de registro.")
 	var lo := []
 	if npl:
 		lo.append("todas las plantas")
@@ -1639,14 +1659,7 @@ func raid_event():
 	await say("%s. Multa: %s%s." % [("Se llevan " + _lista(lo)) if lo.size() else "No encuentran nada que llevarse", Datos.eur(multa), (" (pagas %s: no tienes más)" % Datos.eur(fine)) if fine < multa else ""])
 	if eq.size():
 		await say("Y el equipo de las carpas con plantas: " + ", ".join(eq) + ".")
-	if sot_ya() and (S.sot.bandejas.size() or float(S.sot.g) >= 1 or S.sot.get("fr", []).size()):   # 1.51: el sótano, también
-		var gs: float = float(S.sot.g)
-		for f in S.sot.get("fr", []):
-			gs += float(f.g)
-		S.sot.bandejas = []
-		S.sot.g = 0
-		S.sot.fr = []
-		S.sot.erase("gv")
+	if gs >= 0:
 		await say("Bajan al sótano: se llevan las bandejas%s." % ((" y " + g_txt(gs) + " de setas") if gs >= 1 else ""))
 	await say("La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan." if S.get("caja") != null else "Las semillas no son delito: se quedan.")
 	await say("Toca empezar de nuevo. Y vender menos una temporada.")
@@ -1708,6 +1721,8 @@ func start_menu():
 			await say("Partida guardada." if save() else "No se ha podido guardar la partida.")
 		elif i == 6:
 			await opciones()
+			if get("relanza"):   # E10: la partida importada se abre al cerrar el menú
+				return
 
 # exportar la partida (1.11, exportar de 12-menus): el JSON de S al portapapeles
 var exportado := ""   # lo último copiado (las pruebas lo leen: sin pantalla no hay portapapeles)
@@ -2814,7 +2829,8 @@ func vencer_encargo():
 	S.encargo = null
 	S.rep = max(0, S.rep - 10)
 	S.encVeto = S.day + int(D.ENCARGO_VETO)
-	queue("encargo", func(): await talk("SMS · TOÑO", ["No apareciste. Don Baltasar no se olvida.", "Reputación −10. Nada de encargos hasta el %s." % Datos.fd(S.encVeto, S.day)]))
+	var L := ["No apareciste. Don Baltasar no se olvida.", "Reputación −10. Nada de encargos hasta el %s." % Datos.fd(S.encVeto, S.day)]
+	queue("encargo", func(): await talk("SMS · TOÑO", L), [["SMS · TOÑO", L]])
 
 # ---------- la sala (1.10, 09c-sala): clima y arcón ----------
 func t_clima(cl: Dictionary) -> String:
@@ -2930,7 +2946,7 @@ func elegir_movil(ops: Array, i0 := 0) -> int:
 	_dlg_fijo(desc_movil(MOVIL_V), "MÓVIL")
 	var pr := Motor.Prom.new()
 	push(func(b: String):
-		if b == "B" or b == "start":
+		if b == "B" or b == "START":   # E11 (fase 3): en mayúsculas, como lo manda press
 			pop()
 			pr.res(-1)
 			return
@@ -3144,7 +3160,8 @@ func recibir_envio():
 	for lbl in c:
 		L.append(("%s ×%d" % [lbl, c[lbl]]) if c[lbl] > 1 else lbl)
 	var t := ", ".join(L)
-	queue("envio", func(): await talk("SMS · KIKO", ["Te he dejado el paquete en casa: %s." % t]))
+	var av := ["Te he dejado el paquete en casa: %s." % t]
+	queue("envio", func(): await talk("SMS · KIKO", av), [["SMS · KIKO", av]])
 
 func mensajes():
 	if S.sms.is_empty():
@@ -3170,7 +3187,8 @@ func curro_dia() -> void:
 		if S.money < J.sueldo:
 			C.jard = null
 			confia("begona", -10)
-			queue("jard", func(): await talk("SMS · BEGOÑA", ["Sin cobrar no vuelvo, majo. Cuando tengas el dinero, hablamos."]))
+			var L := ["Sin cobrar no vuelvo, majo. Cuando tengas el dinero, hablamos."]
+			queue("jard", func(): await talk("SMS · BEGOÑA", L), [["SMS · BEGOÑA", L]])
 		else:
 			S.money -= int(J.sueldo)
 			cuidar_plantas()
@@ -3184,13 +3202,15 @@ func curro_dia() -> void:
 			fin.append(v)
 			S.heat = min(100, S.heat + V.calorPilla)
 			confia(v.id, -5)
-			queue("vend" + v.id, func(): await talk(N, ["Me ha parado la policía. Se han quedado con %s de %s. Lo siento." % [g_txt(v.g), lot_nombre(v.k)]]))
+			var L := ["Me ha parado la policía. Se han quedado con %s de %s. Lo siento." % [g_txt(v.g), lot_nombre(v.k)]]
+			queue("vend" + v.id, func(): await talk(N, L), [[N, L]])
 			continue
 		if r < V.pilla + V.estafa * (D.REL.max - rel(v.id)) / D.REL.max:
 			fin.append(v)
 			S.fijos = S.fijos.filter(func(f): return f.id != v.id)
 			S.rel[v.id] = 0
-			queue("vend" + v.id, func(): await say("%s no contesta al móvil. Se ha largado con %s de %s." % [v.n, g_txt(v.g), lot_nombre(v.k)]))
+			var L := ["%s no contesta al móvil. Se ha largado con %s de %s." % [v.n, g_txt(v.g), lot_nombre(v.k)]]
+			queue("vend" + v.id, func(): await say(L[0]), [["", L]])
 			continue
 		var g: int = mini(int(floor(v.g)), ri(int(V.g[0]), int(V.g[1])))
 		var e := Datos.jsround(precio_calle(v.thc) * calidad(v) * D.ZONAS.town.precio * g * (1 - V.com))
@@ -3202,9 +3222,11 @@ func curro_dia() -> void:
 		vende = true
 		if v.g < 1:
 			fin.append(v)
-			queue("vend" + v.id, func(): await talk(N, ["Vendidos los últimos %d g: %s en tu buzón. Si quieres que siga, déjame más." % [g, Datos.eur(e)]]))
+			var L := ["Vendidos los últimos %d g: %s en tu buzón. Si quieres que siga, déjame más." % [g, Datos.eur(e)]]
+			queue("vend" + v.id, func(): await talk(N, L), [[N, L]])
 		else:
-			queue("vend" + v.id, func(): await talk(N, ["Vendidos %d g: %s en tu buzón. Me quedan %s." % [g, Datos.eur(e), g_txt(v.g)]]))
+			var L := ["Vendidos %d g: %s en tu buzón. Me quedan %s." % [g, Datos.eur(e), g_txt(v.g)]]
+			queue("vend" + v.id, func(): await talk(N, L), [[N, L]])
 	if fin.size():
 		C.vend = C.vend.filter(func(v): return not fin.has(v))
 	if vende:   # 1.22: lo vendido cuenta para la historia
@@ -3624,7 +3646,9 @@ func vencer_encargo_club() -> void:
 	S.clubEnc = null
 	S.rep = maxi(0, S.rep - 3)
 	confia(E.k, -10)
-	queue("clubEnc", func(): await talk("SMS · " + D.CLUBS[E.k].n, ["Se acabó el plazo de las semillas. Los socios no se olvidan."]))
+	var Nc: String = "SMS · " + D.CLUBS[E.k].n
+	var L := ["Se acabó el plazo de las semillas. Los socios no se olvidan."]
+	queue("clubEnc", func(): await talk(Nc, L), [[Nc, L]])
 
 # la cata (desde la mochila) y el analizador de THC
 func nota_cata(sid: String, thc: float) -> String:
@@ -4092,7 +4116,8 @@ func cuidar_casa(w: Dictionary) -> int:
 		S.flags.harvest1 = true
 		var N: String = "SMS · " + w.n.to_upper()
 		var tt := tot
-		queue("gerente", func(): await talk(N, ["He cosechado %d g. Está en la caja fuerte." % tt]))
+		var L := ["He cosechado %d g. Está en la caja fuerte." % tt]
+		queue("gerente", func(): await talk(N, L), [[N, L]])
 		queue("historia", check_story)
 	return tot
 
