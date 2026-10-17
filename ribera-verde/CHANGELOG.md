@@ -1,6 +1,6 @@
 # Cambios
 
-## 1.57.2 · Godot 0.47.0 (sin cerrar)
+## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
 Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.
 
@@ -16,7 +16,7 @@ Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller,
 - **La franja de la pantalla de carga**: el cielo (`_cielo`) solo llegaba a la fila 120 y entre el monte y la carretera quedaban 2 filas sin pintar, por las que se veía lo de detrás; ahora llega hasta abajo (también en el viaje).
 - Pruebas: `tests/negocios.gd` (la puerta y el atrezo tras la mejora, el suelo por zonas, el arte y que se llegue a todo, también en la taberna), `tests/escala.gd` (85: las mesas, sillas y taburetes sueltos de la taberna, que te sientes, su arte; con `--pintar`, sentado en la taberna y en la espera), `tests/sotano.gd` (el hueco de 2 × 2), `tests/acceso.gd` (el gesto de sembrar) y `tests/viaje.gd` (106: las fases del bancal por fecha, que no vayan hacia atrás y las plantas de cada variedad; con `--pintar`, `huerto-<mes>-<día>`).
 
-## 1.57.1 · Godot 0.47.0 (sin cerrar)
+## 1.57.1 · Godot 0.47.1
 
 Lo que pidió el usuario tras la 1.57 («que aparezcan en la pantalla de carga los sprites reales de césped, árboles, setos, también molaría que pasasen algún transeúnte… los botones de la UI principal más pequeños, que así le da el toque más limpio… mejor que se quede de fondo la carretera andando coches y por la acera transeúntes andando, en bici, patinete»). Solo Godot, con `Datos.CAL`.
 
