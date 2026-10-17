@@ -10761,40 +10761,6 @@
     "sillaT": "exacto",
     "cafeM": "exacto"
    }
-  },
-  {
-   "fase": "F9",
-   "herramienta": "importado",
-   "estado": "hecho",
-   "familia": "importado",
-   "paleta": "propia",
-   "coste_real": 0,
-   "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/calle_plantas.py",
-   "estilo_ref": "los setos y árboles de la calle (mundo.py)",
-   "notas": "1.57.2, lo pidió el usuario: «que se vea ahí alguna planta pues en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior». De frente, 16 px/m; solo con Datos.CAL.",
-   "id": "calle-plantas",
-   "tipo": "objeto",
-   "celda": "mueble_escala",
-   "descripcion": "1.57.2: las plantas de exterior del huerto de la calle de la carga y del título por fases del año: plántula, vegetativo joven y grande, prefloración, floración, madura y cortada.",
-   "cubre": [
-    "obj:pext-0",
-    "obj:pext-1",
-    "obj:pext-2",
-    "obj:pext-3",
-    "obj:pext-4",
-    "obj:pext-5",
-    "obj:pext-6"
-   ],
-   "ajuste_por_sprite": {
-    "pext-0": "exacto",
-    "pext-1": "exacto",
-    "pext-2": "exacto",
-    "pext-3": "exacto",
-    "pext-4": "exacto",
-    "pext-5": "exacto",
-    "pext-6": "exacto"
-   }
   }
  ],
  "familias": {

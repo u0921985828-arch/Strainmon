@@ -208,7 +208,7 @@ func _corre() -> void:
 				ok_f = false
 			fz = f if f >= 0 else fz
 	chk(ok_f, "el bancal: las fases no van hacia atrás en el año")
-	chk(range(7).all(func(i): return EscViaje.Atlas.frame_de(EscViaje.Atlas.cubre("obj:pext-%d" % i), "pext-%d" % i, "unica", 0, {"i": 0}) != null), "el bancal: los siete dibujos")
+	chk(EscViaje.HUERTO_SM.all(func(v): return range(1, 6).all(func(i): return EscViaje.Atlas.frame_de(EscViaje.Atlas.cubre("misc:planta-vista"), "sm%02d-%d" % [v, i], "unica", 0, {"i": 0}) != null)), "el bancal: las plantas de cada variedad que ya había (plantas-vista)")
 	# 7 · los dibujos
 	if dir != "":
 		J.hud.hide()
