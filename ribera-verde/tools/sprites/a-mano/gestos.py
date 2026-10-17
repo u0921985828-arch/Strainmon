@@ -467,6 +467,33 @@ def mano_abierta():
     return con(L)
 
 
+def semilla():
+    """1.57.2 (lo pidió el usuario: «sería mejor echar una semilla al sembrar»): la semilla de cannabis (8 × 8), un óvalo pardo con
+    las vetas oscuras"""
+    L = lz(8, 8)
+    for y, (x0, x1) in enumerate(((3, 4), (2, 5), (2, 5), (2, 5), (3, 4))):
+        L.hl(x0, x1, y + 1, '#8a6a42')
+    L.p(3, 2, '#b8955e'); L.p(3, 3, '#a8854e')
+    L.p(4, 2, '#4a3420'); L.p(5, 3, '#4a3420'); L.p(2, 4, '#5a4028'); L.p(4, 4, '#5a4028'); L.p(3, 5, '#4a3420')
+    return con(L)
+
+
+def mano_pinza(abierta):
+    """la mano que coge la semilla con el índice y el pulgar, desde arriba (24 × 24); abierta, los dedos se separan y la suelta"""
+    L = lz(24, 24)
+    for y in range(0, 6): L.hl(8, 16, y, MANGA[1] if y < 5 else MANGA[0])
+    L.hl(9, 14, 1, MANGA[2])
+    ovalo(L, 12, 10, 5, 4, PIEL)
+    s = 2 if abierta else 0
+    for y in range(12, 20):                                        # el índice, a la izquierda
+        L.hl(9 - (s if y > 15 else 0), 10 - (s if y > 15 else 0), y, PIEL[2])
+    L.p(9 - s, 19, PIEL[3])
+    for y in range(12, 19):                                        # el pulgar, a la derecha
+        L.hl(13 + (s if y > 15 else 0), 14 + (s if y > 15 else 0), y, PIEL[1] if y > 16 else PIEL[2])
+    for k in range(2): L.vl(11 + k, 13, 14 + k, PIEL[1])           # los nudillos de los otros dedos, doblados
+    return con(L)
+
+
 # ── dormir ──
 def dormido(resp):
     """el protagonista dormido en la cama de cerca (128 × 66, en el panel en (16, 30)): de lado, la mejilla en la almohada, el pelo
@@ -662,6 +689,7 @@ sale('gs-esqueje', esqueje()); sale('gs-vaso', vaso()); sale('gs-cola', cola());
 sale('gs-pincel', pincel()); sale('gs-mechero-0', mechero(0)); sale('gs-mechero-1', mechero(1))
 for n in range(3): sale('gs-humo-%d' % n, humo(n)); sale('gs-bruma-%d' % n, bruma(n))
 sale('gs-billete', billete()); sale('gs-fajo', billete(4)); sale('gs-mano', mano_abierta())
+sale('gs-semilla', semilla()); sale('gs-pinza-0', mano_pinza(0)); sale('gs-pinza-1', mano_pinza(1))
 sale('gs-gota', gota()); sale('gs-hojita', hojita()); sale('gs-bicho', bicho()); sale('gs-burbuja', burbuja()); sale('gs-z', zeta())
 
 

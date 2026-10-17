@@ -9099,10 +9099,10 @@ func _teclado(R: Array, V: Dictionary, t: float, T: Dictionary, cx: int, ty: int
 # ---------- cada acción, de cerca (1.54, lo pidió el usuario: «que todas las acciones del juego sean más realistas, acompañadas de algo
 # gráfico»). Como la llave de la 1.53 (mismo recuadro, ACCESO_V, A o B lo pasan), un plano de detalle de lo que haces: regar, tratar la
 # plaga, abonar, plantar, sacar un esqueje, cosechar, manicurar, polinizar, fumar (porro, pipa, bong o vaporizador), vender y pagar
-const GESTOS := {"regar": 1200, "tratar": 1200, "abonar": 1200, "plantar": 1200, "esqueje": 1200, "cosechar": 1300, "manicurar": 1300,
+const GESTOS := {"regar": 1200, "tratar": 1200, "abonar": 1200, "plantar": 1200, "sembrar": 1200, "esqueje": 1200, "cosechar": 1300, "manicurar": 1300,
 	"polen": 1200, "fumar": 1400, "vender": 1200, "pagar": 1300, "dormir": 1300}
 const GESTO_SON := {"regar": [[150, "agua"], [550, "agua"]], "tratar": [[250, "agua"], [600, "agua"]], "abonar": [[200, "agua"]],
-	"plantar": [[350, "tick"], [900, "tick"]], "esqueje": [[450, "tijera"]], "cosechar": [[450, "tijera"], [850, "tick"]],
+	"plantar": [[350, "tick"], [900, "tick"]], "sembrar": [[450, "tick"], [900, "tick"]], "esqueje": [[450, "tijera"]], "cosechar": [[450, "tijera"], [850, "tick"]],
 	"manicurar": [[250, "tijera"], [500, "tijera"], [750, "tijera"], [1000, "tijera"]], "polen": [[450, "tick"], [700, "tick"]],
 	"fumar": [[100, "chispa"]], "vender": [[600, "coin"]], "pagar": [[200, "tick"], [400, "tick"], [600, "tick"], [800, "tick"], [1000, "coin"]]}
 
@@ -9195,15 +9195,31 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 					_gsr(R, 52, 51, 1, maxi(0, largo - 2), "#a86a1a")
 			else:
 				_gsp(R, "gs-botella-0", 34, _mv(30, -24, (t - 1000) / 200.0))
-		"plantar":   # la plántula baja a la maceta, la tierra se aprieta con la mano
+		"plantar":   # la plántula baja a la maceta, la tierra se aprieta con la mano; 1.57.2: dentro de la maceta, delante del canto de atrás
 			_gsp(R, "gs-f-carpa", 0, 0)
-			_gsp(R, "gs-brote", 36, _mv(-90, -29, t / 600.0))
 			_gsp(R, "gs-maceta", 40, 60)
-			if t > 600:
+			_gsp(R, "gs-brote", 36, _mv(-90, -28, t / 600.0))
+			if t > 600:   # la tierra alrededor del tallo
 				for i in 6:
-					_gsr(R, 47 + i * 3, 63 - (i % 2), 2, 1, "#5a3a22")
+					_gsr(R, 49 + i * 3 + (1 if i > 2 else 0), 67 + (i % 2), 2, 1, "#3e2c1e" if i % 2 else "#56402a")
 			if t > 750:
 				_gsp(R, "gs-mano", 58, 38 + Datos.jsround(sin((t - 750) / 90.0) * 2))
+		"sembrar":   # 1.57.2 (lo pidió el usuario: «sería mejor echar una semilla al sembrar»): los dedos bajan con la semilla, la sueltan,
+			# cae a la tierra y la mano la tapa
+			_gsp(R, "gs-f-carpa", 0, 0)
+			_gsp(R, "gs-maceta", 40, 60)
+			var hy: float = _mv(-26, 36, t / 400.0) if t < 650 else _mv(36, -26, (t - 650) / 200.0)
+			if t < 450:
+				_gsp(R, "gs-semilla", 51, hy + 16)
+			elif t < 900:
+				_gsp(R, "gs-semilla", 51, _mv(52, 62, (t - 450) / 200.0))
+			if t < 850:
+				_gsp(R, "gs-pinza-1" if t >= 420 else "gs-pinza-0", 44, hy)
+			if t > 900:   # tapada: un montoncito de tierra
+				_gsr(R, 53, 66, 5, 1, "#56402a")
+				_gsr(R, 52, 67, 7, 1, "#3e2c1e")
+			if t > 820 and t < 1150:
+				_gsp(R, "gs-mano", 46, 44 + Datos.jsround(sin((t - 820) / 90.0) * 2))
 		"esqueje":   # las tijeras cortan una rama y el esqueje va al vaso de agua
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gs_maceta(R, "v")

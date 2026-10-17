@@ -6,7 +6,7 @@ extends "res://src/ui.gd"
 const TS := 16
 const DV := {"up": [0, -1], "down": [0, 1], "left": [-1, 0], "right": [1, 0]}
 const OPP := {"up": "down", "down": "up", "left": "right", "right": "left"}
-const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2", "barraN", "barraN2", "mostrN", "mostrN2", "mostrE", "mostrE2"]   # 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
+const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2", "barraN", "barraN2", "mostrN", "mostrN2", "mostrE", "mostrE2", "barraTb", "barraTb2"]   # 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
 const SILLAS := ["silla", "sillaG", "sillaG2"]   # 1.27.1: delante de un ordenador; con A, el ordenador de encima (delante)
 var SOLID_G := RegEx.create_from_string("^(water|roof|wall|win|iwT|iwB|void)")
 
@@ -810,7 +810,7 @@ func montar_setas() -> void:
 # los negocios por dentro (1.45, lo pidió el usuario: «que tú puedas acceder a ese sitio y controlarlo desde ahí»; con Datos.CAL):
 # en la calle, la puerta del local (NEGOCIO.k[k]: x, puerta, ancha, dx, tile; gate «neg:k»); dentro (loc-<k>), lo que ponen las mejoras
 # compradas (S.loc[k].mj); sin Datos.CAL, la calle y el local como estaban (la copia _neg0)
-const NEG_ANCHO := ["elevT", "fosoT", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL", "hornoN", "recambT", "barraN", "botN", "estP", "mostrN", "doblaN", "mesaP"]   # 1.47: los muebles de PixelLab de dos casillas
+const NEG_ANCHO := ["elevT", "fosoT", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL", "hornoN", "recambT", "barraN", "botN", "estP", "mostrN", "doblaN", "mesaP", "barraTb", "botTb"]   # 1.47: los muebles de PixelLab de dos casillas
 # 1.46: el elevador y el foso, a escala con los coches del concesionario (5 casillas, como la exposición); 1.47, el box de lavado
 const NEG_LARGO := {"elevT": 5, "fosoT": 5, "boxL": 5}
 var _neg0 := {}
@@ -1920,15 +1920,19 @@ func interact() -> void:
 
 # sentarse (1.47, solo con CAL): en los asientos, mirando al sur (se ven de frente) o al norte (de espaldas); sentado, fumarte
 # uno de lo que lleves (medio gramo), pedir algo, hablar con el de al lado, el móvil, quedarte un rato o levantarte; no se guarda
-const ASIENTOS := {"sofaF": "sur", "sofaV": "sur", "bench": "sur", "sofaB": "norte", "sofa": "norte", "sillon": "norte", "silla": "norte", "sillaG": "norte", "stool": "norte"}
+const ASIENTOS := {"sofaF": "sur", "sofaV": "sur", "bench": "sur", "sofaB": "norte", "sofa": "norte", "sillon": "norte", "silla": "norte", "sillaG": "norte", "stool": "norte",
+	"sillaTs": "sur", "sillaTn": "norte", "taburTb": "norte", "sillaT": "sur"}   # 1.57.2: las sillas y los taburetes de la taberna y la espera del taller, muebles de verdad
 const ASIENTO_TXT := {"sofaF": "Un sofá del club.", "sofaB": "Un sofá del club.", "sofaV": "El sofá del reservado.", "bench": "Un banco.", "stool": "Un taburete.",
-	"sofa": "Tu sofá.", "sillon": "Tu sillón de lectura.", "silla": "La silla del ordenador de la tía.", "sillaG": "Tu silla gaming."}
+	"sofa": "Tu sofá.", "sillon": "Tu sillón de lectura.", "silla": "La silla del ordenador de la tía.", "sillaG": "Tu silla gaming.",
+	"sillaTs": "Una silla de la taberna.", "sillaTn": "Una silla de la taberna.", "taburTb": "Un taburete de la barra.", "sillaT": "Las sillas de la espera."}
 # 1.55.3 (lo pidió el usuario: «la altura correcta en todos los muebles donde se puede sentar»): por asiento, [dx, cadera]: dx,
 # lo que se corre a la derecha para quedar en medio del dibujo (la silla gaming, de 2 casillas, va centrada entre las dos), y
 # cadera, la fila de la casilla (0 arriba, 15 los pies de pie) en la que queda la cadera, la del cojín medida en cada sprite;
 # de pie, en la 9. De espaldas, la cabeza asoma por encima del respaldo (en la silla gaming, alto, la cadera por encima
 # del cojín para que se vea la cabeza; lo de debajo lo tapa el respaldo). El taburete, con SENT_TABURETE en pinta.gd
-const SENT_GEO := {"silla": [0, 5], "sillaG": [8, 2], "sillon": [0, 7], "sofa": [0, 8], "sofaB": [0, 9], "sofaF": [2, 7], "sofaV": [2, 7], "bench": [0, 9], "stool": [0, 4]}
+const SENT_GEO := {"silla": [0, 5], "sillaG": [8, 2], "sillon": [0, 7], "sofa": [0, 8], "sofaB": [0, 9], "sofaF": [2, 7], "sofaV": [2, 7], "bench": [0, 9], "stool": [0, 4],
+	"sillaTs": [0, 8], "sillaTn": [0, 5], "taburTb": [0, 4], "sillaT": [-5, 6]}
+const TABURETES := ["stool", "taburTb"]   # 1.57.2: con las piernas de SENT_TABURETE (pinta.gd)
 func sent_geo(k) -> Array:
 	return SENT_GEO.get(k, [0, 9])
 const SENT_PORRO := 0.5
@@ -2368,12 +2372,13 @@ func object_action(x: int, y: int) -> void:
 func accion(nn: String, vf = null) -> void:
 	var g = Atlas.grupo_look(D.LOOKS.player)
 	if Datos.CAL and GESTO_DE.has(nn):   # 1.54: y el plano de detalle (gesto, trama.gd)
-		if g != null and Atlas.anim_de(g, nn) != null:
-			P.act = {"n": nn, "t0": M.reloj}
+		var na := "plantar" if nn == "sembrar" else nn   # 1.57.2: al sembrar, el protagonista hace lo de plantar
+		if g != null and Atlas.anim_de(g, na) != null:
+			P.act = {"n": na, "t0": M.reloj}
 		if vf:
 			lanzar_vfx(vf.id, vf.x, vf.y, M.reloj, S.map, false)
 		await gesto(GESTO_DE[nn])
-		if P.act and P.act.n == nn:
+		if P.act and P.act.n == na:
 			P.act = null
 		return
 	if g == null or Atlas.anim_de(g, nn) == null:
@@ -3420,7 +3425,7 @@ func ordenar(_mapa: String) -> void:   # trama
 func acceso(_k: String, _c := "", _ok := true) -> void:   # trama (1.53)
 	pass
 
-const GESTO_DE := {"regar": "regar", "plantar": "plantar", "cosechar": "cosechar", "cruzar": "polen", "vender": "vender"}   # accion() → gesto (1.54)
+const GESTO_DE := {"regar": "regar", "plantar": "plantar", "sembrar": "sembrar", "cosechar": "cosechar", "cruzar": "polen", "vender": "vender"}   # accion() → gesto (1.54)
 func gesto(_k: String, _o := {}) -> void:   # trama (1.54)
 	pass
 

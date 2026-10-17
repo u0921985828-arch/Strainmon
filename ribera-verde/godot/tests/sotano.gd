@@ -135,7 +135,7 @@ func _corre() -> void:
 	J.P.y = 2
 	chk(corre(func(): await J.object_action(3, 1)) and S.map == "pasillo" and J.P.x == 1 and J.P.y == 2, "A en la puerta: al pasillo (%s %d,%d)" % [S.map, J.P.x, J.P.y])
 	J.mode = "world"
-	chk(J.MAPS.pasillo.g[2][6] == "bajS1" and J.MAPS.pasillo.g[3][6] == "bajS2", "el hueco de la escalera")
+	chk(J.MAPS.pasillo.g[2][6] == "bajS1" and J.MAPS.pasillo.g[2][7] == "bajS2" and J.MAPS.pasillo.g[3][6] == "bajS3" and J.MAPS.pasillo.g[3][7] == "bajS4", "el hueco de la escalera, que baja hacia la derecha (1.57.2)")
 	await foto(dir, "pasillo")
 	LOG.clear()
 	chk(pisa_puerta(6, 2, 5, 2) and S.map == "pasillo" and J.P.x == 5, "sin obra, la escalera no baja: %s %d" % [S.map, J.P.x])

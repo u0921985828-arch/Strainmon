@@ -297,7 +297,7 @@ func _mundo() -> void:
 	for e in J.ents:
 		list.append([e.py, _pj.bind(e, e.look, false, float(e.get("dur", 320.0)))])
 	if J.SENT != null:   # 1.47: sentado, delante del asiento si se ve de frente y detrás si se ve de espaldas
-		list.append([J.SENT.y * 16 + (1 if J.SENT.d == "sur" or J.SENT.get("k") == "stool" else -1), _pj_sentado])
+		list.append([J.SENT.y * 16 + (1 if J.SENT.d == "sur" or J.SENT.get("k") in J.TABURETES else -1), _pj_sentado])
 	else:
 		list.append([P.py, _pj.bind(P, J.D.LOOKS.player, true, P.dur)])
 	var bolsa = Atlas.foto_misc("bolsa")
@@ -670,7 +670,7 @@ const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadr
 
 # los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
-const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz", "trim", "prensaM", "tamizM", "mallas", "lavadora", "staticM", "armS", "mesaS"]
+const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "mesaTb", "taburTb", "barrilTb", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz", "trim", "prensaM", "tamizM", "mallas", "lavadora", "staticM", "armS", "mesaS"]
 func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var gr = Atlas.cubre("obj:" + o)
 	if not gr:
@@ -1250,7 +1250,7 @@ func _pj_sentado() -> void:
 		return
 	f = J.ropa_c(f, gr)
 	var c: Image = f.c
-	var tab: bool = J.SENT.d == "norte" and J.SENT.get("k") == "stool"
+	var tab: bool = J.SENT.d == "norte" and J.SENT.get("k") in J.TABURETES
 	var g: Array = J.sent_geo(J.SENT.get("k"))
 	var sube: int = 9 - int(g[1])   # 1.55.3: lo que sube la cadera desde la de pie (la 9 de la casilla), por asiento (SENT_GEO)
 	var clave := "%d|%s|%d" % [c.get_instance_id(), J.SENT.d + str(tab), sube]

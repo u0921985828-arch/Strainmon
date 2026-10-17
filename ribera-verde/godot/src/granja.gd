@@ -261,7 +261,7 @@ func plantar(i: int) -> void:
 		S.seeds.erase(sid)
 	S.pots[i] = {"sid": sid, "prog": 0, "water": 70, "health": 100, "fert": false, "pest": false, "f": roll_feno(sid)}
 	sfx("sel")
-	await accion("plantar")
+	await accion("sembrar" if Datos.CAL else "plantar")   # 1.57.2: la semilla a la tierra
 	await say("Has plantado %s%s." % [strain(sid).n, nom_planta(S.pots[i].f)])
 	await pista_barras()
 

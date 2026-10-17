@@ -116,6 +116,7 @@ static func _cielo(P, sw: int, lz: int) -> void:
 	var c1 := Color(CIELO[lz][1])
 	for i in 12:
 		P._rect(0, i * 10, sw, 10, c0.lerp(c1, i / 11.0))
+	P._rect(0, 120, sw, int(P.SH) - 120, c1)   # 1.57.2: hasta abajo, que entre el monte y la carretera no se vea lo de detrás
 	if lz == 2:   # estrellas fijas y la luna
 		for i in 40:
 			var hs := (i * 2654435761 + 977) & 0xffffff

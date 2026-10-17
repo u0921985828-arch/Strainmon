@@ -233,6 +233,18 @@ func _corre() -> void:
 	MENUS = []
 	QUIERO = ["Usar el ordenador"]
 	chk(corre(func(): J.interact()) and MENUS.size() >= 2 and MENUS[0] == ["Sentarte", "Usar el ordenador", "Nada"], "la silla: el ordenador %s" % [MENUS.slice(0, 2)])
+	# 1.57.2 (lo pidió el usuario: «una silla tiene que ser de verdad un mueble»): en la taberna, sillas y taburetes en los que te sientas
+	var mp: Dictionary = J.MAPS["loc-puerto"]
+	var tb := {}
+	for y in mp.h:
+		for x in mp.w:
+			if mp.o[y][x] in ["sillaTs", "sillaTn", "taburTb", "mesaTb"]:
+				tb[mp.o[y][x]] = tb.get(mp.o[y][x], 0) + 1
+	chk(tb.get("sillaTs", 0) >= 1 and tb.get("sillaTn", 0) >= 3 and tb.get("taburTb", 0) == 3 and tb.get("mesaTb", 0) == 3, "la taberna: mesas, sillas y taburetes sueltos %s" % [tb])
+	chk(not mp.o.any(func(r): return "mesaT" in r or "stool" in r), "la taberna, sin la mesa con sillas de antes")
+	chk(J.asiento_de("sillaTs") == "sillaTs" and J.ASIENTOS.sillaTs == "sur" and J.ASIENTOS.sillaTn == "norte" and J.asiento_de("taburTb") == "taburTb" and J.asiento_de("sillaT") == "sillaT", "te sientas en las sillas, los taburetes y la espera del taller")
+	for o in ["mesaTb", "sillaTs", "sillaTn", "taburTb", "cafeTb", "barrilTb", "barraTb", "botTb"]:
+		chk(Atlas.cubre("obj:" + o) in ["taberna-alto", "taberna-ancho"], "%s, a mano (taberna.py)" % o)
 	# sin CAL, la silla como estaba (directa al ordenador)
 	Datos.CAL = false
 	MENUS = []
@@ -242,7 +254,8 @@ func _corre() -> void:
 	J.oraculo = false
 	if dir != "":
 		J.set_process(false)
-		for q in [["town", 16, 16, 17, "sur"], ["club-ibar", -1, -1, -1, "sur"], ["club-ibar", -2, -1, -1, "norte"], ["home", 4, 3, 4, "norte"], ["bar", -3, -1, -1, "norte"]]:
+		for q in [["town", 16, 16, 17, "sur"], ["club-ibar", -1, -1, -1, "sur"], ["club-ibar", -2, -1, -1, "norte"], ["home", 4, 3, 4, "norte"], ["bar", -3, -1, -1, "norte"],
+				["loc-puerto", 8, 5, 5, "sur"], ["loc-puerto", 8, 3, 3, "norte"], ["loc-puerto", 2, 4, 4, "norte"], ["loc-valde", 14, 9, 9, "sur"]]:   # 1.57.2: la taberna y la espera del taller
 			var mk: String = q[0]
 			var mm: Dictionary = J.MAPS[mk]
 			var sx: int = q[1]
@@ -259,8 +272,8 @@ func _corre() -> void:
 			J.SENT = {"x": sx, "y": sy, "d": q[4], "k": J.asiento_de(mm.o[sy][sx])}
 			J.vfx = []
 			J.P.dir = "down" if q[4] == "sur" else "up"
-			await foto(dir, "sentado-%s-%s" % [mk, q[4]])
-			await foto(dir, "sentado-%s-%s" % [mk, q[4]])
+			await foto(dir, "sentado-%s-%s%s" % [mk, q[4], ("-%d" % sx) if mk.begins_with("loc-") else ""])
+			await foto(dir, "sentado-%s-%s%s" % [mk, q[4], ("-%d" % sx) if mk.begins_with("loc-") else ""])
 			J.SENT = null
 	print("escala: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:

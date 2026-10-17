@@ -10186,11 +10186,15 @@
    "cubre": [
     "tile:bajS1",
     "tile:bajS2",
+    "tile:bajS3",
+    "tile:bajS4",
     "tile:escS"
    ],
    "ajuste_por_sprite": {
     "bajS1": "exacto",
     "bajS2": "exacto",
+    "bajS3": "exacto",
+    "bajS4": "exacto",
     "escS": "exacto"
    },
    "descripcion": "1.51: el hueco de la escalera del pasillo que baja al sótano y los peldaños de hormigón del sótano."
@@ -10637,6 +10641,18 @@
     {
      "nombre": "gs-z",
      "celda": "gs_s"
+    },
+    {
+     "nombre": "gs-semilla",
+     "celda": "gs_s"
+    },
+    {
+     "nombre": "gs-pinza-0",
+     "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-pinza-1",
+     "celda": "gs_m"
     }
    ],
    "cubre": [
@@ -10690,7 +10706,10 @@
     "misc:gs-vapo-0",
     "misc:gs-vapo-1",
     "misc:gs-vaso",
-    "misc:gs-z"
+    "misc:gs-z",
+    "misc:gs-semilla",
+    "misc:gs-pinza-0",
+    "misc:gs-pinza-1"
    ],
    "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta) y piezas (manos, herramientas, plantas, humo, billetes)."
   },
@@ -10760,6 +10779,62 @@
     "cajonT": "exacto",
     "sillaT": "exacto",
     "cafeM": "exacto"
+   }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/taberna.py",
+   "estilo_ref": "los muebles del salón (salon.py): la madera de la silla de la tía y el contorno #2a2a34",
+   "notas": "1.57.2, lo pidió el usuario: «en el bar este del Puerto Viejo… no están para nada acorde con el estilo… Una silla tiene que ser de verdad un mueble… crea todo como muebles». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "id": "taberna-alto",
+   "tipo": "objeto",
+   "celda": "mueble_escala",
+   "descripcion": "1.57.2: los muebles de la taberna de Puerto Viejo a 16 px/m: la mesa de pino, la silla de cara y de espaldas (de verdad, para sentarse), el taburete, la cafetera y la barrica.",
+   "cubre": [
+    "obj:mesaTb",
+    "obj:sillaTs",
+    "obj:sillaTn",
+    "obj:taburTb",
+    "obj:cafeTb",
+    "obj:barrilTb"
+   ],
+   "ajuste_por_sprite": {
+    "mesaTb": "exacto",
+    "sillaTs": "exacto",
+    "sillaTn": "exacto",
+    "taburTb": "exacto",
+    "cafeTb": "exacto",
+    "barrilTb": "exacto"
+   }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/taberna.py",
+   "estilo_ref": "los muebles del salón (salon.py): la madera de la silla de la tía y el contorno #2a2a34",
+   "notas": "1.57.2, lo pidió el usuario: «en el bar este del Puerto Viejo… no están para nada acorde con el estilo… Una silla tiene que ser de verdad un mueble… crea todo como muebles». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "id": "taberna-ancho",
+   "tipo": "objeto",
+   "celda": "mueble_ancho",
+   "descripcion": "1.57.2: la barra de pintxos y el botellero de la taberna de Puerto Viejo, de 2 casillas.",
+   "cubre": [
+    "obj:barraTb",
+    "obj:botTb"
+   ],
+   "ajuste_por_sprite": {
+    "barraTb": "exacto",
+    "botTb": "exacto"
    }
   }
  ],

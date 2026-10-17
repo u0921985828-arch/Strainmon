@@ -1,7 +1,7 @@
 # python3 -I tools/sprites/a-mano/sotano.py  (Python 3 + Pillow; no va en los scripts de npm)
 # 1.51 (lo pidió el usuario: «antes de comprar o alquilar el bajo… habilitar el sótano de la casa… unas escaleras y también una
 # puerta en la casa, luego un mapa pequeño como un mini pasillito»; y lo mismo en el taller y en la nave): a 16 px/m, como el piso.
-#  · Casillas (tile, 16 × 16): bajS1 y bajS2, el hueco de la escalera del pasillo que baja al sótano (los peldaños de madera, cada vez
+#  · Casillas (tile, 16 × 16): bajS1..bajS4 (1.57.2, 2 × 2 que bajan hacia la derecha), el hueco de la escalera del pasillo que baja al sótano (los peldaños de madera, cada vez
 #    más oscuros, con la barandilla al lado); escS, los peldaños de hormigón del sótano que suben al pasillo (la salida, abajo).
 #  · Objetos altos (objeto_alto, 32 × 32, pies en (16, 31)), en la fila de la pared: puertaI, la puerta de madera de dentro del piso
 #    (marco, cuarterones y el pomo); puertaM, la puerta metálica gris de los locales (el taller y la nave), con la barra y la rejilla de
@@ -18,16 +18,28 @@ def sale(n, L, grupo):
 
 MAD = ('#c48a52', '#a46e40', '#dcac6c', '#74502e')   # la madera de la paleta fija
 def bajS(n):
-    """el hueco de la escalera: tres peldaños por casilla, del claro de arriba al oscuro de abajo; la barandilla a la derecha"""
+    """1.57.2 (lo pidió el usuario: «las escaleras deberían de estar giradas… que el final se vea a la derecha del todo, no abajo»):
+    el hueco de 2 × 2 casillas baja hacia la derecha: seis peldaños en bandas verticales, del claro de la izquierda al oscuro de la
+    derecha, que se mete por debajo del suelo; arriba, la pared del hueco; abajo, delante, la barandilla de tubo con sus barrotes.
+    bajS1 y bajS2, la fila de arriba (izquierda y derecha); bajS3 y bajS4, la de abajo"""
     L = Lienzo(16, 16)
-    tonos = (('#b07a46', '#8a5e36'), ('#946436', '#6e4a2a'), ('#7a5230', '#5a3c22')) if n == 1 else (('#5e4028', '#46301e'), ('#463020', '#32241a'), ('#30221a', '#221a14'))
-    for i, (c0, c1) in enumerate(tonos):
-        y = i * 5 + (1 if n == 1 else 0)
-        L.r(0, y, 13, 4, c0); L.hl(0, 12, y, MAD[2] if n == 1 and i == 0 else c0); L.hl(0, 12, y + 4 if y + 4 < 16 else 15, c1)
-    L.r(13, 0, 3, 16, '#3a2c20'); L.vl(13, 0, 15, MAD[3])                    # la pared del hueco
-    L.vl(14, 0, 15, '#b8bcc4'); L.vl(15, 0, 15, '#6a6e76')                     # la barandilla de tubo
-    if n == 1:
-        L.hl(0, 15, 0, MAD[3])                                                  # el canto del suelo de arriba
+    col, fil = (n - 1) % 2, (n - 1) // 2
+    tonos = (('#c08a52', '#9a6a3c'), ('#a8763e', '#845830'), ('#8e6234', '#6c4828'), ('#744e2a', '#563a20'), ('#5a3c22', '#42301c'), ('#40301e', '#2e2218'))
+    for x in range(16):
+        gx = col * 16 + x
+        if gx >= 30:
+            L.vl(x, 0, 15, '#1a1410'); continue                                 # el final, por debajo del suelo
+        s = min(gx // 5, 5); c0, c1 = tonos[s]
+        c = c1 if gx % 5 == 4 else (MAD[2] if gx % 5 == 0 and s == 0 else c0)   # la huella y, a la derecha, la sombra del peldaño de abajo
+        L.vl(x, 0, 15, c)
+        if fil == 0:
+            L.vl(x, 0, 2, '#3a2c20'); L.p(x, 0, MAD[3])                          # la pared del hueco y el canto del suelo de arriba
+        else:
+            L.p(x, 11, '#b8bcc4'); L.p(x, 12, '#6a6e76')                         # la barandilla de tubo, delante
+            if gx % 6 == 1:
+                L.vl(x, 13, 15, '#8a8e96')                                       # los barrotes
+    if col == 0:
+        L.vl(0, 0, 15, MAD[3])                                                  # el canto de la izquierda, donde se entra
     return L
 
 def escS():
@@ -79,7 +91,7 @@ def perchero():
     L.contorno(K)
     return L
 
-sale('bajS1', bajS(1), 'sotano-tiles'); sale('bajS2', bajS(2), 'sotano-tiles'); sale('escS', escS(), 'sotano-tiles')
+sale('bajS1', bajS(1), 'sotano-tiles'); sale('bajS2', bajS(2), 'sotano-tiles'); sale('bajS3', bajS(3), 'sotano-tiles'); sale('bajS4', bajS(4), 'sotano-tiles'); sale('escS', escS(), 'sotano-tiles')
 sale('puertaI', puertaI(), 'sotano-alto'); sale('puertaM', puertaM(), 'sotano-alto'); sale('perchero', perchero(), 'sotano-alto')
 
 def escribe(raiz=None):
