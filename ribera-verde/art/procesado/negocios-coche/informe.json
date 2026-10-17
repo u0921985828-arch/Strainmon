@@ -1,0 +1,19 @@
+{
+  "grupo": "negocios-coche",
+  "celda": [
+    80,
+    48
+  ],
+  "tope_colores": 32,
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 18.3,
+  "distancia_media": 0,
+  "colores_finales": 29,
+  "fundidos": [],
+  "huerfanos_quitados": 1,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

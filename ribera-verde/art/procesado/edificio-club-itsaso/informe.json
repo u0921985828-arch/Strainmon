@@ -1,0 +1,21 @@
+{
+  "grupo": "edificio-club-itsaso",
+  "celda": [
+    64,
+    96
+  ],
+  "tope_colores": 24,
+  "secuencias": 2,
+  "fotogramas": 5,
+  "semitransparentes": 0,
+  "en_paleta_antes": 5.5,
+  "distancia_media": 0,
+  "colores_finales": 21,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "puerta/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

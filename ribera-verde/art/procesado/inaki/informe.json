@@ -1,0 +1,25 @@
+{
+  "grupo": "inaki",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 8,
+  "fotogramas": 32,
+  "semitransparentes": 0,
+  "en_paleta_antes": 9.2,
+  "distancia_media": 15.2,
+  "colores_finales": 14,
+  "fundidos": [],
+  "huerfanos_quitados": 3,
+  "deriva_pies": {
+    "cabo/west": 0,
+    "idle/south": 0,
+    "pipa/south": 0,
+    "pipa/west": 0
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #26262e≈#2a2a30"
+  ]
+}

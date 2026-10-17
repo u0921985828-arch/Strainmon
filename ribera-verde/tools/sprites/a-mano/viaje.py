@@ -1,0 +1,338 @@
+#!/usr/bin/env python3
+# Ribera Verde — 1.56: la pantalla del viaje (lo pidió el usuario: «en el autobús no hay animación, como tampoco en los demás
+# vehículos; como una pantalla de carga, pero que sea el vehículo andando recto desde una vista de perfil»). Pixel art propio,
+# dibujado a mano en código: el autobús de la comarca, el scooter 125, el utilitario, la berlina y el superdeportivo del
+# concesionario (con los colores de vehiculos.py), de perfil y mirando a la derecha, a 14 px/m; las ruedas aparte, en 4
+# fotogramas que giran; y los fondos que se repiten (el monte, los caseríos y los árboles, el quitamiedos y la carretera).
+# Sin marcas ni rótulos de verdad. Sale directo a Godot: godot/arte/viaje.png + viaje.json (no va al atlas).
+#   python3 -I tools/sprites/a-mano/viaje.py [--ver <png>]
+import json, math, os, sys
+from PIL import Image, ImageDraw
+
+RAIZ = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+SALIDA = os.path.join(RAIZ, 'godot', 'arte')
+
+O = '#180e1e'          # contorno, el del protagonista
+GOMA, GOMA_L = '#2c333c', '#454d58'
+LLANTA, LLANTA_S, BUJE = '#c4cad2', '#8a929c', '#6c7482'
+VIDRIO, VIDRIO_S, REFLEJO = '#9cc0dc', '#6f94b4', '#eef6fc'
+INT = '#23272f'
+FARO, PILOTO = '#f8f0c0', '#d03028'
+# el protagonista (player): gorra, piel, camiseta, pantalón
+GORRA, GORRA_S, PIEL, PIEL_S, CAMI, CAMI_S, PANT = '#5aa861', '#2a8a5b', '#e8b894', '#c48e6a', '#c83839', '#a03031', '#36466f'
+PINTURA = {'utilitario': ('#eceef0', '#b8bec6', '#ffffff'), 'berlina': ('#6a7280', '#4a5160', '#9aa2ae'),
+           'deportivo': ('#d02a2a', '#8e1818', '#ff6a5a'), 'moto': ('#2c5aa0', '#1e3a6a', '#4a7cc4')}
+
+
+def hexrgb(c):
+    c = c.lstrip('#')
+    return tuple(int(c[i:i + 2], 16) for i in (0, 2, 4)) + (255,)
+
+
+class Lienzo:
+    def __init__(self, w, h):
+        self.im = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+        self.d = ImageDraw.Draw(self.im)
+
+    def r(self, x, y, w, h, c):
+        if w > 0 and h > 0:
+            self.d.rectangle([x, y, x + w - 1, y + h - 1], fill=hexrgb(c))
+
+    def p(self, x, y, c):
+        if 0 <= x < self.im.width and 0 <= y < self.im.height:
+            self.im.putpixel((x, y), hexrgb(c))
+
+    def hl(self, x0, x1, y, c):
+        self.r(x0, y, x1 - x0 + 1, 1, c)
+
+    def vl(self, x, y0, y1, c):
+        self.r(x, y0, 1, y1 - y0 + 1, c)
+
+    def poly(self, pts, c):
+        self.d.polygon(pts, fill=hexrgb(c))
+
+    def contorno(self, c=O):
+        # 1 px por fuera de todo lo opaco (sin diagonales)
+        im = self.im
+        a = im.split()[3].load()
+        W, H = im.size
+        out = []
+        for y in range(H):
+            for x in range(W):
+                if a[x, y]:
+                    continue
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < W and 0 <= ny < H and a[nx, ny]:
+                        out.append((x, y))
+                        break
+        for q in out:
+            im.putpixel(q, hexrgb(c))
+
+
+def rueda(d, f):
+    # rueda de diámetro d, fotograma f de 4: goma, llanta con sombra, buje y una marca que gira
+    L = Lienzo(d, d)
+    c = (d - 1) / 2
+    for y in range(d):
+        for x in range(d):
+            r = math.hypot(x - c, y - c)
+            if r <= c + .45:
+                L.p(x, y, O if r > c - .55 else (GOMA if r > c * .62 else (LLANTA if r > c * .28 else BUJE)))
+    for y in range(d):
+        for x in range(d):
+            r = math.hypot(x - c, y - c)
+            if c * .3 < r <= c * .62 and y > c + 1:
+                L.p(x, y, LLANTA_S)
+            if c * .62 < r <= c - .55 and y < c - c * .4 and x < c:
+                L.p(x, y, GOMA_L)
+    # los radios (2 marcas opuestas) giran 45° por fotograma (con 4, media vuelta: se lee igual que una vuelta)
+    for k in (0, 1):
+        a = math.pi / 4 * f + math.pi * k
+        for t in (.34, .48, .58):
+            L.p(round(c + math.cos(a) * c * t), round(c + math.sin(a) * c * t), BUJE)
+    return L.im
+
+
+def persona_perfil(L, x, y, s=1):
+    # el protagonista sentado, de perfil, mirando a la derecha: cabeza (gorra con visera), cuello, hombro; (x, y): arriba de la gorra
+    L.r(x, y, 6, 2, GORRA); L.hl(x + 1, x + 4, y, '#7cc882'); L.r(x + 6, y + 1, 2, 1, GORRA_S)   # la visera, hacia delante
+    L.r(x, y + 2, 6, 4, PIEL); L.p(x + 5, y + 3, O); L.p(x + 6, y + 4, PIEL)                    # la cara, el ojo, la nariz
+    L.r(x, y + 2, 2, 3, '#4a2e22'); L.p(x + 1, y + 3, PIEL_S)                                  # el pelo de la nuca y la oreja
+    L.r(x + 1, y + 6, 3, 1, PIEL_S)
+    L.r(x - 1, y + 7, 7, 3 * s, CAMI); L.hl(x - 1, x + 5, y + 7, '#e04a4a'); L.r(x - 1, y + 9, 2, 3 * s - 2, CAMI_S)
+
+
+def pasajero(L, x, y, pelo, ropa):
+    L.r(x, y, 5, 2, pelo); L.r(x, y + 2, 5, 3, '#d8a47e'); L.r(x, y + 2, 1, 2, pelo)
+    L.r(x - 1, y + 5, 7, 4, ropa)
+
+
+# ---------- el autobús de la comarca: 12 m × 3,1 m → 168 × 44 (blanco con la franja verde, sin rótulos) ----------
+def autobus():
+    W, H = 170, 46
+    L = Lienzo(W, H)
+    B, B_S, B_L = '#eef0ea', '#c4c8c0', '#ffffff'
+    V, V_S = '#2e8a4e', '#1e6236'
+    # la caja, con la trasera recta y el frontal algo inclinado arriba
+    L.poly([(1, 3), (163, 3), (166, 6), (168, 14), (168, 41), (1, 41)], B)
+    L.r(1, 3, 162, 1, B_L)
+    L.r(1, 33, 168, 8, B_S)                                       # el faldón, en sombra
+    L.r(1, 26, 168, 4, V); L.r(1, 29, 168, 1, V_S)                 # la franja verde
+    L.r(1, 4, 160, 2, '#d8dcd4')                                   # el techo: aire acondicionado
+    L.r(96, 0, 30, 3, '#c8ccc4'); L.hl(97, 124, 0, '#e8ece4')
+    # las ventanas: tramos con montantes y pasajeros (el protagonista, delante, junto al conductor)
+    L.r(6, 8, 128, 15, INT)
+    xs = list(range(6, 134, 21))
+    gente = [('#3a2a20', '#4a6aa0'), ('#9a9a9a', '#8a5a9a'), ('#1a1a1a', '#d8b040'), None, ('#7a4a2a', '#50a070'), ('#c8a060', '#3a3a4a')]
+    for i, xw in enumerate(xs):
+        L.r(xw, 8, 2, 15, '#3a3e48')                               # el montante
+        if i < len(gente) and gente[i]:
+            pasajero(L, xw + 8, 13, *gente[i])
+    persona_perfil(L, 124, 11)
+    L.r(6, 8, 128, 1, '#151820')
+    for xw in xs[:-1] + [134]:
+        L.r(xw + 2, 9, 3, 6, '#3a4250')                            # el reflejo del cristal, arriba a la izquierda de cada hoja
+    # la puerta de delante (dos hojas de cristal) y el parabrisas con el conductor
+    L.r(137, 8, 13, 31, '#3a3e48'); L.r(138, 9, 5, 29, VIDRIO_S); L.r(144, 9, 5, 29, VIDRIO_S); L.vl(143, 9, 37, '#3a3e48')
+    L.r(139, 10, 1, 8, REFLEJO); L.r(145, 10, 1, 8, REFLEJO)
+    L.poly([(152, 7), (163, 7), (166, 10), (167, 23), (152, 23)], VIDRIO)
+    L.r(157, 13, 5, 2, '#3a2a20'); L.r(157, 15, 5, 3, '#d8a47e'); L.r(156, 18, 7, 5, '#4a5a7a')   # el conductor
+    L.r(152, 7, 2, 16, '#3a3e48'); L.hl(154, 165, 8, REFLEJO)
+    L.r(152, 4, 12, 3, '#20201c')                                  # el letrero del destino, en ámbar
+    for xx in range(153, 163, 2):
+        L.p(xx, 5, '#f0a020')
+    # luces, retrovisor, parachoques
+    L.r(165, 34, 3, 3, FARO); L.r(1, 32, 2, 4, PILOTO); L.r(1, 36, 2, 2, '#f0a020')
+    L.r(168, 9, 1, 6, '#3a3e48'); L.r(168, 8, 2, 2, '#3a3e48')
+    L.r(1, 40, 168, 1, '#3a3e48')
+    # los pasos de rueda (las ruedas, en el motor, delante)
+    for cx in (30, 136):
+        L.d.ellipse([cx - 10, 31, cx + 10, 51], fill=(0, 0, 0, 0))
+        L.d.arc([cx - 10, 31, cx + 10, 51], 180, 360, fill=hexrgb('#3a3e48'))
+    L.contorno()
+    return L.im, {'ruedas': [[30, 41, 16], [136, 41, 16]], 'suelo': 49, 'faro': [168, 35]}
+
+
+# ---------- los coches: de juguete como en la calle (cortos y redondos), a escala de perfil ----------
+def coche(k):
+    pin, pin_s, pin_l = PINTURA[k]
+    if k == 'utilitario':
+        W, H, techo, cin, xv, xp, ruedas = 58, 26, 2, 12, (14, 40), (7, 50), [[13, 22, 12], [45, 22, 12]]
+    elif k == 'berlina':
+        W, H, techo, cin, xv, xp, ruedas = 70, 25, 3, 12, (19, 50), (10, 60), [[15, 21, 12], [56, 21, 12]]
+    else:   # deportivo, descapotable y bajo
+        W, H, techo, cin, xv, xp, ruedas = 66, 22, 7, 11, (24, 42), (11, 58), [[14, 18, 12], [53, 18, 12]]
+    L = Lienzo(W, H)
+    base = H - 6
+    # la carrocería baja (de morro a culo, con las esquinas redondas) y el capó
+    L.poly([(1, cin + 2), (3, cin), (W - 6, cin), (W - 2, cin + 2), (W - 1, cin + 4), (W - 1, base), (1, base)], pin)
+    L.r(2, cin, W - 8, 1, pin_l)
+    L.r(1, base - 3, W - 1, 3, pin_s)
+    if k == 'deportivo':
+        L.poly([(xv[0], cin), (xv[0] + 6, techo + 1), (xv[0] + 9, techo + 1), (xv[0] + 9, cin)], VIDRIO)   # el parabrisas, sin techo
+        L.r(xv[0] + 6, techo, 3, 1, '#2a2d34')
+        persona_perfil(L, xv[0] - 9, cin - 8)
+        L.r(xv[0] - 13, cin - 1, 4, 2, INT); L.r(xv[0] + 10, cin, 12, 1, pin_l)
+        L.poly([(4, cin), (8, cin - 3), (14, cin - 3), (14, cin)], pin)   # el alerón y la joroba de atrás
+        L.r(2, cin - 4, 9, 1, '#202228')
+    else:
+        # el habitáculo: techo redondo, cristales, montante, y el protagonista al volante
+        L.poly([(xp[0], cin), (xp[0] + 5, techo + 1), (xp[0] + 8, techo), (xp[1] - 13, techo), (xp[1] - 9, techo + 1), (xp[1], cin)], pin)
+        L.hl(xp[0] + 7, xp[1] - 12, techo, pin_l)
+        L.poly([(xp[0] + 3, cin - 1), (xp[0] + 7, techo + 2), (xv[1] - 14, techo + 2), (xv[1] - 14, cin - 1)], VIDRIO_S)
+        L.poly([(xv[1] - 12, cin - 1), (xv[1] - 12, techo + 2), (xp[1] - 10, techo + 2), (xp[1] - 3, cin - 1)], VIDRIO)
+        L.r(xv[1] - 14, techo + 1, 2, cin - techo - 1, pin_s)
+        persona_perfil(L, xv[1] - 10, techo + 3)
+        L.r(xv[1] - 11, cin - 2, 12, 2, VIDRIO)                    # la ventanilla por delante del hombro
+        L.hl(xp[0] + 8, xv[1] - 16, techo + 3, REFLEJO); L.hl(xv[1] - 9, xp[1] - 11, techo + 3, REFLEJO)
+        L.r(xv[1] - 13, cin + 1, 1, base - cin - 3, pin_s)        # la junta de las puertas
+        L.r(xv[1] - 9, cin + 3, 3, 1, '#2a2d34')                   # el tirador
+    L.r(W - 4, cin + 2, 3, 2, FARO); L.r(1, cin + 2, 2, 2, PILOTO)
+    L.r(1, base - 1, W - 1, 1, '#2a2d34'); L.r(W - 5, base - 2, 4, 1, '#535b6b'); L.r(1, base - 2, 4, 1, '#535b6b')
+    for cx, cy, d in ruedas:
+        L.d.ellipse([cx - 8, cy - 8, cx + 8, cy + 8], fill=(0, 0, 0, 0))
+        L.d.arc([cx - 8, cy - 8, cx + 8, cy + 8], 180, 360, fill=hexrgb('#2a2d34'))
+    L.contorno()
+    return L.im, {'ruedas': ruedas, 'suelo': ruedas[0][1] + ruedas[0][2] // 2, 'faro': [W - 1, cin + 3]}
+
+
+def moto():
+    pin, pin_s, pin_l = PINTURA['moto']
+    W, H = 34, 36
+    L = Lienzo(W, H)
+    # el scooter: el escudo de delante, la plataforma, el asiento sobre el motor y el baúl
+    L.poly([(24, 13), (27, 12), (29, 22), (28, 27), (24, 27)], pin)          # el escudo
+    L.r(25, 6, 2, 7, '#3a3e48'); L.r(22, 6, 6, 2, '#2a2d34')                 # la barra del manillar y el manillar
+    L.r(9, 26, 17, 2, pin_s)                                                   # la plataforma
+    L.poly([(3, 20), (6, 18), (16, 18), (17, 21), (14, 29), (3, 29)], pin)    # el carenado del motor
+    L.r(4, 18, 11, 1, pin_l)
+    L.r(4, 16, 13, 3, '#1e2026'); L.hl(5, 15, 16, '#3a3e48')                  # el asiento
+    L.r(0, 12, 6, 6, '#3a3e48'); L.hl(1, 4, 12, '#535b6b')                    # el baúl
+    L.r(28, 15, 2, 2, FARO); L.r(1, 22, 2, 2, PILOTO)
+    # el piloto: casco verde con visera ahumada, la camiseta, los brazos al manillar y las piernas a la plataforma
+    L.r(9, 0, 9, 7, GORRA); L.hl(10, 16, 0, '#7cc882'); L.r(15, 2, 3, 3, '#3a4250'); L.p(16, 2, REFLEJO); L.r(9, 5, 2, 2, GORRA_S)
+    L.r(10, 7, 6, 1, PIEL_S)
+    L.r(8, 8, 8, 8, CAMI); L.r(8, 8, 2, 8, CAMI_S); L.hl(9, 15, 8, '#e04a4a')
+    L.r(15, 9, 8, 2, CAMI); L.r(22, 8, 2, 2, PIEL)                            # el brazo y la mano en el puño
+    L.r(10, 15, 10, 3, PANT); L.r(18, 18, 3, 8, PANT); L.r(18, 25, 5, 2, '#f4f4f4'); L.hl(18, 22, 26, '#3a3e48')   # rodilla, espinilla, zapatilla
+    ruedas = [[7, 30, 10], [27, 30, 10]]
+    L.contorno()
+    return L.im, {'ruedas': ruedas, 'suelo': 35, 'faro': [30, 16]}
+
+
+# ---------- los fondos (se repiten cada 192 px; el motor los tiñe de tarde y de noche) ----------
+def monte():
+    L = Lienzo(192, 40)
+    def perfil(f, a, b, c, y0):
+        return [y0 - int(a * math.sin(x / 192 * 2 * math.pi * f) + b * math.sin(x / 192 * 2 * math.pi * (f * 2 + 1) + 1.3) + c * math.sin(x / 192 * 2 * math.pi * 7 + .4)) for x in range(192)]
+    lejos = perfil(2, 9, 5, 2, 22)
+    cerca = perfil(3, 6, 4, 2, 31)
+    for x in range(192):
+        L.vl(x, max(0, lejos[x]), 39, '#8aa6b8')
+        L.vl(x, max(0, cerca[x]), 39, '#5e8a6a')
+        if x % 3 == 0:
+            L.p(x, cerca[x] + 2, '#4f7a5c')
+    for x in range(192):
+        L.p(x, max(0, lejos[x]), '#a8c0cc')
+    return L.im
+
+
+def medio():
+    # prados, caseríos con tejado rojo y árboles redondos (los de mundo.py), y postes de la luz con su cable
+    L = Lienzo(192, 44)
+    L.r(0, 30, 192, 14, '#7cbc64'); L.r(0, 30, 192, 1, '#9cd47c')
+    for x in range(0, 192, 7):
+        L.p(x, 34 + (x * 13) % 7, '#6aa858')
+
+    def arbol(x, y, r, c=('#3f8a46', '#62aa56', '#2c6a36')):
+        L.r(x - 1, y, 3, 8, '#74502e')
+        L.d.ellipse([x - r, y - 2 * r + 2, x + r, y + 2], fill=hexrgb(c[0]))
+        L.d.ellipse([x - r + 2, y - 2 * r + 3, x + r - 3, y - r + 2], fill=hexrgb(c[1]))
+        L.d.chord([x - r, y - 2 * r + 2, x + r, y + 2], 20, 160, fill=hexrgb(c[2]))
+
+    def caserio(x, y, w):
+        L.r(x, y - 12, w, 13, '#f0e8d8'); L.r(x, y - 12, w, 1, '#ffffff')
+        L.poly([(x - 3, y - 12), (x + w // 2, y - 21), (x + w + 2, y - 12)], '#c4503e')
+        L.hl(x - 3, x + w + 2, y - 12, '#8e3428')
+        for i in range(2):
+            L.r(x + 3 + i * (w - 9), y - 9, 3, 4, '#5a3a22')
+        L.r(x + w // 2 - 2, y - 6, 4, 7, '#74502e')
+        L.r(x + w // 2 - 4, y - 14, 1, 1, '#ffffff')
+
+    caserio(20, 31, 22)
+    arbol(56, 28, 7)
+    arbol(68, 30, 5)
+    caserio(120, 31, 16)
+    arbol(98, 29, 6)
+    arbol(150, 28, 8)
+    arbol(171, 30, 5)
+    for x in (8, 104, 184):   # los postes y el cable
+        L.r(x, 6, 2, 25, '#74502e'); L.r(x - 3, 8, 8, 1, '#74502e')
+    for x in range(192):
+        y = 9 + int(4 * (1 - ((((x - 9) % 96) / 48 - 1) ** 2)))
+        L.p(x, y, '#3a3428')
+    return L.im
+
+
+def cerca():
+    # el quitamiedos de delante (bionda con sus postes), sobre la cuneta
+    L = Lienzo(64, 16)
+    L.r(0, 8, 64, 8, '#7cbc64'); L.r(0, 8, 64, 1, '#5e9a50')
+    for x in (6, 38):
+        L.r(x, 3, 3, 11, '#6c7482'); L.vl(x, 3, 13, '#9aa3ad')
+    L.r(0, 4, 64, 4, '#b8c0c8'); L.r(0, 4, 64, 1, '#e4e8ee'); L.r(0, 7, 64, 1, '#7a828c')
+    L.hl(0, 63, 5, '#d0d6dc')
+    for x in range(2, 64, 9):
+        L.p(x, 13 + x % 3, '#9cd47c')
+    return L.im
+
+
+def carretera():
+    # 32 px: el arcén, el asfalto con su grano y la raya discontinua del medio
+    L = Lienzo(32, 34)
+    L.r(0, 0, 32, 2, '#c8ccd2')                      # la línea del borde de enfrente
+    L.r(0, 2, 32, 30, '#5c6472')
+    for i in range(23):
+        L.p((i * 11) % 32, 3 + (i * 7) % 28, '#6c7482')
+        L.p((i * 5 + 3) % 32, 3 + (i * 13) % 28, '#525a68')
+    L.r(0, 15, 18, 2, '#eceee8')                     # la raya
+    L.r(0, 30, 32, 2, '#eceee8')                     # la línea del borde de este lado
+    L.r(0, 32, 32, 2, '#7a7e86')
+    return L.im
+
+
+def main():
+    piezas = {}
+    meta = {}
+    im, m = autobus(); piezas['bus'] = im; meta['bus'] = m
+    for k in ('utilitario', 'berlina', 'deportivo'):
+        im, m = coche(k); piezas[k] = im; meta[k] = m
+    im, m = moto(); piezas['moto'] = im; meta['moto'] = m
+    for d in (10, 12, 16):
+        for f in range(4):
+            piezas['rueda-%d-%d' % (d, f)] = rueda(d, f)
+    piezas['monte'] = monte(); piezas['medio'] = medio(); piezas['cerca'] = cerca(); piezas['carretera'] = carretera()
+    # la hoja: por filas, de arriba abajo
+    W = 200
+    x = y = fila = 0
+    rects = {}
+    for k, im in piezas.items():
+        if x + im.width > W:
+            x = 0; y += fila + 1; fila = 0
+        rects[k] = [x, y, im.width, im.height]
+        x += im.width + 1; fila = max(fila, im.height)
+    hoja = Image.new('RGBA', (W, y + fila), (0, 0, 0, 0))
+    for k, im in piezas.items():
+        hoja.paste(im, tuple(rects[k][:2]))
+    os.makedirs(SALIDA, exist_ok=True)
+    hoja.save(os.path.join(SALIDA, 'viaje.png'))
+    with open(os.path.join(SALIDA, 'viaje.json'), 'w') as f:
+        json.dump({'r': rects, 'v': meta}, f, separators=(',', ':'))
+    if '--ver' in sys.argv:
+        hoja.resize((hoja.width * 4, hoja.height * 4), Image.NEAREST).save(sys.argv[sys.argv.index('--ver') + 1])
+    print('viaje: %d piezas, hoja %dx%d' % (len(piezas), hoja.width, hoja.height))
+
+
+if __name__ == '__main__':
+    main()

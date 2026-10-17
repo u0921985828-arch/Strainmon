@@ -1,0 +1,19 @@
+{
+  "grupo": "taller-alto",
+  "celda": [
+    32,
+    48
+  ],
+  "tope_colores": 32,
+  "secuencias": 11,
+  "fotogramas": 11,
+  "semitransparentes": 0,
+  "en_paleta_antes": 36.3,
+  "distancia_media": 0,
+  "colores_finales": 10,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

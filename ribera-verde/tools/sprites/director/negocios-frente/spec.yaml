@@ -1,0 +1,21 @@
+nombre: negocios-frente
+uso: muebles de los locales (lavandería primero; taller, panadería y bar después), objetos quietos en el mapa
+tamano: 32x48 una casilla (celda mueble_escala, ancla 16,47) · 48x48 dos casillas (mueble_ancho)
+escala: 16 px/m; protagonista 27 px = 1,70 m
+vista: 3/4 de frente (alzado recto con la tapa vista), nunca isométrica ni girada
+direcciones: 1
+paleta: libre (≤ 32 colores por pieza), cuadrada después con el suelo floorLv y la pared iwT_lav
+contorno: oscuro de un color
+luz: arriba-izquierda
+sombreado: 2-3 tonos por material, sin degradados ni anti-alias exterior
+estilo: el de los muebles a mano de escala.py
+pivote: base_centro (la base en la fila 47 de la celda)
+referencias: fotos del usuario (lavandería, lavadora industrial, cafetera de dos grupos); solo texto a PixelLab, sin marcas
+medidas:
+  lavaN:  {m: "0,75 × 1,4", px: "12 × 22"}
+  secaN:  {m: "0,8 × 1,9 (dos secadoras apiladas)", px: "13 × 30"}
+  kioskL: {m: "0,4 × 0,6, en la pared (cajero de cambio)", px: "7 × 10"}
+  cestaL: {m: "mesa alta 1,0 × 0,9 con cesto", px: "16 × 15"}
+  bench:  {m: "bancada de 3 asientos 1,8 × 0,8", px: "29 × 13"}
+  papelera: {m: "0,35 × 0,6", px: "6 × 10"}
+  cafeT:  {m: "cafetera 0,75 × 0,5 sobre mueble 0,9", px: "12 × 22"}

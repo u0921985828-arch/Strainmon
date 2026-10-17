@@ -1,0 +1,19 @@
+{
+  "grupo": "almacen",
+  "celda": [
+    18,
+    25
+  ],
+  "tope_colores": 64,
+  "secuencias": 114,
+  "fotogramas": 114,
+  "semitransparentes": 0,
+  "en_paleta_antes": 1.8,
+  "distancia_media": 0,
+  "colores_finales": 41,
+  "fundidos": [],
+  "huerfanos_quitados": 46,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

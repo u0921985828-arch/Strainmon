@@ -1,0 +1,18 @@
+{
+  "grupo": "macetas-vista",
+  "celda": [
+    32,
+    24
+  ],
+  "secuencias": 4,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 14.82,
+  "colores_finales": 8,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}
