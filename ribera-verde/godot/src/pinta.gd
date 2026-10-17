@@ -334,6 +334,20 @@ func _mundo() -> void:
 				_bocadillo(bx, by, "$", css("#2a9a4a"))
 		elif story_mark(e.id) or e.get("caza"):
 			_bocadillo(bx, by, "!", css("#e03030"))
+	if Datos.PLAY:   # U2 (fase 5): la flecha amarilla encima del objetivo, botando
+		var ob: Vector2i = J.objetivo_xy()
+		if ob.x >= 0:
+			var ax: int = ob.x * 16 - cam.x + 8
+			var ay: int = ob.y * 16 - cam.y - 12 + bob * 2
+			var ne := css("#202020")
+			var am := css("#f8d040")
+			_rect(ax - 2, ay - 5, 4, 5, ne)
+			_rect(ax - 1, ay - 4, 2, 4, am)
+			for r in 4:
+				_rect(ax - 4 + r, ay + r, 8 - 2 * r, 1, am)
+				_rect(ax - 5 + r, ay + r, 1, 1, ne)
+				_rect(ax + 4 - r, ay + r, 1, 1, ne)
+			_rect(ax - 1, ay + 4, 2, 1, ne)
 	# el piso de noche (1.10 P5): se oscurece como la calle; la mancha de luz de cada carpa encendida, en _farolas
 	if S.map == "home" and noche() > 0:
 		_rect(0, 0, J.SW, SH, Color8(14, 20, 72, Datos.jsround(noche() * 255)))
@@ -376,7 +390,7 @@ func _tiempo(now: float) -> void:
 			var x := fposmod(hx % J.SW - y / 3.0, J.SW)
 			_rect(int(x), int(y), 1, 3, Color8(200, 220, 240, 200))   # la gota inclinada: dos trazos
 			_rect(int(x) - 1, int(y) + 3, 1, 3, Color8(200, 220, 240, 200))
-	if k == "tormenta" and fposmod(now, 7000.0) < 120.0:
+	if k == "tormenta" and fposmod(now, 7000.0) < 120.0 and not Vista.CALMA:
 		_rect(0, 0, J.SW, SH, Color8(255, 255, 240, 110))
 
 func noche() -> float:
@@ -1495,8 +1509,8 @@ func _combate() -> void:
 	var px := Datos.jsround(40 + (1 - e) * 190)
 	var fE = _comb_frame("E")
 	var fP = J.ropa_c(_comb_frame("P"), J.grupo_combate("P"))
-	var sh := Datos.jsround(sin(float(B.shakeP) / 18) * 3) if B.shakeP > 0 else 0
-	var parpadea: bool = B.flashE > 0 and floori(float(B.flashE) / 70) % 2 == 0
+	var sh := Datos.jsround(sin(float(B.shakeP) / 18) * 3) if B.shakeP > 0 and not Vista.CALMA else 0
+	var parpadea: bool = B.flashE > 0 and floori(float(B.flashE) / 70) % 2 == 0 and not Vista.CALMA   # U5: SIN DESTELLOS
 	if fE:
 		if B.get("gone") and B.get("aE") and B.aE.n == "huir":
 			_pinta(fE, ex + 24 + Datos.jsround((now - B.aE.t0) * .12), 66)

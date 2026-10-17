@@ -323,6 +323,7 @@ func _corre() -> void:
 	dir = arg("--salida", dir)
 	Juego = load("res://src/juego.gd")
 	Juego.GUARDADO = "user://prueba-ciclo.json"
+	Juego.FTUE_CORTO = false   # U1 (fase 5): esta prueba recorre el prólogo; el corto, en tests/ftue.gd
 	for x in ["", ".bak", ".tmp"]:   # E1/E2 (fase 3): sin la copia de una vuelta anterior
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO + x))
 	UI.AJUSTES = "user://prueba-ajustes.json"   # el primer arranque: sin el aviso de edad aceptado
@@ -407,7 +408,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("OPCIONES"), 60)
 	await elige("OPCIONES")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
-	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
+	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "TAMAÑO DE TEXTO", "ZURDO", "DALTÓNICO", "SIN DESTELLOS", "COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
 	await elige("MÚSICA")
 	await hasta(func(): return J.menu_box.visible, 60)
 	var so0 = J.sonido
@@ -565,7 +566,7 @@ func menu_start() -> void:
 	await pulsa("START")
 	await foto("3b-start")
 	var l := etiquetas()
-	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "OPCIONES", "SALIR"])
+	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "REGISTRO", "GUARDAR", "OPCIONES", "SALIR"])
 	await elige("GENOTECA")
 	check("Genoteca: %d filas, todas sin descubrir, y sin el diario de la tía (sale bajo la almohada)" % J.m_items.size(), J.m_items.size() == J.D.DEX.size()
 		and J.m_items.all(func(x): return x.label.ends_with("??????")))
@@ -597,7 +598,7 @@ func menu_start() -> void:
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("GUARDAR"), 60)
 	# OPCIONES · SONIDO apaga la música y los efectos (y lo dice el mando de arriba); otra vez, los enciende
 	await pasa(func(): return J.menu_box.visible)
-	var ini: bool = J.m_items.size() == 8 and J.m_items.all(func(x): return x.get("ic") != null)
+	var ini: bool = J.m_items.size() == (9 if Datos.PLAY else 8) and J.m_items.all(func(x): return x.get("ic") != null)
 	await elige("OPCIONES")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
 	var sin_borrar: bool = not etiquetas().has("BORRAR PARTIDA")

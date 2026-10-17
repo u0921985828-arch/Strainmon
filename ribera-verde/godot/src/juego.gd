@@ -8,6 +8,7 @@ const Pinta = preload("res://src/pinta.gd")
 const Arte = preload("res://src/arte.gd")
 
 static var GUARDADO := "user://partida.json"   # las pruebas usan otro
+static var FTUE_CORTO := true   # U1 (fase 5): con Datos.PLAY, la partida empieza en el piso; tests/ciclo.gd lo apaga para recorrer el prólogo
 var pintor = null
 
 func _ready() -> void:
@@ -55,7 +56,7 @@ func arranque() -> void:
 	push(func(b):
 		if b == "A" or b == "B" or b == "START":
 			cierra.call())
-	M.timeout(cierra, EscViaje.CARGA)
+	M.timeout(cierra, 500.0 if Datos.PLAY else EscViaje.CARGA)   # U1 (fase 5): sin la carga falsa de 3,6 s
 	await Motor.espera(prom)
 	pop()
 	if mode != "carga":   # otra cosa la cambió (las pruebas)
@@ -275,7 +276,9 @@ func migrate() -> void:
 	# 1.10: el plazo del capítulo 3 corre desde Toño (las partidas sin él, desde hoy) y la protección de Molina dura 10 días desde hoy
 	if S.ch == 3 and not S.flags.get("metB") and not (S.get("due", 0) > 0):
 		S.due = int(D.PLAZOS["3"])
-		S.deadline = S.day + 7
+		S.deadline = S.day + dias_plazo(3)
+		if Datos.PLAY:
+			S.due0 = S.due
 		S.flags.tono = S.day
 	if S.flags.get("metB") and not S.flags.has("tono"):   # ya conoces a Toño: sale en el móvil (trama, llamar)
 		S.flags.tono = S.day
@@ -529,6 +532,12 @@ func opciones(desde_titulo := false) -> void:
 			it.insert(4, {"label": "VIBRACIÓN", "right": "SÍ" if aj.vibra else "NO"})   # 1.57
 			it.insert(5, {"label": "AHORRO", "right": "30 FPS" if aj.ahorro else "NO"})   # R3
 			it.append({"label": "COPIA DE SEGURIDAD"})
+		if Datos.PLAY:   # U5: accesibilidad
+			var c := it.size() - (1 if Datos.CAL else 0)
+			it.insert(c, {"label": "TAMAÑO DE TEXTO", "right": TAM_NOM[clampi(int(aj.get("tam", 1)), 0, 2)]})
+			it.insert(c + 1, {"label": "ZURDO", "right": "SÍ" if aj.get("zurdo") else "NO"})
+			it.insert(c + 2, {"label": "DALTÓNICO", "right": "SÍ" if aj.get("dalt") else "NO"})
+			it.insert(c + 3, {"label": "SIN DESTELLOS", "right": "SÍ" if aj.get("calma") else "NO"})
 		it.append({"label": "VOLVER"})
 		i = await menu(it, {"cls": "start", "initial": i, "title": "OPCIONES"})
 		if i < 0 or it[i].label == "VOLVER":
@@ -560,6 +569,14 @@ func opciones(desde_titulo := false) -> void:
 				vibra()
 			"AHORRO":
 				aj.ahorro = not aj.ahorro
+			"TAMAÑO DE TEXTO":
+				aj.tam = (int(aj.get("tam", 1)) + 1) % 3
+			"ZURDO":
+				aj.zurdo = not aj.get("zurdo", false)
+			"DALTÓNICO":
+				aj.dalt = not aj.get("dalt", false)
+			"SIN DESTELLOS":
+				aj.calma = not aj.get("calma", false)
 			"BORRAR PARTIDA":
 				if await ask("¿Borrar la partida guardada? No se puede deshacer.", ["Sí, borrarla", "No"]) == 0:
 					DirAccess.remove_absolute(ProjectSettings.globalize_path(GUARDADO))
@@ -640,6 +657,9 @@ func choose_name() -> String:
 	return v if v != "" else "EDDIE"
 
 func new_game() -> void:
+	if Datos.PLAY and FTUE_CORTO:
+		await new_game_corto()
+		return
 	# prólogo (1.10): en el caserío de la familia, en Mendialde; el piso de la tía, en Ribera Verde, está a un autobús
 	S = new_state()
 	S.map = "casa-ama"
@@ -666,6 +686,67 @@ func new_game() -> void:
 	await chapter(1)
 	await wait(2600)
 	show_objective()
+
+# U1 (fase 5, plan de Google Play): plantar en menos de 90 s. Sin el prólogo del caserío ni el autobús: Kiko pregunta el nombre,
+# la partida empieza en el piso delante del armario, la carta en dos líneas, Kiko por SMS con las semillas y el abono, y Julen
+# en el piso, que explica cada paso del itinerario al hacerlo (aviso_itin); la flecha (objetivo_xy) señala el armario
+func new_game_corto() -> void:
+	S = new_state()
+	S.flags.llegada = true
+	await fade(1)
+	if not oraculo:
+		titulo.hide()
+	mode = "intro"
+	music("home")
+	await fade(0)
+	await talk("KIKO", ["Soy Kiko, el del growshop de la calle de tu tía Maite, en Ribera Verde. ¿Cómo te llamabas?"])
+	S.name = await choose_name()
+	for k in ["letter", "kiko1", "julen1"]:
+		S.flags[k] = true
+	add_seeds("ria", 3)
+	S.items.fert += 2
+	S.items.ofertv += 2
+	S.items.ophm += 4
+	var si: Dictionary = sitio(0)
+	S.x = int(si.x)
+	S.y = int(si.y) + 1
+	S.dir = "up"
+	await fade(1)
+	enter_game()
+	await wait(200)
+	await fade(0)
+	await talk("CARTA", ["«{N}: el piso y el armario de cultivo son tuyos. Le debo dinero a Baltasar, el del bar El Ancla. Lo siento.»",
+		"«Kiko te ayudará. Empieza plantando: A delante del armario.»"])
+	await talk("SMS · KIKO", ["Te he dejado en el armario 3 semillas de SKUNK #1, abono y pH−. Julen, mi hijo, está en el piso: te explica cada paso."])
+	await chapter(1)
+	show_objective()
+
+# la casilla que señala la flecha del objetivo (U2, fase 5; solo con Datos.PLAY), en el mapa en el que estás; (-1, -1) si no hay
+func objetivo_xy() -> Vector2i:
+	var no := Vector2i(-1, -1)
+	if not Datos.PLAY or S == null or int(S.ch) != 1 or S.flags.get("harvest1") or mode != "world":
+		return no
+	if llegando():
+		if D.PARADAS.has(S.map):
+			var a: Array = D.PARADAS[S.map].a
+			return Vector2i(int(a[0]), int(a[1]))
+		return no
+	var sg = itin_sig()
+	if sg == null:
+		return no
+	var casa: bool = sg.id in ["carta", "plantar", "regar", "veg", "flor", "cosecha"]
+	if S.map == "home" and casa and sg.id != "carta":
+		for ci in S.carpas.size():
+			if S.carpas[ci]:
+				var si: Dictionary = sitio(ci)
+				return Vector2i(int(si.x), int(si.y))
+	var va: String = "home" if casa else ("shop" if sg.id == "kiko" else "")
+	if va != "" and S.map != va:
+		for k in MAPS[S.map].get("doors", {}):
+			if MAPS[S.map].doors[k].get("to") == va:
+				var xy: PackedStringArray = String(k).split(",")
+				return Vector2i(int(xy[0]), int(xy[1]))
+	return no
 
 func enter_game() -> void:
 	mode = "world"

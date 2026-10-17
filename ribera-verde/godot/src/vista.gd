@@ -554,12 +554,17 @@ func _pinta_encima() -> void:
 
 # agua: azul, y por debajo de 30 (toca regar) parpadea en rojo; cosecha: verde hasta que está lista, y entonces dorada y
 # parpadeando; con plaga, la «!» roja al lado. Rectángulos que no se pisan: con transparencia (al) no se suman
+# U5 (fase 5, OPCIONES con Datos.PLAY): DALTONICO pone iconos además del color (la gota con sed y la marca de lista, a los
+# lados de la barra); CALMA (SIN DESTELLOS) quita el parpadeo: el rojo de la sed y el dorado de lista, fijos
+static var DALTONICO := false
+static var CALMA := false
+
 static func pinta_barra(L: CanvasItem, b: Dictionary, al: float, now: float) -> void:
 	var r: Rect2i = b.r
 	var p: Dictionary = b.p
 	var x := r.position.x
 	var y := r.position.y
-	var tic := int(floor(now / 400)) % 2 == 1
+	var tic := int(floor(now / 400)) % 2 == 1 and not CALMA
 	var R := func(rx: int, ry: int, w: int, h: int, c: Color) -> void:
 		if w > 0 and h > 0:
 			L.draw_rect(Rect2(rx, ry, w, h), Color(c, al))
@@ -568,7 +573,7 @@ static func pinta_barra(L: CanvasItem, b: Dictionary, al: float, now: float) -> 
 		R.call(x + 1, f, n, 1, OSC)
 	R.call(x, y + 1, 1, BH - 2, OSC)
 	R.call(x + BW - 1, y + 1, 1, BH - 2, OSC)
-	var sed: bool = p.water < 30 and tic
+	var sed: bool = p.water < 30 and (tic or CALMA)
 	var na := ceili(clampf(p.water, 0, 100) * n / 100.0)
 	R.call(x + 1, y + 1, na, 1, Color8(0xf0, 0x80, 0x78) if sed else Color8(0x76, 0xb4, 0xf2))
 	R.call(x + 1, y + 2, na, 1, Color8(0xe0, 0x40, 0x40) if sed else Color8(0x4a, 0x92, 0xe0))
@@ -591,6 +596,20 @@ static func pinta_barra(L: CanvasItem, b: Dictionary, al: float, now: float) -> 
 		R.call(px + 2, y + 4, 2, 1, rojo)
 		R.call(px + 2, y + 1, 2, 3, bla)
 		R.call(px + 2, y + 5, 2, 1, bla)
+	if DALTONICO:
+		var W := Color8(0xf8, 0xf8, 0xf0)
+		if p.water < 30:   # la gota, a la izquierda
+			R.call(x - 5, y, 5, 6, OSC)
+			R.call(x - 3, y + 1, 1, 1, W)
+			R.call(x - 4, y + 2, 3, 2, W)
+			R.call(x - 3, y + 4, 1, 1, W)
+		if lista:   # la marca de lista, a la derecha (después de la «!»)
+			var cx: int = x + BW + (BP if p.pest else 0)
+			R.call(cx, y + 1, 6, 5, OSC)
+			R.call(cx + 1, y + 3, 1, 1, W)
+			R.call(cx + 2, y + 4, 1, 1, W)
+			R.call(cx + 3, y + 3, 1, 1, W)
+			R.call(cx + 4, y + 2, 1, 1, W)
 
 static func pinta_cursor(L: CanvasItem, g: Dictionary, VC: Dictionary, bs: Array, now: float) -> void:
 	var b := int(floor(now / 300)) % 2

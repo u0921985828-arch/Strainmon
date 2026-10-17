@@ -14,6 +14,7 @@ const SH := 180   # 1.12: alto del juego; el ancho, de 240 a SW_MAX
 const SW_MAX := 450
 const Atlas = preload("res://src/atlas.gd")
 const Sonido = preload("res://src/sonido.gd")
+const VistaC = preload("res://src/vista.gd")
 
 const BOX := Color("#f8f8f0")
 const INK := Color("#2c2c36")
@@ -343,6 +344,10 @@ func ajusta() -> void:
 	pulgar_f = G.get("f", 1.0)
 	for n in ["dpad", "cruz", "ab", "A", "B", "start", "movil", "sonido"]:
 		G[n] = Rect2(G[n].position * dp, G[n].size * dp)
+	if Datos.PLAY and aj.get("zurdo", false):   # U5: ZURDO, la cruceta a la derecha y A/B a la izquierda (en espejo)
+		for n in ["dpad", "cruz", "ab", "A", "B", "start", "movil"]:
+			var r: Rect2 = G[n]
+			G[n] = Rect2(V.x - r.end.x, r.position.y, r.size.x, r.size.y)
 	var kp: float = G.k * dp
 	us = clampf(G.med * dp / 120, us_min, s)
 	uiw = minf(cw, roundf(240 * us))
@@ -391,7 +396,7 @@ func ajusta() -> void:
 	var er := x + cw / 2 + 120 * s
 	var bb := y + ch - 49 * s
 	bp_r = 6 * s
-	for n in ["A", "B", "start"]:
+	for n in ["A", "B", "start", "cruz"]:
 		var r: Rect2 = G[n]
 		if r.position.y < bb + kp and r.end.y > bb - 46 * s - kp:
 			bp_r = maxf(bp_r, er - r.position.x + kp)
@@ -567,15 +572,17 @@ func pon_letra(l: Control, f: Font, px: float, c: Color, alto := 0.0, sombra := 
 
 func _estilos() -> void:
 	dlg.add_theme_stylebox_override("panel", caja(us, 6, 10))
-	pon_letra(dlg_txt, letra, 10 * us, INK, 13.5 * us)
+	var ft := fs_txt(10 * us)
+	pon_letra(dlg_txt, letra, ft, INK, 13.5 * us * ft / (10 * us))
 	dlg_nm.add_theme_stylebox_override("panel", plana(LINEA, 3 * us, 2.5 * us, 5 * us))
 	pon_letra(dlg_nm_txt, negrita, 8 * us, Color.WHITE, 0, false)
 	caja_menu = caja(us, 5, 7)
 	menu_box.add_theme_stylebox_override("panel", StyleBoxEmpty.new() if menu_box.get_meta("cls", "") == "titulo" else caja_menu)
 	toast_box.add_theme_stylebox_override("panel", caja(us, 4, 10))
-	pon_letra(toast_txt, letra, 9 * us, INK)
+	var fo := fs_txt(9 * us)
+	pon_letra(toast_txt, letra, fo, INK)
 	toast_txt.add_theme_font_override("bold_font", negrita)
-	toast_txt.add_theme_constant_override("line_separation", roundi(12 * us - letra.get_height(roundi(9 * us))))
+	toast_txt.add_theme_constant_override("line_separation", roundi(12 * us * fo / (9 * us) - letra.get_height(roundi(fo))))
 	hud.add_theme_stylebox_override("panel", plana(Color(16 / 255.0, 28 / 255.0, 22 / 255.0, .78), HUD_R * u, HUD_PV * u, HUD_PH * u))
 	hud_txt.add_theme_font_override("normal_font", negrita)
 	hud_txt.add_theme_font_size_override("normal_font_size", maxi(5, roundi(HUD_FS * u)))
@@ -605,7 +612,8 @@ func _estilos() -> void:
 	lector.get_child(0).add_theme_constant_override("separation", roundi(4 * us))
 	pon_letra(lector_ttl, negrita, 9 * us, LINEA, 0, false)
 	pon_letra(lector_pie, letra, 7 * us, GRIS, 0, false)
-	pon_letra(lector_txt, letra, 9 * us, INK, 12.5 * us, false)
+	var fl := fs_txt(9 * us)
+	pon_letra(lector_txt, letra, fl, INK, 12.5 * us * fl / (9 * us), false)
 	if endcard.visible:
 		_pinta_endcard()
 	if vc_info.visible:
@@ -988,7 +996,15 @@ func set_sound(on: bool, guarda := true) -> void:
 # de 25 en 25 %), la velocidad del texto y SONIDO; en un archivo aparte de la partida, que no los borra ----------
 static var AJUSTES := "user://ajustes.json"   # las pruebas usan otro
 const TEXTO_VEL := ["NORMAL", "RÁPIDO", "AL MOMENTO"]
-var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true, "vibra": true, "ahorro": false}
+var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true, "vibra": true, "ahorro": false, "tam": 1, "zurdo": false, "dalt": false, "calma": false}
+# U5 (fase 5, con Datos.PLAY): TAMAÑO DE TEXTO S/M/L, nunca por debajo de TXT_MIN sp
+const TAM_TXT := [0.85, 1.0, 1.25]
+const TAM_NOM := ["S", "M", "L"]
+const TXT_MIN := 14.0
+func fs_txt(px: float) -> float:
+	if not Datos.PLAY:
+		return px
+	return maxf(px * TAM_TXT[clampi(int(aj.get("tam", 1)), 0, 2)], TXT_MIN * _dp())
 
 func ajustes_carga() -> void:
 	if oraculo:
@@ -1004,6 +1020,10 @@ func ajustes_aplica() -> void:
 	if sonido:
 		sonido.niveles(aj.musica / 4.0, aj.efectos / 4.0)
 	set_sound(aj.sonido, false)
+	VistaC.DALTONICO = Datos.PLAY and aj.get("dalt", false)
+	VistaC.CALMA = Datos.PLAY and aj.get("calma", false)
+	if Datos.PLAY and is_inside_tree() and not oraculo:   # el tamaño del texto y ZURDO cambian el sitio de todo
+		ajusta()
 	if is_inside_tree() and get_tree().current_scene == self:   # en el juego (no en las pruebas, que van a toda prisa)
 		Engine.max_fps = 30 if aj.ahorro else 60   # R3: a 60 como mucho (a 120 Hz era el doble de trabajo) y 30 con AHORRO
 
@@ -1102,13 +1122,28 @@ func wait(ms: float) -> void:
 func nm(t: String) -> String:
 	return Datos.tp(t.replace("{N}", S.name) if S else t)
 
+# U4 (fase 5, con Datos.PLAY): el registro de diálogo (las últimas REGISTRO_MAX cajas, START → REGISTRO), mantener A para
+# avanzar rápido (el texto sale entero y la caja pasa sola tras RAPIDO_MS) y las líneas que sobran en los cap. 1-3 (RECORTE)
+const REGISTRO_MAX := 80
+const RAPIDO_MS := 300
+var registro: Array = []
+
+func recortada(text: String) -> bool:
+	return Datos.PLAY and S != null and D.has("RECORTE") and int(S.get("ch", 1)) <= int(D.RECORTE.ch) and D.RECORTE.quita.has(text)
+
 func type_text(text: String, name_ := "") -> void:
 	if gancho_texto.is_valid():
 		gancho_texto.call(text, name_)
 	var p := Motor.Prom.new()
 	var full := nm(text)
+	if Datos.PLAY and not oraculo:
+		registro.append((name_ + ": " if name_ != "" else "") + full)
+		if registro.size() > REGISTRO_MAX:
+			registro.pop_front()
 	var st := {"i": 0, "n": 0, "done": false, "iv": 0, "h": Callable()}
 	var paso: int = [1, 3, 100000][aj.texto]   # OPCIONES · TEXTO: normal, rápido (3 letras cada vez) o al momento
+	if Datos.PLAY and held.get("A"):
+		paso = 100000
 	if not oraculo:
 		dlg.show()
 		dlg_nm.visible = name_ != ""
@@ -1139,16 +1174,28 @@ func type_text(text: String, name_ := "") -> void:
 	await Motor.espera(p)
 
 func say(text: String, name_ := "", keep := false) -> void:
+	if recortada(text):
+		return
 	await type_text(text, name_)
 	if not oraculo:
 		dlg_more.show()
 		_coloca.call_deferred()
 	var p := Motor.Prom.new()
-	push(func(b):
-		if b == "A" or b == "B":
-			pop()
-			p.res())
+	var st := {"t": 0, "iv": 0, "h": Callable(), "done": false}
+	st.h = func(b):
+		if (b == "A" or b == "B") and not st.done:
+			st.done = true
+			pop(st.h)
+			p.res()
+	push(st.h)
+	if Datos.PLAY and not oraculo:   # A mantenida: la caja pasa sola
+		st.iv = M.intervalo(func():
+			st.t = st.t + 50 if held.get("A") else 0
+			if st.t >= RAPIDO_MS and handlers.size() and handlers[-1] == st.h:
+				st.h.call("A"), 50)
 	await Motor.espera(p)
+	if st.iv:
+		M.quita(st.iv)
 	if not oraculo:
 		dlg_more.hide()
 		if not keep:

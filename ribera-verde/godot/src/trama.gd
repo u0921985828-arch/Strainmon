@@ -808,7 +808,9 @@ func talk_jurado():
 		await talk("DARKO", ["Esto no se acaba aquí.", "Mi tío se va a enterar."])
 		S.flags.copa = true
 		S.due = S.debt
-		S.deadline = S.day + 7
+		S.deadline = S.day + dias_plazo(7)
+		if Datos.PLAY:
+			S.due0 = S.due
 		cerrar_copa()
 		await chapter(7)   # el plazo, antes: chapter() guarda
 		show_objective()
@@ -1477,11 +1479,13 @@ func check_story():
 		show_objective()
 	if S.ch == 2 and S.sales >= D.META_VENTAS:
 		S.due = int(D.PLAZOS["3"])   # el plazo, desde ya (1.10)
-		S.deadline = S.day + 7
+		S.deadline = S.day + dias_plazo(3)
+		if Datos.PLAY:
+			S.due0 = S.due
 		S.flags.tono = S.day
 		await chapter(3)
 		await say("Un hombre enorme en chándal te corta el paso.")
-		await talk("TOÑO", ["Tú vives en el piso de Maite, ¿no?", "Don Baltasar quiere verte. En el bar El Ancla. Hoy.", "Y ve contando: tienes siete días para el primer pago.", "No me hagas venir a buscarte."])
+		await talk("TOÑO", ["Tú vives en el piso de Maite, ¿no?", "Don Baltasar quiere verte. En el bar El Ancla. Hoy.", "Y ve contando: tienes %s días para el primer pago." % dias_letra(dias_plazo(3)), "No me hagas venir a buscarte."])
 		await lineas_nuevas()
 		show_objective()
 	if S.ch >= 8 and imperio_nivel() > S.get("impN", 0):
@@ -1493,9 +1497,11 @@ func check_story():
 		show_objective()
 	if S.ch == 4 and S.flags.get("lab") and rec_count() >= 2:
 		S.due = int(D.PLAZOS["5"])
-		S.deadline = S.day + 10
+		S.deadline = S.day + dias_plazo(5)
+		if Datos.PLAY:
+			S.due0 = S.due
 		await chapter(5)
-		await talk("SMS · TOÑO", ["Don Baltasar quiere %s en diez días." % Datos.eur(D.PLAZOS["5"]), "Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza."])
+		await talk("SMS · TOÑO", ["Don Baltasar quiere %s en %s días." % [Datos.eur(D.PLAZOS["5"]), dias_letra(dias_plazo(5))], "Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza."])
 		show_objective()
 	# 1.43.8 (lo pidió el usuario: «no existe mapa y sitio del bajo de las setas»; con Datos.CAL): nada te decía dónde estaba. Con
 	# Ibarbide abierta, una vez, el SMS de Julen con el sitio (también en MÓVIL → Mapa y en el cartel de la Kale Zaharra)
@@ -1507,17 +1513,43 @@ func check_story():
 		await talk("SMS · KOLDO", ["Soy Koldo, del muelle de Puerto Viejo. Fui amigo de tu tía Maite: tengo una cosa suya para ti.", "Al final de la plaza del puerto, a la derecha, el muelle de la cofradía. Estoy en la acera, delante de los barcos."])
 
 # E5 (fase 3): todo lo que cambia, antes del primer aviso (guardada a medias, no se cuenta dos veces)
+# U3 (fase 5, con Datos.PLAY): el recargo, sobre lo que pedía el plazo (sin interés compuesto) y hasta RESCATE.tope; el primer impago de la partida,
+# el rescate de Toño (RESCATE: la mitad de recargo y más días a cambio de un recado); el embargo, como mucho uno por capítulo
+func dias_plazo(ch: int) -> int:
+	if Datos.PLAY and D.has("PLAZO_DIAS"):
+		return int(D.PLAZO_DIAS[str(ch)])
+	return 10 if ch == 5 else 7
+
+func dias_letra(n: int) -> String:
+	return {7: "siete", 10: "diez", 14: "catorce", 16: "dieciséis", 20: "veinte"}.get(n, str(n))
+
 func penalty_event():
-	var it := Datos.jsround(S.due * D.INTERES / 100) * 100
+	var play: bool = Datos.PLAY and D.has("RESCATE")
+	var base: float = float(S.get("due0", S.due)) if play else float(S.due)
+	var rescate: bool = play and not S.flags.get("rescate")
+	var it := Datos.jsround(base * D.INTERES * (float(D.RESCATE.interes) if rescate else 1.0) / 100) * 100
+	if play:   # los recargos de un plazo, como mucho RESCATE.tope de lo que pedía
+		it = maxi(0, mini(it, int(base * (1 + float(D.RESCATE.get("tope", 9.0)))) - int(S.due)))
 	S.vencidos += 1
 	S.hp = maxi(1, S.hp - 15)
 	S.due += it
 	S.debt += it
-	S.deadline = S.day + 5
+	S.deadline = S.day + (int(D.RESCATE.dias) if rescate else 5)
 	var embarga = null
-	if S.vencidos >= 3:
+	if rescate:
+		S.flags.rescate = true
+		S.vencidos -= 1
+	elif S.vencidos >= 3 and not (play and int(S.get("emb_ch", 0)) == int(S.ch)):
 		S.vencidos = 0
+		if play:
+			S.emb_ch = S.ch
 		embarga = embargo_aplica()
+	if rescate:
+		await say("TOÑO te estaba esperando.")
+		await talk("TOÑO", ["Don Baltasar dice que llegas tarde. Por ser la primera vez, te deja arreglarlo.", "Le llevas un paquete a Puerto Viejo y te da %d días más. Solo son %s de recargo." % [int(D.RESCATE.dias), Datos.eur(it)]])
+		sfx("hurt")
+		await say("La deuda del plazo sube a %s. Nuevo límite: %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)])
+		return
 	await say("TOÑO te estaba esperando.")
 	await talk("TOÑO", ["Don Baltasar dice que llegas tarde.", "Son %s más de intereses. Y esto, para que no se te olvide." % Datos.eur(it)])
 	sfx("hurt")
@@ -1700,13 +1732,21 @@ func start_menu():
 		for k in D.DEX:
 			if S.disc.get(k):
 				desc += 1
-		i = await menu([{"label": "GENOTECA", "right": "%d/%d" % [desc, D.DEX.size()], "ic": icono("cogollo")}, {"label": "MOCHILA", "right": _kg(int(floor(peso_encima()))), "ic": icono("bolsa")},
+		var it := [{"label": "GENOTECA", "right": "%d/%d" % [desc, D.DEX.size()], "ic": icono("cogollo")}, {"label": "MOCHILA", "right": _kg(int(floor(peso_encima()))), "ic": icono("bolsa")},
 			{"label": "MÓVIL", "right": ("%d SMS" % ns) if ns else null, "ic": icono("movil")}, {"label": "PLANTAS", "right": str(vivas), "ic": icono("maceta")},
 			{"label": "OBJETIVO", "right": "cap. %d" % S.ch, "ic": icono("trofeo")}, {"label": "GUARDAR", "ic": icono("guardar")},
-			{"label": "OPCIONES", "ic": icono("altavoz")}, {"label": "SALIR", "ic": icono("salir")}],
-			{"cls": "start", "initial": i, "startCloses": true, "title": "%s · %s" % [Datos.fd_hud(S.day), reloj_txt()], "title2": Datos.eur(S.money)})
-		if i < 0 or i == 7:
+			{"label": "OPCIONES", "ic": icono("altavoz")}, {"label": "SALIR", "ic": icono("salir")}]
+		if Datos.PLAY:   # U4: el registro de diálogo
+			it.insert(5, {"label": "REGISTRO", "right": str(registro.size()), "ic": icono("movil")})
+		i = await menu(it, {"cls": "start", "initial": i, "startCloses": true, "title": "%s · %s" % [Datos.fd_hud(S.day), reloj_txt()], "title2": Datos.eur(S.money)})
+		if i < 0 or it[i].label == "SALIR":
 			return
+		if it[i].label == "REGISTRO":
+			await leer("REGISTRO", "\n\n".join(PackedStringArray(_registro_inv())) if registro.size() else "Todavía no has hablado con nadie.")
+			continue
+		var k: int = ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "OPCIONES"].find(it[i].label)
+		var i0 := i
+		i = k
 		if i == 0:
 			await genoteca()
 		elif i == 1:
@@ -1723,6 +1763,13 @@ func start_menu():
 			await opciones()
 			if get("relanza"):   # E10: la partida importada se abre al cerrar el menú
 				return
+		i = i0
+
+# U4: el registro, de lo último a lo primero
+func _registro_inv() -> Array:
+	var r := registro.duplicate()
+	r.reverse()
+	return r
 
 # exportar la partida (1.11, exportar de 12-menus): el JSON de S al portapapeles
 var exportado := ""   # lo último copiado (las pruebas lo leen: sin pantalla no hay portapapeles)
