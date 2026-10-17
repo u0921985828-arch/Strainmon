@@ -140,6 +140,49 @@ func _corre() -> void:
 			for r in 3:
 				await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(dir.path_join("carpas-casa.png"))
+		# 1.57 (lo pidió el usuario: «en las curvas o giros del tubo no se deben cortar»): por el centro del tubo, del codo de la
+		# carpa al de la ventana, ni una raya del canto; y la esquina de fuera de cada codo, redonda (sin tubo)
+		var im: Image = J.sv.get_texture().get_image()
+		var cam: Vector2i = J.pintor.cam
+		var canto := Color("#2a2a34")
+		var tubos: Array = J.pintor.ventanas_tubos(h)
+		var seguido := tubos.size() > 0
+		var redondo := true
+		var cuerpo := [Color("#e4e8ee"), Color("#b4b8c0"), Color("#8a8e98"), Color("#9aa0a8")]
+		var es_tubo := func(x: int, y: int) -> bool:
+			if x < 0 or y < 0 or x >= im.get_width() or y >= im.get_height():
+				return false
+			var c: Color = im.get_pixel(x, y)
+			for k in cuerpo:
+				if c.is_equal_approx(k):
+					return true
+			return false
+		for q in tubos:
+			var xl: int = mini(q[1], q[2]) - cam.x
+			var xr: int = maxi(q[1], q[2]) - cam.x
+			var yc: int = -cam.y
+			# por dentro del tubo (sin pasar por el canto), del medio del techo a las dos bajadas, doblando los codos (con dos tramos que
+			# se pisan, el canto de la bajada lo corta antes de llegar)
+			var visto := {}
+			var pila := [Vector2i((xl + xr) / 2, yc + 2)]
+			while pila.size():
+				var p: Vector2i = pila.pop_back()
+				if visto.has(p) or not es_tubo.call(p.x, p.y) or p.y > yc + 12:
+					continue
+				visto[p] = true
+				for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					pila.append(p + d)
+			var baja := func(x: int) -> bool:
+				for y in range(yc + 3, yc + 13):
+					for dx in [-1, 0, 1]:
+						if visto.has(Vector2i(x + dx, y)):
+							return true
+				return false
+			seguido = seguido and baja.call(xl) and baja.call(xr)
+			for c in [im.get_pixel(xl - 2, yc), im.get_pixel(xr + 2, yc)]:
+				redondo = redondo and not c.is_equal_approx(canto) and not es_tubo.call(-1, -1) and not cuerpo.has(c)
+		chk(seguido, "los tubos (%d), seguidos por los codos, sin cortes" % tubos.size())
+		chk(redondo, "los codos, redondos por fuera")
 	print("carpas_casa: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:
 		print("  FALLO ", f)

@@ -999,15 +999,13 @@ func _tubos_casa(m: Dictionary) -> void:
 		var yw: int = 16 + 15 + int(ALZA.iwin) - 15 - cam.y   # la fila de arriba del dibujo de la ventana (iwin, en la fila 1)
 		var xa: int = xc - cam.x
 		var xb: int = wx - cam.x
-		_tubo(xa - 2, yc, 5, arriba - cam.y - yc, false)
-		_tubo(mini(xa, xb) - 2, yc, absi(xb - xa) + 5, 5, true)
+		_tubo_codos(xa, xb, yc, arriba - cam.y, yw + 6)
 		# la placa: la hoja de arriba de la ventana (filas 2 a 7 del dibujo), de chapa con la boca del tubo en medio
 		_rect(xb - 7, yw + 2, 14, 6, css("#2a2a34"))
 		_rect(xb - 6, yw + 3, 12, 4, css("#b4b8c0"))
 		_rect(xb - 6, yw + 3, 12, 1, css("#e4e8ee"))
 		for k in 3:
 			_rect(xb - 5 + k * 4, yw + 5, 2, 1, css("#7a7e86"))   # los remaches
-		_tubo(xb - 2, yc, 5, yw + 6 - yc, false)
 		_rect(xb - 3, yw + 3, 7, 2, css("#5a5e66"))   # la abrazadera en la placa
 		_rect(xa - 3, arriba - cam.y - 2, 7, 2, css("#5a5e66"))   # la abrazadera en la boca de la carpa
 
@@ -1052,21 +1050,68 @@ func _asigna_ventanas(cs: Array, i: int, a: Array, mejor: Dictionary) -> void:
 	for w in cs[i].ok:
 		_asigna_ventanas(cs, i + 1, a + [w], mejor)
 
+# 1.57 (lo pidió el usuario: «en las curvas o giros del tubo no se deben cortar»): de la carpa (xa, hasta ya) al techo (yc), por el
+# techo y abajo a la ventana (xb, hasta yb), con un codo curvo en cada giro en vez de dos tramos que se pisan
+func _tubo_codos(xa: int, xb: int, yc: int, ya: int, yb: int) -> void:
+	if absi(xb - xa) < 7:   # la ventana encima: recto
+		_tubo(xa - 2, yc, 5, ya - yc, false)
+		_tubo(xb - 2, yc, 5, yb - yc, false)
+		return
+	var xl := mini(xa, xb)
+	var xr := maxi(xa, xb)
+	var yl: int = ya if xl == xa else yb
+	var yr: int = yb if xl == xa else ya
+	var hueco: int = (xr - xl - 5) >> 1   # lo que cabe de curva a cada lado sin que se toquen
+	var rl: int = clampi(mini(yl - yc - 6, hueco), 0, 3)
+	var rr: int = clampi(mini(yr - yc - 6, hueco), 0, 3)
+	_tubo(xl + 3 + rl, yc, xr - 2 - rr - (xl + 3 + rl), 5, true, true)
+	_tubo(xl - 2, yc + 5 + rl, 5, yl - (yc + 5 + rl), false, true)
+	_tubo(xr - 2, yc + 5 + rr, 5, yr - (yc + 5 + rr), false, true)
+	_codo(xl - 2, yc, rl, 1)
+	_codo(xr - 2, yc, rr, -1)
+
+# el codo: un cuarto de toro de 5 px de grueso y ri de radio por dentro, con el tramo de bajada en x0..x0+4 desde el techo y0; lado 1,
+# el del techo sale a la derecha; -1, a la izquierda. Arriba, la luz como en el tramo del techo; en la bajada, como en la bajada
+const TUBO_C := ["#2a2a34", "#e4e8ee", "#b4b8c0", "#8a8e98", "#2a2a34"]
+func _codo(x0: int, y0: int, ri: int, lado: int) -> void:
+	var R := 5.0 + ri
+	var pv := Vector2(x0 - ri if lado < 0 else x0 + 5 + ri, y0 + 5 + ri)   # el centro de la curva, en la esquina de dentro
+	for j in 5 + ri:
+		for i in 5 + ri:
+			var px: int = (x0 - ri + i) if lado < 0 else (x0 + i)
+			var py: int = y0 + j
+			var dx := absf(px + 0.5 - pv.x)
+			var dy := pv.y - (py + 0.5)
+			var r := sqrt(dx * dx + dy * dy)
+			if r > R + 0.35 or r < ri - 0.35:
+				continue
+			var b := clampi(int(R - r), 0, 4)
+			var c: String
+			if b == 0 or b == 4:
+				c = TUBO_C[0]
+			elif dy > dx:   # en el tramo del techo: la fila
+				c = TUBO_C[b]
+			else:   # en la bajada: la columna, con la luz a la izquierda
+				c = TUBO_C[4 - b if lado < 0 else b]
+			_rect(px, py, 1, 1, css(c))
+
 # un tramo de tubo flexible de aluminio (5 px de grueso: contorno, luz, cuerpo, sombra, contorno) con sus aros cada 3 px
-func _tubo(x: int, y: int, w: int, h: int, horiz: bool) -> void:
+# (1.57: abierto, sin el canto de los extremos, para empalmar con los codos)
+func _tubo(x: int, y: int, w: int, h: int, horiz: bool, abierto := false) -> void:
 	if w <= 0 or h <= 0:
 		return
 	_rect(x, y, w, h, css("#2a2a34"))
+	var e := 0 if abierto else 1
 	if horiz:
-		_rect(x + 1, y + 1, w - 2, 1, css("#e4e8ee"))
-		_rect(x + 1, y + 2, w - 2, 1, css("#b4b8c0"))
-		_rect(x + 1, y + 3, w - 2, 1, css("#8a8e98"))
+		_rect(x + e, y + 1, w - 2 * e, 1, css("#e4e8ee"))
+		_rect(x + e, y + 2, w - 2 * e, 1, css("#b4b8c0"))
+		_rect(x + e, y + 3, w - 2 * e, 1, css("#8a8e98"))
 		for xx in range(x + 2, x + w - 1, 3):
 			_rect(xx, y + 1, 1, 3, css("#9aa0a8"))
 	else:
-		_rect(x + 1, y + 1, 1, h - 2, css("#e4e8ee"))
-		_rect(x + 2, y + 1, 1, h - 2, css("#b4b8c0"))
-		_rect(x + 3, y + 1, 1, h - 2, css("#8a8e98"))
+		_rect(x + 1, y + e, 1, h - 2 * e, css("#e4e8ee"))
+		_rect(x + 2, y + e, 1, h - 2 * e, css("#b4b8c0"))
+		_rect(x + 3, y + e, 1, h - 2 * e, css("#8a8e98"))
 		for yy in range(y + 2, y + h - 1, 3):
 			_rect(x + 1, yy, 3, 1, css("#9aa0a8"))
 
