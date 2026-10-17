@@ -7,7 +7,7 @@ OUT=${1:-/tmp/lh-tests}; mkdir -p "$OUT"
 X=(xvfb-run -a -s "-screen 0 2600x1700x24")
 P=(--rendering-driver opengl3 --audio-driver Dummy --resolution 1560x720)
 export LIBGL_ALWAYS_SOFTWARE=1
-GRAF=" mandos_geo ciclo extracciones pantallas prueba capas capturas "
+GRAF=" mandos_geo ciclo extracciones pantallas prueba capas capturas perf "
 for f in tests/*.gd; do
   t=$(basename "$f" .gd)
   case "$GRAF" in *" $t "*) continue;; esac

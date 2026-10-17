@@ -32,6 +32,8 @@ static func foto(n: String, i := 0) -> Image:
 	var k := "f|%s|%d" % [n, i]
 	if not cache.has(k):
 		var r: Array = spr[n][i]
+		if cache.size() > 1024:   # R7: tope
+			cache.clear()
 		cache[k] = img.get_region(Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])))
 	return cache[k]
 
@@ -61,6 +63,8 @@ static func alto(im: Image) -> int:
 		if hay_px:
 			a = im.get_height() - y
 			break
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = a
 	return a
 
@@ -72,6 +76,8 @@ static func altura(n: String, h: int) -> Array:
 		for i in n_fotos(n):
 			L.append([alto(foto(n, i)), foto(n, i), i])
 		L.sort_custom(func(a, b): return a[0] < b[0] or (a[0] == b[0] and a[2] < b[2]))
+		if cache.size() > 1024:   # R7: tope
+			cache.clear()
 		cache[k] = L
 	for e in cache[k]:
 		if e[0] >= h:
@@ -117,6 +123,8 @@ static func aplasta(c: Image, h: int) -> Image:
 		if not fuera.has(s):
 			y -= 1
 			o.blit_rect(c, Rect2i(0, s, W, 1), Vector2i(0, y))
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = o
 	return o
 
@@ -248,6 +256,8 @@ static func apagado(c: Image) -> Image:
 			if p.a8 and (p.r8 > p.b8 + 40 or mini(p.r8, mini(p.g8, p.b8)) > 190):
 				var l := Datos.jsround((p.r8 * .3 + p.g8 * .59 + p.b8 * .11) * .3)
 				o.set_pixel(x, y, Color8(l, l + 2, l + 4, p.a8))
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = o
 	return o
 
@@ -286,6 +296,8 @@ static func fondo(t: String, vc: Dictionary, capa: String) -> Image:
 				var p := o.get_pixel(i, y)
 				if p.a8:
 					o.set_pixel(i, y, Color8((p.r8 * (256 - kk)) >> 8, (p.g8 * (256 - kk)) >> 8, (p.b8 * (256 - kk)) >> 8, p.a8))
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = o
 	return o
 
@@ -338,6 +350,8 @@ static func luz_led(t: String, vc: Dictionary) -> Image:
 				continue
 			var z: Array = VC_LZ[3 if y < y0 + 2 else (2 if n > 1 else 1)]
 			o.set_pixel(i, y, Color8(z[0], z[1], z[2], 255))
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = o
 	return o
 
@@ -357,6 +371,8 @@ static func luz_baja(t: String, vc: Dictionary) -> Image:
 	o.fill_rect(Rect2i(vc.xl, y0, vc.w, y1 + 1 - y0), Color(0, 0, 0, 0))
 	if y1 + 1 - y0 - dy > 0:
 		o.blit_rect(L, Rect2i(vc.xl, y0, vc.w, y1 + 1 - y0 - dy), Vector2i(vc.xl, y0 + dy))
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = o
 	return o
 
@@ -379,6 +395,8 @@ static func cuelga(c: Image) -> Array:
 		if a >= 0:
 			o = [a, b, r]
 			break
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = o
 	return o
 
@@ -400,6 +418,8 @@ static func luz(t: String, vc: Dictionary) -> Image:
 			if p.a8:
 				var l := (.299 * p.r8 + .587 * p.g8 + .114 * p.b8) / lk
 				o.set_pixel(x, y, Color8(Datos.u8(minf(255, c[0] * l)), Datos.u8(minf(255, c[1] * l)), Datos.u8(minf(255, c[2] * l)), p.a8))
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = o
 	return o
 
@@ -419,6 +439,8 @@ static func fila_arriba(im: Image) -> int:
 		if hay:
 			r = y
 			break
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = r
 	return r
 
@@ -433,6 +455,8 @@ static func caja(im: Image) -> Array:
 			if im.get_pixel(x, y).a8 > 0:
 				a = mini(a, x)
 				b = maxi(b, x)
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = [a, b]
 	return cache[k]
 
@@ -451,6 +475,8 @@ static func nivel(im: Image, par: Array, fr: float) -> Image:
 				if p.a8 and ((p.r8 << 16) | (p.g8 << 8) | p.b8) == K:
 					a = mini(a, y)
 					b = maxi(b, y)
+		if cache.size() > 1024:   # R7: tope
+			cache.clear()
 		cache[kf] = [a, b]
 	var y0: int = cache[kf][0]
 	var y1: int = cache[kf][1]
@@ -465,10 +491,14 @@ static func nivel(im: Image, par: Array, fr: float) -> Image:
 			var p := o.get_pixel(x, y)
 			if p.a8 and ((p.r8 << 16) | (p.g8 << 8) | p.b8) == K:
 				o.set_pixel(x, y, Color8(A.r8, A.g8, A.b8, p.a8))
+	if cache.size() > 1024:   # R7: tope
+		cache.clear()
 	cache[k] = o
 	return o
 
 static func tex(k: String, im: Image) -> ImageTexture:
 	if not texs.has(k):
+		if texs.size() > 2048:   # R7: tope
+			texs.clear()
 		texs[k] = ImageTexture.create_from_image(im)
 	return texs[k]

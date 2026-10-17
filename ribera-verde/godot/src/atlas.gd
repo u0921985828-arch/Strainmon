@@ -13,6 +13,13 @@ static var mir := {}
 static var rec := {}
 static var sobre := {}       # «tile:k» / «obj:k» → [[grupo, anim], …]
 static var ok := false
+# R1 (fase 4): el atlas en la GPU, en hojas de 4096 px de alto como mucho; cada fotograma (y su espejo) se pinta como un trozo
+# de su hoja, así las casillas y los muñecos van en pocas llamadas. Lo que no sale tal cual del atlas (recoloreado, recortado,
+# compuesto) sigue con su propia textura (tex)
+const HOJA_MAX := 4096
+static var hojas: Array[ImageTexture] = []
+static var hoja_y: Array[int] = []
+static var reg := {}         # id de la imagen → [hoja, Rect2 en la hoja, espejo]
 
 static func carga() -> bool:
 	if ok or img:
@@ -23,6 +30,10 @@ static func carga() -> bool:
 	img.load_png_from_buffer(FileAccess.get_file_as_bytes("res://arte/atlas.png"))
 	img.convert(Image.FORMAT_RGBA8)
 	d = JSON.parse_string(FileAccess.get_file_as_string("res://arte/atlas.json"))
+	var h := img.get_height()
+	for y0 in ([0] if h <= HOJA_MAX else [0, h - HOJA_MAX]):   # la 2.ª, pegada abajo: lo que no cabe entero en la 1.ª, entero en ella
+		hojas.append(ImageTexture.create_from_image(img.get_region(Rect2i(0, y0, img.get_width(), mini(h - y0, HOJA_MAX)))))
+		hoja_y.append(y0)
 	for g in d.anims:
 		for s in d.anims[g]:
 			var a: Dictionary = d.anims[g][s]
@@ -37,11 +48,33 @@ static func frame(k: String) -> Image:
 	if not fr.has(k):
 		var f: Dictionary = d.frames[k]
 		fr[k] = img.get_region(Rect2i(int(f.x), int(f.y), int(f.w), int(f.h)))
+		_registra(fr[k], f, false)
 	return fr[k]
+
+static func _registra(im: Image, f: Dictionary, esp: bool) -> void:
+	var y := int(f.y)
+	var i := 0 if y + int(f.h) <= hoja_y[0] + HOJA_MAX or hojas.size() == 1 else 1
+	reg[im.get_instance_id()] = [i, Rect2(int(f.x), y - hoja_y[i], int(f.w), int(f.h)), esp]
+
+# pinta im (o el trozo src de im) en dst: del atlas, el trozo de su hoja (en espejo, con el ancho negativo); si no, su textura
+static func dibuja(L: CanvasItem, im: Image, dst: Rect2, src = null, mod := Color.WHITE) -> void:
+	var s: Rect2 = src if src != null else Rect2(0, 0, im.get_width(), im.get_height())
+	var r = reg.get(im.get_instance_id())
+	if r == null:
+		L.draw_texture_rect_region(tex(im), dst, s, mod)
+		return
+	var b: Rect2 = r[1]
+	if r[2]:
+		# el ancho negativo en el destino lo pinta en espejo en el mismo sitio (FLIP_H del RenderingServer)
+		L.draw_texture_rect_region(hojas[r[0]], Rect2(dst.position, Vector2(-dst.size.x, dst.size.y)), Rect2(b.position.x + b.size.x - s.position.x - s.size.x, b.position.y + s.position.y, s.size.x, s.size.y), mod)
+	else:
+		L.draw_texture_rect_region(hojas[r[0]], dst, Rect2(b.position + s.position, s.size), mod)
 
 static func tex(im: Image) -> ImageTexture:
 	var k := im.get_instance_id()
 	if not tx.has(k):
+		if tx.size() > 2048:   # R7: tope
+			tx.clear()
 		tx[k] = ImageTexture.create_from_image(im)
 	return tx[k]
 
@@ -86,6 +119,7 @@ static func espejo(k: String) -> Image:
 		var s := frame(k).duplicate()
 		s.flip_x()
 		mir[k] = s
+		_registra(s, d.frames[k], true)
 	return mir[k]
 
 static func n_fotos(g, s: String) -> int:

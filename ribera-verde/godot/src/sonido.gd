@@ -32,6 +32,7 @@ var T := {}
 var cola: Array = []
 var hechos := {}
 var hilo: Thread = null
+var hilo_vivo := false   # R10: bajo el cerrojo, si el hilo sigue sacando de la cola
 var cerrojo := Mutex.new()
 var parar := false
 var espera := 0.0   # lo que falta para que entre la canción nueva (tiempo de juego, como el fundido)
@@ -77,16 +78,19 @@ func init() -> void:
 			for k in idx:
 				if FileAccess.file_exists(MUSICA + k + ".ogg"):
 					grabadas[k] = float(idx[k].bucle)
-	cola = grabadas.keys()
+	# R10: los OGG se leen cuando tocan (en memoria, la que suena y la que se apaga); los chiptunes, todos al principio
+	cola = []
 	for k in T:
 		if not grabadas.has(k):
 			cola.append(k)
-	total = cola.size()
+	total = grabadas.size() + cola.size()
 	actual = clave(actual)
 	if cola.has(actual):
 		cola.erase(actual)
+	if actual != "":
 		cola.push_front(actual)
 	_vol()
+	hilo_vivo = true
 	hilo = Thread.new()
 	hilo.start(_hilo)
 
@@ -204,6 +208,7 @@ func _hilo() -> void:
 	while true:
 		cerrojo.lock()
 		if parar or cola.is_empty():
+			hilo_vivo = false
 			cerrojo.unlock()
 			return
 		var n: String = cola.pop_front()
@@ -341,8 +346,18 @@ func music(n: String) -> void:
 	cerrojo.lock()
 	if cola.has(n):
 		cola.erase(n)
+	var otra_vuelta := false
+	if not temas.has(n):
 		cola.push_front(n)
+		otra_vuelta = not hilo_vivo and not parar
+		if otra_vuelta:
+			hilo_vivo = true
 	cerrojo.unlock()
+	if otra_vuelta:   # el hilo ya acabó: otro
+		if hilo and hilo.is_started():
+			hilo.wait_to_finish()
+		hilo = Thread.new()
+		hilo.start(_hilo)
 	if musica.playing:
 		if fundido and fundido.is_valid():
 			fundido.kill()
@@ -374,6 +389,10 @@ func _process(d: float) -> void:
 	cerrojo.unlock()
 	for n in h:
 		temas[n] = h[n] if h[n] is AudioStream else _wav_de(h[n], true)
+	if h.size():   # R10: de los OGG, solo la que suena y la que se apaga
+		for n in temas.keys():
+			if temas[n] is AudioStreamOggVorbis and n != actual and temas[n] != musica.stream and temas[n] != otra.stream:
+				temas.erase(n)
 	if actual != "":
 		_suena()
 

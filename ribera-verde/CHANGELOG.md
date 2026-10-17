@@ -29,6 +29,16 @@
 - START (la pausa) guarda antes de abrir el menú.
 - Prueba nueva `tests/bugs.gd` (29 comprobaciones: una o más por bug, que fallaban antes del arreglo).
 
+### Fase 4 · rendimiento (R1–R15)
+- **Medidas** (`tests/perf.gd`, fuera de la batería; `.modo-absoluto/perf-base.txt` → `perf-final.txt`, 1280 × 720 en Xvfb con GL por software): draw calls en la calle 407 → 112 (−72 %); con el menú START abierto, 446 → 66 y 1,00 → 0,00 redibujos por fotograma; memoria estática tras recorrer las escenas 143 → 110 MB, +0,1 % de la 1.ª a la 4.ª vuelta; escala a 720p 3,933 → 3 (entera); arranque 262 → 259 ms en escritorio.
+- **R1 + R8, el atlas en hojas de GPU** (`atlas.gd`): el atlas de 1024 × 4168 sube en dos texturas de ≤ 4096 (`HOJA_MAX`, `hojas`, `hoja_y`) y cada fotograma y su espejo quedan registrados con su recuadro (`reg`, `_registra`); `Atlas.dibuja` pinta con `draw_texture_rect_region` (el espejo, con el ancho de destino negativo) en vez de una textura por fotograma. La imagen de CPU se queda: la usan los recoloreados de ropa y genética.
+- **R2, pintar solo si cambia** (`juego.gd`, `lienzo_quieto`): con el fundido en negro o un menú, el lector o la importación encima del mapa o la carpa (sin minijuego, vista ni andar), el lienzo deja de redibujarse a los dos fotogramas y su `SubViewport` pasa a `UPDATE_DISABLED`.
+- **R3** el juego a 60 FPS como mucho y, con `Datos.CAL`, OPCIONES → AHORRO a 30 (`aj.ahorro`); solo en la escena del juego, no en las pruebas. **R15** `hud_pon` no rehace el HUD si no ha cambiado nada (`hud_ultimo`).
+- **R4** los colores de texto leídos una vez (`_css`). **R7** tope en todas las cachés (`Atlas.tx`, `Arte.cache`/`texs`, `Procedural.cache`, la del pintor): al pasar el tope se vacían y se rehacen al pedirlas.
+- **R10, la música** (`sonido.gd`): los OGG se leen cuando tocan, no todos al arrancar (`hilo_vivo`: el hilo vuelve si se pide otra canción después de acabar); en memoria, solo la que suena y la que se apaga.
+- **R11** a escala entera (×2 o más) siempre con `Datos.CAL` (720p → ×3, con bandas). **R12** en el móvil, la zona segura se vuelve a mirar al volver a la app y cada segundo (giros, recortes). **R13** al perder el foco en el móvil, el juego se para y se calla, y vuelve como estaba. **R14** mando: cruceta y palanca izquierda, A, B, START, BACK (= B) e Y (el móvil) (`BOTONES_JOY`, `_joy`).
+- Sin hacer: **R5** (el balanceo de las plantas por shader: es un recorte por filas del sprite, no una deformación, y el lienzo ya no se redibuja con los menús), **R6** (`vista.gd` no pinta píxel a píxel: las plantas salen de `Procedural.planta34`, en caché por su clave de alto) y **R9** (el arranque entero ya está en ~0,26 s en escritorio, de ellos ~0,14 s el sonido con sus efectos; la música va en su hilo). El arranque en frío en el emulador x86_64 no se ha podido medir aquí (sin KVM).
+
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
 Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.

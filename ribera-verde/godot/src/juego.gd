@@ -68,14 +68,50 @@ func arranque() -> void:
 	show_title()
 	await fade(0)
 
+var pausa_foco := false
+var zona_vista := Rect2i()
+var mudo_antes := false
 func _process(dt: float) -> void:
-	if oraculo:
+	if oraculo or pausa_foco:
 		return
+	# R12: un giro de 180° no cambia el tamaño de la ventana, pero sí el lado de la muesca: se mira la zona segura cada segundo
+	if OS.has_feature("mobile") and Engine.get_process_frames() % 60 == 0:
+		var zs := DisplayServer.get_display_safe_area()
+		if zs != zona_vista:
+			zona_vista = zs
+			ajusta()
 	var ms := dt * 1000
 	M.avanza(M.reloj + ms)
 	update(minf(50, ms))
-	pintor.redibuja(M.reloj)
+	# R2: con un menú, el lector o la caja de importar encima del mapa o de la carpa (el reloj parado, nada se mueve detrás), o con
+	# la pantalla en negro, el lienzo no se repinta ni se vuelve a componer: se queda el último fotograma (uno más tras taparse,
+	# por si el guion cambió algo justo antes de abrir el menú)
+	if lienzo_quieto():
+		quieto_n += 1
+	else:
+		quieto_n = 0
+	if quieto_n < 2:
+		pintor.redibuja(M.reloj)
+	var upd := SubViewport.UPDATE_DISABLED if quieto_n >= 3 else SubViewport.UPDATE_ALWAYS
+	if sv.render_target_update_mode != upd:
+		sv.render_target_update_mode = upd
 	_process_ui()
+
+var quieto_n := 0
+func lienzo_quieto() -> bool:
+	if fade_el.color.a >= 1.0 and not fade_tw_vivo():
+		return true
+	if mode != "world" and mode != "carpa":
+		return false
+	if not (menu_box.visible or lector.visible or import_box.visible):
+		return false
+	for v in [ACCESO_V, VIAJE_V, TIRO, MESA_B, ORDEN, ALMACEN, CARRO_V, SETAS_V, ARM_V, CAL_V, MAPA_V, FICHA_V, MOVIL_V]:
+		if v != null:
+			return false
+	return wipe_t0 < 0 and not P.moving
+
+func fade_tw_vivo() -> bool:
+	return fade_tw != null and fade_tw.is_valid() and fade_tw.is_running()
 
 func _notification(w: int) -> void:
 	if oraculo:
@@ -93,11 +129,20 @@ func _notification(w: int) -> void:
 		suelta_todo()
 		guarda_al_salir()
 	elif w == NOTIFICATION_APPLICATION_RESUMED:
+		ajusta.call_deferred()   # R12: la muesca puede haber cambiado de lado mientras no se veía
 		# al volver a la app, andando por el mapa, en pausa: el menú START
 		if mode == "world" and is_free() and not P.moving:
 			press("START")
 	elif w == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		suelta_todo()
+		if OS.has_feature("mobile") and not pausa_foco:   # R13: con la persiana bajada o en multiventana, quieto y en silencio
+			pausa_foco = true
+			mudo_antes = AudioServer.is_bus_mute(0)
+			AudioServer.set_bus_mute(0, true)
+	elif w == NOTIFICATION_APPLICATION_FOCUS_IN:
+		if pausa_foco:
+			pausa_foco = false
+			AudioServer.set_bus_mute(0, mudo_antes)
 
 # ---------- guardado (a un archivo aparte y luego se cambia de nombre; sin ordenar las claves y con todos los decimales) ----------
 # E4 y E6 (fase 3): al salir de la app solo se guarda sin un guion a medias (lock) y fuera del combate: si no, se queda la última
@@ -482,6 +527,7 @@ func opciones(desde_titulo := false) -> void:
 			it.append({"label": "BORRAR PARTIDA"})
 		if Datos.CAL:
 			it.insert(4, {"label": "VIBRACIÓN", "right": "SÍ" if aj.vibra else "NO"})   # 1.57
+			it.insert(5, {"label": "AHORRO", "right": "30 FPS" if aj.ahorro else "NO"})   # R3
 			it.append({"label": "COPIA DE SEGURIDAD"})
 		it.append({"label": "VOLVER"})
 		i = await menu(it, {"cls": "start", "initial": i, "title": "OPCIONES"})
@@ -512,6 +558,8 @@ func opciones(desde_titulo := false) -> void:
 			"VIBRACIÓN":
 				aj.vibra = not aj.vibra
 				vibra()
+			"AHORRO":
+				aj.ahorro = not aj.ahorro
 			"BORRAR PARTIDA":
 				if await ask("¿Borrar la partida guardada? No se puede deshacer.", ["Sí, borrarla", "No"]) == 0:
 					DirAccess.remove_absolute(ProjectSettings.globalize_path(GUARDADO))

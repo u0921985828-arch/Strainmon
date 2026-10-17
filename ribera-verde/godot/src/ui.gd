@@ -316,7 +316,7 @@ func ajusta() -> void:
 	var h := V.y - zt - zb - 2 * rim
 	var s := h / SH
 	var k := floorf(s)
-	if k >= 2 and k >= s * .94:
+	if k >= 2 and (k >= s * .94 or Datos.CAL):   # R11: con CAL, siempre entera (a 720p, 3 y no 3,93: los píxeles no bailan), con borde
 		s = k
 	var nsw := clampi(int(floor(w / s / 2)) * 2, 240, SW_MAX)
 	if nsw * s > w:
@@ -678,7 +678,36 @@ func set_held(b: String, v: bool) -> void:
 			if v:
 				dir_order.append(b)
 
+# R14: el mando de juego (la cruceta o el stick izquierdo, A/B, START y Y = MÓVIL)
+const BOTONES_JOY := {JOY_BUTTON_DPAD_UP: "up", JOY_BUTTON_DPAD_DOWN: "down", JOY_BUTTON_DPAD_LEFT: "left", JOY_BUTTON_DPAD_RIGHT: "right",
+	JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "START", JOY_BUTTON_BACK: "B", JOY_BUTTON_Y: "MOVIL"}
+var stick := ""
+func _joy(e: InputEvent) -> void:
+	if (name_box.visible and name_in.has_focus()) or (import_box.visible and import_te.has_focus()):
+		return
+	if e is InputEventJoypadButton and BOTONES_JOY.has(e.button_index):
+		var b: String = BOTONES_JOY[e.button_index]
+		get_viewport().set_input_as_handled()
+		set_held(b, e.pressed)
+		if e.pressed:
+			press(b)
+	elif e is InputEventJoypadMotion and (e.axis == JOY_AXIS_LEFT_X or e.axis == JOY_AXIS_LEFT_Y):
+		var v := Vector2(Input.get_joy_axis(e.device, JOY_AXIS_LEFT_X), Input.get_joy_axis(e.device, JOY_AXIS_LEFT_Y))
+		var d := ""
+		if v.length() > .5:
+			d = ("right" if v.x > 0 else "left") if absf(v.x) > absf(v.y) else ("down" if v.y > 0 else "up")
+		if d != stick:
+			if stick != "":
+				set_held(stick, false)
+			stick = d
+			if d != "":
+				set_held(d, true)
+				press(d)
+
 func _unhandled_input(e: InputEvent) -> void:
+	if e is InputEventJoypadButton or e is InputEventJoypadMotion:
+		_joy(e)
+		return
 	if not (e is InputEventKey) or not TECLAS.has(e.keycode):
 		return
 	if (name_box.visible and name_in.has_focus()) or (import_box.visible and import_te.has_focus()):
@@ -959,7 +988,7 @@ func set_sound(on: bool, guarda := true) -> void:
 # de 25 en 25 %), la velocidad del texto y SONIDO; en un archivo aparte de la partida, que no los borra ----------
 static var AJUSTES := "user://ajustes.json"   # las pruebas usan otro
 const TEXTO_VEL := ["NORMAL", "RÁPIDO", "AL MOMENTO"]
-var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true, "vibra": true}
+var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true, "vibra": true, "ahorro": false}
 
 func ajustes_carga() -> void:
 	if oraculo:
@@ -975,6 +1004,8 @@ func ajustes_aplica() -> void:
 	if sonido:
 		sonido.niveles(aj.musica / 4.0, aj.efectos / 4.0)
 	set_sound(aj.sonido, false)
+	if is_inside_tree() and get_tree().current_scene == self:   # en el juego (no en las pruebas, que van a toda prisa)
+		Engine.max_fps = 30 if aj.ahorro else 60   # R3: a 60 como mucho (a 120 Hz era el doble de trabajo) y 30 con AHORRO
 
 func ajustes_guarda() -> void:
 	if oraculo:
@@ -1671,9 +1702,14 @@ var hud_alarma := false
 var hud_orden := false   # (1.11) con la orden de registro, la barra dice ORDEN
 var hud_tab := Control.new()
 var hud_filas := []   # 1.50: [[etiqueta, valor, color]] del recuadro; vacío, sin recuadro (sin Datos.CAL)
+var hud_ultimo := []   # R15: lo último que se puso; si no cambia, nada
 func hud_pon(t: String, heat: int, sosp := -1, alarma := false, orden := false, filas := []) -> void:
 	if oraculo:
 		return
+	var a := [t, heat, sosp, alarma, orden, filas]
+	if hud.visible and a == hud_ultimo:
+		return
+	hud_ultimo = a.duplicate(true)
 	hud_txt.text = t
 	hud_filas = filas
 	hud_tab.visible = not filas.is_empty()

@@ -142,14 +142,22 @@ func OX() -> int:
 func OY() -> int:
 	return SH - 160
 
+static var _css := {}   # R4: cada color de texto se lee una vez
 static func css(s: String) -> Color:
+	var c = _css.get(s)
+	if c != null:
+		return c
 	if s.begins_with("#"):
-		return Procedural.col(s)
-	var n := s.substr(s.find("(") + 1).replace(")", "").split(",")
-	return Color8(int(n[0]), int(n[1]), int(n[2]), Datos.jsround(float(n[3]) * 255) if n.size() > 3 else 255)
+		c = Procedural.col(s)
+	else:
+		var n := s.substr(s.find("(") + 1).replace(")", "").split(",")
+		c = Color8(int(n[0]), int(n[1]), int(n[2]), Datos.jsround(float(n[3]) * 255) if n.size() > 3 else 255)
+	if _css.size() < 4096:
+		_css[s] = c
+	return c
 
 func _img(im: Image, x: float, y: float, mod := Color.WHITE) -> void:
-	L.draw_texture(Atlas.tex(im), Vector2(x, y), mod)
+	Atlas.dibuja(L, im, Rect2(x, y, im.get_width(), im.get_height()), null, mod)
 
 func _rect(x: float, y: float, w: float, h: float, c: Color) -> void:
 	if w > 0 and h > 0:
@@ -205,6 +213,8 @@ func _fondo_ancho(img: Image, cortes = null) -> void:
 			var b := o.get_region(Rect2i(0, oy, J.SW, oy))
 			b.flip_y()
 			o.blit_rect(b, Rect2i(0, 0, J.SW, oy), Vector2i.ZERO)
+		if cache.size() > 512:   # R7: tope
+			cache.clear()
 		cache[key] = o
 	_img(cache[key], 0, 0)
 
@@ -417,6 +427,8 @@ func _mancha(a: float, tipo: String) -> Image:
 			var t := clampf((d - 1) / 17.0, 0, 1)
 			var al := minf(1, a * 1.2) * (1 - t)
 			im.set_pixel(x, y, Color8(Datos.jsround(c.r8 * al), Datos.jsround(c.g8 * al), Datos.jsround(c.b8 * al), 255))
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = im
 	return im
 
@@ -466,6 +478,8 @@ func _luz(r: int, c: String, a: float) -> Image:
 			var d := Vector2(x + .5 - r, y + .5 - r).length()
 			var al := a * (1 - clampf((d - 1) / (r - 1.0), 0, 1))
 			im.set_pixel(x, y, Color8(Datos.jsround(int(cc[0]) * al), Datos.jsround(int(cc[1]) * al), Datos.jsround(int(cc[2]) * al), 255))
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = im
 	return im
 
@@ -493,6 +507,8 @@ func _encima() -> void:
 	if J.MAPA_V != null:   # 1.42: el mapa de la comarca, un croquis (croquis.gd)
 		var kc := "croquis|%d" % int(J.S.ch)
 		if not cache.has(kc):
+			if cache.size() > 512:   # R7: tope
+				cache.clear()
 			cache[kc] = Croquis.imagen(J.D, int(J.S.ch))
 		var al: int = J.alto_libre()
 		var o := Croquis.origen_mapa(J.SW, al)
@@ -509,6 +525,8 @@ func _encima() -> void:
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 		var hk: String = "hoja|" + str(J.FICHA_V.l[J.FICHA_V.i])
 		if not cache.has(hk):
+			if cache.size() > 512:   # R7: tope
+				cache.clear()
 			cache[hk] = Hoja.imagen(Hoja.params(J.D, J.S, J.FICHA_V.l[J.FICHA_V.i]))
 		var hp: Vector2i = J.hoja_xy()
 		_img(cache[hk], hp.x, hp.y)
@@ -549,6 +567,8 @@ func _farola(a: float) -> Image:
 			var t := clampf((d - 1) / 27.0, 0, 1)
 			var al := a * .7 * (1 - t)
 			im.set_pixel(x, y, Color8(Datos.jsround(255 * al), Datos.jsround(214 * al), Datos.jsround(120 * al), 255))
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = im
 	return im
 
@@ -567,14 +587,14 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 			var f = Atlas.frame_de(an[0][0], an[0][1], "unica", (now - (pt if pt else now)) if pis else now, {"bucle": not pis})
 			if f:
 				if f.c.get_width() >= 32:
-					L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), Rect2((tx & 1) * 16, (ty & 1) * 16, 16, 16))
+					Atlas.dibuja(L, f.c, Rect2(sx, sy, 16, 16), Rect2((tx & 1) * 16, (ty & 1) * 16, 16, 16))
 				else:
 					_img(f.c, sx, sy)
 				return true
 	if Datos.CAL and MOSAICO_TILE.has(k):   # 1.48 (lo pidió el usuario: «más de RPG clásico»): el mosaico de 64 × 64, sin la rejilla de 16
 		var fp = Atlas.frame_de("exterior-mosaico", "mo-" + k, "unica", 0, {"i": 0})
 		if fp:
-			L.draw_texture_rect_region(Atlas.tex(fp.c), Rect2(sx, sy, 16, 16), Rect2(((tx & 3) + 4 * (ty & 3)) * 16, 0, 16, 16))
+			Atlas.dibuja(L, fp.c, Rect2(sx, sy, 16, 16), Rect2(((tx & 3) + 4 * (ty & 3)) * 16, 0, 16, 16))
 			if HIERBA.has(k):
 				_canto_hierba(tx, ty, sx, sy)
 				if k == "grass":
@@ -585,9 +605,9 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 		return false
 	if f.c.get_width() > 16 and f.c.get_height() == 16:   # tira de variantes (orgánico)
 		var v: int = (variante(k, tx, ty) + floori(now / 600)) % 4 if k == "baile" else variante(k, tx, ty)   # la pista de GAUA cambia cada 0,6 s (1.30)
-		L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), Rect2(v * 16, 0, 16, 16))
+		Atlas.dibuja(L, f.c, Rect2(sx, sy, 16, 16), Rect2(v * 16, 0, 16, 16))
 		return true
-	L.draw_texture_rect(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), false)
+	Atlas.dibuja(L, f.c, Rect2(sx, sy, 16, 16))
 	if k == "grass":
 		_detalle(tx, ty, sx, sy)
 	return true
@@ -636,7 +656,7 @@ func _detalle(tx: int, ty: int, sx: int, sy: int) -> void:
 	var f = Atlas.frame_de(Atlas.cubre("misc:detalles"), "detalles", "unica", 0, {"i": 0})
 	if f == null:
 		return
-	L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(sx + (h / 7) % 9, sy + (h / 11) % 9, 8, 8), Rect2((h / 3) % 5 * 8, 0, 8, 8))
+	Atlas.dibuja(L, f.c, Rect2(sx + (h / 7) % 9, sy + (h / 11) % 9, 8, 8), Rect2((h / 3) % 5 * 8, 0, 8, 8))
 
 const DESF := {"tree": [6, 3], "tree2": [6, 3], "manzano": [5, 3], "monte": [4, 2], "monte2": [4, 2]}
 static func desfase(o: String, x: int, y: int) -> Dictionary:
@@ -663,7 +683,7 @@ func _arte_orilla(m: Dictionary, k: String, tx: int, ty: int, sx: int, sy: int) 
 		return
 	var f = Atlas.frame_de("tileset-transiciones", TRANS[k] + "-%02d" % mk, "unica", 0, {"i": 0})
 	if f:
-		L.draw_texture_rect(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), false)
+		Atlas.dibuja(L, f.c, Rect2(sx, sy, 16, 16))
 
 # los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
 const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13, "fotoMaite": -10, "extrN": -14, "extrG": -14, "filtroN": -12, "ctrlN": -12, "fotoK": -13, "ojoBuey": -13, "timon": -13, "red": -13, "diana": -13, "engranaje": -13, "neonH": -13, "copas": -16, "tuboS": -13, "botesW": -16, "neonG": -13}   # 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared; 1.34: lo de las paredes de los clubs, del bajo y de los grows
@@ -1147,6 +1167,8 @@ func _sitio(st: Dictionary) -> void:
 							o[Vector2i(xx + 1, yy)] = c
 			trazos.append(o)
 			s += 5
+		if cache.size() > 512:   # R7: tope
+			cache.clear()
 		cache[key] = trazos
 	var col := Color8(60, 70, 90)
 	var a := Datos.jsround(.45 * 255) / 255.0
@@ -1219,7 +1241,7 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 			var im: Image = f.c
 			if V.get("cabina") and va:
 				im = _en_cabina(f, va, int(V.sube), cy)
-			L.draw_texture_rect_region(Atlas.tex(im), Rect2(Datos.jsround(xp - f.cel.ancla[0]), Datos.jsround(yp - int(V.sube) - f.cel.ancla[1]), im.get_width(), cy), Rect2(0, 0, im.get_width(), cy))
+			Atlas.dibuja(L, im, Rect2(Datos.jsround(xp - f.cel.ancla[0]), Datos.jsround(yp - int(V.sube) - f.cel.ancla[1]), im.get_width(), cy), Rect2(0, 0, im.get_width(), cy))
 		else:
 			_pinta(f, xp, yp - int(V.sube))
 		if vd:
@@ -1570,6 +1592,8 @@ func _elipse(rx: float, ry: float) -> Dictionary:
 						n += 1
 			if n:
 				o[Vector2i(x, y)] = n / 256.0
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = o
 	return o
 
@@ -1584,7 +1608,7 @@ func _retrato(look, cx: float, fy: float, k: int) -> void:
 	if f == null:
 		return
 	var im: Image = f.c
-	L.draw_texture_rect(Atlas.tex(im), Rect2(Datos.jsround(cx - f.cel.ancla[0] * k), Datos.jsround(fy - f.cel.ancla[1] * k), im.get_width() * k, im.get_height() * k), false)
+	Atlas.dibuja(L, im, Rect2(Datos.jsround(cx - f.cel.ancla[0] * k), Datos.jsround(fy - f.cel.ancla[1] * k), im.get_width() * k, im.get_height() * k))
 
 # ---------- la carpa, vista B (renderCarpa sin vista C) ----------
 func _carpa_fondo() -> void:
@@ -1713,6 +1737,8 @@ func _cono() -> void:
 			var t := clampf((p.y + .5 - fy) / (yf - fy), 0, 1)
 			var al: float = a * (1 - t) * cob[p]
 			o[p] = Color8(Datos.jsround(luz.r8 * al), Datos.jsround(luz.g8 * al), Datos.jsround(luz.b8 * al), 255)
+		if cache.size() > 512:   # R7: tope
+			cache.clear()
 		cache[key] = o
 	L.draw_set_transform(Vector2(OX(), OY()))
 	var o: Dictionary = cache[key]
@@ -1759,7 +1785,7 @@ func _img_clip(im: Image, x: int, y: int, src: Rect2i, clip: Rect2i, mod: Color)
 	if dst.size.x <= 0 or dst.size.y <= 0:
 		return
 	var s := Rect2i(src.position + dst.position - Vector2i(x, y), dst.size)
-	L.draw_texture_rect_region(Atlas.tex(im), Rect2(dst), Rect2(s), mod)
+	Atlas.dibuja(L, im, Rect2(dst), Rect2(s), mod)
 
 # un rectángulo recortado al de la carpa
 func _rect_clip(x: int, y: int, w: int, h: int, col: Color, clip: Rect2i) -> void:

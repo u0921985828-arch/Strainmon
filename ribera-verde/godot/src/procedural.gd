@@ -137,6 +137,8 @@ static func carpa_mapa(tk: String) -> Image:
 		t.F(w - 9, ht + hf - 9, 6, 4, K.osc)
 		for i in range(0, 6, 2):
 			t.F(w - 9 + i, ht + hf - 9, 1, 4, "#3a3c44")
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = t.im
 	return t.im
 
@@ -198,6 +200,8 @@ static func carpa34(tk: String) -> Image:
 	t.linea(P.call(0, Dp / 2, H - 4), P.call(W, Dp / 2, H - 4), K.marco2)
 	var bo: Array = P.call(W - 12, Dp, H - 14)
 	t.blob(bo[0], bo[1], 3.5, 3.5, "#26272c", K.som)
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = t.im
 	return t.im
 
@@ -269,6 +273,8 @@ static func maceta34(k: String) -> Image:
 		t.F(1, Datos.jsround(ry + hb * .45), w - 2, 1, Datos.shade(cu, -18))
 		t.F(0, Datos.jsround(ry + 1), 1, 2, Datos.shade(bo, -20))
 		t.F(w - 1, Datos.jsround(ry + 1), 1, 2, Datos.shade(bo, -20))
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = t.im
 	return t.im
 
@@ -315,6 +321,8 @@ static func planta34(po: String, st: int, dry: bool, bud: String, cw := 1e9, ch 
 		t.F(cx, top + 2, 1, H - 2, g2)
 		t.blob(cx - 2, top + 1.5, 2, 1.2, g1, g2, g3)
 		t.blob(cx + 3, top + 1.5, 2, 1.2, g1, g2, g3)
+		if cache.size() > 512:   # R7: tope
+			cache.clear()
 		cache[key] = t.im
 		return t.im
 	if f == 1:
@@ -322,6 +330,8 @@ static func planta34(po: String, st: int, dry: bool, bud: String, cw := 1e9, ch 
 		hoja.call(cx - 3, B - H * .45, 1.5)
 		hoja.call(cx + 3, B - H * .6, 1.5)
 		hoja.call(cx + .5, top + 3, 1.6)
+		if cache.size() > 512:   # R7: tope
+			cache.clear()
 		cache[key] = t.im
 		return t.im
 	var pisos := 5 if po == "s" else 6
@@ -357,6 +367,8 @@ static func planta34(po: String, st: int, dry: bool, bud: String, cw := 1e9, ch 
 				t.P(px, py, "#ffffff")
 	else:
 		hoja.call(cx + .5, top + 4.5, 1.6 if mu else 2.2)
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = t.im
 	return t.im
 
@@ -403,6 +415,8 @@ static func foco34(id: String) -> Image:
 		for i in int(floor(w / 3.0)):
 			t.F(2 + i * 3, 9, 2, 1, d[i % 3])
 		t.F(cx - 3, 4, 6, 1, "#5a5e68")
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = t.im
 	return t.im
 
@@ -436,6 +450,8 @@ static func extra34(k: String) -> Image:
 		t.F(30, 1, 2, 10, "#2a2b30")
 		t.blob(4, 6, 3.5, 3.5, "#3a3c44", "#1c1d22", "#6a6e78")
 		t.F(6, 4, 2, 4, "#a8aebb")
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = t.im
 	return t.im
 
@@ -481,6 +497,8 @@ static func deposito34(l: float) -> Image:
 			if dentro.call(px, py, ry, ry):
 				t.P(px, py, "#5a7a98")
 	t.F(Datos.jsround(r) - 2, Datos.jsround(ry) - 1, 4, 2, "#1c1d22")
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = t.im
 	return t.im
 
@@ -508,6 +526,8 @@ static func garrafa34(l: float) -> Image:
 	t.F(a, 1, 1, 3, o)
 	t.F(w - 4, 0, 3, 3, "#3a6aa8")
 	t.F(w - 4, 0, 3, 1, "#6a9ad8")
+	if cache.size() > 512:   # R7: tope
+		cache.clear()
 	cache[key] = t.im
 	return t.im
 

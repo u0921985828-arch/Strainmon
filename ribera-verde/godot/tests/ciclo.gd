@@ -323,7 +323,8 @@ func _corre() -> void:
 	dir = arg("--salida", dir)
 	Juego = load("res://src/juego.gd")
 	Juego.GUARDADO = "user://prueba-ciclo.json"
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO))
+	for x in ["", ".bak", ".tmp"]:   # E1/E2 (fase 3): sin la copia de una vuelta anterior
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO + x))
 	UI.AJUSTES = "user://prueba-ajustes.json"   # el primer arranque: sin el aviso de edad aceptado
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(UI.AJUSTES))
 	Cultivo.pm = int(arg("--azar", "4242"))   # el azar del Park-Miller: la prueba sale siempre igual
@@ -406,7 +407,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("OPCIONES"), 60)
 	await elige("OPCIONES")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
-	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
+	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
 	await elige("MÚSICA")
 	await hasta(func(): return J.menu_box.visible, 60)
 	var so0 = J.sonido
@@ -437,20 +438,26 @@ func titulo_e_intro() -> void:
 	var so = J.sonido
 	await hasta(func(): return so.temas.has("home"), 1800)
 	check("la canción de la intro (home) ya está sintetizada", so.temas.has("home"))
-	await hasta(func(): return so.temas.size() == so.total, 6000)
+	# R10 (fase 4): los OGG se leen al pedirlos; en memoria, los chiptunes y como mucho la que suena y la que se apaga
+	var chip: int = so.total - so.grabadas.size()
+	await hasta(func(): return so.temas.values().filter(func(w): return not w is AudioStreamOggVorbis).size() == chip, 6000)
 	var oye := true
 	var mudos := []
 	for k in so.efectos:
 		if pico(so.efectos[k]) < 100:
 			mudos.append(k)
 	for k in so.temas:
-		if pico(so.temas[k]) < 100:
+		if not so.temas[k] is AudioStreamOggVorbis and pico(so.temas[k]) < 100:
 			mudos.append(k)
+	var leen := 0
+	for k in so.grabadas:
+		var o = so._ogg(k)
+		leen += 1 if o is AudioStreamOggVorbis and o.get_length() > 1 else 0
 	oye = mudos.is_empty()
 	if not oye:
-		print("  en silencio: ", mudos, " · ", mudos.map(func(k): return pico(so.efectos[k] if so.efectos.has(k) else so.temas[k])))
+		print("  en silencio: ", mudos)
 	var ogg: int = so.temas.values().filter(func(w): return w is AudioStreamOggVorbis).size()
-	check("sonido: %d efectos y %d canciones (%d grabadas, todas las de musica/), ninguno en silencio" % [so.efectos.size(), so.temas.size(), ogg], so.listo and so.efectos.size() == 18 and so.temas.size() == so.total and ogg == so.grabadas.size() and ogg >= 40 and oye)
+	check("sonido: %d efectos, %d chiptunes y %d grabadas que se leen (%d en memoria), ninguno en silencio" % [so.efectos.size(), chip, leen, ogg], so.listo and so.efectos.size() == 18 and leen == so.grabadas.size() and leen >= 40 and ogg <= 3 and oye)
 	# (la del título se apaga en 0,3 s y la nueva entra a los 0,4 s)
 	await hasta(func(): return so.actual == "home" and so.musica.playing and so.musica.stream == so.temas.home, 120)
 	check("en la intro suena la música de casa, tras el fundido", so.actual == "home" and so.musica.playing and so.musica.stream == so.temas.home)
@@ -524,10 +531,10 @@ func prologo() -> void:
 	var dia := {}
 	for k in J.MAPS:
 		var mu: String = J.MAPS[k].music
-		temas_ok = temas_ok and J.sonido.temas.has(mu) and J.sonido.temas[mu] is AudioStreamOggVorbis
+		temas_ok = temas_ok and J.sonido.grabadas.has(mu)
 		if J.D.ZONAS.has(k):
 			var n: String = "night" if mu == "town" else mu + "_n"
-			temas_ok = temas_ok and J.sonido.temas.has(n) and J.sonido.temas[n] is AudioStreamOggVorbis and n != mu
+			temas_ok = temas_ok and J.sonido.grabadas.has(n) and n != mu
 			dia[mu] = n
 	check("música: %d mapas con su canción; %d zonas con la suya de día y de noche, distintas" % [J.MAPS.size(), dia.size()], temas_ok and dia.size() == J.D.ZONAS.size())
 	var pa: Dictionary = J.D.PARADAS.mendialde

@@ -332,11 +332,11 @@ static func pinta_calle(P, e: float) -> void:
 static func _tile(P, k: String, tx: int, ty: int, sx: int, sy: int) -> void:
 	var fp = Atlas.frame_de("exterior-mosaico", "mo-" + k, "unica", 0, {"i": 0})
 	if fp:
-		P.L.draw_texture_rect_region(Atlas.tex(fp.c), Rect2(sx, sy, 16, 16), Rect2(((tx & 3) + 4 * (ty & 3)) * 16, 0, 16, 16))
+		Atlas.dibuja(P.L, fp.c, Rect2(sx, sy, 16, 16), Rect2(((tx & 3) + 4 * (ty & 3)) * 16, 0, 16, 16))
 		return
 	var f = Atlas.frame_de(Atlas.cubre("tile:" + k), k, "unica", 0, {"i": 0})
 	if f:
-		P.L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), Rect2(0, 0, 16, 16))
+		Atlas.dibuja(P.L, f.c, Rect2(sx, sy, 16, 16), Rect2(0, 0, 16, 16))
 
 static func _peatones(P, e: float, acera: int, yp: int) -> void:
 	var sw: int = P.J.SW
