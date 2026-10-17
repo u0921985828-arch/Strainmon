@@ -13,7 +13,14 @@ Lo que pidió el usuario tras la 1.56 («estos recursos se podrían usar antes d
   - la cruceta con histéresis (`CRUZ_HISTERESIS`): al deslizar el pulgar, la flecha de al lado tiene que ganar por unos 11° pasada la diagonal, sin zigzag;
   - andando seguido, cada paso arranca con lo que sobró del anterior (`paso_sobra`): 240 ms por casilla exactos, sin tirones entre casillas (antes, 250 a 60 fps);
   - un toque de vibración al apretar cada mando (`vibra`), con OPCIONES → VIBRACIÓN (sí por defecto; permiso `vibrate` en el APK).
-- Pruebas: `tests/viaje.gd` (91) y `tests/ciclo.gd` (arranca con la carga y acaba sola en el título; los dedos colgados, la histéresis y los 240 ms por casilla).
+- **Los mandos donde caen los pulgares** (lo pidió el usuario: «que sean lo mejor para jugar con el móvil en horizontal, estudiando en qué zonas caen los dedos, por proporciones, para Android, iOS y demás»; `geo_pulgar` y `PUL` en `ui.gd`):
+  - en milímetros de verdad: en el móvil y la tableta, los ppp de la pantalla (`screen_get_dpi`) en vez de estimarlos por el alto;
+  - más grandes (lo pidió el usuario: «la idea es hacerlos más grandes, no más pequeños»): la cruceta de 30 mm (flechas de 10 mm) donde descansa el pulgar izquierdo, a unos 25 mm del canto y 24 del borde de abajo; A y B de 14 mm (el doble de los 48 dp de Android y los 44 pt de iOS) en diagonal por el arco del pulgar derecho, A más arriba y fuera, B más abajo y dentro, a unos 19 mm; nunca más pequeños que los de antes (`fmin`, por `geo_mandos`): en los móviles, de un 20 a un 35 % más; en la tableta, como antes o algo más;
+  - nada a menos de 9 mm de los cantos de los lados (el gesto de Atrás de Android) ni de 8 del de abajo (la barra de inicio de iOS), y dentro de la zona segura (muesca, isla, esquinas redondas), midiendo el pulgar desde el canto de verdad;
+  - START y MÓVIL juntos encima de A y B (MÓVIL al lado de START o, si no cabe, encima), fuera del arco de descanso y sin pisar el recuadro del HUD; la zona de toque de A y B, mayor que el dibujo pero por debajo de ellos y sin entrar en el escenario de diálogos;
+  - en los táctiles (Android, iOS, tabletas y la web en el móvil, `es_movil`); en el escritorio, los de antes;
+  - si no caben al lado del texto (un móvil pequeño), primero se arriman al canto y después encogen, hasta el 80 % (y nunca por debajo de los de antes).
+- Pruebas: `tests/mandos_geo.gd` (242, con las ventanas de escritorio de 4:3 a 21:9 y los tamaños de antes y de ahora en mm: seis pantallas —Android 20:9, Android barato, iPhone con isla, iPhone SE, iPad y tableta Android— con sus ppp y su zona segura), `tests/viaje.gd` (91) y `tests/ciclo.gd` (arranca con la carga y acaba sola en el título; los dedos colgados, la histéresis y los 240 ms por casilla).
 
 ## 1.56 · Godot 0.47.0
 

@@ -254,7 +254,15 @@ func _fuente(f: String, suave := true) -> FontFile:
 	return o
 
 # ---------- pantalla y mandos (06b-pantalla.js) ----------
+# 1.57: para las pruebas de los mandos por móvil (tests/mandos_geo.gd): los ppp y la zona segura de un móvil de verdad
+static var DPI_PRUEBA := 0.0
+static var ZONA_PRUEBA := []
+static func es_movil() -> bool:
+	return DPI_PRUEBA > 0 or OS.has_feature("mobile") or OS.has_feature("web_android") or OS.has_feature("web_ios")
+
 func _zona_segura() -> Array:
+	if ZONA_PRUEBA.size() == 4:
+		return ZONA_PRUEBA
 	if not OS.has_feature("mobile"):
 		return [0.0, 0.0, 0.0, 0.0]
 	var r := Rect2(DisplayServer.get_display_safe_area())
@@ -263,7 +271,12 @@ func _zona_segura() -> Array:
 
 # px de pantalla por px CSS: por los ppp del móvil y, si el sistema no los da bien (escritorio, Xvfb), como un móvil en
 # horizontal, que mide 360-430 px CSS de alto
-func _dp() -> float:
+func _dp(antes := false) -> float:
+	if Datos.CAL and es_movil() and not antes:   # 1.57: en el móvil (y la tableta), por los ppp de verdad: los mandos, en mm, del tamaño del pulgar
+		var dpi: float = DPI_PRUEBA if DPI_PRUEBA > 0 else float(DisplayServer.screen_get_dpi())
+		var hh: float = get_viewport_rect().size.y
+		if dpi >= 100:
+			return clampf(dpi / 160.0, hh / 1000.0, hh / 280.0)
 	return maxf(1.0, maxf(DisplayServer.screen_get_dpi() / 160.0, get_viewport_rect().size.y / 430.0))
 
 func ajusta() -> void:
@@ -299,7 +312,13 @@ func ajusta() -> void:
 	pantalla.size = Vector2(cw, ch)
 	# mandos en mm (geo_mandos): se calculan en px CSS, como el HTML, y se pasan a px de pantalla
 	var us_min := minf(s, maxf(s * .5, 1.3 * dp))
-	var G := geo_mandos(V.x / dp, V.y / dp, zl / dp, zr / dp, zt / dp, zb / dp, 120 * us_min / dp)
+	var G: Dictionary = geo_mandos(V.x / dp, V.y / dp, zl / dp, zr / dp, zt / dp, zb / dp, 120 * us_min / dp)
+	if Datos.CAL and es_movil():   # 1.57: en el móvil y la tableta (táctiles), por los pulgares, y nunca más pequeños que los de antes
+		var da := _dp(true)
+		var Ga: Dictionary = G if da == dp else geo_mandos(V.x / da, V.y / da, zl / da, zr / da, zt / da, zb / da, 120 * minf(s, maxf(s * .5, 1.3 * da)) / da)
+		var fmin := maxf(Ga.A.size.x / (PUL.ab * MM), Ga.cruz.size.x / (PUL.cruz * MM)) * da / dp
+		G = geo_pulgar(V.x / dp, V.y / dp, zl / dp, zr / dp, zt / dp, zb / dp, 120 * us_min / dp, fmin)
+	pulgar_f = G.get("f", 1.0)
 	for n in ["dpad", "cruz", "ab", "A", "B", "start", "movil", "sonido"]:
 		G[n] = Rect2(G[n].position * dp, G[n].size * dp)
 	var kp: float = G.k * dp
@@ -397,6 +416,76 @@ func geo_mandos(W: float, H: float, il: float, ir: float, it: float, ib: float, 
 		"dpad": R.call(dx, dy, cx + 13 * s - dx, minf(H - ib, cy + 15 * s) - dy), "cruz": R.call(cx - 12 * s, cy - 12 * s, 24 * s, 24 * s),
 		"ab": R.call(abx, aby, abr - abx, abb - aby), "A": R.call(ax - 5.25 * s, ay - 5.25 * s, 10.5 * s, 10.5 * s), "B": R.call(bx - 5.25 * s, by - 5.25 * s, 10.5 * s, 10.5 * s),
 		"start": R.call(stx - 7.5 * s, ay - 16.25 * s, 15 * s, 7 * s), "movil": R.call(cx - 7.5 * s, cy - 23 * s, 15 * s, 7 * s), "sonido": R.call(W - ir - 4.5 * m - 15 * s, it + 3 * s, 15 * s, 7 * s)}
+
+# 1.57 (lo pidió el usuario: «que sean lo mejor para jugar con el móvil en horizontal, estudiando en qué zonas caen los dedos»): los
+# mandos donde descansan los pulgares con el móvil cogido con las dos manos, en mm desde el canto de verdad del móvil (el pulgar no sabe
+# de muescas) y sin salirse de la zona segura (muesca, isla, esquinas redondas, la barra de inicio de iOS):
+#   - el pulgar apoya a unos 25 mm del canto y 20-30 mm del borde de abajo; gira desde la base (la esquina de abajo), así que A y B van
+#     en diagonal, siguiendo su arco: B más abajo y hacia dentro, A más arriba y hacia fuera
+#   - nada a menos de PUL.canto mm del canto de los lados (el gesto de Atrás de Android nace ahí) ni de PUL.abajo del de abajo (la barra
+#     de inicio de iOS y los gestos de Android)
+#   - teclas de 10 mm en la cruz (30 mm entera) y de 14 mm en A y B (Android pide 48 dp ≈ 7,6 mm e iOS 44 pt ≈ 7 mm; en un juego,
+#     más), separadas para no pisar dos; y el toque, en una zona mayor que el dibujo (ZONA)
+#   - START y MÓVIL, menos usados, juntos encima de A y B (MÓVIL al lado de START o, en una pantalla más cuadrada, encima), fuera del arco de descanso (a la izquierda, arriba, va el recuadro del HUD);
+#     SONIDO, arriba a la derecha
+# Si no cabe al lado de la escena de diálogos (un móvil pequeño), primero se arriman al canto (hasta su margen) y después encogen,
+# hasta PUL.min (nunca por debajo de los de antes, geo_mandos: en la tableta salen más grandes, fmin); si ni así, se quedan en PUL.min y la caja del texto queda un poco por debajo de ellos
+const PUL := {"cruz": 30.0, "cx": 25.0, "cy": 24.0, "ab": 14.0, "ax": 18.0, "ay": 28.0, "bdx": -17.5, "bdy": 8.5, "canto": 9.0, "abajo": 8.0,
+	"tecla": [17.0, 9.0], "zona": 7.0, "min": 0.8}
+var pulgar_f := 1.0   # el tamaño de los mandos por los pulgares (1: el de PUL)
+func geo_pulgar(W: float, H: float, il: float, ir: float, it: float, ib: float, med: float, fmin := 0.0) -> Dictionary:
+	var c := (W + il - ir) / 2
+	var mide := func(f: float, fp: float, pila := false) -> Dictionary:   # f, el tamaño; fp, lo lejos del canto (1: donde descansa el pulgar; 0: al margen)
+		var s := f * MM
+		var hc: float = PUL.cruz * s / 2
+		var ha: float = PUL.ab * s / 2
+		var tw: float = PUL.tecla[0] * s
+		var th: float = PUL.tecla[1] * s
+		# la cruz: a cx del canto, sin pasar del margen del canto ni de la zona segura
+		var mi := maxf(PUL.canto * MM, il + 2 * MM) + hc
+		var cx := maxf(lerpf(mi, PUL.cx * MM, fp), mi)
+		var ab := minf(H - PUL.abajo * MM, H - ib - 2 * MM) - hc
+		var cy := minf(lerpf(ab, H - PUL.cy * MM, fp), ab)
+		var md := minf(W - PUL.canto * MM, W - ir - 2 * MM) - ha
+		var ax := minf(lerpf(md, W - PUL.ax * MM, fp), md)
+		var aa := minf(H - PUL.abajo * MM, H - ib - 2 * MM) - ha - PUL.bdy * s
+		var ay := minf(lerpf(aa, H - PUL.ay * MM, fp), aa)
+		var bx: float = ax + PUL.bdx * s
+		var by: float = ay + PUL.bdy * s
+		var st := Vector2(ax - 2 * s, ay - ha - 4 * s - th / 2)
+		var mv := Vector2(st.x, st.y - th - 3 * s) if pila else Vector2(st.x - tw - 3 * s, st.y)   # al lado de START o, si no cabe, encima
+		var so := Rect2(W - ir - 3 * s - tw, it + 3 * s, tw, th)
+		return {"s": s, "hc": hc, "ha": ha, "tw": tw, "th": th, "cx": cx, "cy": cy, "ax": ax, "ay": ay, "bx": bx, "by": by, "mv": mv, "st": st, "so": so,
+			"izq": cx + hc + 2 * s, "der": W - minf(bx - ha, mv.x - tw / 2) + 2 * s, "arriba": mv.y - th / 2}
+	var cabe := func(g: Dictionary) -> bool:
+		return g.izq + med <= c and g.der + med <= W - c and g.arriba >= it + 1 * MM and g.arriba >= g.so.end.y + 2.5 * MM
+	var f := maxf(1.0, fmin)
+	var fp := 1.0
+	var prueba := func(f: float, fp: float) -> Dictionary:   # MÓVIL al lado de START y, si así no cabe, encima
+		var g1: Dictionary = mide.call(f, fp)
+		return g1 if cabe.call(g1) else mide.call(f, fp, true)
+	var g: Dictionary = prueba.call(f, fp)
+	while fp > 0 and not cabe.call(g):
+		fp = maxf(0, fp - .05)
+		g = prueba.call(f, fp)
+	while f > maxf(PUL.min, fmin) + .001 and not cabe.call(g):
+		f -= .01
+		g = prueba.call(f, fp)
+	var s: float = g.s
+	var R := func(x: float, y: float, w: float, h: float) -> Rect2: return Rect2(Datos.jsround(x), Datos.jsround(y), Datos.jsround(w), Datos.jsround(h))
+	var z: float = PUL.zona * s
+	var hc: float = g.hc
+	var ha: float = g.ha
+	var ab := Rect2(minf(g.ax, g.bx) - ha - z, g.ay - ha - z, absf(g.ax - g.bx) + 2 * ha + 2 * z, g.by - g.ay + 2 * ha + 2 * z)
+	var m: float = minf(c - g.izq, W - g.der - c)
+	var lim := maxf(0, minf(med, m))   # las zonas, sin entrar en el escenario de diálogos
+	ab = ab.intersection(Rect2(c + lim, g.st.y + g.th / 2 + 1 * s, W - c - lim, H))   # y por debajo de START y MÓVIL (la zona manda al tocar)
+	var dp := Rect2(g.cx - hc - z, g.cy - hc - z, 2 * hc + 2 * z, 2 * hc + 2 * z).intersection(Rect2(0, 0, c - lim, H))
+	return {"f": f, "k": s, "med": m,
+		"dpad": R.call(dp.position.x, dp.position.y, dp.size.x, dp.size.y), "cruz": R.call(g.cx - hc, g.cy - hc, 2 * hc, 2 * hc),
+		"ab": R.call(ab.position.x, ab.position.y, ab.size.x, ab.size.y), "A": R.call(g.ax - ha, g.ay - ha, 2 * ha, 2 * ha), "B": R.call(g.bx - ha, g.by - ha, 2 * ha, 2 * ha),
+		"start": R.call(g.st.x - g.tw / 2, g.st.y - g.th / 2, g.tw, g.th), "movil": R.call(g.mv.x - g.tw / 2, g.mv.y - g.th / 2, g.tw, g.th),
+		"sonido": R.call(g.so.position.x, g.so.position.y, g.so.size.x, g.so.size.y)}
 
 # rectángulo del escenario .ui (en px de pantalla)
 # 1.43: lo que queda libre del lienzo (en píxeles del juego) por encima del cuadro del texto, para centrar ahí el calendario y el mapa
