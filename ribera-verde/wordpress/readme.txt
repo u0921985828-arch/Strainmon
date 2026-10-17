@@ -1,10 +1,10 @@
 === Landrace Hunters ===
-Version: 1.5.2
+Version: 1.5.3
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.5.2.zip → Activar.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.5.3.zip → Activar.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -13,6 +13,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
+1.5.3 — Landrace Hunters 1.57 (Godot 0.47.0): la carga en la carretera y el título con más atrezo, el viaje de perfil, los tubos de las carpas con codos y los mandos más grandes, donde caen los pulgares.
 1.5.2 — Landrace Hunters 1.55.2 (Godot 0.46.1): el que cuida las madres de la nave, delante de su carpa y no de la puerta de la habitación.
 1.5.1 — El juego de hoy (Landrace Hunters 1.55.1, Godot 0.46.0): cada acción de cerca con sprites a mano (regar, abonar, esquejar, cosechar, fumar, dormir…), abrir con llave o clave, las carpas ordenables con su tubo de extracción a la ventana y cualquier mueble de la casa ordenable, con la puerta del sótano y la escalera del camarote siempre libres.
 1.5.0 — El juego de hoy (Landrace Hunters 1.52.0, Godot 0.45.0): todo lo de la 1.44 a la 1.52 —el bajo de las setas entero, los negocios por dentro, sentarse y fumar, los locales a escala, el muelle de Puerto Viejo con los barcos, el piso franco y las obras, el club KAIA y la ley, el sótano, el tiempo y las estaciones en el móvil, la Ruderalis y las autoflorecientes—.

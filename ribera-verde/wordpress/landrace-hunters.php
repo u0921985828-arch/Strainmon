@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Landrace Hunters
  * Description: Hospeda el juego «Landrace Hunters» (Godot 4.3, versión web: la misma partida que la app de Android) dentro de WordPress: dirección propia a pantalla completa y atajo [landrace_hunters] para incrustarlo en cualquier página. Todo se sirve desde el propio plugin.
- * Version: 1.5.2
+ * Version: 1.5.3
  * Author: WOLFCADE
  * License: GPL-2.0-or-later
  * Text Domain: landrace-hunters
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Landrace_Hunters {
 
-	const VERSION   = '1.5.2';
+	const VERSION   = '1.5.3';
 	const OPTION    = 'landrace_hunters';
 	const QUERY_VAR = 'landrace_hunters';
 
