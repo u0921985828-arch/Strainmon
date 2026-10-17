@@ -214,6 +214,21 @@ func _corre() -> void:
 		corre(func(): await J.menu_sentado())
 		chk(MENUS.size() >= 1 and MENUS[0].any(func(t): return t.begins_with("Hablar con")) and MENUS[0].has("Pedir algo"), "el sofá del club: hablar y pedir %s" % [MENUS.slice(0, 1)])
 		J.levantarte()
+	# 1.55.3: cada asiento con su altura y su sitio (SENT_GEO); la silla gaming, centrada en sus dos casillas; de frente, las
+	# piernas de la cadera al suelo
+	for k in J.ASIENTOS:
+		chk(J.SENT_GEO.has(k), "la altura de %s" % k)
+		var g: Array = J.sent_geo(k)
+		chk(int(g[1]) >= 1 and int(g[1]) <= 11, "%s: la cadera en la casilla (%s)" % [k, g])
+	chk(int(J.sent_geo("sillaG")[0]) == 8, "la silla gaming, en medio de sus dos casillas")
+	chk(int(J.sent_geo("silla")[1]) < 9 and int(J.sent_geo("sofaF")[1]) < 9, "en la silla y el sofá, más alto que de pie")
+	for h in [5, 7, 9]:
+		var pl: Array = J.pintor.piernas_sentado(15 - h)
+		chk(pl.size() == 15 - h and pl[-1] == "..aaa....aaa..", "de frente, cadera en %d: %d filas de piernas" % [h, pl.size()])
+	J.SENT = {"x": 16, "y": 3, "d": "norte", "k": "sillaG"}
+	var bo: Vector2 = J.boca_sentado()
+	chk(int(bo.x) == 16 * 16 + 16 and int(bo.y) < 3 * 16, "el humo de la silla gaming, encima de la cabeza (%s)" % bo)
+	J.SENT = null
 	J.enter_map("home", 4, 4, "up")
 	MENUS = []
 	QUIERO = ["Usar el ordenador"]

@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.55.3 · Godot 0.46.2
+
+Lo que pidió el usuario tras la 1.55.2 («fallos de arquitectura notables y todavía no has configurado bien en todos los muebles donde se puede sentar, la altura correcta»). Solo Godot, con `Datos.CAL`.
+
+- **Sentarse a la altura de cada asiento** (`SENT_GEO` en `mundo.gd`, `_pj_sentado` en `pinta.gd`): la cadera en el cojín medido en cada sprite (silla, silla gaming, sillón, sofá, sofás del club y del reservado, banco y taburete). La silla gaming, centrada en sus dos casillas y no a un lado; de espaldas, solo el torso, con la cabeza asomando por encima del respaldo (en la silla, 3 px más arriba que antes); de frente, las piernas dobladas de la cadera al suelo, tantas espinillas como haga falta (`piernas_sentado`); el humo sale de la boca en cada asiento (`boca_sentado`).
+- **El tubo de extracción**: pegado al techo, por encima de puertas y cuadros, y entra en la ventana por una placa de chapa en la hoja de arriba (la de abajo sigue siendo cristal), en vez de tapar la ventana entera con una rejilla; cada carpa a su ventana, sin tramos de techo uno encima de otro (`ventanas_tubos`, `_asigna_ventanas`).
+- Pruebas: `tests/escala.gd` (66) y `tests/carpas_casa.gd` (88).
+
 ## 1.55.2 · Godot 0.46.1
 
 - El de las madres de la nave ya no tapa la puerta de la habitación (lo pidió el usuario): con CAL y las puertas de dentro, se pone en (16, 3), delante de su carpa y mirando a ella (`build_ents` en `mundo.gd`); `tests/sotano.gd` comprueba que nadie de la nave está delante de una puerta (93 comprobaciones).

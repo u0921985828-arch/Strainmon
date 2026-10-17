@@ -976,36 +976,71 @@ func _carpa_mapa(t: Dictionary) -> void:
 # el tubo flexible de aluminio sale por arriba de la carpa, corre por lo alto de la pared y baja a una rejilla en la ventana más
 # cercana que no tape la propia carpa
 func _tubos_casa(m: Dictionary) -> void:
+	for q in ventanas_tubos(m):
+		var t = q[0]
+		var xc: int = q[1]
+		var wx: int = q[2]
+		# 1.55.3 (lo pidió el usuario): sube de la boca del techo de la carpa al techo de la habitación, corre pegado al techo (por
+		# encima de cuadros y puertas) y baja a la ventana, donde entra por una placa de chapa que sustituye la hoja de arriba; la
+		# de abajo sigue siendo cristal
+		var f = Atlas.foto_misc("carpa-" + t.t + "-mapa")
+		var arriba: int = t.y * 16 + 15 - (48 - (f.c.get_used_rect().position.y if f else 8))
+		var yc: int = -cam.y   # el techo
+		var yw: int = 16 + 15 + int(ALZA.iwin) - 15 - cam.y   # la fila de arriba del dibujo de la ventana (iwin, en la fila 1)
+		var xa: int = xc - cam.x
+		var xb: int = wx - cam.x
+		_tubo(xa - 2, yc, 5, arriba - cam.y - yc, false)
+		_tubo(mini(xa, xb) - 2, yc, absi(xb - xa) + 5, 5, true)
+		# la placa: la hoja de arriba de la ventana (filas 2 a 7 del dibujo), de chapa con la boca del tubo en medio
+		_rect(xb - 7, yw + 2, 14, 6, css("#2a2a34"))
+		_rect(xb - 6, yw + 3, 12, 4, css("#b4b8c0"))
+		_rect(xb - 6, yw + 3, 12, 1, css("#e4e8ee"))
+		for k in 3:
+			_rect(xb - 5 + k * 4, yw + 5, 2, 1, css("#7a7e86"))   # los remaches
+		_tubo(xb - 2, yc, 5, yw + 6 - yc, false)
+		_rect(xb - 3, yw + 3, 7, 2, css("#5a5e66"))   # la abrazadera en la placa
+		_rect(xa - 3, arriba - cam.y - 2, 7, 2, css("#5a5e66"))   # la abrazadera en la boca de la carpa
+
+# [carpa, x de su centro, x de su ventana] de cada carpa con extractor de la casa (1.55.3)
+func ventanas_tubos(m: Dictionary) -> Array:
 	var win := []
 	for x in int(m.w):
 		if m.o[1][x] == "iwin":
 			win.append(x * 16 + 8)
+	# 1.55.3: a cada carpa con extractor, su ventana (que no quede detrás de ella), con los tramos de techo sin pisarse y lo más
+	# cortos posible; si hay más carpas que ventanas, se comparten
+	var cs := []
 	for t in m.get("carpas", []):
 		if Cultivo.kit_de(J.S.carpas[t.ci]) == "":
 			continue
 		var xc: int = (t.x0 + t.x1 + 1) * 8
 		var half: int = Datos.jsround(J.D.CARPAS[t.t].cm[0] * .16) >> 1
-		var wx := -1
-		for w in win:
-			if (w < xc - half - 4 or w > xc + half + 4) and (wx < 0 or absi(w - xc) < absi(wx - xc)):
-				wx = w
-		if wx < 0:
-			continue
-		# sube de la boca del techo de la carpa, corre por arriba de la pared (por encima de las puertas) y baja a la rejilla de la ventana
-		var f = Atlas.foto_misc("carpa-" + t.t + "-mapa")
-		var arriba: int = t.y * 16 + 15 - (48 - (f.c.get_used_rect().position.y if f else 8))
-		var yc: int = 2 - cam.y
-		var yv: int = t.y * 16 - 23 - cam.y   # a la altura del cristal de la ventana
-		var xa: int = xc - cam.x
-		var xb: int = wx - cam.x
-		_tubo(xa - 2, yc, 5, arriba - cam.y - yc, false)
-		_tubo(mini(xa, xb) - 2, yc, absi(xb - xa) + 5, 5, true)
-		_tubo(xb - 2, yc, 5, yv - yc, false)
-		_rect(xa - 3, arriba - cam.y - 2, 7, 2, css("#5a5e66"))   # la abrazadera en la boca de la carpa
-		_rect(xb - 5, yv - 3, 10, 10, css("#2a2a34"))   # la rejilla en la ventana
-		_rect(xb - 4, yv - 2, 8, 8, css("#c8ccd2"))
-		for k in 3:
-			_rect(xb - 3, yv - 1 + k * 2 + 1, 6, 1, css("#7a7e86"))
+		var ok := win.filter(func(w): return w < xc - half - 4 or w > xc + half + 4)
+		if ok.size():
+			cs.append({"t": t, "xc": xc, "ok": ok})
+	var mejor := {"c": INF, "a": []}
+	_asigna_ventanas(cs, 0, [], mejor)
+	var r := []
+	for i in cs.size():
+		r.append([cs[i].t, cs[i].xc, mejor.a[i]])
+	return r
+
+func _asigna_ventanas(cs: Array, i: int, a: Array, mejor: Dictionary) -> void:
+	if i == cs.size():
+		var c := 0.0
+		for j in a.size():
+			c += absi(a[j] - cs[j].xc)
+			for k in j:
+				if a[k] == a[j]:
+					c += 500   # la misma ventana
+				elif maxi(mini(a[j], cs[j].xc), mini(a[k], cs[k].xc)) < mini(maxi(a[j], cs[j].xc), maxi(a[k], cs[k].xc)):
+					c += 1000   # los tramos de techo, uno encima de otro
+		if c < mejor.c:
+			mejor.c = c
+			mejor.a = a.duplicate()
+		return
+	for w in cs[i].ok:
+		_asigna_ventanas(cs, i + 1, a + [w], mejor)
 
 # un tramo de tubo flexible de aluminio (5 px de grueso: contorno, luz, cuerpo, sombra, contorno) con sus aros cada 3 px
 func _tubo(x: int, y: int, w: int, h: int, horiz: bool) -> void:
@@ -1133,7 +1168,7 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 		a.humoHecho = 1
 		J.lanzar_vfx(a.humo.vfx, e.px + 8 + a.humo.off[0], e.py + 15 + a.humo.off[1], now, J.S.map, true)
 
-# sentado (1.47): el fotograma quieto sin SENT_CORTA filas de piernas (los pies, en el suelo), en la casilla del asiento
+# sentado (1.47; 1.55.3, a la altura de cada asiento, SENT_GEO): el fotograma quieto, en la casilla del asiento
 var _sent_img := {}
 # 1.50: de frente, sentado: los muslos encima del asiento (vistos desde arriba), las rodillas, las espinillas colgando
 # delante del canto (entre ellas se ve el banco) y las zapatillas en el suelo; de x 9 a 22 del fotograma, bajo el torso
@@ -1153,23 +1188,25 @@ func _pj_sentado() -> void:
 	f = J.ropa_c(f, gr)
 	var c: Image = f.c
 	var tab: bool = J.SENT.d == "norte" and J.SENT.get("k") == "stool"
-	var clave := "%d|%s" % [c.get_instance_id(), tab]
+	var g: Array = J.sent_geo(J.SENT.get("k"))
+	var sube: int = 9 - int(g[1])   # 1.55.3: lo que sube la cadera desde la de pie (la 9 de la casilla), por asiento (SENT_GEO)
+	var clave := "%d|%s|%d" % [c.get_instance_id(), J.SENT.d + str(tab), sube]
 	var im: Image = _sent_img.get(clave)
 	if im == null:
-		var n: int = J.SENT_CORTA
-		var y0: int = int(f.cel.ancla[1])   # la fila de los pies: se quitan las n de encima
-		im = Image.create(c.get_width(), c.get_height(), false, c.get_format())
+		var y0: int = int(f.cel.ancla[1])   # la fila de los pies; la cadera, 6 más arriba (y0 - 6, el cinturón)
+		im = Image.create(c.get_width(), c.get_height() + 8, false, c.get_format())
 		if J.SENT.d == "sur":
-			# 1.50 (lo pidió el usuario: «está sentado en el suelo, no en el banco»): de frente, el culo en el asiento (45 cm)
-			# y las piernas dobladas de SENT_PIERNAS
-			im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - 5), Vector2i(0, 6 - SENT_PIERNAS.size()))   # 6: las filas de pierna de pie
+			# de frente (1.50; 1.55.3, a la altura de su asiento): el torso con la cadera en el cojín y las piernas dobladas de
+			# SENT_PIERNAS: muslos, espinillas hasta el suelo (tantas como haga falta) y zapatillas, con los pies donde de pie
+			im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - 5), Vector2i(0, 0))
 			# los colores, del propio fotograma (la ropa los cambia): contorno, pantalón, su brillo y zapatilla
 			var col := {"a": c.get_pixel(9, y0 - 5), "n": c.get_pixel(12, y0 - 5), "o": c.get_pixel(13, y0 - 5), "h": c.get_pixel(12, y0 - 2)}
-			for i in SENT_PIERNAS.size():
-				var r: String = SENT_PIERNAS[i]
+			var filas := piernas_sentado(6 + sube)
+			for i in filas.size():
+				var r: String = filas[i]
 				for x in r.length():
 					if r[x] != ".":
-						im.set_pixel(9 + x, y0 - SENT_PIERNAS.size() + 1 + i, col[r[x]])
+						im.set_pixel(9 + x, y0 - 5 + i, col[r[x]])
 		elif tab:
 			# de espaldas: el torso con el culo en la fila del asiento y las piernas de SENT_TABURETE debajo (el pie del
 			# taburete, entre ellas), todo TABURETE_SUBE más arriba (en yp)
@@ -1181,12 +1218,21 @@ func _pj_sentado() -> void:
 					if r[x] != ".":
 						im.set_pixel(9 + x, y0 - 5 + i, col[r[x]])
 		else:
-			im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - n), Vector2i(0, n))
-			im.blit_rect(c, Rect2i(0, y0, c.get_width(), c.get_height() - y0), Vector2i(0, y0))
+			# de espaldas (1.55.3): solo el torso, con la cadera en el cojín; las piernas, debajo del asiento, las tapa el respaldo
+			im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - 5), Vector2i(0, 0))
 		_sent_img[clave] = im
-	var xp: int = J.SENT.x * 16 - Datos.jsround(cam.x) + 8
-	var yp: int = J.SENT.y * 16 - Datos.jsround(cam.y) + 15 - (TABURETE_SUBE if tab else (J.SENT_SUBE if J.SENT.d == "norte" else 0))
+	var xp: int = J.SENT.x * 16 - Datos.jsround(cam.x) + 8 + int(g[0])
+	var yp: int = J.SENT.y * 16 - Datos.jsround(cam.y) + 15 - (TABURETE_SUBE if tab else sube)
 	_img(im, Datos.jsround(xp - f.cel.ancla[0]), Datos.jsround(yp - f.cel.ancla[1]))
+
+# las piernas de frente para n filas, de la cadera al suelo: los dos muslos, las espinillas que hagan falta y las zapatillas
+static func piernas_sentado(n: int) -> Array:
+	var l := [SENT_PIERNAS[0], SENT_PIERNAS[1]]
+	for i in maxi(0, n - 4):
+		l.append(SENT_PIERNAS[2])
+	l.append(SENT_PIERNAS[4])
+	l.append(SENT_PIERNAS[5])
+	return l
 
 # en coche con techo (1.43.1): el protagonista, solo donde hay cabina (lo que pinta <v>-atras), para que la visera no se salga
 # del cristal; una vez por par de fotogramas

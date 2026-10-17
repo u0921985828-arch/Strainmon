@@ -71,6 +71,17 @@ func _corre() -> void:
 	for k in ["planta", "nevera"]:
 		var p: Array = J.pos_pieza("home", k)
 		chk(h.o[p[1]][p[0]] in ["plantDeco", "fridge"], "%s, recolocada en (%d, %d)" % [k, p[0], p[1]])
+	# 1.55.3: el tubo de cada carpa a su ventana, sin tramos de techo encima de otro y sin una ventana detrás de su carpa
+	var vt: Array = J.pintor.ventanas_tubos(h)
+	chk(vt.size() == 3, "tres tubos: %s" % [vt.map(func(q): return [q[1], q[2]])])
+	var vs := {}
+	for q in vt:
+		vs[q[2]] = true
+		chk(q[2] < q[0].x0 * 16 - 4 or q[2] > (q[0].x1 + 1) * 16 + 4, "la ventana de la carpa %d (%d), no detrás de ella" % [q[0].ci, q[2]])
+		for q2 in vt:
+			if q2 != q:
+				chk(maxi(mini(q[1], q[2]), mini(q2[1], q2[2])) >= mini(maxi(q[1], q[2]), maxi(q2[1], q2[2])), "los tubos de techo de %d y %d no se pisan" % [q[0].ci, q2[0].ci])
+	chk(vs.size() == 3, "una ventana por carpa: %s" % [vs.keys()])
 	# ordenar: la carpa B a otro sitio de la pared; delante de la puerta, no
 	chk(J.cabe_pieza("home", "carpa1", 3, 2, null, false) != "", "la carpa B no cabe delante de la puerta (%s)" % J.cabe_pieza("home", "carpa1", 3, 2, null, false))
 	chk(J.cabe_pieza("home", "carpa1", 10, 4, null, false) != "", "ni fuera de la fila de la pared")

@@ -1846,9 +1846,14 @@ func interact() -> void:
 const ASIENTOS := {"sofaF": "sur", "sofaV": "sur", "bench": "sur", "sofaB": "norte", "sofa": "norte", "sillon": "norte", "silla": "norte", "sillaG": "norte", "stool": "norte"}
 const ASIENTO_TXT := {"sofaF": "Un sofá del club.", "sofaB": "Un sofá del club.", "sofaV": "El sofá del reservado.", "bench": "Un banco.", "stool": "Un taburete.",
 	"sofa": "Tu sofá.", "sillon": "Tu sillón de lectura.", "silla": "La silla del ordenador de la tía.", "sillaG": "Tu silla gaming."}
-const SENT_CORTA := 5   # las filas de piernas que no se ven sentado
-const SENT_CORTA_SUR := 0   # 1.50: de frente, en el asiento, a la altura de pie (6 filas de piernas dobladas, SENT_PIERNAS en pinta.gd)
-const SENT_SUBE := 6    # de espaldas, el culo en medio del asiento: la cabeza asoma por encima del respaldo
+# 1.55.3 (lo pidió el usuario: «la altura correcta en todos los muebles donde se puede sentar»): por asiento, [dx, cadera]: dx,
+# lo que se corre a la derecha para quedar en medio del dibujo (la silla gaming, de 2 casillas, va centrada entre las dos), y
+# cadera, la fila de la casilla (0 arriba, 15 los pies de pie) en la que queda la cadera, la del cojín medida en cada sprite;
+# de pie, en la 9. De espaldas, la cabeza asoma por encima del respaldo (en la silla gaming, alto, la cadera por encima
+# del cojín para que se vea la cabeza; lo de debajo lo tapa el respaldo). El taburete, con SENT_TABURETE en pinta.gd
+const SENT_GEO := {"silla": [0, 5], "sillaG": [8, 2], "sillon": [0, 7], "sofa": [0, 8], "sofaB": [0, 9], "sofaF": [2, 7], "sofaV": [2, 7], "bench": [0, 9], "stool": [0, 4]}
+func sent_geo(k) -> Array:
+	return SENT_GEO.get(k, [0, 9])
 const SENT_PORRO := 0.5
 var SENT = null   # {x, y, d}
 
@@ -2005,7 +2010,8 @@ func boca_sentado() -> Vector2:
 	if SENT == null:   # de pie
 		return Vector2(P.px + 8, P.py - 4)
 	var sur: bool = SENT.d == "sur"
-	return Vector2(SENT.x * 16 + 8 + (4 if sur else 0), SENT.y * 16 + 15 - (18 if sur else 22 + SENT_SUBE) + (SENT_CORTA_SUR if sur else SENT_CORTA) - (4 if SENT.get("k") == "stool" else 0))   # en el taburete, 4 más arriba
+	var g := sent_geo(SENT.get("k"))
+	return Vector2(SENT.x * 16 + 8 + int(g[0]) + (4 if sur else 0), SENT.y * 16 + int(g[1]) - (9 if sur else 22))   # la boca, 9 filas sobre la cadera; de espaldas, encima de la cabeza
 
 # 1.47 (lo pidió el usuario): con qué se fuma. El papel, el tabaco, las boquillas y el mechero, del estanco (ESTANCO); la pipa,
 # el bong, el vaporizador y el grinder, del grow (PARAFERNALIA). g: cogollos por vez (el porro, con tabaco, gt); gr: extracto
