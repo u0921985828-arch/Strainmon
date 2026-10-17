@@ -10693,6 +10693,108 @@
     "misc:gs-z"
    ],
    "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta) y piezas (manos, herramientas, plantas, humo, billetes)."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/taller.py",
+   "estilo_ref": "el suelo y los muebles del taller (interior-negocios, negocios-pl-alto)",
+   "notas": "1.57.2, lo pidió el usuario: «Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "id": "interior-taller",
+   "tipo": "tiles",
+   "celda": "tile",
+   "descripcion": "1.57.2: el suelo del taller por zonas: el hormigón de los puestos (liso, con aceite y con rodada), la línea amarilla, el sumidero, la goma antifatiga y el gres de la espera.",
+   "cubre": [
+    "tile:floorTc",
+    "tile:floorTc2",
+    "tile:floorTc3",
+    "tile:floorTcR",
+    "tile:floorTcT",
+    "tile:floorTd",
+    "tile:floorTg",
+    "tile:floorTr"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/taller.py",
+   "estilo_ref": "el suelo y los muebles del taller (interior-negocios, negocios-pl-alto)",
+   "notas": "1.57.2, lo pidió el usuario: «Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "id": "taller-alto",
+   "tipo": "objeto",
+   "celda": "mueble_escala",
+   "descripcion": "1.57.2: el atrezo del taller a 16 px/m: la manguera del aire, el calendario, el lavabo, las ruedas nuevas, el extintor, el bidón, el gato, la grúa de motores, el armario de herramientas, las sillas de la espera y la máquina de café.",
+   "cubre": [
+    "obj:mangT",
+    "obj:calT",
+    "obj:lavabT",
+    "obj:rackT",
+    "obj:extinT",
+    "obj:bidonT",
+    "obj:gatoT",
+    "obj:gruaT",
+    "obj:cajonT",
+    "obj:sillaT",
+    "obj:cafeM"
+   ],
+   "ajuste_por_sprite": {
+    "mangT": "exacto",
+    "calT": "exacto",
+    "lavabT": "exacto",
+    "rackT": "exacto",
+    "extinT": "exacto",
+    "bidonT": "exacto",
+    "gatoT": "exacto",
+    "gruaT": "exacto",
+    "cajonT": "exacto",
+    "sillaT": "exacto",
+    "cafeM": "exacto"
+   }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/calle_plantas.py",
+   "estilo_ref": "los setos y árboles de la calle (mundo.py)",
+   "notas": "1.57.2, lo pidió el usuario: «que se vea ahí alguna planta pues en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior». De frente, 16 px/m; solo con Datos.CAL.",
+   "id": "calle-plantas",
+   "tipo": "objeto",
+   "celda": "mueble_escala",
+   "descripcion": "1.57.2: las plantas de exterior del huerto de la calle de la carga y del título por fases del año: plántula, vegetativo joven y grande, prefloración, floración, madura y cortada.",
+   "cubre": [
+    "obj:pext-0",
+    "obj:pext-1",
+    "obj:pext-2",
+    "obj:pext-3",
+    "obj:pext-4",
+    "obj:pext-5",
+    "obj:pext-6"
+   ],
+   "ajuste_por_sprite": {
+    "pext-0": "exacto",
+    "pext-1": "exacto",
+    "pext-2": "exacto",
+    "pext-3": "exacto",
+    "pext-4": "exacto",
+    "pext-5": "exacto",
+    "pext-6": "exacto"
+   }
   }
  ],
  "familias": {

@@ -194,6 +194,21 @@ func _corre() -> void:
 	Datos.CAL = true
 	J.demo_e = null
 	J.mode = "world"
+	# 6b · 1.57.2: el bancal de exterior por la fecha: nada en invierno, plántula en abril, vegetativo hasta julio, flor en agosto y
+	# septiembre, madura en octubre y cortada a finales; los dibujos, en el atlas
+	var esp := {[1, 10]: -1, [4, 10]: -1, [4, 20]: 0, [5, 20]: 1, [7, 1]: 2, [8, 10]: 3, [9, 1]: 4, [10, 1]: 5, [10, 17]: 5, [10, 25]: 6, [11, 5]: -1, [12, 31]: -1}
+	for k in esp:
+		chk(EscViaje.fase_huerto(k[0], k[1]) == esp[k], "el bancal el %d/%d: %d (%d)" % [k[1], k[0], EscViaje.fase_huerto(k[0], k[1]), esp[k]])
+	var fz := -1
+	var ok_f := true
+	for mes in range(1, 13):
+		for dia in range(1, 32):
+			var f := EscViaje.fase_huerto(mes, dia)
+			if f >= 0 and fz >= 0 and f < fz:
+				ok_f = false
+			fz = f if f >= 0 else fz
+	chk(ok_f, "el bancal: las fases no van hacia atrás en el año")
+	chk(range(7).all(func(i): return EscViaje.Atlas.frame_de(EscViaje.Atlas.cubre("obj:pext-%d" % i), "pext-%d" % i, "unica", 0, {"i": 0}) != null), "el bancal: los siete dibujos")
 	# 7 · los dibujos
 	if dir != "":
 		J.hud.hide()
@@ -215,6 +230,14 @@ func _corre() -> void:
 				for r in 3:
 					await RenderingServer.frame_post_draw
 				J.sv.get_texture().get_image().save_png(dir.path_join("calle-%s-%04d.png" % [md, int(ms)]))
+		for fe in [[3, 1], [5, 5], [6, 1], [7, 15], [8, 10], [9, 10], [10, 10], [10, 28]]:   # 1.57.2: el bancal por el año
+			EscViaje.FECHA = fe
+			J.mode = "carga"
+			J.pintor.redibuja(2600.0)
+			for r in 3:
+				await RenderingServer.frame_post_draw
+			J.sv.get_texture().get_image().save_png(dir.path_join("huerto-%02d-%02d.png" % fe))
+		EscViaje.FECHA = []
 		J.mode = "world"
 	print("viaje: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:

@@ -226,6 +226,44 @@ const CALLE_FIL := ["grass", "walk", "roadB", "roadT", "walk", "grass", "grass"]
 const PEATONES := [[0, 1, 0.040, 0.05, ""], [0, -1, 0.034, 0.40, ""], [0, 1, 0.085, 0.62, "bici"], [0, -1, 0.045, 0.85, ""],
 	[1, -1, 0.042, 0.20, ""], [1, 1, 0.066, 0.50, "patinete"], [1, -1, 0.090, 0.75, "bici"], [1, 1, 0.038, 0.95, ""]]
 
+# 1.57.2 (lo pidió el usuario: «que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el
+# cultivo en exterior»): en la hierba de detrás, un bancal con tres plantas de exterior por la fecha del sistema (la carga y el título no
+# tienen partida): (mes, hasta el día, fase de calle_plantas.py: -1 nada, 0 plántula, 1-2 vegetativo, 3 prefloración, 4 floración,
+# 5 madura, 6 cortada). Calendario del norte: se siembra a mediados de abril, florece en agosto y se corta en octubre
+const HUERTO := [[3, 31, -1], [4, 14, -1], [4, 30, 0], [5, 15, 0], [5, 31, 1], [6, 15, 1], [6, 30, 2], [7, 31, 2], [8, 24, 3],
+	[8, 31, 4], [9, 20, 4], [9, 30, 5], [10, 20, 5], [10, 31, 6], [12, 31, -1]]
+const HUERTO_X := 0.55    # dónde empieza el bancal, por el ancho de la pantalla
+const HUERTO_N := 3
+const HUERTO_PASO := 24   # 1,5 m entre plantas
+static var FECHA := []    # [mes, día] para las pruebas; vacío, la del sistema
+
+static func fase_huerto(mes: int, dia: int) -> int:
+	for q in HUERTO:
+		if mes < int(q[0]) or (mes == int(q[0]) and dia <= int(q[1])):
+			return int(q[2])
+	return -1
+
+static func fecha_huerto() -> Array:
+	if FECHA.size() == 2:
+		return FECHA
+	var d := Time.get_date_dict_from_system()
+	return [int(d.month), int(d.day)]
+
+static func _huerto(P, sw: int, fy: int, list: Array) -> void:
+	var f0 := fecha_huerto()
+	var fase := fase_huerto(f0[0], f0[1])
+	var x0 := int(sw * HUERTO_X) & ~15
+	var x1 := x0 + HUERTO_PASO * (HUERTO_N - 1) + 16
+	P._rect(x0 - 4, fy - 2, x1 - x0 + 8, 3, Color8(0x6a, 0x4a, 0x2e))   # el bancal de tierra
+	P._rect(x0 - 3, fy - 3, x1 - x0 + 6, 1, Color8(0x8a, 0x64, 0x40))
+	for i in HUERTO_N:
+		var fi := fase
+		if i == 1 and fi in [4, 5]:   # la del medio, una sativa que va más tarde
+			fi -= 1
+		var f = Atlas.frame_de(Atlas.cubre("obj:pext-0"), "pext-%d" % fi, "unica", 0, {"i": 0, "esp": i % 2 == 1}) if fi >= 0 else null
+		if f:
+			list.append([fy, f, x0 + 8 + i * HUERTO_PASO, fy])
+
 static func calle_y0(P) -> int:
 	return int(P.SH) - 16 * CALLE_FIL.size()
 
@@ -260,7 +298,10 @@ static func pinta_calle(P, e: float) -> void:
 	var gs = Atlas.cubre("obj:seto")
 	var list := []
 	var ult := -9
+	var hx := int(sw * HUERTO_X) >> 4
 	for tx in range(-1, cols + 1):
+		if Datos.CAL and tx >= hx - 2 and tx <= hx + 4:   # 1.57.2: el sitio del bancal
+			continue
 		var h: int = P.hash_t(tx, 3)
 		var d: Dictionary = P.desfase("tree", tx, 3)
 		if gt and tx - ult >= 3 and (h % 3 == 0 or tx - ult >= 7):   # árboles sueltos, a 3-7 casillas
@@ -274,6 +315,9 @@ static func pinta_calle(P, e: float) -> void:
 			var f2 = Atlas.frame_de(gs, "seto", "unica", 0, {"i": 0})
 			if f2:
 				list.append([fy, f2, tx * 16 + 8, fy])
+	if Datos.CAL:
+		_huerto(P, sw, fy - 10, list)   # en lo alto de la hierba, que el tráfico no lo tape
+	list.sort_custom(func(a, b): return a[0] < b[0])
 	for q in list:
 		P._pinta(q[1], q[2], q[3])
 	# la acera de detrás, el carril de enfrente, el de este lado y la de delante

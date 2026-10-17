@@ -4598,7 +4598,7 @@ func obj_local(x: int, y: int, o) -> bool:
 			if await ask(N.txt.armR, ["Cambiarte de ropa", "Nada"]) == 0:
 				await vestirte()
 		else:
-			await say(N.txt.get(ob, "Lo de %s." % D.LOCALES[k].neg))
+			await say(N.txt.get(ob, ATREZO_TXT.get(S.map, {}).get(ob, "Lo de %s." % D.LOCALES[k].neg)))   # 1.57.2: y el atrezo del taller
 		return true
 	if S.map == "nave" and o in ["bedT", "bedB"]:   # 1.45: el camastro de la nave
 		await bed_action("El camastro de la nave, detrás de las mesas: se oyen los extractores toda la noche.")

@@ -224,6 +224,15 @@ func _corre() -> void:
 	chk(corre(func(): await J.obj_local(11, 9, "cajaL")), "mejora bloqueada")
 	chk(int(o.mj) == 1 and b0 - S.banco == int(N.mj[0].p) and J.MAPS["loc-valde"].o[7][8] == "elevT" and J.MAPS["loc-valde"].o[7][12] == "elevT2", "mejora: %s %d" % [o.mj, b0 - S.banco])
 	chk(J.neg_tope("valde") == roundi(float(L.tope) * (1 + float(NG.mjT))), "el tope con mejora")
+	# 1.57.2: la mejora no se lleva la puerta del cuartucho ni el atrezo, y el suelo va por zonas
+	var mt: Dictionary = J.MAPS["loc-valde"]
+	chk(mt.o[1][18] == "puertaM" and mt.o[2][18] == null, "1.57.2: la puerta del cuartucho tras la mejora: %s" % mt.o[1][18])
+	chk(J.ATREZO["loc-valde"].all(func(q): return mt.o[q[1]][q[0]] == q[2]), "1.57.2: el atrezo del taller tras la mejora")
+	chk(mt.g[6][3] == "floorTd" and mt.g[9][10] == "floorTr" and mt.g[3][9] == "floorTg" and mt.g[4][6] == "floorTcR" and mt.g[2][15] == "floorTa", "1.57.2: el suelo por zonas")
+	chk(J.ATREZO["loc-valde"].all(func(q): return Atlas.cubre("obj:" + q[2]) != null) and ["floorTc", "floorTc2", "floorTc3", "floorTcT", "floorTd", "floorTg", "floorTr"].all(func(t): return Atlas.cubre("tile:" + t) != null), "1.57.2: el arte del taller")
+	for q in N.o + N.mj[0].o:
+		chk(llega("loc-valde", [7, 8], [int(q[0]), int(q[1])]), "1.57.2: con el atrezo, se llega a %s" % [q])
+	chk(llega("loc-valde", [7, 8], [18, 1]) and llega("loc-valde", [7, 8], [13, 5]), "1.57.2: se llega a la puerta y a Iker")
 	o.cu = 30
 	var t0: int = int(S.min) + 1440 * int(S.day)
 	QUIERO = ["Limpiar"]

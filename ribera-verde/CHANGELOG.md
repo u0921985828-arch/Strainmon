@@ -1,5 +1,15 @@
 # Cambios
 
+## 1.57.2 · Godot 0.47.0 (sin cerrar)
+
+Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.
+
+- **La puerta del cuartucho del taller ya no desaparece**: al comprar una mejora estando dentro, `montar_locales` rehacía el local desde su copia y se llevaba la puerta (`PUERTAS_INT`); ahora vuelve a ponerla (`montar_puertas`) y el atrezo.
+- **El suelo del taller por zonas** (`TALLER_SUELO`, `montar_taller` en `mundo.gd`; arte a mano en `tools/sprites/a-mano/taller.py`, `interior-taller`): el hormigón gris de los puestos del elevador y del foso (y del segundo elevador), con manchas de aceite y rodadas por el hash de casilla, la línea amarilla que los separa del paso, el sumidero de rejilla entre el elevador y el foso, la goma antifatiga delante del banco y del lavabo y el gres beige de la espera junto a la caja; el resto, la resina azul de antes.
+- **El atrezo del taller, cada cosa en su sitio** (`ATREZO["loc-valde"]`, `taller-alto`, de frente a 16 px/m): el enrollador de la manguera del aire colgado sobre el elevador, el calendario de pared, el lavabo de acero con el papel y el jabón entre el banco y el compresor, la estantería de ruedas nuevas, el extintor con su placa, dos bidones de 200 L, el gato de carretilla y la grúa de motores junto a los puestos, el armario de herramientas grande, la silla de la espera y la máquina de café. Cada cosa con su texto (`ATREZO_TXT`); nada corta el paso.
+- **El bancal de exterior en la calle de la carga y del título** (`HUERTO`, `fase_huerto`, `_huerto` en `escena_viaje.gd`; arte a mano en `tools/sprites/a-mano/calle_plantas.py`, `calle-plantas`): en la hierba de detrás, tres plantas en su bancal según la fecha del sistema y el calendario del norte: nada de noviembre a mediados de abril, plántulas en su vaso hasta mediados de mayo, vegetativo hasta julio (de 50 cm a 1,4 m), prefloración en agosto, floración hasta el 20 de septiembre, maduras con los pelos naranjas y las hojas grandes amarilleando hasta el 20 de octubre (la del medio, una sativa que va una fase por detrás) y después el tocón de lo cosechado.
+- Pruebas: `tests/negocios.gd` (la puerta y el atrezo tras la mejora, el suelo por zonas, el arte y que se llegue a todo) y `tests/viaje.gd` (106: las fases del bancal por fecha, que no vayan hacia atrás y sus siete dibujos; con `--pintar`, `huerto-<mes>-<día>`).
+
 ## 1.57.1 · Godot 0.47.0 (sin cerrar)
 
 Lo que pidió el usuario tras la 1.57 («que aparezcan en la pantalla de carga los sprites reales de césped, árboles, setos, también molaría que pasasen algún transeúnte… los botones de la UI principal más pequeños, que así le da el toque más limpio… mejor que se quede de fondo la carretera andando coches y por la acera transeúntes andando, en bici, patinete»). Solo Godot, con `Datos.CAL`.

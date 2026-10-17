@@ -859,6 +859,9 @@ func montar_locales(mapa: String) -> void:
 					if q[2] in NEG_ANCHO:
 						for j in range(1, int(NEG_LARGO.get(q[2], 2))):
 							m.o[int(q[1])][int(q[0]) + j] = q[2] + "2"
+		if mapa == dentro:   # 1.57.2: la puerta del cuartucho no se pierde al comprar una mejora estando dentro; y el taller, por zonas
+			montar_puertas(mapa)
+			montar_taller(mapa)
 
 # 1.47 (lo pidió el usuario: «la discoteca tiene que ser más grande, el piso de arriba reservado»), solo con Datos.CAL: GAUA, la planta
 # baja grande (disco-g en lugar de la de antes, con el mismo nombre de mapa), su gente en su sitio y la puerta del Ensanche a la entrada
@@ -973,6 +976,21 @@ func montar_puertas(mapa: String) -> void:
 		for x in [12, 13]:
 			if m.o[2][x] in ["escritorio", "escritorio2"]:
 				m.o[2][x] = null
+
+# 1.57.2 (lo pidió el usuario): el taller por zonas, con CAL; montar_locales lo vuelve a poner cada vez que rehace el local
+func montar_taller(mapa: String) -> void:
+	if not Datos.CAL or mapa != "loc-valde" or not MAPS.has(mapa):
+		return
+	var m: Dictionary = MAPS[mapa]
+	for z in TALLER_SUELO:
+		for y in range(int(z[1]), int(z[3]) + 1):
+			for x in range(int(z[0]), int(z[2]) + 1):
+				var t: String = z[4]
+				if t == "floorTc":   # el hormigón, con alguna mancha de aceite o una rodada
+					t = ["floorTc", "floorTc", "floorTc", "floorTc2", "floorTc", "floorTc3"][_hash_t(x, y) % 6]
+				m.g[y][x] = t
+	m.atrezo = false
+	montar_atrezo(mapa)
 
 # 1.51 (lo pidió el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para los envíos»): desde el capítulo de MAR.ch, el paso
 # del final de la plaza de Puerto Viejo (a la derecha) al muelle; en el muelle, la puerta del piso franco y los barcos que tengas,
@@ -1560,7 +1578,17 @@ const ATREZO := {
 	"casa-ama": [[4, 1, "cuadro"], [3, 2, "libreria"], [7, 2, "sillon"], [8, 2, "sillon2"], [5, 5, "silla"], [8, 6, "mesita"]],
 	"comisaria": [[6, 2, "escritorio"], [7, 2, "escritorio2"], [3, 1, "cuadro"]],
 	"almacen": [[3, 2, "sacos"], [2, 1, "red"], [7, 2, "estanteN"], [8, 4, "barrilT"]],
+	# 1.57.2 (lo pidió el usuario: «está muy vacío… el atrezo deja que desear o por lo menos cómo está usado»): el taller, cada cosa en
+	# su zona: la manguera del aire sobre el elevador, el bidón y la grúa junto a los puestos, el lavabo entre el banco y el compresor,
+	# las ruedas nuevas en su estantería, el extintor junto a la puerta del cuartucho, entre las cajas y la recogedora y la espera con su máquina de café
+	"loc-valde": [[3, 1, "mangT"], [17, 1, "calT"], [11, 2, "lavabT"], [15, 2, "rackT"], [19, 3, "extinT"], [0, 6, "bidonT"],
+		[6, 6, "gatoT"], [6, 7, "gruaT"], [19, 6, "cajonT"], [19, 7, "bidonT"], [14, 9, "sillaT"], [16, 9, "cafeM"]],
 }
+# 1.57.2: el suelo del taller por zonas (x0, y0, x1, y1, casilla): el hormigón de los puestos (con manchas de aceite por hash_t), la
+# línea amarilla que los separa del paso, la goma delante del banco y del lavabo, el gres de la espera y el sumidero entre el elevador
+# y el foso; el resto, la resina azul de siempre
+const TALLER_SUELO := [[0, 2, 5, 9, "floorTc"], [6, 2, 6, 9, "floorTcR"], [8, 5, 12, 8, "floorTc"], [8, 5, 12, 5, "floorTcT"],
+	[9, 3, 11, 3, "floorTg"], [9, 9, 16, 9, "floorTr"], [3, 6, 3, 6, "floorTd"]]
 const ATREZO_TXT := {
 	"txaro": {"tv": "La tele, con un tapete de ganchillo encima del mueble. Echan un concurso.", "tv2": "La tele, con un tapete de ganchillo encima del mueble. Echan un concurso.",
 		"cuadro": "Una lámina de la ría. La enmarcó su Paco en el sesenta y ocho.", "libreria": "Novelas de bolsillo, un misal y un álbum de fotos de un viaje a las montañas.",
@@ -1571,6 +1599,17 @@ const ATREZO_TXT := {
 		"cuadro": "Una lámina de la ría, torcida. Nadie la endereza."},
 	"almacen": {"sacos": "Sacos de sal gorda de la conservera.", "red": "Una red de pesca vieja, colgada de un clavo.", "estanteN": "Una estantería con latas oxidadas y cuerdas.",
 		"barrilT": "Un bidón azul. Huele a gasoil."},
+	"loc-valde": {"mangT": "El enrollador de la manguera del aire, colgado encima del elevador: se estira hasta el coche y vuelve solo.",
+		"calT": "Un calendario de pared con un coche de rally de los noventa, sin marca. Los días de las citas, en rojo.",
+		"lavabT": "El lavabo de acero con el jabón de taller, el de la piedra pómez, y un rollo de papel azul.",
+		"rackT": "La estantería de las ruedas nuevas, de pie y con su etiqueta de medida.",
+		"extinT": "El extintor de polvo de 6 kg, con la revisión al día y su placa encima.",
+		"bidonT": "Un bidón de 200 litros de aceite usado, esperando al gestor de residuos.",
+		"gatoT": "El gato de carretilla de 3 toneladas: se mete debajo del coche y se bombea con la palanca.",
+		"gruaT": "La grúa de motores, plegada: con la pluma y la cadena se saca un motor entero.",
+		"cajonT": "El armario de herramientas grande: siete cajones de llaves, carracas y vasos, y encima la caja de las brocas.",
+		"sillaT": "Las sillas de la espera, de plástico. Una revista de coches de hace dos años.",
+		"cafeM": "La máquina de café de la espera: solo, cortado y chocolate. El de chocolate sale aguado."},
 }
 const ASIENTO_FUERA := {"sofa": "Un sofá.", "sillon": "Un sillón.", "silla": "Una silla."}
 
