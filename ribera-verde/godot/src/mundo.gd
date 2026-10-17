@@ -2055,7 +2055,7 @@ func boca_sentado() -> Vector2:
 # el bong, el vaporizador y el grinder, del grow (PARAFERNALIA). g: cogollos por vez (el porro, con tabaco, gt); gr: extracto
 # por vez (0 = el porro no lleva extracto); con: lo que hace falta en S.items
 const FUMAR := {
-	"porro": {"n": "Liarte un porro", "g": 0.5, "gt": 0.3, "gr": 0.0, "con": ["papel", "mechero"]},
+	"porro": {"n": "Liarte un porro", "g": 0.5, "gt": 0.3, "gr": 0.0, "grt": 0.1, "con": ["papel", "mechero"]},   # grt (1.57.1): extracto con tabaco
 	"pipa": {"n": "Una pipa", "g": 0.2, "gr": 0.1, "con": ["pipa", "mechero"]},
 	"bong": {"n": "Un bong", "g": 0.3, "gr": 0.1, "con": ["bong", "mechero"]},
 	"vapo": {"n": "El vaporizador", "g": 0.2, "gr": 0.1, "con": ["vapo"]},
@@ -2096,10 +2096,14 @@ func fumar_sentado() -> void:
 				tab = true
 				gb = F.gt
 	var ls := bud_lots(gb).map(func(l): return [l[0], l[1], false])
-	if F.gr > 0:
-		ls += rosin_lots(F.gr).map(func(l): return [l[0], l[1], true])
+	# 1.57.1 (lo pidió el usuario: «las extracciones se deberían de poder fumar también con tabaco, sin tabaco no, porque sería con la
+	# pipa»): en el porro, el extracto solo con tabaco (grt); solo, en la pipa, el bong o el vaporizador
+	var gx: float = F.gr if F.gr > 0 else (float(F.grt) if tab and Datos.CAL else 0.0)
+	if gx > 0:
+		ls += rosin_lots(gx).map(func(l): return [l[0], l[1], true])
 	if ls.is_empty():
-		await say("No llevas nada para fumar." if F.gr > 0 else "No llevas cogollos para liarte uno.")
+		var sin_tab: bool = mk == "porro" and Datos.CAL and not tab and not rosin_lots(F.grt).is_empty()
+		await say("No llevas nada para fumar." if F.gr > 0 else ("Sin cogollos, el extracto solo se lía con tabaco; si no, en una pipa, un bong o el vaporizador." if sin_tab else "No llevas cogollos para liarte uno."))
 		return
 	var i := 0
 	if ls.size() > 1:
@@ -2111,7 +2115,7 @@ func fumar_sentado() -> void:
 	var thc: float = ls[i][1].thc
 	var nom: String = extr_nombre(lk, true) if r else lot_nombre(lk)
 	if r:
-		use_rosin(lk, F.gr)
+		use_rosin(lk, gx)
 	else:
 		use_buds(lk, gb)
 	if mk == "porro":

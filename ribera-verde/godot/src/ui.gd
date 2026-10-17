@@ -1153,15 +1153,21 @@ func _menu_titulo() -> void:
 	var hueco: float = ui_rect().end.y - 6 * us - _tit_fin() - 4 * us
 	var h := clampf(48 * _dp(), TIT_H * us, maxf(TIT_H * us, (hueco - (n - 1) * TIT_SEP * us) / n))
 	var lista := VBoxContainer.new()
-	lista.add_theme_constant_override("separation", roundi(TIT_SEP * us))
+	lista.add_theme_constant_override("separation", 0 if Datos.CAL else roundi(TIT_SEP * us))
 	var fs := roundi(9.5 * us)
+	var cal: bool = Datos.CAL   # 1.57.1 (lo pidió el usuario: «los botones de la UI principal más pequeños, más limpio»): la pastilla
+	# se dibuja más pequeña (TIT_WV × TIT_HV) en el centro de su botón, que se sigue tocando en 48 dp de alto
+	var hv := minf(h, TIT_HV * us) if cal else h
+	var wv := roundf((TIT_WV if cal else TIT_W) * us)
+	if cal:
+		fs = roundi(7 * us)
 	for k in n:
 		var b := Control.new()
-		b.custom_minimum_size = Vector2(roundf(TIT_W * us), roundf(h))
+		b.custom_minimum_size = Vector2(wv, roundf(h))
 		var sel := k == m_i
 		var txt: String = m_items[k].label
 		b.draw.connect(func():
-			var r := Rect2(Vector2.ZERO, b.custom_minimum_size)
+			var r := Rect2(Vector2(0, roundf((b.custom_minimum_size.y - hv) / 2)), Vector2(b.custom_minimum_size.x, roundf(hv)))
 			var rad := roundi(minf(r.size.y, 12 * us) / 2)
 			var st := StyleBoxFlat.new()
 			st.set_corner_radius_all(rad)
@@ -1179,12 +1185,12 @@ func _menu_titulo() -> void:
 				st.set_border_width_all(roundi(maxf(1, us)))
 			st.draw(b.get_canvas_item(), r)
 			var tw := negrita.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-			var y := (r.size.y + negrita.get_ascent(fs) - negrita.get_descent(fs)) / 2
+			var y := r.position.y + (r.size.y + negrita.get_ascent(fs) - negrita.get_descent(fs)) / 2
 			var col := Color("#10301c") if sel else Color("#e8f8ec")
 			b.draw_string(negrita, Vector2((r.size.x - tw) / 2, y), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
 			if sel:
-				var cy := r.size.y / 2
-				var a := 3.5 * us
+				var cy := r.get_center().y
+				var a := (2.5 if cal else 3.5) * us
 				b.draw_colored_polygon(PackedVector2Array([Vector2(8 * us, cy - a), Vector2(8 * us + a, cy), Vector2(8 * us, cy + a)]), col)
 				b.draw_colored_polygon(PackedVector2Array([Vector2(r.size.x - 8 * us, cy - a), Vector2(r.size.x - 8 * us - a, cy), Vector2(r.size.x - 8 * us, cy + a)]), col))
 		var idx := k
@@ -1746,6 +1752,8 @@ const LEMA := "Caza genéticas. Salda la deuda. Que no te pillen."
 const TIT_W := 132.0   # los botones: de ancho, en u; de alto, 48 dp si caben (TIT_H como poco), con TIT_SEP entre ellos
 const TIT_H := 17.0
 const TIT_SEP := 4.0
+const TIT_WV := 84.0   # 1.57.1: la pastilla, más pequeña
+const TIT_HV := 12.0
 var caja_menu: StyleBox = null
 
 # dónde acaba el lema, en la pantalla (los botones no suben de ahí)

@@ -352,7 +352,7 @@ func titulo_e_intro() -> void:
 		await foto("00-carga")
 		check("la carga acaba sola en el título", await hasta(func(): return J.mode == "title", 900))
 		await espera(20)
-	check("arranca en el título", J.mode == "title" and J.titulo.visible and J.pintor.modo == "demo" and not J.hud.visible)
+	check("arranca en el título (%s)" % J.pintor.modo, J.mode == "title" and J.titulo.visible and J.pintor.modo == ("calle" if Datos.CAL else "demo") and not J.hud.visible)   # 1.57.1: con CAL, la calle de la carga de fondo
 	# el primer arranque: el aviso de edad (+18) con su pregunta; aceptado, se guarda en los ajustes y no vuelve a salir
 	textos.clear()
 	var hay_aviso: bool = await hasta(func(): return J.dlg.visible, 60)

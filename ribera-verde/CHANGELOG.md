@@ -1,5 +1,15 @@
 # Cambios
 
+## 1.57.1 · Godot 0.47.0 (sin cerrar)
+
+Lo que pidió el usuario tras la 1.57 («que aparezcan en la pantalla de carga los sprites reales de césped, árboles, setos, también molaría que pasasen algún transeúnte… los botones de la UI principal más pequeños, que así le da el toque más limpio… mejor que se quede de fondo la carretera andando coches y por la acera transeúntes andando, en bici, patinete»). Solo Godot, con `Datos.CAL`.
+
+- **La calle de la carga, con el arte del juego** (`pinta_calle`, `CALLE_FIL`, `PEATONES` en `escena_viaje.gd`): la calle vista de lado y quieta, de abajo arriba: hierba, la acera de delante, la calzada de dos carriles, la acera de detrás y dos filas de hierba con setos y árboles sueltos (los mismos firmes en mosaico, el canto de la hierba, el seto en matas y los dos árboles del mapa, corridos y en espejo por el hash de casilla), y el monte y el cielo detrás. Por la calzada, los vehículos de perfil de antes; por las aceras, ocho personas: andando, en bici (pedaleando) y en patinete, en los dos sentidos. La barra, en la hierba de abajo.
+- **El título, sobre la misma calle** (modo `calle` en `pinta.gd`): sigue donde la dejó la carga (el mismo reloj, `carga_t0`), en vez de la partida de fondo, con un velo azul arriba más suave para que se lean el título y el lema. Sin CAL, la partida de fondo de antes.
+- **Los botones del título, más pequeños** (`TIT_WV`, `TIT_HV` en `ui.gd`): la pastilla de 84 × 12 u con la letra de 7 u (antes 132 × 17 y 9,5), en el centro de su botón, que se sigue tocando en 48 dp de alto.
+- **El extracto, en el porro con tabaco** (lo pidió el usuario: «las extracciones se deberían de poder fumar también con tabaco, sin tabaco no, porque sería con la pipa»; `FUMAR.porro.grt` en `mundo.gd`): sentado, al liarte uno «Con tabaco», también salen los extractos (0,1 g con 0,7 g de tabaco); «Solo hierba», solo los cogollos, y si no llevas cogollos te dice que el extracto solo se lía con tabaco o va en la pipa, el bong o el vaporizador.
+- Pruebas: `tests/viaje.gd` (92; con `--pintar`, `calle-carga-*` y `calle-title-*`), `tests/ocio.gd` (67: el extracto con y sin tabaco) y `tests/ciclo.gd` (el título con la calle de fondo).
+
 ## 1.57 · Godot 0.47.0
 
 Lo que pidió el usuario tras la 1.56 («estos recursos se podrían usar antes de la pantalla de inicio, usarlo como de carga del juego, en una carretera sin texto, los vehículos andando y la barra cargándose. Luego aparece la pantalla de inicio START con más atrezo»). Solo Godot, con `Datos.CAL`.

@@ -63,6 +63,8 @@ func redibuja(t: float) -> void:
 		modo = "carpa"
 	elif m == "title":
 		modo = "demo"   # 1.35: la partida de fondo (demo_entra, mundo.gd)
+		if Datos.CAL and Atlas.ok and EscViaje.carga():
+			modo = "calle"   # 1.57.1 (lo pidió el usuario): la calle de la carga sigue de fondo, en vez de la partida
 	elif m == "intro":
 		modo = "title"
 	elif m == "carga":
@@ -110,6 +112,12 @@ func _capa(ci: CanvasItem, n: int) -> void:
 	elif modo == "carga":
 		if n == 0:
 			EscViaje.pinta_carga(self, now - float(J.carga_t0))
+	elif modo == "calle":
+		if n == 0:
+			EscViaje.pinta_calle(self, now - float(J.carga_t0))
+		elif n == 2:   # un velo azul arriba, más suave que el de la partida de fondo, para que se lean el título y el lema
+			for i in 11:
+				_rect(0, i * 10, J.SW, 10, Color8(14, 22, 60, Datos.jsround((0.42 - i * 0.038) * 255)))
 	elif modo == "carpaC" and n == 2:
 		L.draw_set_transform(Vector2(OX(), OY()))
 		_vfx({"x": 0, "y": 0}, "home")

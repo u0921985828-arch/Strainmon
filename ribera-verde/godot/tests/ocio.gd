@@ -155,6 +155,17 @@ func _corre() -> void:
 	chk(corre(func(): await J.fumar_sentado()) and is_equal_approx(float(S.buds.ak47.g), 9.6) and int(S.items.papel) == 1, "el porro con grinder: 0,4 g (%s)" % S.buds.ak47.g)
 	QUIERO = ["Con tabaco"]
 	chk(corre(func(): await J.fumar_sentado()) and is_equal_approx(float(S.buds.ak47.g), 9.3) and is_equal_approx(float(S.items.tabaco), 4.3), "con tabaco: 0,3 g y 0,7 de tabaco (%s, %s)" % [S.buds.ak47.g, S.items.tabaco])
+	# 2b · 1.57.1: el extracto en el porro, solo con tabaco (0,1 g); sin tabaco, no (a la pipa)
+	S.buds = {}
+	S.rosin = {"ak47~rosin": {"g": 1.0, "thc": 60.0, "dia": S.day}}
+	S.items.papel = 3
+	LOG = []
+	QUIERO = ["Solo hierba"]
+	chk(corre(func(): await J.fumar_sentado()) and is_equal_approx(float(S.rosin["ak47~rosin"].g), 1.0) and LOG.any(func(t): return t.contains("solo se lía con tabaco")), "el extracto sin tabaco, no: %s" % [LOG])
+	LOG = []
+	QUIERO = ["Con tabaco"]
+	chk(corre(func(): await J.fumar_sentado()) and is_equal_approx(float(S.rosin["ak47~rosin"].g), 0.9) and is_equal_approx(float(S.items.tabaco), 3.6) and LOG.any(func(t): return t.contains("con tabaco")), "el extracto con tabaco: 0,1 g (%s, %s, %s)" % [S.rosin["ak47~rosin"].g, S.items.tabaco, LOG])
+	S.rosin = {}
 	# 3 · los estancos: la puerta y el rótulo en su pueblo, se llega desde la calle, el estanquero y la compra
 	for k in D.ESTANCO.k:
 		var E: Dictionary = D.ESTANCO.k[k]

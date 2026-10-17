@@ -177,29 +177,20 @@ func _corre() -> void:
 		await J.arranque()
 		fin.m = J.mode
 		J.mode = "world") and fin.m == "title" and M.reloj - t0 < 1000, "A pasa la carga (%d ms)" % int(M.reloj - t0))
-	J.demo_e = null
-	var sv: Array = J.demo_entra(5000.0)
-	var coches := 0
-	var gente := 0
-	var acera := true
-	for e2 in J.ents:
-		if e2.get("veh"):
-			coches += 1
-			acera = acera and (int(e2.y) == 10 or int(e2.y) == 11) and e2.moving
-		elif String(e2.id).begins_with("demoG"):
-			gente += 1
-	var py: int = J.P.y
-	J.demo_sale(sv)
-	chk(coches >= 3 and acera, "el título: %d vehículos por la calzada" % coches)
-	chk(gente >= 2 and py != 10 and py != 11, "el título: %d más andando y el protagonista por la acera (fila %d)" % [gente, py])
+	# 1.57.1: la calle de la carga sigue en el título (no la partida de fondo): gente por las dos aceras, en bici y en patinete
+	var ac := {}
+	var vs := {}
+	for q in EscViaje.PEATONES:
+		ac[int(q[0])] = true
+		vs[q[4]] = true
+	chk(ac.size() == 2 and vs.has("") and vs.has("bici") and vs.has("patinete"), "la calle: andando, en bici y en patinete por las dos aceras")
+	chk(EscViaje.CALLE_FIL.has("grass") and EscViaje.CALLE_FIL.has("walk") and EscViaje.CALLE_FIL.has("roadT"), "la calle: hierba, aceras y calzada del juego")
+	J.mode = "title"
+	J.pintor.redibuja(5000.0)
+	chk(J.pintor.modo == "calle", "el título: la calle de fondo (%s)" % J.pintor.modo)
 	Datos.CAL = false
-	J.demo_e = null
-	sv = J.demo_entra(5000.0)
-	var hay := false
-	for e2 in J.ents:
-		hay = hay or e2.get("veh") != null
-	J.demo_sale(sv)
-	chk(not hay, "sin CAL, el título de antes")
+	J.pintor.redibuja(5000.0)
+	chk(J.pintor.modo == "demo", "sin CAL, el título de antes (%s)" % J.pintor.modo)
 	Datos.CAL = true
 	J.demo_e = null
 	J.mode = "world"
@@ -216,6 +207,15 @@ func _corre() -> void:
 					var im: Image = J.sv.get_texture().get_image()
 					im.save_png(dir.path_join("viaje-%s-%02d-%04d.png" % [veh, h, ms]))
 		J.VIAJE_V = null
+		for md in ["carga", "title"]:   # 1.57.1: la calle, en la carga y de fondo en el título
+			for ms in [800.0, 2600.0]:
+				J.mode = md
+				J.carga_t0 = 0.0
+				J.pintor.redibuja(ms)
+				for r in 3:
+					await RenderingServer.frame_post_draw
+				J.sv.get_texture().get_image().save_png(dir.path_join("calle-%s-%04d.png" % [md, int(ms)]))
+		J.mode = "world"
 	print("viaje: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:
 		print("  FALLO ", f)

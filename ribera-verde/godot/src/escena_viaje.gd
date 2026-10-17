@@ -6,6 +6,8 @@
 extends RefCounted
 
 const Croquis = preload("res://src/croquis.gd")
+const Atlas = preload("res://src/atlas.gd")
+const Datos = preload("res://src/datos.gd")
 
 const DUR := 3000.0      # ms: entra, rueda y sale
 const ENTRA := 700.0
@@ -170,8 +172,24 @@ static func pinta_carga(P, e: float) -> void:
 		return
 	var sw: int = P.J.SW
 	var sh: int = P.SH
-	_cielo(P, sw, 0)
-	_fondo(P, sw, sh, 0.0, Color(1, 1, 1))
+	if Datos.CAL and Atlas.ok:   # 1.57.1: la calle con el arte del juego
+		pinta_calle(P, e)
+	else:
+		_cielo(P, sw, 0)
+		_fondo(P, sw, sh, 0.0, Color(1, 1, 1))
+		_coches(P, e, Y_CARRETERA + CARRIL_LEJOS, Y_CARRETERA + CARRIL)
+	# la barra, con su marco
+	var bw := sw - 80
+	var bx := 40
+	var by := sh - 8
+	P._rect(bx - 1, by - 1, bw + 2, 5, Color("#1a1420"))
+	P._rect(bx, by, bw, 3, Color("#3a3446"))
+	P._rect(bx, by, int(bw * clampf(e / CARGA, 0.0, 1.0)), 3, Color("#8bd448"))
+	P._rect(bx, by, int(bw * clampf(e / CARGA, 0.0, 1.0)), 1, Color("#c4f088"))
+
+# los vehículos de perfil por los dos carriles (suelo de cada carril: el de enfrente y este)
+static func _coches(P, e: float, suelo1: int, suelo0: int) -> void:
+	var sw: int = P.J.SW
 	for carril in [1, 0]:
 		for v in CARGA_V:
 			if int(v[1]) != carril:
@@ -184,7 +202,7 @@ static func pinta_carga(P, e: float) -> void:
 			var x := fposmod(anda, vuelta) - w
 			if carril == 1:
 				x = sw - x - w
-			var suelo := Y_CARRETERA + (CARRIL if carril == 0 else CARRIL_LEJOS)
+			var suelo := suelo0 if carril == 0 else suelo1
 			var bote := 1 if int(anda / 18.0) % 4 == 0 else 0
 			var vx := int(x)
 			var vy := suelo - int(m.suelo) - bote
@@ -197,14 +215,121 @@ static func pinta_carga(P, e: float) -> void:
 				var rx := int(r[0]) if carril == 0 else w - int(r[0])
 				var rim: Image = R["rueda-%d-%d" % [d, f if carril == 0 else 3 - f]]
 				P._img(rim, vx + rx - d / 2, vy + bote + int(r[1]) - d / 2, tv)
-	# la barra, con su marco
-	var bw := sw - 80
-	var bx := 40
-	var by := sh - 8
-	P._rect(bx - 1, by - 1, bw + 2, 5, Color("#1a1420"))
-	P._rect(bx, by, bw, 3, Color("#3a3446"))
-	P._rect(bx, by, int(bw * clampf(e / CARGA, 0.0, 1.0)), 3, Color("#8bd448"))
-	P._rect(bx, by, int(bw * clampf(e / CARGA, 0.0, 1.0)), 1, Color("#c4f088"))
+
+# 1.57.1 (lo pidió el usuario: «que aparezcan en la pantalla de carga los sprites reales de césped, árboles, setos, también molaría que
+# pasasen algún transeúnte… que se quede de fondo la carretera andando coches y por la acera transeúntes andando, en bici, patinete»): la
+# calle del juego vista de lado, quieta, de abajo arriba: la acera de delante, la calzada (dos carriles), la acera de detrás y dos filas de
+# hierba con árboles y setos, el monte y el cielo; por las aceras, gente andando, en bici y en patinete; por la calzada, los vehículos de
+# perfil. La carga y el título (CALLE_FIL: filas de 16 px desde abajo)
+const CALLE_FIL := ["grass", "walk", "roadB", "roadT", "walk", "grass", "grass"]   # abajo, la hierba con la barra de la carga
+# los de las aceras: acera (0 la de detrás, 1 la de delante), sentido, px/ms, dónde va en la vuelta (0..1) y vehículo
+const PEATONES := [[0, 1, 0.040, 0.05, ""], [0, -1, 0.034, 0.40, ""], [0, 1, 0.085, 0.62, "bici"], [0, -1, 0.045, 0.85, ""],
+	[1, -1, 0.042, 0.20, ""], [1, 1, 0.066, 0.50, "patinete"], [1, -1, 0.090, 0.75, "bici"], [1, 1, 0.038, 0.95, ""]]
+
+static func calle_y0(P) -> int:
+	return int(P.SH) - 16 * CALLE_FIL.size()
+
+static func pinta_calle(P, e: float) -> void:
+	var sw: int = P.J.SW
+	var y0 := calle_y0(P)
+	_cielo(P, sw, 0)
+	var im: Image = R.monte
+	var x := 0
+	while x < sw:
+		P._img(im, x, y0 - im.get_height() + 3, Color(1, 1, 1))
+		x += im.get_width()
+	var n := CALLE_FIL.size()
+	var cols := ceili(sw / 16.0)
+	for i in n:
+		var k: String = CALLE_FIL[n - 1 - i]
+		var sy := y0 + i * 16
+		for tx in cols:
+			var kk := k
+			if i == 0 and P.hash_t(tx, 5) % 9 == 0:
+				kk = "flowers"
+			_tile(P, kk, tx, i, tx * 16, sy)
+		if k == "grass" and i + 1 < n and CALLE_FIL[n - 2 - i] == "walk":   # el canto de la hierba junto a la acera
+			P._rect(0, sy + 15, sw, 1, Color8(0x5a, 0xa0, 0x4e))
+			P._rect(0, sy + 14, sw, 1, Color8(0x72, 0xbc, 0x5e))
+		if k == "grass" and i > 0 and CALLE_FIL[n - i] == "walk":
+			P._rect(0, sy, sw, 1, Color8(0x5a, 0xa0, 0x4e))
+			P._rect(0, sy + 1, sw, 1, Color8(0x72, 0xbc, 0x5e))
+	# en la fila de hierba de abajo, setos y algún árbol (con el pie en la fila)
+	var fy := y0 + 31
+	var gt = Atlas.cubre("obj:tree")
+	var gs = Atlas.cubre("obj:seto")
+	var list := []
+	var ult := -9
+	for tx in range(-1, cols + 1):
+		var h: int = P.hash_t(tx, 3)
+		var d: Dictionary = P.desfase("tree", tx, 3)
+		if gt and tx - ult >= 3 and (h % 3 == 0 or tx - ult >= 7):   # árboles sueltos, a 3-7 casillas
+			ult = tx
+			var k := "tree2" if h % 5 == 0 else "tree"
+			var g2 = Atlas.cubre("obj:" + k)
+			var f = Atlas.frame_de(g2 if g2 else gt, k, "unica", 0, {"i": 0, "esp": d.esp})
+			if f:
+				list.append([fy - 2, f, tx * 16 + 8 + d.dx, fy - 2])
+		elif h % 4 and gs:
+			var f2 = Atlas.frame_de(gs, "seto", "unica", 0, {"i": 0})
+			if f2:
+				list.append([fy, f2, tx * 16 + 8, fy])
+	for q in list:
+		P._pinta(q[1], q[2], q[3])
+	# la acera de detrás, el carril de enfrente, el de este lado y la de delante
+	_peatones(P, e, 0, y0 + 47)
+	_coches(P, e, y0 + 60, y0 + 77)
+	_peatones(P, e, 1, y0 + 95)
+
+static func _tile(P, k: String, tx: int, ty: int, sx: int, sy: int) -> void:
+	var fp = Atlas.frame_de("exterior-pk", "pk-" + k, "unica", 0, {"i": 0})
+	if fp:
+		P.L.draw_texture_rect_region(Atlas.tex(fp.c), Rect2(sx, sy, 16, 16), Rect2(((tx & 3) + 4 * (ty & 3)) * 16, 0, 16, 16))
+		return
+	var f = Atlas.frame_de(Atlas.cubre("tile:" + k), k, "unica", 0, {"i": 0})
+	if f:
+		P.L.draw_texture_rect_region(Atlas.tex(f.c), Rect2(sx, sy, 16, 16), Rect2(0, 0, 16, 16))
+
+static func _peatones(P, e: float, acera: int, yp: int) -> void:
+	var sw: int = P.J.SW
+	var vuelta := float(sw + 64)
+	for i in PEATONES.size():
+		var q: Array = PEATONES[i]
+		if int(q[0]) != acera:
+			continue
+		var gr = Atlas.grupo_look(Datos.rand_look("calle%d" % i, "client"))
+		if not gr:
+			continue
+		var anda: float = e * float(q[2]) + float(q[3]) * vuelta
+		var x := fposmod(anda, vuelta) - 32.0
+		if int(q[1]) < 0:
+			x = sw - x
+		var dir := "east" if int(q[1]) > 0 else "west"
+		var v: String = q[4]
+		if v != "" and not Atlas.anim_de("vehiculos", v + "-atras"):
+			v = ""
+		var f = null
+		if v == "patinete":
+			f = Atlas.frame_de(gr, "base", dir, 0, {"i": 0})
+		else:
+			f = Atlas.frame_de(gr, "walk", dir, 0, {"ph": fposmod(anda / (48.0 if v == "bici" else 32.0), 1.0)})
+		if f == null:
+			continue
+		var xp := int(x)
+		var sm := Color8(0, 0, 0, 56)
+		P._rect(xp - 4, yp - 1, 8, 3, sm)
+		P._rect(xp - 5, yp, 10, 1, sm)
+		if v != "":
+			var o := {"i": int(anda / 8.0) % 2}
+			var va = Atlas.frame_de("vehiculos", v + "-atras", dir, 0, o)
+			var vd = Atlas.frame_de("vehiculos", v + "-delante", dir, 0, o)
+			if va:
+				P._pinta(va, xp, yp)
+			P._pinta(f, xp, yp - int(P.J.D.VEHICULOS[v].sube))
+			if vd:
+				P._pinta(vd, xp, yp)
+		else:
+			P._pinta(f, xp, yp)
 
 static func _texto(P, x: int, y: int, t: String, s: int) -> void:
 	for q in Croquis.letras(t):
