@@ -41,6 +41,8 @@ func elegir_cal() -> void:
 
 func elegir_mapa() -> void:
 	var aqui := Croquis.pueblo_de(S.map)
+	if not Croquis.PUEBLOS.has(aqui):   # MAESTRO [9]: desde la ciudad, la comarca con la chincheta en Ibarbide
+		aqui = "ibarbide"
 	MAPA_V = {"i": Croquis.ORDEN.find(aqui)}
 	_dlg_fijo(Croquis.desc_mapa(D, int(S.ch), MAPA_V, aqui), "")   # 1.43: sin pestaña, que no pise el croquis
 	var pr := Motor.Prom.new()
@@ -297,13 +299,14 @@ func multa_aparcado(k: String) -> void:
 func tramo(a: String, b: String, k: String) -> Dictionary:
 	var V: Dictionary = D.CONCE.v[k]
 	var km: int = int(D.CONCE.km[a]) + int(D.CONCE.km[b])
-	return {"km": km, "min": maxi(5, roundi(viaje(a, b).min * float(V.t))), "eur": maxi(1, roundi(km * float(V.l) / 100.0 * float(D.CONCE.litro)))}
+	var pj: int = int(D.METRO.peaje) if "metropoli" in [a, b] and D.has("METRO") else 0   # MAESTRO [9]: la autopista, con su peaje
+	return {"km": km, "min": maxi(5, roundi(viaje(a, b).min * float(V.t))), "eur": maxi(1, roundi(km * float(V.l) / 100.0 * float(D.CONCE.litro))) + pj}
 
 func conducir(k):
 	var aqui: String = S.map
 	var ds := []
 	for x in D.PARADAS:
-		if x != aqui and S.ch >= int(D.PARADAS[x].cap):
+		if x != aqui and (S.ch >= int(D.PARADAS[x].cap) or (x == "metropoli" and metro_ya())):   # MAESTRO [9]: la ciudad, por patrimonio
 			ds.append(x)
 	var it := []
 	for x in ds:
@@ -347,6 +350,7 @@ func conducir(k):
 		sfx("bad")
 		await talk(K("SMS · TALLER"), [taller])
 	await control_trafico(k)
+	await metro_llegada()   # MAESTRO [9]: las bandas de la ciudad
 
 # Los km de cada vehículo; al pasar cada CONCE.v[k].revKm, la revisión (aceite y filtros), y cada neuKm, los neumáticos
 func kilometros(k: String, km: int) -> String:

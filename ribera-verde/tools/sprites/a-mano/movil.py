@@ -212,9 +212,25 @@ def mapa():
                '............'], {'y': '#f0e0a8', 'c': '#d8c888', 'g': '#5aa050', 'r': '#e03838'})
     return L
 
+def pisos():   # MAESTRO [9]: los pisos de venta, un bloque con su llave
+    L = app('#6a3a20', '#b06a3a', '#e0a070')
+    dibujo(L, ['..wwwwwww...',
+               '..wbwbwbw...',
+               '..wwwwwww...',
+               '..wbwbwbw...',
+               '..wwwwwww...',
+               '..wbwbwbw...',
+               '..wwwwwww...',
+               '..wbwwwbw...',
+               '..www.www.yy',
+               '......yyyyky',
+               '.........yy.',
+               '............'], {'w': '#ffffff', 'b': '#4a2a18', 'y': '#f8d040', 'k': '#6a3a20'})
+    return L
+
 sale('mv-movil', movil())
 for n, f in (('llamar', llamar), ('kiko', kiko), ('sms', sms), ('gente', gente), ('plantilla', plantilla), ('banca', banca),
-             ('tienda', tienda), ('cal', cal), ('mapa', mapa)):
+             ('tienda', tienda), ('cal', cal), ('mapa', mapa), ('pisos', pisos)):
     sale('mv-' + n, f())
 
 def escribe(raiz=None):

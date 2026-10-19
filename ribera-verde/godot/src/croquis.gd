@@ -67,7 +67,8 @@ const ZONA := {"town": "town", "alto": "town", "astilleros": "town", "home": "to
 	"errotabarri": "errotabarri", "ibarbide": "ibarbide", "ensanche": "ibarbide", "callejon": "ibarbide", "growcity": "ibarbide",
 	"club-ibar": "ibarbide", "club-ens": "ibarbide", "disco": "ibarbide", "setas": "ibarbide",
 	"disco-vip": "ibarbide", "est-rv": "town", "est-puerto": "puerto", "est-valde": "valdehierro", "est-mendi": "mendialde", "est-erro": "errotabarri", "est-ibar": "ibarbide",   # 1.47
-	"pasillo": "town", "sotano": "town", "cuarto-t": "valdehierro", "nave-d": "valdehierro", "nave-h": "valdehierro", "muelle": "puerto", "franco": "puerto"}   # 1.51
+	"pasillo": "town", "sotano": "town", "cuarto-t": "valdehierro", "nave-d": "valdehierro", "nave-h": "valdehierro", "muelle": "puerto", "franco": "puerto",   # 1.51
+	"metropoli": "metropoli", "vip-zen": "metropoli", "vip-ila": "metropoli"}   # MAESTRO [9]: la ciudad no sale en el croquis (la chincheta, en Ibarbide)
 
 static func pueblo_de(mapa: String) -> String:
 	return ZONA.get(mapa, "town")
@@ -285,7 +286,7 @@ static func rects_mapa(sw: int, V: Dictionary, aqui: String, alto := LIBRE) -> A
 	var y: int = o.y + p[1] - 8
 	for e in [[x, y, 24, 1], [x, y + 15, 24, 1], [x, y, 1, 16], [x + 23, y, 1, 16]]:
 		rs.append([e[0], e[1], e[2], e[3], "#f8d040"])
-	var q: Array = PUEBLOS[aqui].p
+	var q: Array = PUEBLOS.get(aqui, PUEBLOS.ibarbide).p
 	var cx: int = o.x + q[0]
 	var cy: int = o.y + q[1] - 7
 	rs.append([cx - 1, cy - 3, 3, 3, "#e03028"])   # la chincheta

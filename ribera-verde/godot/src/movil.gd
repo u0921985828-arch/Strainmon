@@ -14,6 +14,8 @@ func movil_menu():
 		ops.append_array([K("Mensajes"), K("Gente")])
 		if S.ch >= int(D.PLANTILLA.ch):
 			ops.append(K("Plantilla"))
+		if pisos_ok():   # MAESTRO [9]: los pisos de venta
+			ops.append(K("Pisos"))
 		ops.append_array([K("Banca"), K("Tienda online"), K("Calendario"), K("Mapa"), K("Colgar")])   # 1.35: la banca (granja.gd); 1.42: el calendario y el mapa (croquis.gd)
 		var ns: int = S.sms.size()
 		var oi: int
@@ -47,6 +49,8 @@ func movil_menu():
 			await gente()
 		elif op == "Plantilla":   # 1.19
 			await plantilla()
+		elif op == "Pisos":   # MAESTRO [9]
+			await pisos()
 		else:
 			await mensajes()
 
@@ -56,7 +60,8 @@ func desc_movil(V: Dictionary) -> String:
 	var d: String = {"Llamar": K("La agenda: Kiko, Toño, Iñaki y los clientes que te han comprado."), "Pedir a Kiko": T("Lo del growshop, a casa mañana por la mañana (+{n} %).", {"n": Datos.jsround((D.ENVIO - 1) * 100)}),
 		"Mensajes": (T("{n} mensajes.", {"n": ns}) if ns > 1 else T("{n} mensaje.", {"n": ns})) if ns else K("No hay mensajes."), "Gente": K("La confianza con cada persona."),
 		"Plantilla": K("Tu gente: la calle, la casa y la nave."), "Banca": T("En la cuenta, {e}. Movimientos y recibos.", {"e": Datos.eur(S.get("banco", 0))}),
-		"Tienda online": K("Con tarjeta; llega al día siguiente."), "Calendario": K("El mes, con los días señalados."), "Mapa": K("La comarca y las líneas de autobús.")}.get(op, "")
+		"Tienda online": K("Con tarjeta; llega al día siguiente."), "Calendario": K("El mes, con los días señalados."), "Mapa": K("La comarca y las líneas de autobús."),
+		"Pisos": K("Tus pisos de venta y sus lugartenientes.")}.get(op, "")
 	if Datos.CAL:   # 1.52: el tiempo de hoy
 		var Ti := Datos.tiempo(int(S.day), int(S.min))
 		return T("{op} · {f}, {h}\n{d} · Fuera: {n}, {t} °C (máx. {mx}, mín. {mn}), {e}.\nA: abrir · B: colgar.", {"op": op, "f": Datos.fd_hud(S.day).to_lower(), "h": reloj_txt(), "d": d, "n": Ti.n.to_lower(), "t": int(Ti.t), "mx": int(Ti.max), "mn": int(Ti.min), "e": Ti.est})
@@ -366,6 +371,8 @@ func curro_dia() -> void:
 	aso_dia()   # la asociación (1.32)
 	mar_dia()   # 1.51: los envíos por mar y el piso franco
 	franco_dia()
+	pisos_dia()   # MAESTRO [9]: los pisos de venta y la ciudad (metro.gd)
+	metro_dia()
 
 # regar, tratar las plagas con tu insecticida y rellenar garrafas y depósitos (Begoña y el gerente de la plantilla)
 func cuidar_plantas() -> void:

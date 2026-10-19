@@ -1810,7 +1810,7 @@ var MOVIL_V = null
 var ult_app := ""
 
 const APP_MOVIL := {"Llamar": "llamar", "Pedir a Kiko": "kiko", "Mensajes": "sms", "Gente": "gente", "Plantilla": "plantilla", "Banca": "banca",
-	"Tienda online": "tienda", "Calendario": "cal", "Mapa": "mapa"}
+	"Tienda online": "tienda", "Calendario": "cal", "Mapa": "mapa", "Pisos": "pisos"}
 
 const CIFRAS := ["111101101101111", "010110010010111", "111001111100111", "111001111001111", "101101111001001", "111100111001111",
 	"111100111101111", "111001010010010", "111101111101111", "111101111001111"]

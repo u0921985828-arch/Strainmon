@@ -199,6 +199,7 @@ s9c2c1caf,RECIPES,
 s808a2361,BANCO,BANK
 s3765acfa,BOTRITIS,BOTRYTIS
 s9affa116,SHOP,SHOP
+scfd02651,METRO,METRO
 s3c69629d,KAIA,
 se0facbd4,día {n},day {n}
 s8bb5e92a,{d} de {m} de {y},"{m} {d}, {y}"
@@ -1345,11 +1346,99 @@ s0ccb2c5d,LISTA,READY
 s186914ff,CULTIVO,GROW
 s787bc634,Luz {e}/día,Power {e}/day
 s6d3fdaa8,Luz apagada,Lights off
+s84427f42,PISOS9,PISOS9
+s5fca07cd,sin piso,no flat
+s33f5d4da,sin lugarteniente · {s},no lieutenant · {s}
+s7f4550a3,Un piso por pueblo: tu lugarteniente vende cada mañana lo que dejes en su almacén.,One flat per town: your lieutenant sells every morning whatever you leave in the storeroom.
+sf354ec0c,PISOS,FLATS
+sbf3ec475,Alquiler: {a} al mes. Comprarlo: {p}.,Rent: {a} a month. Buy it: {p}.
+sa5838892,nadie,nobody
+s3c61c9ea,"Lugarteniente: {l} · {p}, {x} · ayer {v} · calor {c}.","Lieutenant: {l} · {p}, {x} · yesterday {v} · heat {c}."
+s7752de1e,Un piso discreto en {n}: {a} al mes o {p} en propiedad.,"A quiet flat in {n}: {a} a month, or {p} to own it."
+saa267e0a,Comprarlo,Buy it
+s276aeb3f,"El primer mes va en efectivo, por delante. No te llega.","The first month is paid in cash, up front. You don't have enough."
+s755d7e70,Compra · piso de {n},Purchase · flat in {n}
+s6fecee0b,Para comprarlo hacen falta {p} en la cuenta.,To buy it you need {p} in the account.
+sa3949cff,El piso de {n} es tuyo. Pon a alguien de tu plantilla al frente y déjale género.,The flat in {n} is yours. Put someone from your staff in charge and leave them some product.
+s6247d090,Lugarteniente,Lieutenant
+sec316785,Pureza,Purity
+s1105c494,Precio,Price
+s98778380,Dejar género,Leave product
+s51f29e41,El piso de {n}. {d},The flat in {n}. {d}
+s0f924cf1,"El género y la caja, en persona.","The product and the till, in person."
+s68bff8d8,"Ayer salieron {v}; quedan {s}. Calor {c}. Tuyo, sin alquiler.","Yesterday {v} went out; {s} left. Heat {c}. Yours, no rent."
+s518bd737,"Ayer salieron {v}; quedan {s}. Calor {c}. El alquiler, el {d}.",Yesterday {v} went out; {s} left. Heat {c}. Rent due on {d}.
+s89975833,"¿Cómo lo vende? Rebajado rinde más gramos, pero se nota y da más calor.","How do they sell it? Cut, it yields more grams, but people notice and it brings more heat."
+scc3a395a,"¿A qué precio? Barato vende más; caro, menos.","At what price? Cheap sells more; expensive, less."
+sfc6cd61d,La caja está vacía.,The till is empty.
+sdcfc0011,Te llevas {e}.,You take {e}.
+scda1574f,Para vaciarlo tienes que estar en el pueblo.,To empty it you have to be in the town.
+s62e2b7c1,¿Dejas el piso? Lo que haya en el almacén y en la caja te lo llevas tú.,"Give up the flat? Whatever is in the storeroom and the till, you take with you."
+s622dcd6c,No tienes a nadie libre en la plantilla. Pídele gente a Patxi desde el móvil.,You have nobody free on your staff. Ask Patxi for people from your phone.
+s306cc287,labia {l} · lealtad {e},patter {l} · loyalty {e}
+s6442a796,Nadie,Nobody
+s8efa34cd,¿Quién lleva el piso?,Who runs the flat?
+s914ac3e4,{n} lleva el piso de {p}.,{n} runs the flat in {p}.
+sfab65fcd,Al almacén · {a} de {b},To the storeroom · {a} of {b}
+sdadd327a,El almacén está lleno.,The storeroom is full.
+s9c9a2428,CASERO,LANDLORD
+s66deff5a,el piso de {n},the flat in {n}
+s131e5bb1,SMS · CASERO,SMS · LANDLORD
+se50e53bf,Sin alquiler no hay piso en {n}. Lo que había dentro cubre lo que debes.,"No rent, no flat in {n}. What was inside covers what you owe."
+s9dec49e6,Han entrado en el piso de {n}. Me llevan detenido. Se han quedado {kg} y {e} de la caja.,They've raided the flat in {n}. They're taking me in. They kept {kg} and {e} from the till.
+s3f58cfc2,"Tu nombre ya suena en Hiriburu. Con un patrimonio así, la ciudad se abre: la autopista sale de la parada, con tu vehículo ({p} de peaje).","Your name is getting around in Hiriburu. With assets like yours, the city opens up: the motorway leaves from the stop, in your own vehicle ({p} toll)."
+s88fc49ae,"Allí hay clubs para gente con dinero, un concejal que sabe mirar a otro lado y dos bandas que no te esperan con flores.","There are clubs for people with money, a councillor who knows how to look the other way and two gangs that won't greet you with flowers."
+sd08d1959,SMS · IÑAKI,SMS · IÑAKI
+s3c9f69c2,Multa · {n},Fine · {n}
+s2131d3bd,Inspección en {n}: precintado {d} días y {e} de multa.,Inspection at {n}: sealed for {d} days and a {e} fine.
+s0c1a885c,SMS · AYUNTAMIENTO DE HIRIBURU,SMS · HIRIBURU CITY COUNCIL
+sa864896e,{f} se mueven en {b}: has perdido {q} puntos de control. {j} te espera allí.,{f} are moving in {b}: you've lost {q} points of control. {j} is waiting for you there.
+s05f80854,UN CHAVAL DEL BARRIO,A KID FROM THE NEIGHBOURHOOD
+s23dabcd9,«Aquí se viene a que te vean.»,“You come here to be seen.”
+s860e10af,«¿Tú eres el dueño? Buena música.»,“Are you the owner? Good music.”
+s1a226b33,«La próxima la pago yo.»,“Next round's on me.”
+s6f2cd279,Cerrado. Una cámara te mira desde lo alto.,Closed. A camera watches you from up high.
+s17d6ee6d,Precinto del Ayuntamiento en la puerta: cerrado hasta el {d}.,Council seal on the door: closed until {d}.
+s2497aad8,"{n}: SE TRASPASA. Local de copas con licencia hasta las 6, {p}. ¿Lo compras?","{n}: FOR SALE. Bar licensed until 6 a.m., {p}. Buy it?"
+s1782d7e9,Hacen falta {p} en la cuenta.,You need {p} in the account.
+s2513e9d1,"{n} es tuyo. {e} lo lleva por ti: lo que deje cada noche, a tu cuenta.","{n} is yours. {e} runs it for you: whatever it makes each night, into your account."
+sa203a712,«Esto ya no es tuyo. Fuera.»,“This isn't yours any more. Out.”
+sfa4b87fd,"Anoche, {e}. En {b} mandas un {c} %.","Last night, {e}. In {b} you control {c} %."
+s0d849d9e,"Con el concejal, tranquilos.","With the councillor, we're safe."
+sca274051,"Sin el concejal, cualquier inspección nos cierra.","Without the councillor, any inspection shuts us down."
+s356c8ab1,"Desde que es tuyo, {t}. {s}","Since it's been yours, {t}. {s}"
+sca36415f,"«Usted y yo no nos conocemos. Hasta el {d}, ninguna inspección pasa por sus locales.»","“You and I have never met. Until {d}, no inspection comes near your premises.”"
+s3f4567be,"«Las licencias de ocio nocturno pasan por mi mesa. Por {e} al mes, las inspecciones se pierden por el camino.»","“Nightlife licences go across my desk. For {e} a month, the inspections get lost on the way.”"
+s736adad4,Darle el sobre ({e}),Hand him the envelope ({e})
+sd39254f1,«Eso va en efectivo. Vuelva cuando lo traiga.»,“That's in cash. Come back when you bring it.”
+sb18da280,"Se guarda el sobre sin mirarlo. «Hasta el {d}, sin sustos.»","He pockets the envelope without looking. “Until {d}, no surprises.”"
+s98f37962,«Ya no tengo nada que hablar contigo. La ciudad es tuya… por ahora.»,“I've got nothing more to say to you. The city's yours… for now.”
+s6402ab22,Plantarles cara en {b} ({c} %),Stand up to them in {b} ({c} %)
+sfac14964,Pactar ({e}),Make a deal ({e})
+s4e1e89b5,«{f} mandan aquí. ¿Qué quieres?»,“{f} run things here. What do you want?”
+s6dc53e71,"«Sin el dinero delante, no hay pacto.»","“No money on the table, no deal.”"
+s8e28ebb4,«Trato.» En {b} te dejan sitio: {c} % de control.,“Deal.” In {b} they make room for you: {c} % control.
+s07d587f4,{f} se retiran de media {b}: {c} % de control.,{f} pull out of half of {b}: {c} % control.
+sd0f41e61,{b} es tuyo.,{b} is yours.
+s2224fe4b,Os separáis sin más. Nadie gana nada.,You go your separate ways. Nobody wins anything.
+sb983f460,Te sacan de {b} a empujones: {c} % de control.,They shove you out of {b}: {c} % control.
+s4d12c577,flashE,
+s21cf98f1,shakeP,
+s14da80ca,{j} y los suyos te cortan el paso: «{b} no es tuya.»,{j} and his crew block your way: “{b} isn't yours.”
+s1668d5ed,Plantarles cara,Stand up to them
+s3939eef0,Pagarles ({e}),Pay them ({e})
+se6a65db0,Irte,Leave
+sf0b966a5,Se guardan el dinero y se apartan. Por esta vez.,They pocket the money and step aside. This time.
+s1a55e705,Te apartas. En {b} te queda un {c} %.,You back off. In {b} you keep {c} %.
+sfc860bc5,"Todo de diseño, todo carísimo.","All designer, all very expensive."
+s56771650,Autobús de línea a Ibarbide ({e}),Coach to Ibarbide ({e})
+sc118df21,El billete cuesta {e}. No te llega.,The ticket costs {e}. You don't have enough.
 s94e2731b,Llamar,Call
 s3d578850,Pedir a Kiko,Order from Kiko
 s95e4fed6,Mensajes,Messages
 s14cbbb7a,Gente,People
 sf46c70f0,Plantilla,Crew
+sc5c101b8,Pisos,Flats
 s51a7e3d2,Banca,Banking
 s6044a85c,Calendario,Calendar
 s14a5d6d3,Mapa,Map
@@ -1368,6 +1457,7 @@ s73118433,"En la cuenta, {e}. Movimientos y recibos.",In the account: {e}. Trans
 s9486aa7e,Con tarjeta; llega al día siguiente.,Pay by card; arrives the next day.
 s4d91d9da,"El mes, con los días señalados.","The month, with key dates marked."
 sdabdebc9,La comarca y las líneas de autobús.,The county and the bus lines.
+s6a3d7a39,Tus pisos de venta y sus lugartenientes.,Your selling flats and their lieutenants.
 s964dcfe6,"{op} · {f}, {h}
 {d} · Fuera: {n}, {t} °C (máx. {mx}, mín. {mn}), {e}.
 A: abrir · B: colgar.","{op} · {f}, {h}
@@ -1548,14 +1638,11 @@ s73f45018,Tiras {g} g de {x}.,You throw away {g} g of {x}.
 se4f52602,Tiras {g} de {x}.,You throw away {g} of {x}.
 se4baeb69,Darko,Darko
 sd22f06dd,DARKO,DARKO
-s4d12c577,flashE,
-s21cf98f1,shakeP,
 s07f3d4e0,"Eh, tú. Llevas {n} ventas en {s}.","Hey, you. That's {n} sales in {s}."
 sdaccb4c4,O me pagas {e} o lo arreglamos aquí.,Pay me {e} or we settle it right here.
 sb31eb28a,¿Qué haces?,What do you do?
 s119f5aef,Pelear,Fight
 s92e4033c,Pagarle {e},Pay {e}
-se6a65db0,Irte,Leave
 s70231a6f,"{n} no volverá por {s} en {d} días. Mientras, sus clientes te pagan un {p} % más.","{n} won't show up in {s} for {d} days. Meanwhile, their customers pay you {p} % more."
 s5a62c8e2,{n}: «Vale. Pero no te quiero ver tanto por aquí.»,"{n}: ""Fine. But I don't want to see you around here so much."""
 se1194822,{n} se guarda el dinero. «Así me gusta. Hasta la próxima.»,"{n} pockets the money. ""That's how I like it. Until next time."""
@@ -2774,7 +2861,6 @@ sd57cf1f2,Y ve contando: tienes {n} días para el primer pago.,And start countin
 s6642fcec,No me hagas venir a buscarte.,Don't make me come looking for you.
 s993e2a87,impN,
 sdc286b8f,<small>TU IMPERIO</small>{n},<small>YOUR EMPIRE</small>{n}
-sd08d1959,SMS · IÑAKI,SMS · IÑAKI
 sd04dbc1b,Se corre la voz: {e} vendidos desde que pagaste a Baltasar.,Word's getting around: {e} sold since you paid Baltasar.
 s48d78383,Desde hoy te cargo hasta {g} al día en el barco.,From today I'll load up to {g} a day on the boat.
 s9601bcd7,Don Baltasar quiere {e} en {n} días.,Don Baltasar wants {e} in {n} days.
@@ -2863,6 +2949,7 @@ se8783e8b,"{n} hace un curso de cultivo: riego, plagas y poda. Cuidado {v}.","{n
 s912083b7,calle · {g},street · {g}
 sc584699f,contable · {l},accountant · {l}
 s444d524c,contable,accountant
+s56a2d220,piso · {l},flat · {l}
 s306c486d,gerente,manager
 sf715b59c,nave,warehouse
 s2cd8f5b0,sin trabajo,no job
@@ -2871,6 +2958,7 @@ s922d2f99,Cuida el piso y cosecha a la caja fuerte por {e} al día.,Tends the fl
 s33ee6225,"Cultiva la mesa {m} de la nave por {e} al día: con su cuidado, la cosecha da un {p} %.","Grows table {m} in the warehouse for {e} a day: with their care, the harvest yields {p} %."
 s08c36ec2,Cuida las madres de la nave por {e} al día y les saca esquejes.,Tends the warehouse mothers for {e} a day and takes cuttings.
 sd403c37f,Lleva la caja de {l}: cada mañana mete el efectivo que cabe y se queda el {p} %.,Runs the till at {l}: every morning they put in the cash that fits and keep {p} %.
+sb6b0839c,Lleva tu piso de {l}: vende lo del almacén cada mañana y se queda el {p} %.,Runs your flat in {l}: sells from the storeroom every morning and keeps {p} %.
 s325f7aee,"Dale trabajo: calle, gerente, nave o las madres.","Give them a job: street, manager, warehouse or the mothers."
 sc3bc92ab,{a} de {b} · nave {g},{a} of {b} · warehouse {g}
 s325fecbc,PLANTILLA,CREW
@@ -3913,6 +4001,9 @@ sc7b9360e,escS,escS
 s90b5033c,CLUB KAIA,CLUB KAIA
 s6df05a02,Carretera comarcal,County road
 s9de53392,Caserío abandonado,Abandoned farmhouse
+sadcfbd05,Hiriburu,Hiriburu
+s0c2032d1,Club Zenit,Club Zenit
+sb619fb10,Club Ilargi,Club Ilargi
 s30a02292,ESTUDIANTE,STUDENT
 sf07acb89,Hola. Me ha dicho un amigo que tienes.,Hi. A friend said you've got some.
 s42927016,"Aupa, ¿tienes algo? Voy justo de dinero.","Hey, got anything? I'm a bit short on cash."
@@ -4019,6 +4110,12 @@ The old street. The patrol doesn't come here."
 s97d8dccb,"IBARBIDE · ENSANCHE
 ← Casco Viejo y estación de autobuses.","IBARBIDE · ENSANCHE
 ← Casco Viejo and bus station."
+s8654560c,"HIRIBURU · UDALA
+El Ayuntamiento. Se atiende en la puerta.","HIRIBURU · UDALA
+The Town Hall. Enquiries at the door."
+sbf7a47b7,"APARCAMIENTO
+Entrada y salida de la autopista.","CAR PARK
+Motorway entrance and exit."
 saced0e96,Semillas Skunk #1,Skunk #1 seeds
 s0ea02f6b,Semillas Skonk #1,Skonk #1 seeds
 sae6a55fe,Semillas Lemon Haze,Lemon Haze seeds
@@ -5515,6 +5612,35 @@ s47868adf,"Una librería de roble: libros de botánica de la tía, un herbario y
 s39626e9b,El sofá de terciopelo verde. Desde aquí se ven todos los monitores.,The green velvet sofa. You can see every monitor from here.
 s483cb122,Una kentia en una maceta de barro. La riega Arrieta.,A kentia palm in a clay pot. Arrieta waters it.
 sb6cdb920,"El plano de la nave, enmarcado en roble.","The warehouse floor plan, framed in oak."
+scbb0c1f6,MAESTRO [9]: la ciudad de la autopista (solo con Datos.CAL). Se abre con el patrimonio (umbral) y se va con tu vehículo.,MAESTRO [9]: the motorway city (only with Datos.CAL). It opens with your assets (threshold) and you go in your own vehicle.
+s743849f9,Erdialdea,Erdialdea
+s8f5ea56c,Goialde,Goialde
+se5c341b5,Ibaiondo,Ibaiondo
+s45ddbc45,Geltokia,Geltokia
+sc5bb8f5c,Los del Puente,The Bridge Crew
+s3755b63e,TXEMA,TXEMA
+see0f5828,La Peña Gris,The Grey Gang
+s0ef6a888,MIKEL,MIKEL
+s649b1208,Reservados,Private booths
+s69be6ea4,Tres reservados con su camarero: un 25 % más cada noche.,Three private booths with their own waiter: 25 % more every night.
+sfe6da24e,Seguridad en la puerta,Door security
+s3d749ffc,Dos porteros con licencia: la mitad de riesgo de que lo cierren.,Two licensed bouncers: half the risk of being shut down.
+s25ff2a92,ZUBIRI,ZUBIRI
+s15170e34,Sofá de cuero blanco. Aquí no se sienta cualquiera.,A white leather sofa. Not just anyone sits here.
+s141f8f39,"Sofá de cuero blanco, de espaldas a la pista.","A white leather sofa, with its back to the dance floor."
+s628f0588,Una mesa baja de cristal con una cubitera.,A low glass table with an ice bucket.
+s40c3e978,Un billar de tapete negro. Nadie juega: se mira.,A black-felt pool table. Nobody plays: people watch.
+s6a9a73b1,"Una gramola de las de antes, conectada a los altavoces del techo.","An old-style jukebox, wired to the ceiling speakers."
+saf3f3974,Un neón con el nombre del club.,A neon sign with the club's name.
+sec445062,Un cartel de la sesión del sábado.,A poster for Saturday's session.
+sdba22ac6,"Los tacos del billar, en su soporte.","The pool cues, in their rack."
+sb0c31625,"Una palmera de interior, regada por alguien que no eres tú.","An indoor palm, watered by someone who isn't you."
+s37b59232,"MAESTRO [9]: un piso de venta por pueblo desde el primer envío por mar (S.mar.paso >= 1), con su lugarteniente (solo con Datos.CAL).","MAESTRO [9]: one selling flat per town from the first sea shipment (S.mar.paso >= 1), with its lieutenant (only with Datos.CAL)."
+s9fcf30bf,Pura,Pure
+s6c6bf121,Rebajada,Cut
+s22feee2f,Muy rebajada,Heavily cut
+saec57005,Barata,Cheap
+sc64cc362,Cara,Expensive
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.

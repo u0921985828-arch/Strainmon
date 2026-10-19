@@ -107,7 +107,7 @@ func aparcados(mapa: String) -> Array:   # los tuyos que están en mapa, por ord
 
 # el aparcamiento de cada pueblo, dibujado junto a la parada (3 × 4 casillas: cuatro plazas de 2 × 1 a la izquierda y el pasillo a la
 # derecha; aparcamiento.py), en suelo libre que no corta el paso a nada (lo comprueba tests/vehiculos.gd)
-const APARC := {"puerto": [17, 10], "valdehierro": [17, 11], "mendialde": [25, 19], "errotabarri": [13, 13], "ibarbide": [7, 23]}   # i18n-no
+const APARC := {"puerto": [17, 10], "valdehierro": [17, 11], "mendialde": [25, 19], "errotabarri": [13, 13], "ibarbide": [7, 23], "metropoli": [1, 24]}   # i18n-no
 var _aparc0 := {}
 
 func montar_aparcamiento(mapa: String) -> void:

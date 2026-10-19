@@ -124,6 +124,14 @@ static func _aplica_auto() -> void:
 			D.EXTRAS["sello"] = D.BOTRITIS.extra
 		else:
 			D.EXTRAS.erase("sello")
+	# MAESTRO [9]: Hiriburu, la ciudad de la autopista (solo con CAL: su parada, sus km, su zona, sus patrullas y sus clientes)
+	var MT: Dictionary = D.get("METRO", {})
+	if not MT.is_empty():
+		for t in [[D.PARADAS, MT.parada], [D.CONCE.km, MT.km], [D.ZONAS, MT.zona], [D.PATRULLAS, MT.pat], [D.CLIENT_TILES, MT.ct], [D.RONDA, MT.ronda]]:
+			if CAL:
+				t[0]["metropoli"] = t[1]
+			else:
+				t[0].erase("metropoli")
 	# El club KAIA del muelle, el tuyo (solo con CAL: las pruebas contra el HTML recorren D.CLUBS)
 	var K: Dictionary = D.get("KAIA", {})
 	if K.is_empty():

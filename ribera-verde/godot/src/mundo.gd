@@ -1599,6 +1599,9 @@ func npc_talk(d: Dictionary) -> void:
 	if d.id == "setero":   # 1.51
 		await talk_setero()
 		return
+	if d.id.begins_with("m9_"):   # MAESTRO [9]: la ciudad (metro.gd)
+		await talk_metro(d.id)
+		return
 	if d.id == "koldo":   # 1.51: el muelle
 		await talk_koldo()
 		return
@@ -1741,6 +1744,8 @@ func build_ents() -> void:
 	if Datos.CAL and D.has("MAR") and S.map == "franco" and S.get("franco") is Dictionary:
 		var Gk: Dictionary = D.MAR.gorka
 		ents.append(old["gorka"] if old.has("gorka") else mk_ent({"id": "gorka", "map": "franco", "x": int(Gk.x), "y": int(Gk.y), "look": Gk.look, "dir": "down", "wander": 0}))
+	for dd in metro_npcs(S.map):   # MAESTRO [9]: el concejal, las bandas y los encargados de los clubs VIP
+		ents.append(old[dd.id] if old.has(dd.id) else mk_ent(dd))
 	for c in S.clients:
 		if c.get("map", "town") == S.map:
 			ents.append(old[c.id] if old.has(c.id) else mk_ent({"id": c.id, "x": c.x, "y": c.y, "wander": 2, "lookObj": c.look, "client": c}))
@@ -2610,3 +2615,37 @@ func navc_action():   # MAESTRO [8], en setas.gd
 
 func caja_desp():   # MAESTRO [8], en nave.gd
 	pass
+
+# MAESTRO [9], en metro.gd
+func pisos_ok() -> bool:
+	return false
+
+func pisos() -> void:
+	pass
+
+func pisos_dia() -> void:
+	pass
+
+func metro_ya() -> bool:
+	return false
+
+func metro_dia() -> void:
+	pass
+
+func metro_npcs(_mapa: String) -> Array:
+	return []
+
+func talk_metro(_id: String) -> void:
+	pass
+
+func vip_puerta(_k: String) -> bool:
+	return true
+
+func obj_vip(_o) -> bool:
+	return false
+
+func metro_llegada() -> void:
+	pass
+
+func piso_n(k: String) -> String:
+	return k

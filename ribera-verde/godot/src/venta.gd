@@ -94,6 +94,8 @@ func rol_txt(w: Dictionary) -> String:
 		return T("calle · {g}", {"g": g_txt(w.g)})
 	if w.get("rol") == "contable":
 		return T("contable · {l}", {"l": D.LOCALES[w.loc].n}) if D.LOCALES.has(w.get("loc", "")) else T("contable")
+	if w.get("rol") == "lugar":   # MAESTRO [9]
+		return T("piso · {l}", {"l": piso_n(String(w.get("pv", "")))})
 	return {"gerente": T("gerente"), "nave": T("nave"), "madres": T("madres")}.get(w.rol, w.rol) if w.get("rol") else T("sin trabajo")
 
 func rol_desc(w: Dictionary) -> String:
@@ -109,6 +111,8 @@ func rol_desc(w: Dictionary) -> String:
 			return T("Cuida las madres de la nave por {e} al día y les saca esquejes.", {"e": Datos.eur(P.sueldo.madres)})
 		"contable":   # MAESTRO [6]
 			return T("Lleva la caja de {l}: cada mañana mete el efectivo que cabe y se queda el {p} %.", {"l": D.LOCALES[w.loc].n if D.LOCALES.has(w.get("loc", "")) else "?", "p": roundi(float(D.STAFF.contable.com) * 100)})
+		"lugar":   # MAESTRO [9]
+			return T("Lleva tu piso de {l}: vende lo del almacén cada mañana y se queda el {p} %.", {"l": piso_n(String(w.get("pv", ""))), "p": roundi(float(D.PISOS9.com) * 100)})
 	return T("Dale trabajo: calle, gerente, nave o las madres.")
 
 # deja el trabajo; lo que le quedaba del lote vuelve a la caja fuerte
@@ -116,6 +120,7 @@ func libre(w: Dictionary) -> void:
 	if w.get("rol") == "calle" and w.g >= 1:
 		add_buds(w.k, w.g, w.thc, S.caja.buds if S.get("caja") else S.buds, w.get("cu"), w.get("dia"), w.get("mc", 0))
 	w.rol = null
+	w.erase("pv")   # MAESTRO [9]
 	w.erase("k")
 	w.erase("thc")
 	w.erase("g")
@@ -699,6 +704,9 @@ func entra_local(d: Dictionary):
 			atras_puerta()
 			await say(K("Cerrado. En el cristal, el cartel de SE TRASPASA."))
 			return
+	elif t == "vip":   # MAESTRO [9]: los clubs VIP de la ciudad (metro.gd)
+		if not await vip_puerta(gk[1]):
+			return
 	elif t == "disco":
 		if S.ch < int(D.DISCO.ch) or not disco_abierta():
 			atras_puerta()
@@ -735,6 +743,8 @@ func obj_local(x: int, y: int, o) -> bool:
 	if o == null:
 		return false
 	var txt := ""
+	if Datos.CAL and await obj_vip(o):   # MAESTRO [9]
+		return true
 	if Datos.CAL and S.map == "nave" and o == "estanteC":   # MAESTRO [8]: las estanterías de tarros de la nave
 		await navc_action()
 		return true
