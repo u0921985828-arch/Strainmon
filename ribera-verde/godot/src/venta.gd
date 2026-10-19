@@ -17,14 +17,19 @@ func de_la_nave() -> Array:
 # llevar a la gente (1.34, MANDO de 11f-plantilla): una prima (lealtad +1) y un curso (cuidado +1; a los de la calle, labia +1), hasta
 # 5, cada uno una vez cada MANDO.dias días por persona (w.pr, w.cu1)
 func curso_de(w: Dictionary) -> Array:
-	return ["lab", "labia"] if w.get("rol") == "calle" else ["cui", "cuidado"]
+	return ["lab", "labia"] if w.get("rol") == "calle" or w.get("rol") == "contable" else ["cui", "cuidado"]
+
+# el sueldo del día (MAESTRO [6]: bajo, normal o alto, w.sm; con el bajo, la lealtad media se degrada)
+func sueldo_w(w: Dictionary) -> int:
+	var b: int = int(D.PLANTILLA.sueldo.get(w.get("rol"), 0))
+	return roundi(b * float(D.STAFF.sueldo[int(w.get("sm", 1))][1])) if staff_ok() else b
 
 func prima(w: Dictionary) -> void:
 	var M: Dictionary = D.MANDO
 	if w.get("pr") != null and S.day - int(w.pr) < int(M.dias):
 		await say(T("A {n} ya le diste una prima el {d}. Hasta el {h}, no.", {"n": w.n, "d": Datos.fd(int(w.pr), S.day), "h": Datos.fd(int(w.pr) + int(M.dias), S.day).trim_prefix("día ")}))
 		return
-	if w.lea >= 5:
+	if (lealtad(w) >= 10) if staff_ok() else w.lea >= 5:
 		await say(T("{n} ya te es leal del todo: una prima no le cambia nada.", {"n": w.n}))
 		return
 	if S.money < M.prima:
@@ -33,10 +38,13 @@ func prima(w: Dictionary) -> void:
 		return
 	S.money -= int(M.prima)
 	w.pr = S.day
-	w.lea = int(w.lea) + 1
+	if staff_ok():   # MAESTRO [6]: de 1 a 10
+		pon_lealtad(w, lealtad(w) + 1)
+	else:
+		w.lea = int(w.lea) + 1
 	sfx("coin")
 	update_hud()
-	await say(T("{n}: «Gracias, jefe. Aquí me tienes». Lealtad {l}.", {"n": w.n, "l": int(w.lea)}))
+	await say(T("{n}: «Gracias, jefe. Aquí me tienes». Lealtad {l}.", {"n": w.n, "l": lealtad(w) if staff_ok() else int(w.lea)}))
 
 func curso(w: Dictionary) -> void:
 	var M: Dictionary = D.MANDO
@@ -84,6 +92,8 @@ func nave_g(w: Dictionary) -> int:
 func rol_txt(w: Dictionary) -> String:
 	if w.get("rol") == "calle":
 		return T("calle · {g}", {"g": g_txt(w.g)})
+	if w.get("rol") == "contable":
+		return T("contable · {l}", {"l": D.LOCALES[w.loc].n}) if D.LOCALES.has(w.get("loc", "")) else T("contable")
 	return {"gerente": T("gerente"), "nave": T("nave"), "madres": T("madres")}.get(w.rol, w.rol) if w.get("rol") else T("sin trabajo")
 
 func rol_desc(w: Dictionary) -> String:
@@ -97,6 +107,8 @@ func rol_desc(w: Dictionary) -> String:
 			return T("Cultiva la mesa {m} de la nave por {e} al día: con su cuidado, la cosecha da un {p} %.", {"m": int(w.mesa) + 1, "e": Datos.eur(P.sueldo.nave), "p": int(Datos.jsround(100.0 * nave_g(w) / float(D.NAVE.g)))})
 		"madres":   # 1.34
 			return T("Cuida las madres de la nave por {e} al día y les saca esquejes.", {"e": Datos.eur(P.sueldo.madres)})
+		"contable":   # MAESTRO [6]
+			return T("Lleva la caja de {l}: cada mañana mete el efectivo que cabe y se queda el {p} %.", {"l": D.LOCALES[w.loc].n if D.LOCALES.has(w.get("loc", "")) else "?", "p": roundi(float(D.STAFF.contable.com) * 100)})
 	return T("Dale trabajo: calle, gerente, nave o las madres.")
 
 # deja el trabajo; lo que le quedaba del lote vuelve a la caja fuerte
@@ -111,8 +123,12 @@ func libre(w: Dictionary) -> void:
 	w.erase("mc")
 	w.erase("dia")
 	w.erase("mesa")
+	w.erase("loc")
 
 func plantilla() -> void:
+	if staff_ok():   # MAESTRO [6]: por local
+		await plantilla_locales()
+		return
 	var P: Dictionary = D.PLANTILLA
 	var i := 0
 	while true:
@@ -155,6 +171,9 @@ func pedir_gente() -> void:
 		await say(T("{n} se va por donde ha venido. El sobre ya es de Patxi.", {"n": nm}))
 		return
 	S.plantilla.append(w)
+	if staff_ok():   # MAESTRO [6]: la lealtad de 1 a 10 y, según ella, quizá un chivato
+		lealtad(w)
+		tira_topo(w, "alta")
 	sfx("sel")
 	await say(T("{n} entra en tu plantilla. Dale trabajo desde aquí.", {"n": nm}))
 
@@ -197,6 +216,7 @@ func trabajo(w: Dictionary) -> void:
 		ops.append(K("A la nave"))
 	if w.get("rol") != "madres" and S.get("nave") != null and cuida_madres() == null:   # 1.34
 		ops.append(K("A las madres"))
+	ops.append_array(ops_staff(w))   # MAESTRO [6]: de contable y el sueldo
 	if w.get("rol"):
 		ops.append(K("Dejarlo libre"))
 	var lpr := T("Prima · {e}", {"e": Datos.eur(D.MANDO.prima)})
@@ -204,6 +224,8 @@ func trabajo(w: Dictionary) -> void:
 	ops.append_array([lpr, lcu, K("Despedir"), K("Nada")])
 	var oi: int = await ask("%s · %s · %s" % [w.n, ficha_gente(w), rol_txt(w)], ops)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+	if await staff_op(w, op):
+		return
 	if op == "A la calle":
 		var r = await lote_calle(w)
 		if r == null:
@@ -290,12 +312,13 @@ func plantilla_dia() -> void:
 	for w in S.plantilla:
 		if w.get("rol") == null or not P.sueldo.has(w.rol):   # gerente, nave y madres (1.34)
 			continue
-		if S.money < P.sueldo[w.rol]:
+		if S.money < sueldo_w(w):
 			w.rol = null
 			var N: String = K("SMS · ") + w.n.to_upper()
 			queue("pl" + w.id, func(): await talk(N, [K("Sin cobrar no curro. Cuando tengas el dinero, me llamas.")]))
 		else:
-			S.money -= int(P.sueldo[w.rol])
+			S.money -= sueldo_w(w)
+	staff_dia()   # MAESTRO [6]: la lealtad, los chivatos y el capataz
 	var ger = gerente()
 	if ger != null:
 		cuidar_casa(ger)
@@ -393,11 +416,19 @@ func nave_dia() -> void:
 	var mc := 0
 	for w in W:
 		mc = maxi(mc, int(w.cui))
-	if Cultivo.azar() < maxf(0, D.NAVE.redada - D.NAVE.redadaC * mc) * D.EXTR_NAVE[int(N.ex)].olor:   # 1.33: con los filtros, huele menos
+	carbon_dia()   # MAESTRO [6]: el carbón se gasta
+	if Cultivo.azar() < maxf(0, D.NAVE.redada - D.NAVE.redadaC * mc) * olor_nave() * chivato_nave():   # 1.33: con los filtros, huele menos; MAESTRO [6]: el ozono y los chivatos
 		var ns: Array = de_la_nave().map(func(w): return w.n)
 		var quien: String = T("{a} y {b}", {"a": ", ".join(PackedStringArray(ns.slice(0, -1))), "b": ns[-1]}) if ns.size() > 1 else ns[0]
 		var gg: float = nave_stock()
 		S.nave = null
+		if seg_tiene("nave", "ca"):   # MAESTRO [6]: con las cámaras, tu gente sale por detrás
+			for w in de_la_nave():
+				libre(w)
+			S.heat = min(100, S.heat + D.NAVE.calor)
+			sfx("bad")
+			queue("nave", func(): await say(T("La policía ha entrado en la nave de Valdehierro y se lleva las plantas y {g}. {q} vio el furgón en las cámaras y salió por detrás con los demás.", {"g": g_txt(gg), "q": ns[0]}) if gg >= 1 else T("La policía ha entrado en la nave de Valdehierro y se lleva las plantas. {q} vio el furgón en las cámaras y salió por detrás con los demás.", {"q": ns[0]})))
+			return
 		S.plantilla = S.plantilla.filter(func(w): return w.get("rol") != "nave" and w.get("rol") != "madres")
 		S.heat = min(100, S.heat + D.NAVE.calor)
 		sfx("bad")

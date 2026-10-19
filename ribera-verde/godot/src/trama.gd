@@ -1815,6 +1815,8 @@ const CATA_PASOS := {"b": [0.1, 0.25, 0.5], "r": [0.1, 0.2, 0.3]}
 
 # ---------- la plantilla (1.19, 11f-plantilla): gente del barrio que trabaja para ti ----------
 func ficha_gente(w: Dictionary) -> String:
+	if staff_ok():   # MAESTRO [6]: la lealtad de 1 a 10 y la eficiencia
+		return T("Labia {a} · cuidado {b} · lealtad {c}/10 · eficiencia {e} %", {"a": int(w.lab), "b": int(w.cui), "c": lealtad(w), "e": eficiencia(w)})
 	return T("Labia {a} · cuidado {b} · lealtad {c}", {"a": int(w.lab), "b": int(w.cui), "c": int(w.lea)})
 
 # el billar (1.35, talkBillar de 11j-locales): una partida corta a la bola 8, con el tiro elegido (TIROS) y dos barras, la dirección
@@ -2021,7 +2023,7 @@ func _marco(o: Array, x: int, y: int, w: int, h: int) -> void:
 func alijo_franco() -> void:
 	pass
 
-func almacen_club() -> void:
+func almacen_club(_id := "rv") -> void:
 	pass
 
 func aso() -> Dictionary:

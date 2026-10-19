@@ -337,6 +337,8 @@ func secadero_nave() -> void:
 		if q < 1:
 			break
 		add_buds(Me.k, q, Me.t, null, 0, Me.get("cd", S.day))
+		if staff_ok() and String(S.nave.get("oz", "")) == "sala":   # MAESTRO [6]: el ozono en la sala quema los terpenos
+			S.buds[Me.k].oz = 1
 		Me.g = Datos.jsround((Me.g - q) * 10) / 10.0
 		lleva += q
 	if not lleva:
@@ -372,6 +374,10 @@ func _filas_escritorio() -> Array:
 		rows.append({"label": K("Ordenar la nave"), "right": "", "desc": K("Mover las mesas y el tanque del riego: la manguera va del tanque a cada mesa por el suelo libre. Pulsa A.")})   # 1.37 (12d-orden)
 	rows.append({"label": K("La gente"), "right": T("{n} aquí", {"n": de_la_nave().size()}), "desc": K("Quién cuida cada mesa y las madres: cambiarlos de mesa, una prima o un curso. Pulsa A.")})   # 1.34
 	rows.append({"label": K("Mejoras"), "right": T("Nave {n}", {"n": nivel_nave()}), "desc": T("Extracción: {e}. Riego: {r}. Pulsa A para mejorarlas.", {"e": E.n, "r": D.RIEGO_NAVE[int(N.rg)].n})})
+	if staff_ok():   # MAESTRO [6]: el olor, la seguridad y los monitores
+		rows.append({"label": K("El olor"), "right": T("carbón {p} %", {"p": int(carbon(N))}) if int(N.ex) else "", "desc": olor_txt() + " " + K("Pulsa A.")})
+		rows.append({"label": K("Seguridad"), "right": "", "desc": K("Puertas blindadas, alarmas, perros y cámaras para la nave y los locales. Pulsa A.")})
+		rows.append({"label": K("Monitores"), "right": "", "desc": K("Lo que ven las cámaras de cada local. Pulsa A.")})
 	return rows
 
 func escritorio_nave() -> void:
@@ -386,6 +392,12 @@ func escritorio_nave() -> void:
 			await gente_nave()
 		elif l == "Ordenar la nave":
 			await ordenar("nave")
+		elif l == "El olor":
+			await olor_menu()
+		elif l == "Seguridad":
+			await seguridad_menu()
+		elif l == "Monitores":
+			await monitores()
 		if i < 0:
 			break
 
@@ -728,14 +740,14 @@ func comprar_mercado(id: String, N: String, pool: Array) -> void:
 
 # el almacén del club (1.45, de presidente): lo que dejas en sus estanterías (S.aso.al: buds y rosin, hasta MERCADO.alm.g de flor)
 # lo retiran los socios del dispensario cada mañana (aso_dia), MERCADO.alm.dia g de flor al día, a precio de dispensario
-func alm_club() -> Dictionary:
-	var A := aso()
+func alm_club(id := "rv") -> Dictionary:
+	var A: Dictionary = S.mar if id == "muelle" else aso()   # MAESTRO [6]: el de KAIA, igual
 	if not (A.get("al") is Dictionary):
 		A.al = {"buds": {}, "rosin": {}, "tot": 0}
 	return A.al
 
-func alm_g() -> float:
-	var al := alm_club()
+func alm_g(id := "rv") -> float:
+	var al := alm_club(id)
 	var t := 0.0
 	for k in al.buds:
 		t += float(al.buds[k].g)
@@ -743,15 +755,14 @@ func alm_g() -> float:
 		t += float(al.rosin[k].g) / D.ROSIN.rend
 	return t
 
-func almacen_club() -> void:
-	var N: String = D.DELROY.n
-	if not aso().pres:
+func almacen_club(id := "rv") -> void:
+	if id == "rv" and not aso().pres:
 		await say(K("El almacén del club, con llave. La tiene el presidente."))
 		return
 	while true:
-		var al := alm_club()
+		var al := alm_club(id)
 		var ops := [K("Guardar"), K("Sacar"), K("Nada")]
-		var c: int = await ask(T("EL ALMACÉN DEL CLUB · {a} de {b} ocupados. Lo de aquí lo retiran los socios del dispensario, {d} g al día; en total, {t}.", {"a": g_txt(alm_g()), "b": g_txt(D.MERCADO.alm.g), "d": int(D.MERCADO.alm.dia), "t": Datos.eur(int(al.tot))}), ops)
+		var c: int = await ask(T("EL ALMACÉN DEL CLUB · {a} de {b} ocupados. Lo de aquí lo retiran los socios del dispensario, {d} g al día; en total, {t}.", {"a": g_txt(alm_g(id)), "b": g_txt(D.MERCADO.alm.g), "d": int(D.MERCADO.alm.dia), "t": Datos.eur(int(al.tot))}), ops)
 		if c == 0:
 			var lots := lotes_venta(1, 1)
 			if lots.is_empty():
@@ -765,7 +776,7 @@ func almacen_club() -> void:
 			var lt: Array = lots[i]
 			var x := es_extr(lt)
 			var b: Dictionary = lt[1]
-			var cabe: float = (float(D.MERCADO.alm.g) - alm_g()) * (D.ROSIN.rend if x else 1.0)
+			var cabe: float = (float(D.MERCADO.alm.g) - alm_g(id)) * (D.ROSIN.rend if x else 1.0)
 			var g: float = minf(float(b.g), floorf(cabe * 10) / 10.0)
 			if g < .1:
 				await say(K("Las estanterías están llenas."))
@@ -815,11 +826,12 @@ func almacen_club() -> void:
 		else:
 			return
 
-func almacen_dia() -> void:
-	var A := aso()
-	if not A.pres or not (A.get("al") is Dictionary):
+func almacen_dia(id := "rv") -> void:
+	var A: Dictionary = S.mar if id == "muelle" else aso()
+	if (id == "rv" and not A.pres) or not (A.get("al") is Dictionary):
 		return
-	var al := alm_club()
+	var al := alm_club(id)
+	var fc: float = float(D.MAR.kaia.f) if id == "muelle" else float(D.ASO.f)
 	var r: float = float(D.MERCADO.alm.dia)
 	var e := 0.0
 	for x in [false, true]:
@@ -829,7 +841,7 @@ func almacen_dia() -> void:
 				break
 			var b: Dictionary = L[k]
 			var g: float = minf(float(b.g), r * (D.ROSIN.rend if x else 1.0))
-			var pg: float = (precio_extr(k, b.thc, "club") if x else precio_club(b.thc)) * float(b.get("q", 1)) * float(D.ASO.f)
+			var pg: float = (precio_extr(k, b.thc, "club") if x else precio_club(b.thc)) * float(b.get("q", 1)) * fc
 			e += g * pg
 			r -= g / D.ROSIN.rend if x else g
 			b.g = float(b.g) - g
@@ -838,7 +850,10 @@ func almacen_dia() -> void:
 	if e > 0:
 		var ee := Datos.jsround(e)
 		al.tot = int(al.tot) + ee
-		S.money += ee
+		if id == "muelle" and S.mar.get("lic"):   # KAIA con licencia, por el banco
+			abono_banco(ee, K("KAIA · dispensario"))
+		else:
+			S.money += ee
 		S.sales += ee
 		queue("historia", check_story)
 
@@ -879,7 +894,9 @@ func talk_delroy() -> void:
 	if c == 0:
 		await say(pick(D.DELROY.charla), N)
 	elif c == 1:
-		if A.pres:
+		if A.pres and staff_ok():   # MAESTRO [6]: el panel, el mismo que el de KAIA
+			await panel_club("rv", N)
+		elif A.pres:
 			await dispensario_aso()
 		else:
 			await presidencia_aso()

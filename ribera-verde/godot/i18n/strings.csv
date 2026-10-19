@@ -449,6 +449,71 @@ s9919570a,"{n} compra de 100 g para arriba, en cogollo curado o sin curar.","{n}
 s35117ad1,"{n} · hoy, hasta {kg}","{n} · today, up to {kg}"
 seb1634c6,Venta · {n},Sale · {n}
 s929dd0d5,"{kg} de {l}, con factura: {e} a la cuenta.","{kg} of {l}, invoiced: {e} to your account."
+sb53a3122,STAFF,STAFF
+sc08e634a,El piso,The flat
+sd928546f,La calle,The Street
+scaff5908,La nave,The warehouse
+saa447a67,Sin trabajo,Unemployed
+s89729d10,"Jefe, ojo con {n}: ayer le vi hablando con uno de paisano detrás de {l}. Yo no le contaría nada.","Boss, watch out for {n}: yesterday I saw them talking to a plain-clothes cop behind {l}. I wouldn't tell them anything."
+s5f9d243c,Sin extracción no hay filtro: el olor sale a la calle.,"No extraction, no filter: the smell gets out to the street."
+sd98216f1,Carbón activo al {p} %.,Activated carbon at {p} %.
+s1a7aaaa0,Saturado: huele como sin filtro. Cámbialo.,Saturated: it smells as if there were no filter. Change it.
+s43b78093,"Con el ozonizador en el conducto, en la calle no huele nada.","With the ozonator in the duct, the street smells of nothing."
+s8284658a,"El ozonizador está en la sala: no huele nada, pero quema los terpenos de las flores.","The ozonator is in the room: nothing smells, but it burns the terpenes of the flowers."
+s756ad009,En la calle se nota un {p} % del olor.,On the street you notice {p} % of the smell.
+sa66940bd,Cambiar el carbón · {e},Change the carbon · {e}
+sb43e96fc,Ozonizador · {e},Ozonator · {e}
+s7131855b,Mover el ozonizador,Move the ozonator
+s7a773f6e,EL OLOR,THE SMELL
+s4ede69f9,Arrieta cambia el carbón de los filtros. Huele a nuevo.,Arrieta changes the carbon in the filters. It smells new.
+s8e28e8bd,Comprar,Buy
+s42d1d553,¿Dónde va el ozonizador?,Where does the ozonator go?
+s25e21daf,"En el conducto, después del filtro","In the duct, after the filter"
+s5c9259be,"En la sala, con las plantas","In the room, with the plants"
+s9319dc31,En el conducto: el ozono no toca las flores.,In the duct: the ozone doesn't touch the flowers.
+s454e6ce4,En la sala: el ozono quema los terpenos y lo que se cuelgue se venderá peor.,In the room: the ozone burns the terpenes and whatever is hung will sell worse.
+s5acb22ea,SEGURIDAD,SECURITY
+s07e92688,Han entrado de noche en la nave y se han llevado {g} del secadero.,Someone broke into the warehouse at night and took {g} from the drying room.
+sde8e0ac0,Han entrado de noche en {n} y se han llevado {e} de la caja.,Someone broke into {n} at night and took {e} from the till.
+s9a0449ba,Las cámaras lo grabaron todo: la policía ha recuperado la mitad.,The cameras recorded everything: the police have recovered half.
+s6fdd3773,SMS · ALARMA,SMS · ALARM
+s0af19dff,SMS · VECINO,SMS · NEIGHBOUR
+sd62215c4,No tienes ningún local que proteger.,You don't have any premises to protect.
+sdeacdd7f,{n} de {t},{n} of {t}
+s1ebcb9b3,Riesgo de robo: {p} % al día.,Burglary risk: {p} % a day.
+sa07bffd9,puesta,installed
+s1de497fe,robo {p} %,burglary {p} %
+sce868031,{n}: ya está puesta.,{n}: already installed.
+sddb84e56,"{n} para {l}: {e}, con tarjeta. {d}","{n} for {l}: {e}, by card. {d}"
+sb24f5c49,{n}: puesta,{n}: installed
+s3f318e77,sin cámaras,no cameras
+s954fc698,Ponle cámaras desde SEGURIDAD.,Put cameras in from SECURITY.
+sf19ddb11,{n} trabajando · {g} en el secadero · {o},{n} working · {g} in the drying room · {o}
+s5269d0d0,"Ayer vendió {a}. En la caja, {c}. El local {l}.","Yesterday it sold {a}. In the till, {c}. The premises are {l}."
+s5e51fce6,{n} sale a hablar por teléfono cada poco.,{n} keeps going out to talk on the phone.
+sbab4a89a,en directo,live
+s3e0c59ca,Los monitores están apagados: no tienes locales con cámaras.,The monitors are off: you have no premises with cameras.
+s1bba158f,MONITORES,MONITORS
+sb4496d38,{n} personas,{n} people
+seabccb8c,1 persona,1 person
+s17dc9694,Nadie.,Nobody.
+sc07d59bc,Pedir gente a Patxi,Ask Patxi for people
+s17f51937,Patxi te manda a alguien del barrio que quiere currar. No sabes a quién hasta que llega.,Patxi sends you someone from the hood who wants work. You won't know who until they show up.
+sdc4cf625,PLANTILLA POR LOCAL,STAFF BY PREMISES
+se05f3497,Sueldo {s}.,Wage {s}.
+s49bfd035,El capataz dice que habla con la policía.,The foreman says they talk to the police.
+s8de0863d,En {l} no trabaja nadie.,Nobody works at {l}.
+s63d3cccd,rol · sueldo · lealtad · eficiencia,role · wage · loyalty · efficiency
+s99461b33,De contable,As accountant
+sb4f14f6f,Sueldo: {s},Wage: {s}
+sbb572507,{d} ¿De qué local?,{d} Which premises?
+sf1c51e66,"{n}: «Desde mañana llevo la caja de {l}. Lo que entre, limpio a la cuenta, menos lo mío».","{n}: “From tomorrow I'll run the till at {l}. Whatever comes in goes clean to the account, minus my cut.”"
+s5c469b60,{s} · {e} al día,{s} · {e} a day
+s28eedb05,"El sueldo de {n}. Con el bajo, su lealtad se resiente; con el alto, sube poco a poco.","{n}'s wage. On low, their loyalty suffers; on high, it rises little by little."
+sd887eb8e,El dispensario,The dispensary
+saa689dda,El almacén,The storeroom
+sd9249f84,"¿Qué miramos, presidente?","What shall we look at, president?"
+sdcdb3bdc,"¿Qué miramos, jefe?","What shall we look at, boss?"
 s5d7bbb46,"{w} W · ilumina {l}×{l} cm · {g} g/W ({ga} abonando){crece}{thc} · riego ×{agua}
 Luz: {kwh} kWh ({eur}) al día con plantas.","{w} W · lights {l}×{l} cm · {g} g/W ({ga} with nutrients){crece}{thc} · water ×{agua}
 Power: {kwh} kWh ({eur}) a day with plants."
@@ -917,6 +982,7 @@ s2119a1df,Has dejado {n}.,You've given up {n}.
 s3420c027,Las cuentas,The accounts
 sfa74ce22,Reponer género,Restock
 sd4ac1e23,Mejora: {m},Upgrade: {m}
+s9cf8bea6,Seguridad,Security
 sb1734b74,"LA CAJA · hoy, {h} de {t} metidos · ayer vendió {a}.","THE TILL · today, {h} of {t} put in · yesterday it sold {a}."
 sfc91ba50,"Ayer vendió {a}; en total, {t}. Por la caja has lavado {l}.","Yesterday it sold {a}; in total, {t}. Through the till you've laundered {l}."
 sf0523dc9,"El local {c} ({p} %). Género para {g} días. Mejoras: {m} de {n}. El recibo, {e} el {d}.","The premises are {c} ({p} %). Stock for {g} days. Upgrades: {m} of {n}. The bill, {e} on {d}."
@@ -1379,7 +1445,6 @@ s2c9eb93e,Le dejaste {l}: le quedan {g}.,You left them {l}: {g} to go.
 s10bdb3f4,Cliente de la agenda. Buen precio y regalos suman; con {n} vende para ti.,Regular customer. Fair prices and gifts help; at {n} they sell for you.
 sb64bd5c5,Todavía no conoces a nadie.,You don't know anyone yet.
 s225e56ce,GENTE,PEOPLE
-sb4496d38,{n} personas,{n} people
 s4db97fa9,{n} persona,{n} person
 sc2a10e87,BEGOÑA,BEGOÑA
 se5a31bae,"¿Qué tal las plantas, majo? Paso cada mañana: {e} al día.","How are the plants, love? I come by every morning: {e} a day."
@@ -1402,7 +1467,6 @@ s60ede028,"{c}, asociación de consumidores. Dentro no se vende nada: lo tuyo en
 s10f88777,Hacerme socio,Join
 s12a65c2e,Sin la cuota no hay carné.,"No fee, no card."
 sad1294b0,el carné de {c},the {c} card
-s8e28e8bd,Comprar,Buy
 sc933e3cf,Comprar {n} g,Buy {n} g
 sb1e6bf75,Invitar a {n} g,Treat to {n} g
 s26b1cc26,Vender al club,Sell to the club
@@ -1760,6 +1824,12 @@ sb6d62795,{n} aquí,{n} here
 s9c923edd,"Quién cuida cada mesa y las madres: cambiarlos de mesa, una prima o un curso. Pulsa A.","Who tends each table and the mothers: switch tables, a bonus or a course. Press A."
 sb2d11bc9,Mejoras,Upgrades
 s4387b40a,Extracción: {e}. Riego: {r}. Pulsa A para mejorarlas.,Extraction: {e}. Watering: {r}. Press A to upgrade.
+s4b4ed7ec,El olor,The smell
+s1e6449e9,carbón {p} %,carbon {p} %
+sc1732310,Pulsa A.,Press A.
+s75b31923,"Puertas blindadas, alarmas, perros y cámaras para la nave y los locales. Pulsa A.","Armoured doors, alarms, dogs and cameras for the warehouse and the premises. Press A."
+sdd8989c3,Monitores,Monitors
+sb283f84d,Lo que ven las cámaras de cada local. Pulsa A.,What the cameras at each premises see. Press A.
 sfbc6b18a,LA NAVE,THE WAREHOUSE
 sec5791e8,{e} al día,{e} a day
 s826b90fa,En la nave no trabaja nadie. Pon a tu gente desde el móvil: MÓVIL → PLANTILLA.,Nobody works in the warehouse. Assign your people from the phone: PHONE → CREW.
@@ -1841,7 +1911,6 @@ s5c05d5f3,Sacado: {g},Taken: {g}
 s11a67198,"Junto a la foto de la tía Maite, un hombre mayor con las rastas y la barba canas no te quita ojo.","By Aunt Maite's photo, an older man with grey dreads and beard can't take his eyes off you."
 s13ac81ae,"¿Qué tal, presidente?","How are things, president?"
 se3fd747f,"Dime, sobrino.","Go on, nephew."
-sd887eb8e,El dispensario,The dispensary
 s8a6d5ad8,La presidencia,The presidency
 s9575148d,"La asamblea es el {f}, por la mañana. Habla con la gente del barrio: cada amigo trae votos. O la refundas ya, por {e}.","The assembly is on {f}, in the morning. Talk to the neighbourhood: every friend brings votes. Or refound it now, for {e}."
 s99154ac2,Refundarla,Refound it
@@ -2732,6 +2801,7 @@ s1d54cb36,Pulsa A,Press A
 s5e5c6c6b,"Bajo una lámpara las plantas beben mucho. Riégalas a diario, majo.","Under a lamp plants drink a lot. Water them daily, love."
 s347f5935,"Si se te ponen amarillas las hojas de abajo, les falta agua o abono.","If the lower leaves turn yellow, they need water or feed."
 sfdf08849,Tu tía siempre tenía el piso oliendo a limón. Ahora sé por qué.,Your aunt's flat always smelled of lemon. Now I know why.
+sb0a0be69,Labia {a} · cuidado {b} · lealtad {c}/10 · eficiencia {e} %,Patter {a} · care {b} · loyalty {c}/10 · efficiency {e} %
 s38ef2b1a,Labia {a} · cuidado {b} · lealtad {c},Gab {a} · care {b} · loyalty {c}
 sdd0c6503,Pulsa A para aceptar,Press A to confirm
 s4b294500,PEGAR,PASTE
@@ -2760,6 +2830,8 @@ s5c5f37b1,"{n} hizo un curso el {d}. Hasta el {h}, no.",{n} took a course on {d}
 s318402bc,{n} hace un curso de venta: a tratar con la gente. Labia {v}.,{n} takes a sales course: how to deal with people. Charm {v}.
 se8783e8b,"{n} hace un curso de cultivo: riego, plagas y poda. Cuidado {v}.","{n} takes a growing course: watering, pests and pruning. Care {v}."
 s912083b7,calle · {g},street · {g}
+sc584699f,contable · {l},accountant · {l}
+s444d524c,contable,accountant
 s306c486d,gerente,manager
 sf715b59c,nave,warehouse
 s2cd8f5b0,sin trabajo,no job
@@ -2767,9 +2839,8 @@ s342fbe1f,Vende {l} en la calle: le quedan {g}.,Sells {l} on the street: {g} lef
 s922d2f99,Cuida el piso y cosecha a la caja fuerte por {e} al día.,Tends the flat and harvests into the safe for {e} a day.
 s33ee6225,"Cultiva la mesa {m} de la nave por {e} al día: con su cuidado, la cosecha da un {p} %.","Grows table {m} in the warehouse for {e} a day: with their care, the harvest yields {p} %."
 s08c36ec2,Cuida las madres de la nave por {e} al día y les saca esquejes.,Tends the warehouse mothers for {e} a day and takes cuttings.
+sd403c37f,Lleva la caja de {l}: cada mañana mete el efectivo que cabe y se queda el {p} %.,Runs the till at {l}: every morning they put in the cash that fits and keep {p} %.
 s325f7aee,"Dale trabajo: calle, gerente, nave o las madres.","Give them a job: street, manager, warehouse or the mothers."
-sc07d59bc,Pedir gente a Patxi,Ask Patxi for people
-s17f51937,Patxi te manda a alguien del barrio que quiere currar. No sabes a quién hasta que llega.,Patxi sends you someone from the hood who wants work. You won't know who until they show up.
 sc3bc92ab,{a} de {b} · nave {g},{a} of {b} · warehouse {g}
 s325fecbc,PLANTILLA,CREW
 sb72ad601,Patxi cobra {e} por el sobre. No te llega.,Patxi charges {e} for the envelope. You can't afford it.
@@ -2811,6 +2882,8 @@ se369d988,"Este mes puedes comprar la nave, hasta el {d}: quedan {r} y {g} de ga
 sba988ab1,SMS · ARRIETA,SMS · ARRIETA
 sc18b77f7,"Me han dicho que ahora presides la asociación del barrio. Si quieres, la nave te la alquilo con opción a compra: pásate y lo hablamos.","I hear you're president of the local association now. If you want, I'll rent you the warehouse with an option to buy: drop by and we'll talk."
 sde1fb45a,No me has pagado la nave. Cambio la cerradura y me quedo la fianza.,You haven't paid for the warehouse. I'm changing the lock and keeping the deposit.
+sec2aa285,La policía ha entrado en la nave de Valdehierro y se lleva las plantas y {g}. {q} vio el furgón en las cámaras y salió por detrás con los demás.,The police have raided the Valdehierro warehouse and are taking the plants and {g}. {q} saw the van on the cameras and slipped out the back with the others.
+s2cfcd148,La policía ha entrado en la nave de Valdehierro y se lleva las plantas. {q} vio el furgón en las cámaras y salió por detrás con los demás.,The police have raided the Valdehierro warehouse and are taking the plants. {q} saw the van on the cameras and slipped out the back with the others.
 sa3e0abde,"La policía ha entrado en la nave de Valdehierro. Se lleva las plantas, {g} y a {q}.","The police raided the Valdehierro warehouse. They took the plants, {g} and {q}."
 s87b5b98e,La policía ha entrado en la nave de Valdehierro. Se lleva las plantas y a {q}.,The police raided the Valdehierro warehouse. They took the plants and {q}.
 sfa12a322,cosecha mañana,harvest tomorrow
@@ -3762,7 +3835,6 @@ s47a7790e,CATADOR,TASTER
 sd987a202,¿Tienes rosin? Me han dicho que prensas tú mismo.,Got rosin? Heard you press it yourself.
 sb18f715f,"Busco extracción sin disolventes. Rosin, nada de BHO.","Looking for solventless. Rosin, no BHO."
 sd95b2ffb,La herencia,The Inheritance
-sd928546f,La calle,The Street
 s3829c9c6,La deuda,The Debt
 s220ddc34,Genética,Genetics
 s3fbb9589,El sargento,The Sergeant
@@ -4625,7 +4697,6 @@ s8b0e1299,Ajuste de cuentas,Payback
 s9a6b188a,Gana a Darko.,Beat Darko.
 s1e9abb8c,Tu gente,Your crew
 s737c8f0b,Ten a alguien del barrio en la plantilla.,Have someone from the barrio on your crew.
-scaff5908,La nave,The warehouse
 s99592fdc,Alquila la nave de Valdehierro.,Rent the Valdehierro warehouse.
 s2ef959e8,Sobre ruedas,On wheels
 s3598ce71,Cómprate el patinete o la bici.,Buy the scooter or the bike.
@@ -5228,6 +5299,21 @@ One per tent."
 sfd00a753,Kit de sellado,Sealing kit
 s6fd31337,Sellado,Sealed
 s9bf231e8,Juntas y cinta en cremalleras y pasos de tubo: la lluvia de fuera no entra y la botritis prende un 75 % menos.,Seals and tape on zips and duct ports: rain outside stays out and botrytis takes hold 75 % less.
+s1b531159,Bajo,Low
+s26296dd2,Normal,Normal
+sd57f123b,Alto,High
+s5c5b4a77,Lleva la caja de un local: cada mañana mete en ella el efectivo que cabe y se queda su comisión.,Runs the till at one of the premises: every morning they put in the cash that fits and keep their commission.
+s0f50a880,Puerta blindada,Armoured door
+s3f391fed,Cerradura de seguridad y bisagras ocultas: entrar cuesta mucho más.,Security lock and hidden hinges: breaking in is much harder.
+sd61b0c90,Alarma con central,Alarm with monitoring
+s8f076c81,Sensores en puertas y ventanas y aviso a la central: casi nadie se queda a mirar.,Sensors on doors and windows and a call to the monitoring centre: hardly anyone sticks around.
+sdc66a9f3,Perro guardián,Guard dog
+s71fe44b0,Un pastor que duerme en el local: ladra a todo lo que se mueve.,A shepherd dog that sleeps at the premises: it barks at anything that moves.
+sed22b8fe,Cámaras,Cameras
+s71623fda,"Cámaras con grabación, en los monitores del despacho de la nave: lo robado se recupera a medias y, si entra la policía, tu gente sale por detrás.","Recording cameras, on the monitors in the warehouse office: what's stolen is half recovered and, if the police come in, your people slip out the back."
+s0d1c3b59,Carbón activo de recambio,Replacement activated carbon
+s3747caa1,Ozonizador,Ozonator
+sf9317f86,"Un generador de ozono para el conducto de extracción: con el carbón en buen estado, en la calle no huele nada.","An ozone generator for the extraction duct: with the carbon in good shape, the street smells of nothing."
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.

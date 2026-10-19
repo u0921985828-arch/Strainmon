@@ -221,7 +221,7 @@ func _corre() -> void:
 	chk(J.ents.any(func(x): return x.get("id") == "club_muelle"), "la encargada de KAIA")
 	await foto(dir, "kaia")
 	var m0: float = S.money
-	QUIERO = [lote(), "100 g"]
+	QUIERO = ["El dispensario", lote(), "100 g"]
 	corre(func(): await J.talk_club("muelle"))
 	chk(S.mar.get("kaia") is Dictionary and int(S.mar.kaia.g) == 100, "100 g al dispensario de KAIA")
 	S.day += 1

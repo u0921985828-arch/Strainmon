@@ -161,6 +161,8 @@ func new_day() -> void:
 	curro_dia()   # la gente (1.15)
 	setas_dia()   # el bajo de las setas (1.20)
 	recibos_dia()   # 1.35
+	contable_dia()   # MAESTRO [6]: los contables meten la caja de mañana
+	robos_dia()   # MAESTRO [6]: los robos en la nave y los locales, según su seguridad
 	conce_dia()   # 1.43
 	vencer_encargo_club()
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
@@ -2168,6 +2170,8 @@ func neg_caja(k: String) -> void:
 		if int(o.mj) < N.mj.size():
 			mej = T("Mejora: {m}", {"m": N.mj[int(o.mj)].n})
 			ops.append(mej)
+		if staff_ok():   # MAESTRO [6]
+			ops.append(K("Seguridad"))
 		ops += [K("Dejar el local"), K("Nada")]
 		var oi: int = await ask(T("LA CAJA · hoy, {h} de {t} metidos · ayer vendió {a}.", {"h": Datos.eur(hoy), "t": Datos.eur(neg_tope(k)), "a": Datos.eur(int(o.ay))}), ops, Tn)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
@@ -2191,6 +2195,8 @@ func neg_caja(k: String) -> void:
 			await say(T("El local {c} ({p} %). Género para {g} días. Mejoras: {m} de {n}. El recibo, {e} el {d}.", {"c": neg_cuidado(k), "p": int(o.cu), "g": int(o.st), "m": int(o.mj), "n": N.mj.size(), "e": Datos.eur(L.sem), "d": Datos.fd(o.r, S.day)}), Tn)
 		elif op == "Reponer género":
 			await neg_genero(k)
+		elif op == "Seguridad":
+			await seguridad_local(k)
 		elif mej != "" and op == mej:
 			var M: Dictionary = N.mj[int(o.mj)]
 			if await ask(T("{m}: {p}, con tarjeta. Vende un {a} % más y por la caja pasa un {b} % más al día.", {"m": M.n, "p": Datos.eur(M.p), "a": roundi(float(D.NEGOCIO.mjF) * 100), "b": roundi(float(D.NEGOCIO.mjT) * 100)}), [K("Hacerla"), K("No")], Tn) != 0:

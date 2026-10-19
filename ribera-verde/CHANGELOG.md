@@ -106,6 +106,15 @@
   - **El refugio** (`MAPS.refugio`): el caserío abandonado de la comarcal, con camastro para dormir y un arcón donde esconder los cogollos (`escondite`), donde no llegan ni la redada ni los ladrones.
   - **El control de carretera** (`CONTROL`): yendo en tu vehículo, lo que pesa el maletero sube la probabilidad; al pararte, huir (40 %, 55 % en moto, 75 % en el deportivo; si te pillan, te lo quitan, 600 € de multa y calor), sobornar (200 € + 1,5 €/g; menos probable con calor; si no cuela, se queda el sobre y registran), entregar la carga (sin multa) o dejar que registren, como antes (`resolver_control`).
   - `src/campo.gd` entra en la cadena entre `eventos` y `retencion`. Prueba `tests/campo.gd` (53).
+- **[6] La gestión:**
+  - **KAIA como dispensario:** el club del puerto y el de la asociación comparten el panel (`panel_club`): el dispensario de siempre y el almacén del club (`almacen_club(id)`, `S.mar.al` en KAIA, que cobra a la cuenta con la licencia).
+  - **La plantilla por local** (`plantilla_locales`, `cuadricula`): MÓVIL → PLANTILLA abre la lista de locales (el piso, la nave, la calle y cada negocio) y, en cada uno, su gente en filas de rol · sueldo · lealtad · eficiencia (`fila_staff`); los puestos de siempre (`STAFF.roles`).
+  - **Lealtad de 1 a 10 y topos** (`STAFF`, `w.lt`): la de antes, ×2; con el sueldo bajo o el calor por encima de 70 baja en la franja de 4 a 7, con el alto sube hasta 9 y la prima, hasta 10. Cuanto menos leal, más fácil que sea un chivato (`prob_topo`, por hash al contratarle y al bajar de franja): suma 2 de calor al día y dobla el riesgo de redada en la nave; un capataz de lealtad 10 en el mismo local lo descubre y te avisa por SMS («(!)» en su fila).
+  - **El sueldo** (bajo ×0,75, normal, alto ×1,25; `sueldo_w`) y **la eficiencia** (40 + 12 por labia o cuidado, según el puesto).
+  - **El contable** (`contable_dia`): un trabajador lleva la caja de un negocio y cada mañana mete en ella el efectivo que cabe hasta el tope del local, por su eficiencia; cobra solo su comisión (8 %).
+  - **El olor de la nave** (`OLOR_NAVE`): el carbón de los filtros se gasta (1,5 al día, ×1,5 con lluvia o niebla) y saturado huele como sin filtro (`olor_nave` multiplica la redada); se cambia desde el escritorio (EL OLOR). El ozonizador en el conducto, con el carbón bueno, quita el olor; en la sala también, pero lo que se cuelga se vende un 20 % peor (`oz`).
+  - **La seguridad** (`SEGURIDAD`, `S.seg`): puerta blindada, alarma, perro y cámaras para la nave y cada negocio; cada noche, un 2 % de robo (menos con cada cosa) que se lleva lo del secadero o la caja (`robos_dia`); con cámaras se recupera la mitad y, en una redada de la nave, tu gente sale por detrás y no se pierde. Los monitores del despacho dicen lo de cada local.
+  - `src/gestion.gd` entra en la cadena entre `campo` y `retencion`. Prueba `tests/gestion.gd` (55).
 
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 

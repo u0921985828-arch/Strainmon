@@ -1090,6 +1090,8 @@ func obras_dia() -> void:
 			M_.kaia = null
 			var tot = L.tot
 			queue("kaia", func(): await talk(K("SMS · KAIA"), [T("Se acabó lo del dispensario: {e} en total.", {"e": Datos.eur(tot)})]))
+	if staff_ok():
+		almacen_dia("muelle")   # MAESTRO [6]: el almacén de KAIA
 	var LG: Dictionary = R.legal
 	if M_.oba.has("club") and not M_.get("ley") and int(S.day) >= int(M_.oba.club) + int(LG.dias):
 		M_.ley = int(S.day)
@@ -1098,8 +1100,14 @@ func obras_dia() -> void:
 func kaia_dia() -> float:
 	return float(D.MAR.kaia.dia) * (float(D.MAR.legal.kaia) if S.mar.get("lic") else 1.0)
 
-# el club KAIA, el tuyo: la encargada y el dispensario que llenas tú
+# el club KAIA, el tuyo: la encargada y el dispensario que llenas tú; MAESTRO [6], con el panel de la asociación
 func talk_kaia(N: String) -> void:
+	if staff_ok():
+		await panel_club("muelle", N)
+		return
+	await dispensario_kaia(N)
+
+func dispensario_kaia(N: String) -> void:
 	var K: Dictionary = D.MAR.kaia
 	var M_: Dictionary = S.mar
 	var L = M_.get("kaia")

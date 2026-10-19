@@ -385,6 +385,8 @@ func calidad(b: Dictionary, flor := false) -> float:
 	var q: float = 1 + D.CURADO.precio * float(b.get("cu", 0)) + D.MANICURA.precio * float(b.get("mc", 0)) + D.CAMAROTE.extra * float(b.get("af", 0))   # 1.43.6: afinado en el camarote
 	if Datos.CAL and flor:   # MAESTRO [5]: la hierba verde vale poco y en tarros, semana a semana, más; la rara, ×SHINY.x
 		q *= verde(b) * (float(D.SHINY.x) if b.get("sh") else 1.0)
+	if Datos.CAL and b.get("oz"):   # MAESTRO [6]: secada con el ozono en la sala, sin terpenos
+		q *= float(D.OLOR_NAVE.oz_q)
 	return q
 
 # recién cortada, VERDE.min; seca del todo a los VERDE.dias; y lo curado, VERDE.semana más por semana (hasta VERDE.semanas)
@@ -2334,3 +2336,70 @@ func montar_campo(_mapa: String) -> void:   # MAESTRO [4], en campo.gd
 
 func campo_obj(_x: int, _y: int, _o) -> bool:   # MAESTRO [4], en campo.gd
 	return false
+
+# MAESTRO [6], en gestion.gd
+func staff_ok() -> bool:
+	return false
+
+func lealtad(w: Dictionary) -> int:
+	return int(w.lea)
+
+func pon_lealtad(_w: Dictionary, _v: int) -> void:
+	pass
+
+func eficiencia(_w: Dictionary) -> int:
+	return 0
+
+func tira_topo(_w: Dictionary, _tag: String) -> void:
+	pass
+
+func staff_dia() -> void:
+	pass
+
+func contable_dia() -> void:
+	pass
+
+func robos_dia() -> void:
+	pass
+
+func carbon_dia() -> void:
+	pass
+
+func olor_nave() -> float:
+	return float(D.EXTR_NAVE[int(S.nave.ex)].olor)
+
+func chivato_nave() -> float:
+	return 1.0
+
+func seg_tiene(_k: String, _it: String) -> bool:
+	return false
+
+func ops_staff(_w: Dictionary) -> Array:
+	return []
+
+func staff_op(_w: Dictionary, _op: String) -> bool:
+	return false
+
+func plantilla_locales() -> void:
+	pass
+
+func panel_club(_id: String, _N: String) -> void:
+	pass
+
+func carbon(_N: Dictionary) -> float:
+	return 100.0
+
+func olor_txt() -> String:
+	return ""
+
+func olor_menu() -> void:
+	pass
+
+func seguridad_menu() -> void:
+	pass
+
+func seguridad_local(_k: String) -> void:
+	pass
+
+func monitores() -> void:
+	pass
