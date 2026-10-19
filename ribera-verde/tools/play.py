@@ -17,7 +17,7 @@ NOMBRES = {   # parodias de los nombres reales: una letra cambiada o el orden (l
     'Trainwreck': 'Trenwreck', 'AK-47': 'AX-47', 'Laughing Buddha': 'Laffing Budha', 'Cannalope Haze': 'Kanalope Haize',
     'Master Kush': 'Maister Kush', 'Purple Kush': 'Purpel Kush', 'Critical Mass': 'Kritikal Mass', 'Shiva Skunk': 'Xiva Skonk',
     'NL5 × Haze': 'NZ5 × Haize', "Neville's Haze": "Nevil's Haize", 'Silver Haze': 'Silber Haize', 'Chocolope': 'Txokolope',
-    'Pineapple Express': 'Pinapel Express', 'Tangie': 'Tangi', 'Amnesia Haze': 'Amnesya Haize', 'Jack Herer': 'Jak Herrer',
+    'Pineapple Express': 'Pinapel Express', 'Tangie': 'Tangi', 'Amnesia Haze': 'Amnesya Haize', 'Jack Herer': 'Jak Herrer', 'Ice-o-lator': 'Ais-o-lator', 'Durban Poison': 'Durvan Poizon',
     'Super Silver Haze': 'Supra Silber Haize', 'Blue Dream': 'Blu Drim', 'Blue Cheese': 'Blu Cheez', 'Sour Diesel': 'Saur Disel',
     'Kali 47': 'Kalli 47', 'Critical Kali Mist': 'Kritikal Kalli Mixt', 'White Widow': 'Whyte Widou', 'Purple Haze': 'Purpel Haize',
     'White Russian': 'Whyte Rusian', 'Blue Widow': 'Blu Widou', 'Super Lemon Haze': 'Supra Limon Haize', 'Chronic': 'Kronik',

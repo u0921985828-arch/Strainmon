@@ -1133,12 +1133,14 @@ s240d9493,"De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la me
 s1ad382d4,Tamices de seda,Silk screens
 s73025733,"Dry sift: de la flor, el kief con algo más del doble de THC. Se usa en la mesa del piso.",Dry sift: kief from the flower with just over double the THC. Used at the flat table.
 s767bcfa8,Kit Ice-o-lator,Ice water kit
+s044085df,Kit Ais-o-lator,
 sb390a67a,Agua con hielo y bolsas de malla: la resina más limpia. Se usa en la mesa del piso.,Ice water and mesh bags: the cleanest resin. Used at the flat table.
 sfabfa85b,Mallas 00,00 mesh
 s2bcc1a8a,en el piso,in the flat
 sed6caa2f,"La malla «doble cero» de la tía: dry sift de lo más fino, solo las cabezas. Se usa en los tamices del piso.","Auntie's «double zero» mesh: the finest dry sift, heads only. Used with the flat's screens."
 s5e7c66ae,Lavadora de extracción,Extraction washer
 s541ec757,Ice-o-lator en grande: bate sola con las bolsas de malla. Está montada junto a la nevera.,"An ice water kit, but big: it churns the mesh bags by itself. Set up by the fridge."
+s2977fa39,Ais-o-lator en grande: bate sola con las bolsas de malla. Está montada junto a la nevera.,
 s5f95b5cf,Máquina de static,Static machine
 sfa70e666,La placa cargada levanta las cabezas de resina de la flor fría: la resina más pura.,The charged plate lifts the resin heads off cold flower: the purest resin.
 s73cedc16,{n} g encima · {c} g en la caja,{n} g on you · {c} g in the safe
@@ -2838,6 +2840,7 @@ s6d8ef762,Compartes {l} en el sofá. {n}: «Esto es otra liga. Se lo cuento a lo
 s6fe2b8f5,"Compartes {l} en el sofá. {n}: «Suave, de los de charlar. Gracias.»","You share {l} on the sofa. {n}: ""Smooth, good for chatting. Thanks."""
 s62f4ed41,BILLAR,POOL
 sd6096bb2,"{n}: necesitas 1 g de kief, del tamiz o del Ice-o-lator, como mínimo.","{n}: you need at least 1 g of kief, from the sieve or the ice bags."
+sf01bde89,"{n}: necesitas 1 g de kief, del tamiz o del Ais-o-lator, como mínimo.",
 sdda56c1e,{n}: necesitas 5 g de cogollos como mínimo.,{n}: you need at least 5 g of buds.
 s31272d2b,MOONROCK: necesitas rosin para bañar el cogollo y kief para rebozarlo.,MOONROCK: you need rosin to coat the bud and kief to roll it in.
 s6e6a6ae4,{n}: ¿de qué?,{n}: from what?
@@ -3056,7 +3059,7 @@ scf3e0e9a,"Norzen Lights con Skonk #1: robusta, rápida y muy productiva.","Norz
 s3505da67,NL5 × Haze,NL5 × Haze
 sa9409644,NZ5 × Haize,NZ5 × Haize
 s5101fe0e,Northern Lights × Haze,Northern Lights × Haze
-s1c2360f7,Norzen Lights × Haize,
+s1c2360f7,Norzen Lights × Haize,Norzen Lights × Haize
 s7449f3e9,La madre es la Northern Lights: la Haze con más cogollo y algo más rápida.,Northern Lights is the mother: Haze with more bud and a bit faster.
 see77b86b,La madre es la Norzen Lights: la Haize con más cogollo y algo más rápida.,Norzen Lights is the mother: Haize with more bud and a bit faster.
 sf8fc84d4,Neville's Haze,Neville's Haze
@@ -3122,7 +3125,7 @@ s37e14230,Sour Diesel,Sour Diesel
 s833eb982,Saur Disel,Saur Disel
 sff0fee7c,Chemdawg × Super Skunk · ≈ origen incierto,Chemdawg × Super Skunk · ≈ uncertain origin
 s5f6740f2,Chemdog × Supra Skonk · ≈ origen incierto,Chemdog × Supra Skonk · ≈ uncertain origin
-s7a4151bd,Olor a gasóleo agrio y efecto rápido. Una de las más buscadas.,Sour diesel smell and a fast high. One of the most wanted.
+s7a4151bd,Olor a gasóleo agrio y efecto rápido. Una de las más buscadas.,Sharp fuel smell and a fast high. One of the most wanted.
 s39fe10df,Kali 47,Kali 47
 s6214bb7f,Kalli 47,Kalli 47
 s25ee3034,Kali Mist × AK-47,Kali Mist × AK-47
@@ -3145,6 +3148,7 @@ s56e77257,Manga Rosa,Manga Rosa
 sab4df210,Landrace · nordeste de Brasil,Landrace · northeast Brazil
 s768508d2,"Sativa brasileña de cogollo largo y pistilos rosados, con aroma a fruta tropical.","Brazilian sativa with long buds and pink pistils, tropical fruit aroma."
 sb32bd70a,Durban Poison,Durban Poison
+s92bfcd17,Durvan Poizon,Durvan Poizon
 s34acbb89,"Landrace · puerto de Durban, Sudáfrica","Landrace · port of Durban, South Africa"
 secd7680d,"Sativa sudafricana, rápida para su tipo y muy resinosa. Aroma dulce, a anís, y efecto claro.","South African sativa, fast for its kind and very resinous. Sweet aniseed aroma, clear high."
 s510da877,White Widow,White Widow
@@ -3243,7 +3247,7 @@ sc3e17590,Índica tan cargada de resina que parece helada: de las preferidas par
 s232619c1,NL × Big Bud,NL × Big Bud
 s702eab06,NZ × Big Bod,NZ × Big Bod
 s1ff75faf,Northern Lights × Big Bud,Northern Lights × Big Bud
-s918d1636,Norzen Lights × Big Bod,
+s918d1636,Norzen Lights × Big Bod,Norzen Lights × Big Bod
 s720e5e65,La Northern Lights con el tamaño de la Big Bud: de las que más producen.,Northern Lights with Big Bud's size: one of the top yielders.
 s3bbae97d,La Norzen Lights con el tamaño de la Big Bod: de las que más producen.,Norzen Lights with Big Bod's size: one of the top yielders.
 s07e787fa,Critical Jack,Critical Jack
@@ -3358,8 +3362,11 @@ s35f3b4a5,Purpel Kush × Ruderalis,Purpel Kush × Ruderalis
 saa3059b2,"La Purple Kush con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Purple Kush with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s7f6b7891,"La Purpel Kush con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Purpel Kush with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 seaec403a,Durban Poison Auto,Durban Poison Auto
+s3bbda13d,Durvan Poizon Auto,Durvan Poizon Auto
 s55e48382,Durban Poison × Ruderalis,Durban Poison × Ruderalis
+s89b1aa83,Durvan Poizon × Ruderalis,Durvan Poizon × Ruderalis
 s8b694061,"La Durban Poison con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Durban Poison with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
+s00dd5818,"La Durvan Poizon con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Durvan Poizon with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s0cb3b909,Lowryder,Lowryder
 sb3621ebf,Lowraider,Lowraider
 s6ad9b989,Northern Lights × ruderalis mexicana · ≈ origen incierto,Northern Lights × Mexican ruderalis · ≈ uncertain origin
@@ -3949,6 +3956,7 @@ s5ee46f87,"Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el
 sae9f169a,"Tres tamices, de grueso a fino (1.35): dry sift en la mesa del piso, y su kief para el hachís prensado y el moonrock.","Three sieves, coarse to fine (1.35): dry sift at the flat's table, and its kief for pressed hash and moonrock."
 sf46dd620,"Cubo y bolsas de malla para agua con hielo (1.35): la resina más limpia, en la mesa del piso. Su kief sirve para el prensado y el moonrock.","Bucket and mesh bags for ice water (1.35): the cleanest resin, at the flat's table. Its kief works for pressed hash and moonrock."
 s06d17bf0,"La lavadora de extracción (1.36): una pequeña de carga superior, con la cuba de plástico; bate sola el agua con hielo y la flor congelada con las bolsas de malla dentro y desagua por la manguera. Más Ice-o-lator y más limpio que a mano. Se monta junto a la nevera del piso.",The extraction washer (1.36): a small top-loader with a plastic drum; churns ice water and frozen flower with the mesh bags inside and drains through the hose. More Ice-o-lator and cleaner than by hand. Goes next to the flat's fridge.
+s04e7d431,"La lavadora de extracción (1.36): una pequeña de carga superior, con la cuba de plástico; bate sola el agua con hielo y la flor congelada con las bolsas de malla dentro y desagua por la manguera. Más Ais-o-lator y más limpio que a mano. Se monta junto a la nevera del piso.",The extraction washer (1.36): a small top-loader with a plastic drum; churns ice water and frozen flower with the mesh bags inside and drains through the hose. More Ais-o-lator and cleaner than by hand. Goes next to the flat's fridge.
 sb233e708,"Separador electrostático de mesa (1.36): la placa cargada levanta las cabezas de resina de la flor fría, sin agua ni disolventes. La resina más pura, hasta un 85 % de THC, en la mesa del piso. Una inversión fuerte.","Tabletop electrostatic separator (1.36): the charged plate lifts resin heads off cold flower, no water or solvents. The purest resin, up to 85 % THC, at the flat's table. A big investment."
 s5bf666fd,"Tarros de cristal herméticos (1.29) para la caja fuerte y la nevera: los cogollos que guardas en la caja se curan en 2 días: suben un 1 % de THC y se venden un 15 % más caros. Sin curar no pierden nada. Los extractos, en sus tarros pequeños, se curan en frío en la nevera.","Airtight glass jars (1.29) for the safe and the fridge: buds stored in the safe cure in 2 days: +1 % THC and they sell 15 % higher. Uncured, they lose nothing. Extracts cure cold in the fridge in their small jars."
 s35de1612,TRANQUILO,CALM
@@ -4162,7 +4170,7 @@ s6072432a,La Jack Herer con más Haze y Super Skunk. Termina la Jack primero.,Ja
 s547d0e85,La Jak Herrer con más Haize y Supra Skonk. Termina la Jak primero.,Jak Herrer with more Haize and Supra Skonk. Finish the Jak first.
 s765694ac,"Si terminas la Jack, con la AK-47: la Jack para los que tienen prisa.","If you finish the Jack, with AK-47: the Jack for people in a hurry."
 s2ba88ca8,"Si terminas la Jak, con la AX-47: la Jak para los que tienen prisa.","If you finish the Jak, with AX-47: the Jak for people in a hurry."
-s9690b225,"Gasoil y mandarina. Suena raro, pero funciona.","Diesel and tangerine. Sounds weird, but it works."
+s9690b225,"Gasoil y mandarina. Suena raro, pero funciona.","Fuel and tangerine. Sounds weird, but it works."
 s666307bb,Tanta resina que parece helada. La de las extracciones.,So much resin it looks frozen. The one for extracts.
 s91b4ddc7,"Northern Lights con Big Bud: los tarros llenos. Ponle malla, que las ramas no aguantan.","Northern Lights with Big Bud: full jars. Net it, the branches can't hold."
 sa7a8c8fb,"Norzen Lights con Big Bod: los tarros llenos. Ponle malla, que las ramas no aguantan.","Norzen Lights with Big Bod: full jars. Net it, the branches can't hold."
@@ -4205,6 +4213,7 @@ s64687fcf,"Supra Silber Haize con ruderalis. Florece sola, a su edad: déjala a 
 sb2e44fc5,"Purple Kush con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Purple Kush with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 s6ead5986,"Purpel Kush con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Purpel Kush with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 sde49ec6d,"Durban Poison con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Durban Poison with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
+s75b01717,"Durvan Poizon con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Durvan Poizon with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 sb79c78fd,te las da Kiko al conocerlo,Kiko gives them to you when you meet him
 s453a0624,te las da Kiko con la mesa de genética,Kiko gives them to you with the breeding table
 s051ad7ac,"Txaro, la vecina, por 5 g de cogollo","Txaro, the neighbor, for 5 g of bud"
@@ -4602,6 +4611,7 @@ saa6dd3ee,220 micras: fuera el polvo verde y los trozos.,220 microns: out with t
 sb5cff4aa,"160: sacude en el verde, sin frotar.","160: shake in the green, don't rub."
 s062cd336,120 y 73: aquí se quedan las cabezas de resina.,120 and 73: this is where the resin heads stay.
 s9ed71da3,Ice-o-lator,Ice-o-lator
+secec57d4,Ais-o-lator,Ais-o-lator
 se75b47cc,"El cubo de 20 L con las bolsas de malla: hielo y agua a partes iguales, por debajo de 4 °C, y la flor congelada.","The 20 L bucket with the mesh bags: equal parts ice and water, below 4 °C, and frozen flower."
 s0b7d76d3,"El cubo de 20 L con las bolsas de malla: hielo y agua a partes iguales, por debajo de 4°, y la flor congelada.",
 se8ff4ef9,"El agua con hielo, entre 1 y 3 °C: para la barra en el verde.","Ice water, between 1 and 3 °C: stop the bar in the green."
@@ -4628,6 +4638,7 @@ sd4f409a0,Bañar el cogollo.,Dip the bud.
 s5e7ad018,Rebozarlo en el kief.,Roll it in the kief.
 s9efb330d,Secarlo sin que se pegue.,Dry it without it sticking.
 s09837119,Ice-o-lator en la lavadora,Ice-o-lator in the washer
+s2f91c422,Ais-o-lator en la lavadora,Ais-o-lator in the washer
 s39d82860,"La lavadora de extracción, de carga superior y cuba de plástico: hielo y agua a partes iguales y la flor congelada, a baja velocidad.","The extraction washer, top-loading with a plastic drum: equal parts ice and water and frozen flower, on low speed."
 s023a4470,Cargarla: el agua con hielo por debajo de 4 °C.,Load it: ice water below 4 °C.
 s7af40ba1,Cargarla: el agua con hielo por debajo de 4°.,
@@ -5161,6 +5172,8 @@ s21a99331,PINAPEL EXPRESS,
 se2252172,TANGI,
 sabea3244,AMNESYA HAIZE,
 s6dfee62b,JAK HERRER,
+s19a92d8b,AIS-O-LATOR,
+scf9cb8ad,DURVAN POIZON,
 s149f26a1,SUPRA SILBER HAIZE,
 s422b4f61,BLU DRIM,
 s2f0c3561,BLU CHEEZ,

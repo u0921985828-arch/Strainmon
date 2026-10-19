@@ -77,6 +77,10 @@
 - La fila Vida de la MOCHILA, con su icono (un corazón a mano en `salon.py`, `iconos-menu`). Prueba nueva `tests/iconos.gd`: cada icono que piden los menús, la tienda y el equipo está en el atlas (131, 0 fallos).
 - Los botones SONIDO/MÓVIL, CALOR y VIDA del HUD y del combate, en el idioma elegido.
 
+### APK de Play con el inglés · Godot 0.49.0 (código 68)
+- `node tools/godot-aab.js` con la upload key: `dist/landrace-hunters.aab` (79 MB, firmado, targetSdk 36, 16 KB en las 4 `.so`) y el APK universal.
+- `descargas/LandraceHunters.apk` (82 MB, `apk-instalar.py` + `zipalign -P 16` + `apksigner`): fases 7 y 8, el repaso de la APK de Play (combate, nombres parodia, icono de la vida) y el idioma.
+
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
 Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.
