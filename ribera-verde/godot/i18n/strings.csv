@@ -253,6 +253,9 @@ scfeb4c48,impuesto de circulación de {a},road tax for {a}
 s4d2f585e,Apremio · IVTM · {n},Enforcement · road tax · {n}
 sb5628c63,"Providencia de apremio: el impuesto de circulación de {a}, con un {r} % de recargo, {e}, cobrado de lo que tienes.","Enforcement notice: road tax for {a}, with a {r} % surcharge, {e}, taken from what you have."
 s687b6a63,SMS · AYUNTAMIENTO,SMS · TOWN HALL
+se8de561d,Multa · {p},Fine · {p}
+se7bf68e4,"Multa del Ayuntamiento de {p}: {a} lleva más de {d} días en el aparcamiento de la parada. {e}, cobrados de lo que tienes.","Fine from {p} town hall: {a} has been in the car park by the stop for more than {d} days. {e}, taken from what you have."
+s05644715,Te quedan a deber {f}.,You still owe {f}.
 sef20a6ff,{m} min · {e},{m} min · {e}
 s690b2b4b,¿A dónde vas?,Where to?
 sd298526b,Gasolinera,Petrol station

@@ -102,3 +102,6 @@ Potencia,Potency
 Producción,Yield
 Floración,Flowering
 Resistencia,Resistance
+Multa · {p},Fine · {p}
+"Multa del Ayuntamiento de {p}: {a} lleva más de {d} días en el aparcamiento de la parada. {e}, cobrados de lo que tienes.","Fine from {p} town hall: {a} has been in the car park by the stop for more than {d} days. {e}, taken from what you have."
+Te quedan a deber {f}.,You still owe {f}.

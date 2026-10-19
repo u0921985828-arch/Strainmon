@@ -263,6 +263,7 @@ func conce_dia() -> void:
 			c.r = null
 			var tx2: String = T("Póliza anulada por impago: {a} ya no tiene seguro. Sin seguro no se puede circular.", {"a": V.art})
 			queue("seg" + k, func(): await talk(K("SMS · ASEGURADORA"), [tx2]))
+		multa_aparcado(k)
 		if c.get("iv") == null:   # de antes de la 1.43.2
 			c.iv = maxi(int(c.dia), int(S.day))
 		if not cobra(c, float(V.ivtm), K("AYUNTAMIENTO"), true, T("impuesto de circulación de {a}", {"a": String(V.art)}), int(C.anio), "iv"):   # sin pagar, por apremio con recargo
@@ -271,6 +272,26 @@ func conce_dia() -> void:
 			c.iv = int(c.iv) + int(C.anio)
 			var tx3: String = T("Providencia de apremio: el impuesto de circulación de {a}, con un {r} % de recargo, {e}, cobrado de lo que tienes.", {"a": V.art, "r": roundi(float(C.recargo) * 100), "e": Datos.eur(e)})
 			queue("iv" + k, func(): await talk(K("SMS · AYUNTAMIENTO"), [tx3]))
+
+# MAESTRO [3] (lo pidió el usuario: «si tienes aparcado el coche más de 3 días en el mismo pueblo, te pueden poner multa»): fuera del
+# garaje, pasados CONCE.multa.dias desde que lo aparcaste (c.ap), cada día CONCE.multa.p de una multa de CONCE.multa.e. Por hash, sin el azar
+func multa_aparcado(k: String) -> void:
+	var c: Dictionary = S.coches[k]
+	if donde(k) == GARAJE or not coche_ya(k):
+		c.erase("ap")
+		return
+	if c.get("ap") == null:   # aparcado antes de esto
+		c.ap = S.day
+	var M: Dictionary = D.CONCE.multa
+	if int(S.day) - int(c.ap) <= int(M.dias) or Datos.hash_str("multa|%d|%s" % [int(S.day), k]) % 1000 >= float(M.p) * 1000:
+		return
+	var V: Dictionary = D.CONCE.v[k]
+	var pu: String = D.PARADAS[donde(k)].n
+	var f := pagar_recibo(float(M.e), T("Multa · {p}", {"p": pu}))
+	var tx: String = T("Multa del Ayuntamiento de {p}: {a} lleva más de {d} días en el aparcamiento de la parada. {e}, cobrados de lo que tienes.", {"p": pu, "a": V.art, "d": int(M.dias), "e": Datos.eur(M.e)})
+	if f > 0:
+		tx += " " + T("Te quedan a deber {f}.", {"f": Datos.eur(f)})
+	queue("multa" + k, func(): await talk(K("SMS · AYUNTAMIENTO"), [tx]))
 
 # de parada en parada con tu vehículo (CONCE.km de cada una; CONCE.v[k].t del tiempo del autobús, sin esperas)
 func tramo(a: String, b: String, k: String) -> Dictionary:
@@ -308,6 +329,7 @@ func conducir(k):
 	var a: Array = D.PARADAS[x].a
 	if Datos.CAL:   # MAESTRO [3]: se queda en el aparcamiento de la parada (en Ribera Verde, en el garaje, y sales por su puerta)
 		S.coches[k].en = x
+		S.coches[k].ap = S.day   # el día que lo aparcas (multa_aparcado)
 		if x == GARAJE:
 			a = [GARAJE_B.x0 + 1, GARAJE_B.y0 + GARAJE_B.h, "down"]
 		else:

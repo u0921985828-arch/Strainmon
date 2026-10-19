@@ -124,6 +124,7 @@ func _corre() -> void:
 	chk(MENUS.size() and MENUS[0].has("Maletero de la moto") and MENUS[0].has("Salir en la moto"), "en el garaje, los dos: %s" % [MENUS])
 	chk(S.map == "puerto" and J.donde("utilitario") == "puerto" and J.donde("moto") == J.GARAJE and float(S.money) + float(S.banco) < c0, "llegas y se queda allí: %s %s" % [S.map, J.donde("utilitario")])
 	chk(J.vehiculo() == null, "en Puerto Viejo, a pie")
+	chk(int(S.coches.utilitario.get("ap", -1)) == int(S.day), "aparcado hoy: %s" % S.coches.utilitario.get("ap"))
 	var pl: Array = J.plazas_parque("puerto")
 	chk(pl.size() >= 1 and J.coche_en(pl[0].x, pl[0].y) == "utilitario", "en la primera plaza del aparcamiento: %s" % [pl])
 	var m: Dictionary = J.MAPS.puerto
@@ -282,6 +283,36 @@ func _corre() -> void:
 	QUIERO = ["Envasadora al vacío", "Salir"]
 	chk(corre(func(): await J.tienda_online()), "tienda online")
 	chk(S.items.get("vacio") and absf(float(S.banco) - (1000 - float(D.MALETERO.vacio.p))) < 0.01, "envasadora comprada: banco %s" % S.banco)
+	# 8b) más de CONCE.multa.dias aparcado en otro pueblo: te pueden multar (cada día, CONCE.multa.p); en el garaje, nunca
+	var MU: Dictionary = D.CONCE.multa
+	var d0: int = int(S.day)
+	S.coches.utilitario.en = "puerto"
+	S.coches.utilitario.ap = d0
+	var dinero := func(): return float(S.money) + float(S.banco) + float(S.caja.money if S.get("caja") is Dictionary else 0)
+	var mo0 = S.money
+	S.money = 100000
+	var antes := 0
+	var multas := 0
+	for d in 200:
+		S.day = d0 + d
+		var x0: float = dinero.call()
+		J.multa_aparcado("utilitario")
+		if dinero.call() < x0 - 0.01:
+			chk(absf(x0 - dinero.call() - float(MU.e)) < 0.01, "la multa es de %s" % MU.e)
+			if d <= int(MU.dias):
+				antes += 1
+			multas += 1
+	var E: float = (200 - int(MU.dias) - 1) * float(MU.p)
+	chk(antes == 0 and absf(multas - E) <= 4 * sqrt(E) + 3, "multas: %d en 200 días (esperadas %.0f), %d antes de %d días" % [multas, E, antes, int(MU.dias)])
+	chk(J.pending.size() or J.queued.size(), "con su SMS")
+	S.coches.utilitario.erase("en")
+	var x1: float = dinero.call()
+	for d in 50:
+		S.day = d0 + 300 + d
+		J.multa_aparcado("utilitario")
+	chk(absf(dinero.call() - x1) < 0.01 and not S.coches.utilitario.has("ap"), "en el garaje, sin multa")
+	S.day = d0
+	S.money = mo0
 	# 9) sin CAL, como antes (1.43): montado por la calle en el mejor que tengas
 	Datos.CAL = false
 	J.enter_map("town", 3, 10, "down")
