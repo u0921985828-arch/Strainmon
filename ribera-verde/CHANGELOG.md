@@ -85,7 +85,7 @@
 
 ### APK de la tanda del documento maestro · Godot 0.50.0 (código 69)
 - `node tools/godot-aab.js` con la upload key: `dist/landrace-hunters.aab` (firmado, targetSdk 36, 16 KB) y el APK universal.
-- `descargas/LandraceHunters.apk` (`apk-instalar.py` + `zipalign -P 16` + `apksigner`): MAESTRO [2], [4] a [9] con `Datos.CAL`.
+- `descargas/LandraceHunters.apk` (83 MB, `apk-instalar.py` + `zipalign -P 16` + `apksigner`, la misma firma que la 0.49.0): MAESTRO [2], [4] a [9] con `Datos.CAL`.
 
 ### Documento maestro (`docs/MAESTRO.md`), por tandas, con `Datos.CAL`
 - **[10] La letra:** reserva propia para flechas, ▲▼◀▶, ★, ≈ y −.
