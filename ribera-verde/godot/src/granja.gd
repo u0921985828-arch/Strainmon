@@ -62,16 +62,16 @@ static func signo(v: float) -> String:
 	return ("+" if v >= 0 else "−") + str(absi(Datos.jsround(v)))
 
 static func pc(t: String, f: float) -> String:
-	return "" if absf(f - 1) < .001 else " · %s %s%%" % [t, signo((f - 1) * 100)]
+	return "" if absf(f - 1) < .001 else I18n.T(" · {t} {s}%", {"t": t, "s": signo((f - 1) * 100)})
 
 func desc_foco(k: String) -> String:
 	var F: Dictionary = D.FOCOS[k]
-	return "%s W · ilumina %s×%s cm · %s g/W (%s abonando)%s%s · riego ×%s\nLuz: %d kWh (%s) al día con plantas." % [n(F.w), n(F.lado), n(F.lado), Datos.coma(F.gpw),
-		Datos.coma(Datos.jsround(F.gpw * 1.25 * 100) / 100.0), pc("crece", F.crec), (" · THC +" + Datos.pct(F.thc)) if F.thc else "", Datos.coma(F.agua), kwh_foco(k), Datos.eur(kwh_foco(k) * D.KWH)]
+	return T("{w} W · ilumina {l}×{l} cm · {g} g/W ({ga} abonando){crece}{thc} · riego ×{agua}\nLuz: {kwh} kWh ({eur}) al día con plantas.", {"w": n(F.w), "l": n(F.lado), "g": Datos.coma(F.gpw),
+		"ga": Datos.coma(Datos.jsround(F.gpw * 1.25 * 100) / 100.0), "crece": pc(K("crece"), F.crec), "thc": T(" · THC +{p}", {"p": Datos.pct(F.thc)}) if F.thc else "", "agua": Datos.coma(F.agua), "kwh": kwh_foco(k), "eur": Datos.eur(kwh_foco(k) * D.KWH)})
 
 func desc_maceta(k: String) -> String:
 	var Mc: Dictionary = D.MACETAS[k]
-	return "%s L · hasta %s g por planta%s%s · riego ×%s%s" % [n(Mc.l), n(Mc.cap), pc("cosecha", Mc.rend), pc("crece", Mc.crec), Datos.coma(Mc.agua), " · menos plagas" if Mc.plaga < 1 else ""]
+	return T("{l} L · hasta {cap} g por planta{rend}{crec} · riego ×{agua}{plaga}", {"l": n(Mc.l), "cap": n(Mc.cap), "rend": pc(K("cosecha"), Mc.rend), "crec": pc(K("crece"), Mc.crec), "agua": Datos.coma(Mc.agua), "plaga": T(" · menos plagas") if Mc.plaga < 1 else ""})
 
 # ---------- tiempo ----------
 func plants_advance(mn: int) -> void:
@@ -108,8 +108,8 @@ func new_day() -> void:
 	# la cuota de Molina (1.10): pasado el último día pagado, se acaba la protección (antes de la redada de esta noche)
 	if S.protect and S.get("protHasta") and S.day > S.protHasta:
 		S.protect = false
-		var L := ["Se acabó lo pagado.", "Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría."]
-		queue("cuota", func(): await talk("SMS · MOLINA", L), [["SMS · MOLINA", L]])
+		var L := [K("Se acabó lo pagado."), K("Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría.")]
+		queue("cuota", func(): await talk(K("SMS · MOLINA"), L), [[K("SMS · MOLINA"), L]])
 	# la policía (1.11, NIVEL_POLI): con la orden de ayer, la redada; con 90 o más, la orden (y el aviso), o Molina la para
 	if S.get("orden") and S.day > S.orden:
 		queue("raid", raid_event)
@@ -123,27 +123,27 @@ func new_day() -> void:
 	var luz := factura_luz()
 	var olor := olor_dia()
 	var av := []
-	var nf: float = pagar_recibo(luz, "Luz") if luz > 0 else 0.0    # 1.35: domiciliada; si no llega, de lo de fuera y de la caja (1.10)
+	var nf: float = pagar_recibo(luz, K("Luz")) if luz > 0 else 0.0    # 1.35: domiciliada; si no llega, de lo de fuera y de la caja (1.10)
 	S.luz = {"d": S.day, "e": luz, "o": olor}
 	if luz > 0:
-		av.append("Factura de la luz: −" + Datos.eur(luz - nf) + ((" (te faltan %s)" % Datos.eur(nf)) if nf else ""))
+		av.append(T("Factura de la luz: −{e} (te faltan {f})", {"e": Datos.eur(luz - nf), "f": Datos.eur(nf)}) if nf else T("Factura de la luz: −{e}", {"e": Datos.eur(luz - nf)}))
 	if olor:
 		S.heat = min(100, S.heat + olor)
-		av.append("Olor a cogollo: calor +%d" % olor)
+		av.append(T("Olor a cogollo: calor +{n}", {"n": int(olor)}))
 	var sec := 0
 	for e in S.esquejes:
 		if S.day - e.dia > D.ESQUEJE_DIAS:
 			sec += 1
 	if sec:
 		S.esquejes = S.esquejes.filter(func(e): return S.day - e.dia <= D.ESQUEJE_DIAS)
-		av.append("Se %s sin plantar" % [("han secado %d esquejes" % sec) if sec > 1 else "ha secado un esqueje"])
+		av.append(T("Se han secado {n} esquejes sin plantar", {"n": sec}) if sec > 1 else T("Se ha secado un esqueje sin plantar"))
 	var seb := 0
 	for e in S.bandejas:
 		if S.day - e.dia > D.CARRO.dias:
 			seb += 1
 	if seb:
 		S.bandejas = S.bandejas.filter(func(e): return S.day - e.dia <= D.CARRO.dias)
-		av.append("Se %s en las bandejas" % [("han secado %d esquejes" % seb) if seb > 1 else "ha secado un esqueje"])
+		av.append(T("Se han secado {n} esquejes en las bandejas", {"n": seb}) if seb > 1 else T("Se ha secado un esqueje en las bandejas"))
 	curado_dia(av)   # el curado (1.29)
 	if av.size() and mode == "world":
 		toast("<br>".join(av), 1600)
@@ -180,7 +180,7 @@ func feno_visto(f):
 
 func marca_feno(f) -> String:
 	var v = feno_visto(f)
-	return " ★" if v == "estrella" else (" (floja)" if v == "floja" else "")
+	return " ★" if v == "estrella" else (T(" (floja)") if v == "floja" else "")
 
 # número y nombre de cada planta (1.11, nomPlanta de 09-cultivo): la nº de su fenotipo o el nombre de S.fnom, que heredan sus esquejes
 func nom_planta(f) -> String:
@@ -188,7 +188,7 @@ func nom_planta(f) -> String:
 		return ""
 	var k := str(int(f.id))
 	var fn: Dictionary = S.get("fnom", {})
-	return (" «%s»" % fn[k]) if fn.has(k) else " nº " + k
+	return (" «%s»" % fn[k]) if fn.has(k) else T(" nº {k}", {"k": k})
 
 func etiq(f) -> String:
 	return nom_planta(f) + marca_feno(f)
@@ -197,7 +197,7 @@ func nombrar_planta(f: Dictionary) -> void:
 	if not S.has("fnom"):
 		S.fnom = {}
 	var k := str(int(f.id))
-	var v = await pedir_texto("Nombre de la planta (y sus esquejes)", S.fnom.get(k, ""), 12)
+	var v = await pedir_texto(T("Nombre de la planta (y sus esquejes)"), S.fnom.get(k, ""), 12)
 	if v == null or (v == "" and not S.fnom.has(k)):
 		return
 	if v != "":
@@ -205,17 +205,17 @@ func nombrar_planta(f: Dictionary) -> void:
 	else:
 		S.fnom.erase(k)
 	sfx("sel")
-	await say(("Ahora se llama «%s». Sus esquejes, también." % v) if v != "" else ("Sin nombre: vuelve a ser la nº %s." % k))
+	await say(T("Ahora se llama «{v}». Sus esquejes, también.", {"v": v}) if v != "" else T("Sin nombre: vuelve a ser la nº {k}.", {"k": k}))
 
 # un esqueje del propagador o de las bandejas del carro (l): ponerle nombre o tirarlo
 func esqueje_accion(e: Dictionary, l: Array) -> void:
-	var c: int = await ask("Esqueje de %s%s." % [strain(e.sid).n, etiq(e.f)], ["Nombrar", "Tirar", "Nada"])
+	var c: int = await ask(T("Esqueje de {s}{e}.", {"s": strain(e.sid).n, "e": etiq(e.f)}), [K("Nombrar"), K("Tirar"), K("Nada")])
 	if c == 0:
 		await nombrar_planta(e.f)
 	elif c == 1:
 		l.remove_at(l.find(e))
 		sfx("sel")
-		await say("Tiras el esqueje.")
+		await say(K("Tiras el esqueje."))
 
 # ---------- plantar y cuidar ----------
 func _own() -> Array:
@@ -233,7 +233,7 @@ func plantar(i: int) -> void:
 	for e in S.bandejas:
 		esq.append([e, 1])
 	if own.is_empty() and esq.is_empty():
-		await say("Maceta vacía. No tienes semillas: cómpralas en el growshop de Kiko.")
+		await say(K("Maceta vacía. No tienes semillas: cómpralas en el growshop de Kiko."))
 		return
 	var items := []
 	for o in own:
@@ -243,11 +243,11 @@ func plantar(i: int) -> void:
 		var e: Dictionary = eb[0]
 		var s = strain(e.sid)
 		var v = feno_visto(e.f)
-		var dv := ("Fenotipo estrella: THC ×%s y cosecha ×%s." % [Datos.coma(e.f.t), Datos.coma(e.f.y)]) if v == "estrella" else ("Fenotipo flojo: rinde menos que la media." if v == "floja" else "Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo.")
-		items.append({"label": "Esqueje " + s.n + etiq(e.f), "right": "bandeja" if eb[1] else "esqueje", "sw": s.c, "ic": ic_cog(e.sid),
-			"desc": "Clon enraizado: la misma planta que su madre, con su fenotipo.\n%s\nSe seca si no lo plantas antes del %s." % [dv, Datos.fd(e.dia + (D.CARRO.dias if eb[1] else D.ESQUEJE_DIAS) + 1, S.day)]})
-	items.append({"label": "Cancelar", "desc": ""})
-	var j: int = await menu(items, {"cls": "full", "title": "¿QUÉ PLANTAS?", "desc": true})
+		var dv := T("Fenotipo estrella: THC ×{t} y cosecha ×{y}.", {"t": Datos.coma(e.f.t), "y": Datos.coma(e.f.y)}) if v == "estrella" else (T("Fenotipo flojo: rinde menos que la media.") if v == "floja" else T("Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo."))
+		items.append({"label": T("Esqueje {s}{e}", {"s": s.n, "e": etiq(e.f)}), "right": K("bandeja") if eb[1] else K("esqueje"), "sw": s.c, "ic": ic_cog(e.sid),
+			"desc": T("Clon enraizado: la misma planta que su madre, con su fenotipo.\n{dv}\nSe seca si no lo plantas antes del {d}.", {"dv": dv, "d": Datos.fd(e.dia + (D.CARRO.dias if eb[1] else D.ESQUEJE_DIAS) + 1, S.day)})})
+	items.append({"label": K("Cancelar"), "desc": ""})
+	var j: int = await menu(items, {"cls": "full", "title": K("¿QUÉ PLANTAS?"), "desc": true})
 	if j < 0 or j >= own.size() + esq.size():
 		return
 	cuenta("plantar")
@@ -258,7 +258,7 @@ func plantar(i: int) -> void:
 		S.pots[i] = {"sid": e.sid, "prog": .12, "water": 70, "health": 100, "fert": false, "pest": false, "f": e.f}   # ya enraizado: empieza de plántula
 		sfx("sel")
 		await accion("plantar")
-		await say("Plantas el esqueje de %s%s." % [strain(e.sid).n, etiq(e.f)])
+		await say(T("Plantas el esqueje de {s}{e}.", {"s": strain(e.sid).n, "e": etiq(e.f)}))
 		await pista_barras()
 		return
 	var sid: String = own[j][0]
@@ -268,7 +268,7 @@ func plantar(i: int) -> void:
 	S.pots[i] = {"sid": sid, "prog": 0, "water": 70, "health": 100, "fert": false, "pest": false, "f": roll_feno(sid)}
 	sfx("sel")
 	await accion("sembrar" if Datos.CAL else "plantar")   # 1.57.2: la semilla a la tierra
-	await say("Has plantado %s%s." % [strain(sid).n, nom_planta(S.pots[i].f)])
+	await say(T("Has plantado {s}{e}.", {"s": strain(sid).n, "e": nom_planta(S.pots[i].f)}))
 	await pista_barras()
 
 # con la primera planta, qué dice su barra
@@ -276,14 +276,14 @@ func pista_barras() -> void:
 	if S.flags.get("barras"):
 		return
 	S.flags.barras = true
-	await say("Cada planta lleva su barra: arriba, el agua (roja: toca regar); abajo, la cosecha (dorada: lista).")
-	await say("Si le sale plaga, verás una «!» roja y manchas en las hojas. Trátala con INSECTICIDA.")
+	await say(K("Cada planta lleva su barra: arriba, el agua (roja: toca regar); abajo, la cosecha (dorada: lista)."))
+	await say(K("Si le sale plaga, verás una «!» roja y manchas en las hojas. Trátala con INSECTICIDA."))
 
 func sacar_esqueje(i: int) -> void:
 	var p: Dictionary = S.pots[i]
 	var s = strain(p.sid)
 	if S.esquejes.size() >= 12:
-		await say("El propagador está lleno: 12 esquejes. Planta alguno antes.")
+		await say(K("El propagador está lleno: 12 esquejes. Planta alguno antes."))
 		return
 	S.esquejes.append({"sid": p.sid, "f": p.f if p.get("f") else roll_feno(p.sid), "dia": S.day})
 	if not p.get("f"):
@@ -291,9 +291,9 @@ func sacar_esqueje(i: int) -> void:
 	p.health = max(1, p.health - 5)
 	await gesto("esqueje")   # 1.54
 	sfx("sel")
-	await say("Cortas una punta de la %s%s y la pones a enraizar.\nPlántala antes del %s: es la misma planta." % [s.n, nom_planta(p.f), Datos.fd(S.day + D.ESQUEJE_DIAS + 1, S.day)])
+	await say(T("Cortas una punta de la {s}{e} y la pones a enraizar.\nPlántala antes del {d}: es la misma planta.", {"s": s.n, "e": nom_planta(p.f), "d": Datos.fd(S.day + D.ESQUEJE_DIAS + 1, S.day)}))
 	if carro_ya():
-		await say("O pínchala en el carro: allí aguanta %d días." % D.CARRO.dias)
+		await say(T("O pínchala en el carro: allí aguanta {n} días.", {"n": int(D.CARRO.dias)}))
 
 func stage_name(p: Dictionary) -> String:
 	return Cultivo.stage_name(p)
@@ -302,7 +302,7 @@ func pot_action(i: int) -> void:
 	var p = S.pots[i]
 	if p == null:
 		if macetas_libres(i, false).size():
-			var c: int = await ask("Plaza vacía con una maceta de %s." % D.MACETAS[S.macetas[i]].n, ["Plantar", "Cambiar maceta", "Salir"])
+			var c: int = await ask(T("Plaza vacía con una maceta de {m}.", {"m": D.MACETAS[S.macetas[i]].n}), [K("Plantar"), K("Cambiar maceta"), K("Salir")])
 			if c == 1:
 				await cambiar_maceta(i)
 				return
@@ -312,12 +312,12 @@ func pot_action(i: int) -> void:
 		return
 	var s = strain(p.sid)
 	if p.get("dead"):
-		await say("La %s se ha secado del todo." % s.n)
+		await say(T("La {s} se ha secado del todo.", {"s": s.n}))
 		S.pots[i] = null
-		await say("Retiras la planta muerta.")
+		await say(K("Retiras la planta muerta."))
 		return
 	if p.prog >= 1:
-		var c: int = await ask("%s%s lista para cosechar.\nSalud %d%% · Agua %d%%" % [s.n, etiq(p.get("f")), Datos.jsround(p.health), Datos.jsround(p.water)], ["Cosechar", "Nombrar", "Esperar"])
+		var c: int = await ask(T("{s}{e} lista para cosechar.\nSalud {h}% · Agua {w}%", {"s": s.n, "e": etiq(p.get("f")), "h": Datos.jsround(p.health), "w": Datos.jsround(p.water)}), [K("Cosechar"), K("Nombrar"), K("Esperar")])
 		if c == 0:
 			await harvest(i)
 		elif c == 1:
@@ -330,16 +330,16 @@ func pot_action(i: int) -> void:
 		for k in ["fertv", "ofertv"]:
 			if S.items.get(k, 0) > 0:
 				veg_k.append(k)
-	var opts := ["Regar"]
+	var opts := [K("Regar")]
 	if not p.fert or veg_k.size():
-		opts.append("Abonar")
+		opts.append(K("Abonar"))
 	if p.pest:
-		opts.append("Tratar plaga")
+		opts.append(K("Tratar plaga"))
 	if p.prog >= .2 and p.prog < .65 and not (Datos.CAL and s.get("auto")):   # 1.52: las autos no se clonan
-		opts.append("Sacar esqueje")
-	opts.append_array(["Nombrar", "Arrancar", "Salir"])
-	var c: int = await ask("%s%s · %s %d%%\nAgua %d%% · Salud %d%%%s" % [s.n, etiq(p.get("f")), stage_name(p), int(floor(p.prog * 100)), Datos.jsround(p.water),
-		Datos.jsround(p.health), " · PLAGA" if p.pest else ""], opts)
+		opts.append(K("Sacar esqueje"))
+	opts.append_array([K("Nombrar"), K("Arrancar"), K("Salir")])
+	var c: int = await ask(T("{s}{e} · {st} {p}%\nAgua {w}% · Salud {h}%{pl}", {"s": s.n, "e": etiq(p.get("f")), "st": stage_name(p), "p": int(floor(p.prog * 100)), "w": Datos.jsround(p.water),
+		"h": Datos.jsround(p.health), "pl": T(" · PLAGA") if p.pest else ""}), opts)
 	var op: String = opts[c]
 	if op == "Regar":
 		var v := pos_plaza(i)
@@ -348,7 +348,7 @@ func pot_action(i: int) -> void:
 		S.flags.gRiego = 1
 		cuenta("riego")
 		sfx("sel")
-		await say("Riegas la planta. Agua al 100%.")
+		await say(K("Riegas la planta. Agua al 100%."))
 	elif op == "Abonar":
 		await abonar(p, veg_k)
 	elif op == "Tratar plaga":
@@ -357,9 +357,9 @@ func pot_action(i: int) -> void:
 			p.pest = false
 			await gesto("tratar")   # 1.54
 			sfx("sel")
-			await say("Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.")
+			await say(K("Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada."))
 		else:
-			await say("No tienes INSECTICIDA. Kiko lo vende.")
+			await say(K("No tienes INSECTICIDA. Kiko lo vende."))
 	elif op == "Sacar esqueje":
 		await sacar_esqueje(i)
 	elif op == "Nombrar":
@@ -367,9 +367,9 @@ func pot_action(i: int) -> void:
 			p.f = roll_feno(p.sid)
 		await nombrar_planta(p.f)
 	elif op == "Arrancar":
-		if await ask("¿Seguro que quieres arrancarla?", ["Sí", "No"]) == 0:
+		if await ask(K("¿Seguro que quieres arrancarla?"), [K("Sí"), K("No")]) == 0:
 			S.pots[i] = null
-			await say("Arrancas la planta.")
+			await say(K("Arrancas la planta."))
 
 # tierra (1.10): como mucho LITROS_M2 litros por m² de suelo en cada carpa, sumando todas sus macetas
 func litros_max(ci: int) -> int:
@@ -398,14 +398,14 @@ func macetas_libres(i: int, tierra := true) -> Array:
 func cambiar_maceta(i: int) -> void:
 	var l := macetas_libres(i)
 	var ci: int = huecos()[i].c
-	var tl := "tierra %d de %d L" % [litros_carpa(ci), litros_max(ci)]
+	var tl := T("tierra {a} de {b} L", {"a": litros_carpa(ci), "b": litros_max(ci)})
 	if l.is_empty():
-		await say(("No cabe más tierra en la carpa (%s)." % tl) if macetas_libres(i, false).size() else "No tienes otra maceta que quepa aquí.")
+		await say(T("No cabe más tierra en la carpa ({tl}).", {"tl": tl}) if macetas_libres(i, false).size() else K("No tienes otra maceta que quepa aquí."))
 		return
 	var it := []
 	for k in l:
-		it.append({"label": "Maceta " + D.MACETAS[k].n, "right": "×" + n(S.items["m_" + k]), "ic": icono("maceta"), "desc": desc_maceta(k)})
-	var j: int = await menu(it, {"cls": "full", "title": "CAMBIAR MACETA", "title2": "Ahora: " + D.MACETAS[S.macetas[i]].n + " · " + tl, "desc": true})
+		it.append({"label": T("Maceta {m}", {"m": D.MACETAS[k].n}), "right": "×" + n(S.items["m_" + k]), "ic": icono("maceta"), "desc": desc_maceta(k)})
+	var j: int = await menu(it, {"cls": "full", "title": K("CAMBIAR MACETA"), "title2": T("Ahora: {m} · {tl}", {"m": D.MACETAS[S.macetas[i]].n, "tl": tl}), "desc": true})
 	if j < 0:
 		return
 	var k: String = l[j]
@@ -417,7 +417,7 @@ func cambiar_maceta(i: int) -> void:
 	var gc: Dictionary = S.carpas[h.c]
 	if gc.get("gar") != null and h.j < gc.gar.size():
 		gc.gar[h.j] = null
-	await say("Pones la maceta de %s. La vieja va a la mochila." % D.MACETAS[k].n)
+	await say(T("Pones la maceta de {m}. La vieja va a la mochila.", {"m": D.MACETAS[k].n}))
 
 func focos_libres(ci: int) -> Array:
 	var o := []
@@ -436,16 +436,16 @@ func instalar_foco(ci: int, k: String) -> void:
 func cambiar_foco(ci: int) -> void:
 	var l := focos_libres(ci)
 	if l.is_empty():
-		await say("No tienes otro foco que aguante esta carpa.")
+		await say(K("No tienes otro foco que aguante esta carpa."))
 		return
 	var it := []
 	for k in l:
-		it.append({"label": "Foco " + D.FOCOS[k].n, "right": "×" + n(S.items["f_" + k]), "ic": icono(Atlas.ico_foco(k)), "desc": desc_foco(k)})
-	var j: int = await menu(it, {"cls": "full", "title": "CAMBIAR FOCO", "title2": "Ahora: " + D.FOCOS[S.carpas[ci].foco].n, "desc": true})
+		it.append({"label": T("Foco {f}", {"f": D.FOCOS[k].n}), "right": "×" + n(S.items["f_" + k]), "ic": icono(Atlas.ico_foco(k)), "desc": desc_foco(k)})
+	var j: int = await menu(it, {"cls": "full", "title": K("CAMBIAR FOCO"), "title2": T("Ahora: {f}", {"f": D.FOCOS[S.carpas[ci].foco].n}), "desc": true})
 	if j < 0:
 		return
 	instalar_foco(ci, l[j])
-	await say("Cuelgas el foco %s. El viejo va a la mochila." % D.FOCOS[l[j]].n)
+	await say(T("Cuelgas el foco {f}. El viejo va a la mochila.", {"f": D.FOCOS[l[j]].n}))
 
 # pl: femenino plural (las garrafas) · lo que le falta a la carpa (con goteo, las garrafas no)
 static func falta_extra(c, k: String) -> bool:
@@ -479,15 +479,15 @@ func abonar(p: Dictionary, veg_k: Array) -> void:
 			if S.items.get(x, 0) > 0:
 				ks.append(x)
 	if ks.is_empty():
-		await say("No te queda ABONO.")
+		await say(K("No te queda ABONO."))
 		return
 	var k: String = ks[0]
 	if ks.size() > 1:
 		var L := []
 		for x in ks:
 			L.append("%s ×%s" % [D.PRODUCTOS[x].n, n(S.items[x])])
-		L.append("Nada")
-		var c: int = await ask("¿Qué abono le echas?", L)
+		L.append(K("Nada"))
+		var c: int = await ask(K("¿Qué abono le echas?"), L)
 		if c < 0 or c >= ks.size():
 			return
 		k = ks[c]
@@ -516,16 +516,17 @@ func abonar(p: Dictionary, veg_k: Array) -> void:
 		S.flags.gFlor = 1
 	await gesto("abonar")   # 1.54
 	sfx("sel")
-	var t := "Echas una dosis de %s. %s" % [String(D.PRODUCTOS[k].n).to_upper(), "Crecerá más deprisa." if veg else "Dará más cosecha."]
+	var pk := I18n.v(String(D.PRODUCTOS[k].n)).to_upper()
+	var t := T("Echas una dosis de {p}. Crecerá más deprisa.", {"p": pk}) if veg else T("Echas una dosis de {p}. Dará más cosecha.", {"p": pk})
 	if ph != null:
-		t += ("\nCon el medidor, lo aprovecha entero." if Datos.PLAY else "\nCon el medidor, el pH al %s: lo aprovecha entero." % Datos.coma(D.ABONO.ph[2])) if S.items.get("medidor", 0) else "\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo."
+		t += (T("\nCon el medidor, lo aprovecha entero.") if Datos.PLAY else T("\nCon el medidor, el pH al {ph}: lo aprovecha entero.", {"ph": Datos.coma(D.ABONO.ph[2])})) if S.items.get("medidor", 0) else T("\nCorriges el pH a ojo, sin medidor: lo aprovecha casi todo.")
 	elif bio:
-		t += "\nSin pH−, la tierra amortigua el agua del grifo: lo aprovecha al %d %%." % Datos.jsround(D.ABONO_BIO.q[0] * 100)
+		t += T("\nSin pH−, la tierra amortigua el agua del grifo: lo aprovecha al {p} %.", {"p": Datos.jsround(D.ABONO_BIO.q[0] * 100)})
 	else:
-		t += ("\nSin corrector, el agua del grifo bloquea %d %% del abono." % Datos.jsround((1 - D.ABONO.q[0]) * 100)) if Datos.PLAY else "\nSin pH−, el agua del grifo (pH %s) bloquea %d %% del abono." % [Datos.coma(D.ABONO.ph[0]), Datos.jsround((1 - D.ABONO.q[0]) * 100)]
+		t += T("\nSin corrector, el agua del grifo bloquea {p} % del abono.", {"p": Datos.jsround((1 - D.ABONO.q[0]) * 100)}) if Datos.PLAY else T("\nSin pH−, el agua del grifo (pH {ph}) bloquea {p} % del abono.", {"ph": Datos.coma(D.ABONO.ph[0]), "p": Datos.jsround((1 - D.ABONO.q[0]) * 100)})
 	await say(t)
 	if ph != null and (true if D.PRODUCTOS[ph].bio else false) != bio:
-		await say(("No te queda pH− de su marca: gastas una dosis de %s." % D.PRODUCTOS[ph].n) + (" Con el mineral, el sustrato ya no está vivo." if bio else ""))
+		await say(T("No te queda pH− de su marca: gastas una dosis de {p}.", {"p": D.PRODUCTOS[ph].n}) + (T(" Con el mineral, el sustrato ya no está vivo.") if bio else ""))
 
 func _fv(p: Dictionary) -> float:
 	return float(p.fv) if p.get("fv") != null else 0.0
@@ -533,17 +534,17 @@ func _fv(p: Dictionary) -> float:
 func abono_txt(p: Dictionary) -> String:
 	var L := []
 	if _fv(p) > 0:
-		L.append("crecimiento" + (" bio" if p.get("fvo") else ""))
+		L.append(T("crecimiento bio") if p.get("fvo") else T("crecimiento"))
 	if p.fert:
-		L.append("floración" + (" bio" if p.get("fo") else ""))
-	var t := ("Abonada (" + " y ".join(L) + ")") if L.size() else "Sin abonar"
+		L.append(T("floración bio") if p.get("fo") else T("floración"))
+	var t := (T("Abonada ({a})", {"a": L[0]}) if L.size() == 1 else T("Abonada ({a} y {b})", {"a": L[0], "b": L[1]})) if L.size() else T("Sin abonar")
 	if Cultivo.sustrato_vivo(p):
-		t += " · sustrato vivo"
+		t += T(" · sustrato vivo")
 	if S.items.get("medidor", 0) and L.size():
 		var ec := Datos.jsround((.4 + ((.4 if p.get("fvo") else .7) if _fv(p) > 0 else 0.0) + ((.5 if p.get("fo") else .9) if p.fert else 0.0)) * 10) / 10.0
 		var iv := _ph_i(_fv(p), p.get("fvo")) if _fv(p) > 0 else 2   # cada dosis, con la q de su marca (phDe)
 		var ifl := _ph_i(Cultivo.fq(p), p.get("fo")) if p.fert else 2
-		t += (" · riego %s" % ["a ojo", "a medias", "bien"][mini(iv, ifl)]) if Datos.PLAY else " · EC %s · pH %s" % [Datos.coma(ec), Datos.coma(D.ABONO.ph[mini(iv, ifl)])]
+		t += T(" · riego {r}", {"r": [K("a ojo"), K("a medias"), K("bien")][mini(iv, ifl)]}) if Datos.PLAY else T(" · EC {ec} · pH {ph}", {"ec": Datos.coma(ec), "ph": Datos.coma(D.ABONO.ph[mini(iv, ifl)])})
 	return t
 
 func _ph_i(q: float, bio) -> int:
@@ -575,20 +576,20 @@ func poner_extra(ci: int, k: String) -> String:
 func temporizador(ci: int) -> void:
 	var c: Dictionary = S.carpas[ci]
 	var k := Cultivo.ciclo_de(c)
-	var K: Array = D.CICLOS.keys()
+	var Ks: Array = D.CICLOS.keys()
 	var opts := []
-	for x in K:
+	for x in Ks:
 		opts.append(D.CICLOS[x].m)
-	opts.append("Salir")
-	var j: int = await ask("Temporizador · %s: %s\nLuz %s al día con plantas" % [D.CICLOS[k].n, D.CICLOS[k].c.to_lower(), Datos.eur(luz_carpa(ci))], opts)
-	if j < 0 or j >= K.size() or K[j] == k:
+	opts.append(K("Salir"))
+	var j: int = await ask(T("Temporizador · {n}: {c}\nLuz {e} al día con plantas", {"n": D.CICLOS[k].n, "c": I18n.v(String(D.CICLOS[k].c)).to_lower(), "e": Datos.eur(luz_carpa(ci))}), opts)
+	if j < 0 or j >= Ks.size() or Ks[j] == k:
 		return
-	if K[j] == "auto":
+	if Ks[j] == "auto":
 		c.erase("ciclo")
 	else:
-		c.ciclo = K[j]
+		c.ciclo = Ks[j]
 	sfx("sel")
-	await say(D.CICLOS[K[j]].d)
+	await say(D.CICLOS[Ks[j]].d)
 
 func carpa_action(ci: int) -> void:
 	var c: Dictionary = S.carpas[ci]
@@ -601,26 +602,26 @@ func carpa_action(ci: int) -> void:
 	var gar: bool = c.get("garrafas", false) and not c.get("goteo")
 	var ga := Cultivo.garrafas_carpa(S, ci)
 	var ll: bool = dep < gl if c.get("goteo") else (gar and ga[0] < ga[1])
-	var opts := ["Cambiar foco"] if f else []
+	var opts := [K("Cambiar foco")] if f else []
 	for k in ex:
-		opts.append("Poner " + D.EXTRAS[k].c.to_lower())
+		opts.append(T("Poner {x}", {"x": I18n.v(String(D.EXTRAS[k].c)).to_lower()}))
 	if ll:
-		opts.append("Rellenar depósito" if c.get("goteo") else "Rellenar garrafas")
-	opts.append("Salir")
-	var gt: String = (" · goteo %s de %s L" % [Datos.miles(floor(dep)), Datos.miles(gl)]) if c.get("goteo") else ((" · garrafas %d de %d L" % [int(floor(ga[0])), ga[1]]) if gar else "")
-	var k: int = await ask("%s · %s plantas · %s\n%d W/m² · luz %s al día con plantas%s" % [C.n, n(C.plazas), F.n, Datos.jsround(F.w / (C.cm[0] * C.cm[2] / 1e4)), Datos.eur(luz_carpa(ci)), gt], opts)
+		opts.append(K("Rellenar depósito") if c.get("goteo") else K("Rellenar garrafas"))
+	opts.append(K("Salir"))
+	var gt: String = T(" · goteo {a} de {b} L", {"a": Datos.miles(floor(dep)), "b": Datos.miles(gl)}) if c.get("goteo") else (T(" · garrafas {a} de {b} L", {"a": int(floor(ga[0])), "b": int(ga[1])}) if gar else "")
+	var k: int = await ask(T("{c} · {p} plantas · {f}\n{w} W/m² · luz {e} al día con plantas{gt}", {"c": C.n, "p": n(C.plazas), "f": F.n, "w": Datos.jsround(F.w / (C.cm[0] * C.cm[2] / 1e4)), "e": Datos.eur(luz_carpa(ci)), "gt": gt}), opts)
 	if opts[k] == "Cambiar foco":
 		await cambiar_foco(ci)
 		return
 	if opts[k] == "Rellenar depósito":
 		c.dep = gl
 		sfx("sel")
-		await say("Llenas el depósito del goteo: %s L." % Datos.miles(gl))
+		await say(T("Llenas el depósito del goteo: {l} L.", {"l": Datos.miles(gl)}))
 		return
 	if opts[k] == "Rellenar garrafas":
 		c.gar = []
 		sfx("sel")
-		await say("Llenas las garrafas: %d L." % ga[1])
+		await say(T("Llenas las garrafas: {l} L.", {"l": int(ga[1])}))
 		return
 	var ix := k - (1 if f else 0)
 	if k < 0 or ix < 0 or ix >= ex.size():
@@ -628,8 +629,10 @@ func carpa_action(ci: int) -> void:
 	var x: String = ex[ix]
 	var vu: bool = x == "goteo" and c.get("garrafas", false)
 	var vk := poner_extra(ci, x)
-	await say("Pones %s %s en %s %s.\n%s%s%s" % ["las" if D.EXTRAS[x].get("pl") else "el", D.EXTRAS[x].n.to_lower(), "el" if C.n.begins_with("Armario") else "la", C.n.to_lower(), D.EXTRAS[x].d,
-		"\nLas garrafas vuelven a la mochila." if vu else "", ("\nEl %s vuelve a la mochila." % D.EXTRAS[vk].c.to_lower()) if vk != "" else ""])
+	var arm: bool = C.n.begins_with("Armario")
+	var hx := {"x": I18n.v(String(D.EXTRAS[x].n)).to_lower(), "c": I18n.v(String(C.n)).to_lower()}
+	var pon: String = (T("Pones las {x} en el {c}.", hx) if arm else T("Pones las {x} en la {c}.", hx)) if D.EXTRAS[x].get("pl") else (T("Pones el {x} en el {c}.", hx) if arm else T("Pones el {x} en la {c}.", hx))
+	await say(pon + "\n" + I18n.v(String(D.EXTRAS[x].d)) + (T("\nLas garrafas vuelven a la mochila.") if vu else "") + (T("\nEl {k} vuelve a la mochila.", {"k": I18n.v(String(D.EXTRAS[vk].c)).to_lower()}) if vk != "" else ""))
 
 # ---------- cosecha ----------
 func semillas_cosecha(p: Dictionary) -> Dictionary:
@@ -675,27 +678,30 @@ func harvest(i: int) -> void:
 	sfx("get")
 	if S.rec.get(p.sid) == 1:   # una variedad de receta sacada en la mesa, cosechada (capítulo 4)
 		S.rec[p.sid] = 2
-	await say("Cosechas %d g de %s. THC: %s%%." % [g, s.n, Datos.pct(thc)])
+	await say(T("Cosechas {g} g de {s}. THC: {t}%.", {"g": g, "s": s.n, "t": Datos.pct(thc)}))
 	if sobra >= 1:
-		await say("No te cabe todo en la %s: " % D.MOCHILAS[int(S.items.get("bolsa", 0))].n.to_lower() + ("%d g van a la caja fuerte." % a_caja if a_caja >= 1 else "")
-			+ (("%sLlevas %d g de más: guárdalos en cuanto puedas." % [" " if a_caja >= 1 else "", sobra - a_caja]) if sobra - a_caja >= 1 else ""))
+		var hm := {"m": I18n.v(String(D.MOCHILAS[int(S.items.get("bolsa", 0))].n)).to_lower(), "c": a_caja, "e": sobra - a_caja}
+		if a_caja >= 1:
+			await say(T("No te cabe todo en la {m}: {c} g van a la caja fuerte. Llevas {e} g de más: guárdalos en cuanto puedas.", hm) if sobra - a_caja >= 1 else T("No te cabe todo en la {m}: {c} g van a la caja fuerte.", hm))
+		else:
+			await say(T("No te cabe todo en la {m}: Llevas {e} g de más: guárdalos en cuanto puedas.", hm) if sobra - a_caja >= 1 else T("No te cabe todo en la {m}: ", hm))
 	if cl == "estrella":
 		sfx("enc")
-		await say("¡Fenotipo estrella! THC ×%s y cosecha ×%s sobre la media de la %s." % [Datos.coma(fe.t), Datos.coma(fe.y), s.n])
-		await say("Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.")
+		await say(T("¡Fenotipo estrella! THC ×{t} y cosecha ×{y} sobre la media de la {s}.", {"t": Datos.coma(fe.t), "y": Datos.coma(fe.y), "s": s.n}))
+		await say(K("Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta."))
 	elif cl == "floja":
-		await say("Fenotipo flojo: THC ×%s y cosecha ×%s de la media." % [Datos.coma(fe.t), Datos.coma(fe.y)])
+		await say(T("Fenotipo flojo: THC ×{t} y cosecha ×{y} de la media.", {"t": Datos.coma(fe.t), "y": Datos.coma(fe.y)}))
 	if nn:
-		var pl := "s" if nn > 1 else ""
+		var hs := {"n": nn, "s": s.n}
 		if cria:
-			await say("Las plantas de la línea se han polinizado entre ellas: recoges %d semillas de %s." % [nn, s.n])
+			await say(T("Las plantas de la línea se han polinizado entre ellas: recoges {n} semillas de {s}.", hs))
 		elif not fem:
-			await say("Son semillas regulares: algún macho ha polinizado unas flores. Recoges %d semilla%s de %s." % [nn, pl, s.n])
+			await say(T("Son semillas regulares: algún macho ha polinizado unas flores. Recoges {n} semillas de {s}.", hs) if nn > 1 else T("Son semillas regulares: algún macho ha polinizado unas flores. Recoges {n} semilla de {s}.", hs))
 		else:
-			await say("Una flor hermafrodita ha polinizado unas pocas: recoges %d semilla%s de %s." % [nn, pl, s.n])
+			await say(T("Una flor hermafrodita ha polinizado unas pocas: recoges {n} semillas de {s}.", hs) if nn > 1 else T("Una flor hermafrodita ha polinizado unas pocas: recoges {n} semilla de {s}.", hs))
 	if not S.items.get("tarros") and not S.flags.get("curado"):   # 1.29, una vez
 		S.flags.curado = S.day
-		await say("Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en %d días: algo más de THC y se vende más cara. Sin curar no pierde nada." % int(D.CURADO.dias))   # 1.36: ya no pierde THC; curando, sube
+		await say(T("Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en {d} días: algo más de THC y se vende más cara. Sin curar no pierde nada.", {"d": int(D.CURADO.dias)}))   # 1.36: ya no pierde THC; curando, sube
 	S.flags.harvest1 = true
 	await check_story()
 
@@ -703,7 +709,7 @@ func harvest(i: int) -> void:
 func estabilizar(k: String) -> void:
 	var s = strain(k)
 	var g := Cultivo.gen_de(S, k)
-	if await ask("¿Estabilizar %s (F%d)? Gastas 2 semillas y guardas 1." % [s.n, g], ["Estabilizar", "Cancelar"]) != 0:
+	if await ask(T("¿Estabilizar {s} (F{g})? Gastas 2 semillas y guardas 1.", {"s": s.n, "g": g}), [K("Estabilizar"), K("Cancelar")]) != 0:
 		return
 	S.seeds[k] -= 2
 	if not S.seeds[k]:
@@ -718,11 +724,11 @@ func estabilizar(k: String) -> void:
 		S.gen.erase(k)
 		sfx("get")
 		add_seeds(k, 1)
-		await say("%s ya es una línea estable: todas sus plantas salen iguales.\nGuardas 1 semilla." % s.n)
+		await say(T("{s} ya es una línea estable: todas sus plantas salen iguales.\nGuardas 1 semilla.", {"s": s.n}))
 	else:
 		S.gen[k] = g + 1
 		add_seeds(k, 1)
-		await say("Guardas 1 semilla F%d de %s: cultívala para tener más.\n%s para fijarla." % [g + 1, s.n, "Falta una generación" if GE - g - 1 == 1 else "Faltan %d generaciones" % (GE - g - 1)])
+		await say(T("Guardas 1 semilla F{f} de {s}: cultívala para tener más.\nFalta una generación para fijarla.", {"f": g + 1, "s": s.n}) if GE - g - 1 == 1 else T("Guardas 1 semilla F{f} de {s}: cultívala para tener más.\nFaltan {n} generaciones para fijarla.", {"f": g + 1, "s": s.n, "n": GE - g - 1}))
 
 # ---------- cama ----------
 # la cama del piso y, desde la 1.10, la de casa de ama (txt): allí no hay robo de Darko ni aviso de plagas (las plantas están en el piso).
@@ -730,7 +736,7 @@ func estabilizar(k: String) -> void:
 func bed_action(txt := ""):
 	var piso: bool = S.map == "home"
 	var deco: bool = piso and con_deco().size() > 0
-	var c: int = await ask(txt if txt else "Tu cama. Todavía huele a la colonia de la tía.", ["Dormir hasta las 7", "Siesta de 3 h"] + (["Cambiarte de ropa"] if piso else []) + (["Decorar la casa"] if deco else []) + ["Nada"])
+	var c: int = await ask(txt if txt else K("Tu cama. Todavía huele a la colonia de la tía."), [K("Dormir hasta las 7"), K("Siesta de 3 h")] + ([K("Cambiarte de ropa")] if piso else []) + ([K("Decorar la casa")] if deco else []) + [K("Nada")])
 	if piso and c == 2:   # ropa y pelo (1.21)
 		await vestirte()
 		return
@@ -757,7 +763,7 @@ func bed_action(txt := ""):
 	if diario:
 		S.flags.diario = S.day
 	save()
-	toast("Has descansado" + ((" · Luz −" + Datos.eur(hoy.e)) if hoy and hoy.e else "") + ((" · Olor: calor +" + n(hoy.o)) if hoy and hoy.o else "") + " · Partida guardada", 1800)
+	toast(T("Has descansado") + (T(" · Luz −{e}", {"e": Datos.eur(hoy.e)}) if hoy and hoy.e else "") + (T(" · Olor: calor +{o}", {"o": n(hoy.o)}) if hoy and hoy.o else "") + T(" · Partida guardada"), 1800)
 	if not piso:
 		return
 	if diario:
@@ -768,14 +774,14 @@ func bed_action(txt := ""):
 
 # la primera vez que duermes en el piso (1.25): el diario de la tía Maite, bajo la almohada (S.flags.diario; el recetario, en trama)
 func almohada() -> void:
-	await say("Das vueltas y más vueltas. Al ahuecar la almohada notas algo duro dentro de la funda.")
+	await say(K("Das vueltas y más vueltas. Al ahuecar la almohada notas algo duro dentro de la funda."))
 	sfx("get")
-	await say("Un cuaderno de tapas verdes, gastado de tanto abrirlo: «Cuaderno de cultivo · M.». El diario de la tía Maite.")
-	await say("Una página por cada variedad que conoció: lo que apuntó de ella, las recetas de sus cruces y dónde guardaba las semillas que no se venden.")
-	await say("Lo tienes en START → GENOTECA. Algunas landraces no están en ningún banco: habrá que buscarlas.")
+	await say(K("Un cuaderno de tapas verdes, gastado de tanto abrirlo: «Cuaderno de cultivo · M.». El diario de la tía Maite."))
+	await say(K("Una página por cada variedad que conoció: lo que apuntó de ella, las recetas de sus cruces y dónde guardaba las semillas que no se venden."))
+	await say(K("Lo tienes en START → GENOTECA. Algunas landraces no están en ningún banco: habrá que buscarlas."))
 
 static func _lista(L: Array) -> String:
-	return L[0] if L.size() == 1 else ", ".join(L.slice(0, -1)) + " y " + L[-1]
+	return L[0] if L.size() == 1 else I18n.T("{a} y {b}", {"a": ", ".join(L.slice(0, -1)), "b": L[-1]})
 
 # al despertar: las que han cogido plaga mientras dormías (y el insecticida que te queda), las que la siguen teniendo sin
 # tratar, las que se han secado del todo (antes: [plaga, muerta] de cada plaza al acostarte) y las que florecen con moho porque
@@ -799,7 +805,7 @@ func aviso_plaga(antes: Array) -> void:
 		if not p:
 			continue
 		var a = antes[i] if i < antes.size() and antes[i] else [false, false]
-		var nom := "la %s (%splaza %d)" % [strain(p.sid).n, (D.CARPAS[S.carpas[H[i].c].t].n + ", ") if varias else "", H[i].j + 1]
+		var nom := T("la {s} ({c}, plaza {p})", {"s": strain(p.sid).n, "c": D.CARPAS[S.carpas[H[i].c].t].n, "p": H[i].j + 1}) if varias else T("la {s} (plaza {p})", {"s": strain(p.sid).n, "p": H[i].j + 1})
 		if p.get("dead"):
 			if not a[1]:
 				muertas.append(nom)
@@ -811,24 +817,28 @@ func aviso_plaga(antes: Array) -> void:
 	if nuevas.size():
 		var k: int = S.items.insect
 		sfx("bad")
-		await say("¡Plaga en %s! Trátala%s con INSECTICIDA: %s" % [_lista(nuevas), "s" if nuevas.size() > 1 else "", ("te queda%s %d." % ["n" if k > 1 else "", k]) if k else "no te queda; cómpralo en el growshop."])
+		var hp := {"l": _lista(nuevas), "k": k}
+		if nuevas.size() > 1:
+			await say((T("¡Plaga en {l}! Trátalas con INSECTICIDA: te quedan {k}.", hp) if k > 1 else T("¡Plaga en {l}! Trátalas con INSECTICIDA: te queda {k}.", hp)) if k else T("¡Plaga en {l}! Trátalas con INSECTICIDA: no te queda; cómpralo en el growshop.", hp))
+		else:
+			await say((T("¡Plaga en {l}! Trátala con INSECTICIDA: te quedan {k}.", hp) if k > 1 else T("¡Plaga en {l}! Trátala con INSECTICIDA: te queda {k}.", hp)) if k else T("¡Plaga en {l}! Trátala con INSECTICIDA: no te queda; cómpralo en el growshop.", hp))
 	if siguen.size():
-		await say("Sigue la plaga en %s: sin tratar, pierde%s salud cada hora." % [_lista(siguen), "n" if siguen.size() > 1 else ""])
+		await say(T("Sigue la plaga en {l}: sin tratar, pierden salud cada hora.", {"l": _lista(siguen)}) if siguen.size() > 1 else T("Sigue la plaga en {l}: sin tratar, pierde salud cada hora.", {"l": _lista(siguen)}))
 	if muertas.size():
-		await say("Se ha%s secado del todo %s. Retírala%s con A." % ["n" if muertas.size() > 1 else "", _lista(muertas), "s" if muertas.size() > 1 else ""])
+		await say(T("Se han secado del todo {l}. Retíralas con A.", {"l": _lista(muertas)}) if muertas.size() > 1 else T("Se ha secado del todo {l}. Retírala con A.", {"l": _lista(muertas)}))
 	if moho.size():
-		await say("Moho en %s: de noche la carpa pasa del %s %% de humedad. Un extractor a su medida con intractor, un ventilador o un deshumidificador la bajan." % [_lista(moho), n(D.HR_OK[1])])
+		await say(T("Moho en {l}: de noche la carpa pasa del {h} % de humedad. Un extractor a su medida con intractor, un ventilador o un deshumidificador la bajan.", {"l": _lista(moho), "h": n(D.HR_OK[1])}))
 
 # ---------- PC ----------
 func pc_action():
-	var o := ["Genoteca"]
+	var o := [K("Genoteca")]
 	if S.ch >= 2:
-		o.append("Banco de semillas")
-	o.append_array(["Notas de la tía", "Tienda online"])
+		o.append(K("Banco de semillas"))
+	o.append_array([K("Notas de la tía"), K("Tienda online")])
 	if S.ch >= 4 and S.get("caja") and S.caja.nivel == 1 and not S.caja.get("mejora"):
-		o.append("Caja empotrada")
-	o.append_array(["Guardar partida", "Apagar"])
-	var c: String = o[await ask("El ordenador de la tía. Tiene su registro de cultivos de veinte años.", o)]
+		o.append(K("Caja empotrada"))
+	o.append_array([K("Guardar partida"), K("Apagar")])
+	var c: String = o[await ask(K("El ordenador de la tía. Tiene su registro de cultivos de veinte años."), o)]
 	if c == "Genoteca":
 		await genoteca()
 	elif c == "Banco de semillas":
@@ -840,7 +850,7 @@ func pc_action():
 	elif c == "Caja empotrada":
 		await pedir_caja()
 	elif c == "Guardar partida":
-		await say("Partida guardada." if save() else "No se ha podido guardar la partida.")
+		await say(K("Partida guardada.") if save() else K("No se ha podido guardar la partida."))
 
 # ---------- salón (12c-salon, 1.10): los muebles se compran por internet y llegan al día siguiente ----------
 func por_hora(l: Array) -> String:
@@ -848,18 +858,18 @@ func por_hora(l: Array) -> String:
 
 func noticia() -> String:
 	if S.heat >= 60:
-		return "Noticias: la policía busca un cultivo de interior en Ribera Verde. Los vecinos denuncian olor a marihuana en varios portales."
+		return K("Noticias: la policía busca un cultivo de interior en Ribera Verde. Los vecinos denuncian olor a marihuana en varios portales.")
 	if S.heat >= 30:
-		return "Noticias: detenido en el puerto un hombre con dos kilos de marihuana escondidos en una furgoneta de reparto."
-	return "Noticias: el tiempo. Nubes y claros en la costa y la ría en calma. Nada que contar en Ribera Verde."
+		return K("Noticias: detenido en el puerto un hombre con dos kilos de marihuana escondidos en una furgoneta de reparto.")
+	return K("Noticias: el tiempo. Nubes y claros en la costa y la ría en calma. Nada que contar en Ribera Verde.")
 
 func mueble_action(k):
 	if k == "carro":
 		await carro_action()
 		return
 	if k == "sillon":
-		var o := (["Leer el diario de la tía Maite"] if S.flags.get("diario") else []) + ["Cambiar el tapizado", "Nada"]
-		var oi: int = await ask("Tu sillón de lectura. La lámpara da una luz cálida.", o)
+		var o := ([K("Leer el diario de la tía Maite")] if S.flags.get("diario") else []) + [K("Cambiar el tapizado"), K("Nada")]
+		var oi: int = await ask(K("Tu sillón de lectura. La lámpara da una luz cálida."), o)
 		var c: String = o[oi] if oi >= 0 and oi < o.size() else ""
 		if c == "Cambiar el tapizado":
 			await cambiar_deco(k)
@@ -871,18 +881,18 @@ func mueble_action(k):
 		await recetario()
 		return
 	if k == "cuadro":
-		var o := ["Cambiar la lámina", "Nada"]
-		var oi: int = await ask("En la pared del salón: %s." % D.DECO.cuadro.v[deco_v("cuadro")].to_lower(), o)
+		var o := [K("Cambiar la lámina"), K("Nada")]
+		var oi: int = await ask(T("En la pared del salón: {c}.", {"c": I18n.v(String(D.DECO.cuadro.v[deco_v("cuadro")])).to_lower()}), o)
 		if oi == 0:
 			await cambiar_deco(k)
 		return
 	if k == "sofa":
-		var o := ["Echar una cabezada (1 h)"]
+		var o := [K("Echar una cabezada (1 h)")]
 		if "tv" in muebles_ya():
-			o.append("Ver la tele")
-		o.append("Cambiar el tapizado")
-		o.append("Nada")
-		var oi: int = await ask("Tu sofá. Todavía huele a nuevo.", o)
+			o.append(K("Ver la tele"))
+		o.append(K("Cambiar el tapizado"))
+		o.append(K("Nada"))
+		var oi: int = await ask(K("Tu sofá. Todavía huele a nuevo."), o)
 		var c: String = o[oi] if oi >= 0 and oi < o.size() else ""
 		if c == "Ver la tele":
 			await mueble_action("tv")
@@ -899,11 +909,11 @@ func mueble_action(k):
 		update_hud()
 		await wait(300)
 		await fade(0)
-		await say("Una cabezada en el sofá: +5 de vida.")
+		await say(K("Una cabezada en el sofá: +5 de vida."))
 		return
 	if k == "tv":
-		var o := ["Noticias", "Documental", "Nada"]
-		var oi: int = await ask("La tele.", o)
+		var o := [K("Noticias"), K("Documental"), K("Nada")]
+		var oi: int = await ask(K("La tele."), o)
 		var c: String = o[oi] if oi >= 0 and oi < o.size() else ""
 		if c == "Nada" or c == "":
 			return
@@ -912,8 +922,8 @@ func mueble_action(k):
 		update_hud()
 		await say(t)
 		return
-	var o := ["Jugar (2 h)", "Foro de cultivo", "Tienda online", "Apagar"]
-	var oi: int = await ask("El PC gaming. Los ventiladores brillan de colores.", o)
+	var o := [K("Jugar (2 h)"), K("Foro de cultivo"), K("Tienda online"), K("Apagar")]
+	var oi: int = await ask(K("El PC gaming. Los ventiladores brillan de colores."), o)
 	var c: String = o[oi] if oi >= 0 and oi < o.size() else ""
 	if c == "Jugar (2 h)":
 		var t := por_hora(D.JUEGOS)
@@ -928,7 +938,7 @@ func mueble_action(k):
 		var t := por_hora(D.FORO)
 		advance_time(30)
 		update_hud()
-		await say("Foro de cultivo · " + t)
+		await say(T("Foro de cultivo · {t}", {"t": t}))
 	elif c == "Tienda online":
 		await tienda_online()
 
@@ -938,15 +948,17 @@ func cambiar_deco(k: String) -> void:
 	var v := deco_v(k)
 	var items := []
 	for j in Dk.v.size():
-		items.append({"label": Dk.v[j] + (" · ahora" if j == v else "")})
-	items.append({"label": "Volver"})
-	var i: int = await menu(items, {"title": "Cambiar " + Dk.q, "initial": v})
+		items.append({"label": T("{x} · ahora", {"x": Dk.v[j]}) if j == v else Dk.v[j]})
+	items.append({"label": K("Volver")})
+	var i: int = await menu(items, {"title": T("Cambiar {q}", {"q": Dk.q}), "initial": v})
 	if i < 0 or i >= Dk.v.size() or i == v:
 		return
 	S.deco[k] = i
 	sfx("sel")
 	montar_casa()
-	await say("Cambias %s %s: %s." % [Dk.q, ("de " + D.MUEBLES[k].art).replace("de el ", "del "), Dk.v[i].to_lower()])
+	var art: String = D.MUEBLES[k].art
+	var hc := {"q": Dk.q, "m": art.substr(3) if art.begins_with("el ") else art, "v": I18n.v(String(Dk.v[i])).to_lower()}
+	await say(T("Cambias {q} del {m}: {v}.", hc) if art.begins_with("el ") else T("Cambias {q} de {m}: {v}.", hc))
 
 # decorar la casa (1.27): en la cama del piso, lo que tiene DECO de lo que ya ha llegado
 func con_deco() -> Array:
@@ -960,8 +972,8 @@ func decorar() -> void:
 		for k in ks:
 			var a: String = D.MUEBLES[k].art
 			items.append({"label": "%s: %s" % [a.left(1).to_upper() + a.substr(1), String(D.DECO[k].v[deco_v(k)]).to_lower()]})
-		items.append({"label": "Listo"})
-		i = await menu(items, {"title": "Decorar la casa", "initial": i})
+		items.append({"label": K("Listo")})
+		i = await menu(items, {"title": K("Decorar la casa"), "initial": i})
 		if i < 0 or i >= ks.size():
 			return
 		await cambiar_deco(ks[i])
@@ -980,23 +992,23 @@ func reformas() -> void:
 				var en: bool = j == v
 				var pd: bool = o != null and int(o.v) == j
 				ks.append([k, j])
-				items.append({"label": "%s: %s" % [R.n, R.v[j][0]] + (" · pedido" if pd else " · en casa" if en else ""), "right": Datos.eur(R.v[j][1]), "disabled": o != null or en,
-					"desc": R.v[j][2] + (("\n%s viene mañana." % R.quien) if pd else "\nYa hay una obra pedida: viene mañana." if o != null else "" if en else ("\n%s viene mañana." % R.quien))})
-		items.append({"label": "Volver", "desc": "Pagas con lo que llevas y, si no llega, con la caja fuerte."})
-		i = await menu(items, {"cls": "full", "title": "REFORMAS", "title2": "Suelo y paredes · tienes " + Datos.eur(S.money + caja_e()), "desc": true, "initial": i})
+				items.append({"label": "%s: %s" % [I18n.v(String(R.n)), I18n.v(String(R.v[j][0]))] + (T(" · pedido") if pd else T(" · en casa") if en else ""), "right": Datos.eur(R.v[j][1]), "disabled": o != null or en,
+					"desc": I18n.v(String(R.v[j][2])) + (T("\n{q} viene mañana.", {"q": R.quien}) if pd else T("\nYa hay una obra pedida: viene mañana.") if o != null else "" if en else T("\n{q} viene mañana.", {"q": R.quien}))})
+		items.append({"label": K("Volver"), "desc": K("Pagas con lo que llevas y, si no llega, con la caja fuerte.")})
+		i = await menu(items, {"cls": "full", "title": K("REFORMAS"), "title2": T("Suelo y paredes · tienes {e}", {"e": Datos.eur(S.money + caja_e())}), "desc": true, "initial": i})
 		if i < 0 or i >= ks.size():
 			return
 		var k: String = ks[i][0]
 		var j: int = ks[i][1]
 		var R: Dictionary = D.REFORMA[k]
 		var p = R.v[j][1]
-		if not await tarjeta(p, "Reforma · " + String(R.n).to_lower()):   # 1.35: con tarjeta
+		if not await tarjeta(p, K("Reforma") + " · " + String(R.n).to_lower()):   # 1.35: con tarjeta
 			continue
 		if not (S.get("obra") is Dictionary):
 			S.obra = {}
 		S.obra[k] = {"v": j, "dia": S.day + 1}
 		sfx("coin")
-		toast("Pedido: %s, %s · mañana" % [R.n.to_lower(), String(R.v[j][0]).to_lower()], 1400)
+		toast(T("Pedido: {a}, {b} · mañana", {"a": I18n.v(String(R.n)).to_lower(), "b": I18n.v(String(R.v[j][0])).to_lower()}), 1400)
 
 # ropa y pelo (1.21, vestirte): desde la cama del piso, la camiseta, el pantalón, la gorra y el pelo (S.ropa[k], índice en ROPA[k].v)
 func vestirte() -> void:
@@ -1004,9 +1016,9 @@ func vestirte() -> void:
 		var ks: Array = D.ROPA.keys()
 		var items := []
 		for k in ks:
-			items.append({"label": "%s: %s" % [D.ROPA[k].n, String(D.ROPA[k].v[ropa_v(k)][0]).to_lower()]})
-		items.append({"label": "Listo"})
-		var i: int = await menu(items, {"title": "Ropa y pelo"})
+			items.append({"label": "%s: %s" % [I18n.v(String(D.ROPA[k].n)), I18n.v(String(D.ROPA[k].v[ropa_v(k)][0])).to_lower()]})
+		items.append({"label": K("Listo")})
+		var i: int = await menu(items, {"title": K("Ropa y pelo")})
 		if i < 0 or i >= ks.size():
 			return
 		var k: String = ks[i]
@@ -1014,8 +1026,8 @@ func vestirte() -> void:
 		var v := ropa_v(k)
 		var its := []
 		for n in R.v.size():
-			its.append({"label": R.v[n][0] + (" · ahora" if n == v else "")})
-		its.append({"label": "Volver"})
+			its.append({"label": T("{x} · ahora", {"x": R.v[n][0]}) if n == v else R.v[n][0]})
+		its.append({"label": K("Volver")})
 		var j: int = await menu(its, {"title": R.n, "initial": v})
 		if j >= 0 and j < R.v.size() and j != v:
 			S.ropa[k] = j
@@ -1032,34 +1044,34 @@ func tienda_online() -> void:
 			var m: Dictionary = D.MUEBLES[k]
 			var en: bool = k in ya
 			var pd: bool = not en and S.get("muebles") is Dictionary and float(S.muebles.get(k, 0)) > 0
-			var al := "a casa" if k == "cartel" else "al salón"   # el póster, al dormitorio (1.27)
-			items.append({"label": m.n + (" · en casa" if en else " · pedido" if pd else ""), "right": Datos.eur(m.p), "disabled": en or pd,
-				"desc": m.d + ("" if en else ("\nLlega mañana: te lo suben %s." % al) if pd else ("\nLlega mañana y te lo suben %s." % al))})
+			var al: bool = k == "cartel"   # el póster, al dormitorio (1.27)
+			items.append({"label": I18n.v(String(m.n)) + (T(" · en casa") if en else T(" · pedido") if pd else ""), "right": Datos.eur(m.p), "disabled": en or pd,
+				"desc": I18n.v(String(m.d)) + ("" if en else (T("\nLlega mañana: te lo suben a casa.") if al else T("\nLlega mañana: te lo suben al salón.")) if pd else (T("\nLlega mañana y te lo suben a casa.") if al else T("\nLlega mañana y te lo suben al salón.")))})
 		for k in vs:   # el patinete y la bici (1.13)
 			var v: Dictionary = D.VEHICULOS[k]
 			var d = S.veh.get(k) if S.get("veh") is Dictionary else null
 			var en: bool = d != null and float(d) <= S.day
-			items.append({"label": v.n + (" · tuyo" if en else " · pedido" if d else ""), "right": Datos.eur(v.p), "disabled": d != null and float(d) > 0,
-				"desc": v.d + ("" if en else "\nLlega mañana: te lo dejan en el portal.")})
+			items.append({"label": I18n.v(String(v.n)) + (T(" · tuyo") if en else T(" · pedido") if d else ""), "right": Datos.eur(v.p), "disabled": d != null and float(d) > 0,
+				"desc": I18n.v(String(v.d)) + ("" if en else T("\nLlega mañana: te lo dejan en el portal."))})
 		var AR: Dictionary = D.NEVERA.arcon   # el arcón congelador (1.39): 5 kg más de extractos, en frío
 		var ar = S.nevera.get("arcon") if S.get("nevera") != null else null
-		items.append({"label": AR.n + (" · en casa" if ar == 1 else " · pedido" if ar != null else ""), "right": Datos.eur(AR.p), "disabled": ar != null,
-			"desc": AR.d + ("\nLa nevera de serie: %s." % (Datos.coma(D.NEVERA.g / 1000.0) + " kg") if ar == null else "")})
-		items.append({"label": "Reformas: suelo y paredes", "desc": "El suelo y las paredes del piso: el instalador o el pintor vienen al día siguiente."})   # 1.27
+		items.append({"label": I18n.v(String(AR.n)) + (T(" · en casa") if ar == 1 else T(" · pedido") if ar != null else ""), "right": Datos.eur(AR.p), "disabled": ar != null,
+			"desc": I18n.v(String(AR.d)) + (T("\nLa nevera de serie: {g}.", {"g": Datos.coma(D.NEVERA.g / 1000.0) + " kg"}) if ar == null else "")})
+		items.append({"label": K("Reformas: suelo y paredes"), "desc": K("El suelo y las paredes del piso: el instalador o el pintor vienen al día siguiente.")})   # 1.27
 		if Datos.CAL:   # 1.43.6: el camarote
-			items.append({"label": "El camarote: almacén", "desc": "Habilitar el camarote de arriba como almacén, las estanterías de tarros de cristal de 10 L y los sobres de humedad."})
+			items.append({"label": K("El camarote: almacén"), "desc": K("Habilitar el camarote de arriba como almacén, las estanterías de tarros de cristal de 10 L y los sobres de humedad.")})
 		var SO: Dictionary = D.SOTANO
 		var sot_ok: bool = Datos.CAL and not Datos.PLAY and S.ch >= int(SO.ch)   # 1.51: el sótano de casa, para setas
 		if sot_ok:
 			var sd = S.sot.get("d") if S.get("sot") is Dictionary else null
-			items.append({"label": SO.obra.n + (" · hecho" if sd != null and float(sd) <= S.day else " · mañana" if sd != null else ""), "right": Datos.eur(SO.obra.p), "disabled": sd != null, "desc": SO.obra.d})
-		items.append({"label": "Salir", "desc": "Con tarjeta, de la cuenta del banco."})
-		i = await menu(items, {"cls": "full", "title": "TIENDA ONLINE", "title2": "Muebles y transporte · en la cuenta " + Datos.eur(S.banco), "desc": true, "initial": i})
+			items.append({"label": I18n.v(String(SO.obra.n)) + (T(" · hecho") if sd != null and float(sd) <= S.day else T(" · mañana") if sd != null else ""), "right": Datos.eur(SO.obra.p), "disabled": sd != null, "desc": SO.obra.d})
+		items.append({"label": K("Salir"), "desc": K("Con tarjeta, de la cuenta del banco.")})
+		i = await menu(items, {"cls": "full", "title": K("TIENDA ONLINE"), "title2": T("Muebles y transporte · en la cuenta {e}", {"e": Datos.eur(S.banco)}), "desc": true, "initial": i})
 		if i == ks.size() + vs.size():
-			if ar == null and await tarjeta(AR.p, "Tienda online · " + AR.n):
+			if ar == null and await tarjeta(AR.p, K("Tienda online") + " · " + AR.n):
 				nevera().arcon = -(S.day + 1)   # pedido: el día en que llega, en negativo; 1, en casa
 				sfx("coin")
-				toast("Pedido: " + AR.n + " · llega mañana", 1400)
+				toast(T("Pedido: {n} · llega mañana", {"n": AR.n}), 1400)
 			continue
 		if i == ks.size() + vs.size() + 1:
 			await reformas()
@@ -1068,24 +1080,24 @@ func tienda_online() -> void:
 			await camarote_tienda()
 			continue
 		if sot_ok and i == ks.size() + vs.size() + 3:
-			if not (S.get("sot") is Dictionary) and await tarjeta(SO.obra.p, "Tienda online · " + SO.obra.n):
+			if not (S.get("sot") is Dictionary) and await tarjeta(SO.obra.p, K("Tienda online") + " · " + SO.obra.n):
 				S.sot = {"d": S.day + 1, "bandejas": [], "g": 0, "fr": []}
 				sfx("coin")
-				toast("Pedido: " + SO.obra.n + " · los obreros vienen mañana", 1400)
+				toast(T("Pedido: {n} · los obreros vienen mañana", {"n": SO.obra.n}), 1400)
 			continue
 		if i < 0 or i >= ks.size() + vs.size():
 			return
 		var es_m: bool = i < ks.size()
 		var k: String = ks[i] if es_m else vs[i - ks.size()]
 		var m: Dictionary = D.MUEBLES[k] if es_m else D.VEHICULOS[k]
-		if not await tarjeta(m.p, "Tienda online · " + m.n):   # 1.35: con tarjeta
+		if not await tarjeta(m.p, K("Tienda online") + " · " + m.n):   # 1.35: con tarjeta
 			continue
 		var cl: String = "muebles" if es_m else "veh"
 		if not (S.get(cl) is Dictionary):
 			S[cl] = {}
 		S[cl][k] = S.day + 1
 		sfx("coin")
-		toast("Pedido: " + m.n + " · llega mañana", 1400)
+		toast(T("Pedido: {n} · llega mañana", {"n": m.n}), 1400)
 
 # el camarote (1.43.6, lo pidió el usuario: «habilitar el camarote de arriba… como almacén» con «botes más grandes de cristal con
 # bóvedas de humedad»): la obra, las estanterías de 6 tarros de 10 L (hasta CAMAROTE.est.max) y las cajas de sobres al 62 %; todo
@@ -1103,17 +1115,17 @@ func camarote_tienda() -> void:
 		for q in c.get("sp", []):
 			pend_s += int(q[1])
 		var items := [
-			{"label": CM.obra.n + (" · hecho" if lista else " · mañana" if hecha else ""), "right": Datos.eur(CM.obra.p), "disabled": hecha, "desc": CM.obra.d},
-			{"label": "%s · %d/%d%s" % [CM.est.n, ne, int(CM.est.max), (" · %d mañana" % pend_e) if pend_e else ""], "right": Datos.eur(CM.est.p), "disabled": not hecha or ne >= int(CM.est.max),
-				"desc": (CM.est.d % int(CM.tarro)) + ("" if hecha else "\nAntes hay que habilitar el camarote.")},
-			{"label": CM.sob.n + ((" · quedan %d" % ceili(float(c.get("sob", 0)) - 1e-9)) if float(c.get("sob", 0)) > 0 else "") + ((" · %d mañana" % pend_s) if pend_s else ""), "right": Datos.eur(CM.sob.p), "disabled": not hecha,
-				"desc": (CM.sob.d % int(CM.dura)) + ("\nCon sobres, lo curado se afina en %d días: se vende un %d %% más caro." % [int(CM.af), Datos.jsround(CM.extra * 100)])},
-			{"label": "Volver"}]
-		i = await menu(items, {"cls": "full", "title": "EL CAMAROTE", "title2": "Almacén · en la cuenta " + Datos.eur(S.banco), "desc": true, "initial": i})
+			{"label": I18n.v(String(CM.obra.n)) + (T(" · hecho") if lista else T(" · mañana") if hecha else ""), "right": Datos.eur(CM.obra.p), "disabled": hecha, "desc": CM.obra.d},
+			{"label": "%s · %d/%d%s" % [I18n.v(String(CM.est.n)), ne, int(CM.est.max), T(" · {n} mañana", {"n": pend_e}) if pend_e else ""], "right": Datos.eur(CM.est.p), "disabled": not hecha or ne >= int(CM.est.max),
+				"desc": (CM.est.d % int(CM.tarro)) + ("" if hecha else T("\nAntes hay que habilitar el camarote."))},
+			{"label": I18n.v(String(CM.sob.n)) + (T(" · quedan {n}", {"n": ceili(float(c.get("sob", 0)) - 1e-9)}) if float(c.get("sob", 0)) > 0 else "") + (T(" · {n} mañana", {"n": pend_s}) if pend_s else ""), "right": Datos.eur(CM.sob.p), "disabled": not hecha,
+				"desc": (CM.sob.d % int(CM.dura)) + T("\nCon sobres, lo curado se afina en {d} días: se vende un {p} % más caro.", {"d": int(CM.af), "p": Datos.jsround(CM.extra * 100)})},
+			{"label": K("Volver")}]
+		i = await menu(items, {"cls": "full", "title": K("EL CAMAROTE"), "title2": T("Almacén · en la cuenta {e}", {"e": Datos.eur(S.banco)}), "desc": true, "initial": i})
 		if i < 0 or i > 2:
 			return
 		var art: Dictionary = [CM.obra, CM.est, CM.sob][i]
-		if not await tarjeta(art.p, "Tienda online · " + art.n):
+		if not await tarjeta(art.p, K("Tienda online") + " · " + art.n):
 			continue
 		if not (S.get("cam") is Dictionary):
 			S.cam = {"e": [], "sob": 0.0, "sp": [], "buds": {}}
@@ -1124,22 +1136,22 @@ func camarote_tienda() -> void:
 		else:
 			S.cam.sp.append([S.day + 1, int(CM.sob.u)])
 		sfx("coin")
-		toast("Pedido: " + art.n + " · " + ("los obreros vienen mañana" if i == 0 else "llega mañana"), 1400)
+		toast(T("Pedido: {n} · los obreros vienen mañana", {"n": art.n}) if i == 0 else T("Pedido: {n} · llega mañana", {"n": art.n}), 1400)
 
 func llega_camarote() -> void:
 	if not Datos.CAL or not (S.get("cam") is Dictionary):
 		return
 	var av := []
 	if S.cam.has("d") and int(S.cam.d) == S.day:
-		av.append("Los obreros acaban el camarote: aislado, con pladur, tarima, luz y deshumidificador. Se sube por la escalera escamoteable de entre las carpas.")
+		av.append(K("Los obreros acaban el camarote: aislado, con pladur, tarima, luz y deshumidificador. Se sube por la escalera escamoteable de entre las carpas."))
 	var ne: int = S.cam.e.filter(func(d): return int(d) == S.day).size()
 	if ne:
-		av.append("Llega%s %s: te %s suben al camarote. Caben ahora %s kg." % ["" if ne == 1 else "n", "la estantería de tarros de 10 L" if ne == 1 else "%d estanterías de tarros de 10 L" % ne, "la" if ne == 1 else "las", Datos.coma(cam_cap() / 1000.0)])
+		av.append(T("Llega la estantería de tarros de 10 L: te la suben al camarote. Caben ahora {kg} kg.", {"kg": Datos.coma(cam_cap() / 1000.0)}) if ne == 1 else T("Llegan {n} estanterías de tarros de 10 L: te las suben al camarote. Caben ahora {kg} kg.", {"n": ne, "kg": Datos.coma(cam_cap() / 1000.0)}))
 	var quedan := []
 	for q in S.cam.sp:
 		if int(q[0]) <= S.day:
 			S.cam.sob = float(S.cam.get("sob", 0)) + int(q[1])
-			av.append("Llegan los sobres de humedad al 62 %%: uno en cada tarro del camarote (quedan %d)." % ceili(S.cam.sob - 1e-9))
+			av.append(T("Llegan los sobres de humedad al 62 %: uno en cada tarro del camarote (quedan {n}).", {"n": ceili(S.cam.sob - 1e-9)}))
 		else:
 			quedan.append(q)
 	S.cam.sp = quedan
@@ -1153,13 +1165,13 @@ func llega_camarote() -> void:
 func llega_mueble() -> void:
 	llega_camarote()   # 1.43.6
 	if Datos.CAL and S.get("sot") is Dictionary and int(S.sot.get("d", -1)) == S.day:   # 1.51: el sótano
-		var L := ["Los obreros acaban el sótano: sin trastos, impermeabilizado, con luz, desagüe y tres estanterías de rejilla. Se baja por la puerta del dormitorio. Las bandejas te las prepara Txomin."]
+		var L := [K("Los obreros acaban el sótano: sin trastos, impermeabilizado, con luz, desagüe y tres estanterías de rejilla. Se baja por la puerta del dormitorio. Las bandejas te las prepara Txomin.")]
 		queue("sotano", func():
 			sfx("get")
 			await say(L[0]), [["", L]])
 	if S.get("nevera") != null and S.nevera.get("arcon") != null and S.nevera.arcon != 1 and -int(S.nevera.arcon) <= S.day:   # el arcón (1.39)
 		S.nevera.arcon = 1
-		var L := ["Llega el mensajero con el arcón congelador: te lo dejan enchufado al lado de la nevera. En frío caben ahora %s." % (Datos.coma(nevera_cap() / 1000.0) + " kg")]
+		var L := [T("Llega el mensajero con el arcón congelador: te lo dejan enchufado al lado de la nevera. En frío caben ahora {kg}.", {"kg": Datos.coma(nevera_cap() / 1000.0) + " kg"})]
 		queue("arcon", func():
 			sfx("get")
 			await say(L[0]), [["", L]])
@@ -1177,14 +1189,14 @@ func llega_mueble() -> void:
 			sfx("get")
 			for k in ob:
 				var R: Dictionary = D.REFORMA[k]
-				await say("%s viene a primera hora: %s, %s." % [R.quien, R.nuevo, String(R.v[deco_v(k)][0]).to_lower()]))
+				await say(T("{q} viene a primera hora: {n}, {v}.", {"q": R.quien, "n": R.nuevo, "v": I18n.v(String(R.v[deco_v(k)][0])).to_lower()})))
 	var vs := []   # el patinete y la bici (1.13)
 	if S.get("veh") is Dictionary:
 		for k in D.VEHICULOS:
 			if S.veh.get(k) == S.day:
 				vs.append(D.VEHICULOS[k].art)
 	if vs.size():
-		var L := ["Llega el mensajero con %s. En la calle vas montado; con B, aún más rápido." % _lista(vs)]
+		var L := [T("Llega el mensajero con {l}. En la calle vas montado; con B, aún más rápido.", {"l": _lista(vs)})]
 		queue("vehiculo", func():
 			sfx("get")
 			await say(L[0]), [["", L]])
@@ -1222,9 +1234,9 @@ func llega_mueble() -> void:
 	queue("mueble", func():
 		sfx("get")
 		if on.size():
-			await say("Llega el mensajero con %s: te lo dejan montado en %s." % [_lista(on), "casa" if D.MUEBLES.cartel.art in on else "el salón"])   # el póster, en el dormitorio (1.27)
+			await say(T("Llega el mensajero con {l}: te lo dejan montado en casa.", {"l": _lista(on)}) if D.MUEBLES.cartel.art in on else T("Llega el mensajero con {l}: te lo dejan montado en el salón.", {"l": _lista(on)}))   # el póster, en el dormitorio (1.27)
 		if gr.size():
-			await say("Kiko te sube %s y te lo deja montado delante de las carpas." % _lista(gr)))
+			await say(T("Kiko te sube {l} y te lo deja montado delante de las carpas.", {"l": _lista(gr)})))
 
 # el carro de esquejes (1.11, carroAction): en la tabla de corte, los del propagador se pinchan en las bandejas, donde aguantan
 # CARRO.dias desde ese día; se plantan desde la plaza vacía (plantar)
@@ -1244,18 +1256,18 @@ func carro_action() -> void:
 			sel = mini(sel, maxi(0, S.bandejas.size()))
 			continue
 		if S.esquejes.is_empty():
-			await say("Taco vacío. Saca esquejes de una madre en vegetativo y pínchalos aquí.")
+			await say(K("Taco vacío. Saca esquejes de una madre en vegetativo y pínchalos aquí."))
 			continue
 		var m: int = mini(cap - nb, S.esquejes.size())
 		for e in S.esquejes.slice(0, m):
 			S.bandejas.append({"sid": e.sid, "f": e.f, "dia": S.day})
 		S.esquejes = S.esquejes.slice(m)
 		sfx("sel")
-		await say("En la tabla de corte, corte en bisel y hormona: %s." % (("pinchas %d esquejes" % m) if m > 1 else "pinchas 1 esqueje"))
-		await say("En las bandejas aguantan hasta el %s: plántalos cuando haya hueco." % Datos.fd(S.day + D.CARRO.dias, S.day))
+		await say(T("En la tabla de corte, corte en bisel y hormona: pinchas {n} esquejes.", {"n": m}) if m > 1 else T("En la tabla de corte, corte en bisel y hormona: pinchas 1 esqueje."))
+		await say(T("En las bandejas aguantan hasta el {d}: plántalos cuando haya hueco.", {"d": Datos.fd(S.day + D.CARRO.dias, S.day)}))
 		var r: int = S.esquejes.size()
 		if r:
-			await say(("No caben %d: se quedan en el propagador." % r) if r > 1 else "No cabe 1: se queda en el propagador.")
+			await say(T("No caben {n}: se quedan en el propagador.", {"n": r}) if r > 1 else K("No cabe 1: se queda en el propagador."))
 		sel = mini(S.bandejas.size(), cap - 1)
 
 # la vista del carro (en trama.gd): el taco elegido (0-23: la bandeja de arriba, 0-11, y la de abajo, 12-23) o null
@@ -1274,18 +1286,18 @@ func banco_semillas() -> void:
 		for b in l:
 			var s: Dictionary = D.STRAINS[b[0]]
 			var np: int = S.pedido.count(b[0])
-			items.append({"label": s.n + (" · pedida" if np else ""), "right": Datos.eur(b[1]), "sw": s.c, "ic": ic_cog(b[0]), "desc": strain_line(b[0]) + "\n" + s.h})
-		items.append({"label": "Salir", "desc": "Los pedidos llegan mañana por la mañana."})
-		i = await menu(items, {"cls": "full", "title": "BANCO DE SEMILLAS", "title2": "Sobres de %s · en la cuenta %s" % [n(D.SOBRE), Datos.eur(S.banco)], "desc": true, "initial": i})
+			items.append({"label": s.n + (T(" · pedida") if np else ""), "right": Datos.eur(b[1]), "sw": s.c, "ic": ic_cog(b[0]), "desc": strain_line(b[0]) + "\n" + I18n.v(String(s.h))})
+		items.append({"label": K("Salir"), "desc": K("Los pedidos llegan mañana por la mañana.")})
+		i = await menu(items, {"cls": "full", "title": K("BANCO DE SEMILLAS"), "title2": T("Sobres de {n} · en la cuenta {e}", {"n": n(D.SOBRE), "e": Datos.eur(S.banco)}), "desc": true, "initial": i})
 		if i < 0 or i >= l.size():
 			return
 		var k: String = l[i][0]
 		var pr := int(l[i][1])
-		if not await tarjeta(pr, "Banco de semillas"):   # 1.35: con tarjeta
+		if not await tarjeta(pr, K("Banco de semillas")):   # 1.35: con tarjeta
 			continue
 		S.pedido.append(k)
 		sfx("coin")
-		toast("Pedido: " + D.STRAINS[k].n + " · llega mañana", 1400)
+		toast(T("Pedido: {n} · llega mañana", {"n": D.STRAINS[k].n}), 1400)
 
 func recibir_pedido() -> void:
 	if S.pedido.is_empty():
@@ -1299,7 +1311,7 @@ func recibir_pedido() -> void:
 		S.seeds[k] = S.seeds.get(k, 0) + c[k]
 		discover(k)
 		nl.append("%s ×%d" % [D.STRAINS[k].n, c[k]])
-	var L := ["Llega el paquete del banco de semillas:\n%s semillas." % ", ".join(nl)]
+	var L := [T("Llega el paquete del banco de semillas:\n{l} semillas.", {"l": ", ".join(nl)})]
 	queue("pedido", func():
 		sfx("get")
 		await say(L[0])
@@ -1307,11 +1319,11 @@ func recibir_pedido() -> void:
 
 func letter_action():
 	if S.flags.get("letter"):
-		await say("La carta de la tía Maite. «Cuida el armario. Y perdona lo de Baltasar.»")
+		await say(K("La carta de la tía Maite. «Cuida el armario. Y perdona lo de Baltasar.»"))
 		return
-	await say("Hay una carta encima de la mesa. Es de la tía Maite.")
-	await talk("CARTA", ["«{N}: si lees esto, el piso es tuyo. Cuídalo.»", "«Al fondo del salón está mi armario de cultivo. Lo he tenido treinta años y nunca me ha fallado.»",
-		"«Pásate por el growshop de Kiko, aquí al lado. Él te enseñará lo que yo no pude.»", "«Le debo dinero a Baltasar, el del bar El Ancla. No es buena gente. Lo siento.»"])
+	await say(K("Hay una carta encima de la mesa. Es de la tía Maite."))
+	await talk(K("CARTA"), [K("«{N}: si lees esto, el piso es tuyo. Cuídalo.»"), K("«Al fondo del salón está mi armario de cultivo. Lo he tenido treinta años y nunca me ha fallado.»"),
+		K("«Pásate por el growshop de Kiko, aquí al lado. Él te enseñará lo que yo no pude.»"), K("«Le debo dinero a Baltasar, el del bar El Ancla. No es buena gente. Lo siento.»")])
 	S.flags.letter = true
 	show_objective()
 
@@ -1353,18 +1365,18 @@ func parada_action():
 	var pa: Dictionary = D.PARADAS[aqui]
 	var mios := coches_mios()   # 1.43: con un vehículo del concesionario, a dónde quieras y a cualquier hora
 	if mios.size() and not llegando():
-		var ops: Array = ["En autobús"]
+		var ops: Array = [K("En autobús")]
 		for k in mios:
-			ops.append("En " + String(D.CONCE.v[k].art))
-		ops.append("Nada")
-		var c: int = await ask("PARADA DE %s\n¿Cómo vas?" % String(pa.n).to_upper(), ops)
+			ops.append(T("En {v}", {"v": String(D.CONCE.v[k].art)}))
+		ops.append(K("Nada"))
+		var c: int = await ask(T("PARADA DE {p}\n¿Cómo vas?", {"p": I18n.v(String(pa.n)).to_upper()}), ops)
 		if c < 0 or c > mios.size():
 			return
 		if c > 0:
 			await conducir(mios[c - 1])
 			return
 	if S.min < int(D.BUS_HORAS[0]) or S.min > int(D.BUS_HORAS[1]):   # fuera de horario: se puede esperar al primero (el reloj corre hasta las 7:00)
-		if await ask("PARADA DE %s\nEl primer autobús pasa a las 7:00 y el último, a las 21:00." % String(pa.n).to_upper(), ["Esperar al de las 7:00", "Nada"]) != 0:
+		if await ask(T("PARADA DE {p}\nEl primer autobús pasa a las 7:00 y el último, a las 21:00.", {"p": I18n.v(String(pa.n)).to_upper()}), [K("Esperar al de las 7:00"), K("Nada")]) != 0:
 			return
 		await fade(1)
 		advance_time((int(D.BUS_HORAS[0]) - int(S.min) + 1440) % 1440)
@@ -1372,7 +1384,7 @@ func parada_action():
 		update_hud()
 		await wait(300)
 		await fade(0)
-		await say("Las siete. Llega el primer autobús, medio vacío.")
+		await say(K("Las siete. Llega el primer autobús, medio vacío."))
 	var ama := llegando()
 	var ds := []
 	if ama:
@@ -1384,16 +1396,16 @@ func parada_action():
 	var it := []
 	for k in ds:
 		var v := viaje(aqui, k)
-		it.append({"label": D.PARADAS[k].n, "right": "billete de ama" if ama else "%s · %d min" % [Datos.eur(v.eur), v.min]})
-	it.append({"label": "Nada"})
-	var i: int = await menu(it, {"cls": "right", "title": "¿A dónde vas?"})
+		it.append({"label": D.PARADAS[k].n, "right": K("billete de ama") if ama else T("{e} · {m} min", {"e": Datos.eur(v.eur), "m": int(v.min)})})
+	it.append({"label": K("Nada")})
+	var i: int = await menu(it, {"cls": "right", "title": K("¿A dónde vas?")})
 	if i < 0 or i >= ds.size():
 		return
 	var k: String = ds[i]
 	var v := viaje(aqui, k)
 	if not ama:
 		if S.money < v.eur:
-			await say("El billete hasta %s cuesta %s. No te llega." % [D.PARADAS[k].n, Datos.eur(v.eur)])
+			await say(T("El billete hasta {d} cuesta {e}. No te llega.", {"d": D.PARADAS[k].n, "e": Datos.eur(v.eur)}))
 			return
 		S.money -= v.eur
 	sfx("door")
@@ -1409,7 +1421,7 @@ func parada_action():
 	await fade(0)
 	if ama:
 		S.flags.llegada = true
-		await say("Ribera Verde. El piso de la tía es el del tejado rojo, al otro lado de la calle.")
+		await say(K("Ribera Verde. El piso de la tía es el del tejado rojo, al otro lado de la calle."))
 		show_objective()
 
 # ---------- mesa de genética ----------
@@ -1424,14 +1436,14 @@ func _mk(l: Array) -> Array:
 func lab_action():
 	var L := extr_ya()
 	if not L.is_empty():
-		var c: int = await ask("La mesa de la tía. ¿Qué haces?", L.map(func(t): return D.EXTR[t].v) + ["Cruzar semillas", "Nada"])
+		var c: int = await ask(K("La mesa de la tía. ¿Qué haces?"), L.map(func(t): return D.EXTR[t].v) + [K("Cruzar semillas"), K("Nada")])
 		if c >= 0 and c < L.size():
 			await extraer(L[c])
 			return
 		if c != L.size():
 			return
 	if not S.flags.get("lab"):
-		await say("Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto.")
+		await say(K("Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto."))
 		return
 	var GE := int(D.GEN_ESTABLE)
 	var hay := false
@@ -1439,10 +1451,10 @@ func lab_action():
 		if e[1] >= 2 and Cultivo.gen_de(S, e[0]) < GE:
 			hay = true
 	if _own().size() < 2 and not hay:
-		await say("MESA DE GENÉTICA: necesitas semillas de dos variedades distintas para cruzar, o 2 de una línea sin estabilizar.")
+		await say(K("MESA DE GENÉTICA: necesitas semillas de dos variedades distintas para cruzar, o 2 de una línea sin estabilizar."))
 		return
 	var l1 := _own()
-	var a: int = await menu(_mk(l1), {"cls": "full", "title": "CRUCE · MADRE", "desc": true})
+	var a: int = await menu(_mk(l1), {"cls": "full", "title": K("CRUCE · MADRE"), "desc": true})
 	if a < 0:
 		return
 	var A: String = l1[a][0]
@@ -1450,19 +1462,19 @@ func lab_action():
 	var ga := Cultivo.gen_de(S, A)
 	var it2 := _mk(l2)
 	if ga < GE and S.seeds[A] >= 2:
-		it2.push_front({"label": "%s · estabilizar" % strain(A).n, "right": "F%d→%s" % [ga, ("F%d" % (ga + 1)) if ga + 1 < GE else "estable"], "sw": strain(A).c, "ic": ic_cog(A),
-			"desc": "Cruzas dos plantas de la misma línea y guardas la mejor semilla. Gastas 2 y te quedas 1.\nEn la F%d la variedad queda fijada: todas sus plantas salen iguales." % GE})
+		it2.push_front({"label": T("{s} · estabilizar", {"s": strain(A).n}), "right": T("F{a}→{b}", {"a": ga, "b": ("F%d" % (ga + 1)) if ga + 1 < GE else K("estable")}), "sw": strain(A).c, "ic": ic_cog(A),
+			"desc": T("Cruzas dos plantas de la misma línea y guardas la mejor semilla. Gastas 2 y te quedas 1.\nEn la F{g} la variedad queda fijada: todas sus plantas salen iguales.", {"g": GE})})
 	if it2.is_empty():
-		await say("Para cruzar %s necesitas semillas de otra variedad." % strain(A).n)
+		await say(T("Para cruzar {s} necesitas semillas de otra variedad.", {"s": strain(A).n}))
 		return
-	var b: int = await menu(it2, {"cls": "full", "title": "CRUCE · PADRE", "title2": strain(A).n, "desc": true})
+	var b: int = await menu(it2, {"cls": "full", "title": K("CRUCE · PADRE"), "title2": strain(A).n, "desc": true})
 	if b < 0:
 		return
 	if it2.size() > l2.size() and b == 0:
 		await estabilizar(A)
 		return
 	var Bk: String = l2[b - (it2.size() - l2.size())][0]
-	if await ask("¿Cruzar %s × %s? Gastas 1 semilla de cada." % [strain(A).n, strain(Bk).n], ["Cruzar", "Cancelar"]) != 0:
+	if await ask(T("¿Cruzar {a} × {b}? Gastas 1 semilla de cada.", {"a": strain(A).n, "b": strain(Bk).n}), [K("Cruzar"), K("Cancelar")]) != 0:
 		return
 	S.seeds[A] -= 1
 	S.seeds[Bk] -= 1
@@ -1484,13 +1496,13 @@ func lab_action():
 	add_seeds(r, 2)
 	if is_new:
 		sfx("get")
-		await say("Nueva variedad: %s." % s.n)
-		await say("THC %s%% · ~%d g/m² · %s días.\nObtienes 2 semillas F1: la línea aún no es estable." % [Datos.pct(s.thc), gm2(s), Datos.coma(s.d)])
+		await say(T("Nueva variedad: {s}.", {"s": s.n}))
+		await say(T("THC {t}% · ~{g} g/m² · {d} días.\nObtienes 2 semillas F1: la línea aún no es estable.", {"t": Datos.pct(s.thc), "g": int(gm2(s)), "d": Datos.coma(s.d)}))
 		if r == "leyenda":
-			await say("Te tiemblan las manos: es JACK HERER.")
-			await talk("SMS · KIKO", ["¿Jack Herer? ¿De semilla propia? Llevo veinte años detrás de ella.", "Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso."])
+			await say(K("Te tiemblan las manos: es JACK HERER."))
+			await talk(K("SMS · KIKO"), [K("¿Jack Herer? ¿De semilla propia? Llevo veinte años detrás de ella."), K("Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.")])
 	else:
-		await say("Obtienes 2 semillas de %s." % s.n)
+		await say(T("Obtienes 2 semillas de {s}.", {"s": s.n}))
 	await check_story()
 
 # ---------- vista de carpa (09b-carpa) ----------
@@ -1534,32 +1546,32 @@ func vc_ficha() -> void:
 	var L := []
 	if VC.sel == Vista.SEL_TEMP:
 		var k := Cultivo.ciclo_de(c)
-		L.append("Temporizador")
-		L.append(D.CICLOS[k].n + " · " + D.CICLOS[k].c)
-		L.append(("Luz " + Datos.eur(luz_carpa(VC.ci)) + " al día") if plantas_vivas(VC.ci) else "Apagado")
+		L.append(T("Temporizador"))
+		L.append(T("{n} · {c}", {"n": D.CICLOS[k].n, "c": D.CICLOS[k].c}))
+		L.append(T("Luz {e} al día", {"e": Datos.eur(luz_carpa(VC.ci))}) if plantas_vivas(VC.ci) else T("Apagado"))
 	elif VC.sel < 0:
-		L.append(D.FOCOS[c.foco].n)
-		L.append(("Luz " + Datos.eur(luz_carpa(VC.ci)) + " al día") if plantas_vivas(VC.ci) else "Apagado")
+		L.append(I18n.v(String(D.FOCOS[c.foco].n)))
+		L.append(T("Luz {e} al día", {"e": Datos.eur(luz_carpa(VC.ci))}) if plantas_vivas(VC.ci) else T("Apagado"))
 		for k in D.EXTRAS:
 			if c.get(k):
-				L.append(D.EXTRAS[k].c)
+				L.append(I18n.v(String(D.EXTRAS[k].c)))
 	else:
 		var i: int = VC.sel
 		var p = S.pots[i]
-		L.append("Plaza %d · %s L" % [huecos()[i].j + 1, n(D.MACETAS[S.macetas[i]].l)])
+		L.append(T("Plaza {p} · {l} L", {"p": huecos()[i].j + 1, "l": n(D.MACETAS[S.macetas[i]].l)}))
 		if p == null:
-			L.append("Vacía")
+			L.append(T("Vacía"))
 		else:
 			L.append(strain(p.sid).n + etiq(p.get("f")))
 			if p.get("dead"):
-				L.append("Seca")
+				L.append(T("Seca"))
 			else:
-				L.append("Cosecha lista" if p.prog >= 1 else "%s %d %%" % [stage_name(p), int(floor(p.prog * 100))])
-				L.append("Agua %d %%" % Datos.jsround(p.water))
-				L.append("Salud %d %%" % Datos.jsround(p.health))
+				L.append(T("Cosecha lista") if p.prog >= 1 else T("{s} {p} %", {"s": stage_name(p), "p": int(floor(p.prog * 100))}))
+				L.append(T("Agua {p} %", {"p": Datos.jsround(p.water)}))
+				L.append(T("Salud {p} %", {"p": Datos.jsround(p.health)}))
 			if p.pest and not p.get("dead"):
-				L.append("!PLAGA")
-	var t: String = D.CARPAS[c.t].n
+				L.append("!" + T("PLAGA"))
+	var t: String = I18n.v(String(D.CARPAS[c.t].n))
 	vc_texto = t
 	for l in L:
 		vc_texto += l.substr(1) if l.begins_with("!") else l
@@ -1630,7 +1642,7 @@ func abrir_carpa(ci):
 	await fade(0)
 	if not S.flags.get("vista"):
 		S.flags.vista = true
-		toast("◀ ▶ ▲ ▼ eliges planta, foco o reloj · A la cuidas · B sales", 2800)
+		toast(K("◀ ▶ ▲ ▼ eliges planta, foco o reloj · A la cuidas · B sales"), 2800)
 	var pr := Motor.Prom.new()
 	push(func(b: String):
 		if VC.ocupado:
@@ -1705,7 +1717,7 @@ func tarjeta(e: float, t: String) -> bool:
 	if cobro_banco(e, t):
 		return true
 	sfx("bad")
-	await say("La tarjeta no pasa: en la cuenta tienes %s. Ingresa efectivo en un cajero." % Datos.eur(S.banco))
+	await say(T("La tarjeta no pasa: en la cuenta tienes {e}. Ingresa efectivo en un cajero.", {"e": Datos.eur(S.banco)}))
 	return false
 
 func sacado() -> float:
@@ -1724,44 +1736,44 @@ func cantidad(t: String, mx: int) -> int:
 	var ops := []
 	for x in v:
 		ops.append(Datos.eur(x))
-	ops.append("Nada")
+	ops.append(K("Nada"))
 	var i: int = await ask(t, ops)
 	return v[i] if i >= 0 and i < v.size() else 0
 
 func cajero() -> void:
 	await acceso("pin", cifras_acceso("pin"))   # 1.53: la tarjeta y el PIN
 	while true:
-		var ops := ["Sacar", "Ingresar", "Movimientos", "Salir"]
-		var oi: int = await ask("CAJERO · en la cuenta tienes %s." % Datos.eur(S.banco), ops)
+		var ops := [K("Sacar"), K("Ingresar"), K("Movimientos"), K("Salir")]
+		var oi: int = await ask(T("CAJERO · en la cuenta tienes {e}.", {"e": Datos.eur(S.banco)}), ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "Sacar":
 			var mx := int(floorf(minf(S.banco, D.CUENTA.sacar - sacado())))
 			if mx < 1:
 				sfx("bad")
-				await say("No hay saldo." if S.banco < 1 else "Hoy ya has sacado %s: es el tope del cajero." % Datos.eur(sacado()))
+				await say(K("No hay saldo.") if S.banco < 1 else T("Hoy ya has sacado {e}: es el tope del cajero.", {"e": Datos.eur(sacado())}))
 				continue
-			var e: int = await cantidad("¿Cuánto sacas? Hoy, hasta %s." % Datos.eur(mx), mx)
+			var e: int = await cantidad(T("¿Cuánto sacas? Hoy, hasta {e}.", {"e": Datos.eur(mx)}), mx)
 			if not e:
 				continue
 			S.saca = {"d": S.day, "e": sacado() + e}
 			S.banco -= e
 			S.money += e
-			movimiento("Cajero", -e)
+			movimiento(K("Cajero"), -e)
 			sfx("coin")
 			update_hud()
 		elif op == "Ingresar":
 			var mx := int(floorf(minf(S.money, D.CUENTA.ingreso - ingresado())))
 			if mx < 1:
 				sfx("bad")
-				await say("No llevas efectivo." if S.money < 1 else "Hoy ya has ingresado %s. Más, y el banco pregunta de dónde sale." % Datos.eur(ingresado()))
+				await say(K("No llevas efectivo.") if S.money < 1 else T("Hoy ya has ingresado {e}. Más, y el banco pregunta de dónde sale.", {"e": Datos.eur(ingresado())}))
 				continue
-			var e: int = await cantidad("¿Cuánto ingresas? Sin preguntas, hasta %s al día." % Datos.eur(D.CUENTA.ingreso), mx)
+			var e: int = await cantidad(T("¿Cuánto ingresas? Sin preguntas, hasta {e} al día.", {"e": Datos.eur(D.CUENTA.ingreso)}), mx)
 			if not e:
 				continue
 			S.ingr = {"d": S.day, "e": ingresado() + e}
 			S.money -= e
 			S.banco += e
-			movimiento("Ingreso en efectivo", e)
+			movimiento(K("Ingreso en efectivo"), e)
 			sfx("coin")
 			update_hud()
 		elif op == "Movimientos":
@@ -1779,47 +1791,56 @@ func recibo_setas() -> float:
 func recibos() -> Array:
 	var r := []
 	if S.get("nave") != null and not S.nave.get("mia"):
-		r.append(["Nave de Valdehierro", S.nave.r, recibo_nave(), "efectivo", r.size()])
+		r.append([K("Nave de Valdehierro"), S.nave.r, recibo_nave(), "efectivo", r.size()])
 	if S.get("setas") != null:
-		r.append(["Bajo de la Kale Zaharra", S.setas.r, recibo_setas(), "efectivo", r.size()])
+		r.append([K("Bajo de la Kale Zaharra"), S.setas.r, recibo_setas(), "efectivo", r.size()])
 	for k in S.loc:
 		r.append([D.LOCALES[k].n, S.loc[k].r, D.LOCALES[k].sem, "cuenta", r.size()])
 	for k in D.CONCE.orden:   # 1.43.2: el seguro y el impuesto de circulación de cada vehículo, domiciliados, cada año
 		if S.get("coches") is Dictionary and S.coches.has(k):
 			if S.coches[k].get("r") != null:
-				r.append(["Seguro · " + String(D.CONCE.v[k].n), S.coches[k].r, seguro_anio(k), "cuenta", r.size()])
+				r.append([K("Seguro") + " · " + String(D.CONCE.v[k].n), S.coches[k].r, seguro_anio(k), "cuenta", r.size()])
 			if S.coches[k].get("iv") != null:
-				r.append(["Impuesto de circulación · " + String(D.CONCE.v[k].n), S.coches[k].iv, D.CONCE.v[k].ivtm, "cuenta", r.size()])
+				r.append([K("Impuesto de circulación") + " · " + String(D.CONCE.v[k].n), S.coches[k].iv, D.CONCE.v[k].ivtm, "cuenta", r.size()])
 	if S.protect and S.get("protHasta"):
-		r.append(["Sargento Molina", S.protHasta + 1, D.SOBORNO, "mano", r.size()])
+		r.append([K("Sargento Molina"), S.protHasta + 1, D.SOBORNO, "mano", r.size()])
 	r.sort_custom(func(a, b): return a[1] < b[1] or a[1] == b[1] and a[4] < b[4])   # estable, como sort de JS
 	return r
 
-const COMO := {"cuenta": "de la cuenta", "efectivo": "en efectivo", "mano": "en mano, en la comisaría"}
+func como(k: String) -> String:
+	return {"cuenta": K("de la cuenta"), "efectivo": K("en efectivo"), "mano": K("en mano, en la comisaría")}[k]
+
+# F7: un rótulo guardado en partes «A · B» (los movimientos y los recibos): cada parte, en su idioma
+static func tr_partes(t: String) -> String:
+	var p := t.split(" · ")
+	for j in p.size():
+		p[j] = I18n.v(p[j])
+	return " · ".join(p)
 
 func banca() -> void:
 	var it := []
 	for r in recibos():
-		it.append({"label": "Recibo · " + r[0], "right": Datos.eur(r[2]), "desc": "El %s, %s." % [Datos.fd(r[1], S.day), COMO[r[3]]]})
+		it.append({"label": T("Recibo · {r}", {"r": tr_partes(r[0])}), "right": Datos.eur(r[2]), "desc": T("El {d}, {c}.", {"d": Datos.fd(r[1], S.day), "c": como(r[3])})})
 	for m in S.mov:
-		it.append({"label": m.t, "right": ("−" if m.e < 0 else "+") + Datos.eur(absf(m.e)), "desc": mayus(Datos.fd_larga(m.d)) + "."})
-	it.append({"label": "Salir", "desc": "Ingresos en efectivo: hasta %s al día sin preguntas (hoy, %s)." % [Datos.eur(D.CUENTA.ingreso), Datos.eur(ingresado())]})
-	await menu(it, {"cls": "full", "title": "BANCA", "title2": "Saldo " + Datos.eur(S.banco), "desc": true})
+		it.append({"label": tr_partes(m.t), "right": ("−" if m.e < 0 else "+") + Datos.eur(absf(m.e)), "desc": mayus(Datos.fd_larga(m.d)) + "."})
+	it.append({"label": K("Salir"), "desc": T("Ingresos en efectivo: hasta {e} al día sin preguntas (hoy, {h}).", {"e": Datos.eur(D.CUENTA.ingreso), "h": Datos.eur(ingresado())})})
+	await menu(it, {"cls": "full", "title": K("BANCA"), "title2": T("Saldo {e}", {"e": Datos.eur(S.banco)}), "desc": true})
 
 # un recibo (o.r, el día): el aviso, el cobro (en efectivo, de lo que llevas y de la caja; o domiciliado) y la gracia; false si se pierde
 func cobra(o: Dictionary, e: float, quien: String, banco: bool, t: String, per := 0, f := "r") -> bool:
-	var N := "SMS · " + quien
+	var N := K("SMS · ") + quien
 	if S.day == o[f] - D.RECIBO.aviso:
-		var tx: String = ("El %s se carga el recibo de %s: %s. Saldo: %s." % [Datos.fd(o[f], S.day), t, Datos.eur(e), Datos.eur(S.banco)]) if banco else ("El %s paso a cobrar: %s, en efectivo. Tenlo preparado." % [Datos.fd(o[f], S.day), Datos.eur(e)])
+		var tx: String = T("El {d} se carga el recibo de {t}: {e}. Saldo: {s}.", {"d": Datos.fd(o[f], S.day), "t": tr_partes(t), "e": Datos.eur(e), "s": Datos.eur(S.banco)}) if banco else T("El {d} paso a cobrar: {e}, en efectivo. Tenlo preparado.", {"d": Datos.fd(o[f], S.day), "e": Datos.eur(e)})
 		queue("av" + t, func(): await talk(N, [tx]), [[N, [tx]]])
 	if S.day < o[f]:
 		return true
-	var ok: bool = cobro_banco(e, "Recibo · " + t) if banco else (S.money + caja_e() >= e and pagar_casa(e) == 0)
+	var ok: bool = cobro_banco(e, K("Recibo") + " · " + t) if banco else (S.money + caja_e() >= e and pagar_casa(e) == 0)
 	if ok:
 		o[f] += per if per else int(D.RECIBO.dias)   # 1.43.2: el seguro y el impuesto, cada año (per; f, el campo de la fecha)
 		return true
 	if S.day < o[f] + (D.RECIBO.graciaB if banco else D.RECIBO.gracia):
-		var tx: String = ("Recibo de %s devuelto: %s. Si el %s no hay saldo, %s." % [t, Datos.eur(e), Datos.fd(o[f] + D.RECIBO.graciaB, S.day), "se cobra por apremio, con recargo" if f == "iv" else "se rescinde el contrato"]) if banco else "He pasado a cobrar y no había nada. Vuelvo mañana; como no esté, cambio la cerradura."
+		var hr := {"t": tr_partes(t), "e": Datos.eur(e), "d": Datos.fd(o[f] + D.RECIBO.graciaB, S.day)}
+		var tx: String = (T("Recibo de {t} devuelto: {e}. Si el {d} no hay saldo, se cobra por apremio, con recargo.", hr) if f == "iv" else T("Recibo de {t} devuelto: {e}. Si el {d} no hay saldo, se rescinde el contrato.", hr)) if banco else K("He pasado a cobrar y no había nada. Vuelvo mañana; como no esté, cambio la cerradura.")
 		queue("dv" + t, func(): await talk(N, [tx]), [[N, [tx]]])
 		return true
 	return false
@@ -1834,21 +1855,21 @@ func recibos_dia() -> void:
 			o.ay = v
 			o.vt = int(o.vt) + v
 			if v > 0:
-				abono_banco(v, "Ventas · " + L.n)
+				abono_banco(v, K("Ventas") + " · " + L.n)
 			o.cu = maxi(0, int(o.cu) - int(D.NEGOCIO.cu[1]))
 			o.st = maxi(0, int(o.st) - 1)
 		if o.caja > 0:   # lo de ayer, ya limpio
 			var nt: int = roundi(o.caja * (1 - L.com))
-			abono_banco(nt, "Ingresos · " + L.n)
+			abono_banco(nt, K("Ingresos") + " · " + L.n)
 			o.tot += nt
 			o.caja = 0
-		if not cobra(o, L.sem, "BANCO", true, L.n):
+		if not cobra(o, L.sem, K("BANCO"), true, L.n):
 			S.loc.erase(k)
-			var tx: String = "Contrato de %s rescindido por impago. La fianza no se devuelve." % L.n
-			queue("loc" + k, func(): await talk("SMS · BANCO", [tx]), [["SMS · BANCO", [tx]]])
+			var tx: String = T("Contrato de {n} rescindido por impago. La fianza no se devuelve.", {"n": L.n})
+			queue("loc" + k, func(): await talk(K("SMS · BANCO"), [tx]), [[K("SMS · BANCO"), [tx]]])
 	if S.protect and S.protHasta - S.day == D.RECIBO.aviso:
-		var tx: String = "Lo nuestro se acaba el %s. Si quieres seguir, ya sabes dónde está la comisaría." % Datos.fd(S.protHasta, S.day)
-		queue("avMolina", func(): await talk("SMS · MOLINA", [tx]), [["SMS · MOLINA", [tx]]])
+		var tx: String = T("Lo nuestro se acaba el {d}. Si quieres seguir, ya sabes dónde está la comisaría.", {"d": Datos.fd(S.protHasta, S.day)})
+		queue("avMolina", func(): await talk(K("SMS · MOLINA"), [tx]), [[K("SMS · MOLINA"), [tx]]])   # i18n-no
 
 # los locales (LOCALES): uno por pueblo, por lo pagado de la deuda; meter efectivo en la caja del negocio, que sale limpio mañana
 func pagado_deuda() -> float:
@@ -1863,7 +1884,20 @@ func local_de(m: String, x: int, y: int) -> String:
 
 func del_neg(L: Dictionary) -> String:   # «las llaves del lavadero», «de la taberna»
 	var t: String = L.neg
-	return "del " + t.substr(3) if t.begins_with("el ") else ("de la " + t.substr(3) if t.begins_with("la ") else t)
+	return "del " + t.substr(3) if t.begins_with("el ") else ("de la " + t.substr(3) if t.begins_with("la ") else t)   # i18n-no
+
+# F7: la frase según el artículo del negocio (L.neg: «el lavadero…», «la taberna»), con {n} sin el artículo
+func por_neg(L: Dictionary, s_el: String, s_la: String, s_otro: String, a := {}) -> String:
+	var t: String = L.neg
+	var b: Dictionary = a.duplicate()
+	if t.begins_with("el "):
+		b.n = t.substr(3)
+		return T(s_el, b)
+	if t.begins_with("la "):
+		b.n = t.substr(3)
+		return T(s_la, b)
+	b.n = t
+	return T(s_otro, b)
 
 func metido(o: Dictionary) -> float:
 	return o.caja if o.dia == S.day else 0.0
@@ -1873,39 +1907,39 @@ func rotulo_local(k: String) -> void:
 	var N: String = String(L.n).to_upper()
 	if not S.loc.has(k):
 		if pagado_deuda() < L.pago:
-			await say("SE ALQUILA. Debajo, a boli: «Preguntar en el bar El Ancla». El dueño es amigo de Don Baltasar: hasta que no le hayas pagado %s, para ti no está." % Datos.eur(L.pago))
+			await say(T("SE ALQUILA. Debajo, a boli: «Preguntar en el bar El Ancla». El dueño es amigo de Don Baltasar: hasta que no le hayas pagado {e}, para ti no está.", {"e": Datos.eur(L.pago)}))
 			return
-		if await ask("SE TRASPASA: %s, con el local. %s de fianza y %s cada %s días, domiciliados. Por su caja pasa el efectivo que metas, hasta %s al día: al día siguiente, en tu cuenta, menos un %d %% de gastos e impuestos." % [L.neg, Datos.eur(L.fianza), Datos.eur(L.sem), n(D.RECIBO.dias), Datos.eur(L.tope), roundi(L.com * 100)], ["Alquilarlo", "No"]) != 0:
+		if await ask(T("SE TRASPASA: {n}, con el local. {f} de fianza y {s} cada {d} días, domiciliados. Por su caja pasa el efectivo que metas, hasta {t} al día: al día siguiente, en tu cuenta, menos un {c} % de gastos e impuestos.", {"n": L.neg, "f": Datos.eur(L.fianza), "s": Datos.eur(L.sem), "d": n(D.RECIBO.dias), "t": Datos.eur(L.tope), "c": roundi(L.com * 100)}), [K("Alquilarlo"), K("No")]) != 0:
 			return
-		if not await tarjeta(L.fianza + L.sem, "Fianza · " + L.n):
+		if not await tarjeta(L.fianza + L.sem, K("Fianza") + " · " + L.n):
 			return
 		S.loc[k] = {"r": S.day + D.RECIBO.dias, "caja": 0, "dia": 0, "tot": 0}
 		if Datos.CAL:
 			neg_o(k)
 		sfx("coin")
 		update_hud()
-		await got("las llaves " + del_neg(L))
-		await say("%s: el negocio sigue con su gente. Tú metes el efectivo en la caja y, a la mañana siguiente, sale en el banco como lo que ha hecho." % L.n)
+		await got(por_neg(L, K("las llaves del {n}"), K("las llaves de la {n}"), K("las llaves {n}")))
+		await say(T("{n}: el negocio sigue con su gente. Tú metes el efectivo en la caja y, a la mañana siguiente, sale en el banco como lo que ha hecho.", {"n": L.n}))
 		if Datos.CAL:
 			montar_locales(S.map)
-			await say("Por dentro se lleva todo: la caja, el género, la limpieza y las mejoras. Lo que venda, si lo cuidas, también entra en la cuenta.")
+			await say(K("Por dentro se lleva todo: la caja, el género, la limpieza y las mejoras. Lo que venda, si lo cuidas, también entra en la cuenta."))
 		return
 	if Datos.CAL:   # 1.45: el negocio se lleva desde dentro
-		await say("%s es tuyo: la caja, el género y la gente están dentro. Entra por la puerta." % mayus(L.neg))
+		await say(T("{n} es tuyo: la caja, el género y la gente están dentro. Entra por la puerta.", {"n": mayus(I18n.v(String(L.neg)))}))
 		return
 	var o: Dictionary = S.loc[k]
 	while true:
 		var hoy: float = metido(o)
-		var ops := ["Meter efectivo", "Dejar el local", "Nada"]
-		var oi: int = await ask("Hoy, %s de %s en caja · lavado en total, %s · próximo recibo, el %s." % [Datos.eur(hoy), Datos.eur(L.tope), Datos.eur(o.tot), Datos.fd(o.r, S.day)], ops, N)
+		var ops := [K("Meter efectivo"), K("Dejar el local"), K("Nada")]
+		var oi: int = await ask(T("Hoy, {h} de {t} en caja · lavado en total, {o} · próximo recibo, el {d}.", {"h": Datos.eur(hoy), "t": Datos.eur(L.tope), "o": Datos.eur(o.tot), "d": Datos.fd(o.r, S.day)}), ops, N)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "Meter efectivo":
 			var mx := int(floorf(minf(S.money, L.tope - hoy)))
 			if mx < 1:
 				sfx("bad")
-				await say("No llevas efectivo." if S.money < 1 else "Hoy ya hay %s en la caja: más, y Hacienda se fija." % Datos.eur(L.tope))
+				await say(K("No llevas efectivo.") if S.money < 1 else T("Hoy ya hay {e} en la caja: más, y Hacienda se fija.", {"e": Datos.eur(L.tope)}))
 				continue
-			var e: int = await cantidad("¿Cuánto metes en la caja? Hoy, hasta %s." % Datos.eur(mx), mx)
+			var e: int = await cantidad(T("¿Cuánto metes en la caja? Hoy, hasta {e}.", {"e": Datos.eur(mx)}), mx)
 			if not e:
 				continue
 			o.caja = hoy + e
@@ -1913,15 +1947,15 @@ func rotulo_local(k: String) -> void:
 			S.money -= e
 			sfx("coin")
 			update_hud()
-			await say("Mañana entran en la cuenta %s como ingresos %s." % [Datos.eur(roundi(o.caja * (1 - L.com))), del_neg(L)])
+			await say(por_neg(L, K("Mañana entran en la cuenta {e} como ingresos del {n}."), K("Mañana entran en la cuenta {e} como ingresos de la {n}."), K("Mañana entran en la cuenta {e} como ingresos {n}."), {"e": Datos.eur(roundi(o.caja * (1 - L.com)))}))
 		elif op == "Dejar el local":
-			if await ask("¿Dejas %s? Te devuelven la fianza a la cuenta%s." % [L.neg, "; lo de la caja de hoy se queda en el negocio" if o.caja > 0 else ""], ["Dejarlo", "No"]) != 0:
+			if await ask(T("¿Dejas {n}? Te devuelven la fianza a la cuenta; lo de la caja de hoy se queda en el negocio.", {"n": L.neg}) if o.caja > 0 else T("¿Dejas {n}? Te devuelven la fianza a la cuenta.", {"n": L.neg}), [K("Dejarlo"), K("No")]) != 0:
 				continue
 			S.loc.erase(k)
-			abono_banco(L.fianza, "Fianza · " + L.n)
+			abono_banco(L.fianza, K("Fianza") + " · " + L.n)
 			sfx("coin")
 			update_hud()
-			await say("Has dejado %s." % L.neg)
+			await say(T("Has dejado {n}.", {"n": L.neg}))
 			return
 		else:
 			return
@@ -1956,23 +1990,25 @@ func neg_cuidado(k: String) -> String:
 func neg_caja(k: String) -> void:
 	var L: Dictionary = D.LOCALES[k]
 	var N: Dictionary = D.NEGOCIO.k[k]
-	var T: String = String(L.n).to_upper()
+	var Tn: String = String(L.n).to_upper()
 	while S.loc.has(k):
 		var o := neg_o(k)
 		var hoy: float = metido(o)
-		var ops := ["Meter efectivo", "Las cuentas", "Reponer género"]
+		var ops := [K("Meter efectivo"), K("Las cuentas"), K("Reponer género")]
+		var mej := ""
 		if int(o.mj) < N.mj.size():
-			ops.append("Mejora: " + N.mj[int(o.mj)].n)
-		ops += ["Dejar el local", "Nada"]
-		var oi: int = await ask("LA CAJA · hoy, %s de %s metidos · ayer vendió %s." % [Datos.eur(hoy), Datos.eur(neg_tope(k)), Datos.eur(int(o.ay))], ops, T)
+			mej = T("Mejora: {m}", {"m": N.mj[int(o.mj)].n})
+			ops.append(mej)
+		ops += [K("Dejar el local"), K("Nada")]
+		var oi: int = await ask(T("LA CAJA · hoy, {h} de {t} metidos · ayer vendió {a}.", {"h": Datos.eur(hoy), "t": Datos.eur(neg_tope(k)), "a": Datos.eur(int(o.ay))}), ops, Tn)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "Meter efectivo":
 			var mx := int(floorf(minf(S.money, neg_tope(k) - hoy)))
 			if mx < 1:
 				sfx("bad")
-				await say("No llevas efectivo." if S.money < 1 else "Hoy ya hay %s en la caja: más, y Hacienda se fija." % Datos.eur(neg_tope(k)))
+				await say(K("No llevas efectivo.") if S.money < 1 else T("Hoy ya hay {e} en la caja: más, y Hacienda se fija.", {"e": Datos.eur(neg_tope(k))}))
 				continue
-			var e: int = await cantidad("¿Cuánto metes en la caja? Hoy, hasta %s." % Datos.eur(mx), mx)
+			var e: int = await cantidad(T("¿Cuánto metes en la caja? Hoy, hasta {e}.", {"e": Datos.eur(mx)}), mx)
 			if not e:
 				continue
 			o.caja = hoy + e
@@ -1980,31 +2016,31 @@ func neg_caja(k: String) -> void:
 			S.money -= e
 			sfx("coin")
 			update_hud()
-			await say("Mañana entran en la cuenta %s como ingresos %s." % [Datos.eur(roundi(o.caja * (1 - L.com))), del_neg(L)])
+			await say(por_neg(L, K("Mañana entran en la cuenta {e} como ingresos del {n}."), K("Mañana entran en la cuenta {e} como ingresos de la {n}."), K("Mañana entran en la cuenta {e} como ingresos {n}."), {"e": Datos.eur(roundi(o.caja * (1 - L.com)))}))
 		elif op == "Las cuentas":
-			await say("Ayer vendió %s; en total, %s. Por la caja has lavado %s." % [Datos.eur(int(o.ay)), Datos.eur(int(o.vt)), Datos.eur(int(o.tot))], T)
-			await say("El local %s (%d %%). Género para %d días. Mejoras: %d de %d. El recibo, %s el %s." % [neg_cuidado(k), int(o.cu), int(o.st), int(o.mj), N.mj.size(), Datos.eur(L.sem), Datos.fd(o.r, S.day)], T)
+			await say(T("Ayer vendió {a}; en total, {t}. Por la caja has lavado {l}.", {"a": Datos.eur(int(o.ay)), "t": Datos.eur(int(o.vt)), "l": Datos.eur(int(o.tot))}), Tn)
+			await say(T("El local {c} ({p} %). Género para {g} días. Mejoras: {m} de {n}. El recibo, {e} el {d}.", {"c": neg_cuidado(k), "p": int(o.cu), "g": int(o.st), "m": int(o.mj), "n": N.mj.size(), "e": Datos.eur(L.sem), "d": Datos.fd(o.r, S.day)}), Tn)
 		elif op == "Reponer género":
 			await neg_genero(k)
-		elif op.begins_with("Mejora"):
+		elif mej != "" and op == mej:
 			var M: Dictionary = N.mj[int(o.mj)]
-			if await ask("%s: %s, con tarjeta. Vende un %d %% más y por la caja pasa un %d %% más al día." % [M.n, Datos.eur(M.p), roundi(float(D.NEGOCIO.mjF) * 100), roundi(float(D.NEGOCIO.mjT) * 100)], ["Hacerla", "No"], T) != 0:
+			if await ask(T("{m}: {p}, con tarjeta. Vende un {a} % más y por la caja pasa un {b} % más al día.", {"m": M.n, "p": Datos.eur(M.p), "a": roundi(float(D.NEGOCIO.mjF) * 100), "b": roundi(float(D.NEGOCIO.mjT) * 100)}), [K("Hacerla"), K("No")], Tn) != 0:
 				continue
-			if not await tarjeta(M.p, "Obra · " + L.n):
+			if not await tarjeta(M.p, K("Obra") + " · " + L.n):
 				continue
 			o.mj = int(o.mj) + 1
 			montar_locales(S.map)
 			build_ents()
 			sfx("get")
-			await say("Hecho: %s." % M.n.to_lower())
+			await say(T("Hecho: {m}.", {"m": I18n.v(String(M.n)).to_lower()}))
 		elif op == "Dejar el local":
-			if await ask("¿Dejas %s? Te devuelven la fianza a la cuenta; las mejoras se quedan." % L.neg, ["Dejarlo", "No"]) != 0:
+			if await ask(T("¿Dejas {n}? Te devuelven la fianza a la cuenta; las mejoras se quedan.", {"n": L.neg}), [K("Dejarlo"), K("No")]) != 0:
 				continue
 			S.loc.erase(k)
-			abono_banco(L.fianza, "Fianza · " + L.n)
+			abono_banco(L.fianza, K("Fianza") + " · " + L.n)
 			sfx("coin")
 			update_hud()
-			await say("Has dejado %s. Devuelves las llaves al salir." % L.neg)
+			await say(T("Has dejado {n}. Devuelves las llaves al salir.", {"n": L.neg}))
 			return
 		else:
 			return
@@ -2015,18 +2051,18 @@ func neg_genero(k: String) -> void:
 	var o := neg_o(k)
 	var dias := int(D.NEGOCIO.st)
 	var e: int = roundi(float(N.gen) * dias)
-	if await ask("Género (%s): queda para %d días. Sin género vende un %d %% de lo normal. ¿Pides para %d días por %s, con tarjeta?" % [N.gn, int(o.st), roundi(float(D.NEGOCIO.sinGen) * 100), dias, Datos.eur(e)], ["Pedirlo", "No"]) != 0:
+	if await ask(T("Género ({g}): queda para {s} días. Sin género vende un {p} % de lo normal. ¿Pides para {d} días por {e}, con tarjeta?", {"g": N.gn, "s": int(o.st), "p": roundi(float(D.NEGOCIO.sinGen) * 100), "d": dias, "e": Datos.eur(e)}), [K("Pedirlo"), K("No")]) != 0:
 		return
-	if not await tarjeta(e, "Género · " + L.n):
+	if not await tarjeta(e, K("Género") + " · " + L.n):
 		return
 	o.st = int(o.st) + dias
 	sfx("coin")
 	update_hud()
-	toast("Género para %d días" % int(o.st), 1400)
+	toast(T("Género para {d} días", {"d": int(o.st)}), 1400)
 
 func neg_limpiar(k: String) -> void:
 	var o := neg_o(k)
-	if await ask("El local %s (%d %%). ¿Lo friegas y lo ordenas? Es una hora." % [neg_cuidado(k), int(o.cu)], ["Limpiar", "Nada"]) != 0:
+	if await ask(T("El local {c} ({p} %). ¿Lo friegas y lo ordenas? Es una hora.", {"c": neg_cuidado(k), "p": int(o.cu)}), [K("Limpiar"), K("Nada")]) != 0:
 		return
 	await fade(1)
 	advance_time(int(D.NEGOCIO.limpia))
@@ -2035,19 +2071,19 @@ func neg_limpiar(k: String) -> void:
 	await wait(300)
 	await fade(0)
 	sfx("get")
-	toast("El local reluce", 1400)
+	toast(K("El local reluce"), 1400)
 
 func talk_neg(k: String) -> void:
 	var N: Dictionary = D.NEGOCIO.k[k]
 	var o := neg_o(k)
-	var T: String = N.emp[2]
-	var q: String = ("Ayer hicimos %s. " % Datos.eur(int(o.ay))) + ("El local %s." % neg_cuidado(k)) + (" Y nos estamos quedando sin %s." % N.gn if int(o.st) <= 1 else "")
-	var c: int = await ask(q, ["La caja", "Nada"], T)
+	var Tn: String = N.emp[2]
+	var q: String = T("Ayer hicimos {e}.", {"e": Datos.eur(int(o.ay))}) + " " + T("El local {c}.", {"c": neg_cuidado(k)}) + (T(" Y nos estamos quedando sin {g}.", {"g": N.gn}) if int(o.st) <= 1 else "")
+	var c: int = await ask(q, [K("La caja"), K("Nada")], Tn)
 	if c == 0:
 		await neg_caja(k)
 
 func sprite_rotulo() -> String:
 	for k in D.LOCALES:
 		if D.LOCALES[k].map == S.map:
-			return "rotuloL-%d" % (1 if S.loc.has(k) else 0)
-	return "rotuloL-0"
+			return "rotuloL-%d" % (1 if S.loc.has(k) else 0)   # i18n-no
+	return "rotuloL-0"   # i18n-no

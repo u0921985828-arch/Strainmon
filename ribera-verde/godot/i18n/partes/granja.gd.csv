@@ -1,0 +1,456 @@
+es,en
+"{w} W · ilumina {l}×{l} cm · {g} g/W ({ga} abonando){crece}{thc} · riego ×{agua}
+Luz: {kwh} kWh ({eur}) al día con plantas.","{w} W · lights {l}×{l} cm · {g} g/W ({ga} with nutrients){crece}{thc} · water ×{agua}
+Power: {kwh} kWh ({eur}) a day with plants."
+crece,growth
+ · THC +{p}, · THC +{p}
+{l} L · hasta {cap} g por planta{rend}{crec} · riego ×{agua}{plaga},{l} L · up to {cap} g per plant{rend}{crec} · water ×{agua}{plaga}
+cosecha,yield
+ · menos plagas, · fewer pests
+Se acabó lo pagado.,Your paid time is up.
+"Si quieres que mis agentes sigan mirando hacia otro lado, ya sabes dónde está la comisaría.","If you want my officers to keep looking the other way, you know where the station is."
+SMS · MOLINA,SMS · MOLINA
+Luz,Power
+Factura de la luz: −{e} (te faltan {f}),Power bill: −{e} (you're {f} short)
+Factura de la luz: −{e},Power bill: −{e}
+Olor a cogollo: calor +{n},Bud smell: heat +{n}
+Se han secado {n} esquejes sin plantar,{n} unplanted cuttings have dried out
+Se ha secado un esqueje sin plantar,An unplanted cutting has dried out
+Se han secado {n} esquejes en las bandejas,{n} cuttings have dried out in the trays
+Se ha secado un esqueje en las bandejas,A cutting has dried out in the trays
+ (floja), (weak)
+Nombre de la planta (y sus esquejes),Plant name (and its cuttings)
+"Ahora se llama «{v}». Sus esquejes, también.",It's now called «{v}». Its cuttings too.
+Sin nombre: vuelve a ser la nº {k}.,No name: it's no. {k} again.
+Esqueje de {s}{e}.,Cutting of {s}{e}.
+Nombrar,Name
+Tirar,Discard
+Nada,Nothing
+Tiras el esqueje.,You throw the cutting away.
+Maceta vacía. No tienes semillas: cómpralas en el growshop de Kiko.,Empty pot. You have no seeds: buy some at Kiko's growshop.
+Fenotipo estrella: THC ×{t} y cosecha ×{y}.,Star phenotype: THC ×{t} and yield ×{y}.
+Fenotipo flojo: rinde menos que la media.,Weak phenotype: yields less than average.
+Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo.,Its phenotype will show when you harvest the mother or one of its clones.
+Esqueje {s}{e},Cutting {s}{e}
+bandeja,tray
+esqueje,cutting
+"Clon enraizado: la misma planta que su madre, con su fenotipo.
+{dv}
+Se seca si no lo plantas antes del {d}.","Rooted clone: the same plant as its mother, same phenotype.
+{dv}
+It dries out if you don't plant it before {d}."
+Cancelar,Cancel
+¿QUÉ PLANTAS?,WHAT DO YOU PLANT?
+Plantas el esqueje de {s}{e}.,You plant the cutting of {s}{e}.
+Has plantado {s}{e}.,You've planted {s}{e}.
+"Cada planta lleva su barra: arriba, el agua (roja: toca regar); abajo, la cosecha (dorada: lista).","Each plant has its bars: on top, water (red: time to water); below, harvest (gold: ready)."
+"Si le sale plaga, verás una «!» roja y manchas en las hojas. Trátala con INSECTICIDA.","If it gets pests, you'll see a red «!» and spots on the leaves. Treat it with INSECTICIDE."
+El propagador está lleno: 12 esquejes. Planta alguno antes.,The propagator is full: 12 cuttings. Plant some first.
+"Cortas una punta de la {s}{e} y la pones a enraizar.
+Plántala antes del {d}: es la misma planta.","You cut a tip off the {s}{e} and set it to root.
+Plant it before {d}: it's the same plant."
+O pínchala en el carro: allí aguanta {n} días.,Or stick it in the cart: it lasts {n} days there.
+Plaza vacía con una maceta de {m}.,Empty spot with a {m} pot.
+Plantar,Plant
+Cambiar maceta,Change pot
+Salir,Leave
+La {s} se ha secado del todo.,The {s} has dried out completely.
+Retiras la planta muerta.,You remove the dead plant.
+"{s}{e} lista para cosechar.
+Salud {h}% · Agua {w}%","{s}{e} ready to harvest.
+Health {h}% · Water {w}%"
+Cosechar,Harvest
+Esperar,Wait
+Regar,Water
+Abonar,Feed
+Tratar plaga,Treat pests
+Sacar esqueje,Take cutting
+Arrancar,Uproot
+"{s}{e} · {st} {p}%
+Agua {w}% · Salud {h}%{pl}","{s}{e} · {st} {p}%
+Water {w}% · Health {h}%{pl}"
+ · PLAGA, · PESTS
+Riegas la planta. Agua al 100%.,You water the plant. Water at 100%.
+Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.,You spray INSECTICIDE with gloves and a mask. Pests gone.
+No tienes INSECTICIDA. Kiko lo vende.,You have no INSECTICIDE. Kiko sells it.
+¿Seguro que quieres arrancarla?,Sure you want to uproot it?
+Sí,Yes
+No,No
+Arrancas la planta.,You uproot the plant.
+tierra {a} de {b} L,soil {a} of {b} L
+No cabe más tierra en la carpa ({tl}).,No more soil fits in the tent ({tl}).
+No tienes otra maceta que quepa aquí.,You have no other pot that fits here.
+Maceta {m},Pot {m}
+CAMBIAR MACETA,CHANGE POT
+Ahora: {m} · {tl},Now: {m} · {tl}
+Pones la maceta de {m}. La vieja va a la mochila.,You put in the {m} pot. The old one goes to your backpack.
+No tienes otro foco que aguante esta carpa.,You have no other light this tent can take.
+Foco {f},Light {f}
+CAMBIAR FOCO,CHANGE LIGHT
+Ahora: {f},Now: {f}
+Cuelgas el foco {f}. El viejo va a la mochila.,You hang the {f} light. The old one goes to your backpack.
+No te queda ABONO.,You're out of NUTRIENTS.
+¿Qué abono le echas?,Which nutrient do you give it?
+Echas una dosis de {p}. Crecerá más deprisa.,You give it a dose of {p}. It'll grow faster.
+Echas una dosis de {p}. Dará más cosecha.,You give it a dose of {p}. It'll yield more.
+"
+Con el medidor, lo aprovecha entero.","
+With the meter, it takes it all in."
+"
+Con el medidor, el pH al {ph}: lo aprovecha entero.","
+With the meter, acidity at {ph}: it takes it all in."
+"
+Corriges el pH a ojo, sin medidor: lo aprovecha casi todo.","
+You correct the water by eye, no meter: it takes in almost all of it."
+"
+Sin pH−, la tierra amortigua el agua del grifo: lo aprovecha al {p} %.","
+Without corrector, the soil buffers the tap water: it takes in {p} %."
+"
+Sin corrector, el agua del grifo bloquea {p} % del abono.","
+Without corrector, the tap water locks out {p} % of the nutrients."
+"
+Sin pH−, el agua del grifo (pH {ph}) bloquea {p} % del abono.","
+Without corrector, the tap water (acidity {ph}) locks out {p} % of the nutrients."
+No te queda pH− de su marca: gastas una dosis de {p}.,You're out of that brand's corrector: you use a dose of {p}.
+" Con el mineral, el sustrato ya no está vivo."," With mineral feed, the soil is no longer living."
+crecimiento bio,organic growth
+crecimiento,growth
+floración bio,organic bloom
+floración,bloom
+Abonada ({a}),Fed ({a})
+Abonada ({a} y {b}),Fed ({a} and {b})
+Sin abonar,Not fed
+ · sustrato vivo, · living soil
+ · riego {r}, · water {r}
+a ojo,by eye
+a medias,halfway
+bien,good
+ · EC {ec} · pH {ph}, · EC {ec} · acidity {ph}
+"Temporizador · {n}: {c}
+Luz {e} al día con plantas","Timer · {n}: {c}
+Power {e} a day with plants"
+Cambiar foco,Change light
+Poner {x},Install {x}
+Rellenar depósito,Refill tank
+Rellenar garrafas,Refill jugs
+ · goteo {a} de {b} L, · drip {a} of {b} L
+ · garrafas {a} de {b} L, · jugs {a} of {b} L
+"{c} · {p} plantas · {f}
+{w} W/m² · luz {e} al día con plantas{gt}","{c} · {p} plants · {f}
+{w} W/m² · power {e} a day with plants{gt}"
+Llenas el depósito del goteo: {l} L.,You fill the drip tank: {l} L.
+Llenas las garrafas: {l} L.,You fill the jugs: {l} L.
+Pones las {x} en el {c}.,You put the {x} in the {c}.
+Pones las {x} en la {c}.,You put the {x} in the {c}.
+Pones el {x} en el {c}.,You put the {x} in the {c}.
+Pones el {x} en la {c}.,You put the {x} in the {c}.
+"
+Las garrafas vuelven a la mochila.","
+The jugs go back to your backpack."
+"
+El {k} vuelve a la mochila.","
+The {k} goes back to your backpack."
+Cosechas {g} g de {s}. THC: {t}%.,You harvest {g} g of {s}. THC: {t}%.
+No te cabe todo en la {m}: {c} g van a la caja fuerte. Llevas {e} g de más: guárdalos en cuanto puedas.,Not everything fits in your {m}: {c} g go to the safe. You're carrying {e} g too much: stash it as soon as you can.
+No te cabe todo en la {m}: {c} g van a la caja fuerte.,Not everything fits in your {m}: {c} g go to the safe.
+No te cabe todo en la {m}: Llevas {e} g de más: guárdalos en cuanto puedas.,Not everything fits in your {m}: You're carrying {e} g too much: stash it as soon as you can.
+No te cabe todo en la {m}: ,Not everything fits in your {m}:
+¡Fenotipo estrella! THC ×{t} y cosecha ×{y} sobre la media de la {s}.,Star phenotype! THC ×{t} and yield ×{y} over the {s} average.
+"Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.","It goes into a separate batch (★). If you took cuttings, keep them: they're this same plant."
+Fenotipo flojo: THC ×{t} y cosecha ×{y} de la media.,Weak phenotype: THC ×{t} and yield ×{y} of the average.
+Las plantas de la línea se han polinizado entre ellas: recoges {n} semillas de {s}.,The plants of the line pollinated each other: you collect {n} seeds of {s}.
+Son semillas regulares: algún macho ha polinizado unas flores. Recoges {n} semillas de {s}.,They're regular seeds: some male pollinated a few flowers. You collect {n} seeds of {s}.
+Son semillas regulares: algún macho ha polinizado unas flores. Recoges {n} semilla de {s}.,They're regular seeds: some male pollinated a few flowers. You collect {n} seed of {s}.
+Una flor hermafrodita ha polinizado unas pocas: recoges {n} semillas de {s}.,A hermaphrodite flower pollinated a few: you collect {n} seeds of {s}.
+Una flor hermafrodita ha polinizado unas pocas: recoges {n} semilla de {s}.,A hermaphrodite flower pollinated a few: you collect {n} seed of {s}.
+"Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en {d} días: algo más de THC y se vende más cara. Sin curar no pierde nada.","It comes out uncured. With some curing jars (Kiko sells them), it cures in the safe in {d} days: a bit more THC and it sells for more. Uncured, it loses nothing."
+¿Estabilizar {s} (F{g})? Gastas 2 semillas y guardas 1.,Stabilise {s} (F{g})? You use 2 seeds and keep 1.
+Estabilizar,Stabilise
+"{s} ya es una línea estable: todas sus plantas salen iguales.
+Guardas 1 semilla.","{s} is now a stable line: all its plants come out the same.
+You keep 1 seed."
+"Guardas 1 semilla F{f} de {s}: cultívala para tener más.
+Falta una generación para fijarla.","You keep 1 F{f} seed of {s}: grow it to get more.
+One more generation to fix it."
+"Guardas 1 semilla F{f} de {s}: cultívala para tener más.
+Faltan {n} generaciones para fijarla.","You keep 1 F{f} seed of {s}: grow it to get more.
+{n} more generations to fix it."
+Tu cama. Todavía huele a la colonia de la tía.,Your bed. It still smells of your aunt's cologne.
+Dormir hasta las 7,Sleep until 7
+Siesta de 3 h,3 h nap
+Cambiarte de ropa,Change clothes
+Decorar la casa,Decorate the flat
+Has descansado,You've rested
+ · Luz −{e}, · Power −{e}
+ · Olor: calor +{o}, · Smell: heat +{o}
+ · Partida guardada, · Game saved
+Das vueltas y más vueltas. Al ahuecar la almohada notas algo duro dentro de la funda.,"You toss and turn. Plumping the pillow, you feel something hard inside the case."
+"Un cuaderno de tapas verdes, gastado de tanto abrirlo: «Cuaderno de cultivo · M.». El diario de la tía Maite.","A green-covered notebook, worn from use: «Growing notebook · M.». Aunt Maite's diary."
+"Una página por cada variedad que conoció: lo que apuntó de ella, las recetas de sus cruces y dónde guardaba las semillas que no se venden.","A page for every strain she knew: her notes on it, the recipes for her crosses and where she kept the seeds you can't buy."
+Lo tienes en START → GENOTECA. Algunas landraces no están en ningún banco: habrá que buscarlas.,It's in START → GENOTECA. Some landraces aren't in any seed bank: you'll have to find them.
+"la {s} ({c}, plaza {p})","the {s} ({c}, spot {p})"
+la {s} (plaza {p}),the {s} (spot {p})
+¡Plaga en {l}! Trátalas con INSECTICIDA: te quedan {k}.,Pests on {l}! Treat them with INSECTICIDE: you have {k} left.
+¡Plaga en {l}! Trátalas con INSECTICIDA: te queda {k}.,Pests on {l}! Treat them with INSECTICIDE: you have {k} left.
+¡Plaga en {l}! Trátalas con INSECTICIDA: no te queda; cómpralo en el growshop.,Pests on {l}! Treat them with INSECTICIDE: you have none; buy it at the growshop.
+¡Plaga en {l}! Trátala con INSECTICIDA: te quedan {k}.,Pests on {l}! Treat it with INSECTICIDE: you have {k} left.
+¡Plaga en {l}! Trátala con INSECTICIDA: te queda {k}.,Pests on {l}! Treat it with INSECTICIDE: you have {k} left.
+¡Plaga en {l}! Trátala con INSECTICIDA: no te queda; cómpralo en el growshop.,Pests on {l}! Treat it with INSECTICIDE: you have none; buy it at the growshop.
+"Sigue la plaga en {l}: sin tratar, pierden salud cada hora.","Still pests on {l}: untreated, they lose health every hour."
+"Sigue la plaga en {l}: sin tratar, pierde salud cada hora.","Still pests on {l}: untreated, it loses health every hour."
+Se han secado del todo {l}. Retíralas con A.,{l} have dried out completely. Remove them with A.
+Se ha secado del todo {l}. Retírala con A.,{l} has dried out completely. Remove it with A.
+"Moho en {l}: de noche la carpa pasa del {h} % de humedad. Un extractor a su medida con intractor, un ventilador o un deshumidificador la bajan.","Mould on {l}: at night the tent goes over {h} % humidity. A matching extractor with an intake fan, a fan or a dehumidifier bring it down."
+Genoteca,Genoteca
+Banco de semillas,Seed bank
+Notas de la tía,Aunt's notes
+Tienda online,Online shop
+Caja empotrada,Wall safe
+Guardar partida,Save game
+Apagar,Shut down
+El ordenador de la tía. Tiene su registro de cultivos de veinte años.,Your aunt's computer. It has her grow log from twenty years.
+Partida guardada.,Game saved.
+No se ha podido guardar la partida.,Couldn't save the game.
+Noticias: la policía busca un cultivo de interior en Ribera Verde. Los vecinos denuncian olor a marihuana en varios portales.,News: police are looking for an indoor grow in Ribera Verde. Neighbours report a marijuana smell in several buildings.
+Noticias: detenido en el puerto un hombre con dos kilos de marihuana escondidos en una furgoneta de reparto.,News: man arrested at the port with two kilos of marijuana hidden in a delivery van.
+Noticias: el tiempo. Nubes y claros en la costa y la ría en calma. Nada que contar en Ribera Verde.,News: the weather. Sun and clouds on the coast and a calm estuary. Nothing to report in Ribera Verde.
+Leer el diario de la tía Maite,Read Aunt Maite's diary
+Cambiar el tapizado,Change the upholstery
+Tu sillón de lectura. La lámpara da una luz cálida.,Your reading armchair. The lamp gives off a warm light.
+Cambiar la lámina,Change the print
+En la pared del salón: {c}.,On the living room wall: {c}.
+Echar una cabezada (1 h),Take a nap (1 h)
+Ver la tele,Watch TV
+Tu sofá. Todavía huele a nuevo.,Your sofa. It still smells new.
+Una cabezada en el sofá: +5 de vida.,A nap on the sofa: +5 health.
+Noticias,News
+Documental,Documentary
+La tele.,The TV.
+Jugar (2 h),Play (2 h)
+Foro de cultivo,Grow forum
+El PC gaming. Los ventiladores brillan de colores.,The gaming PC. The fans glow in colours.
+Foro de cultivo · {t},Grow forum · {t}
+{x} · ahora,{x} · now
+Volver,Back
+Cambiar {q},Change {q}
+Cambias {q} del {m}: {v}.,You change {q} of the {m}: {v}.
+Cambias {q} de {m}: {v}.,You change {q} of the {m}: {v}.
+Listo,Done
+ · pedido, · ordered
+ · en casa, · at home
+"
+{q} viene mañana.","
+{q} comes tomorrow."
+"
+Ya hay una obra pedida: viene mañana.","
+There's already work ordered: it comes tomorrow."
+"Pagas con lo que llevas y, si no llega, con la caja fuerte.","You pay with what you carry and, if it's not enough, from the safe."
+REFORMAS,RENOVATIONS
+Suelo y paredes · tienes {e},Floor and walls · you have {e}
+Reforma,Renovation
+"Pedido: {a}, {b} · mañana","Ordered: {a}, {b} · tomorrow"
+Ropa y pelo,Clothes and hair
+"
+Llega mañana: te lo suben a casa.","
+Arrives tomorrow: they bring it up to the flat."
+"
+Llega mañana: te lo suben al salón.","
+Arrives tomorrow: they bring it up to the living room."
+"
+Llega mañana y te lo suben a casa.","
+Arrives tomorrow and they bring it up to the flat."
+"
+Llega mañana y te lo suben al salón.","
+Arrives tomorrow and they bring it up to the living room."
+ · tuyo, · yours
+"
+Llega mañana: te lo dejan en el portal.","
+Arrives tomorrow: they leave it at the front door."
+"
+La nevera de serie: {g}.","
+The standard fridge: {g}."
+Reformas: suelo y paredes,Renovations: floor and walls
+El suelo y las paredes del piso: el instalador o el pintor vienen al día siguiente.,The flat's floor and walls: the fitter or the painter comes the next day.
+El camarote: almacén,The loft: storage
+"Habilitar el camarote de arriba como almacén, las estanterías de tarros de cristal de 10 L y los sobres de humedad.","Fit out the loft upstairs as storage, the shelves of 10 L glass jars and the humidity packs."
+ · hecho, · done
+ · mañana, · tomorrow
+"Con tarjeta, de la cuenta del banco.","By card, from your bank account."
+TIENDA ONLINE,ONLINE SHOP
+Muebles y transporte · en la cuenta {e},Furniture and transport · in the account {e}
+Pedido: {n} · llega mañana,Ordered: {n} · arrives tomorrow
+Pedido: {n} · los obreros vienen mañana,Ordered: {n} · the builders come tomorrow
+ · {n} mañana, · {n} tomorrow
+"
+Antes hay que habilitar el camarote.","
+The loft has to be fitted out first."
+ · quedan {n}, · {n} left
+"
+Con sobres, lo curado se afina en {d} días: se vende un {p} % más caro.","
+With packs, cured buds refine in {d} days: they sell for {p} % more."
+EL CAMAROTE,THE LOFT
+Almacén · en la cuenta {e},Storage · in the account {e}
+"Los obreros acaban el camarote: aislado, con pladur, tarima, luz y deshumidificador. Se sube por la escalera escamoteable de entre las carpas.","The builders finish the loft: insulated, plasterboard, flooring, light and a dehumidifier. You go up by the folding ladder between the tents."
+Llega la estantería de tarros de 10 L: te la suben al camarote. Caben ahora {kg} kg.,The 10 L jar shelf arrives: they take it up to the loft. It now holds {kg} kg.
+Llegan {n} estanterías de tarros de 10 L: te las suben al camarote. Caben ahora {kg} kg.,{n} shelves of 10 L jars arrive: they take them up to the loft. It now holds {kg} kg.
+Llegan los sobres de humedad al 62 %: uno en cada tarro del camarote (quedan {n}).,The 62 % humidity packs arrive: one in each jar in the loft ({n} left).
+"Los obreros acaban el sótano: sin trastos, impermeabilizado, con luz, desagüe y tres estanterías de rejilla. Se baja por la puerta del dormitorio. Las bandejas te las prepara Txomin.","The builders finish the basement: cleared, waterproofed, with light, a drain and three wire shelves. You go down through the bedroom door. Txomin prepares the trays for you."
+Llega el mensajero con el arcón congelador: te lo dejan enchufado al lado de la nevera. En frío caben ahora {kg}.,The courier brings the chest freezer: they leave it plugged in next to the fridge. Cold storage now holds {kg}.
+"{q} viene a primera hora: {n}, {v}.","{q} comes first thing: {n}, {v}."
+"Llega el mensajero con {l}. En la calle vas montado; con B, aún más rápido.","The courier brings {l}. On the street you ride it; with B, even faster."
+Llega el mensajero con {l}: te lo dejan montado en casa.,The courier brings {l}: they leave it set up in the flat.
+Llega el mensajero con {l}: te lo dejan montado en el salón.,The courier brings {l}: they leave it set up in the living room.
+Kiko te sube {l} y te lo deja montado delante de las carpas.,Kiko brings up {l} and sets it up in front of the tents.
+Taco vacío. Saca esquejes de una madre en vegetativo y pínchalos aquí.,Empty plug. Take cuttings from a mother in veg and stick them here.
+"En la tabla de corte, corte en bisel y hormona: pinchas {n} esquejes.","On the cutting board, a bevel cut and hormone: you stick {n} cuttings."
+"En la tabla de corte, corte en bisel y hormona: pinchas 1 esqueje.","On the cutting board, a bevel cut and hormone: you stick 1 cutting."
+En las bandejas aguantan hasta el {d}: plántalos cuando haya hueco.,In the trays they last until {d}: plant them when there's room.
+No caben {n}: se quedan en el propagador.,{n} don't fit: they stay in the propagator.
+No cabe 1: se queda en el propagador.,1 doesn't fit: it stays in the propagator.
+ · pedida, · ordered
+Los pedidos llegan mañana por la mañana.,Orders arrive tomorrow morning.
+BANCO DE SEMILLAS,SEED BANK
+Sobres de {n} · en la cuenta {e},Packs of {n} · in the account {e}
+"Llega el paquete del banco de semillas:
+{l} semillas.","The seed bank parcel arrives:
+{l} seeds."
+La carta de la tía Maite. «Cuida el armario. Y perdona lo de Baltasar.»,Aunt Maite's letter. «Look after the grow cabinet. And sorry about Baltasar.»
+Hay una carta encima de la mesa. Es de la tía Maite.,There's a letter on the table. It's from Aunt Maite.
+CARTA,LETTER
+"«{N}: si lees esto, el piso es tuyo. Cuídalo.»","«{N}: if you're reading this, the flat is yours. Look after it.»"
+«Al fondo del salón está mi armario de cultivo. Lo he tenido treinta años y nunca me ha fallado.»,«At the back of the living room is my grow cabinet. I've had it thirty years and it's never let me down.»
+"«Pásate por el growshop de Kiko, aquí al lado. Él te enseñará lo que yo no pude.»","«Drop by Kiko's growshop, just next door. He'll teach you what I couldn't.»"
+"«Le debo dinero a Baltasar, el del bar El Ancla. No es buena gente. Lo siento.»","«I owe money to Baltasar, from the El Ancla bar. He's not a good man. I'm sorry.»"
+En autobús,By bus
+En {v},By {v}
+"PARADA DE {p}
+¿Cómo vas?","{p} STOP
+How are you going?"
+"PARADA DE {p}
+El primer autobús pasa a las 7:00 y el último, a las 21:00.","{p} STOP
+The first bus comes at 7:00 and the last at 21:00."
+Esperar al de las 7:00,Wait for the 7:00
+"Las siete. Llega el primer autobús, medio vacío.","Seven o'clock. The first bus pulls in, half empty."
+billete de ama,Ama's ticket
+{e} · {m} min,{e} · {m} min
+¿A dónde vas?,Where to?
+El billete hasta {d} cuesta {e}. No te llega.,The ticket to {d} costs {e}. You can't afford it.
+"Ribera Verde. El piso de la tía es el del tejado rojo, al otro lado de la calle.","Ribera Verde. Your aunt's flat is the one with the red roof, across the street."
+La mesa de la tía. ¿Qué haces?,Your aunt's table. What do you do?
+Cruzar semillas,Cross seeds
+Una mesa con un microscopio viejo y frascos. Kiko sabrá qué hacer con esto.,A table with an old microscope and jars. Kiko will know what to do with this.
+"MESA DE GENÉTICA: necesitas semillas de dos variedades distintas para cruzar, o 2 de una línea sin estabilizar.","GENETICS TABLE: you need seeds of two different strains to cross, or 2 of an unstabilised line."
+CRUCE · MADRE,CROSS · MOTHER
+{s} · estabilizar,{s} · stabilise
+estable,stable
+"Cruzas dos plantas de la misma línea y guardas la mejor semilla. Gastas 2 y te quedas 1.
+En la F{g} la variedad queda fijada: todas sus plantas salen iguales.","You cross two plants of the same line and keep the best seed. You use 2 and keep 1.
+At F{g} the strain is fixed: all its plants come out the same."
+Para cruzar {s} necesitas semillas de otra variedad.,To cross {s} you need seeds of another strain.
+CRUCE · PADRE,CROSS · FATHER
+¿Cruzar {a} × {b}? Gastas 1 semilla de cada.,Cross {a} × {b}? You use 1 seed of each.
+Cruzar,Cross
+Nueva variedad: {s}.,New strain: {s}.
+"THC {t}% · ~{g} g/m² · {d} días.
+Obtienes 2 semillas F1: la línea aún no es estable.","THC {t}% · ~{g} g/m² · {d} days.
+You get 2 F1 seeds: the line isn't stable yet."
+Te tiemblan las manos: es JACK HERER.,Your hands are shaking: it's LEYENDA.
+SMS · KIKO,SMS · KIKO
+¿Jack Herer? ¿De semilla propia? Llevo veinte años detrás de ella.,Leyenda? From your own seed? I've been after it for twenty years.
+Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.,Your aunt would be proud. Stabilise it and keep it safe: that's worth more than the flat.
+Obtienes 2 semillas de {s}.,You get 2 seeds of {s}.
+Temporizador,Timer
+Luz {e} al día,Power {e} a day
+Apagado,Off
+Plaza {p} · {l} L,Spot {p} · {l} L
+Vacía,Empty
+Seca,Dried out
+Cosecha lista,Ready to harvest
+Agua {p} %,Water {p} %
+Salud {p} %,Health {p} %
+PLAGA,PESTS
+"◀ ▶ ▲ ▼ eliges planta, foco o reloj · A la cuidas · B sales","◀ ▶ ▲ ▼ pick plant, light or timer · A tend · B leave"
+La tarjeta no pasa: en la cuenta tienes {e}. Ingresa efectivo en un cajero.,The card is declined: you have {e} in the account. Deposit cash at an ATM.
+Sacar,Withdraw
+Ingresar,Deposit
+Movimientos,Transactions
+CAJERO · en la cuenta tienes {e}.,ATM · you have {e} in the account.
+No hay saldo.,No balance.
+Hoy ya has sacado {e}: es el tope del cajero.,You've already withdrawn {e} today: that's the ATM limit.
+"¿Cuánto sacas? Hoy, hasta {e}.",How much do you withdraw? Up to {e} today.
+Cajero,ATM
+No llevas efectivo.,You're not carrying cash.
+"Hoy ya has ingresado {e}. Más, y el banco pregunta de dónde sale.",You've already deposited {e} today. Any more and the bank asks where it comes from.
+"¿Cuánto ingresas? Sin preguntas, hasta {e} al día.","How much do you deposit? No questions asked, up to {e} a day."
+Ingreso en efectivo,Cash deposit
+Nave de Valdehierro,Valdehierro warehouse
+Bajo de la Kale Zaharra,Kale Zaharra basement
+Seguro,Insurance
+Impuesto de circulación,Road tax
+Sargento Molina,Sergeant Molina
+de la cuenta,from the account
+en efectivo,in cash
+"en mano, en la comisaría","by hand, at the station"
+Recibo · {r},Bill · {r}
+"El {d}, {c}.","On {d}, {c}."
+"Ingresos en efectivo: hasta {e} al día sin preguntas (hoy, {h}).","Cash deposits: up to {e} a day with no questions (today, {h})."
+BANCA,BANKING
+Saldo {e},Balance {e}
+SMS · ,SMS ·
+El {d} se carga el recibo de {t}: {e}. Saldo: {s}.,On {d} the {t} bill is charged: {e}. Balance: {s}.
+"El {d} paso a cobrar: {e}, en efectivo. Tenlo preparado.","On {d} I'm coming to collect: {e}, in cash. Have it ready."
+Recibo,Bill
+"Recibo de {t} devuelto: {e}. Si el {d} no hay saldo, se cobra por apremio, con recargo.","{t} bill returned: {e}. If there's no balance on {d}, it's collected by enforcement, with a surcharge."
+"Recibo de {t} devuelto: {e}. Si el {d} no hay saldo, se rescinde el contrato.","{t} bill returned: {e}. If there's no balance on {d}, the contract is terminated."
+"He pasado a cobrar y no había nada. Vuelvo mañana; como no esté, cambio la cerradura.","I came to collect and there was nothing. I'll be back tomorrow; if it's not there, I'm changing the lock."
+Ventas,Sales
+Ingresos,Income
+BANCO,BANK
+Contrato de {n} rescindido por impago. La fianza no se devuelve.,Contract for {n} terminated for non-payment. The deposit is not returned.
+SMS · BANCO,SMS · BANK
+"Lo nuestro se acaba el {d}. Si quieres seguir, ya sabes dónde está la comisaría.","Our deal ends on {d}. If you want to keep going, you know where the station is."
+"SE ALQUILA. Debajo, a boli: «Preguntar en el bar El Ancla». El dueño es amigo de Don Baltasar: hasta que no le hayas pagado {e}, para ti no está.","FOR RENT. Below, in pen: «Ask at the El Ancla bar». The owner is a friend of Don Baltasar: until you've paid him {e}, it's not for you."
+"SE TRASPASA: {n}, con el local. {f} de fianza y {s} cada {d} días, domiciliados. Por su caja pasa el efectivo que metas, hasta {t} al día: al día siguiente, en tu cuenta, menos un {c} % de gastos e impuestos.","BUSINESS FOR SALE: {n}, with the premises. {f} deposit and {s} every {d} days, by direct debit. The cash you put in its till goes through, up to {t} a day: the next day, in your account, minus {c} % in costs and taxes."
+Alquilarlo,Rent it
+Fianza,Deposit
+las llaves del {n},the keys to the {n}
+las llaves de la {n},the keys to the {n}
+las llaves {n},the keys to {n}
+"{n}: el negocio sigue con su gente. Tú metes el efectivo en la caja y, a la mañana siguiente, sale en el banco como lo que ha hecho.","{n}: the business keeps running with its staff. You put cash in the till and, the next morning, it shows up at the bank as takings."
+"Por dentro se lleva todo: la caja, el género, la limpieza y las mejoras. Lo que venda, si lo cuidas, también entra en la cuenta.","Everything's run from inside: the till, the stock, the cleaning and the upgrades. What it sells, if you look after it, also goes into the account."
+"{n} es tuyo: la caja, el género y la gente están dentro. Entra por la puerta.","{n} is yours: the till, the stock and the staff are inside. Go in through the door."
+Meter efectivo,Put in cash
+Dejar el local,Give up the premises
+"Hoy, {h} de {t} en caja · lavado en total, {o} · próximo recibo, el {d}.","Today, {h} of {t} in the till · laundered in total, {o} · next bill, on {d}."
+"Hoy ya hay {e} en la caja: más, y Hacienda se fija.",There's already {e} in the till today: any more and the taxman takes notice.
+"¿Cuánto metes en la caja? Hoy, hasta {e}.",How much do you put in the till? Up to {e} today.
+Mañana entran en la cuenta {e} como ingresos del {n}.,Tomorrow {e} goes into the account as takings from the {n}.
+Mañana entran en la cuenta {e} como ingresos de la {n}.,Tomorrow {e} goes into the account as takings from the {n}.
+Mañana entran en la cuenta {e} como ingresos {n}.,Tomorrow {e} goes into the account as takings from {n}.
+¿Dejas {n}? Te devuelven la fianza a la cuenta; lo de la caja de hoy se queda en el negocio.,Give up {n}? The deposit goes back to your account; today's till stays with the business.
+¿Dejas {n}? Te devuelven la fianza a la cuenta.,Give up {n}? The deposit goes back to your account.
+Dejarlo,Give it up
+Has dejado {n}.,You've given up {n}.
+Las cuentas,The accounts
+Reponer género,Restock
+Mejora: {m},Upgrade: {m}
+"LA CAJA · hoy, {h} de {t} metidos · ayer vendió {a}.","THE TILL · today, {h} of {t} put in · yesterday it sold {a}."
+"Ayer vendió {a}; en total, {t}. Por la caja has lavado {l}.","Yesterday it sold {a}; in total, {t}. Through the till you've laundered {l}."
+"El local {c} ({p} %). Género para {g} días. Mejoras: {m} de {n}. El recibo, {e} el {d}.","The premises are {c} ({p} %). Stock for {g} days. Upgrades: {m} of {n}. The bill, {e} on {d}."
+"{m}: {p}, con tarjeta. Vende un {a} % más y por la caja pasa un {b} % más al día.","{m}: {p}, by card. Sells {a} % more and {b} % more goes through the till each day."
+Hacerla,Do it
+Obra,Works
+Hecho: {m}.,Done: {m}.
+¿Dejas {n}? Te devuelven la fianza a la cuenta; las mejoras se quedan.,Give up {n}? The deposit goes back to your account; the upgrades stay.
+Has dejado {n}. Devuelves las llaves al salir.,You've given up {n}. You hand back the keys on the way out.
+"Género ({g}): queda para {s} días. Sin género vende un {p} % de lo normal. ¿Pides para {d} días por {e}, con tarjeta?","Stock ({g}): enough for {s} days. Without stock it sells {p} % of normal. Order {d} days' worth for {e}, by card?"
+Pedirlo,Order it
+Género,Stock
+Género para {d} días,Stock for {d} days
+El local {c} ({p} %). ¿Lo friegas y lo ordenas? Es una hora.,The premises are {c} ({p} %). Mop and tidy up? It takes an hour.
+Limpiar,Clean
+El local reluce,The place is spotless
+Ayer hicimos {e}.,Yesterday we made {e}.
+El local {c}.,The place is {c}.
+ Y nos estamos quedando sin {g}., And we're running out of {g}.
+La caja,The till
