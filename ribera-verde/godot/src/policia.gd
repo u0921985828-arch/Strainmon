@@ -76,6 +76,8 @@ func battle(kind):
 		B.hpMax = 12 + ch * 2 + ri(0, 4) + 4 * dd + int(D.RIVAL.vida) * rr + (int(D.DARKO.vida) if B.get("jefe") else 0)
 		B.hp = B.hpMax
 		B.atk = [2 + (ch >> 2) + dd + rr, 4 + (ch >> 1) + dd + rr]
+		if Datos.CAL:
+			arma_rival()   # MAESTRO [7]: a veces, con navaja
 	mode = "battle"
 	update_hud()
 	wipe_fuera()
@@ -146,9 +148,11 @@ func enemy_hits():
 			B.contra = 1
 			return null
 		await say(K("No te apartas a tiempo."))
+	if Datos.CAL and await aturdido():   # MAESTRO [7]: aturdido, pierde su turno
+		return null
 	var dmg := (ri(int(B.atk[0]), int(B.atk[1])) + (int(D.PELEA.furia) if B.get("furia") else 0)) * (2 if B.get("carga") else 1)
 	b_anim("E", "ataque")
-	await say(T("{b} te da con la barra.", {"b": el_b()}) if B.get("carga") else T(pick([K("{b} te golpea."), K("{b} te empuja contra un portal."), K("{b} te da una patada."), K("{b} te tira al suelo.")]), {"b": el_b()}))
+	await say(T("{b} te da con la barra.", {"b": el_b()}) if B.get("carga") else (recibe_txt() if Datos.CAL and B.kind == "thief" else T(pick([K("{b} te golpea."), K("{b} te empuja contra un portal."), K("{b} te da una patada."), K("{b} te tira al suelo.")]), {"b": el_b()})))
 	B.carga = 0
 	B.furia = 0
 	var dd: int = int(ceil(dmg / 2.0)) if B.get("cubre") else dmg
@@ -162,6 +166,8 @@ func enemy_hits():
 	S.hp = maxi(0, S.hp - dd)
 	bhud_act()
 	await wait(450)
+	if Datos.CAL and S.hp > 0:
+		await corte()   # MAESTRO [7]: la navaja
 	if S.hp <= 0:
 		b_anim("P", "desmayo")
 		await say(K("Pierdes el conocimiento."))
@@ -205,13 +211,13 @@ func thief_round():
 			return await enemy_hits()
 		var mv := {"n": "PATADA", "acc": .65, "d": [8, 12]} if m else {"n": "PUÑETAZO", "acc": .92, "d": [4, 7]}   # i18n-no
 		await wait(b_anim("P", "patada" if m else "golpe") * .6)
-		await say(K("Le das una patada.") if mv.n == "PATADA" else K("Le das un puñetazo."))
+		await say(golpe_txt(mv.n) if Datos.CAL else (K("Le das una patada.") if mv.n == "PATADA" else K("Le das un puñetazo.")))
 		var g = B.get("guardia")
 		var k = B.get("contra")
 		B.guardia = 0
 		B.contra = 0
 		if g or k or Cultivo.azar() < minf(float(D.PELEA.accMax), mv.acc + int(S.pelea.ref) * float(D.PELEA.acc)):   # la fuerza suma al golpe y los reflejos, a la puntería (1.18)
-			var d: int = ri(mv.d[0], mv.d[1]) + int(S.pelea.fue) + (int(D.PELEA.contra) if k else 0)
+			var d: int = ri(mv.d[0], mv.d[1]) + int(S.pelea.fue) + (int(D.PELEA.contra) if k else 0) + (arma_d() if Datos.CAL else 0)
 			if k:
 				await say(K("Le pillas abierto."))
 			b_anim("E", "herido")
@@ -223,6 +229,8 @@ func thief_round():
 			await wait(500)
 			if m and d >= 11:
 				await say(K("Le has hecho daño de verdad."))
+			if Datos.CAL and B.hp > 0:
+				await tras_golpe()   # MAESTRO [7]: aturdido o sangrando
 		else:
 			await say(K("Fallas."))
 	elif c == 1:
@@ -279,6 +287,8 @@ func thief_round():
 			await say(K("Consigues escapar."))
 			return "flee"
 		await say(K("Te corta el paso. No puedes escapar."))
+	if Datos.CAL:
+		await sangra_tick()   # MAESTRO [7]: lo que sangra cada uno
 	if B.hp <= 0:
 		if B.get("jefe"):   # Darko (1.17) no huye: se queda en el suelo, y la reputación la da ajuste_darko
 			b_anim("E", "herido")

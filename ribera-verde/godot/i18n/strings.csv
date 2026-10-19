@@ -121,6 +121,7 @@ s536bf7ea,Trato hecho.,Deal.
 s90151b06,Gracias. Nos vemos.,Thanks. See you.
 s0c0706e3,Bien. Se lo diré a mis amigos.,Nice. I'll tell my mates.
 s96cb733c,+{p} · {g} g de {x} vendidos,+{p} · {g} g of {x} sold
+sf8340cd9,Fiado · {g} g,On credit · {g} g
 s74e2d5b5,+{p} · {g} g vendidos,+{p} · {g} g sold
 sbd2d5679,darkoFin,
 s778a1cf6,Uno de los chicos de Darko te ha visto vender.,One of Darko's boys saw you dealing.
@@ -1443,6 +1444,8 @@ sa85c1ce8,La {t} de {c}. Hablar e invitarle suma.{no},The {t} of {c}. Chatting a
 sf8804db9,vende para ti,sells for you
 s2c9eb93e,Le dejaste {l}: le quedan {g}.,You left them {l}: {g} to go.
 s10bdb3f4,Cliente de la agenda. Buen precio y regalos suman; con {n} vende para ti.,Regular customer. Fair prices and gifts help; at {n} they sell for you.
+sd20c58d6,Deudas,Debts
+sc8fb373b,Lo que te deben los que les fiaste. Pulsa A.,What the people you gave credit to owe you. Press A.
 sb64bd5c5,Todavía no conoces a nadie.,You don't know anyone yet.
 s225e56ce,GENTE,PEOPLE
 s4db97fa9,{n} persona,{n} person
@@ -2408,6 +2411,8 @@ se655e971,ANE,ANE
 s770159ff,Buenas. ¿Qué te pongo?,Hi there. What'll it be?
 s703d5c31,"Hola, majo. Dime.","Hey, love. Go on."
 s761cb832,"Buenas. Tabaco, papel, mecheros… lo que quieras.","Hi. Tobacco, papers, lighters… whatever you need."
+se3452d10,ESTANCO_MAS,ESTANCO_MAS
+s33bb533e, Marca: {m}., Brand: {m}.
 s5ffd8c72,Volver al mostrador.,Back to the counter.
 sc8d45ec6,Tienes {e},You have {e}
 sa89c4f50,Ten cuidado ahí fuera.,Take care out there.
@@ -2516,6 +2521,7 @@ De segunda mano: funciona, pero sin garantía.","{d}
 Second hand: it works, but no warranty."
 s914e1f5a,Cada día entran tres piezas.,Three pieces come in every day.
 s1f3c870c,CHATARRERÍA DEL SOLAR,SCRAPYARD
+s06bb6152,"«Para defenderte, ¿eh? Yo no te he visto.»","“For self-defence, eh? I never saw you.”"
 sdad59ce5,"Lo que entra, sale. Si lo quieres, no tardes.","What comes in, goes out. If you want it, don't wait."
 s6ec689a2,NEREA,NEREA
 sf894b425,"De madrugada se subasta el pescado. Lo otro, cuando te conozca más gente.","The fish is auctioned at dawn. The other stuff, once more people know you."
@@ -3069,6 +3075,72 @@ sd67d19ec,Se hace tarde y lo dejáis en tablas.,It's getting late and you call i
 se6e07865,"Ganas tú. {nb} te paga {e}: «La próxima, la revancha».","You win. {nb} pays you {e}: ""Next time, a rematch."""
 s113b3085,Gana {nb}. Le pagas {e}.,{nb} wins. You pay {e}.
 sa29835e5,Se hace tarde y lo dejáis en tablas. Nadie paga.,It's getting late and you call it a draw. Nobody pays.
+s1641fb63,GENTE7,GENTE7
+s643e6825,índica,indica
+s78adc8eb,sativa,sativa
+s60bda0b9,híbrida,hybrid
+sd7ea13d0,Le va la {e} con aroma {a}.,They like {e} with a {a} aroma.
+s49392ee3,"Oye… lo de lo que te debo, que no me olvido. Dame un poco más.","Listen… about what I owe you, I haven't forgotten. Give me a bit longer."
+s6a2c7ceb,"Por fiarme el otro día, te cuento una cosa:","For giving me credit the other day, I'll tell you something:"
+sf73ac696,¿Qué tal? La {s} de la otra vez estaba de diez.,How's it going? That {s} from last time was top notch.
+s1ad453ba,"Busco {g} g de una {e} con aroma {a}, de más del {t} % de THC. Si das con ella, te lo pago bien.","I'm after {g} g of a {e} with a {a} aroma, over {t} % THC. If you find it, I'll pay well."
+s9f602093,«Justo lo que buscaba.» Te da también {x}.,“Just what I was looking for.” They also give you {x}.
+s9d8fc5ad,{n} hojas de papel,{n} rolling papers
+s827d1101,un mechero,a lighter
+s19df432a,un bocata,a sandwich
+sc3699f3c,un spray de pimienta,a pepper spray
+se2cfefbb,"Me pillas sin un duro. ¿Me lo fías hasta el {d}? Te lo pago, palabra.","I'm totally broke. Can you give me credit until {d}? I'll pay you, I promise."
+s0b517f9a,Fiárselo,Give them credit
+sb3ee3716,Que pague ya,Pay up now
+sc51e0d0c,«Eres de los buenos. No te fallo.»,“You're one of the good ones. I won't let you down.”
+s905fba33,"Rebusca en todos los bolsillos y al final te lo paga, a regañadientes.","They search every pocket and in the end they pay, grudgingly."
+s50ab9883,Te he dejado {e} en el buzón. Gracias por fiarme; te debo una.,I've left {e} in your letterbox. Thanks for the credit; I owe you one.
+s62ac34a8,"No llego, de verdad. Dame unos días.","I can't make it, honestly. Give me a few days."
+sc684866f,Ya no hace falta. Otra vez será.,No need any more. Another time.
+s23b98e67,{e} · no paga,{e} · not paying
+scea4c07d,{e} · el {d},{e} · due {d}
+s41d8824e,{a}. Le fiaste el {d}.,{a}. You gave them credit on {d}.
+sd7ac7359,Nadie te debe nada.,Nobody owes you anything.
+s25589a66,DEUDAS,DEBTS
+s862d4d9d,{n} te debe {e}. Vence el {d}.,{n} owes you {e}. Due {d}.
+s42ef5757,Ya has hablado hoy con {n}. Déjale respirar.,You've already talked to {n} today. Give them some space.
+s8707b819,{n} no te ha pagado los {e}. ¿Qué haces?,{n} hasn't paid you the {e}. What do you do?
+s22393d49,Perdonarle,Forgive them
+sd61b818c,Exigirle {e},Demand {e}
+s2ce942c9,Amenazarle,Threaten them
+sc83b9186,«Te debo la vida. En el barrio se va a saber que eres legal.»,“I owe you my life. The whole neighbourhood will know you're legit.”
+sf2fd9fa7,Para cobrar hay que quedar en la calle.,"To collect, you have to meet on the street."
+s8387feea,{n} se pone chulo: «¿Intereses? Te vas a enterar».,{n} gets cocky: “Interest? You'll see.”
+s7885e247,Al final suelta los {e}.,In the end they hand over the {e}.
+s9347c3c3,"Te paga los {e}, intereses incluidos, mirando al suelo.","They pay you the {e}, interest included, staring at the floor."
+s6e0f6c8e,"«No tengo nada, te lo juro.» Hoy no le sacas ni un euro.","“I've got nothing, I swear.” You won't get a single euro out of them today."
+sa687bf27,"Se asusta y te paga los {e}. En el barrio se habla de ti, y no para bien.","They get scared and pay you the {e}. People in the neighbourhood are talking about you, and not kindly."
+sd1417eb1,Se esconde: no te coge el teléfono. Y alguien ha oído la amenaza.,They hide: they won't pick up the phone. And someone heard the threat.
+s92373c73,"Por cierto: {q} en {p} necesita {g} g de una {ef}. Si se los llevas antes del {d}, te paga {e}. ¿Te animas?","By the way: {q} in {p} needs {g} g of a {ef}. If you get it to them before {d}, they'll pay {e}. Up for it?"
+s3c6b2960,Me animo,I'm in
+s7a432755,Paso,Pass
+s1df8aa04,{q} de {n},{q} of {n}
+s414c3ab0,"«Te paso su número. Cuando estés en {p}, llámale.»","“I'll give you their number. When you're in {p}, call them.”"
+s2c8f900c,Encargo: {g} g de una {ef} antes del {d}. Paga {e}.,Job: {g} g of a {ef} before {d}. Pays {e}.
+s7b87c4fa,"«Estoy en {p}. Llámame cuando estés por aquí, en la calle.»","“I'm in {p}. Call me when you're around here, on the street.”"
+s70cf6903,«¿No traes una {ef}? Entonces nada.»,“You haven't brought a {ef}? Then forget it.”
+sb0c83104,¿Qué le llevas?,What do you bring them?
+sc64eb865,"Viene en diez minutos, mira el material y te paga {e}. «Ya me dijeron que eras de fiar.»","They come in ten minutes, check the stuff and pay you {e}. “They told me you could be trusted.”"
+s9c28aa17,COMBATE7,COMBATE7
+sea73634c," Con el bate, se nota."," With the bat, it shows."
+s172c5f58," Con la cadena, se nota."," With the chain, it shows."
+s5ff98b0f,{b} se queda aturdido.,{b} is stunned.
+sf2920d0a,{b} sangra.,{b} is bleeding.
+sf20a55fe,{b} sigue sangrando: −{d}.,{b} keeps bleeding: −{d}.
+s71d013fb,El corte te sigue sangrando: −{d}.,The cut keeps bleeding: −{d}.
+se209766b,{b} no se tiene en pie: no te ataca.,{b} can't stand up straight: no attack.
+s9885234d,{b} saca una navaja y te alcanza en el brazo. Sangras.,{b} pulls a knife and catches you on the arm. You're bleeding.
+s219ff709,CATALOGO,CATALOGO
+sd4ba207b,Ver solo esta sección.,Show only this section.
+s1085286a,Ver solo este tipo.,Show only this type.
+se7b29b61,Ver solo esta marca.,Show only this brand.
+s3f8f7ec9,Todas las secciones,All sections
+s5635e3e3,Volver atrás.,Go back.
 s71ca27b4,Skunk #1,Skunk #1
 sd3870649,Skonk #1,Skonk #1
 sc546d362,Afghani × Colombian Gold × Acapulco Gold,Afghani × Colombian Gold × Acapulco Gold
@@ -5314,6 +5386,102 @@ s71623fda,"Cámaras con grabación, en los monitores del despacho de la nave: lo
 s0d1c3b59,Carbón activo de recambio,Replacement activated carbon
 s3747caa1,Ozonizador,Ozonator
 sf9317f86,"Un generador de ozono para el conducto de extracción: con el carbón en buen estado, en la calle no huele nada.","An ozone generator for the extraction duct: with the carbon in good shape, the street smells of nothing."
+sf4a2a16a,"Egun on. Tú eres la familia de Maite, ¿no? Aquí se sabe todo.","Egun on. You're Maite's family, aren't you? Everybody knows everything here."
+s6c5d4db8,"Buenas. Mal tiempo se nos viene, dicen los viejos.","Afternoon. Bad weather's coming, the old folk say."
+s69b17183,"Aupa. Que no te vea nadie del pueblo, que luego hablan.","Aupa. Don't let anyone from the village see you, they'll talk."
+s758ca152,"Bueno, pues trato. Y que no se entere el cura.","Right then, deal. And don't let the priest find out."
+s1e27ed92,"Hecho. Lo que se habla aquí, aquí se queda.",Done. What's said here stays here.
+s750f93d4,Ondo. Ya te diré qué tal.,Ondo. I'll tell you how it was.
+s7a222be3,"Uy, a ese precio ni mi cuñado.","Ooh, not even my brother-in-law would pay that."
+sbd3bc936,Eso es mucho dinero para el monte.,That's a lot of money for up in the hills.
+sa593d822,"No, no. Con eso compro pienso para un mes.","No, no. With that I buy feed for a month."
+sebbf1d9e,Dicen que en el caserío de arriba alguien planta entre el maíz.,They say someone at the farmhouse up the hill grows it among the maize.
+s89e6f12e,El martes subió una patrulla hasta la ermita. Mira tú.,On Tuesday a patrol went all the way up to the chapel. Fancy that.
+s050bdf40,"Este año las lluvias vienen tarde: lo que tengas fuera, que se dé prisa.",The rain is late this year: whatever you've got outside had better hurry.
+s8ff63116,"¿Qué pasa, máquina? ¿Hay algo o qué?","What's up, champ? Got anything or what?"
+s0bf65331,"Ey. Rápido, que me están esperando.","Hey. Quick, they're waiting for me."
+s185ab988,"Buenas. Tú eres el que mueve, ¿no? Me han hablado bien.","Alright. You're the one who moves stuff, right? I've heard good things."
+s9a014726,Hecho. Palabra de barrio.,Done. Neighbourhood's honour.
+sfb9c36d3,Guay. Esto queda entre tú y yo.,Sweet. This stays between you and me.
+sd20e964e,De lujo. Te debo una.,Brilliant. I owe you one.
+s54d84c86,¿Me ves cara de banco? Ni de coña.,Do I look like a bank? No way.
+s467e1f00,A ese precio que te lo compre tu madre.,"At that price, get your mum to buy it."
+sf90eb90a,"Paso, tío. Eso es un robo.","I'll pass, mate. That's daylight robbery."
+s929a73ee,Han cambiado el turno de la patrulla: de noche pasan menos por la plaza.,The patrol changed shifts: at night they come through the square less.
+sb900a07a,Al de la moto roja le pillaron con lo que llevaba. Por bocas.,The guy with the red motorbike got caught with what he had on him. Ratted out.
+s72b06808,Dicen que en los astilleros alguien vende cortado. Ojo.,They say someone at the shipyards sells cut stuff. Careful.
+sb92e6de4,Buenas tardes. Me han dicho que tu producto es… distinto.,Good afternoon. I'm told your product is… different.
+sdfea4ba4,"Hola. Seamos breves: busco calidad, no conversación.","Hello. Let's keep it brief: I'm after quality, not conversation."
+sadd92824,Encantado. Un amigo del club te recomienda.,Delighted. A friend from the club recommends you.
+s7ea4cd04,Perfecto. Un placer hacer negocios.,Perfect. A pleasure doing business.
+sd1fb4a95,"Excelente. Te recomendaré, con discreción.","Excellent. I'll recommend you, discreetly."
+s04b03a1e,"De acuerdo. Si repite la calidad, repito yo.","Very well. If the quality holds, so will I."
+s6e91f136,"No, gracias. No pago por estética.","No, thank you. I don't pay for looks."
+s80a376c0,Para ese precio prefiero a mi proveedor de siempre.,At that price I'd rather stick to my usual supplier.
+s15169951,Me temo que no hablamos de lo mismo.,I'm afraid we're not talking about the same thing.
+sfae28787,En el Ensanche hay un concejal que se deja ver mucho en los reservados.,In the Ensanche there's a councillor who's often seen in the private rooms.
+s583abfe4,La RRPP de GAUA cambia de proveedor cada mes. Hay hueco.,GAUA's promoter changes supplier every month. There's an opening.
+s9db5bbc5,Han abierto un local nuevo en el Casco. Mucho dinero detrás.,A new bar has opened in the Casco. Lots of money behind it.
+s07cf90ca,chaval de la plaza,lad from the square
+s45f27757,mi primo,my cousin
+s89204ff8,una amiga,a friend
+sb166b09c,mi cuñado,my brother-in-law
+s6990b648,una compañera del curro,a workmate
+s8f737412,mi vecino,my neighbour
+s45ff1225,Le sueltas un directo a la cara.,You land a straight to the face.
+sdcbd22e9,Le cazas con un gancho al hígado.,You catch them with a hook to the liver.
+s5b33d88c,Le das un crochet que le gira la cara.,You throw a cross that turns their head.
+s3f09c7e8,Le hundes el puño en el estómago.,You sink your fist into their stomach.
+sb23a81f8,Le das una patada en la rodilla.,You kick them in the knee.
+se5d58edb,Le metes una patada baja que le dobla.,You land a low kick that doubles them over.
+se287a529,Le das una patada en las costillas.,You kick them in the ribs.
+s1626ee09,{b} te suelta un derechazo.,{b} throws a right hook at you.
+s290bca0d,{b} te agarra del cuello y te empuja.,{b} grabs you by the neck and shoves you.
+s8f531033,{b} te da un rodillazo.,{b} knees you.
+s2fa6b1fb,{b} te tira contra un contenedor.,{b} throws you against a bin.
+s05a21f76,{b} te mete un codazo.,{b} elbows you.
+s707eecd6,Bate de madera,Wooden bat
+sc6ed9fbb,Pesa y se nota. Suma 3 a cada golpe y a veces deja al otro aturdido.,It's heavy and it shows. Adds 3 to every hit and sometimes leaves the other one stunned.
+s0207f1ed,Cadena de bici,Bike chain
+se923a607,Suma 2 a cada golpe y a veces le abre una herida que sangra.,Adds 2 to every hit and sometimes opens a bleeding wound.
+sc29a4129,Semillas,Seeds
+s8290dd3d,Carpas y macetas,Tents and pots
+s3c65ea07,Clima y aire,Climate and air
+s9594dc37,Riego y abono,Watering and nutrients
+s40775eba,Plagas y hongos,Pests and mould
+s94f31d01,Extracción y curado,Extraction and curing
+s1def6f95,Para fumar,For smoking
+s621edbe2,Varios,Miscellaneous
+scc42f5e1,HAZIA,HAZIA
+s97005fc2,ARGIA,ARGIA
+s85f18529,EGUZKI,EGUZKI
+s79cd05dc,OLATU,OLATU
+s419c09cb,LURRA,LURRA
+sb4a06d43,HAIZE,
+sb41fd9f8,UREZ,UREZ
+s00e5de2a,NEURRI,NEURRI
+s41c0db31,BABESA,BABESA
+s7a2ac6e2,ESTUTU,ESTUTU
+s8b0af99e,KUPEL,KUPEL
+s0f5b7175,KEA,KEA
+s445c2e51,ZIGA,ZIGA
+s5c90684f,SUGAR,SUGAR
+sfc20e498,ZAKU,ZAKU
+s66cf52de,Un mosto,A grape juice
+sd8ee393b,Un txakoli,A txakoli
+sa1feeba9,Una sidra,A cider
+s605a01f4,Un cortado,A cortado
+s8ccaecae,Una infusión,A herbal tea
+sb941c9fe,Un agua,A water
+s04cc39e2,Un chupito,A shot
+s3850139c,Papel de arroz (50 hojas),Rice papers (50 sheets)
+sef65df1c,"Fino y lento. ZIGA, de arroz.","Thin and slow-burning. ZIGA, rice paper."
+sf1669ffb,Papel y filtros,Papers and filters
+s6c9a1c70,Boquillas de cartón (50),Cardboard tips (50)
+s3dc89cc8,"Para el porro: de cartón, se enrollan a mano.","For the joint: cardboard, rolled by hand."
+s41092c40,Mechero de gasolina,Petrol lighter
+scff74584,"De metal, recargable. Dura toda la vida.","Metal, refillable. Lasts a lifetime."
+s59f2c68e,Mecheros,Lighters
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -5364,7 +5532,6 @@ s50674b74,KALLI MIXT,
 sf730e9d7,CHEEZ,
 s3847bcb4,KALIFORNIA ORANTX,
 s1a23cda7,CHEMDOG,
-sb4a06d43,HAIZE,
 s9a25faba,NORZEN LIGHTS,
 s366ac7c2,PURPEL THAI,
 s5ae9deaa,TRENWRECK,
@@ -5468,3 +5635,27 @@ s6d193c08,A {e},For {e}
 sd13db6e8,primavera,spring
 s933b44a2,verano,summer
 s45a8294e,invierno,winter
+sc9686f8d,Tabaco,Tobacco
+se5d5a345,Autoflorecientes,Autoflowering
+s9fd31cb8,Índicas,Indicas
+se31360af,Sativas,Sativas
+s2b22fb20,Híbridas,Hybrids
+s7a7e937f,LED,LED
+sfc386a88,Sodio,Sodium
+sbc71fdbb,Carpas,Tents
+s4f60a778,Macetas,Pots
+s2176045b,Carros,Trolleys
+s5aed8d44,Tratamientos,Treatments
+sc5dcc834,Ventilación,Ventilation
+sef587c5a,Climatización,Climate control
+s7a9d0e8a,Bolsas,Bags
+s5d5ff024,Abono mineral,Mineral nutrients
+s5b567d58,Abono orgánico,Organic nutrients
+s6f6a446c,Medición,Measuring
+sb3f743f7,Prensas y tamices,Presses and sieves
+s9ce0fde8,Máquinas,Machines
+s5d83adb4,Curado,Curing
+sf45cf29a,Análisis,Analysis
+s1c48efeb,Pipas y bongs,Pipes and bongs
+s960219e1,Comida,Food
+s137508f0,Defensa,Self-defence

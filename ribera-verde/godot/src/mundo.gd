@@ -2403,3 +2403,88 @@ func seguridad_local(_k: String) -> void:
 
 func monitores() -> void:
 	pass
+
+# MAESTRO [7], en vida.gd
+func cal_saludo(_c: Dictionary, _N: String) -> bool:
+	return false
+
+func cal_busco(_c: Dictionary) -> String:
+	return ""
+
+func cal_precio(_c: Dictionary, _sid: String, _b: Dictionary) -> float:
+	return 1.0
+
+func cal_acc(_c: Dictionary, _sid: String, _b: Dictionary, _j: int, acc: float) -> float:
+	return acc
+
+func cal_frase(_k: String, _c: Dictionary) -> String:
+	return ""
+
+func cal_vendido(_c: Dictionary, _sid: String, _b: Dictionary, _N: String) -> void:
+	pass
+
+func cal_fiar(_c: Dictionary, _e: int) -> int:
+	return 0
+
+func cal_charla(_e) -> void:
+	pass
+
+func carta(bb: String) -> Array:
+	return BEBIDAS[bb]
+
+func arma_rival() -> void:
+	pass
+
+func aturdido() -> bool:
+	return false
+
+func recibe_txt() -> String:
+	return ""
+
+func corte() -> void:
+	pass
+
+func golpe_txt(_mv: String) -> String:
+	return ""
+
+func arma_d() -> int:
+	return 0
+
+func tras_golpe() -> void:
+	pass
+
+func sangra_tick() -> void:
+	pass
+
+func filtra_tienda(list: Array, _F: Dictionary) -> Dictionary:
+	return {"filas": [], "list": list}
+
+func marca_de(_it: Dictionary) -> String:
+	return ""
+
+func armas_venta() -> Array:
+	return []
+
+func cal_llamar_filas() -> Array:
+	return []
+
+func entrega_encargo(_E: Dictionary) -> void:
+	pass
+
+func gusto_txt(_id: String) -> String:
+	return ""
+
+func arq_txt(_a: String) -> String:
+	return ""
+
+func arq_de(_c: Dictionary) -> String:
+	return ""
+
+func fiados() -> Array:
+	return []
+
+func deudas() -> void:
+	pass
+
+func vida_dia() -> void:
+	pass

@@ -480,6 +480,8 @@ func hablar_con(e) -> void:
 		var r = rel_de(e.id)
 		if not e.get("pat") and r:
 			saludo(r)
+		if Datos.CAL and SENT != null:   # MAESTRO [7]: sentado, la charla y, a veces, un encargo
+			await cal_charla(e)
 
 func menu_sentado() -> void:
 	if SENT == null:
@@ -523,7 +525,7 @@ func nombre_ent(e) -> String:   # dónde está respecto al asiento
 	return K("quien tienes delante") if (dy > 0) == (SENT.d == "sur") else K("quien tienes detrás")
 
 func beber_sentado(bb: String) -> void:
-	var L: Array = BEBIDAS[bb]
+	var L: Array = carta(bb)
 	var j: int = await ask(K("¿Qué te pones?"), L.map(func(b): return T("{b} · {p}", {"b": b[0], "p": Datos.eur(b[1])})) + [K("Nada")])
 	if j < 0 or j >= L.size():
 		return
@@ -914,9 +916,14 @@ func talk_client(c: Dictionary) -> void:
 	var ct: Dictionary = D.CTYPES[c.type]
 	var N: String = c.get("n", etiqueta_ct(c.type, mujer_look(c.get("look"))))   # n: el nombre de un cliente de la agenda (12b-movil)
 	var ext: bool = c.type == "ext"
-	await say(pick(ct.greet), N)
+	var ya: bool = (not ext) and await cal_saludo(c, N)   # MAESTRO [7]: la memoria, la deuda, el chisme o la manera de hablar de su zona
+	if not ya:
+		await say(pick(ct.greet), N)
+	var bus := "" if ext else cal_busco(c)
 	if ext:
 		await say(T("Busco {g} g de rosin o de hachís.", {"g": n(c.want)}), N)
+	elif bus != "":
+		await say(bus, N)
 	else:
 		await say(T("Busco {g} g de algo potente, mínimo {thc}% de THC.", {"g": n(c.want), "thc": n(c.minThc)}) if c.minThc else T("Busco {g} g.", {"g": n(c.want)}), N)
 	var lots := rosin_lots(c.want) if ext else bud_lots(c.want, c.minThc)
@@ -938,6 +945,7 @@ func talk_client(c: Dictionary) -> void:
 		base *= sat
 		if sat < .8:
 			await say(K("Esa la está vendiendo todo el mundo por aquí. Ya no se paga como antes."), N)
+		base *= cal_precio(c, sid, b)   # MAESTRO [7]: el pedido acertado
 	var pr := [Datos.jsround(base * .85), Datos.jsround(base), Datos.jsround(base * 1.3)]
 	var j: int = await ask(T("{g} g de {x} de {nom}. ¿Cuánto le pides?", {"g": n(c.want), "x": xn.substr(0, xn.length() - 1), "nom": lot_nombre(sid)}) if ext else T("{g} g de {nom}. ¿Cuánto le pides?", {"g": n(c.want), "nom": lot_nombre(sid)}), [T("Rebaja · {p} €", {"p": int(pr[0])}), T("Justo · {p} €", {"p": int(pr[1])}), T("Caro · {p} €", {"p": int(pr[2])}), K("Cancelar")])
 	if j == 3:
@@ -947,15 +955,19 @@ func talk_client(c: Dictionary) -> void:
 	var acc: float = [1.0, .92, clampf(.3 + (b.thc - mt) * .05 + (.25 if c.type == "pij" else 0.0) + (.15 if c.type == "tur" else 0.0) + (.3 if c.type == "vip" else 0.0), .1, .9)][j]
 	if j > 0:   # 1.15: la confianza de los de la agenda, la cata y el análisis
 		acc = minf(.97, acc + (rel(c.fid) / 250.0 if c.get("fid") else 0.0) + (.05 if b.get("cata") else 0.0) + (.1 if b.get("ana") else 0.0))
+	if Datos.CAL and not ext:
+		acc = cal_acc(c, sid, b, j, acc)
 	if Cultivo.azar() < acc:
+		var fio: int = 0 if ext else await cal_fiar(c, int(pr[j]))   # MAESTRO [7]: fiárselo a uno de la agenda
 		if c.get("fid"):
 			confia(c.fid, [3, 2, 1][j])
 		if ext:
 			use_rosin(sid, c.want)
 		else:
 			use_buds(sid, c.want)
-		S.money += pr[j]
-		S.sales += pr[j]
+		if not fio:
+			S.money += pr[j]
+			S.sales += pr[j]
 		if Datos.CAL and not ext:
 			satura(lot_sid(sid), c.get("map", "town"), c.want)
 		var fc := calle_tiempo()
@@ -965,8 +977,11 @@ func talk_client(c: Dictionary) -> void:
 		await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
 		remove_client(c.id)
 		apunta_fijo(c)
-		await say(pick([K("Trato hecho."), K("Gracias. Nos vemos."), K("Bien. Se lo diré a mis amigos.")]), N)
-		toast(T("+{p} · {g} g de {x} vendidos", {"p": Datos.eur(pr[j]), "g": n(c.want), "x": xn.substr(0, xn.length() - 1)}) if ext else T("+{p} · {g} g vendidos", {"p": Datos.eur(pr[j]), "g": n(c.want)}), 1600)
+		var fr := "" if ext else cal_frase("si", c)
+		await say(fr if fr != "" else pick([K("Trato hecho."), K("Gracias. Nos vemos."), K("Bien. Se lo diré a mis amigos.")]), N)
+		toast(T("+{p} · {g} g de {x} vendidos", {"p": Datos.eur(pr[j]), "g": n(c.want), "x": xn.substr(0, xn.length() - 1)}) if ext else (T("Fiado · {g} g", {"g": n(c.want)}) if fio else T("+{p} · {g} g vendidos", {"p": Datos.eur(pr[j]), "g": n(c.want)})), 1600)
+		if not ext:
+			await cal_vendido(c, sid, b, N)
 		visto_vender()
 		heat_warn()
 		await check_story()
@@ -982,7 +997,8 @@ func talk_client(c: Dictionary) -> void:
 			confia(c.fid, -2)
 		sfx("bad")
 		remove_client(c.id)
-		await say(pick([K("¿Tanto? No."), K("A ese precio, paso."), K("Eso es demasiado. Adiós.")]), N)
+		var fr := "" if ext else cal_frase("no", c)
+		await say(fr if fr != "" else pick([K("¿Tanto? No."), K("A ese precio, paso."), K("Eso es demasiado. Adiós.")]), N)
 
 # MAESTRO [5]: la saturación del mercado. S.sat[pueblo][cepa] = gramos vendidos en la calle de ese pueblo; con SATURA.g, el precio
 # baja SATURA.baja (la mitad), y cada día se olvida SATURA.dia de lo vendido (sat_dia, desde new_day)

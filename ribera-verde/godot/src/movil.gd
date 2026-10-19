@@ -172,6 +172,8 @@ func llamar() -> bool:
 		C.append({"label": K("Iñaki"), "right": K("muelle"), "desc": K("Compra al por mayor."), "k": "inaki"})
 	for f in S.fijos:
 		C.append({"label": f.n, "right": etiqueta_ct(f.t, mujer_nombre(f.n)).to_lower(), "desc": K("Ya ha venido hoy.") if f.dia == S.day else K("Te compró en la calle. Si estás fuera, viene a buscarte."), "f": f})
+	if Datos.CAL:
+		C.append_array(cal_llamar_filas())   # MAESTRO [7]: el encargo de una charla
 	if C.is_empty():
 		await say(K("La agenda está vacía."))
 		return false
@@ -181,6 +183,9 @@ func llamar() -> bool:
 	if i < 0 or i >= C.size():
 		return false
 	var c: Dictionary = C[i]
+	if c.has("enc"):
+		await entrega_encargo(c.enc)
+		return false
 	match c.get("k", ""):
 		"kiko":
 			await talk(K("KIKO"), [kiko_tip()])
@@ -474,7 +479,14 @@ func gente() -> void:
 	for f in S.fijos:
 		var v = _vend_de(f.id)
 		rows.append({"label": f.n, "right": T("{r} · {t}", {"r": rel(f.id), "t": K("vende para ti") if v else rel_nivel(f.id)}),
-			"desc": T("Le dejaste {l}: le quedan {g}.", {"l": lot_nombre(v.k), "g": g_txt(v.g)}) if v else T("Cliente de la agenda. Buen precio y regalos suman; con {n} vende para ti.", {"n": int(D.REL.socio)})})
+			"desc": (T("Le dejaste {l}: le quedan {g}.", {"l": lot_nombre(v.k), "g": g_txt(v.g)}) if v else T("Cliente de la agenda. Buen precio y regalos suman; con {n} vende para ti.", {"n": int(D.REL.socio)}))
+				+ (" " + T("{a}. {g}", {"a": may1(I18n.v(arq_txt(arq_de({"type": f.t, "fid": f.id})))), "g": gusto_txt(f.id)}) if Datos.CAL else "")})
+	var deu := Datos.CAL and not fiados().is_empty()   # MAESTRO [7]: lo que te deben, arriba
+	if deu:
+		var tot := 0
+		for f in fiados():
+			tot += int(f.e)
+		rows.push_front({"label": K("Deudas"), "right": Datos.eur(tot), "desc": K("Lo que te deben los que les fiaste. Pulsa A.")})
 	if rows.is_empty():
 		await say(K("Todavía no conoces a nadie."))
 		return
@@ -482,6 +494,9 @@ func gente() -> void:
 	while true:
 		i = await menu(rows, {"cls": "full", "title": K("GENTE"), "title2": T("{n} personas", {"n": rows.size()}) if rows.size() > 1 else T("{n} persona", {"n": rows.size()}), "desc": true, "initial": i})
 		if i < 0:
+			return
+		if deu and i == 0:
+			await deudas()
 			return
 
 func talk_begona():

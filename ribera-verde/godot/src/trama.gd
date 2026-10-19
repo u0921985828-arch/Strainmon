@@ -116,15 +116,21 @@ func shop(T: Dictionary = {}) -> void:
 	if T.is_empty():
 		T = D.TIENDAS.kiko
 	var i := 0
+	var F := {"c": "", "s": "", "m": ""}   # MAESTRO [7]: el filtro por sección, tipo y marca
 	while true:
 		var list := []
 		var fuente: Array = D[T.lista].items if T.has("lista") else D.SHOP
 		if Datos.CAL and not T.has("lista"):   # 1.47 (lo pidió el usuario): las pipas y demás, en el grow, en sus vitrinas
 			fuente = fuente + D.PARAFERNALIA
+		if Datos.CAL and T.get("lista") == "ESTANCO" and D.has("ESTANCO_MAS"):   # MAESTRO [7]: más surtido
+			fuente = fuente + D.ESTANCO_MAS
 		for it in fuente:
 			if S.ch + T.ch >= it.ch and tienda_ok(T, it) and shop_cond(it):
 				list.append(it)
-		var items := []
+		var ft := filtra_tienda(list, F)
+		var filas: Array = ft.filas
+		list = ft.list
+		var items := filas.duplicate()
 		for it in list:
 			var ic = null
 			if it.get("sid"):
@@ -141,13 +147,18 @@ func shop(T: Dictionary = {}) -> void:
 				ic = icono(Atlas.ICX[it.extra])
 			elif it.get("carpa"):
 				ic = icono(Atlas.ico_carpa(it.carpa))
+			var mk := marca_de(it) if Datos.CAL and not it.get("sid") else ""
 			items.append({"label": it.lbl, "right": Datos.eur(precio_t(T, it)) + ("/u" if it.get("sid") else ""), "sw": D.STRAINS[it.sid].c if it.get("sid") else null, "ic": ic,
-				"desc": strain_line(it.sid) if it.get("sid") else it.get("desc", "")})
+				"desc": strain_line(it.sid) if it.get("sid") else (I18n.v(String(it.get("desc", ""))) + ("" if mk == "" else T(" Marca: {m}.", {"m": mk})))})
 		items.append({"label": K("Salir"), "desc": K("Volver al mostrador.")})
-		i = await menu(items, {"cls": "full", "title": T.t, "title2": I18n.T("Tienes {e}", {"e": Datos.eur(S.money)}), "desc": true, "initial": i})
-		if i < 0 or i >= list.size():
+		i = await menu(items, {"cls": "full", "title": T.t, "title2": I18n.T("Tienes {e}", {"e": Datos.eur(S.money)}), "desc": true, "initial": clampi(i, 0, items.size() - 1)})
+		if i >= 0 and i < filas.size():
+			F = filas[i].f
+			i = 0
+			continue
+		if i < 0 or i - filas.size() >= list.size():
 			break
-		var it: Dictionary = list[i]
+		var it: Dictionary = list[i - filas.size()]
 		if it.get("sid"):
 			if await comprar_semillas(it) and T.N == "KIKO":
 				confia("kiko", 1)
@@ -509,14 +520,29 @@ func talk_bixente():
 					if S.ch >= int(it.ch) and shop_cond(it):   # solo lo de su capítulo
 						l.append(it)
 					break
-		if l.is_empty():
+		var aw: Array = armas_venta() if Datos.CAL else []   # MAESTRO [7]: el bate y la cadena
+		if l.is_empty() and aw.is_empty():
 			await say(K("Hoy no me queda nada que te sirva. Mañana entra más."), N)
 			return
 		var items := []
+		for a in aw:
+			items.append({"label": a.lbl, "right": Datos.eur(int(a.p)), "desc": a.desc})
 		for it in l:
 			items.append({"label": it.lbl, "right": Datos.eur(Datos.jsround(it.p * D.CHATARRA.f)), "desc": T("{d}\nDe segunda mano: funciona, pero sin garantía.", {"d": it.get("desc", "")})})
 		items.append({"label": K("Nada"), "desc": K("Cada día entran tres piezas.")})
 		i = await menu(items, {"cls": "full", "title": K("CHATARRERÍA DEL SOLAR"), "title2": I18n.T("Tienes {e}", {"e": Datos.eur(S.money)}), "desc": true, "initial": i})
+		if i >= 0 and i < aw.size():
+			if float(S.money) < int(aw[i].p):
+				sfx("bad")
+				await say(K("Sin dinero no hay trato."), N)
+				continue
+			S.money -= int(aw[i].p)
+			S.items[String(aw[i].arma)] = 1
+			sfx("coin")
+			await say(K("«Para defenderte, ¿eh? Yo no te he visto.»"), N)
+			i = 0
+			continue
+		i -= aw.size()
 		if i < 0 or i >= l.size():
 			await say(K("Lo que entra, sale. Si lo quieres, no tardes."), N)
 			return

@@ -163,6 +163,7 @@ func new_day() -> void:
 	recibos_dia()   # 1.35
 	contable_dia()   # MAESTRO [6]: los contables meten la caja de mañana
 	robos_dia()   # MAESTRO [6]: los robos en la nave y los locales, según su seguridad
+	vida_dia()   # MAESTRO [7]: los fiados que vencen y los encargos que caducan
 	conce_dia()   # 1.43
 	vencer_encargo_club()
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
