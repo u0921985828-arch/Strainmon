@@ -1241,7 +1241,7 @@ func _aparcado(k: String, x: int, y: int, d: String, dx := 0) -> void:   # dx: e
 			_pinta(f, xp, yp)
 
 func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
-	var gr = Atlas.grupo_look(look)
+	var gr = J.grupo_pj() if isP else Atlas.grupo_look(look)
 	if not gr:
 		return
 	var v = J.vehiculo() if isP else e.get("veh")   # 1.57: los coches de la demo del título, con su conductor; en la calle, con el patinete o la bici: detrás, él (subido) y delante (dibujarPJ)
@@ -1293,7 +1293,7 @@ const SENT_PIERNAS := ["anooonaanooona", "anonnnaannnona", ".annna..annna.", ".a
 const SENT_TABURETE := [".akka....akka.", ".akka....akka.", ".akla....alka.", ".akka....akka.", ".akka....akka.", ".ahha....ahha.", ".aaaa....aaaa."]
 const TABURETE_SUBE := 5
 func _pj_sentado() -> void:
-	var gr = Atlas.grupo_look(J.D.LOOKS.player)
+	var gr = J.grupo_pj()
 	if not gr:
 		return
 	var f = Atlas.frame_de(gr, "base", DIR4[J.P.dir], 0, {"i": 0})

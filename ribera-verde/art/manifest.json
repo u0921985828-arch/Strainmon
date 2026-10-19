@@ -3677,6 +3677,287 @@
    "coste_real": 28
   },
   {
+   "id": "player-f",
+   "tipo": "personaje",
+   "fase": "MAESTRO-1",
+   "cubre": [
+    "look:player-f"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "v3",
+    "size": 32,
+    "view": "low top-down"
+   },
+   "descripcion": "young woman with green cap worn forward, dark brown shoulder-length hair, light skin, red t-shirt, navy jeans, white sneakers; same style and scale as the player.",
+   "celda": "personaje",
+   "estado": "aprobado",
+   "familia": "personaje",
+   "paleta": "propia",
+   "notas": "MAESTRO [1]: la protagonista. create_image_pro 32×32 (estilo del player) → create_character v3 con la elegida → animaciones v3 con las mismas acciones que el player. Fotogramas al color más cercano de la paleta del player (ROPA.src igual).",
+   "pixellab": {
+    "character_id": "e8767a87-c179-4f92-b9d5-691ddf514e96"
+   },
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 4,
+     "bucle": true,
+     "modo": "v3",
+     "accion": "standing still, gentle breathing idle, shoulders rise and fall by one pixel, keeps facing the same direction",
+     "frames": 4
+    },
+    {
+     "nombre": "walk",
+     "herramienta": "animate_character",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "walking at a normal pace, simple 4-frame walk cycle with alternating legs and small arm swing, keeps facing the same direction",
+     "frames": 4
+    },
+    {
+     "nombre": "run",
+     "herramienta": "animate_character",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 12,
+     "bucle": true,
+     "sincronia": "un ciclo cada 2 casillas",
+     "modo": "v3",
+     "accion": "running fast, simple 6-frame run cycle with long strides and pumping arms, keeps facing the same direction",
+     "frames": 6
+    },
+    {
+     "nombre": "regar",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "watering a potted plant on the floor in front with a small green watering can, tilting it so water drips from the spout, keeps facing the same direction",
+     "frames": 8,
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "plantar",
+     "herramienta": "animate_character",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": false,
+     "modo": "v3",
+     "accion": "crouching down to plant a small seedling in a pot on the floor in front, pressing the soil with both hands, then standing up, keeps facing the same direction",
+     "frames": 6
+    },
+    {
+     "nombre": "cosechar",
+     "herramienta": "animate_character",
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": false,
+     "modo": "v3",
+     "accion": "bending down to a plant on the floor in front, cutting and picking the buds with both hands, then standing up holding them, keeps facing the same direction",
+     "frames": 6
+    },
+    {
+     "nombre": "cruzar",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "bending over a microscope on a desk in front, looking into it and turning the focus knob, keeps facing the same direction",
+     "frames": 8,
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "oler",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "lifting a small green bud to the nose with one hand and smelling it, pleased, then lowering the hand, keeps facing the same direction",
+     "frames": 8,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "vender",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "discreetly handing over a small bag with one hand and receiving folded banknotes with the other, then pocketing them, keeps facing the same direction",
+     "frames": 8,
+     "direcciones": [
+      "south",
+      "north",
+      "east",
+      "west"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "telefono",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "taking a mobile phone out of the pocket, looking at the screen and reading a message, then putting it away, keeps facing the same direction",
+     "frames": 6,
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ]
+  },
+  {
+   "id": "player-f-combate",
+   "tipo": "combate",
+   "fase": "MAESTRO-1",
+   "cubre": [
+    "combate:espalda:player-f"
+   ],
+   "herramienta": "create_character",
+   "parametros": {
+    "mode": "v3",
+    "size": 64,
+    "view": "low top-down"
+   },
+   "descripcion": "young woman in a fighting stance with fists up: green baseball cap worn forwards, shoulder-length dark brown hair, light skin, bright red t-shirt, navy jeans, white sneakers.",
+   "celda": "combate",
+   "estado": "aprobado",
+   "familia": "personaje",
+   "paleta": "propia",
+   "depende_de": [
+    "player-f"
+   ],
+   "notas": "Se usa la dirección north (de espaldas). create_image_pro 64×64 con la protagonista y el previo del player-combate (16 candidatos, el 0) → create_character v3 → animaciones v3 con las acciones del player-combate. Fotogramas al color más cercano de la paleta del player-combate.",
+   "pixellab": {
+    "create_image_pro_job": "766d71cb-f268-48f6-827b-c96a3d462b2a",
+    "character_id": "65812796-2c69-4fc2-812a-7ad9cdb97c34"
+   },
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "animate_character",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": true,
+     "modo": "v3",
+     "accion": "fighting stance idle, fists up, bouncing lightly on the feet, keeps facing the same direction",
+     "frames": 4
+    },
+    {
+     "nombre": "golpe",
+     "herramienta": "animate_character",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "throwing a quick straight punch forward with the right fist and pulling back to guard, keeps facing the same direction"
+    },
+    {
+     "nombre": "patada",
+     "herramienta": "animate_character",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "a high front kick forward with the right leg and back to guard, keeps facing the same direction"
+    },
+    {
+     "nombre": "spray",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "raising a small spray can and spraying it forward, then lowering it, keeps facing the same direction",
+     "frames": 8,
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "comer",
+     "herramienta": "animate_character",
+     "modo": "v3",
+     "accion": "quickly eating a sandwich with both hands, keeps facing the same direction",
+     "frames": 6,
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "animate_character",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 10,
+     "bucle": false,
+     "modo": "v3",
+     "accion": "flinching backwards after being punched and recovering the guard, keeps facing the same direction",
+     "frames": 4
+    },
+    {
+     "nombre": "desmayo",
+     "herramienta": "animate_character",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false,
+     "frames": 6,
+     "modo": "v3",
+     "accion": "staggering, dropping to the knees and collapsing to the ground, keeps facing the same direction"
+    }
+   ]
+  },
+  {
    "id": "ladron1-combate",
    "tipo": "combate",
    "fase": "F6",

@@ -755,7 +755,7 @@ func object_action(x: int, y: int) -> void:
 
 # ---------- acciones y efectos del atlas (01b-arte accion, lanzarVfx) ----------
 func accion(nn: String, vf = null) -> void:
-	var g = Atlas.grupo_look(D.LOOKS.player)
+	var g = grupo_pj()
 	if Datos.CAL and GESTO_DE.has(nn):   # 1.54: y el plano de detalle (gesto, trama.gd)
 		var na := "plantar" if nn == "sembrar" else nn   # 1.57.2: al sembrar, el protagonista hace lo de plantar
 		if g != null and Atlas.anim_de(g, na) != null:

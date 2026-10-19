@@ -1,5 +1,5 @@
-# Landrace Hunters (Godot) — MAESTRO [1]: crear el personaje (chico o chica y el cumpleaños, S.sexo y S.cumple), la melena de la
-# protagonista sobre todos los fotogramas, sin ventajas por sexo, el regalo del cumpleaños con sus tres
+# Landrace Hunters (Godot) — MAESTRO [1]: crear el personaje (chico o chica y el cumpleaños, S.sexo y S.cumple), el sprite de
+# PixelLab de la protagonista (mapa y combate), sin ventajas por sexo, el regalo del cumpleaños con sus tres
 # cartas (una vez al año, con el 29 de febrero) y la semilla estrella; sin Datos.CAL, nada de esto.
 #   $GODOT --headless --path godot --script res://tests/personaje.gd   → «personaje: N comprobaciones, 0 fallos»
 extends SceneTree
@@ -94,26 +94,38 @@ func _corre() -> void:
 	chk(J.vista_pat() == vis0 and J.vista_pat(true) == int(D.PAT.vista[0]) * 2 and absf(J.cap_mochila() - cap0) < 1e-9, "chica: todo igual")
 	J.S.sexo = "m"
 	chk(J.vista_pat() == vis0 and absf(J.cap_mochila() - cap0) < 1e-9, "chico: todo igual")
-	# 3 · la melena: solo en ella, en todos los fotogramas, con contorno; él, igual que antes
-	var cambia := 0
-	var iguales := 0
-	var mira := 0
-	for gr in ["player", "player-combate"]:
-		for an in ["base", "run"]:
-			for d in ["south", "east", "north", "west"]:
-				var f = Atlas.frame_de(gr, an, d, 0, {"i": 0})
-				if f == null:
-					continue
-				mira += 1
-				J.S.sexo = "m"
-				var a: Image = J.ropa_c(f, gr).c
-				J.S.sexo = "f"
-				var b: Image = J.ropa_c(f, gr).c
-				if a.get_data() == f.c.get_data():
-					iguales += 1
-				if b.get_data() != a.get_data():
-					cambia += 1
-	chk(mira >= 8 and cambia == mira and iguales == mira, "melena en %d de %d; él igual en %d" % [cambia, mira, iguales])
+	# 3 · su sprite de PixelLab: player-f en el mapa (todas las animaciones del player) y player-f-combate de espaldas;
+	# él, el de siempre; la ropa cambia las mismas piezas en los dos
+	var anims: Array = Atlas.d.anims.get("player", {}).keys()
+	J.S.sexo = "m"
+	var gm = J.grupo_pj()
+	J.B = {"kind": "thief"}
+	var cm = J.grupo_combate("P")
+	J.S.sexo = "f"
+	var gf = J.grupo_pj()
+	var cf = J.grupo_combate("P")
+	J.B = null
+	chk(gm == "player" and cm == "player-combate" and gf == "player-f" and cf == "player-f-combate", "grupos %s %s %s %s" % [gm, cm, gf, cf])
+	var faltan := []
+	for an in anims:
+		for d in Atlas.d.anims.player[an].dirs:
+			if Atlas.frame_de("player-f", an, d, 0, {"i": 0}) == null:
+				faltan.append("%s/%s" % [an, d])
+	for an in Atlas.d.anims.get("player-combate", {}).keys():
+		if Atlas.frame_de("player-f-combate", an, "north", 0, {"i": 0}) == null:
+			faltan.append("combate %s" % an)
+	chk(anims.size() >= 10 and faltan.is_empty(), "animaciones de la protagonista: faltan %s" % [faltan])
+	var vis := 0
+	for gr in ["player-f", "player-f-combate"]:
+		var f = Atlas.frame_de(gr, "base" if gr == "player-f" else "idle", "south" if gr == "player-f" else "north", 0, {"i": 0})
+		if f == null:
+			continue
+		J.S.ropa = {"camiseta": 1, "pantalon": 1, "gorra": 1, "pelo": 2}
+		var r: Image = J.ropa_c(f, gr).c
+		J.S.ropa = {}
+		if r.get_data() != f.c.get_data():
+			vis += 1
+	chk(vis == 2, "la ropa le cambia el sprite (%d de 2)" % vis)
 	# 4 · el cumpleaños: el 29-2 de 2028 (bisiesto) y el 28-2 de 2027; un regalo al año; sin CAL, nada
 	var d28 := Datos.dia_de(2027, 2, 28)
 	var d29 := Datos.dia_de(2028, 2, 29)
@@ -148,7 +160,7 @@ func _corre() -> void:
 	var e0: int = int(J.S.items.get(fk, 0))
 	chk(corre(func(): await J.cumple_event()), "regalo épico")
 	chk(int(J.S.items.get(fk, 0)) == e0 + int(PE.cumple.epica.n), "focos %d" % int(J.S.items.get(fk, 0)))
-	# sin CAL: ni melena, ni pasivas, ni cumpleaños, ni menús
+	# sin CAL: ni su sprite, ni pasivas, ni cumpleaños, ni menús
 	Datos.CAL = false
 	J.S.sexo = "f"
 	chk(J.vista_pat() == vis0 and not J.es_cumple(d29) and not J.es_chica(), "sin CAL, nada")

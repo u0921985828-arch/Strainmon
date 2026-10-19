@@ -28,7 +28,8 @@ func grupo_combate(who: String):
 	if not Atlas.ok or B == null:
 		return null
 	if who == "P":
-		return Atlas.cubre("combate:espalda:player")
+		var g = Atlas.cubre("combate:espalda:player-f") if es_chica() else null   # MAESTRO [1]: la suya, de PixelLab
+		return g if g else Atlas.cubre("combate:espalda:player")
 	if B.kind == "thief":
 		var g = Atlas.cubre("combate:frente:darko") if B.get("jefe") else Atlas.grupo_look(B.get("look"))   # sin look (como en grupoLook), el del ladrón; Darko (1.17): su personaje es de 32 px; pelea con el suyo de combate (1.21)
 		return g if g else Atlas.cubre("combate:frente:ladron")
