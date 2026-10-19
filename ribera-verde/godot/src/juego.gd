@@ -126,7 +126,7 @@ func _notification(w: int) -> void:
 		if handlers.size():
 			press("B")
 		elif mode == "world":
-			press("START")
+			press("START")   # i18n-no
 		elif mode == "title" and lock == 0:
 			get_tree().quit()
 	elif w == NOTIFICATION_APPLICATION_PAUSED or w == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -138,7 +138,7 @@ func _notification(w: int) -> void:
 		al_volver()   # fase 6: lo que han crecido las plantas
 		# al volver a la app, andando por el mapa, en pausa: el menú START
 		if mode == "world" and is_free() and not P.moving:
-			press("START")
+			press("START")   # i18n-no
 	elif w == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		suelta_todo()
 		if OS.has_feature("mobile") and not pausa_foco:   # R13: con la persiana bajada o en multiventana, quieto y en silencio
@@ -371,8 +371,8 @@ func _titulo_entra() -> void:
 
 # el aviso de contenido, una vez (se guarda en los ajustes): mayores de 18 o salir
 func aviso_edad() -> void:
-	await say("Landrace Hunters es un juego de ficción para mayores de 18 años.", "AVISO")
-	var c: int = await ask("Ficción. No es una guía de cultivo. Trata del cannabis, que es delito en muchos países." if Datos.PLAY else "Trata del cultivo y la venta de cannabis, delito en muchos países. No anima a consumir ni a vender.", ["TENGO 18 O MÁS", "SALIR"], "AVISO")
+	await say(K("Landrace Hunters es un juego de ficción para mayores de 18 años."), K("AVISO"))
+	var c: int = await ask(K("Ficción. No es una guía de cultivo. Trata del cannabis, que es delito en muchos países.") if Datos.PLAY else K("Trata del cultivo y la venta de cannabis, delito en muchos países. No anima a consumir ni a vender."), [K("TENGO 18 O MÁS"), K("SALIR")], K("AVISO"))
 	if c != 0:
 		get_tree().quit()
 		return
@@ -392,7 +392,7 @@ func _title_press() -> void:
 	var ult := ""
 	while true:
 		var sv = load_save()
-		var ops := (["CONTINUAR"] if sv else []) + ["NUEVA PARTIDA", "OPCIONES", "CRÉDITOS"]
+		var ops := ([K("CONTINUAR")] if sv else []) + [K("NUEVA PARTIDA"), K("OPCIONES"), K("CRÉDITOS")]
 		i = await menu(ops, {"cls": "titulo", "initial": maxi(0, ops.find(ult))})
 		if i < 0:
 			return
@@ -413,7 +413,7 @@ func _title_press() -> void:
 			await fade(0)
 			show_objective()
 			return
-		elif not sv or await ask("Hay una partida guardada. ¿Empezar de cero y sobrescribirla?", ["Sí", "No"]) == 0:
+		elif not sv or await ask(K("Hay una partida guardada. ¿Empezar de cero y sobrescribirla?"), [K("Sí"), K("No")]) == 0:
 			await new_game()
 			return
 
@@ -464,25 +464,26 @@ static func limpia_import(v):
 var relanza := false
 
 func importar(desde_titulo := false, nube = null) -> void:
-	var t = nube if nube != null else await pedir_partida("Pega aquí la partida exportada")   # fase 6: o la de la nube
+	var t = nube if nube != null else await pedir_partida(I18n.v("Pega aquí la partida exportada"))   # fase 6: o la de la nube
 	if t == null or t == "":
 		if nube != null:
-			await say("No hay ninguna partida en la nube.")
+			await say(K("No hay ninguna partida en la nube."))
 		return
 	var js := JSON.new()   # (JSON.parse_string avisa en la consola si no es JSON)
 	var s = limpia_import(Datos.enteros(js.data)) if js.parse(t) == OK and js.data is Dictionary else null
 	if not partida_valida(s):
-		await say("Eso no es una partida exportada.")
+		await say(K("Eso no es una partida exportada."))
 		return
-	var pierde := " La de ahora se pierde." if not desde_titulo else (" La guardada se pierde." if FileAccess.file_exists(GUARDADO) else "")
-	if await ask("¿Cargar la partida de %s, %s?%s" % [s.name, Datos.fd(int(s.day)), pierde], ["Cargar", "No"]) != 0:
+	var A := {"n": s.name, "f": Datos.fd(int(s.day))}
+	var preg: String = T("¿Cargar la partida de {n}, {f}? La de ahora se pierde.", A) if not desde_titulo else (T("¿Cargar la partida de {n}, {f}? La guardada se pierde.", A) if FileAccess.file_exists(GUARDADO) else T("¿Cargar la partida de {n}, {f}?", A))
+	if await ask(preg, [K("Cargar"), K("No")]) != 0:
 		return
 	if desde_titulo:
 		if not escribe_partida(JSON.stringify(s, "", false, true)):   # como save()
-			await say("No se ha podido guardar la partida.")
+			await say(K("No se ha podido guardar la partida."))
 			return
 		sfx("coin")
-		await say("Partida cargada.")
+		await say(K("Partida cargada."))
 		return
 	if not Datos.CAL:   # contra el HTML congelado (historia.gd): en caliente, como en la 1.22
 		S = s
@@ -492,14 +493,14 @@ func importar(desde_titulo := false, nube = null) -> void:
 		enter_game()
 		var ok = save()
 		sfx("coin")
-		await say("Partida cargada." if ok else "Partida cargada, pero no se ha podido guardar.")
+		await say(K("Partida cargada.") if ok else K("Partida cargada, pero no se ha podido guardar."))
 		return
 	if not escribe_partida(JSON.stringify(s, "", false, true)):
-		await say("No se ha podido guardar la partida.")
+		await say(K("No se ha podido guardar la partida."))
 		return
 	sfx("coin")
 	relanza = true
-	await say("Partida cargada. Se abre al cerrar el menú.")
+	await say(K("Partida cargada. Se abre al cerrar el menú."))
 
 func relanzar() -> void:
 	relanza = false
@@ -516,12 +517,12 @@ func relanzar() -> void:
 func copia_seguridad(desde_titulo: bool) -> void:
 	var it := []
 	if not desde_titulo:
-		it.append({"label": "EXPORTAR PARTIDA"})
-	it.append({"label": "IMPORTAR PARTIDA"})
+		it.append({"label": K("EXPORTAR PARTIDA")})
+	it.append({"label": K("IMPORTAR PARTIDA")})
 	if Datos.PLAY and plat().hay():   # fase 6: Play Games (se sube sola al salir de la app)
-		it.append({"label": "CARGAR DE LA NUBE"})
-	it.append({"label": "VOLVER"})
-	var i: int = await menu(it, {"cls": "start", "title": "COPIA DE SEGURIDAD"})
+		it.append({"label": K("CARGAR DE LA NUBE")})
+	it.append({"label": K("VOLVER")})
+	var i: int = await menu(it, {"cls": "start", "title": K("COPIA DE SEGURIDAD")})
 	if i < 0 or it[i].label == "VOLVER":
 		return
 	if it[i].label == "EXPORTAR PARTIDA":
@@ -532,34 +533,34 @@ func copia_seguridad(desde_titulo: bool) -> void:
 		await importar(desde_titulo)
 
 # OPCIONES (en el título y en el menú START): A cambia cada fila; se guardan al momento
-const IDIOMA_NOM := ["SISTEMA", "ESPAÑOL", "ENGLISH"]
+var IDIOMA_NOM := [I18n.K("SISTEMA"), I18n.K("ESPAÑOL"), I18n.K("ENGLISH")]
 
 func opciones(desde_titulo := false) -> void:
 	var i := 0
 	while true:
-		var it := [{"label": "MÚSICA", "right": "%d %%" % (aj.musica * 25)}, {"label": "EFECTOS", "right": "%d %%" % (aj.efectos * 25)},
-			{"label": "TEXTO", "right": TEXTO_VEL[aj.texto]}, {"label": "SONIDO", "right": "SÍ" if aj.sonido else "NO"}]
+		var it := [{"label": K("MÚSICA"), "right": "%d %%" % (aj.musica * 25)}, {"label": K("EFECTOS"), "right": "%d %%" % (aj.efectos * 25)},
+			{"label": K("TEXTO"), "right": TEXTO_VEL[aj.texto]}, {"label": K("SONIDO"), "right": K("SÍ") if aj.sonido else K("NO")}]
 		if not Datos.CAL:   # 1.43.4: las pruebas contra el HTML, como antes
 			if not desde_titulo:
-				it.append({"label": "EXPORTAR PARTIDA"})
-			it.append({"label": "IMPORTAR PARTIDA"})
+				it.append({"label": K("EXPORTAR PARTIDA")})
+			it.append({"label": K("IMPORTAR PARTIDA")})
 		if desde_titulo and FileAccess.file_exists(GUARDADO):
-			it.append({"label": "BORRAR PARTIDA"})
+			it.append({"label": K("BORRAR PARTIDA")})
 		if Datos.CAL:
-			it.insert(4, {"label": "VIBRACIÓN", "right": "SÍ" if aj.vibra else "NO"})   # 1.57
-			it.insert(5, {"label": "AHORRO", "right": "30 FPS" if aj.ahorro else "NO"})   # R3
-			it.append({"label": "COPIA DE SEGURIDAD"})
+			it.insert(4, {"label": K("VIBRACIÓN"), "right": K("SÍ") if aj.vibra else K("NO")})   # 1.57
+			it.insert(5, {"label": K("AHORRO"), "right": K("30 FPS") if aj.ahorro else K("NO")})   # R3
+			it.append({"label": K("COPIA DE SEGURIDAD")})
 		if Datos.PLAY:   # U5: accesibilidad
 			var c := it.size() - (1 if Datos.CAL else 0)
-			it.insert(c, {"label": "TAMAÑO DE TEXTO", "right": TAM_NOM[clampi(int(aj.get("tam", 1)), 0, 2)]})
-			it.insert(c + 1, {"label": "ZURDO", "right": "SÍ" if aj.get("zurdo") else "NO"})
-			it.insert(c + 2, {"label": "DALTÓNICO", "right": "SÍ" if aj.get("dalt") else "NO"})
-			it.insert(c + 3, {"label": "SIN DESTELLOS", "right": "SÍ" if aj.get("calma") else "NO"})
-			it.insert(c + 4, {"label": "AVISO DE COSECHA", "right": "SÍ" if aj.get("avisos") else "NO"})   # fase 6
-			it.insert(c + 5, {"label": "INFORMES DE ERRORES", "right": "SÍ" if aj.get("errores") else "NO"})
-			it.insert(c + 6, {"label": "IDIOMA", "right": IDIOMA_NOM[clampi(int(aj.get("idioma", 0)), 0, 2)]})   # F7
-		it.append({"label": "VOLVER"})
-		i = await menu(it, {"cls": "start", "initial": i, "title": "OPCIONES"})
+			it.insert(c, {"label": K("TAMAÑO DE TEXTO"), "right": TAM_NOM[clampi(int(aj.get("tam", 1)), 0, 2)]})
+			it.insert(c + 1, {"label": K("ZURDO"), "right": K("SÍ") if aj.get("zurdo") else K("NO")})
+			it.insert(c + 2, {"label": K("DALTÓNICO"), "right": K("SÍ") if aj.get("dalt") else K("NO")})
+			it.insert(c + 3, {"label": K("SIN DESTELLOS"), "right": K("SÍ") if aj.get("calma") else K("NO")})
+			it.insert(c + 4, {"label": K("AVISO DE COSECHA"), "right": K("SÍ") if aj.get("avisos") else K("NO")})   # fase 6
+			it.insert(c + 5, {"label": K("INFORMES DE ERRORES"), "right": K("SÍ") if aj.get("errores") else K("NO")})
+			it.insert(c + 6, {"label": K("IDIOMA"), "right": IDIOMA_NOM[clampi(int(aj.get("idioma", 0)), 0, 2)]})   # F7
+		it.append({"label": K("VOLVER")})
+		i = await menu(it, {"cls": "start", "initial": i, "title": K("OPCIONES")})
 		if i < 0 or it[i].label == "VOLVER":
 			return
 		if it[i].label == "COPIA DE SEGURIDAD":
@@ -601,21 +602,21 @@ func opciones(desde_titulo := false) -> void:
 				aj.avisos = not aj.get("avisos", false)
 				if aj.avisos and not await plat().permiso_avisos():
 					aj.avisos = false
-					await say("Sin permiso para avisar. Se puede dar en los ajustes del móvil.")
+					await say(K("Sin permiso para avisar. Se puede dar en los ajustes del móvil."))
 				elif aj.avisos:
-					await say("Te avisaremos cuando una planta esté lista para cosechar (con la app cerrada).")
+					await say(K("Te avisaremos cuando una planta esté lista para cosechar (con la app cerrada)."))
 			"IDIOMA":   # F7: el del sistema, castellano o inglés
 				aj.idioma = (clampi(int(aj.get("idioma", 0)), 0, 2) + 1) % 3
 			"INFORMES DE ERRORES":   # fase 6 (U10): opt-in
 				if not aj.get("errores", false):
-					aj.errores = await ask("Si el juego falla, ¿enviar un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y dónde falló) para arreglarlo? Sin datos personales ni de la partida. Se puede quitar cuando quieras.", ["Sí, enviar", "No"]) == 0
+					aj.errores = await ask(K("Si el juego falla, ¿enviar un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y dónde falló) para arreglarlo? Sin datos personales ni de la partida. Se puede quitar cuando quieras."), [K("Sí, enviar"), K("No")]) == 0
 				else:
 					aj.errores = false
 				plat().errores(aj.errores)
 			"BORRAR PARTIDA":
-				if await ask("¿Borrar la partida guardada? No se puede deshacer.", ["Sí, borrarla", "No"]) == 0:
+				if await ask(K("¿Borrar la partida guardada? No se puede deshacer."), [K("Sí, borrarla"), K("No")]) == 0:
 					DirAccess.remove_absolute(ProjectSettings.globalize_path(GUARDADO))
-					await say("Partida borrada.")
+					await say(K("Partida borrada."))
 					i = 0
 		ajustes_aplica()
 		ajustes_guarda()
@@ -623,8 +624,8 @@ func opciones(desde_titulo := false) -> void:
 			sfx("coin")   # para oír el volumen nuevo
 
 var VERSION: String = ProjectSettings.get_setting("application/config/version", "")
-const CREDITOS := """LANDRACE HUNTERS · genética de barrio
-Versión %s para Android
+var CREDITOS: String = I18n.K("""LANDRACE HUNTERS · genética de barrio
+Versión {v} para Android
 
 Un juego de Eddie.
 Hecho con Godot Engine y con la ayuda de Claude Code (Anthropic).
@@ -643,8 +644,8 @@ FICCIÓN
 Ribera Verde, Mendialde, Puerto Viejo, Valdehierro, Errotabarri y sus personajes son inventados: cualquier parecido con personas o lugares reales es casualidad. Las variedades llevan el nombre de genéticas conocidas y su historia es solo información.
 El cultivo y la venta de cannabis son delito en muchos países. Este juego no anima a consumir ni a vender.
 
-Gracias por jugar."""
-const PRIVACIDAD := """Landrace Hunters no vende, no alquila y no usa tus datos para anuncios.
+Gracias por jugar.""")
+var PRIVACIDAD: String = I18n.K("""Landrace Hunters no vende, no alquila y no usa tus datos para anuncios.
 
 · Se juega sin conexión y sin anuncios. Los capítulos 1 a 3 son gratis; el juego completo es una compra única por Google Play: la tarjeta y el pago los gestiona Google, nosotros solo sabemos que está comprado.
 · Play Games (si inicias sesión): los logros y la partida en la nube se guardan en tu cuenta de Google Play Juegos.
@@ -653,45 +654,45 @@ const PRIVACIDAD := """Landrace Hunters no vende, no alquila y no usa tus datos 
 · La partida y los ajustes se guardan en este móvil, en la carpeta privada de la app. Se borran al desinstalarla (o desde OPCIONES · BORRAR PARTIDA).
 · Si tienes activada la copia de seguridad de Android, el sistema la guarda en tu cuenta de Google (no pasa por nosotros).
 
-Si tienes dudas, escribe a la dirección de contacto de la ficha de la tienda."""
+Si tienes dudas, escribe a la dirección de contacto de la ficha de la tienda.""")
 
 # CRÉDITOS (en el título): los créditos, las licencias (Godot y las fuentes, enteras, como piden) y la privacidad
 func creditos() -> void:
 	var i := 0
 	while true:
-		i = await menu(["CRÉDITOS", "LICENCIAS", "PRIVACIDAD", "VOLVER"], {"cls": "start", "initial": i, "title": "CRÉDITOS"})
+		i = await menu([K("CRÉDITOS"), K("LICENCIAS"), K("PRIVACIDAD"), K("VOLVER")], {"cls": "start", "initial": i, "title": K("CRÉDITOS")})
 		if i < 0 or i == 3:
 			return
 		if i == 0:
-			await leer("CRÉDITOS", CREDITOS % VERSION)
+			await leer(K("CRÉDITOS"), T(CREDITOS, {"v": VERSION}))
 		elif i == 1:
-			await leer("LICENCIAS", licencias())
+			await leer(K("LICENCIAS"), licencias())
 		else:
-			await leer("PRIVACIDAD", PRIVACIDAD)
+			await leer(K("PRIVACIDAD"), PRIVACIDAD)
 
 func licencias() -> String:
-	var t := "Este juego usa Godot Engine, con licencia MIT:\n\n" + Engine.get_license_text()
-	for f in ["OFL-PressStart2P.txt", "OFL-AtkinsonHyperlegible.txt"]:
+	var t := I18n.v("Este juego usa Godot Engine, con licencia MIT:\n\n") + Engine.get_license_text()
+	for f in ["OFL-PressStart2P.txt", "OFL-AtkinsonHyperlegible.txt"]:   # i18n-no
 		t += "\n\n— %s —\n\n%s" % [f.trim_prefix("OFL-").trim_suffix(".txt"), FileAccess.get_file_as_string("res://fuentes/" + f).strip_edges()]
-	t += "\n\nGODOT ENGINE: PARTES DE TERCEROS"
+	t += I18n.v("\n\nGODOT ENGINE: PARTES DE TERCEROS")
 	for c in Engine.get_copyright_info():
 		t += "\n\n" + str(c.name)
 		for p in c.parts:
 			for cp in p.copyright:
 				t += "\n© " + str(cp)
-			t += "\nLicencia: " + str(p.license)
+			t += I18n.v("\nLicencia: ") + str(p.license)
 	var li := Engine.get_license_info()
 	for k in li:
 		t += "\n\n— %s —\n\n%s" % [k, str(li[k]).strip_edges()]
 	return t
 
 func choose_name() -> String:
-	var opts := ["EDDIE", "ÁLEX", "LUR", "ANDER", "Otro..."]
-	var i: int = await menu(opts, {"cls": "start", "cancel": false, "title": "NOMBRE"})
+	var opts := [K("EDDIE"), K("ÁLEX"), K("LUR"), K("ANDER"), K("Otro...")]
+	var i: int = await menu(opts, {"cls": "start", "cancel": false, "title": K("NOMBRE")})
 	if i < 4:
 		return opts[i]
-	var v: String = str(await pedir_texto("¿Cómo te llamas?", "", 8, true, false)).to_upper().substr(0, 8)
-	return v if v != "" else "EDDIE"
+	var v: String = str(await pedir_texto(I18n.v("¿Cómo te llamas?"), "", 8, true, false)).to_upper().substr(0, 8)
+	return v if v != "" else K("EDDIE")
 
 func new_game() -> void:
 	if Datos.PLAY and FTUE_CORTO:
@@ -710,12 +711,12 @@ func new_game() -> void:
 	mode = "intro"
 	music("home")
 	await fade(0)
-	await talk("???", ["¿Diga? ¿Eres familia de Maite, la de Ribera Verde? Un barrio obrero a orillas de la ría.", "Me llamo Kiko. Llevo treinta años con el growshop de su calle."])
-	await talk("KIKO", ["Conservo genéticas: variedades locales de Afganistán, México o la India, y los cruces que salen de ellas.",
-		"Las apunto todas en un registro, una GENOTECA. Tu tía Maite me ayudaba a mantenerla.", "Perdona. ¿Cómo te llamabas?"])
+	await talk("???", [K("¿Diga? ¿Eres familia de Maite, la de Ribera Verde? Un barrio obrero a orillas de la ría."), K("Me llamo Kiko. Llevo treinta años con el growshop de su calle.")])
+	await talk(K("KIKO"), [K("Conservo genéticas: variedades locales de Afganistán, México o la India, y los cruces que salen de ellas."),
+		K("Las apunto todas en un registro, una GENOTECA. Tu tía Maite me ayudaba a mantenerla."), K("Perdona. ¿Cómo te llamabas?")])
 	S.name = await choose_name()
-	await talk("KIKO", ["{N}. Hacía años que no te veía por el barrio.", "Maite murió hace tres semanas. Te ha dejado su piso, su armario de cultivo... y una deuda.",
-		"Coge el autobús en la plaza del pueblo: te deja enfrente del piso. La llave está en el buzón.", "Lee la carta que te dejó. Después pásate por el growshop."])
+	await talk(K("KIKO"), [K("{N}. Hacía años que no te veía por el barrio."), K("Maite murió hace tres semanas. Te ha dejado su piso, su armario de cultivo... y una deuda."),
+		K("Coge el autobús en la plaza del pueblo: te deja enfrente del piso. La llave está en el buzón."), K("Lee la carta que te dejó. Después pásate por el growshop.")])
 	await fade(1)
 	enter_game()
 	await wait(300)
@@ -736,7 +737,7 @@ func new_game_corto() -> void:
 	mode = "intro"
 	music("home")
 	await fade(0)
-	await talk("KIKO", ["Soy Kiko, el del growshop de la calle de tu tía Maite, en Ribera Verde. ¿Cómo te llamabas?"])
+	await talk(K("KIKO"), [K("Soy Kiko, el del growshop de la calle de tu tía Maite, en Ribera Verde. ¿Cómo te llamabas?")])
 	S.name = await choose_name()
 	for k in ["letter", "kiko1", "julen1"]:
 		S.flags[k] = true
@@ -752,9 +753,9 @@ func new_game_corto() -> void:
 	enter_game()
 	await wait(200)
 	await fade(0)
-	await talk("CARTA", ["«{N}: el piso y el armario de cultivo son tuyos. Le debo dinero a Baltasar, el del bar El Ancla. Lo siento.»",
-		"«Kiko te ayudará. Empieza plantando: A delante del armario.»"])
-	await talk("SMS · KIKO", ["Te he dejado en el armario 3 semillas de SKUNK #1, abono y pH−. Julen, mi hijo, está en el piso: te explica cada paso."])
+	await talk(K("CARTA"), [K("«{N}: el piso y el armario de cultivo son tuyos. Le debo dinero a Baltasar, el del bar El Ancla. Lo siento.»"),
+		K("«Kiko te ayudará. Empieza plantando: A delante del armario.»")])
+	await talk(K("SMS · KIKO"), [K("Te he dejado en el armario 3 semillas de SKUNK #1, abono y pH−. Julen, mi hijo, está en el piso: te explica cada paso.")])
 	await chapter(1)
 	show_objective()
 
@@ -880,15 +881,15 @@ func update_hud() -> void:
 	var mm := "%02d" % (int(floor(int(S.min) % 60 / 10.0)) * 10)
 	hud_visto = sosp_hud()
 	var r := total_rosin()
-	var ro := (" · " + Datos.coma(Datos.jsround(r * 10) / 10.0) + " g rosin") if r else ""
+	var ro := T(" · {g} g rosin", {"g": Datos.coma(Datos.jsround(r * 10) / 10.0)}) if r else ""
 	var sp := Datos.jsround(SOSP.v) if n_patrullas() else -1
 	var od := float(S.get("orden", 0)) > 0
 	if Datos.CAL:   # 1.50 (lo pidió el usuario): efectivo, cuenta, flores y extractos encima, en su recuadro
 		var gb := total_buds()
 		hud_pon("%s · %s:%s" % [Datos.fd_hud(S.day), hh, mm], Datos.jsround(S.heat), sp, SOSP.alarma != null, od, [
-			["EFECTIVO", Datos.eur(S.money), Color("#eef8f0")],
-			["BANCO", Datos.eur(float(S.get("banco", 0))), Color("#a8d8f0")],
-			["FLORES", ("%d g" % int(floor(gb))) if gb >= 10 or gb == floor(gb) else Datos.coma(floor(gb * 10 + 1e-9) / 10.0) + " g", Color("#9ee070")],
-			["ROSIN", Datos.coma(Datos.jsround(r * 10) / 10.0) + " g", Color("#f0c050")]])
+			[I18n.v("EFECTIVO"), Datos.eur(S.money), Color("#eef8f0")],
+			[I18n.v("BANCO"), Datos.eur(float(S.get("banco", 0))), Color("#a8d8f0")],
+			[I18n.v("FLORES"), ("%d g" % int(floor(gb))) if gb >= 10 or gb == floor(gb) else Datos.coma(floor(gb * 10 + 1e-9) / 10.0) + " g", Color("#9ee070")],
+			[I18n.v("ROSIN"), Datos.coma(Datos.jsround(r * 10) / 10.0) + " g", Color("#f0c050")]])
 		return
 	hud_pon("%s · %s:%s\n%s · %d g%s" % [Datos.fd_hud(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds())), ro], Datos.jsround(S.heat), sp, SOSP.alarma != null, od)

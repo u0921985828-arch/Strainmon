@@ -1,0 +1,160 @@
+es,en
+Landrace Hunters es un juego de ficción para mayores de 18 años.,Landrace Hunters is a work of fiction for players 18 and over.
+AVISO,NOTICE
+"Ficción. No es una guía de cultivo. Trata del cannabis, que es delito en muchos países.","Fiction. Not a growing guide. It deals with cannabis, which is a crime in many countries."
+"Trata del cultivo y la venta de cannabis, delito en muchos países. No anima a consumir ni a vender.","It deals with growing and selling cannabis, a crime in many countries. It does not encourage using or selling."
+TENGO 18 O MÁS,I'M 18 OR OVER
+SALIR,EXIT
+CONTINUAR,CONTINUE
+NUEVA PARTIDA,NEW GAME
+OPCIONES,OPTIONS
+CRÉDITOS,CREDITS
+Hay una partida guardada. ¿Empezar de cero y sobrescribirla?,There is a saved game. Start over and overwrite it?
+Sí,Yes
+No,No
+Pega aquí la partida exportada,Paste the exported save here
+No hay ninguna partida en la nube.,There's no save in the cloud.
+Eso no es una partida exportada.,That's not an exported save.
+"¿Cargar la partida de {n}, {f}? La de ahora se pierde.","Load {n}'s game, {f}? The current one will be lost."
+"¿Cargar la partida de {n}, {f}? La guardada se pierde.","Load {n}'s game, {f}? The saved one will be lost."
+"¿Cargar la partida de {n}, {f}?","Load {n}'s game, {f}?"
+Cargar,Load
+No se ha podido guardar la partida.,Couldn't save the game.
+Partida cargada.,Game loaded.
+"Partida cargada, pero no se ha podido guardar.","Game loaded, but it couldn't be saved."
+Partida cargada. Se abre al cerrar el menú.,Game loaded. It opens when you close the menu.
+EXPORTAR PARTIDA,EXPORT SAVE
+IMPORTAR PARTIDA,IMPORT SAVE
+CARGAR DE LA NUBE,LOAD FROM CLOUD
+VOLVER,BACK
+COPIA DE SEGURIDAD,BACKUP
+SISTEMA,SYSTEM
+ESPAÑOL,ESPAÑOL
+ENGLISH,ENGLISH
+MÚSICA,MUSIC
+EFECTOS,SOUND FX
+TEXTO,TEXT
+SONIDO,SOUND
+SÍ,YES
+NO,NO
+BORRAR PARTIDA,DELETE SAVE
+VIBRACIÓN,VIBRATION
+AHORRO,POWER SAVER
+30 FPS,30 FPS
+TAMAÑO DE TEXTO,TEXT SIZE
+ZURDO,LEFT-HANDED
+DALTÓNICO,COLOUR-BLIND
+SIN DESTELLOS,NO FLASHES
+AVISO DE COSECHA,HARVEST ALERT
+INFORMES DE ERRORES,ERROR REPORTS
+IDIOMA,LANGUAGE
+Sin permiso para avisar. Se puede dar en los ajustes del móvil.,No permission to notify. You can allow it in your phone's settings.
+Te avisaremos cuando una planta esté lista para cosechar (con la app cerrada).,We'll let you know when a plant is ready to harvest (with the app closed).
+"Si el juego falla, ¿enviar un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y dónde falló) para arreglarlo? Sin datos personales ni de la partida. Se puede quitar cuando quieras.","If the game crashes, send an anonymous technical report (phone model, Android and game version, and where it failed) so we can fix it? No personal or game data. You can turn it off any time."
+"Sí, enviar","Yes, send"
+¿Borrar la partida guardada? No se puede deshacer.,Delete the saved game? It can't be undone.
+"Sí, borrarla","Yes, delete it"
+Partida borrada.,Game deleted.
+"LANDRACE HUNTERS · genética de barrio
+Versión {v} para Android
+
+Un juego de Eddie.
+Hecho con Godot Engine y con la ayuda de Claude Code (Anthropic).
+
+ARTE
+Personajes, escenarios y objetos: PixelLab (pixellab.ai), revisados y retocados a mano. Carpas por dentro, plantas, equipo, muebles, iconos y el icono de la app: dibujados a mano, píxel a píxel.
+
+MÚSICA Y SONIDO
+Chiptune original, sintetizado en el propio juego.
+
+FUENTES
+Press Start 2P · Copyright 2012 The Press Start 2P Project Authors. SIL Open Font License 1.1.
+Atkinson Hyperlegible · Copyright 2020 Braille Institute of America, Inc. SIL Open Font License 1.1.
+
+FICCIÓN
+Ribera Verde, Mendialde, Puerto Viejo, Valdehierro, Errotabarri y sus personajes son inventados: cualquier parecido con personas o lugares reales es casualidad. Las variedades llevan el nombre de genéticas conocidas y su historia es solo información.
+El cultivo y la venta de cannabis son delito en muchos países. Este juego no anima a consumir ni a vender.
+
+Gracias por jugar.","LANDRACE HUNTERS · neighbourhood genetics
+Version {v} for Android
+
+A game by Eddie.
+Made with Godot Engine and with help from Claude Code (Anthropic).
+
+ART
+Characters, scenery and objects: PixelLab (pixellab.ai), reviewed and touched up by hand. Tent interiors, plants, equipment, furniture, icons and the app icon: drawn by hand, pixel by pixel.
+
+MUSIC AND SOUND
+Original chiptune, synthesised in the game itself.
+
+FONTS
+Press Start 2P · Copyright 2012 The Press Start 2P Project Authors. SIL Open Font License 1.1.
+Atkinson Hyperlegible · Copyright 2020 Braille Institute of America, Inc. SIL Open Font License 1.1.
+
+FICTION
+Ribera Verde, Mendialde, Puerto Viejo, Valdehierro, Errotabarri and their characters are made up: any resemblance to real people or places is coincidental. Strain names refer to well-known genetics and their history is for information only.
+Growing and selling cannabis is a crime in many countries. This game does not encourage using or selling it.
+
+Thanks for playing."
+"Landrace Hunters no vende, no alquila y no usa tus datos para anuncios.
+
+· Se juega sin conexión y sin anuncios. Los capítulos 1 a 3 son gratis; el juego completo es una compra única por Google Play: la tarjeta y el pago los gestiona Google, nosotros solo sabemos que está comprado.
+· Play Games (si inicias sesión): los logros y la partida en la nube se guardan en tu cuenta de Google Play Juegos.
+· Informes de errores (OPCIONES · INFORMES DE ERRORES, apagados de serie): si los activas y el juego falla, se envía un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y lo que fallaba), sin tu nombre, cuenta ni partida. Se apagan en el mismo sitio.
+· Aviso de cosecha (OPCIONES · AVISO DE COSECHA, apagado de serie): el móvil te avisa cuando tus plantas están listas. Pide el permiso de notificaciones solo si lo activas; el aviso se programa en el propio móvil.
+· La partida y los ajustes se guardan en este móvil, en la carpeta privada de la app. Se borran al desinstalarla (o desde OPCIONES · BORRAR PARTIDA).
+· Si tienes activada la copia de seguridad de Android, el sistema la guarda en tu cuenta de Google (no pasa por nosotros).
+
+Si tienes dudas, escribe a la dirección de contacto de la ficha de la tienda.","Landrace Hunters does not sell, rent or use your data for ads.
+
+· It plays offline and without ads. Chapters 1 to 3 are free; the full game is a one-time purchase on Google Play: Google handles the card and the payment, we only know it has been bought.
+· Play Games (if you sign in): achievements and the cloud save are stored in your Google Play Games account.
+· Error reports (OPTIONS · ERROR REPORTS, off by default): if you turn them on and the game crashes, an anonymous technical report is sent (phone model, Android and game version, and what failed), without your name, account or save. Turn them off in the same place.
+· Harvest alert (OPTIONS · HARVEST ALERT, off by default): your phone tells you when your plants are ready. It asks for notification permission only if you turn it on; the alert is scheduled on the phone itself.
+· Your save and settings are stored on this phone, in the app's private folder. They are deleted when you uninstall it (or from OPTIONS · DELETE SAVE).
+· If Android backup is on, the system stores it in your Google account (it does not go through us).
+
+If you have questions, write to the contact address on the store listing."
+LICENCIAS,LICENSES
+PRIVACIDAD,PRIVACY
+"Este juego usa Godot Engine, con licencia MIT:
+
+","This game uses Godot Engine, under the MIT license:
+
+"
+"
+
+GODOT ENGINE: PARTES DE TERCEROS","
+
+GODOT ENGINE: THIRD-PARTY PARTS"
+"
+Licencia: ","
+License: "
+EDDIE,EDDIE
+ÁLEX,ÁLEX
+LUR,LUR
+ANDER,ANDER
+Otro...,Other...
+NOMBRE,NAME
+¿Cómo te llamas?,What's your name?
+"¿Diga? ¿Eres familia de Maite, la de Ribera Verde? Un barrio obrero a orillas de la ría.","Hello? Are you Maite's family, from Ribera Verde? A working-class neighbourhood on the estuary."
+Me llamo Kiko. Llevo treinta años con el growshop de su calle.,I'm Kiko. I've run the growshop on her street for thirty years.
+KIKO,KIKO
+"Conservo genéticas: variedades locales de Afganistán, México o la India, y los cruces que salen de ellas.","I keep genetics: local strains from Afghanistan, Mexico or India, and the crosses that come from them."
+"Las apunto todas en un registro, una GENOTECA. Tu tía Maite me ayudaba a mantenerla.","I log them all in a register, a GENOTECA. Your aunt Maite helped me keep it."
+Perdona. ¿Cómo te llamabas?,Sorry. What was your name again?
+{N}. Hacía años que no te veía por el barrio.,{N}. I haven't seen you in the neighbourhood for years.
+"Maite murió hace tres semanas. Te ha dejado su piso, su armario de cultivo... y una deuda.","Maite died three weeks ago. She left you her flat, her grow cabinet... and a debt."
+Coge el autobús en la plaza del pueblo: te deja enfrente del piso. La llave está en el buzón.,Take the bus from the village square: it drops you outside the flat. The key's in the mailbox.
+Lee la carta que te dejó. Después pásate por el growshop.,Read the letter she left you. Then drop by the growshop.
+"Soy Kiko, el del growshop de la calle de tu tía Maite, en Ribera Verde. ¿Cómo te llamabas?","I'm Kiko, from the growshop on your aunt Maite's street, in Ribera Verde. What was your name?"
+CARTA,LETTER
+"«{N}: el piso y el armario de cultivo son tuyos. Le debo dinero a Baltasar, el del bar El Ancla. Lo siento.»","""{N}: the flat and the grow cabinet are yours. I owe money to Baltasar, from the El Ancla bar. I'm sorry."""
+«Kiko te ayudará. Empieza plantando: A delante del armario.»,"""Kiko will help you. Start by planting: A in front of the cabinet."""
+SMS · KIKO,SMS · KIKO
+"Te he dejado en el armario 3 semillas de SKUNK #1, abono y pH−. Julen, mi hijo, está en el piso: te explica cada paso.","I've left 3 RÍA UNO seeds, nutrients and corrector in the cabinet. Julen, my son, is at the flat: he'll explain each step."
+ · {g} g rosin, · {g} g rosin
+EFECTIVO,CASH
+BANCO,BANK
+FLORES,BUDS
+ROSIN,ROSIN
