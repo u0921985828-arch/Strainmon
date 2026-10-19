@@ -788,6 +788,8 @@ func montar_nave() -> void:
 	for q in D.get("CURADO_NAVE", {}).get("sitio", []):
 		if ne <= 0:
 			break
+		if n.o[int(q[1]) - 1][int(q[0])] in ["extrN", "extrG", "ctrlN"]:   # i18n-no  delante del extractor o del controlador de la pared, no
+			continue
 		if n.o[int(q[1])][int(q[0])] == null:
 			n.o[int(q[1])][int(q[0])] = "estanteC"   # i18n-no
 			ne -= 1
