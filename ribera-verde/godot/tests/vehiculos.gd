@@ -268,6 +268,14 @@ func _corre() -> void:
 	chk(MENUS.size() and not MENUS[0].has("Rellenar los tanques de la nave"), "fuera de Valdehierro, no se rellena: %s" % [MENUS])
 	S.coches.utilitario.erase("en")
 	S.nave = nave0
+	# 7d) el estado de cada vehículo se guarda con la partida (S.coches: dónde está, km, maletero y abono), JSON puro
+	J.mal("utilitario").buds = {"ria": {"g": 5.0, "thc": 18.0}}
+	S.coches.utilitario.en = "puerto"
+	var cj: String = JSON.stringify(S.coches)
+	var cp = JSON.parse_string(cj)
+	chk(cp is Dictionary and cp.utilitario.en == "puerto" and float(cp.utilitario.mal.buds.ria.g) == 5.0 and cp.utilitario.mal.has("ab"), "S.coches, JSON puro: %s" % cj.substr(0, 120))
+	S.coches.utilitario.erase("en")
+	J.mal("utilitario").buds = {}
 	# 8) la envasadora, en la tienda online
 	S.items.erase("vacio")
 	S.banco = 1000
