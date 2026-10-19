@@ -140,13 +140,23 @@ def hojas(v, out):
     elif isinstance(v, str) and visible(v):
         out.append(v)
 
+PARTES = os.path.join(R, 'i18n', 'partes')
+
 def leer_csv():
+    """el inglés que ya hay: strings.csv y, encima, las partes (i18n/partes/*.csv: es,en)"""
     d = {}
     if os.path.exists(CSV):
         with open(CSV, encoding='utf-8', newline='') as f:
             for r in csv.reader(f):
-                if len(r) >= 3 and r[0] != 'clave':
+                if len(r) >= 3 and r[0] != 'clave' and r[2]:
                     d[r[1]] = r[2]
+    if os.path.isdir(PARTES):
+        for fn in sorted(os.listdir(PARTES)):
+            if fn.endswith('.csv'):
+                with open(os.path.join(PARTES, fn), encoding='utf-8', newline='') as f:
+                    for r in csv.reader(f):
+                        if len(r) >= 2 and r[0] != 'es' and r[1]:
+                            d[r[0]] = r[1]
     return d
 
 def clave(s):
@@ -159,7 +169,20 @@ def extrae(extra=()):
     pj = json.load(open(os.path.join(R, 'datos', 'play.json'), encoding='utf-8'))
     hojas(pj.get('set', {}), ds)
     hojas(list(pj.get('nombres', {}).values()), ds)
-    todo = marcados() + ds + list(extra)
+    # con PLAY, la clave que se busca primero es la del texto cambiado (Datos.tp): las dos
+    L = pj['letra']; ks = sorted(pj['nombres'], key=lambda k: (-len(k), k))
+    rx = re.compile('(?<![%s])(%s)(?![%s\\-])' % (L, '|'.join(re.escape(k) for k in ks), L))
+    reps = [(re.compile(a), b) for a, b in pj['rep']]
+    def tp(s):
+        for r, b in reps:
+            s = r.sub(b, s)
+        return rx.sub(lambda m: pj['nombres'][m.group(1)], s)
+    base = marcados() + ds + list(extra) + [k for k in en if k not in set(ds)]
+    todo = []
+    for s in base:
+        todo.append(s)
+        if tp(s) != s:
+            todo.append(tp(s))
     vistos, filas = set(), []
     for s in todo:
         if s in vistos:
