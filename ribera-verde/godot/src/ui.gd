@@ -1020,11 +1020,11 @@ func ajustes_carga() -> void:
 func ajustes_aplica() -> void:
 	if sonido:
 		sonido.niveles(aj.musica / 4.0, aj.efectos / 4.0)
-	set_sound(aj.sonido, false)
 	VistaC.DALTONICO = Datos.PLAY and aj.get("dalt", false)
 	VistaC.CALMA = Datos.PLAY and aj.get("calma", false)
 	I18n.LANG = ["", "es", "en"][clampi(int(aj.get("idioma", 0)), 0, 2)]   # F7
 	Datos.SOLO_NOMBRES = I18n.en()
+	set_sound(aj.sonido, false)   # el botón SONIDO, ya en su idioma
 	if botones.has("MOVIL"):   # F7: los botones, en el idioma elegido
 		botones.MOVIL.text = I18n.v("MÓVIL")
 	import_pegar.text = I18n.v("PEGAR")
@@ -1138,7 +1138,9 @@ func K(s: String) -> String:
 	return s
 
 func nm(t: String) -> String:
-	t = I18n.v(t)   # F7: el idioma, con la clave aún con {N}
+	if I18n.en():   # F7: el idioma, con la clave aún con {N}
+		t = I18n.v(t)
+		return t.replace("{N}", S.name) if S else t
 	return Datos.tp(t.replace("{N}", S.name) if S else t)
 
 # U4 (fase 5, con Datos.PLAY): el registro de diálogo (las últimas REGISTRO_MAX cajas, START → REGISTRO), mantener A para
@@ -1254,7 +1256,7 @@ func menu(items_: Array, o := {}) -> int:
 	for it in items_:
 		items.append({"label": it} if it is String else it)
 	if Datos.PLAY or I18n.en():   # la versión de Google Play: los textos que se ven, con sus cambios (Datos.tp); F7: y en su idioma
-		var tr_ := func(s: String) -> String: return Datos.tp(I18n.v(s))
+		var tr_ := func(s: String) -> String: return I18n.vt(s)
 		for i in items.size():
 			var it: Dictionary = items[i].duplicate()
 			for k in ["label", "desc", "right"]:
@@ -1708,7 +1710,7 @@ func toast(html: String, ms := 2400.0) -> void:
 	if gancho_toast.is_valid():
 		gancho_toast.call(html, ms)
 	if not oraculo:
-		toast_txt.text = "[center]" + html_bb(Datos.tp(I18n.v(html))) + "[/center]"
+		toast_txt.text = "[center]" + html_bb(I18n.vt(html)) + "[/center]"
 		toast_box.show()
 		coloca_toast.call_deferred()
 	M.quita(toast_t)
@@ -1831,7 +1833,7 @@ func _pinta_hud_bar() -> void:
 	var f := negrita
 	var fs := roundi(HUD_FS * u)
 	var lh := HUD_LH * u
-	var eti := "ORDEN" if hud_orden else "CALOR"
+	var eti := I18n.v("ORDEN") if hud_orden else I18n.v("CALOR")
 	hud_bar.draw_string(f, Vector2(0, f.get_ascent(fs) + (lh - f.get_height(fs)) / 2), eti, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color("#eef8f0"))
 	var x := f.get_string_size(eti, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + HUD_GAP * u
 	var y := (lh - HUD_BH * u) / 2
@@ -1927,7 +1929,7 @@ func bhud() -> void:
 		col.add_child(fila)
 		var hp := Control.new()
 		hp.custom_minimum_size = Vector2(0, 11 * u)
-		var etq: String = "VIDA" if par[2] else v[1]
+		var etq: String = I18n.v("VIDA") if par[2] else v[1]
 		var fr: float = v[2]
 		var cc: Color = v[3]
 		hp.draw.connect(func():

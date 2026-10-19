@@ -1,7 +1,7 @@
 # Google Play listing · English (en-US)
 
 The three texts sit between the `<<<` and `>>>` lines; `tools/ficha.py` measures them (title ≤ 30, short ≤ 80, full ≤ 4000).
-The game itself is in Spanish until phase 7 (i18n) of the plan ships English.
+The game ships in Spanish and English (OPTIONS → LANGUAGE; by default, the phone's language). Screenshots in English: `store/graficos/en/`.
 
 ## Title
 
@@ -35,6 +35,7 @@ From the farmhouse in Mendialde to the shipyards, from the old town of Ibarbide 
 · Original, hand-drawn pixel art
 · Original music for each area, by day and by night
 · Touch controls built for landscape play with your thumbs
+· In Spanish and English
 · Plays offline, no ads
 · Chapters 1 to 3 free; the full game is a single purchase (no pay-to-win)
 · Autosave and backup

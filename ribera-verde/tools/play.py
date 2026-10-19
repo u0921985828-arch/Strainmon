@@ -82,6 +82,9 @@ SET = {
     'SOTANO.txt.cerrado': 'La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.',
 }
 
+# y en mayúsculas (los rótulos y avisos: «JACK HERER», «SKUNK #1»)
+NOMBRES.update({k.upper(): v.upper() for k, v in list(NOMBRES.items()) if k.upper() != k})
+
 LETRA = 'A-Za-zÀ-ÿ0-9'
 def nombres_rx():
     alt = '|'.join(re.escape(k) for k in sorted(NOMBRES, key=len, reverse=True))

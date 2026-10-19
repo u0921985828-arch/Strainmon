@@ -34,6 +34,7 @@ Del caserío de Mendialde a los astilleros, del casco viejo de Ibarbide al puert
 · Pixel art original, dibujado a mano
 · Música propia por zonas, de día y de noche
 · Mandos táctiles para jugar en horizontal con los pulgares
+· En castellano y en inglés
 · Se juega sin conexión y sin anuncios
 · Capítulos 1 a 3 gratis; el juego completo, con una sola compra (sin ventajas de pago)
 · Guardado automático y copia de seguridad

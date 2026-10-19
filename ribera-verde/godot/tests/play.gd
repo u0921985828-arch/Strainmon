@@ -126,7 +126,8 @@ func _corre() -> void:
 	# 4 · las extracciones y el foro, sin cifras; la Ice-o-lator no es la variedad Ice
 	chk(not String(D.EXTR.rosin.d).contains("80") and not String(D.EXTR.ice.d).contains("4"), "extracciones: %s / %s" % [D.EXTR.rosin.d, D.EXTR.ice.d])
 	chk(String(D.EXTR.ice.n) == "Ice-o-lator" and Datos.tp("el kit Ice-o-lator") == "el kit Ice-o-lator", "Ice-o-lator")
-	chk(Datos.tp("una Ice muy blanca") == "una Helada muy blanca", "Ice → Helada: %s" % Datos.tp("una Ice muy blanca"))
+	chk(Datos.tp("una Ice muy blanca") == "una Ize muy blanca", "Ice → Ize: %s" % Datos.tp("una Ice muy blanca"))
+	chk(Datos.tp("es JACK HERER.") == "es JAK HERRER.", "JACK HERER → JAK HERRER: %s" % Datos.tp("es JACK HERER."))
 	# 5 · ida y vuelta: sin PLAY, como antes (en su sitio: las mismas listas)
 	var foro: Array = D.FORO
 	Datos.PLAY = false

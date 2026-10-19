@@ -65,6 +65,18 @@
 - Los 89 comentarios con la versión delante (`# 1.47: …`) se quedan sin ella en el código y van, por versión, a «Notas del código por versión (fase 8)», al final de este archivo.
 - historia 120 pasos y vista C con 0 diferencias; batería entera en verde.
 
+### Fase 7 · el juego en inglés
+- Los textos que se ven pasan por `T()` (frase con huecos con nombre: `{n}`, `{g}`), `K()` (literal que se traduce al enseñarlo y que el código también compara) o `I18n.v()` (lo que se pinta a mano); el castellano es la clave y sale letra a letra igual que antes (las pruebas contra el HTML no cambian). Género y plural, con una plantilla por variante; nada de frases pegadas a trozos.
+- `godot/i18n/strings.csv` (clave, es, en; 4.878 filas) lo hace `python3 -I tools/i18n.py extrae` desde `godot/i18n/partes/*.csv` (es,en, por script y los datos), con las variantes de PLAY (`Datos.tp`). `tools/i18n.py cuenta` cuenta los literales visibles fuera de `T`/`K`/`v`: 0 (`# i18n-no` marca lo que no se enseña).
+- OPCIONES → IDIOMA (sistema, español, inglés; por defecto el del móvil: es, eu, ca y gl en castellano, lo demás en inglés). En inglés no se pasa `Datos.tp` por el texto traducido (cambiaría «Ice» o «Critical»): `I18n.vt`. Un nombre en minúscula («la skunk #1») se busca con mayúscula.
+- Prueba nueva `tests/capturas_ui.gd` (combate, START, OPCIONES, diálogo, tienda, Genoteca, mochila y móvil, en castellano y en inglés, a los ppp de un móvil): 8 pantallas, 0 textos cortados. En la batería.
+
+### Repaso de la APK de Play (lo pidió el usuario: «hay errores… faltan iconos… los nombres de las genéticas son de risa»)
+- La caja de vida del jugador en el combate ya no tapa al jugador: si A, B o START la echan a la izquierda, va debajo de la del enemigo (`capturas_ui`, con los ppp de un móvil, falla sin el arreglo).
+- Los nombres de las variedades en la versión de Play, parodias de los reales (una letra o el orden): Skonk #1, Limon Haize, Supra Skonk, Bluberri, Big Bod, Norzen Lights, Jak Herrer, Whyte Widou, Saur Disel, Amnesya Haize… y en mayúsculas en los avisos (JAK HERRER, SKONK #1). `tools/play.py` → `datos/play.json`; las traducciones migradas de los nombres de antes.
+- La fila Vida de la MOCHILA, con su icono (un corazón a mano en `salon.py`, `iconos-menu`). Prueba nueva `tests/iconos.gd`: cada icono que piden los menús, la tienda y el equipo está en el atlas (131, 0 fallos).
+- Los botones SONIDO/MÓVIL, CALOR y VIDA del HUD y del combate, en el idioma elegido.
+
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
 Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.

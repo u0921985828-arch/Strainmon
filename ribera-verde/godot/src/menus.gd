@@ -294,7 +294,7 @@ func mochila() -> void:
 		if nevera_r() >= .1:
 			rows.append({"label": K("Nevera"), "right": Datos.coma(Datos.jsround(nevera_r() * 10) / 10.0) + " g", "ic": icono("cogollo"),
 				"desc": T("Los extractos, en frío, en casa (caben {n} g). Un control en la calle no la ve; una redada se la lleva.", {"n": n(nevera_cap())})})
-		rows.append({"label": K("Vida"), "right": "%s/%s" % [n(S.hp), n(S.hpMax)], "desc": K("Se recupera durmiendo, comiendo o con el tiempo.")})
+		rows.append({"label": K("Vida"), "right": "%s/%s" % [n(S.hp), n(S.hpMax)], "ic": icono("corazon"), "desc": K("Se recupera durmiendo, comiendo o con el tiempo.")})
 		if int(S.pelea.xp) > 0:
 			rows.append({"label": K("Pelea"), "right": T("nivel {n}", {"n": nivel_pelea()}), "desc": ficha_pelea()})
 		for k in D.PRODUCTOS:   # 1.23: por marca

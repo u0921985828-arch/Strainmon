@@ -45,7 +45,20 @@ static func v(s: String) -> String:
 		var t := Datos.tp(s)
 		if _en.has(t):
 			return _en[t]
-	return _en.get(s, s)
+	if _en.has(s):
+		return _en[s]
+	var c := s.substr(0, 1)
+	if c != c.to_upper():   # «la skunk #1» (to_lower de un nombre): la del nombre con mayúscula, en minúscula
+		var m := c.to_upper() + s.substr(1)
+		var r := v(m)
+		if r != m:
+			return r.substr(0, 1).to_lower() + r.substr(1)
+	return Datos.tp(s)   # sin inglés, el castellano (con los nombres de PLAY)
+
+# lo que se ve: en inglés, la traducción (ya con los nombres de PLAY: Datos.tp no se pasa por el inglés,
+# que cambiaría palabras como «Ice» o «Critical»); en castellano, Datos.tp
+static func vt(s: String) -> String:
+	return v(s) if en() else Datos.tp(s)
 
 # una frase con huecos: T("Tienes {n} €", {"n": 30}); los textos que van en los huecos también se traducen
 static func T(s: String, a := {}) -> String:

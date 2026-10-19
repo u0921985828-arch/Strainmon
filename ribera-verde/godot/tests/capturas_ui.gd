@@ -43,6 +43,8 @@ func _corre() -> void:
 		root.add_child(J)
 		await espera(3)
 		J.aj.idioma = 2 if idioma == "en" else 1
+		if arg("--dpi") != "":   # los ppp de un móvil (mandos_geo): los mandos a su tamaño real
+			J.DPI_PRUEBA = float(arg("--dpi"))
 		J.ajustes_aplica()
 		J.S = J.new_game_estado() if J.has_method("new_game_estado") else J.S
 		for x in O:
@@ -61,7 +63,7 @@ func _corre() -> void:
 			"opciones":
 				J.opciones()
 			"dialogo":
-				J.talk("KIKO", [J.K("Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono. Y el foco, a su distancia.")])
+				J.talk("KIKO", [J.K("Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.")])
 			"tienda":
 				J.shop()
 			"genoteca":
@@ -72,6 +74,13 @@ func _corre() -> void:
 				J.movil_menu()
 		await espera(90)
 		_mira_cortes(p)
+		if p == "combate" and Datos.PLAY:   # 1.58: la caja del jugador no tapa al jugador (lo de la izquierda) ni pisa la del enemigo
+			var rp: Rect2 = J.bP.get_global_rect()
+			var re: Rect2 = J.bE.get_global_rect()
+			var es: Rect2 = J.escena.get_global_rect()
+			# el jugador está de pie abajo (pies en la fila 142 de 160, 64 px de alto): la caja, entera por encima de su cintura
+			if rp.end.y > es.position.y + es.size.y * .6 or rp.intersects(re):
+				cortes.append("combate: la caja de EDDIE en %s tapa al jugador o a la del enemigo (%s)" % [rp, re])
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(dir.path_join("ui-%d-%s-%s.png" % [n + 1, p, idioma]))
 		n += 1

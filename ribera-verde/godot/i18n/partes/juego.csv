@@ -152,7 +152,7 @@ CARTA,LETTER
 "«{N}: el piso y el armario de cultivo son tuyos. Le debo dinero a Baltasar, el del bar El Ancla. Lo siento.»","""{N}: the flat and the grow cabinet are yours. I owe money to Baltasar, from the El Ancla bar. I'm sorry."""
 «Kiko te ayudará. Empieza plantando: A delante del armario.»,"""Kiko will help you. Start by planting: A in front of the cabinet."""
 SMS · KIKO,SMS · KIKO
-"Te he dejado en el armario 3 semillas de SKUNK #1, abono y pH−. Julen, mi hijo, está en el piso: te explica cada paso.","I've left 3 RÍA UNO seeds, nutrients and corrector in the cabinet. Julen, my son, is at the flat: he'll explain each step."
+"Te he dejado en el armario 3 semillas de SKUNK #1, abono y pH−. Julen, mi hijo, está en el piso: te explica cada paso.","I've left 3 SKONK #1 seeds, nutrients and corrector in the cabinet. Julen, my son, is at the flat: he'll explain each step."
  · {g} g rosin, · {g} g rosin
 EFECTIVO,CASH
 BANCO,BANK

@@ -303,7 +303,19 @@ def salir():
     L.contorno(K)
     return L
 
+def corazon():
+    """1.58 (lo pidió el usuario: «faltan iconos»): la vida en la MOCHILA"""
+    L = Lienzo(16, 16)
+    filas = {3: [(3, 6), (9, 12)], 4: [(2, 7), (8, 13)], 5: [(2, 13)], 6: [(2, 13)], 7: [(2, 13)], 8: [(3, 12)], 9: [(4, 11)], 10: [(5, 10)], 11: [(6, 9)], 12: [(7, 8)]}
+    for y, tr in filas.items():
+        for a, b in tr: L.hl(a, b, y, '#e04040')
+    for y, tr in filas.items(): L.p(tr[-1][1], y, '#a82a34')                            # sombra a la derecha
+    L.hl(3, 5, 4, '#ff9a9a'); L.p(3, 5, '#ff9a9a'); L.p(4, 3, '#ffd0d0')               # el brillo arriba a la izquierda
+    L.contorno(K)
+    return L
+
 sale('movil', movil(), 'iconos-menu')
+sale('corazon', corazon(), 'iconos-menu')
 sale('salir', salir(), 'iconos-menu')
 sale('guardar', guardar(), 'iconos-menu')
 sale('altavoz', altavoz(), 'iconos-menu')
