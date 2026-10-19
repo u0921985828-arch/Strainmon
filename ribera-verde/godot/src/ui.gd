@@ -277,7 +277,7 @@ func _fuente(f: String, suave := true) -> FontFile:
 	return o
 
 # ---------- pantalla y mandos (06b-pantalla.js) ----------
-# 1.57: para las pruebas de los mandos por móvil (tests/mandos_geo.gd): los ppp y la zona segura de un móvil de verdad
+# Para las pruebas de los mandos por móvil (tests/mandos_geo.gd): los ppp y la zona segura de un móvil de verdad
 static var DPI_PRUEBA := 0.0
 static var ZONA_PRUEBA := []
 static func es_movil() -> bool:
@@ -355,7 +355,7 @@ func ajusta() -> void:
 	zona_ab = G.ab
 	cruz = G.cruz
 	var a: float = cruz.size.x / 3
-	# 1.40 (lo pidió el usuario: «más ergonómicos, más espaciadas las flechas del cuadrado del medio»): cada flecha, una tecla suelta
+	# (lo pidió el usuario: «más ergonómicos, más espaciadas las flechas del cuadrado del medio»): cada flecha, una tecla suelta
 	# con sus cuatro esquinas redondas, separada del cuadrado del medio por CRUZ_HUECO del brazo; el toque sigue siendo por ángulo
 	var g: float = roundf(a * CRUZ_HUECO)
 	for b in ["up", "down", "left", "right"]:
@@ -444,7 +444,7 @@ func geo_mandos(W: float, H: float, il: float, ir: float, it: float, ib: float, 
 		"ab": R.call(abx, aby, abr - abx, abb - aby), "A": R.call(ax - 5.25 * s, ay - 5.25 * s, 10.5 * s, 10.5 * s), "B": R.call(bx - 5.25 * s, by - 5.25 * s, 10.5 * s, 10.5 * s),
 		"start": R.call(stx - 7.5 * s, ay - 16.25 * s, 15 * s, 7 * s), "movil": R.call(cx - 7.5 * s, cy - 23 * s, 15 * s, 7 * s), "sonido": R.call(W - ir - 4.5 * m - 15 * s, it + 3 * s, 15 * s, 7 * s)}
 
-# 1.57 (lo pidió el usuario: «que sean lo mejor para jugar con el móvil en horizontal, estudiando en qué zonas caen los dedos»): los
+# (lo pidió el usuario: «que sean lo mejor para jugar con el móvil en horizontal, estudiando en qué zonas caen los dedos»): los
 # mandos donde descansan los pulgares con el móvil cogido con las dos manos, en mm desde el canto de verdad del móvil (el pulgar no sabe
 # de muescas) y sin salirse de la zona segura (muesca, isla, esquinas redondas, la barra de inicio de iOS):
 #   - el pulgar apoya a unos 25 mm del canto y 20-30 mm del borde de abajo; gira desde la base (la esquina de abajo), así que A y B van
@@ -515,7 +515,7 @@ func geo_pulgar(W: float, H: float, il: float, ir: float, it: float, ib: float, 
 		"sonido": R.call(g.so.position.x, g.so.position.y, g.so.size.x, g.so.size.y)}
 
 # rectángulo del escenario .ui (en px de pantalla)
-# 1.43: lo que queda libre del lienzo (en píxeles del juego) por encima del cuadro del texto, para centrar ahí el calendario y el mapa
+# Lo que queda libre del lienzo (en píxeles del juego) por encima del cuadro del texto, para centrar ahí el calendario y el mapa
 func alto_libre() -> int:
 	if oraculo or not dlg.visible or u <= 0:
 		return SH - 47
@@ -799,7 +799,7 @@ func _input(e: InputEvent) -> void:
 		if not dedos.values().has(k):
 			aprieta(k, false)
 
-# 1.57: al deslizar de una flecha a la de al lado, la nueva tiene que ganar por CRUZ_HISTERESIS (unos 11° pasada la diagonal):
+# Al deslizar de una flecha a la de al lado, la nueva tiene que ganar por CRUZ_HISTERESIS (unos 11° pasada la diagonal):
 # el pulgar sobre la diagonal ya no hace zigzag
 const CRUZ_HISTERESIS := 1.4
 func dir_cruz(p: Vector2, actual: String) -> String:
@@ -872,7 +872,7 @@ func aprieta(k: String, on: bool) -> void:
 		M.quita(rep[k][1])
 		rep.erase(k)
 
-# 1.57: un toque corto del vibrador al apretar un mando (OPCIONES → VIBRACIÓN), en el móvil
+# Un toque corto del vibrador al apretar un mando (OPCIONES → VIBRACIÓN), en el móvil
 func vibra() -> void:
 	if Datos.CAL and aj.get("vibra", true) and not oraculo and OS.has_feature("mobile"):
 		Input.vibrate_handheld(12)
@@ -1591,7 +1591,7 @@ func _coloca() -> void:
 		dlg_nm.position = dlg.position + Vector2(6 * us, -12 * us)
 		dlg_more.position = dlg.position + dlg.size - Vector2(8 * us + 8 * us, 4 * us + 5 * us)
 		dlg_more.size = Vector2(8 * us, 7 * us)
-		# 1.43: la primera vez, el texto aún no sabe su ancho y el cuadro sale de toda la pantalla; se recoloca al fotograma siguiente
+		# La primera vez, el texto aún no sabe su ancho y el cuadro sale de toda la pantalla; se recoloca al fotograma siguiente
 		if dlg.size.y > R.size.y * 0.6 and not get_tree().process_frame.is_connected(_coloca):
 			get_tree().process_frame.connect(_coloca, CONNECT_ONE_SHOT)
 	if menu_box.visible:
@@ -1784,7 +1784,7 @@ const HUD_BW := 28.0  # barra
 const HUD_BH := 2.5
 const HUD_GAP := 2.5
 
-# 1.50: el recuadro, etiqueta a la izquierda y cifra a la derecha, con una raya arriba y abajo
+# El recuadro, etiqueta a la izquierda y cifra a la derecha, con una raya arriba y abajo
 const HUD_TAB_SEP := 6.0   # entre la etiqueta más larga y la cifra más larga
 func _pinta_hud_tab() -> void:
 	var f := negrita
@@ -1934,7 +1934,7 @@ func bhud() -> void:
 	_coloca.call_deferred()
 
 # ---------- título (.title) ----------
-# 1.35 (lo pidió el usuario): el rótulo, el lema y, debajo, los botones (el menú «titulo»); detrás, la partida de fondo (pinta.gd)
+# (lo pidió el usuario): el rótulo, el lema y, debajo, los botones (el menú «titulo»); detrás, la partida de fondo (pinta.gd)
 const LEMA := "Caza genéticas. Salda la deuda. Que no te pillen."
 const TIT_W := 132.0   # los botones: de ancho, en u; de alto, 48 dp si caben (TIT_H como poco), con TIT_SEP entre ellos
 const TIT_H := 17.0

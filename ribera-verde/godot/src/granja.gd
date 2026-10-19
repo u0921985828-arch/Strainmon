@@ -1,7 +1,7 @@
 # Ribera Verde (Godot) — 09-cultivo y la lógica de 09b-carpa: el tiempo (minuto a minuto y de golpe), el día nuevo con su
 # factura y su olor, plantar, cuidar, sacar esquejes, cosechar, la cama, el PC (Genoteca y banco de semillas), la carta, la
 # mesa de genética y la vista de carpa (VC: elegir plaza o foco y cuidar). Los números salen de Cultivo (src/cultivo.gd).
-extends "res://src/mundo.gd"
+extends "res://src/calle.gd"
 
 const Vista = preload("res://src/vista.gd")
 const EscViaje = preload("res://src/escena_viaje.gd")
@@ -459,7 +459,7 @@ func extras_libres(ci: int) -> Array:
 	return o
 
 # abono, pH y EC (1.11, 09-cultivo): lo que aprovecha la dosis (con pH− y medidor, 1; a ojo, .75; sin pH−, .5) y su texto.
-# 1.23: por marca (D.PRODUCTOS): el pH− que se gasta es el de su marca y, si no hay, el otro
+# Por marca (D.PRODUCTOS): el pH− que se gasta es el de su marca y, si no hay, el otro
 func ph_item(bio):
 	for k in (["ophm", "phm"] if bio else ["phm", "ophm"]):
 		if S.items.get(k, 0) > 0:
@@ -469,7 +469,7 @@ func ph_item(bio):
 func abono_q(bio = 0) -> float:
 	return float(Cultivo.abo_de(bio).q[(2 if S.items.get("medidor", 0) else 1) if ph_item(bio) != null else 0])
 
-# 1.23 (09-cultivo: abonar): el de crecimiento (veg_k: los que hay, en vegetativo y sin él) o el de floración; con dos marcas, eliges
+# (09-cultivo: abonar): el de crecimiento (veg_k: los que hay, en vegetativo y sin él) o el de floración; con dos marcas, eliges
 func abonar(p: Dictionary, veg_k: Array) -> void:
 	var veg := veg_k.size() > 0
 	var ks := veg_k
@@ -1229,7 +1229,7 @@ func llega_mueble() -> void:
 # el carro de esquejes (1.11, carroAction): en la tabla de corte, los del propagador se pinchan en las bandejas, donde aguantan
 # CARRO.dias desde ese día; se plantan desde la plaza vacía (plantar)
 func carro_action() -> void:
-	# 1.40 (lo pidió el usuario): el carro se ve tal cual, dos bandejas de tacos (arriba y abajo) en vez de un menú; A en un taco
+	# (lo pidió el usuario): el carro se ve tal cual, dos bandejas de tacos (arriba y abajo) en vez de un menú; A en un taco
 	# vacío pincha los del propagador y A en un esqueje lo nombra o lo tira
 	var cap: int = D.CARRO.bandejas * D.CARRO.plazas
 	var sel := mini(S.bandejas.size(), cap - 1)
@@ -1321,7 +1321,7 @@ func letter_action():
 func viaje(a: String, b: String) -> Dictionary:
 	return {"min": int(D.PARADAS[a].min + D.PARADAS[b].min), "eur": D.PARADAS[a].eur + D.PARADAS[b].eur}
 
-# 1.56: el viaje, de perfil, como pantalla de carga (escena_viaje.gd): el autobús o tu vehículo por la carretera; A o B lo pasan
+# El viaje, de perfil, como pantalla de carga (escena_viaje.gd): el autobús o tu vehículo por la carretera; A o B lo pasan
 var VIAJE_V = null   # {veh, de, a, min, h, t0}
 var gancho_viaje := Callable()   # (vehículo, de, a) · las pruebas lo apuntan sin esperar
 func anim_viaje(veh: String, de: String, a: String, mins: int) -> void:

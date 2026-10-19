@@ -97,7 +97,7 @@ static func tp(s: String) -> String:
 		i = m.get_end()
 	return o + s.substr(i)
 
-# 1.52: las autoflorecientes (AUTO) entran en la Genoteca, las recetas y el banco solo con CAL (las pruebas contra el HTML, sin ellas)
+# Las autoflorecientes (AUTO) entran en la Genoteca, las recetas y el banco solo con CAL (las pruebas contra el HTML, sin ellas)
 static var _cal_d = null
 static func _aplica_auto() -> void:
 	_cal_d = CAL
@@ -110,7 +110,7 @@ static func _aplica_auto() -> void:
 		D.DEX.append_array(D.AUTO.dex)
 		D.RECIPES.merge(D.AUTO.recipes)
 		D.BANCO.append_array(D.AUTO.banco)
-	# 1.52: el club KAIA del muelle, el tuyo (solo con CAL: las pruebas contra el HTML recorren D.CLUBS)
+	# El club KAIA del muelle, el tuyo (solo con CAL: las pruebas contra el HTML recorren D.CLUBS)
 	var K: Dictionary = D.get("KAIA", {})
 	if K.is_empty():
 		return

@@ -149,7 +149,7 @@ static func _fondo(P, sw: int, sh: int, corre: float, tin: Color) -> void:
 		x2 += ca.get_width()
 	P._rect(0, Y_CARRETERA + ca.get_height(), sw, sh, Color("#3a4a30") * tin)
 
-# 1.57 (lo pidió el usuario: «estos recursos se podrían usar antes de la pantalla de inicio, como de carga del juego, en una carretera
+# (lo pidió el usuario: «estos recursos se podrían usar antes de la pantalla de inicio, como de carga del juego, en una carretera
 # sin texto, los vehículos andando y la barra cargándose»): al abrir el juego, de día, la carretera quieta con los vehículos que pasan
 # por los dos carriles (en el de enfrente, al revés y un poco más oscuros) y, abajo, la barra; sin letras
 const CARGA := 3600.0
@@ -217,7 +217,7 @@ static func _coches(P, e: float, suelo1: int, suelo0: int) -> void:
 				var rim: Image = R["rueda-%d-%d" % [d, f if carril == 0 else 3 - f]]
 				P._img(rim, vx + rx - d / 2, vy + bote + int(r[1]) - d / 2, tv)
 
-# 1.57.1 (lo pidió el usuario: «que aparezcan en la pantalla de carga los sprites reales de césped, árboles, setos, también molaría que
+# (lo pidió el usuario: «que aparezcan en la pantalla de carga los sprites reales de césped, árboles, setos, también molaría que
 # pasasen algún transeúnte… que se quede de fondo la carretera andando coches y por la acera transeúntes andando, en bici, patinete»): la
 # calle del juego vista de lado, quieta, de abajo arriba: la acera de delante, la calzada (dos carriles), la acera de detrás y dos filas de
 # hierba con árboles y setos, el monte y el cielo; por las aceras, gente andando, en bici y en patinete; por la calzada, los vehículos de
@@ -227,7 +227,7 @@ const CALLE_FIL := ["grass", "walk", "roadB", "roadT", "walk", "grass", "grass"]
 const PEATONES := [[0, 1, 0.040, 0.05, ""], [0, -1, 0.034, 0.40, ""], [0, 1, 0.085, 0.62, "bici"], [0, -1, 0.045, 0.85, ""],
 	[1, -1, 0.042, 0.20, ""], [1, 1, 0.066, 0.50, "patinete"], [1, -1, 0.090, 0.75, "bici"], [1, 1, 0.038, 0.95, ""]]
 
-# 1.57.2 (lo pidió el usuario: «que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el
+# (lo pidió el usuario: «que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el
 # cultivo en exterior»): en la hierba de detrás, un bancal con tres plantas de exterior por la fecha del sistema (la carga y el título no
 # tienen partida): (mes, hasta el día, fase: -1 nada, 0 plántula, 1-2 vegetativo, 3 prefloración, 4 floración,
 # 5 madura, 6 cortada). Las plantas, dibujadas a mano con contorno como el árbol y el seto (huerto-pl, hp<variedad>-<1..5>: índica,

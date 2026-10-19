@@ -55,6 +55,12 @@
 - **Plugin Android** propio (`tools/android-plugin`, `tools/plugin-android.sh` → `godot/addons/landrace_play/bin/landrace-play.aar`; `addons/landrace_play/export_plugin.gd` añade el AAR, Billing 7.1.1, Play Games v2 20.1.2, Sentry 7.22.6 y el APP_ID). `plataforma.gd` lo envuelve y, sin él, no hace nada.
 - PRIVACIDAD, `store/privacy-policy.md`, `data-safety.md`, `iarc.md`, las fichas, `store/play-console.md` (lo que hace Eddie) y `store/logros-play-games.csv`. Prueba nueva `tests/retencion.gd` (41 comprobaciones: 0 h, 3 h y 30 h → tope; logros 27/27; compra cancelada, más tarde y hecha).
 
+### Fase 8 · `trama.gd` y `mundo.gd` en módulos, sin cambiar el comportamiento
+- `tools/partir.py` (planes `tools/plan_trama.json` y `tools/plan_mundo.json`) parte cada script en una cadena de herencia: los miembros y las funciones static se quedan en la base; cada función va al módulo de su tramo; lo que una parte anterior llama y vive en una posterior lleva un stub en la base.
+- Cadena: ui → mundo → `calle` → granja → trama → `menus` → `policia` → `movil` → `venta` → `nave` → `setas` → `eventos` → retencion → juego. Ningún archivo de `src/` pasa de 2.500 líneas (antes `trama.gd` 9.438 y `mundo.gd` 3.659; ahora el mayor, `mundo.gd`, 2.216).
+- Los 89 comentarios con la versión delante (`# 1.47: …`) se quedan sin ella en el código y van, por versión, a «Notas del código por versión (fase 8)», al final de este archivo.
+- historia 120 pasos y vista C con 0 diferencias; batería entera en verde.
+
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
 Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.
@@ -1331,3 +1337,166 @@ Sale con el arte del plan de producción (`docs/PLAN-PRODUCCION.md`, P3–P6 cer
 ## 1.0.0 · 5 de octubre de 2026
 
 - Primera versión, publicada como Artifact de Claude.
+
+## Notas del código por versión (fase 8)
+
+Los comentarios del código que empezaban por su versión («# 1.51: …») la pierden aquí; esta es la lista, por versión, con el archivo y lo que comentan.
+
+### 1.57.2
+- `escena_viaje.gd` · `HUERTO`: (lo pidió el usuario: «que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el
+- `mundo.gd` · `montar_taller`: (lo pidió el usuario): el taller por zonas, con CAL; montar_locales lo vuelve a poner cada vez que rehace el local
+- `mundo.gd`: (lo pidió el usuario: «está muy vacío… el atrezo deja que desear o por lo menos cómo está usado»): el taller, cada cosa en
+- `mundo.gd` · `TALLER_SUELO`: el suelo del taller por zonas (x0, y0, x1, y1, casilla): el hormigón de los puestos (con manchas de aceite por hash_t), la
+
+### 1.57.1
+- `calle.gd` · `gx`: (lo pidió el usuario: «las extracciones se deberían de poder fumar también con tabaco, sin tabaco no, porque sería con la
+- `escena_viaje.gd` · `CALLE_FIL`: (lo pidió el usuario: «que aparezcan en la pantalla de carga los sprites reales de césped, árboles, setos, también molaría que
+
+### 1.57
+- `escena_viaje.gd` · `CARGA`: (lo pidió el usuario: «estos recursos se podrían usar antes de la pantalla de inicio, como de carga del juego, en una carretera
+- `juego.gd` · `carga_t0`: (lo pidió el usuario: «estos recursos se podrían usar antes de la pantalla de inicio, como de carga del juego, en una carretera
+- `mundo.gd` · `DEMO_CAL`: (lo pidió el usuario: «luego aparece la pantalla de inicio START con más atrezo»): en el título, con CAL, el protagonista y el
+- `pinta.gd` · `arriba`: (lo pidió el usuario: «los tubos no llegan a las carpas, falta 1 o 2 píxeles»): la boca, en la primera fila opaca del
+- `pinta.gd` · `_tubo_codos`: (lo pidió el usuario: «en las curvas o giros del tubo no se deben cortar»): de la carpa (xa, hasta ya) al techo (yc), por el
+- `ui.gd` · `DPI_PRUEBA`: para las pruebas de los mandos por móvil (tests/mandos_geo.gd): los ppp y la zona segura de un móvil de verdad
+- `ui.gd`: (lo pidió el usuario: «que sean lo mejor para jugar con el móvil en horizontal, estudiando en qué zonas caen los dedos»): los
+- `ui.gd` · `CRUZ_HISTERESIS`: al deslizar de una flecha a la de al lado, la nueva tiene que ganar por CRUZ_HISTERESIS (unos 11° pasada la diagonal):
+- `ui.gd` · `vibra`: un toque corto del vibrador al apretar un mando (OPCIONES → VIBRACIÓN), en el móvil
+
+### 1.56
+- `granja.gd` · `VIAJE_V`: el viaje, de perfil, como pantalla de carga (escena_viaje.gd): el autobús o tu vehículo por la carretera; A o B lo pasan
+
+### 1.55.3
+- `mundo.gd` · `SENT_GEO`: (lo pidió el usuario: «la altura correcta en todos los muebles donde se puede sentar»): por asiento, [dx, cadera]: dx,
+- `pinta.gd` · `f`: (lo pidió el usuario): sube de la boca del techo de la carpa al techo de la habitación, corre pegado al techo (por
+- `pinta.gd` · `cs`: a cada carpa con extractor, su ventana (que no quede detrás de ella), con los tramos de techo sin pisarse y lo más
+
+### 1.55
+- `mundo.gd` · `sitio`: (lo pidió el usuario: «la puerta del sótano está inaccesible porque hay una carpa delante» y «poder ordenar las carpas al
+- `pinta.gd` · `_tubos_casa`: (lo pidió el usuario: «debería salir un tubo de extracción de cada carpa hacia una de las ventanas»): con el extractor puesto,
+
+### 1.54.1
+- `trama.gd` · `GS_W`: (lo pidió el usuario: «eso no son sprites en condiciones en el mismo estilo que los muebles del juego»): el plano de
+
+### 1.52
+- `calle.gd` · `calle_tiempo`: con lluvia, tormenta o nieve hay menos gente en la calle: el calor de cada venta, por esto
+- `datos.gd` · `_cal_d`: las autoflorecientes (AUTO) entran en la Genoteca, las recetas y el banco solo con CAL (las pruebas contra el HTML, sin ellas)
+- `datos.gd` · `K`: el club KAIA del muelle, el tuyo (solo con CAL: las pruebas contra el HTML recorren D.CLUBS)
+- `eventos.gd`: las obras del muelle, el club KAIA y la ley
+- `mundo.gd`: (lo pidió el usuario: «comenzar destartalado… ir reformándolo poco a poco, edificio por edificio»): cada casa, en ruina hasta
+- `mundo.gd` · `obra_ya`: una obra del muelle, terminada (S.mar.ob: el día en que se acaba cada una)
+- `trama.gd` · `ICONO_TIEMPO`: el dibujo del tiempo, 13 × 9 (. vacío, s sol, n nube, m sombra de la nube, g gota, r rayo, b nieve, f niebla)
+
+### 1.51
+- `eventos.gd`: el muelle de Puerto Viejo, los envíos por mar y el piso franco
+- `mundo.gd` · `puertas_int`: (lo pidió el usuario: «una puerta en la casa, luego un mapa pequeño como un mini pasillito»; y en el taller y en la nave): las
+- `mundo.gd` · `_muelle0`: (lo pidió el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para los envíos»): desde el capítulo de MAR.ch, el paso
+- `mundo.gd` · `ATREZO`: (lo pidió el usuario: «la casa de Txaro es la casa con menos atrezo que hay en el mundo… que en casi todos los lugares donde
+- `setas.gd` · `ayudante_setas`: (lo pidió el usuario: «que se cultive como la nave»): Ekaitz, el ayudante del bajo grande, cada mañana: todo húmedo y lo listo, a secar
+- `trama.gd` · `_SOT`: (lo pidió el usuario: «antes de… alquilar el bajo… habilitar el sótano de la casa»): las setas, en el bajo de Txomin
+
+### 1.50
+- `nave.gd` · `i`: a lo ancho, con el nombre entero (en la columna de la derecha se cortaba: «Beldi», «Zam»…)
+- `pinta.gd` · `SENT_PIERNAS`: de frente, sentado: los muslos encima del asiento (vistos desde arriba), las rodillas, las espinillas colgando
+- `pinta.gd` · `SENT_TABURETE`: de espaldas en el taburete de la barra (asiento a 72 cm, 11 px): el culo encima del asiento y, a los lados del pie,
+- `policia.gd` · `g_lote`: un lote de menos de 10 g, con su décima (0,4 g no es «0 g»); sin CAL, como g_txt
+- `ui.gd` · `HUD_TAB_SEP`: el recuadro, etiqueta a la izquierda y cifra a la derecha, con una raya arriba y abajo
+
+### 1.49
+- `calle.gd` · `levantarte`: (lo pidió el usuario: «que te puedas sentar de verdad»): sentado es un estado, no un menú; el mundo sigue (la gente
+
+### 1.48
+- `pinta.gd` · `MOSAICO_TILE`: los firmes en mosaico (exterior-mosaico) y el canto de la hierba donde toca acera, calzada u hormigón: dos píxeles más oscuros,
+- `pinta.gd` · `_det_c`: (lo pidió el usuario: «que se note que es el sprite y lo que trae»): d-<objeto>-<mapa>-<tramo>, d-<objeto>-<mapa>,
+
+### 1.47
+- `mundo.gd` · `_disco_cal`: (lo pidió el usuario: «la discoteca tiene que ser más grande, el piso de arriba reservado»), solo con Datos.CAL: GAUA, la planta
+- `mundo.gd` · `montar_estancos`: (lo pidió el usuario: «un estanco en cada pueblo»), solo con Datos.CAL: la puerta en una casa libre de cada pueblo (en el barrio
+- `mundo.gd` · `FUMAR`: (lo pidió el usuario): con qué se fuma. El papel, el tabaco, las boquillas y el mechero, del estanco (ESTANCO); la pipa,
+- `nave.gd` · `subir_vip`: (lo pidió el usuario): el reservado, arriba; desde la cristalera del suelo se ve la pista de abajo
+- `pinta.gd` · `_bailan`: (lo pidió el usuario: «desde el que se ve el piso de abajo, en la cristalera del suelo, transparente»): en el reservado, la gente
+- `pinta.gd` · `g0`: (lo pidió el usuario: «que se vea algo más que la pista»): por el cristal, lo de abajo entero en su sitio, recortado al
+- `pinta.gd` · `_rotulo_x`: el rótulo del estanco, centrado encima de su puerta
+- `trama.gd` · `talk_estanco`: (lo pidió el usuario): el estanco de cada pueblo, papel, filtros, tabaco y mecheros (D.ESTANCO)
+- `trama.gd` · `CATA_MAX`: (lo pidió el usuario: «que se pueda probar todo tipo de cogollos y extracción… hasta un límite lógico claro»): catar cualquier
+
+### 1.46
+- `mundo.gd` · `NEG_LARGO`: el elevador y el foso, a escala con los coches del concesionario (5 casillas, como la exposición); 1.47, el box de lavado
+- `setas.gd` · `cp`: cada cepa con su forma y sus colores (CEPAS.v): cúpula (la de siempre), campana, plato o racimo
+
+### 1.45
+- `mundo.gd`: (lo pidió el usuario: «en la nave en la que cultivas, lo mismo»): el camastro del rincón, para dormir allí
+
+### 1.43.8
+- `trama.gd`: (lo pidió el usuario: «no existe mapa y sitio del bajo de las setas»; con Datos.CAL): nada te decía dónde estaba. Con
+
+### 1.43.7
+- `mundo.gd` · `lotes_venta`: (lo pidió el usuario: «las extracciones se deberían poder vender al por mayor, en clubs y donde se pueda vender cogollos»;
+
+### 1.43.6
+- `mundo.gd` · `CM`: la escalera escamoteable del camarote, entre las carpas A y B, bajo la ventana; se sube desde la casilla de delante
+
+### 1.43.4
+- `juego.gd` · `copia_seguridad`: (lo pidió el usuario: exportar e importar, más escondidos): al final de OPCIONES, en su submenú y con su aviso
+
+### 1.43.3
+- `movil.gd` · `look_rival`: el muñeco del rival, del sexo de su nombre (GENERO.rival)
+- `mundo.gd` · `sprite_look`: (GENERO): el muñeco de un look (como Atlas.grupo_look: los de la calle, por su hash) y si es de chica
+- `venta.gd` · `con_encargada`: donde lleva el club una mujer (GENERO.enc), «la encargada»
+
+### 1.43.2
+- `eventos.gd` · `kilometros`: los km de cada vehículo; al pasar cada CONCE.v[k].revKm, la revisión (aceite y filtros), y cada neuKm, los neumáticos
+
+### 1.43
+- `calle.gd` · `coche_ya`: un vehículo del concesionario (S.coches: {k: {dia: cuándo llega, p: lo pagado, r: el próximo recibo del seguro o null}}), ya entregado
+- `croquis.gd` · `LIBRE`: (lo pidió el usuario): centrados como la nevera y la caja fuerte, a lo ancho y en el alto que deja libre el cuadro del texto
+- `mundo.gd`: el carro de las bandejas de clones (S.nave.bc), contra la pared, entre el secadero y el escritorio
+- `ui.gd` · `alto_libre`: lo que queda libre del lienzo (en píxeles del juego) por encima del cuadro del texto, para centrar ahí el calendario y el mapa
+- `ui.gd`: la primera vez, el texto aún no sabe su ancho y el cuadro sale de toda la pantalla; se recoloca al fotograma siguiente
+
+### 1.41
+- `setas.gd` · `tg`: (lo pidió el usuario: realista): cada lote, en los tarros de ALM.tarro g que llenaría de verdad (de 4 L, sin aplastar)
+
+### 1.40
+- `granja.gd` · `cap`: (lo pidió el usuario): el carro se ve tal cual, dos bandejas de tacos (arriba y abajo) en vez de un menú; A en un taco
+- `ui.gd` · `g`: (lo pidió el usuario: «más ergonómicos, más espaciadas las flechas del cuadrado del medio»): cada flecha, una tecla suelta
+
+### 1.37
+- `calle.gd` · `j`: (lo pidió el usuario): con la carta leída, la mesa redonda ordena la casa (12d-orden)
+
+### 1.36
+- `policia.gd` · `caja_action`: (lo pidió el usuario): al abrirla, la caja por dentro (rects_almacen): los billetes abren el menú de siempre y un tarro, sacarlo
+
+### 1.35
+- `juego.gd` · `_titulo_entra`: el aviso de edad (la primera vez) y, sin PULSA START, los botones del título; con B se cierran y A o START los abren
+- `ui.gd` · `LEMA`: (lo pidió el usuario): el rótulo, el lema y, debajo, los botones (el menú «titulo»); detrás, la partida de fondo (pinta.gd)
+- `venta.gd` · `nave_alquiler`: cada RECIBO.dias, en efectivo, con su aviso (cobra, granja.gd)
+
+### 1.34
+- `movil.gd` · `club_te_compra`: (PRESI): fuera del barrio, un club solo te compra (lotes y encargos) si se fían de ti el encargado y su presidente
+- `venta.gd` · `de_la_nave`: con el de las madres (cuida_madres)
+- `venta.gd` · `talk_gente_club`: los demás socios de cada club (GENTE_CLUB)
+
+### 1.30
+- `sonido.gd`: la música grabada (tools/musica.js → musica/<clave>.ogg, con indice.json: dónde empieza el bucle) va antes que el
+
+### 1.27
+- `mundo.gd` · `vs`: el suelo y las paredes de la reforma (REFORMA) y la alfombra (suelo: 1, sus 4 trozos sobre el suelo que haya)
+
+### 1.25
+- `menus.gd` · `tipo_diario`: todas las de la Genoteca, en su orden; las de receta abren lo que entra; las demás dicen dónde están sus semillas
+- `trama.gd` · `lao_miren`: y MIREN.n2 de la de Laos (MIREN.s2, que no está en el banco; S.flags.lao: las partidas de antes, al volver a hablarle)
+
+### 1.23
+- `granja.gd` · `ph_item`: por marca (D.PRODUCTOS): el pH− que se gasta es el de su marca y, si no hay, el otro
+- `granja.gd` · `abonar`: (09-cultivo: abonar): el de crecimiento (veg_k: los que hay, en vegetativo y sin él) o el de floración; con dos marcas, eliges
+
+### 1.13
+- `juego.gd`: lo que se quedó en la cola al guardar (la cama guarda antes de que salgan los avisos de la noche)
+
+### 1.11
+- `calle.gd` · `heat_warn`: un aviso antes, con 50 (con 60 investigan), que dice por dónde se vende sin tanto calor
+- `trama.gd` · `llevas`: en los plazos, lo que llevas entre el bolsillo y la caja
+
+### 1.10
+- `juego.gd`: el plazo del capítulo 3 corre desde Toño (las partidas sin él, desde hoy) y la protección de Molina dura 10 días desde hoy

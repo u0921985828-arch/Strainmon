@@ -4,7 +4,7 @@
 # convertido en pasos por tema() de 05-audio: melodía con su largo, arpegio, bajo y batería), en un hilo aparte, primero la que
 # toca sonar, y suenan en cuanto están; al cambiar de canción, la que suena se apaga en 0,3 s y la nueva entra a los 0,4 s.
 # El ruido sale de un generador propio con semilla fija: no toca el azar del juego (Cultivo.azar).
-# 1.30: la música grabada (tools/musica.js → musica/<clave>.ogg, con indice.json: dónde empieza el bucle) va antes que el
+# La música grabada (tools/musica.js → musica/<clave>.ogg, con indice.json: dónde empieza el bucle) va antes que el
 # chiptune: el hilo la carga en vez de sintetizarla, suena en bucle desde su intro y MUSICA_DB más baja (sale a -17 dBFS de
 # RMS) para quedar a la altura de los efectos. Una clave sin grabar suena con su chiptune o, si no lo hay, con la de MUS_ALIAS.
 extends Node

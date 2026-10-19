@@ -3,7 +3,7 @@
 # los objetivos diarios (DIARIO, por la fecha del móvil), la demo (capítulos 1-3; el 4 pide la compra única DEMO.producto), los
 # logros y la nube de Play Games y el embudo del FTUE (Plataforma, solo con el opt-in de INFORMES DE ERRORES).
 # Cadena: ui → mundo → granja → trama → retencion → juego.
-extends "res://src/trama.gd"
+extends "res://src/eventos.gd"
 
 const Plataforma = preload("res://src/plataforma.gd")
 

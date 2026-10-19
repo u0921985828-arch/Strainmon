@@ -266,7 +266,7 @@ static func imagen(D: Dictionary, ch: int) -> Image:
 			_px(im, MW - 1 - e, j, Color8(84, 62, 40))
 	return im
 
-# 1.43 (lo pidió el usuario): centrados como la nevera y la caja fuerte, a lo ancho y en el alto que deja libre el cuadro del texto
+# (lo pidió el usuario): centrados como la nevera y la caja fuerte, a lo ancho y en el alto que deja libre el cuadro del texto
 const LIBRE := 133   # sin cuadro a la vista (las pruebas), lo que deja uno de dos líneas: 180 − 47
 
 static func centro_y(h: int, alto: int) -> int:

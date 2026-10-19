@@ -36,7 +36,7 @@ func _arranca() -> void:
 	else:
 		run(arranque)
 
-# 1.57 (lo pidió el usuario: «estos recursos se podrían usar antes de la pantalla de inicio, como de carga del juego, en una carretera
+# (lo pidió el usuario: «estos recursos se podrían usar antes de la pantalla de inicio, como de carga del juego, en una carretera
 # sin texto, los vehículos andando y la barra cargándose; luego aparece la pantalla de inicio»): la carretera con los vehículos y la barra
 # (EscViaje.pinta_carga) durante CARGA ms, sin botones; A, B o START la pasan; después, el título
 var carga_t0 := 0.0
@@ -280,7 +280,7 @@ func migrate() -> void:
 		for p in D.ITINERARIO:
 			if itin_ok(p.id):
 				S.itin[p.id] = 0
-	# 1.10: el plazo del capítulo 3 corre desde Toño (las partidas sin él, desde hoy) y la protección de Molina dura 10 días desde hoy
+	# El plazo del capítulo 3 corre desde Toño (las partidas sin él, desde hoy) y la protección de Molina dura 10 días desde hoy
 	if S.ch == 3 and not S.flags.get("metB") and not (S.get("due", 0) > 0):
 		S.due = int(D.PLAZOS["3"])
 		S.deadline = S.day + dias_plazo(3)
@@ -361,7 +361,7 @@ func show_title() -> void:
 	if not oraculo:
 		run(_titulo_entra)
 
-# 1.35: el aviso de edad (la primera vez) y, sin PULSA START, los botones del título; con B se cierran y A o START los abren
+# El aviso de edad (la primera vez) y, sin PULSA START, los botones del título; con B se cierran y A o START los abren
 func _titulo_entra() -> void:
 	if not aj.aviso:
 		await aviso_edad()
@@ -512,7 +512,7 @@ func relanzar() -> void:
 	migrate()
 	enter_game()
 
-# 1.43.4 (lo pidió el usuario: exportar e importar, más escondidos): al final de OPCIONES, en su submenú y con su aviso
+# (lo pidió el usuario: exportar e importar, más escondidos): al final de OPCIONES, en su submenú y con su aviso
 func copia_seguridad(desde_titulo: bool) -> void:
 	var it := []
 	if not desde_titulo:
@@ -788,7 +788,7 @@ func enter_game() -> void:
 		enter_map(S.map, cl.x, cl.y, "down")
 	if S.clientsDay != S.day:
 		spawn_clients()
-	# 1.13: lo que se quedó en la cola al guardar (la cama guarda antes de que salgan los avisos de la noche)
+	# Lo que se quedó en la cola al guardar (la cama guarda antes de que salgan los avisos de la noche)
 	if S.get("orden") and S.day > S.orden:
 		queue("raid", raid_event)
 	elif S.get("orden") and S.orden == S.day:

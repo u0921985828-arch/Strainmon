@@ -626,7 +626,7 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 		_detalle(tx, ty, sx, sy)
 	return true
 
-# 1.48: los firmes en mosaico (exterior-mosaico) y el canto de la hierba donde toca acera, calzada u hormigón: dos píxeles más oscuros,
+# Los firmes en mosaico (exterior-mosaico) y el canto de la hierba donde toca acera, calzada u hormigón: dos píxeles más oscuros,
 # como un borde, en vez del corte seco de casilla a casilla
 const MOSAICO_TILE := {"grass": 1, "flowers": 1, "tallgrass": 1, "dirt": 1, "walk": 1, "plaza": 1, "roadT": 1, "roadB": 1}
 const DURO := {"walk": 1, "roadT": 1, "roadB": 1, "hormigon": 1, "rotoT": 1, "rotoB": 1}
@@ -775,7 +775,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	else:
 		_pinta_mesa(f, xp, yp, pl, J.mesa_idx(tx, ty) if o == "mesaN" else -1, fm, ex)
 
-# 1.48 (lo pidió el usuario: «que se note que es el sprite y lo que trae»): d-<objeto>-<mapa>-<tramo>, d-<objeto>-<mapa>,
+# (lo pidió el usuario: «que se note que es el sprite y lo que trae»): d-<objeto>-<mapa>-<tramo>, d-<objeto>-<mapa>,
 # d-<objeto>-<tramo> o d-<objeto>, de detalle.py (grupos detalle-alto y detalle-16); el tramo, por la columna (los mostradores)
 var _det_c := {}
 func _detalle_obj(o: String, tx: int):
@@ -887,11 +887,11 @@ func _arte_edificios(m: Dictionary) -> void:
 			if fr:
 				_img(fr.c, _rotulo_x(b) - cam.x, (b.y0 + b.h - 1) * 16 - 31 - cam.y)
 
-# 1.47 (lo pidió el usuario: «desde el que se ve el piso de abajo, en la cristalera del suelo, transparente»): en el reservado, la gente
+# (lo pidió el usuario: «desde el que se ve el piso de abajo, en la cristalera del suelo, transparente»): en el reservado, la gente
 # que baila abajo (en su sitio de la pista, con su vaivén) y, encima, el cristal: más oscuro que la pista, con sus juntas y el brillo
 var _bailan := []
 func _cristalera(m: Dictionary, tx0: int, ty0: int) -> void:
-	# 1.47 (lo pidió el usuario: «que se vea algo más que la pista»): por el cristal, lo de abajo entero en su sitio, recortado al
+	# (lo pidió el usuario: «que se vea algo más que la pista»): por el cristal, lo de abajo entero en su sitio, recortado al
 	# cristal: la barra, los altavoces, la gente de la barra y de alrededor y los que bailan (los de baila*, moviéndose)
 	var g0 := Vector2i(m.w, m.h)
 	var g1 := Vector2i(-1, -1)
@@ -961,7 +961,7 @@ func _cristalera(m: Dictionary, tx0: int, ty0: int) -> void:
 				if ny < 0 or ny >= m.h or nx < 0 or nx >= m.w or m.g[ny][nx] != "cristalV":
 					_rect(q[2], q[3], q[4], q[5], css("#c8ccd0"))
 
-# 1.47: el rótulo del estanco, centrado encima de su puerta
+# El rótulo del estanco, centrado encima de su puerta
 func _rotulo_x(b: Dictionary) -> int:
 	var E: Dictionary = {}
 	for k in J.D.ESTANCO.k:
@@ -1022,7 +1022,7 @@ func _carpa_mapa(t: Dictionary) -> void:
 		var tipo: String = J.D.FOCOS[J.S.carpas[t.ci].foco].tipo
 		_rect(xc - 3, yb + 1, 6, 1, css(J.D.FOCO_LUZ[tipo] + ".6)"))
 
-# 1.55 (lo pidió el usuario: «debería salir un tubo de extracción de cada carpa hacia una de las ventanas»): con el extractor puesto,
+# (lo pidió el usuario: «debería salir un tubo de extracción de cada carpa hacia una de las ventanas»): con el extractor puesto,
 # el tubo flexible de aluminio sale por arriba de la carpa, corre por lo alto de la pared y baja a una rejilla en la ventana más
 # cercana que no tape la propia carpa
 func _tubos_casa(m: Dictionary) -> void:
@@ -1030,11 +1030,11 @@ func _tubos_casa(m: Dictionary) -> void:
 		var t = q[0]
 		var xc: int = q[1]
 		var wx: int = q[2]
-		# 1.55.3 (lo pidió el usuario): sube de la boca del techo de la carpa al techo de la habitación, corre pegado al techo (por
+		# (lo pidió el usuario): sube de la boca del techo de la carpa al techo de la habitación, corre pegado al techo (por
 		# encima de cuadros y puertas) y baja a la ventana, donde entra por una placa de chapa que sustituye la hoja de arriba; la
 		# de abajo sigue siendo cristal
 		var f = Atlas.foto_misc("carpa-" + t.t + "-mapa")
-		# 1.57 (lo pidió el usuario: «los tubos no llegan a las carpas, falta 1 o 2 píxeles»): la boca, en la primera fila opaca del
+		# (lo pidió el usuario: «los tubos no llegan a las carpas, falta 1 o 2 píxeles»): la boca, en la primera fila opaca del
 		# dibujo de la carpa tal como lo pinta _carpa_mapa (por su ancla), y el tubo un píxel dentro del techo
 		var arriba: int = (t.y * 16 + 15 - int(f.cel.ancla[1]) + f.c.get_used_rect().position.y if f else t.y * 16 + 15 - 40) + 1
 		var yc: int = -cam.y   # el techo
@@ -1057,7 +1057,7 @@ func ventanas_tubos(m: Dictionary) -> Array:
 	for x in int(m.w):
 		if m.o[1][x] == "iwin":
 			win.append(x * 16 + 8)
-	# 1.55.3: a cada carpa con extractor, su ventana (que no quede detrás de ella), con los tramos de techo sin pisarse y lo más
+	# A cada carpa con extractor, su ventana (que no quede detrás de ella), con los tramos de techo sin pisarse y lo más
 	# cortos posible; si hay más carpas que ventanas, se comparten
 	var cs := []
 	for t in m.get("carpas", []):
@@ -1092,7 +1092,7 @@ func _asigna_ventanas(cs: Array, i: int, a: Array, mejor: Dictionary) -> void:
 	for w in cs[i].ok:
 		_asigna_ventanas(cs, i + 1, a + [w], mejor)
 
-# 1.57 (lo pidió el usuario: «en las curvas o giros del tubo no se deben cortar»): de la carpa (xa, hasta ya) al techo (yc), por el
+# (lo pidió el usuario: «en las curvas o giros del tubo no se deben cortar»): de la carpa (xa, hasta ya) al techo (yc), por el
 # techo y abajo a la ventana (xb, hasta yb), con un codo curvo en cada giro en vez de dos tramos que se pisan
 func _tubo_codos(xa: int, xb: int, yc: int, ya: int, yb: int) -> void:
 	if absi(xb - xa) < 7:   # la ventana encima: recto
@@ -1269,10 +1269,10 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 
 # sentado (1.47; 1.55.3, a la altura de cada asiento, SENT_GEO): el fotograma quieto, en la casilla del asiento
 var _sent_img := {}
-# 1.50: de frente, sentado: los muslos encima del asiento (vistos desde arriba), las rodillas, las espinillas colgando
+# De frente, sentado: los muslos encima del asiento (vistos desde arriba), las rodillas, las espinillas colgando
 # delante del canto (entre ellas se ve el banco) y las zapatillas en el suelo; de x 9 a 22 del fotograma, bajo el torso
 const SENT_PIERNAS := ["anooonaanooona", "anonnnaannnona", ".annna..annna.", ".annna..annna.", ".ahhha..ahhha.", "..aaa....aaa.."]
-# 1.50: de espaldas en el taburete de la barra (asiento a 72 cm, 11 px): el culo encima del asiento y, a los lados del pie,
+# De espaldas en el taburete de la barra (asiento a 72 cm, 11 px): el culo encima del asiento y, a los lados del pie,
 # las espinillas colgando hasta el reposapiés con las zapatillas; delante del taburete. TABURETE_SUBE: lo que sube del suelo
 # la fila de los pies del fotograma; las zapatillas, en el reposapiés, y el culo, 6 filas más arriba, en el asiento
 const SENT_TABURETE := [".akka....akka.", ".akka....akka.", ".akla....alka.", ".akka....akka.", ".akka....akka.", ".ahha....ahha.", ".aaaa....aaaa."]
