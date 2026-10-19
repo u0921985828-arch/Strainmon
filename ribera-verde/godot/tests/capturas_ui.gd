@@ -81,6 +81,7 @@ func _corre() -> void:
 			# el jugador está de pie abajo (pies en la fila 142 de 160, 64 px de alto): la caja, entera por encima de su cintura
 			if rp.end.y > es.position.y + es.size.y * .6 or rp.intersects(re):
 				cortes.append("combate: la caja de EDDIE en %s tapa al jugador o a la del enemigo (%s)" % [rp, re])
+		_mira_hueco(p)
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(dir.path_join("ui-%d-%s-%s.png" % [n + 1, p, idioma]))
 		n += 1
@@ -108,6 +109,20 @@ func _mira_cortes(p: String) -> void:
 				cortes.append("%s: «%s» %d > %d" % [p, c.text, w, r.size.x])
 		if r.end.x > vp.end.x + 1 or r.position.x < -1:
 			cortes.append("%s: «%s» fuera de la pantalla" % [p, String(c.text).left(30)])
+
+# un menú con más filas de las que enseña no deja debajo de la última un hueco donde cabría otra (lo vio el usuario en la tienda)
+func _mira_hueco(p: String) -> void:
+	if not J.menu_box.visible:
+		return
+	var lh: float = 14.5 * J.us
+	for c in J.menu_col.get_children():
+		if c is VBoxContainer and c.get_child_count() > 0 and c.get_child_count() < J.m_items.size():
+			var libre: float = c.size.y - c.get_combined_minimum_size().y
+			if libre >= lh - .5:
+				cortes.append("%s: hueco de %.1f filas debajo de la última (%d de %d)" % [p, libre / lh, c.get_child_count(), J.m_items.size()])
+	var aire: float = J.menu_col.size.y - J.menu_col.get_combined_minimum_size().y
+	if J.menu_box.get_meta("cls", "") == "full" and aire >= lh - .5:   # caben todas: la caja, sin aire debajo
+		cortes.append("%s: %.1f filas de aire en la caja" % [p, aire / lh])
 
 func _todos(n: Node) -> Array:
 	var r := [n]

@@ -1423,6 +1423,8 @@ func _pinta_menu(rows: int) -> void:
 			var nl := letra.get_multiline_string_size(dsc, HORIZONTAL_ALIGNMENT_LEFT, dw, roundi(8.5 * us)).y
 			var lineas := maxf(1, roundf(nl / letra.get_height(roundi(8.5 * us))))
 			alto -= maxf(24 * us, lineas * 11.5 * us) + 7 * us
+		if Datos.CAL and not o.has("rows"):   # las 5 filas eran las de la pantalla de 160 px: en una más alta, todas las que caben (sin hueco debajo)
+			vis = m_items.size()
 		while vis > 1 and vis * lh > alto:
 			vis -= 1
 	elif not g:
@@ -1433,7 +1435,8 @@ func _pinta_menu(rows: int) -> void:
 				vis = maxi(1, floori((d - 10) / 14.5 + .01))
 	else:
 		vis = m_items.size()
-	var fl := full or vis < m_items.size()
+	menu_box.set_meta("cabe", full and Datos.CAL and not o.has("rows") and vis >= m_items.size())
+	var fl: bool = (full and not menu_box.get_meta("cabe")) or vis < m_items.size()
 	if m_i < m_top:
 		m_top = m_i
 	if m_i >= m_top + vis:
@@ -1468,7 +1471,7 @@ func _pinta_menu(rows: int) -> void:
 	lista.add_theme_constant_override("separation", 0)
 	lista.add_theme_constant_override("h_separation", 0)
 	lista.add_theme_constant_override("v_separation", 0)
-	if full:
+	if full and not menu_box.get_meta("cabe"):
 		lista.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var maxw := (170 - 14 - 4) * us if cls == "right" else 1e9
 	if Datos.CAL and cls == "right":   # 1.50: el menú de la derecha se ensancha hasta casi toda la pantalla antes de cortar
@@ -1617,7 +1620,12 @@ func _coloca() -> void:
 		menu_box.custom_minimum_size = Vector2(60 * us, 0)
 		if cls == "full":
 			menu_box.custom_minimum_size = R.size - Vector2(6 * us, 6 * us)
-			menu_box.size = menu_box.custom_minimum_size
+			if menu_box.get_meta("cabe", false):   # caben todas las filas: la caja, del alto de lo que lleva (sin aire debajo)
+				menu_box.custom_minimum_size.y = 0
+				menu_box.reset_size()
+				menu_box.size.x = R.size.x - 6 * us
+			else:
+				menu_box.size = menu_box.custom_minimum_size
 			menu_box.position = R.position + Vector2(3 * us, 3 * us)
 		elif cls == "battle":
 			menu_box.custom_minimum_size = Vector2(118 * us, 44 * us)
