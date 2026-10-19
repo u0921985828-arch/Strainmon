@@ -200,7 +200,7 @@ func _ready() -> void:
 	add_child(menu_box)
 	var nc := VBoxContainer.new()
 	name_box.add_child(nc)
-	name_lbl.text = "¿Cómo te llamas?"
+	name_lbl.text = I18n.v("¿Cómo te llamas?")
 	nc.add_child(name_lbl)
 	name_in.max_length = 8
 	nc.add_child(name_in)
@@ -209,7 +209,7 @@ func _ready() -> void:
 			var cc := name_in.caret_column
 			name_in.text = t.to_upper()
 			name_in.caret_column = cc)
-	name_small.text = "Pulsa A para aceptar"
+	name_small.text = I18n.v("Pulsa A para aceptar")
 	nc.add_child(name_small)
 	name_in.focus_exited.connect(func():   # con la caja abierta, el foco se queda en ella (las teclas no vuelven al juego)
 		if name_box.visible:
@@ -218,17 +218,17 @@ func _ready() -> void:
 	var ic := VBoxContainer.new()
 	import_box.add_child(ic)
 	var it := Label.new()
-	it.text = "Pega aquí la partida exportada"
+	it.text = I18n.v("Pega aquí la partida exportada")
 	ic.add_child(it)
 	import_te.wrap_mode = TextEdit.LINE_WRAPPING_NONE
 	ic.add_child(import_te)
 	var ih := HBoxContainer.new()
 	ic.add_child(ih)
-	import_pegar.text = "PEGAR"
+	import_pegar.text = I18n.v("PEGAR")
 	import_pegar.focus_mode = Control.FOCUS_NONE
 	import_pegar.pressed.connect(pegar_partida)
 	ih.add_child(import_pegar)
-	import_small.text = "A: cargar · B: cancelar"
+	import_small.text = I18n.v("A: cargar · B: cancelar")
 	ih.add_child(import_small)
 	import_box.hide()
 	add_child(import_box)
@@ -239,7 +239,7 @@ func _ready() -> void:
 	lt.add_child(lector_ttl)
 	lector_ttl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lt.add_child(lector_pie)
-	lector_pie.text = "▲▼ · B VOLVER"
+	lector_pie.text = I18n.v("▲▼ · B VOLVER")
 	lc.add_child(lector_sc)
 	lector_sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	lector_sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -369,7 +369,7 @@ func ajusta() -> void:
 	botones.mid.add_theme_stylebox_override("panel", st)
 	for b in ["A", "B"]:
 		_estilo(botones[b], Color(109 / 255.0, 44 / 255.0, 75 / 255.0, .55), Color(154 / 255.0, 74 / 255.0, 114 / 255.0, .85), Color(1, 210 / 255.0, 230 / 255.0, .4), G.A.size.x / 2, kp * 3.8, "")
-	for b in ["START", "MOVIL", "SONIDO"]:
+	for b in ["START", "MOVIL", "SONIDO"]:   # i18n-no
 		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .55), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), kp * 3.5, kp * 2.6, "")
 	# después de la letra: un botón no encoge por debajo de lo que pide la letra que tenía (de una ventana más grande)
 	_pon(botones.up, cruz.position + Vector2(a, 0), Vector2(a, a - g))
@@ -623,9 +623,9 @@ func _estilos() -> void:
 		bhud()
 
 func _mandos() -> void:
-	for b in [["up", ""], ["down", ""], ["left", ""], ["right", ""], ["A", "A"], ["B", "B"], ["START", "START"], ["MOVIL", "MÓVIL"], ["SONIDO", "SONIDO"]]:
+	for b in [["up", ""], ["down", ""], ["left", ""], ["right", ""], ["A", "A"], ["B", "B"], ["START", "START"], ["MOVIL", K("MÓVIL")], ["SONIDO", K("SONIDO")]]:   # START: igual en los dos idiomas · i18n-no
 		var n := Button.new()
-		n.text = b[1]
+		n.text = I18n.v(b[1])
 		if b[1] == "":
 			var dir: String = b[0]
 			n.draw.connect(func():
@@ -676,7 +676,7 @@ func _estilo(n: Button, bg: Color, on: Color, borde: Color, r: float, px: float,
 # ---------- entrada (06-controles) ----------
 const TECLAS := {KEY_UP: "up", KEY_DOWN: "down", KEY_LEFT: "left", KEY_RIGHT: "right", KEY_W: "up", KEY_S: "down", KEY_A: "left", KEY_D: "right",
 	KEY_Z: "A", KEY_SPACE: "A", KEY_ENTER: "A", KEY_KP_ENTER: "A", KEY_J: "A", KEY_X: "B", KEY_ESCAPE: "B", KEY_BACKSPACE: "B", KEY_K: "B", KEY_SHIFT: "B",
-	KEY_M: "START", KEY_TAB: "START", KEY_P: "MOVIL"}
+	KEY_M: "START", KEY_TAB: "START", KEY_P: "MOVIL"}   # i18n-no
 const DIRS := ["up", "down", "left", "right"]
 
 func set_held(b: String, v: bool) -> void:
@@ -689,7 +689,7 @@ func set_held(b: String, v: bool) -> void:
 
 # R14: el mando de juego (la cruceta o el stick izquierdo, A/B, START y Y = MÓVIL)
 const BOTONES_JOY := {JOY_BUTTON_DPAD_UP: "up", JOY_BUTTON_DPAD_DOWN: "down", JOY_BUTTON_DPAD_LEFT: "left", JOY_BUTTON_DPAD_RIGHT: "right",
-	JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "START", JOY_BUTTON_BACK: "B", JOY_BUTTON_Y: "MOVIL"}
+	JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_START: "START", JOY_BUTTON_BACK: "B", JOY_BUTTON_Y: "MOVIL"}   # i18n-no
 var stick := ""
 func _joy(e: InputEvent) -> void:
 	if (name_box.visible and name_in.has_focus()) or (import_box.visible and import_te.has_focus()):
@@ -834,7 +834,7 @@ func mando_en(p: Vector2) -> String:
 		return "A" if p.distance_to(botones.A.get_global_rect().get_center()) < p.distance_to(botones.B.get_global_rect().get_center()) else "B"
 	# START, MÓVIL y SONIDO se tocan en 48 × 48 dp como poco (el mínimo de Android), aunque se vean más pequeños
 	var m := 48 * _dp()
-	for k in ["START", "MOVIL", "SONIDO"]:
+	for k in ["START", "MOVIL", "SONIDO"]:   # i18n-no
 		var r: Rect2 = botones[k].get_global_rect()
 		var gx := maxf(0, (m - r.size.x) / 2)
 		var gy := maxf(0, (m - r.size.y) / 2)
@@ -899,8 +899,8 @@ func pedir_texto(txt: String, ini := "", mx := 12, mayus := false, cancela := tr
 	if gancho_pedir.is_valid():
 		return gancho_pedir.call(txt, ini, mx, cancela)
 	var pr := Motor.Prom.new()
-	name_lbl.text = txt
-	name_small.text = "Pulsa A para aceptar" + (" y B para cancelar" if cancela else "")
+	name_lbl.text = I18n.v(txt)
+	name_small.text = I18n.v("Pulsa A para aceptar y B para cancelar") if cancela else I18n.v("Pulsa A para aceptar")
 	name_mayus = mayus
 	name_in.max_length = mx
 	name_in.text = ini
@@ -924,7 +924,7 @@ func pedir_partida(txt: String):
 		return gancho_pedir.call(txt, "", IMPORTA_MAX, true)
 	var pr := Motor.Prom.new()
 	import_te.text = ""
-	import_small.text = "A: cargar · B: cancelar"
+	import_small.text = I18n.v("A: cargar · B: cancelar")
 	import_box.show()
 	_coloca()
 	import_te.grab_focus.call_deferred()
@@ -932,7 +932,7 @@ func pedir_partida(txt: String):
 		if b == "A" or b == "B":
 			var v = import_te.text.strip_edges() if b == "A" else null
 			if v != null and v.length() > IMPORTA_MAX:
-				import_small.text = "Demasiado largo para ser una partida."
+				import_small.text = I18n.v("Demasiado largo para ser una partida.")
 				return
 			import_box.hide()
 			import_te.release_focus()
@@ -947,7 +947,7 @@ func pegar_partida() -> void:
 		return
 	var t := DisplayServer.clipboard_get().strip_edges()
 	if t.length() > IMPORTA_MAX:
-		import_small.text = "Demasiado largo para ser una partida."
+		import_small.text = I18n.v("Demasiado largo para ser una partida.")
 		return
 	import_te.text = t
 
@@ -987,7 +987,7 @@ func sonido_on() -> bool:
 func set_sound(on: bool, guarda := true) -> void:
 	if sonido:
 		sonido.set_on(on)
-		botones.SONIDO.text = "SONIDO" if on else "SILENCIO"
+		botones.SONIDO.text = I18n.v("SONIDO") if on else I18n.v("SILENCIO")
 		botones.SONIDO.set_pressed_no_signal(not on)
 	aj.sonido = on
 	if guarda:
@@ -996,7 +996,7 @@ func set_sound(on: bool, guarda := true) -> void:
 # ---------- ajustes de la app (solo Godot): el aviso de edad aceptado, el volumen de la música y de los efectos (de 0 a 4,
 # de 25 en 25 %), la velocidad del texto y SONIDO; en un archivo aparte de la partida, que no los borra ----------
 static var AJUSTES := "user://ajustes.json"   # las pruebas usan otro
-const TEXTO_VEL := ["NORMAL", "RÁPIDO", "AL MOMENTO"]
+var TEXTO_VEL := [I18n.K("NORMAL"), I18n.K("RÁPIDO"), I18n.K("AL MOMENTO")]   # F7: var, por K()
 var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true, "vibra": true, "ahorro": false, "tam": 1, "zurdo": false, "dalt": false, "calma": false, "avisos": false, "errores": false, "completo": false, "idioma": 0}
 # U5 (fase 5, con Datos.PLAY): TAMAÑO DE TEXTO S/M/L, nunca por debajo de TXT_MIN sp
 const TAM_TXT := [0.85, 1.0, 1.25]
@@ -1025,6 +1025,9 @@ func ajustes_aplica() -> void:
 	VistaC.CALMA = Datos.PLAY and aj.get("calma", false)
 	I18n.LANG = ["", "es", "en"][clampi(int(aj.get("idioma", 0)), 0, 2)]   # F7
 	Datos.SOLO_NOMBRES = I18n.en()
+	if botones.has("MOVIL"):   # F7: los botones, en el idioma elegido
+		botones.MOVIL.text = I18n.v("MÓVIL")
+	import_pegar.text = I18n.v("PEGAR")
 	if Datos.PLAY and is_inside_tree() and not oraculo:   # el tamaño del texto y ZURDO cambian el sitio de todo
 		ajusta()
 	if is_inside_tree() and get_tree().current_scene == self:   # en el juego (no en las pruebas, que van a toda prisa)
@@ -1057,7 +1060,7 @@ func leer(t: String, texto: String) -> void:
 	var ver := func(i: int):
 		lector_i = clampi(i, 0, lector_pags.size() - 1)
 		lector_ttl.text = t if lector_pags.size() == 1 else "%s · %d/%d" % [t, lector_i + 1, lector_pags.size()]
-		lector_pie.text = "▲▼ · B VOLVER" if lector_pags.size() == 1 else "▲▼ ◀▶ · B VOLVER"
+		lector_pie.text = I18n.v("▲▼ · B VOLVER") if lector_pags.size() == 1 else I18n.v("▲▼ ◀▶ · B VOLVER")
 		lector_txt.text = lector_pags[lector_i]
 		lector_sc.scroll_vertical = 0
 	ver.call(0)
@@ -1969,7 +1972,7 @@ func _pinta_titulo() -> void:
 	var s1 := roundi(17 * u)
 	var y := tt + f.get_ascent(s1) - 17 * u * 1.05
 	var x := 0.0
-	for t1 in ["LANDRACE", "HUNTERS"]:   # dos líneas (<br> en el HTML)
+	for t1 in ["LANDRACE", "HUNTERS"]:   # dos líneas (<br> en el HTML); el nombre del juego, igual en inglés · i18n-no
 		y += 17 * u * 1.05
 		x = (w - f.get_string_size(t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1).x) / 2
 		c.draw_string(f, Vector2(x + 3 * u, y + 3 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#10301c"))

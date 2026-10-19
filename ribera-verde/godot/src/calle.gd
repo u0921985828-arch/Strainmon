@@ -240,17 +240,17 @@ func asiento_de(o) -> String:
 
 func asiento(x: int, y: int) -> void:
 	var k := asiento_de(MAPS[S.map].o[y][x])
-	var ops := ["Sentarte"]
+	var ops := [K("Sentarte")]
 	var fuera: bool = Datos.CAL and S.map != "home" and ASIENTO_FUERA.has(k)   # 1.51: el sillón y la silla de otras casas no son los tuyos
 	if fuera:
 		pass
-	elif k in ["silla", "sillaG"]:
-		ops.append("Usar el ordenador")
-	elif k in ["sofa", "sillon", "sofaF", "sofaB", "sofaV"]:
-		ops.append("Otra cosa")
-	ops.append("Nada")
+	elif k in ["silla", "sillaG"]:   # i18n-no
+		ops.append(K("Usar el ordenador"))
+	elif k in ["sofa", "sillon", "sofaF", "sofaB", "sofaV"]:   # i18n-no
+		ops.append(K("Otra cosa"))
+	ops.append(K("Nada"))
 	var j: int = await ask(ASIENTO_FUERA[k] if fuera else ASIENTO_TXT[k], ops)
-	var c: String = ops[j] if j >= 0 and j < ops.size() else "Nada"
+	var c: String = ops[j] if j >= 0 and j < ops.size() else K("Nada")
 	if c == "Nada":
 		return
 	if c != "Sentarte":
@@ -310,16 +310,16 @@ func menu_sentado() -> void:
 	if SENT == null:
 		return
 	var ops := []   # [texto, clave]
-	ops.append(["Fumarte uno", "fumar"])
+	ops.append([K("Fumarte uno"), "fumar"])
 	var bb := bebidas_aqui()
 	if bb != "":
-		ops.append(["Pedir algo", "beber"])
+		ops.append([K("Pedir algo"), "beber"])
 	for e in al_lado():
-		ops.append(["Hablar con " + nombre_ent(e), e])
-	ops.append(["Mirar el móvil", "movil"])
-	ops.append(["Quedarte un rato", "rato"])
-	ops.append(["Levantarte", "fuera"])
-	var j: int = await ask("Estás sentado.", ops.map(func(o): return o[0]))
+		ops.append([T("Hablar con {q}", {"q": nombre_ent(e)}), e])
+	ops.append([K("Mirar el móvil"), "movil"])
+	ops.append([K("Quedarte un rato"), "rato"])
+	ops.append([K("Levantarte"), "fuera"])
+	var j: int = await ask(K("Estás sentado."), ops.map(func(o): return o[0]))
 	if j < 0 or j >= ops.size():
 		return
 	var c = ops[j][1]
@@ -342,31 +342,31 @@ func nombre_ent(e) -> String:   # dónde está respecto al asiento
 	var dx: int = e.x - SENT.x
 	var dy: int = e.y - SENT.y
 	if dx < 0:
-		return "quien tienes a la izquierda"
+		return K("quien tienes a la izquierda")
 	if dx > 0:
-		return "quien tienes a la derecha"
-	return "quien tienes delante" if (dy > 0) == (SENT.d == "sur") else "quien tienes detrás"
+		return K("quien tienes a la derecha")
+	return K("quien tienes delante") if (dy > 0) == (SENT.d == "sur") else K("quien tienes detrás")
 
 func beber_sentado(bb: String) -> void:
 	var L: Array = BEBIDAS[bb]
-	var j: int = await ask("¿Qué te pones?", L.map(func(b): return "%s · %s" % [b[0], Datos.eur(b[1])]) + ["Nada"])
+	var j: int = await ask(K("¿Qué te pones?"), L.map(func(b): return T("{b} · {p}", {"b": b[0], "p": Datos.eur(b[1])})) + [K("Nada")])
 	if j < 0 or j >= L.size():
 		return
 	var b: Array = L[j]
 	if float(S.money) < float(b[1]):
-		await say("No llevas suelto ni para eso.")
+		await say(K("No llevas suelto ni para eso."))
 		return
 	S.money = snappedf(float(S.money) - float(b[1]), 0.01)
 	advance_time(int(b[2]))
 	update_hud()
-	await say("%s. Te lo tomas sentado, sin prisa." % b[0])
+	await say(T("{b}. Te lo tomas sentado, sin prisa.", {"b": b[0]}))
 
 func rato_sentado() -> void:
 	advance_time(30)
-	var t := "Pasas media hora mirando a la gente."
+	var t := T("Pasas media hora mirando a la gente.")
 	if D.ZONAS.has(S.map) and float(S.heat) > 0 and not is_night():
 		S.heat = maxf(0, float(S.heat) - 1)   # sentado y quieto en un banco, pasas desapercibido
-		t += " Sentado en un banco no llamas la atención."
+		t += T(" Sentado en un banco no llamas la atención.")
 	update_hud()
 	await say(t)
 
@@ -380,21 +380,21 @@ func boca_sentado() -> Vector2:
 
 func fumar_sentado() -> void:
 	if S.map == "comisaria":
-		await say("¿Aquí, en comisaría? Mejor no.")
+		await say(K("¿Aquí, en comisaría? Mejor no."))
 		return
 	if S.map in NO_FUMAR or S.map.begins_with("loc-") or S.map.begins_with("est-"):
-		await say("Aquí dentro no se puede fumar.")
+		await say(K("Aquí dentro no se puede fumar."))
 		return
 	var ms := []
 	for k in FUMAR:
 		if FUMAR[k].con.all(func(i): return float(S.items.get(i, 0)) > 0):
 			ms.append(k)
 	if ms.is_empty():
-		await say("No tienes con qué: el papel y el mechero, en el estanco; las pipas, el bong y el vaporizador, en el grow.")
+		await say(K("No tienes con qué: el papel y el mechero, en el estanco; las pipas, el bong y el vaporizador, en el grow."))
 		return
 	var mk: String = ms[0]
 	if ms.size() > 1:
-		var j: int = await ask("¿Cómo?", ms.map(func(k): return FUMAR[k].n) + ["Nada"])
+		var j: int = await ask(K("¿Cómo?"), ms.map(func(k): return FUMAR[k].n) + [K("Nada")])
 		if j < 0 or j >= ms.size():
 			return
 		mk = ms[j]
@@ -405,7 +405,7 @@ func fumar_sentado() -> void:
 		if S.items.get("grinder"):
 			gb = 0.4   # desmenuzado con el grinder, se aprovecha más
 		if float(S.items.get("tabaco", 0)) >= 0.7:
-			var t: int = await ask("¿Con tabaco?", ["Con tabaco", "Solo hierba", "Nada"])
+			var t: int = await ask(K("¿Con tabaco?"), [K("Con tabaco"), K("Solo hierba"), K("Nada")])
 			if t < 0 or t > 1:
 				return
 			if t == 0:
@@ -419,11 +419,11 @@ func fumar_sentado() -> void:
 		ls += rosin_lots(gx).map(func(l): return [l[0], l[1], true])
 	if ls.is_empty():
 		var sin_tab: bool = mk == "porro" and Datos.CAL and not tab and not rosin_lots(F.grt).is_empty()
-		await say("No llevas nada para fumar." if F.gr > 0 else ("Sin cogollos, el extracto solo se lía con tabaco; si no, en una pipa, un bong o el vaporizador." if sin_tab else "No llevas cogollos para liarte uno."))
+		await say(K("No llevas nada para fumar.") if F.gr > 0 else (K("Sin cogollos, el extracto solo se lía con tabaco; si no, en una pipa, un bong o el vaporizador.") if sin_tab else K("No llevas cogollos para liarte uno.")))
 		return
 	var i := 0
 	if ls.size() > 1:
-		i = await menu(ls.map(func(l): return rosin_item([l[0], l[1]]) if l[2] else lot_item([l[0], l[1]])), {"title": "¿DE CUÁL?"})
+		i = await menu(ls.map(func(l): return rosin_item([l[0], l[1]]) if l[2] else lot_item([l[0], l[1]])), {"title": K("¿DE CUÁL?")})
 		if i < 0 or i >= ls.size():
 			return
 	var lk: String = ls[i][0]
@@ -447,12 +447,12 @@ func fumar_sentado() -> void:
 		lanzar_vfx("vfx-humo-porro", b.x, b.y, M.reloj, S.map, true)
 		await wait(700)
 	advance_time(15)
-	var t := ("Te lías uno de %s%s y te lo fumas sin prisa." % [nom, " con tabaco" if tab else ""]) if mk == "porro" else \
-		("Cargas %s de %s y le das unas caladas." % [{"pipa": "la pipa", "bong": "el bong"}.get(mk, "el vaporizador"), nom])
+	var t := (T("Te lías uno de {nom} con tabaco y te lo fumas sin prisa.", {"nom": nom}) if tab else T("Te lías uno de {nom} y te lo fumas sin prisa.", {"nom": nom})) if mk == "porro" else \
+		(T("Cargas la pipa de {nom} y le das unas caladas.", {"nom": nom}) if mk == "pipa" else (T("Cargas el bong de {nom} y le das unas caladas.", {"nom": nom}) if mk == "bong" else T("Cargas el vaporizador de {nom} y le das unas caladas.", {"nom": nom})))
 	if D.ZONAS.has(S.map):
 		S.heat = minf(100, S.heat + (1 if mk == "vapo" else 3))
 		heat_warn()
-		t += " Fumar en la calle llama la atención."
+		t += T(" Fumar en la calle llama la atención.")
 	update_hud()
 	await say(t)
 
@@ -472,7 +472,7 @@ func object_action(x: int, y: int) -> void:
 				return
 		var sl := sitio_libre(x, y)
 		if sl >= 0:
-			await say(("Hueco junto a la cama: aquí cabe una carpa de 120×120." + (" Kiko las tendrá más adelante." if S.ch < 5 else " Kiko las vende.")) if sl == 2 else "Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100.")
+			await say((T("Hueco junto a la cama: aquí cabe una carpa de 120×120.") + (T(" Kiko las tendrá más adelante.") if S.ch < 5 else T(" Kiko las vende."))) if sl == 2 else K("Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100."))
 			return
 		if mueble_de(o) != "":
 			await mueble_action(mueble_de(o))
@@ -486,13 +486,13 @@ func object_action(x: int, y: int) -> void:
 				var pd = S.get("muebles", {}).get(k) if S.get("muebles") is Dictionary else null
 				if mu.get("grow") and not pd:   # el carro de esquejes (1.11): sin pedir, nada
 					break
-				await say(("Aquí va %s: llega mañana." % mu.art) if pd else ("Aquí iría bien %s. Se compra por internet: en el ordenador de la tía o con el móvil." % mu.art))
+				await say(T("Aquí va {art}: llega mañana.", {"art": mu.art}) if pd else T("Aquí iría bien {art}. Se compra por internet: en el ordenador de la tía o con el móvil.", {"art": mu.art}))
 				return
 		if o != null and D.MUEBLE_EXTR.has(o):   # 1.36: los muebles de las extracciones
 			await mueble_extr(o)
 			return
 		match o:
-			"bedT", "bedB":
+			"bedT", "bedB":   # i18n-no
 				await bed_action()
 				return
 			"pc":
@@ -509,7 +509,7 @@ func object_action(x: int, y: int) -> void:
 					await letter_action()
 					return
 				# (lo pidió el usuario): con la carta leída, la mesa redonda ordena la casa (12d-orden)
-				var j := await ask("La mesa redonda de la tía. Desde aquí se ve todo el piso.", ["Ordenar la casa", "Leer la carta", "Nada"])
+				var j := await ask(K("La mesa redonda de la tía. Desde aquí se ve todo el piso."), [K("Ordenar la casa"), K("Leer la carta"), K("Nada")])
 				if j == 0:
 					await ordenar("home")
 				elif j == 1:
@@ -520,17 +520,17 @@ func object_action(x: int, y: int) -> void:
 					if extr_algo() or nevera_r() > 0 or total_rosin() > 0:   # 1.36: los extractos, en frío
 						await nevera_action()
 					else:
-						await say("La nevera: medio limón, leche y un táper de alubias que dejó la tía.")
+						await say(K("La nevera: medio limón, leche y un táper de alubias que dejó la tía."))
 					return
 				S.flags.nevera = S.day   # 1.25: el bote de la tía
-				await say("Detrás del táper de alubias hay un bote de cristal con una etiqueta: «Choco Thai. NO TOCAR».")
-				await semillas_tia("choco", "El frío las ha conservado: siguen buenas.", 3)
+				await say(K("Detrás del táper de alubias hay un bote de cristal con una etiqueta: «Choco Thai. NO TOCAR»."))
+				await semillas_tia("choco", K("El frío las ha conservado: siguen buenas."), 3)
 				return
 			"plantDeco":
-				await say("Una monstera. La tía Maite le hablaba cada mañana.")
+				await say(K("Una monstera. La tía Maite le hablaba cada mañana."))
 				return
 			"iwin":
-				await say("Por la ventana se ve la ría. Huele a salitre.")
+				await say(K("Por la ventana se ve la ría. Huele a salitre."))
 				return
 			"poster":
 				await diploma_action()
@@ -549,43 +549,43 @@ func object_action(x: int, y: int) -> void:
 				await camarote_action()
 				return
 			"deshumC":
-				await say("El deshumidificador: deja el camarote entre el 58 y el 62 % de humedad, a 18 °C. Los sobres de dentro de los tarros hacen el resto.")
+				await say(K("El deshumidificador: deja el camarote entre el 58 y el 62 % de humedad, a 18 °C. Los sobres de dentro de los tarros hacen el resto."))
 				return
 			"crate":
-				await say("Cajas de la tía: revistas de jardinería, un ventilador viejo y los adornos de Navidad.")
+				await say(K("Cajas de la tía: revistas de jardinería, un ventilador viejo y los adornos de Navidad."))
 				return
 	if S.map == "casa-ama":   # el caserío de la familia, en Mendialde (1.10)
 		match o:
 			"table":
 				var nueva: bool = not S.flags.get("notaAma")
 				S.flags.notaAma = true
-				await say("Una nota de tu ama: «Te he dejado un táper de alubias en la nevera. Llama cuando llegues. Y no te metas en líos»." if nueva else "La nota de ama: «...y no te metas en líos».")
+				await say(K("Una nota de tu ama: «Te he dejado un táper de alubias en la nevera. Llama cuando llegues. Y no te metas en líos».") if nueva else K("La nota de ama: «...y no te metas en líos»."))
 				return
 			"fridge":
 				if S.flags.get("taper"):
-					await say("La nevera de casa. El táper ya va en la mochila.")
+					await say(K("La nevera de casa. El táper ya va en la mochila."))
 					return
 				S.flags.taper = true
 				S.items.bocata += 1
-				await got("el táper de alubias de ama (1 × BOCATA)")
+				await got(K("el táper de alubias de ama (1 × BOCATA)"))
 				return
-			"bedT", "bedB":   # si pierdes el último autobús
-				await bed_action("Tu cama de siempre, con la colcha de cuadros.")
+			"bedT", "bedB":   # si pierdes el último autobús · i18n-no
+				await bed_action(K("Tu cama de siempre, con la colcha de cuadros."))
 				return
 			"iwin":
-				await say("Por la ventana se ven el monte y la carretera de la comarca.")
+				await say(K("Por la ventana se ven el monte y la carretera de la comarca."))
 				return
 			"plantDeco":
-				await say("Los geranios de ama. Les sobra agua.")
+				await say(K("Los geranios de ama. Les sobra agua."))
 				return
 	var txt := ""
 	if S.map == "txaro":
-		txt = {"bedT": "Una cama con colcha de ganchillo.", "bedB": "Una cama con colcha de ganchillo.", "table": "Un bote de aceite con una etiqueta a mano: «Para dormir. 2 gotas».",
-			"fridge": "Nevera de las de antes. No es tuya.", "iwin": "Por la ventana se ve el parque de los Sauces."}.get(o, "")
+		txt = {"bedT": K("Una cama con colcha de ganchillo."), "bedB": K("Una cama con colcha de ganchillo."), "table": K("Un bote de aceite con una etiqueta a mano: «Para dormir. 2 gotas»."),
+			"fridge": K("Nevera de las de antes. No es tuya."), "iwin": K("Por la ventana se ve el parque de los Sauces.")}.get(o, "")
 	elif S.map == "comisaria":
-		txt = {"iwin": "Por la ventana se ve la plaza del Ensanche.", "shelfW": "Archivadores con expedientes. Hay uno con tu calle.", "counter": "El mostrador de denuncias. No hay nadie detrás."}.get(o, "")
+		txt = {"iwin": K("Por la ventana se ve la plaza del Ensanche."), "shelfW": K("Archivadores con expedientes. Hay uno con tu calle."), "counter": K("El mostrador de denuncias. No hay nadie detrás.")}.get(o, "")
 	elif S.map == "almacen":
-		txt = {"crate": "Cajas precintadas con el sello de una conservera que cerró hace años.", "btable": "Una mesa con una báscula y rollos de film transparente."}.get(o, "")
+		txt = {"crate": K("Cajas precintadas con el sello de una conservera que cerró hace años."), "btable": K("Una mesa con una báscula y rollos de film transparente.")}.get(o, "")
 	if not txt and Datos.CAL and ATREZO_TXT.has(S.map):   # 1.51
 		txt = ATREZO_TXT[S.map].get(o, "")
 	if txt:
@@ -594,7 +594,7 @@ func object_action(x: int, y: int) -> void:
 	match o:
 		"sign":
 			var st: String = "%s:%d,%d" % [S.map, x, y]
-			await say(D.SIGNS.get(st, "Está tan desgastado que no se lee.") + (("\n" + D.SETAS_SITIO.cartel) if Datos.CAL and not Datos.PLAY and st == D.SETAS_SITIO.k else ""))   # 1.43.8
+			await say(I18n.v(D.SIGNS.get(st, K("Está tan desgastado que no se lee."))) + (("\n" + I18n.v(D.SETAS_SITIO.cartel)) if Datos.CAL and not Datos.PLAY and st == D.SETAS_SITIO.k else ""))   # 1.43.8
 		"parada":
 			await parada_action()
 		"cajero":   # 1.35 (granja.gd)
@@ -609,28 +609,28 @@ func object_action(x: int, y: int) -> void:
 					await pick_item(it)
 					return
 		"fountain":
-			await say("La fuente de la plaza. Lleva años sin agua potable.")
+			await say(K("La fuente de la plaza. Lleva años sin agua potable."))
 		"shelfW":
-			await say("Botes de abono, sustrato de coco y medidores de pH.")
+			await say(K("Botes de abono, sustrato de coco y medidores de pH."))
 		"display":
-			await say("Sobres de semillas de bancos de todo el mundo, ordenados por tipo.")
-		"vitrinaP", "vitrinaP2":   # 1.47
-			await say("La vitrina iluminada: grinders, pipas de cristal, bongs y vaporizadores. Se piden en el mostrador.")
-		"estanteE", "estanteE2":
-			await say("Cajetillas de todos los colores, en filas. Lo de liar, en el mostrador.")
+			await say(K("Sobres de semillas de bancos de todo el mundo, ordenados por tipo."))
+		"vitrinaP", "vitrinaP2":   # 1.47 · i18n-no
+			await say(K("La vitrina iluminada: grinders, pipas de cristal, bongs y vaporizadores. Se piden en el mostrador."))
+		"estanteE", "estanteE2":   # i18n-no
+			await say(K("Cajetillas de todos los colores, en filas. Lo de liar, en el mostrador."))
 		"humidor":
-			await say("El humidificador de los puros, con su higrómetro.")
+			await say(K("El humidificador de los puros, con su higrómetro."))
 		"papelE":
-			await say("El expositor del papel de fumar: librillos de todos los tamaños.")
-		"mostrE", "mostrE2":
-			await say("Mecheros de colores en la vitrina del mostrador.")
+			await say(K("El expositor del papel de fumar: librillos de todos los tamaños."))
+		"mostrE", "mostrE2":   # i18n-no
+			await say(K("Mecheros de colores en la vitrina del mostrador."))
 		"bottles":
-			await say("Txakoli, pacharán y orujo casero.")
+			await say(K("Txakoli, pacharán y orujo casero."))
 		"jukebox":
 			sfx("get")
-			await say("La gramola suena: rock vasco de los 80.")
+			await say(K("La gramola suena: rock vasco de los 80."))
 		"crate":
-			await say("Cajas de madera de los astilleros, podridas por la humedad." if S.map == "astilleros" else ("Cajas de piezas de la fundición, oxidadas." if S.map == "valdehierro" else ("Cajas de fruta vacías. La frutería de la esquina cerró en verano." if S.map == "callejon" else "Cajas de pescado vacías del puerto.")))
+			await say(K("Cajas de madera de los astilleros, podridas por la humedad.") if S.map == "astilleros" else (K("Cajas de piezas de la fundición, oxidadas.") if S.map == "valdehierro" else (K("Cajas de fruta vacías. La frutería de la esquina cerró en verano.") if S.map == "callejon" else K("Cajas de pescado vacías del puerto."))))
 
 # ---------- acciones y efectos del atlas (01b-arte accion, lanzarVfx) ----------
 func accion(nn: String, vf = null) -> void:
@@ -734,27 +734,27 @@ func talk_client(c: Dictionary) -> void:
 	var ext: bool = c.type == "ext"
 	await say(pick(ct.greet), N)
 	if ext:
-		await say("Busco %s g de rosin o de hachís." % n(c.want), N)
+		await say(T("Busco {g} g de rosin o de hachís.", {"g": n(c.want)}), N)
 	else:
-		await say("Busco %s g%s." % [n(c.want), (" de algo potente, mínimo %s%% de THC" % n(c.minThc)) if c.minThc else ""], N)
+		await say(T("Busco {g} g de algo potente, mínimo {thc}% de THC.", {"g": n(c.want), "thc": n(c.minThc)}) if c.minThc else T("Busco {g} g.", {"g": n(c.want)}), N)
 	var lots := rosin_lots(c.want) if ext else bud_lots(c.want, c.minThc)
 	if lots.is_empty():
-		await say("Eso no me vale. Vuelve cuando tengas lo que busco." if (total_rosin() if ext else total_buds()) > 0 else "¿No llevas nada? Vale.", N)
+		await say(K("Eso no me vale. Vuelve cuando tengas lo que busco.") if (total_rosin() if ext else total_buds()) > 0 else K("¿No llevas nada? Vale."), N)
 		return
 	var it := lots.map(rosin_item if ext else lot_item)
-	it.append({"label": "Nada"})
-	var i: int = await menu(it, {"cls": "right", "title": "¿Qué le vendes?"})
+	it.append({"label": K("Nada")})
+	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué le vendes?")})
 	if i < 0 or i >= lots.size():
-		await say("Vale, otro día.", N)
+		await say(K("Vale, otro día."), N)
 		return
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
 	var xn: String = (D.EXTR[tipo_extr(sid)].n.to_lower() + " ") if ext else ""
 	var base: float = (precio_rosin(b.thc) * D.EXTR[tipo_extr(sid)].px if ext else precio_calle(b.thc)) * calidad(b) * ct.mult * D.ZONAS[c.get("map", "town")].precio * rival_f(c.get("map", "town")) * c.want
 	var pr := [Datos.jsround(base * .85), Datos.jsround(base), Datos.jsround(base * 1.3)]
-	var j: int = await ask("%s g de %s%s. ¿Cuánto le pides?" % [n(c.want), (xn + "de ") if ext else "", lot_nombre(sid)], ["Rebaja · %d €" % pr[0], "Justo · %d €" % pr[1], "Caro · %d €" % pr[2], "Cancelar"])
+	var j: int = await ask(T("{g} g de {x} de {nom}. ¿Cuánto le pides?", {"g": n(c.want), "x": xn.substr(0, xn.length() - 1), "nom": lot_nombre(sid)}) if ext else T("{g} g de {nom}. ¿Cuánto le pides?", {"g": n(c.want), "nom": lot_nombre(sid)}), [T("Rebaja · {p} €", {"p": int(pr[0])}), T("Justo · {p} €", {"p": int(pr[1])}), T("Caro · {p} €", {"p": int(pr[2])}), K("Cancelar")])
 	if j == 3:
-		await say("Entonces me voy.", N)
+		await say(K("Entonces me voy."), N)
 		return
 	var mt: float = 50.0 if ext else (c.minThc if c.minThc else 14)
 	var acc: float = [1.0, .92, clampf(.3 + (b.thc - mt) * .05 + (.25 if c.type == "pij" else 0.0) + (.15 if c.type == "tur" else 0.0) + (.3 if c.type == "vip" else 0.0), .1, .9)][j]
@@ -776,16 +776,16 @@ func talk_client(c: Dictionary) -> void:
 		await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
 		remove_client(c.id)
 		apunta_fijo(c)
-		await say(pick(["Trato hecho.", "Gracias. Nos vemos.", "Bien. Se lo diré a mis amigos."]), N)
-		toast("+%s · %s g %svendidos" % [Datos.eur(pr[j]), n(c.want), ("de " + xn) if ext else ""], 1600)
+		await say(pick([K("Trato hecho."), K("Gracias. Nos vemos."), K("Bien. Se lo diré a mis amigos.")]), N)
+		toast(T("+{p} · {g} g de {x} vendidos", {"p": Datos.eur(pr[j]), "g": n(c.want), "x": xn.substr(0, xn.length() - 1)}) if ext else T("+{p} · {g} g vendidos", {"p": Datos.eur(pr[j]), "g": n(c.want)}), 1600)
 		visto_vender()
 		heat_warn()
 		await check_story()
 		rival_venta(c.get("map", "town"))
 		# en las esquinas de Darko (1.10), 1 de cada 3 ventas acaba con uno de sus chicos encima
 		if c.get("map") == "astilleros" and not S.flags.get("darkoFin") and Cultivo.azar() < 1.0 / 3:
-			await say("Uno de los chicos de Darko te ha visto vender.")
-			await say("«Te dijimos que lejos de nuestras esquinas.»", "CHICO DE DARKO")
+			await say(K("Uno de los chicos de Darko te ha visto vender."))
+			await say(K("«Te dijimos que lejos de nuestras esquinas.»"), K("CHICO DE DARKO"))
 			await battle("thief")
 	else:
 		S.rep = maxi(0, S.rep - 1)
@@ -793,7 +793,7 @@ func talk_client(c: Dictionary) -> void:
 			confia(c.fid, -2)
 		sfx("bad")
 		remove_client(c.id)
-		await say(pick(["¿Tanto? No.", "A ese precio, paso.", "Eso es demasiado. Adiós."]), N)
+		await say(pick([K("¿Tanto? No."), K("A ese precio, paso."), K("Eso es demasiado. Adiós.")]), N)
 
 # policía por niveles (1.11, 11-historia): el nivel por el calor (con la orden, 3), lo que baja cada día y la multa de la redada
 func nivel_poli() -> int:
@@ -816,10 +816,10 @@ func heat_warn() -> void:
 	if S.heat >= 70 and not S.flags.get("heatW"):
 		S.flags.heatW = true
 		S.flags.heatA = true
-		toast("<small>CUIDADO</small>La policía investiga. Si el calor llega a %d al cambiar el día, habrá orden de registro." % int(D.NIVEL_POLI[3][0]), 3200)
+		toast(T("<small>CUIDADO</small>La policía investiga. Si el calor llega a {n} al cambiar el día, habrá orden de registro.", {"n": int(D.NIVEL_POLI[3][0])}), 3200)
 	elif S.heat >= D.CALOR_AVISO and S.heat < 70 and not S.flags.get("heatA"):
 		S.flags.heatA = true
-		toast("<small>CALOR</small>Con %d, la policía investiga. Vende menos en la calle: %s con menos calor." % [int(D.NIVEL_POLI[2][0]), "Iñaki compra al por mayor" if S.ch >= 3 else "Iñaki compra 10 g al día"], 3200)
+		toast(T("<small>CALOR</small>Con {n}, la policía investiga. Vende menos en la calle: Iñaki compra al por mayor con menos calor.", {"n": int(D.NIVEL_POLI[2][0])}) if S.ch >= 3 else T("<small>CALOR</small>Con {n}, la policía investiga. Vende menos en la calle: Iñaki compra 10 g al día con menos calor.", {"n": int(D.NIVEL_POLI[2][0])}), 3200)
 	if S.heat < 60:
 		S.flags.heatW = false
 	if S.heat < D.CALOR_AVISO - 10:
@@ -1080,7 +1080,7 @@ func update_patrullas(dt: float) -> void:
 			SOSP.alarma = null
 			SOSP.v = 50.0
 			music(map_music())
-			toast("Lo has despistado.", 1600)
+			toast(K("Lo has despistado."), 1600)
 			return
 		if ve:
 			SOSP.sinVer = 0.0
@@ -1092,7 +1092,7 @@ func update_patrullas(dt: float) -> void:
 			SOSP.alarma = null
 			SOSP.v = 50.0
 			music(map_music())
-			toast("Lo has despistado.", 1600)
+			toast(K("Lo has despistado."), 1600)
 		return
 	if SOSP.tregua > 0:
 		SOSP.tregua -= dt
@@ -1101,7 +1101,7 @@ func update_patrullas(dt: float) -> void:
 		SOSP.v = minf(100, SOSP.v + (8 + minf(g, 100) * .12) * float(D.PAT.sube[1 if is_night() else 0]) * (1 + S.heat / 100.0) * (.4 if S.protect else 1.0) * seg)
 		if not SOSP.aviso and (not is_night() or SOSP.v >= 40):
 			SOSP.aviso = 1
-			toast("Oyes pasos detrás de ti." if is_night() else "Un agente te está mirando.", 1800)
+			toast(K("Oyes pasos detrás de ti.") if is_night() else K("Un agente te está mirando."), 1800)
 	else:
 		SOSP.v = maxf(0, SOSP.v - D.PAT.baja * seg)
 	if SOSP.v >= 100:
@@ -1114,7 +1114,7 @@ func alarma(e: Dictionary) -> void:
 	e.espera = float(D.PAT.alto)
 	sfx("enc")
 	music(map_music())
-	toast("<small>¡ALTO, POLICÍA!</small>Corre (B): métete en un portal o aléjate.", 2200)
+	toast(K("<small>¡ALTO, POLICÍA!</small>Corre (B): métete en un portal o aléjate."), 2200)
 
 # vender cerca de un agente (talk_client), aunque no mire: la sospecha sube de golpe
 func visto_vender() -> void:
@@ -1124,7 +1124,7 @@ func visto_vender() -> void:
 		if e.get("pat") and ve_casilla(e, P.x, P.y, int(D.PAT.vista[0])):
 			SOSP.v = minf(100, SOSP.v + D.PAT.vende)
 			SOSP.aviso = 1
-			toast("Un agente te ha visto vender.", 1600)
+			toast(K("Un agente te ha visto vender."), 1600)
 			return
 
 # te alcanza: el control de siempre (battle); después, una tregua
@@ -1466,7 +1466,7 @@ func montar_club(mapa: String) -> void:
 		if Datos.CAL and S != null and S.get("aso") is Dictionary and S.aso.get("pres"):
 			for q in [[9, 2], [12, 2], [13, 2], [11, 2]]:
 				if m.o[q[1]][q[0]] == null and m.o[q[1] + 1][q[0]] == null:
-					m.o[q[1]][q[0]] = "almC"
+					m.o[q[1]][q[0]] = "almC"   # i18n-no
 					break
 
 # el marco de la pieza en el cursor: verde si cabe, rojo si no; y la casilla de su gente, en azul

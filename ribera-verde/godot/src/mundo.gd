@@ -9,9 +9,9 @@ const DV := {"up": [0, -1], "down": [0, 1], "left": [-1, 0], "right": [1, 0]}
 
 const OPP := {"up": "down", "down": "up", "left": "right", "right": "left"}
 
-const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2", "barraN", "barraN2", "mostrN", "mostrN2", "mostrE", "mostrE2", "barraTb", "barraTb2"]   # 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
+const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2", "barraN", "barraN2", "mostrN", "mostrN2", "mostrE", "mostrE2", "barraTb", "barraTb2"]   # i18n-no · 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
 
-const SILLAS := ["silla", "sillaG", "sillaG2"]   # 1.27.1: delante de un ordenador; con A, el ordenador de encima (delante)
+const SILLAS := ["silla", "sillaG", "sillaG2"]   # i18n-no · 1.27.1: delante de un ordenador; con A, el ordenador de encima (delante)
 
 var SOLID_G := RegEx.create_from_string("^(water|roof|wall|win|iwT|iwB|void)")
 
@@ -210,7 +210,7 @@ func rel_de(id: String):
 		return S.map.substr(5)
 	if id == "darko2":
 		return "darko"
-	if id in ["gorila", "camarera", "dj", "rrpp", "gentD1", "gentD2", "gentD3"] or (id.length() == 6 and id.begins_with("baila") and id[5].is_valid_int()):
+	if id in ["gorila", "camarera", "dj", "rrpp", "gentD1", "gentD2", "gentD3"] or (id.length() == 6 and id.begins_with("baila") and id[5].is_valid_int()):   # i18n-no
 		return "gaua"
 	if id.length() == 3 and id.begins_with("nv") and (id[2].is_valid_int() or id[2] == "m"):   # 1.34: y el de las madres
 		return null
@@ -325,14 +325,14 @@ func gm2(s) -> int:
 func linea_ind(k: String) -> String:
 	var s = strain(k)
 	var i := Datos.ind_de(S, k)
-	return "Índica %s %% · sativa %s %%%s" % [n(i), n(100 - i), (" · %s %% madre · %s %% padre" % [n(s.m), n(100 - s.m)]) if s.get("m") else ""]
+	return T("Índica {i} % · sativa {s} % · {m} % madre · {p} % padre", {"i": n(i), "s": n(100 - i), "m": n(s.m), "p": n(100 - s.m)}) if s.get("m") else T("Índica {i} % · sativa {s} %", {"i": n(i), "s": n(100 - i)})
 
 func strain_line(k: String) -> String:
 	var s = strain(k)
 	var G: Dictionary = D.GENETICA[Cultivo.tipo_gen(S, k)]
 	var pa = D.PADRES.get(k)
-	return "THC %s%% · ~%d g/m² · %s días · Resist. %s%%\n%s\n%s%s: %s. Estrella: 1 de cada ~%s.\n%s" % [Datos.pct(s.thc), gm2(s), Datos.coma(s.d), n(s.r),
-		linea_ind(k), G.n, (" (" + pa + ")") if pa else "", G.d, Datos.miles(G.uno), (str(int(s.gen)) + ".ª generación · " if s.get("gen") else "") + s.o]
+	return T("THC {thc}% · ~{gm} g/m² · {d} días · Resist. {r}%\n{ind}\n{gn}{pa}: {gd}. Estrella: 1 de cada ~{uno}.\n{o}", {"thc": Datos.pct(s.thc), "gm": gm2(s), "d": Datos.coma(s.d), "r": n(s.r),
+		"ind": linea_ind(k), "gn": G.n, "pa": (" (" + pa + ")") if pa else "", "gd": G.d, "uno": Datos.miles(G.uno), "o": T("{g}.ª generación · {o}", {"g": int(s.gen), "o": s.o}) if s.get("gen") else s.o})
 
 func discover(sid: String) -> void:
 	if not S.disc.get(sid):
@@ -340,7 +340,7 @@ func discover(sid: String) -> void:
 		var cu := ""   # 1.25: cuántas de la Genoteca llevas
 		if D.STRAINS.has(sid):
 			cu = " · %d/%d" % [D.DEX.filter(func(k): return S.disc.get(k)).size(), D.DEX.size()]
-		toast("<small>NUEVA EN LA GENOTECA%s</small>" % cu + esc(strain(sid).n))
+		toast(T("<small>NUEVA EN LA GENOTECA{cu}</small>", {"cu": cu}) + esc(strain(sid).n))
 		queue("historia", check_story)
 
 func add_seeds(sid: String, k: int) -> void:
@@ -484,13 +484,13 @@ func curado_dia(av: Array) -> void:
 	var c: Array = _cura(S.caja.buds) if S.items.get("tarros") and S.get("caja") else []
 	var nv: Array = _cura(S.nevera.rosin) if S.items.get("tarros") and S.get("nevera") != null else []   # 1.36: los dos, con los tarros
 	if c.size():
-		av.append("Curada en la caja fuerte: " + y_lista(c.map(lot_nombre)))
+		av.append(T("Curada en la caja fuerte: {l}", {"l": y_lista(c.map(lot_nombre))}))
 	if nv.size():
-		av.append("Curado en la nevera: " + y_lista(nv.map(extr_nombre)))
+		av.append(T("Curado en la nevera: {l}", {"l": y_lista(nv.map(extr_nombre))}))
 	if cam_ya() and cam().get("buds", {}).size():   # 1.43.6: el camarote cura en sus tarros de 10 L y, con sobres, afina
 		var cc: Array = _cura(S.cam.buds)
 		if cc.size():
-			av.append("Curada en el camarote: " + y_lista(cc.map(lot_nombre)))
+			av.append(T("Curada en el camarote: {l}", {"l": y_lista(cc.map(lot_nombre))}))
 		if float(S.cam.get("sob", 0)) > 0:
 			var af := []
 			for k in S.cam.buds:
@@ -500,30 +500,30 @@ func curado_dia(av: Array) -> void:
 					if b.af >= 1:
 						af.append(k)
 			if af.size():
-				av.append("Afinada al 62 %% en el camarote: %s (un %d %% más cara)" % [y_lista(af.map(lot_nombre)), Datos.jsround(D.CAMAROTE.extra * 100)])
+				av.append(T("Afinada al 62 % en el camarote: {l} (un {p} % más cara)", {"l": y_lista(af.map(lot_nombre)), "p": int(Datos.jsround(D.CAMAROTE.extra * 100))}))
 			S.cam.sob = maxf(0.0, float(S.cam.sob) - float(cam_tarros()) / float(D.CAMAROTE.dura))
 			if S.cam.sob <= 0:
-				av.append("Se han gastado los sobres de humedad del camarote")
+				av.append(K("Se han gastado los sobres de humedad del camarote"))
 
 # cómo está un lote, para la mochila: curado, curándose o sin curar ("" en los de antes de la 1.29), y manicurado
 func man_txt(b: Dictionary) -> String:
 	var mc := float(b.get("mc", 0))
-	return (" Manicurada: un %d %% más cara." % Datos.jsround(D.MANICURA.precio * 100)) if mc >= 1 else (" Manicurada en parte." if mc else "")
+	return T(" Manicurada: un {p} % más cara.", {"p": int(Datos.jsround(D.MANICURA.precio * 100))}) if mc >= 1 else (T(" Manicurada en parte.") if mc else "")
 
 func cura_txt(b: Dictionary) -> String:
 	var cu := float(b.get("cu", 0))
 	var t := ""
 	if cu >= 1:
-		t = "Curada: un %d %% más de THC y se vende un %d %% más cara." % [Datos.jsround(D.CURADO.thc * 100), Datos.jsround(D.CURADO.precio * 100)]
+		t = T("Curada: un {t} % más de THC y se vende un {p} % más cara.", {"t": int(Datos.jsround(D.CURADO.thc * 100)), "p": int(Datos.jsround(D.CURADO.precio * 100))})
 	elif cu:
-		t = "Curándose (%d %%): termina de curarla con los tarros, en la caja fuerte." % Datos.jsround(cu * 100)
+		t = T("Curándose ({p} %): termina de curarla con los tarros, en la caja fuerte.", {"p": int(Datos.jsround(cu * 100))})
 	elif b.get("dia") != null:
-		t = "Sin curar: con tarros, en la caja fuerte, se cura en %d días: sube un %d %% de THC y se vende un %d %% más cara." % [int(D.CURADO.dias), Datos.jsround(D.CURADO.thc * 100), Datos.jsround(D.CURADO.precio * 100)]
+		t = T("Sin curar: con tarros, en la caja fuerte, se cura en {d} días: sube un {t} % de THC y se vende un {p} % más cara.", {"d": int(D.CURADO.dias), "t": int(Datos.jsround(D.CURADO.thc * 100)), "p": int(Datos.jsround(D.CURADO.precio * 100))})
 	return (t + man_txt(b)).strip_edges()
 
 func cura_corto(b: Dictionary) -> String:
 	var cu := float(b.get("cu", 0))
-	return (" · curada" if cu >= 1 else (" · curándose" if cu else (" · sin curar" if b.get("dia") != null else ""))) + (" · manicurada" if float(b.get("mc", 0)) >= 1 else "")
+	return (T(" · curada") if cu >= 1 else (T(" · curándose") if cu else (T(" · sin curar") if b.get("dia") != null else ""))) + (T(" · manicurada") if float(b.get("mc", 0)) >= 1 else "")
 
 func use_buds(k: String, g: float) -> void:
 	var b: Dictionary = S.buds[k]
@@ -569,7 +569,7 @@ func use_rosin(k: String, g: float) -> void:
 		S.rosin.erase(k)
 
 func rosin_txt(r: float) -> String:
-	return Datos.coma(Datos.jsround(r * 10) / 10.0) + " g de rosin"
+	return T("{g} g de rosin", {"g": Datos.coma(Datos.jsround(r * 10) / 10.0)})
 
 # lo que llevas encima en gramos de flor: el rosin, como la flor de la que sale (1 g ↔ 1 / ROSIN.rend = 5 g). Ladrones y Darko
 func gramos_flor() -> float:
@@ -584,7 +584,7 @@ func rosin_lots(mn: float) -> Array:
 
 func rosin_item(l: Array) -> Dictionary:
 	var k: String = l[0]
-	return {"label": D.EXTR[tipo_extr(k)].n + " · " + lot_nombre(k) + (" · curado" if float(l[1].get("cu", 0)) >= 1 else ""), "right": "%s g · %s%%" % [Datos.coma(l[1].g), Datos.pct(l[1].thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k))}
+	return {"label": D.EXTR[tipo_extr(k)].n + " · " + lot_nombre(k) + (T(" · curado") if float(l[1].get("cu", 0)) >= 1 else ""), "right": "%s g · %s%%" % [Datos.coma(l[1].g), Datos.pct(l[1].thc)], "sw": "#d89a18", "ic": ic_cog(lot_sid(k))}
 
 # las extracciones (1.35, 11l-extraccion): el tipo va en la clave del lote («ria~seco»; el rosin, sin nada)
 func tipo_extr(k: String) -> String:
@@ -663,12 +663,12 @@ func llegando() -> bool:
 
 func got(t: String) -> void:
 	sfx("get")
-	await say("Consigues %s." % t)
+	await say(T("Consigues {t}.", {"t": t}))
 
 # las semillas que escondió la tía Maite (1.25): landraces que no están en el banco
 func semillas_tia(k: String, txt: String, k_n: int = 2) -> void:
 	add_seeds(k, k_n)
-	await got("%d semillas de %s" % [k_n, D.STRAINS[k].n.to_upper()])
+	await got(T("{n} semillas de {nom}", {"n": k_n, "nom": D.STRAINS[k].n.to_upper()}))
 	await say(txt)
 
 # ---------- mapas (04-mapas) ----------
@@ -690,19 +690,19 @@ func montar_nave() -> void:
 		aplica_orden("nave")
 	# El carro de las bandejas de clones (S.nave.bc), contra la pared, entre el secadero y el escritorio
 	for x in [8, 9]:
-		if n.o[2][x] in ["clonN", "clonN2"]:
+		if n.o[2][x] in ["clonN", "clonN2"]:   # i18n-no
 			n.o[2][x] = null
 	if S != null and S.get("nave") != null and Datos.CAL and not S.nave.has("bc"):
 		S.nave.bc = []
 	if S != null and S.get("nave") != null and S.nave.has("bc") and n.o[2][8] == null and n.o[2][9] == null:
-		n.o[2][8] = "clonN"
-		n.o[2][9] = "clonN2"
+		n.o[2][8] = "clonN"   # i18n-no
+		n.o[2][9] = "clonN2"   # i18n-no
 	# (lo pidió el usuario: «en la nave en la que cultivas, lo mismo»): el camastro del rincón, para dormir allí
 	for y in [6, 7]:
-		if n.o[y][17] in ["bedT", "bedB"]:
+		if n.o[y][17] in ["bedT", "bedB"]:   # i18n-no
 			n.o[y][17] = null
 	if S != null and S.get("nave") != null and Datos.CAL and n.o[6][17] == null and n.o[7][17] == null and puertas_int("nave").is_empty():
-		n.o[6][17] = "bedT"
+		n.o[6][17] = "bedT"   # i18n-no
 		n.o[7][17] = "bedB"
 	montar_puertas("nave")   # 1.51: el despacho y la habitación, detrás de sus puertas
 
@@ -737,7 +737,7 @@ func montar_alto() -> void:
 	var dy: int = y0 + int(b.h) - 1
 	for y in range(y0, dy + 1):
 		for x in range(int(b.x0), int(b.x0) + int(b.w)):
-			m.g[y][x] = ("roofT_" if y == y0 else "roofB_" if y == y0 + 1 else "wall_") + "conce"
+			m.g[y][x] = ("roofT_" if y == y0 else "roofB_" if y == y0 + 1 else "wall_") + "conce"   # i18n-no
 			m.o[y][x] = null
 	for x in range(int(b.x0) + 1, int(b.x0) + int(b.w) - 1):   # la acera de delante
 		m.g[dy + 1][x] = "walk"
@@ -773,9 +773,9 @@ func montar_casa() -> void:
 			if h.g[y][x] == "mat":
 				continue
 			if y == 0:
-				h.g[y][x] = "iwT_home" + vs
+				h.g[y][x] = "iwT_home" + vs   # i18n-no
 			elif y == 1:
-				h.g[y][x] = "iwB_home" + vs
+				h.g[y][x] = "iwB_home" + vs   # i18n-no
 			elif al and x >= al[0] and x <= al[0] + 1 and y >= al[1] and y <= al[1] + 1:
 				h.g[y][x] = "alf" + str(deco_v("alfombra")) + "abcd"[(y - int(al[1])) * 2 + x - int(al[0])] + fs
 			else:
@@ -842,7 +842,7 @@ func montar_casa() -> void:
 		h.carpasK = ""
 		montar_casa()
 		return
-	h.o[int(CM.y)][int(CM.x)] = "escaleraC"
+	h.o[int(CM.y)][int(CM.x)] = "escaleraC"   # i18n-no
 
 # el camarote por dentro: las estanterías que han llegado, contra la pared de arriba (x 1, 3, 5 y 7)
 # el bajo de las setas entero (1.44, con Datos.CAL): el armario de almacén, la mesa de trabajo y, si se lo has comprado a Txomin,
@@ -869,17 +869,17 @@ func montar_setas() -> void:
 	if not Datos.CAL:
 		return
 	var X: Dictionary = D.SETAS_PRO.x
-	m.o[int(X.armS[1])][int(X.armS[0])] = "armS"
-	m.o[int(X.mesaS[1])][int(X.mesaS[0])] = "mesaS"
+	m.o[int(X.armS[1])][int(X.armS[0])] = "armS"   # i18n-no
+	m.o[int(X.mesaS[1])][int(X.mesaS[0])] = "mesaS"   # i18n-no
 	if S != null and S.get("setas") is Dictionary and S.setas.get("dh"):
-		m.o[int(X.deshidS[1])][int(X.deshidS[0])] = "deshidS"
+		m.o[int(X.deshidS[1])][int(X.deshidS[0])] = "deshidS"   # i18n-no
 	if S != null and S.get("setas") is Dictionary and S.setas.get("ay") and int(m.w) > 10:   # 1.51: la mesa del ayudante
 		m.o[int(D.SETAS_AY.mesa[1])][int(D.SETAS_AY.mesa[0])] = "mesita"
 
 # los negocios por dentro (1.45, lo pidió el usuario: «que tú puedas acceder a ese sitio y controlarlo desde ahí»; con Datos.CAL):
 # en la calle, la puerta del local (NEGOCIO.k[k]: x, puerta, ancha, dx, tile; gate «neg:k»); dentro (loc-<k>), lo que ponen las mejoras
 # compradas (S.loc[k].mj); sin Datos.CAL, la calle y el local como estaban (la copia _neg0)
-const NEG_ANCHO := ["elevT", "fosoT", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL", "hornoN", "recambT", "barraN", "botN", "estP", "mostrN", "doblaN", "mesaP", "barraTb", "botTb"]   # 1.47: los muebles de PixelLab de dos casillas
+const NEG_ANCHO := ["elevT", "fosoT", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL", "hornoN", "recambT", "barraN", "botN", "estP", "mostrN", "doblaN", "mesaP", "barraTb", "botTb"]   # 1.47: los muebles de PixelLab de dos casillas   # i18n-no
 
 # El elevador y el foso, a escala con los coches del concesionario (5 casillas, como la exposición); 1.47, el box de lavado
 const NEG_LARGO := {"elevT": 5, "fosoT": 5, "boxL": 5}
@@ -1007,7 +1007,7 @@ func montar_estancos(mapa: String) -> void:
 					b = q
 		if b == null:
 			continue
-		b.rotulo = "rotuloE"
+		b.rotulo = "rotuloE"   # i18n-no
 		if E.puerta != null:
 			b.doorX = int(E.x)
 			b.puerta = E.puerta
@@ -1021,7 +1021,7 @@ func montar_estancos(mapa: String) -> void:
 func montar_camarote() -> void:
 	var m: Dictionary = MAPS.camarote
 	for i in int(D.CAMAROTE.est.max):
-		m.o[2][1 + i * 2] = "estanteC" if i < cam_est() else null
+		m.o[2][1 + i * 2] = "estanteC" if i < cam_est() else null   # i18n-no
 
 # lo que no se puede ocupar al ordenar (12d-orden): delante de la escalera del camarote (1.43.6)
 func reserva_orden(mapa: String) -> Array:
@@ -1062,7 +1062,7 @@ func montar_taller(mapa: String) -> void:
 			for x in range(int(z[0]), int(z[2]) + 1):
 				var t: String = z[4]
 				if t == "floorTc":   # el hormigón, con alguna mancha de aceite o una rodada
-					t = ["floorTc", "floorTc", "floorTc", "floorTc2", "floorTc", "floorTc3"][_hash_t(x, y) % 6]
+					t = ["floorTc", "floorTc", "floorTc", "floorTc2", "floorTc", "floorTc3"][_hash_t(x, y) % 6]   # i18n-no
 				m.g[y][x] = t
 	for q in [[0, 3], [16, 3]]:   # una pila de tres ruedas por sitio: dos seguidas, de fondo, parecían una torre más alta que el coche
 		if m.o[q[1]][q[0]] == "neumT":
@@ -1122,7 +1122,7 @@ func montar_muelle(mapa: String) -> void:
 	if R.has("obras") and not obra_ya("pantalan"):
 		for x in R.podrido:
 			if mu.g[10][int(x)] == "dock":
-				mu.g[10][int(x)] = "dockR"
+				mu.g[10][int(x)] = "dockR"   # i18n-no
 	if R.has("kaia") and obra_ya("club"):
 		var K: Dictionary = R.kaia
 		mu.g[int(K.door[1])][int(K.door[0])] = K.tile
@@ -1293,10 +1293,10 @@ func demo_entra(now_: float) -> Array:
 		demo_e.append(quieto.call("demo2", 0, 0, "left", D.LOOKS.cop, {}))
 		if Datos.CAL:   # 1.57: el atrezo del título, detrás del poli
 			for i in DEMO_CAL.gente.size():
-				demo_e.insert(demo_e.size() - 1, quieto.call("demoG%d" % i, 0, 0, "left", Datos.rand_look("demoG%d" % i, "client"), {}))
+				demo_e.insert(demo_e.size() - 1, quieto.call("demoG%d" % i, 0, 0, "left", Datos.rand_look("demoG%d" % i, "client"), {}))   # i18n-no
 			for i in DEMO_CAL.coches.size():
 				var c: Array = DEMO_CAL.coches[i]
-				var ce: Dictionary = quieto.call("demoC%d" % i, 0, int(c[1]), "right" if int(c[2]) > 0 else "left", Datos.rand_look("demoC%d" % i, "client"), {})
+				var ce: Dictionary = quieto.call("demoC%d" % i, 0, int(c[1]), "right" if int(c[2]) > 0 else "left", Datos.rand_look("demoC%d" % i, "client"), {})   # i18n-no
 				ce.veh = c[0]
 				demo_e.insert(demo_e.size() - 1, ce)
 	ents = demo_e
@@ -1360,7 +1360,7 @@ func npc_cond(d: Dictionary) -> bool:
 			return S.ch == 6
 		"julen":   # 1.23: en el piso hasta la primera cosecha; después, en el growshop
 			return (S.flags.get("kiko1") and not S.flags.get("harvest1")) if d.map == "home" else (true if S.flags.get("harvest1") else false)
-	if d.id.begins_with("est_") or d.id in ["camareraV", "vipA", "vipB", "gentD1", "gentD2", "gentD3"]:   # 1.47: el estanco, el reservado de GAUA y su gente de abajo
+	if d.id.begins_with("est_") or d.id in ["camareraV", "vipA", "vipB", "gentD1", "gentD2", "gentD3"]:   # i18n-no · 1.47: el estanco, el reservado de GAUA y su gente de abajo
 		return Datos.CAL
 	if d.id.begins_with("neg_"):   # 1.45: la gente de los negocios alquilados
 		return Datos.CAL and S.get("loc") is Dictionary and S.loc.has(d.id.substr(4))
@@ -1384,7 +1384,7 @@ func npc_talk(d: Dictionary) -> void:
 		await talk_sec(d.id)
 		return
 	if d.get("look") == "cop" and d.id.begins_with("pat"):   # las patrullas (1.10)
-		await say(pick(["«Circule.»", "«Buenas. Nada que ver aquí.»", "«¿Todo bien? Siga.»"]), "AGENTE")
+		await say(pick([K("«Circule.»"), K("«Buenas. Nada que ver aquí.»"), K("«¿Todo bien? Siga.»")]), K("AGENTE"))
 		return
 	if d.id == "setero":   # 1.51
 		await talk_setero()
@@ -1421,13 +1421,13 @@ func npc_talk(d: Dictionary) -> void:
 		"txomin":   # el bajo de las setas (1.20)
 			await talk_txomin()
 		"ibarbitarra":
-			await say(pick(["Esto es el Ensanche: pisos, oficinas y el parque. El Casco Viejo, por la avenida.", "En Ibarbide hay policía en cada esquina. Y aun así...", "Los de los pueblos venís en autobús, ¿no? La estación está en el Casco."]), "VECINO")
+			await say(pick([K("Esto es el Ensanche: pisos, oficinas y el parque. El Casco Viejo, por la avenida."), K("En Ibarbide hay policía en cada esquina. Y aun así..."), K("Los de los pueblos venís en autobús, ¿no? La estación está en el Casco.")]), K("VECINO"))
 		"josune":
 			await talk_josune()
 		"baltasar":
 			await talk_baltasar()
 		"tono":
-			await say(pick(["Don Baltasar está ocupado. Habla con él si traes el dinero.", "Aquí dentro no se hacen preguntas."]), "TOÑO")
+			await say(pick([K("Don Baltasar está ocupado. Habla con él si traes el dinero."), K("Aquí dentro no se hacen preguntas.")]), K("TOÑO"))
 		"begona":   # 1.15: consejos, regalos y la jardinera
 			await talk_begona()
 		"club_puerto", "club_valde", "club_ibar", "club_ens", "club_rv":   # los clubs (1.15); la asociación (1.32)
@@ -1446,7 +1446,7 @@ func npc_talk(d: Dictionary) -> void:
 		"arantxa":   # 1.43: el concesionario
 			await talk_conce()
 		"conce2":
-			await say(pick(["Vengo a por la berlina de empresa. Bueno, a mirar; lo de comprar, lo decide mi mujer.", "¿Has visto el rojo? Doscientos cuarenta y cinco mil. Con eso me compro dos pisos en el pueblo.", "La moto es lo más práctico: aparcas en cualquier sitio y gasta nada."]), "CLIENTE")
+			await say(pick([K("Vengo a por la berlina de empresa. Bueno, a mirar; lo de comprar, lo decide mi mujer."), K("¿Has visto el rojo? Doscientos cuarenta y cinco mil. Con eso me compro dos pisos en el pueblo."), K("La moto es lo más práctico: aparcas en cualquier sitio y gasta nada.")]), K("CLIENTE"))
 		"cg1", "cg2", "cg3", "cg4":   # 1.34: los demás socios de cada club
 			await talk_gente_club(S.map.substr(5), int(d.id.substr(2)) - 1)
 		"pres_puerto", "pres_valde", "pres_ibar", "pres_ens":   # 1.34: los presidentes de los clubs de fuera
@@ -1455,10 +1455,10 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_gorila()
 		"camarera", "camareraV":
 			await talk_barra()
-		"vipA", "vipB":   # 1.47
+		"vipA", "vipB":   # 1.47 · i18n-no
 			await talk_vip(0 if d.id == "vipA" else 1)
-		"gentD1", "gentD2", "gentD3":   # 1.47: la gente de la pista, la que se ve desde el cristal del reservado
-			await say(D.DISCO_CAL.gente[(int(d.id.substr(5)) + S.day) % D.DISCO_CAL.gente.size()], "GENTE")
+		"gentD1", "gentD2", "gentD3":   # i18n-no · 1.47: la gente de la pista, la que se ve desde el cristal del reservado
+			await say(D.DISCO_CAL.gente[(int(d.id.substr(5)) + S.day) % D.DISCO_CAL.gente.size()], K("GENTE"))
 		"dj":
 			await talk_dj()
 		"rrpp":
@@ -1466,7 +1466,7 @@ func npc_talk(d: Dictionary) -> void:
 		"baila1", "baila2", "baila3":
 			await talk_baila(int(d.id.substr(5)) - 1)
 		"unai":
-			await say(pick(["Si mantienes pulsado B, corres.", "Mi hermano dice que de noche, en la hierba alta del parque, roban a la gente.", "Con START abres tu GENOTECA y la mochila.", "En los arbustos del parque la gente esconde cosas. Mira delante de ellos con A."]), "UNAI")
+			await say(pick([K("Si mantienes pulsado B, corres."), K("Mi hermano dice que de noche, en la hierba alta del parque, roban a la gente."), K("Con START abres tu GENOTECA y la mochila."), K("En los arbustos del parque la gente esconde cosas. Mira delante de ellos con A.")]), K("UNAI"))
 		"patxi":
 			await talk_patxi()
 		"txaro":
@@ -1485,13 +1485,13 @@ func npc_talk(d: Dictionary) -> void:
 			await talk_jurado()
 		# la comarca (1.10)
 		"vecina":
-			await say(pick(["En Mendialde el autobús para en la plaza. El último sale a las nueve.", "Tu ama dice que en la ciudad no comes. Llévate el táper.", "Aquí el maíz se siembra en mayo y se recoge en octubre. Como toda la vida."]), "VECINA")
+			await say(pick([K("En Mendialde el autobús para en la plaza. El último sale a las nueve."), K("Tu ama dice que en la ciudad no comes. Llévate el táper."), K("Aquí el maíz se siembra en mayo y se recoge en octubre. Como toda la vida.")]), K("VECINA"))
 		"excursionista":
-			await say(pick(["El molino tiene trescientos años. Todavía muele algún domingo.", "Del puente para arriba, el río baja limpio. Para abajo, ya no tanto.", "Vengo en el autobús de Ribera Verde: treinta minutos y tres euros."]), "EXCURSIONISTA")
+			await say(pick([K("El molino tiene trescientos años. Todavía muele algún domingo."), K("Del puente para arriba, el río baja limpio. Para abajo, ya no tanto."), K("Vengo en el autobús de Ribera Verde: treinta minutos y tres euros.")]), K("EXCURSIONISTA"))
 		"turista":
-			await say(pick(["Las casas son de colores para que cada pescador viera la suya desde el mar.", "Dicen que en este puerto se paga bien... y que la policía mira poco.", "He venido a por anchoas y me han ofrecido de todo."]), "TURISTA")
+			await say(pick([K("Las casas son de colores para que cada pescador viera la suya desde el mar."), K("Dicen que en este puerto se paga bien... y que la policía mira poco."), K("He venido a por anchoas y me han ofrecido de todo.")]), K("TURISTA"))
 		"obrero":
-			await say(pick(["La fundición cerró hace años. Ahora el solar es del chatarrero.", "Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.", "De Valdehierro a Ribera Verde, veinte minutos de autobús."]), "OBRERO")
+			await say(pick([K("La fundición cerró hace años. Ahora el solar es del chatarrero."), K("Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera."), K("De Valdehierro a Ribera Verde, veinte minutos de autobús.")]), K("OBRERO"))
 
 func mk_ent(d: Dictionary) -> Dictionary:
 	var look = d.get("lookObj")
@@ -1588,44 +1588,44 @@ func item_give(id: String) -> void:
 	match id:
 		"i_spray":
 			S.items.spray += 2
-			await got("2 × SPRAY DE PIMIENTA")
+			await got(K("2 × SPRAY DE PIMIENTA"))
 		"i_fert":
 			S.items.fert += 3
-			await got("3 dosis de MEATZA FLORACIÓN")
+			await got(K("3 dosis de MEATZA FLORACIÓN"))
 		"i_boc":
 			S.items.bocata += 2
-			await got("2 × BOCATA")
+			await got(K("2 × BOCATA"))
 		"h_acap":
 			add_seeds("acapulco", 2)
-			await got("2 semillas de ACAPULCO GOLD")
-			await say("Un bote de carrete con dos semillas y una etiqueta a boli: «Guerrero, 1979».")
+			await got(K("2 semillas de ACAPULCO GOLD"))
+			await say(K("Un bote de carrete con dos semillas y una etiqueta a boli: «Guerrero, 1979»."))
 		"h_50":
 			S.money += 50
-			await got("50 € en billetes doblados")
+			await got(K("50 € en billetes doblados"))
 		"h_ins":
 			S.items.insect += 1
-			await got("1 tratamiento de INSECTICIDA")
+			await got(K("1 tratamiento de INSECTICIDA"))
 		"i_ast":
 			S.items.spray += 2
-			await got("2 × SPRAY DE PIMIENTA")
+			await got(K("2 × SPRAY DE PIMIENTA"))
 		"h_alto":
 			S.money += 80
-			await got("80 € en un sobre arrugado")
+			await got(K("80 € en un sobre arrugado"))
 		"h_kale":   # la Kale Zaharra (1.14)
 			S.money += 120
-			await got("120 € en una riñonera abandonada")
+			await got(K("120 € en una riñonera abandonada"))
 		"h_lamb":   # las de la tía Maite (1.25)
-			await semillas_tia("lamb", "Una lata de tabaco oxidada con una etiqueta a boli: «Jamaica». Es la letra de la tía Maite.")
+			await semillas_tia("lamb", K("Una lata de tabaco oxidada con una etiqueta a boli: «Jamaica». Es la letra de la tía Maite."))
 		"h_kerala":
-			await semillas_tia("kerala", "Un bote de carrete envuelto en plástico: «Kerala, India». Es la letra de la tía Maite.")
+			await semillas_tia("kerala", K("Un bote de carrete envuelto en plástico: «Kerala, India». Es la letra de la tía Maite."))
 		"h_manga":
-			await semillas_tia("mangarosa", "Un sobre en una bolsa de congelar: «Manga Rosa · Brasil». Es la letra de la tía Maite.")
+			await semillas_tia("mangarosa", K("Un sobre en una bolsa de congelar: «Manga Rosa · Brasil». Es la letra de la tía Maite."))
 		"h_mallas":   # 1.36: las mallas 00, en un arbusto de Mendialde
 			S.items.mallas00 = 1
-			await got("unas MALLAS 00 (DOBLE CERO)")
-			await say("Una bolsa de tela con un bastidor y una malla finísima: «00». Con esto se tamiza en seco lo más fino, solo las cabezas de resina.")
+			await got(K("unas MALLAS 00 (DOBLE CERO)"))
+			await say(K("Una bolsa de tela con un bastidor y una malla finísima: «00». Con esto se tamiza en seco lo más fino, solo las cabezas de resina."))
 		"h_hawai":
-			await semillas_tia("hawai", "Un tubo de pastillas con semillas dentro: «Hawái». Es la letra de la tía Maite.")
+			await semillas_tia("hawai", K("Un tubo de pastillas con semillas dentro: «Hawái». Es la letra de la tía Maite."))
 
 func item_at(x: int, y: int):
 	for it in D.ITEMS:
@@ -1662,46 +1662,46 @@ const ATREZO := {
 	"txaro": [[3, 2, "tv"], [4, 2, "tv2"], [6, 1, "cuadro"], [8, 2, "libreria"], [3, 4, "sillon"], [4, 4, "sillon2"], [5, 5, "silla"], [8, 6, "mesita"], [5, 1, "cartel"]],
 	"casa-ama": [[4, 1, "cuadro"], [3, 2, "libreria"], [7, 2, "sillon"], [8, 2, "sillon2"], [5, 5, "silla"], [8, 6, "mesita"]],
 	"comisaria": [[6, 2, "escritorio"], [7, 2, "escritorio2"], [3, 1, "cuadro"]],
-	"almacen": [[3, 2, "sacos"], [2, 1, "red"], [7, 2, "estanteN"], [8, 4, "barrilT"]],
+	"almacen": [[3, 2, "sacos"], [2, 1, "red"], [7, 2, "estanteN"], [8, 4, "barrilT"]],   # i18n-no
 	# (lo pidió el usuario: «está muy vacío… el atrezo deja que desear o por lo menos cómo está usado»): el taller, cada cosa en
 	# su zona: la manguera del aire sobre el elevador, el bidón y la grúa junto a los puestos, el lavabo entre el banco y el compresor,
 	# las ruedas nuevas en su estantería, el extintor junto a la puerta del cuartucho, entre las cajas y la recogedora y la espera con su máquina de café
-	"loc-valde": [[3, 1, "mangT"], [17, 1, "calT"], [11, 2, "lavabT"], [15, 2, "rackT"], [19, 3, "extinT"], [0, 6, "bidonT"],
-		[6, 6, "gatoT"], [6, 7, "gruaT"], [19, 6, "cajonT"], [19, 7, "bidonT"], [14, 9, "sillaT"], [16, 9, "cafeM"]],
+	"loc-valde": [[3, 1, "mangT"], [17, 1, "calT"], [11, 2, "lavabT"], [15, 2, "rackT"], [19, 3, "extinT"], [0, 6, "bidonT"],   # i18n-no
+		[6, 6, "gatoT"], [6, 7, "gruaT"], [19, 6, "cajonT"], [19, 7, "bidonT"], [14, 9, "sillaT"], [16, 9, "cafeM"]],   # i18n-no
 
 }
 
 # El suelo del taller por zonas (x0, y0, x1, y1, casilla): el hormigón de los puestos (con manchas de aceite por hash_t), la
 # línea amarilla que los separa del paso, la goma delante del banco y del lavabo, el gres de la espera y el sumidero entre el elevador
 # y el foso; el resto, la resina azul de siempre
-const TALLER_SUELO := [[0, 2, 5, 9, "floorTc"], [6, 2, 6, 9, "floorTcR"], [8, 5, 12, 8, "floorTc"], [8, 5, 12, 5, "floorTcT"],
-	[9, 3, 11, 3, "floorTg"], [9, 9, 16, 9, "floorTr"], [3, 6, 3, 6, "floorTd"]]
+const TALLER_SUELO := [[0, 2, 5, 9, "floorTc"], [6, 2, 6, 9, "floorTcR"], [8, 5, 12, 8, "floorTc"], [8, 5, 12, 5, "floorTcT"],   # i18n-no
+	[9, 3, 11, 3, "floorTg"], [9, 9, 16, 9, "floorTr"], [3, 6, 3, 6, "floorTd"]]   # i18n-no
 
-const ATREZO_TXT := {
-	"txaro": {"tv": "La tele, con un tapete de ganchillo encima del mueble. Echan un concurso.", "tv2": "La tele, con un tapete de ganchillo encima del mueble. Echan un concurso.",
-		"cuadro": "Una lámina de la ría. La enmarcó su Paco en el sesenta y ocho.", "libreria": "Novelas de bolsillo, un misal y un álbum de fotos de un viaje a las montañas.",
-		"mesita": "Un costurero abierto y unas gafas de cerca.", "cartel": "Un póster del faro de Puerto Viejo. Paco trabajó allí de joven."},
-	"casa-ama": {"cuadro": "Una lámina del monte, con el marco descolorido por el sol.", "libreria": "Los libros de aitona: el monte, los pájaros y una enciclopedia por fascículos.",
-		"mesita": "Una radio vieja con la emisora de la comarca."},
-	"comisaria": {"escritorio": "Una mesa con un ordenador viejo y una montaña de atestados.", "escritorio2": "Una mesa con un ordenador viejo y una montaña de atestados.",
-		"cuadro": "Una lámina de la ría, torcida. Nadie la endereza."},
-	"almacen": {"sacos": "Sacos de sal gorda de la conservera.", "red": "Una red de pesca vieja, colgada de un clavo.", "estanteN": "Una estantería con latas oxidadas y cuerdas.",
-		"barrilT": "Un bidón azul. Huele a gasoil."},
-	"loc-valde": {"mangT": "El enrollador de la manguera del aire, colgado encima del elevador: se estira hasta el coche y vuelve solo.",
-		"calT": "Un calendario de pared con un coche de rally de los noventa, sin marca. Los días de las citas, en rojo.",
-		"lavabT": "El lavabo de acero con el jabón de taller, el de la piedra pómez, y un rollo de papel azul.",
-		"rackT": "La estantería de las ruedas nuevas, de pie y con su etiqueta de medida.",
-		"extinT": "El extintor de polvo de 6 kg, con la revisión al día y su placa encima.",
-		"bidonT": "Un bidón de 200 litros de aceite usado, esperando al gestor de residuos.",
-		"gatoT": "El gato de carretilla de 3 toneladas: se mete debajo del coche y se bombea con la palanca.",
-		"gruaT": "La grúa de motores, plegada: con la pluma y la cadena se saca un motor entero.",
-		"cajonT": "El armario de herramientas grande: siete cajones de llaves, carracas y vasos, y encima la caja de las brocas.",
-		"sillaT": "Las sillas de la espera, de plástico. Una revista de coches de hace dos años.",
-		"cafeM": "La máquina de café de la espera: solo, cortado y chocolate. El de chocolate sale aguado."},
+var ATREZO_TXT := {   # F7: var, por K()
+	"txaro": {"tv": I18n.K("La tele, con un tapete de ganchillo encima del mueble. Echan un concurso."), "tv2": I18n.K("La tele, con un tapete de ganchillo encima del mueble. Echan un concurso."),
+		"cuadro": I18n.K("Una lámina de la ría. La enmarcó su Paco en el sesenta y ocho."), "libreria": I18n.K("Novelas de bolsillo, un misal y un álbum de fotos de un viaje a las montañas."),
+		"mesita": I18n.K("Un costurero abierto y unas gafas de cerca."), "cartel": I18n.K("Un póster del faro de Puerto Viejo. Paco trabajó allí de joven.")},
+	"casa-ama": {"cuadro": I18n.K("Una lámina del monte, con el marco descolorido por el sol."), "libreria": I18n.K("Los libros de aitona: el monte, los pájaros y una enciclopedia por fascículos."),
+		"mesita": I18n.K("Una radio vieja con la emisora de la comarca.")},
+	"comisaria": {"escritorio": I18n.K("Una mesa con un ordenador viejo y una montaña de atestados."), "escritorio2": I18n.K("Una mesa con un ordenador viejo y una montaña de atestados."),
+		"cuadro": I18n.K("Una lámina de la ría, torcida. Nadie la endereza.")},
+	"almacen": {"sacos": I18n.K("Sacos de sal gorda de la conservera."), "red": I18n.K("Una red de pesca vieja, colgada de un clavo."), "estanteN": I18n.K("Una estantería con latas oxidadas y cuerdas."),
+		"barrilT": I18n.K("Un bidón azul. Huele a gasoil.")},
+	"loc-valde": {"mangT": I18n.K("El enrollador de la manguera del aire, colgado encima del elevador: se estira hasta el coche y vuelve solo."),
+		"calT": I18n.K("Un calendario de pared con un coche de rally de los noventa, sin marca. Los días de las citas, en rojo."),
+		"lavabT": I18n.K("El lavabo de acero con el jabón de taller, el de la piedra pómez, y un rollo de papel azul."),
+		"rackT": I18n.K("La estantería de las ruedas nuevas, de pie y con su etiqueta de medida."),
+		"extinT": I18n.K("El extintor de polvo de 6 kg, con la revisión al día y su placa encima."),
+		"bidonT": I18n.K("Un bidón de 200 litros de aceite usado, esperando al gestor de residuos."),
+		"gatoT": I18n.K("El gato de carretilla de 3 toneladas: se mete debajo del coche y se bombea con la palanca."),
+		"gruaT": I18n.K("La grúa de motores, plegada: con la pluma y la cadena se saca un motor entero."),
+		"cajonT": I18n.K("El armario de herramientas grande: siete cajones de llaves, carracas y vasos, y encima la caja de las brocas."),
+		"sillaT": I18n.K("Las sillas de la espera, de plástico. Una revista de coches de hace dos años."),
+		"cafeM": I18n.K("La máquina de café de la espera: solo, cortado y chocolate. El de chocolate sale aguado.")},
 
 }
 
-const ASIENTO_FUERA := {"sofa": "Un sofá.", "sillon": "Un sillón.", "silla": "Una silla."}
+var ASIENTO_FUERA := {"sofa": I18n.K("Un sofá."), "sillon": I18n.K("Un sillón."), "silla": I18n.K("Una silla.")}
 
 func montar_atrezo(k: String) -> void:
 	if not Datos.CAL or not ATREZO.has(k) or not MAPS.has(k):
@@ -1733,8 +1733,8 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_disco()
 	if Datos.CAL and VITRINA_GROW.has(name_):   # 1.47: la vitrina de las pipas y demás en los dos grows
 		var vg: Array = VITRINA_GROW[name_]
-		MAPS[name_].o[vg[1]][vg[0]] = "vitrinaP"
-		MAPS[name_].o[vg[1]][vg[0] + 1] = "vitrinaP2"
+		MAPS[name_].o[vg[1]][vg[0]] = "vitrinaP"   # i18n-no
+		MAPS[name_].o[vg[1]][vg[0] + 1] = "vitrinaP2"   # i18n-no
 	if Datos.CAL and CAJERO_CAL.has(name_):
 		var cj: Array = CAJERO_CAL[name_]
 		if MAPS[name_].o[cj[0][1]][cj[0][0]] == "cajero":
@@ -1791,9 +1791,9 @@ var paso_sobra := 0.0
 const ASIENTOS := {"sofaF": "sur", "sofaV": "sur", "bench": "sur", "sofaB": "norte", "sofa": "norte", "sillon": "norte", "silla": "norte", "sillaG": "norte", "stool": "norte",
 	"sillaTs": "sur", "sillaTn": "norte", "taburTb": "norte", "sillaT": "sur"}   # 1.57.2: las sillas y los taburetes de la taberna y la espera del taller, muebles de verdad
 
-const ASIENTO_TXT := {"sofaF": "Un sofá del club.", "sofaB": "Un sofá del club.", "sofaV": "El sofá del reservado.", "bench": "Un banco.", "stool": "Un taburete.",
-	"sofa": "Tu sofá.", "sillon": "Tu sillón de lectura.", "silla": "La silla del ordenador de la tía.", "sillaG": "Tu silla gaming.",
-	"sillaTs": "Una silla de la taberna.", "sillaTn": "Una silla de la taberna.", "taburTb": "Un taburete de la barra.", "sillaT": "Las sillas de la espera."}
+var ASIENTO_TXT := {"sofaF": I18n.K("Un sofá del club."), "sofaB": I18n.K("Un sofá del club."), "sofaV": I18n.K("El sofá del reservado."), "bench": I18n.K("Un banco."), "stool": I18n.K("Un taburete."),
+	"sofa": I18n.K("Tu sofá."), "sillon": I18n.K("Tu sillón de lectura."), "silla": I18n.K("La silla del ordenador de la tía."), "sillaG": I18n.K("Tu silla gaming."),
+	"sillaTs": I18n.K("Una silla de la taberna."), "sillaTn": I18n.K("Una silla de la taberna."), "taburTb": I18n.K("Un taburete de la barra."), "sillaT": I18n.K("Las sillas de la espera.")}
 
 # (lo pidió el usuario: «la altura correcta en todos los muebles donde se puede sentar»): por asiento, [dx, cadera]: dx,
 # lo que se corre a la derecha para quedar en medio del dibujo (la silla gaming, de 2 casillas, va centrada entre las dos), y
@@ -1803,28 +1803,28 @@ const ASIENTO_TXT := {"sofaF": "Un sofá del club.", "sofaB": "Un sofá del club
 const SENT_GEO := {"silla": [0, 5], "sillaG": [8, 2], "sillon": [0, 7], "sofa": [0, 8], "sofaB": [0, 9], "sofaF": [2, 7], "sofaV": [2, 7], "bench": [0, 9], "stool": [0, 4],
 	"sillaTs": [0, 8], "sillaTn": [0, 5], "taburTb": [0, 4], "sillaT": [-6, 8]}
 
-const TABURETES := ["stool", "taburTb"]   # 1.57.2: con las piernas de SENT_TABURETE (pinta.gd)
+const TABURETES := ["stool", "taburTb"]   # 1.57.2: con las piernas de SENT_TABURETE (pinta.gd)   # i18n-no
 
 const SENT_PORRO := 0.5
 
 var SENT = null   # {x, y, d}
 
 # bebidas en la barra o en la mesa, por sitio (1.49): [texto, euros, minutos]
-const BEBIDAS := {
-	"bar": [["Un café", 1.5, 10], ["Una caña", 2.5, 15], ["Un refresco", 2.2, 15], ["Un vino", 2.0, 15]],
-	"club": [["Un café", 1.2, 10], ["Un refresco", 1.8, 15], ["Un zumo", 2.0, 15], ["Una cerveza", 2.2, 15]],
-	"disco": [["Un refresco", 5.0, 15], ["Una cerveza", 6.0, 15], ["Una copa", 9.0, 20]],
+var BEBIDAS := {
+	"bar": [[I18n.K("Un café"), 1.5, 10], [I18n.K("Una caña"), 2.5, 15], [I18n.K("Un refresco"), 2.2, 15], [I18n.K("Un vino"), 2.0, 15]],
+	"club": [[I18n.K("Un café"), 1.2, 10], [I18n.K("Un refresco"), 1.8, 15], [I18n.K("Un zumo"), 2.0, 15], [I18n.K("Una cerveza"), 2.2, 15]],
+	"disco": [[I18n.K("Un refresco"), 5.0, 15], [I18n.K("Una cerveza"), 6.0, 15], [I18n.K("Una copa"), 9.0, 20]],
 
 }
 
 # (lo pidió el usuario): con qué se fuma. El papel, el tabaco, las boquillas y el mechero, del estanco (ESTANCO); la pipa,
 # el bong, el vaporizador y el grinder, del grow (PARAFERNALIA). g: cogollos por vez (el porro, con tabaco, gt); gr: extracto
 # por vez (0 = el porro no lleva extracto); con: lo que hace falta en S.items
-const FUMAR := {
-	"porro": {"n": "Liarte un porro", "g": 0.5, "gt": 0.3, "gr": 0.0, "grt": 0.1, "con": ["papel", "mechero"]},   # grt (1.57.1): extracto con tabaco
-	"pipa": {"n": "Una pipa", "g": 0.2, "gr": 0.1, "con": ["pipa", "mechero"]},
-	"bong": {"n": "Un bong", "g": 0.3, "gr": 0.1, "con": ["bong", "mechero"]},
-	"vapo": {"n": "El vaporizador", "g": 0.2, "gr": 0.1, "con": ["vapo"]},
+var FUMAR := {
+	"porro": {"n": I18n.K("Liarte un porro"), "g": 0.5, "gt": 0.3, "gr": 0.0, "grt": 0.1, "con": ["papel", "mechero"]},   # grt (1.57.1): extracto con tabaco
+	"pipa": {"n": I18n.K("Una pipa"), "g": 0.2, "gr": 0.1, "con": ["pipa", "mechero"]},
+	"bong": {"n": I18n.K("Un bong"), "g": 0.3, "gr": 0.1, "con": ["bong", "mechero"]},
+	"vapo": {"n": I18n.K("El vaporizador"), "g": 0.2, "gr": 0.1, "con": ["vapo"]},
 
 }
 
