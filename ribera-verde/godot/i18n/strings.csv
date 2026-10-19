@@ -404,6 +404,17 @@ s36a87693,Se han secado {n} esquejes sin plantar,{n} unplanted cuttings have dri
 s3289f066,Se ha secado un esqueje sin plantar,An unplanted cutting has dried out
 sf6273387,Se han secado {n} esquejes en las bandejas,{n} cuttings have dried out in the trays
 s29d563da,Se ha secado un esqueje en las bandejas,A cutting has dried out in the trays
+s080ab8eb,SMS · KIKO,SMS · KIKO
+sd818275a,"¡Feliz cumpleaños, {N}! Te he guardado tres regalos en el armario. Elige uno.","Happy birthday, {N}! I've kept three presents for you in the cupboard. Pick one."
+s82121a10,LEGENDARIO · 1 semilla ★ de {s},LEGENDARY · 1 ★ seed of {s}
+s6c4aed93,Sale fenotipo estrella seguro: más cogollo y más THC.,A sure star phenotype: more bud and more THC.
+secb90184,ÉPICO · {n} focos {f},EPIC · {n} {f} lights
+sb8e78124,Para las carpas: cámbialos desde la carpa.,For the tents: swap them from the tent.
+s6df40b4a,RARO · {n} consumibles,RARE · {n} supplies
+sba2de590,"{a} abonos de crecimiento, {b} de floración y {c} botes de pH−","{a} grow nutrients, {b} bloom nutrients and {c} bottles of pH−"
+sd99d0662,"{a} abonos de crecimiento, {b} de floración y {c} botes de corrector","{a} grow nutrients, {b} bloom nutrients and {c} bottles of corrector"
+sa5eca118,CUMPLEAÑOS,BIRTHDAY
+sf8c4237f,Regalo de cumpleaños en la mochila,Birthday present in your backpack
 sfa38d7e6, (floja), (weak)
 s69d91731,Nombre de la planta (y sus esquejes),Plant name (and its cuttings)
 sa1cf3437,"Ahora se llama «{v}». Sus esquejes, también.",It's now called «{v}». Its cuttings too.
@@ -747,7 +758,6 @@ Obtienes 2 semillas F1: la línea aún no es estable.","THC {t}% · ~{g} g/m² �
 You get 2 F1 seeds: the line isn't stable yet."
 s941becb7,Te tiemblan las manos: es JACK HERER.,Your hands are shaking: it's JAK HERRER.
 s7445a88c,Te tiemblan las manos: es JAK HERRER.,
-s080ab8eb,SMS · KIKO,SMS · KIKO
 s611bc98c,¿Jack Herer? ¿De semilla propia? Llevo veinte años detrás de ella.,Jak Herrer? From your own seed? I've been after it for twenty years.
 sf8e6f3a0,¿Jak Herrer? ¿De semilla propia? Llevo veinte años detrás de ella.,
 sd646f76d,Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.,Your aunt would be proud. Stabilise it and keep it safe: that's worth more than the flat.
@@ -988,7 +998,6 @@ sfd6ac111,"Este juego usa Godot Engine, con licencia MIT:
 ","This game uses Godot Engine, under the MIT license:
 
 "
-s8f373a79,OFL-,
 sc4af1884,"
 
 GODOT ENGINE: PARTES DE TERCEROS","
@@ -1004,6 +1013,13 @@ sa782076e,ANDER,ANDER
 sbac9aeca,Otro...,Other...
 sca6856a0,NOMBRE,NAME
 sd55c37f2,¿Cómo te llamas?,What's your name?
+sc5ad53de,CHICO,MAN
+sb956bd07,Carga un 15 % más en la mochila.,Carries 15% more in the backpack.
+s22157ed9,CHICA,WOMAN
+sb64124b2,Las patrullas te ven desde menos lejos y regateas mejor.,Patrols spot you from less far away and you haggle better.
+sc0f425e4,¿QUIÉN ERES?,WHO ARE YOU?
+s2938be15,TU CUMPLEAÑOS: EL MES,YOUR BIRTHDAY: MONTH
+s392682f7,TU CUMPLEAÑOS: EL DÍA,YOUR BIRTHDAY: DAY
 s6d29508e,"¿Diga? ¿Eres familia de Maite, la de Ribera Verde? Un barrio obrero a orillas de la ría.","Hello? Are you Maite's family, from Ribera Verde? A working-class neighbourhood on the estuary."
 s435833a2,Me llamo Kiko. Llevo treinta años con el growshop de su calle.,I'm Kiko. I've run the growshop on her street for thirty years.
 se7f47ca0,KIKO,KIKO

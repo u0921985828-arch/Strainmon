@@ -502,6 +502,11 @@ func titulo_e_intro() -> void:
 		Input.parse_input_event(e.duplicate())
 		await espera(2)
 	check("el nombre escrito, en mayúsculas («%s»)" % J.S.name, J.S.name == "NAIA" and not J.name_box.visible)
+	# MAESTRO [1]: chica (la melena) y el cumpleaños, el 14 de marzo
+	check("después del nombre, chico o chica (%s)" % [etiquetas()], await elige("CHICA"))
+	check("el mes del cumpleaños", await elige("Marzo"))
+	check("el día del cumpleaños", await elige("14"))
+	check("chica, cumpleaños el 14 de marzo (%s, %s)" % [J.S.get("sexo"), J.S.get("cumple")], J.S.get("sexo") == "f" and J.S.get("cumple") == {"d": 14, "m": 3})
 	textos.clear()
 	await libre()
 	check("Kiko te llama por tu nombre", textos.any(func(t): return t.begins_with("NAIA. Hacía años")))

@@ -169,6 +169,9 @@ func _corre() -> void:
 		quit(1)
 		return
 	await pulsa("A")
+	for q in 3:   # MAESTRO [1]: chico o chica, el mes y el día del cumpleaños (lo primero de cada uno)
+		await hasta(func(): return J.menu_box.visible, 300)
+		await pulsa("A")
 	var listo := func(): return J.mode == "world" and J.is_free() and J.pending.is_empty() and not J.P.moving and not J.dlg.visible
 	await pasa(listo, 3000)
 	var S: Dictionary = J.S

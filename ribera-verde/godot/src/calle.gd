@@ -759,7 +759,7 @@ func talk_client(c: Dictionary) -> void:
 	var mt: float = 50.0 if ext else (c.minThc if c.minThc else 14)
 	var acc: float = [1.0, .92, clampf(.3 + (b.thc - mt) * .05 + (.25 if c.type == "pij" else 0.0) + (.15 if c.type == "tur" else 0.0) + (.3 if c.type == "vip" else 0.0), .1, .9)][j]
 	if j > 0:   # 1.15: la confianza de los de la agenda, la cata y el análisis
-		acc = minf(.97, acc + (rel(c.fid) / 250.0 if c.get("fid") else 0.0) + (.05 if b.get("cata") else 0.0) + (.1 if b.get("ana") else 0.0))
+		acc = minf(.97, acc + (rel(c.fid) / 250.0 if c.get("fid") else 0.0) + (.05 if b.get("cata") else 0.0) + (.1 if b.get("ana") else 0.0) + (D.PERSONAJE.trato if es_chica() else 0.0))   # MAESTRO [1]: la protagonista negocia mejor
 	if Cultivo.azar() < acc:
 		if c.get("fid"):
 			confia(c.fid, [3, 2, 1][j])
@@ -887,7 +887,7 @@ func ve_casilla(e: Dictionary, x: int, y: int, lejos: int) -> bool:
 			var f: Array = DV[e.dir]
 			var fr: int = dx * f[0] + dy * f[1]
 			var la: int = absi(dx * f[1]) + absi(dy * f[0])
-			if fr <= 0 or la > fr or fr > int(D.PAT.vista[1 if is_night() else 0]):
+			if fr <= 0 or la > fr or fr > vista_pat():
 				return false
 	var nn := maxi(absi(dx), absi(dy))
 	for s in range(1, nn):
@@ -899,7 +899,7 @@ func ve_casilla(e: Dictionary, x: int, y: int, lejos: int) -> bool:
 	return true
 
 func te_pilla(e: Dictionary) -> bool:
-	return ve_casilla(e, P.x, P.y, int(D.PAT.vista[0]) * 2 if e.caza else 0)
+	return ve_casilla(e, P.x, P.y, vista_pat(true) if e.caza else 0)
 
 func _libre_ronda(e: Dictionary, m: Dictionary, d: String) -> bool:
 	var nx: int = e.x + DV[d][0]
@@ -1121,7 +1121,7 @@ func visto_vender() -> void:
 	if SOSP.alarma != null:
 		return
 	for e in ents:
-		if e.get("pat") and ve_casilla(e, P.x, P.y, int(D.PAT.vista[0])):
+		if e.get("pat") and ve_casilla(e, P.x, P.y, vista_pat()):
 			SOSP.v = minf(100, SOSP.v + D.PAT.vende)
 			SOSP.aviso = 1
 			toast(K("Un agente te ha visto vender."), 1600)

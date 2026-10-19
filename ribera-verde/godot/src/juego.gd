@@ -673,7 +673,7 @@ func creditos() -> void:
 func licencias() -> String:
 	var t := I18n.v("Este juego usa Godot Engine, con licencia MIT:\n\n") + Engine.get_license_text()
 	for f in ["OFL-PressStart2P.txt", "OFL-AtkinsonHyperlegible.txt", "LICENCIA-DejaVu.txt"]:   # i18n-no
-		t += "\n\n— %s —\n\n%s" % [f.trim_prefix("OFL-").trim_prefix("LICENCIA-").trim_suffix(".txt"), FileAccess.get_file_as_string("res://fuentes/" + f).strip_edges()]
+		t += "\n\n— %s —\n\n%s" % [f.trim_prefix("OFL-").trim_prefix("LICENCIA-").trim_suffix(".txt"), FileAccess.get_file_as_string("res://fuentes/" + f).strip_edges()]   # i18n-no
 	t += I18n.v("\n\nGODOT ENGINE: PARTES DE TERCEROS")
 	for c in Engine.get_copyright_info():
 		t += "\n\n" + str(c.name)
@@ -693,6 +693,23 @@ func choose_name() -> String:
 		return opts[i]
 	var v: String = str(await pedir_texto(I18n.v("¿Cómo te llamas?"), "", 8, true, false)).to_upper().substr(0, 8)
 	return v if v != "" else K("EDDIE")
+
+# MAESTRO [1] (con Datos.CAL): chico o chica (la melena y las pasivas de PERSONAJE) y el cumpleaños (día y mes, S.cumple)
+func elegir_personaje() -> void:
+	if not Datos.CAL:
+		return
+	var g: int = await menu([{"label": K("CHICO"), "desc": K("Carga un 15 % más en la mochila.")}, {"label": K("CHICA"), "desc": K("Las patrullas te ven desde menos lejos y regateas mejor.")}],
+		{"cls": "start", "cancel": false, "title": K("¿QUIÉN ERES?"), "desc": true})
+	S.sexo = "f" if g == 1 else "m"
+	var ms := []
+	for m in Datos.MES_N:
+		ms.append(I18n.v(m).capitalize())
+	var m: int = await menu(ms, {"cls": "full", "cancel": false, "title": K("TU CUMPLEAÑOS: EL MES")})
+	var ds := []
+	for d in Datos.dias_mes(2028, m + 1):   # con el 29 de febrero
+		ds.append(str(d + 1))
+	var d: int = await menu(ds, {"cls": "full", "cancel": false, "title": K("TU CUMPLEAÑOS: EL DÍA")})
+	S.cumple = {"d": d + 1, "m": m + 1}
 
 func new_game() -> void:
 	if Datos.PLAY and FTUE_CORTO:
@@ -715,6 +732,7 @@ func new_game() -> void:
 	await talk(K("KIKO"), [K("Conservo genéticas: variedades locales de Afganistán, México o la India, y los cruces que salen de ellas."),
 		K("Las apunto todas en un registro, una GENOTECA. Tu tía Maite me ayudaba a mantenerla."), K("Perdona. ¿Cómo te llamabas?")])
 	S.name = await choose_name()
+	await elegir_personaje()
 	await talk(K("KIKO"), [K("{N}. Hacía años que no te veía por el barrio."), K("Maite murió hace tres semanas. Te ha dejado su piso, su armario de cultivo... y una deuda."),
 		K("Coge el autobús en la plaza del pueblo: te deja enfrente del piso. La llave está en el buzón."), K("Lee la carta que te dejó. Después pásate por el growshop.")])
 	await fade(1)
@@ -739,6 +757,7 @@ func new_game_corto() -> void:
 	await fade(0)
 	await talk(K("KIKO"), [K("Soy Kiko, el del growshop de la calle de tu tía Maite, en Ribera Verde. ¿Cómo te llamabas?")])
 	S.name = await choose_name()
+	await elegir_personaje()
 	for k in ["letter", "kiko1", "julen1"]:
 		S.flags[k] = true
 	add_seeds("ria", 3)

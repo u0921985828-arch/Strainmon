@@ -163,6 +163,58 @@ func new_day() -> void:
 	elif S.due > 0 and (S.deadline - S.day == 3 or S.deadline == S.day):   # 1.11: a 3 días y el último
 		queue("plazo", recuerdo_plazo)
 	queue("calor", heat_warn)   # 1.22: el olor de la noche también avisa
+	if es_cumple(S.day) and int(S.get("cumpleY", 0)) != int(Datos.fecha(S.day).y):   # i18n-no
+		queue("cumple", cumple_event)
+
+# ---------- MAESTRO [1]: el cumpleaños (S.cumple {d, m}, con Datos.CAL) ----------
+# El día del cumpleaños (el 29 de febrero, el 28 si el año no es bisiesto), al amanecer, tres regalos y eliges uno
+# (PERSONAJE.cumple): legendario, una semilla que sale fenotipo estrella; épico, dos focos buenos; raro, diez consumibles
+func es_cumple(dia: int) -> bool:
+	var c = S.get("cumple")
+	if not (Datos.CAL and c is Dictionary and c.has("m")):
+		return false
+	var f := Datos.fecha(dia)
+	return int(f.m) == int(c.m) and int(f.d) == mini(int(c.d), Datos.dias_mes(int(f.y), int(c.m)))
+
+func semilla_cumple() -> String:   # una landrace del banco, distinta cada año
+	var B: Array = D.BANCO
+	return String(B[(int(Datos.fecha(S.day).y) * 7 + S.day) % B.size()][0])
+
+func cumple_event() -> void:
+	S.cumpleY = int(Datos.fecha(S.day).y)
+	var C: Dictionary = D.PERSONAJE.cumple
+	var sid := semilla_cumple()
+	var foco: String = C.epica.foco
+	await talk(K("SMS · KIKO"), [K("¡Feliz cumpleaños, {N}! Te he guardado tres regalos en el armario. Elige uno.")])
+	var it := [
+		{"label": T("LEGENDARIO · 1 semilla ★ de {s}", {"s": strain(sid).n}), "desc": K("Sale fenotipo estrella seguro: más cogollo y más THC.")},
+		{"label": T("ÉPICO · {n} focos {f}", {"n": int(C.epica.n), "f": D.FOCOS[foco].n}), "desc": K("Para las carpas: cámbialos desde la carpa.")},
+		{"label": T("RARO · {n} consumibles", {"n": int(C.rara.fert + C.rara.ofertv + C.rara.ophm)}), "desc": T("{a} abonos de crecimiento, {b} de floración y {c} botes de pH−", {"a": int(C.rara.fert), "b": int(C.rara.ofertv), "c": int(C.rara.ophm)})}]
+	var i: int = await menu(it, {"cls": "full", "title": K("CUMPLEAÑOS"), "cancel": false, "desc": true})
+	if i == 0:
+		add_seeds(sid, 1)
+		var e: Dictionary = S.get("estrella", {})
+		e[sid] = int(e.get(sid, 0)) + 1
+		S.estrella = e
+	elif i == 1:
+		S.items["f_" + foco] = int(S.items.get("f_" + foco, 0)) + int(C.epica.n)
+	else:
+		for k in ["fert", "ofertv", "ophm"]:
+			S.items[k] = int(S.items.get(k, 0)) + int(C.rara[k])
+	sfx("coin")
+	toast(K("Regalo de cumpleaños en la mochila"), 1600)
+
+# la semilla del regalo legendario: la primera que se planta de esa variedad sale estrella (sin tocar el azar: se sube después)
+func estrella_regalo(sid: String, f: Dictionary) -> void:
+	var e = S.get("estrella")
+	if not (Datos.CAL and e is Dictionary and int(e.get(sid, 0)) > 0):
+		return
+	e[sid] = int(e[sid]) - 1
+	if e[sid] <= 0:
+		e.erase(sid)
+	var m: float = ceilf(sqrt(D.FENO_ESTRELLA) * 100) / 100.0
+	f.t = maxf(float(f.t), m)
+	f.y = maxf(float(f.y), m)
 
 # ---------- fenotipo ----------
 func tira_feno(sg: float) -> Dictionary:
@@ -266,6 +318,7 @@ func plantar(i: int) -> void:
 	if not S.seeds[sid]:
 		S.seeds.erase(sid)
 	S.pots[i] = {"sid": sid, "prog": 0, "water": 70, "health": 100, "fert": false, "pest": false, "f": roll_feno(sid)}
+	estrella_regalo(sid, S.pots[i].f)
 	sfx("sel")
 	await accion("sembrar" if Datos.CAL else "plantar")   # 1.57.2: la semilla a la tierra
 	await say(T("Has plantado {s}{e}.", {"s": strain(sid).n, "e": nom_planta(S.pots[i].f)}))

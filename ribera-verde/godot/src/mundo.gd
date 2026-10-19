@@ -178,8 +178,8 @@ func bolsa_ya() -> int:
 func peso_encima() -> float:
 	return total_buds() + total_rosin()
 
-func cap_mochila() -> float:
-	return D.MOCHILAS[int(S.items.get("bolsa", 0))].g
+func cap_mochila() -> float:   # MAESTRO [1]: el protagonista, un 15 % más de carga
+	return D.MOCHILAS[int(S.items.get("bolsa", 0))].g * (1.0 + D.PERSONAJE.carga if es_chico() else 1.0)
 
 func libre_mochila() -> float:
 	return maxf(0, cap_mochila() - peso_encima())
@@ -1188,12 +1188,87 @@ func ropa_mapa(g):
 	return [m, id] if not m.is_empty() else null   # id: el color de cada pieza, en orden (1.22)
 
 func ropa_c(f, g):
+	if f != null and es_chica():   # MAESTRO [1]: la protagonista, con melena hasta los hombros (antes de cambiarle el color al pelo)
+		f = f.duplicate()
+		f.c = melena(f.c, D.ROPA.pelo.src.get(g, []))
 	var r = ropa_mapa(g) if f != null else null
 	if r == null:
 		return f
 	var o: Dictionary = f.duplicate()
 	o.c = Atlas.con_rampa(f.c, r[0], "ropa|" + r[1])
 	return o
+
+func es_chica() -> bool:
+	return Datos.CAL and S != null and S.get("sexo") == "f"
+
+func es_chico() -> bool:   # solo si lo eligió (las partidas de antes no tienen sexo: sin pasiva)
+	return Datos.CAL and S != null and S.get("sexo") == "m"
+
+# MAESTRO [1]: las casillas que ve una patrulla; la protagonista, un 15 % menos
+func vista_pat(caza := false) -> int:
+	var v: float = float(D.PAT.vista[0 if caza else (1 if is_night() else 0)]) * (2 if caza else 1)
+	return int(floor(v * (1.0 - D.PERSONAJE.poli))) if es_chica() else int(v)
+
+# MAESTRO [1]: la melena, por código sobre cualquier fotograma del protagonista (andar, acciones, combate): bajo el pelo de
+# cada columna (sus colores, los de ROPA.pelo.src del grupo), MELENA filas más de pelo hasta los hombros; donde hay cara, un
+# píxel hacia fuera (las patillas de frente pasan a mechones por fuera de la cara) y el contorno alrededor de lo nuevo
+const MELENA := 5
+static var _melena := {}
+static func melena(c: Image, pelo: Array) -> Image:
+	var k := c.get_instance_id()
+	if _melena.has(k):
+		return _melena[k]
+	var cols := []
+	for h in pelo:
+		if h != null:
+			cols.append(Color.html(h))
+	var im: Image = c.duplicate()
+	var W := c.get_width()
+	var H := c.get_height()
+	var piel := Color.html("#e8b894")
+	var linea := Color.html("#180e1e")
+	var x0 := W
+	var x1 := -1
+	for y in H:
+		for x in W:
+			if c.get_pixel(x, y).a > 0.5:
+				x0 = mini(x0, x)
+				x1 = maxi(x1, x)
+	var mid := (x0 + x1) / 2.0
+	var nuevo := {}
+	for x in W:
+		var yb := -1
+		for y in H:
+			var p := c.get_pixel(x, y)
+			if p.a > 0.5 and _es_color(p, cols):
+				yb = y
+		if yb < 0:
+			continue
+		var tono := c.get_pixel(x, yb)
+		for y in range(yb + 1, mini(H, yb + 1 + MELENA)):
+			var xx := x
+			if c.get_pixel(xx, y).a > 0.5 and _parecido(c.get_pixel(xx, y), piel):
+				xx += -1 if x < mid else 1
+				if xx < 0 or xx >= W or (c.get_pixel(xx, y).a > 0.5 and _parecido(c.get_pixel(xx, y), piel)):
+					continue
+			im.set_pixel(xx, y, tono)
+			nuevo[Vector2i(xx, y)] = true
+	for v in nuevo:
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1)]:
+			var q: Vector2i = v + d
+			if q.x >= 0 and q.x < W and q.y < H and im.get_pixel(q.x, q.y).a < 0.5:
+				im.set_pixel(q.x, q.y, linea)
+	_melena[k] = im
+	return im
+
+static func _parecido(a: Color, b: Color) -> bool:
+	return absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b) < 0.02
+
+static func _es_color(p: Color, cols: Array) -> bool:   # exacto: el pelo va a 1 de azul de la sombra del cuello (player_pelo.py)
+	for c in cols:
+		if p.to_rgba32() | 0xff == c.to_rgba32() | 0xff:
+			return true
+	return false
 
 # personalizar la casa (1.16, 12c-salon): el tapizado o la lámina de un mueble (S.deco[k], índice en DECO[k].v) y su sprite
 func deco_v(k: String) -> int:
