@@ -2,5 +2,31 @@
   "enabledMcpjsonServers": [
     "pixellab",
     "pixellab-mcp"
-  ]
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 15,
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/skills/modo-absoluto/scripts/ma.py hook-start 2>/dev/null || python \"$CLAUDE_PROJECT_DIR\"/.claude/skills/modo-absoluto/scripts/ma.py hook-start"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 15,
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/skills/modo-absoluto/scripts/ma.py hook-precompact 2>/dev/null || python \"$CLAUDE_PROJECT_DIR\"/.claude/skills/modo-absoluto/scripts/ma.py hook-precompact"
+          }
+        ]
+      }
+    ]
+  }
 }
