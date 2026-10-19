@@ -10,8 +10,8 @@
         "hooks": [
           {
             "type": "command",
-            "timeout": 15,
-            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/skills/modo-absoluto/scripts/ma.py hook-start 2>/dev/null || python \"$CLAUDE_PROJECT_DIR\"/.claude/skills/modo-absoluto/scripts/ma.py hook-start"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-start 2>/dev/null || python \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-start",
+            "timeout": 15
           }
         ]
       }
@@ -22,8 +22,19 @@
         "hooks": [
           {
             "type": "command",
-            "timeout": 15,
-            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/skills/modo-absoluto/scripts/ma.py hook-precompact 2>/dev/null || python \"$CLAUDE_PROJECT_DIR\"/.claude/skills/modo-absoluto/scripts/ma.py hook-precompact"
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-precompact 2>/dev/null || python \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-precompact",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-prompt 2>/dev/null || python \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-prompt",
+            "timeout": 15
           }
         ]
       }

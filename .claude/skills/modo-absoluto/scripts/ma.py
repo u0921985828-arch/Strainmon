@@ -8,7 +8,8 @@
   ma.py esperando "texto"                      (trabajando · esperando texto · faltan N subtareas), sin %
   ma.py next                                   tras compactar: %, siguiente subtarea, pendientes
   ma.py tabla                                  subtarea · peso · % del total · hecho n/m · aporta
-  ma.py hook-start | hook-precompact           para los hooks del plugin
+  ma.py on | off                               activa o desactiva el recordatorio por turno
+  ma.py hook-start | hook-prompt | hook-precompact   para los hooks
 """
 import json, math, os, shutil, sys, time
 
@@ -222,9 +223,55 @@ def cmd_hook_start(args):
         with contextlib.redirect_stdout(buf):
             cmd_next([])
         partes.append(buf.getvalue().strip())
+    if os.path.exists(ON):
+        partes.insert(0, recordatorio())
     if partes:
         partes.append(f"El contador de modo absoluto está en {os.path.abspath(__file__)}.")
         print("\n\n".join(partes))
+
+
+ON = os.path.join(D, "ON")
+RECORDATORIO = """Modo absoluto activo en este proyecto (protocolo completo: skill modo-absoluto, .claude/skills/modo-absoluto/SKILL.md). Si ese skill no está cargado en esta sesión, se carga antes de responder.
+Reglas de este turno:
+- Entre llamadas a herramientas no se escribe texto. Ni anuncios, ni «voy a», ni resultados parciales, ni resúmenes.
+- La única línea permitida mientras se trabaja es la que imprime ma.py (set, imprevisto, esperando). Ningún porcentaje se escribe a mano ni se repite.
+- Tareas largas: plan con ma.py init al empezar; ma.py set al comprobar cada subtarea; tras compactar, ma.py next.
+- Pregunta de Eddie: respuesta en 1-3 líneas y se sigue. Dato que falta: formato ❓.
+- Cierre: solo el bloque ✅ COMPLETADO (o 📦 ENTREGA PARCIAL), sin texto antes ni después. Todo en español.
+Contador: {ma}"""
+
+
+def recordatorio():
+    return RECORDATORIO.format(ma=os.path.abspath(__file__))
+
+
+def cmd_hook_prompt(args):
+    import re
+    try:
+        prompt = json.load(sys.stdin).get("prompt", "")
+    except Exception:
+        prompt = ""
+    p = prompt.lower()
+    if re.search(r"modo\s+normal", p):
+        if os.path.exists(ON):
+            os.remove(ON)
+        print("Modo absoluto desactivado: vuelve el modo normal.")
+        return
+    if re.search(r"modo[\s-]+absoluto|/modo-absoluto|sin narrar|solo el completado", p):
+        os.makedirs(D, exist_ok=True)
+        open(ON, "w").close()
+    if os.path.exists(ON):
+        print(recordatorio())
+
+
+def cmd_on(args):
+    os.makedirs(D, exist_ok=True)
+    open(ON, "w").close()
+
+
+def cmd_off(args):
+    if os.path.exists(ON):
+        os.remove(ON)
 
 
 def cmd_hook_precompact(args):
@@ -242,7 +289,8 @@ def cmd_hook_precompact(args):
 
 CMDS = {"init": cmd_init, "set": cmd_set, "emit": cmd_emit, "imprevisto": cmd_imprevisto,
         "esperando": cmd_esperando, "tabla": cmd_tabla, "next": cmd_next,
-        "hook-start": cmd_hook_start, "hook-precompact": cmd_hook_precompact}
+        "hook-start": cmd_hook_start, "hook-precompact": cmd_hook_precompact,
+        "hook-prompt": cmd_hook_prompt, "on": cmd_on, "off": cmd_off}
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or sys.argv[1] not in CMDS:

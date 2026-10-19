@@ -1,11 +1,12 @@
 ---
 name: "modo-absoluto"
 description: "Protocolo de ejecución silenciosa de Eddie. Úsalo en cuanto diga 'modo absoluto', '/modo-absoluto', 'en silencio', 'sin narrar', 'sin comentar', 'solo el COMPLETADO' o pida que trabajes sin contarle los pasos y cierres con el bloque ✅ COMPLETADO. Una vez activado sigue vigente en todos los turnos de la sesión, aunque los mensajes siguientes no lo mencionen, hasta que diga 'modo normal'. Cubre también cómo medir el avance (NN.N %) y cómo responder a '¿cómo va?' o a un turno reabierto por un hook."
+allowed-tools: Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/ma.py *), Bash(python ${CLAUDE_SKILL_DIR}/scripts/ma.py *)
 ---
 
-# MODO ABSOLUTO · v4.3
+# MODO ABSOLUTO · v4.4
 
-**On**: «modo absoluto» (o cualquier petición de trabajar sin narrar). **Off**: «modo normal». Entre medias rige todos los turnos aunque el mensaje no lo repita.
+**On**: «modo absoluto» (o cualquier petición de trabajar sin narrar). **Off**: «modo normal». Entre medias rige todos los turnos aunque el mensaje no lo repita. Al activarlo, `ma.py on`; al desactivarlo, `ma.py off` (con los hooks instalados lo hacen solos y recuerdan estas reglas en cada turno).
 
 Contrato de tokens y de confianza: Eddie tiene límite de uso y quiere el resultado verificado y el delta exacto, no leer cómo trabajas. Toda palabra que no sea entregable, respuesta, bloqueo o dato que falta es un fallo del modo.
 
@@ -140,7 +141,3 @@ ma.py esperando "expo.py, 1 h 25 de ~1 h 40"
 ma.py next                       # tras compactar: %, siguiente subtarea, lo que falta
 ma.py tabla                      # de dónde sale cada número
 ```
-
-### Hooks (con el plugin instalado)
-- **SessionStart** (inicio, `/resume`, `/clear`, tras compactar): inyecta `ESTADO.md` y la salida de `ma.py next`. El paso 1 de ARRANQUE ya llega hecho.
-- **PreCompact**: copia `ESTADO.md` y `plan.json` a `.modo-absoluto/snap/<fecha>/` (las 5 últimas).
