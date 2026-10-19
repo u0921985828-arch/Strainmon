@@ -54,20 +54,21 @@ func comprar_semillas(it: Dictionary) -> bool:
 	var o := []
 	for nf in l:
 		var nn := int(nf[0])
-		o.append("%s · %s" % ["1 semilla" if nn == 1 else ("Bolsa de %d" % nn if nn >= 50 else "Sobre de %d" % nn), Datos.eur(precio_sobre(it, nf))])
-	o.append("Nada")
-	var j: int = await ask("Semillas feminizadas de %s. ¿Cuántas?" % D.STRAINS[it.sid].n, o, "KIKO")
+		var pe := Datos.eur(precio_sobre(it, nf))
+		o.append(T("1 semilla · {p}", {"p": pe}) if nn == 1 else (T("Bolsa de {n} · {p}", {"n": nn, "p": pe}) if nn >= 50 else T("Sobre de {n} · {p}", {"n": nn, "p": pe})))
+	o.append(K("Nada"))
+	var j: int = await ask(T("Semillas feminizadas de {s}. ¿Cuántas?", {"s": D.STRAINS[it.sid].n}), o, K("KIKO"))
 	if j < 0 or j >= l.size():
 		return false
 	var e := precio_sobre(it, l[j])
 	if S.money < e:
 		sfx("bad")
-		await say("No te llega el dinero.", "KIKO")
+		await say(K("No te llega el dinero."), K("KIKO"))
 		return false
 	S.money -= e
 	sfx("coin")
 	add_seeds(it.sid, int(l[j][0]))
-	toast("Comprado: %d × %s" % [int(l[j][0]), D.STRAINS[it.sid].n], 1200)
+	toast(T("Comprado: {n} × {s}", {"n": int(l[j][0]), "s": D.STRAINS[it.sid].n}), 1200)
 	return true
 
 # carpa comprada (en un sitio libre) o ampliada (mismo sitio): cada plaza conserva su planta y su maceta por (carpa, plaza)
@@ -105,7 +106,7 @@ func precio_t(T: Dictionary, it: Dictionary) -> int:
 # (lo pidió el usuario): el estanco de cada pueblo, papel, filtros, tabaco y mecheros (D.ESTANCO)
 func talk_estanco(k: String) -> void:
 	var E: Dictionary = D.ESTANCO.k[k]
-	await say(pick(["Buenas. ¿Qué te pongo?", "Hola, majo. Dime.", "Buenas. Tabaco, papel, mecheros… lo que quieras."]), E.N)
+	await say(pick([K("Buenas. ¿Qué te pongo?"), K("Hola, majo. Dime."), K("Buenas. Tabaco, papel, mecheros… lo que quieras.")]), E.N)
 	var T: Dictionary = D.TIENDAS.est.duplicate()
 	T.t = E.t
 	T.N = E.N
@@ -142,8 +143,8 @@ func shop(T: Dictionary = {}) -> void:
 				ic = icono(Atlas.ico_carpa(it.carpa))
 			items.append({"label": it.lbl, "right": Datos.eur(precio_t(T, it)) + ("/u" if it.get("sid") else ""), "sw": D.STRAINS[it.sid].c if it.get("sid") else null, "ic": ic,
 				"desc": strain_line(it.sid) if it.get("sid") else it.get("desc", "")})
-		items.append({"label": "Salir", "desc": "Volver al mostrador."})
-		i = await menu(items, {"cls": "full", "title": T.t, "title2": "Tienes " + Datos.eur(S.money), "desc": true, "initial": i})
+		items.append({"label": K("Salir"), "desc": K("Volver al mostrador.")})
+		i = await menu(items, {"cls": "full", "title": T.t, "title2": I18n.T("Tienes {e}", {"e": Datos.eur(S.money)}), "desc": true, "initial": i})
 		if i < 0 or i >= list.size():
 			break
 		var it: Dictionary = list[i]
@@ -155,7 +156,7 @@ func shop(T: Dictionary = {}) -> void:
 		var p := precio_t(T, it)
 		if S.money < p:
 			sfx("bad")
-			await say("No te llega el dinero.", T.N)
+			await say(K("No te llega el dinero."), T.N)
 			continue
 		S.money -= p
 		sfx("coin")
@@ -163,7 +164,7 @@ func shop(T: Dictionary = {}) -> void:
 			confia("kiko", 1)
 		await entregar(it, T.N)
 		await check_story()
-	await say("Ten cuidado ahí fuera.", T.N)
+	await say(K("Ten cuidado ahí fuera."), T.N)
 
 # lo comprado (en una tienda o en la chatarrería): a la mochila, a la sala o puesto en una carpa, si quieres
 func entregar(it: Dictionary, N: String) -> void:
@@ -176,12 +177,12 @@ func entregar(it: Dictionary, N: String) -> void:
 	if it.get("aparato"):
 		S.sala[it.aparato] = true
 	if not it.get("foco") and not it.get("carpa") and not it.get("extra") and not it.get("mueble"):
-		toast("Comprado: " + it.lbl, 1200)
+		toast(T("Comprado: {x}", {"x": it.lbl}), 1200)
 	if it.get("mueble"):
 		if not (S.get("muebles") is Dictionary):
 			S.muebles = {}
 		S.muebles[it.mueble] = S.day + 1
-		await say("Mañana te lo subo al piso y te lo monto junto a las carpas.", N)
+		await say(K("Mañana te lo subo al piso y te lo monto junto a las carpas."), N)
 	if it.get("carpa"):
 		comprar_carpa(it.carpa, int(it.ci))
 		await say(D.DICHO_CARPA[it.carpa], N)
@@ -193,21 +194,21 @@ func entregar(it: Dictionary, N: String) -> void:
 				ok.append(ci)
 		var pl: bool = D.EXTRAS[it.extra].get("pl", false)
 		if ok.is_empty():
-			await say("Ya tienes unas en cada carpa. Te las guardo en la mochila." if pl else "Ya tienes uno en cada carpa. Te lo guardo en la mochila.", N)
+			await say(K("Ya tienes unas en cada carpa. Te las guardo en la mochila.") if pl else K("Ya tienes uno en cada carpa. Te lo guardo en la mochila."), N)
 		else:
 			var o := []
 			for ci in ok:
 				o.append(D.CARPAS[S.carpas[ci].t].n)
-			o.append("Luego")
-			var c: int = await ask("¿Te las pongo ya?" if pl else "¿Te lo pongo ya?", o, N)
+			o.append(K("Luego"))
+			var c: int = await ask(K("¿Te las pongo ya?") if pl else K("¿Te lo pongo ya?"), o, N)
 			if c >= 0 and c < ok.size():
 				var vu: bool = it.extra == "goteo" and S.carpas[ok[c]].get("garrafas", false)
 				var vk := poner_extra(ok[c], it.extra)
-				toast(("Puestas: " if pl else "Puesto: ") + it.lbl, 1200)
+				toast(T("Puestas: {x}", {"x": it.lbl}) if pl else T("Puesto: {x}", {"x": it.lbl}), 1200)
 				if vu:
-					await say("Las garrafas de esa carpa vuelven a la mochila.", N)
+					await say(K("Las garrafas de esa carpa vuelven a la mochila."), N)
 				if vk != "":
-					await say("El %s que tenías vuelve a tu mochila." % D.EXTRAS[vk].c.to_lower(), N)
+					await say(T("El {x} que tenías vuelve a tu mochila.", {"x": I18n.v(D.EXTRAS[vk].c).to_lower()}), N)
 	if it.get("foco"):
 		S.items["f_" + it.foco] += 1
 		var ok := []
@@ -216,16 +217,16 @@ func entregar(it: Dictionary, N: String) -> void:
 			if cc and D.FOCOS[it.foco].w <= D.CARPAS[cc.t].wmax:
 				ok.append(ci)
 		if ok.is_empty():
-			await say("Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande.", N)
+			await say(K("Ese foco calienta demasiado para tus carpas. Guárdalo hasta que tengas una más grande."), N)
 		else:
 			var o := []
 			for ci in ok:
-				o.append("%s (%s)" % [D.CARPAS[S.carpas[ci].t].n, D.FOCOS[S.carpas[ci].foco].n])
-			o.append("Luego")
-			var c: int = await ask("¿Lo cuelgo ya? El que quites va a tu mochila.", o, N)
+				o.append(T("{c} ({f})", {"c": D.CARPAS[S.carpas[ci].t].n, "f": D.FOCOS[S.carpas[ci].foco].n}))
+			o.append(K("Luego"))
+			var c: int = await ask(K("¿Lo cuelgo ya? El que quites va a tu mochila."), o, N)
 			if c >= 0 and c < ok.size():
 				instalar_foco(ok[c], it.foco)
-				toast("Instalado: " + it.lbl, 1200)
+				toast(T("Instalado: {x}", {"x": it.lbl}), 1200)
 
 func kiko_tip() -> String:
 	var t: Array = D.KIKO_TIPS
@@ -236,29 +237,29 @@ func kiko_tip() -> String:
 
 # ---------- personajes ----------
 func talk_kiko():
-	var N := "KIKO"
+	var N := K("KIKO")
 	if not S.flags.get("kiko1"):
-		await talk(N, ["{N}, pasa. Te pareces a tu tía.", "Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia.", "Para empezar, toma esto."])
+		await talk(N, [K("{N}, pasa. Te pareces a tu tía."), K("Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia."), K("Para empezar, toma esto.")])
 		add_seeds("ria", 3)
-		await got("3 semillas de SKUNK #1")
+		await got(K("3 semillas de SKUNK #1"))
 		S.items.fert += 2
-		await got("2 dosis de MEATZA FLORACIÓN")
-		await talk(N, ["La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.", "Planta en las macetas del armario de tu tía y riega cuando baje el agua.",
-			"El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.", "Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.",
-			"Las plantas siguen creciendo mientras duermes.", "Te iré mandando al móvil lo que te hace falta para salir adelante. Lo tienes en START, en OBJETIVO.",
-			"Mi hijo Julen te espera en el piso. Sabe más que yo de esto: te ayudará hasta tu primera cosecha."])
+		await got(K("2 dosis de MEATZA FLORACIÓN"))
+		await talk(N, [K("La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender."), K("Planta en las macetas del armario de tu tía y riega cuando baje el agua."),
+			K("El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí."), K("Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala."),
+			K("Las plantas siguen creciendo mientras duermes."), K("Te iré mandando al móvil lo que te hace falta para salir adelante. Lo tienes en START, en OBJETIVO."),
+			K("Mi hijo Julen te espera en el piso. Sabe más que yo de esto: te ayudará hasta tu primera cosecha.")])
 		S.flags.kiko1 = true
 		show_objective()
 		return
 	if S.ch == 4 and not S.flags.get("lab"):
-		await talk(N, ["Ya me han contado que has pagado a Baltasar. Bien hecho.", "Te he montado en el piso mi equipo de polinización: pinceles, bolsas de papel y una lupa."])
+		await talk(N, [K("Ya me han contado que has pagado a Baltasar. Bien hecho."), K("Te he montado en el piso mi equipo de polinización: pinceles, bolsas de papel y una lupa.")])
 		S.flags.lab = true
-		await got("la MESA DE GENÉTICA")
+		await got(K("la MESA DE GENÉTICA"))
 		add_seeds("rif", 3)
-		await got("3 semillas de AFGHANI")
-		await talk(N, ["Me las trajo un amigo de Mazar-i-Sharif en los ochenta. Las he ido renovando desde entonces.", "En la mesa polinizas una variedad con otra: gastas una semilla de cada y obtienes 2 del cruce.",
-			"Algunos cruces dan variedades conocidas. Otros, híbridos que solo tendrás tú.", "Apúntalo todo en la GENOTECA. Las mejores genéticas salen de cruzar cruces.",
-			"Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas."])
+		await got(K("3 semillas de AFGHANI"))
+		await talk(N, [K("Me las trajo un amigo de Mazar-i-Sharif en los ochenta. Las he ido renovando desde entonces."), K("En la mesa polinizas una variedad con otra: gastas una semilla de cada y obtienes 2 del cruce."),
+			K("Algunos cruces dan variedades conocidas. Otros, híbridos que solo tendrás tú."), K("Apúntalo todo en la GENOTECA. Las mejores genéticas salen de cruzar cruces."),
+			K("Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.")])
 		show_objective()
 		await check_story()
 		return
@@ -267,91 +268,91 @@ func talk_kiko():
 		if p:
 			alguna = true
 	if S.seeds.is_empty() and not alguna and not total_buds() and not total_rosin() and not caja_g() and not cam_g() and not nevera_r() and S.money + caja_e() < 15:   # lo de la caja y la nevera también cuenta (1.10; 1.36: sin arcón)
-		await say("¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.", N)
+		await say(K("¿Sin semillas y sin dinero? Toma. Ya me lo pagarás."), N)
 		add_seeds("ria", 2)
-		await got("2 semillas de SKUNK #1")
-	var c: int = await ask("¿Qué necesitas?", ["Comprar", "Un consejo", "Nada"], N)
+		await got(K("2 semillas de SKUNK #1"))
+	var c: int = await ask(K("¿Qué necesitas?"), [K("Comprar"), K("Un consejo"), K("Nada")], N)
 	if c == 0:
 		await shop()
 	elif c == 1:
 		await say(kiko_tip(), N)
 	else:
-		await say("Ten cuidado ahí fuera.", N)
+		await say(K("Ten cuidado ahí fuera."), N)
 
 func talk_josune():
-	var N := "JOSUNE"
-	var c: int = await ask("¡Kaixo! ¿Qué te pongo?", ["Pintxo · 4 €", "Kalimotxo · 3 €", "¿Algún rumor?", "Nada"], N)
+	var N := K("JOSUNE")
+	var c: int = await ask(K("¡Kaixo! ¿Qué te pongo?"), [K("Pintxo · 4 €"), K("Kalimotxo · 3 €"), K("¿Algún rumor?"), K("Nada")], N)
 	if c == 0 or c == 1:
 		var cost := 3 if c else 4
 		var hp := 6 if c else 12
 		if S.money < cost:
-			await say("Aquí no se fía.", N)
+			await say(K("Aquí no se fía."), N)
 			return
 		S.money -= cost
 		S.hp = mini(S.hpMax, S.hp + hp)
 		sfx("coin")
-		await say("Un kalimotxo. Recuperas algo de vida." if c else "Pintxo de tortilla, recién hecha. Recuperas vida.", N)
+		await say(K("Un kalimotxo. Recuperas algo de vida.") if c else K("Pintxo de tortilla, recién hecha. Recuperas vida."), N)
 		return
 	if c == 2:
-		await say(pick(["Dicen que alguien escondía cosas en los arbustos del parque.", "Iñaki, el del muelle, trae semillas de sus viajes.", "Txaro está con la quimio. Lo está pasando muy mal.",
-			"Darko es sobrino de Baltasar. Por eso nadie le dice nada.", "El sargento Molina cobra por mirar hacia otro lado. Lo sabe todo el barrio."]), N)
+		await say(pick([K("Dicen que alguien escondía cosas en los arbustos del parque."), K("Iñaki, el del muelle, trae semillas de sus viajes."), K("Txaro está con la quimio. Lo está pasando muy mal."),
+			K("Darko es sobrino de Baltasar. Por eso nadie le dice nada."), K("El sargento Molina cobra por mirar hacia otro lado. Lo sabe todo el barrio.")]), N)
 
 func talk_patxi():
 	S.patxi = S.get("patxi", 0) + 1
 	var R: Array = D.RECIPE_HINTS
-	await say("Cuando tengas una mesa de genética, ven a verme. Algo sé de cruces." if S.ch < 4 else "Cuarenta años cultivando en el monte. Te digo una cosa: " + R[S.patxi % R.size()], "PATXI")
+	await say(K("Cuando tengas una mesa de genética, ven a verme. Algo sé de cruces.") if S.ch < 4 else T("Cuarenta años cultivando en el monte. Te digo una cosa: {x}", {"x": R[S.patxi % R.size()]}), K("PATXI"))
 
 func talk_txaro():
-	var N := "ABUELA TXARO"
+	var N := K("ABUELA TXARO")
 	if S.flags.get("txaro") and (S.flags.get("txaro2") or S.ch < 4):
-		await say(pick(["Ya duermo de un tirón. Gracias, de verdad.", "Tu tía me ayudaba igual. No se lo contábamos a nadie."]), N)
+		await say(pick([K("Ya duermo de un tirón. Gracias, de verdad."), K("Tu tía me ayudaba igual. No se lo contábamos a nadie.")]), N)
 		return
 	# segunda misión (1.10), en su casa desde el capítulo 4: 10 g de una índica (70 % o más)
 	if S.flags.get("txaro"):
-		await talk(N, ["El aceite me ha devuelto el sueño. Gracias, de verdad.", "Pero el dolor no se va. El médico dice que, para eso, mejor una índica: relaja más.",
-			"¿Me traerías 10 gramos de una índica? De las de hoja ancha."])
+		await talk(N, [K("El aceite me ha devuelto el sueño. Gracias, de verdad."), K("Pero el dolor no se va. El médico dice que, para eso, mejor una índica: relaja más."),
+			K("¿Me traerías 10 gramos de una índica? De las de hoja ancha.")])
 		var li := bud_lots(10).filter(func(l): return Datos.ind_de(S, lot_sid(l[0])) >= 70)
 		if li.is_empty():
-			await say("Cuando tengas 10 gramos de una índica, ven a verme. Aquí estaré.", N)
+			await say(K("Cuando tengas 10 gramos de una índica, ven a verme. Aquí estaré."), N)
 			return
 		var it2 := li.map(lot_item)
-		it2.append({"label": "Ahora no"})
-		var i2: int = await menu(it2, {"cls": "right", "title": "¿Qué le das?"})
+		it2.append({"label": K("Ahora no")})
+		var i2: int = await menu(it2, {"cls": "right", "title": K("¿Qué le das?")})
 		if i2 < 0 or i2 >= li.size():
-			await say("No pasa nada. Aquí estaré.", N)
+			await say(K("No pasa nada. Aquí estaré."), N)
 			return
 		use_buds(li[i2][0], 10)
 		S.rep += 5
 		confia("txaro", 10)
-		await say("Toma, las últimas de mi Paco. Las trajo de Chitral, en las montañas de Pakistán.", N)
+		await say(K("Toma, las últimas de mi Paco. Las trajo de Chitral, en las montañas de Pakistán."), N)
 		add_seeds("chitral", 3)
-		await got("3 semillas de CHITRAL KUSH")
+		await got(K("3 semillas de CHITRAL KUSH"))
 		S.items.bocata += 3
-		await got("3 × BOCATA")
+		await got(K("3 × BOCATA"))
 		S.flags.txaro2 = true
 		return
-	await talk(N, ["Tú vives en el piso de Maite. Tu tía me ayudaba con... ya sabes.", "Desde la quimio apenas duermo y no tengo hambre. Las pastillas no me hacen nada.",
-		"Me vendrían bien 5 gramos, para hacer aceite como me enseñó ella. ¿Me los das?"])
+	await talk(N, [K("Tú vives en el piso de Maite. Tu tía me ayudaba con... ya sabes."), K("Desde la quimio apenas duermo y no tengo hambre. Las pastillas no me hacen nada."),
+		K("Me vendrían bien 5 gramos, para hacer aceite como me enseñó ella. ¿Me los das?")])
 	var lots := bud_lots(5)
 	if lots.is_empty():
-		await say("Cuando tengas 5 gramos, acuérdate de mí.", N)
+		await say(K("Cuando tengas 5 gramos, acuérdate de mí."), N)
 		return
 	var it := lots.map(lot_item)
-	it.append({"label": "Ahora no"})
-	var i: int = await menu(it, {"cls": "right", "title": "¿Qué le das?"})
+	it.append({"label": K("Ahora no")})
+	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué le das?")})
 	if i < 0 or i >= lots.size():
-		await say("No pasa nada. Aquí estaré.", N)
+		await say(K("No pasa nada. Aquí estaré."), N)
 		return
 	use_buds(lots[i][0], 5)
 	confia("txaro", 10)
-	await say("Gracias. Toma: las trajo mi Paco de Pakistán en el setenta y seis. Nunca supe qué hacer con ellas.", N)
+	await say(K("Gracias. Toma: las trajo mi Paco de Pakistán en el setenta y seis. Nunca supe qué hacer con ellas."), N)
 	add_seeds("hindu", 2)
-	await got("2 semillas de HINDU KUSH")
+	await got(K("2 semillas de HINDU KUSH"))
 	S.items.bocata += 3
-	await say("Y llévate estos bocadillos, que comes poco.", N)
-	await got("3 × BOCATA")
+	await say(K("Y llévate estos bocadillos, que comes poco."), N)
+	await got(K("3 × BOCATA"))
 	S.flags.txaro = true
-	await say("Me voy a casa a preparar el aceite. Vivo en la casa gris, al lado del bar. Pásate cuando quieras.", N)
+	await say(K("Me voy a casa a preparar el aceite. Vivo en la casa gris, al lado del bar. Pásate cuando quieras."), N)
 	if S.map == "town":
 		await fade(1)
 		build_ents()
@@ -359,10 +360,10 @@ func talk_txaro():
 
 # Iñaki: 10 g para el viaje, una vez al día; desde el capítulo 3 también compra al por mayor
 func talk_inaki():
-	var N := "IÑAKI"
+	var N := K("IÑAKI")
 	if S.ch >= 3:
-		var ops := ["10 g para el viaje", "Venta al por mayor"] + (["Comprarle al por mayor"] if Datos.CAL else []) + ["Nada"]   # 1.45: también vende
-		var c: int = await ask("Aupa. ¿Qué traes?", ops, N)
+		var ops := [K("10 g para el viaje"), K("Venta al por mayor")] + ([K("Comprarle al por mayor")] if Datos.CAL else []) + [K("Nada")]   # 1.45: también vende
+		var c: int = await ask(K("Aupa. ¿Qué traes?"), ops, N)
 		if c == 1:
 			await venta_mayor(N)
 			return
@@ -372,22 +373,22 @@ func talk_inaki():
 		if c != 0:
 			return
 	if S.iDay == S.day:
-		await say("Ya me has vendido hoy. Mañana más, que el barco sale temprano.", N)
+		await say(K("Ya me has vendido hoy. Mañana más, que el barco sale temprano."), N)
 		return
-	await say("Aupa. Me voy tres semanas a la mar. ¿Tienes 10 g para el viaje? Pago bien.", N)
+	await say(K("Aupa. Me voy tres semanas a la mar. ¿Tienes 10 g para el viaje? Pago bien."), N)
 	var lots := bud_lots(10)
 	if lots.is_empty():
-		await say("Pues nada. Si consigues 10 g, aquí estaré.", N)
+		await say(K("Pues nada. Si consigues 10 g, aquí estaré."), N)
 		return
 	var it := lots.map(lot_item)
-	it.append({"label": "Nada"})
-	var i: int = await menu(it, {"cls": "right", "title": "¿Qué le vendes?"})
+	it.append({"label": K("Nada")})
+	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué le vendes?")})
 	if i < 0 or i >= lots.size():
 		return
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
 	var amt := Datos.jsround(precio_calle(b.thc) * calidad(b) * 1.2 * 10)
-	if await ask("Te doy %d € por 10 g de %s. ¿Hecho?" % [amt, lot_nombre(sid)], ["Hecho", "No"], N) != 0:
+	if await ask(T("Te doy {e} € por 10 g de {s}. ¿Hecho?", {"e": amt, "s": lot_nombre(sid)}),[K("Hecho"), K("No")], N) != 0:
 		return
 	use_buds(sid, 10)
 	S.money += amt
@@ -399,11 +400,11 @@ func talk_inaki():
 	sfx("coin")
 	if not S.flags.get("inaki"):
 		S.flags.inaki = true
-		await say("Toma. Me las dio un marinero de Malaui en Mombasa, en el último viaje.", N)
+		await say(K("Toma. Me las dio un marinero de Malaui en Mombasa, en el último viaje."), N)
 		add_seeds("malawi", 2)
-		await got("2 semillas de MALAWI GOLD")
+		await got(K("2 semillas de MALAWI GOLD"))
 	else:
-		await say("Eskerrik asko. Hasta la vuelta.", N)
+		await say(K("Eskerrik asko. Hasta la vuelta."), N)
 	await check_story()
 
 func mayor_dia() -> int:
@@ -418,18 +419,18 @@ static func _dos(x: float) -> String:
 func venta_mayor(N: String) -> void:
 	var resto: float = resto_mer("inaki", mayor_dia()) if Datos.CAL else float(mayor_dia())   # 1.45: varias cargas al día, hasta el tope
 	if (S.mDay == S.day and not Datos.CAL) or resto < 1:
-		await say("Hoy ya he cargado. Mañana sale otro barco.", N)
+		await say(K("Hoy ya he cargado. Mañana sale otro barco."), N)
 		return
 	var VX: Dictionary = D.VENTA_EXTR
 	var lots := lotes_venta(100, VX.min)
 	if lots.is_empty():
-		await say("Al por mayor, de 100 g para arriba. Pago entre %s y %s € el gramo, según lo bueno que sea. Hasta %s por carga." % [_dos(precio_mayor(12)), _dos(precio_mayor(30)), _kg(mayor_dia())] + (" Extracciones, de %d g para arriba." % int(VX.min) if Datos.CAL else ""), N)
+		await say(T("Al por mayor, de 100 g para arriba. Pago entre {a} y {b} € el gramo, según lo bueno que sea. Hasta {c} por carga.", {"a": _dos(precio_mayor(12)), "b": _dos(precio_mayor(30)), "c": _kg(mayor_dia())}) + (T(" Extracciones, de {n} g para arriba.", {"n": int(VX.min)}) if Datos.CAL else ""), N)
 		return
 	var it := lots.map(venta_item)
-	it.append({"label": "Nada"})
-	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
+	it.append({"label": K("Nada")})
+	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué lote?")})
 	if i < 0 or i >= lots.size():
-		await say("Otro día.", N)
+		await say(K("Otro día."), N)
 		return
 	var l: Array = lots[i]
 	var x := es_extr(l)
@@ -448,8 +449,8 @@ func venta_mayor(N: String) -> void:
 	var o := []
 	for g in ops:
 		o.append("%s · %s" % [_kg(g), Datos.eur(g * pg)])
-	o.append("Nada")
-	var j: int = await ask("%s a %s € el gramo. ¿Cuánto cargas?" % [venta_nombre(l), _dos(pg)], o, N)
+	o.append(K("Nada"))
+	var j: int = await ask(T("{s} a {p} € el gramo. ¿Cuánto cargas?", {"s": venta_nombre(l), "p": _dos(pg)}), o, N)
 	if j < 0 or j >= ops.size():
 		return
 	var g: int = ops[j]
@@ -465,8 +466,8 @@ func venta_mayor(N: String) -> void:
 	confia("inaki", 1)
 	sfx("coin")
 	await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
-	toast("+%s · %s %sal por mayor" % [Datos.eur(e), _kg(g), (extr_nombre(k, true).get_slice(" de ", 0) + " ") if x else ""], 1600)
-	await say("Cargado. Esta noche sale en el barco.", N)
+	toast(T("+{e} · {g} {x} al por mayor", {"e": Datos.eur(e), "g": _kg(g), "x": extr_nombre(k, true).get_slice(" de ", 0)}) if x else T("+{e} · {g} al por mayor", {"e": Datos.eur(e), "g": _kg(g)}), 1600)
+	await say(K("Cargado. Esta noche sale en el barco."), N)
 	heat_warn()
 	await check_story()
 
@@ -475,8 +476,8 @@ func venta_mayor(N: String) -> void:
 # 3 días. Valdehierro: la chatarrería del solar (BIXENTE), 3 piezas de segunda mano al día a mitad de precio. Errotabarri: el
 # molino (ANDONI), 20 g de cogollo por 3 semillas de una landrace del banco que aún no tengas, una vez por semana
 func talk_ane():
-	var N := "ANE"
-	await say("¿Qué te hace falta hoy?" if S.flags.get("ane") else "Kaixo. Esto es GROW IBARBIDE: el equipo, un 10 % más barato que en el barrio, y lo nuevo antes que nadie.", N)
+	var N := K("ANE")
+	await say(K("¿Qué te hace falta hoy?") if S.flags.get("ane") else K("Kaixo. Esto es GROW IBARBIDE: el equipo, un 10 % más barato que en el barrio, y lo nuevo antes que nadie."), N)
 	S.flags.ane = true
 	await shop(D.TIENDAS.ane)
 
@@ -491,9 +492,9 @@ func chatarra_dia() -> Array:
 	return r
 
 func talk_bixente():
-	var N := "BIXENTE"
+	var N := K("BIXENTE")
 	if S.ch < int(D.CHATARRA.ch):
-		await say("Compro chatarra y vendo lo que se puede aprovechar. Vuelve cuando cultives en serio.", N)
+		await say(K("Compro chatarra y vendo lo que se puede aprovechar. Vuelve cuando cultives en serio."), N)
 		return
 	var i := 0
 	while true:
@@ -509,21 +510,21 @@ func talk_bixente():
 						l.append(it)
 					break
 		if l.is_empty():
-			await say("Hoy no me queda nada que te sirva. Mañana entra más.", N)
+			await say(K("Hoy no me queda nada que te sirva. Mañana entra más."), N)
 			return
 		var items := []
 		for it in l:
-			items.append({"label": it.lbl, "right": Datos.eur(Datos.jsround(it.p * D.CHATARRA.f)), "desc": it.get("desc", "") + "\nDe segunda mano: funciona, pero sin garantía."})
-		items.append({"label": "Nada", "desc": "Cada día entran tres piezas."})
-		i = await menu(items, {"cls": "full", "title": "CHATARRERÍA DEL SOLAR", "title2": "Tienes " + Datos.eur(S.money), "desc": true, "initial": i})
+			items.append({"label": it.lbl, "right": Datos.eur(Datos.jsround(it.p * D.CHATARRA.f)), "desc": T("{d}\nDe segunda mano: funciona, pero sin garantía.", {"d": it.get("desc", "")})})
+		items.append({"label": K("Nada"), "desc": K("Cada día entran tres piezas.")})
+		i = await menu(items, {"cls": "full", "title": K("CHATARRERÍA DEL SOLAR"), "title2": I18n.T("Tienes {e}", {"e": Datos.eur(S.money)}), "desc": true, "initial": i})
 		if i < 0 or i >= l.size():
-			await say("Lo que entra, sale. Si lo quieres, no tardes.", N)
+			await say(K("Lo que entra, sale. Si lo quieres, no tardes."), N)
 			return
 		var it: Dictionary = l[i]
 		var p := Datos.jsround(it.p * D.CHATARRA.f)
 		if S.money < p:
 			sfx("bad")
-			await say("Sin dinero no hay trato.", N)
+			await say(K("Sin dinero no hay trato."), N)
 			continue
 		S.money -= p
 		sfx("coin")
@@ -534,13 +535,13 @@ func talk_bixente():
 		await check_story()
 
 func talk_nerea():
-	var N := "NEREA"
+	var N := K("NEREA")
 	var L: Dictionary = D.LONJA
 	if S.ch < int(L.ch):
-		await say("De madrugada se subasta el pescado. Lo otro, cuando te conozca más gente.", N)
+		await say(K("De madrugada se subasta el pescado. Lo otro, cuando te conozca más gente."), N)
 		return
 	if Datos.CAL:   # 1.45: la lonja también vende, y carga varios lotes hasta su tope por barco
-		var c: int = await ask("¿Vienes a cargar o a llevarte algo?", ["Venderle", "Comprarle", "Nada"], N)
+		var c: int = await ask(K("¿Vienes a cargar o a llevarte algo?"), [K("Venderle"), K("Comprarle"), K("Nada")], N)
 		if c == 1:
 			await comprar_mercado("lonja", N, pool_mayor())
 			return
@@ -548,20 +549,20 @@ func talk_nerea():
 			return
 	var resto: float = float(L.g) - (float(S.mer_v.lonja.g) if Datos.CAL and S.get("mer_v") is Dictionary and S.mer_v.has("lonja") and S.get("lonja") and int(S.mer_v.lonja.d) == int(S.lonja) else 0.0)
 	if S.get("lonja") and S.day < int(S.lonja) + int(L.dias) and (not Datos.CAL or resto < 1 or S.day != int(S.lonja)):
-		await say("Los barcos de fuera vuelven el %s. Tráelo entonces." % Datos.fd(int(S.lonja) + int(L.dias), S.day), N)
+		await say(T("Los barcos de fuera vuelven el {f}. Tráelo entonces.", {"f": Datos.fd(int(S.lonja) + int(L.dias), S.day)}), N)
 		return
 	if not (S.get("lonja") and S.day < int(S.lonja) + int(L.dias)):
 		resto = float(L.g)
 	var VX: Dictionary = D.VENTA_EXTR
 	var lots := lotes_venta(100, VX.min)
 	if lots.is_empty():
-		await say("Cargo para los barcos de fuera: de 100 a %d g, un %d %% por encima de lo que paga Iñaki. Cada %d días." % [int(L.g), Datos.jsround((L.f - 1) * 100), int(L.dias)] + (" Extracciones, de %d g para arriba." % int(VX.min) if Datos.CAL else ""), N)
+		await say(T("Cargo para los barcos de fuera: de 100 a {g} g, un {p} % por encima de lo que paga Iñaki. Cada {d} días.", {"g": int(L.g), "p": Datos.jsround((L.f - 1) * 100), "d": int(L.dias)}) + (T(" Extracciones, de {n} g para arriba.", {"n": int(VX.min)}) if Datos.CAL else ""), N)
 		return
 	var it := lots.map(venta_item)
-	it.append({"label": "Nada"})
-	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
+	it.append({"label": K("Nada")})
+	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué lote?")})
 	if i < 0 or i >= lots.size():
-		await say("Otro día.", N)
+		await say(K("Otro día."), N)
 		return
 	var l: Array = lots[i]
 	var x := es_extr(l)
@@ -580,8 +581,8 @@ func talk_nerea():
 	var o := []
 	for g in ops:
 		o.append("%s · %s" % [_kg(g), Datos.eur(g * pg)])
-	o.append("Nada")
-	var j: int = await ask("%s a %s € el gramo. ¿Cuánto cargas?" % [venta_nombre(l), _dos(pg)], o, N)
+	o.append(K("Nada"))
+	var j: int = await ask(T("{s} a {p} € el gramo. ¿Cuánto cargas?", {"s": venta_nombre(l), "p": _dos(pg)}), o, N)
 	if j < 0 or j >= ops.size():
 		return
 	var g: int = ops[j]
@@ -599,8 +600,8 @@ func talk_nerea():
 	S.rep += 1
 	sfx("coin")
 	await accion("vender", {"id": "vfx-monedas", "x": P.px + 8, "y": P.py + 2})
-	toast("+%s · %s en la lonja" % [Datos.eur(e), _kg(g)], 1600)
-	await say("Hecho. Sale con el pesquero de las cinco.", N)
+	toast(T("+{e} · {g} en la lonja", {"e": Datos.eur(e), "g": _kg(g)}), 1600)
+	await say(K("Hecho. Sale con el pesquero de las cinco."), N)
 	heat_warn()
 	await check_story()
 
@@ -627,41 +628,41 @@ func landrace_trueque() -> String:
 # Darko (1.17): en el capítulo 8, el ajuste de cuentas en sus esquinas de los astilleros. Pelea como un rival con DARKO.vida más
 # y la carga (enemy_hits). Si le ganas, se va (S.flags.darkoFin = el día): ni él ni sus chicos vuelven por los astilleros
 func ajuste_darko() -> void:
-	var N := "DARKO"
-	await talk(N, ["Mírate. Cargas en el barco de Iñaki y mi tío te llama socio.", "A mí me trata como a un recadero. Y todo empezó contigo.", "Esto lo arreglamos tú y yo. Aquí y ahora."])
-	if await ask("¿Peleas con Darko?", ["Pelear", "Ahora no"], N) != 0:
-		await say("Ya sabes dónde estoy. Mis chicos también.", N)
+	var N := K("DARKO")
+	await talk(N, [K("Mírate. Cargas en el barco de Iñaki y mi tío te llama socio."), K("A mí me trata como a un recadero. Y todo empezó contigo."), K("Esto lo arreglamos tú y yo. Aquí y ahora.")])
+	if await ask(K("¿Peleas con Darko?"), [K("Pelear"), K("Ahora no")], N) != 0:
+		await say(K("Ya sabes dónde estoy. Mis chicos también."), N)
 		return
 	var r = await battle("darko")
 	if r == "ko":
 		return
 	if r != "win":
-		await say("Corre, corre. Aquí te espero.", N)
+		await say(K("Corre, corre. Aquí te espero."), N)
 		return
 	S.flags.darkoFin = S.day
 	S.rep += int(D.DARKO.rep)
 	sfx("get")
-	await talk(N, ["Vale. Vale. Ya está.", "Las esquinas son tuyas. Yo me largo de aquí una temporada."])
+	await talk(N, [K("Vale. Vale. Ya está."), K("Las esquinas son tuyas. Yo me largo de aquí una temporada.")])
 	await fade(1)
 	build_ents()
 	await fade(0)
-	await talk("SMS · DON BALTASAR", ["Me han contado lo de mi sobrino.", "Se va a trabajar a un pesquero de fuera. Le vendrá bien.", "Tú y yo seguimos como siempre."])
+	await talk(K("SMS · DON BALTASAR"), [K("Me han contado lo de mi sobrino."), K("Se va a trabajar a un pesquero de fuera. Le vendrá bien."), K("Tú y yo seguimos como siempre.")])
 
 # Miren (1.17): la amiga de la tía Maite, en Errotabarri desde el capítulo MIREN.ch. Le llevas MIREN.g g de la variedad que
 # cultivaban juntas (MIREN.sid) y te da la página que falta del diario (S.flags.pagina, PAGINA) y MIREN.n semillas
 func talk_miren():
-	var N := "MIREN"
+	var N := K("MIREN")
 	var M: Dictionary = D.MIREN
 	var v: String = String(D.STRAINS[M.sid].n).to_upper()
 	if S.flags.get("pagina") and not S.flags.get("lao"):
 		await lao_miren(N)
 		return
 	if S.flags.get("pagina"):
-		await say(pick(["Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir.", "Del caserío no me echó nadie gracias a ella. Eso no se olvida.", "Cuando la Haze te salga sola, acuérdate de nosotras."]), N)
+		await say(pick([K("Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir."), K("Del caserío no me echó nadie gracias a ella. Eso no se olvida."), K("Cuando la Haze te salga sola, acuérdate de nosotras.")]), N)
 		return
 	if not S.flags.get("miren"):
 		S.flags.miren = S.day
-		await talk(N, ["¿Tú eres el de Maite? Tienes sus ojos.", "Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años.", "Su diario tiene una página arrancada. Me la dio la última vez que subió.", "Tráeme %d g de %s, la que hacíamos las dos, y es tuya." % [int(M.g), v]])
+		await talk(N, [K("¿Tú eres el de Maite? Tienes sus ojos."), K("Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años."), K("Su diario tiene una página arrancada. Me la dio la última vez que subió."), T("Tráeme {g} g de {s}, la que hacíamos las dos, y es tuya.", {"g": int(M.g), "s": v})])
 		return
 	var ks: Array = S.buds.keys().filter(func(k): return lot_sid(k) == M.sid)
 	ks.sort_custom(func(a, b): return not a.ends_with("*") and b.ends_with("*"))   # primero lo que no es estrella
@@ -669,10 +670,10 @@ func talk_miren():
 	for k in ks:
 		tot += float(S.buds[k].g)
 	if tot < float(M.g):
-		await say("¿Me traes los %d g de %s? Sin prisa: aquí estoy." % [int(M.g), v], N)
+		await say(T("¿Me traes los {g} g de {s}? Sin prisa: aquí estoy.", {"g": int(M.g), "s": v}), N)
 		return
-	if await ask("¿Le das %d g de %s?" % [int(M.g), v], ["Dárselos", "Todavía no"], N) != 0:
-		await say("Cuando quieras.", N)
+	if await ask(T("¿Le das {g} g de {s}?", {"g": int(M.g), "s": v}),[K("Dárselos"), K("Todavía no")], N) != 0:
+		await say(K("Cuando quieras."), N)
 		return
 	var q := float(M.g)
 	for k in ks:
@@ -683,66 +684,66 @@ func talk_miren():
 			break
 	S.flags.pagina = S.day
 	add_seeds(M.s, int(M.n))
-	await talk(N, ["Huele igual que entonces.", "Toma. La página que falta, y unas semillas de su Haze."])
-	await got("la última página del diario y %d semillas de %s" % [int(M.n), String(D.STRAINS[M.s].n).to_upper()])
+	await talk(N, [K("Huele igual que entonces."), K("Toma. La página que falta, y unas semillas de su Haze.")])
+	await got(T("la última página del diario y {n} semillas de {s}", {"n": int(M.n), "s": String(D.STRAINS[M.s].n).to_upper()}))
 	await lao_miren(N)
-	await say("Léela en casa, con calma.", N)
+	await say(K("Léela en casa, con calma."), N)
 
 # Y MIREN.n2 de la de Laos (MIREN.s2, que no está en el banco; S.flags.lao: las partidas de antes, al volver a hablarle)
 func lao_miren(N: String) -> void:
 	var M: Dictionary = D.MIREN
 	S.flags.lao = S.day
 	add_seeds(M.s2, int(M.n2))
-	await say("Y esto también era de las dos. La de Laos: la guardábamos para la Amnesia.", N)
-	await got("%d semillas de %s" % [int(M.n2), String(D.STRAINS[M.s2].n).to_upper()])
+	await say(K("Y esto también era de las dos. La de Laos: la guardábamos para la Amnesia."), N)
+	await got(T("{n} semillas de {s}", {"n": int(M.n2), "s": String(D.STRAINS[M.s2].n).to_upper()}))
 
 func talk_andoni():
-	var N := "ANDONI"
+	var N := K("ANDONI")
 	var T: Dictionary = D.TRUEQUE
 	if S.ch < int(T.ch):
-		await say("El molino muele los domingos. Si te interesan las semillas viejas, vuelve más adelante.", N)
+		await say(K("El molino muele los domingos. Si te interesan las semillas viejas, vuelve más adelante."), N)
 		return
 	if S.get("trueque") and S.day < int(S.trueque) + int(T.dias):
-		await say("Hasta el %s no tengo más semillas para cambiar." % Datos.fd(int(S.trueque) + int(T.dias), S.day), N)
+		await say(I18n.T("Hasta el {f} no tengo más semillas para cambiar.", {"f": Datos.fd(int(S.trueque) + int(T.dias), S.day)}), N)
 		return
 	var k := landrace_trueque()
-	await say("Mi abuelo guardaba semillas en botes de cristal, junto a la harina. Tengo de %s." % D.STRAINS[k].n, N)
+	await say(I18n.T("Mi abuelo guardaba semillas en botes de cristal, junto a la harina. Tengo de {s}.", {"s": D.STRAINS[k].n}), N)
 	var lots := bud_lots(int(T.g))
 	if lots.is_empty():
-		await say("Te doy %d por %d g de lo tuyo. Cuando los tengas, aquí estoy." % [int(T.n), int(T.g)], N)
+		await say(I18n.T("Te doy {n} por {g} g de lo tuyo. Cuando los tengas, aquí estoy.", {"n": int(T.n), "g": int(T.g)}), N)
 		return
 	var it := lots.map(lot_item)
-	it.append({"label": "Nada"})
-	var i: int = await menu(it, {"cls": "right", "title": "%d semillas por %d g" % [int(T.n), int(T.g)]})
+	it.append({"label": K("Nada")})
+	var i: int = await menu(it, {"cls": "right", "title": I18n.T("{n} semillas por {g} g", {"n": int(T.n), "g": int(T.g)})})
 	if i < 0 or i >= lots.size():
-		await say("Tú verás. El bote no se mueve de aquí.", N)
+		await say(K("Tú verás. El bote no se mueve de aquí."), N)
 		return
 	use_buds(lots[i][0], int(T.g))
 	add_seeds(k, int(T.n))
 	S.trueque = S.day
-	await got("%d semillas de %s" % [int(T.n), String(D.STRAINS[k].n).to_upper()])
-	await say("Cuídalas. Ya no quedan muchas así.", N)
+	await got(I18n.T("{n} semillas de {s}", {"n": int(T.n), "s": String(D.STRAINS[k].n).to_upper()}))
+	await say(K("Cuídalas. Ya no quedan muchas así."), N)
 
 func talk_cop():
 	if carga_sosp() > 0 and not S.protect:
-		await say("¿Y ese olor? Quieto ahí.", "AGENTE")
+		await say(K("¿Y ese olor? Quieto ahí."), K("AGENTE"))
 		await battle("police")
 		return
-	await say(pick(["Circule.", "Todo tranquilo por aquí. Que siga así.", "De noche hay robos en el parque. Tenga cuidado."]), "AGENTE")
+	await say(pick([K("Circule."), K("Todo tranquilo por aquí. Que siga así."), K("De noche hay robos en el parque. Tenga cuidado.")]), K("AGENTE"))
 
 func talk_darko():
-	var N := "DARKO"
+	var N := K("DARKO")
 	if S.ch == 6:
-		await talk(N, ["¿Vienes a la Copa? Mi AMNESIA HAZE dio un 26,8 % de THC en el laboratorio.", "Nadie en Ribera ha pasado del 26. No vas a ser tú el primero."])
+		await talk(N, [K("¿Vienes a la Copa? Mi AMNESIA HAZE dio un 26,8 % de THC en el laboratorio."), K("Nadie en Ribera ha pasado del 26. No vas a ser tú el primero.")])
 		return
 	if S.ch >= int(D.DARKO.ch):   # el ajuste de cuentas (1.17)
 		await ajuste_darko()
 		return
 	if S.ch >= 7:   # en los astilleros (1.10)
-		await talk(N, ["¿Has dormido bien últimamente?" if S.flags.get("robo") else "Mi tío dice que ya no le debes nada. A mí, sí.", "Estas esquinas son mías. Si vendes aquí, mis chicos te lo van a recordar."])
+		await talk(N, [K("¿Has dormido bien últimamente?") if S.flags.get("robo") else K("Mi tío dice que ya no le debes nada. A mí, sí."), K("Estas esquinas son mías. Si vendes aquí, mis chicos te lo van a recordar.")])
 		return
 	S.flags.darko1 = true
-	await talk(N, ["Así que tú te has quedado el piso de Maite.", "Soy DARKO. La hierba de este barrio la muevo yo.", "Vende lo tuyo si quieres, pero lejos de mis esquinas.", "No me hagas repetirlo."])
+	await talk(N, [K("Así que tú te has quedado el piso de Maite."), K("Soy DARKO. La hierba de este barrio la muevo yo."), K("Vende lo tuyo si quieres, pero lejos de mis esquinas."), K("No me hagas repetirlo.")])
 	await fade(1)
 	build_ents()
 	await fade(0)
@@ -750,45 +751,45 @@ func talk_darko():
 # la cuota de Molina (1.10): SOBORNO cada CUOTA_DIAS días (S.protHasta, el último día cubierto; new_day la da por acabada).
 # La primera vez, en la plaza; después, en la comisaría del barrio alto
 func talk_molina():
-	var N := "SARGENTO MOLINA"
+	var N := K("SARGENTO MOLINA")
 	var sob := int(D.SOBORNO)
 	var cd := int(D.CUOTA_DIAS)
 	var plaza: bool = S.map == "town"
 	if not S.flags.get("molina1"):
 		S.flags.molina1 = true
-		await talk(N, ["Así que eres tú quien vende en la plaza.", "Podría detenerte ahora mismo. O podemos entendernos.", "Por %s cada %d días, mis patrullas no pasan por tu calle. Y nada de registros en tu piso." % [Datos.eur(sob), cd]])
+		await talk(N, [K("Así que eres tú quien vende en la plaza."), K("Podría detenerte ahora mismo. O podemos entendernos."), T("Por {e} cada {d} días, mis patrullas no pasan por tu calle. Y nada de registros en tu piso.", {"e": Datos.eur(sob), "d": cd})])
 	elif S.protect:
-		await say("Estás cubierto hasta el %s. %s" % [Datos.fd(S.protHasta, S.day), ("Te quedan %s días." % n(S.protHasta - S.day)) if S.protHasta > S.day else "Se acaba HOY."], N)
-	var c: int = await ask("¿Pagar ya los diez días siguientes?" if S.protect else "¿Aceptas el trato del sargento?", ["Pagar " + Datos.eur(sob), "No"], N)
+		await say(T("Estás cubierto hasta el {f}. {r}", {"f": Datos.fd(S.protHasta, S.day), "r": T("Te quedan {n} días.", {"n": n(S.protHasta - S.day)}) if S.protHasta > S.day else K("Se acaba HOY.")}), N)
+	var c: int = await ask(K("¿Pagar ya los diez días siguientes?") if S.protect else K("¿Aceptas el trato del sargento?"), [T("Pagar {e}", {"e": Datos.eur(sob)}), K("No")], N)
 	if c == 0:
 		if S.money < sob:
-			await say("¿Con qué dinero? Vuelve cuando lo tengas.", N)
+			await say(K("¿Con qué dinero? Vuelve cuando lo tengas."), N)
 		else:
 			S.money -= sob
 			S.protHasta = int(max(S.day, S.protHasta if S.protect else 0)) + cd
 			S.protect = true
 			sfx("coin")
-			await say("Bien. Mis agentes mirarán hacia otro lado hasta el %s." % Datos.fd(S.protHasta, S.day), N)
+			await say(T("Bien. Mis agentes mirarán hacia otro lado hasta el {f}.", {"f": Datos.fd(S.protHasta, S.day)}), N)
 	elif not S.protect:
 		S.heat = min(100, S.heat + 10)
-		await say("Tú sabrás. Mis agentes van a estar muy atentos.", N)
+		await say(K("Tú sabrás. Mis agentes van a estar muy atentos."), N)
 		heat_warn()
 	if plaza:
-		await say("Si me necesitas, estoy en la comisaría del barrio alto.", N)
+		await say(K("Si me necesitas, estoy en la comisaría del barrio alto."), N)
 		await fade(1)
 		build_ents()
 		await fade(0)
 
 func talk_jurado():
-	var N := "JURADO"
-	await talk(N, ["Esto es la COPA DE RIBERA, la de la asociación cannábica del barrio.", "Para competir, trae 20 g de una sola variedad. Se analizan en laboratorio.", "Marca a batir: DARKO, con AMNESIA HAZE, 26,8 % de THC."])
+	var N := K("JURADO")
+	await talk(N, [K("Esto es la COPA DE RIBERA, la de la asociación cannábica del barrio."), K("Para competir, trae 20 g de una sola variedad. Se analizan en laboratorio."), K("Marca a batir: DARKO, con AMNESIA HAZE, 26,8 % de THC.")])
 	var lots := bud_lots(20)
 	if lots.is_empty():
-		await say("Vuelve cuando tengas 20 g de algo.", N)
+		await say(K("Vuelve cuando tengas 20 g de algo."), N)
 		return
 	var it := lots.map(lot_item)
-	it.append({"label": "Todavía no"})
-	var i: int = await menu(it, {"cls": "right", "title": "¿Qué presentas?"})
+	it.append({"label": K("Todavía no")})
+	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué presentas?")})
 	if i < 0 or i >= lots.size():
 		return
 	var sid: String = lots[i][0]
@@ -799,15 +800,15 @@ func talk_jurado():
 	await fade(1)
 	await wait(500)
 	await fade(0)
-	await say("Resultado del laboratorio. AMNESIA HAZE de Darko: 26,8 % de THC.", N)
-	await say("%s de {N}: %s %% de THC." % [name_, Datos.pct(thc)], N)
+	await say(K("Resultado del laboratorio. AMNESIA HAZE de Darko: 26,8 % de THC."), N)
+	await say(T("{s} de {N}: {p} % de THC.", {"s": name_, "p": Datos.pct(thc)}), N)
 	if thc > float(D.COPA_THC):
 		sfx("get")
-		await say("Nueva marca. {N} gana la COPA DE RIBERA.", N)
+		await say(K("Nueva marca. {N} gana la COPA DE RIBERA."), N)
 		S.money += int(D.PREMIO_COPA)
 		S.rep += 20
-		await got(Datos.eur(D.PREMIO_COPA) + " y el trofeo de la Copa")
-		await talk("DARKO", ["Esto no se acaba aquí.", "Mi tío se va a enterar."])
+		await got(T("{e} y el trofeo de la Copa", {"e": Datos.eur(D.PREMIO_COPA)}))
+		await talk(K("DARKO"), [K("Esto no se acaba aquí."), K("Mi tío se va a enterar.")])
 		S.flags.copa = true
 		S.due = S.debt
 		S.deadline = S.day + dias_plazo(7)
@@ -818,19 +819,19 @@ func talk_jurado():
 		show_objective()
 	else:
 		sfx("bad")
-		await say("Gana DARKO. La Copa sigue abierta: vuelve con algo más potente.", N)
+		await say(K("Gana DARKO. La Copa sigue abierta: vuelve con algo más potente."), N)
 
 func talk_baltasar():
-	var N := "DON BALTASAR"
+	var N := K("DON BALTASAR")
 	if S.ch < 3:
-		await say("¿Y tú quién eres? No tengo nada que hablar contigo.", N)
+		await say(K("¿Y tú quién eres? No tengo nada que hablar contigo."), N)
 		return
 	# el plazo corre desde que Toño te avisa (1.10): si tardas más de 2 días en venir, «Llegas tarde»
 	if S.ch == 3 and not S.flags.get("metB"):
 		var tarde: bool = S.flags.has("tono") and S.day - S.flags.tono > 2
-		await talk(N, ["Llegas tarde, {N}. Toño te dijo «hoy»." if tarde else "Siéntate, {N}. Vamos al grano.", "Tu tía Maite me debía %s. Las deudas no se mueren con la gente." % Datos.eur(D.DEUDA).replace(" €", " euros"),
-			"Me los vas a pagar a plazos. El primero, %s%s." % [Datos.eur(S.due), ", con los intereses de tu retraso" if S.due > D.PLAZOS["3"] else ""],
-			"Tienes hasta el %s. Si no, Toño te hará una visita. Y Toño cobra intereses." % Datos.fd(S.deadline, S.day)])
+		await talk(N, [K("Llegas tarde, {N}. Toño te dijo «hoy».") if tarde else K("Siéntate, {N}. Vamos al grano."), T("Tu tía Maite me debía {e}. Las deudas no se mueren con la gente.", {"e": Datos.eur(D.DEUDA).replace(" €", " euros")}),
+			T("Me los vas a pagar a plazos. El primero, {e}, con los intereses de tu retraso.", {"e": Datos.eur(S.due)}) if S.due > D.PLAZOS["3"] else T("Me los vas a pagar a plazos. El primero, {e}.", {"e": Datos.eur(S.due)}),
+			T("Tienes hasta el {f}. Si no, Toño te hará una visita. Y Toño cobra intereses.", {"f": Datos.fd(S.deadline, S.day)})])
 		S.flags.metB = true
 		show_objective()
 		return
@@ -838,17 +839,17 @@ func talk_baltasar():
 		await encargo_baltasar(N)
 		return
 	if S.ch == 4:
-		await say("Tranquilo. Ya te avisaré cuando toque el siguiente pago.", N)
+		await say(K("Tranquilo. Ya te avisaré cuando toque el siguiente pago."), N)
 		return
 	if S.ch == 6:
-		await say("Primero, la Copa. Darko te espera en la plaza.", N)
+		await say(K("Primero, la Copa. Darko te espera en la plaza."), N)
 		return
 	var left: int = S.deadline - S.day
-	await say("Me debes %s para el %s. %s" % [Datos.eur(S.due), Datos.fd(S.deadline, S.day), ("Te quedan %d días." % left) if left > 0 else "Es HOY."], N)
+	await say(T("Me debes {e} para el {f}. {r}", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day), "r": T("Te quedan {n} días.", {"n": left}) if left > 0 else K("Es HOY.")}), N)
 	if S.money < S.due:
-		await say("Vuelve cuando tengas el dinero.", N)
+		await say(K("Vuelve cuando tengas el dinero."), N)
 		return
-	if await ask("¿Pagar ahora?", ["Pagar", "Todavía no"], N) != 0:
+	if await ask(K("¿Pagar ahora?"), [K("Pagar"), K("Todavía no")], N) != 0:
 		return
 	await gesto("pagar")   # 1.54
 	S.money -= S.due
@@ -856,19 +857,19 @@ func talk_baltasar():
 	var paid = S.due
 	S.due = 0
 	sfx("coin")
-	toast("Pagado: " + Datos.eur(paid), 1500)
+	toast(T("Pagado: {e}", {"e": Datos.eur(paid)}), 1500)
 	if S.ch == 3:
-		await talk(N, ["Puntual. Así me gusta.", "Quedan %s. Ya te avisaré del siguiente plazo." % Datos.eur(S.debt).replace(" €", "")])
+		await talk(N, [K("Puntual. Así me gusta."), T("Quedan {e}. Ya te avisaré del siguiente plazo.", {"e": Datos.eur(S.debt).replace(" €", "")})])
 		if Datos.PLAY and await demo_corta():   # U11 (fase 6): la demo acaba aquí sin el juego completo
 			return
 		await cap4_sigue()
 	elif S.ch == 5:
-		await talk(N, ["Me sorprendes, {N}.", "Quedan %s. Te propongo algo." % Datos.eur(S.debt).replace(" €", ""), "La COPA DE RIBERA se juega estos días en la plaza. Premio: %s." % Datos.eur(D.PREMIO_COPA),
-			"Mi sobrino Darko compite. No ha perdido nunca.", "Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes."])
+		await talk(N, [K("Me sorprendes, {N}."), T("Quedan {e}. Te propongo algo.", {"e": Datos.eur(S.debt).replace(" €", "")}), T("La COPA DE RIBERA se juega estos días en la plaza. Premio: {e}.", {"e": Datos.eur(D.PREMIO_COPA)}),
+			K("Mi sobrino Darko compite. No ha perdido nunca."), K("Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes.")])
 		await chapter(6)
 		show_objective()
 	elif S.ch == 7:
-		await talk(N, ["%s. Contados." % Datos.eur(paid), "Deuda saldada. Lo de tu tía queda cerrado.", "Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy."])
+		await talk(N, [T("{e}. Contados.", {"e": Datos.eur(paid)}),K("Deuda saldada. Lo de tu tía queda cerrado."), K("Una cosa más, {N}: si algún día quieres trabajar para mí, ya sabes dónde estoy.")])
 		S.debt = 0
 		S.imp0 = S.sales
 		S.impN = 0
@@ -882,12 +883,12 @@ func lineas_nuevas() -> void:
 		if int(D.PARADAS[k].cap) == S.ch:
 			L.append(D.PARADAS[k].n)
 	if L.size():
-		await talk("SMS · AUTOBUSES DE LA COMARCA", ["Nueva línea desde Ribera Verde: %s." % _lista(L), "Salidas de %d:%02d a %d:%02d, en la parada de la calle Ribera." % [int(D.BUS_HORAS[0]) / 60, int(D.BUS_HORAS[0]) % 60, int(D.BUS_HORAS[1]) / 60, int(D.BUS_HORAS[1]) % 60]])
+		await talk(K("SMS · AUTOBUSES DE LA COMARCA"), [T("Nueva línea desde Ribera Verde: {l}.", {"l": _lista(L)}), T("Salidas de {a} a {b}, en la parada de la calle Ribera.", {"a": "%d:%02d" % [int(D.BUS_HORAS[0]) / 60, int(D.BUS_HORAS[0]) % 60], "b": "%d:%02d" % [int(D.BUS_HORAS[1]) / 60, int(D.BUS_HORAS[1]) % 60]})])
 
 # el capítulo 4 tras el primer plazo (fase 6: también desde START · JUEGO COMPLETO, al comprar después)
 func cap4_sigue() -> void:
 	await chapter(4)
-	await talk("SMS · KIKO", ["Pásate por el growshop. Tengo algo para ti."])
+	await talk(K("SMS · KIKO"), [K("Pásate por el growshop. Tengo algo para ti.")])
 	await lineas_nuevas()
 	show_objective()
 
@@ -914,7 +915,7 @@ func chapter(nn: int) -> void:
 	S.ch = nn
 	evento("cap_%d" % nn)
 	sfx("get")
-	toast("<small>CAPÍTULO %d</small>%s" % [nn, D.CH_TITLES[str(nn)]], 2800)
+	toast(T("<small>CAPÍTULO {n}</small>{t}", {"n": nn, "t": D.CH_TITLES[str(nn)]}), 2800)
 	cap_hasta = M.reloj + 2800
 	build_ents()
 	await wait(400)
@@ -924,50 +925,50 @@ func objective_text() -> String:
 	match int(S.ch):
 		1:
 			if llegando():
-				return "Coge el autobús en la plaza de Mendialde hasta Ribera Verde."
+				return K("Coge el autobús en la plaza de Mendialde hasta Ribera Verde.")
 			if not S.flags.get("letter"):
-				return "Lee la carta que hay en la mesa." if S.map == "home" else "Entra en el piso de la tía Maite, enfrente de la parada, y lee la carta que hay en la mesa."
+				return K("Lee la carta que hay en la mesa.") if S.map == "home" else K("Entra en el piso de la tía Maite, enfrente de la parada, y lee la carta que hay en la mesa.")
 			if not S.flags.get("kiko1"):
-				return "Visita el growshop de Kiko, al lado de casa."
+				return K("Visita el growshop de Kiko, al lado de casa.")
 			var sg = itin_sig()   # 1.23: el paso del itinerario
-			return sg.d if sg != null and not S.flags.get("harvest1") else "Planta y consigue tu primera cosecha."
+			return sg.d if sg != null and not S.flags.get("harvest1") else K("Planta y consigue tu primera cosecha.")
 		2:
 			var mv := int(D.META_VENTAS)
-			return "Gana %d € vendiendo (%d/%d)." % [mv, mini(mv, Datos.jsround(S.sales)), mv]
+			return T("Gana {m} € vendiendo ({a}/{b}).", {"m": mv, "a": mini(mv, Datos.jsround(S.sales)), "b": mv})
 		3:
-			return (("Ve al bar El Ancla antes de que acabe el %s: Don Baltasar quiere %s." % [Datos.fd(S.deadline, S.day), Datos.eur(S.due)]) if not S.flags.get("metB") else "Paga %s a Don Baltasar antes de que acabe el %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)]) + llevas()
+			return (T("Ve al bar El Ancla antes de que acabe el {f}: Don Baltasar quiere {e}.", {"f": Datos.fd(S.deadline, S.day), "e": Datos.eur(S.due)}) if not S.flags.get("metB") else T("Paga {e} a Don Baltasar antes de que acabe el {f}.", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day)})) + llevas()
 		4:
-			return "Kiko quiere verte en el growshop." if not S.flags.get("lab") else "Saca en la mesa 2 variedades de receta y cosecha una planta de cada (%d/2)." % rec_count()
+			return K("Kiko quiere verte en el growshop.") if not S.flags.get("lab") else T("Saca en la mesa 2 variedades de receta y cosecha una planta de cada ({n}/2).", {"n": rec_count()})
 		5:
-			return "Paga %s a Don Baltasar antes de que acabe el %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)] + llevas()
+			return T("Paga {e} a Don Baltasar antes de que acabe el {f}.", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day)}) + llevas()
 		6:
-			return "Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza."
+			return K("Gana la Copa: 20 g con más de 26,8% de THC al jurado de la plaza.")
 		7:
-			return "Paga los últimos %s a Don Baltasar antes de que acabe el %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)] + llevas()
+			return T("Paga los últimos {e} a Don Baltasar antes de que acabe el {f}.", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day)}) + llevas()
 	if S.get("encargo"):
-		return "Encargo de Don Baltasar: lleva %s al almacén de los astilleros, de noche, antes de que acabe el %s." % [_kg(int(S.encargo.g)), Datos.fd(S.encargo.hasta, S.day)]
+		return T("Encargo de Don Baltasar: lleva {g} al almacén de los astilleros, de noche, antes de que acabe el {f}.", {"g": _kg(int(S.encargo.g)), "f": Datos.fd(S.encargo.hasta, S.day)})
 	var nv := imperio_nivel()
 	var I: Array = D.IMPERIO
 	var nd := 0
 	for k in D.DEX:
 		if S.disc.get(k):
 			nd += 1
-	var gen := "Genoteca %d/%d" % [nd, D.DEX.size()]
+	var gen := T("Genoteca {a}/{b}", {"a": nd, "b": D.DEX.size()})
 	if nv + 1 < I.size():
 		var sig: Dictionary = I[nv + 1]
-		return "Tu imperio · %s. Facturado desde la deuda: %s de %s para ser %s. %s." % [I[nv].n, Datos.eur(minf(sig.meta, facturado())), Datos.eur(sig.meta), sig.n.to_lower(), gen]
-	return "Tu imperio · %s. Completa la %s." % [I[nv].n, gen]
+		return T("Tu imperio · {n}. Facturado desde la deuda: {a} de {b} para ser {s}. {g}.", {"n": I[nv].n, "a": Datos.eur(minf(sig.meta, facturado())), "b": Datos.eur(sig.meta), "s": I18n.v(sig.n).to_lower(), "g": gen})
+	return T("Tu imperio · {n}. Completa la {g}.", {"n": I[nv].n, "g": gen})
 
 # En los plazos, lo que llevas entre el bolsillo y la caja
 func llevas() -> String:
-	return " Llevas %s." % Datos.eur(S.money + caja_e())
+	return T(" Llevas {e}.", {"e": Datos.eur(S.money + caja_e())})
 
 func show_objective():
 	var d := cap_hasta - M.reloj
 	if d > 0:
 		M.timeout(show_objective, d)
 		return
-	toast("<small>OBJETIVO</small>" + esc(objective_text()), 3200)
+	toast(T("<small>OBJETIVO</small>{t}", {"t": esc(objective_text())}), 3200)
 
 # ---------- misiones guiadas (1.11, 11c-misiones.js): textos y regalos del HTML (D.MISIONES); aquí, lo que mira cada una ----------
 var mision_aviso: Array = []
@@ -1030,11 +1031,11 @@ func premio_txt(m: Dictionary) -> Array:
 	var p = m.get("p")
 	if p:
 		for k in p:
-			r.append("%d %s" % [int(p[k]), D.PREMIO_N[k]])
+			r.append(T("{n} {x}", {"n": int(p[k]), "x": D.PREMIO_N[k]}))
 	var s = m.get("s")
 	if s:
 		for k in s:
-			r.append("%d semillas de %s" % [int(s[k]), strain(k).n.to_upper()])
+			r.append(T("{n} semillas de {s}", {"n": int(s[k]), "s": strain(k).n.to_upper()}))
 	return r
 
 # run() la llama al acabar cada guion: marca las cumplidas, da el regalo y encola el SMS
@@ -1064,12 +1065,12 @@ func aviso_mision():
 			if x.id == id:
 				m = x
 		sfx("get")
-		toast("<small>MISIÓN CUMPLIDA</small>" + m.t, 2400)
-		await talk("SMS · KIKO", m.sms)
+		toast(T("<small>MISIÓN CUMPLIDA</small>{t}", {"t": m.t}), 2400)
+		await talk(K("SMS · KIKO"), m.sms)
 		for t in premio_txt(m):
 			await got(t)
 	var sg = mision_sig()
-	var h := con_logro(("<small>MISIÓN</small>" + sg.t) if sg else "")
+	var h := con_logro(T("<small>MISIÓN</small>{t}", {"t": sg.t}) if sg else "")
 	if h != "":
 		toast(h, 3200)
 
@@ -1154,12 +1155,12 @@ func logro_txt() -> String:
 	for id in logro_aviso:
 		for x in D.LOGROS:
 			if x.id == id:
-				l.append(esc(x.t))
+				l.append(esc(I18n.v(x.t)))
 	logro_aviso.clear()
 	if l.is_empty():
 		return ""
 	sfx("get")
-	return "<small>%s · %d/%d</small>%s" % ["LOGROS" if l.size() > 1 else "LOGRO", logros_n(), D.LOGROS.size(), " · ".join(l)]
+	return T("<small>LOGROS · {a}/{b}</small>{l}", {"a": logros_n(), "b": D.LOGROS.size(), "l": " · ".join(l)}) if l.size() > 1 else T("<small>LOGRO · {a}/{b}</small>{l}", {"a": logros_n(), "b": D.LOGROS.size(), "l": " · ".join(l)})
 
 # el aviso h (del itinerario o de la misión, en la cola mientras corre) con los logros debajo, si el otro no viene después
 func con_logro(h: String) -> String:
@@ -1180,44 +1181,44 @@ func logros_menu():
 	var it := []
 	for l in D.LOGROS:
 		var h: bool = S.logros.has(l.id)
-		it.append({"label": l.t, "right": ((Datos.fd_corto(S.logros[l.id])) if S.logros[l.id] else "HECHO") if h else null, "desc": l.d})
-	it.append({"label": "Volver", "desc": ""})
-	await menu(it, {"cls": "full", "title": "LOGROS", "title2": "%d de %d" % [logros_n(), D.LOGROS.size()], "desc": true})
+		it.append({"label": l.t, "right": ((Datos.fd_corto(S.logros[l.id])) if S.logros[l.id] else K("HECHO")) if h else null, "desc": l.d})
+	it.append({"label": K("Volver"), "desc": ""})
+	await menu(it, {"cls": "full", "title": K("LOGROS"), "title2": T("{a} de {b}", {"a": logros_n(), "b": D.LOGROS.size()}), "desc": true})
 
 # el plazo (1.11): Toño avisa cuando quedan 3 días y el último, con lo que llevas
 func recuerdo_plazo():
 	var nd := int(S.deadline - S.day)   # los días, como los cuenta Baltasar (talk_baltasar)
 	var ll: float = S.money + caja_e()
-	await talk("SMS · TOÑO", [("Don Baltasar quiere %s antes de que acabe el %s. Te quedan %d días." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day), nd]) if nd > 0 else "Hoy es el último día para los %s de Don Baltasar." % Datos.eur(S.due)])
-	await say(("Llevas %s entre el bolsillo y la caja: te faltan %s." % [Datos.eur(ll), Datos.eur(S.due - ll)]) if ll < S.due else "Llevas %s entre el bolsillo y la caja: ya lo tienes.%s Ve al bar El Ancla." % [Datos.eur(ll), " Saca lo que falte de la caja y" if S.money < S.due else ""])
+	await talk(K("SMS · TOÑO"), [T("Don Baltasar quiere {e} antes de que acabe el {f}. Te quedan {n} días.", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day), "n": nd}) if nd > 0 else T("Hoy es el último día para los {e} de Don Baltasar.", {"e": Datos.eur(S.due)})])
+	await say(T("Llevas {e} entre el bolsillo y la caja: te faltan {f}.", {"e": Datos.eur(ll), "f": Datos.eur(S.due - ll)}) if ll < S.due else (T("Llevas {e} entre el bolsillo y la caja: ya lo tienes. Saca lo que falte de la caja y Ve al bar El Ancla.", {"e": Datos.eur(ll)}) if S.money < S.due else T("Llevas {e} entre el bolsillo y la caja: ya lo tienes. Ve al bar El Ancla.", {"e": Datos.eur(ll)})))
 
 # START → OBJETIVO: el del capítulo, las misiones (con lo que hay que hacer abajo) y la deuda
 # (1.23: y el ITINERARIO hasta el primer plazo, hasta el capítulo 4; con A, sus pasos)
 func objetivo_menu():
 	while true:
 		var iti: bool = S.ch <= 4
-		var it := [{"label": "CAPÍTULO %d" % S.ch, "desc": "%s\n%s" % [D.CH_TITLES.get(str(S.ch), ""), objective_text()]}]
+		var it := [{"label": T("CAPÍTULO {n}", {"n": S.ch}), "desc": T("{a}\n{b}", {"a": D.CH_TITLES.get(str(S.ch), ""), "b": objective_text()})}]
 		if iti:
 			it.append(itin_row())
 		var ini := 0
 		var mv := misiones_ver()
 		for i in mv.size():
 			var hecha: bool = S.misiones.has(mv[i].id)
-			it.append({"label": mv[i].t, "right": "HECHA" if hecha else null, "desc": mv[i].d})
+			it.append({"label": mv[i].t, "right": K("HECHA") if hecha else null, "desc": mv[i].d})
 			if not hecha and ini == 0:
 				ini = i + 1 + (1 if iti else 0)
 		if iti and itin_sig() != null:
 			ini = 1
-		var plazo := ("Plazo: %s antes de que acabe el %s. Llevas %s.\n" % [Datos.eur(S.due), Datos.fd(S.deadline, S.day), Datos.eur(S.money + caja_e())]) if S.due > 0 else ""
+		var plazo := T("Plazo: {e} antes de que acabe el {f}. Llevas {l}.\n", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day), "l": Datos.eur(S.money + caja_e())}) if S.due > 0 else ""
 		if Datos.CAL:   # 1.51
 			var rv := recados_ver()
-			it.append({"label": "RECADOS", "right": "%d/%d" % [rv.filter(func(sc): return sec_estado(sc.id) == 2).size(), rv.size()], "desc": "Lo que te piden por la comarca, según el capítulo. Pulsa A para verlos."})
+			it.append({"label": K("RECADOS"), "right": "%d/%d" % [rv.filter(func(sc): return sec_estado(sc.id) == 2).size(), rv.size()], "desc": K("Lo que te piden por la comarca, según el capítulo. Pulsa A para verlos.")})
 		if Datos.PLAY:   # fase 6
-			it.append({"label": "DIARIOS", "right": diarios_txt(), "desc": "Tres objetivos al día; cada uno da un abono. Pulsa A para verlos."})
-		it.append({"label": "LOGROS", "right": "%d/%d" % [logros_n(), D.LOGROS.size()], "desc": "Lo que llevas conseguido en la partida. Pulsa A para verlos."})   # 1.27
-		it.append({"label": "DEUDA", "right": Datos.eur(S.debt), "desc": plazo + "Ventas %s · Reputación %s · Calor %d %%" % [Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)]})
-		it.append({"label": "Volver", "desc": ""})
-		var i: int = await menu(it, {"cls": "full", "title": "OBJETIVO", "title2": "cap. %d" % S.ch, "desc": true, "initial": ini})
+			it.append({"label": K("DIARIOS"), "right": diarios_txt(), "desc": K("Tres objetivos al día; cada uno da un abono. Pulsa A para verlos.")})
+		it.append({"label": K("LOGROS"), "right": "%d/%d" % [logros_n(), D.LOGROS.size()], "desc": K("Lo que llevas conseguido en la partida. Pulsa A para verlos.")})   # 1.27
+		it.append({"label": K("DEUDA"), "right": Datos.eur(S.debt), "desc": plazo + T("Ventas {v} · Reputación {r} · Calor {c} %", {"v": Datos.eur(S.sales), "r": n(S.rep), "c": Datos.jsround(S.heat)})})
+		it.append({"label": K("Volver"), "desc": ""})
+		var i: int = await menu(it, {"cls": "full", "title": K("OBJETIVO"), "title2": T("cap. {n}", {"n": S.ch}),"desc": true, "initial": ini})
 		if iti and i == 1:
 			await itinerario_menu()
 			continue
@@ -1235,8 +1236,8 @@ func objetivo_menu():
 # ---------- los recados (1.51, lo pidió el usuario: «que haya misiones por el mapa, dependiendo del capítulo en el que estés») ----------
 # D.SECUNDARIAS: gente con su «!» por la comarca desde su capítulo; piden gramos (con un THC, una índica o una landrace), extracto,
 # algo de la mochila o llevar un paquete a otra persona (b). S.sec[id]: 1 en marcha (el paquete encima), 2 hecho
-const ZONA_N := {"town": "Ribera Verde", "alto": "el barrio alto", "astilleros": "los astilleros", "puerto": "Puerto Viejo", "valdehierro": "Valdehierro",
-	"mendialde": "Mendialde", "errotabarri": "Errotabarri", "ibarbide": "el Casco Viejo", "ensanche": "el Ensanche", "callejon": "la Kale Zaharra"}
+var ZONA_N := {"town": K("Ribera Verde"), "alto": K("el barrio alto"), "astilleros": K("los astilleros"), "puerto": K("Puerto Viejo"), "valdehierro": K("Valdehierro"),
+	"mendialde": K("Mendialde"), "errotabarri": K("Errotabarri"), "ibarbide": K("el Casco Viejo"), "ensanche": K("el Ensanche"), "callejon": K("la Kale Zaharra")}
 
 func sec_estado(id: String) -> int:
 	return int(S.get("sec", {}).get(id, 0)) if S.get("sec") is Dictionary else 0
@@ -1277,9 +1278,9 @@ func sec_premio(sc: Dictionary) -> void:
 	await got(Datos.eur(R.get("e", 0)))
 	if R.has("seeds"):
 		add_seeds(R.seeds[0], int(R.seeds[1]))
-		await got("%d semillas de %s" % [int(R.seeds[1]), D.STRAINS[R.seeds[0]].n.to_upper()])
+		await got(T("{n} semillas de {s}", {"n": int(R.seeds[1]), "s": D.STRAINS[R.seeds[0]].n.to_upper()}))
 	sec_pon(sc.id, 2)
-	toast("Recado hecho: " + sc.t, 1600)
+	toast(T("Recado hecho: {t}", {"t": sc.t}), 1600)
 
 func talk_sec(eid: String) -> void:
 	var b := eid.begins_with("secb_")
@@ -1292,28 +1293,28 @@ func talk_sec(eid: String) -> void:
 		await say(sc.ya, N)
 		return
 	if b:   # el que recibe el paquete
-		await talk(N, sc.get("txtb", ["Trae."]))
+		await talk(N, sc.get("txtb", [K("Trae.")]))
 		await talk(N, sc.fin)
 		await sec_premio(sc)
 		update_hud()
 		return
 	if st == 1:
-		await say("Ya sabes: a %s, en %s. Date prisa." % [sc.b.n.to_lower(), ZONA_N.get(sc.b.map, sc.b.map)], N)
+		await say(T("Ya sabes: a {n}, en {z}. Date prisa.", {"n": I18n.v(sc.b.n).to_lower(), "z": ZONA_N.get(sc.b.map, sc.b.map)}), N)
 		return
 	await talk(N, sc.txt)
 	var P_: Dictionary = sc.pide
 	if P_.tipo == "lleva":
-		if await ask("¿Llevas el paquete?", ["Sí, dámelo", "Ahora no"], N) != 0:
-			await say("Tú verás. Aquí sigo.", N)
+		if await ask(K("¿Llevas el paquete?"), [K("Sí, dámelo"), K("Ahora no")], N) != 0:
+			await say(K("Tú verás. Aquí sigo."), N)
 			return
 		sec_pon(sc.id, 1)
-		await got("el paquete para " + sc.b.n.to_lower())
+		await got(T("el paquete para {n}", {"n": I18n.v(sc.b.n).to_lower()}))
 		return
 	if P_.tipo == "item":
 		if int(S.items.get(P_.item, 0)) < int(P_.n):
-			await say("No llevas nada. Si vuelves con algo, aquí estaré.", N)
+			await say(K("No llevas nada. Si vuelves con algo, aquí estaré."), N)
 			return
-		if await ask("¿Se lo das?", ["Sí", "Ahora no"], N) != 0:
+		if await ask(K("¿Se lo das?"), [K("Sí"), K("Ahora no")], N) != 0:
 			return
 		S.items[P_.item] = int(S.items[P_.item]) - int(P_.n)
 		await talk(N, sc.fin)
@@ -1322,13 +1323,13 @@ func talk_sec(eid: String) -> void:
 		return
 	var L := sec_lotes(sc)
 	if L.is_empty():
-		await say("Cuando tengas lo que te pido, vuelve.", N)
+		await say(K("Cuando tengas lo que te pido, vuelve."), N)
 		return
 	var items: Array = L.map(rosin_item if P_.tipo == "extr" else lot_item)
-	items.append({"label": "Ahora no"})
-	var i: int = await menu(items, {"cls": "right", "title": "¿Qué le das?"})
+	items.append({"label": K("Ahora no")})
+	var i: int = await menu(items, {"cls": "right", "title": K("¿Qué le das?")})
 	if i < 0 or i >= L.size():
-		await say("No pasa nada. Aquí estaré.", N)
+		await say(K("No pasa nada. Aquí estaré."), N)
 		return
 	if P_.tipo == "extr":
 		use_rosin(L[i][0], float(P_.g))
@@ -1347,11 +1348,11 @@ func recados_menu() -> void:
 	for sc in recados_ver():
 		var st := sec_estado(sc.id)
 		var donde: String = ZONA_N.get(sc.a.map if st != 1 else sc.b.map, "")
-		it.append({"label": sc.t, "right": "HECHO" if st == 2 else ("EN MARCHA" if st == 1 else donde), "desc": sc.d + (("\nLleva el paquete a %s (%s)." % [sc.b.n.to_lower(), donde]) if st == 1 else "")})
+		it.append({"label": sc.t, "right": K("HECHO") if st == 2 else (K("EN MARCHA") if st == 1 else donde), "desc": T("{d}\nLleva el paquete a {n} ({z}).", {"d": sc.d, "n": I18n.v(sc.b.n).to_lower(), "z": donde}) if st == 1 else sc.d})
 	if it.is_empty():
-		it.append({"label": "Nada todavía", "desc": "Los recados salen por la comarca según el capítulo: busca a la gente con el «!»."})
-	it.append({"label": "Volver", "desc": ""})
-	await menu(it, {"cls": "full", "title": "RECADOS", "desc": true})
+		it.append({"label": K("Nada todavía"), "desc": K("Los recados salen por la comarca según el capítulo: busca a la gente con el «!».")})
+	it.append({"label": K("Volver"), "desc": ""})
+	await menu(it, {"cls": "full", "title": K("RECADOS"), "desc": true})
 
 # ---------- Julen y el itinerario (1.23, 11h-guia.js): textos del HTML (D.ITINERARIO, D.JULEN, D.MINERAL_ORG); aquí, lo que mira cada paso ----------
 var itin_aviso: Array = []
@@ -1413,40 +1414,40 @@ func paso_cultivo() -> String:
 	var sin := func(ks: Array) -> bool: return not ks.any(func(k): return S.items.get(k, 0) > 0)
 	var t: String = sg.d
 	if sg.id == "plantar" and not S.seeds.values().any(func(v): return v > 0):
-		t += " Si no te quedan semillas, mi aita tiene."
+		t = T("{d} Si no te quedan semillas, mi aita tiene.", {"d": t})
 	elif (sg.id == "veg" and sin.call(["fertv", "ofertv"])) or (sg.id == "flor" and sin.call(["fert", "ofert"])):
-		t += " No te queda: mi aita lo vende en el growshop."
+		t = T("{d} No te queda: mi aita lo vende en el growshop.", {"d": t})
 	elif (sg.id == "veg" or sg.id == "flor") and sin.call(["phm", "ophm"]):
-		t += " Y te falta pH−: lo tiene mi aita."
+		t = T("{d} Y te falta pH−: lo tiene mi aita.", {"d": t})
 	return t
 
 func talk_julen():
-	var N := "JULEN"
+	var N := K("JULEN")
 	if not S.flags.get("julen1"):
 		await talk(N, D.JULEN.tarde if S.flags.get("harvest1") else D.JULEN.hola)
 		S.items.ofertv += 2
-		await got("2 dosis de ORTUA BIO CRECIMIENTO")
+		await got(K("2 dosis de ORTUA BIO CRECIMIENTO"))
 		S.items.ophm += 4
-		await got("4 dosis de pH− ORTUA BIO")
+		await got(K("4 dosis de pH− ORTUA BIO"))
 		await talk(N, D.JULEN.ph + D.MINERAL_ORG + ([] if S.flags.get("harvest1") else D.JULEN.aqui))
 		S.flags.julen1 = true
 		return
 	if not S.flags.get("harvest1"):
-		var c: int = await ask("¿Qué pasa?", ["¿Qué hago ahora?", "Mineral u orgánico", "Nada"], N)
+		var c: int = await ask(K("¿Qué pasa?"), [K("¿Qué hago ahora?"), K("Mineral u orgánico"), K("Nada")], N)
 		if c == 0:
 			await say(paso_cultivo(), N)
 		elif c == 1:
 			await talk(N, D.MINERAL_ORG)
 		else:
-			await say("Aquí estoy si me necesitas.", N)
+			await say(K("Aquí estoy si me necesitas."), N)
 		return
-	var c: int = await ask("¿Qué tal la cosecha?", ["Un consejo", "Mineral u orgánico", "Nada"], N)
+	var c: int = await ask(K("¿Qué tal la cosecha?"), [K("Un consejo"), K("Mineral u orgánico"), K("Nada")], N)
 	if c == 0:
 		await say(pick(D.JULEN.tips), N)
 	elif c == 1:
 		await talk(N, D.MINERAL_ORG)
 	else:
-		await say("Agur. Saluda a las plantas de mi parte.", N)
+		await say(K("Agur. Saluda a las plantas de mi parte."), N)
 
 # run() → revisa_misiones → aquí: apunta los pasos hechos y avisa del último (y del siguiente); si Julen está delante, lo comenta
 func revisa_itinerario() -> void:
@@ -1469,29 +1470,29 @@ func aviso_itin():
 		if x.id == ids[-1]:
 			p = x
 	var sg = itin_sig()
-	toast(con_logro("<small>ITINERARIO · %d/%d</small>%s" % [itin_n(), D.ITINERARIO.size(), p.t] + ("<br>Ahora: " + sg.t if sg != null else "")), 2800)
+	toast(con_logro(T("<small>ITINERARIO · {a}/{b}</small>{t}", {"a": itin_n(), "b": D.ITINERARIO.size(), "t": p.t}) + (T("<br>Ahora: {t}", {"t": sg.t}) if sg != null else "")), 2800)
 	var j := ids.map(func(id): return D.JULEN.ok.get(id)).filter(func(x): return x != null)
 	if julen_aqui() and j.size():
-		await say(j[-1], "JULEN")
+		await say(j[-1], K("JULEN"))
 
 # START → OBJETIVO → ITINERARIO
 func itin_row() -> Dictionary:
 	var sg = itin_sig()
 	var I: Array = D.ITINERARIO
 	var i: int = I.find(sg) if sg != null else -1
-	var desc := "Hecho: el primer plazo, pagado."
+	var desc := K("Hecho: el primer plazo, pagado.")
 	if sg != null:
-		desc = "Ahora: %s. %s" % [sg.t, sg.d] + (("\nDespués: %s." % I[i + 1].t) if i + 1 < I.size() else "")
-	return {"label": "ITINERARIO", "right": "%d/%d" % [itin_n(), I.size()], "itin": 1, "desc": desc}
+		desc = T("Ahora: {t}. {d}", {"t": sg.t, "d": sg.d}) + (T("\nDespués: {t}.", {"t": I[i + 1].t}) if i + 1 < I.size() else "")
+	return {"label": K("ITINERARIO"), "right": "%d/%d" % [itin_n(), I.size()], "itin": 1, "desc": desc}
 
 func itinerario_menu():
 	var sg = itin_sig()
 	var I: Array = D.ITINERARIO
 	var it := []
 	for p in I:
-		it.append({"label": p.t, "right": "HECHO" if itin_hecho(p) else ("AHORA" if p == sg else null), "desc": p.d})
-	it.append({"label": "Volver", "desc": ""})
-	await menu(it, {"cls": "full", "title": "ITINERARIO", "title2": "%d/%d" % [itin_n(), I.size()], "desc": true, "initial": maxi(0, I.find(sg) if sg != null else 0)})
+		it.append({"label": p.t, "right": K("HECHO") if itin_hecho(p) else (K("AHORA") if p == sg else null), "desc": p.d})
+	it.append({"label": K("Volver"), "desc": ""})
+	await menu(it, {"cls": "full", "title": K("ITINERARIO"), "title2": "%d/%d" % [itin_n(), I.size()], "desc": true, "initial": maxi(0, I.find(sg) if sg != null else 0)})
 
 func facturado() -> float:
 	return maxf(0, S.sales - S.get("imp0", 0))
@@ -1506,10 +1507,10 @@ func imperio_nivel() -> int:
 func check_story():
 	if S.ch == 1 and S.flags.get("harvest1"):
 		if S.flags.get("julen1"):   # 1.23: se vuelve al growshop (antes del capítulo, que lo quita del piso)
-			await talk("JULEN", D.JULEN.adios)
+			await talk(K("JULEN"), D.JULEN.adios)
 		await chapter(2)
 		spawn_clients()
-		await talk("SMS · KIKO", ["Primera cosecha. Bien hecho.", "La gente que busca material lleva un $ encima. Puedes venderles en la calle.", "Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba."])
+		await talk(K("SMS · KIKO"), [K("Primera cosecha. Bien hecho."), K("La gente que busca material lleva un $ encima. Puedes venderles en la calle."), K("Cuanto más vendas, más se fijará la policía: es el CALOR. Y de noche hay quien roba.")])
 		await lineas_nuevas()
 		show_objective()
 	if S.ch == 2 and S.sales >= D.META_VENTAS:
@@ -1519,16 +1520,16 @@ func check_story():
 			S.due0 = S.due
 		S.flags.tono = S.day
 		await chapter(3)
-		await say("Un hombre enorme en chándal te corta el paso.")
-		await talk("TOÑO", ["Tú vives en el piso de Maite, ¿no?", "Don Baltasar quiere verte. En el bar El Ancla. Hoy.", "Y ve contando: tienes %s días para el primer pago." % dias_letra(dias_plazo(3)), "No me hagas venir a buscarte."])
+		await say(K("Un hombre enorme en chándal te corta el paso."))
+		await talk(K("TOÑO"), [K("Tú vives en el piso de Maite, ¿no?"), K("Don Baltasar quiere verte. En el bar El Ancla. Hoy."), T("Y ve contando: tienes {n} días para el primer pago.", {"n": dias_letra(dias_plazo(3))}), K("No me hagas venir a buscarte.")])
 		await lineas_nuevas()
 		show_objective()
 	if S.ch >= 8 and imperio_nivel() > S.get("impN", 0):
 		S.impN = imperio_nivel()
 		var r: Dictionary = D.IMPERIO[S.impN]
 		sfx("get")
-		toast("<small>TU IMPERIO</small>" + r.n, 2800)
-		await talk("SMS · IÑAKI", ["Se corre la voz: %s vendidos desde que pagaste a Baltasar." % Datos.eur(facturado()), "Desde hoy te cargo hasta %s al día en el barco." % _kg(int(r.mayor))])
+		toast(T("<small>TU IMPERIO</small>{n}", {"n": r.n}), 2800)
+		await talk(K("SMS · IÑAKI"), [T("Se corre la voz: {e} vendidos desde que pagaste a Baltasar.", {"e": Datos.eur(facturado())}), T("Desde hoy te cargo hasta {g} al día en el barco.", {"g": _kg(int(r.mayor))})])
 		show_objective()
 	if S.ch == 4 and S.flags.get("lab") and rec_count() >= 2:
 		S.due = int(D.PLAZOS["5"])
@@ -1536,16 +1537,16 @@ func check_story():
 		if Datos.PLAY:
 			S.due0 = S.due
 		await chapter(5)
-		await talk("SMS · TOÑO", ["Don Baltasar quiere %s en %s días." % [Datos.eur(D.PLAZOS["5"]), dias_letra(dias_plazo(5))], "Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza."])
+		await talk(K("SMS · TOÑO"), [T("Don Baltasar quiere {e} en {n} días.", {"e": Datos.eur(D.PLAZOS["5"]), "n": dias_letra(dias_plazo(5))}), K("Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza.")])
 		show_objective()
 	# (lo pidió el usuario: «no existe mapa y sitio del bajo de las setas»; con Datos.CAL): nada te decía dónde estaba. Con
 	# Ibarbide abierta, una vez, el SMS de Julen con el sitio (también en MÓVIL → Mapa y en el cartel de la Kale Zaharra)
 	if Datos.CAL and not Datos.PLAY and S.ch >= int(D.SETAS.ch) and S.get("setas") == null and not S.flags.get("setasSms"):
 		S.flags.setasSms = S.day
-		await talk("SMS · JULEN", D.SETAS_SITIO.sms)
+		await talk(K("SMS · JULEN"), D.SETAS_SITIO.sms)
 	if Datos.CAL and D.has("MAR") and S.ch >= int(D.MAR.ch) and S.get("mar") == null and not S.flags.get("koldoSms"):   # 1.51: el muelle
 		S.flags.koldoSms = S.day
-		await talk("SMS · KOLDO", ["Soy Koldo, del muelle de Puerto Viejo. Fui amigo de tu tía Maite: tengo una cosa suya para ti.", "Al final de la plaza del puerto, a la derecha, el muelle de la cofradía. Estoy en la acera, delante de los barcos."])
+		await talk(K("SMS · KOLDO"), [K("Soy Koldo, del muelle de Puerto Viejo. Fui amigo de tu tía Maite: tengo una cosa suya para ti."), K("Al final de la plaza del puerto, a la derecha, el muelle de la cofradía. Estoy en la acera, delante de los barcos.")])
 
 # E5 (fase 3): todo lo que cambia, antes del primer aviso (guardada a medias, no se cuenta dos veces)
 # U3 (fase 5, con Datos.PLAY): el recargo, sobre lo que pedía el plazo (sin interés compuesto) y hasta RESCATE.tope; el primer impago de la partida,
@@ -1556,7 +1557,7 @@ func dias_plazo(ch: int) -> int:
 	return 10 if ch == 5 else 7
 
 func dias_letra(n: int) -> String:
-	return {7: "siete", 10: "diez", 14: "catorce", 16: "dieciséis", 20: "veinte"}.get(n, str(n))
+	return {7: K("siete"), 10: K("diez"), 14: K("catorce"), 16: K("dieciséis"), 20: K("veinte")}.get(n, str(n))
 
 func penalty_event():
 	var play: bool = Datos.PLAY and D.has("RESCATE")
@@ -1580,15 +1581,15 @@ func penalty_event():
 			S.emb_ch = S.ch
 		embarga = embargo_aplica()
 	if rescate:
-		await say("TOÑO te estaba esperando.")
-		await talk("TOÑO", ["Don Baltasar dice que llegas tarde. Por ser la primera vez, te deja arreglarlo.", "Le llevas un paquete a Puerto Viejo y te da %d días más. Solo son %s de recargo." % [int(D.RESCATE.dias), Datos.eur(it)]])
+		await say(K("TOÑO te estaba esperando."))
+		await talk(K("TOÑO"), [K("Don Baltasar dice que llegas tarde. Por ser la primera vez, te deja arreglarlo."), T("Le llevas un paquete a Puerto Viejo y te da {n} días más. Solo son {e} de recargo.", {"n": int(D.RESCATE.dias), "e": Datos.eur(it)})])
 		sfx("hurt")
-		await say("La deuda del plazo sube a %s. Nuevo límite: %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)])
+		await say(T("La deuda del plazo sube a {e}. Nuevo límite: {f}.", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day)}))
 		return
-	await say("TOÑO te estaba esperando.")
-	await talk("TOÑO", ["Don Baltasar dice que llegas tarde.", "Son %s más de intereses. Y esto, para que no se te olvide." % Datos.eur(it)])
+	await say(K("TOÑO te estaba esperando."))
+	await talk(K("TOÑO"), [K("Don Baltasar dice que llegas tarde."), T("Son {e} más de intereses. Y esto, para que no se te olvide.", {"e": Datos.eur(it)})])
 	sfx("hurt")
-	await say("La deuda del plazo sube a %s. Nuevo límite: %s." % [Datos.eur(S.due), Datos.fd(S.deadline, S.day)])
+	await say(T("La deuda del plazo sube a {e}. Nuevo límite: {f}.", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day)}))
 	if embarga != null:
 		await embargo(embarga)
 
@@ -1631,20 +1632,20 @@ func embargo_aplica() -> Dictionary:   # E5: lo que se lleva, antes de decirlo
 func embargo(em = null) -> void:
 	if em == null:
 		em = embargo_aplica()
-	await talk("TOÑO", ["Tres plazos tarde. Don Baltasar se cobra en especie."])
+	await talk(K("TOÑO"), [K("Tres plazos tarde. Don Baltasar se cobra en especie.")])
 	sfx("bad")
 	if em.has("nc"):
-		await say("TOÑO se lleva tu %s, con su foco y sus plantas." % em.nc)
+		await say(T("TOÑO se lleva tu {c}, con su foco y sus plantas.", {"c": em.nc}))
 	else:
-		await say("TOÑO te vacía los bolsillos: se lleva %s." % Datos.eur(em.e))
+		await say(T("TOÑO te vacía los bolsillos: se lleva {e}.", {"e": Datos.eur(em.e)}))
 
 # el aviso de la orden de registro (1.11): un día antes de la redada
 func aviso_orden():
 	sfx("bad")
-	var L := ["Me dice uno de la comisaría que mañana entran en tu piso con orden de registro.", "Esta noche, el dinero y los cogollos a la caja o fuera de casa. Las plantas no se pueden esconder."]
+	var L := [K("Me dice uno de la comisaría que mañana entran en tu piso con orden de registro."), K("Esta noche, el dinero y los cogollos a la caja o fuera de casa. Las plantas no se pueden esconder.")]
 	if S.ch >= 5:
-		L.append("O paga a Molina, que aún estás a tiempo.")
-	await talk("SMS · KIKO", L)
+		L.append(K("O paga a Molina, que aún estás a tiempo."))
+	await talk(K("SMS · KIKO"), L)
 
 # la redada (1.11): lo de fuera y las plantas, siempre; la caja fuerte, nunca. La multa (multa_redada) sale de lo de fuera y, si no
 # llega, de la caja. Lo de encima, solo si estás en casa (1.13)
@@ -1652,7 +1653,7 @@ func raid_event():
 	S.orden = 0
 	if S.protect:
 		S.heat = 50
-		await talk("SMS · MOLINA", ["Esta noche había orden de entrada en tu piso. La he parado.", "Baja el ritmo."])
+		await talk(K("SMS · MOLINA"), [K("Esta noche había orden de entrada en tu piso. La he parado."), K("Baja el ritmo.")])
 		return
 	# E4 (fase 3): todo lo que se llevan, antes del primer aviso (si se cierra la app a medias, la redada ya ha pasado)
 	var casa: bool = S.map == "home" or S.map == "camarote"
@@ -1678,7 +1679,7 @@ func raid_event():
 			continue
 		for k in D.EXTRAS:
 			if c.get(k):
-				var nm: String = D.EXTRAS[k].n.to_lower()
+				var nm: String = I18n.v(D.EXTRAS[k].n).to_lower()
 				if not eq.has(nm):
 					eq.append(nm)
 				c.erase(k)
@@ -1713,31 +1714,35 @@ func raid_event():
 		S.sot.erase("gv")
 	music("redada")
 	sfx("bad")
-	await say("REDADA. La policía entra en tu piso con una orden de registro.")
+	await say(K("REDADA. La policía entra en tu piso con una orden de registro."))
 	var lo := []
 	if npl:
-		lo.append("todas las plantas")
+		lo.append(T("todas las plantas"))
 	if ne:
-		lo.append("los esquejes" if ne > 1 else "el esqueje")
+		lo.append(T("los esquejes") if ne > 1 else T("el esqueje"))
 	if g:
-		lo.append(("%d g (%d del camarote)" % [g, gc]) if gc else "%d g" % g)
+		lo.append(T("{g} g ({c} del camarote)", {"g": g, "c": gc}) if gc else "%d g" % g)
 	if ro:
 		lo.append(rosin_txt(ro))
-	await say("%s. Multa: %s%s." % [("Se llevan " + _lista(lo)) if lo.size() else "No encuentran nada que llevarse", Datos.eur(multa), (" (pagas %s: no tienes más)" % Datos.eur(fine)) if fine < multa else ""])
+	var mu := Datos.eur(multa)
+	if lo.size():
+		await say(T("Se llevan {l}. Multa: {m} (pagas {p}: no tienes más).", {"l": _lista(lo), "m": mu, "p": Datos.eur(fine)}) if fine < multa else T("Se llevan {l}. Multa: {m}.", {"l": _lista(lo), "m": mu}))
+	else:
+		await say(T("No encuentran nada que llevarse. Multa: {m} (pagas {p}: no tienes más).", {"m": mu, "p": Datos.eur(fine)}) if fine < multa else T("No encuentran nada que llevarse. Multa: {m}.", {"m": mu}))
 	if eq.size():
-		await say("Y el equipo de las carpas con plantas: " + ", ".join(eq) + ".")
+		await say(T("Y el equipo de las carpas con plantas: {l}.", {"l": ", ".join(eq)}))
 	if gs >= 0:
-		await say("Bajan al sótano: se llevan las bandejas%s." % ((" y " + g_txt(gs) + " de setas") if gs >= 1 else ""))
-	await say("La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan." if S.get("caja") != null else "Las semillas no son delito: se quedan.")
-	await say("Toca empezar de nuevo. Y vender menos una temporada.")
+		await say(T("Bajan al sótano: se llevan las bandejas y {g} de setas.", {"g": g_txt(gs)}) if gs >= 1 else T("Bajan al sótano: se llevan las bandejas."))
+	await say(K("La caja de detrás del diploma ni la ven. Las semillas no son delito: se quedan.") if S.get("caja") != null else K("Las semillas no son delito: se quedan."))
+	await say(K("Toca empezar de nuevo. Y vender menos una temporada."))
 	music(map_music())
 
 func ending() -> void:
 	await fade(1)
 	music("final")
 	endcard_on = true
-	endcard_pon(["DEUDA SALDADA", "Has saldado los %s de tu tía Maite en %s días." % [Datos.eur(D.DEUDA), n(S.day)], "Variedades: %d · Ventas totales: %s" % [disc_count(), Datos.eur(S.sales)],
-		"Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.\n¿Completarás la GENOTECA? ¿Conseguirás la JACK HERER?", "Pulsa A"])
+	endcard_pon([T("DEUDA SALDADA"), T("Has saldado los {e} de tu tía Maite en {n} días.", {"e": Datos.eur(D.DEUDA), "n": n(S.day)}), T("Variedades: {n} · Ventas totales: {e}", {"n": disc_count(), "e": Datos.eur(S.sales)}),
+		T("Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.\n¿Completarás la GENOTECA? ¿Conseguirás la JACK HERER?"), T("Pulsa A")])
 	await fade(0)
 	sfx("get")
 	var pr := Motor.Prom.new()
@@ -1796,7 +1801,7 @@ const ICONO_TIEMPO := {
 const COLOR_TIEMPO := {"s": "#f8c030", "n": "#e4ecf4", "m": "#9aa8b8", "g": "#6ab0f0", "r": "#f8e060", "b": "#ffffff", "f": "#b8c4cc"}
 
 # Begoña (la vecina): consejos, un regalo al día y, con confianza y desde el capítulo 3, la jardinera
-const BEGONA_TIPS := ["Bajo una lámpara las plantas beben mucho. Riégalas a diario, majo.", "Si se te ponen amarillas las hojas de abajo, les falta agua o abono.", "Tu tía siempre tenía el piso oliendo a limón. Ahora sé por qué."]
+var BEGONA_TIPS := [K("Bajo una lámpara las plantas beben mucho. Riégalas a diario, majo."), K("Si se te ponen amarillas las hojas de abajo, les falta agua o abono."), K("Tu tía siempre tenía el piso oliendo a limón. Ahora sé por qué.")]
 
 # los clubs cannábicos (CLUBS): el carné, vender un lote al día, comprar 10 g y encargos de semillas
 func precio_club(thc: float) -> float:
@@ -1810,7 +1815,7 @@ const CATA_PASOS := {"b": [0.1, 0.25, 0.5], "r": [0.1, 0.2, 0.3]}
 
 # ---------- la plantilla (1.19, 11f-plantilla): gente del barrio que trabaja para ti ----------
 func ficha_gente(w: Dictionary) -> String:
-	return "Labia %d · cuidado %d · lealtad %d" % [w.lab, w.cui, w.lea]
+	return T("Labia {a} · cuidado {b} · lealtad {c}", {"a": int(w.lab), "b": int(w.cui), "c": int(w.lea)})
 
 # el billar (1.35, talkBillar de 11j-locales): una partida corta a la bola 8, con el tiro elegido (TIROS) y dos barras, la dirección
 # y la fuerza; quien mete, sigue; gana quien mete la negra con las suyas dentro. MESA_B: la mesa que se ve mientras dura (pinta.gd)
@@ -1853,57 +1858,57 @@ const CARRO_H := 108
 # El del último día, amarillento (seco)
 const CLON := [
 	"......L.L......",
-	"...X..LLL..X...",
-	".X.XX.LLL.XX.X.",
-	"..XXX..L..XXX..",
-	"XX.DXX.L.XXD.XX",
-	"..XXDDXTXDDXX..",
-	".XX...DTD...XX.",
+	"...X..LLL..X...",   # i18n-no
+	".X.XX.LLL.XX.X.",   # i18n-no
+	"..XXX..L..XXX..",   # i18n-no
+	"XX.DXX.L.XXD.XX",   # i18n-no
+	"..XXDDXTXDDXX..",   # i18n-no
+	".XX...DTD...XX.",   # i18n-no
 	"X......T......X",
 	".....L.T.......",
-	"....LLLT.......",
+	"....LLLT.......",   # i18n-no
 	".....L.T.L.....",
-	".......TLLL....",
+	".......TLLL....",   # i18n-no
 	".......T.L.....",
 	".......T.......",
 	".......T......."]
 
-const CLON_MINI := ["..X..", "X.X.X", ".XXX.", "..T.."]
+const CLON_MINI := ["..X..", "X.X.X", ".XXX.", "..T.."]   # i18n-no
 
 # el elegido, en grande (48 × 40, 1 px): cuatro hojas de cannabis de 7 dedos, las dos de atrás en sombra (K), y dos brotes;
 # lo saca tools/sprites/a-mano/esqueje.py (L haz, X hoja, D nervio y envés, K sombra, T tallo)
 const CLON_G := [
 	"...............................D................",
-	"................D.............DX...D............",
-	"............D...DX.....XL.....DX..DX............",
-	"............DX..DX.....XL...X.DX.DX.............",
-	".............DX.DX.D...XL...DXDXDDX..DD.........",
-	".........DX..DKXDXDXL..XL..XDXDXDXDDDX..........",
-	"..........DXXXDXDXDXDL.XL.XDXDDXXDDXX...........",
-	"...........DDXXKDDXDXDLXLXXLDDKDDDX..L....X.....",
-	".....L....X..DDDKDDXXXLXLXL.DDDDDDDDXL..XXL.....",
-	".....XLL..XLXXXDKDXXLLXXXLXXX.TKDDXXXL.XXL......",
-	"......XLL.XLDDDDDT..XXXDXXLL.T..XXDXXLXXL.......",
-	".......XLLXLLXDD..T...XXTL..TT...XLXXLXLL.......",
-	".......XXLXLLXL....T....T...T.....XXLXLL.XXXXXX.",
-	".XXLLLL.XXLXXL......T...T..T......XXXDXXXXLLL...",
-	"...XXXLLLLDXXL.......T..T.T........XDXXLLL......",
-	"......XXXXXDD.........T.TT.....TTTTTDXXXX.......",
-	".......LLLLDDTTTTTTTTT.TTTTTTT.....LXXLLXXXX....",
-	"....LLLXXXLDX..........TT..........LXLX.LLLXX...",
-	"...LXXXX.LXLX...........T..........LXLLX....LL..",
-	"..XX....LXXLX...........T...........X.LDX.......",
-	".......LDX.L............T.XL.XL........LX.......",
-	".......LX...............T.XLXL..................",
-	"........................T.XXXX..................",
-	"........................T.TDLL..................",
-	"........................TT......................",
+	"................D.............DX...D............",   # i18n-no
+	"............D...DX.....XL.....DX..DX............",   # i18n-no
+	"............DX..DX.....XL...X.DX.DX.............",   # i18n-no
+	".............DX.DX.D...XL...DXDXDDX..DD.........",   # i18n-no
+	".........DX..DKXDXDXL..XL..XDXDXDXDDDX..........",   # i18n-no
+	"..........DXXXDXDXDXDL.XL.XDXDDXXDDXX...........",   # i18n-no
+	"...........DDXXKDDXDXDLXLXXLDDKDDDX..L....X.....",   # i18n-no
+	".....L....X..DDDKDDXXXLXLXL.DDDDDDDDXL..XXL.....",   # i18n-no
+	".....XLL..XLXXXDKDXXLLXXXLXXX.TKDDXXXL.XXL......",   # i18n-no
+	"......XLL.XLDDDDDT..XXXDXXLL.T..XXDXXLXXL.......",   # i18n-no
+	".......XLLXLLXDD..T...XXTL..TT...XLXXLXLL.......",   # i18n-no
+	".......XXLXLLXL....T....T...T.....XXLXLL.XXXXXX.",   # i18n-no
+	".XXLLLL.XXLXXL......T...T..T......XXXDXXXXLLL...",   # i18n-no
+	"...XXXLLLLDXXL.......T..T.T........XDXXLLL......",   # i18n-no
+	"......XXXXXDD.........T.TT.....TTTTTDXXXX.......",   # i18n-no
+	".......LLLLDDTTTTTTTTT.TTTTTTT.....LXXLLXXXX....",   # i18n-no
+	"....LLLXXXLDX..........TT..........LXLX.LLLXX...",   # i18n-no
+	"...LXXXX.LXLX...........T..........LXLLX....LL..",   # i18n-no
+	"..XX....LXXLX...........T...........X.LDX.......",   # i18n-no
+	".......LDX.L............T.XL.XL........LX.......",   # i18n-no
+	".......LX...............T.XLXL..................",   # i18n-no
+	"........................T.XXXX..................",   # i18n-no
+	"........................T.TDLL..................",   # i18n-no
+	"........................TT......................",   # i18n-no
 	"........................T.......................",
-	".................XL.XL..T.......................",
-	"..................XLXL..T.......................",
-	"..................LLDL..T.......................",
-	"..................XXXT..T.......................",
-	"......................TTT.......................",
+	".................XL.XL..T.......................",   # i18n-no
+	"..................XLXL..T.......................",   # i18n-no
+	"..................LLDL..T.......................",   # i18n-no
+	"..................XXXT..T.......................",   # i18n-no
+	"......................TTT.......................",   # i18n-no
 	"........................T.......................",
 	"........................T.......................",
 	"........................T.......................",
