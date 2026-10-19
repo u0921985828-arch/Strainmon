@@ -233,6 +233,8 @@ func _corre() -> void:
 	# 6 · el seguro, cada año; sin saldo, devuelto y, pasada la gracia, anulado (y entonces, a la grúa en un control)
 	J.S.banco = 1000
 	J.S.coches.utilitario.iv = 999   # el impuesto, aparte (6b)
+	J.S.coches.utilitario.erase("en")   # MAESTRO [3]: aparcado en la parada desde el control, la multa del aparcamiento iría aparte
+	J.S.coches.utilitario.erase("ap")
 	t = dia(480)
 	chk(int(J.S.banco) == 1000 - J.seguro_anio("utilitario") and int(J.S.coches.utilitario.r) == 845, "recibo cobrado: %s %s" % [J.S.banco, J.S.coches.utilitario])
 	J.S.banco = 0

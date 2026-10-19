@@ -637,6 +637,8 @@ func fumar_sentado() -> void:
 func object_action(x: int, y: int) -> void:
 	var m: Dictionary = MAPS[S.map]
 	var o = m.o[y][x] if y >= 0 and y < m.h and x >= 0 and x < m.w else null
+	if await campo_obj(x, y, o):   # MAESTRO [4]: las salvajes de la comarcal y el refugio
+		return
 	var pi_ = puerta_int(S.map, x, y)
 	if pi_ != null and o == pi_.o:   # 1.51: las puertas de dentro
 		await cruzar_puerta(pi_)

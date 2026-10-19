@@ -158,7 +158,8 @@ func _corre() -> void:
 	chk(Datos.tp("pH− y Skunk #1") == "pH− y Skunk #1", "sin PLAY, tp no cambia nada")
 	var iguales := true
 	for k in P.claves:
-		if JSON.stringify(D[k]) != JSON.stringify(O[k]) and k != "BANCO":
+		var dk = D[k].slice(0, O[k].size()) if k == "SHOP" else D[k]   # con CAL, la tienda de la botritis va al final (MAESTRO [4])
+		if JSON.stringify(dk) != JSON.stringify(O[k]) and k != "BANCO":
 			iguales = false
 			print("  distinto sin PLAY: ", k)
 	chk(iguales, "sin PLAY, los datos de antes")

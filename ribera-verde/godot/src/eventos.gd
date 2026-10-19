@@ -535,10 +535,14 @@ func control_trafico(k: String) -> void:
 		await say(K("«Todo en orden. Circule.»"), K("AGENTE"))
 		return
 	var pr: float = .5 + float(S.heat) / 200.0
+	if enmal and Datos.CAL and D.has("CONTROL"):   # MAESTRO [4]: el peso del maletero también cuenta
+		pr += mal_g(k) / 1000.0 * float(D.CONTROL.kg)
 	if enmal and mal_vacio(k):
 		pr *= float(D.MALETERO.vacio.f)
 	if Cultivo.azar() >= pr:
 		await say(K("Te mira un rato. «Circule.»"), K("AGENTE"))
+		return
+	if Datos.CAL and D.has("CONTROL") and await resolver_control(k, enmal):
 		return
 	var habia: bool = total_buds() >= 1 or total_rosin() > 0
 	var r := confiscate()
@@ -549,6 +553,54 @@ func control_trafico(k: String) -> void:
 	S.heat = mini(100, int(S.heat) + 10)
 	update_hud()
 	await say(T("«¿Y este olor?» Te registran {a}: te requisan {r} y te multan con {e}.", {"a": V.art, "r": r[0], "e": Datos.eur(r[1])}), K("AGENTE"))
+
+# MAESTRO [4]: el control de carretera (PoliceCheckpoint). Te van a registrar: huir (mejor en el deportivo o en la moto; si no sale,
+# multa y calor), sobornar al agente, entregarle la carga tú (sin multa) o dejar que registren (lo de siempre, devuelve false).
+# Las tiradas, por hash_str (no por Cultivo.azar). true: ya está resuelto
+func resolver_control(k: String, enmal: bool) -> bool:
+	var C: Dictionary = D.CONTROL
+	var V: Dictionary = D.CONCE.v[k]
+	var gl := total_buds() + (mal_g(k) if enmal else 0.0)
+	var cost: int = Datos.jsround(float(C.soborno.base) + gl * float(C.soborno.g))
+	var ops := [K("Huir"), T("Sobornar ({e})", {"e": Datos.eur(cost)}), K("Entregar la carga"), K("Dejar que registren")]
+	var c: int = await ask(T("«Abra {a}, por favor.» Llevas {g} encima y en el maletero.", {"a": V.art, "g": g_txt(gl)}), ops, K("AGENTE"))
+	var h := Datos.hash_str("control%d_%d_%s" % [S.day, int(S.min), k]) % 100
+	if c == 0:
+		var ph: float = float(C.huir.get(k, C.huir.p))
+		if h < int(ph * 100):
+			S.heat = mini(100, int(S.heat) + int(C.huida.calor))
+			update_hud()
+			sfx("bad")
+			await say(T("Pisas a fondo y te pierdes por la comarcal. Te han visto la matrícula: calor +{c}.", {"c": int(C.huida.calor)}))
+			return true
+		confiscate(false)
+		if enmal:
+			mal(k).buds = {}
+		var f: float = pagar_recibo(float(C.fallo.multa), K("Multa · huida"))
+		S.heat = mini(100, int(S.heat) + int(C.fallo.calor))
+		update_hud()
+		await say(T("Te cierran el paso en la rotonda. Te requisan {r} y te multan con {e} por darte a la fuga.", {"r": g_txt(gl), "e": Datos.eur(float(C.fallo.multa) - f)}), K("AGENTE"))
+		return true
+	if c == 1:
+		if S.money < cost:
+			await say(K("No llevas tanto dinero encima."))
+			return false
+		S.money -= cost
+		if h < int((float(C.soborno.p) - float(S.heat) / float(C.soborno.calor)) * 100):
+			update_hud()
+			await say(K("Se guarda el sobre sin mirarte. «Circule. Y no le he visto.»"), K("AGENTE"))
+			return true
+		await say(K("«¿Me está intentando sobornar?» Se queda el sobre como prueba."), K("AGENTE"))
+		return false
+	if c == 2:
+		confiscate(false)
+		if enmal:
+			mal(k).buds = {}
+		S.heat = mini(100, int(S.heat) + int(C.entregar.calor))
+		update_hud()
+		await say(T("Le das la carga sin rechistar: {r}. «Por esta vez, sin multa. Circule.»", {"r": g_txt(gl)}), K("AGENTE"))
+		return true
+	return false
 
 # ---------- El muelle de Puerto Viejo, los envíos por mar y el piso franco ----------
 # (lo pidió el usuario: «distribución a gran escala por un piso franco o una persona… un mini puerto para hacer envíos, invertir en un

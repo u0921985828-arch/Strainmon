@@ -272,7 +272,7 @@ func recibir_envio():
 		if it.get("foco"):
 			S.items["f_" + it.foco] += 1
 		if it.get("extra"):
-			S.items["x_" + it.extra] += 1
+			S.items["x_" + it.extra] = S.items.get("x_" + it.extra, 0) + 1
 		if it.get("bolsa"):
 			S.items.bolsa = maxi(int(S.items.get("bolsa", 0)), int(it.bolsa))
 		if it.get("aparato"):

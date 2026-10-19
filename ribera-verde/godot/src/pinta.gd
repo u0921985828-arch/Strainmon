@@ -357,7 +357,7 @@ func _mundo() -> void:
 	# el piso de noche (1.10 P5): se oscurece como la calle; la mancha de luz de cada carpa encendida, en _farolas
 	if S.map == "home" and noche() > 0:
 		_rect(0, 0, J.SW, SH, Color8(14, 20, 72, Datos.jsround(noche() * 255)))
-	if J.D.ZONAS.has(S.map):
+	if _al_raso():
 		var h: float = S.min / 60.0
 		if h >= 17.5 and h < 20.5:
 			_rect(0, 0, J.SW, SH, Color8(255, 130, 50, Datos.jsround(.13 * sin((h - 17.5) / 3 * PI) * 255)))
@@ -399,6 +399,20 @@ func _tiempo(now: float) -> void:
 	if k == "tormenta" and fposmod(now, 7000.0) < 120.0 and not Vista.CALMA:
 		_rect(0, 0, J.SW, SH, Color8(255, 255, 240, 110))
 
+# al aire libre: las zonas de la calle y, con CAL (MAESTRO [4]), el muelle de Puerto Viejo, que ya no está siempre a pleno sol:
+# el atardecer, el tiempo, la noche y sus farolas como en la calle
+func _al_raso() -> bool:
+	return J.D.ZONAS.has(J.S.map) or (Datos.CAL and J.S.map in ["muelle", "comarcal"])
+
+func _farolas_mapa() -> Array:   # las farolas de un mapa sin LAMPS: las «lamp» que tenga
+	var o := []
+	var m: Dictionary = J.MAPS[J.S.map]
+	for y in int(m.h):
+		for x in int(m.w):
+			if m.o[y][x] == "lamp":
+				o.append([x, y])
+	return o
+
 func noche() -> float:
 	var h: float = J.S.min / 60.0
 	return .5 if h >= 21 or h < 5 else ((h - 19) / 2 * .5 if h >= 19 else ((7 - h) / 2 * .5 if h < 7 else 0.0))
@@ -408,13 +422,13 @@ func _farolas() -> void:
 	if J.S.map == "home":
 		_manchas()
 	_luces_local()
-	if not J.D.ZONAS.has(J.S.map):   # farolas de cada zona de fuera (1.10)
+	if not _al_raso():   # farolas de cada zona de fuera (1.10)
 		return
 	var a := noche()
 	if a <= .2:
 		return
 	var im := _farola(a)
-	for l in J.D.LAMPS[J.S.map]:
+	for l in J.D.LAMPS.get(J.S.map, _farolas_mapa()):
 		var x: int = l[0] * 16 + 8 - cam.x
 		var y: int = l[1] * 16 + 2 - cam.y
 		if x < -30 or y < -30 or x > J.SW + 30 or y > SH + 30:

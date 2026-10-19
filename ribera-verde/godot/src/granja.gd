@@ -149,6 +149,7 @@ func new_day() -> void:
 		S.bandejas = S.bandejas.filter(func(e): return S.day - e.dia <= D.CARRO.dias)
 		av.append(T("Se han secado {n} esquejes en las bandejas", {"n": seb}) if seb > 1 else T("Se ha secado un esqueje en las bandejas"))
 	curado_dia(av)   # el curado (1.29)
+	botritis_dia()   # MAESTRO [4]
 	if av.size() and mode == "world":
 		toast("<br>".join(av), 1600)
 	spawn_clients()
@@ -169,6 +170,44 @@ func new_day() -> void:
 	queue("calor", heat_warn)   # 1.22: el olor de la noche también avisa
 	if es_cumple(S.day) and int(S.get("cumpleY", 0)) != int(Datos.fecha(S.day).y):   # i18n-no
 		queue("cumple", cumple_event)
+
+# ---------- MAESTRO [4]: la botritis (BOTRITIS, con Datos.CAL) ----------
+# Al amanecer, cada planta en flor de una carpa puede coger botritis: con lluvia o tormenta fuera (si la carpa no está sellada) y con la
+# humedad de su carpa por encima de BOTRITIS.hr de noche. Con el preventivo (p.prev, hasta ese día), no. La tirada va por hash_str,
+# no por Cultivo.azar (la historia y el ciclo no cambian). Con botritis, pierde BOTRITIS.dano de salud al día y la cosecha merma.
+func prob_botritis(i: int, ci: int, llueve: bool) -> float:
+	var B: Dictionary = D.BOTRITIS
+	var p = S.pots[i]
+	if not p or p.get("dead") or p.get("bot") or p.prog < .65 or p.prog >= 1 or int(p.get("prev", 0)) >= S.day:
+		return 0.0
+	var c = S.carpas[ci]
+	var pr := 0.0
+	if llueve and not c.get("sello"):
+		pr += float(B.lluvia)
+	if Cultivo.clima_carpa(S, ci, true).hr > float(B.hr):
+		pr += float(B.hr_p) * (float(B.sello) if c.get("sello") else 1.0)
+	return pr * (1 - float(D.IVS.res) * Cultivo.iv_f(p.get("f"), 3))
+
+func botritis_dia() -> void:
+	if not Datos.CAL or not D.has("BOTRITIS"):
+		return
+	var llueve: bool = Datos.tiempo(S.day, 720).k in ["lluvia", "tormenta"]
+	var H := huecos()
+	for i in mini(H.size(), S.pots.size()):
+		var p = S.pots[i]
+		if not p or p.get("dead"):
+			continue
+		if p.get("bot"):
+			p.health = maxf(0, float(p.health) - float(D.BOTRITIS.dano))
+			if p.health <= 0:
+				p.dead = true
+			continue
+		var pr := prob_botritis(i, H[i].c, llueve)
+		if pr > 0 and Datos.hash_str("bot%d_%d_%s" % [S.day, i, p.sid]) % 1000 < int(pr * 1000):
+			p.bot = S.day
+
+func botritis_merma(p: Dictionary, g: int) -> int:
+	return maxi(1, Datos.jsround(g * (1 - float(D.BOTRITIS.merma)))) if Datos.CAL and p.get("bot") else g
 
 # ---------- MAESTRO [1]: el cumpleaños (S.cumple {d, m}, con Datos.CAL) ----------
 # El día del cumpleaños (el 29 de febrero, el 28 si el año no es bisiesto), al amanecer, tres regalos y eliges uno
@@ -396,11 +435,15 @@ func pot_action(i: int) -> void:
 		opts.append(K("Abonar"))
 	if p.pest:
 		opts.append(K("Tratar plaga"))
+	if Datos.CAL and p.get("bot"):
+		opts.append(K("Tratar hongos"))
+	elif Datos.CAL and D.has("BOTRITIS") and S.items.get("prevent", 0) > 0 and int(p.get("prev", 0)) < S.day:
+		opts.append(K("Preventivo"))
 	if p.prog >= .2 and p.prog < .65 and not (Datos.CAL and s.get("auto")):   # 1.52: las autos no se clonan
 		opts.append(K("Sacar esqueje"))
 	opts.append_array([K("Nombrar"), K("Arrancar"), K("Salir")])
 	var c: int = await ask(T("{s}{e} · {st} {p}%\nAgua {w}% · Salud {h}%{pl}", {"s": s.n, "e": etiq(p.get("f")), "st": stage_name(p), "p": int(floor(p.prog * 100)), "w": Datos.jsround(p.water),
-		"h": Datos.jsround(p.health), "pl": T(" · PLAGA") if p.pest else ""}), opts)
+		"h": Datos.jsround(p.health), "pl": (T(" · PLAGA") if p.pest else "") + (T(" · BOTRITIS") if Datos.CAL and p.get("bot") else "")}), opts)
 	var op: String = opts[c]
 	if op == "Regar":
 		var v := pos_plaza(i)
@@ -421,6 +464,21 @@ func pot_action(i: int) -> void:
 			await say(K("Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada."))
 		else:
 			await say(K("No tienes INSECTICIDA. Kiko lo vende."))
+	elif op == "Tratar hongos":
+		if S.items.get("fungi", 0) > 0:
+			S.items.fungi -= 1
+			p.erase("bot")
+			await gesto("tratar")
+			sfx("sel")
+			await say(K("Quitas los cogollos con moho gris y aplicas el FUNGICIDA. Botritis parada."))
+		else:
+			await say(K("No tienes FUNGICIDA. Lo venden en el growshop."))
+	elif op == "Preventivo":
+		S.items.prevent -= 1
+		p.prev = S.day + int(D.BOTRITIS.prev)
+		await gesto("tratar")
+		sfx("sel")
+		await say(T("Aplicas el PREVENTIVO: la botritis no la coge en {n} días.", {"n": int(D.BOTRITIS.prev)}))
 	elif op == "Sacar esqueje":
 		await sacar_esqueje(i)
 	elif op == "Nombrar":
@@ -716,7 +774,7 @@ func harvest(i: int) -> void:
 	var f := factores(i)
 	var fe: Dictionary = p.f if p.get("f") else {"t": 1, "y": 1}
 	var cl := Cultivo.clase_feno(p.get("f"))
-	var g := gramos_planta(p, f)
+	var g := botritis_merma(p, gramos_planta(p, f))
 	var thc := Cultivo.thc_cosecha(S, p, f)
 	var v := pos_plaza(i)
 	await accion("cosechar")
@@ -901,6 +959,19 @@ func aviso_plaga(antes: Array) -> void:
 		await say(T("Sigue la plaga en {l}: sin tratar, pierden salud cada hora.", {"l": _lista(siguen)}) if siguen.size() > 1 else T("Sigue la plaga en {l}: sin tratar, pierde salud cada hora.", {"l": _lista(siguen)}))
 	if muertas.size():
 		await say(T("Se han secado del todo {l}. Retíralas con A.", {"l": _lista(muertas)}) if muertas.size() > 1 else T("Se ha secado del todo {l}. Retírala con A.", {"l": _lista(muertas)}))
+	if Datos.CAL:
+		var bn := []
+		var bs := []
+		for i in S.pots.size():
+			var p = S.pots[i]
+			if p and not p.get("dead") and p.get("bot"):
+				var nom := T("la {s} (plaza {p})", {"s": strain(p.sid).n, "p": H[i].j + 1}) if i < H.size() else String(strain(p.sid).n)
+				(bn if int(p.bot) == S.day else bs).append(nom)
+		if bn.size():
+			sfx("bad")
+			await say(T("Botritis en {l}: moho gris en los cogollos. Trátala con FUNGICIDA; el PREVENTIVO y el sellado de la carpa la evitan.", {"l": _lista(bn)}))
+		if bs.size():
+			await say(T("Sigue la botritis en {l}: pierde salud cada día y cosecharás menos.", {"l": _lista(bs)}))
 	if moho.size():
 		await say(T("Moho en {l}: de noche la carpa pasa del {h} % de humedad. Un extractor a su medida con intractor, un ventilador o un deshumidificador la bajan.", {"l": _lista(moho), "h": n(D.HR_OK[1])}))
 

@@ -142,6 +142,25 @@ s97dc0be5,Un agente te ha visto vender.,An officer saw you dealing.
 sbd1f9630,sinVer,
 s4df66c9c,PUERTAS_INT,
 sdc9578fe,almC,
+sde43f51a,CAMPO,CAMPO
+s7e63f8d8,Un camastro con una manta de lana. Aquí no te busca nadie.,A cot with a wool blanket. Nobody looks for you here.
+s661dd807,Una mesa de castaño con un candil. Alguien dejó un mapa de la comarca con los claros marcados en lápiz.,A chestnut table with an oil lamp. Someone left a map of the county with the clearings marked in pencil.
+s1178d002,"Por la ventana, la carretera comarcal y el monte.","Through the window, the county road and the hills."
+s4074b024,"Una {s} salvaje, madura y con semillas en los cogollos.","A wild {s}, ripe and with seeds in the buds."
+s580e6c4e,Recoger semillas,Collect seeds
+s8181262c,Dejarla,Give it up
+s628efe73,"Sacas {n} semillas puras de {s}. Van con las demás, para plantar o cruzar.","You get {n} pure {s} seeds. They go with the others, to plant or cross."
+sdf6c2867,Una {s} salvaje en pleno crecimiento.,A wild {s} in full growth.
+sf84eb1e5,Sacar esqueje,Take cutting
+se3539baa,El propagador está lleno: 12 esquejes. Planta alguno antes.,The propagator is full: 12 cuttings. Plant some first.
+s31f1dbc1,Cortas una punta de la {s} y la envuelves en papel húmedo. Plántala antes del {d}.,You cut a tip off the {s} and wrap it in damp paper. Plant it before {d}.
+sde1bc4d8,Un arcón de madera bajo unos sacos. Dentro: {g}.,A wooden chest under some sacks. Inside: {g}.
+s2c91d7d9,Esconder lo que llevo,Hide what I carry
+s31e866b4,Sacarlo todo,Take everything out
+sd3dcfd09,Lo metes en el arcón y lo tapas con los sacos.,You put it in the chest and cover it with the sacks.
+s90031372,No llevas cogollos encima.,You have no buds on you.
+s4b05791e,El arcón está vacío.,The chest is empty.
+scb82bcdd,Lo sacas todo del arcón y lo guardas en la mochila.,You take everything out of the chest and put it in your backpack.
 s457a182b,"Puerto Viejo, en la costa: el puerto, la lonja y el club de los marineros.","Puerto Viejo, on the coast: the harbour, the fish market and the sailors' club."
 sb6f597e2,"Ribera Verde, tu barrio, en la ría: el piso de la tía, el barrio alto y los astilleros.","Ribera Verde, your neighbourhood, on the estuary: your aunt's flat, the upper town and the shipyards."
 sc39b7de7,"Ibarbide, la ciudad grande: el Casco Viejo, el Ensanche y la Kale Zaharra.","Ibarbide, the big city: the Old Town, the Ensanche and Kale Zaharra."
@@ -177,6 +196,8 @@ s155aeee2,Floración,Flowering
 s606c9e88,DEX,
 s9c2c1caf,RECIPES,
 s808a2361,BANCO,BANK
+s3765acfa,BOTRITIS,BOTRYTIS
+s9affa116,SHOP,SHOP
 s3c69629d,KAIA,
 se0facbd4,día {n},day {n}
 s8bb5e92a,{d} de {m} de {y},"{m} {d}, {y}"
@@ -286,7 +307,6 @@ sf9c3a4e4,Maletero {dv},Boot {dv}
 s07f3c4f1,El garaje de la tía.,Your aunt's garage.
 s30e044fa,No te cabe nada más encima.,You can't carry any more.
 s52465e63,Sacas {g} de {n}.,You take out {g} of {n}.
-s90031372,No llevas cogollos encima.,You have no buds on you.
 sf454b922,Guardas {q} en el maletero.,You put {q} in the boot.
 sa6244d43,Sin envasadora al vacío: se pide en la tienda online.,No vacuum sealer: order one from the online shop.
 s1e788ba4,Envasas al vacío {n} lotes del maletero.,You vacuum-seal {n} batches in the boot.
@@ -298,10 +318,23 @@ sa22a5f11,Multa · sin seguro,Fine · no insurance
 sda73d2d2,"Sin seguro en vigor: denuncia de {e} (te faltan {f}) y {a}, a la grúa hasta que lo asegures.",No valid insurance: a {e} fine (you owe {f}) and {a} gets towed until insured.
 s93cabf4f,"Sin seguro en vigor: denuncia de {e} y {a}, a la grúa hasta que lo asegures.",No valid insurance: a {e} fine and {a} gets towed until insured.
 se9c36eb6,«Todo en orden. Circule.»,“All in order. Move along.”
+sd29ed251,CONTROL,CONTROL
 s7168a09d,Te mira un rato. «Circule.»,He stares at you a while. “Move along.”
 s9cf8e2ff,{r} y {g} del maletero,{r} and {g} from the boot
 s3fa18629,{g} del maletero,{g} from the boot
 s0b94ccfd,«¿Y este olor?» Te registran {a}: te requisan {r} y te multan con {e}.,“What’s that smell?” They search {a}: they seize {r} and fine you {e}.
+s27eac58b,Huir,Flee
+s79a0b645,Sobornar ({e}),Bribe ({e})
+se7b9c302,Entregar la carga,Hand over the load
+se53cc7db,Dejar que registren,Let them search
+s361f4753,"«Abra {a}, por favor.» Llevas {g} encima y en el maletero.","“Open {a}, please.” You carry {g} on you and in the trunk."
+s7bc15af2,Pisas a fondo y te pierdes por la comarcal. Te han visto la matrícula: calor +{c}.,You floor it and vanish down the county road. They saw your plate: heat +{c}.
+s0c288b5d,Multa · huida,Fine · fleeing
+s17b5afb9,Te cierran el paso en la rotonda. Te requisan {r} y te multan con {e} por darte a la fuga.,They block you at the roundabout. They seize {r} and fine you {e} for fleeing.
+s7d5c81b6,No llevas tanto dinero encima.,You don't have that much cash on you.
+s5f8b9961,Se guarda el sobre sin mirarte. «Circule. Y no le he visto.»,He pockets the envelope without looking at you. “Move along. I never saw you.”
+s03f5bab8,«¿Me está intentando sobornar?» Se queda el sobre como prueba.,“Are you trying to bribe me?” He keeps the envelope as evidence.
+sc116b7f4,"Le das la carga sin rechistar: {r}. «Por esta vez, sin multa. Circule.»",You hand over the load without a fuss: {r}. “No fine this time. Move along.”
 s5c9ad442,"{kg} a {r}, de {thc} % de THC o más, antes del {d}","{kg} to {r}, {thc} % THC or more, before {d}"
 s2180748a,KOLDO,KOLDO
 s421ef0d1,Tú eres el sobrino de Maite. Tienes su cara cuando se reía de los guardias.,You're Maite's nephew. You've got her face when she laughed at the cops.
@@ -473,7 +506,6 @@ s5cb3b00c,Plantas el esqueje de {s}{e}.,You plant the cutting of {s}{e}.
 se9f7eb8a,Has plantado {s}{e}.,You've planted {s}{e}.
 sdd947a1b,"Cada planta lleva su barra: arriba, el agua (roja: toca regar); abajo, la cosecha (dorada: lista).","Each plant has its bars: on top, water (red: time to water); below, harvest (gold: ready)."
 sb76237b9,"Si le sale plaga, verás una «!» roja y manchas en las hojas. Trátala con INSECTICIDA.","If it gets pests, you'll see a red «!» and spots on the leaves. Treat it with INSECTICIDE."
-se3539baa,El propagador está lleno: 12 esquejes. Planta alguno antes.,The propagator is full: 12 cuttings. Plant some first.
 scad16f8a,"Cortas una punta de la {s}{e} y la pones a enraizar.
 Plántala antes del {d}: es la misma planta.","You cut a tip off the {s}{e} and set it to root.
 Plant it before {d}: it's the same plant."
@@ -492,15 +524,20 @@ s665bebf9,Esperar,Wait
 s077cfbd4,Regar,Water
 s75d517ce,Abonar,Feed
 sc0a87065,Tratar plaga,Treat pests
-sf84eb1e5,Sacar esqueje,Take cutting
+s48d33552,Tratar hongos,Treat mould
+sea707cbb,Preventivo,Preventive
 s4adf9190,Arrancar,Uproot
 sb76254af,"{s}{e} · {st} {p}%
 Agua {w}% · Salud {h}%{pl}","{s}{e} · {st} {p}%
 Water {w}% · Health {h}%{pl}"
 s986fc522, · PLAGA, · PESTS
+s26bde956, · BOTRITIS, · BOTRYTIS
 s9de1e7b0,Riegas la planta. Agua al 100%.,You water the plant. Water at 100%.
 s6c1f63eb,Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada.,You spray INSECTICIDE with gloves and a mask. Pests gone.
 s8d0c9a28,No tienes INSECTICIDA. Kiko lo vende.,You have no INSECTICIDE. Kiko sells it.
+s113d0d75,Quitas los cogollos con moho gris y aplicas el FUNGICIDA. Botritis parada.,You remove the buds with grey mould and apply the FUNGICIDE. Botrytis stopped.
+sb1a4540a,No tienes FUNGICIDA. Lo venden en el growshop.,You have no FUNGICIDE. The growshop sells it.
+s25ccf54d,Aplicas el PREVENTIVO: la botritis no la coge en {n} días.,You apply the PREVENTIVE: no botrytis for {n} days.
 se427de54,¿Seguro que quieres arrancarla?,Sure you want to uproot it?
 s94ab7537,Arrancas la planta.,You uproot the plant.
 se130c299,tierra {a} de {b} L,soil {a} of {b} L
@@ -644,6 +681,8 @@ sbd03ce82,"Sigue la plaga en {l}: sin tratar, pierden salud cada hora.","Still p
 s36845ceb,"Sigue la plaga en {l}: sin tratar, pierde salud cada hora.","Still pests on {l}: untreated, it loses health every hour."
 s077b8570,Se han secado del todo {l}. Retíralas con A.,{l} have dried out completely. Remove them with A.
 s6f25226e,Se ha secado del todo {l}. Retírala con A.,{l} has dried out completely. Remove it with A.
+s0f770524,Botritis en {l}: moho gris en los cogollos. Trátala con FUNGICIDA; el PREVENTIVO y el sellado de la carpa la evitan.,Botrytis in {l}: grey mould in the buds. Treat it with FUNGICIDE; the PREVENTIVE and sealing the tent prevent it.
+s8fa8ec3b,Sigue la botritis en {l}: pierde salud cada día y cosecharás menos.,Botrytis persists in {l}: it loses health every day and you will harvest less.
 s0edfbd0a,"Moho en {l}: de noche la carpa pasa del {h} % de humedad. Un extractor a su medida con intractor, un ventilador o un deshumidificador la bajan.","Mould on {l}: at night the tent goes over {h} % humidity. A matching extractor with an intake fan, a fan or a dehumidifier bring it down."
 s684caec3,Genoteca,Genoteca
 sb2036f54,Banco de semillas,Seed bank
@@ -1453,7 +1492,6 @@ se6a65db0,Irte,Leave
 s70231a6f,"{n} no volverá por {s} en {d} días. Mientras, sus clientes te pagan un {p} % más.","{n} won't show up in {s} for {d} days. Meanwhile, their customers pay you {p} % more."
 s5a62c8e2,{n}: «Vale. Pero no te quiero ver tanto por aquí.»,"{n}: ""Fine. But I don't want to see you around here so much."""
 se1194822,{n} se guarda el dinero. «Así me gusta. Hasta la próxima.»,"{n} pockets the money. ""That's how I like it. Until next time."""
-s7d5c81b6,No llevas tanto dinero encima.,You don't have that much cash on you.
 scf5ddead,Te apartas. {n} se queda mirándote.,You back off. {n} keeps staring at you.
 sda8bda0a,^(water|roof|wall|win|iwT|iwB|void),
 s7a0737f6,bumpT,
@@ -2794,7 +2832,6 @@ s743dffe4,"¿Dejas la nave? Te devuelvo la fianza; lo que no recojas se queda aq
 s18a126e8,"¿Dejas la nave? Te devuelvo la fianza; la opción a compra se pierde, y lo pagado para ella.","Giving up the warehouse? I'll return the deposit; the option to buy is lost, and what you paid toward it."
 sec4b7460,¿Dejas la nave? Te devuelvo la fianza; lo que no recojas se queda aquí.,Giving up the warehouse? I'll return the deposit; whatever you don't collect stays here.
 sb19ba1d1,¿Dejas la nave? Te devuelvo la fianza.,Giving up the warehouse? I'll return the deposit.
-s8181262c,Dejarla,Give it up
 s5a1ffd5a,"Trato hecho. Si la quieres otra vez, ya sabes dónde estoy.","Deal. If you want it again, you know where I am."
 s329259df,"Te la vendo por {p} ({m} m², a unos {pm} el metro). Firmamos la opción: {pr} de prima, que se descuentan, y la mitad de cada alquiler va a la compra. El precio no se mueve. Los primeros {d} días de cada mes, si quieres, la compras a tocateja con lo que falte, más los gastos ({g}), en el notario y por transferencia.","I'll sell it for {p} ({m} m², about {pm} per metre). We sign the option: {pr} up front, which is deducted, and half of each rent goes toward the purchase. The price stays put. In the first {d} days of each month, if you want, you buy it outright with what's left, plus fees ({g}), at the notary and by bank transfer."
 sbe0ca99b,Firmar la opción,Sign the option
@@ -3705,6 +3742,8 @@ scd4c6221,bajS3,bajS3
 s5328f782,bajS4,bajS4
 sc7b9360e,escS,escS
 s90b5033c,CLUB KAIA,CLUB KAIA
+s6df05a02,Carretera comarcal,County road
+s9de53392,Caserío abandonado,Abandoned farmhouse
 s30a02292,ESTUDIANTE,STUDENT
 sf07acb89,Hola. Me ha dicho un amigo que tienes.,Hi. A friend said you've got some.
 s42927016,"Aupa, ¿tienes algo? Voy justo de dinero.","Hey, got anything? I'm a bit short on cash."
@@ -5178,6 +5217,17 @@ sd8262e80,Vende por 100 €,Sell for 100 €
 s9379d320,Potencia,Potency
 s68797708,Producción,Yield
 s79125788,Resistencia,Resistance
+s97429b99,Fungicida de cobre 250 ml,Copper fungicide 250 ml
+s2e36671d,3 tratamientos. Cada uno para la botritis de una planta en flor.,3 treatments. Each one for the botrytis of one flowering plant.
+s1a284be6,Preventivo de cola de caballo 500 ml,Horsetail preventive 500 ml
+s3de4c2b4,4 aplicaciones. Cada una protege una planta de la botritis una semana.,4 applications. Each one protects a plant from botrytis for a week.
+sb3d7ce24,Kit de sellado de carpa,Tent sealing kit
+s55b2bc3a,"Juntas y cinta para las cremalleras y los pasos de tubo: la lluvia de fuera no sube la humedad de la carpa y la botritis prende un 75 % menos.
+Uno por carpa.","Seals and tape for the zips and duct ports: rain outside no longer raises the tent's humidity and botrytis takes hold 75 % less.
+One per tent."
+sfd00a753,Kit de sellado,Sealing kit
+s6fd31337,Sellado,Sealed
+s9bf231e8,Juntas y cinta en cremalleras y pasos de tubo: la lluvia de fuera no entra y la botritis prende un 75 % menos.,Seals and tape on zips and duct ports: rain outside stays out and botrytis takes hold 75 % less.
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.

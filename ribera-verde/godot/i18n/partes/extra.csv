@@ -113,3 +113,53 @@ Y {g} g de lo que llevabas encima.,And {g} g of what you were carrying.
 ALCOHOL,ALCOHOL
 COLOCÓN,HIGH
 ÍNDICA,INDICA
+CAMPO,CAMPO
+BOTRITIS,BOTRYTIS
+SHOP,SHOP
+CONTROL,CONTROL
+Un camastro con una manta de lana. Aquí no te busca nadie.,A cot with a wool blanket. Nobody looks for you here.
+Una mesa de castaño con un candil. Alguien dejó un mapa de la comarca con los claros marcados en lápiz.,A chestnut table with an oil lamp. Someone left a map of the county with the clearings marked in pencil.
+"Por la ventana, la carretera comarcal y el monte.","Through the window, the county road and the hills."
+"Una {s} salvaje, madura y con semillas en los cogollos.","A wild {s}, ripe and with seeds in the buds."
+Recoger semillas,Collect seeds
+"Sacas {n} semillas puras de {s}. Van con las demás, para plantar o cruzar.","You get {n} pure {s} seeds. They go with the others, to plant or cross."
+Una {s} salvaje en pleno crecimiento.,A wild {s} in full growth.
+Cortas una punta de la {s} y la envuelves en papel húmedo. Plántala antes del {d}.,You cut a tip off the {s} and wrap it in damp paper. Plant it before {d}.
+Un arcón de madera bajo unos sacos. Dentro: {g}.,A wooden chest under some sacks. Inside: {g}.
+Esconder lo que llevo,Hide what I carry
+Sacarlo todo,Take everything out
+Lo metes en el arcón y lo tapas con los sacos.,You put it in the chest and cover it with the sacks.
+El arcón está vacío.,The chest is empty.
+Lo sacas todo del arcón y lo guardas en la mochila.,You take everything out of the chest and put it in your backpack.
+Huir,Flee
+Sobornar ({e}),Bribe ({e})
+Entregar la carga,Hand over the load
+Dejar que registren,Let them search
+"«Abra {a}, por favor.» Llevas {g} encima y en el maletero.","“Open {a}, please.” You carry {g} on you and in the trunk."
+Pisas a fondo y te pierdes por la comarcal. Te han visto la matrícula: calor +{c}.,You floor it and vanish down the county road. They saw your plate: heat +{c}.
+Multa · huida,Fine · fleeing
+Te cierran el paso en la rotonda. Te requisan {r} y te multan con {e} por darte a la fuga.,They block you at the roundabout. They seize {r} and fine you {e} for fleeing.
+Se guarda el sobre sin mirarte. «Circule. Y no le he visto.»,He pockets the envelope without looking at you. “Move along. I never saw you.”
+«¿Me está intentando sobornar?» Se queda el sobre como prueba.,“Are you trying to bribe me?” He keeps the envelope as evidence.
+"Le das la carga sin rechistar: {r}. «Por esta vez, sin multa. Circule.»",You hand over the load without a fuss: {r}. “No fine this time. Move along.”
+Tratar hongos,Treat mould
+Preventivo,Preventive
+ · BOTRITIS, · BOTRYTIS
+Quitas los cogollos con moho gris y aplicas el FUNGICIDA. Botritis parada.,You remove the buds with grey mould and apply the FUNGICIDE. Botrytis stopped.
+No tienes FUNGICIDA. Lo venden en el growshop.,You have no FUNGICIDE. The growshop sells it.
+Aplicas el PREVENTIVO: la botritis no la coge en {n} días.,You apply the PREVENTIVE: no botrytis for {n} days.
+Botritis en {l}: moho gris en los cogollos. Trátala con FUNGICIDA; el PREVENTIVO y el sellado de la carpa la evitan.,Botrytis in {l}: grey mould in the buds. Treat it with FUNGICIDE; the PREVENTIVE and sealing the tent prevent it.
+Sigue la botritis en {l}: pierde salud cada día y cosecharás menos.,Botrytis persists in {l}: it loses health every day and you will harvest less.
+Carretera comarcal,County road
+Caserío abandonado,Abandoned farmhouse
+Fungicida de cobre 250 ml,Copper fungicide 250 ml
+3 tratamientos. Cada uno para la botritis de una planta en flor.,3 treatments. Each one for the botrytis of one flowering plant.
+Preventivo de cola de caballo 500 ml,Horsetail preventive 500 ml
+4 aplicaciones. Cada una protege una planta de la botritis una semana.,4 applications. Each one protects a plant from botrytis for a week.
+Kit de sellado de carpa,Tent sealing kit
+"Juntas y cinta para las cremalleras y los pasos de tubo: la lluvia de fuera no sube la humedad de la carpa y la botritis prende un 75 % menos.
+Uno por carpa.","Seals and tape for the zips and duct ports: rain outside no longer raises the tent's humidity and botrytis takes hold 75 % less.
+One per tent."
+Kit de sellado,Sealing kit
+Sellado,Sealed
+Juntas y cinta en cremalleras y pasos de tubo: la lluvia de fuera no entra y la botritis prende un 75 % menos.,Seals and tape on zips and duct ports: rain outside stays out and botrytis takes hold 75 % less.

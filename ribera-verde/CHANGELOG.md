@@ -99,6 +99,13 @@
   - **Borracho:** de 31 a 70 el paso se tuerce y al soltar sigues una casilla (`vaiven`, `deriva`); de 70 para arriba, la pantalla en triple con los colores separados (`src/vision.gdshader`); a 100 en la calle, el desmayo: 8 horas después en la parada del pueblo, sin el 30 % del efectivo ni la mitad de los cogollos y extractos que llevabas (`desmayo`).
   - **Fumar y catar** (`colocar`): sube por los mg de THC; la sativa o la índica, por el % índica de la variedad. Sativa: andas un 15 % más rápido y la policía te ve una casilla antes. Índica: andas más despacio, levantas un 30 % menos de sospecha, las extracciones tardan un 20 % menos y el curado de la mañana cunde un 25 % más.
   - En el HUD, ALCOHOL y COLOCÓN cuando los hay (`hud_fisio`). Prueba `tests/estados.gd`.
+- **[4] El mundo abierto:**
+  - **El puerto al raso:** el muelle (y la comarcal) con el tiempo, el atardecer, la noche y las farolas de la calle (`_al_raso` en `pinta.gd`).
+  - **La botritis** (`BOTRITIS`): en flor (del 65 %), cada día la puede coger una planta de las carpas de casa: un 8 % si llueve fuera y la carpa no está sellada, un 12 % con la humedad por encima del 80 % (un 75 % menos sellada) y menos con la resistencia de su línea. Por hash, sin el azar (`prob_botritis`, `botritis_dia`). Pierde 8 de salud al día hasta morir y, cosechada, un 40 % de los gramos (`botritis_merma`). En el growshop, el fungicida (la para), el preventivo (una semana sin ella) y el kit de sellado de la carpa, al final de la tienda. La nave, no.
+  - **La carretera comarcal** (`MAPS.comarcal`, 44 × 16, desde el cap. 2): de Mendialde a Errotabarri por las salidas de lado (`montar_campo`), con un claro de landraces salvajes (`CAMPO`): en verano, para esquejes; en otoño, con semillas; en invierno, nada; con tormenta o nieve no se ven; lo recogido no vuelve en una semana. Por hash semanal.
+  - **El refugio** (`MAPS.refugio`): el caserío abandonado de la comarcal, con camastro para dormir y un arcón donde esconder los cogollos (`escondite`), donde no llegan ni la redada ni los ladrones.
+  - **El control de carretera** (`CONTROL`): yendo en tu vehículo, lo que pesa el maletero sube la probabilidad; al pararte, huir (40 %, 55 % en moto, 75 % en el deportivo; si te pillan, te lo quitan, 600 € de multa y calor), sobornar (200 € + 1,5 €/g; menos probable con calor; si no cuela, se queda el sobre y registran), entregar la carga (sin multa) o dejar que registren, como antes (`resolver_control`).
+  - `src/campo.gd` entra en la cadena entre `eventos` y `retencion`. Prueba `tests/campo.gd` (53).
 
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 

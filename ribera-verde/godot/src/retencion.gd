@@ -2,8 +2,8 @@
 # minutos de juego por hora fuera, hasta OFFLINE.tope_h horas; el reloj, la deuda y los eventos no corren), el aviso de la cosecha,
 # los objetivos diarios (DIARIO, por la fecha del móvil), la demo (capítulos 1-3; el 4 pide la compra única DEMO.producto), los
 # logros y la nube de Play Games y el embudo del FTUE (Plataforma, solo con el opt-in de INFORMES DE ERRORES).
-# Cadena: ui → mundo → granja → trama → retencion → juego.
-extends "res://src/eventos.gd"
+# Cadena: ui → mundo → granja → trama → … → eventos → campo → retencion → juego.
+extends "res://src/campo.gd"
 
 const Plataforma = preload("res://src/plataforma.gd")
 

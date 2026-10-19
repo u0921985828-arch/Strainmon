@@ -1839,6 +1839,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	if name_ != "home" and name_ != "nave":
 		montar_puertas(name_)
 	montar_muelle(name_)
+	montar_campo(name_)   # MAESTRO [4]
 	montar_garaje(name_)
 	montar_aparcamiento(name_)
 	P.x = x
@@ -2328,3 +2329,8 @@ func reset_sosp() -> void:
 func sosp_hud():
 	pass
 
+func montar_campo(_mapa: String) -> void:   # MAESTRO [4], en campo.gd
+	pass
+
+func campo_obj(_x: int, _y: int, _o) -> bool:   # MAESTRO [4], en campo.gd
+	return false

@@ -93,7 +93,7 @@ func comprar_carpa(t: String, ci: int) -> void:
 	S.pots = np
 	S.macetas = nm_
 
-const IC := {"fert": "abono", "fertv": "abono", "phm": "abono", "ofert": "abono", "ofertv": "abono", "ophm": "abono", "insect": "insecticida", "spray": "spray", "bocata": "bocadillo"}
+const IC := {"fert": "abono", "fertv": "abono", "phm": "abono", "ofert": "abono", "ofertv": "abono", "ophm": "abono", "insect": "insecticida", "fungi": "insecticida", "prevent": "spray", "spray": "spray", "bocata": "bocadillo"}
 
 # las tiendas (1.14, D.TIENDAS): GROWSHOP KIKO y GROW IBARBIDE (ANE: un 10 % más barato y un capítulo antes, sin semillas, muebles ni
 # aparatos: su ok() del JS, aquí a mano)
@@ -187,7 +187,7 @@ func entregar(it: Dictionary, N: String) -> void:
 		comprar_carpa(it.carpa, int(it.ci))
 		await say(D.DICHO_CARPA[it.carpa], N)
 	if it.get("extra"):
-		S.items["x_" + it.extra] += 1
+		S.items["x_" + it.extra] = S.items.get("x_" + it.extra, 0) + 1
 		var ok := []
 		for ci in S.carpas.size():
 			if falta_extra(S.carpas[ci], it.extra):

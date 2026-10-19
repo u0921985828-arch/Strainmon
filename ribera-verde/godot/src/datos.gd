@@ -114,6 +114,16 @@ static func _aplica_auto() -> void:
 		D.DEX.append_array(D.AUTO.dex)
 		D.RECIPES.merge(D.AUTO.recipes)
 		D.BANCO.append_array(D.AUTO.banco)
+	# MAESTRO [4]: el fungicida, el preventivo y el sellado de la botritis, al final de la tienda (solo con CAL)
+	if D.has("BOTRITIS"):
+		if not D._base.has("SHOP"):
+			D._base.SHOP = D.SHOP.duplicate()
+		D.SHOP = D._base.SHOP.duplicate()
+		if CAL:   # al final: PLAY restaura los textos de SHOP por posición
+			D.SHOP.append_array(D.BOTRITIS.shop)
+			D.EXTRAS["sello"] = D.BOTRITIS.extra
+		else:
+			D.EXTRAS.erase("sello")
 	# El club KAIA del muelle, el tuyo (solo con CAL: las pruebas contra el HTML recorren D.CLUBS)
 	var K: Dictionary = D.get("KAIA", {})
 	if K.is_empty():
