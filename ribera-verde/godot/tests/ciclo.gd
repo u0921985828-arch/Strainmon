@@ -966,6 +966,7 @@ func patrulla() -> void:
 	var lado := Vector2i(-1, -1)
 	var sitio := Vector2i(-1, -1)
 	var mira_a := ""
+	var recta := ""
 	for d in ["left", "right", "down", "up"]:
 		var ok := sitio.x < 0
 		for i in range(1, 10):
@@ -976,9 +977,14 @@ func patrulla() -> void:
 			lado = t + DV[d] * 6
 			sitio = t + DV[d] * 9
 			mira_a = {"down": "up", "up": "down", "left": "right", "right": "left"}[d]
+			recta = d
 	check("recta de calle junto al portal para la persecución: el jugador a (%d,%d), el agente a (%d,%d)" % [lado.x, lado.y, sitio.x, sitio.y], sitio.x >= 0)
 	if sitio.x < 0:
 		return
+	for i in range(1, 10):   # los clientes que estén en la recta, fuera (su sitio sale del azar del día)
+		var q = J.ent_at(t.x + DV[recta][0] * i, t.y + DV[recta][1] * i)
+		if q and q.get("client"):
+			J.remove_client(q.id)
 	var e: Dictionary = pats[0]
 	for o in pats:   # quietos lejos mientras el jugador se aparta del portal
 		o.merge({"espera": 1e9}, true)
