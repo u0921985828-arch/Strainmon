@@ -80,6 +80,8 @@
 ### APK de Play con el inglés · Godot 0.49.0 (código 68)
 - `node tools/godot-aab.js` con la upload key: `dist/landrace-hunters.aab` (79 MB, firmado, targetSdk 36, 16 KB en las 4 `.so`) y el APK universal.
 - `descargas/LandraceHunters.apk` (82 MB, `apk-instalar.py` + `zipalign -P 16` + `apksigner`): fases 7 y 8, el repaso de la APK de Play (combate, nombres parodia, icono de la vida) y el idioma.
+- En inglés tampoco sale un nombre real: las filas de PLAY sin inglés caían en la del nombre real (Northern Lights × Haze, Durban Poison); ahora Norzen Lights × Haize, Durvan Poizon y la marca Ice-o-lator como Ais-o-lator (`play.gd` recorre `strings.csv` en inglés: 12 → 0).
+- Menús a toda pantalla sin aire (lo vio el usuario en la tienda): las 5 filas eran las de la pantalla de 160 px; ahora todas las que caben, y si caben todas, la caja a su alto (`capturas_ui`: 6 huecos → 0).
 
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
