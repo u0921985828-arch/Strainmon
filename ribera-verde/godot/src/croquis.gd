@@ -7,6 +7,7 @@
 extends RefCounted
 
 const Datos = preload("res://src/datos.gd")
+const I18n = preload("res://src/i18n.gd")
 
 const MW := 232   # el croquis
 const MH := 112
@@ -51,13 +52,13 @@ static func texto(rs: Array, x: int, y: int, t: String, c: String) -> void:
 
 # ---------- el croquis ----------
 # los pueblos: p, en el croquis; z, las zonas del juego que caen en él; d, lo que cuenta al elegirlo
-const PUEBLOS := {
-	"puerto": {"p": [40, 30], "d": "Puerto Viejo, en la costa: el puerto, la lonja y el club de los marineros."},
-	"town": {"p": [116, 48], "d": "Ribera Verde, tu barrio, en la ría: el piso de la tía, el barrio alto y los astilleros."},
-	"ibarbide": {"p": [190, 34], "d": "Ibarbide, la ciudad grande: el Casco Viejo, el Ensanche y la Kale Zaharra."},
-	"valdehierro": {"p": [48, 80], "d": "Valdehierro, el pueblo de las fábricas: naves, la chatarrería y tu nave."},
-	"mendialde": {"p": [122, 94], "d": "Mendialde, el pueblo del monte: el caserío donde empezó todo."},
-	"errotabarri": {"p": [194, 84], "d": "Errotabarri, la aldea del molino viejo, al final de la pista."},
+static var PUEBLOS := {
+	"puerto": {"p": [40, 30], "d": I18n.K("Puerto Viejo, en la costa: el puerto, la lonja y el club de los marineros.")},
+	"town": {"p": [116, 48], "d": I18n.K("Ribera Verde, tu barrio, en la ría: el piso de la tía, el barrio alto y los astilleros.")},
+	"ibarbide": {"p": [190, 34], "d": I18n.K("Ibarbide, la ciudad grande: el Casco Viejo, el Ensanche y la Kale Zaharra.")},
+	"valdehierro": {"p": [48, 80], "d": I18n.K("Valdehierro, el pueblo de las fábricas: naves, la chatarrería y tu nave.")},
+	"mendialde": {"p": [122, 94], "d": I18n.K("Mendialde, el pueblo del monte: el caserío donde empezó todo.")},
+	"errotabarri": {"p": [194, 84], "d": I18n.K("Errotabarri, la aldea del molino viejo, al final de la pista.")},
 }
 const ORDEN := ["puerto", "town", "ibarbide", "errotabarri", "mendialde", "valdehierro"]
 const ZONA := {"town": "town", "alto": "town", "astilleros": "town", "home": "town", "shop": "town", "bar": "town", "txaro": "town",
@@ -250,7 +251,7 @@ static func imagen(D: Dictionary, ch: int) -> Image:
 			ly = cy + 9
 		_txt(im, cx - ancho(nm) / 2, ly, nm, Color8(40, 30, 24) if ok else Color8(120, 114, 104), papel)
 	# el mar con su nombre, la rosa de los vientos y el marco doble
-	_txt(im, 70, 6, "MAR", Color8(70, 104, 124), Color8(150, 186, 200))
+	_txt(im, 70, 6, I18n.v("MAR"), Color8(70, 104, 124), Color8(150, 186, 200))
 	var rx := MW - 12
 	var ry := 9
 	_linea(im, Vector2(rx, ry - 5), Vector2(rx, ry + 5), Color8(70, 60, 50))
@@ -294,17 +295,17 @@ static func rects_mapa(sw: int, V: Dictionary, aqui: String, alto := LIBRE) -> A
 
 static func desc_mapa(D: Dictionary, ch: int, V: Dictionary, aqui: String) -> String:
 	var k: String = ORDEN[int(V.i)]
-	var t: String = PUEBLOS[k].d
+	var t: String = I18n.v(PUEBLOS[k].d)
 	if k == aqui:
-		t += " Estás aquí."
+		t += I18n.v(" Estás aquí.")
 	if Datos.CAL and not Datos.PLAY and k == "ibarbide" and ch >= int(D.SETAS.ch):   # 1.43.8: el bajo de las setas, en el mapa
-		t += " " + D.SETAS_SITIO.mapa
+		t += " " + I18n.v(D.SETAS_SITIO.mapa)
 	if k == "town":
-		t += "\nDe su plaza salen todos los autobuses."
+		t += I18n.v("\nDe su plaza salen todos los autobuses.")
 	elif abierto(D, ch, k):
-		t += "\nAutobús: %d min, %s." % [int(D.PARADAS[k].min), Datos.eur(D.PARADAS[k].eur)]
+		t += I18n.T("\nAutobús: {min} min, {eur}.", {"min": int(D.PARADAS[k].min), "eur": Datos.eur(D.PARADAS[k].eur)})
 	else:
-		t += "\nSin autobús hasta el capítulo %d." % int(D.PARADAS[k].cap)
+		t += I18n.T("\nSin autobús hasta el capítulo {cap}.", {"cap": int(D.PARADAS[k].cap)})
 	return t
 
 static func mueve_mapa(V: Dictionary, b: String) -> bool:
@@ -338,10 +339,10 @@ static func rects_cal(sw: int, V: Dictionary, hoy: int, marcas: Array, alto := L
 	rs.append([o.x - 2, o.y - 2, W + 4, H + 4, "#54402a"])
 	rs.append([o.x, o.y, W, H, "#f0e6c8"])
 	rs.append([o.x, o.y, W, 11, "#3a6a3a"])
-	var tit := "%s %d" % [Datos.MES_N[m - 1], y]
+	var tit := "%s %d" % [I18n.v(Datos.MES_N[m - 1]), y]
 	texto(rs, o.x + (W - ancho(tit)) / 2, o.y + 3, tit, "#f8f0d8")
 	for i in 7:
-		texto(rs, o.x + 4 + i * CW + 6, o.y + 14, "LMXJVSD"[i], "#a03020" if i == 6 else "#54402a")
+		texto(rs, o.x + 4 + i * CW + 6, o.y + 14, I18n.v("LMXJVSD")[i], "#a03020" if i == 6 else "#54402a")
 	for d in nd:
 		var k := s0 + d
 		var cx := o.x + 4 + (k % 7) * CW
@@ -363,7 +364,7 @@ static func rects_cal(sw: int, V: Dictionary, hoy: int, marcas: Array, alto := L
 	return rs
 
 static func desc_cal(V: Dictionary, hoy: int, marcas: Array) -> String:
-	var t := "Hoy es %s." % Datos.fd_larga(hoy)
+	var t := I18n.T("Hoy es {f}.", {"f": Datos.fd_larga(hoy)})
 	var d1 := Datos.dia_de(V.y, V.m, 1)
 	var d2 := d1 + Datos.dias_mes(V.y, V.m) - 1
 	var L := []
@@ -371,10 +372,10 @@ static func desc_cal(V: Dictionary, hoy: int, marcas: Array) -> String:
 		if int(e.d) >= d1 and int(e.d) <= d2 and int(e.d) >= hoy:
 			L.append("%d, %s" % [int(Datos.fecha(int(e.d)).d), e.t])
 	if L.size() > 3:   # 1.43: el cuadro, de tres líneas como mucho; el resto, en los puntos de colores
-		L = L.slice(0, 2) + ["y %d más" % (L.size() - 2)]
+		L = L.slice(0, 2) + [I18n.T("y {n} más", {"n": L.size() - 2})]
 	if L.size():
-		t += " En %s: %s." % [Datos.MES_N[V.m - 1], " · ".join(L)]
-	t += "\nFlechas: otro mes · B: cerrar."
+		t += I18n.T(" En {mes}: {l}.", {"mes": Datos.MES_N[V.m - 1], "l": " · ".join(L)})
+	t += I18n.v("\nFlechas: otro mes · B: cerrar.")
 	return t
 
 static func mueve_cal(V: Dictionary, b: String) -> bool:

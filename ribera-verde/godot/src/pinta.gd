@@ -78,7 +78,7 @@ func redibuja(t: float) -> void:
 		if not g.vc and g.c.get("goteo"):
 			g.lg = _lineas_goteo()
 		if g.vc:
-			modo = "carpaC"
+			modo = "carpaC"  # i18n-no
 			vc.visible = true
 			vc.pinta(J.S, J.VC, now, J.SW, SH)
 	elif modo == "world":
@@ -591,7 +591,7 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 		return false
 	if k == "cristalV":   # 1.47: el suelo de cristal del reservado: debajo, la pista de GAUA (y encima, _cristalera)
 		var md: Dictionary = J.MAPS.disco
-		return _arte_tile(md.g[ty][tx] if ty < md.g.size() and tx < md.g[ty].size() else "floorD", tx, ty, sx, sy)
+		return _arte_tile(md.g[ty][tx] if ty < md.g.size() and tx < md.g[ty].size() else "floorD", tx, ty, sx, sy)  # i18n-no
 	var an = Atlas.sobre.get("tile:" + k)
 	if an:
 		var a = Atlas.anim_de(an[0][0], an[0][1])
@@ -704,7 +704,7 @@ const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadr
 
 # los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
-const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "mesaTb", "taburTb", "barrilTb", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz", "trim", "prensaM", "tamizM", "mallas", "lavadora", "staticM", "armS", "mesaS"]
+const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "mesaTb", "taburTb", "barrilTb", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz", "trim", "prensaM", "tamizM", "mallas", "lavadora", "staticM", "armS", "mesaS"]  # i18n-no
 func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var gr = Atlas.cubre("obj:" + o)
 	if not gr:
@@ -713,7 +713,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var d := desfase(o, tx, ty)
 	var fm: int = J.fase_mesa(J.mesa_idx(tx, ty)) if o == "mesaN" else 0
 	var pl = _plantas_mesa(gr, J.mesa_idx(tx, ty), fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima
-	var sp: String = ("mesaN-%d" % mini(fm, 1)) if o == "mesaN" else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)
+	var sp: String = ("mesaN-%d" % mini(fm, 1)) if o == "mesaN" else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)  # i18n-no
 	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
 	var ge = Atlas.cubre("obj:e-" + o) if Datos.CAL and not an else null   # 1.47: a escala con el protagonista (escala.py), solo con CAL
 	var fd = _detalle_obj(o, tx) if Datos.CAL and not an else null   # 1.48: con lo que trae encima (detalle.py)
@@ -805,8 +805,8 @@ func _pinta_mesa(f, xp: float, yp: float, pl, i := -1, fm := 0, ex := []) -> voi
 # sin plantas, a la altura de un esqueje; la cuerda del techo se desvanece hacia arriba en FOCO_DEG pasos
 func _focos_mesa(i: int, xp: float, yp: float, fm: int, pl) -> void:
 	var D = J.D
-	var g = Atlas.cubre("obj:focoN")
-	var f = Atlas.frame_de(g, "focoN-%s-%d" % [J.S.nave.f[i] if J.S.get("nave") != null else "led", 1 if fm else 0], "unica", 0, {"i": 0}) if g else null
+	var g = Atlas.cubre("obj:focoN")  # i18n-no
+	var f = Atlas.frame_de(g, "focoN-%s-%d" % [J.S.nave.f[i] if J.S.get("nave") != null else "led", 1 if fm else 0], "unica", 0, {"i": 0}) if g else null  # i18n-no
 	if f == null:
 		return
 	var top: float = (yp - 47 + Arte.fila_arriba(pl)) if pl != null else (yp - 47 + 25 - int(D.FOCO_ALTO))
@@ -852,7 +852,7 @@ func _plantas_mesa(gr, i: int, fm: int):
 	if not Me:
 		return null
 	var p := {"sid": J.lot_sid(Me.k), "f": Me.get("f")}
-	var f = Atlas.frame_de(gr, "plantasN-1" if fm == 1 else "plantasN-%d-%s" % [fm, Datos.porte_planta(S_, p)], "unica", 0, {"i": 0})
+	var f = Atlas.frame_de(gr, "plantasN-1" if fm == 1 else "plantasN-%d-%s" % [fm, Datos.porte_planta(S_, p)], "unica", 0, {"i": 0})  # i18n-no
 	if f == null:
 		return null
 	var s = Datos.strain(S_, p.sid)
