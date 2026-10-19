@@ -552,6 +552,14 @@ func mal_g(k: String) -> float:
 		t += float(mal(k).buds[q].g)
 	return t
 
+func mal_ab(k: String) -> Dictionary:   # MAESTRO [3]: las dosis de abono de floración en el maletero (m MEATZA, o ORTUA BIO)
+	if not (mal(k).get("ab") is Dictionary):
+		mal(k).ab = {"m": 0, "o": 0}
+	return mal(k).ab
+
+func mal_peso(k: String) -> float:   # lo que lleva el maletero, en g: los cogollos y el abono (MALETERO.dosis g la dosis)
+	return mal_g(k) + (float(mal_ab(k).m) + float(mal_ab(k).o)) * float(D.MALETERO.dosis)
+
 func items_almacen(t: String) -> Array:
 	var o := []
 	if t == "mal":
@@ -661,7 +669,7 @@ func desc_almacen(A: Dictionary) -> String:
 	if A.t == "mal":
 		var cap := mal_kg(MAL_K)
 		if it == null or it.k == "+":
-			return T("GUARDAR: llevas {a} de cogollos y en el maletero caben {b} más.\nA: guardar · B: cerrar.", {"a": g_txt(total_buds()), "b": g_txt(maxf(0, cap - mal_g(MAL_K)))})
+			return T("GUARDAR: llevas {a} de cogollos y en el maletero caben {b} más.\nA: guardar · B: cerrar.", {"a": g_txt(total_buds()), "b": g_txt(maxf(0, cap - mal_peso(MAL_K)))})
 		if it.k == "v":
 			return T("ENVASAR AL VACÍO: lo del maletero, en bolsas selladas; en un registro de tráfico se nota menos.{e}\nA: envasar · B: cerrar.", {"e": "" if S.items.get("vacio") else " " + K("Hace falta la envasadora de la tienda online.")})
 		return T("{n}: {g} · {t} % THC{v}.\nA: sacarlo · B: cerrar.", {"n": lot_nombre(it.k), "g": g_lote(it.b.g), "t": Datos.pct(it.b.thc), "v": (" · " + K("al vacío")) if it.b.get("vac") else ""})
@@ -794,11 +802,11 @@ func panel_almacen(o: Array, A: Dictionary, px: int, py: int) -> void:
 		if it.k == "+" or it.k == "v":
 			o.append(["@", "alm-mas-g", px + 12, py + 8])
 			_barra_alm(o, px, py, 0, "g", peso_encima() / cap_mochila(), "#e0a040")
-			_barra_alm(o, px, py, 1, "cu", mal_g(MAL_K) / mc, "#d8b048")
+			_barra_alm(o, px, py, 1, "cu", mal_peso(MAL_K) / mc, "#d8b048")
 			return
 		_tarro(o, px + 12, py + 8, 18, 25, _color_lote(it.k), float(it.gj) / float(D.ALM.tarro), it.b.get("vac", false), "alm-tarro-s" if it.k.contains("*") else "alm-tarro", _dentro_lote(it.k, it.b), 2)
 		_barra_alm(o, px, py, 0, "thc", it.b.thc / 30.0, "#e8d070")
-		_barra_alm(o, px, py, 1, "cu", mal_g(MAL_K) / mc, "#d8b048")
+		_barra_alm(o, px, py, 1, "cu", mal_peso(MAL_K) / mc, "#d8b048")
 		return
 	var caja: bool = A.t == "caja"
 	var C: Dictionary = D.CAJA[int(S.caja.nivel)] if caja else {}
@@ -883,7 +891,7 @@ func rects_almacen(A: Dictionary) -> Array:
 					_tarro(o, x, y, 18, 25, _color_lote(Jt.k), float(Jt.gj) / float(D.ALM.tarro), Jt.b.get("vac", false), "alm-tarro-s" if Jt.k.contains("*") else "alm-tarro", _dentro_lote(Jt.k, Jt.b))
 				if q == A.i:
 					_marco(o, x - 2, y - 2, 22, 29)
-		o.append_array([[x0 + 8, y0 + 89, 152, 5, "#2a2d34"], [x0 + 9, y0 + 90, Datos.jsround(150 * minf(1.0, mal_g(MAL_K) / maxf(1.0, mal_kg(MAL_K)))), 3, "#d8b048"]])
+		o.append_array([[x0 + 8, y0 + 89, 152, 5, "#2a2d34"], [x0 + 9, y0 + 90, Datos.jsround(150 * minf(1.0, mal_peso(MAL_K) / maxf(1.0, mal_kg(MAL_K)))), 3, "#d8b048"]])
 		panel_almacen(o, A, x0 + 172, y0)
 		return o
 	if A.t == "caja":

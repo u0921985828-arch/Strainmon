@@ -87,9 +87,6 @@ func vehiculo():
 # casa): en Ribera Verde, dentro del garaje; en los demás, en una plaza del aparcamiento dibujado junto a la parada (APARC)
 const GARAJE := "town"
 
-func de_art(art: String) -> String:   # «de» + el artículo: «del utilitario», «de la moto»
-	return ("del " + art.substr(3)) if art.begins_with("el ") else ("de " + art)   # i18n-no
-
 func donde(k: String) -> String:
 	return String(S.coches[k].get("en", GARAJE))
 

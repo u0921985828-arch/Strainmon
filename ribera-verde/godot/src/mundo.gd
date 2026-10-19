@@ -467,6 +467,9 @@ func cam_tarros() -> int:
 func extr_nombre(k: String, mn := false) -> String:
 	return (D.EXTR[tipo_extr(k)].n.to_lower() if mn else D.EXTR[tipo_extr(k)].n) + " de " + lot_nombre(base_extr(k))
 
+func de_art(art: String) -> String:   # «de» + el artículo: «del utilitario», «de la moto»
+	return ("del " + art.substr(3)) if art.begins_with("el ") else ("de " + art)   # i18n-no
+
 func _cura(L: Dictionary) -> Array:
 	var o := []
 	for k in L:
@@ -487,6 +490,17 @@ func curado_dia(av: Array) -> void:
 		av.append(T("Curada en la caja fuerte: {l}", {"l": y_lista(c.map(lot_nombre))}))
 	if nv.size():
 		av.append(T("Curado en la nevera: {l}", {"l": y_lista(nv.map(extr_nombre))}))
+	if Datos.CAL and S.items.get("tarros") and S.get("coches") is Dictionary:   # MAESTRO [3]: el maletero también cura en botes (los tarros); lo envasado al vacío, no
+		for k in D.CONCE.orden:
+			var ml = S.coches.get(k, {}).get("mal")
+			if ml is Dictionary and ml.get("buds", {}).size():
+				var bs := {}
+				for q in ml.buds:
+					if not ml.buds[q].get("vac"):
+						bs[q] = ml.buds[q]
+				var cm: Array = _cura(bs)
+				if cm.size():
+					av.append(T("Curada en el maletero {dv}: {l}", {"dv": de_art(String(D.CONCE.v[k].art)), "l": y_lista(cm.map(lot_nombre))}))
 	if cam_ya() and cam().get("buds", {}).size():   # 1.43.6: el camarote cura en sus tarros de 10 L y, con sobres, afina
 		var cc: Array = _cura(S.cam.buds)
 		if cc.size():

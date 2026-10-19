@@ -350,11 +350,52 @@ func kilometros(k: String, km: int) -> String:
 # control de tráfico, MALETERO.vacio.f)
 func coche_menu(k: String):
 	var V: Dictionary = D.CONCE.v[k]
-	var j: int = await ask(T("{A}, en el aparcamiento. Maletero: {g} de {c}.", {"A": mayus(V.art), "g": g_txt(mal_g(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), [K("Viajar"), K("Maletero"), K("Nada")])
+	var ops := [K("Viajar"), K("Maletero")]
+	ops.append_array(ops_abono(k))
+	ops.append(K("Nada"))
+	var j: int = await ask(T("{A}, en el aparcamiento. Maletero: {g} de {c}.", {"A": mayus(V.art), "g": g_txt(mal_peso(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), ops)
+	var op: String = ops[j] if j >= 0 and j < ops.size() else ""
 	if j == 0:
 		await conducir(k)
 	elif j == 1:
 		await maletero(k)
+	elif op != "":
+		await accion_abono(k, op)
+
+# (MAESTRO [3]: «rellenar tanques de abono de la nave»): las garrafas de abono de floración que llevas, al maletero; en Valdehierro,
+# del maletero a la estantería y los tanques de la nave (S.nave.ab)
+func ops_abono(k: String) -> Array:
+	var o := []
+	if int(S.items.get("fert", 0)) + int(S.items.get("ofert", 0)) > 0:
+		o.append(T("Cargar el abono {dv}", {"dv": de_art(String(D.CONCE.v[k].art))}))
+	if S.map == "valdehierro" and S.get("nave") and float(mal_ab(k).m) + float(mal_ab(k).o) > 0:   # i18n-no
+		o.append(K("Rellenar los tanques de la nave"))
+	return o
+
+func accion_abono(k: String, op: String) -> void:
+	var A := mal_ab(k)
+	if op == K("Rellenar los tanques de la nave"):
+		var da := {"m": int(A.m), "o": int(A.o)}
+		S.nave.ab.m += A.m
+		S.nave.ab.o += A.o
+		A.m = 0
+		A.o = 0
+		sfx("sel")
+		await say(T("Descargas el abono en la nave: MEATZA ×{m} y ORTUA BIO ×{o}. Los tanques, llenos: MEATZA ×{tm} · ORTUA BIO ×{to}.", da.merged({"tm": dosis_txt(S.nave.ab.m), "to": dosis_txt(S.nave.ab.o)})))
+		return
+	var cabe: int = int(floor((mal_kg(k) - mal_peso(k)) / float(D.MALETERO.dosis)))
+	var q := {"m": 0, "o": 0}
+	for par in [["fert", "m"], ["ofert", "o"]]:   # i18n-no
+		var n: int = mini(int(S.items.get(par[0], 0)), cabe)
+		cabe -= n
+		q[par[1]] = n
+		S.items[par[0]] = int(S.items.get(par[0], 0)) - n
+		A[par[1]] = int(A[par[1]]) + n
+	if q.m + q.o < 1:
+		await say(K("En el maletero no cabe más."))
+		return
+	sfx("sel")
+	await say(T("Cargas el abono en el maletero: MEATZA ×{m} y ORTUA BIO ×{o} dosis.", q) + ((" " + K("No cabe todo: el resto se queda fuera.")) if int(S.items.get("fert", 0)) + int(S.items.get("ofert", 0)) > 0 else ""))
 
 # A en la puerta del garaje: salir con uno de los que hay dentro o abrirle el maletero
 func garaje_menu():
@@ -367,14 +408,21 @@ func garaje_menu():
 		ops.append(T("Salir en {v}", {"v": String(D.CONCE.v[k].art)}))
 	for k in ks:
 		ops.append(T("Maletero {dv}", {"dv": de_art(String(D.CONCE.v[k].art))}))
+	var ab := []
+	for k in ks:
+		for o in ops_abono(k):
+			ops.append(o)
+			ab.append(k)
 	ops.append(K("Nada"))
 	var c: int = await ask(K("El garaje de la tía."), ops)
 	if c < 0 or c >= ops.size() - 1:
 		return
 	if c < ks.size():
 		await conducir(ks[c])
-	else:
+	elif c < 2 * ks.size():
 		await maletero(ks[c - ks.size()])
+	else:
+		await accion_abono(ab[c - 2 * ks.size()], ops[c])
 
 func maletero(k: String) -> void:
 	MAL_K = k
@@ -405,7 +453,7 @@ func guardar_mal(k: String) -> void:
 		return
 	var q := 0.0
 	for l in L:
-		var g: float = minf(l[1].g, floor(mal_kg(k) - mal_g(k)))
+		var g: float = minf(l[1].g, floor(mal_kg(k) - mal_peso(k)))
 		if g < 1:
 			break
 		q += g

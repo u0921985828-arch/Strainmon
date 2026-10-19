@@ -262,9 +262,15 @@ s1e56d38e,neumáticos nuevos a los {km} km,new tyres at {km} km
 s0002b805,Taller · {n},Garage · {n}
 s2a1d17f9,{q}: {e} (te quedan a deber {f}),{q}: {e} (you still owe {f})
 sf332a444,"{a}, en el taller. {tx}.","{a}, at the garage. {tx}."
-sfcdfc8f0,"{A}, en el aparcamiento. Maletero: {g} de {c}.","{A}, in the car park. Boot: {g} of {c}."
 sfb00cb13,Viajar,Travel
 sbeda21a5,Maletero,Boot
+sfcdfc8f0,"{A}, en el aparcamiento. Maletero: {g} de {c}.","{A}, in the car park. Boot: {g} of {c}."
+sf80e3683,Cargar el abono {dv},Load the fertiliser into {dv}
+s13b6f339,Rellenar los tanques de la nave,Refill the warehouse tanks
+sd82d8661,"Descargas el abono en la nave: MEATZA ×{m} y ORTUA BIO ×{o}. Los tanques, llenos: MEATZA ×{tm} · ORTUA BIO ×{to}.",You unload the fertiliser at the warehouse: MEATZA ×{m} and ORTUA BIO ×{o}. The tanks now hold MEATZA ×{tm} · ORTUA BIO ×{to}.
+s02f43829,En el maletero no cabe más.,The boot is full.
+sdefbc86b,Cargas el abono en el maletero: MEATZA ×{m} y ORTUA BIO ×{o} dosis.,You load the fertiliser into the boot: MEATZA ×{m} and ORTUA BIO ×{o} doses.
+sdf439b17,No cabe todo: el resto se queda fuera.,Not everything fits: the rest stays out.
 s84a3d684,El garaje de la tía. Está vacío: aquí se guarda lo que compres en AUTOS RIBERA.,Your aunt's garage. It's empty: whatever you buy at AUTOS RIBERA is kept here.
 s6ac5d7a0,Salir en {v},Drive out in {v}
 sf9c3a4e4,Maletero {dv},Boot {dv}
@@ -272,9 +278,7 @@ s07f3c4f1,El garaje de la tía.,Your aunt's garage.
 s30e044fa,No te cabe nada más encima.,You can't carry any more.
 s52465e63,Sacas {g} de {n}.,You take out {g} of {n}.
 s90031372,No llevas cogollos encima.,You have no buds on you.
-s02f43829,En el maletero no cabe más.,The boot is full.
 sf454b922,Guardas {q} en el maletero.,You put {q} in the boot.
-sdf439b17,No cabe todo: el resto se queda fuera.,Not everything fits: the rest stays out.
 sa6244d43,Sin envasadora al vacío: se pide en la tienda online.,No vacuum sealer: order one from the online shop.
 s1e788ba4,Envasas al vacío {n} lotes del maletero.,You vacuum-seal {n} batches in the boot.
 s456f33d9,Ya está todo envasado.,Everything is already sealed.
@@ -1447,6 +1451,7 @@ sd11be8ca,{g}.ª generación · {o},Gen {g} · {o}
 s6b714594,<small>NUEVA EN LA GENOTECA{cu}</small>,<small>NEW IN THE GENEBANK{cu}</small>
 s91fa5a5c,Curada en la caja fuerte: {l},Cured in the safe: {l}
 s7403d508,Curado en la nevera: {l},Cured in the fridge: {l}
+scfe37c45,Curada en el maletero {dv}: {l},Cured in the boot {dv}: {l}
 s441e4614,Curada en el camarote: {l},Cured in the loft: {l}
 scb7ca896,Afinada al 62 % en el camarote: {l} (un {p} % más cara),Fine-tuned at 62 % in the loft: {l} ({p} % pricier)
 se24ab753,Se han gastado los sobres de humedad del camarote,The loft's humidity packs are used up

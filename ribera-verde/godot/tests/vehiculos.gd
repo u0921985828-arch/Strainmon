@@ -224,6 +224,50 @@ func _corre() -> void:
 	S.coches.utilitario.erase("en")
 	J.gancho_almacen = Callable()
 	J.S.buds = {}
+	# 7b) el maletero cura en botes (con los tarros, como la caja fuerte); lo envasado al vacío, no
+	J.mal("utilitario").buds = {"ria": {"g": 30.0, "thc": 18.0, "dia": S.day}, "ak": {"g": 10.0, "thc": 18.0, "dia": S.day, "vac": true}}
+	var tar0 = S.items.get("tarros")
+	S.items.erase("tarros")
+	var av := []
+	J.curado_dia(av)
+	chk(float(J.mal("utilitario").buds.ria.get("cu", 0)) == 0.0, "sin tarros, en el maletero no se cura")
+	S.items.tarros = 1
+	for d in int(D.CURADO.dias):
+		J.curado_dia(av)
+	chk(float(J.mal("utilitario").buds.ria.get("cu", 0)) >= 1.0 and float(J.mal("utilitario").buds.ria.thc) > 18.0, "con los tarros, curada en el maletero: %s" % [J.mal("utilitario").buds.ria])
+	chk(float(J.mal("utilitario").buds.ak.get("cu", 0)) == 0.0, "lo envasado al vacío no se cura")
+	chk(av.any(func(t): return "maletero del utilitario" in String(t)), "el aviso del curado: %s" % [av])
+	if tar0 == null:
+		S.items.erase("tarros")
+	else:
+		S.items.tarros = tar0
+	J.mal("utilitario").buds = {}
+	# 7c) el abono de floración al maletero y, en Valdehierro, a los tanques de la nave (cuenta en el peso del maletero)
+	S.items.fert = 20
+	S.items.ofert = 8
+	J.enter_map("town", 10, 9, "up")
+	QUIERO = ["Cargar el abono del utilitario"]
+	chk(corre(func(): await J.object_action(10, 8)), "garaje → cargar el abono")
+	chk(int(J.mal_ab("utilitario").m) == 20 and int(J.mal_ab("utilitario").o) == 8 and int(S.items.fert) == 0 and int(S.items.ofert) == 0, "el abono, en el maletero: %s" % [J.mal_ab("utilitario")])
+	chk(absf(J.mal_peso("utilitario") - 28 * float(D.MALETERO.dosis)) < 0.01, "pesa: %.0f g" % J.mal_peso("utilitario"))
+	var nave0 = S.get("nave")
+	S.nave = J.nave_nueva()
+	var abm: float = float(S.nave.ab.m)
+	S.coches.utilitario.en = "valdehierro"
+	J.enter_map("valdehierro", int(D.PARADAS.valdehierro.a[0]), int(D.PARADAS.valdehierro.a[1]), "down")
+	QUIERO = ["Rellenar los tanques de la nave"]
+	MENUS = []
+	chk(corre(func(): await J.coche_menu("utilitario")), "en Valdehierro → rellenar los tanques")
+	chk(float(S.nave.ab.m) == abm + 20 and float(S.nave.ab.o) == 8 and int(J.mal_ab("utilitario").m) == 0, "los tanques de la nave, rellenos: %s" % [S.nave.ab])
+	S.coches.utilitario.en = "puerto"
+	J.enter_map("puerto", 20, 9, "down")
+	S.items.fert = 0
+	MENUS = []
+	QUIERO = ["Nada"]
+	corre(func(): await J.coche_menu("utilitario"))
+	chk(MENUS.size() and not MENUS[0].has("Rellenar los tanques de la nave"), "fuera de Valdehierro, no se rellena: %s" % [MENUS])
+	S.coches.utilitario.erase("en")
+	S.nave = nave0
 	# 8) la envasadora, en la tienda online
 	S.items.erase("vacio")
 	S.banco = 1000

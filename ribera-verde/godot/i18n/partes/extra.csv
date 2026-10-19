@@ -83,3 +83,8 @@ El garaje de la tía. Está vacío: aquí se guarda lo que compres en AUTOS RIBE
 Salir en {v},Drive out in {v}
 Maletero {dv},Boot {dv}
 El garaje de la tía.,Your aunt's garage.
+"Curada en el maletero {dv}: {l}","Cured in the boot {dv}: {l}"
+Cargar el abono {dv},Load the fertiliser into {dv}
+Rellenar los tanques de la nave,Refill the warehouse tanks
+"Descargas el abono en la nave: MEATZA ×{m} y ORTUA BIO ×{o}. Los tanques, llenos: MEATZA ×{tm} · ORTUA BIO ×{to}.",You unload the fertiliser at the warehouse: MEATZA ×{m} and ORTUA BIO ×{o}. The tanks now hold MEATZA ×{tm} · ORTUA BIO ×{to}.
+Cargas el abono en el maletero: MEATZA ×{m} y ORTUA BIO ×{o} dosis.,You load the fertiliser into the boot: MEATZA ×{m} and ORTUA BIO ×{o} doses.
