@@ -983,7 +983,7 @@ func patrulla() -> void:
 		return
 	for i in range(1, 10):   # los clientes que estén en la recta, fuera (su sitio sale del azar del día)
 		var q = J.ent_at(t.x + DV[recta][0] * i, t.y + DV[recta][1] * i)
-		if q and q.get("client"):
+		if q and q.def.get("client"):
 			J.remove_client(q.id)
 	var e: Dictionary = pats[0]
 	for o in pats:   # quietos lejos mientras el jugador se aparta del portal
