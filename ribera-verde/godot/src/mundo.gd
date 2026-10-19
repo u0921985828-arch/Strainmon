@@ -250,6 +250,46 @@ func _sprites_look() -> Dictionary:
 func mujer_look(look) -> bool:
 	return D.GENERO.mujeres.has(sprite_look(look))
 
+# MAESTRO [8]: el retrato de quien habla (ui.gd, _pon_retrato): [look, mujer] por su nombre (NPCDEF y LOOKS; «SMS · X», «DON X»),
+# si no, el de la persona con la que hablas en vivo (habla_look) y, si es un nombre de persona sin muñeco (Koldo, Gorka…), uno
+# propio por su nombre; lo que no es una persona (CARTA, BANCO…), sin retrato
+const NO_PERSONA := ["carta", "gente", "banco", "ayuntamiento", "taller", "kaia", "aseguradora", "autobuses de la comarca", "notas de la tia", "el olor", "movil", "nave"]   # i18n-no
+var _looks_n := {}
+
+static func _llano(t: String) -> String:
+	var r := t.to_lower().strip_edges()
+	for q in [["á", "a"], ["é", "e"], ["í", "i"], ["ó", "o"], ["ú", "u"], ["ñ", "n"], ["ü", "u"]]:
+		r = r.replace(q[0], q[1])
+	return r
+
+func retrato_de(n: String):
+	if S == null:
+		return null
+	var k := _llano(n.trim_prefix("SMS · ").trim_prefix("SMS: "))
+	if k.begins_with("don "):
+		k = k.substr(4)
+	if k == "" or k in NO_PERSONA:
+		return null
+	if _looks_n.is_empty():
+		for d in D.NPCDEF:
+			if d.get("look") is String and not _looks_n.has(_llano(str(d.id))):
+				_looks_n[_llano(str(d.id))] = d.look
+		_looks_n["agente"] = "cop"
+	var L = null
+	if _looks_n.has(k) and D.LOOKS.has(_looks_n[k]):
+		L = D.LOOKS[_looks_n[k]]
+	elif D.LOOKS.has(k):
+		L = D.LOOKS[k]
+	elif S.get("name") and _llano(str(S.name)) == k:
+		L = D.LOOKS.player
+	if L is Dictionary:
+		return [L, mujer_look(L)]
+	if habla_look is Dictionary:
+		return [habla_look, mujer_look(habla_look)]
+	if " " in k or k.length() < 3:
+		return null
+	return [Datos.rand_look("ret" + k, "client"), mujer_nombre(k)]
+
 # PIJA, CATADORA: la etiqueta del tipo de cliente, en femenino si es una chica (1.43.3)
 func etiqueta_ct(t: String, m: bool) -> String:
 	return D.GENERO.ctM.get(t, D.CTYPES[t].label) if m and Datos.CAL else D.CTYPES[t].label
@@ -519,6 +559,10 @@ func curado_dia(av: Array) -> void:
 				var cm: Array = _cura(bs)
 				if cm.size():
 					av.append(T("Curada en el maletero {dv}: {l}", {"dv": de_art(String(D.CONCE.v[k].art)), "l": y_lista(cm.map(lot_nombre))}))
+	if navc().get("buds", {}).size():   # MAESTRO [8]: las estanterías de la nave
+		var cn: Array = _cura(S.nave.cur.buds)
+		if cn.size():
+			av.append(T("Curada en la nave: {l}", {"l": y_lista(cn.map(lot_nombre))}))
 	if cam_ya() and cam().get("buds", {}).size():   # 1.43.6: el camarote cura en sus tarros de 10 L y, con sobres, afina
 		var cc: Array = _cura(S.cam.buds)
 		if cc.size():
@@ -736,7 +780,77 @@ func montar_nave() -> void:
 	if S != null and S.get("nave") != null and Datos.CAL and n.o[6][17] == null and n.o[7][17] == null and puertas_int("nave").is_empty():
 		n.o[6][17] = "bedT"   # i18n-no
 		n.o[7][17] = "bedB"
+	# MAESTRO [8]: las estanterías de tarros de 10 L del curado de la nave (CURADO_NAVE), en los huecos libres de la pared
+	for q in D.get("CURADO_NAVE", {}).get("sitio", []):
+		if n.o[int(q[1])][int(q[0])] == "estanteC":   # i18n-no
+			n.o[int(q[1])][int(q[0])] = null
+	var ne := navc_est()
+	for q in D.get("CURADO_NAVE", {}).get("sitio", []):
+		if ne <= 0:
+			break
+		if n.o[int(q[1])][int(q[0])] == null:
+			n.o[int(q[1])][int(q[0])] = "estanteC"   # i18n-no
+			ne -= 1
 	montar_puertas("nave")   # 1.51: el despacho y la habitación, detrás de sus puertas
+
+# MAESTRO [8]: el despacho de lujo (DESPACHO): la tarima, las paredes, la alfombra y los muebles, sobre la copia del de siempre
+var _desp0 = null
+
+func montar_despacho() -> void:
+	var m = MAPS.get("nave-d")
+	if m == null:
+		return
+	if _desp0 == null:
+		_desp0 = {"g": m.g.duplicate(true), "o": m.o.duplicate(true)}
+	for y in int(m.h):
+		m.g[y] = _desp0.g[y].duplicate()
+		m.o[y] = _desp0.o[y].duplicate()
+	if not desp_ya():
+		return
+	var DS: Dictionary = D.DESPACHO
+	for y in int(m.h):
+		for x in int(m.w):
+			var g: String = m.g[y][x]
+			if g == "floorN":
+				m.g[y][x] = DS.suelo
+			elif g == "iwT_nave" or g == "iwB_nave":
+				m.g[y][x] = g.left(4) + "home-" + str(int(DS.pared))   # i18n-no
+	var al: Array = DS.alf
+	for j in 4:
+		m.g[int(al[1]) + j / 2][int(al[0]) + j % 2] = String(al[2]) + "abcd"[j] + "-" + String(DS.suelo).get_slice("-", 1)
+	for q in DS.quita:
+		m.o[int(q[1])][int(q[0])] = null
+	for q in DS.o:
+		m.o[int(q[1])][int(q[0])] = q[2]
+
+# MAESTRO [8]: el curado de la nave, como el camarote: S.nave.cur = {buds, mj (1 con la ampliación)}; CURADO_NAVE.est
+# estanterías de serie, el doble con la ampliación, de CAMAROTE.est.tarros tarros de CAMAROTE.tarro g
+func navc() -> Dictionary:
+	if not Datos.CAL or S == null or S.get("nave") == null:
+		return {}
+	if not (S.nave.get("cur") is Dictionary):
+		S.nave.cur = {"buds": {}, "mj": 0}
+	return S.nave.cur
+
+func navc_est() -> int:
+	var c := navc()
+	return 0 if c.is_empty() else int(D.CURADO_NAVE.est) * (2 if int(c.get("mj", 0)) else 1)
+
+func navc_cap() -> float:
+	return float(navc_est() * int(D.CAMAROTE.est.tarros) * int(D.CAMAROTE.tarro))
+
+func navc_g() -> float:
+	var t := 0.0
+	for k in navc().get("buds", {}):
+		t += float(S.nave.cur.buds[k].g)
+	return t
+
+# MAESTRO [8]: el despacho de lujo comprado (S.desp = {d, money, buds}); la caja fuerte del despacho no la encuentra la redada
+func desp() -> Dictionary:
+	return S.desp if S != null and S.get("desp") is Dictionary else {}
+
+func desp_ya() -> bool:
+	return Datos.CAL and not desp().is_empty() and S.get("nave") != null
 
 # el concesionario del barrio alto (1.43, lo pidió el usuario): con AUTOS RIBERA abierto (S.flags.conce), su edificio (D.CONCE.bld),
 # sin los árboles de donde va (CONCE.quita), con la acera, las banderas y la puerta; sin él, el barrio alto como estaba
@@ -1821,6 +1935,8 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_alto()
 	if name_ == "camarote":
 		montar_camarote()
+	if name_ == "nave-d":
+		montar_despacho()
 	if name_ == "setas":
 		montar_setas()
 	montar_locales(name_)   # 1.45: la puerta de los negocios y sus mejoras
@@ -2487,4 +2603,10 @@ func deudas() -> void:
 	pass
 
 func vida_dia() -> void:
+	pass
+
+func navc_action():   # MAESTRO [8], en setas.gd
+	pass
+
+func caja_desp():   # MAESTRO [8], en nave.gd
 	pass

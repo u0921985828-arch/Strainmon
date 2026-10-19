@@ -16,6 +16,7 @@ const SW_MAX := 450
 const Atlas = preload("res://src/atlas.gd")
 const Sonido = preload("res://src/sonido.gd")
 const VistaC = preload("res://src/vista.gd")
+const Retrato = preload("res://src/retrato.gd")
 
 const BOX := Color("#f8f8f0")
 const INK := Color("#2c2c36")
@@ -69,6 +70,9 @@ var dlg := PanelContainer.new()
 var dlg_txt := Label.new()
 var dlg_nm := PanelContainer.new()
 var dlg_nm_txt := Label.new()
+var retrato := TextureRect.new()   # MAESTRO [8]: el retrato de quien habla (PortraitRect), dentro de la caja, a la izquierda
+var retrato_l = null               # [look, mujer] de quien habla ahora
+var habla_look = null              # el look de la persona con la que hablas en vivo (hablar_con)
 var dlg_more := Control.new()
 var menu_box := PanelContainer.new()
 var menu_col := VBoxContainer.new()
@@ -188,6 +192,18 @@ func _ready() -> void:
 	dlg_nm.add_child(dlg_nm_txt)
 	dlg_nm.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(dlg_nm)
+	retrato.name = "PortraitRect"   # i18n-no
+	retrato.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	retrato.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	retrato.stretch_mode = TextureRect.STRETCH_SCALE
+	retrato.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	add_child(retrato)
+	dlg_nm.visibility_changed.connect(func():
+		if not dlg_nm.visible:
+			retrato.hide())
+	dlg.visibility_changed.connect(func():
+		if not dlg.visible:
+			retrato.hide())
 	dlg_more.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dlg_more.draw.connect(func():
 		var y := (2 * us if int(M.reloj / 300) % 2 else 0.0)
@@ -259,7 +275,7 @@ func _ready() -> void:
 	wipe.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	wipe.draw.connect(_pinta_wipe)
 	add_child(wipe)
-	for n in [hud, titulo, bE, bP, vc_info, toast_box, dlg, dlg_nm, dlg_more, menu_box, name_box, lector, endcard, wipe]:
+	for n in [hud, titulo, bE, bP, vc_info, toast_box, dlg, dlg_nm, retrato, dlg_more, menu_box, name_box, lector, endcard, wipe]:
 		n.hide()
 	_mandos()
 	sonido = Sonido.new()
@@ -1176,6 +1192,7 @@ func type_text(text: String, name_ := "") -> void:
 		dlg.show()
 		dlg_nm.visible = name_ != ""
 		dlg_nm_txt.text = I18n.v(name_)
+		_pon_retrato(name_, full, 0)
 		dlg_more.hide()
 		dlg_txt.text = ""
 		_coloca.call_deferred()
@@ -1183,6 +1200,8 @@ func type_text(text: String, name_ := "") -> void:
 		M.quita(st.iv)
 		if not oraculo:
 			dlg_txt.text = full
+			if retrato.visible and retrato_l != null:
+				retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], Retrato.expresion(full), 0)
 		st.done = true
 		pop(st.h)
 		p.res()
@@ -1193,6 +1212,8 @@ func type_text(text: String, name_ := "") -> void:
 		st.n += 1
 		if st.n % 3 == 0:
 			sfx("blip")
+			if retrato.visible and retrato_l != null:   # la boca, al ritmo del texto
+				retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], Retrato.expresion(full), (st.n / 3) % 2 if st.i < full.length() else 0)
 		if st.i >= full.length():
 			fin.call(), 20)
 	st.h = func(b):
@@ -1200,6 +1221,21 @@ func type_text(text: String, name_ := "") -> void:
 			fin.call()
 	push(st.h)
 	await Motor.espera(p)
+
+# MAESTRO [8]: el retrato (con Datos.CAL, fuera de las pruebas contra el HTML): quien habla por su nombre o con quien hablas en
+# vivo (retrato_de, en mundo.gd), con el gesto por el tono de lo que dice (Retrato.expresion)
+const RETRATO_W := 32
+
+func retrato_de(_n: String):
+	return null
+
+func _pon_retrato(name_: String, full: String, boca: int) -> void:
+	retrato_l = retrato_de(name_) if Datos.CAL and name_ != "" else null
+	if retrato_l == null:
+		retrato.hide()
+		return
+	retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], Retrato.expresion(full), boca)
+	retrato.show()
 
 func say(text: String, name_ := "", keep := false) -> void:
 	if recortada(text):
@@ -1612,11 +1648,15 @@ func _coloca() -> void:
 		# en el combate, el texto no pasa por debajo del menú de la derecha (118 de ancho): .dlg con padding-right 126 en el CSS
 		var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
 		dlg.get_theme_stylebox("panel").content_margin_right = ((126 if bt else 10) + 2) * us
+		dlg.get_theme_stylebox("panel").content_margin_left = ((10 + (RETRATO_W + 4 if retrato.visible else 0)) + 2) * us
 		dlg.reset_size()
 		dlg.size.x = R.size.x - 6 * us
 		dlg.position = Vector2(R.position.x + 3 * us, R.end.y - 3 * us - dlg.size.y)
 		dlg_nm.reset_size()
 		dlg_nm.position = dlg.position + Vector2(6 * us, -12 * us)
+		if retrato.visible:
+			retrato.size = Vector2(RETRATO_W, RETRATO_W) * us
+			retrato.position = dlg.position + Vector2(6 * us, maxf(6 * us, (dlg.size.y - RETRATO_W * us) / 2))
 		dlg_more.position = dlg.position + dlg.size - Vector2(8 * us + 8 * us, 4 * us + 5 * us)
 		dlg_more.size = Vector2(8 * us, 7 * us)
 		# La primera vez, el texto aún no sabe su ancho y el cuadro sale de toda la pantalla; se recoloca al fotograma siguiente

@@ -270,9 +270,23 @@ func mejoras_nave() -> void:
 	var N: Dictionary = S.nave
 	var j := 0
 	while true:
-		j = await menu([_fila_mejora(D.EXTR_NAVE, "ex", K("Extracción")), _fila_mejora(D.RIEGO_NAVE, "rg", K("Riego")), {"label": K("Volver"), "desc": ""}], {"cls": "full", "title": K("MEJORAS DE LA NAVE"), "title2": T("Nave {n}", {"n": nivel_nave()}), "desc": true, "initial": j})
-		if j < 0 or j > 1:
+		var F := [_fila_mejora(D.EXTR_NAVE, "ex", K("Extracción")), _fila_mejora(D.RIEGO_NAVE, "rg", K("Riego"))]
+		var Q := ["ex", "rg"]
+		if Datos.CAL:
+			var cu: Dictionary = D.CURADO_NAVE
+			F.append({"label": "%s: %s" % [I18n.v(K("Curado")), T("{t} tarros", {"t": int(navc_cap() / float(D.CAMAROTE.tarro))})], "right": K("a tope") if int(navc().get("mj", 0)) else Datos.eur(cu.p), "desc": cu.d})
+			Q.append("cur")
+			if _nave_tope():
+				var ds: Dictionary = D.DESPACHO
+				F.append({"label": K("Despacho de lujo"), "right": K("hecho") if desp_ya() else Datos.eur(ds.p), "desc": ds.d})
+				Q.append("desp")
+		F.append({"label": K("Volver"), "desc": ""})
+		j = await menu(F, {"cls": "full", "title": K("MEJORAS DE LA NAVE"), "title2": T("Nave {n}", {"n": nivel_nave()}), "desc": true, "initial": j})
+		if j < 0 or j >= Q.size():
 			return
+		if Q[j] == "cur" or Q[j] == "desp":
+			await _mejora_cal(Q[j])
+			continue
 		var L: Array = D.RIEGO_NAVE if j else D.EXTR_NAVE
 		var k := "rg" if j else "ex"
 		if int(N[k]) + 1 >= L.size():
@@ -290,6 +304,91 @@ func mejoras_nave() -> void:
 		update_hud()
 		montar_nave()
 		await say(T("Arrieta y los suyos montan {a}. La nave ya es una nave {n}.", {"a": b.a, "n": nivel_nave()}))
+
+# MAESTRO [8]: la nave a tope (extracción y riego) abre el despacho de lujo
+func _nave_tope() -> bool:
+	return int(S.nave.ex) + 1 >= D.EXTR_NAVE.size() and int(S.nave.rg) + 1 >= D.RIEGO_NAVE.size()
+
+func _mejora_cal(q: String) -> void:
+	var M: Dictionary = D.CURADO_NAVE if q == "cur" else D.DESPACHO
+	if (q == "cur" and int(navc().get("mj", 0))) or (q == "desp" and desp_ya()):
+		return
+	if await ask(T("{n}: {d} {p}, montado hoy mismo.", {"n": M.n, "d": M.d, "p": Datos.eur(M.p)}), [K("Comprar"), K("No")]) != 0:
+		return
+	if S.money < M.p:
+		sfx("bad")
+		await say(K("No te llega."))
+		return
+	S.money -= M.p
+	if q == "cur":
+		navc().mj = 1
+	else:
+		S.desp = {"d": S.day, "money": 0, "buds": {}}
+	sfx("coin")
+	update_hud()
+	montar_nave()
+	if q == "cur":
+		await say(T("Arrieta cuelga dos estanterías más de tarros: ya caben {g} g curando en la nave.", {"g": Datos.jsround(navc_cap())}))
+	else:
+		await say(K("Arrieta y los suyos dejan el despacho de lujo: tarima, sofá, la pared de monitores con las cámaras de tus locales y una caja fuerte de las grandes."))
+
+# MAESTRO [8]: la caja fuerte del despacho de lujo (fuera de la nave: la redada no la encuentra)
+func caja_desp() -> void:
+	if not desp_ya():
+		return
+	var Ds: Dictionary = S.desp
+	var C: Dictionary = D.DESPACHO.caja
+	while true:
+		var g := 0.0
+		for k in Ds.buds:
+			g += float(Ds.buds[k].g)
+		var ops := [K("Guardar dinero"), K("Sacar dinero"), K("Guardar cogollos"), K("Sacar cogollos"), K("Nada")]
+		var o: int = await ask(T("La caja del despacho: {m} y {g} g (caben {cm} y {cg} g).", {"m": Datos.eur(Ds.money), "g": Datos.jsround(g), "cm": Datos.eur(C.money), "cg": int(C.g)}), ops)
+		if o < 0 or o == 4:
+			return
+		if o == 0:
+			var mx: int = int(min(S.money, float(C.money) - float(Ds.money)))
+			if mx <= 0:
+				await say(K("No hay nada que guardar o la caja está llena."))
+				continue
+			var q = await cuanto(K("¿Cuánto guardas?"), mx, [1000, 5000, 20000, 50000, 100000], func(v): return Datos.eur(v))
+			if int(q) <= 0:
+				continue
+			S.money -= int(q)
+			Ds.money = float(Ds.money) + int(q)
+		elif o == 1:
+			if float(Ds.money) <= 0:
+				await say(K("No hay dinero en la caja."))
+				continue
+			var q = await cuanto(K("¿Cuánto sacas?"), int(Ds.money), [1000, 5000, 20000, 50000, 100000], func(v): return Datos.eur(v))
+			if int(q) <= 0:
+				continue
+			Ds.money = float(Ds.money) - int(q)
+			S.money += int(q)
+		elif o == 2:
+			var ks := []
+			for k in S.buds:
+				if float(S.buds[k].g) > 0:
+					ks.append(k)
+			if ks.is_empty() or g >= float(C.g):
+				await say(K("No hay nada que guardar o la caja está llena."))
+				continue
+			var e: int = await menu(ks.map(func(k): return {"label": lot_nombre(k), "right": "%d g" % int(S.buds[k].g)}), {"title": K("¿Qué guardas?")})
+			if e < 0:
+				continue
+			var mg: int = int(min(float(S.buds[ks[e]].g), float(C.g) - g))
+			mover_lote(S.buds, Ds.buds, ks[e], mg)
+			await say(T("Guardas {g} g en la caja del despacho.", {"g": mg}))
+		elif o == 3:
+			var ks: Array = Ds.buds.keys()
+			if ks.is_empty():
+				await say(K("No hay cogollos en la caja."))
+				continue
+			var e: int = await menu(ks.map(func(k): return {"label": lot_nombre(k), "right": "%d g" % int(Ds.buds[k].g)}), {"title": K("¿Qué sacas?")})
+			if e < 0:
+				continue
+			mover_lote(Ds.buds, S.buds, ks[e], float(Ds.buds[ks[e]].g))
+		update_hud()
 
 func estante_nave() -> void:
 	var N: Dictionary = S.nave

@@ -1563,6 +1563,7 @@ scf5ddead,Te apartas. {n} se queda mirándote.,You back off. {n} keeps staring a
 sda8bda0a,^(water|roof|wall|win|iwT|iwB|void),
 s7a0737f6,bumpT,
 s656930f7,pisT,
+sa0d2acbe,SMS: ,SMS: 
 sa267487a,Índica {i} % · sativa {s} % · {m} % madre · {p} % padre,Indica {i} % · sativa {s} % · {m} % mother · {p} % father
 sa699142c,Índica {i} % · sativa {s} %,Indica {i} % · sativa {s} %
 s8cfe2b25,"THC {thc}% · ~{gm} g/m² · {d} días · Resist. {r}%
@@ -1578,6 +1579,7 @@ sd0873cc4, (rara), (rare)
 s91fa5a5c,Curada en la caja fuerte: {l},Cured in the safe: {l}
 s7403d508,Curado en la nevera: {l},Cured in the fridge: {l}
 scfe37c45,Curada en el maletero {dv}: {l},Cured in the boot {dv}: {l}
+s95c82ccd,Curada en la nave: {l},Cured at the warehouse: {l}
 s441e4614,Curada en el camarote: {l},Cured in the loft: {l}
 scb7ca896,Afinada al 62 % en el camarote: {l} (un {p} % más cara),Fine-tuned at 62 % in the loft: {l} ({p} % pricier)
 se24ab753,Se han gastado los sobres de humedad del camarote,The loft's humidity packs are used up
@@ -1594,6 +1596,10 @@ sa8896979,{g} g de rosin,{g} g of rosin
 sc285af6b, · curado, · cured
 sae7bad0d,Consigues {t}.,You get {t}.
 s2e273e39,{n} semillas de {nom},{n} {nom} seeds
+sd64e1e70,CURADO_NAVE,CURADO_NAVE
+s9f0ecb03,floorN,floorN
+s7844f227,iwT_nave,iwT_nave
+sadcb13a1,iwB_nave,iwB_nave
 s4c2cce78,conceK,
 sa0be55f0,carpasK,
 sbd7f05cd,elevT,elevT
@@ -1794,10 +1800,29 @@ s069a05af,a tope,maxed
 sc911c63f,Siguiente: {n}. {d},Next: {n}. {d}
 sa72ad395,Extracción,Extraction
 s7b725b5d,Riego,Watering
+s5d83adb4,Curado,Curing
+s314fabf0,{t} tarros,{t} jars
+s0e3e9c5c,Despacho de lujo,Luxury office
+s592024bf,hecho,done
 s34e4a08d,MEJORAS DE LA NAVE,WAREHOUSE UPGRADES
 sd5013d21,Nave {n},Warehouse {n}
 s1c793b40,"{n}: {d} {p}, montado hoy mismo.","{n}: {d} {p}, fitted today."
 s58f46bc2,Arrieta y los suyos montan {a}. La nave ya es una nave {n}.,Arrieta and his lot fit {a}. The warehouse is now a {n} one.
+sa62faa6b,Arrieta cuelga dos estanterías más de tarros: ya caben {g} g curando en la nave.,Arrieta hangs two more shelves of jars: {g} g can now cure at the warehouse.
+s04b3d0d8,"Arrieta y los suyos dejan el despacho de lujo: tarima, sofá, la pared de monitores con las cámaras de tus locales y una caja fuerte de las grandes.","Arrieta and his crew finish the luxury office: wooden floor, a sofa, the wall of monitors with the cameras of your premises and a big safe."
+sa7d7089e,Guardar dinero,Store cash
+sa3cc34b8,Sacar dinero,Take cash
+s3d8326df,Guardar cogollos,Store buds
+sd132dd67,Sacar cogollos,Take buds
+saede4c07,La caja del despacho: {m} y {g} g (caben {cm} y {cg} g).,The office safe: {m} and {g} g (it holds {cm} and {cg} g).
+s1cbbc8a6,No hay nada que guardar o la caja está llena.,There's nothing to store or the safe is full.
+s37f57119,¿Cuánto guardas?,Store how much?
+sefa7c585,No hay dinero en la caja.,There's no money in the safe.
+s1dfb67eb,¿Cuánto sacas?,Take how much?
+s69fb28fc,¿Qué guardas?,Store what?
+s76dc76f2,Guardas {g} g en la caja del despacho.,You put {g} g in the office safe.
+scac84c2d,No hay cogollos en la caja.,There are no buds in the safe.
+sdd06e80e,¿Qué sacas?,Take what?
 saa522ab9,Dejar MEATZA ×{n},Leave MEATZA ×{n}
 s075601c9,Dejar ORTUA BIO ×{n},Leave ORTUA BIO ×{n}
 sbf9083a0,Ordenar la nave,Arrange the warehouse
@@ -1905,11 +1930,9 @@ sf07774c9,"El almacén del club, con llave. La tiene el presidente.","The club's
 saf78171b,Guardar,Store
 s2cd4de14,"EL ALMACÉN DEL CLUB · {a} de {b} ocupados. Lo de aquí lo retiran los socios del dispensario, {d} g al día; en total, {t}.","THE CLUB STOREROOM · {a} of {b} used. Members collect from here at the dispensary, {d} g a day; total so far, {t}."
 s90c352c6,No llevas nada encima.,You're not carrying anything.
-s69fb28fc,¿Qué guardas?,Store what?
 sf20109ce,Las estanterías están llenas.,The shelves are full.
 s9b5f53a9,Al almacén: {g},Stored: {g}
 s8ae67f1e,El almacén está vacío.,The storeroom is empty.
-sdd06e80e,¿Qué sacas?,Take what?
 s5c05d5f3,Sacado: {g},Taken: {g}
 s11a67198,"Junto a la foto de la tía Maite, un hombre mayor con las rastas y la barba canas no te quita ojo.","By Aunt Maite's photo, an older man with grey dreads and beard can't take his eyes off you."
 s13ac81ae,"¿Qué tal, presidente?","How are things, president?"
@@ -2063,10 +2086,6 @@ s1eb4a41e,Bien secas y a oscuras: siguen buenas.,Kept dry and dark: they're stil
 sf1f1b89d,cajaSem,
 s51c28a0d,Sacas {g} de {l}.,You take out {g} of {l}.
 sd52ae1de,Guardar todo,Store all
-sa7d7089e,Guardar dinero,Store cash
-s3d8326df,Guardar cogollos,Store buds
-sa3cc34b8,Sacar dinero,Take cash
-sd132dd67,Sacar cogollos,Take buds
 s7575caa1,Sacar todo,Take all
 s3d72bf83,Cerrar,Close
 sb4cd0c1e,"{c}: {d} (caben {e} y {g}).
@@ -2079,8 +2098,6 @@ s65f864b9,Sacas {x}.,You take out {x}.
 s49a3abb1,No llevas dinero encima.,You have no cash on you.
 s5b246fbf,No cabe más dinero.,No room for more cash.
 s579440bc,La caja no tiene dinero.,The safe has no cash.
-s37f57119,¿Cuánto guardas?,Store how much?
-s1dfb67eb,¿Cuánto sacas?,Take how much?
 s8d81a1b4,La caja no tiene cogollos.,The safe has no buds.
 s66242b33,No caben más cogollos.,No room for more buds.
 s21936528,{l}: ¿cuánto?,{l}: how much?
@@ -2268,12 +2285,18 @@ saed18911,+{e} · {g} g de setas,+{e} · {g} g of mushrooms
 s291d3888,Para mis clientes de siempre. {e}.,For my regulars. {e}.
 s2d41042d,¿Dejas el bajo? Te devuelvo la fianza; lo que haya dentro se queda.,Leaving the basement? I'll return the deposit; whatever's inside stays.
 se155d2c6,"Como quieras. La puerta, cerrada al salir.",As you like. Shut the door on your way out.
+s662317eb,"GUARDAR: llevas {a} de cogollos y en las estanterías de la nave caben {b} más ({t} tarros de 10 L).
+A: guardar · B: cerrar.","STORE: you carry {a} of buds and the warehouse shelves hold {b} more ({t} 10 L jars).
+A: store · B: close."
+se15017c4,"en {n} tarros (este, el {q}.º: {g} g)","in {n} jars (this, no. {q}: {g} g)"
+sd75e6d9b,"{n}: {g}{tj} · {t} % THC{c}.
+A: sacarlo · B: cerrar.","{n}: {g}{tj} · {t} % THC{c}.
+A: take out · B: close."
 s2dd1d7a6,"Sobres de humedad: {n} (uno por tarro, {d} días).","Humidity packs: {n} (one per jar, {d} days)."
 sd49404f9,Sin sobres de humedad: lo curado no se afina.,No humidity packs: cured stuff won't refine.
 s01266b39,"GUARDAR: llevas {a} de cogollos y en el camarote caben {b} más ({t} tarros de 10 L). {s}
 A: guardar · B: cerrar.","STORE: you carry {a} of buds and the loft holds {b} more ({t} 10 L jars). {s}
 A: store · B: close."
-se15017c4,"en {n} tarros (este, el {q}.º: {g} g)","in {n} jars (this, no. {q}: {g} g)"
 sa0180f3c,"{n}: {g}{tj} · {t} % THC{c}{af}.
 A: sacarlo · B: cerrar.","{n}: {g}{tj} · {t} % THC{c}{af}.
 A: take out · B: close."
@@ -2297,9 +2320,6 @@ s73185d2f,Con los tarros se curan en {d} días.,With the jars they cure in {d} d
 s09e922d2,"Dinero: {a} de {b} ({c}). Tarros: {d} de {e} ({f}).
 A: guardar o sacar · B: cerrar.","Cash: {a} of {b} ({c}). Jars: {d} of {e} ({f}).
 A: store or take · B: close."
-sd75e6d9b,"{n}: {g}{tj} · {t} % THC{c}.
-A: sacarlo · B: cerrar.","{n}: {g}{tj} · {t} % THC{c}.
-A: take out · B: close."
 s16170d09,"GUARDAR: llevas {a} g de extractos y en la nevera caben {b} g más.{c}
 A: guardar · B: cerrar.","STORE: you carry {a} g of extracts and the fridge holds {b} g more.{c}
 A: store · B: close."
@@ -2313,6 +2333,7 @@ s4aa91aa8,curándose,curing
 s2b4dc95b,sin curar,uncured
 s060206be,CAJA FUERTE,SAFE
 s34ba2c7a,CAMAROTE,LOFT
+saa4d28c0,CURADO DE LA NAVE,WAREHOUSE CURING
 s819fdfbf,MALETERO,BOOT
 s05e24c03,NEVERA,FRIDGE
 s221d3703,No llevas extractos encima.,You have no extracts on you.
@@ -2328,9 +2349,13 @@ s20db70b0,Guardas {q} en {s}.,You store {q} in {s}.
 s1632210d,la caja,the safe
 scb7ad581,la nevera,the fridge
 sc0fda185,{n}: ¿cuánto?,{n}: how much?
+s8decc066,Las estanterías de la nave están llenas.,The warehouse shelves are full.
+s9561e783,Las estanterías de la nave están llenas: en las mejoras del escritorio se amplía el curado.,The warehouse shelves are full: you can expand the curing in the desk upgrades.
 s036da9ff,En el camarote no caben más tarros: pide otra estantería en la tienda online.,No more jars fit in the loft: order another shelf from the online shop.
 s87777fbd,El camarote está lleno.,The loft is full.
+s26448a07,¿Qué guardas en las estanterías de la nave?,What do you put on the warehouse shelves?
 s6967b3c3,¿Qué guardas en el camarote?,What goes in the loft?
+s69a557e7,Guardas {q} en los tarros de la nave.,You put {q} in the warehouse jars.
 s385e39a7,Guardas {q} en los tarros del camarote.,You store {q} in the loft jars.
 sb6ff4294,Aquí van las estanterías de los tarros de 10 L. Se piden en la tienda online.,The 10 L jar shelves go here. Order them from the online shop.
 sa6c7f8a3,Sacas {g} g de {n}.,You take out {g} g of {n}.
@@ -2911,6 +2936,7 @@ s743dffe4,"¿Dejas la nave? Te devuelvo la fianza; lo que no recojas se queda aq
 s18a126e8,"¿Dejas la nave? Te devuelvo la fianza; la opción a compra se pierde, y lo pagado para ella.","Giving up the warehouse? I'll return the deposit; the option to buy is lost, and what you paid toward it."
 sec4b7460,¿Dejas la nave? Te devuelvo la fianza; lo que no recojas se queda aquí.,Giving up the warehouse? I'll return the deposit; whatever you don't collect stays here.
 sb19ba1d1,¿Dejas la nave? Te devuelvo la fianza.,Giving up the warehouse? I'll return the deposit.
+s186c1c34,Vacías la caja del despacho: {l}.,You empty the office safe: {l}.
 s5a1ffd5a,"Trato hecho. Si la quieres otra vez, ya sabes dónde estoy.","Deal. If you want it again, you know where I am."
 s329259df,"Te la vendo por {p} ({m} m², a unos {pm} el metro). Firmamos la opción: {pr} de prima, que se descuentan, y la mitad de cada alquiler va a la compra. El precio no se mueve. Los primeros {d} días de cada mes, si quieres, la compras a tocateja con lo que falte, más los gastos ({g}), en el notario y por transferencia.","I'll sell it for {p} ({m} m², about {pm} per metre). We sign the option: {pr} up front, which is deducted, and half of each rent goes toward the purchase. The price stays put. In the first {d} days of each month, if you want, you buy it outright with what's left, plus fees ({g}), at the notary and by bank transfer."
 sbe0ca99b,Firmar la opción,Sign the option
@@ -2930,6 +2956,7 @@ s4ab5a04a,Una puerta gris con un candado. No es la tuya.,A grey door with a padl
 s4374da3b,"La puerta del bajo de Txomin, con un candado. La llave te la da él, si lo alquilas.","The door to Txomin's basement, padlocked. He gives you the key if you rent it."
 sd3654415,"Cerrado. En el cristal, el cartel de SE TRASPASA.",Closed. A BUSINESS FOR SALE sign hangs in the window.
 sa8adefc7,{n} abre de 23:00 a 6:00.,{n} opens from 23:00 to 6:00.
+sd33dfb7f,cajaD,cajaD
 s65fc8191,"Redes de la cofradía, remendadas mil veces.","The fishermen's guild nets, mended a thousand times."
 se8bccce5,"Nasas para el bogavante, apiladas a secar.","Lobster pots, stacked to dry."
 sd385b533,"Arriba está el reservado, con la cristalera encima de la pista. Sin mesa, no se sube: la RRPP te la vende.","Upstairs is the VIP area, glass wall over the dance floor. No table, no entry: the promoter sells you one."
@@ -3781,9 +3808,6 @@ s37bf7fc9,iwT_club,iwT_club
 se2309e4f,iwB_club,iwB_club
 se1bfb7be,floorC,floorC
 s3b52007a,fotoMaite2,fotoMaite2
-s7844f227,iwT_nave,iwT_nave
-sadcb13a1,iwB_nave,iwB_nave
-s9f0ecb03,floorN,floorN
 sc8a28715,carpaM2,carpaM2
 sc2c8d874,mesaN2,mesaN2
 s75e837fe,iwT_disco,iwT_disco
@@ -5482,6 +5506,15 @@ s3dc89cc8,"Para el porro: de cartón, se enrollan a mano.","For the joint: cardb
 s41092c40,Mechero de gasolina,Petrol lighter
 scff74584,"De metal, recargable. Dura toda la vida.","Metal, refillable. Lasts a lifetime."
 s59f2c68e,Mecheros,Lighters
+se5120ded,Ampliar el curado,Expand the curing
+s63e6d4be,Dos estanterías más de tarros de 10 L contra la pared de la nave: el doble de tarros para curar lo que sale del secadero.,Two more shelves of 10 L jars against the warehouse wall: twice the jars to cure what comes out of the drying room.
+s7b71d76b,"Tarima de roble, paredes de obra, una librería, un sofá de terciopelo, la pared de monitores con las cámaras de tus locales y una caja fuerte empotrada de alta capacidad. Solo con la nave a tope (extracción y riego).","Oak floor, brick walls, a bookcase, a velvet sofa, the wall of monitors with the cameras of your premises and a high-capacity built-in safe. Only with the warehouse maxed out (extraction and watering)."
+s214cbf7f,monD,monD
+sda4e9e1f,monD2,monD2
+s47868adf,"Una librería de roble: libros de botánica de la tía, un herbario y una botella de reserva.","An oak bookcase: your aunt's botany books, a herbarium and a bottle of reserve wine."
+s39626e9b,El sofá de terciopelo verde. Desde aquí se ven todos los monitores.,The green velvet sofa. You can see every monitor from here.
+s483cb122,Una kentia en una maceta de barro. La riega Arrieta.,A kentia palm in a clay pot. Arrieta waters it.
+sb6cdb920,"El plano de la nave, enmarcado en roble.","The warehouse floor plan, framed in oak."
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -5654,7 +5687,6 @@ s5b567d58,Abono orgánico,Organic nutrients
 s6f6a446c,Medición,Measuring
 sb3f743f7,Prensas y tamices,Presses and sieves
 s9ce0fde8,Máquinas,Machines
-s5d83adb4,Curado,Curing
 sf45cf29a,Análisis,Analysis
 s1c48efeb,Pipas y bongs,Pipes and bongs
 s960219e1,Comida,Food

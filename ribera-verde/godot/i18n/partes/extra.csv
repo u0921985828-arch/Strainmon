@@ -440,3 +440,35 @@ Boquillas de cartón (50),Cardboard tips (50)
 "Para el porro: de cartón, se enrollan a mano.","For the joint: cardboard, rolled by hand."
 Mechero de gasolina,Petrol lighter
 "De metal, recargable. Dura toda la vida.","Metal, refillable. Lasts a lifetime."
+SMS: ,SMS: 
+Curada en la nave: {l},Cured at the warehouse: {l}
+CURADO_NAVE,CURADO_NAVE
+{t} tarros,{t} jars
+Despacho de lujo,Luxury office
+hecho,done
+Arrieta cuelga dos estanterías más de tarros: ya caben {g} g curando en la nave.,Arrieta hangs two more shelves of jars: {g} g can now cure at the warehouse.
+"Arrieta y los suyos dejan el despacho de lujo: tarima, sofá, la pared de monitores con las cámaras de tus locales y una caja fuerte de las grandes.","Arrieta and his crew finish the luxury office: wooden floor, a sofa, the wall of monitors with the cameras of your premises and a big safe."
+La caja del despacho: {m} y {g} g (caben {cm} y {cg} g).,The office safe: {m} and {g} g (it holds {cm} and {cg} g).
+No hay nada que guardar o la caja está llena.,There's nothing to store or the safe is full.
+No hay dinero en la caja.,There's no money in the safe.
+Guardas {g} g en la caja del despacho.,You put {g} g in the office safe.
+No hay cogollos en la caja.,There are no buds in the safe.
+"GUARDAR: llevas {a} de cogollos y en las estanterías de la nave caben {b} más ({t} tarros de 10 L).
+A: guardar · B: cerrar.","STORE: you carry {a} of buds and the warehouse shelves hold {b} more ({t} 10 L jars).
+A: store · B: close."
+CURADO DE LA NAVE,WAREHOUSE CURING
+Las estanterías de la nave están llenas.,The warehouse shelves are full.
+Las estanterías de la nave están llenas: en las mejoras del escritorio se amplía el curado.,The warehouse shelves are full: you can expand the curing in the desk upgrades.
+¿Qué guardas en las estanterías de la nave?,What do you put on the warehouse shelves?
+Guardas {q} en los tarros de la nave.,You put {q} in the warehouse jars.
+Vacías la caja del despacho: {l}.,You empty the office safe: {l}.
+cajaD,cajaD
+Ampliar el curado,Expand the curing
+Dos estanterías más de tarros de 10 L contra la pared de la nave: el doble de tarros para curar lo que sale del secadero.,Two more shelves of 10 L jars against the warehouse wall: twice the jars to cure what comes out of the drying room.
+"Tarima de roble, paredes de obra, una librería, un sofá de terciopelo, la pared de monitores con las cámaras de tus locales y una caja fuerte empotrada de alta capacidad. Solo con la nave a tope (extracción y riego).","Oak floor, brick walls, a bookcase, a velvet sofa, the wall of monitors with the cameras of your premises and a high-capacity built-in safe. Only with the warehouse maxed out (extraction and watering)."
+monD,monD
+monD2,monD2
+"Una librería de roble: libros de botánica de la tía, un herbario y una botella de reserva.","An oak bookcase: your aunt's botany books, a herbarium and a bottle of reserve wine."
+El sofá de terciopelo verde. Desde aquí se ven todos los monitores.,The green velvet sofa. You can see every monitor from here.
+Una kentia en una maceta de barro. La riega Arrieta.,A kentia palm in a clay pot. Arrieta waters it.
+"El plano de la nave, enmarcado en roble.","The warehouse floor plan, framed in oak."

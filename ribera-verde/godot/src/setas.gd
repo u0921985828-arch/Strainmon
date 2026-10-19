@@ -560,6 +560,18 @@ func mal_ab(k: String) -> Dictionary:   # MAESTRO [3]: las dosis de abono de flo
 func mal_peso(k: String) -> float:   # lo que lleva el maletero, en g: los cogollos y el abono (MALETERO.dosis g la dosis)
 	return mal_g(k) + (float(mal_ab(k).m) + float(mal_ab(k).o)) * float(D.MALETERO.dosis)
 
+# MAESTRO [8]: los almacenes de tarros de 10 L: el camarote y el curado de la nave
+const TARROS := ["cam", "navc"]
+
+func tar_buds(t: String) -> Dictionary:
+	return cam().get("buds", {}) if t == "cam" else navc().get("buds", {})
+
+func tar_g(t: String) -> float:
+	return cam_g() if t == "cam" else navc_g()
+
+func tar_cap(t: String) -> float:
+	return cam_cap() if t == "cam" else navc_cap()
+
 func items_almacen(t: String) -> Array:
 	var o := []
 	if t == "mal":
@@ -572,10 +584,10 @@ func items_almacen(t: String) -> Array:
 			for q in nt:
 				o.append({"k": l[0], "b": l[1], "r": 0, "q": q, "n": nt, "gj": g - tg * (nt - 1) if q == nt - 1 else tg})
 		return o
-	if t == "cam":   # 1.43.6: el camarote, GUARDAR y los tarros de 10 L (CAMAROTE.tarro g cada uno)
+	if t in TARROS:   # 1.43.6: el camarote, GUARDAR y los tarros de 10 L (CAMAROTE.tarro g cada uno); MAESTRO [8]: y la nave
 		o.append({"k": "+"})
 		var tc := float(D.CAMAROTE.tarro)
-		for l in por_thc(cam().get("buds", {})):
+		for l in por_thc(tar_buds(t)):
 			var g: float = floor(l[1].g)
 			var nt: int = maxi(1, ceili(g / tc - 1e-9))
 			for q in nt:
@@ -611,7 +623,7 @@ func mueve_almacen(A: Dictionary, b: String) -> bool:
 		return false
 	var j := i
 	var F := int(D.ALM.fila)
-	if A.t == "cam" or A.t == "mal":   # 1.43.6: seis por balda (y el maletero, MAESTRO [3])
+	if A.t in TARROS or A.t == "mal":   # 1.43.6: seis por balda (y el maletero, MAESTRO [3])
 		var FC := int(D.CAMAROTE.est.tarros)
 		j = i + {"left": -1, "right": 1, "up": -FC, "down": FC}.get(b, 0)
 		j = maxi(0, mini(nn - 1, j))
@@ -656,6 +668,11 @@ func _pct_txt(p: float) -> String:
 func desc_almacen(A: Dictionary) -> String:
 	var its := items_almacen(A.t)
 	var it = its[A.i] if A.i < its.size() else null
+	if A.t == "navc":   # MAESTRO [8]: el curado de la nave, sin sobres
+		if it == null or it.k == "+":
+			return T("GUARDAR: llevas {a} de cogollos y en las estanterías de la nave caben {b} más ({t} tarros de 10 L).\nA: guardar · B: cerrar.", {"a": g_txt(total_buds()), "b": g_txt(maxf(0, navc_cap() - navc_g())), "t": int(navc_est() * int(D.CAMAROTE.est.tarros))})
+		var tn: String = (" " + T("en {n} tarros (este, el {q}.º: {g} g)", {"n": int(it.n), "q": int(it.q) + 1, "g": int(it.gj)})) if int(it.n) > 1 else ""
+		return T("{n}: {g}{tj} · {t} % THC{c}.\nA: sacarlo · B: cerrar.", {"n": lot_nombre(it.k), "g": g_lote(it.b.g), "tj": tn, "t": Datos.pct(it.b.thc), "c": cura_corto(it.b)})
 	if A.t == "cam":   # 1.43.6
 		var CM: Dictionary = D.CAMAROTE
 		var so: float = float(cam().get("sob", 0))
@@ -714,7 +731,7 @@ func elegir_almacen(t: String, i0 := 0):
 		return r
 	var nn := items_almacen(t).size()
 	ALMACEN = {"t": t, "i": maxi(0, mini(nn - 1, i0))}
-	var N := K("CAJA FUERTE") if t == "caja" else K("CAMAROTE") if t == "cam" else K("MALETERO") if t == "mal" else K("NEVERA")
+	var N := K("CAJA FUERTE") if t == "caja" else K("CAMAROTE") if t == "cam" else K("CURADO DE LA NAVE") if t == "navc" else K("MALETERO") if t == "mal" else K("NEVERA")
 	_dlg_fijo(desc_almacen(ALMACEN), N)
 	var pr := Motor.Prom.new()
 	push(func(b: String):
@@ -784,18 +801,20 @@ func panel_almacen(o: Array, A: Dictionary, px: int, py: int) -> void:
 	o.append(["@", "alm-panel", px, py])
 	if it == null:
 		return
-	if A.t == "cam":   # 1.43.6: el tarro de 10 L y sus barras (lo afinado, con la gota)
+	if A.t in TARROS:   # 1.43.6: el tarro de 10 L y sus barras (lo afinado, con la gota); MAESTRO [8]: la nave, sin sobres
 		var so: float = float(cam().get("sob", 0))
 		if it.k == "+":
 			o.append(["@", "alm-mas-xl", px + 19, py + 16])
 			_barra_alm(o, px, py, 0, "g", peso_encima() / cap_mochila(), "#e0a040")
-			_barra_alm(o, px, py, 1, "cu", cam_g() / maxf(1.0, cam_cap()), "#d8b048")
-			_barra_alm(o, px, py, 2, "hr", minf(1.0, so / float(maxi(1, cam_tarros()))), "#4e9ad8")
+			_barra_alm(o, px, py, 1, "cu", tar_g(A.t) / maxf(1.0, tar_cap(A.t)), "#d8b048")
+			if A.t == "cam":
+				_barra_alm(o, px, py, 2, "hr", minf(1.0, so / float(maxi(1, cam_tarros()))), "#4e9ad8")
 			return
 		_tarro(o, px + 19, py + 16, 22, 31, _color_lote(it.k), float(it.gj) / float(D.CAMAROTE.tarro), float(it.b.get("cu", 0)) >= 1, "alm-tarro-xl-s" if it.k.contains("*") else "alm-tarro-xl", _dentro_lote(it.k, it.b), 1, "#2a343a", "-xl")
 		_barra_alm(o, px, py, 0, "thc", it.b.thc / 30.0, "#e8d070")
 		_barra_alm(o, px, py, 1, "cu", float(it.b.get("cu", 0)), "#58c070")
-		_barra_alm(o, px, py, 2, "hr", float(it.b.get("af", 0)), "#4e9ad8")
+		if A.t == "cam":
+			_barra_alm(o, px, py, 2, "hr", float(it.b.get("af", 0)), "#4e9ad8")
 		return
 	if A.t == "mal":   # MAESTRO [3]
 		var mc := maxf(1.0, mal_kg(MAL_K))
@@ -840,7 +859,7 @@ func rects_almacen(A: Dictionary) -> Array:
 	var o := []
 	var it := items_almacen(A.t)
 	var F := int(D.ALM.fila)
-	if A.t == "cam":   # 1.43.6: el camarote (168 × 100), seis tarros de 10 L por balda y dos baldas a la vista
+	if A.t in TARROS:   # 1.43.6: el camarote (168 × 100), seis tarros de 10 L por balda y dos baldas a la vista
 		var FC := int(D.CAMAROTE.est.tarros)
 		var x0: int = (SW - 232) >> 1
 		var y0 := 4
@@ -864,7 +883,7 @@ func rects_almacen(A: Dictionary) -> Array:
 			o.append_array([[x0 + 160, y0 + 3, 2, 1, "#f8d040"], [x0 + 159, y0 + 4, 4, 1, "#f8d040"]])
 		if it.size() > (fila0 + 2) * FC:
 			o.append_array([[x0 + 159, y0 + 88, 4, 1, "#f8d040"], [x0 + 160, y0 + 89, 2, 1, "#f8d040"]])
-		o.append_array([[x0 + 8, y0 + 89, 140, 5, "#2a2d34"], [x0 + 9, y0 + 90, Datos.jsround(138 * minf(1.0, cam_g() / maxf(1.0, cam_cap()))), 3, "#d8b048"]])
+		o.append_array([[x0 + 8, y0 + 89, 140, 5, "#2a2d34"], [x0 + 9, y0 + 90, Datos.jsround(138 * minf(1.0, tar_g(A.t) / maxf(1.0, tar_cap(A.t)))), 3, "#d8b048"]])
 		panel_almacen(o, A, x0 + 172, y0)
 		return o
 	if A.t == "mal":   # MAESTRO [3]: el maletero por dentro: la moqueta, el burlete y los tarros, seis por fila
@@ -972,8 +991,8 @@ func _hueco_alm(caja: bool) -> float:
 	return floor(D.CAJA[int(S.caja.nivel)].g - caja_g()) if caja else floor((nevera_cap() - nevera_r()) * 10 + 1e-9) / 10.0
 
 func guardar_almacen(t: String):
-	if t == "cam":   # 1.43.6: el camarote, como la caja
-		await _guardar_cam()
+	if t in TARROS:   # 1.43.6: el camarote, como la caja; MAESTRO [8]: y la nave
+		await _guardar_cam(t)
 		return
 	var caja := t == "caja"
 	var L := bud_lots(1) if caja else rosin_lots(.1)
@@ -1024,16 +1043,20 @@ func guardar_almacen(t: String):
 		mover_rosin(de, a, k, g)
 	sfx("sel")
 
-func _guardar_cam():
+func _guardar_cam(t := "cam"):
 	var L := bud_lots(1)
-	var hueco := func() -> float: return floor(cam_cap() - cam_g())
+	var hueco := func() -> float: return floor(tar_cap(t) - tar_g(t))
+	var nv: bool = t == "navc"
 	if L.is_empty():
 		await say(K("No llevas cogollos encima."))
 		return
 	if hueco.call() < 1:
-		await say(K("En el camarote no caben más tarros: pide otra estantería en la tienda online.") if cam_est() < int(D.CAMAROTE.est.max) else K("El camarote está lleno."))
+		if nv:
+			await say(K("Las estanterías de la nave están llenas.") if int(navc().get("mj", 0)) else K("Las estanterías de la nave están llenas: en las mejoras del escritorio se amplía el curado."))
+		else:
+			await say(K("En el camarote no caben más tarros: pide otra estantería en la tienda online.") if cam_est() < int(D.CAMAROTE.est.max) else K("El camarote está lleno."))
 		return
-	var j: int = await ask(K("¿Qué guardas en el camarote?"), [K("Todos los cogollos"), K("Un lote"), K("Nada")])
+	var j: int = await ask(K("¿Qué guardas en las estanterías de la nave?") if nv else K("¿Qué guardas en el camarote?"), [K("Todos los cogollos"), K("Un lote"), K("Nada")])
 	if j == 0:
 		var q := 0.0
 		for l in L:
@@ -1041,9 +1064,9 @@ func _guardar_cam():
 			if g < 1:
 				break
 			q += g
-			mover_lote(S.buds, S.cam.buds, l[0], g)
+			mover_lote(S.buds, tar_buds(t), l[0], g)
 		sfx("sel")
-		await say(T("Guardas {q} en los tarros del camarote.", {"q": g_txt(q)}) + ((" " + T("No cabe todo: el resto se queda fuera.")) if total_buds() >= 1 else ""))
+		await say((T("Guardas {q} en los tarros de la nave.", {"q": g_txt(q)}) if nv else T("Guardas {q} en los tarros del camarote.", {"q": g_txt(q)})) + ((" " + T("No cabe todo: el resto se queda fuera.")) if total_buds() >= 1 else ""))
 		return
 	if j != 1:
 		return
@@ -1056,8 +1079,29 @@ func _guardar_cam():
 	var g = await cuanto(T("{n}: ¿cuánto?", {"n": lot_nombre(k)}), minf(floor(L[i][1].g), hueco.call()), [10, 50, 100, 500, 1000], func(v): return g_txt(v))
 	if not g:
 		return
-	mover_lote(S.buds, S.cam.buds, k, g)
+	mover_lote(S.buds, tar_buds(t), k, g)
 	sfx("sel")
+
+# MAESTRO [8]: las estanterías de tarros de la nave (como el camarote, sin sobres): GUARDAR el primero y, en los demás, sacar
+func navc_action():
+	if navc().is_empty():
+		return
+	var i := 0
+	while true:
+		var e = await elegir_almacen("navc", i)
+		if e == null:
+			return
+		i = e.i
+		if e.k == "+":
+			await guardar_almacen("navc")
+			continue
+		var g: float = minf(floor(e.b.g * 10) / 10.0, floor(libre_mochila()))
+		if g < 1:
+			await say(K("No te cabe nada más encima."))
+			continue
+		mover_lote(S.nave.cur.buds, S.buds, e.k, g)
+		sfx("sel")
+		await say(T("Sacas {g} de {n}.", {"g": g_txt(g), "n": lot_nombre(e.k)}))
 
 # el camarote (1.43.6): las estanterías de tarros de 10 L; GUARDAR el primero y, en los demás, sacar un lote
 func camarote_action():

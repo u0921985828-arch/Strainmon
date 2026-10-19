@@ -420,7 +420,7 @@ func nave_dia() -> void:
 	if Cultivo.azar() < maxf(0, D.NAVE.redada - D.NAVE.redadaC * mc) * olor_nave() * chivato_nave():   # 1.33: con los filtros, huele menos; MAESTRO [6]: el ozono y los chivatos
 		var ns: Array = de_la_nave().map(func(w): return w.n)
 		var quien: String = T("{a} y {b}", {"a": ", ".join(PackedStringArray(ns.slice(0, -1))), "b": ns[-1]}) if ns.size() > 1 else ns[0]
-		var gg: float = nave_stock()
+		var gg: float = nave_stock() + navc_g()   # MAESTRO [8]: y lo de las estanterías de tarros
 		S.nave = null
 		if seg_tiene("nave", "ca"):   # MAESTRO [6]: con las cámaras, tu gente sale por detrás
 			for w in de_la_nave():
@@ -560,7 +560,7 @@ func talk_nave() -> void:
 		await comprar_nave()
 		return
 	if op == "Dejar la nave":
-		var st: bool = nave_stock() >= 1
+		var st: bool = nave_stock() + navc_g() >= 1
 		var tdj: String
 		if N.get("op"):
 			tdj = T("¿Dejas la nave? Te devuelvo la fianza; lo que no recojas se queda aquí; la opción a compra se pierde, y lo pagado para ella.") if st else T("¿Dejas la nave? Te devuelvo la fianza; la opción a compra se pierde, y lo pagado para ella.")
@@ -570,10 +570,22 @@ func talk_nave() -> void:
 			return
 		for w in de_la_nave():
 			libre(w)
+		var dsp := ""
+		if desp_ya():   # MAESTRO [8]: la caja del despacho de lujo se vacía antes de irte; el despacho se queda en la nave
+			var Ds: Dictionary = S.desp
+			var dg := 0.0
+			for k in Ds.buds.keys():
+				dg += float(Ds.buds[k].g)
+				mover_lote(Ds.buds, S.buds, k, float(Ds.buds[k].g))
+			S.money += int(Ds.money)
+			if int(Ds.money) > 0 or dg >= 1:
+				dsp = " " + T("Vacías la caja del despacho: {l}.", {"l": lo_que(float(Ds.money), dg, 0)})
+			S.erase("desp")
 		S.nave = null
 		S.money += int(D.NAVE.fianza)
 		sfx("coin")
-		await say(K("Trato hecho. Si la quieres otra vez, ya sabes dónde estoy."), A)
+		update_hud()
+		await say(K("Trato hecho. Si la quieres otra vez, ya sabes dónde estoy.") + dsp, A)
 
 # ---------- la nave con opción a compra (1.42, lo pidió el usuario: «cuando seas presidente de la asociación, alquilas con opción
 # a compra la nave, por la tranquilidad; cada mes te da la opción de comprarla a tocateja, a un precio realista»). NAVE.compra:
@@ -723,6 +735,18 @@ func obj_local(x: int, y: int, o) -> bool:
 	if o == null:
 		return false
 	var txt := ""
+	if Datos.CAL and S.map == "nave" and o == "estanteC":   # MAESTRO [8]: las estanterías de tarros de la nave
+		await navc_action()
+		return true
+	if Datos.CAL and S.map == "nave-d" and desp_ya() and o in ["monD", "monD2", "cajaD"]:   # i18n-no   # MAESTRO [8]: el despacho de lujo
+		if o == "cajaD":
+			await caja_desp()
+		else:
+			await monitores()
+		return true
+	if Datos.CAL and S.map == "nave-d" and desp_ya() and D.DESPACHO.txt.has(String(o).trim_suffix("2")):
+		await say(String(D.DESPACHO.txt[String(o).trim_suffix("2")]))
+		return true
 	if Datos.CAL and S.map == "muelle" and o == "noray":   # 1.51
 		await mar_noray(x)
 		return true

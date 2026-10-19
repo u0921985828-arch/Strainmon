@@ -473,6 +473,11 @@ func al_lado() -> Array:
 func hablar_con(e) -> void:
 	if not e.moving:
 		e.dir = OPP[P.dir]
+	habla_look = e.get("look") if e.get("look") is Dictionary else null   # MAESTRO [8]: el retrato de la charla en vivo
+	await _hablar_con(e)
+	habla_look = null
+
+func _hablar_con(e) -> void:
 	if e.def.get("client"):
 		await talk_client(e.def.client)
 	else:

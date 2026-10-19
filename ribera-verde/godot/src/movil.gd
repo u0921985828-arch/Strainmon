@@ -302,6 +302,10 @@ func mensajes():
 		i = await menu(items, {"cls": "full", "title": K("MENSAJES"), "title2": T("{a} de {b}", {"a": S.sms.size(), "b": n(D.SMS_MAX)}), "desc": true, "initial": i})
 		if i < 0:
 			return
+		if Datos.CAL and not oraculo:   # MAESTRO [8]: abierto, el mensaje con el retrato de quien lo manda
+			var sm: Dictionary = S.sms[i]
+			for l in String(sm.t).split("\n"):
+				await say(l, "SMS · " + String(sm.n))   # i18n-no
 
 # =========================================================
 # LA GENTE (1.15, 11e-gente): trabajadores, clubs y la cata (la confianza, en mundo.gd)

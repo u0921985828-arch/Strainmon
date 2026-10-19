@@ -9747,6 +9747,50 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/despacho.py",
+   "notas": "MAESTRO [8] «Despacho Narco»: mobiliario de lujo, monitores de seguridad conectados a cámaras de locales, caja fuerte de alta capacidad.",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "despacho-ancho",
+   "celda": "mueble_ancho",
+   "estilo_ref": "los muebles a escala de la nave (locales-alto)",
+   "cubre": [
+    "obj:monD"
+   ],
+   "ajuste_por_sprite": {
+    "monD": "exacto"
+   },
+   "descripcion": "MAESTRO [8]: la pared de monitores de seguridad del despacho de lujo."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/despacho.py",
+   "notas": "MAESTRO [8] «Despacho Narco»: mobiliario de lujo, monitores de seguridad conectados a cámaras de locales, caja fuerte de alta capacidad.",
+   "max_colores": 32,
+   "tipo": "objeto",
+   "id": "despacho-alto",
+   "celda": "objeto_alto",
+   "estilo_ref": "los muebles a escala de la nave (locales-alto)",
+   "cubre": [
+    "obj:cajaD"
+   ],
+   "ajuste_por_sprite": {
+    "cajaD": "exacto"
+   },
+   "descripcion": "MAESTRO [8]: la caja fuerte de alta capacidad del despacho de lujo."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bajo.py",
    "notas": "1.44, pedido por el usuario: «los sprites y todo para crear el piso bajo, donde se cultivan, se secan, almacenan y se crean microdosis y comestibles».",
    "max_colores": 32,
