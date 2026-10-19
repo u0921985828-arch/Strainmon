@@ -83,6 +83,10 @@
 - En inglés tampoco sale un nombre real: las filas de PLAY sin inglés caían en la del nombre real (Northern Lights × Haze, Durban Poison); ahora Norzen Lights × Haize, Durvan Poizon y la marca Ice-o-lator como Ais-o-lator (`play.gd` recorre `strings.csv` en inglés: 12 → 0).
 - Menús a toda pantalla sin aire (lo vio el usuario en la tienda): las 5 filas eran las de la pantalla de 160 px; ahora todas las que caben, y si caben todas, la caja a su alto (`capturas_ui`: 6 huecos → 0).
 
+### APK de la tanda del documento maestro · Godot 0.50.0 (código 69)
+- `node tools/godot-aab.js` con la upload key: `dist/landrace-hunters.aab` (firmado, targetSdk 36, 16 KB) y el APK universal.
+- `descargas/LandraceHunters.apk` (`apk-instalar.py` + `zipalign -P 16` + `apksigner`): MAESTRO [2], [4] a [9] con `Datos.CAL`.
+
 ### Documento maestro (`docs/MAESTRO.md`), por tandas, con `Datos.CAL`
 - **[10] La letra:** reserva propia para flechas, ▲▼◀▶, ★, ≈ y −.
 - **[1] El personaje:** chico o chica y el cumpleaños al empezar (`S.sexo`, `S.cumple`), sin ventajas por sexo (solo cambia el aspecto); el regalo del cumpleaños una vez al año (el 29 de febrero, también); la protagonista con su sprite de PixelLab en el mapa y en el combate (`player-f`, `player-f-combate`), con boca, y la ropa cambia las mismas piezas. Prueba `tests/personaje.gd`.
