@@ -535,8 +535,35 @@ func por_thc(L: Dictionary) -> Array:
 	o.sort_custom(func(a, b): return a[1].thc > b[1].thc or (a[1].thc == b[1].thc and a[0] < b[0]))
 	return o
 
+# MAESTRO [3]: el maletero del vehículo MAL_K, como la caja fuerte (lotes en S.coches[k].mal.buds; kg en MALETERO.kg)
+var MAL_K := ""
+func mal_kg(k: String) -> float:
+	return float(D.MALETERO.kg.get(k, 0)) * 1000.0
+
+func mal(k: String) -> Dictionary:
+	var c: Dictionary = S.coches[k]
+	if not (c.get("mal") is Dictionary):
+		c.mal = {"buds": {}}
+	return c.mal
+
+func mal_g(k: String) -> float:
+	var t := 0.0
+	for q in mal(k).buds:
+		t += float(mal(k).buds[q].g)
+	return t
+
 func items_almacen(t: String) -> Array:
 	var o := []
+	if t == "mal":
+		o.append({"k": "+"})
+		o.append({"k": "v"})   # envasar al vacío
+		var tg := float(D.ALM.tarro)
+		for l in por_thc(mal(MAL_K).buds):
+			var g: float = floor(l[1].g)
+			var nt: int = maxi(1, ceili(g / tg - 1e-9))
+			for q in nt:
+				o.append({"k": l[0], "b": l[1], "r": 0, "q": q, "n": nt, "gj": g - tg * (nt - 1) if q == nt - 1 else tg})
+		return o
 	if t == "cam":   # 1.43.6: el camarote, GUARDAR y los tarros de 10 L (CAMAROTE.tarro g cada uno)
 		o.append({"k": "+"})
 		var tc := float(D.CAMAROTE.tarro)
@@ -576,7 +603,7 @@ func mueve_almacen(A: Dictionary, b: String) -> bool:
 		return false
 	var j := i
 	var F := int(D.ALM.fila)
-	if A.t == "cam":   # 1.43.6: seis por balda
+	if A.t == "cam" or A.t == "mal":   # 1.43.6: seis por balda (y el maletero, MAESTRO [3])
 		var FC := int(D.CAMAROTE.est.tarros)
 		j = i + {"left": -1, "right": 1, "up": -FC, "down": FC}.get(b, 0)
 		j = maxi(0, mini(nn - 1, j))
@@ -631,6 +658,13 @@ func desc_almacen(A: Dictionary) -> String:
 		var af := float(it.b.get("af", 0))
 		return T("{n}: {g}{tj} · {t} % THC{c}{af}.\nA: sacarlo · B: cerrar.", {"n": lot_nombre(it.k), "g": g_lote(it.b.g), "tj": tj, "t": Datos.pct(it.b.thc), "c": cura_corto(it.b),
 			"af": ((" · " + T("afinada al 62 %%")) if af >= 1 else (" · " + T("afinándose ({p} %)", {"p": Datos.jsround(af * 100)}))) if af else ""})
+	if A.t == "mal":
+		var cap := mal_kg(MAL_K)
+		if it == null or it.k == "+":
+			return T("GUARDAR: llevas {a} de cogollos y en el maletero caben {b} más.\nA: guardar · B: cerrar.", {"a": g_txt(total_buds()), "b": g_txt(maxf(0, cap - mal_g(MAL_K)))})
+		if it.k == "v":
+			return T("ENVASAR AL VACÍO: lo del maletero, en bolsas selladas; en un registro de tráfico se nota menos.{e}\nA: envasar · B: cerrar.", {"e": "" if S.items.get("vacio") else " " + K("Hace falta la envasadora de la tienda online.")})
+		return T("{n}: {g} · {t} % THC{v}.\nA: sacarlo · B: cerrar.", {"n": lot_nombre(it.k), "g": g_lote(it.b.g), "t": Datos.pct(it.b.thc), "v": (" · " + K("al vacío")) if it.b.get("vac") else ""})
 	if A.t == "caja":
 		var C: Dictionary = D.CAJA[int(S.caja.nivel)]
 		var g := caja_g()
@@ -672,7 +706,7 @@ func elegir_almacen(t: String, i0 := 0):
 		return r
 	var nn := items_almacen(t).size()
 	ALMACEN = {"t": t, "i": maxi(0, mini(nn - 1, i0))}
-	var N := K("CAJA FUERTE") if t == "caja" else K("CAMAROTE") if t == "cam" else K("NEVERA")
+	var N := K("CAJA FUERTE") if t == "caja" else K("CAMAROTE") if t == "cam" else K("MALETERO") if t == "mal" else K("NEVERA")
 	_dlg_fijo(desc_almacen(ALMACEN), N)
 	var pr := Motor.Prom.new()
 	push(func(b: String):
@@ -755,6 +789,17 @@ func panel_almacen(o: Array, A: Dictionary, px: int, py: int) -> void:
 		_barra_alm(o, px, py, 1, "cu", float(it.b.get("cu", 0)), "#58c070")
 		_barra_alm(o, px, py, 2, "hr", float(it.b.get("af", 0)), "#4e9ad8")
 		return
+	if A.t == "mal":   # MAESTRO [3]
+		var mc := maxf(1.0, mal_kg(MAL_K))
+		if it.k == "+" or it.k == "v":
+			o.append(["@", "alm-mas-g", px + 12, py + 8])
+			_barra_alm(o, px, py, 0, "g", peso_encima() / cap_mochila(), "#e0a040")
+			_barra_alm(o, px, py, 1, "cu", mal_g(MAL_K) / mc, "#d8b048")
+			return
+		_tarro(o, px + 12, py + 8, 18, 25, _color_lote(it.k), float(it.gj) / float(D.ALM.tarro), it.b.get("vac", false), "alm-tarro-s" if it.k.contains("*") else "alm-tarro", _dentro_lote(it.k, it.b), 2)
+		_barra_alm(o, px, py, 0, "thc", it.b.thc / 30.0, "#e8d070")
+		_barra_alm(o, px, py, 1, "cu", mal_g(MAL_K) / mc, "#d8b048")
+		return
 	var caja: bool = A.t == "caja"
 	var C: Dictionary = D.CAJA[int(S.caja.nivel)] if caja else {}
 	if it.k == "$":
@@ -812,6 +857,33 @@ func rects_almacen(A: Dictionary) -> Array:
 		if it.size() > (fila0 + 2) * FC:
 			o.append_array([[x0 + 159, y0 + 88, 4, 1, "#f8d040"], [x0 + 160, y0 + 89, 2, 1, "#f8d040"]])
 		o.append_array([[x0 + 8, y0 + 89, 140, 5, "#2a2d34"], [x0 + 9, y0 + 90, Datos.jsround(138 * minf(1.0, cam_g() / maxf(1.0, cam_cap()))), 3, "#d8b048"]])
+		panel_almacen(o, A, x0 + 172, y0)
+		return o
+	if A.t == "mal":   # MAESTRO [3]: el maletero por dentro: la moqueta, el burlete y los tarros, seis por fila
+		var FM := int(D.CAMAROTE.est.tarros)
+		var x0: int = (SW - 232) >> 1
+		var y0 := 4
+		o.append_array([[x0, y0, 168, 100, "#1c1e24"], [x0 + 2, y0 + 2, 164, 96, "#3a3e48"], [x0 + 4, y0 + 4, 160, 82, "#2e3138"], [x0 + 2, y0 + 2, 164, 2, "#555a66"]])
+		for yy in range(y0 + 8, y0 + 84, 4):
+			o.append([x0 + 4, yy, 160, 1, "#34373f"])
+		var fila0: int = 0 if A.i < FM else int(floor(float(A.i) / FM)) - 1
+		for f in 2:
+			var y: int = y0 + 8 + f * 38
+			for c in FM:
+				var q: int = (fila0 + f) * FM + c
+				if q >= it.size():
+					continue
+				var Jt: Dictionary = it[q]
+				var x: int = x0 + 10 + c * 25
+				if Jt.k == "+":
+					o.append(["@", "alm-mas", x, y])
+				elif Jt.k == "v":
+					o.append_array([[x + 1, y + 4, 16, 20, "#c8d0d8"], [x + 3, y + 6, 12, 16, "#9aa4ae"], [x + 1, y + 4, 16, 2, "#e8ecf0"], [x + 7, y + 10, 4, 4, "#58c070"]])
+				else:
+					_tarro(o, x, y, 18, 25, _color_lote(Jt.k), float(Jt.gj) / float(D.ALM.tarro), Jt.b.get("vac", false), "alm-tarro-s" if Jt.k.contains("*") else "alm-tarro", _dentro_lote(Jt.k, Jt.b))
+				if q == A.i:
+					_marco(o, x - 2, y - 2, 22, 29)
+		o.append_array([[x0 + 8, y0 + 89, 152, 5, "#2a2d34"], [x0 + 9, y0 + 90, Datos.jsround(150 * minf(1.0, mal_g(MAL_K) / maxf(1.0, mal_kg(MAL_K)))), 3, "#d8b048"]])
 		panel_almacen(o, A, x0 + 172, y0)
 		return o
 	if A.t == "caja":

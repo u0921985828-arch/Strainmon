@@ -279,14 +279,16 @@ func _corre() -> void:
 	J.S.banco = 10000
 	t = haz(J.talk_conce, ["Scooter", "Firmar", "Nada"])
 	J.S.day += 2
+	J.S.conduce = "moto"   # MAESTRO [3]: conduces el que te entregan (conce_dia), no el mejor que tengas
 	J.enter_map("town", 7, 12, "down")
 	chk(J.vehiculo() == "moto" and J.paso_ms() < float(D.VEHICULOS.bici.paso[0]), "la moto en la calle: %s" % J.vehiculo())
 	# 9b · los coches por la calle, a escala de juguete (más bajos que él de pie): el mejor que tengas; con la grúa, no
 	J.S.day = int(J.S.coches.deportivo.dia)
+	J.S.conduce = "deportivo"
 	J.enter_map("town", 7, 12, "down")
 	chk(J.vehiculo() == "deportivo" and J.paso_ms() < float(D.VEHICULOS.moto.paso[0]), "el deportivo en la calle: %s" % J.vehiculo())
 	J.S.coches.deportivo.grua = true
-	chk(J.vehiculo() == "moto", "el deportivo en la grúa, la moto: %s" % J.vehiculo())
+	chk(J.vehiculo() != "deportivo", "el deportivo en la grúa, a pie: %s" % J.vehiculo())
 	J.S.coches.deportivo.erase("grua")
 	for k in ["utilitario", "berlina", "deportivo"]:
 		var Vk: Dictionary = D.VEHICULOS[k]
@@ -341,12 +343,18 @@ func _corre() -> void:
 		J.enter_map("town", 7, 14, "right")
 		var cs: Dictionary = J.S.coches
 		J.S.coches = {"moto": cs.moto}
+		J.S.conduce = "moto"
 		await foto(dir, "moto")
 		for k in ["utilitario", "berlina", "deportivo"]:
 			J.S.coches = {k: {"dia": 0, "p": 1, "r": null}}
+			J.S.conduce = k
 			for dd in ["right", "down", "up"]:
 				J.enter_map("town", 7, 14, dd)
 				await foto(dir, "coche-%s-%s" % [k, dd])
+		J.S.coches = {"berlina": {"dia": 0, "p": 1, "r": null, "pos": ["town", 6, 14, "right"]}, "moto": {"dia": 0, "p": 1, "r": null, "pos": ["town", 9, 14, "down"]}}   # MAESTRO [3]: aparcados, sin nadie
+		J.S.conduce = null
+		J.enter_map("town", 7, 15, "up")
+		await foto(dir, "aparcados")
 		J.S.coches = cs
 	for x in fallos:
 		print("  FALLO ", x)

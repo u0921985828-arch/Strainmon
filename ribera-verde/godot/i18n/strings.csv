@@ -212,6 +212,8 @@ s6e939a26,{n} · tuya,{n} · yours
 s892bb721,{n} · tuyo,{n} · yours
 sfee87111,{n} · pedida,{n} · ordered
 s19505c16,{n} · pedido,{n} · ordered
+sc2f980ee,Recoger del depósito,Collect from the pound
+s97aabce9,La grúa se lo llevó por mal aparcado. Pagas la tasa y te lo dejan en la puerta.,The tow truck took it for bad parking. Pay the fee and they leave it at the door.
 s0861de4a,Vender,Sell
 s6c365936,"Te lo recompran: pierde un {ya} % al salir del concesionario y un {mes} % cada mes, hasta el {min} % de lo que valía.","They buy it back: it loses {ya} % when it leaves the lot and {mes} % each month, down to {min} % of what it cost."
 se7c7447e,Asegurar,Insure
@@ -239,6 +241,8 @@ s4201d831,Hecho: {v} en tu cuenta. El seguro se da de baja hoy.,Done: {v} in you
 s564c74b4,"El año de póliza son {e}, de la cuenta, y no hay.","A year's policy is {e} from your account, and it isn't there."
 s6eb480ff,"Póliza en vigor: {e} al año, domiciliado. Y te saco {a} del depósito de la grúa.","Policy active: {e} a year, direct debit. And I'll get {a} out of the tow pound."
 se1d7755a,SMS · ,SMS · 
+sa7eff092,"La grúa municipal se ha llevado {a}: estaba mal aparcad{o}. En el depósito, {e} de tasa (en el concesionario).","The council tow truck took {a}: it was badly parked. At the pound, a {e} fee (at the dealership)."
+s687b6a63,SMS · AYUNTAMIENTO,SMS · TOWN HALL
 s5b1e940f," Y en la calle, montado."," And on the street, you ride it."
 sa18b57e8," Y en la calle, al volante."," And on the street, behind the wheel."
 s10fb9fb3,"{A} ya está matriculada y con el seguro en vigor. Desde cualquier parada de autobús puedes ir en ella, a la hora que quieras.{x}","{A} is registered and insured. From any bus stop you can take it, any time you like.{x}"
@@ -251,7 +255,6 @@ sa1c22727,AYUNTAMIENTO,TOWN HALL
 scfeb4c48,impuesto de circulación de {a},road tax for {a}
 s4d2f585e,Apremio · IVTM · {n},Enforcement · road tax · {n}
 sb5628c63,"Providencia de apremio: el impuesto de circulación de {a}, con un {r} % de recargo, {e}, cobrado de lo que tienes.","Enforcement notice: road tax for {a}, with a {r} % surcharge, {e}, taken from what you have."
-s687b6a63,SMS · AYUNTAMIENTO,SMS · TOWN HALL
 sef20a6ff,{m} min · {e},{m} min · {e}
 s690b2b4b,¿A dónde vas?,Where to?
 sd298526b,Gasolinera,Petrol station
@@ -262,6 +265,26 @@ s1e56d38e,neumáticos nuevos a los {km} km,new tyres at {km} km
 s0002b805,Taller · {n},Garage · {n}
 s2a1d17f9,{q}: {e} (te quedan a deber {f}),{q}: {e} (you still owe {f})
 sf332a444,"{a}, en el taller. {tx}.","{a}, at the garage. {tx}."
+s2cef7cff,Depósito municipal,Council pound
+s14e055be,La tasa del depósito son {e} y no te llega.,The pound fee is {e} and you can't cover it.
+s09b6285c,"{A}, recogid{o} del depósito. Lo tienes en la puerta.","{A}, collected from the pound. It's at the door."
+sa527d471,"{A}, aparcad{o} aquí. Maletero: {g} de {c}.","{A}, parked here. Boot: {g} of {c}."
+sfdc67ce5,Conducir,Drive
+sbeda21a5,Maletero,Boot
+s9a485a41,Maletero: {g} de {c}.,Boot: {g} of {c}.
+s406c2212,Aparcar aquí,Park here
+s4d885bc6,No hay sitio para bajarte por ese lado.,No room to get out on that side.
+s22b69147,"Aquí no se puede aparcar: si no lo mueves, mañana se lo lleva la grúa.","No parking here: if you don't move it, the tow truck takes it tomorrow."
+s30e044fa,No te cabe nada más encima.,You can't carry any more.
+s52465e63,Sacas {g} de {n}.,You take out {g} of {n}.
+s90031372,No llevas cogollos encima.,You have no buds on you.
+s02f43829,En el maletero no cabe más.,The boot is full.
+sf454b922,Guardas {q} en el maletero.,You put {q} in the boot.
+sdf439b17,No cabe todo: el resto se queda fuera.,Not everything fits: the rest stays out.
+sa6244d43,Sin envasadora al vacío: se pide en la tienda online.,No vacuum sealer: order one from the online shop.
+s1e788ba4,Envasas al vacío {n} lotes del maletero.,You vacuum-seal {n} batches in the boot.
+s456f33d9,Ya está todo envasado.,Everything is already sealed.
+s8caab12a,Un bache: se ha caído {g} del baúl de la moto.,A pothole: {g} fell out of the scooter's top box.
 s24ce7818,"Control de tráfico a la entrada. «Buenas. Carné, permiso de circulación y el seguro de {a}.»","Traffic stop on the way in. “Evening. Licence, registration and insurance for {a}.”"
 s91bad9b9,AGENTE,OFFICER
 sa22a5f11,Multa · sin seguro,Fine · no insurance
@@ -269,6 +292,8 @@ sda73d2d2,"Sin seguro en vigor: denuncia de {e} (te faltan {f}) y {a}, a la grú
 s93cabf4f,"Sin seguro en vigor: denuncia de {e} y {a}, a la grúa hasta que lo asegures.",No valid insurance: a {e} fine and {a} gets towed until insured.
 se9c36eb6,«Todo en orden. Circule.»,“All in order. Move along.”
 s7168a09d,Te mira un rato. «Circule.»,He stares at you a while. “Move along.”
+s9cf8e2ff,{r} y {g} del maletero,{r} and {g} from the boot
+s3fa18629,{g} del maletero,{g} from the boot
 s0b94ccfd,«¿Y este olor?» Te registran {a}: te requisan {r} y te multan con {e}.,“What’s that smell?” They search {a}: they seize {r} and fine you {e}.
 s5c9ad442,"{kg} a {r}, de {thc} % de THC o más, antes del {d}","{kg} to {r}, {thc} % THC or more, before {d}"
 s2180748a,KOLDO,KOLDO
@@ -678,11 +703,14 @@ s2607fbf1,El camarote: almacén,The loft: storage
 s16008835,"Habilitar el camarote de arriba como almacén, las estanterías de tarros de cristal de 10 L y los sobres de humedad.","Fit out the loft upstairs as storage, the shelves of 10 L glass jars and the humidity packs."
 s210771fd, · hecho, · done
 see4ed37b, · mañana, · tomorrow
+s7cf87763,Envasadora al vacío,Vacuum sealer
+s83aaf052,Para envasar lo del maletero en bolsas selladas: en un registro de tráfico se nota menos.,To seal what's in the boot in bags: it shows less in a traffic search.
 sfa78c4b9,"Con tarjeta, de la cuenta del banco.","By card, from your bank account."
 s3a1d6591,TIENDA ONLINE,ONLINE SHOP
 sb1ead1df,Muebles y transporte · en la cuenta {e},Furniture and transport · in the account {e}
 s61b3ec3e,Pedido: {n} · llega mañana,Ordered: {n} · arrives tomorrow
 s6d058a0e,Pedido: {n} · los obreros vienen mañana,Ordered: {n} · the builders come tomorrow
+sed705066,"La envasadora, en casa: se usa desde el maletero.",The sealer is at home: use it from the boot.
 sfe38af21, · {n} mañana, · {n} tomorrow
 se46cf368,"
 Antes hay que habilitar el camarote.","
@@ -1904,7 +1932,6 @@ se104bef9,Caben {e} y {g}. Lo que está dentro no lo llevas encima.,It holds {e}
 s29719190,"Al fondo de la caja hay un sobre de papel de estraza: «Oaxaca, 1979».","At the back of the safe there's a brown paper envelope: «Oaxaca, 1979»."
 s1eb4a41e,Bien secas y a oscuras: siguen buenas.,Kept dry and dark: they're still good.
 sf1f1b89d,cajaSem,
-s30e044fa,No te cabe nada más encima.,You can't carry any more.
 s51c28a0d,Sacas {g} de {l}.,You take out {g} of {l}.
 sd52ae1de,Guardar todo,Store all
 sa7d7089e,Guardar dinero,Store cash
@@ -1925,7 +1952,6 @@ s5b246fbf,No cabe más dinero.,No room for more cash.
 s579440bc,La caja no tiene dinero.,The safe has no cash.
 s37f57119,¿Cuánto guardas?,Store how much?
 s1dfb67eb,¿Cuánto sacas?,Take how much?
-s90031372,No llevas cogollos encima.,You have no buds on you.
 s8d81a1b4,La caja no tiene cogollos.,The safe has no buds.
 s66242b33,No caben más cogollos.,No room for more buds.
 s21936528,{l}: ¿cuánto?,{l}: how much?
@@ -2124,6 +2150,17 @@ A: sacarlo · B: cerrar.","{n}: {g}{tj} · {t} % THC{c}{af}.
 A: take out · B: close."
 s9ae4f42b,afinada al 62 %%,refined at 62 %
 s43f5ff8f,afinándose ({p} %),refining ({p} %)
+se7a48b74,"GUARDAR: llevas {a} de cogollos y en el maletero caben {b} más.
+A: guardar · B: cerrar.","STORE: you carry {a} of buds and the boot holds {b} more.
+A: store · B: close."
+s8c9a5c06,"ENVASAR AL VACÍO: lo del maletero, en bolsas selladas; en un registro de tráfico se nota menos.{e}
+A: envasar · B: cerrar.","VACUUM SEAL: what's in the boot, in sealed bags; it shows less in a traffic search.{e}
+A: seal · B: close."
+sb4c7299f,Hace falta la envasadora de la tienda online.,You need the sealer from the online shop.
+s8b04cce1,"{n}: {g} · {t} % THC{v}.
+A: sacarlo · B: cerrar.","{n}: {g} · {t} % THC{v}.
+A: take out · B: close."
+se01f7399,al vacío,vacuum-sealed
 s49ee777d,"GUARDAR: llevas {a} de cogollos y en la caja caben {b} más.{c}
 A: guardar · B: cerrar.","STORE: you carry {a} of buds and the safe holds {b} more.{c}
 A: store · B: close."
@@ -2147,6 +2184,7 @@ s4aa91aa8,curándose,curing
 s2b4dc95b,sin curar,uncured
 s060206be,CAJA FUERTE,SAFE
 s34ba2c7a,CAMAROTE,LOFT
+s819fdfbf,MALETERO,BOOT
 s05e24c03,NEVERA,FRIDGE
 s221d3703,No llevas extractos encima.,You have no extracts on you.
 s0b559ea1,En la caja no caben más cogollos.,No more buds fit in the safe.
@@ -2160,14 +2198,12 @@ s24c99f25,Un extracto,One extract
 s20db70b0,Guardas {q} en {s}.,You store {q} in {s}.
 s1632210d,la caja,the safe
 scb7ad581,la nevera,the fridge
-sdf439b17,No cabe todo: el resto se queda fuera.,Not everything fits: the rest stays out.
 sc0fda185,{n}: ¿cuánto?,{n}: how much?
 s036da9ff,En el camarote no caben más tarros: pide otra estantería en la tienda online.,No more jars fit in the loft: order another shelf from the online shop.
 s87777fbd,El camarote está lleno.,The loft is full.
 s6967b3c3,¿Qué guardas en el camarote?,What goes in the loft?
 s385e39a7,Guardas {q} en los tarros del camarote.,You store {q} in the loft jars.
 sb6ff4294,Aquí van las estanterías de los tarros de 10 L. Se piden en la tienda online.,The 10 L jar shelves go here. Order them from the online shop.
-s52465e63,Sacas {g} de {n}.,You take out {g} of {n}.
 sa6c7f8a3,Sacas {g} g de {n}.,You take out {g} g of {n}.
 sc27db8ae,La mesa de manicurar. ¿Qué haces?,The trimming table. What now?
 s25ff189e,Manicurar un lote,Trim a batch

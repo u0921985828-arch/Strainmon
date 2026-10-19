@@ -49,7 +49,7 @@ func try_move(d: String) -> void:
 		return
 	var nx: int = P.x + dv[0]
 	var ny: int = P.y + dv[1]
-	if tile_solid(m, nx, ny) or ent_at(nx, ny):
+	if tile_solid(m, nx, ny) or ent_at(nx, ny) or coche_en(nx, ny) != "":
 		if M.reloj - P.bumpT > 350:
 			sfx("bump")
 			P.bumpT = M.reloj
@@ -71,15 +71,40 @@ func vehiculo():
 	var v = S.get("veh")
 	if not D.ZONAS.has(S.map):
 		return null
-	for k in ["deportivo", "berlina", "utilitario", "moto"]:   # 1.43: lo del concesionario, antes que nada (el mejor que tengas)
-		if coche_ya(k) and not S.coches[k].get("grua") and D.VEHICULOS.has(k):
-			return k
+	if Datos.CAL and S.get("coches") is Dictionary and not S.coches.is_empty():   # MAESTRO [3]: solo el que conduces; los demás, aparcados
+		var kc = S.get("conduce")
+		if kc is String and coche_ya(kc) and not S.coches[kc].get("grua") and not S.coches[kc].get("dep") and D.VEHICULOS.has(kc):
+			return kc
+	else:
+		for k in ["deportivo", "berlina", "utilitario", "moto"]:   # 1.43: lo del concesionario, antes que nada (el mejor que tengas)
+			if coche_ya(k) and not S.coches[k].get("grua") and D.VEHICULOS.has(k):
+				return k
 	if not (v is Dictionary):
 		return null
 	for k in ["bici", "patinete"]:
 		if v.get(k) and float(v[k]) <= S.day:
 			return k
 	return null
+
+# MAESTRO [3]: el vehículo aparcado en (x, y) de este mapa (S.coches[k].pos = [mapa, x, y, dir]), o ""
+func coche_en(x: int, y: int) -> String:
+	if not (Datos.CAL and S.get("coches") is Dictionary):
+		return ""
+	for k in S.coches:
+		var p = S.coches[k].get("pos")
+		if p is Array and String(p[0]) == S.map and int(p[1]) == x and int(p[2]) == y and S.get("conduce") != k and not S.coches[k].get("dep"):
+			return k
+	return ""
+
+func conduce_coche() -> String:   # el del concesionario que llevas (no la bici ni el patinete), o ""
+	var v = vehiculo()
+	return v if v is String and S.get("coches") is Dictionary and S.coches.has(v) else ""
+
+# MAESTRO [3]: aparcar k donde estás (al entrar en un sitio, al coger el autobús o a mano)
+func aparcar(k: String, mapa: String, x: int, y: int, d: String) -> void:
+	S.coches[k].pos = [mapa, x, y, d]
+	if S.get("conduce") == k:
+		S.conduce = null
 
 # Un vehículo del concesionario (S.coches: {k: {dia: cuándo llega, p: lo pagado, r: el próximo recibo del seguro o null}}), ya entregado
 func coche_ya(k: String) -> bool:
@@ -214,6 +239,10 @@ func interact() -> void:
 	var de := delante()
 	var tx: int = de[0]
 	var ty: int = de[1]
+	var ck := coche_en(tx, ty)   # MAESTRO [3]: tu vehículo aparcado: conducir o el maletero
+	if ck != "":
+		run(func(): await coche_menu(ck))
+		return
 	var e = ent_at(tx, ty)
 	if e == null and ty >= 0 and ty < m.h and tx >= 0 and tx < m.w and m.o[ty][tx] in COUNTERS:
 		e = ent_at(tx + dv[0], ty + dv[1])
@@ -223,6 +252,9 @@ func interact() -> void:
 	var it = item_at(tx, ty)
 	if it:
 		run(func(): await pick_item(it))
+		return
+	if Datos.CAL and conduce_coche() != "" and ty >= 0 and ty < m.h and tx >= 0 and tx < m.w and m.o[ty][tx] == null:   # MAESTRO [3]: bajarte y aparcar
+		run(func(): await bajar_menu())
 		return
 	run(func(): await object_action(tx, ty))
 

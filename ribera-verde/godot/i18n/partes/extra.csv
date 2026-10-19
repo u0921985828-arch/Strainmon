@@ -40,3 +40,39 @@ Las patrullas te ven desde menos lejos y regateas mejor.,Patrols spot you from l
 ¿QUIÉN ERES?,WHO ARE YOU?
 TU CUMPLEAÑOS: EL MES,YOUR BIRTHDAY: MONTH
 TU CUMPLEAÑOS: EL DÍA,YOUR BIRTHDAY: DAY
+Recoger del depósito,Collect from the pound
+La grúa se lo llevó por mal aparcado. Pagas la tasa y te lo dejan en la puerta.,The tow truck took it for bad parking. Pay the fee and they leave it at the door.
+"La grúa municipal se ha llevado {a}: estaba mal aparcad{o}. En el depósito, {e} de tasa (en el concesionario).","The council tow truck took {a}: it was badly parked. At the pound, a {e} fee (at the dealership)."
+Depósito municipal,Council pound
+La tasa del depósito son {e} y no te llega.,The pound fee is {e} and you can't cover it.
+"{A}, recogid{o} del depósito. Lo tienes en la puerta.","{A}, collected from the pound. It's at the door."
+"{A}, aparcad{o} aquí. Maletero: {g} de {c}.","{A}, parked here. Boot: {g} of {c}."
+Conducir,Drive
+Maletero,Boot
+Maletero: {g} de {c}.,Boot: {g} of {c}.
+Aparcar aquí,Park here
+No hay sitio para bajarte por ese lado.,No room to get out on that side.
+"Aquí no se puede aparcar: si no lo mueves, mañana se lo lleva la grúa.","No parking here: if you don't move it, the tow truck takes it tomorrow."
+En el maletero no cabe más.,The boot is full.
+Guardas {q} en el maletero.,You put {q} in the boot.
+Sin envasadora al vacío: se pide en la tienda online.,No vacuum sealer: order one from the online shop.
+Envasas al vacío {n} lotes del maletero.,You vacuum-seal {n} batches in the boot.
+Ya está todo envasado.,Everything is already sealed.
+Un bache: se ha caído {g} del baúl de la moto.,A pothole: {g} fell out of the scooter's top box.
+{r} y {g} del maletero,{r} and {g} from the boot
+{g} del maletero,{g} from the boot
+Envasadora al vacío,Vacuum sealer
+Para envasar lo del maletero en bolsas selladas: en un registro de tráfico se nota menos.,To seal what's in the boot in bags: it shows less in a traffic search.
+"La envasadora, en casa: se usa desde el maletero.",The sealer is at home: use it from the boot.
+"GUARDAR: llevas {a} de cogollos y en el maletero caben {b} más.
+A: guardar · B: cerrar.","STORE: you carry {a} of buds and the boot holds {b} more.
+A: store · B: close."
+"ENVASAR AL VACÍO: lo del maletero, en bolsas selladas; en un registro de tráfico se nota menos.{e}
+A: envasar · B: cerrar.","VACUUM SEAL: what's in the boot, in sealed bags; it shows less in a traffic search.{e}
+A: seal · B: close."
+Hace falta la envasadora de la tienda online.,You need the sealer from the online shop.
+"{n}: {g} · {t} % THC{v}.
+A: sacarlo · B: cerrar.","{n}: {g} · {t} % THC{v}.
+A: take out · B: close."
+al vacío,vacuum-sealed
+MALETERO,BOOT

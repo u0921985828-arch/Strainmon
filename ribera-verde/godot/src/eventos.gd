@@ -161,11 +161,20 @@ func talk_conce():
 			elif c != null:
 				lb = T("{n} · pedida", {"n": V.n}) if _art_m(k) == "a" else T("{n} · pedido", {"n": V.n})
 			it.append({"label": lb, "right": Datos.eur(V.p), "desc": ficha_coche(k)})
+		var dep := tuyos.filter(func(q): return S.coches[q].get("dep") != null)
+		if Datos.CAL and dep.size():   # MAESTRO [3]: lo de la grúa
+			it.append({"label": K("Recoger del depósito"), "right": Datos.eur(D.MALETERO.tasa), "desc": K("La grúa se lo llevó por mal aparcado. Pagas la tasa y te lo dejan en la puerta.")})
 		it.append({"label": K("Vender"), "disabled": tuyos.is_empty(), "desc": T("Te lo recompran: pierde un {ya} % al salir del concesionario y un {mes} % cada mes, hasta el {min} % de lo que valía.", {"ya": roundi(C.dep.ya * 100), "mes": Datos.coma(C.dep.mes * 100), "min": roundi(C.dep.min * 100)})})
 		it.append({"label": K("Asegurar"), "disabled": sin.is_empty(), "desc": T("Sin seguro no se puede circular: la multa es de {e} y el vehículo, a la grúa.", {"e": Datos.eur(C.sinSeguro)})})
 		it.append({"label": K("Nada"), "desc": T("Precios con IVA. Aparte, la matriculación por emisiones y {g} de gestoría y placas.", {"g": Datos.eur(C.gastos)})})
 		i = await menu(it, {"cls": "full", "title": C.n, "title2": T("Cuenta {b} · efectivo {e}", {"b": Datos.eur(S.banco), "e": Datos.eur(S.money)}), "desc": true, "initial": i})
 		var no: int = C.orden.size()
+		if Datos.CAL and dep.size():
+			if i == no:
+				await recoger_deposito(dep[0])
+				continue
+			if i > no:
+				i -= 1
 		if i < 0 or i >= no + 2:
 			if S.get("coches") is Dictionary and not S.coches.is_empty():
 				await say(K("Cualquier cosa, aquí estamos. Y ojo con la ITV."), K("ARANTXA"))
@@ -255,6 +264,13 @@ func conce_dia() -> void:
 		if c == null:
 			continue
 		var V: Dictionary = C.v[k]
+		if int(c.dia) == int(S.day) and S.get("conduce") == null:   # MAESTRO [3]: te lo dan con las llaves
+			S.conduce = k
+		if c.get("pos") is Array and mal_aparcado(k):   # MAESTRO [3]: la grúa municipal, al depósito
+			c.erase("pos")
+			c.dep = int(S.day)
+			var txg: String = T("La grúa municipal se ha llevado {a}: estaba mal aparcad{o}. En el depósito, {e} de tasa (en el concesionario).", {"a": V.art, "o": _art_m(k), "e": Datos.eur(D.MALETERO.tasa)})
+			queue("grua" + k, func(): await talk(K("SMS · AYUNTAMIENTO"), [txg]))
 		if int(c.dia) == int(S.day):
 			var cx: String = T(" Y en la calle, montado.") if k == "moto" else T(" Y en la calle, al volante.") if D.VEHICULOS.has(k) else ""
 			var tx: String = T("{A} ya está matriculada y con el seguro en vigor. Desde cualquier parada de autobús puedes ir en ella, a la hora que quieras.{x}", {"A": mayus(V.art), "x": cx}) if _art_m(k) == "a" else T("{A} ya está matriculado y con el seguro en vigor. Desde cualquier parada de autobús puedes ir en él, a la hora que quieras.{x}", {"A": mayus(V.art), "x": cx})
@@ -306,12 +322,17 @@ func conducir(k):
 	await anim_viaje(k, aqui, x, int(t.min))
 	advance_time(t.min)
 	var a: Array = D.PARADAS[x].a
+	if Datos.CAL:   # MAESTRO [3]: vas en él y llegas en él
+		S.coches[k].erase("pos")
+		S.conduce = k
 	enter_map(x, int(a[0]), int(a[1]), a[2])
 	if S.clientsDay != S.day:
 		spawn_clients()
 	update_hud()
 	await wait(80)
 	await fade(0)
+	if Datos.CAL:
+		await caida_moto(k)
 	if taller != "":
 		sfx("bad")
 		await talk(K("SMS · TALLER"), [taller])
@@ -333,6 +354,152 @@ func kilometros(k: String, km: int) -> String:
 			tx.append(T("{q}: {e} (te quedan a deber {f})", {"q": qt, "e": Datos.eur(e), "f": Datos.eur(f)}) if f > 0 else T("{q}: {e}", {"q": qt, "e": Datos.eur(e)}))
 	return T("{a}, en el taller. {tx}.", {"a": mayus(V.art), "tx": ". ".join(tx)}) if tx.size() else ""
 
+# ---------- MAESTRO [3]: aparcado, el maletero y la grúa (con Datos.CAL) ----------
+# Cada vehículo se queda donde lo dejas (S.coches[k].pos) y conduces solo el tuyo (S.conduce). Con A delante de él: conducir o el
+# maletero; conduciendo, A sin nada delante: aparcar o el maletero. Mal aparcado (un coche en la acera, en la plaza o en la hierba
+# donde hay calzada), la grúa al amanecer: al depósito, MALETERO.tasa en el concesionario. El maletero (MALETERO.kg por vehículo)
+# guarda cogollos como la caja fuerte y los envasa al vacío (la envasadora, en la tienda online: el registro, MALETERO.vacio.f)
+func mal_aparcado(k: String) -> bool:
+	if k == "moto":
+		return false
+	var p: Array = S.coches[k].pos
+	var m = MAPS.get(String(p[0]))
+	if m == null:
+		return false
+	var g: String = m.g[int(p[2])][int(p[1])]
+	if g.begins_with("road"):
+		return false
+	var hay_calzada := false
+	for r in m.g:
+		for t in r:
+			if String(t).begins_with("road"):
+				hay_calzada = true
+				break
+		if hay_calzada:
+			break
+	return hay_calzada or g == "walk"
+
+func recoger_deposito(k: String) -> void:
+	var e := float(D.MALETERO.tasa)
+	if S.money >= e:
+		S.money -= e
+	elif not cobro_banco(e, K("Depósito municipal")):
+		sfx("bad")
+		await say(T("La tasa del depósito son {e} y no te llega.", {"e": Datos.eur(e)}), K("ARANTXA"))
+		return
+	S.coches[k].erase("dep")
+	S.conduce = k
+	sfx("coin")
+	await say(T("{A}, recogid{o} del depósito. Lo tienes en la puerta.", {"A": mayus(D.CONCE.v[k].art), "o": _art_m(k)}), K("ARANTXA"))
+
+func coche_menu(k: String):
+	var V: Dictionary = D.CONCE.v[k]
+	var j: int = await ask(T("{A}, aparcad{o} aquí. Maletero: {g} de {c}.", {"A": mayus(V.art), "o": _art_m(k), "g": g_txt(mal_g(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), [K("Conducir"), K("Maletero"), K("Nada")])
+	if j == 0:
+		var p: Array = S.coches[k].pos
+		S.coches[k].erase("pos")
+		S.conduce = k
+		sfx("door")
+		enter_map(S.map, int(p[1]), int(p[2]), String(p[3]) if p.size() > 3 else P.dir)
+	elif j == 1:
+		await maletero(k)
+
+func bajar_menu():
+	var k := conduce_coche()
+	var de := delante()
+	var m: Dictionary = MAPS[S.map]
+	var j: int = await ask(T("Maletero: {g} de {c}.", {"g": g_txt(mal_g(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), [K("Aparcar aquí"), K("Maletero"), K("Nada")])
+	if j == 1:
+		await maletero(k)
+	elif j == 0:
+		if not pisable(m, de[0], de[1]) or tile_solid(m, de[0], de[1]) or ent_at(de[0], de[1]) or coche_en(de[0], de[1]) != "":
+			await say(K("No hay sitio para bajarte por ese lado."))
+			return
+		aparcar(k, S.map, P.x, P.y, P.dir)
+		P.x = int(de[0])
+		P.y = int(de[1])
+		P.fx = P.x
+		P.fy = P.y
+		P.px = P.x * 16.0
+		P.py = P.y * 16.0
+		S.x = P.x
+		S.y = P.y
+		sfx("door")
+		if mal_aparcado(k):
+			await say(K("Aquí no se puede aparcar: si no lo mueves, mañana se lo lleva la grúa."))
+
+func maletero(k: String) -> void:
+	MAL_K = k
+	var i := 0
+	while true:
+		var e = await elegir_almacen("mal", i)
+		if e == null:
+			return
+		i = e.i
+		if e.k == "+":
+			await guardar_mal(k)
+			continue
+		if e.k == "v":
+			await envasar(k)
+			continue
+		var g: float = minf(floor(e.b.g * 10) / 10.0, floor(libre_mochila()))
+		if g < 1:
+			await say(K("No te cabe nada más encima."))
+			continue
+		mover_lote(mal(k).buds, S.buds, e.k, g)
+		sfx("sel")
+		await say(T("Sacas {g} de {n}.", {"g": g_txt(g), "n": lot_nombre(e.k)}))
+
+func guardar_mal(k: String) -> void:
+	var L := bud_lots(1)
+	if L.is_empty():
+		await say(K("No llevas cogollos encima."))
+		return
+	var q := 0.0
+	for l in L:
+		var g: float = minf(l[1].g, floor(mal_kg(k) - mal_g(k)))
+		if g < 1:
+			break
+		q += g
+		mover_lote(S.buds, mal(k).buds, l[0], g)
+	sfx("sel")
+	if q < 1:
+		await say(K("En el maletero no cabe más."))
+		return
+	await say(T("Guardas {q} en el maletero.", {"q": g_txt(q)}) + ((" " + T("No cabe todo: el resto se queda fuera.")) if total_buds() >= 1 else ""))
+
+# al vacío: con la envasadora (S.items.vacio), cada lote del maletero, en su bolsa (b.vac): en un registro, se nota menos
+func envasar(k: String) -> void:
+	if not S.items.get("vacio"):
+		await say(K("Sin envasadora al vacío: se pide en la tienda online."))
+		return
+	var n := 0
+	for q in mal(k).buds:
+		if not mal(k).buds[q].get("vac"):
+			mal(k).buds[q].vac = true
+			n += 1
+	sfx("sel")
+	await say(T("Envasas al vacío {n} lotes del maletero.", {"n": n}) if n else K("Ya está todo envasado."))
+
+func mal_vacio(k: String) -> bool:   # todo lo del maletero, al vacío
+	for q in mal(k).buds:
+		if not mal(k).buds[q].get("vac"):
+			return false
+	return true
+
+# la moto (MALETERO.cae): de vez en cuando, en un bache, se cae parte de la carga
+func caida_moto(k: String) -> void:
+	if k != "moto" or mal_g(k) < 1 or Cultivo.azar() >= float(D.MALETERO.cae):
+		return
+	var L: Dictionary = mal(k).buds
+	var q0: String = L.keys()[0]
+	var g: float = floor(float(L[q0].g) * float(D.MALETERO.caeF) + 1)
+	L[q0].g = float(L[q0].g) - g
+	if L[q0].g < 1:
+		L.erase(q0)
+	sfx("bad")
+	await say(T("Un bache: se ha caído {g} del baúl de la moto.", {"g": g_txt(g)}))
+
 # el control de tráfico (CONCE.control; el deportivo, el triple): el seguro y, si te registran, lo que lleves encima
 func control_trafico(k: String) -> void:
 	var C: Dictionary = D.CONCE
@@ -345,13 +512,22 @@ func control_trafico(k: String) -> void:
 		var f: float = pagar_recibo(float(C.sinSeguro), K("Multa · sin seguro"))
 		S.coches[k].grua = true
 		await say(T("Sin seguro en vigor: denuncia de {e} (te faltan {f}) y {a}, a la grúa hasta que lo asegures.", {"e": Datos.eur(C.sinSeguro), "f": Datos.eur(f), "a": V.art}) if f > 0 else T("Sin seguro en vigor: denuncia de {e} y {a}, a la grúa hasta que lo asegures.", {"e": Datos.eur(C.sinSeguro), "a": V.art}), K("AGENTE"))
-	if total_buds() < 1 and total_rosin() <= 0:
+	var enmal: bool = Datos.CAL and mal_g(k) >= 1   # MAESTRO [3]: lo del maletero también cuenta; al vacío, se nota menos
+	if total_buds() < 1 and total_rosin() <= 0 and not enmal:
 		await say(K("«Todo en orden. Circule.»"), K("AGENTE"))
 		return
-	if Cultivo.azar() >= .5 + float(S.heat) / 200.0:
+	var pr: float = .5 + float(S.heat) / 200.0
+	if enmal and mal_vacio(k):
+		pr *= float(D.MALETERO.vacio.f)
+	if Cultivo.azar() >= pr:
 		await say(K("Te mira un rato. «Circule.»"), K("AGENTE"))
 		return
+	var habia: bool = total_buds() >= 1 or total_rosin() > 0
 	var r := confiscate()
+	if enmal:
+		var gm := mal_g(k)
+		mal(k).buds = {}
+		r[0] = T("{r} y {g} del maletero", {"r": r[0], "g": g_txt(gm)}) if habia else T("{g} del maletero", {"g": g_txt(gm)})
 	S.heat = mini(100, int(S.heat) + 10)
 	update_hud()
 	await say(T("«¿Y este olor?» Te registran {a}: te requisan {r} y te multan con {e}.", {"a": V.art, "r": r[0], "e": Datos.eur(r[1])}), K("AGENTE"))

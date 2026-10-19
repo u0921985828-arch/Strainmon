@@ -306,6 +306,11 @@ func _mundo() -> void:
 		_vistas()
 	for e in J.ents:
 		list.append([e.py, _pj.bind(e, e.look, false, float(e.get("dur", 320.0)))])
+	if Datos.CAL and S.get("coches") is Dictionary:   # MAESTRO [3]: los vehículos aparcados, sin nadie, donde los dejaste
+		for k in S.coches:
+			var cp = S.coches[k].get("pos")
+			if cp is Array and String(cp[0]) == S.map and S.get("conduce") != k and not S.coches[k].get("dep") and Atlas.anim_de("vehiculos", String(k) + "-atras"):
+				list.append([int(cp[2]) * 16, _aparcado.bind(String(k), int(cp[1]), int(cp[2]), String(cp[3]))])
 	if J.SENT != null:   # 1.47: sentado, delante del asiento si se ve de frente y detrás si se ve de espaldas
 		list.append([J.SENT.y * 16 + (1 if J.SENT.d == "sur" or J.SENT.get("k") in J.TABURETES else -1), _pj_sentado])
 	else:
@@ -1225,6 +1230,15 @@ static func _trazo(pts: Array, s0: float, s1: float, cajas: Array) -> void:
 		acc += l
 
 # personajes: el fotograma (acción, andar, idle o base), con la sombra; las acciones de fumar sueltan su humo
+func _aparcado(k: String, x: int, y: int, d: String) -> void:
+	var xp: int = x * 16 - cam.x + 8
+	var yp: int = y * 16 - cam.y + 15
+	var dd: String = DIR4.get(d, "south")
+	for p in ["-atras", "-delante"]:
+		var f = Atlas.frame_de("vehiculos", k + p, dd, 0, {"i": 0})
+		if f:
+			_pinta(f, xp, yp)
+
 func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 	var gr = Atlas.grupo_look(look)
 	if not gr:

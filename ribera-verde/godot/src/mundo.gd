@@ -1791,6 +1791,11 @@ func montar_atrezo(k: String) -> void:
 
 func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	SENT = null   # 1.49: al cambiar de sitio, de pie
+	if Datos.CAL and name_ != S.map and not D.ZONAS.has(name_) and S.get("conduce") is String and D.ZONAS.has(S.map) and S.get("coches") is Dictionary and S.coches.has(S.conduce):
+		# MAESTRO [3]: al entrar en un sitio, el vehículo se queda fuera, en la casilla de antes de la puerta
+		var mm: Dictionary = MAPS[S.map]
+		var en := [P.x, P.y] if call("pisable", mm, P.x, P.y) else [P.fx, P.fy]
+		call("aparcar", String(S.conduce), S.map, int(en[0]), int(en[1]), String(P.dir))
 	S.map = name_
 	if name_ == "home":
 		montar_casa()
@@ -2105,6 +2110,12 @@ func coches_mios() -> Array:
 	return []
 
 func conducir(_k):
+	pass
+
+func coche_menu(_k: String):   # MAESTRO [3], en eventos.gd
+	pass
+
+func bajar_menu():   # MAESTRO [3], en eventos.gd
 	pass
 
 func seguro_anio(_k) -> int:

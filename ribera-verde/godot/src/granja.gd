@@ -1118,6 +1118,13 @@ func tienda_online() -> void:
 		if sot_ok:
 			var sd = S.sot.get("d") if S.get("sot") is Dictionary else null
 			items.append({"label": I18n.v(String(SO.obra.n)) + (T(" · hecho") if sd != null and float(sd) <= S.day else T(" · mañana") if sd != null else ""), "right": Datos.eur(SO.obra.p), "disabled": sd != null, "desc": SO.obra.d})
+		var ienv := -1
+		if Datos.CAL and S.get("coches") is Dictionary and not S.coches.is_empty():   # MAESTRO [3]: la envasadora al vacío, para el maletero
+			var VA: Dictionary = D.MALETERO.vacio
+			var tv: bool = int(S.items.get("vacio", 0)) > 0
+			ienv = items.size() - ks.size() - vs.size()
+			items.append({"label": K("Envasadora al vacío") + (T(" · en casa") if tv else ""), "right": Datos.eur(VA.p), "disabled": tv,
+				"desc": K("Para envasar lo del maletero en bolsas selladas: en un registro de tráfico se nota menos.")})
 		items.append({"label": K("Salir"), "desc": K("Con tarjeta, de la cuenta del banco.")})
 		i = await menu(items, {"cls": "full", "title": K("TIENDA ONLINE"), "title2": T("Muebles y transporte · en la cuenta {e}", {"e": Datos.eur(S.banco)}), "desc": true, "initial": i})
 		if i == ks.size() + vs.size():
@@ -1137,6 +1144,12 @@ func tienda_online() -> void:
 				S.sot = {"d": S.day + 1, "bandejas": [], "g": 0, "fr": []}
 				sfx("coin")
 				toast(T("Pedido: {n} · los obreros vienen mañana", {"n": SO.obra.n}), 1400)
+			continue
+		if ienv >= 0 and i == ks.size() + vs.size() + ienv:
+			if await tarjeta(D.MALETERO.vacio.p, K("Tienda online") + " · " + K("Envasadora al vacío")):
+				S.items.vacio = 1
+				sfx("coin")
+				toast(K("La envasadora, en casa: se usa desde el maletero."), 1400)
 			continue
 		if i < 0 or i >= ks.size() + vs.size():
 			return
@@ -1417,6 +1430,8 @@ func parada_action():
 	var aqui: String = S.map
 	var pa: Dictionary = D.PARADAS[aqui]
 	var mios := coches_mios()   # 1.43: con un vehículo del concesionario, a dónde quieras y a cualquier hora
+	if Datos.CAL:   # MAESTRO [3]: el que llevas o el que tengas aparcado en este pueblo
+		mios = mios.filter(func(k): return S.get("conduce") == k or (S.coches[k].get("pos") is Array and String(S.coches[k].pos[0]) == aqui))
 	if mios.size() and not llegando():
 		var ops: Array = [K("En autobús")]
 		for k in mios:
@@ -1461,6 +1476,10 @@ func parada_action():
 			await say(T("El billete hasta {d} cuesta {e}. No te llega.", {"d": D.PARADAS[k].n, "e": Datos.eur(v.eur)}))
 			return
 		S.money -= v.eur
+	if Datos.CAL and conduce_coche() != "":   # MAESTRO [3]: en autobús, el tuyo se queda aparcado en la parada
+		var cc := conduce_coche()
+		var mp: Dictionary = MAPS[aqui]
+		aparcar(cc, aqui, P.x if pisable(mp, P.x, P.y) else P.fx, P.y if pisable(mp, P.x, P.y) else P.fy, P.dir)
 	sfx("door")
 	await fade(1)
 	await anim_viaje("bus", aqui, k, int(v.min))
