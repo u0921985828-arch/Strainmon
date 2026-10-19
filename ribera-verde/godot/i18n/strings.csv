@@ -384,6 +384,9 @@ s60f43198,La bodega va llena.,The hold is full.
 sb1aaa35f,Sueltas amarras. {b} sale hacia {r} con {kg}: llega el {d}.,You cast off. {b} heads for {r} with {kg}: arrives {d}.
 scd28d831, Es el pedido de la semana., It's this week's order.
 s88458006, El último trabajo de Koldo., Koldo's last job.
+s84427f42,PISOS9,PISOS9
+sd08d1959,SMS · IÑAKI,SMS · IÑAKI
+s0a964c72,"Me dicen que ya sacas género por mar. Con ese volumen, monta pisos de venta por los pueblos, con alguien de tu plantilla al frente: MÓVIL → PISOS.","Word is you're already shipping product by sea. With that volume, set up selling flats around the towns, with someone from your staff in charge: PHONE → FLATS."
 sc0611256,SMS · KOLDO,SMS · KOLDO
 s1adfd66e,Malas noticias: la patrullera paró a {b} antes de {r}. Se han quedado la carga; el barco lo saco yo con la cofradía. Tranquilo unos días.,Bad news: the patrol boat stopped {b} before {r}. They kept the cargo; I'll get the boat back through the guild. Lie low a few days.
 s9ebc0cf7,Transferencia · {n},Transfer · {n}
@@ -455,6 +458,7 @@ sb53a3122,STAFF,STAFF
 sc08e634a,El piso,The flat
 sd928546f,La calle,The Street
 scaff5908,La nave,The warehouse
+scf6a408b,Los pisos,The flats
 saa447a67,Sin trabajo,Unemployed
 s89729d10,"Jefe, ojo con {n}: ayer le vi hablando con uno de paisano detrás de {l}. Yo no le contaría nada.","Boss, watch out for {n}: yesterday I saw them talking to a plain-clothes cop behind {l}. I wouldn't tell them anything."
 s5f9d243c,Sin extracción no hay filtro: el olor sale a la calle.,"No extraction, no filter: the smell gets out to the street."
@@ -1346,7 +1350,6 @@ s0ccb2c5d,LISTA,READY
 s186914ff,CULTIVO,GROW
 s787bc634,Luz {e}/día,Power {e}/day
 s6d3fdaa8,Luz apagada,Lights off
-s84427f42,PISOS9,PISOS9
 s5fca07cd,sin piso,no flat
 s33f5d4da,sin lugarteniente · {s},no lieutenant · {s}
 s7f4550a3,Un piso por pueblo: tu lugarteniente vende cada mañana lo que dejes en su almacén.,One flat per town: your lieutenant sells every morning whatever you leave in the storeroom.
@@ -1374,6 +1377,7 @@ sfc6cd61d,La caja está vacía.,The till is empty.
 sdcfc0011,Te llevas {e}.,You take {e}.
 scda1574f,Para vaciarlo tienes que estar en el pueblo.,To empty it you have to be in the town.
 s62e2b7c1,¿Dejas el piso? Lo que haya en el almacén y en la caja te lo llevas tú.,"Give up the flat? Whatever is in the storeroom and the till, you take with you."
+sd2faba41,No te cabe todo encima: quedan {s} en el almacén. Vacía la mochila y vuelve a por ello.,You can't carry it all: {s} left in the storeroom. Empty your backpack and come back for it.
 s622dcd6c,No tienes a nadie libre en la plantilla. Pídele gente a Patxi desde el móvil.,You have nobody free on your staff. Ask Patxi for people from your phone.
 s306cc287,labia {l} · lealtad {e},patter {l} · loyalty {e}
 s6442a796,Nadie,Nobody
@@ -1388,7 +1392,6 @@ se50e53bf,Sin alquiler no hay piso en {n}. Lo que había dentro cubre lo que deb
 s9dec49e6,Han entrado en el piso de {n}. Me llevan detenido. Se han quedado {kg} y {e} de la caja.,They've raided the flat in {n}. They're taking me in. They kept {kg} and {e} from the till.
 s3f58cfc2,"Tu nombre ya suena en Hiriburu. Con un patrimonio así, la ciudad se abre: la autopista sale de la parada, con tu vehículo ({p} de peaje).","Your name is getting around in Hiriburu. With assets like yours, the city opens up: the motorway leaves from the stop, in your own vehicle ({p} toll)."
 s88fc49ae,"Allí hay clubs para gente con dinero, un concejal que sabe mirar a otro lado y dos bandas que no te esperan con flores.","There are clubs for people with money, a councillor who knows how to look the other way and two gangs that won't greet you with flowers."
-sd08d1959,SMS · IÑAKI,SMS · IÑAKI
 s3c9f69c2,Multa · {n},Fine · {n}
 s2131d3bd,Inspección en {n}: precintado {d} días y {e} de multa.,Inspection at {n}: sealed for {d} days and a {e} fine.
 s0c1a885c,SMS · AYUNTAMIENTO DE HIRIBURU,SMS · HIRIBURU CITY COUNCIL
@@ -1397,6 +1400,10 @@ s05f80854,UN CHAVAL DEL BARRIO,A KID FROM THE NEIGHBOURHOOD
 s23dabcd9,«Aquí se viene a que te vean.»,“You come here to be seen.”
 s860e10af,«¿Tú eres el dueño? Buena música.»,“Are you the owner? Good music.”
 s1a226b33,«La próxima la pago yo.»,“Next round's on me.”
+sc4a796e4,"«Con prisa, perdona.»","“In a hurry, sorry.”"
+s7d99dc07,«Esta ciudad no duerme.»,“This city never sleeps.”
+sbfa600de,«¿Buscas algo? Yo no he visto nada.»,“Looking for something? I haven't seen a thing.”
+sab18eb5d,«El alquiler aquí te come vivo.»,“The rent here eats you alive.”
 s6f2cd279,Cerrado. Una cámara te mira desde lo alto.,Closed. A camera watches you from up high.
 s17d6ee6d,Precinto del Ayuntamiento en la puerta: cerrado hasta el {d}.,Council seal on the door: closed until {d}.
 s2497aad8,"{n}: SE TRASPASA. Local de copas con licencia hasta las 6, {p}. ¿Lo compras?","{n}: FOR SALE. Bar licensed until 6 a.m., {p}. Buy it?"
@@ -1428,6 +1435,7 @@ s14da80ca,{j} y los suyos te cortan el paso: «{b} no es tuya.»,{j} and his cre
 s1668d5ed,Plantarles cara,Stand up to them
 s3939eef0,Pagarles ({e}),Pay them ({e})
 se6a65db0,Irte,Leave
+se63decb4,No llevas {e} encima.,You don't have {e} on you.
 sf0b966a5,Se guardan el dinero y se apartan. Por esta vez.,They pocket the money and step aside. This time.
 s1a55e705,Te apartas. En {b} te queda un {c} %.,You back off. In {b} you keep {c} %.
 sfc860bc5,"Todo de diseño, todo carísimo.","All designer, all very expensive."

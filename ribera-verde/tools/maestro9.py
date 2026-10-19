@@ -34,7 +34,7 @@ def manzana(x0, y0, idb, door=None, ancha=False, fach=None):
 # las dos filas de manzanas, con los callejones de una casilla entre ellas (como el Ensanche)
 for fila, y0 in ((0, 2), (1, 13)):
     for i, x0 in enumerate((1, 10, 19, 28, 37)):
-        idb = 'bloque2' if i % 2 else 'bloque'
+        idb = 'bloque2' if (i + fila) % 2 else 'bloque'   # las dos filas al tresbolillo, no la misma calle dos veces
         if fila == 0 and i == 1:
             manzana(x0, y0, idb, 12, False, 'club-ensanche')       # el Club Zenit
         elif fila == 0 and i == 4:
@@ -91,7 +91,7 @@ doors['39,8'] = OrderedDict([('to', 'vip-ila'), ('x', 10), ('y', 8), ('dir', 'up
 
 MAPS = D['MAPS']
 MAPS['metropoli'] = OrderedDict([('name', 'Hiriburu'), ('w', W), ('h', H), ('g', g), ('o', o), ('exits', OrderedDict()),
-    ('doors', doors), ('music', MAPS['ensanche']['music']), ('blds', blds), ('est', None)])
+    ('doors', doors), ('music', 'metropoli'), ('blds', blds), ('est', None)])
 
 # los dos clubs VIP por dentro: el plano del club del Ensanche, sin el dispensario (sin vitrina, tarros ni pizarra)
 for k, puerta in (('zen', (12, 9)), ('ila', (38, 9))):
@@ -108,6 +108,9 @@ for k, puerta in (('zen', (12, 9)), ('ila', (38, 9))):
 D['SIGNS']['metropoli:19,9'] = 'HIRIBURU · UDALA\nEl Ayuntamiento. Se atiende en la puerta.'
 D['SIGNS']['metropoli:5,23'] = 'APARCAMIENTO\nEntrada y salida de la autopista.'
 
+# la gente que pasea por las aceras y la plaza (m9_t*): no son clientes, pero la ciudad no está vacía
+PASEO = [(16, 12, 'clubg1'), (30, 12, 'turista'), (7, 20, 'clubg4'), (26, 20, 'vecina'), (20, 26, 'baila2'), (27, 25, 'cliente4'), (42, 23, 'clubg2'), (35, 9, 'cliente6')]
+
 # las casillas de clientes: aceras libres, lejos de las farolas (la farola alta tapa 3 filas) y de las puertas
 ct = []
 for y in (9, 12, 20, 23):
@@ -117,6 +120,8 @@ for y in (9, 12, 20, 23):
         if any(o[y + d][x] == 'lamp' for d in (1, 2, 3) if y + d < H) or g[y - 1][x].startswith('door_') or (x, y) in ((12, 9), (38, 9), (39, 9), (23, 9), (8, 23), (40, 12)):
             continue
         if x <= 6 and y == 23:   # el aparcamiento
+            continue
+        if any((x, y) == (q[0], q[1]) for q in PASEO):
             continue
         ct.append([x, y])
 D['CLIENT_TILES'].pop('metropoli', None)
@@ -144,7 +149,8 @@ D['METRO'] = OrderedDict([
     ('concejal', OrderedDict([('n', 'ZUBIRI'), ('look', 'presi_ibar'), ('x', 23), ('y', 9), ('sobre', 12000), ('per', 30)])),
     ('npc', [OrderedDict([('id', 'm9_g1'), ('map', 'vip-zen'), ('x', 12), ('y', 3), ('look', 'clubg3'), ('dir', 'left')]),
              OrderedDict([('id', 'm9_g2'), ('map', 'vip-ila'), ('x', 12), ('y', 3), ('look', 'baila1'), ('dir', 'left')]),
-             OrderedDict([('id', 'm9_g3'), ('map', 'vip-ila'), ('x', 3), ('y', 7), ('look', 'clubg5'), ('dir', 'right')])]),
+             OrderedDict([('id', 'm9_g3'), ('map', 'vip-ila'), ('x', 3), ('y', 7), ('look', 'clubg5'), ('dir', 'right')])] +
+            [OrderedDict([('id', 'm9_t%d' % i), ('map', 'metropoli'), ('x', q[0]), ('y', q[1]), ('look', q[2]), ('dir', 'down'), ('wander', 2)]) for i, q in enumerate(PASEO)]),
     ('txt', OrderedDict([
         ('sofaF', 'Sofá de cuero blanco. Aquí no se sienta cualquiera.'), ('sofaB', 'Sofá de cuero blanco, de espaldas a la pista.'),
         ('mesita', 'Una mesa baja de cristal con una cubitera.'), ('billar', 'Un billar de tapete negro. Nadie juega: se mira.'),

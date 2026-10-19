@@ -876,6 +876,8 @@ func spawn_clients() -> void:
 		if S.ch >= 3 and extr_algo():
 			for zx in [["town", 2], ["astilleros", 1], ["puerto", 1], ["valdehierro", 1]] + ([["ibarbide", 1], ["ensanche", 1]] if S.ch >= 4 else []):
 				zonas.append([zx[0], zx[1], ["ext"], "x"])
+		if metro_ya():   # MAESTRO [9]: Hiriburu, al final para no mover las tiradas de los demás
+			zonas.append(["metropoli", 6 + (2 if S.ch >= 8 else 0), ["pij", "pij", "tur", "cur", "est"]])
 		for zz in zonas:
 			var map_: String = zz[0]
 			if not usado.has(map_):
@@ -897,7 +899,7 @@ func spawn_clients() -> void:
 				used["%d,%d" % [t[0], t[1]]] = true
 				var type: String = pick(zz[2])
 				var ct: Dictionary = D.CTYPES[type]
-				var id := "c%d_%s%s%d" % [S.day, pre, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e", "ibarbide": "i", "ensanche": "n", "callejon": "k"}[map_], i]
+				var id := "c%d_%s%s%d" % [S.day, pre, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e", "ibarbide": "i", "ensanche": "n", "callejon": "k", "metropoli": "h"}[map_], i]
 				var want := ri(int(ct.g[0]), int(ct.g[1]))
 				var mt := 0
 				if type == "pij":

@@ -114,6 +114,8 @@ func _corre() -> void:
 	QUIERO = ["Colgar"]
 	chk(corre(J.movil_menu), "móvil bloqueado")
 	chk(MENUS.size() and not MENUS[0].has("Pisos"), "app sin envío: %s" % [MENUS])
+	S.mar = {"exp": 1}
+	chk(J.pisos_ok(), "pisos al mandar el primer envío (aunque no haya llegado)")
 	S.mar = {"paso": 1}
 	chk(J.pisos_ok(), "pisos con el envío")
 	MENUS = []
@@ -152,6 +154,8 @@ func _corre() -> void:
 	chk(corre(func(): await J.piso_menu("town")), "lugarteniente bloqueado")
 	chk(w.get("rol") == "lugar" and w.get("pv") == "town" and J.lt_de("town") == w, "lugarteniente %s" % [w])
 	chk(J.rol_txt(w).contains("piso") and J.rol_desc(w).contains("piso"), "rol " + J.rol_txt(w))
+	chk(J.local_staff(w) == "pisos" and J.nombre_local("pisos") == "Los pisos", "plantilla por local: %s" % J.local_staff(w))
+	chk(not J.ops_staff(w).any(func(o): return String(o).begins_with("Sueldo")), "sin sueldo: %s" % [J.ops_staff(w)])
 
 	# 4 · dejar género: solo en el pueblo
 	var sid: String = D.DEX[0]
@@ -221,11 +225,23 @@ func _corre() -> void:
 	# dejar el piso desde fuera con género: no; en el pueblo, todo vuelve
 	J.pisos_d().puerto.caja = 50
 	J.enter_map("puerto", int(D.PARADAS.puerto.a[0]), int(D.PARADAS.puerto.a[1]), "down")
-	var g0: float = J.total_buds()
+	S.buds = {}
+	J.pisos_d().puerto.buds = {sid: {"g": J.cap_mochila() * 2.5, "thc": 18.0, "dia": S.day}}
 	var stp: float = J.stock_piso(J.pisos_d().puerto)
-	QUIERO = ["Dejar el piso", "Sí"]
-	chk(corre(func(): await J.piso_menu("puerto")), "dejar el piso bloqueado")
-	chk(not J.pisos_d().has("puerto") and absf(J.total_buds() - g0 - stp) < 1 and w2.get("rol") == null and not w2.has("pv"), "dejado: %s %s" % [J.total_buds(), w2])
+	var llevo := 0.0
+	var vueltas := 0
+	while J.pisos_d().has("puerto") and vueltas < 6:
+		LOG = []
+		QUIERO = ["Dejar el piso", "Sí", "Nada"]
+		chk(corre(func(): await J.piso_menu("puerto")), "dejar el piso bloqueado")
+		chk(J.peso_encima() <= J.cap_mochila() + 1, "dejar el piso: encima %s de %s" % [J.peso_encima(), J.cap_mochila()])
+		llevo += J.total_buds()
+		if J.pisos_d().has("puerto"):
+			chk(LOG.any(func(t): return String(t).contains("No te cabe")), "aviso de la mochila: %s" % [LOG])
+		S.buds = {}
+		vueltas += 1
+	chk(vueltas == 3, "tres viajes para %s g con %s de mochila: %d" % [stp, J.cap_mochila(), vueltas])
+	chk(not J.pisos_d().has("puerto") and absf(llevo - stp) < 1 and w2.get("rol") == null and not w2.has("pv"), "dejado: %s de %s %s" % [llevo, stp, w2])
 	# el alquiler sin pagar: se pierde el piso
 	J.enter_map("town", 10, 10, "down")
 	S.money = 0
@@ -246,6 +262,18 @@ func _corre() -> void:
 	J.metro_dia()
 	chk(J.metro_ya(), "ciudad abierta con %s" % J.patrimonio())
 	chk(J.pisos_lista().has("metropoli"), "piso en la ciudad")
+	# el patrimonio neto cuenta los bienes: comprar un piso no lo baja; el género y los coches suman
+	S.banco = int(MT.umbral) + int(R.k.ibarbide.p)
+	var pt0: float = J.patrimonio()
+	QUIERO = ["Comprarlo"]
+	chk(corre(func(): await J.piso_menu("ibarbide")), "comprar en Ibarbide bloqueado")
+	chk(J.pisos_d().has("ibarbide") and absf(J.patrimonio() - pt0) < 1, "comprar un piso no baja el patrimonio: %s → %s" % [pt0, J.patrimonio()])
+	var pt1: float = J.patrimonio()
+	S.buds = {sid: {"g": 1000.0, "thc": 20.0, "dia": S.day}}
+	chk(absf(J.patrimonio() - pt1 - 1000.0 * J.precio_mayor(20.0)) < 1, "el género a precio de por mayor")
+	S.buds = {}
+	J.pisos_d().erase("ibarbide")
+	S.banco = int(MT.umbral)
 	# conducir: la ciudad sale en la lista y el tramo lleva el peaje
 	S.coches = {"utilitario": {"km": 0, "r": 1, "dia": 0, "en": "ibarbide"}}
 	J.enter_map("ibarbide", int(D.PARADAS.ibarbide.a[0]), int(D.PARADAS.ibarbide.a[1]), "down")
@@ -278,6 +306,18 @@ func _corre() -> void:
 	chk(ids.has("m9_concejal") and ids.has("m9_fac_puente") and ids.has("m9_fac_gris"), "gente %s" % [ids])
 	for d in J.metro_npcs("metropoli") + J.metro_npcs("vip-zen") + J.metro_npcs("vip-ila"):
 		chk(D.LOOKS.has(String(d.look)), "look " + String(d.look))
+	var pas: Array = J.ents.filter(func(x): return String(x.id).begins_with("m9_t"))
+	chk(pas.size() >= 8 and pas.all(func(x): return int(x.wander) > 0), "gente paseando: %d" % pas.size())
+	for x in pas:
+		chk(vis.has(Vector2i(int(x.x), int(x.y))), "paseante al alcance %s" % x.id)
+	S.clientsDay = -1
+	J.spawn_clients()
+	var cm: Array = S.clients.filter(func(c): return c.map == "metropoli")
+	chk(cm.size() >= 6, "clientes en la ciudad: %d" % cm.size())
+	chk(cm.all(func(c): return MT.ct.any(func(t): return int(t[0]) == int(c.x) and int(t[1]) == int(c.y))), "clientes en sus casillas")
+	LOG = []
+	chk(corre(func(): await J.talk_metro("m9_t0")), "paseante bloqueado")
+	chk(LOG.size() == 1, "el paseante habla: %s" % [LOG])
 	# la parada de la ciudad: con tu vehículo, la autopista; el de línea a Ibarbide
 	MENUS = []
 	QUIERO = ["Nada"]
@@ -375,6 +415,16 @@ func _corre() -> void:
 	QUIERO = ["Plantarles cara"]
 	chk(corre(J.metro_llegada), "llegada bloqueada")
 	chk(J.metro_d().at.is_empty() and J.control(b) > c0, "pelea al llegar %d → %d" % [c0, J.control(b)])
+	# pagarles sin dinero: lo dice y vuelve a preguntar
+	J.metro_d().at[b] = S.day
+	S.money = 0
+	c0 = J.control(b)
+	LOG = []
+	MENUS = []
+	QUIERO = ["Pagarles", "Irte"]
+	chk(corre(J.metro_llegada), "llegada sin dinero bloqueada")
+	chk(MENUS.size() == 2 and not MENUS[1].any(func(l): return l.begins_with("Pagarles")), "sin dinero, sin pagar: %s" % [MENUS])
+	chk(J.control(b) == maxi(0, c0 - int(MT.ter.pierde)), "y te apartas %d → %d" % [c0, J.control(b)])
 	chk(J.rival_b("rival").name != MT.fac.gris.jefe, "rival de siempre sin banda")
 	J.rival_fac = "gris"
 	chk(J.rival_b("rival").name == MT.fac.gris.jefe, "jefe de la banda")

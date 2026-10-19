@@ -198,5 +198,15 @@
   "h": "ea8eaaa06d16f0747356",
   "bucle": 12.631587301587302,
   "dur": 113.684
+ },
+ "metropoli": {
+  "h": "ea8eaaa06d49b93b20d6",
+  "bucle": 8.13560090702948,
+  "dur": 73.22
+ },
+ "metropoli_n": {
+  "h": "ea8eaaa06dbf2fcd2d09",
+  "bucle": 9.6,
+  "dur": 67.2
  }
 }

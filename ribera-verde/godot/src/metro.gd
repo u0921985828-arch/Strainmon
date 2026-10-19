@@ -17,7 +17,7 @@ func _pm(s: String, p: float) -> bool:   # true con probabilidad p, por hash
 
 # ---------- los pisos de venta ----------
 func pisos_ok() -> bool:
-	return Datos.CAL and D.has("PISOS9") and S != null and S.get("mar") is Dictionary and int(S.mar.get("paso", 0)) >= 1
+	return Datos.CAL and D.has("PISOS9") and S != null and S.get("mar") is Dictionary and (int(S.mar.get("paso", 0)) >= 1 or int(S.mar.get("exp", 0)) >= 1)
 
 func pisos_d() -> Dictionary:
 	if not (S.get("pisos") is Dictionary):
@@ -151,9 +151,17 @@ func piso_menu(k: String) -> void:
 				await say(K("Para vaciarlo tienes que estar en el pueblo."))
 				continue
 			if await confirm(K("¿Dejas el piso? Lo que haya en el almacén y en la caja te lo llevas tú.")):
-				for b in F.buds.keys():
-					mover_lote(F.buds, S.buds, b, F.buds[b].g)
 				S.money += int(F.caja)
+				F.caja = 0
+				for b in F.buds.keys():
+					var cabe: float = minf(float(F.buds[b].g), floor(libre_mochila()))
+					if cabe >= 1:
+						mover_lote(F.buds, S.buds, b, cabe)
+				if stock_piso(F) >= 1:   # lo que no cabe encima se queda: el piso sigue hasta que vuelvas a por ello
+					sfx("bad")
+					update_hud()
+					await say(T("No te cabe todo encima: quedan {s} en el almacén. Vacía la mochila y vuelve a por ello.", {"s": _kg(int(stock_piso(F)))}))
+					continue
 				var w = lt_de(k)
 				if w:
 					libre(w)
@@ -290,7 +298,48 @@ func patrimonio() -> float:
 		t += float(S.franco.get("caja", 0))
 	for k in pisos_d():
 		t += float(pisos_d()[k].caja)
-	return t - maxf(0.0, float(S.get("debt", 0)))
+	return t + bienes() - maxf(0.0, float(S.get("debt", 0)))
+
+# los bienes: lo comprado a su precio (la nave, los pisos, los clubs VIP, los barcos), los coches a lo que paga el concesionario
+# y el género a precio de por mayor (los cogollos) o a la mitad del rosin (los extractos), esté donde esté
+func bienes() -> float:
+	var t := 0.0
+	if S.get("nave") is Dictionary and S.nave.get("mia"):
+		t += float(D.NAVE.compra.precio)
+	for k in pisos_d():
+		var F: Dictionary = pisos_d()[k]
+		if F.get("mia"):
+			t += float(D.PISOS9.k[k].p)
+		t += _vale(F.buds, false)
+	if S.get("metro") is Dictionary:
+		for k in metro_d().vip:
+			t += float(D.METRO.vip[k].p)
+	if S.get("mar") is Dictionary:
+		for B in D.MAR.barcos:
+			if B.k in S.mar.get("b", []):
+				t += float(B.p)
+	if S.get("coches") is Dictionary:
+		for k in S.coches:
+			t += valor_coche(k)
+	t += _vale(S.get("buds", {}), false) + _vale(S.get("rosin", {}), true)
+	for q in ["caja", "cam", "desp"]:
+		if S.get(q) is Dictionary:
+			t += _vale(S[q].get("buds", {}), false)
+	if S.get("nevera") is Dictionary:
+		t += _vale(S.nevera.get("rosin", {}), true)
+	if S.get("nave") is Dictionary and S.nave.get("cur") is Dictionary:
+		t += _vale(S.nave.cur.get("buds", {}), false)
+	return t
+
+func _vale(L, rosin: bool) -> float:
+	var t := 0.0
+	if not L is Dictionary:
+		return t
+	for k in L:
+		var b = L[k]
+		if b is Dictionary:
+			t += float(b.get("g", 0)) * (precio_rosin(float(b.get("thc", 0))) * .5 if rosin else precio_mayor(float(b.get("thc", 0))))
+	return t
 
 func metro_d() -> Dictionary:
 	var M_: Dictionary = S.metro
@@ -391,7 +440,7 @@ func metro_npcs(mapa: String) -> Array:
 	for n in MT.npc:
 		if n.map == mapa:
 			var d: Dictionary = n.duplicate()
-			d.wander = 0
+			d.wander = int(n.get("wander", 0))
 			o.append(d)
 	return o
 
@@ -404,7 +453,10 @@ func talk_metro(id: String) -> void:
 	elif id.begins_with("m9_vip_"):
 		await talk_vip9(id.substr(7))
 	else:
-		await say(pick([K("«Aquí se viene a que te vean.»"), K("«¿Tú eres el dueño? Buena música.»"), K("«La próxima la pago yo.»")]))
+		var fr: Array = [K("«Aquí se viene a que te vean.»"), K("«¿Tú eres el dueño? Buena música.»"), K("«La próxima la pago yo.»")]
+		if id.begins_with("m9_t"):   # los que pasean por la calle
+			fr = [K("«Con prisa, perdona.»"), K("«Esta ciudad no duerme.»"), K("«¿Buscas algo? Yo no he visto nada.»"), K("«El alquiler aquí te come vivo.»")]
+		await say(fr[_hm("m9|%s|%d" % [id, S.day]) % fr.size()])
 
 # la puerta de un club VIP (entra_local): comprarlo o entrar con tu llave
 func vip_puerta(k: String) -> bool:
@@ -569,6 +621,9 @@ func metro_llegada() -> void:
 		var Tr: Dictionary = D.METRO.ter
 		var pago: int = int(Tr.pacto_e) / 2
 		var j: int = await ask(T("{j} y los suyos te cortan el paso: «{b} no es tuya.»", {"j": may1(String(F.jefe).to_lower()), "b": D.METRO.barrios[b].n}), [K("Plantarles cara"), T("Pagarles ({e})", {"e": Datos.eur(pago)}), K("Irte")], F.jefe)
+		while j == 1 and S.money < pago:
+			sfx("bad")
+			j = 0 if await ask(T("No llevas {e} encima.", {"e": Datos.eur(pago)}), [K("Plantarles cara"), K("Irte")], F.jefe) == 0 else 2
 		if j == 0:
 			await pelea_barrio(b, f)
 		elif j == 1 and S.money >= pago:

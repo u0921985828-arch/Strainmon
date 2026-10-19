@@ -51,6 +51,8 @@ func eficiencia(w: Dictionary) -> int:
 func local_staff(w: Dictionary) -> String:
 	if w.get("rol") == "contable":
 		return String(w.get("loc", ""))
+	if w.get("rol") == "lugar":   # MAESTRO [9]: los lugartenientes de los pisos de venta
+		return "pisos"
 	return String(D.STAFF.roles.get(w.get("rol"), ""))
 
 func nombre_local(k: String) -> String:
@@ -61,6 +63,8 @@ func nombre_local(k: String) -> String:
 			return K("La calle")
 		"nave":
 			return K("La nave")
+		"pisos":
+			return K("Los pisos")
 		"":
 			return K("Sin trabajo")
 	return String(D.LOCALES[k].n) if D.LOCALES.has(k) else k
@@ -345,6 +349,8 @@ func plantilla_locales() -> void:
 		var ks := ["piso", "calle"]
 		if S.get("nave") != null:
 			ks.append("nave")
+		if S.plantilla.any(func(w): return w.get("rol") == "lugar"):
+			ks.append("pisos")
 		for k in S.loc:
 			ks.append(k)
 		ks.append("")
@@ -393,7 +399,7 @@ func ops_staff(w: Dictionary) -> Array:
 	var o := []
 	if w.get("rol") != "contable" and S.loc.size():
 		o.append(K("De contable"))
-	if w.get("rol") and w.get("rol") != "calle" and w.get("rol") != "contable":
+	if w.get("rol") and not w.get("rol") in ["calle", "contable", "lugar"]:   # el lugarteniente va a comisión
 		o.append(T("Sueldo: {s}", {"s": I18n.v(D.STAFF.sueldo[int(w.get("sm", 1))][0]).to_lower()}))
 	return o
 

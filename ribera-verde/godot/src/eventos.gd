@@ -824,6 +824,9 @@ func cargar_envio(B: Dictionary) -> void:
 	sfx("get")
 	update_hud()
 	await say(T("Sueltas amarras. {b} sale hacia {r} con {kg}: llega el {d}.", {"b": may1(B.n), "r": rt.n, "kg": _kg(tot), "d": Datos.fd(S.day + int(B.dias) + int(rt.d), S.day)}) + (T(" Es el pedido de la semana.") if ped else "") + (T(" El último trabajo de Koldo.") if gr else ""))
+	if Datos.CAL and D.has("PISOS9") and int(S.mar.get("exp", 0)) < 1:   # MAESTRO [9]: con la exportación, la red de pisos
+		S.mar.exp = 1
+		queue("pisos9", func(): await talk(K("SMS · IÑAKI"), [K("Me dicen que ya sacas género por mar. Con ese volumen, monta pisos de venta por los pueblos, con alguien de tu plantilla al frente: MÓVIL → PISOS.")]))
 
 func mar_dia() -> void:
 	if not mar_ok():

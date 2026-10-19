@@ -102,6 +102,16 @@ const TEMAS = {
         mel: 'a5 . a5 . c6 . e6 . | d6 . c6 . a5 . f5 . | g5 . c6 . e6 . g6 . | f6 - e6 - d6 - b5 . | c6 . a5 . e5 . a5 . | c6 - - . a5 . f5 . | g5 - b5 - d6 - g5 . | b5 - - - d6 - - .' },
     },
     forma: 'i> | A B A+ B+', formaN: 'i> | A B A~' },
+  // Hiriburu, la ciudad de la autopista: electro en fa menor, más oscuro que el Ensanche
+  metropoli: { bpm: 118, estilo: 'electro', calle: 1, inst: { lead: 'supersaw', lead2: 'pulso12' },
+    sec: {
+      i: { ch: 'Fm Db Eb C' },
+      A: { ch: 'Fm Fm Db Eb Fm Db Eb:2 C:2 Fm',
+        mel: 'c6 . ab5 . f5 . ab5 . | c6 - bb5 . ab5 - . . | f5 . ab5 . db6 . ab5 . | g5 - eb5 . bb4 - . . | f5 . ab5 . c6 . f6 . | eb6 . db6 . ab5 . f5 . | g5 . bb5 . e5 . g5 . | f5 - - - c5 - - .' },
+      B: { ch: 'Db Eb Cm Fm Db Eb C C',
+        mel: 'ab5 . f5 . db6 . ab5 . | bb5 - g5 . eb6 - . . | c6 . eb6 . g6 . eb6 . | f6 - c6 - ab5 - f5 . | db6 . ab5 . f5 . ab5 . | g5 - bb5 . eb6 - bb5 . | c6 - e6 - g6 - e6 . | e6 - - - c6 - - .' },
+    },
+    forma: 'i> | A B A+ B+', formaN: 'i> | A B A~' },
   // la Kale Zaharra: cine negro en la menor, contrabajo, piano y trompeta con sordina
   callejon: { bpm: 84, estilo: 'noir', calle: 1, inst: { lead: 'metales', lead2: 'piano' },
     sec: {
