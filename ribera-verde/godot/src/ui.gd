@@ -1652,6 +1652,8 @@ func _coloca() -> void:
 		bE.position = Vector2(6 * u, 8 * u)
 		bP.reset_size()
 		bP.position = Vector2(escena.size.x - bp_r - bP.size.x, escena.size.y - 49 * u - bP.size.y)
+		if Datos.PLAY and bP.position.x < escena.size.x / 2:   # 1.58 (lo pidió el usuario): si A, B o START la echan encima del jugador, debajo de la del enemigo
+			bP.position = Vector2(bE.position.x, bE.position.y + bE.size.y + 4 * u)
 	coloca_toast()
 
 # el aviso, sin pisar la ficha, el HUD ni SONIDO: de ancho, lo que quepa a la derecha de la ficha (el texto pasa a dos líneas);

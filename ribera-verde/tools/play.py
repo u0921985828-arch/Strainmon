@@ -10,23 +10,24 @@ import json, re, os
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D = json.load(open(os.path.join(RAIZ, 'godot/datos/datos.json'), encoding='utf-8'))
 
-NOMBRES = {
-    'Skunk #1': 'Ría Uno', 'Lemon Haze': 'Limonera', 'Super Skunk': 'Txoko', 'Blueberry': 'Niebla', 'Big Bud': 'Mango',
-    'Lemon Skunk': 'Citrus', 'Kali Mist': 'Kalima', 'Cheese': 'Curada', 'California Orange': 'Naranjal', 'Chemdawg': 'Química',
-    'Haze': 'Ondarra', 'Northern Lights': 'Ipar', 'Purple Thai': 'Amanecer', 'Trainwreck': 'Sol y Limón', 'AK-47': 'Cuatro Tierras',
-    'Laughing Buddha': 'Risueña', 'Cannalope Haze': 'Melonera', 'Master Kush': 'Cordillera', 'Purple Kush': 'Púrpura Alta',
-    'Critical Mass': 'Pesada', 'Shiva Skunk': 'Robusta', 'NL5 × Haze': 'Ipar × Ondarra', "Neville's Haze": 'Ondarra Triple',
-    'Silver Haze': 'Ondarra Corta', 'Chocolope': 'Cacaotera', 'Pineapple Express': 'Oro Tropical', 'Tangie': 'Bruma Dulce',
-    'Amnesia Haze': 'Tormenta', 'Jack Herer': 'Leyenda', 'Super Silver Haze': 'Ondarra Mayor', 'Blue Dream': 'Niebla Dulce',
-    'Blue Cheese': 'Curada Azul', 'Sour Diesel': 'Dragón', 'Kali 47': 'Kalima Cuatro', 'Critical Kali Mist': 'Reina',
-    'White Widow': 'Escarcha', 'Purple Haze': 'Ondarra Púrpura', 'White Russian': 'Escarcha del Este', 'Blue Widow': 'Escarcha Azul',
-    'Super Lemon Haze': 'Limonera Mayor', 'Chronic': 'Cosechera', 'White Rhino': 'Escarcha Baja', 'White Shark': 'Escarcha Fiera',
-    'Hawaiian Snow': 'Nieve de Isla', 'Jack Flash': 'Leyenda Rápida', 'Jack 47': 'Leyenda Cuatro', 'Sour Tangie': 'Dragón Dulce',
-    'Ice': 'Helada', 'NL × Big Bud': 'Ipar × Mango', 'Critical Jack': 'Pesada Leyenda', 'Critical 47': 'Pesada Cuatro',
-    'Critical Cheese': 'Pesada Curada', 'Northern Light Blue': 'Ipar Azul', 'Lowryder': 'Rastrera',
+NOMBRES = {   # parodias de los nombres reales: una letra cambiada o el orden (lo pidió el usuario, 1.58)
+    'Skunk #1': 'Skonk #1', 'Lemon Haze': 'Limon Haize', 'Super Skunk': 'Supra Skonk', 'Blueberry': 'Bluberri', 'Big Bud': 'Big Bod',
+    'Lemon Skunk': 'Limon Skonk', 'Kali Mist': 'Kalli Mixt', 'Cheese': 'Cheez', 'California Orange': 'Kalifornia Orantx',
+    'Chemdawg': 'Chemdog', 'Haze': 'Haize', 'Northern Lights': 'Norzen Lights', 'Purple Thai': 'Purpel Thai',
+    'Trainwreck': 'Trenwreck', 'AK-47': 'AX-47', 'Laughing Buddha': 'Laffing Budha', 'Cannalope Haze': 'Kanalope Haize',
+    'Master Kush': 'Maister Kush', 'Purple Kush': 'Purpel Kush', 'Critical Mass': 'Kritikal Mass', 'Shiva Skunk': 'Xiva Skonk',
+    'NL5 × Haze': 'NZ5 × Haize', "Neville's Haze": "Nevil's Haize", 'Silver Haze': 'Silber Haize', 'Chocolope': 'Txokolope',
+    'Pineapple Express': 'Pinapel Express', 'Tangie': 'Tangi', 'Amnesia Haze': 'Amnesya Haize', 'Jack Herer': 'Jak Herrer',
+    'Super Silver Haze': 'Supra Silber Haize', 'Blue Dream': 'Blu Drim', 'Blue Cheese': 'Blu Cheez', 'Sour Diesel': 'Saur Disel',
+    'Kali 47': 'Kalli 47', 'Critical Kali Mist': 'Kritikal Kalli Mixt', 'White Widow': 'Whyte Widou', 'Purple Haze': 'Purpel Haize',
+    'White Russian': 'Whyte Rusian', 'Blue Widow': 'Blu Widou', 'Super Lemon Haze': 'Supra Limon Haize', 'Chronic': 'Kronik',
+    'White Rhino': 'Whyte Rino', 'White Shark': 'Whyte Xark', 'Hawaiian Snow': 'Hawayan Snou', 'Jack Flash': 'Jak Flash',
+    'Jack 47': 'Jak 47', 'Sour Tangie': 'Saur Tangi', 'Ice': 'Ize', 'NL × Big Bud': 'NZ × Big Bod', 'Critical Jack': 'Kritikal Jak',
+    'Critical 47': 'Kritikal 47', 'Critical Cheese': 'Kritikal Cheez', 'Northern Light Blue': 'Norzen Light Blu',
+    'Lowryder': 'Lowraider',
     # sueltos en los textos (después de los largos: van en la misma alternativa, la más larga gana)
-    'Critical': 'Pesada', 'Northern Lights #5': 'Ipar', 'NL5': 'Ipar', 'Skunk': 'Ría', 'Jack': 'Leyenda', 'Amnesia': 'Tormenta',
-    'Widow': 'Escarcha', 'Kali': 'Kalima', 'Sour': 'Dragón', 'Diesel': 'Dragón',
+    'Critical': 'Kritikal', 'Northern Lights #5': 'Norzen Lights #5', 'NL5': 'NZ5', 'Skunk': 'Skonk', 'Jack': 'Jak',
+    'Amnesia': 'Amnesya', 'Widow': 'Widou', 'Kali': 'Kalli', 'Sour': 'Saur', 'Diesel': 'Disel',
 }
 
 REP = [

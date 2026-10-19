@@ -91,8 +91,8 @@ def literales(path):
             continue   # clave de diccionario o arm de match
         if antes.endswith(('==', '!=', ' in', '\tin')) or despues.startswith(('==', '!=', ' in ', 'in ')):
             continue
-        if antes.endswith('[') and despues.startswith(']'):
-            continue
+        if antes.endswith('[') and despues.startswith(']') and re.search(r'[\w\)\]]\s*\[$', antes):
+            continue   # subíndice (x["k"]); una lista de un literal (["…"]) sí cuenta
         f = llamada(src, a)
         base = f.split('.')[-1]
         if f in OK_CALL or base in ('T', 'K', 'v'):

@@ -141,7 +141,7 @@ func _corre() -> void:
 	chk(iguales, "sin PLAY, los datos de antes")
 	Datos.PLAY = true
 	Datos.carga()
-	chk(D.STRAINS.ria.n == "Ría Uno" and not String(D.FORO[0]).contains("pH"), "otra vez con PLAY: %s" % D.STRAINS.ria.n)
+	chk(D.STRAINS.ria.n == "Skonk #1" and not String(D.FORO[0]).contains("pH"), "otra vez con PLAY: %s" % D.STRAINS.ria.n)
 	# 6 · el juego: sin Txomin, sin SMS, sin mapa ni cartel del bajo, la puerta cerrada, sin sótano en la tienda; billar sin apuestas
 	var Oe = JSON.parse_string(FileAccess.get_file_as_string("res://tests/pantallas.json"))
 	var e: Dictionary = {}
