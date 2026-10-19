@@ -1430,15 +1430,21 @@ func parada_action():
 	var aqui: String = S.map
 	var pa: Dictionary = D.PARADAS[aqui]
 	var mios := coches_mios()   # 1.43: con un vehículo del concesionario, a dónde quieras y a cualquier hora
-	if Datos.CAL:   # MAESTRO [3]: el que llevas o el que tengas aparcado en este pueblo
-		mios = mios.filter(func(k): return S.get("conduce") == k or (S.coches[k].get("pos") is Array and String(S.coches[k].pos[0]) == aqui))
+	if Datos.CAL:   # MAESTRO [3]: solo los que están en este pueblo (en Ribera Verde, en el garaje; en los demás, en el aparcamiento)
+		mios = mios.filter(func(k): return donde(k) == aqui and aqui != GARAJE)   # en Ribera Verde se sale del garaje
 	if mios.size() and not llegando():
 		var ops: Array = [K("En autobús")]
 		for k in mios:
 			ops.append(T("En {v}", {"v": String(D.CONCE.v[k].art)}))
+		if Datos.CAL:
+			for k in mios:
+				ops.append(T("Maletero {dv}", {"dv": de_art(String(D.CONCE.v[k].art))}))
 		ops.append(K("Nada"))
 		var c: int = await ask(T("PARADA DE {p}\n¿Cómo vas?", {"p": I18n.v(String(pa.n)).to_upper()}), ops)
-		if c < 0 or c > mios.size():
+		if c < 0 or c >= ops.size() - 1:
+			return
+		if c > mios.size():
+			await maletero(mios[c - 1 - mios.size()])
 			return
 		if c > 0:
 			await conducir(mios[c - 1])
@@ -1476,10 +1482,6 @@ func parada_action():
 			await say(T("El billete hasta {d} cuesta {e}. No te llega.", {"d": D.PARADAS[k].n, "e": Datos.eur(v.eur)}))
 			return
 		S.money -= v.eur
-	if Datos.CAL and conduce_coche() != "":   # MAESTRO [3]: en autobús, el tuyo se queda aparcado en la parada
-		var cc := conduce_coche()
-		var mp: Dictionary = MAPS[aqui]
-		aparcar(cc, aqui, P.x if pisable(mp, P.x, P.y) else P.fx, P.y if pisable(mp, P.x, P.y) else P.fy, P.dir)
 	sfx("door")
 	await fade(1)
 	await anim_viaje("bus", aqui, k, int(v.min))

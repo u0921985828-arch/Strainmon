@@ -341,11 +341,6 @@ func migrate() -> void:
 				if not is_same(S.custom[q], C) and S.custom[q].n.to_lower() == nm.to_lower():
 					return true
 			return false)
-	if Datos.CAL and S.get("coches") is Dictionary and S.get("conduce") == null and not S.coches.values().any(func(c): return c.has("pos") or c.has("mal")):
-		for k in ["deportivo", "berlina", "utilitario", "moto"]:   # MAESTRO [3]: de antes, el mejor que tengas, contigo
-			if S.coches.has(k):
-				S.conduce = k
-				break
 	var nh := huecos().size()
 	while S.pots.size() < nh:
 		S.pots.append(null)

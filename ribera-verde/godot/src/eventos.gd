@@ -161,20 +161,11 @@ func talk_conce():
 			elif c != null:
 				lb = T("{n} · pedida", {"n": V.n}) if _art_m(k) == "a" else T("{n} · pedido", {"n": V.n})
 			it.append({"label": lb, "right": Datos.eur(V.p), "desc": ficha_coche(k)})
-		var dep := tuyos.filter(func(q): return S.coches[q].get("dep") != null)
-		if Datos.CAL and dep.size():   # MAESTRO [3]: lo de la grúa
-			it.append({"label": K("Recoger del depósito"), "right": Datos.eur(D.MALETERO.tasa), "desc": K("La grúa se lo llevó por mal aparcado. Pagas la tasa y te lo dejan en la puerta.")})
 		it.append({"label": K("Vender"), "disabled": tuyos.is_empty(), "desc": T("Te lo recompran: pierde un {ya} % al salir del concesionario y un {mes} % cada mes, hasta el {min} % de lo que valía.", {"ya": roundi(C.dep.ya * 100), "mes": Datos.coma(C.dep.mes * 100), "min": roundi(C.dep.min * 100)})})
 		it.append({"label": K("Asegurar"), "disabled": sin.is_empty(), "desc": T("Sin seguro no se puede circular: la multa es de {e} y el vehículo, a la grúa.", {"e": Datos.eur(C.sinSeguro)})})
 		it.append({"label": K("Nada"), "desc": T("Precios con IVA. Aparte, la matriculación por emisiones y {g} de gestoría y placas.", {"g": Datos.eur(C.gastos)})})
 		i = await menu(it, {"cls": "full", "title": C.n, "title2": T("Cuenta {b} · efectivo {e}", {"b": Datos.eur(S.banco), "e": Datos.eur(S.money)}), "desc": true, "initial": i})
 		var no: int = C.orden.size()
-		if Datos.CAL and dep.size():
-			if i == no:
-				await recoger_deposito(dep[0])
-				continue
-			if i > no:
-				i -= 1
 		if i < 0 or i >= no + 2:
 			if S.get("coches") is Dictionary and not S.coches.is_empty():
 				await say(K("Cualquier cosa, aquí estamos. Y ojo con la ITV."), K("ARANTXA"))
@@ -264,13 +255,6 @@ func conce_dia() -> void:
 		if c == null:
 			continue
 		var V: Dictionary = C.v[k]
-		if int(c.dia) == int(S.day) and S.get("conduce") == null:   # MAESTRO [3]: te lo dan con las llaves
-			S.conduce = k
-		if c.get("pos") is Array and mal_aparcado(k):   # MAESTRO [3]: la grúa municipal, al depósito
-			c.erase("pos")
-			c.dep = int(S.day)
-			var txg: String = T("La grúa municipal se ha llevado {a}: estaba mal aparcad{o}. En el depósito, {e} de tasa (en el concesionario).", {"a": V.art, "o": _art_m(k), "e": Datos.eur(D.MALETERO.tasa)})
-			queue("grua" + k, func(): await talk(K("SMS · AYUNTAMIENTO"), [txg]))
 		if int(c.dia) == int(S.day):
 			var cx: String = T(" Y en la calle, montado.") if k == "moto" else T(" Y en la calle, al volante.") if D.VEHICULOS.has(k) else ""
 			var tx: String = T("{A} ya está matriculada y con el seguro en vigor. Desde cualquier parada de autobús puedes ir en ella, a la hora que quieras.{x}", {"A": mayus(V.art), "x": cx}) if _art_m(k) == "a" else T("{A} ya está matriculado y con el seguro en vigor. Desde cualquier parada de autobús puedes ir en él, a la hora que quieras.{x}", {"A": mayus(V.art), "x": cx})
@@ -322,9 +306,10 @@ func conducir(k):
 	await anim_viaje(k, aqui, x, int(t.min))
 	advance_time(t.min)
 	var a: Array = D.PARADAS[x].a
-	if Datos.CAL:   # MAESTRO [3]: vas en él y llegas en él
-		S.coches[k].erase("pos")
-		S.conduce = k
+	if Datos.CAL:   # MAESTRO [3]: se queda en el aparcamiento de la parada (en Ribera Verde, en el garaje, y sales por su puerta)
+		S.coches[k].en = x
+		if x == GARAJE:
+			a = [GARAJE_B.x0 + 1, GARAJE_B.y0 + GARAJE_B.h, "down"]
 	enter_map(x, int(a[0]), int(a[1]), a[2])
 	if S.clientsDay != S.day:
 		spawn_clients()
@@ -354,79 +339,39 @@ func kilometros(k: String, km: int) -> String:
 			tx.append(T("{q}: {e} (te quedan a deber {f})", {"q": qt, "e": Datos.eur(e), "f": Datos.eur(f)}) if f > 0 else T("{q}: {e}", {"q": qt, "e": Datos.eur(e)}))
 	return T("{a}, en el taller. {tx}.", {"a": mayus(V.art), "tx": ". ".join(tx)}) if tx.size() else ""
 
-# ---------- MAESTRO [3]: aparcado, el maletero y la grúa (con Datos.CAL) ----------
-# Cada vehículo se queda donde lo dejas (S.coches[k].pos) y conduces solo el tuyo (S.conduce). Con A delante de él: conducir o el
-# maletero; conduciendo, A sin nada delante: aparcar o el maletero. Mal aparcado (un coche en la acera, en la plaza o en la hierba
-# donde hay calzada), la grúa al amanecer: al depósito, MALETERO.tasa en el concesionario. El maletero (MALETERO.kg por vehículo)
-# guarda cogollos como la caja fuerte y los envasa al vacío (la envasadora, en la tienda online: el registro, MALETERO.vacio.f)
-func mal_aparcado(k: String) -> bool:
-	if k == "moto":
-		return false
-	var p: Array = S.coches[k].pos
-	var m = MAPS.get(String(p[0]))
-	if m == null:
-		return false
-	var g: String = m.g[int(p[2])][int(p[1])]
-	if g.begins_with("road"):
-		return false
-	var hay_calzada := false
-	for r in m.g:
-		for t in r:
-			if String(t).begins_with("road"):
-				hay_calzada = true
-				break
-		if hay_calzada:
-			break
-	return hay_calzada or g == "walk"
-
-func recoger_deposito(k: String) -> void:
-	var e := float(D.MALETERO.tasa)
-	if S.money >= e:
-		S.money -= e
-	elif not cobro_banco(e, K("Depósito municipal")):
-		sfx("bad")
-		await say(T("La tasa del depósito son {e} y no te llega.", {"e": Datos.eur(e)}), K("ARANTXA"))
-		return
-	S.coches[k].erase("dep")
-	S.conduce = k
-	sfx("coin")
-	await say(T("{A}, recogid{o} del depósito. Lo tienes en la puerta.", {"A": mayus(D.CONCE.v[k].art), "o": _art_m(k)}), K("ARANTXA"))
-
+# ---------- MAESTRO [3]: el garaje, el aparcamiento y el maletero (con Datos.CAL) ----------
+# (lo pidió el usuario: «tiene que estar en el garaje; del garaje viajas al otro pueblo y se queda estacionado en un aparcamiento;
+# no se usa por el mapa»). Cada vehículo está en un pueblo (S.coches[k].en): en Ribera Verde, en el garaje; en los demás, en el
+# aparcamiento de la parada (plazas_parque). Desde la parada o con A delante de él: viajar o el maletero. El maletero
+# (MALETERO.kg por vehículo) guarda cogollos como la caja fuerte y los envasa al vacío (la envasadora, en la tienda online: en un
+# control de tráfico, MALETERO.vacio.f)
 func coche_menu(k: String):
 	var V: Dictionary = D.CONCE.v[k]
-	var j: int = await ask(T("{A}, aparcad{o} aquí. Maletero: {g} de {c}.", {"A": mayus(V.art), "o": _art_m(k), "g": g_txt(mal_g(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), [K("Conducir"), K("Maletero"), K("Nada")])
+	var j: int = await ask(T("{A}, en el aparcamiento. Maletero: {g} de {c}.", {"A": mayus(V.art), "g": g_txt(mal_g(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), [K("Viajar"), K("Maletero"), K("Nada")])
 	if j == 0:
-		var p: Array = S.coches[k].pos
-		S.coches[k].erase("pos")
-		S.conduce = k
-		sfx("door")
-		enter_map(S.map, int(p[1]), int(p[2]), String(p[3]) if p.size() > 3 else P.dir)
+		await conducir(k)
 	elif j == 1:
 		await maletero(k)
 
-func bajar_menu():
-	var k := conduce_coche()
-	var de := delante()
-	var m: Dictionary = MAPS[S.map]
-	var j: int = await ask(T("Maletero: {g} de {c}.", {"g": g_txt(mal_g(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), [K("Aparcar aquí"), K("Maletero"), K("Nada")])
-	if j == 1:
-		await maletero(k)
-	elif j == 0:
-		if not pisable(m, de[0], de[1]) or tile_solid(m, de[0], de[1]) or ent_at(de[0], de[1]) or coche_en(de[0], de[1]) != "":
-			await say(K("No hay sitio para bajarte por ese lado."))
-			return
-		aparcar(k, S.map, P.x, P.y, P.dir)
-		P.x = int(de[0])
-		P.y = int(de[1])
-		P.fx = P.x
-		P.fy = P.y
-		P.px = P.x * 16.0
-		P.py = P.y * 16.0
-		S.x = P.x
-		S.y = P.y
-		sfx("door")
-		if mal_aparcado(k):
-			await say(K("Aquí no se puede aparcar: si no lo mueves, mañana se lo lleva la grúa."))
+# A en la puerta del garaje: salir con uno de los que hay dentro o abrirle el maletero
+func garaje_menu():
+	var ks := aparcados(GARAJE)
+	if ks.is_empty():
+		await say(K("El garaje de la tía. Está vacío: aquí se guarda lo que compres en AUTOS RIBERA."))
+		return
+	var ops := []
+	for k in ks:
+		ops.append(T("Salir en {v}", {"v": String(D.CONCE.v[k].art)}))
+	for k in ks:
+		ops.append(T("Maletero {dv}", {"dv": de_art(String(D.CONCE.v[k].art))}))
+	ops.append(K("Nada"))
+	var c: int = await ask(K("El garaje de la tía."), ops)
+	if c < 0 or c >= ops.size() - 1:
+		return
+	if c < ks.size():
+		await conducir(ks[c])
+	else:
+		await maletero(ks[c - ks.size()])
 
 func maletero(k: String) -> void:
 	MAL_K = k

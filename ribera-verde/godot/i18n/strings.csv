@@ -212,8 +212,6 @@ s6e939a26,{n} · tuya,{n} · yours
 s892bb721,{n} · tuyo,{n} · yours
 sfee87111,{n} · pedida,{n} · ordered
 s19505c16,{n} · pedido,{n} · ordered
-sc2f980ee,Recoger del depósito,Collect from the pound
-s97aabce9,La grúa se lo llevó por mal aparcado. Pagas la tasa y te lo dejan en la puerta.,The tow truck took it for bad parking. Pay the fee and they leave it at the door.
 s0861de4a,Vender,Sell
 s6c365936,"Te lo recompran: pierde un {ya} % al salir del concesionario y un {mes} % cada mes, hasta el {min} % de lo que valía.","They buy it back: it loses {ya} % when it leaves the lot and {mes} % each month, down to {min} % of what it cost."
 se7c7447e,Asegurar,Insure
@@ -241,8 +239,6 @@ s4201d831,Hecho: {v} en tu cuenta. El seguro se da de baja hoy.,Done: {v} in you
 s564c74b4,"El año de póliza son {e}, de la cuenta, y no hay.","A year's policy is {e} from your account, and it isn't there."
 s6eb480ff,"Póliza en vigor: {e} al año, domiciliado. Y te saco {a} del depósito de la grúa.","Policy active: {e} a year, direct debit. And I'll get {a} out of the tow pound."
 se1d7755a,SMS · ,SMS · 
-sa7eff092,"La grúa municipal se ha llevado {a}: estaba mal aparcad{o}. En el depósito, {e} de tasa (en el concesionario).","The council tow truck took {a}: it was badly parked. At the pound, a {e} fee (at the dealership)."
-s687b6a63,SMS · AYUNTAMIENTO,SMS · TOWN HALL
 s5b1e940f," Y en la calle, montado."," And on the street, you ride it."
 sa18b57e8," Y en la calle, al volante."," And on the street, behind the wheel."
 s10fb9fb3,"{A} ya está matriculada y con el seguro en vigor. Desde cualquier parada de autobús puedes ir en ella, a la hora que quieras.{x}","{A} is registered and insured. From any bus stop you can take it, any time you like.{x}"
@@ -255,6 +251,7 @@ sa1c22727,AYUNTAMIENTO,TOWN HALL
 scfeb4c48,impuesto de circulación de {a},road tax for {a}
 s4d2f585e,Apremio · IVTM · {n},Enforcement · road tax · {n}
 sb5628c63,"Providencia de apremio: el impuesto de circulación de {a}, con un {r} % de recargo, {e}, cobrado de lo que tienes.","Enforcement notice: road tax for {a}, with a {r} % surcharge, {e}, taken from what you have."
+s687b6a63,SMS · AYUNTAMIENTO,SMS · TOWN HALL
 sef20a6ff,{m} min · {e},{m} min · {e}
 s690b2b4b,¿A dónde vas?,Where to?
 sd298526b,Gasolinera,Petrol station
@@ -265,16 +262,13 @@ s1e56d38e,neumáticos nuevos a los {km} km,new tyres at {km} km
 s0002b805,Taller · {n},Garage · {n}
 s2a1d17f9,{q}: {e} (te quedan a deber {f}),{q}: {e} (you still owe {f})
 sf332a444,"{a}, en el taller. {tx}.","{a}, at the garage. {tx}."
-s2cef7cff,Depósito municipal,Council pound
-s14e055be,La tasa del depósito son {e} y no te llega.,The pound fee is {e} and you can't cover it.
-s09b6285c,"{A}, recogid{o} del depósito. Lo tienes en la puerta.","{A}, collected from the pound. It's at the door."
-sa527d471,"{A}, aparcad{o} aquí. Maletero: {g} de {c}.","{A}, parked here. Boot: {g} of {c}."
-sfdc67ce5,Conducir,Drive
+sfcdfc8f0,"{A}, en el aparcamiento. Maletero: {g} de {c}.","{A}, in the car park. Boot: {g} of {c}."
+sfb00cb13,Viajar,Travel
 sbeda21a5,Maletero,Boot
-s9a485a41,Maletero: {g} de {c}.,Boot: {g} of {c}.
-s406c2212,Aparcar aquí,Park here
-s4d885bc6,No hay sitio para bajarte por ese lado.,No room to get out on that side.
-s22b69147,"Aquí no se puede aparcar: si no lo mueves, mañana se lo lleva la grúa.","No parking here: if you don't move it, the tow truck takes it tomorrow."
+s84a3d684,El garaje de la tía. Está vacío: aquí se guarda lo que compres en AUTOS RIBERA.,Your aunt's garage. It's empty: whatever you buy at AUTOS RIBERA is kept here.
+s6ac5d7a0,Salir en {v},Drive out in {v}
+sf9c3a4e4,Maletero {dv},Boot {dv}
+s07f3c4f1,El garaje de la tía.,Your aunt's garage.
 s30e044fa,No te cabe nada más encima.,You can't carry any more.
 s52465e63,Sacas {g} de {n}.,You take out {g} of {n}.
 s90031372,No llevas cogollos encima.,You have no buds on you.
@@ -5259,6 +5253,19 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+sd8aadce6,Maletero de {v},Boot of {v}
+sc2f980ee,Recoger del depósito,Collect from the pound
+s97aabce9,La grúa se lo llevó por mal aparcado. Pagas la tasa y te lo dejan en la puerta.,The tow truck took it for bad parking. Pay the fee and they leave it at the door.
+sa7eff092,"La grúa municipal se ha llevado {a}: estaba mal aparcad{o}. En el depósito, {e} de tasa (en el concesionario).","The council tow truck took {a}: it was badly parked. At the pound, a {e} fee (at the dealership)."
+s2cef7cff,Depósito municipal,Council pound
+s14e055be,La tasa del depósito son {e} y no te llega.,The pound fee is {e} and you can't cover it.
+s09b6285c,"{A}, recogid{o} del depósito. Lo tienes en la puerta.","{A}, collected from the pound. It's at the door."
+sa527d471,"{A}, aparcad{o} aquí. Maletero: {g} de {c}.","{A}, parked here. Boot: {g} of {c}."
+sfdc67ce5,Conducir,Drive
+s9a485a41,Maletero: {g} de {c}.,Boot: {g} of {c}.
+s406c2212,Aparcar aquí,Park here
+s4d885bc6,No hay sitio para bajarte por ese lado.,No room to get out on that side.
+s22b69147,"Aquí no se puede aparcar: si no lo mueves, mañana se lo lleva la grúa.","No parking here: if you don't move it, the tow truck takes it tomorrow."
 sb956bd07,Carga un 15 % más en la mochila.,Carries 15% more in the backpack.
 sb64124b2,Las patrullas te ven desde menos lejos y regateas mejor.,Patrols spot you from less far away and you haggle better.
 s608435a5,{b} · {p},{b} · {p}

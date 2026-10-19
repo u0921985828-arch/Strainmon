@@ -306,11 +306,12 @@ func _mundo() -> void:
 		_vistas()
 	for e in J.ents:
 		list.append([e.py, _pj.bind(e, e.look, false, float(e.get("dur", 320.0)))])
-	if Datos.CAL and S.get("coches") is Dictionary:   # MAESTRO [3]: los vehículos aparcados, sin nadie, donde los dejaste
-		for k in S.coches:
-			var cp = S.coches[k].get("pos")
-			if cp is Array and String(cp[0]) == S.map and S.get("conduce") != k and not S.coches[k].get("dep") and Atlas.anim_de("vehiculos", String(k) + "-atras"):
-				list.append([int(cp[2]) * 16, _aparcado.bind(String(k), int(cp[1]), int(cp[2]), String(cp[3]))])
+	if Datos.CAL and S.map != J.GARAJE:   # MAESTRO [3]: los tuyos, en el aparcamiento de la parada, sin nadie
+		var ak: Array = J.aparcados(S.map)
+		var pl: Array = J.plazas_parque(S.map) if ak.size() else []
+		for i in mini(ak.size(), pl.size()):
+			if Atlas.anim_de("vehiculos", String(ak[i]) + "-atras"):
+				list.append([pl[i].y * 16, _aparcado.bind(String(ak[i]), pl[i].x, pl[i].y, "right")])
 	if J.SENT != null:   # 1.47: sentado, delante del asiento si se ve de frente y detrás si se ve de espaldas
 		list.append([J.SENT.y * 16 + (1 if J.SENT.d == "sur" or J.SENT.get("k") in J.TABURETES else -1), _pj_sentado])
 	else:

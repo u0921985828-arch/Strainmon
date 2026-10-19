@@ -852,6 +852,16 @@
    ],
    "ajuste": "exacto",
    "nota": "1.54.1: el plano de cerca de cada acción (gestos.py)"
+  },
+  "edificio_2x3": {
+   "w": 32,
+   "h": 48,
+   "ancla": [
+    16,
+    47
+   ],
+   "ajuste": "pies",
+   "nota": "MAESTRO [3]: el garaje de la tía junto al piso (garaje.py)"
   }
  },
  "fases": [
@@ -8242,6 +8252,23 @@
    "notas": "1.43, pedido por el usuario: «abren un concesionario en el barrio … espacio y lugar del concesionario con el atrezzo, los coches y vehículos en venta». Sale en el barrio alto solo desde que abre (montar_alto, mundo.gd).",
    "montaje": "tal cual (concesionario.py), 128 × 96",
    "calco": "comisaria"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "edificio",
+   "id": "edificio-garaje",
+   "cubre": [],
+   "celda": "edificio_2x3",
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/garaje.py",
+   "max_colores": 16,
+   "descripcion": "El garaje de la tía, pegado a la derecha del piso (2 × 3 casillas): tejado y pared del piso y puerta seccional gris.",
+   "notas": "MAESTRO [3], pedido por el usuario: «dibujado en el mapa junto al piso». Sale en Ribera Verde con Datos.CAL (montar_garaje, calle.gd).",
+   "montaje": "tal cual (garaje.py), 32 × 48"
   },
   {
    "fase": "F9",

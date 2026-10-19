@@ -1,6 +1,6 @@
-# Landrace Hunters (Godot) — MAESTRO [3]: los vehículos se quedan donde los dejas (S.coches[k].pos, S.conduce), no se atraviesan, se
-# conducen desde el aparcado, el maletero por kg (MALETERO.kg) con la envasadora al vacío, el control de tráfico con el maletero y la
-# grúa al depósito si están mal aparcados; sin Datos.CAL, como antes.
+# Landrace Hunters (Godot) — MAESTRO [3]: el vehículo en el garaje dibujado junto al piso de Ribera Verde (se sale desde su puerta); de la parada a otro pueblo, donde se queda en el
+# aparcamiento de la parada (S.coches[k].en, plazas_parque) sin usarse por el mapa; el maletero por kg (MALETERO.kg) con la envasadora
+# al vacío y el control de tráfico con el maletero; sin Datos.CAL, como antes.
 #   $GODOT --headless --path godot --script res://tests/vehiculos.gd   → «vehiculos: N comprobaciones, 0 fallos»
 extends SceneTree
 
@@ -79,26 +79,62 @@ func _corre() -> void:
 	var S = J.S
 	S.money = 5000
 	S.coches = {"utilitario": {"dia": 0, "p": 20000, "r": S.day + 365, "iv": S.day + 365}, "moto": {"dia": 0, "p": 4000, "r": S.day + 365, "iv": S.day + 365}}
-	S.conduce = "utilitario"
-	# 1) conduces solo el tuyo; al entrar en un sitio, se queda fuera, donde estabas
+	S.ch = 4
+	# 1) con CAL, por el mapa siempre a pie: el vehículo está en el garaje (Ribera Verde) y no se pinta ni estorba
 	J.enter_map("town", 3, 10, "down")
 	J.mode = "world"
-	chk(J.vehiculo() == "utilitario", "conduces el utilitario: %s" % J.vehiculo())
-	J.enter_map("home", 9, 3, "up")
-	var p = S.coches.utilitario.get("pos")
-	chk(p is Array and p[0] == "town" and int(p[1]) == 3 and int(p[2]) == 10 and S.get("conduce") == null, "aparcado en la calle al entrar: %s %s" % [p, S.get("conduce")])
-	chk(S.coches.moto.get("pos") == null, "la moto no se mueve")
-	# 2) en la calle: está donde lo dejaste, no se pasa por encima y vas a pie
-	J.enter_map("town", 3, 11, "up")
-	chk(J.coche_en(3, 10) == "utilitario" and J.coche_en(3, 11) == "", "coche_en: %s" % J.coche_en(3, 10))
-	chk(J.vehiculo() == null, "a pie: %s" % J.vehiculo())
+	chk(J.vehiculo() == null and J.donde("utilitario") == J.GARAJE, "a pie y el utilitario en el garaje: %s %s" % [J.vehiculo(), J.donde("utilitario")])
+	chk(J.aparcados("town") == ["moto", "utilitario"] and J.coche_en(3, 11) == "", "en el garaje, no en la calle")
+	# 1b) el garaje, dibujado junto al piso: 2 × 3 casillas a la derecha del portal, sólido, la puerta en la fila de la acera
+	var t: Dictionary = J.MAPS.town
+	var gb: Dictionary = J.GARAJE_B
+	chk(t.blds.any(func(q): return q.id == "garaje" and int(q.x0) == 9 and int(q.y0) == 6) and Atlas.frame_de("edificio-garaje", "base", "unica", 0, {"i": 0}) != null, "el garaje en el mapa, con su fachada")
+	var home: Dictionary = t.blds.filter(func(q): return q.id == "home")[0]
+	chk(int(gb.x0) == int(home.x0) + int(home.w) and int(gb.y0) + int(gb.h) == int(home.y0) + int(home.h), "pegado al piso, a ras de su fachada")
+	chk(J.tile_solid(t, 9, 7) and J.tile_solid(t, 10, 8) and t.o[8][9] == "garaje" and t.o[8][10] == "garaje", "sólido, con la puerta abajo")
+	chk(t.o[8][1] == "sign" and String(D.SIGNS.get("town:1,8", "")).begins_with("Calle Ribera"), "el cartel del piso, al otro lado del portal")
+	# la parada de Ribera Verde, solo el autobús: el coche sale del garaje
+	QUIERO = ["Nada"]
+	MENUS = []
+	J.S.min = 600
+	corre(func(): await J.parada_action())
+	chk(not MENUS.any(func(mm): return mm.any(func(l): return String(l).begins_with("En el utilitario") or String(l).begins_with("Maletero"))), "en la parada de Ribera Verde, sin el coche: %s" % [MENUS])
+	# 2) desde el garaje: viajar en él (gasolina) y se queda en el aparcamiento de la parada de destino
+	J.P.x = 10
+	J.P.y = 9
+	J.P.fx = 10
+	J.P.fy = 9
 	J.P.dir = "up"
+	QUIERO = ["Salir en el utilitario", "Puerto Viejo"]
+	MENUS = []
+	var c0: float = float(S.money) + float(S.banco)
+	chk(corre(func(): await J.object_action(10, 8)), "garaje → Puerto Viejo en el utilitario")
+	chk(MENUS.size() and MENUS[0].has("Maletero de la moto") and MENUS[0].has("Salir en la moto"), "en el garaje, los dos: %s" % [MENUS])
+	chk(S.map == "puerto" and J.donde("utilitario") == "puerto" and J.donde("moto") == J.GARAJE and float(S.money) + float(S.banco) < c0, "llegas y se queda allí: %s %s" % [S.map, J.donde("utilitario")])
+	chk(J.vehiculo() == null, "en Puerto Viejo, a pie")
+	var pl: Array = J.plazas_parque("puerto")
+	chk(pl.size() >= 1 and J.coche_en(pl[0].x, pl[0].y) == "utilitario", "en la primera plaza del aparcamiento: %s" % [pl])
+	var m: Dictionary = J.MAPS.puerto
+	chk(String(m.g[pl[0].y][pl[0].x]) != "walk" and not J.tile_solid(m, pl[0].x, pl[0].y), "la plaza, fuera de la acera (en Puerto Viejo, en la plaza: no hay calzada cerca): %s" % m.g[pl[0].y][pl[0].x])
+	var pa: Array = D.PARADAS.puerto.a
+	chk(absi(pl[0].x - int(pa[0])) + absi(pl[0].y - int(pa[1])) >= 2, "no tapa la bajada del autobús")
+	for mp in D.PARADAS:
+		chk(J.plazas_parque(mp).size() >= 2, "aparcamiento en %s: %d plazas" % [mp, J.plazas_parque(mp).size()])
+	# 3) el coche aparcado no se atraviesa; con A delante: viajar o el maletero; en autobús, se queda
+	J.P.x = pl[0].x
+	J.P.y = pl[0].y + 1
+	J.P.fx = J.P.x
+	J.P.fy = J.P.y
 	J.try_move("up")
-	chk(J.P.y == 11 and not J.P.moving, "el coche aparcado no se atraviesa: %d" % J.P.y)
-	# 3) A delante: conducir
-	QUIERO = ["Conducir"]
-	chk(corre(func(): await J.coche_menu("utilitario")), "coche_menu")
-	chk(S.get("conduce") == "utilitario" and S.coches.utilitario.get("pos") == null and J.P.x == 3 and J.P.y == 10, "al volante desde el aparcado: %s (%d, %d)" % [S.get("conduce"), J.P.x, J.P.y])
+	chk(J.P.y == pl[0].y + 1, "no se atraviesa")
+	QUIERO = ["Viajar", "Ribera Verde"]
+	chk(corre(func(): await J.coche_menu("utilitario")), "coche_menu → Ribera Verde")
+	chk(S.map == "town" and J.donde("utilitario") == J.GARAJE and J.P.x == 10 and J.P.y == 9, "de vuelta, al garaje, en su puerta: %d,%d" % [J.P.x, J.P.y])
+	QUIERO = ["Puerto Viejo"]   # en Ribera Verde, la parada es solo del autobús
+	chk(corre(func(): await J.parada_action()), "en autobús")
+	chk(S.map == "puerto" and J.donde("utilitario") == J.GARAJE, "en autobús, el coche se queda en el garaje")
+	QUIERO = ["En autobús", "Ribera Verde"]
+	corre(func(): await J.parada_action())
 	# 4) el maletero: capacidad en kg por vehículo, guardar y sacar
 	chk(J.mal_kg("utilitario") == 150000.0 and J.mal_kg("moto") == 40000.0 and J.mal_kg("deportivo") == 30000.0, "MALETERO.kg")
 	J.add_buds("ria", 100, 18.0)
@@ -129,34 +165,47 @@ func _corre() -> void:
 	chk(LOG.any(func(t): return "maletero" in String(t)), "lo dice el agente")
 	D.CONCE.control = ctl
 	D.MALETERO.vacio.f = vf
-	# 7) la grúa: en la acera, al depósito; en la calzada, no; la moto, nunca
-	J.aparcar("utilitario", "town", 11, 0, "down")
-	J.aparcar("moto", "town", 12, 0, "down")
-	chk(J.mal_aparcado("utilitario") and not J.mal_aparcado("moto"), "mal aparcado en la acera; la moto, no")
-	chk(corre(func(): J.conce_dia()), "conce_dia")
-	chk(S.coches.utilitario.get("dep") != null and S.coches.utilitario.get("pos") == null and J.coche_en(11, 0) == "", "al depósito")
-	chk(S.coches.moto.get("pos") is Array and J.coche_en(12, 0) == "moto", "la moto sigue")
-	var m0: float = S.money
-	S.conduce = null
-	chk(corre(func(): await J.recoger_deposito("utilitario")), "recoger del depósito")
-	chk(S.coches.utilitario.get("dep") == null and S.money == m0 - float(D.MALETERO.tasa) and S.conduce == "utilitario", "recogido por %s" % Datos.eur(D.MALETERO.tasa))
-	J.aparcar("utilitario", "town", 3, 10, "down")
-	chk(not J.mal_aparcado("utilitario"), "en la calzada, bien")
+	# 7) el maletero desde el garaje (en la vista, el «+» de guardar y luego cerrar)
+	var gal := [0]
+	J.gancho_almacen = func(tt):
+		gal[0] += 1
+		if gal[0] > 1:
+			return null
+		var its: Array = J.items_almacen(tt)
+		for i in its.size():
+			if its[i].k == "+":
+				return i
+		return null
+	J.enter_map("town", 10, 9, "up")
+	J.add_buds("ria", 20, 18.0)
+	QUIERO = ["Maletero del utilitario", "+"]
+	MENUS = []
+	chk(corre(func(): await J.object_action(10, 8)), "garaje → maletero")
+	chk(J.mal_g("utilitario") >= 1, "guardado desde el garaje: %.1f" % J.mal_g("utilitario"))
+	J.S.buds = {}
+	# y en Puerto Viejo, desde la parada (el coche, aparcado allí)
+	S.coches.utilitario.en = "puerto"
+	J.enter_map("puerto", int(D.PARADAS.puerto.a[0]), int(D.PARADAS.puerto.a[1]), "down")
+	J.add_buds("ria", 20, 18.0)
+	var g7: float = J.mal_g("utilitario")
+	gal[0] = 0
+	QUIERO = ["Maletero del utilitario", "+"]
+	chk(corre(func(): await J.parada_action()), "parada de Puerto Viejo → maletero")
+	chk(J.mal_g("utilitario") > g7, "guardado desde la parada: %.1f" % J.mal_g("utilitario"))
+	S.coches.utilitario.erase("en")
+	J.gancho_almacen = Callable()
+	J.S.buds = {}
 	# 8) la envasadora, en la tienda online
 	S.items.erase("vacio")
 	S.banco = 1000
 	QUIERO = ["Envasadora al vacío", "Salir"]
 	chk(corre(func(): await J.tienda_online()), "tienda online")
 	chk(S.items.get("vacio") and absf(float(S.banco) - (1000 - float(D.MALETERO.vacio.p))) < 0.01, "envasadora comprada: banco %s" % S.banco)
-	# 9) sin CAL, como antes: el mejor que tengas y nada se aparca
+	# 9) sin CAL, como antes (1.43): montado por la calle en el mejor que tengas
 	Datos.CAL = false
-	S.coches.utilitario.erase("pos")
-	S.coches.moto.erase("pos")
-	S.conduce = null
 	J.enter_map("town", 3, 10, "down")
 	chk(J.vehiculo() == "utilitario", "sin CAL, el mejor: %s" % J.vehiculo())
-	J.enter_map("home", 9, 3, "up")
-	chk(S.coches.utilitario.get("pos") == null and J.coche_en(3, 10) == "", "sin CAL, nada aparcado")
+	chk(not t.blds.any(func(q): return q.id == "garaje") and t.o[8][9] == "sign" and t.o[8][1] == null and not J.tile_solid(t, 9, 7), "sin CAL, sin garaje y el cartel en su sitio")
 	Datos.CAL = true
 	print("vehiculos: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:

@@ -71,11 +71,7 @@ func vehiculo():
 	var v = S.get("veh")
 	if not D.ZONAS.has(S.map):
 		return null
-	if Datos.CAL and S.get("coches") is Dictionary and not S.coches.is_empty():   # MAESTRO [3]: solo el que conduces; los demás, aparcados
-		var kc = S.get("conduce")
-		if kc is String and coche_ya(kc) and not S.coches[kc].get("grua") and not S.coches[kc].get("dep") and D.VEHICULOS.has(kc):
-			return kc
-	else:
+	if not Datos.CAL:   # MAESTRO [3]: con CAL, los del concesionario no van por el mapa: del garaje o del aparcamiento, de pueblo a pueblo
 		for k in ["deportivo", "berlina", "utilitario", "moto"]:   # 1.43: lo del concesionario, antes que nada (el mejor que tengas)
 			if coche_ya(k) and not S.coches[k].get("grua") and D.VEHICULOS.has(k):
 				return k
@@ -86,25 +82,92 @@ func vehiculo():
 			return k
 	return null
 
-# MAESTRO [3]: el vehículo aparcado en (x, y) de este mapa (S.coches[k].pos = [mapa, x, y, dir]), o ""
-func coche_en(x: int, y: int) -> String:
-	if not (Datos.CAL and S.get("coches") is Dictionary):
+# MAESTRO [3] (lo pidió el usuario: «tiene que estar en el garaje y del garaje viajas al otro pueblo, y se queda estacionado en un
+# aparcamiento; no se usa por el mapa»): cada vehículo del concesionario está en un pueblo (S.coches[k].en; sin él, GARAJE, el de
+# casa): en Ribera Verde, dentro del garaje; en los demás, en el aparcamiento de la parada, en una plaza de la calzada (plazas_parque)
+const GARAJE := "town"
+
+func de_art(art: String) -> String:   # «de» + el artículo: «del utilitario», «de la moto»
+	return ("del " + art.substr(3)) if art.begins_with("el ") else ("de " + art)   # i18n-no
+
+func donde(k: String) -> String:
+	return String(S.coches[k].get("en", GARAJE))
+
+func aparcados(mapa: String) -> Array:   # los tuyos que están en mapa, por orden
+	var o := []
+	if Datos.CAL and S.get("coches") is Dictionary:
+		for k in D.CONCE.orden:
+			if S.coches.has(k) and coche_ya(k) and donde(k) == mapa:
+				o.append(k)
+	return o
+
+# las plazas del aparcamiento de la parada de mapa: las casillas de calzada libres más cerca de donde te deja el autobús (sin la
+# suya ni las de al lado, que se baja por ahí); sin calzada, el suelo libre que no sea acera
+func plazas_parque(mapa: String) -> Array:
+	var m: Dictionary = MAPS[mapa]
+	if m.has("_parque"):
+		return m._parque
+	var o := []
+	if D.PARADAS.has(mapa):
+		var a: Array = D.PARADAS[mapa].a
+		var c := []
+		for pase in 2:
+			for y in m.h:
+				for x in m.w:
+					var g: String = String(m.g[y][x])
+					var d: int = absi(x - int(a[0])) + absi(y - int(a[1]))
+					if d < 2 or d > 10 or m.o[y][x] != null or tile_solid(m, x, y) or not pisable(m, x, y):
+						continue
+					if (g.begins_with("road") if pase == 0 else g != "walk"):
+						c.append([d, x, y])
+			if c.size():
+				break
+		c.sort()
+		for q in c.slice(0, 4):
+			o.append(Vector2i(q[1], q[2]))
+	m._parque = o
+	return o
+
+func coche_en(x: int, y: int) -> String:   # el tuyo aparcado en (x, y) de este mapa, o ""
+	if S.map == GARAJE:
 		return ""
-	for k in S.coches:
-		var p = S.coches[k].get("pos")
-		if p is Array and String(p[0]) == S.map and int(p[1]) == x and int(p[2]) == y and S.get("conduce") != k and not S.coches[k].get("dep"):
-			return k
+	var ks := aparcados(S.map)
+	var pl := plazas_parque(S.map)
+	for i in mini(ks.size(), pl.size()):
+		if pl[i] == Vector2i(x, y):
+			return ks[i]
 	return ""
 
-func conduce_coche() -> String:   # el del concesionario que llevas (no la bici ni el patinete), o ""
-	var v = vehiculo()
-	return v if v is String and S.get("coches") is Dictionary and S.coches.has(v) else ""
+# el garaje de la tía, dibujado junto al piso (lo pidió el usuario: «dibujado en el mapa junto al piso»): 2 × 3 casillas a la
+# derecha del portal, con la puerta en la fila de la acera; el cartel del piso, que estaba ahí, pasa al otro lado del portal
+const GARAJE_B := {"id": "garaje", "x0": 9, "y0": 6, "w": 2, "h": 3}   # i18n-no
+const GARAJE_CARTEL := [Vector2i(9, 8), Vector2i(1, 8)]
+var _garaje0 = null
 
-# MAESTRO [3]: aparcar k donde estás (al entrar en un sitio, al coger el autobús o a mano)
-func aparcar(k: String, mapa: String, x: int, y: int, d: String) -> void:
-	S.coches[k].pos = [mapa, x, y, d]
-	if S.get("conduce") == k:
-		S.conduce = null
+func montar_garaje(mapa: String) -> void:
+	if mapa != GARAJE or not MAPS.has(mapa):
+		return
+	var m: Dictionary = MAPS[mapa]
+	var b := GARAJE_B
+	if _garaje0 == null:
+		_garaje0 = {"g": m.g.duplicate(true), "o": m.o.duplicate(true)}
+	for y in range(b.y0, b.y0 + b.h):
+		for x in range(b.x0, b.x0 + b.w):
+			m.g[y][x] = "wall_garaje" if Datos.CAL else _garaje0.g[y][x]   # i18n-no
+			m.o[y][x] = ("garaje" if y == b.y0 + b.h - 1 else null) if Datos.CAL else _garaje0.o[y][x]   # i18n-no
+	var c0: Vector2i = GARAJE_CARTEL[0]
+	var c1: Vector2i = GARAJE_CARTEL[1]
+	if Datos.CAL:
+		m.o[c1.y][c1.x] = "sign"   # i18n-no
+		D.SIGNS["%s:%d,%d" % [mapa, c1.x, c1.y]] = D.SIGNS["%s:%d,%d" % [mapa, c0.x, c0.y]]
+	else:
+		m.o[c1.y][c1.x] = _garaje0.o[c1.y][c1.x]
+	var bs: Array = m.blds.filter(func(q): return q.id != "garaje")
+	if Datos.CAL:
+		bs.append(b.duplicate())
+	m.blds.clear()
+	m.blds.append_array(bs)
+	m.erase("_parque")
 
 # Un vehículo del concesionario (S.coches: {k: {dia: cuándo llega, p: lo pagado, r: el próximo recibo del seguro o null}}), ya entregado
 func coche_ya(k: String) -> bool:
@@ -239,7 +302,7 @@ func interact() -> void:
 	var de := delante()
 	var tx: int = de[0]
 	var ty: int = de[1]
-	var ck := coche_en(tx, ty)   # MAESTRO [3]: tu vehículo aparcado: conducir o el maletero
+	var ck := coche_en(tx, ty)   # MAESTRO [3]: tu vehículo en el aparcamiento: viajar o el maletero
 	if ck != "":
 		run(func(): await coche_menu(ck))
 		return
@@ -252,9 +315,6 @@ func interact() -> void:
 	var it = item_at(tx, ty)
 	if it:
 		run(func(): await pick_item(it))
-		return
-	if Datos.CAL and conduce_coche() != "" and ty >= 0 and ty < m.h and tx >= 0 and tx < m.w and m.o[ty][tx] == null:   # MAESTRO [3]: bajarte y aparcar
-		run(func(): await bajar_menu())
 		return
 	run(func(): await object_action(tx, ty))
 
@@ -629,6 +689,8 @@ func object_action(x: int, y: int) -> void:
 			await say(I18n.v(D.SIGNS.get(st, K("Está tan desgastado que no se lee."))) + (("\n" + I18n.v(D.SETAS_SITIO.cartel)) if Datos.CAL and not Datos.PLAY and st == D.SETAS_SITIO.k else ""))   # 1.43.8
 		"parada":
 			await parada_action()
+		"garaje":   # MAESTRO [3]
+			await garaje_menu()
 		"cajero":   # 1.35 (granja.gd)
 			await cajero()
 		"rotuloL":

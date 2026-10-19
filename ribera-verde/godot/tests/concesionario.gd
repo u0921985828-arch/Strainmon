@@ -3,7 +3,7 @@
 # de la nave (lo pidió el usuario: «en la nave debería haber bandejas de clones»). Sin oráculo del HTML (congelado en la 1.37): parte
 # del S de la pantalla caja-dentro.
 #   $GODOT --headless --path godot --script res://tests/concesionario.gd   → «concesionario: N comprobaciones, 0 fallos»
-#   con -- --sin-arranque --pintar <dir> (y xvfb, --rendering-driver opengl3) deja también conce-fuera.png, conce-dentro.png y nave-clones.png
+#   con -- --sin-arranque --pintar <dir> (y xvfb, --rendering-driver opengl3) deja también conce-fuera.png, conce-dentro.png, nave-clones.png, aparcados.png y garaje.png
 extends SceneTree
 
 const Datos = preload("res://src/datos.gd")
@@ -210,7 +210,7 @@ func _corre() -> void:
 	var tr: Dictionary = J.tramo("town", "puerto", "utilitario")
 	chk(tr.min == roundi(25 * .55) and tr.eur == roundi(18 * 5.4 / 100 * 1.6), "tramo: %s" % [tr])
 	Cultivo.fijo = .99   # sin control
-	t = haz(J.parada_action, ["En el utilitario", "Puerto Viejo"])
+	t = haz(func(): await J.object_action(10, 8), ["Salir en el utilitario", "Puerto Viejo"])   # MAESTRO [3]: de Ribera Verde se sale del garaje
 	chk(J.S.map == "puerto" and int(J.S.money) == 100 - int(tr.eur), "en coche a Puerto Viejo, de noche, sin billete: %s %s" % [J.S.map, J.S.money])
 	chk(int(J.S.coches.utilitario.km) == 18 and not t.contains("TALLER"), "los km: %s" % [J.S.coches.utilitario])
 	# 4b · el taller por km: al pasar los 15.000, la revisión; a los 40.000, también los neumáticos
@@ -221,7 +221,7 @@ func _corre() -> void:
 	chk(int(J.S.coches.utilitario.km) == 15008 and int(J.S.banco) == 1000 - 220 and t.contains("revisión") and not t.contains("neumáticos"), "la revisión: %s %s %s" % [J.S.banco, J.S.coches.utilitario, t])
 	J.S.coches.utilitario.km = 39990
 	J.S.banco = 1000
-	t = haz(J.parada_action, ["En el utilitario", "Puerto Viejo"])
+	t = haz(func(): await J.object_action(10, 8), ["Salir en el utilitario", "Puerto Viejo"])
 	chk(int(J.S.banco) == 1000 - 300 and t.contains("neumáticos") and not t.contains("revisión"), "los neumáticos: %s %s" % [J.S.banco, t])
 	J.S.coches.utilitario.km = 18
 	# 5 · control de tráfico: con algo encima y registro, te lo quitan
@@ -279,17 +279,18 @@ func _corre() -> void:
 	J.S.banco = 10000
 	t = haz(J.talk_conce, ["Scooter", "Firmar", "Nada"])
 	J.S.day += 2
-	J.S.conduce = "moto"   # MAESTRO [3]: conduces el que te entregan (conce_dia), no el mejor que tengas
 	J.enter_map("town", 7, 12, "down")
+	chk(J.vehiculo() == null, "MAESTRO [3]: con CAL, por el mapa a pie (el vehículo, en el garaje): %s" % J.vehiculo())
+	Datos.CAL = false   # como antes (1.43), contra el HTML: montado por la calle
 	chk(J.vehiculo() == "moto" and J.paso_ms() < float(D.VEHICULOS.bici.paso[0]), "la moto en la calle: %s" % J.vehiculo())
 	# 9b · los coches por la calle, a escala de juguete (más bajos que él de pie): el mejor que tengas; con la grúa, no
 	J.S.day = int(J.S.coches.deportivo.dia)
-	J.S.conduce = "deportivo"
 	J.enter_map("town", 7, 12, "down")
 	chk(J.vehiculo() == "deportivo" and J.paso_ms() < float(D.VEHICULOS.moto.paso[0]), "el deportivo en la calle: %s" % J.vehiculo())
 	J.S.coches.deportivo.grua = true
-	chk(J.vehiculo() != "deportivo", "el deportivo en la grúa, a pie: %s" % J.vehiculo())
+	chk(J.vehiculo() == "moto", "el deportivo en la grúa, la moto: %s" % J.vehiculo())
 	J.S.coches.deportivo.erase("grua")
+	Datos.CAL = true
 	for k in ["utilitario", "berlina", "deportivo"]:
 		var Vk: Dictionary = D.VEHICULOS[k]
 		chk(int(Vk.sube) < 0 and int(Vk.corta) <= 24 and Vk.n == C.v[k].n and Atlas.anim_de("vehiculos", k + "-atras") and Atlas.anim_de("vehiculos", k + "-delante"), "%s: sentado y con su arte" % k)
@@ -343,18 +344,20 @@ func _corre() -> void:
 		J.enter_map("town", 7, 14, "right")
 		var cs: Dictionary = J.S.coches
 		J.S.coches = {"moto": cs.moto}
-		J.S.conduce = "moto"
+		Datos.CAL = false
 		await foto(dir, "moto")
 		for k in ["utilitario", "berlina", "deportivo"]:
 			J.S.coches = {k: {"dia": 0, "p": 1, "r": null}}
-			J.S.conduce = k
 			for dd in ["right", "down", "up"]:
 				J.enter_map("town", 7, 14, dd)
 				await foto(dir, "coche-%s-%s" % [k, dd])
-		J.S.coches = {"berlina": {"dia": 0, "p": 1, "r": null, "pos": ["town", 6, 14, "right"]}, "moto": {"dia": 0, "p": 1, "r": null, "pos": ["town", 9, 14, "down"]}}   # MAESTRO [3]: aparcados, sin nadie
-		J.S.conduce = null
-		J.enter_map("town", 7, 15, "up")
+		Datos.CAL = true
+		J.S.coches = {"berlina": {"dia": 0, "p": 1, "r": null, "en": "puerto"}, "moto": {"dia": 0, "p": 1, "r": null, "en": "puerto"}}   # MAESTRO [3]: en el aparcamiento de la parada
+		var pa: Array = D.PARADAS.puerto.a
+		J.enter_map("puerto", int(pa[0]), int(pa[1]), pa[2])
 		await foto(dir, "aparcados")
+		J.enter_map("town", 10, 9, "up")   # MAESTRO [3]: el garaje, junto al piso
+		await foto(dir, "garaje")
 		J.S.coches = cs
 	for x in fallos:
 		print("  FALLO ", x)

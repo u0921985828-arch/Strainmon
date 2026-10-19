@@ -77,3 +77,9 @@ A: take out · B: close."
 al vacío,vacuum-sealed
 MALETERO,BOOT
 "Solo cambia cómo te ves: lo demás, igual.",It only changes how you look: everything else is the same.
+"{A}, en el aparcamiento. Maletero: {g} de {c}.","{A}, in the car park. Boot: {g} of {c}."
+Viajar,Travel
+El garaje de la tía. Está vacío: aquí se guarda lo que compres en AUTOS RIBERA.,Your aunt's garage. It's empty: whatever you buy at AUTOS RIBERA is kept here.
+Salir en {v},Drive out in {v}
+Maletero {dv},Boot {dv}
+El garaje de la tía.,Your aunt's garage.
