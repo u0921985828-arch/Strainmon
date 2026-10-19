@@ -269,12 +269,19 @@ func _ready() -> void:
 	ajusta()
 
 func _fuente(f: String, suave := true) -> FontFile:
+	return _fuente_de(f, suave)
+
+static func _fuente_de(f: String, suave := true) -> FontFile:
 	var o := FontFile.new()
 	o.data = FileAccess.get_file_as_bytes("res://fuentes/" + f)
 	o.antialiasing = TextServer.FONT_ANTIALIASING_GRAY if suave else TextServer.FONT_ANTIALIASING_NONE
 	var sf := SystemFont.new()
 	sf.font_names = PackedStringArray(["sans-serif"])
-	o.fallbacks = [sf]
+	# MAESTRO [10]: flechas, ▲▼◀▶, ★, ≈ y − de una letra de reserva propia (DejaVu, subconjunto), no de la del móvil
+	var sim := FontFile.new()
+	sim.data = FileAccess.get_file_as_bytes("res://fuentes/dejavu-sans-simbolos.woff2")
+	sim.antialiasing = o.antialiasing
+	o.fallbacks = [sim, sf]
 	return o
 
 # ---------- pantalla y mandos (06b-pantalla.js) ----------

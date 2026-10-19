@@ -672,8 +672,8 @@ func creditos() -> void:
 
 func licencias() -> String:
 	var t := I18n.v("Este juego usa Godot Engine, con licencia MIT:\n\n") + Engine.get_license_text()
-	for f in ["OFL-PressStart2P.txt", "OFL-AtkinsonHyperlegible.txt"]:   # i18n-no
-		t += "\n\n— %s —\n\n%s" % [f.trim_prefix("OFL-").trim_suffix(".txt"), FileAccess.get_file_as_string("res://fuentes/" + f).strip_edges()]
+	for f in ["OFL-PressStart2P.txt", "OFL-AtkinsonHyperlegible.txt", "LICENCIA-DejaVu.txt"]:   # i18n-no
+		t += "\n\n— %s —\n\n%s" % [f.trim_prefix("OFL-").trim_prefix("LICENCIA-").trim_suffix(".txt"), FileAccess.get_file_as_string("res://fuentes/" + f).strip_edges()]
 	t += I18n.v("\n\nGODOT ENGINE: PARTES DE TERCEROS")
 	for c in Engine.get_copyright_info():
 		t += "\n\n" + str(c.name)
