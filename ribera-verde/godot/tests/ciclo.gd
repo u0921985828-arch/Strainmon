@@ -324,6 +324,7 @@ func _corre() -> void:
 	Juego = load("res://src/juego.gd")
 	Juego.GUARDADO = "user://prueba-ciclo.json"
 	Juego.FTUE_CORTO = false   # U1 (fase 5): esta prueba recorre el prólogo; el corto, en tests/ftue.gd
+	Juego.SALTAR = false   # 0.51: sin la pregunta de saltar el tutorial (tests/saltar.gd)
 	for x in ["", ".bak", ".tmp"]:   # E1/E2 (fase 3): sin la copia de una vuelta anterior
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO + x))
 	UI.AJUSTES = "user://prueba-ajustes.json"   # el primer arranque: sin el aviso de edad aceptado

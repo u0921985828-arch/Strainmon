@@ -8,6 +8,7 @@ const Pinta = preload("res://src/pinta.gd")
 const Arte = preload("res://src/arte.gd")
 
 static var GUARDADO := "user://partida.json"   # las pruebas usan otro
+static var SALTAR := true   # 0.51: NUEVA PARTIDA pregunta si saltar el tutorial (con Datos.CAL); las pruebas del prólogo lo apagan
 static var FTUE_CORTO := true   # U1 (fase 5): con Datos.PLAY, la partida empieza en el piso; tests/ciclo.gd lo apaga para recorrer el prólogo
 var pintor = null
 
@@ -228,7 +229,40 @@ func load_save():
 		var j = Datos.enteros(js.data)
 		if partida_valida(j):
 			return j
+		j = repara_partida(j)   # 0.51: la de una versión con otro tipo en alguna clave se arregla, no se tira
+		if partida_valida(j):
+			return j
+		guarda_rota(r)
 	return null
+
+# 0.51 (lo pidió el usuario: «no coge la partida anterior»): cada clave de new_state() con el tipo cambiado vuelve a su valor de
+# partida nueva; el mapa que ya no existe, el piso; día, hora y capítulo, a su rango. El nombre, las macetas y las flags, sin tocar
+func repara_partida(s: Dictionary) -> Dictionary:
+	var o := s.duplicate(true)
+	var base := new_state()
+	for k in base:
+		if not o.has(k) or base[k] == null or o[k] == null:
+			continue
+		var a = base[k]
+		var v = o[k]
+		if a is int or a is float:
+			if not (v is int or v is float) or not is_finite(float(v)):
+				o[k] = a
+		elif typeof(a) != typeof(v) and not (a is bool and (v is int or v is float)):
+			o[k] = a
+	if not (o.get("map") is String and MAPS.has(o.map)):
+		o.map = "home"   # (x, y: enter_game busca la casilla libre más cercana)
+	for k in VAL_ENTEROS:
+		var v = o.get(k)
+		if v is int or v is float:
+			o[k] = int(clampf(floorf(float(v)), VAL_ENTEROS[k][0], VAL_ENTEROS[k][1]))
+	return o
+
+# la que no se puede leer ni arreglar no se pierde: copia en partida.rota.json (la primera; no se pisa con otra)
+static func guarda_rota(r: String) -> void:
+	var dst := GUARDADO.get_basename() + ".rota.json"
+	if not FileAccess.file_exists(dst):
+		DirAccess.copy_absolute(r, dst)
 
 func migrate() -> void:
 	if not S.get("carpas"):   # antes de la 1.6: macetas extra → carpa de 100; lámpara LED → LED en cada carpa
@@ -737,6 +771,9 @@ func elegir_personaje() -> void:
 	S.cumple = {"d": d + 1, "m": m + 1}
 
 func new_game() -> void:
+	if Datos.CAL and SALTAR and await ask(K("¿Jugar el tutorial (el primer cultivo, paso a paso) o saltarlo y empezar con la primera cosecha hecha?"), [K("Jugarlo"), K("Saltarlo")]) == 1:
+		await new_game_saltado()
+		return
 	if Datos.PLAY and FTUE_CORTO:
 		await new_game_corto()
 		return
@@ -767,6 +804,49 @@ func new_game() -> void:
 	await chapter(1)
 	await wait(2600)
 	show_objective()
+
+# 0.51 (lo pidió el usuario: «poder saltarte el tutorial, que ya hagas todo el cultivo, el primer cultivo»; con Datos.CAL): el
+# nombre y el personaje, y la partida empieza en el piso como tras la primera cosecha (saltar_tutorial) y pasa al capítulo 2
+func new_game_saltado() -> void:
+	S = new_state()
+	await fade(1)
+	if not oraculo:
+		titulo.hide()
+	mode = "intro"
+	music("home")
+	await fade(0)
+	S.name = await choose_name()
+	await elegir_personaje()
+	saltar_tutorial()
+	await fade(1)
+	enter_game()
+	await wait(200)
+	await fade(0)
+	await say(K("Tutorial saltado: el primer cultivo ya está hecho. La cosecha, en la mochila."))
+	await check_story()
+
+# el estado tras la primera cosecha (el de tests/historia.json, paso 7): la carta leída, Kiko visto, el itinerario hasta cosechar,
+# 41 g de Skunk #1 sin curar, una semilla y una dosis de abono; en el piso, delante del armario
+func saltar_tutorial() -> void:
+	S.ch = 1
+	S.flags.llegada = true
+	for k in ["letter", "kiko1", "barras", "harvest1"]:
+		S.flags[k] = true
+	S.flags.gFlor = 1
+	S.flags.curado = S.day
+	add_seeds("ria", 1)
+	add_buds("ria", 41, float(strain("ria").thc))
+	S.items.fert += 1
+	for it in D.ITINERARIO:
+		S.itin[it.id] = S.day
+		if it.id == "cosecha":
+			break
+	S.logros["cosecha"] = S.day
+	var si: Dictionary = sitio(0)
+	S.map = "home"
+	S.x = int(si.x)
+	S.y = int(si.y) + 1
+	S.dir = "up"
 
 # U1 (fase 5, plan de Google Play): plantar en menos de 90 s. Sin el prólogo del caserío ni el autobús: Kiko pregunta el nombre,
 # la partida empieza en el piso delante del armario, la carta en dos líneas, Kiko por SMS con las semillas y el abono, y Julen

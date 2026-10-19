@@ -1,10 +1,10 @@
 === Landrace Hunters ===
-Version: 1.5.4
+Version: 1.5.5
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.5.4.zip → Activar.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.5.5.zip → Activar.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -13,6 +13,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
+1.5.5 — Landrace Hunters (Godot 0.51.0): saltar el tutorial al empezar (el primer cultivo ya hecho), la partida guardada que no se pierde al actualizar y los retratos con gestos de quien habla.
 1.5.4 — Landrace Hunters 1.57.2 (Godot 0.47.1): la calle del juego en la carga con un bancal de exterior por la fecha, el taller por zonas y a la escala del coche, la taberna de Puerto Viejo con mesas y sillas en las que te sientas, la semilla al sembrar y la escalera del sótano hacia la derecha.
 1.5.3 — Landrace Hunters 1.57 (Godot 0.47.0): la carga en la carretera y el título con más atrezo, el viaje de perfil, los tubos de las carpas con codos y los mandos más grandes, donde caen los pulgares.
 1.5.2 — Landrace Hunters 1.55.2 (Godot 0.46.1): el que cuida las madres de la nave, delante de su carpa y no de la puerta de la habitación.

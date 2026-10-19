@@ -87,6 +87,13 @@
 - `node tools/godot-aab.js` con la upload key: `dist/landrace-hunters.aab` (firmado, targetSdk 36, 16 KB) y el APK universal.
 - `descargas/LandraceHunters.apk` (83 MB, `apk-instalar.py` + `zipalign -P 16` + `apksigner`, la misma firma que la 0.49.0): MAESTRO [2], [4] a [9] con `Datos.CAL`.
 
+### Saltar el tutorial y la partida de antes · Godot 0.51.0 (código 70)
+- **Saltar el tutorial** (lo pidió el usuario: «que ya hagas todo el cultivo, el primer cultivo»; con `Datos.CAL`): NUEVA PARTIDA pregunta «Jugarlo / Saltarlo»; saltado, el nombre y el personaje, y la partida empieza en el piso como tras la primera cosecha (`saltar_tutorial`: la carta, Kiko, el itinerario hasta cosechar, 41 g de Skunk #1 sin curar, una semilla y el abono) y pasa al capítulo 2 con el SMS de Kiko (`new_game_saltado`, `Juego.SALTAR`; `ciclo` y `ftue` lo apagan).
+- **La partida no se pierde** (lo vio el usuario: «empieza otra vez el juego»): `load_save` arregla la guardada con una clave de otro tipo o un mapa que ya no existe (`repara_partida`: esa clave, a la de partida nueva; día, hora y capítulo, a su rango) en vez de empezar de cero, y la que no tiene arreglo se copia en `partida.rota.json` (`guarda_rota`). Importar sigue estricto (E8).
+- Por qué las dos últimas APK empezaban de cero: desde la 0.48 el paquete es `com.landracehunters.game` con la upload key (antes `com.riberaverde.godot` con otra firma), así que Android la instala como otra app, con sus propios datos. Desde aquí el paquete y la firma no cambian; la partida de la app vieja se pasa con OPCIONES → COPIA DE SEGURIDAD → EXPORTAR en la vieja e IMPORTAR en la nueva.
+- Prueba nueva `tests/saltar.gd` (25; con el código de antes, 13 fallos).
+- `descargas/LandraceHunters.apk` (`apk-instalar.py` + `zipalign -P 16` + `apksigner`, la misma firma y el mismo paquete que la 0.50.0) y el plugin de WordPress 1.5.5 con esta versión (`tools/wordpress.js` pasa a Godot 4.7: el motor web sin hilos sale de la plantilla instalada, con `index.audio.position.worklet.js`).
+
 ### Documento maestro (`docs/MAESTRO.md`), por tandas, con `Datos.CAL`
 - **[10] La letra:** reserva propia para flechas, ▲▼◀▶, ★, ≈ y −.
 - **[1] El personaje:** chico o chica y el cumpleaños al empezar (`S.sexo`, `S.cumple`), sin ventajas por sexo (solo cambia el aspecto); el regalo del cumpleaños una vez al año (el 29 de febrero, también); la protagonista con su sprite de PixelLab en el mapa y en el combate (`player-f`, `player-f-combate`), con boca, y la ropa cambia las mismas piezas. Prueba `tests/personaje.gd`.

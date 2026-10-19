@@ -6,7 +6,7 @@
     1. Copia godot/ a una carpeta temporal, le añade un preset «Web» (sin hilos, sin extensiones) y exporta solo el paquete:
        index.pck (--export-pack). export_presets.cfg del repo no se toca.
     2. Monta landrace-hunters/: el plugin (wordpress/: PHP, readme, .htaccess, lh-fs.js, index.html, iconos y licencias), el motor
-       web de Godot 4.3 sin hilos (index.js, index.wasm, index.audio.worklet.js, de --motor <dir> o LH_MOTOR) y el index.pck;
+       web de Godot 4.7 sin hilos (index.js, index.wasm y los dos worklets de audio, de --motor <dir>, LH_MOTOR o la plantilla instalada) y el index.pck;
        en index.html, los tamaños de fileSizes.
     3. Lo comprime en descargas/landrace-hunters-<versión del plugin>.zip.
   Uso: node tools/wordpress.js --motor <carpeta con index.js, index.wasm e index.audio.worklet.js> [--sin-zip --salida <dir>]
@@ -17,13 +17,20 @@ const os = require('os');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..'), GD = path.join(ROOT, 'godot'), WP = path.join(ROOT, 'wordpress');
-const GODOT = process.env.GODOT || '/home/user/godot-bin/Godot_v4.3-stable_linux.x86_64';
+const GODOT = process.env.GODOT || '/home/user/godot-bin/Godot_v4.7-stable_linux.x86_64';
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 && i + 1 < process.argv.length ? process.argv[i + 1] : d; };
-const MOTOR = arg('--motor', process.env.LH_MOTOR || '');
-const MOTOR_F = ['index.js', 'index.wasm', 'index.audio.worklet.js'];
+const MOTOR_F = ['index.js', 'index.wasm', 'index.audio.worklet.js', 'index.audio.position.worklet.js'];   // 4.7: con el de la posición
+// 0.51: sin --motor, el de la plantilla web sin hilos de Godot 4.7 instalada (godot.* → index.*)
+const PLANTILLA = path.join(os.homedir(), '.local/share/godot/export_templates/4.7.stable/web_nothreads_release.zip');
+let MOTOR = arg('--motor', process.env.LH_MOTOR || '');
+if (!MOTOR && fs.existsSync(PLANTILLA)) {
+  MOTOR = fs.mkdtempSync(path.join(os.tmpdir(), 'lh-motor-'));
+  execFileSync('unzip', ['-q', '-o', PLANTILLA, '-d', MOTOR]);
+  for (const f of MOTOR_F) fs.renameSync(path.join(MOTOR, f.replace(/^index/, 'godot')), path.join(MOTOR, f));
+}
 
-if (!fs.existsSync(GODOT)) throw new Error('falta Godot 4.3: ' + GODOT + ' (o GODOT=…)');
-if (!MOTOR || !MOTOR_F.every((f) => fs.existsSync(path.join(MOTOR, f)))) throw new Error('falta el motor web de Godot 4.3 (sin hilos): --motor <dir> con ' + MOTOR_F.join(', '));
+if (!fs.existsSync(GODOT)) throw new Error('falta Godot 4.7: ' + GODOT + ' (o GODOT=…)');
+if (!MOTOR || !MOTOR_F.every((f) => fs.existsSync(path.join(MOTOR, f)))) throw new Error('falta el motor web de Godot 4.7 (sin hilos): --motor <dir> con ' + MOTOR_F.join(', '));
 const php = fs.readFileSync(path.join(WP, 'landrace-hunters.php'), 'utf8');
 const V = (php.match(/const VERSION\s*=\s*'([^']+)'/) || [])[1];
 if (!V) throw new Error('no encuentro la versión en wordpress/landrace-hunters.php');

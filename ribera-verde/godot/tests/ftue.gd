@@ -143,6 +143,7 @@ func accesibilidad() -> void:
 func _corre() -> void:
 	Juego = load("res://src/juego.gd")
 	Juego.GUARDADO = "user://prueba-ftue.json"
+	Juego.SALTAR = false   # 0.51: sin la pregunta de saltar el tutorial (tests/saltar.gd)
 	for x in ["", ".bak", ".tmp"]:
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(Juego.GUARDADO + x))
 	UI.AJUSTES = "user://prueba-ftue-ajustes.json"

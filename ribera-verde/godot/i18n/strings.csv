@@ -1173,6 +1173,9 @@ s22157ed9,CHICA,WOMAN
 sc0f425e4,¿QUIÉN ERES?,WHO ARE YOU?
 s2938be15,TU CUMPLEAÑOS: EL MES,YOUR BIRTHDAY: MONTH
 s392682f7,TU CUMPLEAÑOS: EL DÍA,YOUR BIRTHDAY: DAY
+sc4474146,"¿Jugar el tutorial (el primer cultivo, paso a paso) o saltarlo y empezar con la primera cosecha hecha?","Play the tutorial (your first grow, step by step) or skip it and start with the first harvest done?"
+scd40b65c,Jugarlo,Play it
+s20849109,Saltarlo,Skip it
 s6d29508e,"¿Diga? ¿Eres familia de Maite, la de Ribera Verde? Un barrio obrero a orillas de la ría.","Hello? Are you Maite's family, from Ribera Verde? A working-class neighbourhood on the estuary."
 s435833a2,Me llamo Kiko. Llevo treinta años con el growshop de su calle.,I'm Kiko. I've run the growshop on her street for thirty years.
 se7f47ca0,KIKO,KIKO
@@ -1183,6 +1186,7 @@ s5c719eb9,{N}. Hacía años que no te veía por el barrio.,{N}. I haven't seen y
 s23ab98fe,"Maite murió hace tres semanas. Te ha dejado su piso, su armario de cultivo... y una deuda.","Maite died three weeks ago. She left you her flat, her grow cabinet... and a debt."
 sc3e93ebe,Coge el autobús en la plaza del pueblo: te deja enfrente del piso. La llave está en el buzón.,Take the bus from the village square: it drops you outside the flat. The key's in the mailbox.
 s868534e1,Lee la carta que te dejó. Después pásate por el growshop.,Read the letter she left you. Then drop by the growshop.
+s30d0d8df,"Tutorial saltado: el primer cultivo ya está hecho. La cosecha, en la mochila.",Tutorial skipped: your first grow is done. The harvest is in your backpack.
 sa99d31ba,"Soy Kiko, el del growshop de la calle de tu tía Maite, en Ribera Verde. ¿Cómo te llamabas?","I'm Kiko, from the growshop on your aunt Maite's street, in Ribera Verde. What was your name?"
 s57a5399c,"«{N}: el piso y el armario de cultivo son tuyos. Le debo dinero a Baltasar, el del bar El Ancla. Lo siento.»","""{N}: the flat and the grow cabinet are yours. I owe money to Baltasar, from the El Ancla bar. I'm sorry."""
 s1809cf3b,«Kiko te ayudará. Empieza plantando: A delante del armario.»,"""Kiko will help you. Start by planting: A in front of the cabinet."""

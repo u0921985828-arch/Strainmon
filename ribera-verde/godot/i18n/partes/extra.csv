@@ -606,3 +606,7 @@ No te cabe todo encima: quedan {s} en el almacén. Vacía la mochila y vuelve a 
 «¿Buscas algo? Yo no he visto nada.»,“Looking for something? I haven't seen a thing.”
 «El alquiler aquí te come vivo.»,“The rent here eats you alive.”
 No llevas {e} encima.,You don't have {e} on you.
+"¿Jugar el tutorial (el primer cultivo, paso a paso) o saltarlo y empezar con la primera cosecha hecha?","Play the tutorial (your first grow, step by step) or skip it and start with the first harvest done?"
+Jugarlo,Play it
+Saltarlo,Skip it
+"Tutorial saltado: el primer cultivo ya está hecho. La cosecha, en la mochila.","Tutorial skipped: your first grow is done. The harvest is in your backpack."
