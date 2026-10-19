@@ -310,6 +310,9 @@ func conducir(k):
 		S.coches[k].en = x
 		if x == GARAJE:
 			a = [GARAJE_B.x0 + 1, GARAJE_B.y0 + GARAJE_B.h, "down"]
+		else:
+			montar_aparcamiento(x)
+			a = llegada_parque(x, k)
 	enter_map(x, int(a[0]), int(a[1]), a[2])
 	if S.clientsDay != S.day:
 		spawn_clients()

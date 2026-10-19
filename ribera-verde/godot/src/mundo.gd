@@ -1820,6 +1820,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_puertas(name_)
 	montar_muelle(name_)
 	montar_garaje(name_)
+	montar_aparcamiento(name_)
 	P.x = x
 	P.y = y
 	P.px = x * 16.0
@@ -2115,6 +2116,12 @@ func garaje_menu():   # MAESTRO [3], en eventos.gd
 
 func maletero(_k: String) -> void:   # MAESTRO [3], en eventos.gd
 	pass
+
+func montar_aparcamiento(_mapa: String) -> void:   # MAESTRO [3], en calle.gd
+	pass
+
+func llegada_parque(_mapa: String, _k: String) -> Array:   # MAESTRO [3], en calle.gd
+	return []
 
 func montar_garaje(_mapa: String) -> void:   # MAESTRO [3], en calle.gd
 	pass

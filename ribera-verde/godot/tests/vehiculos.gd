@@ -1,5 +1,5 @@
 # Landrace Hunters (Godot) — MAESTRO [3]: el vehículo en el garaje dibujado junto al piso de Ribera Verde (se sale desde su puerta); de la parada a otro pueblo, donde se queda en el
-# aparcamiento de la parada (S.coches[k].en, plazas_parque) sin usarse por el mapa; el maletero por kg (MALETERO.kg) con la envasadora
+# aparcamiento dibujado junto a la parada (S.coches[k].en, APARC, plazas_parque) sin usarse por el mapa; el maletero por kg (MALETERO.kg) con la envasadora
 # al vacío y el control de tráfico con el maletero; sin Datos.CAL, como antes.
 #   $GODOT --headless --path godot --script res://tests/vehiculos.gd   → «vehiculos: N comprobaciones, 0 fallos»
 extends SceneTree
@@ -38,6 +38,18 @@ func _menu(items: Array, o: Dictionary) -> Dictionary:
 	o = o.duplicate()
 	o.initial = k
 	return o
+
+func _llega(m: Dictionary, a: Vector2i, tapa: Dictionary) -> Dictionary:   # las casillas a las que se llega andando desde a
+	var vis := {a: 1}
+	var q := [a]
+	while q.size():
+		var c: Vector2i = q.pop_back()
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var n: Vector2i = c + d
+			if not vis.has(n) and not tapa.has(n) and J.pisable(m, n.x, n.y) and not J.tile_solid(m, n.x, n.y):
+				vis[n] = 1
+				q.append(n)
+	return vis
 
 func corre(f: Callable) -> bool:
 	var st := {"fin": false}
@@ -115,11 +127,28 @@ func _corre() -> void:
 	var pl: Array = J.plazas_parque("puerto")
 	chk(pl.size() >= 1 and J.coche_en(pl[0].x, pl[0].y) == "utilitario", "en la primera plaza del aparcamiento: %s" % [pl])
 	var m: Dictionary = J.MAPS.puerto
-	chk(String(m.g[pl[0].y][pl[0].x]) != "walk" and not J.tile_solid(m, pl[0].x, pl[0].y), "la plaza, fuera de la acera (en Puerto Viejo, en la plaza: no hay calzada cerca): %s" % m.g[pl[0].y][pl[0].x])
+	chk(m.blds.any(func(q): return q.id == "aparcamiento" and int(q.x0) == pl[0].x and int(q.y0) == pl[0].y) and Atlas.frame_de("edificio-aparcamiento", "base", "unica", 0, {"i": 0}) != null, "el aparcamiento dibujado, con el coche en su primera plaza")
+	chk(J.coche_en(pl[0].x + 1, pl[0].y) == "utilitario" and J.P.x == pl[0].x + 2 and J.P.y == pl[0].y, "la plaza es de 2 casillas y te deja en el pasillo, a su lado: %d,%d" % [J.P.x, J.P.y])
 	var pa: Array = D.PARADAS.puerto.a
 	chk(absi(pl[0].x - int(pa[0])) + absi(pl[0].y - int(pa[1])) >= 2, "no tapa la bajada del autobús")
-	for mp in D.PARADAS:
-		chk(J.plazas_parque(mp).size() >= 2, "aparcamiento en %s: %d plazas" % [mp, J.plazas_parque(mp).size()])
+	for mp in J.APARC:   # en cada pueblo: dibujado junto a la parada, en suelo libre, y con los coches en sus plazas no corta el paso
+		J.montar_aparcamiento(mp)
+		var mm: Dictionary = J.MAPS[mp]
+		var q: Array = J.APARC[mp]
+		var a: Array = D.PARADAS[mp].a
+		var libre := true
+		for y in range(q[1], q[1] + 4):
+			for x in range(q[0], q[0] + 3):
+				libre = libre and not J.tile_solid(mm, x, y) and J.pisable(mm, x, y)
+		chk(libre and mm.blds.any(func(b): return b.id == "aparcamiento"), "aparcamiento en %s, libre" % mp)
+		chk(absi(int(q[0]) + 1 - int(a[0])) + absi(int(q[1]) + 2 - int(a[1])) <= 12, "en %s, junto a la parada" % mp)
+		var tapa := {}
+		for y in range(q[1], q[1] + 4):
+			tapa[Vector2i(q[0], y)] = 1
+			tapa[Vector2i(q[0] + 1, y)] = 1
+		var antes := _llega(mm, Vector2i(int(a[0]), int(a[1])), {})
+		var ahora := _llega(mm, Vector2i(int(a[0]), int(a[1])), tapa)
+		chk(antes.keys().all(func(c): return tapa.has(c) or ahora.has(c)), "en %s, con las cuatro plazas llenas se llega a todo" % mp)
 	# 3) el coche aparcado no se atraviesa; con A delante: viajar o el maletero; en autobús, se queda
 	J.P.x = pl[0].x
 	J.P.y = pl[0].y + 1
@@ -206,6 +235,8 @@ func _corre() -> void:
 	J.enter_map("town", 3, 10, "down")
 	chk(J.vehiculo() == "utilitario", "sin CAL, el mejor: %s" % J.vehiculo())
 	chk(not t.blds.any(func(q): return q.id == "garaje") and t.o[8][9] == "sign" and t.o[8][1] == null and not J.tile_solid(t, 9, 7), "sin CAL, sin garaje y el cartel en su sitio")
+	J.enter_map("puerto", 20, 9, "down")
+	chk(not J.MAPS.puerto.blds.any(func(q): return q.id == "aparcamiento") and String(J.MAPS.puerto.g[10][17]) == "plaza", "sin CAL, sin aparcamiento")
 	Datos.CAL = true
 	print("vehiculos: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:

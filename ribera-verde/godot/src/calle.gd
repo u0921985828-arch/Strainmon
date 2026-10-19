@@ -84,7 +84,7 @@ func vehiculo():
 
 # MAESTRO [3] (lo pidió el usuario: «tiene que estar en el garaje y del garaje viajas al otro pueblo, y se queda estacionado en un
 # aparcamiento; no se usa por el mapa»): cada vehículo del concesionario está en un pueblo (S.coches[k].en; sin él, GARAJE, el de
-# casa): en Ribera Verde, dentro del garaje; en los demás, en el aparcamiento de la parada, en una plaza de la calzada (plazas_parque)
+# casa): en Ribera Verde, dentro del garaje; en los demás, en una plaza del aparcamiento dibujado junto a la parada (APARC)
 const GARAJE := "town"
 
 func de_art(art: String) -> String:   # «de» + el artículo: «del utilitario», «de la moto»
@@ -101,42 +101,72 @@ func aparcados(mapa: String) -> Array:   # los tuyos que están en mapa, por ord
 				o.append(k)
 	return o
 
-# las plazas del aparcamiento de la parada de mapa: las casillas de calzada libres más cerca de donde te deja el autobús (sin la
-# suya ni las de al lado, que se baja por ahí); sin calzada, el suelo libre que no sea acera
+# el aparcamiento de cada pueblo, dibujado junto a la parada (3 × 4 casillas: cuatro plazas de 2 × 1 a la izquierda y el pasillo a la
+# derecha; aparcamiento.py), en suelo libre que no corta el paso a nada (lo comprueba tests/vehiculos.gd)
+const APARC := {"puerto": [17, 10], "valdehierro": [17, 11], "mendialde": [25, 19], "errotabarri": [13, 13], "ibarbide": [7, 23]}   # i18n-no
+var _aparc0 := {}
+
+func montar_aparcamiento(mapa: String) -> void:
+	if not APARC.has(mapa) or not MAPS.has(mapa):
+		return
+	var m: Dictionary = MAPS[mapa]
+	var x0: int = APARC[mapa][0]
+	var y0: int = APARC[mapa][1]
+	if not _aparc0.has(mapa):
+		var g0 := []
+		for y in range(y0, y0 + 4):
+			g0.append(m.g[y].slice(x0, x0 + 3))
+		_aparc0[mapa] = g0
+	for y in 4:
+		for x in 3:
+			m.g[y0 + y][x0 + x] = "road" if Datos.CAL else _aparc0[mapa][y][x]   # i18n-no
+	var bs: Array = m.blds.filter(func(q): return q.id != "aparcamiento")   # i18n-no
+	if Datos.CAL:
+		bs.append({"id": "aparcamiento", "x0": x0, "y0": y0, "w": 3, "h": 4})   # i18n-no
+	m.blds.clear()
+	m.blds.append_array(bs)
+	m.erase("_parque")
+
+# las plazas del aparcamiento de mapa (la casilla de la izquierda de cada una, de arriba abajo); sin aparcamiento (no debería
+# pasar), las casillas de calzada libres más cerca de donde te deja el autobús
 func plazas_parque(mapa: String) -> Array:
 	var m: Dictionary = MAPS[mapa]
 	if m.has("_parque"):
 		return m._parque
 	var o := []
-	if D.PARADAS.has(mapa):
+	if APARC.has(mapa):
+		for i in 4:
+			o.append(Vector2i(APARC[mapa][0], APARC[mapa][1] + i))
+	elif D.PARADAS.has(mapa):
 		var a: Array = D.PARADAS[mapa].a
 		var c := []
-		for pase in 2:
-			for y in m.h:
-				for x in m.w:
-					var g: String = String(m.g[y][x])
-					var d: int = absi(x - int(a[0])) + absi(y - int(a[1]))
-					if d < 2 or d > 10 or m.o[y][x] != null or tile_solid(m, x, y) or not pisable(m, x, y):
-						continue
-					if (g.begins_with("road") if pase == 0 else g != "walk"):
-						c.append([d, x, y])
-			if c.size():
-				break
+		for y in m.h:
+			for x in m.w:
+				var d: int = absi(x - int(a[0])) + absi(y - int(a[1]))
+				if d >= 2 and d <= 10 and m.o[y][x] == null and not tile_solid(m, x, y) and pisable(m, x, y) and String(m.g[y][x]).begins_with("road"):
+					c.append([d, x, y])
 		c.sort()
 		for q in c.slice(0, 4):
 			o.append(Vector2i(q[1], q[2]))
 	m._parque = o
 	return o
 
-func coche_en(x: int, y: int) -> String:   # el tuyo aparcado en (x, y) de este mapa, o ""
+func coche_en(x: int, y: int) -> String:   # el tuyo aparcado en (x, y) de este mapa (las dos casillas de su plaza), o ""
 	if S.map == GARAJE:
 		return ""
 	var ks := aparcados(S.map)
 	var pl := plazas_parque(S.map)
+	var ancha := APARC.has(S.map)
 	for i in mini(ks.size(), pl.size()):
-		if pl[i] == Vector2i(x, y):
+		if pl[i] == Vector2i(x, y) or (ancha and pl[i] + Vector2i(1, 0) == Vector2i(x, y)):
 			return ks[i]
 	return ""
+
+func llegada_parque(mapa: String, k: String) -> Array:   # dónde te deja el coche: en el pasillo, al lado de su plaza
+	var i: int = aparcados(mapa).find(k)
+	if not APARC.has(mapa) or i < 0 or i > 3:
+		return D.PARADAS[mapa].a
+	return [APARC[mapa][0] + 2, APARC[mapa][1] + i, "down"]   # i18n-no
 
 # el garaje de la tía, dibujado junto al piso (lo pidió el usuario: «dibujado en el mapa junto al piso»): 2 × 3 casillas a la
 # derecha del portal, con la puerta en la fila de la acera; el cartel del piso, que estaba ahí, pasa al otro lado del portal

@@ -311,7 +311,7 @@ func _mundo() -> void:
 		var pl: Array = J.plazas_parque(S.map) if ak.size() else []
 		for i in mini(ak.size(), pl.size()):
 			if Atlas.anim_de("vehiculos", String(ak[i]) + "-atras"):
-				list.append([pl[i].y * 16, _aparcado.bind(String(ak[i]), pl[i].x, pl[i].y, "right")])
+				list.append([pl[i].y * 16, _aparcado.bind(String(ak[i]), pl[i].x, pl[i].y, "right", 8 if J.APARC.has(S.map) else 0)])
 	if J.SENT != null:   # 1.47: sentado, delante del asiento si se ve de frente y detrás si se ve de espaldas
 		list.append([J.SENT.y * 16 + (1 if J.SENT.d == "sur" or J.SENT.get("k") in J.TABURETES else -1), _pj_sentado])
 	else:
@@ -1231,8 +1231,8 @@ static func _trazo(pts: Array, s0: float, s1: float, cajas: Array) -> void:
 		acc += l
 
 # personajes: el fotograma (acción, andar, idle o base), con la sombra; las acciones de fumar sueltan su humo
-func _aparcado(k: String, x: int, y: int, d: String) -> void:
-	var xp: int = x * 16 - cam.x + 8
+func _aparcado(k: String, x: int, y: int, d: String, dx := 0) -> void:   # dx: en la plaza de 2 casillas, en medio
+	var xp: int = x * 16 - cam.x + 8 + dx
 	var yp: int = y * 16 - cam.y + 15
 	var dd: String = DIR4.get(d, "south")
 	for p in ["-atras", "-delante"]:
