@@ -1042,9 +1042,8 @@ sbac9aeca,Otro...,Other...
 sca6856a0,NOMBRE,NAME
 sd55c37f2,¿Cómo te llamas?,What's your name?
 sc5ad53de,CHICO,MAN
-sb956bd07,Carga un 15 % más en la mochila.,Carries 15% more in the backpack.
+s5523bf79,"Solo cambia cómo te ves: lo demás, igual.",It only changes how you look: everything else is the same.
 s22157ed9,CHICA,WOMAN
-sb64124b2,Las patrullas te ven desde menos lejos y regateas mejor.,Patrols spot you from less far away and you haggle better.
 sc0f425e4,¿QUIÉN ERES?,WHO ARE YOU?
 s2938be15,TU CUMPLEAÑOS: EL MES,YOUR BIRTHDAY: MONTH
 s392682f7,TU CUMPLEAÑOS: EL DÍA,YOUR BIRTHDAY: DAY
@@ -5260,6 +5259,8 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+sb956bd07,Carga un 15 % más en la mochila.,Carries 15% more in the backpack.
+sb64124b2,Las patrullas te ven desde menos lejos y regateas mejor.,Patrols spot you from less far away and you haggle better.
 s608435a5,{b} · {p},{b} · {p}
 s55ce64b1,lunes,Monday
 se2b2f425,martes,Tuesday

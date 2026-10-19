@@ -791,7 +791,7 @@ func talk_client(c: Dictionary) -> void:
 	var mt: float = 50.0 if ext else (c.minThc if c.minThc else 14)
 	var acc: float = [1.0, .92, clampf(.3 + (b.thc - mt) * .05 + (.25 if c.type == "pij" else 0.0) + (.15 if c.type == "tur" else 0.0) + (.3 if c.type == "vip" else 0.0), .1, .9)][j]
 	if j > 0:   # 1.15: la confianza de los de la agenda, la cata y el análisis
-		acc = minf(.97, acc + (rel(c.fid) / 250.0 if c.get("fid") else 0.0) + (.05 if b.get("cata") else 0.0) + (.1 if b.get("ana") else 0.0) + (D.PERSONAJE.trato if es_chica() else 0.0))   # MAESTRO [1]: la protagonista negocia mejor
+		acc = minf(.97, acc + (rel(c.fid) / 250.0 if c.get("fid") else 0.0) + (.05 if b.get("cata") else 0.0) + (.1 if b.get("ana") else 0.0))
 	if Cultivo.azar() < acc:
 		if c.get("fid"):
 			confia(c.fid, [3, 2, 1][j])

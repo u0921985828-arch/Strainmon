@@ -703,7 +703,7 @@ func choose_name() -> String:
 func elegir_personaje() -> void:
 	if not Datos.CAL:
 		return
-	var g: int = await menu([{"label": K("CHICO"), "desc": K("Carga un 15 % más en la mochila.")}, {"label": K("CHICA"), "desc": K("Las patrullas te ven desde menos lejos y regateas mejor.")}],
+	var g: int = await menu([{"label": K("CHICO"), "desc": K("Solo cambia cómo te ves: lo demás, igual.")}, {"label": K("CHICA"), "desc": K("Solo cambia cómo te ves: lo demás, igual.")}],   # sin ventajas por sexo (lo pidió el usuario)
 		{"cls": "start", "cancel": false, "title": K("¿QUIÉN ERES?"), "desc": true})
 	S.sexo = "f" if g == 1 else "m"
 	var ms := []

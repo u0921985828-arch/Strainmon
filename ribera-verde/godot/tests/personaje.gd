@@ -1,5 +1,5 @@
 # Landrace Hunters (Godot) — MAESTRO [1]: crear el personaje (chico o chica y el cumpleaños, S.sexo y S.cumple), la melena de la
-# protagonista sobre todos los fotogramas, las pasivas (PERSONAJE: carga, patrullas, regateo), el regalo del cumpleaños con sus tres
+# protagonista sobre todos los fotogramas, sin ventajas por sexo, el regalo del cumpleaños con sus tres
 # cartas (una vez al año, con el 29 de febrero) y la semilla estrella; sin Datos.CAL, nada de esto.
 #   $GODOT --headless --path godot --script res://tests/personaje.gd   → «personaje: N comprobaciones, 0 fallos»
 extends SceneTree
@@ -90,12 +90,10 @@ func _corre() -> void:
 	chk(J.S.gen is Dictionary, "S.gen (las generaciones) sigue siendo un diccionario")
 	chk(J.S.get("sexo") == "f" and J.S.get("cumple") == {"d": 29, "m": 2}, "chica y 29-2: %s %s" % [J.S.get("sexo"), J.S.get("cumple")])
 	chk(MENUS.size() >= 3 and MENUS[-1].size() == 29, "febrero con 29 días en el menú: %d" % (MENUS[-1].size() if MENUS.size() else -1))
-	# 2 · pasivas: ella, la patrulla ve un 15 % menos; él, un 15 % más de carga; sin elegir (partidas de antes), nada
-	chk(J.vista_pat() == int(floor(int(D.PAT.vista[0]) * (1 - PE.poli))) and J.vista_pat() < vis0, "vista con chica %d" % J.vista_pat())
-	chk(J.vista_pat(true) == int(floor(int(D.PAT.vista[0]) * 2 * (1 - PE.poli))), "vista de caza %d" % J.vista_pat(true))
-	chk(absf(J.cap_mochila() - cap0) < 1e-9, "chica: carga igual")
+	# 2 · sin ventajas por sexo (lo pidió el usuario): la misma vista de las patrullas y la misma carga
+	chk(J.vista_pat() == vis0 and J.vista_pat(true) == int(D.PAT.vista[0]) * 2 and absf(J.cap_mochila() - cap0) < 1e-9, "chica: todo igual")
 	J.S.sexo = "m"
-	chk(absf(J.cap_mochila() - cap0 * (1 + PE.carga)) < 1e-6 and J.vista_pat() == vis0, "chico: +15 %% carga %s → %s" % [cap0, J.cap_mochila()])
+	chk(J.vista_pat() == vis0 and absf(J.cap_mochila() - cap0) < 1e-9, "chico: todo igual")
 	# 3 · la melena: solo en ella, en todos los fotogramas, con contorno; él, igual que antes
 	var cambia := 0
 	var iguales := 0

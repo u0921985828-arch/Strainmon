@@ -179,7 +179,7 @@ func peso_encima() -> float:
 	return total_buds() + total_rosin()
 
 func cap_mochila() -> float:   # MAESTRO [1]: el protagonista, un 15 % más de carga
-	return D.MOCHILAS[int(S.items.get("bolsa", 0))].g * (1.0 + D.PERSONAJE.carga if es_chico() else 1.0)
+	return D.MOCHILAS[int(S.items.get("bolsa", 0))].g
 
 func libre_mochila() -> float:
 	return maxf(0, cap_mochila() - peso_encima())
@@ -1204,10 +1204,9 @@ func es_chica() -> bool:
 func es_chico() -> bool:   # solo si lo eligió (las partidas de antes no tienen sexo: sin pasiva)
 	return Datos.CAL and S != null and S.get("sexo") == "m"
 
-# MAESTRO [1]: las casillas que ve una patrulla; la protagonista, un 15 % menos
+# las casillas que ve una patrulla (de día o de noche; persiguiéndote, el doble)
 func vista_pat(caza := false) -> int:
-	var v: float = float(D.PAT.vista[0 if caza else (1 if is_night() else 0)]) * (2 if caza else 1)
-	return int(floor(v * (1.0 - D.PERSONAJE.poli))) if es_chica() else int(v)
+	return int(float(D.PAT.vista[0 if caza else (1 if is_night() else 0)]) * (2 if caza else 1))
 
 # MAESTRO [1]: la melena, por código sobre cualquier fotograma del protagonista (andar, acciones, combate): bajo el pelo de
 # cada columna (sus colores, los de ROPA.pelo.src del grupo), MELENA filas más de pelo hasta los hombros; donde hay cara, un
