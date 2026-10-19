@@ -348,10 +348,10 @@ func add_seeds(sid: String, k: int) -> void:
 	discover(sid)
 
 func lot_sid(k: String) -> String:
-	return k.get_slice("~", 0).trim_suffix("*")   # 1.35: «~tipo», las extracciones
+	return k.get_slice("~", 0).trim_suffix("!").trim_suffix("*")   # 1.35: «~tipo», las extracciones; «!», la rara (MAESTRO [5])
 
 func lot_nombre(k: String) -> String:
-	return strain(lot_sid(k)).n + (" ★" if k.contains("*") else "")
+	return strain(lot_sid(k)).n + (" ★" if k.contains("*") else "") + (T(" (rara)") if k.get_slice("~", 0).ends_with("!") else "")
 
 # L: otro sitio (la caja fuerte); cu y dia: el curado y el día de la cosecha (1.29; sin dar dia, hoy; dia null, sin día, como los de antes)
 func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 0) -> void:
@@ -372,6 +372,8 @@ func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 
 			L[k].cu = cu
 		if mc:
 			L[k].mc = mc
+		if k.ends_with("!"):
+			L[k].sh = 1
 	discover(lot_sid(k))
 
 # ---------- el curado (1.29, 09c-sala) ----------
@@ -379,8 +381,20 @@ func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 
 # (1.36), 1/CURADO.dias al día; curado se vende CURADO.precio más caro (calidad) y el THC sube CURADO.thc por lo que se cura (1.36). 1.36: sin curar ya no
 # pierde THC; los extractos se curan en frío en la nevera (S.nevera.rosin, sin tarros) y el manicurado (mc, de 0 a 1) pela los
 # cogollos: MANICURA.precio más caro. Al juntar dos lotes, el THC, lo curado, lo manicurado y el día van por gramos
-func calidad(b: Dictionary) -> float:
-	return 1 + D.CURADO.precio * float(b.get("cu", 0)) + D.MANICURA.precio * float(b.get("mc", 0)) + D.CAMAROTE.extra * float(b.get("af", 0))   # 1.43.6: afinado en el camarote
+func calidad(b: Dictionary, flor := false) -> float:
+	var q: float = 1 + D.CURADO.precio * float(b.get("cu", 0)) + D.MANICURA.precio * float(b.get("mc", 0)) + D.CAMAROTE.extra * float(b.get("af", 0))   # 1.43.6: afinado en el camarote
+	if Datos.CAL and flor:   # MAESTRO [5]: la hierba verde vale poco y en tarros, semana a semana, más; la rara, ×SHINY.x
+		q *= verde(b) * (float(D.SHINY.x) if b.get("sh") else 1.0)
+	return q
+
+# recién cortada, VERDE.min; seca del todo a los VERDE.dias; y lo curado, VERDE.semana más por semana (hasta VERDE.semanas)
+func verde(b: Dictionary) -> float:
+	if b.get("dia") == null:
+		return 1.0
+	var V: Dictionary = D.VERDE
+	var d := maxf(0, S.day - float(b.dia))
+	var f: float = minf(1, float(V.min) + (1 - float(V.min)) * d / float(V.dias))
+	return f * (1 + float(V.semana) * minf(d / 7.0, float(V.semanas)) * float(b.get("cu", 0)))
 
 func cura_de(b: Dictionary) -> Dictionary:
 	var o := {}
@@ -392,6 +406,8 @@ func cura_de(b: Dictionary) -> Dictionary:
 		o.mc = b.mc
 	if b.get("af"):
 		o.af = b.af
+	if b.get("sh"):
+		o.sh = b.sh
 	return o
 
 func junta_lote(t: Dictionary, g: float, thc: float, cu, dia, mc = 0, af = 0) -> void:

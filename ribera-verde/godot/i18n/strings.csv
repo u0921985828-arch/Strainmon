@@ -104,6 +104,7 @@ s57c1547d,Eso no me vale. Vuelve cuando tengas lo que busco.,That's no good. Com
 scc7ce7aa,¿No llevas nada? Vale.,Got nothing on you? Fine.
 sdea0a595,¿Qué le vendes?,What do you sell him?
 sc2bb71b5,"Vale, otro día.","OK, another day."
+sd635aef0,Esa la está vendiendo todo el mundo por aquí. Ya no se paga como antes.,Everyone around here is selling that one. It doesn't fetch what it used to.
 s7fb6bcb8,{g} g de {x} de {nom}. ¿Cuánto le pides?,{g} g of {nom} {x}. How much do you ask?
 sb9c3a961,{g} g de {nom}. ¿Cuánto le pides?,{g} g of {nom}. How much do you ask?
 s7fc6468d,Rebaja · {p} €,Cheap · {p} €
@@ -446,6 +447,7 @@ sa1583d34,Esqueje de {s}{e}.,Cutting of {s}{e}.
 s15ef1669,Nombrar,Name
 sd807d057,Tirar,Throw away
 se547350d,Tiras el esqueje.,You throw the cutting away.
+sef47a8e2,Genes: potencia {a} · producción {b} · floración {c} · resistencia {d} (de 31).,Genes: potency {a} · yield {b} · flowering {c} · resistance {d} (out of 31).
 s2df605cf,Maceta vacía. No tienes semillas: cómpralas en el growshop de Kiko.,Empty pot. You have no seeds: buy some at Kiko's growshop.
 s71e18491,Fenotipo estrella: THC ×{t} y cosecha ×{y}.,Star phenotype: THC ×{t} and yield ×{y}.
 sa42a16a1,Fenotipo flojo: rinde menos que la media.,Weak phenotype: yields less than average.
@@ -585,11 +587,18 @@ s77389fd5,No te cabe todo en la {m}: ,Not everything fits in your {m}:
 s37464a1c,¡Fenotipo estrella! THC ×{t} y cosecha ×{y} sobre la media de la {s}.,Star phenotype! THC ×{t} and yield ×{y} over the {s} average.
 s53663629,"Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta.","It goes into a separate batch (★). If you took cuttings, keep them: they're this same plant."
 s04604778,Fenotipo flojo: THC ×{t} y cosecha ×{y} de la media.,Weak phenotype: THC ×{t} and yield ×{y} of the average.
+s3ac9be60,cogollos morados,purple buds
+sd33e9c01,cogollos albinos,albino buds
+saf51fbb3,cogollos dorados,golden buds
+sa6919769,"¡Una planta rara, de {c}! Va a su lote y se paga {x} veces más.","A rare plant, with {c}! It goes to its own batch and sells for {x} times as much."
+sd4d45dd3,"Sus semillas no salen así: solo sus esquejes son esta misma planta. Si no le sacaste ninguno, se ha perdido.","Its seeds won't come out like this: only its clones are this same plant. If you didn't take any, it's gone."
 sa1905e75,Las plantas de la línea se han polinizado entre ellas: recoges {n} semillas de {s}.,The plants of the line pollinated each other: you collect {n} seeds of {s}.
 s949320f4,Son semillas regulares: algún macho ha polinizado unas flores. Recoges {n} semillas de {s}.,They're regular seeds: some male pollinated a few flowers. You collect {n} seeds of {s}.
 sb62d5589,Son semillas regulares: algún macho ha polinizado unas flores. Recoges {n} semilla de {s}.,They're regular seeds: some male pollinated a few flowers. You collect {n} seed of {s}.
 sd846d9b9,Una flor hermafrodita ha polinizado unas pocas: recoges {n} semillas de {s}.,A hermaphrodite flower pollinated a few: you collect {n} seeds of {s}.
 s0ac446a8,Una flor hermafrodita ha polinizado unas pocas: recoges {n} semilla de {s}.,A hermaphrodite flower pollinated a few: you collect {n} seed of {s}.
+s3ff11748,"Sale verde: recién cortada se paga poco, y no está seca del todo hasta los {d} días.","It's green: freshly cut it sells cheap, and it isn't fully dry until {d} days."
+s57a56002,"Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura y vale más cada semana en el tarro.","With curing jars (Kiko sells them), it cures in the safe and is worth more every week in the jar."
 s893d0923,"Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en {d} días: algo más de THC y se vende más cara. Sin curar no pierde nada.","It comes out uncured. With some curing jars (Kiko sells them), it cures in the safe in {d} days: a bit more THC and it sells for more. Uncured, it loses nothing."
 sdd1e1958,¿Estabilizar {s} (F{g})? Gastas 2 semillas y guardas 1.,Stabilise {s} (F{g})? You use 2 seeds and keep 1.
 sd25d8ecd,Estabilizar,Stabilise
@@ -1449,6 +1458,7 @@ s8cfe2b25,"THC {thc}% · ~{gm} g/m² · {d} días · Resist. {r}%
 {o}"
 sd11be8ca,{g}.ª generación · {o},Gen {g} · {o}
 s6b714594,<small>NUEVA EN LA GENOTECA{cu}</small>,<small>NEW IN THE GENEBANK{cu}</small>
+sd0873cc4, (rara), (rare)
 s91fa5a5c,Curada en la caja fuerte: {l},Cured in the safe: {l}
 s7403d508,Curado en la nevera: {l},Cured in the fridge: {l}
 scfe37c45,Curada en el maletero {dv}: {l},Cured in the boot {dv}: {l}
@@ -5154,6 +5164,9 @@ sa67b65a5,Riega 3 plantas,Water 3 plants
 sfb6078c5,Planta una semilla o un esqueje,Plant a seed or a clone
 s24af77c8,Cosecha una planta,Harvest a plant
 sd8262e80,Vende por 100 €,Sell for 100 €
+s9379d320,Potencia,Potency
+s68797708,Producción,Yield
+s79125788,Resistencia,Resistance
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.

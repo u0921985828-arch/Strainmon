@@ -248,6 +248,13 @@ static func u8(x: float) -> int:
 	return int(f)
 
 # hashStr de 00-nucleo.js: FNV-1a de 32 bits
+# el color de los cogollos de una planta: el de su variedad o, si es rara (MAESTRO [5], f.sh), el suyo
+static func color_cog(S: Dictionary, p: Dictionary) -> String:
+	var f = p.get("f")
+	if CAL and f is Dictionary and f.get("sh"):
+		return String(carga().SHINY.c[f.sh])
+	return String(strain(S, p.sid).c)
+
 static func hash_str(s: String) -> int:
 	var h := 2166136261
 	for i in s.length():

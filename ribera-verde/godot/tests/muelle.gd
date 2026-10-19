@@ -201,7 +201,7 @@ func _corre() -> void:
 	var en: Dictionary = S.mar.env[0] if S.mar.env.size() else {}
 	chk(int(en.get("g", 0)) == cap and absf(S.buds[sid].g - (g0 - cap)) < .01, "se lleva %s del lote (%s)" % [J._kg(cap), en.get("g")])
 	chk(int(en.get("d", 0)) == S.day + int(B0.dias), "llega a los %d días" % B0.dias)
-	var esp: int = Datos.jsround(J.precio_mayor(24) * J.calidad(S.buds[sid]) * 1.5 * cap)
+	var esp: int = Datos.jsround(J.precio_mayor(24) * J.calidad(S.buds[sid], true) * 1.5 * cap)
 	chk(absi(int(en.get("e", 0)) - esp) <= 1, "lo que pagan: %s (%d)" % [en.get("e"), esp])
 	QUIERO = []
 	LOG.clear()
@@ -237,7 +237,7 @@ func _corre() -> void:
 	var c0: int = int(S.franco.caja)
 	S.franco.r = S.day + 30
 	chk(corre(func(): J.franco_dia()) and absf(J.stock_franco() - (2000 - int(D.FRANCO.dia[0]))) < .01 and int(S.franco.caja) > c0, "reparte %s al día: caja %s" % [J._kg(int(D.FRANCO.dia[0])), S.franco.caja])
-	var esp2: int = Datos.jsround(J.precio_mayor(24) * J.calidad(S.buds[sid]) * float(D.FRANCO.px) * int(D.FRANCO.dia[0]) * (1 - float(D.FRANCO.com)))
+	var esp2: int = Datos.jsround(J.precio_mayor(24) * J.calidad(S.buds[sid], true) * float(D.FRANCO.px) * int(D.FRANCO.dia[0]) * (1 - float(D.FRANCO.com)))
 	chk(absi(int(S.franco.caja) - esp2) <= 2, "lo que deja: %s (%d)" % [S.franco.caja, esp2])
 	m0 = S.money
 	var cj: int = int(S.franco.caja)
@@ -266,7 +266,7 @@ func _corre() -> void:
 	chk(corre(func(): await J.mar_noray(int(B0.nor))) and S.mar.env.size() == 1 and S.mar.env[0].ped and S.mar.ped == null, "el pedido, cumplido: %s" % [S.mar.env])
 	if S.mar.env.size():
 		var e2: Dictionary = S.mar.env[0]
-		var esp3: int = Datos.jsround(J.precio_mayor(24) * J.calidad(S.buds[sid]) * 1.5 * 500 * float(R.ped.bonus))
+		var esp3: int = Datos.jsround(J.precio_mayor(24) * J.calidad(S.buds[sid], true) * 1.5 * 500 * float(R.ped.bonus))
 		chk(absi(int(e2.e) - esp3) <= 1, "con la prima: %s (%d)" % [e2.e, esp3])
 		e2.mal = true
 		var h0: int = int(S.heat)

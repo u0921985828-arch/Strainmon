@@ -776,7 +776,7 @@ func almacen_club() -> void:
 				L[k].thc = (float(L[k].thc) * float(L[k].g) + float(b.thc) * g) / (float(L[k].g) + g)
 				L[k].g = float(L[k].g) + g
 			else:
-				L[k] = {"g": g, "thc": float(b.thc), "q": calidad(b)}
+				L[k] = {"g": g, "thc": float(b.thc), "q": calidad(b, not x)}
 			usa_lote(lt, g)
 			sfx("sel")
 			toast(T("Al almacén: {g}", {"g": g_txt(g)}), 1200)
@@ -939,7 +939,7 @@ func dispensario_aso() -> void:
 	var x := es_extr(l)
 	var k: String = l[0]
 	var b: Dictionary = l[1]
-	var pg := Datos.jsround((precio_extr(k, b.thc, "club") if x else precio_club(b.thc)) * calidad(b) * float(O.f) * 100) / 100.0
+	var pg := Datos.jsround((precio_extr(k, b.thc, "club") if x else precio_club(b.thc)) * calidad(b, not x) * float(O.f) * 100) / 100.0
 	var ops := []
 	for g in (VX.club_g if x else O.g):
 		if g <= floor(b.g):

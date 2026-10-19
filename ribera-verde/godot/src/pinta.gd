@@ -866,10 +866,11 @@ func _plantas_mesa(gr, i: int, fm: int):
 	if rk == null or s == null:
 		return f
 	var hj := Datos.hoja_planta(S_, p)
-	var m := {rk.rampa[0]: Datos.shade(s.c, 50), rk.rampa[1]: s.c, rk.rampa[2]: Datos.shade(s.c, -60)}
+	var sc := Datos.color_cog(S_, p)
+	var m := {rk.rampa[0]: Datos.shade(sc, 50), rk.rampa[1]: sc, rk.rampa[2]: Datos.shade(sc, -60)}
 	m.merge(Datos.vc_tonos(hj), true)
 	var o: Dictionary = f.duplicate()
-	o.c = Atlas.con_rampa(f.c, m, "g|" + s.c + "|" + hj)
+	o.c = Atlas.con_rampa(f.c, m, "g|" + sc + "|" + hj)
 	return o
 
 func _arte_edificios(m: Dictionary) -> void:
@@ -1862,7 +1863,7 @@ func _planta_b(q: Dictionary, al: float, clip: Rect2i) -> void:
 	var s = Datos.strain(S, p.sid)
 	var dead: bool = true if p.get("dead") else false
 	var st := 9 if dead else Cultivo.plant_stage(p)
-	var pc := Procedural.planta34(Datos.porte_planta(S, p), st, not dead and p.water <= 0, s.c if s else "#9bd35a", q.cw, q.ch)
+	var pc := Procedural.planta34(Datos.porte_planta(S, p), st, not dead and p.water <= 0, Datos.color_cog(S, p) if s else "#9bd35a", q.cw, q.ch)
 	var yb: int = q.y - mp.hb + 1
 	var a := 1 if not dead and p.water > 0 and st >= 2 else 0
 	var x: int = q.x - 24

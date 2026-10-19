@@ -717,7 +717,7 @@ func cargar_envio(B: Dictionary) -> void:
 			var l: Array = lots[i]
 			var g = await cuanto(T("¿Cuánto de {n}?", {"n": lot_nombre(l[0])}), mini(int(floor(l[1].g)), cap - tot), [250, 500, 1000, 2000, 5000, 10000, 20000], func(v): return _kg(int(v)))
 			if g > 0:
-				carga.append([l[0], int(g), float(l[1].thc), calidad(l[1])])
+				carga.append([l[0], int(g), float(l[1].thc), calidad(l[1], true)])
 				tot += int(g)
 			if tot >= cap:
 				await say(K("La bodega va llena."))
@@ -911,7 +911,7 @@ func franco_dia() -> void:
 		var g: int = mini(int(floor(b.g)), cap - v)
 		if g < 1:
 			continue
-		var e := Datos.jsround(precio_mayor(b.thc) * calidad(b) * float(FR.px) * g * (1 - float(FR.com)))
+		var e := Datos.jsround(precio_mayor(b.thc) * calidad(b, true) * float(FR.px) * g * (1 - float(FR.com)))
 		F.caja = int(F.caja) + e
 		S.sales += e
 		b.g -= g
@@ -1046,7 +1046,7 @@ func talk_kaia(N: String) -> void:
 	var x := es_extr(l)
 	var k: String = l[0]
 	var b: Dictionary = l[1]
-	var pg := Datos.jsround((precio_extr(k, b.thc, "club") if x else precio_club(b.thc)) * calidad(b) * float(K.f) * 100) / 100.0
+	var pg := Datos.jsround((precio_extr(k, b.thc, "club") if x else precio_club(b.thc)) * calidad(b, not x) * float(K.f) * 100) / 100.0
 	var ops := []
 	for g in (VX.club_g if x else K.g):
 		if g <= floor(b.g):
@@ -1101,7 +1101,7 @@ func vender_legal(N: String) -> void:
 	var g = await cuanto(T("¿Cuánto de {n}?", {"n": lot_nombre(l[0])}), mini(int(floor(l[1].g)), resto), [100, 250, 500, 1000, 2000, 5000], func(v): return _kg(int(v)))
 	if g <= 0:
 		return
-	var e := Datos.jsround(precio_mayor(float(l[1].thc)) * calidad(l[1]) * float(LG.f) * int(g))
+	var e := Datos.jsround(precio_mayor(float(l[1].thc)) * calidad(l[1], true) * float(LG.f) * int(g))
 	use_buds(l[0], int(g))
 	M_.lgg = int(M_.lgg) + int(g)
 	abono_banco(e, T("Venta · {n}", {"n": LG.n}))

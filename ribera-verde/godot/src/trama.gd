@@ -387,7 +387,7 @@ func talk_inaki():
 		return
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
-	var amt := Datos.jsround(precio_calle(b.thc) * calidad(b) * 1.2 * 10)
+	var amt := Datos.jsround(precio_calle(b.thc) * calidad(b, true) * 1.2 * 10)
 	if await ask(T("Te doy {e} € por 10 g de {s}. ¿Hecho?", {"e": amt, "s": lot_nombre(sid)}),[K("Hecho"), K("No")], N) != 0:
 		return
 	use_buds(sid, 10)
@@ -436,7 +436,7 @@ func venta_mayor(N: String) -> void:
 	var x := es_extr(l)
 	var k: String = l[0]
 	var b: Dictionary = l[1]
-	var pg := Datos.jsround((precio_extr(k, b.thc, "mayor") if x else precio_mayor(b.thc)) * calidad(b) * (1.05 if rel("inaki") >= D.REL.amigo else 1.0) * 100) / 100.0   # 1.15: con confianza, un 5 % más
+	var pg := Datos.jsround((precio_extr(k, b.thc, "mayor") if x else precio_mayor(b.thc)) * calidad(b, not x) * (1.05 if rel("inaki") >= D.REL.amigo else 1.0) * 100) / 100.0   # 1.15: con confianza, un 5 % más
 	var ops := []
 	if x:   # 1.43.7: la carga, en gramos de flor (1 g de extracción ↔ 1 / ROSIN.rend)
 		ops = ops_extr(b, resto * D.ROSIN.rend, VX.g)
@@ -568,7 +568,7 @@ func talk_nerea():
 	var x := es_extr(l)
 	var k: String = l[0]
 	var b: Dictionary = l[1]
-	var pg := Datos.jsround((precio_extr(k, b.thc, "mayor") if x else precio_mayor(b.thc)) * calidad(b) * L.f * 100) / 100.0
+	var pg := Datos.jsround((precio_extr(k, b.thc, "mayor") if x else precio_mayor(b.thc)) * calidad(b, not x) * L.f * 100) / 100.0
 	var ops := []
 	if x:
 		ops = ops_extr(b, resto * D.ROSIN.rend, VX.g)

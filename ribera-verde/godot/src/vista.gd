@@ -286,7 +286,7 @@ static func orden(g_: Dictionary) -> Array:
 	return o
 
 static func clave_planta(S_: Dictionary, p: Dictionary, v: Dictionary) -> String:
-	var k := "pl|%s|%d|%s|%s|%s" % [v.p.n, v.hp, Datos.strain(S_, p.sid).c, Datos.hoja_planta(S_, p), p.water <= 0]
+	var k := "pl|%s|%d|%s|%s|%s" % [v.p.n, v.hp, Datos.color_cog(S_, p), Datos.hoja_planta(S_, p), p.water <= 0]
 	var n := nivel_dano(p)
 	return k + ("|d%d|%d" % [n, semilla(p)] if n else "")
 
@@ -303,9 +303,9 @@ static func semilla(p: Dictionary) -> int:
 
 # la planta tal como se pinta: el fotograma de su alto (sin las filas de más), con los colores de su variedad y seca sin agua
 static func img_planta(S_: Dictionary, p: Dictionary, v: Dictionary) -> Image:
-	var s = Datos.strain(S_, p.sid)
+	var sc := Datos.color_cog(S_, p)
 	var c0 := Arte.aplasta(Arte.altura(v.p.n, v.hp)[1], v.hp)
-	var mapa := {Arte.rampa[0]: Datos.shade(s.c, 50), Arte.rampa[1]: s.c, Arte.rampa[2]: Datos.shade(s.c, -60)}
+	var mapa := {Arte.rampa[0]: Datos.shade(sc, 50), Arte.rampa[1]: sc, Arte.rampa[2]: Datos.shade(sc, -60)}
 	mapa.merge(Datos.vc_tonos(Datos.hoja_planta(S_, p)), true)
 	var im := Arte.recolor(c0, mapa)
 	var n := nivel_dano(p)

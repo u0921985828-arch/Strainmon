@@ -120,6 +120,8 @@ func new_day() -> void:
 			S.orden = S.day
 			queue("orden", aviso_orden)
 	S.heat = max(0, S.heat - baja_calor())
+	if Datos.CAL:
+		sat_dia()
 	var luz := factura_luz()
 	var olor := olor_dia()
 	var av := []
@@ -269,6 +271,10 @@ func esqueje_accion(e: Dictionary, l: Array) -> void:
 		sfx("sel")
 		await say(K("Tiras el esqueje."))
 
+# MAESTRO [5]: los 4 valores de la línea, de 1 a 31
+func genes_txt(iv: Array) -> String:
+	return T("Genes: potencia {a} · producción {b} · floración {c} · resistencia {d} (de 31).", {"a": int(iv[0]), "b": int(iv[1]), "c": int(iv[2]), "d": int(iv[3])})
+
 # ---------- plantar y cuidar ----------
 func _own() -> Array:
 	var o := []
@@ -290,7 +296,7 @@ func plantar(i: int) -> void:
 	var items := []
 	for o in own:
 		var s = strain(o[0])
-		items.append({"label": s.n, "right": "×" + n(o[1]), "sw": s.c, "ic": ic_cog(o[0]), "desc": strain_line(o[0])})
+		items.append({"label": s.n, "right": "×" + n(o[1]), "sw": s.c, "ic": ic_cog(o[0]), "desc": strain_line(o[0]) + (("\n" + genes_txt(Cultivo.iv_linea(S, o[0]))) if Datos.CAL and S.items.get("analizador") else "")})
 	for eb in esq:
 		var e: Dictionary = eb[0]
 		var s = strain(e.sid)
@@ -718,9 +724,14 @@ func harvest(i: int) -> void:
 	var fem: bool = sc.fem
 	var nn: int = sc.n
 	var lk: String = p.sid + "*" if cl == "estrella" else p.sid
+	var sh = fe.get("sh") if Datos.CAL else null   # MAESTRO [5]: la rara, a su lote (×SHINY.x); sus semillas no la llevan
+	if sh:
+		lk += "!"
 	add_buds(lk, g, thc)
 	if nn:
 		add_seeds(p.sid, nn)
+		if Datos.CAL and fe.get("iv"):
+			Cultivo.hereda_iv(S, p.sid, fe.iv)
 	var sobra := mini(g, int(floor(peso_encima() - cap_mochila())))   # lo que no cabe encima, a la caja fuerte (1.36; antes, al arcón)
 	var a_caja := mini(sobra, int(floor(D.CAJA[int(S.caja.nivel)].g - caja_g()))) if sobra >= 1 and S.get("caja") else 0
 	if a_caja >= 1:
@@ -744,6 +755,11 @@ func harvest(i: int) -> void:
 		await say(K("Va a un lote aparte (★). Si le sacaste esquejes, guárdalos: son esta misma planta."))
 	elif cl == "floja":
 		await say(T("Fenotipo flojo: THC ×{t} y cosecha ×{y} de la media.", {"t": Datos.coma(fe.t), "y": Datos.coma(fe.y)}))
+	if sh:
+		sfx("enc")
+		var ct := K("cogollos morados") if sh == "morada" else (K("cogollos albinos") if sh == "albina" else K("cogollos dorados"))
+		await say(T("¡Una planta rara, de {c}! Va a su lote y se paga {x} veces más.", {"c": ct, "x": int(D.SHINY.x)}))
+		await say(K("Sus semillas no salen así: solo sus esquejes son esta misma planta. Si no le sacaste ninguno, se ha perdido."))
 	if nn:
 		var hs := {"n": nn, "s": s.n}
 		if cria:
@@ -754,7 +770,11 @@ func harvest(i: int) -> void:
 			await say(T("Una flor hermafrodita ha polinizado unas pocas: recoges {n} semillas de {s}.", hs) if nn > 1 else T("Una flor hermafrodita ha polinizado unas pocas: recoges {n} semilla de {s}.", hs))
 	if not S.items.get("tarros") and not S.flags.get("curado"):   # 1.29, una vez
 		S.flags.curado = S.day
-		await say(T("Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en {d} días: algo más de THC y se vende más cara. Sin curar no pierde nada.", {"d": int(D.CURADO.dias)}))   # 1.36: ya no pierde THC; curando, sube
+		if Datos.CAL:   # MAESTRO [5]: la hierba verde
+			await say(T("Sale verde: recién cortada se paga poco, y no está seca del todo hasta los {d} días.", {"d": int(D.VERDE.dias)}))
+			await say(K("Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura y vale más cada semana en el tarro."))
+		else:
+			await say(T("Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en {d} días: algo más de THC y se vende más cara. Sin curar no pierde nada.", {"d": int(D.CURADO.dias)}))   # 1.36: ya no pierde THC; curando, sube
 	S.flags.harvest1 = true
 	await check_story()
 
@@ -1556,6 +1576,8 @@ func lab_action():
 		if not S.seeds[k]:
 			S.seeds.erase(k)
 	var r := Datos.cross_result(S, A, Bk)
+	if Datos.CAL:   # MAESTRO [5]: la línea nueva, con lo mejor de las dos
+		Cultivo.cruza_iv(S, A, Bk, r)
 	var is_new: bool = not S.disc.get(r)
 	var s = strain(r)
 	if is_new and not D.SHOP.any(func(it): return it.get("sid") == r):   # la de tienda sigue estable

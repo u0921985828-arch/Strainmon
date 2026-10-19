@@ -871,7 +871,12 @@ func talk_client(c: Dictionary) -> void:
 	var sid: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
 	var xn: String = (D.EXTR[tipo_extr(sid)].n.to_lower() + " ") if ext else ""
-	var base: float = (precio_rosin(b.thc) * D.EXTR[tipo_extr(sid)].px if ext else precio_calle(b.thc)) * calidad(b) * ct.mult * D.ZONAS[c.get("map", "town")].precio * rival_f(c.get("map", "town")) * c.want
+	var base: float = (precio_rosin(b.thc) * D.EXTR[tipo_extr(sid)].px if ext else precio_calle(b.thc)) * calidad(b, not ext) * ct.mult * D.ZONAS[c.get("map", "town")].precio * rival_f(c.get("map", "town")) * c.want
+	if Datos.CAL and not ext:   # MAESTRO [5]: la misma cepa, mucho en el mismo pueblo, hasta la mitad
+		var sat := saturado(lot_sid(sid), c.get("map", "town"))
+		base *= sat
+		if sat < .8:
+			await say(K("Esa la está vendiendo todo el mundo por aquí. Ya no se paga como antes."), N)
 	var pr := [Datos.jsround(base * .85), Datos.jsround(base), Datos.jsround(base * 1.3)]
 	var j: int = await ask(T("{g} g de {x} de {nom}. ¿Cuánto le pides?", {"g": n(c.want), "x": xn.substr(0, xn.length() - 1), "nom": lot_nombre(sid)}) if ext else T("{g} g de {nom}. ¿Cuánto le pides?", {"g": n(c.want), "nom": lot_nombre(sid)}), [T("Rebaja · {p} €", {"p": int(pr[0])}), T("Justo · {p} €", {"p": int(pr[1])}), T("Caro · {p} €", {"p": int(pr[2])}), K("Cancelar")])
 	if j == 3:
@@ -890,6 +895,8 @@ func talk_client(c: Dictionary) -> void:
 			use_buds(sid, c.want)
 		S.money += pr[j]
 		S.sales += pr[j]
+		if Datos.CAL and not ext:
+			satura(lot_sid(sid), c.get("map", "town"), c.want)
 		var fc := calle_tiempo()
 		S.heat = minf(100, Datos.jsround((S.heat + (D.CALOR_CALLE.base + c.want * (D.CALOR_CALLE.rosin if ext else D.CALOR_CALLE.g)) * fc) * 10) / 10.0)
 		S.rep += [3, 2, 1][j]
@@ -915,6 +922,29 @@ func talk_client(c: Dictionary) -> void:
 		sfx("bad")
 		remove_client(c.id)
 		await say(pick([K("¿Tanto? No."), K("A ese precio, paso."), K("Eso es demasiado. Adiós.")]), N)
+
+# MAESTRO [5]: la saturación del mercado. S.sat[pueblo][cepa] = gramos vendidos en la calle de ese pueblo; con SATURA.g, el precio
+# baja SATURA.baja (la mitad), y cada día se olvida SATURA.dia de lo vendido (sat_dia, desde new_day)
+func saturado(sid: String, mapa: String) -> float:
+	var g := float(S.get("sat", {}).get(preload("res://src/croquis.gd").pueblo_de(mapa), {}).get(sid, 0))
+	return 1 - float(D.SATURA.baja) * minf(1, g / float(D.SATURA.g))
+
+func satura(sid: String, mapa: String, g: float) -> void:
+	if not S.has("sat"):
+		S.sat = {}
+	var pu := preload("res://src/croquis.gd").pueblo_de(mapa)
+	if not S.sat.has(pu):
+		S.sat[pu] = {}
+	S.sat[pu][sid] = float(S.sat[pu].get(sid, 0)) + g
+
+func sat_dia() -> void:
+	for pu in S.get("sat", {}).keys():
+		for k in S.sat[pu].keys():
+			S.sat[pu][k] = float(S.sat[pu][k]) * (1 - float(D.SATURA.dia))
+			if S.sat[pu][k] < 1:
+				S.sat[pu].erase(k)
+		if S.sat[pu].is_empty():
+			S.sat.erase(pu)
 
 # policía por niveles (1.11, 11-historia): el nivel por el calor (con la orden, 3), lo que baja cada día y la multa de la redada
 func nivel_poli() -> int:

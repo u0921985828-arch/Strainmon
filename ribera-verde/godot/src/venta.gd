@@ -330,7 +330,7 @@ func plantilla_dia() -> void:
 			if r < pt:
 				m = T("Me han pagado {g} g con billetes falsos. No me he dado cuenta hasta el banco.", {"g": q})
 			else:
-				var e := Datos.jsround(precio_calle(w.thc) * calidad(w) * D.ZONAS.town.precio * q * (1 - P.com))
+				var e := Datos.jsround(precio_calle(w.thc) * calidad(w, true) * D.ZONAS.town.precio * q * (1 - P.com))
 				S.money += e
 				S.sales += e
 				S.heat = min(100, S.heat + P.calor)

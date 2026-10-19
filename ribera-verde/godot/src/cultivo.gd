@@ -254,6 +254,8 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 	var auto: bool = Datos.CAL and s.get("auto")
 	if auto and f.get("ciclo") == "flor":   # 1.52: la auto florece por la edad; a 12/12 tiene menos luz y crece menos
 		g *= float(Datos.carga().AUTO.rinde_1212)
+	if p.prog >= .65:   # MAESTRO [5]: el IV de floración
+		g *= 1 + float(Datos.carga().IVS.flor) * iv_f(p.get("f"), 2)
 	if p.prog < 1:
 		if auto:
 			p.prog = minf(1, p.prog + g)
@@ -272,7 +274,7 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 		p.health += h
 	var D := Datos.carga()
 	if f.get("hr", 0) > D.HR_OK[1] and p.prog >= .65 and p.prog < 1:   # moho: humedad alta en floración (1.10)
-		p.health -= h * (f.hr - D.HR_OK[1]) * D.MOHO * float(f.get("moho", 1.0))
+		p.health -= h * (f.hr - D.HR_OK[1]) * D.MOHO * float(f.get("moho", 1.0)) * (1 - float(D.IVS.res) * iv_f(p.get("f"), 3))   # MAESTRO [5]: resistencia a hongos
 	p.health = clampf(p.health, 0, 100)
 	if p.health <= 0:
 		p.dead = true
@@ -311,7 +313,59 @@ static func roll_feno(S: Dictionary, sid: String) -> Dictionary:
 	var m := func() -> float: return Datos.jsround(clampf(1 + G.sigma * gauss(), .6, 1.5) * 100) / 100.0
 	var t: float = m.call()
 	var y: float = m.call()
-	return {"id": S.fenoN, "t": t, "y": y, "i": Datos.jsround(clampf(Datos.ind_de(S, sid) + G.si * gauss(), 0, 100))}
+	var o := {"id": S.fenoN, "t": t, "y": y, "i": Datos.jsround(clampf(Datos.ind_de(S, sid) + G.si * gauss(), 0, 100))}
+	if Datos.CAL:
+		genes(S, sid, o)
+	return o
+
+# MAESTRO [5]: los 4 valores ocultos (IVS.n, de 1 a 31) de cada línea (S.iv[sid]) y de cada planta (f.iv, los de su línea ± IVS.var),
+# y la rara (SHINY: 1 de cada 1/SHINY.p, f.sh = su color). Sin tirar del azar (hash del fenotipo): no cambia lo demás
+static func iv_linea(S: Dictionary, sid: String) -> Array:
+	if not S.has("iv"):
+		S.iv = {}
+	if not S.iv.has(sid):
+		var B: Array = Datos.carga().IVS.base
+		var l := []
+		for i in 4:
+			l.append(int(B[0]) + Datos.hash_str("iv%d|%s" % [i, sid]) % (int(B[1]) - int(B[0]) + 1))
+		S.iv[sid] = l
+	return S.iv[sid]
+
+static func genes(S: Dictionary, sid: String, f: Dictionary) -> void:
+	var D := Datos.carga()
+	var L := iv_linea(S, sid)
+	var v := int(D.IVS.var)
+	var iv := []
+	for i in 4:
+		iv.append(clampi(int(L[i]) + Datos.hash_str("ivp%d|%d|%s|%d" % [i, int(f.id), sid, int(S.day)]) % (2 * v + 1) - v, 1, 31))
+	f.iv = iv
+	if Datos.hash_str("sh|%d|%s|%d|%d" % [int(f.id), sid, int(S.day), int(S.get("min", 0))]) % 100000 < float(D.SHINY.p) * 100000:
+		var cs: Array = D.SHINY.c.keys()
+		f.sh = cs[Datos.hash_str("shc|%d" % int(f.id)) % cs.size()]
+
+# de -1 (IV 1) a 1 (IV 31); 0 sin IVs
+static func iv_f(fe, i: int) -> float:
+	if fe is Dictionary and fe.get("iv") is Array:
+		return (float(fe.iv[i]) - 16.0) / 15.0
+	return 0.0
+
+# las semillas de una planta llevan lo mejor de ella a su línea; las de un cruce, lo mejor de las dos y un poco más (IVS.mejora)
+static func hereda_iv(S: Dictionary, sid: String, iv: Array) -> void:
+	var L := iv_linea(S, sid)
+	for i in 4:
+		L[i] = maxi(int(L[i]), int(iv[i]))
+
+static func cruza_iv(S: Dictionary, a: String, b: String, r: String) -> void:
+	var A := iv_linea(S, a)
+	var B := iv_linea(S, b)
+	var m := int(Datos.carga().IVS.mejora)
+	var o := []
+	for i in 4:
+		o.append(mini(31, maxi(int(A[i]), int(B[i])) + Datos.hash_str("ivx%d|%s|%s" % [i, a, b]) % (m + 1)))
+	if S.iv.has(r):
+		for i in 4:
+			o[i] = maxi(o[i], int(S.iv[r][i]))
+	S.iv[r] = o
 
 static func nueva_planta(S: Dictionary, sid: String) -> Dictionary:
 	return {"sid": sid, "prog": 0.0, "water": 70.0, "health": 100.0, "fert": false, "pest": false, "f": roll_feno(S, sid)}
@@ -344,7 +398,7 @@ static func cosecha(S: Dictionary, i: int) -> Dictionary:
 		n = ri(2, 5)
 	elif not fem or azar() < D.SEMILLA_HERMA:
 		n = ri(1, 3)
-	var k: String = p.sid + ("*" if cl == "estrella" else "")
+	var k: String = p.sid + ("*" if cl == "estrella" else "") + ("!" if Datos.CAL and p.get("f") is Dictionary and p.f.get("sh") else "")
 	if S.buds.has(k):   # como juntaLote (1.29): THC, curado y día por gramos
 		var b: Dictionary = S.buds[k]
 		var nn: float = b.g + g
@@ -360,8 +414,12 @@ static func cosecha(S: Dictionary, i: int) -> Dictionary:
 		b.erase("ana")
 	else:
 		S.buds[k] = {"g": g, "thc": thc, "dia": S.day}
+		if k.ends_with("!"):
+			S.buds[k].sh = 1
 	if n:
 		S.seeds[p.sid] = int(S.seeds.get(p.sid, 0)) + n
+		if Datos.CAL and p.get("f") is Dictionary and p.f.get("iv"):
+			hereda_iv(S, p.sid, p.f.iv)
 	if p.get("f") is Dictionary and p.f.get("id"):
 		S.fenos[str(int(p.f.id))] = cl
 	S.pots[i] = null
@@ -369,12 +427,12 @@ static func cosecha(S: Dictionary, i: int) -> Dictionary:
 static func gramos_planta(S: Dictionary, p: Dictionary, f: Dictionary) -> int:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"y": 1}
-	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + abo_de(p.get("fo")).rend * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0)))))
+	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + abo_de(p.get("fo")).rend * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0))) * (1 + float(Datos.carga().IVS.prod) * iv_f(fe, 1))))
 
 static func thc_cosecha(S: Dictionary, p: Dictionary, f: Dictionary) -> float:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"t": 1}
-	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) + f.thc + abo_de(p.get("fo")).thc * fq(p)) * 10) / 10.0)
+	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) * (1 + float(Datos.carga().IVS.pot) * iv_f(fe, 0)) + f.thc + abo_de(p.get("fo")).thc * fq(p)) * 10) / 10.0)
 
 static func plantas_vivas(S: Dictionary, ci: int) -> bool:
 	var H := huecos(S)

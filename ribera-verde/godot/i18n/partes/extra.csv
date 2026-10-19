@@ -88,3 +88,17 @@ Cargar el abono {dv},Load the fertiliser into {dv}
 Rellenar los tanques de la nave,Refill the warehouse tanks
 "Descargas el abono en la nave: MEATZA ×{m} y ORTUA BIO ×{o}. Los tanques, llenos: MEATZA ×{tm} · ORTUA BIO ×{to}.",You unload the fertiliser at the warehouse: MEATZA ×{m} and ORTUA BIO ×{o}. The tanks now hold MEATZA ×{tm} · ORTUA BIO ×{to}.
 Cargas el abono en el maletero: MEATZA ×{m} y ORTUA BIO ×{o} dosis.,You load the fertiliser into the boot: MEATZA ×{m} and ORTUA BIO ×{o} doses.
+Esa la está vendiendo todo el mundo por aquí. Ya no se paga como antes.,Everyone around here is selling that one. It doesn't fetch what it used to.
+Genes: potencia {a} · producción {b} · floración {c} · resistencia {d} (de 31).,Genes: potency {a} · yield {b} · flowering {c} · resistance {d} (out of 31).
+cogollos morados,purple buds
+cogollos albinos,albino buds
+cogollos dorados,golden buds
+"¡Una planta rara, de {c}! Va a su lote y se paga {x} veces más.","A rare plant, with {c}! It goes to its own batch and sells for {x} times as much."
+"Sus semillas no salen así: solo sus esquejes son esta misma planta. Si no le sacaste ninguno, se ha perdido.","Its seeds won't come out like this: only its clones are this same plant. If you didn't take any, it's gone."
+"Sale verde: recién cortada se paga poco, y no está seca del todo hasta los {d} días.","It's green: freshly cut it sells cheap, and it isn't fully dry until {d} days."
+"Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura y vale más cada semana en el tarro.","With curing jars (Kiko sells them), it cures in the safe and is worth more every week in the jar."
+ (rara), (rare)
+Potencia,Potency
+Producción,Yield
+Floración,Flowering
+Resistencia,Resistance

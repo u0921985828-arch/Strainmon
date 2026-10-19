@@ -83,6 +83,18 @@
 - En inglés tampoco sale un nombre real: las filas de PLAY sin inglés caían en la del nombre real (Northern Lights × Haze, Durban Poison); ahora Norzen Lights × Haize, Durvan Poizon y la marca Ice-o-lator como Ais-o-lator (`play.gd` recorre `strings.csv` en inglés: 12 → 0).
 - Menús a toda pantalla sin aire (lo vio el usuario en la tienda): las 5 filas eran las de la pantalla de 160 px; ahora todas las que caben, y si caben todas, la caja a su alto (`capturas_ui`: 6 huecos → 0).
 
+### Documento maestro (`docs/MAESTRO.md`), por tandas, con `Datos.CAL`
+- **[10] La letra:** reserva propia para flechas, ▲▼◀▶, ★, ≈ y −.
+- **[1] El personaje:** chico o chica y el cumpleaños al empezar (`S.sexo`, `S.cumple`), sin ventajas por sexo (solo cambia el aspecto); el regalo del cumpleaños una vez al año (el 29 de febrero, también); la protagonista con su sprite de PixelLab en el mapa y en el combate (`player-f`, `player-f-combate`), con boca, y la ropa cambia las mismas piezas. Prueba `tests/personaje.gd`.
+- **[3] Los vehículos:** el garaje dibujado junto al piso; se viaja desde el garaje y el coche se queda en el aparcamiento dibujado junto a la parada de cada pueblo (plaza de 2 × 1), no se conduce por el mapa; el maletero por kg (con la envasadora al vacío), cura en botes con los tarros y lleva el abono a los tanques de la nave; la grúa al depósito. Pruebas `tests/vehiculos.gd` y `tests/concesionario.gd`.
+- **[5] La genética:**
+  - **Los valores ocultos:** cada línea lleva 4 (`IVS`: potencia, producción, floración y resistencia, de 1 a 31; `S.iv[sid]`) y cada planta, los suyos (`f.iv`, los de su línea ± 3). Salen por hash, sin tirar del azar. Cambian el THC y los gramos (±15 %), la floración (±15 %) y el moho (±50 %).
+  - **Herencia y lectura:** las semillas suben la línea a lo mejor de la planta; el cruce, a lo mejor de los dos padres y hasta 2 más (tope 31). Solo se ven con el analizador, en la ficha de la semilla.
+  - **La planta rara** (`SHINY`, 1 de cada 500): cogollos morados, albinos o dorados, a su lote `sid!` (`b.sh`), que se paga ×5. Sus semillas no salen así; sus esquejes sí.
+  - **La saturación** (`SATURA`): lo vendido en la calle de cada pueblo (`S.sat`) baja el precio de esa variedad hasta la mitad con 100 g; cada día se olvida un 15 %.
+  - **La hierba verde** (`VERDE`, `verde`): recién cortada vale un 35 % y está seca del todo a los 4 días; curada en tarros, un 8 % más por semana, hasta 8 semanas. `calidad(b, flor)`: lo verde y la rara, solo en los cogollos.
+  - Prueba `tests/genetica.gd`.
+
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
 Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.

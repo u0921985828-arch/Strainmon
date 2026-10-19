@@ -335,7 +335,7 @@ func curro_dia() -> void:
 			queue("vend" + v.id, func(): await say(L[0]), [["", L]])
 			continue
 		var g: int = mini(int(floor(v.g)), ri(int(V.g[0]), int(V.g[1])))
-		var e := Datos.jsround(precio_calle(v.thc) * calidad(v) * D.ZONAS.town.precio * g * (1 - V.com))
+		var e := Datos.jsround(precio_calle(v.thc) * calidad(v, true) * D.ZONAS.town.precio * g * (1 - V.com))
 		v.g -= g
 		S.money += e
 		S.sales += e
@@ -654,7 +654,7 @@ func vender_club(k: String) -> void:
 	var x := es_extr(l)
 	var kk: String = l[0]
 	var b: Dictionary = l[1]
-	var pg := Datos.jsround((precio_extr(kk, b.thc, "club") if x else precio_club(b.thc)) * calidad(b) * (1.05 if b.get("ana") else 1.0) * 100) / 100.0
+	var pg := Datos.jsround((precio_extr(kk, b.thc, "club") if x else precio_club(b.thc)) * calidad(b, not x) * (1.05 if b.get("ana") else 1.0) * 100) / 100.0
 	var ops := []
 	for g in (VX.club_g if x else D.CLUB.g):
 		if g <= floor(b.g) and (g / D.ROSIN.rend if x else float(g)) <= resto:
