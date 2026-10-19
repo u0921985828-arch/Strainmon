@@ -83,6 +83,7 @@ func advance_time(mn: int) -> void:
 		mn -= st
 		S.min += st
 		plants_advance(st)
+		fisio_pasa(st)   # MAESTRO [2]
 		if S.min >= 1440:
 			S.min -= 1440
 			new_day()
@@ -95,6 +96,7 @@ func tick_minute() -> void:
 	S.min += 1
 	if S.min % 10 == 0:
 		plants_advance(10)
+		fisio_pasa(10)   # MAESTRO [2]
 	if S.min % 30 == 0 and S.hp < S.hpMax:
 		S.hp += 1
 	if S.min >= 1440:

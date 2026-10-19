@@ -8,6 +8,9 @@ func update_player(dt: float) -> void:
 		var k := minf(1, P.t / P.dur)
 		P.px = (P.fx + (P.x - P.fx) * k) * 16
 		P.py = (P.fy + (P.y - P.fy) * k) * 16
+		var vv := vaiven(k)   # MAESTRO [2]: borracho, el paso se va de lado
+		P.px += vv * absf(P.y - P.fy)
+		P.py += vv * absf(P.x - P.fx)
 		if k < 1:
 			return
 		P.moving = false
@@ -21,9 +24,13 @@ func update_player(dt: float) -> void:
 		return
 	var d = dir_order[-1] if dir_order.size() else null
 	if d == null:
+		if P.chain and deriva():   # MAESTRO [2]: borracho, al soltar das un paso de más
+			try_move(P.dir)
+			return
 		P.chain = false
 		P.hold = 0.0
 		return
+	P.der = 0
 	if SENT != null:   # 1.49: una flecha te levanta, mirando hacia ella, sin dar el paso todavía
 		levantarte(d)
 		P.chain = false
@@ -200,11 +207,57 @@ func montar_garaje(mapa: String) -> void:
 func coche_ya(k: String) -> bool:
 	return S.get("coches") is Dictionary and S.coches.has(k) and int(S.coches[k].dia) <= int(S.day)
 
+# MAESTRO [2]: el desmayo. FISIO.desmayo.h horas después te despiertas en la parada del pueblo (la de Ribera Verde si la zona
+# no tiene), sin FISIO.desmayo.dinero del efectivo ni FISIO.desmayo.cosas de los cogollos y extractos que llevabas encima
+func desmayo() -> void:
+	var F: Dictionary = D.FISIO.desmayo
+	await fade(1)
+	var pa: String = S.map if D.PARADAS.has(S.map) else ("ibarbide" if S.map in ["ensanche", "callejon"] else "town")
+	var dm := snappedf(float(S.money) * float(F.dinero), 0.01)
+	S.money = snappedf(float(S.money) - dm, 0.01)
+	var g0 := total_buds() + total_rosin()
+	for k in S.buds.keys():
+		S.buds[k].g = snappedf(float(S.buds[k].g) * (1 - float(F.cosas)), 0.1)
+		if S.buds[k].g < .5:
+			S.buds.erase(k)
+	for k in S.rosin.keys():
+		S.rosin[k].g = snappedf(float(S.rosin[k].g) * (1 - float(F.cosas)), 0.1)
+		if S.rosin[k].g < .1:
+			S.rosin.erase(k)
+	var gp := g0 - total_buds() - total_rosin()
+	advance_time(int(F.h) * 60)
+	S.borr = float(D.FISIO.inercia[0])   # se te ha pasado lo peor
+	var A: Array = D.PARADAS[pa].a
+	enter_map(pa, int(A[0]), int(A[1]), A[2])
+	update_hud()
+	await wait(80)
+	await fade(0)
+	await say(T("Te despiertas en el banco de la parada, con la cabeza a punto de estallar. Han pasado {h} horas.", {"h": int(F.h)}) + \
+		(" " + T("Te faltan {e} de la cartera.", {"e": Datos.eur(dm)}) if dm > 0 else "") + (" " + T("Y {g} g de lo que llevabas encima.", {"g": Datos.coma(snappedf(gp, 0.1))}) if gp > 0 else ""))
+
 func paso_ms() -> float:   # ms por casilla: a pie, corriendo o montado (pasoMs)
 	var v = vehiculo()
 	if v:
 		return float(D.VEHICULOS[v].paso[1 if held.B else 0])
-	return 130.0 if held.B else 240.0
+	var e := efecto()   # MAESTRO [2]: la sativa te acelera y la índica te pesa
+	return (130.0 if held.B else 240.0) / (float(D.FISIO[e].vel) if e != "" else 1.0)
+
+# MAESTRO [2]: de FISIO.inercia[0] a [1] de borrachera, el paso se tuerce (vaiven, en px) y al soltar sigues una casilla más
+# (deriva, una vez por soltar, con más probabilidad cuanto más borracho; sin azar: por el número de pasos)
+func vaiven(k: float) -> float:
+	var b := borr()
+	if b <= float(D.FISIO.inercia[0]):
+		return 0.0
+	var f := minf(1.0, (b - float(D.FISIO.inercia[0])) / (float(D.FISIO.inercia[1]) - float(D.FISIO.inercia[0])))
+	return float(D.FISIO.vaiven) * f * sin(k * PI) * (1 if int(S.steps) % 2 else -1)
+
+func deriva() -> bool:
+	var b := borr()
+	if b <= float(D.FISIO.inercia[0]) or P.get("der") or vehiculo():
+		return false
+	P.der = 1
+	var p := minf(1.0, (b - float(D.FISIO.inercia[0])) / (float(D.FISIO.inercia[1]) - float(D.FISIO.inercia[0]))) * float(D.FISIO.deriva)
+	return Datos.hash_str("deriva|%d|%d" % [int(S.day), int(S.steps)]) % 1000 < p * 1000
 
 func on_step_end() -> void:
 	S.x = P.x
@@ -228,6 +281,9 @@ func on_step_end() -> void:
 		run(func(): await echar_disco())
 		return
 	if not D.ZONAS.has(S.map):
+		return
+	if borr() >= float(D.FISIO.tope):   # MAESTRO [2]: en la calle con la borrachera a tope, al suelo
+		run(func(): await desmayo())
 		return
 	var Z: Dictionary = D.ZONAS[S.map]
 	if S.map == "town" and P.y >= 13 and P.y <= 14 and P.x >= 18 and P.x <= 22:
@@ -477,8 +533,10 @@ func beber_sentado(bb: String) -> void:
 		return
 	S.money = snappedf(float(S.money) - float(b[1]), 0.01)
 	advance_time(int(b[2]))
+	beber_alc(float(b[3]))   # MAESTRO [2]
 	update_hud()
-	await say(T("{b}. Te lo tomas sentado, sin prisa.", {"b": b[0]}))
+	var bt := borr()
+	await say(T("{b}. Te lo tomas sentado, sin prisa.", {"b": b[0]}) + ("" if float(b[3]) <= 0 or bt <= float(D.FISIO.inercia[0]) else (T(" Ya vas tocado: te cuesta andar recto.") if bt <= float(D.FISIO.vision) else T(" Lo ves todo triple. Si sales así a la calle, acabas en el suelo."))))
 
 func rato_sentado() -> void:
 	advance_time(30)
@@ -560,6 +618,7 @@ func fumar_sentado() -> void:
 		if tab:
 			S.items.tabaco = snappedf(float(S.items.tabaco) - 0.7, 0.1)
 	marca_cata(lk, r, lot_sid(lk), thc)   # fumarlo es catarlo
+	colocar(lot_sid(lk), (gx if r else gb) * thc * 10)   # MAESTRO [2]
 	await gesto("fumar", {"m": mk})   # 1.54
 	var b := boca_sentado()
 	for n in 3:
@@ -1249,7 +1308,8 @@ func update_patrullas(dt: float) -> void:
 		SOSP.tregua -= dt
 	var g := 0.0 if SOSP.tregua > 0 else carga_sosp()
 	if ve and g > 0:
-		SOSP.v = minf(100, SOSP.v + (8 + minf(g, 100) * .12) * float(D.PAT.sube[1 if is_night() else 0]) * (1 + S.heat / 100.0) * (.4 if S.protect else 1.0) * seg)
+		SOSP.v = minf(100, SOSP.v + (8 + minf(g, 100) * .12) * float(D.PAT.sube[1 if is_night() else 0]) * (1 + S.heat / 100.0) * (.4 if S.protect else 1.0) * seg \
+			* (float(D.FISIO.indica.sosp) if efecto() == "indica" else 1.0))   # MAESTRO [2]: con la índica, tranquilo, levantas menos sospechas
 		if not SOSP.aviso and (not is_night() or SOSP.v >= 40):
 			SOSP.aviso = 1
 			toast(K("Oyes pasos detrás de ti.") if is_night() else K("Un agente te está mirando."), 1800)

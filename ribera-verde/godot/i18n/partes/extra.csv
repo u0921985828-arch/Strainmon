@@ -105,3 +105,11 @@ Resistencia,Resistance
 Multa · {p},Fine · {p}
 "Multa del Ayuntamiento de {p}: {a} lleva más de {d} días en el aparcamiento de la parada. {e}, cobrados de lo que tienes.","Fine from {p} town hall: {a} has been in the car park by the stop for more than {d} days. {e}, taken from what you have."
 Te quedan a deber {f}.,You still owe {f}.
+"Te despiertas en el banco de la parada, con la cabeza a punto de estallar. Han pasado {h} horas.","You wake up on the bench at the stop, with your head about to burst. {h} hours have gone by."
+Te faltan {e} de la cartera.,{e} is missing from your wallet.
+Y {g} g de lo que llevabas encima.,And {g} g of what you were carrying.
+ Ya vas tocado: te cuesta andar recto., You're tipsy now: it's hard to walk straight.
+" Lo ves todo triple. Si sales así a la calle, acabas en el suelo."," You're seeing everything in triple. If you go out like this, you'll end up on the ground."
+ALCOHOL,ALCOHOL
+COLOCÓN,HIGH
+ÍNDICA,INDICA

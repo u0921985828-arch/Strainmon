@@ -492,7 +492,7 @@ func _cura(L: Dictionary) -> Array:
 		var b: Dictionary = L[k]
 		if float(b.get("cu", 0)) < 1:
 			var c0 := float(b.get("cu", 0))
-			b.cu = minf(1.0, c0 + 1.0 / D.CURADO.dias)
+			b.cu = minf(1.0, c0 + 1.0 / D.CURADO.dias * (float(D.FISIO.indica.cura) if indica_ayer() else 1.0))   # MAESTRO [2]: con la índica, sin prisa, se cura antes
 			b.thc = b.thc * (1 + D.CURADO.thc * (b.cu - c0))
 			if b.cu >= 1:
 				o.append(k)
@@ -1238,7 +1238,56 @@ func es_chico() -> bool:   # solo si lo eligió (las partidas de antes no tienen
 
 # las casillas que ve una patrulla (de día o de noche; persiguiéndote, el doble)
 func vista_pat(caza := false) -> int:
-	return int(float(D.PAT.vista[0 if caza else (1 if is_night() else 0)]) * (2 if caza else 1))
+	var v := int(float(D.PAT.vista[0 if caza else (1 if is_night() else 0)]) * (2 if caza else 1))
+	return v + (int(D.FISIO.sativa.vista) if efecto() == "sativa" else 0)   # MAESTRO [2]: con la sativa, la paranoia (te ven antes)
+
+# MAESTRO [2] (con CAL): la borrachera (S.borr) y el colocón (S.colo), de 0 a 100, que bajan con las horas (FISIO.baja);
+# S.efe.ind, el % índica de lo que has fumado (de su variedad): de FISIO.efecto para arriba se nota la sativa o la índica
+func borr() -> float:
+	return float(S.get("borr", 0)) if Datos.CAL and S != null else 0.0
+
+func colo() -> float:
+	return float(S.get("colo", 0)) if Datos.CAL and S != null else 0.0
+
+func efecto() -> String:
+	if colo() < float(D.FISIO.efecto):
+		return ""
+	return "indica" if float(S.get("efe", {}).get("ind", 50)) >= 50 else "sativa"
+
+func fisio_pasa(mn: int) -> void:   # granja: con cada rato que pasa
+	if not Datos.CAL:
+		return
+	for i in 2:
+		var k: String = ["borr", "colo"][i]
+		if S.has(k):
+			S[k] = maxf(0, float(S[k]) - float(D.FISIO.baja[i]) * mn / 60.0)
+			if S[k] <= 0:
+				S.erase(k)
+				if k == "colo":
+					S.erase("efe")
+
+func beber_alc(p: float) -> void:
+	if Datos.CAL and p > 0:
+		S.borr = minf(float(D.FISIO.tope), borr() + p)
+
+# lo que sube fumar o catar: los mg de THC (g × % × 10) por FISIO.colo; el perfil, la media de lo fumado por lo que sube cada vez
+func colocar(sid: String, mg: float) -> void:
+	if not Datos.CAL or mg <= 0:
+		return
+	var c0 := colo()
+	var sube := minf(float(D.FISIO.tope) - c0, mg * float(D.FISIO.colo))
+	if sube <= 0:
+		return
+	var st = Datos.strain(S, sid) if sid != "" else null
+	var ind := float(st.get("ind", 50)) if st else 50.0
+	var i0 := float(S.get("efe", {}).get("ind", ind))
+	S.colo = c0 + sube
+	S.efe = {"ind": snappedf((i0 * c0 + ind * sube) / (c0 + sube), 0.1)}
+	if efecto() == "indica":
+		S.ind_d = int(S.day)
+
+func indica_ayer() -> bool:   # el curado de esta mañana: si ayer o hoy notaste la índica
+	return Datos.CAL and int(S.get("ind_d", -9)) >= int(S.day) - 1
 
 # personalizar la casa (1.16, 12c-salon): el tapizado o la lámina de un mueble (S.deco[k], índice en DECO[k].v) y su sprite
 func deco_v(k: String) -> int:
@@ -1856,11 +1905,11 @@ const SENT_PORRO := 0.5
 
 var SENT = null   # {x, y, d}
 
-# bebidas en la barra o en la mesa, por sitio (1.49): [texto, euros, minutos]
+# bebidas en la barra o en la mesa, por sitio (1.49): [texto, euros, minutos, borrachera que sube (MAESTRO [2], con CAL)]
 var BEBIDAS := {
-	"bar": [[I18n.K("Un café"), 1.5, 10], [I18n.K("Una caña"), 2.5, 15], [I18n.K("Un refresco"), 2.2, 15], [I18n.K("Un vino"), 2.0, 15]],
-	"club": [[I18n.K("Un café"), 1.2, 10], [I18n.K("Un refresco"), 1.8, 15], [I18n.K("Un zumo"), 2.0, 15], [I18n.K("Una cerveza"), 2.2, 15]],
-	"disco": [[I18n.K("Un refresco"), 5.0, 15], [I18n.K("Una cerveza"), 6.0, 15], [I18n.K("Una copa"), 9.0, 20]],
+	"bar": [[I18n.K("Un café"), 1.5, 10, 0], [I18n.K("Una caña"), 2.5, 15, 10], [I18n.K("Un refresco"), 2.2, 15, 0], [I18n.K("Un vino"), 2.0, 15, 12]],
+	"club": [[I18n.K("Un café"), 1.2, 10, 0], [I18n.K("Un refresco"), 1.8, 15, 0], [I18n.K("Un zumo"), 2.0, 15, 0], [I18n.K("Una cerveza"), 2.2, 15, 12]],
+	"disco": [[I18n.K("Un refresco"), 5.0, 15, 0], [I18n.K("Una cerveza"), 6.0, 15, 12], [I18n.K("Una copa"), 9.0, 20, 25]],
 
 }
 

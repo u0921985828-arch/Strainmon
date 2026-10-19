@@ -1,4 +1,7 @@
 clave,es,en
+se7166571,"Te despiertas en el banco de la parada, con la cabeza a punto de estallar. Han pasado {h} horas.","You wake up on the bench at the stop, with your head about to burst. {h} hours have gone by."
+s5cdf67e8,Te faltan {e} de la cartera.,{e} is missing from your wallet.
+sf85b7e0e,Y {g} g de lo que llevabas encima.,And {g} g of what you were carrying.
 s682d973f,START,
 s93d6887b,MOVIL,
 sfbcd6556,Sentarte,Sit down
@@ -19,6 +22,8 @@ s228cbc7e,quien tienes detrás,whoever's behind you
 sfd90e97a,¿Qué te pones?,What'll it be?
 sddaa5297,No llevas suelto ni para eso.,You haven't got enough change even for that.
 sabe9483e,"{b}. Te lo tomas sentado, sin prisa.","{b}. You drink it sitting down, no rush."
+s518f2904, Ya vas tocado: te cuesta andar recto., You're tipsy now: it's hard to walk straight.
+sa08f2134," Lo ves todo triple. Si sales así a la calle, acabas en el suelo."," You're seeing everything in triple. If you go out like this, you'll end up on the ground."
 s69b84efe,Pasas media hora mirando a la gente.,You spend half an hour people-watching.
 sbf63ea5c, Sentado en un banco no llamas la atención.," Sitting on a bench, nobody notices you."
 s533f9743,"¿Aquí, en comisaría? Mejor no.","Here, in the police station? Better not."
@@ -1072,6 +1077,10 @@ s57a5399c,"«{N}: el piso y el armario de cultivo son tuyos. Le debo dinero a Ba
 s1809cf3b,«Kiko te ayudará. Empieza plantando: A delante del armario.»,"""Kiko will help you. Start by planting: A in front of the cabinet."""
 s6da88bdd,"Te he dejado en el armario 3 semillas de SKUNK #1, abono y pH−. Julen, mi hijo, está en el piso: te explica cada paso.","I've left 3 SKONK #1 seeds, nutrients and corrector in the cabinet. Julen, my son, is at the flat: he'll explain each step."
 sed8c7456,"Te he dejado en el armario 3 semillas de SKONK #1, abono y corrector. Julen, mi hijo, está en el piso: te explica cada paso.",
+sadac835f,ALCOHOL,ALCOHOL
+s030a70fc,COLOCÓN,HIGH
+s88550f6d,SATIVA,SATIVA
+s94c6afa3,ÍNDICA,INDICA
 s4929112a, · {g} g rosin, · {g} g rosin
 s52e4628c,EFECTIVO,CASH
 s26e3f421,FLORES,BUDS
@@ -1113,7 +1122,6 @@ s384f2b34,{a}/{b} · {c} propias,{a}/{b} · {c} your own
 sbda0b4c2,Ver la hoja,See the leaf
 s8544cf85,Cambiar el nombre,Rename
 s4ca50e41,"Autofloreciente: florece por la edad, sin cambiar la luz.","Autoflower: blooms by age, no light change needed."
-s88550f6d,SATIVA,SATIVA
 s828f7fbb,HIBRIDO SATIVA,SATIVA HYBRID
 s7fbc8d96,EQUILIBRADO,BALANCED
 sc53e781c,HIBRIDO INDICA,INDICA HYBRID

@@ -94,6 +94,11 @@
   - **La saturación** (`SATURA`): lo vendido en la calle de cada pueblo (`S.sat`) baja el precio de esa variedad hasta la mitad con 100 g; cada día se olvida un 15 %.
   - **La hierba verde** (`VERDE`, `verde`): recién cortada vale un 35 % y está seca del todo a los 4 días; curada en tarros, un 8 % más por semana, hasta 8 semanas. `calidad(b, flor)`: lo verde y la rara, solo en los cogollos.
   - Prueba `tests/genetica.gd`.
+- **[2] Borrachera y colocón** (`FISIO`, `S.borr`, `S.colo`, `S.efe`): de 0 a 100, bajan con las horas.
+  - **Beber** (`BEBIDAS`, 4.º número): la caña, el vino, la cerveza y la copa suben; el café, el refresco y el zumo, no.
+  - **Borracho:** de 31 a 70 el paso se tuerce y al soltar sigues una casilla (`vaiven`, `deriva`); de 70 para arriba, la pantalla en triple con los colores separados (`src/vision.gdshader`); a 100 en la calle, el desmayo: 8 horas después en la parada del pueblo, sin el 30 % del efectivo ni la mitad de los cogollos y extractos que llevabas (`desmayo`).
+  - **Fumar y catar** (`colocar`): sube por los mg de THC; la sativa o la índica, por el % índica de la variedad. Sativa: andas un 15 % más rápido y la policía te ve una casilla antes. Índica: andas más despacio, levantas un 30 % menos de sospecha, las extracciones tardan un 20 % menos y el curado de la mañana cunde un 25 % más.
+  - En el HUD, ALCOHOL y COLOCÓN cuando los hay (`hud_fisio`). Prueba `tests/estados.gd`.
 
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 

@@ -812,6 +812,7 @@ func catar(k: String, g := -1.0) -> void:
 	var fresca: bool = b.get("dia") != null
 	use_buds(k, g)
 	marca_cata(k, false, sid, thc)
+	colocar(sid, g * thc * 10)   # MAESTRO [2]
 	await gesto("fumar", {"m": "porro"})   # 1.54
 	advance_time(int(D.CATA.min))
 	update_hud()
@@ -842,6 +843,7 @@ func catar_extr(k: String, g: float) -> void:
 	var thc: float = b.thc
 	use_rosin(k, g)
 	marca_cata(k, true, sid, thc)
+	colocar(sid, g * thc * 10)   # MAESTRO [2]
 	await gesto("fumar", {"m": "pipa"})   # 1.54
 	advance_time(int(D.CATA.min))
 	update_hud()

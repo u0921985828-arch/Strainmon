@@ -96,10 +96,35 @@ func _process(dt: float) -> void:
 		quieto_n = 0
 	if quieto_n < 2:
 		pintor.redibuja(M.reloj)
+	vision_borracho()
 	var upd := SubViewport.UPDATE_DISABLED if quieto_n >= 3 else SubViewport.UPDATE_ALWAYS
 	if sv.render_target_update_mode != upd:
 		sv.render_target_update_mode = upd
 	_process_ui()
+
+# MAESTRO [2]: de FISIO.vision de borrachera para arriba, la pantalla en triple con los colores separados (aberración); más
+# fuerte cuanto más cerca de FISIO.tope. Sin borrachera, sin material (la pantalla de siempre)
+const VISION_SH := preload("res://src/vision.gdshader")
+var vision_mat: ShaderMaterial = null
+func vision_k() -> float:
+	var b := borr()
+	if mode != "world" or b <= float(D.FISIO.vision):
+		return 0.0
+	return clampf((b - float(D.FISIO.vision)) / (float(D.FISIO.tope) - float(D.FISIO.vision)), 0.15, 1.0)
+
+func vision_borracho() -> void:
+	var k := vision_k()
+	if k <= 0:
+		if pantalla.material:
+			pantalla.material = null
+		return
+	if vision_mat == null:
+		vision_mat = ShaderMaterial.new()
+		vision_mat.shader = VISION_SH
+	if pantalla.material != vision_mat:
+		pantalla.material = vision_mat
+	vision_mat.set_shader_parameter("k", k)
+	vision_mat.set_shader_parameter("t", M.reloj / 1000.0)
 
 var quieto_n := 0
 func lienzo_quieto() -> bool:
@@ -890,6 +915,16 @@ func update(dt: float) -> void:
 		if B.shakeP > 0:
 			B.shakeP -= dt
 
+# MAESTRO [2]: la borrachera y el colocón en el recuadro, solo si los hay (con la sativa o la índica que se note)
+func hud_fisio() -> Array:
+	var o := []
+	if borr() >= 1:
+		o.append([I18n.v("ALCOHOL"), "%d %%" % int(borr()), Color("#f08070") if borr() > float(D.FISIO.vision) else Color("#f0b090")])
+	if colo() >= 1:
+		var e := efecto()
+		o.append([I18n.v("COLOCÓN"), ("%d %%" % int(colo())) + ("" if e == "" else " · " + (I18n.v("SATIVA") if e == "sativa" else I18n.v("ÍNDICA"))), Color("#b8a0f0")])
+	return o
+
 func update_hud() -> void:
 	if oraculo:
 		return
@@ -909,6 +944,6 @@ func update_hud() -> void:
 			[I18n.v("EFECTIVO"), Datos.eur(S.money), Color("#eef8f0")],
 			[I18n.v("BANCO"), Datos.eur(float(S.get("banco", 0))), Color("#a8d8f0")],
 			[I18n.v("FLORES"), ("%d g" % int(floor(gb))) if gb >= 10 or gb == floor(gb) else Datos.coma(floor(gb * 10 + 1e-9) / 10.0) + " g", Color("#9ee070")],
-			[I18n.v("ROSIN"), Datos.coma(Datos.jsround(r * 10) / 10.0) + " g", Color("#f0c050")]])
+			[I18n.v("ROSIN"), Datos.coma(Datos.jsround(r * 10) / 10.0) + " g", Color("#f0c050")]] + hud_fisio())
 		return
 	hud_pon("%s · %s:%s\n%s · %d g%s" % [Datos.fd_hud(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds())), ro], Datos.jsround(S.heat), sp, SOSP.alarma != null, od)

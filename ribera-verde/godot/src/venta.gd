@@ -1150,7 +1150,7 @@ func extraer(t: String):
 	else:
 		use_buds(k, g)
 	add_rosin(k if t == "rosin" else base_extr(k) + "~" + E.get("sale", t), r, thc)
-	advance_time(E.min)
+	advance_time(int(ceil(float(E.min) * (float(D.FISIO.indica.lab) if efecto() == "indica" else 1.0))))   # MAESTRO [2]: con la índica, el laboratorio cunde
 	sfx("get")
 	var ar := {"e": E.n, "l": lot_nombre(base_extr(k)), "r": Datos.coma(r), "t": Datos.pct(thc)}
 	await say(T("Te sale perfecto. {e} de {l}: {r} g con un {t} % de THC.", ar) if q >= 1 else T("Te sale bien, con algo de pérdida. {e} de {l}: {r} g con un {t} % de THC.", ar) if q >= .5 else T("Te sale regular: pierdes bastante. {e} de {l}: {r} g con un {t} % de THC.", ar))
