@@ -408,7 +408,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("OPCIONES"), 60)
 	await elige("OPCIONES")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
-	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "TAMAÑO DE TEXTO", "ZURDO", "DALTÓNICO", "SIN DESTELLOS"] + (["AVISO DE COSECHA", "INFORMES DE ERRORES"] if Datos.PLAY else []) + ["COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
+	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "TAMAÑO DE TEXTO", "ZURDO", "DALTÓNICO", "SIN DESTELLOS"] + (["AVISO DE COSECHA", "INFORMES DE ERRORES", "IDIOMA"] if Datos.PLAY else []) + ["COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
 	await elige("MÚSICA")
 	await hasta(func(): return J.menu_box.visible, 60)
 	var so0 = J.sonido

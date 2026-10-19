@@ -532,6 +532,8 @@ func copia_seguridad(desde_titulo: bool) -> void:
 		await importar(desde_titulo)
 
 # OPCIONES (en el título y en el menú START): A cambia cada fila; se guardan al momento
+const IDIOMA_NOM := ["SISTEMA", "ESPAÑOL", "ENGLISH"]
+
 func opciones(desde_titulo := false) -> void:
 	var i := 0
 	while true:
@@ -555,6 +557,7 @@ func opciones(desde_titulo := false) -> void:
 			it.insert(c + 3, {"label": "SIN DESTELLOS", "right": "SÍ" if aj.get("calma") else "NO"})
 			it.insert(c + 4, {"label": "AVISO DE COSECHA", "right": "SÍ" if aj.get("avisos") else "NO"})   # fase 6
 			it.insert(c + 5, {"label": "INFORMES DE ERRORES", "right": "SÍ" if aj.get("errores") else "NO"})
+			it.insert(c + 6, {"label": "IDIOMA", "right": IDIOMA_NOM[clampi(int(aj.get("idioma", 0)), 0, 2)]})   # F7
 		it.append({"label": "VOLVER"})
 		i = await menu(it, {"cls": "start", "initial": i, "title": "OPCIONES"})
 		if i < 0 or it[i].label == "VOLVER":
@@ -601,6 +604,8 @@ func opciones(desde_titulo := false) -> void:
 					await say("Sin permiso para avisar. Se puede dar en los ajustes del móvil.")
 				elif aj.avisos:
 					await say("Te avisaremos cuando una planta esté lista para cosechar (con la app cerrada).")
+			"IDIOMA":   # F7: el del sistema, castellano o inglés
+				aj.idioma = (clampi(int(aj.get("idioma", 0)), 0, 2) + 1) % 3
 			"INFORMES DE ERRORES":   # fase 6 (U10): opt-in
 				if not aj.get("errores", false):
 					aj.errores = await ask("Si el juego falla, ¿enviar un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y dónde falló) para arreglarlo? Sin datos personales ni de la partida. Se puede quitar cuando quieras.", ["Sí, enviar", "No"]) == 0

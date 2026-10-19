@@ -85,11 +85,13 @@ static func _hoja(s: String, ruta: String) -> String:
 	return _P.set[ruta] if _P.set.has(ruta) else tp(s)
 
 # el texto que se ve (diálogos, menús, avisos): con PLAY, los mismos cambios que en los datos
+static var SOLO_NOMBRES := false   # F7: en inglés, solo los nombres (los cambios de rep son frases en castellano)
 static func tp(s: String) -> String:
 	if not PLAY or _rx_n == null or s == "":
 		return s
-	for r in _rx_r:
-		s = r[0].sub(s, r[1], true)
+	if not SOLO_NOMBRES:
+		for r in _rx_r:
+			s = r[0].sub(s, r[1], true)
 	var o := ""
 	var i := 0
 	for m in _rx_n.search_all(s):

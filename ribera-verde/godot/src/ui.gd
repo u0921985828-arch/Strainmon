@@ -8,6 +8,7 @@
 extends Control
 
 const Datos = preload("res://src/datos.gd")
+const I18n = preload("res://src/i18n.gd")
 const Cultivo = preload("res://src/cultivo.gd")
 const Motor = preload("res://src/motor.gd")
 const SH := 180   # 1.12: alto del juego; el ancho, de 240 a SW_MAX
@@ -996,7 +997,7 @@ func set_sound(on: bool, guarda := true) -> void:
 # de 25 en 25 %), la velocidad del texto y SONIDO; en un archivo aparte de la partida, que no los borra ----------
 static var AJUSTES := "user://ajustes.json"   # las pruebas usan otro
 const TEXTO_VEL := ["NORMAL", "RÁPIDO", "AL MOMENTO"]
-var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true, "vibra": true, "ahorro": false, "tam": 1, "zurdo": false, "dalt": false, "calma": false, "avisos": false, "errores": false, "completo": false}
+var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true, "vibra": true, "ahorro": false, "tam": 1, "zurdo": false, "dalt": false, "calma": false, "avisos": false, "errores": false, "completo": false, "idioma": 0}
 # U5 (fase 5, con Datos.PLAY): TAMAÑO DE TEXTO S/M/L, nunca por debajo de TXT_MIN sp
 const TAM_TXT := [0.85, 1.0, 1.25]
 const TAM_NOM := ["S", "M", "L"]
@@ -1022,6 +1023,8 @@ func ajustes_aplica() -> void:
 	set_sound(aj.sonido, false)
 	VistaC.DALTONICO = Datos.PLAY and aj.get("dalt", false)
 	VistaC.CALMA = Datos.PLAY and aj.get("calma", false)
+	I18n.LANG = ["", "es", "en"][clampi(int(aj.get("idioma", 0)), 0, 2)]   # F7
+	Datos.SOLO_NOMBRES = I18n.en()
 	if Datos.PLAY and is_inside_tree() and not oraculo:   # el tamaño del texto y ZURDO cambian el sitio de todo
 		ajusta()
 	if is_inside_tree() and get_tree().current_scene == self:   # en el juego (no en las pruebas, que van a toda prisa)
@@ -1049,7 +1052,8 @@ func evento(_k: String) -> void:
 func leer(t: String, texto: String) -> void:
 	if oraculo:
 		return
-	lector_pags = paginas(texto)
+	t = I18n.v(t)
+	lector_pags = paginas(I18n.v(texto))
 	var ver := func(i: int):
 		lector_i = clampi(i, 0, lector_pags.size() - 1)
 		lector_ttl.text = t if lector_pags.size() == 1 else "%s · %d/%d" % [t, lector_i + 1, lector_pags.size()]
@@ -1123,7 +1127,15 @@ func update_hud() -> void:
 func wait(ms: float) -> void:
 	await M.wait(ms)
 
+# F7: una frase con huecos con nombre y un literal que se ve (i18n.gd)
+func T(s: String, a := {}) -> String:
+	return I18n.T(s, a)
+
+func K(s: String) -> String:
+	return s
+
 func nm(t: String) -> String:
+	t = I18n.v(t)   # F7: el idioma, con la clave aún con {N}
 	return Datos.tp(t.replace("{N}", S.name) if S else t)
 
 # U4 (fase 5, con Datos.PLAY): el registro de diálogo (las últimas REGISTRO_MAX cajas, START → REGISTRO), mantener A para
@@ -1151,7 +1163,7 @@ func type_text(text: String, name_ := "") -> void:
 	if not oraculo:
 		dlg.show()
 		dlg_nm.visible = name_ != ""
-		dlg_nm_txt.text = name_
+		dlg_nm_txt.text = I18n.v(name_)
 		dlg_more.hide()
 		dlg_txt.text = ""
 		_coloca.call_deferred()
@@ -1238,17 +1250,18 @@ func menu(items_: Array, o := {}) -> int:
 	var items := []
 	for it in items_:
 		items.append({"label": it} if it is String else it)
-	if Datos.PLAY:   # la versión de Google Play: los textos que se ven, con sus cambios (Datos.tp)
+	if Datos.PLAY or I18n.en():   # la versión de Google Play: los textos que se ven, con sus cambios (Datos.tp); F7: y en su idioma
+		var tr_ := func(s: String) -> String: return Datos.tp(I18n.v(s))
 		for i in items.size():
 			var it: Dictionary = items[i].duplicate()
 			for k in ["label", "desc", "right"]:
 				if it.get(k) is String:
-					it[k] = Datos.tp(it[k])
+					it[k] = tr_.call(it[k])
 			items[i] = it
 		o = o.duplicate()
 		for k in ["title", "title2"]:
 			if o.get(k) is String:
-				o[k] = Datos.tp(o[k])
+				o[k] = tr_.call(o[k])
 	var p := Motor.Prom.new()
 	var st := {"i": clampi(int(o.get("initial", 0)), 0, items.size() - 1)}
 	var rows: int = o.get("rows", (5 if o.get("desc") else 8) if o.get("cls") == "full" else items.size())
@@ -1690,7 +1703,7 @@ func toast(html: String, ms := 2400.0) -> void:
 	if gancho_toast.is_valid():
 		gancho_toast.call(html, ms)
 	if not oraculo:
-		toast_txt.text = "[center]" + html_bb(Datos.tp(html)) + "[/center]"
+		toast_txt.text = "[center]" + html_bb(Datos.tp(I18n.v(html))) + "[/center]"
 		toast_box.show()
 		coloca_toast.call_deferred()
 	M.quita(toast_t)
