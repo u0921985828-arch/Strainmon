@@ -72,6 +72,9 @@ var dlg_nm := PanelContainer.new()
 var dlg_nm_txt := Label.new()
 var retrato := TextureRect.new()   # MAESTRO [8]: el retrato de quien habla (PortraitRect), dentro de la caja, a la izquierda
 var retrato_l = null               # [look, mujer] de quien habla ahora
+var retrato_e := 0                 # su gesto (Retrato.expresion)
+var retrato_hab := false           # escribiéndose (la boca se mueve; no parpadea)
+var retrato_ojo := 0               # 1 con los ojos cerrados (el parpadeo, en tiempo real)
 var habla_look = null              # el look de la persona con la que hablas en vivo (hablar_con)
 var dlg_more := Control.new()
 var menu_box := PanelContainer.new()
@@ -1200,8 +1203,9 @@ func type_text(text: String, name_ := "") -> void:
 		M.quita(st.iv)
 		if not oraculo:
 			dlg_txt.text = full
+			retrato_hab = false
 			if retrato.visible and retrato_l != null:
-				retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], Retrato.expresion(full), 0)
+				retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], retrato_e, 0)
 		st.done = true
 		pop(st.h)
 		p.res()
@@ -1213,7 +1217,7 @@ func type_text(text: String, name_ := "") -> void:
 		if st.n % 3 == 0:
 			sfx("blip")
 			if retrato.visible and retrato_l != null:   # la boca, al ritmo del texto
-				retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], Retrato.expresion(full), (st.n / 3) % 2 if st.i < full.length() else 0)
+				retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], retrato_e, (st.n / 3) % 2 if st.i < full.length() else 0)
 		if st.i >= full.length():
 			fin.call(), 20)
 	st.h = func(b):
@@ -1238,8 +1242,21 @@ func _pon_retrato(name_: String, full: String, boca: int) -> void:
 	if retrato_l == null:
 		retrato.hide()
 		return
-	retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], Retrato.expresion(full), boca)
+	retrato_e = Retrato.expresion(full)
+	retrato_hab = true
+	retrato_ojo = 0
+	retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], retrato_e, boca)
 	retrato.show()
+
+# con CAL, callado y tranquilo, parpadea 130 ms cada 3,6 s (tiempo real: no toca el reloj del juego)
+const PARPADEO := [3600, 130]
+func _parpadeo() -> void:
+	if not Datos.CAL or retrato_hab or retrato_l == null or not retrato.visible or retrato_e != Retrato.NEUTRO:
+		return
+	var o := 1 if Time.get_ticks_msec() % PARPADEO[0] < PARPADEO[1] else 0
+	if o != retrato_ojo:
+		retrato_ojo = o
+		retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], retrato_e, 0, o)
 
 func say(text: String, name_ := "", keep := false) -> void:
 	if recortada(text):
@@ -2097,6 +2114,7 @@ func _process_ui() -> void:
 	botones.MOVIL.visible = mode == "world"
 	if dlg_more.visible:
 		dlg_more.queue_redraw()
+	_parpadeo()
 	if titulo.visible:
 		titulo.queue_redraw()
 	if wipe.visible:

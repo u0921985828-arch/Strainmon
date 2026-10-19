@@ -49,15 +49,16 @@ static func _osc(c: Color, f := 0.78) -> Color:
 static func _cla(c: Color, f := 0.25) -> Color:
 	return c.lerp(Color.WHITE, f)
 
-# look: {id, skin, hair, style, hat, shirt, beard, glasses}; mujer: el muñeco es de chica; boca: 1 abierta (hablando)
-static func textura(look: Dictionary, mujer: bool, expr: int, boca := 0) -> ImageTexture:
-	var k := "%s|%d|%d|%d" % [str(look.get("id", "")), int(mujer), expr, boca]
+# look: {id, skin, hair, style, hat, shirt, beard, glasses}; mujer: el muñeco es de chica; boca: 1 abierta (hablando);
+# ojos: 1 cerrados (el parpadeo)
+static func textura(look: Dictionary, mujer: bool, expr: int, boca := 0, ojos := 0) -> ImageTexture:
+	var k := "%s|%d|%d|%d|%d" % [str(look.get("id", "")), int(mujer), expr, boca, ojos]
 	if cache.has(k):
 		return cache[k]
 	if cache.size() > 256:
 		cache.clear()
 	var g := grupo(look, mujer)
-	var t := ImageTexture.create_from_image(busto(g, boca) if g != "" else imagen(look, mujer, expr, boca))
+	var t := ImageTexture.create_from_image(estado(g, expr, boca, ojos) if g != "" else imagen(look, mujer, expr, boca))
 	cache[k] = t
 	return t
 
@@ -68,7 +69,9 @@ const CHICAS := ["cliente4", "cliente5", "cliente6"]
 const CHICOS := ["cliente1", "cliente2", "cliente3"]
 static var hoja: Image = null
 static var bustos := {}
+static var estados := {}
 static var BW := 64
+const GESTO := ["n", "a", "e", "d"]   # NEUTRO, ALEGRE, ENFADO, DUDA
 
 static func _carga() -> void:
 	if hoja != null:
@@ -82,6 +85,7 @@ static func _carga() -> void:
 	if j is Dictionary:
 		BW = int(j.get("w", 64))
 		bustos = j.get("grupos", {})
+		estados = j.get("estados", {})
 
 static func grupo(look: Dictionary, mujer: bool) -> String:
 	_carga()
@@ -96,10 +100,32 @@ static func grupo(look: Dictionary, mujer: bool) -> String:
 
 # boca 1 (hablando): el busto 1 px más abajo, el vaivén al ritmo del texto
 static func busto(g: String, boca := 0) -> Image:
-	var p: Array = bustos[g]
+	return _celda(bustos[g], boca)
+
+static func _celda(p: Array, baja := 0) -> Image:
 	var im := Image.create(BW, BW, false, Image.FORMAT_RGBA8)
-	im.blit_rect(hoja, Rect2i(int(p[0]), int(p[1]), BW, BW - boca), Vector2i(0, boca))
+	im.blit_rect(hoja, Rect2i(int(p[0]), int(p[1]), BW, BW - baja), Vector2i(0, baja))
 	return im
+
+# con CAL, la celda del estado (tools/retratos.py): el parpadeo «p» solo tranquilo y callado; si no, el gesto con la boca
+# («a1»: contento hablando); sin él, el gesto callado 1 px más abajo (los ladrones, tapados); luego «n1» y el busto
+static func estado(g: String, expr: int, boca := 0, ojos := 0) -> Image:
+	var E: Dictionary = estados.get(g, {}) if Datos.CAL else {}
+	if E.is_empty():
+		return busto(g, boca)
+	if ojos and boca == 0 and expr == NEUTRO and E.has("p"):
+		return _celda(E["p"])
+	var ge: String = GESTO[clampi(expr, 0, 3)]
+	var k := "%s%d" % [ge, boca]
+	if ge == "n" and boca == 0:
+		return busto(g)
+	if E.has(k):
+		return _celda(E[k])
+	if E.has(ge + "0"):
+		return _celda(E[ge + "0"], boca)
+	if boca and E.has("n1"):
+		return _celda(E["n1"])
+	return busto(g, boca)
 
 static func imagen(look: Dictionary, mujer: bool, expr: int, boca := 0) -> Image:
 	var im := Image.create(W, W, false, Image.FORMAT_RGBA8)

@@ -146,6 +146,11 @@
   - `retrato_de` (`mundo.gd`) da el mismo muñeco que se ve en el mapa cuando el nombre lo cambia: `GENERO.look` (Bixente y los presidentes, como `mk_ent`), la protagonista (`player-f`) y los rivales (`look_rival`).
   - `ui.gd`: el busto a 1:1 (64 u), de pie sobre el canto de abajo de la caja y asomando por encima, con el texto y el nombre a su derecha (`retrato_w`).
   - Prueba `tests/retratos.gd` (gráfica, en la batería).
+- **Los retratos con estados** (lo pidió el usuario: «tiene que tener diferentes estados, hablando y demás»; con `Datos.CAL`): 204 estados de PixelLab (inpaint de Pro Flash sobre cada busto, solo la boca, los ojos o las cejas; lo de fuera, intacto) en `tools/sprites/retratos/estados/<grupo>-<estado>.png`: `n1` hablando, `p` parpadeo, `a0`/`e0`/`d0` contento, enfadado y dudando, y `a1`/`e1`/`d1` lo mismo hablando. Los tres ladrones, tapados, solo ojos y cejas (al hablar, su gesto con el vaivén).
+  - `tools/retratos.py` los pone debajo de los bustos, una fila por grupo, en `"estados"` de `retratos.json` (seis bajados a 32 colores).
+  - `retrato.gd`: `estado(g, expr, boca, ojos)` y `textura(…, ojos)`; el gesto sale de `expresion` (lo que dice) y la boca se abre y cierra al ritmo del texto con el gesto puesto; parpadeo solo tranquilo y callado. Sin CAL, el busto de siempre con el vaivén.
+  - `ui.gd`: `retrato_e`/`retrato_hab`/`retrato_ojo` y `_parpadeo` en `_process_ui`: 130 ms cada 3,6 s en tiempo real (no toca el reloj del juego ni el oráculo).
+  - `tests/retratos.gd` (400): los estados de los 27, la celda de cada gesto con y sin boca, el parpadeo en la caja (y no escribiendo), los tapados y sin CAL.
 
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 

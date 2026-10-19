@@ -1,6 +1,6 @@
 # Ribera Verde (Godot) — MAESTRO [8]: los retratos de diálogo son el muñeco del mapa en grande (bustos de PixelLab de
 # arte/retratos.png, uno por grupo de sprite del atlas): cada look tiene el suyo, el de la calle por su hash y de su sexo,
-# el vaivén al hablar, la caja con el busto de pie a la izquierda y el nombre a su derecha; sin busto, el dibujado.
+# la boca al hablar, el parpadeo y los gestos (los estados, con CAL; sin ellos, el vaivén), la caja con el busto de pie a la izquierda y el nombre a su derecha; sin busto, el dibujado.
 #   con xvfb (la caja se coloca con la ventana): $GODOT --path godot --rendering-driver opengl3 --audio-driver Dummy
 #   --resolution 1560x720 --script res://tests/retratos.gd -- --sin-arranque [--pintar <dir>] → «retratos: N comprobaciones, 0 fallos»
 extends SceneTree
@@ -142,16 +142,47 @@ func _corre() -> void:
 		var Rv: Dictionary = D.RIVALES[z]
 		var rr = J.retrato_de(str(Rv.n))
 		chk(rr is Array and Retrato.grupo(rr[0], rr[1]) == Atlas.grupo_look(J.look_rival(Rv)), "rival %s, el de su pelea" % Rv.n)
-	# 4 · la textura: el busto de 64, en caché, y el vaivén de 1 px al hablar
+	# 4 · la textura: el busto de 64, en caché; sin CAL, el vaivén de 1 px al hablar
 	var t0: ImageTexture = Retrato.textura(D.LOOKS.kid, false, 0, 0)
-	var t1: ImageTexture = Retrato.textura(D.LOOKS.kid, false, 0, 1)
 	chk(t0.get_width() == 64 and t0.get_height() == 64, "busto de 64")
 	chk(t0 == Retrato.textura(D.LOOKS.kid, false, 0, 0), "en caché")
 	var i0 := t0.get_image()
-	var i1 := t1.get_image()
-	chk(i0.get_region(Rect2i(0, 0, 64, 63)).get_data() == i1.get_region(Rect2i(0, 1, 64, 63)).get_data(), "vaivén: 1 px abajo")
 	var p: Array = Retrato.bustos.unai
 	chk(i0.get_data() == Retrato.hoja.get_region(Rect2i(int(p[0]), int(p[1]), 64, 64)).get_data(), "Unai, el de la hoja")
+	Datos.CAL = false
+	Retrato.cache.clear()
+	var i1 := Retrato.textura(D.LOOKS.kid, false, 0, 1).get_image()
+	chk(i0.get_region(Rect2i(0, 0, 64, 63)).get_data() == i1.get_region(Rect2i(0, 1, 64, 63)).get_data(), "sin CAL, vaivén: 1 px abajo")
+	chk(Retrato.textura(D.LOOKS.kid, false, Retrato.ENFADO, 0).get_image().get_data() == i0.get_data(), "sin CAL, sin gestos")
+	Datos.CAL = true
+	Retrato.cache.clear()
+	# 4b · los estados (tools/retratos.py): los 27 con parpadeo y los tres gestos; los 24 sin tapar, con la boca en todos
+	var celda := func(g: String, e: String) -> PackedByteArray:
+		var q: Array = Retrato.estados[g][e]
+		return Retrato.hoja.get_region(Rect2i(int(q[0]), int(q[1]), 64, 64)).get_data()
+	var tapados := 0
+	for g in grupos:
+		var E: Dictionary = Retrato.estados.get(g, {})
+		chk(E.has("p") and E.has("a0") and E.has("e0") and E.has("d0"), "%s: parpadeo y gestos (%s)" % [g, E.keys()])
+		if E.has("n1"):
+			chk(E.has("a1") and E.has("e1") and E.has("d1"), "%s: la boca en los gestos" % g)
+		else:
+			tapados += 1
+		for es in E:
+			chk(celda.call(g, es) != Retrato.hoja.get_region(Rect2i(int(Retrato.bustos[g][0]), int(Retrato.bustos[g][1]), 64, 64)).get_data(), "%s-%s distinto del busto" % [g, es])
+	chk(tapados == 3, "solo los 3 ladrones, tapados, sin boca (%d)" % tapados)
+	var tx := func(e: int, b: int, o: int) -> PackedByteArray:
+		return Retrato.textura(D.LOOKS.kid, false, e, b, o).get_image().get_data()
+	chk(tx.call(0, 1, 0) == celda.call("unai", "n1"), "hablando: la boca abierta")
+	chk(tx.call(0, 0, 1) == celda.call("unai", "p"), "parpadeo: los ojos cerrados")
+	chk(tx.call(Retrato.ALEGRE, 0, 0) == celda.call("unai", "a0") and tx.call(Retrato.ALEGRE, 1, 0) == celda.call("unai", "a1"), "contento, callado y hablando")
+	chk(tx.call(Retrato.ENFADO, 0, 0) == celda.call("unai", "e0") and tx.call(Retrato.ENFADO, 1, 0) == celda.call("unai", "e1"), "enfadado, callado y hablando")
+	chk(tx.call(Retrato.DUDA, 0, 0) == celda.call("unai", "d0") and tx.call(Retrato.DUDA, 1, 0) == celda.call("unai", "d1"), "dudando, callado y hablando")
+	chk(tx.call(Retrato.ALEGRE, 0, 1) == celda.call("unai", "a0") and tx.call(0, 1, 1) == celda.call("unai", "n1"), "no parpadea con gesto ni hablando")
+	chk(Retrato.textura(D.LOOKS.kid, false, 0, 0, 1) != Retrato.textura(D.LOOKS.kid, false, 0, 0, 0), "los ojos, en la clave de la caché")
+	var lad: Image = Retrato.estado("ladron1-combate", Retrato.ENFADO, 1)
+	var le: Array = Retrato.estados["ladron1-combate"]["e0"]
+	chk(lad.get_region(Rect2i(0, 1, 64, 63)).get_data() == Retrato.hoja.get_region(Rect2i(int(le[0]), int(le[1]), 64, 63)).get_data(), "tapado: el gesto con el vaivén")
 	# 5 · sin busto (un look sin muñeco), el dibujado de siempre
 	var tz: ImageTexture = Retrato.textura({"id": "zz-nadie", "skin": "#e0b080"}, false, 0)
 	chk(Retrato.grupo({"id": "zz-nadie"}, false) == "" and tz.get_width() == Retrato.W, "sin busto, el dibujado")
@@ -178,6 +209,29 @@ func _corre() -> void:
 	chk(R.position.y >= 0, "dentro de la pantalla")
 	if dir != "":
 		await pinta(dir, "unai")
+	# 6b · el parpadeo en la caja: callado y tranquilo, cada PARPADEO[0] ms; nunca mientras escribe
+	chk(J.retrato_e == Retrato.DUDA and R.texture.get_image().get_data() == celda.call("unai", "d0"), "con «¿», dudando")
+	chk(corre(func(): await J.type_text("Hoy hace buen día en el barrio.", "UNAI")), "type_text bloqueado (tranquilo)")
+	chk(not J.retrato_hab and J.retrato_e == Retrato.NEUTRO, "escrito y tranquilo")
+	var tw := Time.get_ticks_msec()
+	while Time.get_ticks_msec() % J.PARPADEO[0] >= J.PARPADEO[1] - 40 and Time.get_ticks_msec() - tw < 8000:
+		await process_frame
+	J._parpadeo()
+	chk(J.retrato_ojo == 1 and R.texture.get_image().get_data() == celda.call("unai", "p"), "parpadea")
+	while Time.get_ticks_msec() % J.PARPADEO[0] < J.PARPADEO[1] and Time.get_ticks_msec() - tw < 8000:
+		await process_frame
+	J._parpadeo()
+	chk(J.retrato_ojo == 0 and R.texture.get_image().get_data() == i0.get_data(), "abre los ojos")
+	J.retrato_hab = true
+	while Time.get_ticks_msec() % J.PARPADEO[0] >= J.PARPADEO[1] - 40 and Time.get_ticks_msec() - tw < 16000:
+		await process_frame
+	J._parpadeo()
+	chk(J.retrato_ojo == 0, "no parpadea escribiendo")
+	J.retrato_hab = false
+	chk(corre(func(): await J.type_text("¡Gracias, de lujo!", "UNAI")), "type_text bloqueado (contento)")
+	chk(J.retrato_e == Retrato.ALEGRE and R.texture.get_image().get_data() == celda.call("unai", "a0"), "contento al acabar")
+	if dir != "":
+		await pinta(dir, "unai-contento")
 	J.habla_look = null
 	chk(corre(func(): await J.type_text("Me debes 3.000 €. Último aviso.", "SMS · TOÑO")), "type_text bloqueado (SMS)")
 	chk(R.visible and Retrato.grupo(J.retrato_l[0], J.retrato_l[1]) == "tono", "Toño en el SMS")
