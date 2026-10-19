@@ -1,10 +1,12 @@
 # Ribera Verde (Godot) — MAESTRO [8] «Sistema de Diálogos HD»: el retrato de quien habla (PortraitRect), en la charla en vivo,
-# las llamadas y los SMS. Se hace aquí, píxel a píxel, con la identidad de la persona (su look de LOOKS o el de la calle: piel,
-# pelo y peinado, gorra o capucha, barba, gafas, camiseta; de chica o de chico, GENERO) y su gesto según el tono de lo que dice
-# (expresion: 0 tranquilo, 1 contento, 2 enfadado, 3 dudando). Arte propio, sin nada de fuera. Cacheado por persona y gesto.
+# las llamadas y los SMS: el busto del muñeco que se ve en el mapa, más grande (busto, de PixelLab). Sin busto, se hace aquí,
+# píxel a píxel, con la identidad de la persona (su look de LOOKS o el de la calle: piel, pelo y peinado, gorra o capucha, barba,
+# gafas, camiseta; de chica o de chico, GENERO) y su gesto según el tono de lo que dice (expresion: 0 tranquilo, 1 contento,
+# 2 enfadado, 3 dudando). Cacheado por persona y gesto.
 extends RefCounted
 
 const Datos = preload("res://src/datos.gd")
+const Atlas = preload("res://src/atlas.gd")
 
 const W := 32
 const K := Color8(0x26, 0x26, 0x2e)          # el contorno (paleta fija)
@@ -54,9 +56,50 @@ static func textura(look: Dictionary, mujer: bool, expr: int, boca := 0) -> Imag
 		return cache[k]
 	if cache.size() > 256:
 		cache.clear()
-	var t := ImageTexture.create_from_image(imagen(look, mujer, expr, boca))
+	var g := grupo(look, mujer)
+	var t := ImageTexture.create_from_image(busto(g, boca) if g != "" else imagen(look, mujer, expr, boca))
 	cache[k] = t
 	return t
+
+# el busto de PixelLab del muñeco que se ve en el mapa (arte/retratos.png + retratos.json, de tools/retratos.py): el grupo del
+# atlas del look (Atlas.grupo_look, los de la calle por su hash); un cliente de la calle que no es de su sexo, uno que sí, por el
+# mismo hash. Sin busto, "" (y el dibujado de abajo)
+const CHICAS := ["cliente4", "cliente5", "cliente6"]
+const CHICOS := ["cliente1", "cliente2", "cliente3"]
+static var hoja: Image = null
+static var bustos := {}
+static var BW := 64
+
+static func _carga() -> void:
+	if hoja != null:
+		return
+	hoja = Image.new()
+	if not FileAccess.file_exists("res://arte/retratos.png"):
+		return
+	hoja.load_png_from_buffer(FileAccess.get_file_as_bytes("res://arte/retratos.png"))
+	hoja.convert(Image.FORMAT_RGBA8)
+	var j = JSON.parse_string(FileAccess.get_file_as_string("res://arte/retratos.json"))
+	if j is Dictionary:
+		BW = int(j.get("w", 64))
+		bustos = j.get("grupos", {})
+
+static func grupo(look: Dictionary, mujer: bool) -> String:
+	_carga()
+	Atlas.carga()
+	var g = Atlas.grupo_look(look)
+	if not (g is String) or not bustos.has(g):
+		return ""
+	if g.begins_with("cliente") and (g in CHICAS) != mujer:
+		var L: Array = CHICAS if mujer else CHICOS
+		g = L[Datos.hash_str(str(look.get("id", "x"))) % L.size()]
+	return g
+
+# boca 1 (hablando): el busto 1 px más abajo, el vaivén al ritmo del texto
+static func busto(g: String, boca := 0) -> Image:
+	var p: Array = bustos[g]
+	var im := Image.create(BW, BW, false, Image.FORMAT_RGBA8)
+	im.blit_rect(hoja, Rect2i(int(p[0]), int(p[1]), BW, BW - boca), Vector2i(0, boca))
+	return im
 
 static func imagen(look: Dictionary, mujer: bool, expr: int, boca := 0) -> Image:
 	var im := Image.create(W, W, false, Image.FORMAT_RGBA8)

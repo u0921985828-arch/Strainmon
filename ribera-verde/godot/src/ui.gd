@@ -1226,6 +1226,10 @@ func type_text(text: String, name_ := "") -> void:
 # vivo (retrato_de, en mundo.gd), con el gesto por el tono de lo que dice (Retrato.expresion)
 const RETRATO_W := 32
 
+# el ancho del retrato en u: el del busto (64) o RETRATO_W el dibujado
+func retrato_w() -> int:
+	return retrato.texture.get_width() if retrato.texture else RETRATO_W
+
 func retrato_de(_n: String):
 	return null
 
@@ -1648,15 +1652,20 @@ func _coloca() -> void:
 		# en el combate, el texto no pasa por debajo del menú de la derecha (118 de ancho): .dlg con padding-right 126 en el CSS
 		var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
 		dlg.get_theme_stylebox("panel").content_margin_right = ((126 if bt else 10) + 2) * us
-		dlg.get_theme_stylebox("panel").content_margin_left = ((10 + (RETRATO_W + 4 if retrato.visible else 0)) + 2) * us
+		var rw := retrato_w()
+		dlg.get_theme_stylebox("panel").content_margin_left = ((10 + (rw + 4 if retrato.visible else 0)) + 2) * us
 		dlg.reset_size()
 		dlg.size.x = R.size.x - 6 * us
 		dlg.position = Vector2(R.position.x + 3 * us, R.end.y - 3 * us - dlg.size.y)
 		dlg_nm.reset_size()
 		dlg_nm.position = dlg.position + Vector2(6 * us, -12 * us)
 		if retrato.visible:
-			retrato.size = Vector2(RETRATO_W, RETRATO_W) * us
-			retrato.position = dlg.position + Vector2(6 * us, maxf(6 * us, (dlg.size.y - RETRATO_W * us) / 2))
+			retrato.size = Vector2(rw, rw) * us
+			if rw > RETRATO_W:   # el busto, de pie sobre el canto de abajo de la caja y asomando por encima; el nombre, a su derecha
+				retrato.position = dlg.position + Vector2(6 * us, dlg.size.y - (rw + 3) * us)
+				dlg_nm.position.x += (rw + 4) * us
+			else:
+				retrato.position = dlg.position + Vector2(6 * us, maxf(6 * us, (dlg.size.y - rw * us) / 2))
 		dlg_more.position = dlg.position + dlg.size - Vector2(8 * us + 8 * us, 4 * us + 5 * us)
 		dlg_more.size = Vector2(8 * us, 7 * us)
 		# La primera vez, el texto aún no sabe su ancho y el cuadro sale de toda la pantalla; se recoloca al fotograma siguiente

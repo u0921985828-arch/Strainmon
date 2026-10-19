@@ -276,12 +276,25 @@ func retrato_de(n: String):
 				_looks_n[_llano(str(d.id))] = d.look
 		_looks_n["agente"] = "cop"
 	var L = null
+	var lk := ""
 	if _looks_n.has(k) and D.LOOKS.has(_looks_n[k]):
-		L = D.LOOKS[_looks_n[k]]
+		lk = _looks_n[k]
 	elif D.LOOKS.has(k):
-		L = D.LOOKS[k]
+		lk = k
+	if lk != "":
+		L = D.LOOKS[lk]
+		if Datos.CAL and D.GENERO.look.has(lk):   # el mismo muñeco que en el mapa (mk_ent)
+			L = L.duplicate()
+			L.id = D.GENERO.look[lk]
 	elif S.get("name") and _llano(str(S.name)) == k:
 		L = D.LOOKS.player
+		if es_chica():   # la protagonista, la suya (player-f)
+			L = L.duplicate()
+			L.id = "player-f"
+	else:
+		for z in D.RIVALES:   # los rivales, con el muñeco de su pelea (look_rival)
+			if _llano(str(D.RIVALES[z].n)) == k:
+				L = look_rival(D.RIVALES[z])
 	if L is Dictionary:
 		return [L, mujer_look(L)]
 	if habla_look is Dictionary:
@@ -2651,3 +2664,6 @@ func metro_llegada() -> void:
 
 func piso_n(k: String) -> String:
 	return k
+
+func look_rival(_R: Dictionary) -> Dictionary:
+	return {}
