@@ -35,7 +35,8 @@ From the farmhouse in Mendialde to the shipyards, from the old town of Ibarbide 
 · Original, hand-drawn pixel art
 · Original music for each area, by day and by night
 · Touch controls built for landscape play with your thumbs
-· Offline, no ads, no accounts
+· Plays offline, no ads
+· Chapters 1 to 3 free; the full game is a single purchase (no pay-to-win)
 · Autosave and backup
 
 NOTICE: Landrace Hunters is a work of fiction for adults (18+). It is not a growing guide and does not encourage using or selling drugs: growing and selling cannabis is a crime in many countries. All characters, places, brands and strains in the game are fictional.

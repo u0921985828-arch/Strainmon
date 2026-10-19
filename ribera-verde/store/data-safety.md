@@ -1,35 +1,38 @@
 # Formulario «Seguridad de los datos» (Play Console → Contenido de la app → Seguridad de los datos)
 
-Respuestas para la versión de la tienda (`Datos.PLAY = true`, paquete `com.landracehunters.game`). Si una fase posterior añade
-algo que envíe datos (informes de fallos, compras), este archivo se actualiza con ella.
+Respuestas para la versión de la tienda (`Datos.PLAY = true`, paquete `com.landracehunters.game`) desde la fase 6: compra única
+(Facturación de Google Play), Play Games v2 (logros y nube) e informes de errores de Sentry **con consentimiento** (apagados de
+serie). Sin anuncios ni analítica.
 
 ## 1. Recogida y compartición
 
 | Pregunta | Respuesta |
 |---|---|
-| ¿Tu app recoge o comparte alguno de los tipos de datos de usuario obligatorios? | **No** |
-| ¿Todos los datos de usuario recogidos por tu app están cifrados en tránsito? | No aplica (no se envía nada) |
-| ¿Ofreces una forma de que los usuarios pidan que se eliminen sus datos? | No aplica (no se recoge nada; la partida se borra desde el juego o al desinstalar) |
+| ¿Tu app recoge o comparte alguno de los tipos de datos de usuario obligatorios? | **Sí** |
+| ¿Todos los datos de usuario recogidos por tu app están cifrados en tránsito? | **Sí** (HTTPS: Sentry y los servicios de Google) |
+| ¿Ofreces una forma de que los usuarios pidan que se eliminen sus datos? | **Sí** (los informes, por la dirección de contacto; se borran solos a los 90 días) |
 
-Con «No» en la primera pregunta la consola salta el resto y muestra en la ficha «No se recogen datos» y «No se comparten datos
-con terceros».
+## 2. Tipos de datos (solo lo que recoge la app; lo de Play Billing y Play Games lo declara Google)
 
-## 2. Por qué es «No»
+| Categoría → tipo | ¿Recogido? | ¿Compartido? | ¿Opcional? | Para qué |
+|---|---|---|---|---|
+| Información y rendimiento de la app → **Registros de fallos** | Sí | No (Sentry es encargado del tratamiento: no cuenta como compartir) | **Sí** (OPCIONES · INFORMES DE ERRORES, apagado de serie) | Análisis (diagnóstico de fallos) |
+| Información y rendimiento de la app → **Diagnóstico** | Sí (modelo, versión de Android y del juego, hitos de la partida) | No | **Sí** (el mismo interruptor) | Análisis (diagnóstico de fallos) |
+| Identificadores del dispositivo u otros | **No** (Sentry sin PII: `sendDefaultPii=false`, sin capturas ni jerarquía de vistas) | — | — | — |
+| Información personal, ubicación, contactos, fotos, audio, mensajes, salud, finanzas | No | — | — | — |
 
-- El juego no tiene código de red: ni cuentas, ni anuncios, ni analítica, ni informes de fallos.
-- `export_presets.cfg` solo pide `VIBRATE` (la vibración de los mandos, OPCIONES → VIBRACIÓN), que no da acceso a ningún dato; ni `INTERNET` ni ningún otro.
-- La partida y los ajustes se quedan en la carpeta privada de la app.
-- **Copia de seguridad de Android** (`user_data_backup/allow=true`): la hace el sistema, bajo la cuenta de Google del usuario y
-  cifrada; el desarrollador no recibe nada. Según la guía de Google Play, lo que se transfiere con el servicio de copia de
-  seguridad de Android no cuenta como dato «recogido» por la app.
-- El portapapeles solo se usa cuando el jugador pulsa EXPORTAR o IMPORTAR en OPCIONES · COPIA DE SEGURIDAD, y no sale del
-  móvil.
+Notas para la consola:
+- **Compras** (Facturación de Google Play): el pago lo trata Google; la app no ve datos de pago. Google indica que lo que
+  procesa su biblioteca de facturación lo declara él; no se marca «Información financiera».
+- **Play Games**: el inicio de sesión y los logros los trata Google Play Juegos bajo su propia política.
+- **Datos efímeros**: no.
 
 ## 3. Otras casillas de la consola
 
 | Campo | Respuesta |
 |---|---|
-| Permisos | Solo `VIBRATE` (permiso normal, sin acceso a datos) |
+| Permisos | `INTERNET` (de las bibliotecas de Google y Sentry), `POST_NOTIFICATIONS` (solo se pide al activar el aviso de cosecha), `VIBRATE`, `com.android.vending.BILLING` |
 | Anuncios | No contiene anuncios |
-| Acceso a la app | Toda la app es accesible sin credenciales |
+| Compras en la aplicación | Sí: una compra única, «Juego completo» (no consumible) |
+| Acceso a la app | Los capítulos 1 a 3 sin credenciales; el resto, tras la compra. Para la revisión: cuenta de tester de licencias (ver `play-console.md`) |
 | Política de privacidad (URL) | La URL pública de `store/privacy-policy.md` |

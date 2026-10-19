@@ -45,6 +45,16 @@
 - **Texto** (`ui.gd`): −42 % de cajas en los capítulos 1-3 (95 → 55, contando el arranque corto; `RECORTE` en `datos.json` quita 15 líneas de relleno), A mantenida pasa el texto y las cajas solas (`RAPIDO_MS`) y START → REGISTRO enseña las últimas 80 cajas (`registro`).
 - **OPCIONES de accesibilidad**: TAMAÑO DE TEXTO S/M/L (nunca por debajo de 14 sp, `fs_txt`), ZURDO (la cruceta a la derecha y A/B a la izquierda), DALTÓNICO (gota y marca de lista junto a las barras de las plantas, `Vista.DALTONICO`) y SIN DESTELLOS (sin parpadeo de las barras, del enemigo golpeado, del temblor ni del relámpago, `Vista.CALMA`).
 
+### Fase 6 · retención y métricas (U7, U10, U11), con `Datos.PLAY`
+- **Progreso offline** (`retencion.gd`: `minutos_fuera`, `crece_fuera`, `fuera_desde`): al volver o al CONTINUAR, las plantas crecen el tiempo real que estuviste fuera (`OFFLINE.min_h` minutos de juego por hora, tope `OFFLINE.tope_h` = 8 h) sin sed, plagas ni muertes; el reloj y la deuda no corren. Desde `OFFLINE.aviso` minutos, la pantalla «MIENTRAS ESTABAS FUERA» (cuántas crecieron y cuántas están listas). `S.ts` se guarda con la partida.
+- **Aviso de cosecha** opcional (OPCIONES · AVISO DE COSECHA, apagado): al salir, una notificación local para cuando la primera planta esté lista (`seg_cosecha`); `POST_NOTIFICATIONS` se pide solo al activarlo.
+- **Objetivos diarios** (`DIARIOS` en `datos.json`; START → OBJETIVO → DIARIOS): tres al día, rotando por la fecha, con un abono por cada uno.
+- **Demo + compra única** (`COMPLETO`): los capítulos 1-3 gratis; al pagar el plazo del capítulo 3, «FIN DE LA DEMO» con «Comprar el juego completo» (`juego_completo`, no consumible) o «Más tarde» (START → JUEGO COMPLETO). Sin ventajas de pago.
+- **Play Games v2**: los 27 logros (`datos/play_games.json`, 1000 puntos) y CARGAR DE LA NUBE en COPIA DE SEGURIDAD (se sube al salir).
+- **Informes de errores** (OPCIONES · INFORMES DE ERRORES, opt-in): Sentry sin PII y eventos del embudo de la primera hora (`evento`: capítulos, primer riego, plantar, cosecha) solo con el consentimiento.
+- **Plugin Android** propio (`tools/android-plugin`, `tools/plugin-android.sh` → `godot/addons/landrace_play/bin/landrace-play.aar`; `addons/landrace_play/export_plugin.gd` añade el AAR, Billing 7.1.1, Play Games v2 20.1.2, Sentry 7.22.6 y el APP_ID). `plataforma.gd` lo envuelve y, sin él, no hace nada.
+- PRIVACIDAD, `store/privacy-policy.md`, `data-safety.md`, `iarc.md`, las fichas, `store/play-console.md` (lo que hace Eddie) y `store/logros-play-games.csv`. Prueba nueva `tests/retencion.gd` (41 comprobaciones: 0 h, 3 h y 30 h → tope; logros 27/27; compra cancelada, más tarde y hecha).
+
 ## 1.57.2 · Godot 0.47.1 (código 66; plugin de WordPress 1.5.4)
 
 Lo que pidió el usuario tras la 1.57.1 («Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear o por lo menos como está usado» y «en la carretera de la pantalla de carga, que se vea alguna planta en vegetativo, alguna floración, dependiendo del punto del año… cómo sería el cultivo en exterior»). Solo Godot, con `Datos.CAL`.

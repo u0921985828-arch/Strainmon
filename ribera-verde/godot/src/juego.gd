@@ -1,8 +1,8 @@
 # Ribera Verde (Godot) — 15-arranque y el bucle: guardar y cargar (con migrate de las partidas viejas), el título, el nombre,
 # la partida nueva, entrar en el juego, update (el jugador, los personajes, el reloj del juego y los eventos pendientes) y
 # el HUD. El dibujo de cada modo (mundo, carpa, combate, título) lo hace pinta.gd en el lienzo de SW × SH (180).
-# Cadena: ui → mundo → granja → trama → juego (este es el script de la escena).
-extends "res://src/trama.gd"
+# Cadena: ui → mundo → granja → trama → retencion → juego (este es el script de la escena).
+extends "res://src/retencion.gd"
 
 const Pinta = preload("res://src/pinta.gd")
 const Arte = preload("res://src/arte.gd")
@@ -20,6 +20,9 @@ func _ready() -> void:
 	pintor.J = self
 	lienzo.add_child(pintor)
 	name_in.text_submitted.connect(func(_t): if name_box.visible: press("A"))
+	if Datos.PLAY:   # fase 6: los informes (si los aceptó) y las compras ya hechas
+		plat().errores(aj.get("errores", false))
+		plat().consultar()
 	if OS.get_cmdline_user_args().has("--sin-arranque"):
 		return
 	if Datos.CAL and not OS.get_cmdline_user_args().has("--sin-carga"):
@@ -129,8 +132,10 @@ func _notification(w: int) -> void:
 	elif w == NOTIFICATION_APPLICATION_PAUSED or w == NOTIFICATION_WM_CLOSE_REQUEST:
 		suelta_todo()
 		guarda_al_salir()
+		al_pausar()   # fase 6: el aviso de la cosecha y la nube
 	elif w == NOTIFICATION_APPLICATION_RESUMED:
 		ajusta.call_deferred()   # R12: la muesca puede haber cambiado de lado mientras no se veía
+		al_volver()   # fase 6: lo que han crecido las plantas
 		# al volver a la app, andando por el mapa, en pausa: el menú START
 		if mode == "world" and is_free() and not P.moving:
 			press("START")
@@ -161,6 +166,8 @@ func save():
 	S.x = P.x
 	S.y = P.y
 	S.dir = P.dir
+	if Datos.PLAY and not oraculo:   # fase 6: la hora del móvil al guardar, para el progreso offline
+		S.ts = ahora()
 	var o: Dictionary = S
 	var cola := cola_guardar()
 	if cola.size():
@@ -397,10 +404,12 @@ func _title_press() -> void:
 		elif ops[i] == "CONTINUAR":
 			S = sv
 			migrate()
+			var ts := float(S.get("ts", 0))
 			await fade(1)
 			if not oraculo:
 				titulo.hide()
 			enter_game()
+			fuera_desde(ts)   # fase 6
 			await fade(0)
 			show_objective()
 			return
@@ -454,9 +463,11 @@ static func limpia_import(v):
 # y, al cerrarse todo (run, lock 0), se carga como CONTINUAR (relanza)
 var relanza := false
 
-func importar(desde_titulo := false) -> void:
-	var t = await pedir_partida("Pega aquí la partida exportada")
-	if t == null:
+func importar(desde_titulo := false, nube = null) -> void:
+	var t = nube if nube != null else await pedir_partida("Pega aquí la partida exportada")   # fase 6: o la de la nube
+	if t == null or t == "":
+		if nube != null:
+			await say("No hay ninguna partida en la nube.")
 		return
 	var js := JSON.new()   # (JSON.parse_string avisa en la consola si no es JSON)
 	var s = limpia_import(Datos.enteros(js.data)) if js.parse(t) == OK and js.data is Dictionary else null
@@ -507,12 +518,16 @@ func copia_seguridad(desde_titulo: bool) -> void:
 	if not desde_titulo:
 		it.append({"label": "EXPORTAR PARTIDA"})
 	it.append({"label": "IMPORTAR PARTIDA"})
+	if Datos.PLAY and plat().hay():   # fase 6: Play Games (se sube sola al salir de la app)
+		it.append({"label": "CARGAR DE LA NUBE"})
 	it.append({"label": "VOLVER"})
 	var i: int = await menu(it, {"cls": "start", "title": "COPIA DE SEGURIDAD"})
 	if i < 0 or it[i].label == "VOLVER":
 		return
 	if it[i].label == "EXPORTAR PARTIDA":
 		await exportar()
+	elif it[i].label == "CARGAR DE LA NUBE":
+		await importar(desde_titulo, await plat().nube_carga())
 	else:
 		await importar(desde_titulo)
 
@@ -538,6 +553,8 @@ func opciones(desde_titulo := false) -> void:
 			it.insert(c + 1, {"label": "ZURDO", "right": "SÍ" if aj.get("zurdo") else "NO"})
 			it.insert(c + 2, {"label": "DALTÓNICO", "right": "SÍ" if aj.get("dalt") else "NO"})
 			it.insert(c + 3, {"label": "SIN DESTELLOS", "right": "SÍ" if aj.get("calma") else "NO"})
+			it.insert(c + 4, {"label": "AVISO DE COSECHA", "right": "SÍ" if aj.get("avisos") else "NO"})   # fase 6
+			it.insert(c + 5, {"label": "INFORMES DE ERRORES", "right": "SÍ" if aj.get("errores") else "NO"})
 		it.append({"label": "VOLVER"})
 		i = await menu(it, {"cls": "start", "initial": i, "title": "OPCIONES"})
 		if i < 0 or it[i].label == "VOLVER":
@@ -577,6 +594,19 @@ func opciones(desde_titulo := false) -> void:
 				aj.dalt = not aj.get("dalt", false)
 			"SIN DESTELLOS":
 				aj.calma = not aj.get("calma", false)
+			"AVISO DE COSECHA":   # fase 6: el permiso de Android 13 solo al activarlo
+				aj.avisos = not aj.get("avisos", false)
+				if aj.avisos and not await plat().permiso_avisos():
+					aj.avisos = false
+					await say("Sin permiso para avisar. Se puede dar en los ajustes del móvil.")
+				elif aj.avisos:
+					await say("Te avisaremos cuando una planta esté lista para cosechar (con la app cerrada).")
+			"INFORMES DE ERRORES":   # fase 6 (U10): opt-in
+				if not aj.get("errores", false):
+					aj.errores = await ask("Si el juego falla, ¿enviar un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y dónde falló) para arreglarlo? Sin datos personales ni de la partida. Se puede quitar cuando quieras.", ["Sí, enviar", "No"]) == 0
+				else:
+					aj.errores = false
+				plat().errores(aj.errores)
 			"BORRAR PARTIDA":
 				if await ask("¿Borrar la partida guardada? No se puede deshacer.", ["Sí, borrarla", "No"]) == 0:
 					DirAccess.remove_absolute(ProjectSettings.globalize_path(GUARDADO))
@@ -609,12 +639,14 @@ Ribera Verde, Mendialde, Puerto Viejo, Valdehierro, Errotabarri y sus personajes
 El cultivo y la venta de cannabis son delito en muchos países. Este juego no anima a consumir ni a vender.
 
 Gracias por jugar."""
-const PRIVACIDAD := """Landrace Hunters no recoge, no envía y no comparte ningún dato.
+const PRIVACIDAD := """Landrace Hunters no vende, no alquila y no usa tus datos para anuncios.
 
-· No tiene cuentas, anuncios ni compras.
-· No usa internet ni pide permisos (salvo el de vibrar, para los mandos).
-· La partida y los ajustes se guardan solo en este móvil, en la carpeta privada de la app. Se borran al desinstalarla (o desde OPCIONES · BORRAR PARTIDA).
-· Si tienes activada la copia de seguridad de Android, el sistema la guarda en tu cuenta de Google (no pasa por nosotros) y la devuelve al reinstalar.
+· Se juega sin conexión y sin anuncios. Los capítulos 1 a 3 son gratis; el juego completo es una compra única por Google Play: la tarjeta y el pago los gestiona Google, nosotros solo sabemos que está comprado.
+· Play Games (si inicias sesión): los logros y la partida en la nube se guardan en tu cuenta de Google Play Juegos.
+· Informes de errores (OPCIONES · INFORMES DE ERRORES, apagados de serie): si los activas y el juego falla, se envía un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y lo que fallaba), sin tu nombre, cuenta ni partida. Se apagan en el mismo sitio.
+· Aviso de cosecha (OPCIONES · AVISO DE COSECHA, apagado de serie): el móvil te avisa cuando tus plantas están listas. Pide el permiso de notificaciones solo si lo activas; el aviso se programa en el propio móvil.
+· La partida y los ajustes se guardan en este móvil, en la carpeta privada de la app. Se borran al desinstalarla (o desde OPCIONES · BORRAR PARTIDA).
+· Si tienes activada la copia de seguridad de Android, el sistema la guarda en tu cuenta de Google (no pasa por nosotros).
 
 Si tienes dudas, escribe a la dirección de contacto de la ficha de la tienda."""
 

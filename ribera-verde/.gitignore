@@ -5,3 +5,8 @@ __pycache__/
 dist/ribera-verde-godot.apk
 dist/landrace-hunters.aab
 dist/landrace-hunters.apk
+tools/android-plugin/build/
+tools/android-plugin/libs/
+tools/android-plugin/local.properties
+tools/android-plugin/.gradle/
+.modo-absoluto/

@@ -87,6 +87,10 @@ func advance_time(mn: int) -> void:
 			S.min -= 1440
 			new_day()
 
+# fase 6: los objetivos diarios cuentan riegos, plantas y cosechas (retencion.gd)
+func cuenta(_k: String) -> void:
+	pass
+
 func tick_minute() -> void:
 	S.min += 1
 	if S.min % 10 == 0:
@@ -246,6 +250,7 @@ func plantar(i: int) -> void:
 	var j: int = await menu(items, {"cls": "full", "title": "¿QUÉ PLANTAS?", "desc": true})
 	if j < 0 or j >= own.size() + esq.size():
 		return
+	cuenta("plantar")
 	if j >= own.size():
 		var e: Dictionary = esq[j - own.size()][0]
 		var l: Array = S.bandejas if esq[j - own.size()][1] else S.esquejes
@@ -341,6 +346,7 @@ func pot_action(i: int) -> void:
 		await accion("regar", {"id": "vfx-gotas", "x": v[0], "y": v[1] - 6})
 		p.water = 100
 		S.flags.gRiego = 1
+		cuenta("riego")
 		sfx("sel")
 		await say("Riegas la planta. Agua al 100%.")
 	elif op == "Abonar":
@@ -641,6 +647,7 @@ func semillas_cosecha(p: Dictionary) -> Dictionary:
 
 func harvest(i: int) -> void:
 	var p: Dictionary = S.pots[i]
+	cuenta("cosecha")
 	var s = strain(p.sid)
 	var f := factores(i)
 	var fe: Dictionary = p.f if p.get("f") else {"t": 1, "y": 1}

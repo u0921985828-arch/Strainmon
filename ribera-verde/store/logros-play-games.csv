@@ -1,0 +1,28 @@
+clave,nombre,descripcion,puntos
+venta,"Primera venta","Vende hierba por primera vez.",10
+cosecha,"Primera cosecha","Cosecha tu primera planta.",10
+diario,"El diario de la tía","Encuentra el diario de la tía Maite.",10
+estrella,"Fenotipo estrella","Cosecha una planta con fenotipo estrella.",30
+receta,"Primera receta","Saca en la mesa y cosecha una variedad de receta del diario.",20
+recetas10,"Diez recetas","Cosecha diez variedades de receta.",60
+jack,"La meta de la tía","Cosecha la Jack Herer.",100
+mitad,"Media Genoteca","Ten 44 de las 87 variedades en la Genoteca.",50
+genoteca,"Genoteca completa","Las 87 variedades en la Genoteca.",90
+landraces,"Cazador de landraces","Las 31 landraces en la Genoteca.",60
+tia,"Tras la pista de la tía","Las 7 landraces que dejó la tía Maite (en casa, por la comarca y con Miren), en la Genoteca.",40
+rosin,"Prensado","Prensa tu primer rosin.",20
+cata,"Catador","Cata tu propia hierba.",15
+club,"Socio","Hazte el carné de un club cannábico.",20
+presidente,"Como la tía Maite","Preside la Asociación Cannábica Ribera Verde.",50
+goteo,"Riego automático","Monta el goteo en una carpa.",20
+carpas,"Tres carpas","Ten tres carpas montadas en el piso.",30
+plazo,"Primer plazo","Paga el primer plazo de la deuda.",30
+libre,"Sin deudas","Salda la deuda con Don Baltasar.",70
+ventas10,"10.000 € en ventas","Llega a 10.000 € vendidos.",30
+ventas100,"100.000 € en ventas","Llega a 100.000 € vendidos.",60
+rival,"Esta es mi calle","Gana a un rival de zona.",30
+darko,"Ajuste de cuentas","Gana a Darko.",50
+plantilla,"Tu gente","Ten a alguien del barrio en la plantilla.",25
+nave,"La nave","Alquila la nave de Valdehierro.",40
+ruedas,"Sobre ruedas","Cómprate el patinete o la bici.",15
+casa,"A tu gusto","Cambia el suelo o las paredes del piso.",15

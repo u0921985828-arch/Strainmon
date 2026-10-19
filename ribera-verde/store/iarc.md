@@ -16,8 +16,8 @@ billar). Hay que contestar con la verdad: una clasificación falsa es motivo de 
 | **Delito** | ¿Se muestran o se premian actos delictivos? | **Sí** | Tráfico de drogas ficticio, lavar dinero en negocios, sobornar a un policía (cuota) y huir de las patrullas. Hay consecuencias: multas, redadas y embargos |
 | Apuestas | ¿Apuestas simuladas o juegos de azar? | **No** | En la versión de la tienda el billar es solo partidas sin dinero (`talk_billar`, «Una partida» / «Nada») |
 | Apuestas | ¿Apuestas con dinero real? | No | |
-| Compras | ¿Compras digitales o cajas de botín? | No | (si se activa el desbloqueo de la fase 6: «Sí, compra única, sin elementos aleatorios») |
-| Interacción | ¿Usuarios que interactúan o se comunican? | No | |
+| Compras | ¿Compras digitales o cajas de botín? | **Sí: compras digitales** | Una compra única «Juego completo» (capítulos 4 a 8); sin cajas de botín ni elementos aleatorios |
+| Interacción | ¿Usuarios que interactúan o se comunican? | No | Play Games solo guarda logros y la partida; sin chat ni multijugador |
 | Interacción | ¿Comparte la ubicación del usuario? | No | |
 | Interacción | ¿Información personal compartida con terceros? | No | |
 | Otros | ¿Navegador web sin restricciones? | No | |

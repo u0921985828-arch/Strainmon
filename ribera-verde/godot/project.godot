@@ -36,3 +36,7 @@ textures/vram_compression/import_etc2_astc=true
 2d/snap/snap_2d_transforms_to_pixel=true
 2d/snap/snap_2d_vertices_to_pixel=true
 environment/defaults/default_clear_color=Color(0.0706, 0.0824, 0.098, 1)
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/landrace_play/plugin.cfg")

@@ -34,7 +34,8 @@ Del caserío de Mendialde a los astilleros, del casco viejo de Ibarbide al puert
 · Pixel art original, dibujado a mano
 · Música propia por zonas, de día y de noche
 · Mandos táctiles para jugar en horizontal con los pulgares
-· Sin conexión, sin anuncios y sin cuentas
+· Se juega sin conexión y sin anuncios
+· Capítulos 1 a 3 gratis; el juego completo, con una sola compra (sin ventajas de pago)
 · Guardado automático y copia de seguridad
 
 AVISO: Landrace Hunters es una obra de ficción para mayores de 18 años. No es una guía de cultivo ni anima a consumir ni a vender: el cultivo y la venta de cannabis son delito en muchos países. Los personajes, lugares, marcas y variedades del juego son inventados.

@@ -857,10 +857,9 @@ func talk_baltasar():
 	toast("Pagado: " + Datos.eur(paid), 1500)
 	if S.ch == 3:
 		await talk(N, ["Puntual. Así me gusta.", "Quedan %s. Ya te avisaré del siguiente plazo." % Datos.eur(S.debt).replace(" €", "")])
-		await chapter(4)
-		await talk("SMS · KIKO", ["Pásate por el growshop. Tengo algo para ti."])
-		await lineas_nuevas()
-		show_objective()
+		if Datos.PLAY and await demo_corta():   # U11 (fase 6): la demo acaba aquí sin el juego completo
+			return
+		await cap4_sigue()
 	elif S.ch == 5:
 		await talk(N, ["Me sorprendes, {N}.", "Quedan %s. Te propongo algo." % Datos.eur(S.debt).replace(" €", ""), "La COPA DE RIBERA se juega estos días en la plaza. Premio: %s." % Datos.eur(D.PREMIO_COPA),
 			"Mi sobrino Darko compite. No ha perdido nunca.", "Gana la Copa y, con el premio y lo que vendas, me pagas lo que queda. Si puedes."])
@@ -883,8 +882,35 @@ func lineas_nuevas() -> void:
 	if L.size():
 		await talk("SMS · AUTOBUSES DE LA COMARCA", ["Nueva línea desde Ribera Verde: %s." % _lista(L), "Salidas de %d:%02d a %d:%02d, en la parada de la calle Ribera." % [int(D.BUS_HORAS[0]) / 60, int(D.BUS_HORAS[0]) % 60, int(D.BUS_HORAS[1]) / 60, int(D.BUS_HORAS[1]) % 60]])
 
+# el capítulo 4 tras el primer plazo (fase 6: también desde START · JUEGO COMPLETO, al comprar después)
+func cap4_sigue() -> void:
+	await chapter(4)
+	await talk("SMS · KIKO", ["Pásate por el growshop. Tengo algo para ti."])
+	await lineas_nuevas()
+	show_objective()
+
+# fase 6 (retencion.gd): la demo, los objetivos diarios y Play Games
+func demo_corta() -> bool:
+	return false
+
+func demo_menu() -> bool:
+	return false
+
+func diario_revisa() -> void:
+	pass
+
+func diarios_txt() -> String:
+	return ""
+
+func diario_menu() -> void:
+	pass
+
+func logro_play(_id: String) -> void:
+	pass
+
 func chapter(nn: int) -> void:
 	S.ch = nn
+	evento("cap_%d" % nn)
 	sfx("get")
 	toast("<small>CAPÍTULO %d</small>%s" % [nn, D.CH_TITLES[str(nn)]], 2800)
 	cap_hasta = M.reloj + 2800
@@ -1112,10 +1138,12 @@ func logros_n() -> int:
 	return D.LOGROS.filter(func(l): return S.logros.has(l.id)).size()
 
 func revisa_logros() -> void:
+	diario_revisa()   # fase 6
 	for l in D.LOGROS:
 		if not S.logros.has(l.id) and logro_ok(l.id):
 			S.logros[l.id] = S.day
 			logro_aviso.append(l.id)
+			logro_play(l.id)
 	if logro_aviso.size():
 		queue("logro", aviso_logro)
 
@@ -1182,6 +1210,8 @@ func objetivo_menu():
 		if Datos.CAL:   # 1.51
 			var rv := recados_ver()
 			it.append({"label": "RECADOS", "right": "%d/%d" % [rv.filter(func(sc): return sec_estado(sc.id) == 2).size(), rv.size()], "desc": "Lo que te piden por la comarca, según el capítulo. Pulsa A para verlos."})
+		if Datos.PLAY:   # fase 6
+			it.append({"label": "DIARIOS", "right": diarios_txt(), "desc": "Tres objetivos al día; cada uno da un abono. Pulsa A para verlos."})
 		it.append({"label": "LOGROS", "right": "%d/%d" % [logros_n(), D.LOGROS.size()], "desc": "Lo que llevas conseguido en la partida. Pulsa A para verlos."})   # 1.27
 		it.append({"label": "DEUDA", "right": Datos.eur(S.debt), "desc": plazo + "Ventas %s · Reputación %s · Calor %d %%" % [Datos.eur(S.sales), n(S.rep), Datos.jsround(S.heat)]})
 		it.append({"label": "Volver", "desc": ""})
@@ -1189,10 +1219,13 @@ func objetivo_menu():
 		if iti and i == 1:
 			await itinerario_menu()
 			continue
+		if i >= 0 and it[i].label == "DIARIOS":
+			await diario_menu()
+			continue
 		if i == it.size() - 3:   # 1.27
 			await logros_menu()
 			continue
-		if Datos.CAL and i == it.size() - 4:   # 1.51
+		if Datos.CAL and i == it.size() - (5 if Datos.PLAY else 4):   # 1.51
 			await recados_menu()
 			continue
 		return
@@ -1738,9 +1771,16 @@ func start_menu():
 			{"label": "OPCIONES", "ic": icono("altavoz")}, {"label": "SALIR", "ic": icono("salir")}]
 		if Datos.PLAY:   # U4: el registro de diálogo
 			it.insert(5, {"label": "REGISTRO", "right": str(registro.size()), "ic": icono("movil")})
+		if Datos.PLAY and S.flags.get("demo4"):   # U11: la demo, acabada
+			it.insert(0, {"label": "JUEGO COMPLETO", "right": "cap. %d" % int(D.COMPLETO.ch), "ic": icono("trofeo")})
 		i = await menu(it, {"cls": "start", "initial": i, "startCloses": true, "title": "%s · %s" % [Datos.fd_hud(S.day), reloj_txt()], "title2": Datos.eur(S.money)})
 		if i < 0 or it[i].label == "SALIR":
 			return
+		if it[i].label == "JUEGO COMPLETO":
+			if await demo_menu():
+				await cap4_sigue()
+				return
+			continue
 		if it[i].label == "REGISTRO":
 			await leer("REGISTRO", "\n\n".join(PackedStringArray(_registro_inv())) if registro.size() else "Todavía no has hablado con nadie.")
 			continue

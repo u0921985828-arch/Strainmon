@@ -408,7 +408,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("OPCIONES"), 60)
 	await elige("OPCIONES")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
-	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "TAMAÑO DE TEXTO", "ZURDO", "DALTÓNICO", "SIN DESTELLOS", "COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
+	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "TAMAÑO DE TEXTO", "ZURDO", "DALTÓNICO", "SIN DESTELLOS"] + (["AVISO DE COSECHA", "INFORMES DE ERRORES"] if Datos.PLAY else []) + ["COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
 	await elige("MÚSICA")
 	await hasta(func(): return J.menu_box.visible, 60)
 	var so0 = J.sonido
@@ -580,7 +580,7 @@ func menu_start() -> void:
 	# OBJETIVO (1.11): una lista con el capítulo, las misiones (ninguna antes de conocer a Kiko) y la deuda
 	await elige("OBJETIVO")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OBJETIVO", 60)
-	check("Objetivo: el capítulo y la carta, el itinerario (1.23) al principio, sin misiones hasta conocer a Kiko, los logros (1.27) y la deuda", etiquetas() == (["CAPÍTULO 1", "ITINERARIO", "RECADOS", "LOGROS", "DEUDA", "Volver"] if Datos.CAL else ["CAPÍTULO 1", "ITINERARIO", "LOGROS", "DEUDA", "Volver"])
+	check("Objetivo: el capítulo y la carta, el itinerario (1.23) al principio, sin misiones hasta conocer a Kiko, los logros (1.27) y la deuda", etiquetas() == (["CAPÍTULO 1", "ITINERARIO"] + (["RECADOS"] if Datos.CAL else []) + (["DIARIOS"] if Datos.PLAY else []) + ["LOGROS", "DEUDA", "Volver"])
 		and str(J.m_items[0].desc).contains("carta") and J.m_i == 1 and str(J.m_items[1].right) == "1/14" and str(J.m_items[-3].right) == "%d/%d" % [J.logros_n(), J.D.LOGROS.size()] and str(J.m_items[-2].right) == Datos.eur(30000))
 	await pulsa("A")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "ITINERARIO", 60)
