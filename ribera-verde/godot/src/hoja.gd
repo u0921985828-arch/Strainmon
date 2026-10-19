@@ -8,6 +8,7 @@
 extends RefCounted
 
 const Datos = preload("res://src/datos.gd")
+const I18n = preload("res://src/i18n.gd")
 
 const W := 64
 const H := 64
@@ -93,17 +94,17 @@ static func imagen(p: Dictionary) -> Image:
 static func grupo(ind: float, landrace: bool) -> String:
 	var pi_ := roundi(ind * 100)
 	if pi_ <= 10:
-		return "Sativa" + (" · landrace pura" if landrace else "") + " · ~%d %% sativa" % (100 - pi_)
+		return I18n.T("Sativa · landrace pura · ~{n} % sativa", {"n": 100 - pi_}) if landrace else I18n.T("Sativa · ~{n} % sativa", {"n": 100 - pi_})
 	if pi_ < 40:
-		return "Híbrido de dominancia sativa · ~%d/%d sativa" % [100 - pi_, pi_]
+		return I18n.T("Híbrido de dominancia sativa · ~{a}/{b} sativa", {"a": 100 - pi_, "b": pi_})
 	if pi_ <= 60:
-		return ("Landrace intermedia" if landrace else "Híbrido equilibrado") + " · ~%d/%d" % [100 - pi_, pi_]
+		return I18n.T("Landrace intermedia · ~{a}/{b}", {"a": 100 - pi_, "b": pi_}) if landrace else I18n.T("Híbrido equilibrado · ~{a}/{b}", {"a": 100 - pi_, "b": pi_})
 	if pi_ < 90:
-		return "Híbrido de dominancia índica · ~%d/%d índica" % [pi_, 100 - pi_]
-	return "Índica" + (" · landrace pura" if landrace else "") + " · ~%d %% índica" % pi_
+		return I18n.T("Híbrido de dominancia índica · ~{a}/{b} índica", {"a": pi_, "b": 100 - pi_})
+	return I18n.T("Índica · landrace pura · ~{n} % índica", {"n": pi_}) if landrace else I18n.T("Índica · ~{n} % índica", {"n": pi_})
 
 static func como(p: Dictionary) -> String:
 	var ind: float = p.ind
-	var fo := "%d foliolos" % int(p.f)
-	var an := "finos y largos" if ind < .3 and float(p.a) < 1.15 else ("anchos y cortos" if ind > .7 or float(p.a) > 1.2 else "medianos")
-	return "Hoja de %s %s%s." % [fo, an, ", con las puntas caídas" if float(p.cu) > .3 else ""]
+	var fo := I18n.T("{n} foliolos", {"n": int(p.f)})
+	var an := I18n.K("finos y largos") if ind < .3 and float(p.a) < 1.15 else (I18n.K("anchos y cortos") if ind > .7 or float(p.a) > 1.2 else I18n.K("medianos"))
+	return I18n.T("Hoja de {fo} {an}, con las puntas caídas.", {"fo": fo, "an": an}) if float(p.cu) > .3 else I18n.T("Hoja de {fo} {an}.", {"fo": fo, "an": an})

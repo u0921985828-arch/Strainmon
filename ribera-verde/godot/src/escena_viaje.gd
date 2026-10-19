@@ -8,6 +8,7 @@ extends RefCounted
 const Croquis = preload("res://src/croquis.gd")
 const Atlas = preload("res://src/atlas.gd")
 const Datos = preload("res://src/datos.gd")
+const I18n = preload("res://src/i18n.gd")
 
 const DUR := 3000.0      # ms: entra, rueda y sale
 const ENTRA := 700.0
@@ -104,7 +105,7 @@ static func pinta(P, V: Dictionary, now: float) -> void:
 	# arriba, el trayecto y los minutos; abajo, la barra
 	var t1: String = "%s - %s" % [String(V.de), String(V.a)]
 	_texto(P, (sw - Croquis.ancho(t1) * 2) / 2, 30, t1, 2)
-	var t2: String = "%d MIN" % int(V.min)
+	var t2: String = I18n.T("{n} MIN", {"n": int(V.min)})
 	_texto(P, (sw - Croquis.ancho(t2)) / 2, 44, t2, 1)
 	var bw := sw - 40
 	P._rect(20, sh - 6, bw, 3, Color(0, 0, 0, 0.5))
@@ -222,7 +223,7 @@ static func _coches(P, e: float, suelo1: int, suelo0: int) -> void:
 # calle del juego vista de lado, quieta, de abajo arriba: la acera de delante, la calzada (dos carriles), la acera de detrás y dos filas de
 # hierba con árboles y setos, el monte y el cielo; por las aceras, gente andando, en bici y en patinete; por la calzada, los vehículos de
 # perfil. La carga y el título (CALLE_FIL: filas de 16 px desde abajo)
-const CALLE_FIL := ["grass", "walk", "roadB", "roadT", "walk", "grass", "grass"]   # abajo, la hierba con la barra de la carga
+const CALLE_FIL := ["grass", "walk", "roadB", "roadT", "walk", "grass", "grass"]   # i18n-no · abajo, la hierba con la barra de la carga
 # los de las aceras: acera (0 la de detrás, 1 la de delante), sentido, px/ms, dónde va en la vuelta (0..1) y vehículo
 const PEATONES := [[0, 1, 0.040, 0.05, ""], [0, -1, 0.034, 0.40, ""], [0, 1, 0.085, 0.62, "bici"], [0, -1, 0.045, 0.85, ""],
 	[1, -1, 0.042, 0.20, ""], [1, 1, 0.066, 0.50, "patinete"], [1, -1, 0.090, 0.75, "bici"], [1, 1, 0.038, 0.95, ""]]

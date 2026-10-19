@@ -2,6 +2,8 @@
 # cuentas de color y de porte de 00-nucleo, 03-datos y 09b-carpa, con el mismo redondeo que JavaScript
 extends RefCounted
 
+const I18n = preload("res://src/i18n.gd")
+
 static var D := {}
 
 static func carga() -> Dictionary:
@@ -129,7 +131,7 @@ static func _aplica_auto() -> void:
 # comparan con el HTML congelado (historia, C1, pantallas) ponen CAL = false: «día N» y un mes por día, como antes.
 static var CAL := true
 const CAL0 := [2026, 4, 20]
-const DIA_SEM := ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+const DIA_SEM := ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]   # i18n-no: se traducen al enseñarlos (I18n.v)
 const MES_N := ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
 static func bisiesto(y: int) -> bool:
@@ -171,33 +173,32 @@ static func dia_de(y: int, m: int, d: int) -> int:
 # «día 12» (CAL = false) o «12 de mayo» (con el año si no es el de hoy, hoy)
 static func fd(dia: int, hoy := -1) -> String:
 	if not CAL:
-		return "día %s" % js_num(dia)
+		return I18n.T("día {n}", {"n": js_num(dia)})
 	var f := fecha(dia)
-	var t := "%d de %s" % [f.d, MES_N[f.m - 1]]
 	if hoy >= 0 and int(fecha(hoy).y) != int(f.y):
-		t += " de %d" % f.y
-	return t
+		return I18n.T("{d} de {m} de {y}", {"d": f.d, "m": MES_N[f.m - 1], "y": f.y})
+	return I18n.T("{d} de {m}", {"d": f.d, "m": MES_N[f.m - 1]})
 
 # corto, para las columnas de los menús: «día 12» o «12 may»
 static func fd_corto(dia: int) -> String:
 	if not CAL:
-		return "día %s" % js_num(dia)
+		return I18n.T("día {n}", {"n": js_num(dia)})
 	var f := fecha(dia)
-	return "%d %s" % [f.d, MES_N[f.m - 1].substr(0, 3)]
+	return "%d %s" % [f.d, I18n.v(MES_N[f.m - 1]).substr(0, 3)]
 
 # el de arriba (HUD, START y móvil): «DÍA 12» o «LUN 20 ABR»
 static func fd_hud(dia: int) -> String:
 	if not CAL:
-		return "DÍA %s" % js_num(dia)
+		return I18n.T("DÍA {n}", {"n": js_num(dia)})
 	var f := fecha(dia)
-	return "%s %d %s" % [DIA_SEM[f.s].substr(0, 3).to_upper(), f.d, MES_N[f.m - 1].substr(0, 3).to_upper()]
+	return "%s %d %s" % [I18n.v(DIA_SEM[f.s]).substr(0, 3).to_upper(), f.d, I18n.v(MES_N[f.m - 1]).substr(0, 3).to_upper()]
 
 # entera: «lunes, 20 de abril de 2026»
 static func fd_larga(dia: int) -> String:
 	if not CAL:
-		return "día %s" % js_num(dia)
+		return I18n.T("día {n}", {"n": js_num(dia)})
 	var f := fecha(dia)
-	return "%s, %d de %s de %d" % [DIA_SEM[f.s], f.d, MES_N[f.m - 1], f.y]
+	return I18n.T("{s}, {d} de {m} de {y}", {"s": DIA_SEM[f.s], "d": f.d, "m": MES_N[f.m - 1], "y": f.y})
 
 # ---------- el tiempo de fuera (1.52): por mes del calendario, uno por día ----------
 static func estacion(dia: int) -> String:
@@ -389,7 +390,7 @@ static func js_num(x) -> String:
 		return str(x)
 	var f: float = x
 	if is_nan(f):
-		return "NaN"
+		return "NaN"   # i18n-no
 	if f == floorf(f) and absf(f) < 1e21:
 		return str(int(f))
 	for d in range(1, 21):
@@ -539,7 +540,7 @@ static func nombre_cruce(wa: Array, wb: Array, usado: Callable) -> String:
 			base = n
 			break
 	if base == "":
-		base = (wa[0] if wa.size() else (wb[0] if wb.size() else "Cruce")).substr(0, NOM_MAX - 4)
+		base = (wa[0] if wa.size() else (wb[0] if wb.size() else I18n.K("Cruce"))).substr(0, NOM_MAX - 4)
 	var k := 2
 	while true:
 		var nm := base.substr(0, NOM_MAX - 2 - str(k).length()).rstrip(" ") + " #" + str(k)
@@ -577,7 +578,7 @@ static func cross_result(S: Dictionary, a: String, b: String) -> String:
 		C.y = jsround((A.y + B.y) / 2.0 + R.sig() * 8 - 4)
 		C.d = jsround(((A.d + B.d) / 2.0 + R.sig() * .6 - .3) * 2) / 2.0
 		C.r = int(clamp_js(jsround((A.r + B.r) / 2.0 + R.sig() * 10 - 5), 20, 95))
-		C.o = A.n + " × " + B.n + " · híbrido propio"
+		C.o = I18n.T("{a} × {b} · híbrido propio", {"a": A.n, "b": B.n})
 		if CAL and A.get("auto") and B.get("auto"):   # 1.52: la auto es recesiva; solo sale auto de dos autos
 			C.auto = 1
 		S.custom[id] = C

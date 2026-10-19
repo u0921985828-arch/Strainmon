@@ -67,26 +67,26 @@ func mesa_nave(i: int) -> void:
 	var N: Dictionary = S.nave
 	var Me = N.m[i]
 	var w = navero_de(i)
-	var ops: Array = ["Arrancar y plantar" if Me else "Plantar"]
+	var ops: Array = [K("Arrancar y plantar") if Me else K("Plantar")]
 	if Me:
-		ops.append("Abono")
-	ops.append("Focos")
-	ops.append("Nada")
-	var que: String = (mesa_txt(Me) + " · " + D.FASE_MESA[fase_mesa(i)] + " · " + cosecha_txt(Me) + " · " + D.ABONO_MESA[int(Me.abo)]) if Me else "vacía"
-	var oi: int = await ask("Mesa %d · %s · %s\n%s" % [i + 1, que, D.FOCO_NAVE[N.f[i]].n, ("La cuida " + w.n + ".") if w else "Nadie la cuida: pon a alguien de tu plantilla en la nave."], ops)
+		ops.append(K("Abono"))
+	ops.append(K("Focos"))
+	ops.append(K("Nada"))
+	var que: String = (mesa_txt(Me) + " · " + I18n.v(D.FASE_MESA[fase_mesa(i)]) + " · " + cosecha_txt(Me) + " · " + I18n.v(D.ABONO_MESA[int(Me.abo)])) if Me else K("vacía")
+	var oi: int = await ask(T("Mesa {i} · {que} · {foco}\n{cuida}", {"i": i + 1, "que": que, "foco": D.FOCO_NAVE[N.f[i]].n, "cuida": T("La cuida {n}.", {"n": w.n}) if w else K("Nadie la cuida: pon a alguien de tu plantilla en la nave.")}), ops)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 	if op == "Focos":
 		await focos_nave(i)
 	elif op == "Plantar" or op == "Arrancar y plantar":
 		if Me and Me.get("h") != null:
-			await say("Lo de esta mesa aún se está secando en el secadero: espera a descolgarlo.")
+			await say(K("Lo de esta mesa aún se está secando en el secadero: espera a descolgarlo."))
 			return
 		if Me and Me.g >= 1:
-			await say("Antes, descuelga del secadero lo de esta mesa.")
+			await say(K("Antes, descuelga del secadero lo de esta mesa."))
 			return
 		await plantar_mesa(i)
 	elif op == "Abono":
-		var c: int = await ask("¿Qué abono le echa cada día? En la estantería: MEATZA ×%s · ORTUA BIO ×%s." % [dosis_txt(N.ab.m), dosis_txt(N.ab.o)], ["Sin abono", "MEATZA Floración", "ORTUA BIO Floración", "Nada"])
+		var c: int = await ask(T("¿Qué abono le echa cada día? En la estantería: MEATZA ×{m} · ORTUA BIO ×{o}.", {"m": dosis_txt(N.ab.m), "o": dosis_txt(N.ab.o)}), [K("Sin abono"), K("MEATZA Floración"), K("ORTUA BIO Floración"), K("Nada")])
 		if c < 3:
 			Me.abo = c
 			sfx("sel")
@@ -103,24 +103,24 @@ func elegir_planta(title: String, madres: bool):
 	var ma: Array = S.nave.ma if madres and S.get("nave") != null else []
 	var bc: Array = bandejas_listas() if madres else []   # 1.43: las bandejas de clones enraizados de la nave
 	if own.is_empty() and esq.is_empty() and ma.is_empty() and bc.is_empty():
-		await say("No llevas semillas ni esquejes.")
+		await say(K("No llevas semillas ni esquejes."))
 		return null
 	var items := []
 	for j in ma.size():
 		var k := lot_sid(ma[j].k)
 		var s = strain(k)
-		items.append({"label": "Madre %d: %s%s" % [j + 1, s.n, etiq(ma[j].get("f"))], "right": "clon", "sw": s.c, "ic": ic_cog(k), "desc": "Un clon de la carpa de las madres: no se gasta nada."})
+		items.append({"label": T("Madre {j}: {nom}{et}", {"j": j + 1, "nom": s.n, "et": etiq(ma[j].get("f"))}), "right": K("clon"), "sw": s.c, "ic": ic_cog(k), "desc": K("Un clon de la carpa de las madres: no se gasta nada.")})
 	for b in bc:
 		var k := lot_sid(b.k)
 		var s = strain(k)
-		items.append({"label": "Bandeja: %s%s" % [s.n, etiq(b.get("f"))], "right": "%d clones" % int(D.NAVE.tacos), "sw": s.c, "ic": ic_cog(k), "desc": "Los clones enraizados del carro de bandejas: una mesa entera."})
+		items.append({"label": T("Bandeja: {nom}{et}", {"nom": s.n, "et": etiq(b.get("f"))}), "right": T("{n} clones", {"n": int(D.NAVE.tacos)}), "sw": s.c, "ic": ic_cog(k), "desc": K("Los clones enraizados del carro de bandejas: una mesa entera.")})
 	for o in own:
 		var s = strain(o[0])
 		items.append({"label": s.n, "right": "×" + n(o[1]), "sw": s.c, "ic": ic_cog(o[0]), "desc": strain_line(o[0])})
 	for eb in esq:
 		var s = strain(eb[0].sid)
-		items.append({"label": "Esqueje " + s.n + etiq(eb[0].f), "right": "bandeja" if eb[1] else "esqueje", "sw": s.c, "ic": ic_cog(eb[0].sid), "desc": "Clon enraizado: sale con su fenotipo."})
-	items.append({"label": "Cancelar", "desc": ""})
+		items.append({"label": T("Esqueje {nom}{et}", {"nom": s.n, "et": etiq(eb[0].f)}), "right": K("bandeja") if eb[1] else K("esqueje"), "sw": s.c, "ic": ic_cog(eb[0].sid), "desc": K("Clon enraizado: sale con su fenotipo.")})
+	items.append({"label": K("Cancelar"), "desc": ""})
 	var j: int = await menu(items, {"cls": "full", "title": title, "desc": true})
 	if j < 0 or j >= items.size() - 1:
 		return null
@@ -144,14 +144,14 @@ func elegir_planta(title: String, madres: bool):
 
 # con una semilla o un esqueje, tu gente saca una madre y llena la mesa de clones: toda la mesa, con su fenotipo
 func plantar_mesa(i: int) -> void:
-	var p = await elegir_planta("¿QUÉ PLANTAS EN LA MESA?", true)
+	var p = await elegir_planta(K("¿QUÉ PLANTAS EN LA MESA?"), true)
 	if p == null:
 		return
 	var sid: String = p.sid
 	var f: Dictionary = p.f
 	S.nave.m[i] = {"k": sid + ("*" if Cultivo.clase_feno(f) == "estrella" else ""), "f": f, "thc": thc_nave(sid, f), "y": f.y, "dia": S.day, "g": 0, "t": 0, "abo": 0, "p": float(D.NAVE.clon), "dn": 0, "am": 0, "ao": 0, "n": 0}
 	sfx("sel")
-	await say("Mesa %d: %s%s. De la madre salen los clones para toda la mesa: enraízan, crecen a 18/6 y florecen a 12/12. Se cosecha entera en unos %d días y vuelve a empezar." % [i + 1, strain(sid).n, etiq(f), dias_mesa(S.nave.m[i])])
+	await say(T("Mesa {i}: {nom}{et}. De la madre salen los clones para toda la mesa: enraízan, crecen a 18/6 y florecen a 12/12. Se cosecha entera en unos {d} días y vuelve a empezar.", {"i": i + 1, "nom": strain(sid).n, "et": etiq(f), "d": dias_mesa(S.nave.m[i])}))
 
 # la carpa de las madres (1.34, carpaMadres de 11j-locales): hasta MADRES.max madres (S.nave.ma: {k, f, v: el vigor, e: los esquejes
 # listos}); se mete una con una semilla o un esqueje; los esquejes se recogen aquí, al propagador (S.esquejes, con su tope)
@@ -174,45 +174,48 @@ func carpa_madres() -> void:
 			var M: Dictionary = N.ma[j]
 			var k := lot_sid(M.k)
 			var s = strain(k)
-			rows.append({"label": "Madre %d · %s" % [j + 1, s.n], "right": ("%d esq." % int(M.e)) if M.e else ("%d %%" % int(M.v)), "sw": s.c, "ic": ic_cog(k),
-				"desc": "%s. Vigor %d %%%s." % [madre_txt(M), int(M.v), (" · %d esquejes listos" % int(M.e)) if M.e else ""]})
+			rows.append({"label": T("Madre {j} · {nom}", {"j": j + 1, "nom": s.n}), "right": T("{n} esq.", {"n": int(M.e)}) if M.e else ("%d %%" % int(M.v)), "sw": s.c, "ic": ic_cog(k),
+				"desc": T("{m}. Vigor {v} % · {e} esquejes listos.", {"m": madre_txt(M), "v": int(M.v), "e": int(M.e)}) if M.e else T("{m}. Vigor {v} %.", {"m": madre_txt(M), "v": int(M.v)})})
 		if N.ma.size() < int(D.MADRES.max):
-			rows.append({"label": "Meter una madre", "right": "%d de %d" % [N.ma.size(), int(D.MADRES.max)], "desc": "Con una semilla o un esqueje: la madre de una genética que quieras guardar. De ella salen los esquejes y los clones de las mesas."})
-		rows.append({"label": "Volver", "desc": ""})
-		i = await menu(rows, {"cls": "full", "title": "LAS MADRES", "title2": ("Las cuida " + c.n) if c != null else "Nadie las cuida", "desc": true, "initial": mini(i, rows.size() - 1)})
+			rows.append({"label": K("Meter una madre"), "right": T("{a} de {b}", {"a": N.ma.size(), "b": int(D.MADRES.max)}), "desc": K("Con una semilla o un esqueje: la madre de una genética que quieras guardar. De ella salen los esquejes y los clones de las mesas.")})
+		rows.append({"label": K("Volver"), "desc": ""})
+		i = await menu(rows, {"cls": "full", "title": K("LAS MADRES"), "title2": T("Las cuida {n}", {"n": c.n}) if c != null else K("Nadie las cuida"), "desc": true, "initial": mini(i, rows.size() - 1)})
 		if i < 0 or i == rows.size() - 1:
 			return
 		if i >= N.ma.size():
-			var p = await elegir_planta("¿QUÉ MADRE METES?", false)
+			var p = await elegir_planta(K("¿QUÉ MADRE METES?"), false)
 			if p == null:
 				continue
 			if Datos.CAL and strain(p.sid).get("auto"):   # 1.52
-				await say("La %s es autofloreciente: florece por la edad y no se queda de madre. Sus esquejes florecerían enanos." % strain(p.sid).n)
+				await say(T("La {nom} es autofloreciente: florece por la edad y no se queda de madre. Sus esquejes florecerían enanos.", {"nom": strain(p.sid).n}))
 				continue
 			N.ma.append({"k": p.sid + ("*" if Cultivo.clase_feno(p.f) == "estrella" else ""), "f": p.f, "v": 100, "e": 0})
 			sfx("sel")
-			await say("La %s%s, a la carpa de las madres: a 18/6, siempre en crecimiento." % [strain(p.sid).n, etiq(p.f)] + ((" %s se encarga." % c.n) if c != null else " Sin nadie que la cuide, se va apagando: pon a alguien de tu plantilla en las madres."))
+			await say(T("La {nom}{et}, a la carpa de las madres: a 18/6, siempre en crecimiento.", {"nom": strain(p.sid).n, "et": etiq(p.f)}) + " " + (T("{n} se encarga.", {"n": c.n}) if c != null else K("Sin nadie que la cuide, se va apagando: pon a alguien de tu plantilla en las madres.")))
 			continue
 		var M: Dictionary = N.ma[i]
 		var ops := []
+		var rec := ""
 		if M.e:
-			ops.append("Recoger %d %s" % [int(M.e), "esquejes" if M.e > 1 else "esqueje"])
-		ops.append_array(["Quitarla", "Nada"])
-		var oi: int = await ask("Madre %d: %s · vigor %d %%." % [i + 1, madre_txt(M), int(M.v)] + ("" if M.e else ((" %s le saca esquejes cada mañana." % c.n) if c != null else " Nadie le saca esquejes.")), ops)
+			rec = T("Recoger {n} esquejes", {"n": int(M.e)}) if M.e > 1 else T("Recoger {n} esqueje", {"n": int(M.e)})
+			ops.append(rec)
+		ops.append_array([K("Quitarla"), K("Nada")])
+		var oi: int = await ask(T("Madre {j}: {m} · vigor {v} %.", {"j": i + 1, "m": madre_txt(M), "v": int(M.v)}) + ("" if M.e else (" " + (T("{n} le saca esquejes cada mañana.", {"n": c.n}) if c != null else K("Nadie le saca esquejes.")))), ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
-		if op.begins_with("Recoger"):
+		if rec != "" and op == rec:
 			var q: int = mini(int(M.e), int(D.MADRES.propagador) - S.esquejes.size())
 			if q < 1:
-				await say("El propagador está lleno: %d esquejes. Planta alguno antes." % int(D.MADRES.propagador))
+				await say(T("El propagador está lleno: {n} esquejes. Planta alguno antes.", {"n": int(D.MADRES.propagador)}))
 				continue
 			for j in q:
 				S.esquejes.append({"sid": lot_sid(M.k), "f": M.f, "dia": S.day})
 			M.e = int(M.e) - q
 			sfx("get")
-			await say("%s de la %s, al propagador. Plántalos antes del %s." % [("%d esquejes" % q) if q > 1 else "Un esqueje", madre_txt(M), Datos.fd(int(S.day) + int(D.ESQUEJE_DIAS) + 1, S.day)])
+			var fq := Datos.fd(int(S.day) + int(D.ESQUEJE_DIAS) + 1, S.day)
+			await say(T("{q} esquejes de la {m}, al propagador. Plántalos antes del {f}.", {"q": q, "m": madre_txt(M), "f": fq}) if q > 1 else T("Un esqueje de la {m}, al propagador. Plántalos antes del {f}.", {"m": madre_txt(M), "f": fq}))
 			continue
 		if op == "Quitarla":
-			if await ask("¿Quitas la madre de %s? Se tira." % madre_txt(M), ["Quitarla", "No"]) != 0:
+			if await ask(T("¿Quitas la madre de {m}? Se tira.", {"m": madre_txt(M)}), [K("Quitarla"), K("No")]) != 0:
 				continue
 			N.ma.remove_at(i)
 			sfx("sel")
@@ -223,8 +226,14 @@ func talk_madres():
 		return
 	var N: Dictionary = S.nave
 	var dos: bool = int(D.MADRES.esq) + (1 if w.cui >= 4 else 0) > 1
-	await say("La carpa está vacía. Tráeme una madre, una semilla o un esqueje de lo que quieras guardar, y te la cuido." if N.ma.is_empty()
-		else "%s, a 18/6 y bien regadas. Cada mañana les saco %s; los tienes en la carpa." % [("%d madres" % N.ma.size()) if N.ma.size() > 1 else "Una madre", "dos esquejes" if dos else "un esqueje"], w.n.to_upper())
+	var t: String
+	if N.ma.is_empty():
+		t = K("La carpa está vacía. Tráeme una madre, una semilla o un esqueje de lo que quieras guardar, y te la cuido.")
+	elif N.ma.size() > 1:
+		t = T("{n} madres, a 18/6 y bien regadas. Cada mañana les saco dos esquejes; los tienes en la carpa.", {"n": N.ma.size()}) if dos else T("{n} madres, a 18/6 y bien regadas. Cada mañana les saco un esqueje; los tienes en la carpa.", {"n": N.ma.size()})
+	else:
+		t = K("Una madre, a 18/6 y bien regadas. Cada mañana les saco dos esquejes; los tienes en la carpa.") if dos else K("Una madre, a 18/6 y bien regadas. Cada mañana les saco un esqueje; los tienes en la carpa.")
+	await say(t, w.n.to_upper())
 
 # los focos de la mesa i (1.33, focosNave): cambiarlos por los de otro tipo (los de antes se los queda Arrieta)
 func focos_nave(i: int) -> void:
@@ -236,32 +245,32 @@ func focos_nave(i: int) -> void:
 		if x != k:
 			ks.append(x)
 			ops.append("%s · %s" % [D.FOCO_NAVE[x].n, Datos.eur(D.FOCO_NAVE[x].p)])
-	ops.append("Nada")
-	var c: int = await ask("Mesa %d: %s. %s\n¿Los cambias? Los de ahora se los queda Arrieta." % [i + 1, D.FOCO_NAVE[k].n, D.FOCO_NAVE[k].d], ops)
+	ops.append(K("Nada"))
+	var c: int = await ask(T("Mesa {i}: {n}. {d}\n¿Los cambias? Los de ahora se los queda Arrieta.", {"i": i + 1, "n": D.FOCO_NAVE[k].n, "d": D.FOCO_NAVE[k].d}), ops)
 	if c < 0 or c >= ks.size():
 		return
 	var F: Dictionary = D.FOCO_NAVE[ks[c]]
 	if S.money < F.p:
 		sfx("bad")
-		await say("No te llega.")
+		await say(K("No te llega."))
 		return
 	S.money -= F.p
 	N.f[i] = ks[c]
 	sfx("coin")
 	update_hud()
-	await say("Arrieta cuelga los %s en la mesa %d. %s" % [F.n, i + 1, F.d] + (" Con tanto foco, la nave se calienta: hará falta más extracción." if calor_nave() > float(D.EXTR_NAVE[int(N.ex)].cap) else ""))
+	await say(T("Arrieta cuelga los {n} en la mesa {i}. {d}", {"n": F.n, "i": i + 1, "d": F.d}) + ((" " + K("Con tanto foco, la nave se calienta: hará falta más extracción.")) if calor_nave() > float(D.EXTR_NAVE[int(N.ex)].cap) else ""))
 
 # las mejoras de la nave (1.33, mejorasNave): la extracción y el riego, nivel a nivel
 func _fila_mejora(L: Array, k: String, t: String) -> Dictionary:
 	var a: Dictionary = L[int(S.nave[k])]
 	var b = L[int(S.nave[k]) + 1] if int(S.nave[k]) + 1 < L.size() else null
-	return {"label": "%s: %s" % [t, a.n], "right": Datos.eur(b.p) if b else "a tope", "desc": ("Siguiente: %s. %s" % [b.n, b.d]) if b else a.d}
+	return {"label": "%s: %s" % [I18n.v(t), I18n.v(a.n)], "right": Datos.eur(b.p) if b else K("a tope"), "desc": T("Siguiente: {n}. {d}", {"n": b.n, "d": b.d}) if b else a.d}
 
 func mejoras_nave() -> void:
 	var N: Dictionary = S.nave
 	var j := 0
 	while true:
-		j = await menu([_fila_mejora(D.EXTR_NAVE, "ex", "Extracción"), _fila_mejora(D.RIEGO_NAVE, "rg", "Riego"), {"label": "Volver", "desc": ""}], {"cls": "full", "title": "MEJORAS DE LA NAVE", "title2": "Nave " + nivel_nave(), "desc": true, "initial": j})
+		j = await menu([_fila_mejora(D.EXTR_NAVE, "ex", K("Extracción")), _fila_mejora(D.RIEGO_NAVE, "rg", K("Riego")), {"label": K("Volver"), "desc": ""}], {"cls": "full", "title": K("MEJORAS DE LA NAVE"), "title2": T("Nave {n}", {"n": nivel_nave()}), "desc": true, "initial": j})
 		if j < 0 or j > 1:
 			return
 		var L: Array = D.RIEGO_NAVE if j else D.EXTR_NAVE
@@ -269,36 +278,41 @@ func mejoras_nave() -> void:
 		if int(N[k]) + 1 >= L.size():
 			continue
 		var b: Dictionary = L[int(N[k]) + 1]
-		if await ask("%s: %s %s, montado hoy mismo." % [b.n, b.d, Datos.eur(b.p)], ["Comprar", "No"]) != 0:
+		if await ask(T("{n}: {d} {p}, montado hoy mismo.", {"n": b.n, "d": b.d, "p": Datos.eur(b.p)}), [K("Comprar"), K("No")]) != 0:
 			continue
 		if S.money < b.p:
 			sfx("bad")
-			await say("No te llega.")
+			await say(K("No te llega."))
 			continue
 		S.money -= b.p
 		N[k] = int(N[k]) + 1
 		sfx("coin")
 		update_hud()
 		montar_nave()
-		await say("Arrieta y los suyos montan %s. La nave ya es una nave %s." % [b.a, nivel_nave()])
+		await say(T("Arrieta y los suyos montan {a}. La nave ya es una nave {n}.", {"a": b.a, "n": nivel_nave()}))
 
 func estante_nave() -> void:
 	var N: Dictionary = S.nave
 	var ops := []
+	var dm := ""
+	var dob := ""
 	if S.items.get("fert", 0):
-		ops.append("Dejar MEATZA ×%d" % int(S.items.fert))
+		dm = T("Dejar MEATZA ×{n}", {"n": int(S.items.fert)})
+		ops.append(dm)
 	if S.items.get("ofert", 0):
-		ops.append("Dejar ORTUA BIO ×%d" % int(S.items.ofert))
+		dob = T("Dejar ORTUA BIO ×{n}", {"n": int(S.items.ofert)})
+		ops.append(dob)
 	if S.map == "nave" and puertas_int("nave").size():   # 1.52.1: el escritorio está en el despacho; la nave se ordena desde la nave
-		ops.append("Ordenar la nave")
-	ops.append("Nada")
-	var oi: int = await ask("La estantería de los abonos: MEATZA FLORACIÓN ×%s · ORTUA BIO FLORACIÓN ×%s. Cada mesa con abono gasta %suna dosis al día." % [dosis_txt(N.ab.m), dosis_txt(N.ab.o), "menos de " if int(N.rg) >= 2 else ""], ops)
+		ops.append(K("Ordenar la nave"))
+	ops.append(K("Nada"))
+	var da := {"m": dosis_txt(N.ab.m), "o": dosis_txt(N.ab.o)}
+	var oi: int = await ask(T("La estantería de los abonos: MEATZA FLORACIÓN ×{m} · ORTUA BIO FLORACIÓN ×{o}. Cada mesa con abono gasta menos de una dosis al día.", da) if int(N.rg) >= 2 else T("La estantería de los abonos: MEATZA FLORACIÓN ×{m} · ORTUA BIO FLORACIÓN ×{o}. Cada mesa con abono gasta una dosis al día.", da), ops)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
-	if op.begins_with("Dejar MEATZA"):
+	if dm != "" and op == dm:
 		N.ab.m += S.items.fert
 		S.items.fert = 0
 		sfx("sel")
-	elif op.begins_with("Dejar ORTUA"):
+	elif dob != "" and op == dob:
 		N.ab.o += S.items.ofert
 		S.items.ofert = 0
 		sfx("sel")
@@ -310,9 +324,9 @@ func secadero_nave() -> void:
 	var cu := colgado_nave()
 	if nave_stock() - cu < 1:
 		if cu >= 1:
-			await say("En el secadero cuelgan %s secándose: mañana se pueden descolgar." % g_txt(cu))
+			await say(T("En el secadero cuelgan {g} secándose: mañana se pueden descolgar.", {"g": g_txt(cu)}))
 		else:
-			await say("El secadero está vacío. Cada mesa se cosecha entera al final de su ciclo y se seca aquí %s." % ("un día" if int(D.NAVE.seca) == 1 else "%d días" % int(D.NAVE.seca)))
+			await say(K("El secadero está vacío. Cada mesa se cosecha entera al final de su ciclo y se seca aquí un día.") if int(D.NAVE.seca) == 1 else T("El secadero está vacío. Cada mesa se cosecha entera al final de su ciclo y se seca aquí {n} días.", {"n": int(D.NAVE.seca)}))
 		return
 	var lleva := 0
 	var cabe := int(floor(libre_mochila()))
@@ -326,11 +340,11 @@ func secadero_nave() -> void:
 		Me.g = Datos.jsround((Me.g - q) * 10) / 10.0
 		lleva += q
 	if not lleva:
-		await say("No te cabe nada más en la mochila.")
+		await say(K("No te cabe nada más en la mochila."))
 		return
 	sfx("get")
 	update_hud()
-	await say("Descuelgas %s del secadero." % g_txt(lleva) + ((" Quedan %s: no te caben." % g_txt(nave_stock() - cu)) if nave_stock() - cu >= 1 else "") + ((" Siguen colgados %s, secándose." % g_txt(cu)) if cu >= 1 else ""))
+	await say(T("Descuelgas {g} del secadero.", {"g": g_txt(lleva)}) + ((" " + T("Quedan {g}: no te caben.", {"g": g_txt(nave_stock() - cu)})) if nave_stock() - cu >= 1 else "") + ((" " + T("Siguen colgados {g}, secándose.", {"g": g_txt(cu)})) if cu >= 1 else ""))
 
 func _filas_escritorio() -> Array:
 	var N: Dictionary = S.nave
@@ -339,23 +353,32 @@ func _filas_escritorio() -> Array:
 		var Me = N.m[i]
 		var w = navero_de(i)
 		var ab: String = D.ABONO_MESA[int(Me.abo)] if Me else ""
-		rows.append({"label": "Mesa %d · %s" % [i + 1, strain(lot_sid(Me.k)).n if Me else "vacía"], "right": D.FASE_MESA[fase_mesa(i)] if Me else "",
-			"desc": ("La cuida " + w.n if w else "Nadie la cuida") + ". " + D.FOCO_NAVE[N.f[i]].n + "." + ((" %s · %s · ciclo %d · en el secadero, %s%s." % [ab.substr(0, 1).to_upper() + ab.substr(1), cosecha_txt(Me), int(Me.get("n", 0)) + 1, g_txt(Me.g), (" y %s secándose" % g_txt(Me.h.g)) if Me.get("h") != null else ""]) if Me else "")})
-	rows.append({"label": "Estantería", "right": "%s + %s dosis" % [dosis_txt(N.ab.m), dosis_txt(N.ab.o)], "desc": "MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: %suna dosis al día por mesa con abono." % ("menos de " if int(N.rg) >= 2 else "")})
+		var det := ""
+		if Me:
+			var ab_ := I18n.v(ab)
+			var da := {"ab": ab_.substr(0, 1).to_upper() + ab_.substr(1), "co": cosecha_txt(Me), "c": int(Me.get("n", 0)) + 1, "g": g_txt(Me.g)}
+			if Me.get("h") != null:
+				da.h = g_txt(Me.h.g)
+				det = " " + T("{ab} · {co} · ciclo {c} · en el secadero, {g} y {h} secándose.", da)
+			else:
+				det = " " + T("{ab} · {co} · ciclo {c} · en el secadero, {g}.", da)
+		rows.append({"label": T("Mesa {i} · {n}", {"i": i + 1, "n": strain(lot_sid(Me.k)).n if Me else K("vacía")}), "right": D.FASE_MESA[fase_mesa(i)] if Me else "",
+			"desc": (T("La cuida {n}.", {"n": w.n}) if w else K("Nadie la cuida.")) + " " + I18n.v(D.FOCO_NAVE[N.f[i]].n) + "." + det})
+	rows.append({"label": K("Estantería"), "right": T("{m} + {o} dosis", {"m": dosis_txt(N.ab.m), "o": dosis_txt(N.ab.o)}), "desc": K("MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: menos de una dosis al día por mesa con abono.") if int(N.rg) >= 2 else K("MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: una dosis al día por mesa con abono.")})
 	var E: Dictionary = D.EXTR_NAVE[int(N.ex)]
 	var so := sofoco_nave()
-	rows.append({"label": "Clima", "right": "%s de %s" % [n(calor_nave()), n(E.cap)], "desc": "El calor de los focos encendidos y lo que saca la extracción (%s)." % E.n + ((" Hace demasiado calor: las mesas dan un %d %% menos." % Datos.jsround((1 - so) * 100)) if so < 1 else "")})
+	rows.append({"label": K("Clima"), "right": T("{a} de {b}", {"a": n(calor_nave()), "b": n(E.cap)}), "desc": T("El calor de los focos encendidos y lo que saca la extracción ({n}).", {"n": E.n}) + ((" " + T("Hace demasiado calor: las mesas dan un {p} % menos.", {"p": int(Datos.jsround((1 - so) * 100))})) if so < 1 else "")})
 	if S.map == "nave":   # 1.52.1 (lo pidió el usuario): solo con el escritorio en la nave; con el despacho, desde la estantería o el riego de la nave
-		rows.append({"label": "Ordenar la nave", "right": "", "desc": "Mover las mesas y el tanque del riego: la manguera va del tanque a cada mesa por el suelo libre. Pulsa A."})   # 1.37 (12d-orden)
-	rows.append({"label": "La gente", "right": "%d aquí" % de_la_nave().size(), "desc": "Quién cuida cada mesa y las madres: cambiarlos de mesa, una prima o un curso. Pulsa A."})   # 1.34
-	rows.append({"label": "Mejoras", "right": "Nave " + nivel_nave(), "desc": "Extracción: %s. Riego: %s. Pulsa A para mejorarlas." % [E.n, D.RIEGO_NAVE[int(N.rg)].n]})
+		rows.append({"label": K("Ordenar la nave"), "right": "", "desc": K("Mover las mesas y el tanque del riego: la manguera va del tanque a cada mesa por el suelo libre. Pulsa A.")})   # 1.37 (12d-orden)
+	rows.append({"label": K("La gente"), "right": T("{n} aquí", {"n": de_la_nave().size()}), "desc": K("Quién cuida cada mesa y las madres: cambiarlos de mesa, una prima o un curso. Pulsa A.")})   # 1.34
+	rows.append({"label": K("Mejoras"), "right": T("Nave {n}", {"n": nivel_nave()}), "desc": T("Extracción: {e}. Riego: {r}. Pulsa A para mejorarlas.", {"e": E.n, "r": D.RIEGO_NAVE[int(N.rg)].n})})
 	return rows
 
 func escritorio_nave() -> void:
 	var i := 0
 	while true:
 		var rows := _filas_escritorio()
-		i = await menu(rows, {"cls": "full", "title": "LA NAVE", "title2": "%s al día" % Datos.eur(D.NAVE.dia), "desc": true, "initial": i})
+		i = await menu(rows, {"cls": "full", "title": K("LA NAVE"), "title2": T("{e} al día", {"e": Datos.eur(D.NAVE.dia)}), "desc": true, "initial": i})
 		var l: String = rows[i].label if i >= 0 else ""
 		if l == "Mejoras":
 			await mejoras_nave()
@@ -379,21 +402,23 @@ func gente_nave() -> void:
 				return ma < mb
 			return ma == 0 and int(a.mesa) < int(b.mesa))
 		if W.is_empty():
-			await say("En la nave no trabaja nadie. Pon a tu gente desde el móvil: MÓVIL → PLANTILLA.")
+			await say(K("En la nave no trabaja nadie. Pon a tu gente desde el móvil: MÓVIL → PLANTILLA."))
 			return
 		var rows := []
 		for w in W:
-			rows.append({"label": w.n, "right": "madres" if w.rol == "madres" else "mesa %d" % (int(w.mesa) + 1), "desc": ficha_gente(w) + ". " + rol_desc(w)})
-		rows.append({"label": "Volver", "desc": ""})
-		i = await menu(rows, {"cls": "full", "title": "LA GENTE DE LA NAVE", "title2": "%d trabajando" % W.size(), "desc": true, "initial": mini(i, rows.size() - 1)})
+			rows.append({"label": w.n, "right": K("madres") if w.rol == "madres" else T("mesa {n}", {"n": int(w.mesa) + 1}), "desc": ficha_gente(w) + ". " + rol_desc(w)})
+		rows.append({"label": K("Volver"), "desc": ""})
+		i = await menu(rows, {"cls": "full", "title": K("LA GENTE DE LA NAVE"), "title2": T("{n} trabajando", {"n": W.size()}), "desc": true, "initial": mini(i, rows.size() - 1)})
 		if i < 0 or i >= W.size():
 			return
 		var w: Dictionary = W[i]
 		var ops := []
 		if w.rol == "nave":
-			ops.append("Cambiar de mesa")
-		ops.append_array(["Prima · " + Datos.eur(D.MANDO.prima), "Curso · " + Datos.eur(D.MANDO.curso), "Nada"])
-		var oi: int = await ask("%s · %s · %s" % [w.n, ficha_gente(w), "las madres" if w.rol == "madres" else "la mesa %d" % (int(w.mesa) + 1)], ops)
+			ops.append(K("Cambiar de mesa"))
+		var pr := T("Prima · {e}", {"e": Datos.eur(D.MANDO.prima)})
+		var cs := T("Curso · {e}", {"e": Datos.eur(D.MANDO.curso)})
+		ops.append_array([pr, cs, K("Nada")])
+		var oi: int = await ask(T("{w} · {f} · {s}", {"w": w.n, "f": ficha_gente(w), "s": K("las madres") if w.rol == "madres" else T("la mesa {n}", {"n": int(w.mesa) + 1})}), ops)
 		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
 		if op == "Cambiar de mesa":
 			var ms := []
@@ -403,9 +428,9 @@ func gente_nave() -> void:
 			var lb := []
 			for j in ms:
 				var o = navero_de(j)
-				lb.append("Mesa %d" % (j + 1) + ((" · con " + o.n) if o != null else ""))
-			lb.append("Nada")
-			var c: int = await ask("¿A qué mesa pasa %s?" % w.n, lb)
+				lb.append(T("Mesa {n} · con {o}", {"n": j + 1, "o": o.n}) if o != null else T("Mesa {n}", {"n": j + 1}))
+			lb.append(K("Nada"))
+			var c: int = await ask(T("¿A qué mesa pasa {n}?", {"n": w.n}), lb)
 			if c < 0 or c >= ms.size():
 				continue
 			var o = navero_de(ms[c])
@@ -413,10 +438,10 @@ func gente_nave() -> void:
 				o.mesa = w.mesa
 			w.mesa = ms[c]
 			sfx("sel")
-			await say("%s pasa a la mesa %d" % [w.n, int(w.mesa) + 1] + ((" y %s, a la %d." % [o.n, int(o.mesa) + 1]) if o != null else "."))
-		elif op.begins_with("Prima"):
+			await say(T("{a} pasa a la mesa {i} y {b}, a la {j}.", {"a": w.n, "i": int(w.mesa) + 1, "b": o.n, "j": int(o.mesa) + 1}) if o != null else T("{a} pasa a la mesa {i}.", {"a": w.n, "i": int(w.mesa) + 1}))
+		elif op == pr:
 			await prima(w)
-		elif op.begins_with("Curso"):
+		elif op == cs:
 			await curso(w)
 
 func talk_navero(i: int):
@@ -427,10 +452,10 @@ func talk_navero(i: int):
 	var f := fase_mesa(i)
 	var t: String
 	if not Me:
-		t = "Mi mesa está vacía. Plántame algo y la saco adelante."
+		t = K("Mi mesa está vacía. Plántame algo y la saco adelante.")
 	else:
-		t = "La %s va bien: %s, %s. Cuando acaba la flor la corto entera, la cuelgo en el secadero y vuelvo a empezar con los esquejes que saqué antes de pasarla a 12/12." % [strain(lot_sid(Me.k)).n, D.FASE_MESA[f], cosecha_txt(Me)] + (" Se ha acabado el abono de la estantería." if Me.abo and float(S.nave.ab["m" if Me.abo == 1 else "o"]) < float(D.RIEGO_NAVE[int(S.nave.rg)].dosis) else "") \
-			+ (" Y aquí dentro hace un calor que no veas: hace falta más extracción." if sofoco_nave() < 1 else "")
+		t = T("La {nom} va bien: {f}, {c}. Cuando acaba la flor la corto entera, la cuelgo en el secadero y vuelvo a empezar con los esquejes que saqué antes de pasarla a 12/12.", {"nom": strain(lot_sid(Me.k)).n, "f": D.FASE_MESA[f], "c": cosecha_txt(Me)}) + ((" " + K("Se ha acabado el abono de la estantería.")) if Me.abo and float(S.nave.ab["m" if Me.abo == 1 else "o"]) < float(D.RIEGO_NAVE[int(S.nave.rg)].dosis) else "") \
+			+ ((" " + K("Y aquí dentro hace un calor que no veas: hace falta más extracción.")) if sofoco_nave() < 1 else "")
 	await say(t, String(w.n).to_upper())
 
 # ---------- GAUA ----------
@@ -447,12 +472,12 @@ func noche_gaua() -> Dictionary:
 	return S.noche
 
 func entrada_disco() -> bool:
-	var N := "PORTERO"
-	if await ask("La entrada, %s. Se paga una vez por noche." % Datos.eur(D.DISCO.entrada), ["Pagar", "No"], N) != 0:
+	var N := K("PORTERO")
+	if await ask(T("La entrada, {e}. Se paga una vez por noche.", {"e": Datos.eur(D.DISCO.entrada)}), [K("Pagar"), K("No")], N) != 0:
 		return false
 	if S.money < D.DISCO.entrada:
 		sfx("bad")
-		await say("Sin entrada no se pasa.", N)
+		await say(K("Sin entrada no se pasa."), N)
 		return false
 	S.money -= int(D.DISCO.entrada)
 	noche_gaua()
@@ -461,27 +486,27 @@ func entrada_disco() -> bool:
 	return true
 
 func echar_disco():
-	await say("Las seis. Se encienden las luces y el portero echa a todo el mundo.", "PORTERO")
+	await say(K("Las seis. Se encienden las luces y el portero echa a todo el mundo."), K("PORTERO"))
 	await warp({"to": "ensanche", "x": 38, "y": 9, "dir": "down"})
 
 func talk_gorila():
-	await say("Abrimos a las once de la noche. Hasta las seis." if not disco_abierta() else ("Ya has pagado esta noche. Pasa." if noche_ya() else "La entrada, %s. En la puerta." % Datos.eur(D.DISCO.entrada)), "PORTERO")
+	await say(K("Abrimos a las once de la noche. Hasta las seis.") if not disco_abierta() else (K("Ya has pagado esta noche. Pasa.") if noche_ya() else T("La entrada, {e}. En la puerta.", {"e": Datos.eur(D.DISCO.entrada)})), K("PORTERO"))
 
 # la barra, el DJ y la RRPP, solo con GAUA abierta (1.31): si te quedas quieto pasadas las seis, el portero te echa al hablar con ellos
 func talk_barra():
 	if not disco_abierta():
 		await echar_disco()
 		return
-	var N := "CAMARERA"
+	var N := K("CAMARERA")
 	var X := noche_gaua()
-	var c: int = await ask("¿Qué te pongo?", ["Una copa · " + Datos.eur(D.DISCO.copa), "Invitar a una ronda · " + Datos.eur(D.DISCO.ronda), "Nada"], N)
+	var c: int = await ask(K("¿Qué te pongo?"), [T("Una copa · {e}", {"e": Datos.eur(D.DISCO.copa)}), T("Invitar a una ronda · {e}", {"e": Datos.eur(D.DISCO.ronda)}), K("Nada")], N)
 	if c == 0:
 		if X.copas >= D.DISCO.copaMax:
-			await say("Por hoy ya vale. Agua, si quieres.", N)
+			await say(K("Por hoy ya vale. Agua, si quieres."), N)
 			return
 		if S.money < D.DISCO.copa:
 			sfx("bad")
-			await say("Sin dinero no hay copa.", N)
+			await say(K("Sin dinero no hay copa."), N)
 			return
 		S.money -= int(D.DISCO.copa)
 		X.copas += 1
@@ -490,14 +515,14 @@ func talk_barra():
 		advance_time(10)
 		sfx("coin")
 		update_hud()
-		await say(["Un gin-tonic con mucho hielo.", "Otra. La música sube.", "La tercera. Mejor que sea la última."][int(X.copas) - 1])
+		await say([K("Un gin-tonic con mucho hielo."), K("Otra. La música sube."), K("La tercera. Mejor que sea la última.")][int(X.copas) - 1])
 	elif c == 1:
 		if X.ronda:
-			await say("Ya has invitado esta noche. Con una, ya te conocen.", N)
+			await say(K("Ya has invitado esta noche. Con una, ya te conocen."), N)
 			return
 		if S.money < D.DISCO.ronda:
 			sfx("bad")
-			await say("No te llega para la ronda.", N)
+			await say(K("No te llega para la ronda."), N)
 			return
 		S.money -= int(D.DISCO.ronda)
 		X.ronda = 1
@@ -506,24 +531,24 @@ func talk_barra():
 		advance_time(10)
 		sfx("coin")
 		update_hud()
-		await say("Invitas a la barra entera. Medio local brinda por ti.")
+		await say(K("Invitas a la barra entera. Medio local brinda por ti."))
 
 func talk_dj():
 	if not disco_abierta():
 		await echar_disco()
 		return
-	var c: int = await ask(pick(["¿Qué tal suena?", "Esta noche se llena."]), ["Bailar", "Pedir una canción", "Nada"], "DJ")
+	var c: int = await ask(pick([K("¿Qué tal suena?"), K("Esta noche se llena.")]), [K("Bailar"), K("Pedir una canción"), K("Nada")], K("DJ"))
 	if c == 0:
 		await bailar()
 	elif c == 1:
 		sfx("sel")
-		await say(pick(["Te la pongo después de esta.", "¿Esa? Hace años que no la pincho. Venga, va.", "Esa no la tengo. Te pongo algo parecido."]), "DJ")
+		await say(pick([K("Te la pongo después de esta."), K("¿Esa? Hace años que no la pincho. Venga, va."), K("Esa no la tengo. Te pongo algo parecido.")]), K("DJ"))
 
 # bailar (una vez por noche): media hora y, la mitad de las veces, alguien te pide el número (un pijo para la agenda)
 func bailar() -> void:
 	var X := noche_gaua()
 	if X.baile:
-		await say("Ya has bailado esta noche. Las piernas no dan para más.")
+		await say(K("Ya has bailado esta noche. Las piernas no dan para más."))
 		return
 	X.baile = 1
 	await fade(1)
@@ -537,28 +562,28 @@ func bailar() -> void:
 		var nf := nombre_fijo(id)
 		S.fijos.append({"id": id, "n": nf, "t": "pij", "dia": 0})
 		sfx("get")
-		await say("Bailas media hora sin parar. %s te pide el número: «Si tienes de lo bueno, llámame»." % nf)
+		await say(T("Bailas media hora sin parar. {n} te pide el número: «Si tienes de lo bueno, llámame».", {"n": nf}))
 		return
-	await say("Bailas media hora sin parar. Sales de la pista con la camiseta empapada.")
+	await say(K("Bailas media hora sin parar. Sales de la pista con la camiseta empapada."))
 
 # el reservado (una vez por noche): una hora y la RRPP te presenta a un cliente VIP (CTYPES.vip) para la agenda
 func talk_rrpp():
 	if not disco_abierta():
 		await echar_disco()
 		return
-	var N := "RRPP"
+	var N := K("RRPP")
 	var X := noche_gaua()
 	if X.mesa:
-		await say("Disfruta del reservado. Si conoces a alguien que merezca la pena, me lo presentas.", N)
+		await say(K("Disfruta del reservado. Si conoces a alguien que merezca la pena, me lo presentas."), N)
 		return
 	if S.fijos.size() >= D.FIJOS_MAX:   # 1.31: antes de cobrar
-		await say("Tu agenda ya está llena. Cuando tengas sitio para alguien que importa, vuelve.", N)
+		await say(K("Tu agenda ya está llena. Cuando tengas sitio para alguien que importa, vuelve."), N)
 		return
-	if await ask("El reservado: sofá, mesa y botella, %s la noche. Ahí se sienta la gente que importa." % Datos.eur(D.DISCO.mesa), ["Reservar", "No"], N) != 0:
+	if await ask(T("El reservado: sofá, mesa y botella, {e} la noche. Ahí se sienta la gente que importa.", {"e": Datos.eur(D.DISCO.mesa)}), [K("Reservar"), K("No")], N) != 0:
 		return
 	if S.money < D.DISCO.mesa:
 		sfx("bad")
-		await say("Para el reservado hace falta dinero. Otra noche.", N)
+		await say(K("Para el reservado hace falta dinero. Otra noche."), N)
 		return
 	S.money -= int(D.DISCO.mesa)
 	X.mesa = 1
@@ -574,7 +599,7 @@ func talk_rrpp():
 	S.vipN += 1
 	S.fijos.append({"id": id, "n": nv, "t": "vip", "dia": 0})
 	sfx("get")
-	await say("Una hora en el reservado. La RRPP te presenta a %s: «Me han dicho que lo tuyo es de lo mejor. Llámame». Apuntas su número." % nv)
+	await say(T("Una hora en el reservado. La RRPP te presenta a {n}: «Me han dicho que lo tuyo es de lo mejor. Llámame». Apuntas su número.", {"n": nv}))
 	if Datos.CAL:   # 1.47: el reservado, arriba
 		await subir_vip()
 
@@ -591,10 +616,10 @@ func talk_vip(i: int) -> void:
 	if not disco_abierta():
 		await echar_disco()
 		return
-	await say(D.DISCO_CAL.vip[(i + S.day) % D.DISCO_CAL.vip.size()], "GENTE")
+	await say(D.DISCO_CAL.vip[(i + S.day) % D.DISCO_CAL.vip.size()], K("GENTE"))
 
 func talk_baila(i: int):
-	await say(D.BAILA[i], "GENTE")
+	await say(D.BAILA[i], K("GENTE"))
 
 # ---------- LA ASOCIACIÓN (1.32, 11j-locales): la de la tía Maite, en el barrio alto (CLUBS.rv) ----------
 # la segunda vez que entras (otro día), Delroy; presentarte (la asamblea) o refundarla; de presidente, el dispensario (ASO, DELROY)
@@ -652,42 +677,42 @@ func precio_mer(id: String, q: Dictionary) -> float:
 	return Datos.jsround(e * 100) / 100.0
 
 func nombre_mer(q: Dictionary) -> String:
-	return (D.EXTR[q.x].n + " de " + strain(q.k).n) if q.x != "" else strain(q.k).n
+	return T("{x} de {n}", {"x": D.EXTR[q.x].n, "n": strain(q.k).n}) if q.x != "" else strain(q.k).n
 
 func comprar_mercado(id: String, N: String, pool: Array) -> void:
-	var T: Dictionary = D.MERCADO[tipo_mer(id)]
-	var l: Array = mercado_lista(id, pool).filter(func(q): return int(q.g) >= int((T.gx if q.x != "" else T.g)[0]))
+	var TM: Dictionary = D.MERCADO[tipo_mer(id)]
+	var l: Array = mercado_lista(id, pool).filter(func(q): return int(q.g) >= int((TM.gx if q.x != "" else TM.g)[0]))
 	if l.is_empty():
-		await say("Hoy ya está todo repartido. Mañana entra más.", N)
+		await say(K("Hoy ya está todo repartido. Mañana entra más."), N)
 		return
 	var it := l.map(func(q): return {"label": nombre_mer(q), "right": "%d g · %s %% · %s €/g" % [int(q.g), Datos.pct(q.thc), _dos(precio_mer(id, q))], "sw": "#d89a18" if q.x != "" else strain(q.k).c, "ic": ic_cog(q.k),
-		"desc": "%s: %d g a %s %% de THC, a %s el gramo." % [nombre_mer(q), int(q.g), Datos.pct(q.thc), _dos(precio_mer(id, q)) + " €"]})
-	it.append({"label": "Nada", "desc": "No comprar nada hoy."})
+		"desc": T("{n}: {g} g a {t} % de THC, a {p} el gramo.", {"n": nombre_mer(q), "g": int(q.g), "t": Datos.pct(q.thc), "p": _dos(precio_mer(id, q)) + " €"})})
+	it.append({"label": K("Nada"), "desc": K("No comprar nada hoy.")})
 	# A lo ancho, con el nombre entero (en la columna de la derecha se cortaba: «Beldi», «Zam»…)
-	var i: int = await menu(it, {"cls": "full", "title": "Hoy tenemos", "desc": true} if Datos.CAL else {"cls": "right", "title": "Hoy tenemos"})
+	var i: int = await menu(it, {"cls": "full", "title": K("Hoy tenemos"), "desc": true} if Datos.CAL else {"cls": "right", "title": K("Hoy tenemos")})
 	if i < 0 or i >= l.size():
 		return
 	var q: Dictionary = l[i]
 	var pg := precio_mer(id, q)
 	var ops := []
-	for g in (T.gx if q.x != "" else T.g):
+	for g in (TM.gx if q.x != "" else TM.g):
 		if g <= int(q.g):
 			ops.append(int(g))
 	var o := []
 	for g in ops:
 		o.append("%d g · %s" % [g, Datos.eur(Datos.jsround(g * pg))])
-	o.append("Nada")
-	var j: int = await ask("%s, al %s %% de THC. ¿Cuánto te llevas?" % [nombre_mer(q), Datos.pct(q.thc)], o, N)
+	o.append(K("Nada"))
+	var j: int = await ask(T("{n}, al {t} % de THC. ¿Cuánto te llevas?", {"n": nombre_mer(q), "t": Datos.pct(q.thc)}), o, N)
 	if j < 0 or j >= ops.size():
 		return
 	var g: int = ops[j]
 	var e := Datos.jsround(g * pg)
 	if S.money < e:
 		sfx("bad")
-		await say("Sin dinero no hay trato.", N)
+		await say(K("Sin dinero no hay trato."), N)
 		return
 	if libre_mochila() < g:
-		await say("No te cabe en la bolsa.", N)
+		await say(K("No te cabe en la bolsa."), N)
 		return
 	S.money -= e
 	q.g = int(q.g) - g
@@ -699,7 +724,7 @@ func comprar_mercado(id: String, N: String, pool: Array) -> void:
 	confia(id.substr(5) if id.begins_with("club_") else id, 1)
 	update_hud()
 	sfx("coin")
-	toast("Comprado: %d g de %s" % [g, nombre_mer(q)], 1400)
+	toast(T("Comprado: {g} g de {n}", {"g": g, "n": nombre_mer(q)}), 1400)
 
 # el almacén del club (1.45, de presidente): lo que dejas en sus estanterías (S.aso.al: buds y rosin, hasta MERCADO.alm.g de flor)
 # lo retiran los socios del dispensario cada mañana (aso_dia), MERCADO.alm.dia g de flor al día, a precio de dispensario
@@ -721,20 +746,20 @@ func alm_g() -> float:
 func almacen_club() -> void:
 	var N: String = D.DELROY.n
 	if not aso().pres:
-		await say("El almacén del club, con llave. La tiene el presidente.")
+		await say(K("El almacén del club, con llave. La tiene el presidente."))
 		return
 	while true:
 		var al := alm_club()
-		var ops := ["Guardar", "Sacar", "Nada"]
-		var c: int = await ask("EL ALMACÉN DEL CLUB · %s de %s ocupados. Lo de aquí lo retiran los socios del dispensario, %d g al día; en total, %s." % [g_txt(alm_g()), g_txt(D.MERCADO.alm.g), int(D.MERCADO.alm.dia), Datos.eur(int(al.tot))], ops)
+		var ops := [K("Guardar"), K("Sacar"), K("Nada")]
+		var c: int = await ask(T("EL ALMACÉN DEL CLUB · {a} de {b} ocupados. Lo de aquí lo retiran los socios del dispensario, {d} g al día; en total, {t}.", {"a": g_txt(alm_g()), "b": g_txt(D.MERCADO.alm.g), "d": int(D.MERCADO.alm.dia), "t": Datos.eur(int(al.tot))}), ops)
 		if c == 0:
 			var lots := lotes_venta(1, 1)
 			if lots.is_empty():
-				await say("No llevas nada encima.")
+				await say(K("No llevas nada encima."))
 				continue
 			var it := lots.map(venta_item)
-			it.append({"label": "Nada"})
-			var i: int = await menu(it, {"cls": "right", "title": "¿Qué guardas?"})
+			it.append({"label": K("Nada")})
+			var i: int = await menu(it, {"cls": "right", "title": K("¿Qué guardas?")})
 			if i < 0 or i >= lots.size():
 				continue
 			var lt: Array = lots[i]
@@ -743,7 +768,7 @@ func almacen_club() -> void:
 			var cabe: float = (float(D.MERCADO.alm.g) - alm_g()) * (D.ROSIN.rend if x else 1.0)
 			var g: float = minf(float(b.g), floorf(cabe * 10) / 10.0)
 			if g < .1:
-				await say("Las estanterías están llenas.")
+				await say(K("Las estanterías están llenas."))
 				continue
 			var L: Dictionary = al.rosin if x else al.buds
 			var k: String = lt[0]
@@ -754,7 +779,7 @@ func almacen_club() -> void:
 				L[k] = {"g": g, "thc": float(b.thc), "q": calidad(b)}
 			usa_lote(lt, g)
 			sfx("sel")
-			toast("Al almacén: %s" % g_txt(g), 1200)
+			toast(T("Al almacén: {g}", {"g": g_txt(g)}), 1200)
 		elif c == 1:
 			var it := []
 			var ks := []
@@ -765,10 +790,10 @@ func almacen_club() -> void:
 				ks.append([k, true])
 				it.append({"label": extr_nombre(k), "right": g_txt(al.rosin[k].g)})
 			if ks.is_empty():
-				await say("El almacén está vacío.")
+				await say(K("El almacén está vacío."))
 				continue
-			it.append({"label": "Nada"})
-			var i: int = await menu(it, {"cls": "right", "title": "¿Qué sacas?"})
+			it.append({"label": K("Nada")})
+			var i: int = await menu(it, {"cls": "right", "title": K("¿Qué sacas?")})
 			if i < 0 or i >= ks.size():
 				continue
 			var k: String = ks[i][0]
@@ -776,7 +801,7 @@ func almacen_club() -> void:
 			var b: Dictionary = (al.rosin if x else al.buds)[k]
 			var g: float = minf(float(b.g), floorf(libre_mochila()))
 			if g < .1:
-				await say("No te cabe en la bolsa.")
+				await say(K("No te cabe en la bolsa."))
 				continue
 			if x:
 				add_rosin(k, g, b.thc)
@@ -786,7 +811,7 @@ func almacen_club() -> void:
 			if b.g < .1:
 				(al.rosin if x else al.buds).erase(k)
 			sfx("sel")
-			toast("Sacado: %s" % g_txt(g), 1200)
+			toast(T("Sacado: {g}", {"g": g_txt(g)}), 1200)
 		else:
 			return
 
@@ -841,7 +866,7 @@ func entra_aso(d: Dictionary) -> void:
 		A.d = S.day
 	await warp(d)
 	if delroy_aqui() and not A.tio:
-		await say("Junto a la foto de la tía Maite, un hombre mayor con las rastas y la barba canas no te quita ojo.")
+		await say(K("Junto a la foto de la tía Maite, un hombre mayor con las rastas y la barba canas no te quita ojo."))
 
 func talk_delroy() -> void:
 	var A := aso()
@@ -850,7 +875,7 @@ func talk_delroy() -> void:
 		await talk(N, D.DELROY.revela)
 		A.tio = true
 		confia("delroy", 5)
-	var c: int = await ask("¿Qué tal, presidente?" if A.pres else "Dime, sobrino.", ["Charlar", "El dispensario" if A.pres else "La presidencia", "Nada"], N)
+	var c: int = await ask(K("¿Qué tal, presidente?") if A.pres else K("Dime, sobrino."), [K("Charlar"), K("El dispensario") if A.pres else K("La presidencia"), K("Nada")], N)
 	if c == 0:
 		await say(pick(D.DELROY.charla), N)
 	elif c == 1:
@@ -864,23 +889,23 @@ func presidencia_aso() -> void:
 	var N: String = D.DELROY.n
 	var O: Dictionary = D.ASO
 	if A.asam:   # con la asamblea pendiente, todavía se puede refundar
-		if await ask("La asamblea es el %s, por la mañana. Habla con la gente del barrio: cada amigo trae votos. O la refundas ya, por %s." % [Datos.fd(int(A.asam), S.day), Datos.eur(O.refunda)], ["Refundarla", "Nada"], N) != 0:
+		if await ask(T("La asamblea es el {f}, por la mañana. Habla con la gente del barrio: cada amigo trae votos. O la refundas ya, por {e}.", {"f": Datos.fd(int(A.asam), S.day), "e": Datos.eur(O.refunda)}), [K("Refundarla"), K("Nada")], N) != 0:
 			return
 	else:
-		var c: int = await ask("Hacen falta %d votos de %d. Hoy tendrías %d. O pagas %s de deudas y registro y la refundas tú." % [int(O.mayoria), int(O.votos), votos_aso(), Datos.eur(O.refunda)], ["Presentarme", "Refundarla", "Nada"], N)
+		var c: int = await ask(T("Hacen falta {m} votos de {v}. Hoy tendrías {h}. O pagas {e} de deudas y registro y la refundas tú.", {"m": int(O.mayoria), "v": int(O.votos), "h": votos_aso(), "e": Datos.eur(O.refunda)}), [K("Presentarme"), K("Refundarla"), K("Nada")], N)
 		if c == 0:
 			if S.day < int(A.otra):
-				await say("Hasta el %s no hay otra asamblea. Gánate al barrio mientras." % Datos.fd(int(A.otra), S.day), N)
+				await say(T("Hasta el {f} no hay otra asamblea. Gánate al barrio mientras.", {"f": Datos.fd(int(A.otra), S.day)}), N)
 				return
 			A.asam = int(S.day) + int(O.dias)
 			sfx("sel")
-			await say("Apuntado. La asamblea, el %s. %s también se presenta." % [Datos.fd(int(A.asam), S.day), O.rival], N)
+			await say(T("Apuntado. La asamblea, el {f}. {r} también se presenta.", {"f": Datos.fd(int(A.asam), S.day), "r": O.rival}), N)
 			return
 		if c != 1:
 			return
 	if S.money < int(O.refunda):
 		sfx("bad")
-		await say("Sin los %s no hay refundación." % Datos.eur(O.refunda), N)
+		await say(T("Sin los {e} no hay refundación.", {"e": Datos.eur(O.refunda)}), N)
 		return
 	S.money -= int(O.refunda)
 	A.pres = true
@@ -889,7 +914,7 @@ func presidencia_aso() -> void:
 	confia("rv", 10)
 	update_hud()
 	sfx("get")
-	await say("Pagas las deudas de la gestora y el registro. La asociación vuelve a nacer, con tus estatutos. Maite estaría orgullosa.", N)
+	await say(K("Pagas las deudas de la gestora y el registro. La asociación vuelve a nacer, con tus estatutos. Maite estaría orgullosa."), N)
 
 # el dispensario: un lote a la vez; dice cuánto queda y lo que llevas
 func dispensario_aso() -> void:
@@ -898,16 +923,16 @@ func dispensario_aso() -> void:
 	var O: Dictionary = D.ASO
 	var L = A.lote
 	if L is Dictionary:
-		await say("En el dispensario quedan %s de %s, a %s € el gramo. Llevas %s." % [g_txt(L.g), extr_nombre(L.k, true) if L.get("x") else lot_nombre(L.k), _dos(L.pg), Datos.eur(L.tot)], N)
+		await say(T("En el dispensario quedan {g} de {n}, a {p} € el gramo. Llevas {t}.", {"g": g_txt(L.g), "n": extr_nombre(L.k, true) if L.get("x") else lot_nombre(L.k), "p": _dos(L.pg), "t": Datos.eur(L.tot)}), N)
 		return
 	var VX: Dictionary = D.VENTA_EXTR
 	var lots := lotes_venta(O.g[0], VX.club_g[0])
 	if lots.is_empty():
-		await say("Déjame %d g o más y los socios lo retiran, %d g al día. El dinero, a tu buzón." % [int(O.g[0]), int(O.dia)], N)
+		await say(T("Déjame {a} g o más y los socios lo retiran, {d} g al día. El dinero, a tu buzón.", {"a": int(O.g[0]), "d": int(O.dia)}), N)
 		return
 	var it := lots.map(venta_item)
-	it.append({"label": "Nada"})
-	var i: int = await menu(it, {"cls": "right", "title": "¿Qué lote?"})
+	it.append({"label": K("Nada")})
+	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué lote?")})
 	if i < 0 or i >= lots.size():
 		return
 	var l: Array = lots[i]
@@ -922,8 +947,8 @@ func dispensario_aso() -> void:
 	var o := []
 	for g in ops:
 		o.append("%d g · %s" % [g, Datos.eur(g * pg)])
-	o.append("Nada")
-	var j: int = await ask("%s a %s € el gramo para los socios. ¿Cuánto dejas?" % [venta_nombre(l), _dos(pg)], o, N)
+	o.append(K("Nada"))
+	var j: int = await ask(T("{n} a {p} € el gramo para los socios. ¿Cuánto dejas?", {"n": venta_nombre(l), "p": _dos(pg)}), o, N)
 	if j < 0 or j >= ops.size():
 		return
 	usa_lote(l, ops[j])
@@ -931,7 +956,7 @@ func dispensario_aso() -> void:
 	if x:   # 1.43.7: de una extracción retiran VENTA_EXTR.dia de lo de la flor
 		A.lote.x = true
 	sfx("sel")
-	await say("Al dispensario. Cada mañana, %s para los socios." % g_txt(O.dia * (VX.dia if x else 1.0)), N)
+	await say(T("Al dispensario. Cada mañana, {g} para los socios.", {"g": g_txt(O.dia * (VX.dia if x else 1.0))}), N)
 
 # al amanecer (curro_dia): la asamblea, si toca, y lo que retiran los socios del dispensario
 func aso_dia() -> void:
@@ -947,8 +972,8 @@ func aso_dia() -> void:
 			confia("delroy", 10)
 		else:
 			A.otra = int(S.day) + int(O.espera)
-		var t: String = ("¡%d votos de %d! Eres el presidente de la asociación, sobrino. Como tu tía." % [v, int(O.votos)]) if gana else ("%d votos de %d: gana %s. Gánate al barrio y preséntate otra vez desde el %s." % [v, int(O.votos), O.rival, Datos.fd(int(A.otra), S.day)])
-		queue("aso", func(): await talk("SMS · DELROY", [t]))
+		var t: String = T("¡{v} votos de {t}! Eres el presidente de la asociación, sobrino. Como tu tía.", {"v": v, "t": int(O.votos)}) if gana else T("{v} votos de {t}: gana {r}. Gánate al barrio y preséntate otra vez desde el {f}.", {"v": v, "t": int(O.votos), "r": O.rival, "f": Datos.fd(int(A.otra), S.day)})
+		queue("aso", func(): await talk(K("SMS · DELROY"), [t]))
 	if Datos.CAL:
 		almacen_dia()   # 1.45: lo del almacén del club
 	var L = A.lote
@@ -963,4 +988,4 @@ func aso_dia() -> void:
 	queue("historia", check_story)
 	if L.g < 1:
 		A.lote = null
-		queue("asoLote", func(): await talk("SMS · DELROY", ["Se acabó lo del dispensario: %s en total, en tu buzón." % Datos.eur(L.tot)]))
+		queue("asoLote", func(): await talk(K("SMS · DELROY"), [T("Se acabó lo del dispensario: {e} en total, en tu buzón.", {"e": Datos.eur(L.tot)})]))   # i18n-no: «asoLote» es la clave de la cola

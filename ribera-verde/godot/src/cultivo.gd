@@ -3,6 +3,7 @@
 extends RefCounted
 
 const Datos = preload("res://src/datos.gd")
+const I18n = preload("res://src/i18n.gd")
 
 # azar: el de Godot o, para las pruebas, el Park-Miller del oráculo (tools/godot.js), que sustituye a Math.random
 static var pm := -1
@@ -71,7 +72,11 @@ static func ext_txt(S: Dictionary, ci: int) -> String:
 	var c: Dictionary = S.carpas[ci]
 	var k := kit_de(c)
 	var E: Dictionary = Datos.carga().EXTRAS
-	return "%s de %d m³/h%s" % [E[k].c + ": " + str(int(E[k].m3)) if k != "" else "Sin extractor: 0", caudal_pide(S, ci), " · sin intractor" if k != "" and not c.get("intra") else ""]
+	var pide := int(caudal_pide(S, ci))
+	if k == "":
+		return I18n.T("Sin extractor: 0 de {p} m³/h", {"p": pide})
+	var a := {"c": E[k].c, "m": int(E[k].m3), "p": pide}
+	return I18n.T("{c}: {m} de {p} m³/h · sin intractor", a) if not c.get("intra") else I18n.T("{c}: {m} de {p} m³/h", a)
 
 static func clima_carpa(S: Dictionary, ci: int, noche: bool) -> Dictionary:
 	var D := Datos.carga()
@@ -229,7 +234,7 @@ static func plant_stage(p: Dictionary) -> int:
 	return 4 if p.prog >= 1 else (0 if p.prog < .12 else (1 if p.prog < .35 else (2 if p.prog < .65 else 3)))
 
 static func stage_name(p: Dictionary) -> String:
-	return "Germinando" if p.prog < .12 else ("Plántula" if p.prog < .35 else ("Vegetativo" if p.prog < .65 else "Floración"))
+	return I18n.K("Germinando") if p.prog < .12 else (I18n.K("Plántula") if p.prog < .35 else (I18n.K("Vegetativo") if p.prog < .65 else I18n.K("Floración")))
 
 static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) -> void:
 	if p.get("dead"):

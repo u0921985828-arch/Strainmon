@@ -23,7 +23,7 @@ const SEL_TEMP := -2   # VC.sel del temporizador (1.10)
 const RUEDA := [[3, 0], [4, 0], [5, 1], [6, 2], [6, 3], [6, 4], [5, 5], [4, 6], [3, 6], [2, 6], [1, 5], [0, 4], [0, 3], [0, 2], [1, 1], [2, 0]]
 const VACIO := Color8(0x4a, 0x4a, 0x56)
 
-const OVERLAY := """
+const OVERLAY := """// i18n-no
 shader_type canvas_item;
 uniform sampler2D pantalla : hint_screen_texture, filter_nearest;
 uniform float fuerza = 1.0;
