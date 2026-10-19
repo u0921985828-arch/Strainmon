@@ -55,6 +55,10 @@
 - **Plugin Android** propio (`tools/android-plugin`, `tools/plugin-android.sh` → `godot/addons/landrace_play/bin/landrace-play.aar`; `addons/landrace_play/export_plugin.gd` añade el AAR, Billing 7.1.1, Play Games v2 20.1.2, Sentry 7.22.6 y el APP_ID). `plataforma.gd` lo envuelve y, sin él, no hace nada.
 - PRIVACIDAD, `store/privacy-policy.md`, `data-safety.md`, `iarc.md`, las fichas, `store/play-console.md` (lo que hace Eddie) y `store/logros-play-games.csv`. Prueba nueva `tests/retencion.gd` (41 comprobaciones: 0 h, 3 h y 30 h → tope; logros 27/27; compra cancelada, más tarde y hecha).
 
+### APK de la tanda Play · Godot 0.48.0 (código 67)
+- `node tools/godot-aab.js` con la upload key: `dist/landrace-hunters.aab` (79 MB, firmado) y el APK universal (176 MB: las `.so` sin comprimir por los 16 KB).
+- `descargas/LandraceHunters.apk` (85 MB, para instalar a mano; GitHub no admite más de 100 MB): `tools/apk-instalar.py` pone `extractNativeLibs=true` y comprime las `.so`; después `zipalign -P 16` y `apksigner` con la upload key. Paquete `com.landracehunters.game`: hay que desinstalar antes la de `com.riberaverde.godot`.
+
 ### Fase 8 · `trama.gd` y `mundo.gd` en módulos, sin cambiar el comportamiento
 - `tools/partir.py` (planes `tools/plan_trama.json` y `tools/plan_mundo.json`) parte cada script en una cadena de herencia: los miembros y las funciones static se quedan en la base; cada función va al módulo de su tramo; lo que una parte anterior llama y vive en una posterior lleva un stub en la base.
 - Cadena: ui → mundo → `calle` → granja → trama → `menus` → `policia` → `movil` → `venta` → `nave` → `setas` → `eventos` → retencion → juego. Ningún archivo de `src/` pasa de 2.500 líneas (antes `trama.gd` 9.438 y `mundo.gd` 3.659; ahora el mayor, `mundo.gd`, 2.216).
