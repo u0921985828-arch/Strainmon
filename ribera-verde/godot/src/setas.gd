@@ -113,16 +113,16 @@ func panes_txomin(T: String) -> void:
 			var c: Dictionary = D.CEPAS.v[k]
 			if c.has("pan"):
 				ks.append(k)
-				ops.append("%s · %s (%s)" % [c.n, D.CEPAS.fam[c.f], Datos.eur(c.pan)])
-		ops.append("Nada")
-		var oi: int = await ask("Panes de micelio, cada uno de su cepa. Con uno, te preparo una bandeja de esa cepa; juntando dos en la mesa, sale otra si está en el cuaderno.", ops, T)
+				ops.append("%s · %s (%s)" % [c.n, I18n.v(D.CEPAS.fam[c.f]), Datos.eur(c.pan)])
+		ops.append(K("Nada"))
+		var oi: int = await ask(K("Panes de micelio, cada uno de su cepa. Con uno, te preparo una bandeja de esa cepa; juntando dos en la mesa, sale otra si está en el cuaderno."), ops, T)
 		if oi < 0 or oi >= ks.size():
 			return
 		var k: String = ks[oi]
 		var pz: int = int(D.CEPAS.v[k].pan)
 		if S.money < pz:
 			sfx("bad")
-			await say("Sin %s no hay pan." % Datos.eur(pz), T)
+			await say(I18n.T("Sin {e} no hay pan.", {"e": Datos.eur(pz)}), T)
 			continue
 		S.money -= pz
 		if not L.get("panes") is Dictionary:
@@ -130,7 +130,7 @@ func panes_txomin(T: String) -> void:
 		L.panes[k] = int(L.panes.get(k, 0)) + 1
 		descubre_cepa(L, k)
 		sfx("coin")
-		await say("Un pan de %s: %s" % [nom_cepa(k), D.CEPAS.v[k].d], T)
+		await say(I18n.T("Un pan de {n}: {d}", {"n": nom_cepa(k), "d": D.CEPAS.v[k].d}), T)
 
 # los panes que tienes, para elegir uno (sin el excluido): [[k, "Nombre (n)"]]
 func mis_panes(L: Dictionary, sin := "") -> Array:
@@ -146,28 +146,28 @@ func juntar_micelios() -> void:
 	var L: Dictionary = S.setas
 	var A := mis_panes(L)
 	if A.is_empty():
-		await say("No tienes panes de micelio. Txomin los vende en la puerta.")
+		await say(K("No tienes panes de micelio. Txomin los vende en la puerta."))
 		return
-	var oa: int = await ask("Juntar micelios: el primer pan.", A.map(func(x): return x[1]) + ["Nada"])
+	var oa: int = await ask(K("Juntar micelios: el primer pan."), A.map(func(x): return x[1]) + [K("Nada")])
 	if oa < 0 or oa >= A.size():
 		return
 	var a: String = A[oa][0]
 	var B := mis_panes(L, a)
 	if B.is_empty():
-		await say("Hace falta un pan de otra cepa para juntarlo con el de %s." % nom_cepa(a))
+		await say(T("Hace falta un pan de otra cepa para juntarlo con el de {n}.", {"n": nom_cepa(a)}))
 		return
-	var ob: int = await ask("Juntar %s con…" % nom_cepa(a), B.map(func(x): return x[1]) + ["Nada"])
+	var ob: int = await ask(T("Juntar {n} con…", {"n": nom_cepa(a)}), B.map(func(x): return x[1]) + [K("Nada")])
 	if ob < 0 or ob >= B.size():
 		return
 	var b: String = B[ob][0]
 	if veta_cepa(a, b):
 		sfx("bad")
-		await say("%s y %s no se juntan: un %s y una %s se repelen, las hifas no se tocan. No gastas nada." % [nom_cepa(a), nom_cepa(b), D.CEPAS.fam[D.CEPAS.v[a].f], D.CEPAS.fam[D.CEPAS.v[b].f]])
+		await say(T("{a} y {b} no se juntan: un {fa} y una {fb} se repelen, las hifas no se tocan. No gastas nada.", {"a": nom_cepa(a), "b": nom_cepa(b), "fa": D.CEPAS.fam[D.CEPAS.v[a].f], "fb": D.CEPAS.fam[D.CEPAS.v[b].f]}))
 		return
 	var r: String = receta_cepa(a, b)
 	if r == "":
 		sfx("bad")
-		await say("No prende: %s con %s no está en el cuaderno. No gastas nada." % [nom_cepa(a), nom_cepa(b)])
+		await say(T("No prende: {a} con {b} no está en el cuaderno. No gastas nada.", {"a": nom_cepa(a), "b": nom_cepa(b)}))
 		return
 	L.panes[a] = int(L.panes[a]) - 1
 	L.panes[b] = int(L.panes[b]) - 1
@@ -177,7 +177,7 @@ func juntar_micelios() -> void:
 	advance_time(int(D.CEPAS.min))
 	update_hud()
 	sfx("get")
-	await say("Juntas los dos micelios en un pan nuevo y, al rato, prende: %d panes de %s.%s" % [int(D.CEPAS.sale), nom_cepa(r), (" ¡Nueva en tu cuaderno! " + D.CEPAS.v[r].d) if nueva else ""])
+	await say(T("Juntas los dos micelios en un pan nuevo y, al rato, prende: {n} panes de {c}. ¡Nueva en tu cuaderno! {d}", {"n": int(D.CEPAS.sale), "c": nom_cepa(r), "d": D.CEPAS.v[r].d}) if nueva else T("Juntas los dos micelios en un pan nuevo y, al rato, prende: {n} panes de {c}.", {"n": int(D.CEPAS.sale), "c": nom_cepa(r)}))
 
 # el cuaderno de las cepas: cada una con su forma, de dónde sale y si ya la tienes; y lo que no se junta
 func cuaderno_setas() -> void:
@@ -186,38 +186,38 @@ func cuaderno_setas() -> void:
 	while true:
 		var ops := []
 		for k in ks:
-			ops.append("%s%s · %s" % ["✓ " if cepa_ya(L, k) else "", nom_cepa(k), D.CEPAS.fam[D.CEPAS.v[k].f]])
-		ops.append("Lo que no se junta")
-		ops.append("Nada")
+			ops.append("%s%s · %s" % ["✓ " if cepa_ya(L, k) else "", nom_cepa(k), I18n.v(D.CEPAS.fam[D.CEPAS.v[k].f])])
+		ops.append(K("Lo que no se junta"))
+		ops.append(K("Nada"))
 		var n_ya: int = ks.filter(func(k): return cepa_ya(L, k)).size()
-		var oi: int = await ask("El cuaderno de las cepas: %d de %d." % [n_ya, ks.size()], ops)
+		var oi: int = await ask(T("El cuaderno de las cepas: {a} de {b}.", {"a": n_ya, "b": ks.size()}), ops)
 		if oi < 0 or oi >= ks.size() + 1:
 			return
 		if oi == ks.size():
 			var t := []
 			for v in D.CEPAS.veta:
-				t.append("un %s con una %s" % [D.CEPAS.fam[v[0]], D.CEPAS.fam[v[1]]] if v[1] == "campana" or v[1] == "cupula" else "%s con %s" % [D.CEPAS.fam[v[0]], D.CEPAS.fam[v[1]]])
-			await say("No se juntan: %s; se repelen. Y lo que no está en el cuaderno no prende." % " ni ".join(PackedStringArray(t)))
+				t.append(T("un {a} con una {b}", {"a": D.CEPAS.fam[v[0]], "b": D.CEPAS.fam[v[1]]}) if v[1] == "campana" or v[1] == "cupula" else T("{a} con {b}", {"a": D.CEPAS.fam[v[0]], "b": D.CEPAS.fam[v[1]]}))
+			await say(T("No se juntan: {t}; se repelen. Y lo que no está en el cuaderno no prende.", {"t": (" " + T("ni") + " ").join(PackedStringArray(t))}))
 			continue
 		var k: String = ks[oi]
 		var c: Dictionary = D.CEPAS.v[k]
-		var de := "La vende Txomin (%s el pan)." % Datos.eur(c.pan) if c.has("pan") else ""
+		var de := T("La vende Txomin ({e} el pan).", {"e": Datos.eur(c.pan)}) if c.has("pan") else ""
 		for r in D.CEPAS.r:
 			if r[2] == k:
-				de = "Sale de juntar %s con %s." % [nom_cepa(r[0]), nom_cepa(r[1])]
-		await say("%s · %s · %d.ª generación. %s %s Rinde ×%s y se paga ×%s." % [c.n, D.CEPAS.fam[c.f], int(c.gen), c.d if cepa_ya(L, k) else "Aún no la has tenido.", de, str(c.g), str(c.p)])
+				de = T("Sale de juntar {a} con {b}.", {"a": nom_cepa(r[0]), "b": nom_cepa(r[1])})
+		await say(T("{n} · {f} · {g}.ª generación. {d} {de} Rinde ×{r} y se paga ×{p}.", {"n": c.n, "f": D.CEPAS.fam[c.f], "g": int(c.gen), "d": c.d if cepa_ya(L, k) else K("Aún no la has tenido."), "de": de, "r": str(c.g), "p": str(c.p)}))
 
 func setas_dia() -> void:
 	if Datos.CAL and sot_ya():   # 1.51: el sótano de casa, sin recibo ni redada propia (la de casa se lo lleva)
 		secar_setas(S.sot)
-		_setas_bandejas(S.sot, "SMS · TXOMIN")
+		_setas_bandejas(S.sot, K("SMS · TXOMIN"))
 	var L = S.get("setas")
 	if L == null:
 		return
 	var Z: Dictionary = D.SETAS
-	if not cobra(L, recibo_setas(), "TXOMIN", false, "el bajo"):   # 1.35: cada RECIBO.dias (granja.gd)
+	if not cobra(L, recibo_setas(), K("TXOMIN"), false, K("el bajo")):   # 1.35: cada RECIBO.dias (granja.gd)
 		S.setas = null
-		queue("setas", func(): await talk("SMS · TXOMIN", ["No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí."]))
+		queue("setas", func(): await talk(K("SMS · TXOMIN"), [K("No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí.")]))
 		return
 	if Datos.CAL:
 		secar_setas(L)   # 1.44: lo seco, al armario
@@ -231,9 +231,9 @@ func setas_dia() -> void:
 		S.setas = null
 		S.heat = min(100, S.heat + Z.calorRedada)
 		sfx("bad")
-		queue("setas", func(): await say("La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas%s." % ((" y " + g_txt(gg) + " de setas") if gg >= 1 else "")))
+		queue("setas", func(): await say(T("La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas y {g} de setas.", {"g": g_txt(gg)}) if gg >= 1 else K("La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas.")))
 		return
-	_setas_bandejas(L, "SMS · TXOMIN")
+	_setas_bandejas(L, K("SMS · TXOMIN"))
 
 # lo que pasa cada noche en unas bandejas (el bajo o el sótano): se secan y alguna se echa a perder
 func _setas_bandejas(L: Dictionary, quien: String) -> void:
@@ -249,9 +249,11 @@ func _setas_bandejas(L: Dictionary, quien: String) -> void:
 			b.mala = "contaminada"
 			malas.append("contaminada")
 	if malas.size():
-		var t: String = ("Se te han echado a perder %d bandejas. Tíralas." % malas.size()) if malas.size() > 1 else ("Una bandeja se te ha %s. Tírala." % ("secado" if malas[0] == "seca" else "contaminado"))
+		var t: String
 		if L == S.get("sot"):
-			t = t.replace("Tíralas.", "Las del sótano: tíralas.").replace("Tírala.", "La del sótano: tírala.")
+			t = T("Se te han echado a perder {n} bandejas. Las del sótano: tíralas.", {"n": malas.size()}) if malas.size() > 1 else (K("Una bandeja se te ha secado. La del sótano: tírala.") if malas[0] == "seca" else K("Una bandeja se te ha contaminado. La del sótano: tírala."))
+		else:
+			t = T("Se te han echado a perder {n} bandejas. Tíralas.", {"n": malas.size()}) if malas.size() > 1 else (K("Una bandeja se te ha secado. Tírala.") if malas[0] == "seca" else K("Una bandeja se te ha contaminado. Tírala."))
 		queue("setas", func(): await talk(quien, [t]))
 
 # (lo pidió el usuario: «que se cultive como la nave»): Ekaitz, el ayudante del bajo grande, cada mañana: todo húmedo y lo listo, a secar
@@ -271,33 +273,33 @@ func ayudante_setas(L: Dictionary) -> void:
 			quedan.append(b)
 	L.bandejas = quedan + L.bandejas.filter(func(b): return b.get("mala"))
 	if g:
-		queue("setas", func(): await talk("SMS · " + str(D.SETAS_AY.n).to_upper(), ["Bandejas pulverizadas. He recogido %d g y están secándose." % g]))
+		queue("setas", func(): await talk(T("SMS · {n}", {"n": str(D.SETAS_AY.n).to_upper()}), [T("Bandejas pulverizadas. He recogido {g} g y están secándose.", {"g": g})]))
 
 func talk_setero() -> void:
 	var A: Dictionary = D.SETAS_AY
 	var N: String = str(A.n).to_upper()
 	if S.get("setas") == null:
-		await say("Sin bajo no hay faena. Me vuelvo con mi tío.", N)
+		await say(K("Sin bajo no hay faena. Me vuelvo con mi tío."), N)
 		return
 	var L: Dictionary = S.setas
 	var vivas: Array = L.bandejas.filter(func(b): return not b.get("mala"))
-	var c: int = await ask("Todo en orden: %d bandejas vivas de %d. Cada mañana las pulverizo y recojo lo que esté listo." % [vivas.size(), max_bandejas()], ["Seguir así", "Despedirlo", "Nada"], N)
+	var c: int = await ask(T("Todo en orden: {a} bandejas vivas de {b}. Cada mañana las pulverizo y recojo lo que esté listo.", {"a": vivas.size(), "b": int(max_bandejas())}), [K("Seguir así"), K("Despedirlo"), K("Nada")], N)
 	if c == 1:
-		if await ask("¿Seguro? Txomin no se lo va a tomar bien.", ["Despedirlo", "No"], N) == 0:
+		if await ask(K("¿Seguro? Txomin no se lo va a tomar bien."), [K("Despedirlo"), K("No")], N) == 0:
 			L.erase("ay")
 			build_ents()
-			await say("Vale. Ahí te quedas con las bandejas.", N)
+			await say(K("Vale. Ahí te quedas con las bandejas."), N)
 	elif c == 0:
-		await say("Lo que tú digas, jefe.", N)
+		await say(K("Lo que tú digas, jefe."), N)
 
 func talk_txomin() -> void:
-	var T := "TXOMIN"
+	var T := K("TXOMIN")
 	var Z: Dictionary = D.SETAS
 	if S.ch < int(Z.ch):
-		await say("¿Setas? Eso era antes, chaval. Ahora solo paseo.", T)
+		await say(K("¿Setas? Eso era antes, chaval. Ahora solo paseo."), T)
 		return
 	if sot_ya():   # 1.51: las bandejas para el sótano de casa
-		var cs: int = await ask("¿Para el sótano de tu casa o para mi bajo?", ["Para el sótano", "El bajo", "Nada"], T)
+		var cs: int = await ask(K("¿Para el sótano de tu casa o para mi bajo?"), [K("Para el sótano"), K("El bajo"), K("Nada")], T)
 		if cs == 0:
 			_SOT = true
 			await bajo_menu(T)
@@ -307,17 +309,17 @@ func talk_txomin() -> void:
 			return
 	if S.get("setas") == null:
 		var e: float = Z.fianza + recibo_setas()
-		if await ask("El bajo de mi casa: oscuro, húmedo y nadie pregunta. %s de fianza y %s cada %s días, en efectivo; el primero, ahora. Las bandejas te las preparo yo." % [Datos.eur(Z.fianza), Datos.eur(recibo_setas()), n(D.RECIBO.dias)] + (" Caben %d." % (2 * maxi(1, MAPS["setas-g"].o[2].filter(func(o): return o == "baldaS").size())) if Datos.CAL and MAPS.has("setas-g") else ""), ["Alquilarlo", "No"], T) != 0:
+		if await ask(I18n.T("El bajo de mi casa: oscuro, húmedo y nadie pregunta. {f} de fianza y {r} cada {d} días, en efectivo; el primero, ahora. Las bandejas te las preparo yo.", {"f": Datos.eur(Z.fianza), "r": Datos.eur(recibo_setas()), "d": n(D.RECIBO.dias)}) + ((" " + I18n.T("Caben {n}.", {"n": 2 * maxi(1, MAPS["setas-g"].o[2].filter(func(o): return o == "baldaS").size())})) if Datos.CAL and MAPS.has("setas-g") else ""), [K("Alquilarlo"), K("No")], T) != 0:
 			return
 		if S.money < e:
 			sfx("bad")
-			await say("Sin %s no hay llave." % Datos.eur(e), T)
+			await say(I18n.T("Sin {e} no hay llave.", {"e": Datos.eur(e)}), T)
 			return
 		S.money -= e
 		S.setas = {"bandejas": [], "g": 0, "r": S.day + D.RECIBO.dias}
 		sfx("coin")
-		await got("la llave del bajo")
-		await say("Compra las bandejas y tenlas húmedas. Lo demás lo hace el tiempo.", T)
+		await got(K("la llave del bajo"))
+		await say(K("Compra las bandejas y tenlas húmedas. Lo demás lo hace el tiempo."), T)
 		return
 	await bajo_menu(T)
 
@@ -336,7 +338,7 @@ func pulverizar_bajo() -> bool:
 	var hv := 0.0
 	for b in v:
 		hv += b.hum
-	await say(("Pulverizas las bandejas: humedad al %d %%." % Datos.jsround(hv / v.size())) if v.size() else "Pulverizas las bandejas.")
+	await say(T("Pulverizas las bandejas: humedad al {h} %.", {"h": Datos.jsround(hv / v.size())}) if v.size() else K("Pulverizas las bandejas."))
 	return true
 
 # las bandejas del bajo (1.34, bajoMenu): con Txomin, en la puerta (T), todo; dentro, en las baldas (T vacío), lo de las bandejas: ni
@@ -355,56 +357,72 @@ func bajo_menu(T: String) -> void:
 		var partes := []
 		for k in D.FASES_SETA:
 			if cnt[k]:
-				partes.append("%d %s" % [cnt[k], D.FASES_SETA[k][1 if cnt[k] > 1 else 0]])
-		var est: String = ", ".join(PackedStringArray(partes)) if B.size() else "sin bandejas"
+				partes.append("%d %s" % [cnt[k], I18n.v(D.FASES_SETA[k][1 if cnt[k] > 1 else 0])])
+		var est: String = ", ".join(PackedStringArray(partes)) if B.size() else K("sin bandejas")
 		var ops := []
+		var oid := []   # F7: lo que se compara (en castellano), al lado de lo que se ve
 		if T != "" and B.size() < max_bandejas():
-			ops.append("Comprar bandeja (%s)" % Datos.eur(Z.bandeja))
+			ops.append(I18n.T("Comprar bandeja ({e})", {"e": Datos.eur(Z.bandeja)}))
+			oid.append("Comprar")   # i18n-no
 		if T != "" and Datos.CAL:   # 1.46: los panes de micelio
-			ops.append("Panes de micelio")
+			ops.append(K("Panes de micelio"))
+			oid.append("Panes de micelio")   # i18n-no
 		if hum.size():
-			ops.append("Pulverizar")
+			ops.append(K("Pulverizar"))
+			oid.append("Pulverizar")   # i18n-no
 		if cnt.lista:
-			ops.append("Recoger")
+			ops.append(K("Recoger"))
+			oid.append("Recoger")   # i18n-no
 		if B.any(func(b): return b.get("mala")):
-			ops.append("Tirar las malas")
+			ops.append(K("Tirar las malas"))
+			oid.append("Tirar las malas")   # i18n-no
 		if T != "" and L.g >= 1:
-			ops.append("Venderle " + g_txt(L.g))
+			ops.append(I18n.T("Venderle {g}", {"g": g_txt(L.g)}))
+			oid.append("Venderle")   # i18n-no
 		if T != "" and Datos.CAL and not es_sot():   # 1.44: el equipo del bajo y lo que haces en la mesa
 			var ZP: Dictionary = D.SETAS_PRO
 			if L.get("mc", 0):
-				ops.append("Microdosis: %d %s" % [L.mc, "caja" if L.mc == 1 else "cajas"])
+				ops.append(I18n.T("Microdosis: {n} caja", {"n": int(L.mc)}) if L.mc == 1 else I18n.T("Microdosis: {n} cajas", {"n": int(L.mc)}))
+				oid.append("Microdosis:")   # i18n-no
 			if L.get("cc", 0):
-				ops.append("Comestibles: %d %s" % [L.cc, "caja" if L.cc == 1 else "cajas"])
+				ops.append(I18n.T("Comestibles: {n} caja", {"n": int(L.cc)}) if L.cc == 1 else I18n.T("Comestibles: {n} cajas", {"n": int(L.cc)}))
+				oid.append("Comestibles:")   # i18n-no
 			if not L.get("dh"):
-				ops.append("Deshidratador (%s)" % Datos.eur(ZP.deshid))
+				ops.append(I18n.T("Deshidratador ({e})", {"e": Datos.eur(ZP.deshid)}))
+				oid.append("Deshidratador")   # i18n-no
 			if not L.get("enc"):
-				ops.append("Encapsuladora (%s)" % Datos.eur(ZP.encap))
+				ops.append(I18n.T("Encapsuladora ({e})", {"e": Datos.eur(ZP.encap)}))
+				oid.append("Encapsuladora")   # i18n-no
 			if not L.get("mol"):
-				ops.append("Moldes (%s)" % Datos.eur(ZP.moldes))
+				ops.append(I18n.T("Moldes ({e})", {"e": Datos.eur(ZP.moldes)}))
+				oid.append("Moldes")   # i18n-no
 		if T != "" and Datos.CAL and not es_sot() and not L.get("ay"):   # 1.51: el ayudante, como los de la nave
-			ops.append("Contratar a %s (%s)" % [D.SETAS_AY.n, Datos.eur(D.SETAS_AY.sueldo)])
+			ops.append(I18n.T("Contratar a {n} ({e})", {"n": D.SETAS_AY.n, "e": Datos.eur(D.SETAS_AY.sueldo)}))
+			oid.append("Contratar")   # i18n-no
 		if T != "" and not es_sot():
-			ops.append("Dejar el bajo")
-		ops.append("Nada")
+			ops.append(K("Dejar el bajo"))
+			oid.append("Dejar el bajo")   # i18n-no
+		ops.append(K("Nada"))
+		oid.append("Nada")   # i18n-no
 		var hm := 0.0
 		for b in hum:
 			hm += b.hum
-		var oi: int = await ask(("El sótano: %s%s." if es_sot() else "El bajo: %s%s.") % [est, (" · humedad %d %%" % Datos.jsround(hm / hum.size())) if hum.size() else ""] + ("" if T != "" or B.size() else " Las bandejas las prepara Txomin, en la puerta."), ops, T)
-		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		var hx: String = (" · " + I18n.T("humedad {h} %", {"h": Datos.jsround(hm / hum.size())})) if hum.size() else ""
+		var oi: int = await ask((I18n.T("El sótano: {e}{h}.", {"e": est, "h": hx}) if es_sot() else I18n.T("El bajo: {e}{h}.", {"e": est, "h": hx})) + ("" if T != "" or B.size() else " " + I18n.T("Las bandejas las prepara Txomin, en la puerta.")), ops, T)
+		var op: String = oid[oi] if oi >= 0 and oi < oid.size() else ""
 		if op == "" or op == "Nada":
 			return
 		if op.begins_with("Comprar"):
 			if S.money < Z.bandeja:
 				sfx("bad")
-				await say("Sin dinero no hay bandeja.", T)
+				await say(K("Sin dinero no hay bandeja."), T)
 				continue
 			var v := "txuria"
 			if Datos.CAL:   # 1.46: de qué cepa (Txuria, la de Txomin, o uno de tus panes)
 				var P := mis_panes(L)
 				var oc: int = 0
 				if P.size():
-					oc = await ask("¿De qué cepa? La Txuria la pongo yo; si no, uno de tus panes.", ["Txuria (la de Txomin)"] + P.map(func(x): return x[1]) + ["Nada"], T)
+					oc = await ask(K("¿De qué cepa? La Txuria la pongo yo; si no, uno de tus panes."), [K("Txuria (la de Txomin)")] + P.map(func(x): return x[1]) + [K("Nada")], T)
 					if oc < 0 or oc > P.size():
 						continue
 				if oc > 0:
@@ -413,14 +431,14 @@ func bajo_menu(T: String) -> void:
 			S.money -= int(Z.bandeja)
 			B.append({"d": S.day, "hum": 100, "v": v} if Datos.CAL else {"d": S.day, "hum": 100})
 			sfx("coin")
-			await say("Lista para colonizar. En %d días la habrá cogido el micelio; %d más y a recoger." % [int(Z.colon), int(Z.fruto)], T)
+			await say(I18n.T("Lista para colonizar. En {a} días la habrá cogido el micelio; {b} más y a recoger.", {"a": int(Z.colon), "b": int(Z.fruto)}), T)
 		elif op.begins_with("Contratar"):
 			var A: Dictionary = D.SETAS_AY
-			if await ask("%s Cada %s días, %s más en el recibo del bajo." % [A.d, n(D.RECIBO.dias), Datos.eur(A.sueldo)], ["Contratarlo", "No"], T) != 0:
+			if await ask(I18n.T("{d} Cada {n} días, {e} más en el recibo del bajo.", {"d": A.d, "n": n(D.RECIBO.dias), "e": Datos.eur(A.sueldo)}), [K("Contratarlo"), K("No")], T) != 0:
 				continue
 			L.ay = S.day
 			sfx("coin")
-			await say("Mañana empieza. Es de fiar: lo he criado yo.", T)
+			await say(K("Mañana empieza. Es de fiar: lo he criado yo."), T)
 		elif op == "Panes de micelio":
 			await panes_txomin(T)
 		elif op == "Pulverizar":
@@ -448,14 +466,14 @@ func bajo_menu(T: String) -> void:
 					nf.append({"g": pv[k], "d": S.day, "v": k})
 					tx.append("%s %d g" % [nom_cepa(k), pv[k]])
 				L.fr = L.get("fr", []) + nf
-				await say("Recoges %d g de setas%s y las tiendes en %s: en %s, al armario." % [g, (" (" + ", ".join(PackedStringArray(tx)) + ")") if pv.size() > 1 or not pv.has("txuria") else "", "el deshidratador" if L.get("dh") else "la malla del secadero", "un día" if dias_secar(L) == 1 else "%d días" % dias_secar(L)])
+				await say(I18n.T("Recoges {g} g de setas{x} y las tiendes en {s}: en {d}, al armario.", {"g": g, "x": (" (" + ", ".join(PackedStringArray(tx)) + ")") if pv.size() > 1 or not pv.has("txuria") else "", "s": K("el deshidratador") if L.get("dh") else K("la malla del secadero"), "d": K("un día") if dias_secar(L) == 1 else I18n.T("{n} días", {"n": int(dias_secar(L))})}))
 			else:
 				L.g += g
-				await say("Recoges las setas y las dejas secando en el bajo: %d g." % g)
+				await say(I18n.T("Recoges las setas y las dejas secando en el bajo: {g} g.", {"g": g}))
 		elif op == "Tirar las malas":
 			var k: int = B.filter(func(b): return b.get("mala")).size()
 			L.bandejas = B.filter(func(b): return not b.get("mala"))
-			await say(("Tiras %d bandejas." % k) if k > 1 else "Tiras la bandeja.")
+			await say(I18n.T("Tiras {n} bandejas.", {"n": k}) if k > 1 else K("Tiras la bandeja."))
 		elif op.begins_with("Microdosis:") or op.begins_with("Comestibles:"):
 			var kk: String = "mc" if op.begins_with("Micro") else "cc"
 			var nn: int = int(L[kk])
@@ -465,22 +483,23 @@ func bajo_menu(T: String) -> void:
 			S.sales += e
 			S.heat = min(100, S.heat + D.SETAS_PRO.calor * nn)
 			sfx("coin")
-			toast("+%s · %d %s de %s" % [Datos.eur(e), nn, "caja" if nn == 1 else "cajas", "microdosis" if kk == "mc" else "comestibles"], 1600)
-			await say("Esto se mueve solo. %s." % Datos.eur(e), T)
+			var dt := {"e": Datos.eur(e), "n": nn}
+			toast(((I18n.T("+{e} · {n} caja de microdosis", dt) if nn == 1 else I18n.T("+{e} · {n} cajas de microdosis", dt)) if kk == "mc" else (I18n.T("+{e} · {n} caja de comestibles", dt) if nn == 1 else I18n.T("+{e} · {n} cajas de comestibles", dt))), 1600)
+			await say(I18n.T("Esto se mueve solo. {e}.", {"e": Datos.eur(e)}), T)
 			await check_story()
 		elif op.begins_with("Deshidratador") or op.begins_with("Encapsuladora") or op.begins_with("Moldes"):
 			var kk: String = "dh" if op.begins_with("Desh") else ("enc" if op.begins_with("Enc") else "mol")
 			var pz: int = int(D.SETAS_PRO[{"dh": "deshid", "enc": "encap", "mol": "moldes"}[kk]])
 			if S.money < pz:
 				sfx("bad")
-				await say("Sin %s no hay trato." % Datos.eur(pz), T)
+				await say(I18n.T("Sin {e} no hay trato.", {"e": Datos.eur(pz)}), T)
 				continue
 			S.money -= pz
 			L[kk] = true
 			sfx("coin")
-			await say({"dh": "Te lo bajo yo y lo enchufo junto al secadero: lo que recojas, seco en un día.",
-				"enc": "La encapsuladora, en la mesa de trabajo. Con setas secas del armario, cajas de microdosis.",
-				"mol": "Los moldes y el chocolate, en la mesa de trabajo. Con setas secas del armario, cajas de comestibles."}[kk], T)
+			await say({"dh": K("Te lo bajo yo y lo enchufo junto al secadero: lo que recojas, seco en un día."),
+				"enc": K("La encapsuladora, en la mesa de trabajo. Con setas secas del armario, cajas de microdosis."),
+				"mol": K("Los moldes y el chocolate, en la mesa de trabajo. Con setas secas del armario, cajas de comestibles.")}[kk], T)
 		elif op.begins_with("Venderle"):
 			var g: int = int(floor(L.g))
 			var e: int = g * int(Z.precio)
@@ -497,16 +516,16 @@ func bajo_menu(T: String) -> void:
 			S.sales += e
 			S.heat = min(100, S.heat + Z.calor)
 			sfx("coin")
-			toast("+%s · %d g de setas" % [Datos.eur(e), g], 1600)
-			await say("Para mis clientes de siempre. %s." % Datos.eur(e), T)
+			toast(I18n.T("+{e} · {g} g de setas", {"e": Datos.eur(e), "g": g}), 1600)
+			await say(I18n.T("Para mis clientes de siempre. {e}.", {"e": Datos.eur(e)}), T)
 			await check_story()
 		elif op == "Dejar el bajo":
-			if await ask("¿Dejas el bajo? Te devuelvo la fianza; lo que haya dentro se queda.", ["Dejarlo", "No"], T) != 0:
+			if await ask(K("¿Dejas el bajo? Te devuelvo la fianza; lo que haya dentro se queda."), [K("Dejarlo"), K("No")], T) != 0:
 				continue
 			S.setas = null
 			S.money += int(Z.fianza)
 			sfx("coin")
-			await say("Como quieras. La puerta, cerrada al salir.", T)
+			await say(K("Como quieras. La puerta, cerrada al salir."), T)
 			return
 
 func por_thc(L: Dictionary) -> Array:
@@ -605,36 +624,36 @@ func desc_almacen(A: Dictionary) -> String:
 	if A.t == "cam":   # 1.43.6
 		var CM: Dictionary = D.CAMAROTE
 		var so: float = float(cam().get("sob", 0))
-		var sob_t := ("Sobres de humedad: %d (uno por tarro, %d días)." % [ceili(so - 1e-9), int(CM.dura)]) if so > 0 else "Sin sobres de humedad: lo curado no se afina."
+		var sob_t := T("Sobres de humedad: {n} (uno por tarro, {d} días).", {"n": ceili(so - 1e-9), "d": int(CM.dura)}) if so > 0 else K("Sin sobres de humedad: lo curado no se afina.")
 		if it == null or it.k == "+":
-			return "GUARDAR: llevas %s de cogollos y en el camarote caben %s más (%d tarros de 10 L). %s\nA: guardar · B: cerrar." % [g_txt(total_buds()), g_txt(maxf(0, cam_cap() - cam_g())), cam_est() * int(CM.est.tarros), sob_t]
-		var tj: String = (" en %d tarros (este, el %d.º: %d g)" % [int(it.n), int(it.q) + 1, int(it.gj)]) if int(it.n) > 1 else ""
+			return T("GUARDAR: llevas {a} de cogollos y en el camarote caben {b} más ({t} tarros de 10 L). {s}\nA: guardar · B: cerrar.", {"a": g_txt(total_buds()), "b": g_txt(maxf(0, cam_cap() - cam_g())), "t": int(cam_est() * int(CM.est.tarros)), "s": sob_t})
+		var tj: String = (" " + T("en {n} tarros (este, el {q}.º: {g} g)", {"n": int(it.n), "q": int(it.q) + 1, "g": int(it.gj)})) if int(it.n) > 1 else ""
 		var af := float(it.b.get("af", 0))
-		return "%s: %s%s · %s %% THC%s%s.\nA: sacarlo · B: cerrar." % [lot_nombre(it.k), g_lote(it.b.g), tj, Datos.pct(it.b.thc), cura_corto(it.b),
-			(" · afinada al 62 %%" if af >= 1 else (" · afinándose (%d %%)" % Datos.jsround(af * 100))) if af else ""]
+		return T("{n}: {g}{tj} · {t} % THC{c}{af}.\nA: sacarlo · B: cerrar.", {"n": lot_nombre(it.k), "g": g_lote(it.b.g), "tj": tj, "t": Datos.pct(it.b.thc), "c": cura_corto(it.b),
+			"af": ((" · " + T("afinada al 62 %%")) if af >= 1 else (" · " + T("afinándose ({p} %)", {"p": Datos.jsround(af * 100)}))) if af else ""})
 	if A.t == "caja":
 		var C: Dictionary = D.CAJA[int(S.caja.nivel)]
 		var g := caja_g()
 		if it != null and it.k == "+":
-			return "GUARDAR: llevas %s de cogollos y en la caja caben %s más.%s\nA: guardar · B: cerrar." % [g_txt(total_buds()), g_txt(maxf(0, C.g - g)), (" Con los tarros se curan en %d días." % int(D.CURADO.dias)) if S.items.get("tarros") else ""]
+			return T("GUARDAR: llevas {a} de cogollos y en la caja caben {b} más.{c}\nA: guardar · B: cerrar.", {"a": g_txt(total_buds()), "b": g_txt(maxf(0, C.g - g)), "c": (" " + T("Con los tarros se curan en {d} días.", {"d": int(D.CURADO.dias)})) if S.items.get("tarros") else ""})
 		if it == null or it.k == "$":
-			return "Dinero: %s de %s (%s). Tarros: %s de %s (%s).\nA: guardar o sacar · B: cerrar." % [Datos.eur(S.caja.money), Datos.eur(C.money), _pct_txt(S.caja.money / C.money), g_lote(g), _kg(int(C.g)), _pct_txt(g / C.g)]
-		var tj: String = (" en %d tarros (este, el %d.º: %d g)" % [int(it.n), int(it.q) + 1, int(it.gj)]) if int(it.n) > 1 else ""
-		return "%s: %s%s · %s %% THC%s.\nA: sacarlo · B: cerrar." % [lot_nombre(it.k), g_lote(it.b.g), tj, Datos.pct(it.b.thc), cura_corto(it.b)]
+			return T("Dinero: {a} de {b} ({c}). Tarros: {d} de {e} ({f}).\nA: guardar o sacar · B: cerrar.", {"a": Datos.eur(S.caja.money), "b": Datos.eur(C.money), "c": _pct_txt(S.caja.money / C.money), "d": g_lote(g), "e": _kg(int(C.g)), "f": _pct_txt(g / C.g)})
+		var tj: String = (" " + T("en {n} tarros (este, el {q}.º: {g} g)", {"n": int(it.n), "q": int(it.q) + 1, "g": int(it.gj)})) if int(it.n) > 1 else ""
+		return T("{n}: {g}{tj} · {t} % THC{c}.\nA: sacarlo · B: cerrar.", {"n": lot_nombre(it.k), "g": g_lote(it.b.g), "tj": tj, "t": Datos.pct(it.b.thc), "c": cura_corto(it.b)})
 	var r := nevera_r()
 	if it == null or it.k == "+":
-		return "GUARDAR: llevas %s g de extractos y en la nevera caben %s g más.%s\nA: guardar · B: cerrar." % [Datos.coma(Datos.jsround(total_rosin() * 10) / 10.0), Datos.coma(maxf(0, floor((nevera_cap() - r) * 10 + 1e-9) / 10.0)),
-			(" En los tarros, en frío, se curan en %d días." % int(D.CURADO.dias)) if S.items.get("tarros") else " Con tarros, se curarían en frío."]
+		return T("GUARDAR: llevas {a} g de extractos y en la nevera caben {b} g más.{c}\nA: guardar · B: cerrar.", {"a": Datos.coma(Datos.jsround(total_rosin() * 10) / 10.0), "b": Datos.coma(maxf(0, floor((nevera_cap() - r) * 10 + 1e-9) / 10.0)),
+			"c": (" " + T("En los tarros, en frío, se curan en {d} días.", {"d": int(D.CURADO.dias)})) if S.items.get("tarros") else " " + T("Con tarros, se curarían en frío.")})
 	var cu := float(it.b.get("cu", 0))
-	return "%s: %s g · %s %% THC · %s. Nevera: %s g de %d (%s).\nA: sacarlo · B: cerrar." % [extr_nombre(it.k), Datos.coma(it.b.g), Datos.pct(it.b.thc), "curado" if cu >= 1 else ("curándose" if cu else "sin curar"),
-		Datos.coma(Datos.jsround(r * 10) / 10.0), int(nevera_cap()), _pct_txt(r / nevera_cap())]
+	return T("{n}: {g} g · {t} % THC · {c}. Nevera: {r} g de {m} ({p}).\nA: sacarlo · B: cerrar.", {"n": extr_nombre(it.k), "g": Datos.coma(it.b.g), "t": Datos.pct(it.b.thc), "c": K("curado") if cu >= 1 else (K("curándose") if cu else K("sin curar")),
+		"r": Datos.coma(Datos.jsround(r * 10) / 10.0), "m": int(nevera_cap()), "p": _pct_txt(r / nevera_cap())})
 
 func _dlg_fijo(t: String, nombre: String) -> void:
 	if oraculo:
 		return
 	dlg.show()
 	dlg_nm.visible = nombre != ""
-	dlg_nm_txt.text = nombre
+	dlg_nm_txt.text = I18n.v(nombre)
 	dlg_more.hide()
 	dlg_txt.text = nm(t)
 	_coloca.call_deferred()
@@ -653,7 +672,7 @@ func elegir_almacen(t: String, i0 := 0):
 		return r
 	var nn := items_almacen(t).size()
 	ALMACEN = {"t": t, "i": maxi(0, mini(nn - 1, i0))}
-	var N := "CAJA FUERTE" if t == "caja" else "CAMAROTE" if t == "cam" else "NEVERA"
+	var N := K("CAJA FUERTE") if t == "caja" else K("CAMAROTE") if t == "cam" else K("NEVERA")
 	_dlg_fijo(desc_almacen(ALMACEN), N)
 	var pr := Motor.Prom.new()
 	push(func(b: String):
@@ -882,12 +901,12 @@ func guardar_almacen(t: String):
 	var a: Dictionary = S.caja.buds if caja else nevera().rosin
 	var mn := 1.0 if caja else .1
 	if L.is_empty():
-		await say("No llevas cogollos encima." if caja else "No llevas extractos encima.")
+		await say(K("No llevas cogollos encima.") if caja else K("No llevas extractos encima."))
 		return
 	if _hueco_alm(caja) < mn:
-		await say("En la caja no caben más cogollos." if caja else "En la nevera ya no cabe más.")
+		await say(K("En la caja no caben más cogollos.") if caja else K("En la nevera ya no cabe más."))
 		return
-	var j: int = await ask("¿Qué guardas en la caja?" if caja else "¿Qué guardas en la nevera?", ["Todos los cogollos" if caja else "Todos los extractos", "Un lote" if caja else "Un extracto", "Nada"])
+	var j: int = await ask(K("¿Qué guardas en la caja?") if caja else K("¿Qué guardas en la nevera?"), [K("Todos los cogollos") if caja else K("Todos los extractos"), K("Un lote") if caja else K("Un extracto"), K("Nada")])
 	if j == 0:
 		var q := 0.0
 		for l in L:
@@ -901,22 +920,22 @@ func guardar_almacen(t: String):
 				mover_rosin(de, a, l[0], g)
 		sfx("sel")
 		var resto: bool = total_buds() >= 1 if caja else total_rosin() >= .1
-		await say("Guardas %s en %s.%s" % [g_txt(q) if caja else Datos.coma(Datos.jsround(q * 10) / 10.0) + " g", "la caja" if caja else "la nevera", " No cabe todo: el resto se queda fuera." if resto else ""])
+		await say(T("Guardas {q} en {s}.", {"q": g_txt(q) if caja else Datos.coma(Datos.jsround(q * 10) / 10.0) + " g", "s": K("la caja") if caja else K("la nevera")}) + ((" " + T("No cabe todo: el resto se queda fuera.")) if resto else ""))
 		return
 	if j != 1:
 		return
 	var its := L.map(lot_item) if caja else L.map(rosin_item)
-	its.append({"label": "Nada"})
-	var i: int = await menu(its, {"cls": "right", "title": "¿Qué guardas?"})
+	its.append({"label": K("Nada")})
+	var i: int = await menu(its, {"cls": "right", "title": K("¿Qué guardas?")})
 	if i < 0 or i >= L.size():
 		return
 	var k: String = L[i][0]
 	var b: Dictionary = L[i][1]
 	var g
 	if caja:
-		g = await cuanto("%s: ¿cuánto?" % lot_nombre(k), minf(floor(b.g), _hueco_alm(caja)), [10, 50, 100, 500, 1000], func(v): return g_txt(v))
+		g = await cuanto(T("{n}: ¿cuánto?", {"n": lot_nombre(k)}), minf(floor(b.g), _hueco_alm(caja)), [10, 50, 100, 500, 1000], func(v): return g_txt(v))
 	else:
-		g = await cuanto("%s: ¿cuánto?" % extr_nombre(k), minf(b.g, _hueco_alm(caja)), [1, 5, 10, 50], func(v): return Datos.coma(v) + " g")
+		g = await cuanto(T("{n}: ¿cuánto?", {"n": extr_nombre(k)}), minf(b.g, _hueco_alm(caja)), [1, 5, 10, 50], func(v): return Datos.coma(v) + " g")
 	if not g:
 		return
 	if caja:
@@ -929,12 +948,12 @@ func _guardar_cam():
 	var L := bud_lots(1)
 	var hueco := func() -> float: return floor(cam_cap() - cam_g())
 	if L.is_empty():
-		await say("No llevas cogollos encima.")
+		await say(K("No llevas cogollos encima."))
 		return
 	if hueco.call() < 1:
-		await say("En el camarote no caben más tarros: pide otra estantería en la tienda online." if cam_est() < int(D.CAMAROTE.est.max) else "El camarote está lleno.")
+		await say(K("En el camarote no caben más tarros: pide otra estantería en la tienda online.") if cam_est() < int(D.CAMAROTE.est.max) else K("El camarote está lleno."))
 		return
-	var j: int = await ask("¿Qué guardas en el camarote?", ["Todos los cogollos", "Un lote", "Nada"])
+	var j: int = await ask(K("¿Qué guardas en el camarote?"), [K("Todos los cogollos"), K("Un lote"), K("Nada")])
 	if j == 0:
 		var q := 0.0
 		for l in L:
@@ -944,17 +963,17 @@ func _guardar_cam():
 			q += g
 			mover_lote(S.buds, S.cam.buds, l[0], g)
 		sfx("sel")
-		await say("Guardas %s en los tarros del camarote.%s" % [g_txt(q), " No cabe todo: el resto se queda fuera." if total_buds() >= 1 else ""])
+		await say(T("Guardas {q} en los tarros del camarote.", {"q": g_txt(q)}) + ((" " + T("No cabe todo: el resto se queda fuera.")) if total_buds() >= 1 else ""))
 		return
 	if j != 1:
 		return
 	var its := L.map(lot_item)
-	its.append({"label": "Nada"})
-	var i: int = await menu(its, {"cls": "right", "title": "¿Qué guardas?"})
+	its.append({"label": K("Nada")})
+	var i: int = await menu(its, {"cls": "right", "title": K("¿Qué guardas?")})
 	if i < 0 or i >= L.size():
 		return
 	var k: String = L[i][0]
-	var g = await cuanto("%s: ¿cuánto?" % lot_nombre(k), minf(floor(L[i][1].g), hueco.call()), [10, 50, 100, 500, 1000], func(v): return g_txt(v))
+	var g = await cuanto(T("{n}: ¿cuánto?", {"n": lot_nombre(k)}), minf(floor(L[i][1].g), hueco.call()), [10, 50, 100, 500, 1000], func(v): return g_txt(v))
 	if not g:
 		return
 	mover_lote(S.buds, S.cam.buds, k, g)
@@ -963,7 +982,7 @@ func _guardar_cam():
 # el camarote (1.43.6): las estanterías de tarros de 10 L; GUARDAR el primero y, en los demás, sacar un lote
 func camarote_action():
 	if cam_est() == 0:
-		await say("Aquí van las estanterías de los tarros de 10 L. Se piden en la tienda online.")
+		await say(K("Aquí van las estanterías de los tarros de 10 L. Se piden en la tienda online."))
 		return
 	if not (S.cam.get("buds") is Dictionary):
 		S.cam.buds = {}
@@ -978,11 +997,11 @@ func camarote_action():
 			continue
 		var g: float = minf(floor(e.b.g * 10) / 10.0, floor(libre_mochila()))
 		if g < 1:
-			await say("No te cabe nada más encima.")
+			await say(K("No te cabe nada más encima."))
 			continue
 		mover_lote(S.cam.buds, S.buds, e.k, g)
 		sfx("sel")
-		await say("Sacas %s de %s." % [g_txt(g), lot_nombre(e.k)])
+		await say(T("Sacas {g} de {n}.", {"g": g_txt(g), "n": lot_nombre(e.k)}))
 
 # la nevera (1.36): en la vista, GUARDAR arriba y, en los pisos, sacar un extracto
 func nevera_action():
@@ -997,16 +1016,16 @@ func nevera_action():
 			continue
 		var g: float = minf(e.b.g, floor(libre_mochila() * 10 + 1e-9) / 10.0)
 		if g < .1:
-			await say("No te cabe nada más encima.")
+			await say(K("No te cabe nada más encima."))
 			continue
 		mover_rosin(nevera().rosin, S.rosin, e.k, g)
 		sfx("sel")
-		await say("Sacas %s g de %s." % [Datos.coma(g), extr_nombre(e.k, true)])
+		await say(T("Sacas {g} g de {n}.", {"g": Datos.coma(g), "n": extr_nombre(e.k, true)}))
 
 # la mesa de manicurar (1.36, junto a la de genética): tijeras, guantes y bandeja; pela un lote de los que llevas encima
 func manicura_action():
 	if "charas" in extr_ya():
-		var j: int = await ask("La mesa de manicurar. ¿Qué haces?", ["Manicurar un lote", D.EXTR.charas.v, "Nada"])
+		var j: int = await ask(K("La mesa de manicurar. ¿Qué haces?"), [K("Manicurar un lote"), D.EXTR.charas.v, K("Nada")])
 		if j == 1:
 			await extraer("charas")
 			return
@@ -1014,23 +1033,23 @@ func manicura_action():
 			return
 	var lots := bud_lots(1).filter(func(l): return float(l[1].get("mc", 0)) < 1)
 	if lots.is_empty():
-		await say("La mesa de manicurar: tijeras de punta fina, guantes y una bandeja con rejilla. %s" % ["Lo que llevas ya está manicurado." if total_buds() >= 1 else "Trae cogollos para pelarlos."])
+		await say(T("La mesa de manicurar: tijeras de punta fina, guantes y una bandeja con rejilla. {x}", {"x": K("Lo que llevas ya está manicurado.") if total_buds() >= 1 else K("Trae cogollos para pelarlos.")}))
 		return
 	var its := lots.map(lot_item)
-	its.append({"label": "Nada"})
-	var i: int = await menu(its, {"cls": "right", "title": "Manicurar: ¿qué lote?"})
+	its.append({"label": K("Nada")})
+	var i: int = await menu(its, {"cls": "right", "title": K("Manicurar: ¿qué lote?")})
 	if i < 0 or i >= lots.size():
 		return
 	var k: String = lots[i][0]
 	var b: Dictionary = lots[i][1]
 	var m: int = mini(int(D.MANICURA.max), maxi(15, Datos.jsround(b.g * (1 - float(b.get("mc", 0))) * D.MANICURA.min)))
-	await say("Con las tijeras, cogollo a cogollo: fuera las hojitas con poca resina, que quede limpio y redondo.", "MANICURA")
+	await say(K("Con las tijeras, cogollo a cogollo: fuera las hojitas con poca resina, que quede limpio y redondo."), K("MANICURA"))
 	await gesto("manicurar")   # 1.54
 	b.mc = 1
 	advance_time(m)
 	sfx("get")
-	var dur: String = (("%d h" % int(m / 60)) + ((" %d min" % (m % 60)) if m % 60 else "")) if m >= 60 else "%d min" % m
-	await say("%s: %s manicurados en %s. Se venden un %d %% más caros." % [lot_nombre(k), g_txt(b.g), dur, Datos.jsround(D.MANICURA.precio * 100)])
+	var dur: String = (("%d h" % int(m / 60)) + ((" " + T("{n} min", {"n": m % 60})) if m % 60 else "")) if m >= 60 else T("{n} min", {"n": m})
+	await say(T("{n}: {g} manicurados en {d}. Se venden un {p} % más caros.", {"n": lot_nombre(k), "g": g_txt(b.g), "d": dur, "p": Datos.jsround(D.MANICURA.precio * 100)}))
 
 # un mueble por máquina (1.36), montado en el piso cuando la tienes (montar_casa)
 func mueble_extr(o: String):
@@ -1044,8 +1063,8 @@ func mueble_extr(o: String):
 		await extraer(L[0])
 		return
 	var ops := L.map(func(t): return D.EXTR[t].v)
-	ops.append("Nada")
-	var j: int = await ask(Mu.n + ". ¿Qué haces?", ops)
+	ops.append(K("Nada"))
+	var j: int = await ask(T("{n}. ¿Qué haces?", {"n": Mu.n}), ops)
 	if j >= 0 and j < L.size():
 		await extraer(L[j])
 
@@ -1101,7 +1120,7 @@ func mover_pieza(mapa: String, k: String) -> bool:
 	var muestra := func():
 		ORDEN.no = cabe_pieza(mapa, k, ORDEN.x, ORDEN.y, O)
 		_vista_orden(m, P_, O, G)
-		_dlg_fijo("%s · %s\nFlechas: mover · A: dejar aquí · B: como estaba" % [P_.n, D.ORDEN_MOTIVO[ORDEN.no] if ORDEN.no != "" else "Aquí cabe."], D.ORDEN_P[mapa].n)
+		_dlg_fijo(T("{n} · {m}\nFlechas: mover · A: dejar aquí · B: como estaba", {"n": P_.n, "m": D.ORDEN_MOTIVO[ORDEN.no] if ORDEN.no != "" else K("Aquí cabe.")}), D.ORDEN_P[mapa].n)
 	muestra.call()
 	var pr := Motor.Prom.new()
 	push(func(b: String):
@@ -1171,7 +1190,7 @@ func ordenar(mapa: String) -> void:
 	while true:
 		var L := piezas_ya(mapa)
 		var items: Array = L.map(func(P_): return {"label": P_.n})
-		items.append({"label": "Terminar"})
+		items.append({"label": K("Terminar")})
 		i = await menu(items, {"title": D.ORDEN_P[mapa].n, "initial": i, "cancel": true})
 		if i < 0 or i >= L.size():
 			return
@@ -1204,16 +1223,17 @@ func desc_carro(V: Dictionary) -> String:
 		var e: Dictionary = S.bandejas[V.i]
 		var s = strain(e.sid)
 		var hasta: int = int(e.dia) + int(D.CARRO.dias)
-		return "Esqueje de %s%s: pinchado el %s, aguanta hasta el %s%s.\nA: nombrarlo o tirarlo · B: cerrar." % [s.n, etiq(e.f), Datos.fd(e.dia, S.day), Datos.fd(hasta, S.day), " (hoy es el último)" if hasta <= S.day else ""]
+		var de := {"n": s.n + etiq(e.f), "a": Datos.fd(e.dia, S.day), "b": Datos.fd(hasta, S.day)}
+		return T("Esqueje de {n}: pinchado el {a}, aguanta hasta el {b} (hoy es el último).\nA: nombrarlo o tirarlo · B: cerrar.", de) if hasta <= S.day else T("Esqueje de {n}: pinchado el {a}, aguanta hasta el {b}.\nA: nombrarlo o tirarlo · B: cerrar.", de)
 	var pr: int = S.esquejes.size()
-	return "Taco vacío · %d de %d ocupados. %s\n%s · B: cerrar." % [nb, cap, ("En el propagador llevas %d." % pr) if pr else "El propagador está vacío.", "A: pinchar" if pr and nb < cap else "A: ver"]
+	return T("Taco vacío · {a} de {b} ocupados. {p}\n{x} · B: cerrar.", {"a": nb, "b": cap, "p": T("En el propagador llevas {n}.", {"n": pr}) if pr else K("El propagador está vacío."), "x": K("A: pinchar") if pr and nb < cap else K("A: ver")})
 
 func elegir_carro(i0 := 0):
 	if gancho_carro.is_valid():
 		return gancho_carro.call()
 	var cap: int = D.CARRO.bandejas * D.CARRO.plazas
 	CARRO_V = {"i": clampi(i0, 0, cap - 1)}
-	_dlg_fijo(desc_carro(CARRO_V), "CARRO DE ESQUEJES")
+	_dlg_fijo(desc_carro(CARRO_V), K("CARRO DE ESQUEJES"))
 	var pr := Motor.Prom.new()
 	push(func(b: String):
 		if b == "B":
@@ -1226,7 +1246,7 @@ func elegir_carro(i0 := 0):
 			return
 		if mueve_carro(CARRO_V, b):
 			sfx("sel")
-			_dlg_fijo(desc_carro(CARRO_V), "CARRO DE ESQUEJES"))
+			_dlg_fijo(desc_carro(CARRO_V), K("CARRO DE ESQUEJES")))
 	var e = await Motor.espera(pr)
 	CARRO_V = null
 	if not oraculo:
@@ -1361,7 +1381,7 @@ func desc_bajo(V: Dictionary) -> String:
 	var Z: Dictionary = D.SETAS
 	var B: Array = SL().bandejas
 	if V.i >= B.size():
-		return "Hueco libre en la balda · %d de %d bandejas. Las prepara Txomin, en la puerta.\nB: cerrar." % [B.size(), max_bandejas()]
+		return T("Hueco libre en la balda · {a} de {b} bandejas. Las prepara Txomin, en la puerta.\nB: cerrar.", {"a": B.size(), "b": int(max_bandejas())})
 	var b: Dictionary = B[V.i]
 	var f: String = fase_seta(b)
 	var t := t_seta(b)
@@ -1369,23 +1389,23 @@ func desc_bajo(V: Dictionary) -> String:
 	var q := ""
 	match f:
 		"colonizando":
-			q = "el micelio cubre el %d %% del sustrato" % Datos.jsround(100 * clampf(t / Z.colon, 0, 1))
+			q = T("el micelio cubre el {p} % del sustrato", {"p": Datos.jsround(100 * clampf(t / Z.colon, 0, 1))})
 		"fructificando":
-			q = "las setas crecen: %d %%" % Datos.jsround(100 * clampf((t - Z.colon) / Z.fruto, 0, 1))
+			q = T("las setas crecen: {p} %", {"p": Datos.jsround(100 * clampf((t - Z.colon) / Z.fruto, 0, 1))})
 		"lista":
-			q = "lista para recoger"
+			q = K("lista para recoger")
 		"contaminada":
-			q = "contaminada: hay que tirarla"
+			q = K("contaminada: hay que tirarla")
 		"seca":
-			q = "seca: hay que tirarla"
-	var dd: String = (" · día %d de %d" % [mini(int(S.day - b.d) + 1, tot), tot]) if not b.get("mala") else ""
-	return "Bandeja %d%s · %s%s · humedad %d %%.\nA: pulverizar, recoger o tirar · B: cerrar." % [V.i + 1, (" · " + nom_cepa(cepa_de(b))) if Datos.CAL else "", q, dd, Datos.jsround(b.hum)]
+			q = K("seca: hay que tirarla")
+	var dd: String = (" · " + T("día {a} de {b}", {"a": mini(int(S.day - b.d) + 1, tot), "b": tot})) if not b.get("mala") else ""
+	return T("Bandeja {n}{c} · {q}{d} · humedad {h} %.\nA: pulverizar, recoger o tirar · B: cerrar.", {"n": int(V.i + 1), "c": (" · " + nom_cepa(cepa_de(b))) if Datos.CAL else "", "q": q, "d": dd, "h": Datos.jsround(b.hum)})
 
 func elegir_bajo(i0 := 0):
 	if gancho_bajo.is_valid():
 		return gancho_bajo.call(i0)
 	SETAS_V = {"i": clampi(i0, 0, 2 * n_baldas() - 1)}
-	var tit := "EL SÓTANO" if es_sot() else "EL BAJO"
+	var tit := K("EL SÓTANO") if es_sot() else K("EL BAJO")
 	_dlg_fijo(desc_bajo(SETAS_V), tit)
 	var pr := Motor.Prom.new()
 	push(func(b: String):
@@ -1420,7 +1440,7 @@ func vista_bajo(i0 := 0) -> void:
 		if i < SL().bandejas.size():
 			await bajo_menu("")
 		else:
-			await say("En ese hueco no hay bandeja. Las prepara Txomin: se las compras en la puerta.")
+			await say(K("En ese hueco no hay bandeja. Las prepara Txomin: se las compras en la puerta."))
 
 # una bandeja (19 × 15 unidades de u px) en x, y: la caja de plástico con la tapa, el sustrato, el micelio, las setas y las gotas
 func _bandeja_seta(o: Array, b, x: int, y: int, u: int, sid: int) -> void:
@@ -1587,17 +1607,17 @@ func txt_secando(o: String) -> String:
 	var L: Dictionary = SL()
 	var dh: bool = L.get("dh", false)
 	if o == "secaS" and dh:
-		return "La malla del secadero, sin usar: ahora secas en el deshidratador."
+		return K("La malla del secadero, sin usar: ahora secas en el deshidratador.")
 	var fr: Array = L.get("fr", [])
-	var nm: String = "el deshidratador" if o == "deshidS" else "la malla del secadero"
 	if fr.is_empty():
-		return "%s está %s. Lo que recojas se seca aquí y pasa al armario." % [nm[0].to_upper() + nm.substr(1), "vacío" if o == "deshidS" else "vacía"]
+		return K("El deshidratador está vacío. Lo que recojas se seca aquí y pasa al armario.") if o == "deshidS" else K("La malla del secadero está vacía. Lo que recojas se seca aquí y pasa al armario.")
 	var g := 0
 	var d: int = 1 << 30
 	for f in fr:
 		g += int(f.g)
 		d = mini(d, int(f.d) + dias_secar(L))
-	return "En %s, %s de setas secándose; las primeras pasan al armario el %s." % [nm, g_txt(g), Datos.fd(d, S.day)]
+	var dg := {"g": g_txt(g), "d": Datos.fd(d, S.day)}
+	return T("En el deshidratador, {g} de setas secándose; las primeras pasan al armario el {d}.", dg) if o == "deshidS" else T("En la malla del secadero, {g} de setas secándose; las primeras pasan al armario el {d}.", dg)
 
 # lo lleno de cada piso del armario: 0 vacío, 1 a medias, 2 lleno (SETAS_PRO.lleno)
 func lleno_arm(k: String) -> int:
@@ -1612,18 +1632,23 @@ func mesa_setas() -> void:
 	while S.get("setas") != null:
 		var L: Dictionary = S.setas
 		var ops := []
+		var oid := []   # F7: lo que se compara (en castellano), al lado de lo que se ve
 		if L.get("enc"):
-			ops.append("Microdosis (%d g)" % int(Z.lote))
+			ops.append(T("Microdosis ({n} g)", {"n": int(Z.lote)}))
+			oid.append("Microdosis")   # i18n-no
 		if L.get("mol"):
-			ops.append("Comestibles (%d g + %s)" % [int(Z.lote), Datos.eur(Z.choco)])
+			ops.append(T("Comestibles ({n} g + {e})", {"n": int(Z.lote), "e": Datos.eur(Z.choco)}))
+			oid.append("Comestibles")   # i18n-no
 		if Datos.CAL:   # 1.46: juntar micelios y el cuaderno de las cepas
-			ops.append_array(["Juntar micelios", "El cuaderno"])
+			ops.append_array([K("Juntar micelios"), K("El cuaderno")])
+			oid.append_array(["Juntar micelios", "El cuaderno"])   # i18n-no
 		if ops.is_empty():
-			await say("La mesa de trabajo, con la báscula. Para las microdosis falta la encapsuladora y para los comestibles, los moldes: te los consigue Txomin, en la puerta.")
+			await say(K("La mesa de trabajo, con la báscula. Para las microdosis falta la encapsuladora y para los comestibles, los moldes: te los consigue Txomin, en la puerta."))
 			return
-		ops.append("Nada")
-		var oi: int = await ask("La mesa de trabajo. En el armario, %s de setas secas." % g_txt(L.g), ops)
-		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+		ops.append(K("Nada"))
+		oid.append("Nada")   # i18n-no
+		var oi: int = await ask(T("La mesa de trabajo. En el armario, {g} de setas secas.", {"g": g_txt(L.g)}), ops)
+		var op: String = oid[oi] if oi >= 0 and oi < oid.size() else ""
 		if op == "" or op == "Nada":
 			return
 		if op == "Juntar micelios":
@@ -1635,11 +1660,11 @@ func mesa_setas() -> void:
 		var mc: bool = op.begins_with("Micro")
 		if L.g < Z.lote:
 			sfx("bad")
-			await say("Hacen falta %d g de setas secas del armario." % int(Z.lote))
+			await say(T("Hacen falta {n} g de setas secas del armario.", {"n": int(Z.lote)}))
 			continue
 		if not mc and S.money < Z.choco:
 			sfx("bad")
-			await say("Sin %s no hay chocolate." % Datos.eur(Z.choco))
+			await say(T("Sin {e} no hay chocolate.", {"e": Datos.eur(Z.choco)}))
 			continue
 		L.g -= Z.lote
 		if Datos.CAL:
@@ -1651,7 +1676,7 @@ func mesa_setas() -> void:
 		advance_time(int(Z.min[kk]))
 		update_hud()
 		sfx("get")
-		await say("Llenas las cápsulas con la encapsuladora y cierras la cajita: una caja de microdosis, al armario." if mc else "Fundes el chocolate, llenas los moldes y, cuando enfría, los encajas: una caja de comestibles, al armario.")
+		await say(K("Llenas las cápsulas con la encapsuladora y cierras la cajita: una caja de microdosis, al armario.") if mc else K("Fundes el chocolate, llenas los moldes y, cuando enfría, los encajas: una caja de comestibles, al armario."))
 
 func desc_armario() -> String:
 	var L: Dictionary = S.setas
@@ -1667,14 +1692,14 @@ func desc_armario() -> String:
 			if gv[k] >= 1:
 				t.append("%s %s" % [nom_cepa(k), g_txt(gv[k])])
 		cv = " (" + ", ".join(PackedStringArray(t)) + ")"
-	return "Setas secas: %s%s · microdosis: %d · comestibles: %d.%s\nB: cerrar." % [g_txt(L.g), cv, int(L.get("mc", 0)), int(L.get("cc", 0)), (" Secándose, %s." % g_txt(g)) if g else ""]
+	return T("Setas secas: {g}{c} · microdosis: {m} · comestibles: {k}.{s}\nB: cerrar.", {"g": g_txt(L.g), "c": cv, "m": int(L.get("mc", 0)), "k": int(L.get("cc", 0)), "s": (" " + T("Secándose, {g}.", {"g": g_txt(g)})) if g else ""})
 
 func vista_armario() -> void:
 	if gancho_bajo.is_valid():
 		gancho_bajo.call(-1)
 		return
 	ARM_V = {}
-	_dlg_fijo(desc_armario(), "EL ARMARIO")
+	_dlg_fijo(desc_armario(), K("EL ARMARIO"))
 	var pr := Motor.Prom.new()
 	push(func(b: String):
 		if b == "A" or b == "B":
