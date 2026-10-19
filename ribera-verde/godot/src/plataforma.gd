@@ -4,7 +4,7 @@
 # Sin el plugin (escritorio, pruebas) todo es un no-op y la compra responde PRUEBA_COMPRA.
 extends Node
 
-const PLUGIN := "LandracePlay"
+const PLUGIN := "LandracePlay"   # i18n-no
 const PG_JSON := "res://datos/play_games.json"
 const SENTRY_DSN := ""   # el DSN del proyecto de Sentry (lo pone Eddie); vacío, no se envía nada aunque se active
 

@@ -68,17 +68,22 @@ func fuera_desde(ts: float) -> Dictionary:
 	r.mn = mn
 	if r.crecen > 0:
 		var tx := _fuera_txt(r)
-		queue("fuera", func(): await leer("MIENTRAS ESTABAS FUERA", tx), [["MIENTRAS ESTABAS FUERA", [tx]]])
+		queue("fuera", func(): await leer(K("MIENTRAS ESTABAS FUERA"), tx), [[K("MIENTRAS ESTABAS FUERA"), [tx]]])
 	return r
 
 func _fuera_txt(r: Dictionary) -> String:
 	var h := int(floor(r.seg / 3600.0))
-	var fuera := ("%d h" % h) if h >= 1 else ("%d min" % int(floor(r.seg / 60.0)))
-	var tope := " (cuenta como mucho %d h)" % int(D.OFFLINE.tope_h) if r.seg > float(D.OFFLINE.tope_h) * 3600 else ""
-	var L := ["Has estado fuera %s%s." % [fuera, tope], "Tus plantas han seguido creciendo: %d %s, como %d h de juego." % [r.crecen, "planta" if r.crecen == 1 else "plantas", int(r.mn / 60)]]
+	var mi := int(floor(r.seg / 60.0))
+	var tp := int(D.OFFLINE.tope_h)
+	var L: Array
+	if r.seg > float(D.OFFLINE.tope_h) * 3600:
+		L = [T("Has estado fuera {h} h (cuenta como mucho {t} h).", {"h": h, "t": tp}) if h >= 1 else T("Has estado fuera {m} min (cuenta como mucho {t} h).", {"m": mi, "t": tp})]
+	else:
+		L = [T("Has estado fuera {h} h.", {"h": h}) if h >= 1 else T("Has estado fuera {m} min.", {"m": mi})]
+	L.append(T("Tus plantas han seguido creciendo: {n} planta, como {h} h de juego.", {"n": int(r.crecen), "h": int(r.mn / 60)}) if r.crecen == 1 else T("Tus plantas han seguido creciendo: {n} plantas, como {h} h de juego.", {"n": int(r.crecen), "h": int(r.mn / 60)}))
 	if r.listas:
-		L.append("%d %s para cosechar." % [r.listas, "está lista" if r.listas == 1 else "están listas"])
-	L.append("El reloj del juego, la deuda y lo demás no han corrido.")
+		L.append(T("{n} está lista para cosechar.", {"n": int(r.listas)}) if r.listas == 1 else T("{n} están listas para cosechar.", {"n": int(r.listas)}))
+	L.append(T("El reloj del juego, la deuda y lo demás no han corrido."))
 	return "\n".join(PackedStringArray(L))
 
 # ---------- aviso de la cosecha ----------
@@ -118,7 +123,7 @@ func al_pausar() -> void:
 	if aj.get("avisos"):
 		var s := seg_cosecha()
 		if s > 0:
-			plat().aviso(s, "Landrace Hunters", "Tienes plantas listas para cosechar.")
+			plat().aviso(s, T("Landrace Hunters"), T("Tienes plantas listas para cosechar."))
 	if mode == "world" or mode == "carpa":
 		plat().nube_guarda(JSON.stringify(S, "", false, true))
 
@@ -171,7 +176,7 @@ func diario_revisa() -> void:
 		if not Dd.ok.has(id) and diario_lleva(id) >= int(x.n):
 			Dd.ok.append(id)
 			S.items[D.DIARIOS.premio] = int(S.items.get(D.DIARIOS.premio, 0)) + 1
-			toast("<small>OBJETIVO DIARIO</small>%s · +1 abono" % x.t, 2600)
+			toast(T("<small>OBJETIVO DIARIO</small>{t} · +1 abono", {"t": x.t}), 2600)
 
 func diarios_txt() -> String:
 	return "%d/%d" % [diario().ok.size(), diario().o.size()]
@@ -183,10 +188,10 @@ func diario_menu() -> void:
 		var x := diario_obj(id)
 		var hecho: bool = Dd.ok.has(id)
 		var ll := mini(diario_lleva(id), int(x.n))
-		it.append({"label": x.t, "right": "HECHO" if hecho else ("%s/%s" % [Datos.eur(ll), Datos.eur(x.n)] if id == "ventas" else "%d/%d" % [ll, int(x.n)]),
-			"desc": "Cada objetivo hecho da un abono. Cambian cada día (la fecha del móvil)."})
-	it.append({"label": "Volver", "desc": ""})
-	await menu(it, {"cls": "full", "title": "OBJETIVOS DIARIOS", "title2": Dd.f, "desc": true})
+		it.append({"label": x.t, "right": K("HECHO") if hecho else ("%s/%s" % [Datos.eur(ll), Datos.eur(x.n)] if id == "ventas" else "%d/%d" % [ll, int(x.n)]),
+			"desc": K("Cada objetivo hecho da un abono. Cambian cada día (la fecha del móvil).")})
+	it.append({"label": K("Volver"), "desc": ""})
+	await menu(it, {"cls": "full", "title": K("OBJETIVOS DIARIOS"), "title2": Dd.f, "desc": true})
 
 # ---------- la demo y la compra única ----------
 func completo() -> bool:
@@ -207,19 +212,19 @@ func demo_corta() -> bool:
 	return true
 
 func fin_demo() -> bool:
-	var c: int = await ask("FIN DE LA DEMO\nLos capítulos %d a 8 vienen con el juego completo: una compra única, sin anuncios ni pagos dentro. La partida te espera aquí." % int(D.COMPLETO.ch),
-		["Comprar el juego completo", "Más tarde"])
+	var c: int = await ask(T("FIN DE LA DEMO\nLos capítulos {c} a 8 vienen con el juego completo: una compra única, sin anuncios ni pagos dentro. La partida te espera aquí.", {"c": int(D.COMPLETO.ch)}),
+		[K("Comprar el juego completo"), K("Más tarde")])
 	if c != 0:
-		await say("Cuando quieras: START · JUEGO COMPLETO.")
+		await say(K("Cuando quieras: START · JUEGO COMPLETO."))
 		return false
 	var e: String = await plat().comprar(String(D.COMPLETO.producto))
 	if e == "ok":
 		aj.completo = true
 		ajustes_guarda()
 		sfx("get")
-		await say("¡Gracias! Ya tienes el juego completo.")
+		await say(K("¡Gracias! Ya tienes el juego completo."))
 		return true
-	await say({"pendiente": "La compra está pendiente. Cuando se confirme, sigue desde START · JUEGO COMPLETO.", "cancelada": "Compra cancelada."}.get(e, "No se ha podido hacer la compra. Inténtalo más tarde."))
+	await say({"pendiente": K("La compra está pendiente. Cuando se confirme, sigue desde START · JUEGO COMPLETO."), "cancelada": K("Compra cancelada.")}.get(e, K("No se ha podido hacer la compra. Inténtalo más tarde.")))
 	return false
 
 # START · JUEGO COMPLETO (con S.flags.demo4): true si ya se puede seguir al capítulo 4
