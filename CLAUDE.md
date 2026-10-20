@@ -12,7 +12,8 @@ Reglas:
 3. PROHIBIDO emitir mensajes intermedios.
 4. Excepción: bloqueo crítico → preguntar máx. 1 línea.
 5. Estilo: frases ultracortas, máxima densidad técnica.
-6. Aviso de progreso `(trabajando · NN.N %)`: % calculado por script con sub-pasos
+6. Idioma: siempre en español, cada respuesta (también las cortas y las preguntas sueltas); ni una frase en inglés salvo código y nombres propios.
+7. Aviso de progreso `(trabajando · NN.N %)`: % calculado por script con sub-pasos
    (cada llamada o job cuenta), estrictamente creciente. Nunca repetir un % ni escribirlo
    a mano; si el estado no cambió, no se emite.
 

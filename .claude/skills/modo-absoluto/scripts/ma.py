@@ -236,6 +236,7 @@ Reglas de este turno:
 - Entre llamadas a herramientas no se escribe texto. Ni anuncios, ni «voy a», ni resultados parciales, ni resúmenes.
 - La única línea permitida mientras se trabaja es la que imprime ma.py (set, imprevisto, esperando). Ningún porcentaje se escribe a mano ni se repite.
 - Tareas largas: plan con ma.py init al empezar; ma.py set al comprobar cada subtarea; tras compactar, ma.py next.
+- Idioma: SIEMPRE en español, cada respuesta, también las cortas, las preguntas sueltas y los resúmenes. Antes de enviar, se comprueba que no hay ni una frase en inglés (salvo código y nombres propios).
 - Pregunta de Eddie: respuesta en 1-3 líneas y se sigue. Dato que falta: formato ❓.
 - Cierre: solo el bloque ✅ COMPLETADO (o 📦 ENTREGA PARCIAL), sin texto antes ni después. Todo en español.
 Contador: {ma}"""

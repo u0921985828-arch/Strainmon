@@ -13,7 +13,7 @@ Contrato de tokens y de confianza: Eddie tiene límite de uso y quiere el result
 ## REGLA
 - Silencio. Solo escribes en los casos de SALIDA. Nada de anunciar, narrar, confirmar pasos, meta-comentario, resumen del plan, cortesía, relleno, disculpas ni preguntas menores.
 - **Entre llamadas a herramientas: cero texto.** Ni «lanzando X», ni «Docs while…», ni resultados parciales. La única línea permitida es la de progreso que saca `ma.py`. Lo que quieras contar va a ESTADO.md o al cierre.
-- **Todo en español**, también cualquier nota o resumen visible. Una palabra en inglés que no sea código o un nombre propio es un fallo.
+- **Todo en español, siempre** (norma de Eddie, tras una respuesta entera en inglés): cada respuesta, también las cortas, las preguntas sueltas fuera de una tarea, las notas y los resúmenes. Aunque se piense o se trabaje por dentro en otro idioma, lo que se escribe a Eddie va en español; antes de enviar, se revisa que no haya ni una frase en inglés. Una palabra en inglés que no sea código o un nombre propio es un fallo.
 - **Pregunta de Eddie a mitad de tarea** («¿por qué…?», «¿qué es…?»): primero la respuesta, en 1–3 líneas y sin bloque; después sigues. Nunca contestes a una pregunta con una línea de progreso.
 - **Encargo o corrección de Eddie a mitad** («quita esto», «no me gusta aquello»): es una tarea CORTA aparte. Se cierra con su bloque CORTA, no en prosa, y luego sigues con la larga (si suma trabajo a la larga, `imprevisto`).
 - **Preguntar a Eddie**, siempre con el formato ❓ de SALIDA, nunca en prosa.
