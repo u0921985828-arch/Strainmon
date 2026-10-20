@@ -1305,6 +1305,10 @@ const SENT_PIERNAS := ["anooonaanooona", "anonnnaannnona", ".annna..annna.", ".a
 # De espaldas en el taburete de la barra (asiento a 72 cm, 11 px): el culo encima del asiento y, a los lados del pie,
 # las espinillas colgando hasta el reposapiés con las zapatillas; delante del taburete. TABURETE_SUBE: lo que sube del suelo
 # la fila de los pies del fotograma; las zapatillas, en el reposapiés, y el culo, 6 filas más arriba, en el asiento
+# sentado al ordenador, de espaldas: el brazo izquierdo, de la mano (arriba, en la mesa) al codo (columnas 6-10 del fotograma,
+# hasta la fila y0-6; «,» borra el brazo que colgaba)
+const SENT_MESA_G := 4
+const SENT_MESA := [".aa..", "ajja.", "ajja.", "agja.", "agja.", "agja.", "agja.", "ahha.", "ahha.", "ahhha", ".aaa,", "..,,,", "..,,,"]
 const SENT_TABURETE := [".akka....akka.", ".akka....akka.", ".akla....alka.", ".akka....akka.", ".akka....akka.", ".ahha....ahha.", ".aaaa....aaaa."]
 const TABURETE_SUBE := 5
 func _pj_sentado() -> void:
@@ -1319,7 +1323,8 @@ func _pj_sentado() -> void:
 	var tab: bool = J.SENT.d == "norte" and J.SENT.get("k") in J.TABURETES
 	var g: Array = J.sent_geo(J.SENT.get("k"))
 	var sube: int = 9 - int(g[1])   # 1.55.3: lo que sube la cadera desde la de pie (la 9 de la casilla), por asiento (SENT_GEO)
-	var clave := "%d|%s|%d" % [c.get_instance_id(), J.SENT.d + str(tab), sube]
+	var mesa: bool = J.SENT.d == "norte" and not tab and J.sent_mesa()
+	var clave := "%d|%s|%d|%s" % [c.get_instance_id(), J.SENT.d + str(tab), sube, str(J.SENT.get("k")) if mesa else ""]
 	var im: Image = _sent_img.get(clave)
 	if im == null:
 		var y0: int = int(f.cel.ancla[1])   # la fila de los pies; la cadera, 6 más arriba (y0 - 6, el cinturón)
@@ -1349,10 +1354,30 @@ func _pj_sentado() -> void:
 		else:
 			# de espaldas (1.55.3): solo el torso, con la cadera en el cojín; las piernas, debajo del asiento, las tapa el respaldo
 			im.blit_rect(c, Rect2i(0, 0, c.get_width(), y0 - 5), Vector2i(0, 0))
+			if mesa:
+				# delante del ordenador (lo pidió el usuario): los codos fuera y los antebrazos hacia delante, con las manos en la
+				# mesa a los lados de la cabeza (SENT_MESA, el brazo izquierdo; el derecho, en espejo); los colores, del fotograma
+				var col := {"a": c.get_pixel(9, y0 - 5), "j": c.get_pixel(10, y0 - 9), "g": c.get_pixel(9, y0 - 8), "h": c.get_pixel(11, y0 - 11), ",": Color(0, 0, 0, 0)}
+				var filas := brazos_mesa(J.SENT.get("k"))
+				var y1: int = y0 - 5 - filas.size()
+				for i in filas.size():
+					var r: String = filas[i]
+					for x in r.length():
+						if r[x] != ".":
+							im.set_pixel(6 + x, y1 + i, col[r[x]])
+							im.set_pixel(c.get_width() - 7 - x, y1 + i, col[r[x]])
 		_sent_img[clave] = im
 	var xp: int = J.SENT.x * 16 - Datos.jsround(cam.x) + 8 + int(g[0])
 	var yp: int = J.SENT.y * 16 - Datos.jsround(cam.y) + 15 - (TABURETE_SUBE if tab else sube)
 	_img(im, Datos.jsround(xp - f.cel.ancla[0]), Datos.jsround(yp - f.cel.ancla[1]))
+
+# los brazos de SENT_MESA; en la silla gaming, que es más baja que su mesa, los antebrazos SENT_MESA_G filas más largos
+static func brazos_mesa(k) -> Array:
+	var l: Array = SENT_MESA.duplicate()
+	if k == "sillaG":   # i18n-no
+		for i in SENT_MESA_G:
+			l.insert(3, SENT_MESA[3])
+	return l
 
 # las piernas de frente para n filas, de la cadera al suelo: los dos muslos, las espinillas que hagan falta y las zapatillas
 static func piernas_sentado(n: int) -> Array:

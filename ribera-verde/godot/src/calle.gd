@@ -429,10 +429,21 @@ func asiento(x: int, y: int) -> void:
 	if c == "Nada":
 		return
 	if c != "Sentarte":
+		if Datos.CAL and c == "Usar el ordenador":   # (lo pidió el usuario): para usar el ordenador te sientas, y te quedas sentado
+			await sentado(x, y, k)
+			await object_action(x, y - 1)
+			return
 		var de := delante()
 		await object_action(de[0], de[1])
 		return
 	await sentado(x, y, k)
+
+# sentado delante de un ordenador (la silla de la tía o la gaming, con algo encima): las manos en la mesa (_pj_sentado)
+func sent_mesa() -> bool:
+	if not Datos.CAL or SENT == null or not (SENT.get("k") in ["silla", "sillaG"]) or S.map != "home":   # i18n-no
+		return false
+	var o = MAPS[S.map].o[SENT.y - 1][SENT.x] if SENT.y > 0 else null
+	return o is String and o != ""
 
 func sentado(x: int, y: int, k: String) -> void:
 	SENT = {"x": x, "y": y, "d": ASIENTOS[k], "k": k, "dir0": P.dir}
@@ -492,6 +503,8 @@ func menu_sentado() -> void:
 	if SENT == null:
 		return
 	var ops := []   # [texto, clave]
+	if sent_mesa():
+		ops.append([K("Usar el ordenador"), "pc"])
 	ops.append([K("Fumarte uno"), "fumar"])
 	var bb := bebidas_aqui()
 	if bb != "":
@@ -509,6 +522,8 @@ func menu_sentado() -> void:
 		await hablar_con(c)
 		return
 	match c:
+		"pc":
+			await object_action(SENT.x, SENT.y - 1)
 		"fumar":
 			await fumar_sentado()
 		"beber":

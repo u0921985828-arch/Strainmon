@@ -2035,7 +2035,7 @@ var ASIENTO_TXT := {"sofaF": I18n.K("Un sofá del club."), "sofaB": I18n.K("Un s
 # cadera, la fila de la casilla (0 arriba, 15 los pies de pie) en la que queda la cadera, la del cojín medida en cada sprite;
 # de pie, en la 9. De espaldas, la cabeza asoma por encima del respaldo (en la silla gaming, alto, la cadera por encima
 # del cojín para que se vea la cabeza; lo de debajo lo tapa el respaldo). El taburete, con SENT_TABURETE en pinta.gd
-const SENT_GEO := {"silla": [0, 5], "sillaG": [8, 2], "sillon": [0, 7], "sofa": [0, 8], "sofaB": [0, 9], "sofaF": [2, 7], "sofaV": [2, 7], "bench": [0, 9], "stool": [0, 4],
+const SENT_GEO := {"silla": [0, 1], "sillaG": [8, 2], "sillon": [0, 7], "sofa": [0, 8], "sofaB": [0, 9], "sofaF": [2, 7], "sofaV": [2, 7], "bench": [0, 9], "stool": [0, 4],
 	"sillaTs": [0, 8], "sillaTn": [0, 5], "taburTb": [0, 4], "sillaT": [-6, 8]}
 
 const TABURETES := ["stool", "taburTb"]   # 1.57.2: con las piernas de SENT_TABURETE (pinta.gd)   # i18n-no

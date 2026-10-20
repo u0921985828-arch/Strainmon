@@ -503,7 +503,7 @@ func chatarra_dia() -> Array:
 	return r
 
 # el rastro (lo pidió el usuario, con Datos.CAL): Bixente te compra el equipo que te sobra (focos, macetas y accesorios de la
-# mochila) a RASTRO.compra de lo que cuesta y lo pone a la venta a CHATARRA.f; se queda RASTRO.dias en el solar, RASTRO.max piezas
+# mochila) a RASTRO.compra de lo que cuesta (la mitad), sin tope; lo vendido, vendido: no se recompra (se pregunta antes)
 func rastro_ok() -> bool:
 	return Datos.CAL and D.has("RASTRO")
 
@@ -525,13 +525,6 @@ func rastro_pieza(key: String) -> Dictionary:
 func rastro_compra(it: Dictionary) -> int:
 	return maxi(1, Datos.jsround(float(it.p) * float(D.RASTRO.compra)))
 
-# lo que tiene a la venta de lo tuyo (lo que pasa de RASTRO.dias, se lo ha llevado otro)
-func rastro_stock() -> Array:
-	if not (S.get("rastro") is Array):
-		S.rastro = []
-	S.rastro = S.rastro.filter(func(r): return int(S.day) - int(r.d) <= int(D.RASTRO.dias) and not rastro_pieza(String(r.k)).is_empty())
-	return S.rastro
-
 func rastro_vendible() -> Array:
 	var l := []
 	for key in S.items:
@@ -549,20 +542,19 @@ func vender_rastro(N: String) -> void:
 		var items := []
 		for key in l:
 			var it := rastro_pieza(key)
-			items.append({"label": String(it.lbl), "right": Datos.eur(rastro_compra(it)), "desc": T("Tienes {n} de sobra en la mochila.\nTe la pago a {e} y la pongo a la venta.", {"n": n(S.items[key]), "e": Datos.eur(rastro_compra(it))})})
-		items.append({"label": K("Nada"), "desc": K("Lo que me vendas, lo pongo en el puesto.")})
+			items.append({"label": String(it.lbl), "right": Datos.eur(rastro_compra(it)), "desc": T("Tienes {n} de sobra en la mochila.\nTe la pago a {e}, la mitad de lo que vale nueva.", {"n": n(S.items[key]), "e": Datos.eur(rastro_compra(it))})})
+		items.append({"label": K("Nada"), "desc": K("Lo que me vendas, vendido está: no se devuelve.")})
 		i = await menu(items, {"cls": "full", "title": K("VENDERLE A BIXENTE"), "title2": I18n.T("Tienes {e}", {"e": Datos.eur(S.money)}), "desc": true, "initial": mini(i, items.size() - 1)})
 		if i < 0 or i >= l.size():
 			return
 		var key: String = l[i]
 		var it := rastro_pieza(key)
 		var e := rastro_compra(it)
+		var si: int = await ask(T("¿Seguro que le vendes {x} por {e}? Lo vendido no se recupera.", {"x": it.lbl, "e": Datos.eur(e)}), [K("Vender"), K("No")], N)
+		if si != 0:
+			continue
 		S.items[key] = int(S.items[key]) - 1
 		S.money = float(S.money) + e
-		var st := rastro_stock()
-		st.append({"k": key, "d": int(S.day)})
-		while st.size() > int(D.RASTRO.max):
-			st.pop_front()
 		sfx("coin")
 		toast(T("+{e} · {x}", {"e": Datos.eur(e), "x": it.lbl}), 1200)
 
@@ -591,17 +583,13 @@ func talk_bixente():
 					if S.ch >= int(it.ch) and shop_cond(it):   # solo lo de su capítulo
 						l.append(it)
 					break
-		var st: Array = rastro_stock() if rastro_ok() else []
 		var aw: Array = armas_venta() if Datos.CAL else []   # MAESTRO [7]: el bate y la cadena
-		if l.is_empty() and aw.is_empty() and st.is_empty():
+		if l.is_empty() and aw.is_empty():
 			await say(K("Hoy no me queda nada que te sirva. Mañana entra más."), N)
 			return
 		var items := []
 		for a in aw:
 			items.append({"label": a.lbl, "right": Datos.eur(int(a.p)), "desc": a.desc})
-		for r in st:
-			var it := rastro_pieza(String(r.k))
-			items.append({"label": it.lbl, "right": Datos.eur(Datos.jsround(it.p * D.CHATARRA.f)), "desc": T("{d}\nDe segunda mano: funciona, pero sin garantía.", {"d": it.get("desc", "")})})
 		for it in l:
 			items.append({"label": it.lbl, "right": Datos.eur(Datos.jsround(it.p * D.CHATARRA.f)), "desc": T("{d}\nDe segunda mano: funciona, pero sin garantía.", {"d": it.get("desc", "")})})
 		items.append({"label": K("Nada"), "desc": K("Cada día entran tres piezas.")})
@@ -618,22 +606,6 @@ func talk_bixente():
 			i = 0
 			continue
 		i -= aw.size()
-		if i >= 0 and i < st.size():
-			var it := rastro_pieza(String(st[i].k))
-			var p := Datos.jsround(it.p * D.CHATARRA.f)
-			if float(S.money) < p:
-				sfx("bad")
-				await say(K("Sin dinero no hay trato."), N)
-				i += aw.size()
-				continue
-			S.money -= p
-			sfx("coin")
-			S.rastro.remove_at(S.rastro.find(st[i]))
-			await entregar(it, N)
-			await check_story()
-			i = 0
-			continue
-		i -= st.size()
 		if i < 0 or i >= l.size():
 			await say(K("Lo que entra, sale. Si lo quieres, no tardes."), N)
 			return

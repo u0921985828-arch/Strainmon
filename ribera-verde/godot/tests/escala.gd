@@ -234,6 +234,19 @@ func _corre() -> void:
 	MENUS = []
 	QUIERO = ["Usar el ordenador"]
 	chk(corre(func(): J.interact()) and MENUS.size() >= 2 and MENUS[0] == ["Sentarte", "Usar el ordenador", "Nada"], "la silla: el ordenador %s" % [MENUS.slice(0, 2)])
+	# (lo pidió el usuario: «cuando usas el ordenador no te sientas»): para usarlo te sientas y te quedas sentado, con las manos
+	# en la mesa (SENT_MESA: de la mano, arriba, al codo); sentado, el ordenador también está en el menú
+	chk(J.SENT != null and J.SENT.get("k") == "silla" and J.SENT.d == "norte" and J.P.dir == "up", "usando el ordenador, sentado %s" % [J.SENT])
+	chk(J.sent_mesa(), "sentado al ordenador: las manos en la mesa")
+	var sm: Array = J.pintor.SENT_MESA
+	chk(sm.size() == 13 and sm[1].contains("j") and sm[-1].contains(","), "las manos arriba y el brazo que colgaba, borrado")
+	chk(J.pintor.brazos_mesa("sillaG").size() == sm.size() + J.pintor.SENT_MESA_G, "en la gaming, más baja que su mesa, los antebrazos más largos")
+	chk(int(J.sent_geo("silla")[1]) <= 2, "en la silla de la tía, los hombros por encima del respaldo (cadera %d)" % int(J.sent_geo("silla")[1]))
+	MENUS = []
+	QUIERO = ["Usar el ordenador"]
+	chk(corre(func(): await J.menu_sentado()) and MENUS.size() >= 2 and MENUS[0][0] == "Usar el ordenador" and J.SENT != null, "sentado, el ordenador %s" % [MENUS.slice(0, 1)])
+	J.levantarte()
+	chk(J.SENT == null and not J.sent_mesa(), "de pie, sin mesa")
 	# 1.57.2 (lo pidió el usuario: «una silla tiene que ser de verdad un mueble»): en la taberna, sillas y taburetes en los que te sientas
 	var mp: Dictionary = J.MAPS["loc-puerto"]
 	var tb := {}
@@ -251,6 +264,7 @@ func _corre() -> void:
 	MENUS = []
 	QUIERO = []
 	chk(corre(func(): J.interact()) and MENUS.size() >= 1 and not MENUS[0].has("Sentarte"), "sin CAL, sin sentarse %s" % [MENUS.slice(0, 1)])
+	chk(J.SENT == null, "sin CAL, al ordenador de pie")
 	Datos.CAL = true
 	J.oraculo = false
 	if dir != "":

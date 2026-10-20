@@ -2643,11 +2643,12 @@ s9f085fe5,Cargado. Esta noche sale en el barco.,Loaded. It ships out on the boat
 sd94ef466,¿Qué te hace falta hoy?,What do you need today?
 s0c624925,"Kaixo. Esto es GROW IBARBIDE: el equipo, un 10 % más barato que en el barrio, y lo nuevo antes que nadie.","Kaixo. This is GROW IBARBIDE: gear 10 % cheaper than in the barrio, and the new stuff first."
 sbb5610b8,"No te sobra nada que me interese. Cuando cambies un foco o una maceta, la vieja me la traes.","You've got nothing spare I'm after. When you swap a lamp or a pot, bring me the old one."
-sa99a7bb0,"Tienes {n} de sobra en la mochila.
-Te la pago a {e} y la pongo a la venta.","You have {n} spare in your backpack.
-I'll pay {e} and put it up for sale."
-sb192237d,"Lo que me vendas, lo pongo en el puesto.",Whatever you sell me goes on the stall.
+s84fbe9dd,"Tienes {n} de sobra en la mochila.
+Te la pago a {e}, la mitad de lo que vale nueva.","You have {n} spare in your backpack.
+I'll pay {e}, half what it costs new."
+sd4f8e03d,"Lo que me vendas, vendido está: no se devuelve.","Whatever you sell me, stays sold: no take-backs."
 sa6ad744b,VENDERLE A BIXENTE,SELL TO BIXENTE
+sd482c654,¿Seguro que le vendes {x} por {e}? Lo vendido no se recupera.,Sure you want to sell him {x} for {e}? Once sold
 s6063410a,BIXENTE,BIXENTE
 sc7edf53c,Compro chatarra y vendo lo que se puede aprovechar. Vuelve cuando cultives en serio.,I buy scrap and sell what's still good. Come back when you grow for real.
 sf2e70439,"Esto es el rastro de la comarca: lo que a uno le sobra, a otro le hace falta. ¿Compras o vendes?",This is the county flea market: one man's spare is another man's need. Buying or selling?
@@ -5769,6 +5770,10 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+sa99a7bb0,"Tienes {n} de sobra en la mochila.
+Te la pago a {e} y la pongo a la venta.","You have {n} spare in your backpack.
+I'll pay {e} and put it up for sale."
+sb192237d,"Lo que me vendas, lo pongo en el puesto.",Whatever you sell me goes on the stall.
 sd7ea13d0,Le va la {e} con aroma {a}.,They like {e} with a {a} aroma.
 s1ad453ba,"Busco {g} g de una {e} con aroma {a}, de más del {t} % de THC. Si das con ella, te lo pago bien.","I'm after {g} g of a {e} with a {a} aroma, over {t} % THC. If you find it, I'll pay well."
 s92373c73,"Por cierto: {q} en {p} necesita {g} g de una {ef}. Si se los llevas antes del {d}, te paga {e}. ¿Te animas?","By the way: {q} in {p} needs {g} g of a {ef}. If you get it to them before {d}, they'll pay {e}. Up for it?"

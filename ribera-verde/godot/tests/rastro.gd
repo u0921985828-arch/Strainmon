@@ -1,6 +1,7 @@
 # Ribera Verde (Godot) — el rastro de la chatarrería (lo pidió el usuario tras probarlo: «lo que se te queda obsoleto, que lo
-# puedas vender»; con Datos.CAL): Bixente compra los focos, macetas y accesorios de sobra de la mochila a RASTRO.compra, los pone
-# a la venta a CHATARRA.f, se van a los RASTRO.dias y caben RASTRO.max; lo montado en las carpas no se vende; sin CAL, como antes.
+# puedas vender»; con Datos.CAL): Bixente compra los focos, macetas y accesorios de sobra de la mochila a RASTRO.compra (la
+# mitad), sin tope y preguntando antes; lo vendido, vendido (no hay puesto ni se recompra); lo montado en las carpas no se vende;
+# sin CAL, como antes.
 # Sin oráculo del HTML (congelado en la 1.37): parte del S de la pantalla casa-extr.
 #   $GODOT --headless --path godot --script res://tests/rastro.gd   → «rastro: N comprobaciones, 0 fallos»
 extends SceneTree
@@ -101,42 +102,44 @@ func _corre() -> void:
 	chk(MENUS.size() >= 1 and MENUS[0].has("Comprar") and MENUS[0].has("Venderle"), "compra o venta")
 	chk(log_tiene("No te sobra nada"), "nada que venderle")
 	chk(S.carpas[0].foco == foco0, "la carpa sigue con su foco")
-	# 2 · venderle el foco viejo: RASTRO.compra de su precio, y a su puesto
+	# 2 · venderle el foco viejo: pregunta antes y lo paga a RASTRO.compra (la mitad) de su precio
 	S.items.f_led100 = 1
 	S.items.f_cfl = 1
 	S.items.m_plastico7 = 2
+	chk(is_equal_approx(float(R.compra), 0.5) and not R.has("max") and not R.has("dias"), "a la mitad, sin tope ni días")
 	var din := float(S.money)
 	MENUS.clear()
-	QUIERO = ["Venderle", "Foco LED 100 W", "Nada"]
+	QUIERO = ["Venderle", "Foco LED 100 W", "Vender", "Nada"]
 	chk(corre(func(): await J.talk_bixente()), "venta del foco")
 	var p_led := Datos.jsround(110 * float(R.compra))
 	chk(float(S.money) == din + p_led and int(S.items.f_led100) == 0, "pagado a %d €" % p_led)
-	chk(S.rastro.size() == 1 and String(S.rastro[0].k) == "f_led100" and int(S.rastro[0].d) == int(S.day), "al puesto")
-	chk(MENUS.size() >= 2 and MENUS[1].any(func(l): return String(l).begins_with("Foco CFL")), "lo de serie también se vende")
-	# lo de serie, a su precio de RASTRO.base
+	chk(MENUS.size() >= 3 and MENUS[2] == ["Vender", "No"], "¿seguro? %s" % [MENUS.slice(2, 3)])
+	chk(not S.has("rastro"), "sin puesto: lo vendido, vendido")
+	chk(MENUS[1].any(func(l): return String(l).begins_with("Foco CFL")), "lo de serie también se vende")
+	# si dices que no, no se vende
 	din = float(S.money)
-	QUIERO = ["Venderle", "Foco CFL", "Nada"]
+	QUIERO = ["Venderle", "Foco CFL", "No", "Nada"]
+	chk(corre(func(): await J.talk_bixente()), "no vender el CFL")
+	chk(float(S.money) == din and int(S.items.f_cfl) == 1, "dicho que no, sigue en la mochila")
+	# lo de serie, a su precio de RASTRO.base
+	QUIERO = ["Venderle", "Foco CFL", "Vender", "Nada"]
 	chk(corre(func(): await J.talk_bixente()), "venta del CFL")
 	chk(float(S.money) == din + Datos.jsround(float(R.base.cfl) * float(R.compra)) and int(S.items.f_cfl) == 0, "el CFL a su precio")
-	# 3 · comprarlo de vuelta, a CHATARRA.f (no sale a cuenta: compra < venta)
-	chk(float(R.compra) < float(D.CHATARRA.f), "no hay trampa de comprar y vender")
-	din = float(S.money)
+	# 3 · comprar: solo la chatarra del día (no sale a cuenta: vender no paga más que comprar)
+	chk(float(R.compra) <= float(D.CHATARRA.f), "no hay trampa de comprar y vender")
 	MENUS.clear()
-	QUIERO = ["Comprar", "Foco LED 100 W", "Luego", "Nada"]
-	chk(corre(func(): await J.talk_bixente()), "compra del foco")
-	chk(MENUS.size() >= 2 and MENUS[1].has("Foco LED 100 W"), "el foco, en la lista de la chatarrería")
-	chk(float(S.money) == din - Datos.jsround(110 * float(D.CHATARRA.f)) and int(S.items.f_led100) == 1, "comprado a mitad de precio")
-	chk(S.rastro.size() == 1 and String(S.rastro[0].k) == "f_cfl", "sale del puesto")
-	# 4 · lo del puesto se va a los RASTRO.dias y caben RASTRO.max
-	S.rastro[0].d = int(S.day) - int(R.dias) - 1
-	chk(J.rastro_stock().is_empty(), "se lo lleva otro")
-	S.items.m_plastico7 = int(R.max) + 3
+	QUIERO = ["Comprar", "Nada"]
+	chk(corre(func(): await J.talk_bixente()), "a comprar")
+	chk(MENUS.size() >= 2 and MENUS[1].size() <= int(D.CHATARRA.n) + J.armas_venta().size() + 1, "en venta, solo lo del día %s" % [MENUS.slice(1, 2)])
+	# 4 · sin tope: le vendes todo lo que te sobre
+	S.items.m_plastico7 = 15
+	din = float(S.money)
 	QUIERO = ["Venderle"]
-	for i in int(R.max) + 2:
-		QUIERO.append("Maceta")
+	for i in 15:
+		QUIERO.append_array(["Maceta", "Vender"])
 	QUIERO.append("Nada")
 	chk(corre(func(): await J.talk_bixente()), "venta de macetas")
-	chk(S.rastro.size() == int(R.max) and int(S.items.m_plastico7) == 1, "caben %d" % int(R.max))
+	chk(int(S.items.m_plastico7) == 0 and float(S.money) == din + 15 * J.rastro_compra(J.rastro_pieza("m_plastico7")), "las 15, sin tope")
 	# 5 · la pista al cambiar el foco, una vez
 	S.flags.erase("rastroP")
 	chk(J.pista_rastro().contains("Bixente") and J.pista_rastro() == "", "la pista, una vez")
