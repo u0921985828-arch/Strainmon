@@ -205,6 +205,7 @@ func _ready() -> void:
 	retrato_marco.hide()
 	add_child(retrato_marco)
 	add_child(retrato)
+	move_child(dlg_nm, retrato.get_index())   # la pestaña del nombre, encima del hombro del busto
 	retrato.visibility_changed.connect(func(): retrato_marco.visible = retrato.visible)
 	dlg_nm.visibility_changed.connect(func():
 		if not dlg_nm.visible:
@@ -557,7 +558,10 @@ func geo_pulgar(W: float, H: float, il: float, ir: float, it: float, ib: float, 
 func alto_libre() -> int:
 	if oraculo or not dlg.visible or u <= 0:
 		return SH - 47
-	return clampi(int(floor((dlg_nm.position.y if dlg_nm.visible else dlg.position.y) - scr.position.y) / u) - 1, 40, SH)
+	var arriba: float = dlg_nm.position.y if dlg_nm.visible else dlg.position.y
+	if retrato.visible:
+		arriba = minf(arriba, retrato_marco.position.y)
+	return clampi(int(floor((arriba - scr.position.y) / u)) - 1, 40, SH)
 
 func ui_rect() -> Rect2:
 	return Rect2(scr.position.x + scr.size.x / 2 - uiw / 2, scr.position.y + ut, uiw, scr.size.y - ut)
@@ -1698,25 +1702,24 @@ func _coloca() -> void:
 		return
 	var R := ui_rect()
 	if dlg.visible:
-		# con el busto, la caja crece hasta que quepa entero dentro, centrado y por debajo de la pestaña del nombre
-		dlg_nm.reset_size()
-		var mb := maxf(4 * us, ceilf((dlg_nm.size.y - 12 * us) / us + 1) * us)
-		var alto := maxf(44 * us, retrato_w() * us + 2 * mb) if retrato.visible else 44 * us
-		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us, alto)
-		dlg.size = Vector2(R.size.x - 6 * us, 0)
+		# con el busto, el retrato va al lado de la caja, a su izquierda y de pie sobre su canto de abajo, y la caja empieza a su
+		# derecha; el nombre, en la pestaña sobre el hombro del busto que toca a la caja
+		var rw := retrato_w()
+		var ri := (rw + 5) * us if retrato.visible else 0.0
+		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us - ri, 44 * us)
+		dlg.size = Vector2(R.size.x - 6 * us - ri, 0)
 		# en el combate, el texto no pasa por debajo del menú de la derecha (118 de ancho): .dlg con padding-right 126 en el CSS
 		var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
 		dlg.get_theme_stylebox("panel").content_margin_right = ((126 if bt else 10) + 2) * us
-		var rw := retrato_w()
-		dlg.get_theme_stylebox("panel").content_margin_left = ((10 + (rw + 4 if retrato.visible else 0)) + 2) * us
+		dlg.get_theme_stylebox("panel").content_margin_left = (10 + 2) * us
 		dlg.reset_size()
-		dlg.size.x = R.size.x - 6 * us
-		dlg.position = Vector2(R.position.x + 3 * us, R.end.y - 3 * us - dlg.size.y)
+		dlg.size.x = R.size.x - 6 * us - ri
+		dlg.position = Vector2(R.position.x + 3 * us + ri, R.end.y - 3 * us - dlg.size.y)
 		dlg_nm.reset_size()
 		dlg_nm.position = dlg.position + Vector2(6 * us, -12 * us)
 		if retrato.visible:
 			retrato.size = Vector2(rw, rw) * us
-			retrato.position = dlg.position + Vector2(6 * us, maxf(mb, floorf((dlg.size.y - rw * us) / 2 / us) * us))
+			retrato.position = Vector2(R.position.x + 4 * us, dlg.position.y + dlg.size.y - (rw + 1) * us)
 			var sm := StyleBoxFlat.new()
 			sm.bg_color = Retrato.FONDO
 			sm.border_color = Retrato.BORDE
@@ -1724,6 +1727,7 @@ func _coloca() -> void:
 			retrato_marco.add_theme_stylebox_override("panel", sm)
 			retrato_marco.position = retrato.position - Vector2(us, us)
 			retrato_marco.size = retrato.size + Vector2(2 * us, 2 * us)
+			dlg_nm.position = retrato.position + retrato.size - dlg_nm.size + Vector2(8 * us, -6 * us)
 		dlg_more.position = dlg.position + dlg.size - Vector2(8 * us + 8 * us, 4 * us + 5 * us)
 		dlg_more.size = Vector2(8 * us, 7 * us)
 		# La primera vez, el texto aún no sabe su ancho y el cuadro sale de toda la pantalla; se recoloca al fotograma siguiente
