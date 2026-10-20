@@ -502,11 +502,82 @@ func chatarra_dia() -> Array:
 		l.remove_at(j)
 	return r
 
+# el rastro (lo pidió el usuario, con Datos.CAL): Bixente te compra el equipo que te sobra (focos, macetas y accesorios de la
+# mochila) a RASTRO.compra de lo que cuesta y lo pone a la venta a CHATARRA.f; se queda RASTRO.dias en el solar, RASTRO.max piezas
+func rastro_ok() -> bool:
+	return Datos.CAL and D.has("RASTRO")
+
+# la pieza de la tienda de la clave de la mochila (f_led100, m_tela11, x_vent…); lo de serie, con su precio de RASTRO.base
+func rastro_pieza(key: String) -> Dictionary:
+	var t := key.substr(0, 2)
+	var k := key.substr(2)
+	var campo: String = {"f_": "foco", "m_": "maceta", "x_": "extra"}.get(t, "")
+	if campo == "":
+		return {}
+	for it in D.SHOP:
+		if String(it.get(campo, "")) == k:
+			return it
+	if D.RASTRO.base.has(k):
+		var nm: String = T("Foco {f}", {"f": D.FOCOS[k].n}) if campo == "foco" else (T("Maceta {m}", {"m": D.MACETAS[k].n}) if campo == "maceta" else String(D.EXTRAS[k].c))
+		return {"lbl": nm, "p": int(D.RASTRO.base[k]), campo: k, "ch": 1}
+	return {}
+
+func rastro_compra(it: Dictionary) -> int:
+	return maxi(1, Datos.jsround(float(it.p) * float(D.RASTRO.compra)))
+
+# lo que tiene a la venta de lo tuyo (lo que pasa de RASTRO.dias, se lo ha llevado otro)
+func rastro_stock() -> Array:
+	if not (S.get("rastro") is Array):
+		S.rastro = []
+	S.rastro = S.rastro.filter(func(r): return int(S.day) - int(r.d) <= int(D.RASTRO.dias) and not rastro_pieza(String(r.k)).is_empty())
+	return S.rastro
+
+func rastro_vendible() -> Array:
+	var l := []
+	for key in S.items:
+		if int(S.items[key]) > 0 and not rastro_pieza(String(key)).is_empty():
+			l.append(String(key))
+	return l
+
+func vender_rastro(N: String) -> void:
+	var i := 0
+	while true:
+		var l := rastro_vendible()
+		if l.is_empty():
+			await say(K("No te sobra nada que me interese. Cuando cambies un foco o una maceta, la vieja me la traes."), N)
+			return
+		var items := []
+		for key in l:
+			var it := rastro_pieza(key)
+			items.append({"label": String(it.lbl), "right": Datos.eur(rastro_compra(it)), "desc": T("Tienes {n} de sobra en la mochila.\nTe la pago a {e} y la pongo a la venta.", {"n": n(S.items[key]), "e": Datos.eur(rastro_compra(it))})})
+		items.append({"label": K("Nada"), "desc": K("Lo que me vendas, lo pongo en el puesto.")})
+		i = await menu(items, {"cls": "full", "title": K("VENDERLE A BIXENTE"), "title2": I18n.T("Tienes {e}", {"e": Datos.eur(S.money)}), "desc": true, "initial": mini(i, items.size() - 1)})
+		if i < 0 or i >= l.size():
+			return
+		var key: String = l[i]
+		var it := rastro_pieza(key)
+		var e := rastro_compra(it)
+		S.items[key] = int(S.items[key]) - 1
+		S.money = float(S.money) + e
+		var st := rastro_stock()
+		st.append({"k": key, "d": int(S.day)})
+		while st.size() > int(D.RASTRO.max):
+			st.pop_front()
+		sfx("coin")
+		toast(T("+{e} · {x}", {"e": Datos.eur(e), "x": it.lbl}), 1200)
+
 func talk_bixente():
 	var N := K("BIXENTE")
 	if S.ch < int(D.CHATARRA.ch):
 		await say(K("Compro chatarra y vendo lo que se puede aprovechar. Vuelve cuando cultives en serio."), N)
 		return
+	if rastro_ok():
+		var c: int = await ask(K("Esto es el rastro de la comarca: lo que a uno le sobra, a otro le hace falta. ¿Compras o vendes?"), [K("Comprar"), K("Venderle"), K("Nada")], N)
+		if c == 1:
+			await vender_rastro(N)
+			return
+		if c != 0:
+			return
 	var i := 0
 	while true:
 		var ch = S.get("chatarra")
@@ -520,17 +591,21 @@ func talk_bixente():
 					if S.ch >= int(it.ch) and shop_cond(it):   # solo lo de su capítulo
 						l.append(it)
 					break
+		var st: Array = rastro_stock() if rastro_ok() else []
 		var aw: Array = armas_venta() if Datos.CAL else []   # MAESTRO [7]: el bate y la cadena
-		if l.is_empty() and aw.is_empty():
+		if l.is_empty() and aw.is_empty() and st.is_empty():
 			await say(K("Hoy no me queda nada que te sirva. Mañana entra más."), N)
 			return
 		var items := []
 		for a in aw:
 			items.append({"label": a.lbl, "right": Datos.eur(int(a.p)), "desc": a.desc})
+		for r in st:
+			var it := rastro_pieza(String(r.k))
+			items.append({"label": it.lbl, "right": Datos.eur(Datos.jsround(it.p * D.CHATARRA.f)), "desc": T("{d}\nDe segunda mano: funciona, pero sin garantía.", {"d": it.get("desc", "")})})
 		for it in l:
 			items.append({"label": it.lbl, "right": Datos.eur(Datos.jsround(it.p * D.CHATARRA.f)), "desc": T("{d}\nDe segunda mano: funciona, pero sin garantía.", {"d": it.get("desc", "")})})
 		items.append({"label": K("Nada"), "desc": K("Cada día entran tres piezas.")})
-		i = await menu(items, {"cls": "full", "title": K("CHATARRERÍA DEL SOLAR"), "title2": I18n.T("Tienes {e}", {"e": Datos.eur(S.money)}), "desc": true, "initial": i})
+		i = await menu(items, {"cls": "full", "title": K("CHATARRERÍA DEL SOLAR"), "title2": I18n.T("Tienes {e}", {"e": Datos.eur(S.money)}), "desc": true, "initial": mini(i, items.size() - 1)})
 		if i >= 0 and i < aw.size():
 			if float(S.money) < int(aw[i].p):
 				sfx("bad")
@@ -543,6 +618,22 @@ func talk_bixente():
 			i = 0
 			continue
 		i -= aw.size()
+		if i >= 0 and i < st.size():
+			var it := rastro_pieza(String(st[i].k))
+			var p := Datos.jsround(it.p * D.CHATARRA.f)
+			if float(S.money) < p:
+				sfx("bad")
+				await say(K("Sin dinero no hay trato."), N)
+				i += aw.size()
+				continue
+			S.money -= p
+			sfx("coin")
+			S.rastro.remove_at(S.rastro.find(st[i]))
+			await entregar(it, N)
+			await check_story()
+			i = 0
+			continue
+		i -= st.size()
 		if i < 0 or i >= l.size():
 			await say(K("Lo que entra, sale. Si lo quieres, no tardes."), N)
 			return

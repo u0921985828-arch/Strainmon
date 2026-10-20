@@ -623,6 +623,11 @@ s87a95c48,Foco {f},Light {f}
 s1c696ef9,CAMBIAR FOCO,CHANGE LIGHT
 scac9c1b6,Ahora: {f},Now: {f}
 s1ab378f2,Cuelgas el foco {f}. El viejo va a la mochila.,You hang the {f} light. The old one goes to your backpack.
+s49f43c51,RASTRO,RASTRO
+sa167f5f5,rastroP,rastroP
+sf3e3b2bf,"
+Si ya no te sirve, Bixente te lo compra en la chatarrería de Valdehierro.","
+If you don't need it anymore, Bixente buys it at the Valdehierro scrapyard."
 s70977637,No te queda ABONO.,You're out of NUTRIENTS.
 sd7d565b1,¿Qué abono le echas?,Which nutrient do you give it?
 s67860766,Echas una dosis de {p}. Crecerá más deprisa.,You give it a dose of {p}. It'll grow faster.
@@ -2637,8 +2642,15 @@ sf15b7de1,+{e} · {g} al por mayor,+{e} · {g} wholesale
 s9f085fe5,Cargado. Esta noche sale en el barco.,Loaded. It ships out on the boat tonight.
 sd94ef466,¿Qué te hace falta hoy?,What do you need today?
 s0c624925,"Kaixo. Esto es GROW IBARBIDE: el equipo, un 10 % más barato que en el barrio, y lo nuevo antes que nadie.","Kaixo. This is GROW IBARBIDE: gear 10 % cheaper than in the barrio, and the new stuff first."
+sbb5610b8,"No te sobra nada que me interese. Cuando cambies un foco o una maceta, la vieja me la traes.","You've got nothing spare I'm after. When you swap a lamp or a pot, bring me the old one."
+sa99a7bb0,"Tienes {n} de sobra en la mochila.
+Te la pago a {e} y la pongo a la venta.","You have {n} spare in your backpack.
+I'll pay {e} and put it up for sale."
+sb192237d,"Lo que me vendas, lo pongo en el puesto.",Whatever you sell me goes on the stall.
+sa6ad744b,VENDERLE A BIXENTE,SELL TO BIXENTE
 s6063410a,BIXENTE,BIXENTE
 sc7edf53c,Compro chatarra y vendo lo que se puede aprovechar. Vuelve cuando cultives en serio.,I buy scrap and sell what's still good. Come back when you grow for real.
+sf2e70439,"Esto es el rastro de la comarca: lo que a uno le sobra, a otro le hace falta. ¿Compras o vendes?",This is the county flea market: one man's spare is another man's need. Buying or selling?
 s47ea7ec5,Hoy no me queda nada que te sirva. Mañana entra más.,Nothing left that'd suit you today. More comes in tomorrow.
 sd8392c8a,"{d}
 De segunda mano: funciona, pero sin garantía.","{d}
@@ -3207,11 +3219,11 @@ s1641fb63,GENTE7,GENTE7
 s643e6825,índica,indica
 s78adc8eb,sativa,sativa
 s60bda0b9,híbrida,hybrid
-sd7ea13d0,Le va la {e} con aroma {a}.,They like {e} with a {a} aroma.
+s93e1d722,Le gusta la de olor {a}.,Likes it with a {a} smell.
 s49392ee3,"Oye… lo de lo que te debo, que no me olvido. Dame un poco más.","Listen… about what I owe you, I haven't forgotten. Give me a bit longer."
 s6a2c7ceb,"Por fiarme el otro día, te cuento una cosa:","For giving me credit the other day, I'll tell you something:"
 sf73ac696,¿Qué tal? La {s} de la otra vez estaba de diez.,How's it going? That {s} from last time was top notch.
-s1ad453ba,"Busco {g} g de una {e} con aroma {a}, de más del {t} % de THC. Si das con ella, te lo pago bien.","I'm after {g} g of a {e} with a {a} aroma, over {t} % THC. If you find it, I'll pay well."
+s558ce3f1,"Busco {g} g de algo fuerte, del {t} % de THC para arriba. Si me lo traes, te lo pago bien.","I'm after {g} g of something strong, {t} % THC or more. Bring it and I'll pay well."
 s9f602093,«Justo lo que buscaba.» Te da también {x}.,“Just what I was looking for.” They also give you {x}.
 s9d8fc5ad,{n} hojas de papel,{n} rolling papers
 s827d1101,un mechero,a lighter
@@ -3244,14 +3256,14 @@ s9347c3c3,"Te paga los {e}, intereses incluidos, mirando al suelo.","They pay yo
 s6e0f6c8e,"«No tengo nada, te lo juro.» Hoy no le sacas ni un euro.","“I've got nothing, I swear.” You won't get a single euro out of them today."
 sa687bf27,"Se asusta y te paga los {e}. En el barrio se habla de ti, y no para bien.","They get scared and pay you the {e}. People in the neighbourhood are talking about you, and not kindly."
 sd1417eb1,Se esconde: no te coge el teléfono. Y alguien ha oído la amenaza.,They hide: they won't pick up the phone. And someone heard the threat.
-s92373c73,"Por cierto: {q} en {p} necesita {g} g de una {ef}. Si se los llevas antes del {d}, te paga {e}. ¿Te animas?","By the way: {q} in {p} needs {g} g of a {ef}. If you get it to them before {d}, they'll pay {e}. Up for it?"
+s4902bc4d,"Por cierto: {q} en {p} necesita {g} g de algo del {t} % para arriba. Si se los llevas antes del {d}, te paga {e}. ¿Te animas?",By the way: {q} in {p} needs {g} g of something {t} % or stronger. Get it there before {d} and they'll pay {e}. You in?
 s3c6b2960,Me animo,I'm in
 s7a432755,Paso,Pass
 s1df8aa04,{q} de {n},{q} of {n}
 s414c3ab0,"«Te paso su número. Cuando estés en {p}, llámale.»","“I'll give you their number. When you're in {p}, call them.”"
-s2c8f900c,Encargo: {g} g de una {ef} antes del {d}. Paga {e}.,Job: {g} g of a {ef} before {d}. Pays {e}.
+s6ee3b0b9,Encargo: {g} g del {t} % para arriba antes del {d}. Paga {e}.,"Order: {g} g, {t} % or stronger, before {d}. Pays {e}."
 s7b87c4fa,"«Estoy en {p}. Llámame cuando estés por aquí, en la calle.»","“I'm in {p}. Call me when you're around here, on the street.”"
-s70cf6903,«¿No traes una {ef}? Entonces nada.»,“You haven't brought a {ef}? Then forget it.”
+s0fbea56b,«¿No traes {g} g del {t} % para arriba? Entonces nada.»,“No {g} g of {t} % or stronger? Then no deal.”
 sb0c83104,¿Qué le llevas?,What do you bring them?
 sc64eb865,"Viene en diez minutos, mira el material y te paga {e}. «Ya me dijeron que eras de fiar.»","They come in ten minutes, check the stuff and pay you {e}. “They told me you could be trusted.”"
 s9c28aa17,COMBATE7,COMBATE7
@@ -5411,9 +5423,9 @@ sb018834f,Esto es otra liga. Te llamaré para la próxima.,This is another leagu
 s6782ec97,La fiesta fue un éxito. Se habla de ti.,The party was a hit. People are talking about you.
 s98569d9f,PASTOR,SHEPHERD
 s19f6fac3,El dolor del pastor,The shepherd's ache
-s02ed5913,Un pastor de Mendialde busca 5 g de una índica (70 % o más) para dormir en la borda.,A Mendialde shepherd wants 5 g of an indica (70 % or more) to sleep in his hut.
+s20d388c5,Un pastor de Mendialde busca 5 g de algo fuerte (18 % de THC o más) para dormir en la borda.,A Mendialde shepherd wants 5 g of something strong (18 % THC or more) to sleep in his hut.
 s936997e0,"En la borda no duermo: el frío, los lobos y la espalda.","I can't sleep in the hut: the cold, the wolves and my back."
-sa557a452,"5 gramos de una índica de verdad, de las que tumban.","5 grams of a real indica, the knockout kind."
+s2919bb67,"5 gramos de algo fuerte, de lo que tumba.","5 grams of something strong, the kind that knocks you out."
 sf91160ef,Toma: me las dio un montañero que venía de Pakistán. A mí no me hacen falta.,Here: a climber coming back from Pakistan gave me these. I don't need them.
 sc0f3dc6e,"Duermo como un tronco. Las ovejas, no tanto.","I sleep like a log. The sheep, not so much."
 s3f2075b5,DON IGNACIO,DON IGNACIO
@@ -5757,6 +5769,13 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+sd7ea13d0,Le va la {e} con aroma {a}.,They like {e} with a {a} aroma.
+s1ad453ba,"Busco {g} g de una {e} con aroma {a}, de más del {t} % de THC. Si das con ella, te lo pago bien.","I'm after {g} g of a {e} with a {a} aroma, over {t} % THC. If you find it, I'll pay well."
+s92373c73,"Por cierto: {q} en {p} necesita {g} g de una {ef}. Si se los llevas antes del {d}, te paga {e}. ¿Te animas?","By the way: {q} in {p} needs {g} g of a {ef}. If you get it to them before {d}, they'll pay {e}. Up for it?"
+s2c8f900c,Encargo: {g} g de una {ef} antes del {d}. Paga {e}.,Job: {g} g of a {ef} before {d}. Pays {e}.
+s70cf6903,«¿No traes una {ef}? Entonces nada.»,“You haven't brought a {ef}? Then forget it.”
+s02ed5913,Un pastor de Mendialde busca 5 g de una índica (70 % o más) para dormir en la borda.,A Mendialde shepherd wants 5 g of an indica (70 % or more) to sleep in his hut.
+sa557a452,"5 gramos de una índica de verdad, de las que tumban.","5 grams of a real indica, the knockout kind."
 sd8aadce6,Maletero de {v},Boot of {v}
 sc2f980ee,Recoger del depósito,Collect from the pound
 s97aabce9,La grúa se lo llevó por mal aparcado. Pagas la tasa y te lo dejan en la puerta.,The tow truck took it for bad parking. Pay the fee and they leave it at the door.

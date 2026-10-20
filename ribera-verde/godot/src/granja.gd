@@ -539,7 +539,7 @@ func cambiar_maceta(i: int) -> void:
 	var gc: Dictionary = S.carpas[h.c]
 	if gc.get("gar") != null and h.j < gc.gar.size():
 		gc.gar[h.j] = null
-	await say(T("Pones la maceta de {m}. La vieja va a la mochila.", {"m": D.MACETAS[k].n}))
+	await say(T("Pones la maceta de {m}. La vieja va a la mochila.", {"m": D.MACETAS[k].n}) + pista_rastro())
 
 func focos_libres(ci: int) -> Array:
 	var o := []
@@ -567,7 +567,14 @@ func cambiar_foco(ci: int) -> void:
 	if j < 0:
 		return
 	instalar_foco(ci, l[j])
-	await say(T("Cuelgas el foco {f}. El viejo va a la mochila.", {"f": D.FOCOS[l[j]].n}))
+	await say(T("Cuelgas el foco {f}. El viejo va a la mochila.", {"f": D.FOCOS[l[j]].n}) + pista_rastro())
+
+# la primera vez que algo va a la mochila, dónde se vende (el rastro de Bixente, con Datos.CAL)
+func pista_rastro() -> String:
+	if not Datos.CAL or not D.has("RASTRO") or S.ch < int(D.CHATARRA.ch) or S.flags.get("rastroP"):
+		return ""
+	S.flags.rastroP = 1
+	return T("\nSi ya no te sirve, Bixente te lo compra en la chatarrería de Valdehierro.")
 
 # pl: femenino plural (las garrafas) · lo que le falta a la carpa (con goteo, las garrafas no)
 static func falta_extra(c, k: String) -> bool:

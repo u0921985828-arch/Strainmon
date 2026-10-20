@@ -610,3 +610,22 @@ No llevas {e} encima.,You don't have {e} on you.
 Jugarlo,Play it
 Saltarlo,Skip it
 "Tutorial saltado: el primer cultivo ya está hecho. La cosecha, en la mochila.","Tutorial skipped: your first grow is done. The harvest is in your backpack."
+RASTRO,RASTRO
+rastroP,rastroP
+"
+Si ya no te sirve, Bixente te lo compra en la chatarrería de Valdehierro.","
+If you don't need it anymore, Bixente buys it at the Valdehierro scrapyard."
+"No te sobra nada que me interese. Cuando cambies un foco o una maceta, la vieja me la traes.","You've got nothing spare I'm after. When you swap a lamp or a pot, bring me the old one."
+"Tienes {n} de sobra en la mochila.
+Te la pago a {e} y la pongo a la venta.","You have {n} spare in your backpack.
+I'll pay {e} and put it up for sale."
+"Lo que me vendas, lo pongo en el puesto.",Whatever you sell me goes on the stall.
+VENDERLE A BIXENTE,SELL TO BIXENTE
+"Esto es el rastro de la comarca: lo que a uno le sobra, a otro le hace falta. ¿Compras o vendes?",This is the county flea market: one man's spare is another man's need. Buying or selling?
+Le gusta la de olor {a}.,Likes it with a {a} smell.
+"Busco {g} g de algo fuerte, del {t} % de THC para arriba. Si me lo traes, te lo pago bien.","I'm after {g} g of something strong, {t} % THC or more. Bring it and I'll pay well."
+"Por cierto: {q} en {p} necesita {g} g de algo del {t} % para arriba. Si se los llevas antes del {d}, te paga {e}. ¿Te animas?",By the way: {q} in {p} needs {g} g of something {t} % or stronger. Get it there before {d} and they'll pay {e}. You in?
+Encargo: {g} g del {t} % para arriba antes del {d}. Paga {e}.,"Order: {g} g, {t} % or stronger, before {d}. Pays {e}."
+«¿No traes {g} g del {t} % para arriba? Entonces nada.»,“No {g} g of {t} % or stronger? Then no deal.”
+Un pastor de Mendialde busca 5 g de algo fuerte (18 % de THC o más) para dormir en la borda.,A Mendialde shepherd wants 5 g of something strong (18 % THC or more) to sleep in his hut.
+"5 gramos de algo fuerte, de lo que tumba.","5 grams of something strong, the kind that knocks you out."

@@ -27,6 +27,8 @@ func jerga(k: String, sal: String, mapa := "") -> String:
 	return String(_elige(D.GENTE7.jerga[zona_habla(mapa if mapa != "" else String(S.map))][k], "%s|%s|%d|%d" % [k, sal, int(S.day), int(S.min)]))
 
 # ---------- gustos, arquetipo y pedidos ----------
+# (lo pidió el usuario tras probarlo: «que no pidan un híbrido de sativa»): el gusto es solo el olor y el pedido, solo lo fuerte
+# que sea (el THC); el efecto (ef_de, de la genética) queda para el colocón, no para lo que pide la gente
 func ef_de(sid: String) -> String:
 	var ind := float(Datos.ind_de(S, lot_sid(sid)))
 	return "indica" if ind >= 65 else ("sativa" if ind <= 35 else "hibrida")
@@ -36,11 +38,11 @@ func ef_txt(ef: String) -> String:
 
 func gusto_de(id: String) -> Dictionary:
 	var h := _h("gusto|" + id)
-	return {"ef": ["sativa", "indica", "hibrida"][h % 3], "ar": String(D.AROMAS[(h / 3) % D.AROMAS.size()])}
+	return {"ar": String(D.AROMAS[(h / 3) % D.AROMAS.size()])}
 
 func gusto_txt(id: String) -> String:
 	var g := gusto_de(id)
-	return T("Le va la {e} con aroma {a}.", {"e": ef_txt(g.ef), "a": g.ar})
+	return T("Le gusta la de olor {a}.", {"a": g.ar})
 
 func arq_de(c: Dictionary) -> String:
 	var L: Array = D.GENTE7.arq.get(String(c.get("type", c.get("t", "cur"))), ["currela"])
@@ -49,7 +51,7 @@ func arq_de(c: Dictionary) -> String:
 func arq_txt(a: String) -> String:
 	return String(D.GENTE7.arqs.get(a, D.GENTE7.arqs.currela).n)
 
-# el pedido del día: {ef, ar, thc} o {} (el catador no pide así)
+# el pedido del día: {thc} o {} (el catador no pide así)
 func pedido_de(c: Dictionary) -> Dictionary:
 	if not vida_ok() or c.get("type") == "ext":
 		return {}
@@ -57,16 +59,14 @@ func pedido_de(c: Dictionary) -> Dictionary:
 	var q := quien(c)
 	if _h("pedido|%s|%d" % [q, int(S.day)]) % 100 >= int(float(P.p) * 100):
 		return {}
-	var g := gusto_de(q)
-	g.thc = int(P.thc[0]) + _h("pthc|" + q) % (int(P.thc[1]) - int(P.thc[0]) + 1)
-	return g
+	return {"thc": int(P.thc[0]) + _h("pthc|" + q) % (int(P.thc[1]) - int(P.thc[0]) + 1)}
 
 func casa_pedido(p: Dictionary, sid: String, b: Dictionary) -> bool:
-	return not p.is_empty() and ef_de(sid) == p.ef and aroma_de(lot_sid(sid)) == p.ar and float(b.thc) >= float(p.thc)
+	return not p.is_empty() and float(b.thc) >= float(p.thc)
 
 func cuantos_gustos(c: Dictionary, sid: String) -> int:
 	var g := gusto_de(quien(c))
-	return (1 if ef_de(sid) == g.ef else 0) + (1 if aroma_de(lot_sid(sid)) == g.ar else 0)
+	return 1 if aroma_de(lot_sid(sid)) == g.ar else 0
 
 # ---------- la memoria (S.mem[id] = {n, d, s, ok, mal, fav}) ----------
 func mem(id: String) -> Dictionary:
@@ -100,7 +100,7 @@ func cal_busco(c: Dictionary) -> String:
 	var p := pedido_de(c)
 	if p.is_empty():
 		return ""
-	return T("Busco {g} g de una {e} con aroma {a}, de más del {t} % de THC. Si das con ella, te lo pago bien.", {"g": n(c.want), "e": ef_txt(p.ef), "a": p.ar, "t": int(p.thc)})
+	return T("Busco {g} g de algo fuerte, del {t} % de THC para arriba. Si me lo traes, te lo pago bien.", {"g": n(c.want), "t": int(p.thc)})
 
 # el precio: con el pedido acertado, PEDIDO.plus más
 func cal_precio(c: Dictionary, sid: String, b: Dictionary) -> float:
@@ -314,30 +314,30 @@ func ofrece_encargo(N: String, sal: String) -> void:
 		return
 	var pu: String = _elige(pus, "epu|%s|%d" % [sal, int(S.day)])
 	var g: int = int(E.g[0]) + _h("eg|" + sal) % (int(E.g[1]) - int(E.g[0]) + 1)
-	var ef: String = ["sativa", "indica", "hibrida"][_h("eef|%s|%d" % [sal, int(S.day)]) % 3]
+	var th: int = int(D.GENTE7.pedido.thc[0]) + _h("eef|%s|%d" % [sal, int(S.day)]) % (int(D.GENTE7.pedido.thc[1]) - int(D.GENTE7.pedido.thc[0]) + 1)
 	var d: int = int(E.dias[0]) + _h("ed|" + sal) % (int(E.dias[1]) - int(E.dias[0]) + 1)
 	var e: int = int(round(g * precio_calle(18) * float(E.plus)))
 	var qn: String = _elige(E.quien, "eq|" + sal)
-	var c: int = await ask(T("Por cierto: {q} en {p} necesita {g} g de una {ef}. Si se los llevas antes del {d}, te paga {e}. ¿Te animas?", {"q": qn, "p": E.pu[pu], "g": g, "ef": ef_txt(ef), "d": Datos.fd(int(S.day) + d, int(S.day)), "e": Datos.eur(e)}), [K("Me animo"), K("Paso")], N)
+	var c: int = await ask(T("Por cierto: {q} en {p} necesita {g} g de algo del {t} % para arriba. Si se los llevas antes del {d}, te paga {e}. ¿Te animas?", {"q": qn, "p": E.pu[pu], "g": g, "t": th, "d": Datos.fd(int(S.day) + d, int(S.day)), "e": Datos.eur(e)}), [K("Me animo"), K("Paso")], N)
 	if c != 0:
 		return
-	S.encargo7 = {"q": sal, "n": T("{q} de {n}", {"q": qn, "n": may1(N.to_lower())}), "pu": pu, "g": g, "ef": ef, "d": int(S.day) + d, "e": e}
+	S.encargo7 = {"q": sal, "n": T("{q} de {n}", {"q": qn, "n": may1(N.to_lower())}), "pu": pu, "g": g, "t": th, "d": int(S.day) + d, "e": e}
 	await say(T("«Te paso su número. Cuando estés en {p}, llámale.»", {"p": E.pu[pu]}), N)
 
 func cal_llamar_filas() -> Array:
 	var E = S.get("encargo7") if vida_ok() else null
 	if not (E is Dictionary):
 		return []
-	return [{"label": String(E.n), "right": D.GENTE7.encargo.pu[E.pu], "desc": T("Encargo: {g} g de una {ef} antes del {d}. Paga {e}.", {"g": int(E.g), "ef": ef_txt(String(E.ef)), "d": Datos.fd(int(E.d), int(S.day)), "e": Datos.eur(int(E.e))}), "enc": E}]
+	return [{"label": String(E.n), "right": D.GENTE7.encargo.pu[E.pu], "desc": T("Encargo: {g} g del {t} % para arriba antes del {d}. Paga {e}.", {"g": int(E.g), "t": int(E.get("t", 0)), "d": Datos.fd(int(E.d), int(S.day)), "e": Datos.eur(int(E.e))}), "enc": E}]
 
 func entrega_encargo(E: Dictionary) -> void:
 	var N := String(E.n).to_upper()
 	if preload("res://src/croquis.gd").pueblo_de(String(S.map)) != String(E.pu) or not D.ZONAS.has(S.map):
 		await say(T("«Estoy en {p}. Llámame cuando estés por aquí, en la calle.»", {"p": D.GENTE7.encargo.pu[E.pu]}), N)
 		return
-	var lots := bud_lots(float(E.g)).filter(func(l): return ef_de(String(l[0])) == String(E.ef))
+	var lots := bud_lots(float(E.g), float(E.get("t", 0)))   # los de antes (con «ef»), cualquiera
 	if lots.is_empty():
-		await say(T("«¿No traes una {ef}? Entonces nada.»", {"ef": ef_txt(String(E.ef))}), N)
+		await say(T("«¿No traes {g} g del {t} % para arriba? Entonces nada.»", {"g": int(E.g), "t": int(E.get("t", 0))}), N)
 		return
 	var it := lots.map(lot_item)
 	it.append({"label": K("Nada")})

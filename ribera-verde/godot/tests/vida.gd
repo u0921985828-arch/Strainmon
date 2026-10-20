@@ -94,45 +94,43 @@ func _corre() -> void:
 	chk(G7.jerga.rural.hola.has(J.jerga("hola", "x", "mendialde")) and G7.jerga.centro.hola.has(J.jerga("hola", "x", "ensanche")), "jerga por mapa")
 	chk(not G7.jerga.rural.hola.has(J.jerga("hola", "x", "ensanche")) or G7.jerga.centro.hola.has(J.jerga("hola", "x", "ensanche")), "jerga del centro")
 	# 2 · gustos y arquetipos: fijos por persona, de los que hay
-	var efs := {}
 	var ars := {}
 	for i in 200:
 		var g: Dictionary = J.gusto_de("p%d" % i)
-		efs[g.ef] = 1
 		ars[g.ar] = 1
-		chk(J.gusto_de("p%d" % i) == g, "gusto fijo")
-	chk(efs.size() == 3 and ars.size() == D.AROMAS.size(), "gustos repartidos")
+		chk(J.gusto_de("p%d" % i) == g and not g.has("ef"), "gusto fijo, sin la genética")
+	chk(ars.size() == D.AROMAS.size(), "gustos repartidos")
 	chk(J.arq_de({"type": "est", "fid": "a"}) in ["estudiante", "pandillero"] and J.arq_de({"type": "cur", "fid": "a"}) in ["currela", "abuelo"] and J.arq_de({"type": "tur", "fid": "a"}) == "turista", "arquetipos por tipo")
-	chk(J.gusto_txt("p1").begins_with("Le va la "), "gusto en texto")
-	# 3 · el pedido por efecto y aroma: casa y paga más; si no casa, cuela peor
+	chk(J.gusto_txt("p1").begins_with("Le gusta la de olor "), "gusto en texto")
+	# 3 · el pedido, solo por lo fuerte que sea (lo pidió el usuario: ni sativa ni híbrida): casa y paga más; si no casa, cuela peor
 	var q := ""
 	for i in 500:
 		var id := "fx%d" % i
 		var c0 := {"fid": id, "type": "cur"}
 		var p0: Dictionary = J.pedido_de(c0)
-		if not p0.is_empty() and J._h("fiar|%s|%d" % [id, 40]) % 100 < 30 and J._h("paga|%s|%d" % [id, 40]) % 100 < int(float(G7.arqs[J.arq_de(c0)].paga) * 100) \
-				and D.STRAINS.keys().any(func(k): return not D.STRAINS[k].get("auto") and J.ef_de(k) == p0.ef and J.aroma_de(k) == p0.ar):
+		if not p0.is_empty() and J._h("fiar|%s|%d" % [id, 40]) % 100 < 30 and J._h("paga|%s|%d" % [id, 40]) % 100 < int(float(G7.arqs[J.arq_de(c0)].paga) * 100):
 			q = id
 			break
 	chk(q != "", "hay un pedido fiable")
 	var c := {"id": "cl-" + q, "fid": q, "n": "PACO", "type": "cur", "want": 5, "minThc": 0, "map": "town", "x": 5, "y": 5}
 	var p: Dictionary = J.pedido_de(c)
+	chk(p.keys() == ["thc"], "el pedido es solo el THC")
 	var sid := ""
 	var otro := ""
 	for k in D.STRAINS:
 		if D.STRAINS[k].get("auto"):
 			continue
-		if J.ef_de(k) == p.ef and J.aroma_de(k) == p.ar and sid == "":
+		if sid == "":
 			sid = k
-		elif J.ef_de(k) != p.ef and otro == "":
+		elif otro == "" and J.ef_de(k) != J.ef_de(sid):
 			otro = k
 	chk(sid != "" and otro != "", "cepas para el pedido")
 	J.add_buds(sid, 30, float(p.thc) + 2)
-	J.add_buds(otro, 30, 25)
+	J.add_buds(otro, 30, float(p.thc) - 3)
 	chk(J.casa_pedido(p, sid, S.buds[sid]) and not J.casa_pedido(p, otro, S.buds[otro]), "casa el pedido")
 	chk(is_equal_approx(J.cal_precio(c, sid, S.buds[sid]), 1.0 + float(G7.pedido.plus)) and J.cal_precio(c, otro, S.buds[otro]) == 1.0, "precio del pedido")
 	chk(J.cal_acc(c, otro, S.buds[otro], 1, .9) < .9 and J.cal_acc(c, sid, S.buds[sid], 1, .9) == .9 and J.cal_acc(c, otro, S.buds[otro], 0, 1.0) == 1.0, "lo que cuela")
-	chk(J.cal_busco(c).begins_with("Busco 5 g de una "), "busca por efecto")
+	chk(J.cal_busco(c).begins_with("Busco 5 g de algo fuerte") and not J.cal_busco(c).contains("sativa") and not J.cal_busco(c).contains("índica") and not J.cal_busco(c).contains("híbrida"), "busca por lo fuerte, sin genética")
 	# 4 · la venta entera con un fijo: pide lo suyo, se lo fías y te regala algo
 	S.fijos = [{"id": q, "n": "Paco", "t": "cur", "dia": -1}]
 	S.clients = [c]
@@ -216,12 +214,13 @@ func _corre() -> void:
 		chk(corre(func(): await J.entrega_encargo(E)), "entrega lejos")
 		chk(S.encargo7 != null and log_tiene("Llámame cuando estés"), "solo en su pueblo")
 		S.map = String(E.pu)
+		chk(not E.has("ef") and int(E.t) >= int(G7.pedido.thc[0]) and not String(J.cal_llamar_filas()[0].desc).contains("sativa"), "encargo por lo fuerte, sin genética")
 		var se := ""
 		for k in D.STRAINS:
-			if not D.STRAINS[k].get("auto") and J.ef_de(k) == String(E.ef) and not S.buds.has(k):
+			if not D.STRAINS[k].get("auto") and not S.buds.has(k):
 				se = k
 				break
-		J.add_buds(se, 40, 20)
+		J.add_buds(se, 40, float(E.t) + 1)
 		din = float(S.money)
 		QUIERO = [J.lot_nombre(se)]
 		chk(corre(func(): await J.entrega_encargo(E)), "entrega")
@@ -323,7 +322,7 @@ func _corre() -> void:
 	S.items.erase("bate")
 	S.items.erase("cadena")
 	din = float(S.money)
-	QUIERO = ["Bate de madera", "Nada"]
+	QUIERO = ["Comprar", "Bate de madera", "Nada"]
 	chk(corre(func(): await J.talk_bixente()), "chatarrería")
 	chk(int(S.items.get("bate", 0)) == 1 and float(S.money) == din - 45, "el bate de Bixente")
 	# 10 · sin CAL, como antes
