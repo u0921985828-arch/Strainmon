@@ -71,6 +71,7 @@ var dlg_txt := Label.new()
 var dlg_nm := PanelContainer.new()
 var dlg_nm_txt := Label.new()
 var retrato := TextureRect.new()   # MAESTRO [8]: el retrato de quien habla (PortraitRect), dentro de la caja, a la izquierda
+var retrato_marco := Panel.new()   # su cuadro: el fondo y el canto de la caja de diálogo
 var retrato_l = null               # [look, mujer] de quien habla ahora
 var retrato_e := 0                 # su gesto (Retrato.expresion)
 var retrato_hab := false           # escribiéndose (la boca se mueve; no parpadea)
@@ -200,7 +201,11 @@ func _ready() -> void:
 	retrato.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	retrato.stretch_mode = TextureRect.STRETCH_SCALE
 	retrato.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	retrato_marco.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	retrato_marco.hide()
+	add_child(retrato_marco)
 	add_child(retrato)
+	retrato.visibility_changed.connect(func(): retrato_marco.visible = retrato.visible)
 	dlg_nm.visibility_changed.connect(func():
 		if not dlg_nm.visible:
 			retrato.hide())
@@ -1693,7 +1698,11 @@ func _coloca() -> void:
 		return
 	var R := ui_rect()
 	if dlg.visible:
-		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us, 44 * us)
+		# con el busto, la caja crece hasta que quepa entero dentro, centrado y por debajo de la pestaña del nombre
+		dlg_nm.reset_size()
+		var mb := maxf(4 * us, ceilf((dlg_nm.size.y - 12 * us) / us + 1) * us)
+		var alto := maxf(44 * us, retrato_w() * us + 2 * mb) if retrato.visible else 44 * us
+		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us, alto)
 		dlg.size = Vector2(R.size.x - 6 * us, 0)
 		# en el combate, el texto no pasa por debajo del menú de la derecha (118 de ancho): .dlg con padding-right 126 en el CSS
 		var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
@@ -1707,11 +1716,14 @@ func _coloca() -> void:
 		dlg_nm.position = dlg.position + Vector2(6 * us, -12 * us)
 		if retrato.visible:
 			retrato.size = Vector2(rw, rw) * us
-			if rw > RETRATO_W:   # el busto, de pie sobre el canto de abajo de la caja y asomando por encima; el nombre, a su derecha
-				retrato.position = dlg.position + Vector2(6 * us, dlg.size.y - (rw + 3) * us)
-				dlg_nm.position.x += (rw + 4) * us
-			else:
-				retrato.position = dlg.position + Vector2(6 * us, maxf(6 * us, (dlg.size.y - rw * us) / 2))
+			retrato.position = dlg.position + Vector2(6 * us, maxf(mb, floorf((dlg.size.y - rw * us) / 2 / us) * us))
+			var sm := StyleBoxFlat.new()
+			sm.bg_color = Retrato.FONDO
+			sm.border_color = Retrato.BORDE
+			sm.set_border_width_all(maxi(1, int(us)))
+			retrato_marco.add_theme_stylebox_override("panel", sm)
+			retrato_marco.position = retrato.position - Vector2(us, us)
+			retrato_marco.size = retrato.size + Vector2(2 * us, 2 * us)
 		dlg_more.position = dlg.position + dlg.size - Vector2(8 * us + 8 * us, 4 * us + 5 * us)
 		dlg_more.size = Vector2(8 * us, 7 * us)
 		# La primera vez, el texto aún no sabe su ancho y el cuadro sale de toda la pantalla; se recoloca al fotograma siguiente
