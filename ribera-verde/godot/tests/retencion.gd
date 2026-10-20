@@ -94,6 +94,19 @@ func _corre() -> void:
 	chk(J.minutos_fuera(3 * 3600) == 3 * int(D.OFFLINE.min_h), "offline: 3 h → %d min (%d)" % [3 * int(D.OFFLINE.min_h), J.minutos_fuera(3 * 3600)])
 	chk(J.minutos_fuera(30 * 3600) == tope and J.minutos_fuera(8 * 3600) == tope, "offline: 30 h → el tope de %d h, %d min (%d)" % [D.OFFLINE.tope_h, tope, J.minutos_fuera(30 * 3600)])
 	Retencion.AHORA = 1_800_000_000.0
+	# 0.52 (lo pidió el usuario): de serie, con la app cerrada no pasa nada: ni crecen, ni pantalla, ni aviso
+	Retencion.OFFLINE = false
+	J.S = S0.duplicate(true)
+	J.S.pots[0] = planta(.4, 50.0, false)
+	var pr0 := float(J.S.pots[0].prog)
+	J.pending.clear()
+	chk(J.fuera_desde(Retencion.AHORA - 5 * 3600.0).is_empty() and float(J.S.pots[0].prog) == pr0 and J.pending.is_empty(), "sin OFFLINE: 5 h fuera, la planta igual y sin «mientras estabas fuera»")
+	PL.enviados.clear()
+	J.aj.avisos = true
+	J.al_pausar()
+	chk(not PL.enviados.any(func(e): return e.begins_with("aviso:")), "sin OFFLINE: sin aviso de la cosecha")
+	J.aj.avisos = false
+	Retencion.OFFLINE = true   # lo de antes, encendido para probarlo
 	var casos := [[0.0, 0], [3.0, 3 * int(D.OFFLINE.min_h)], [30.0, tope]]
 	for c in casos:
 		J.S = S0.duplicate(true)

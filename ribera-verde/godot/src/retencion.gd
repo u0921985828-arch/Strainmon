@@ -7,6 +7,9 @@ extends "res://src/metro.gd"
 
 const Plataforma = preload("res://src/plataforma.gd")
 
+# 0.52 (lo pidió el usuario: «pierde el sentido… igual se te secan las plantas»): con la app cerrada no pasa nada, ni crecen las
+# plantas ni hay aviso de la cosecha; al volver, todo donde lo dejaste. El código se queda, apagado (las pruebas lo encienden)
+static var OFFLINE := false
 static var HOY := ""        # las pruebas fijan la fecha (AAAA-MM-DD); vacía, la del móvil
 static var AHORA := -1.0    # las pruebas fijan la hora unix; negativa, la del móvil
 var plat_n: Node = null
@@ -57,7 +60,7 @@ func crece_fuera(mn: int) -> Dictionary:
 
 # al volver (CONTINUAR o la app de segundo plano): lo que ha pasado desde ts, con su pantalla «mientras estabas fuera»
 func fuera_desde(ts: float) -> Dictionary:
-	if not Datos.PLAY or S == null or ts <= 0:
+	if not Datos.PLAY or not OFFLINE or S == null or ts <= 0:
 		return {}
 	var seg := ahora() - ts
 	var mn := minutos_fuera(seg)
@@ -120,7 +123,7 @@ func al_pausar() -> void:
 	pausa_ts = ahora()
 	if not Datos.PLAY or S == null:
 		return
-	if aj.get("avisos"):
+	if OFFLINE and aj.get("avisos"):
 		var s := seg_cosecha()
 		if s > 0:
 			plat().aviso(s, T("Landrace Hunters"), T("Tienes plantas listas para cosechar."))

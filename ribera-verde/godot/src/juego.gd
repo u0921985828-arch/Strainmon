@@ -615,9 +615,12 @@ func opciones(desde_titulo := false) -> void:
 			it.insert(c + 1, {"label": K("ZURDO"), "right": K("SÍ") if aj.get("zurdo") else K("NO")})
 			it.insert(c + 2, {"label": K("DALTÓNICO"), "right": K("SÍ") if aj.get("dalt") else K("NO")})
 			it.insert(c + 3, {"label": K("SIN DESTELLOS"), "right": K("SÍ") if aj.get("calma") else K("NO")})
-			it.insert(c + 4, {"label": K("AVISO DE COSECHA"), "right": K("SÍ") if aj.get("avisos") else K("NO")})   # fase 6
-			it.insert(c + 5, {"label": K("INFORMES DE ERRORES"), "right": K("SÍ") if aj.get("errores") else K("NO")})
-			it.insert(c + 6, {"label": K("IDIOMA"), "right": IDIOMA_NOM[clampi(int(aj.get("idioma", 0)), 0, 2)]})   # F7
+			var o := 0
+			if OFFLINE:   # fase 6; 0.52: sin progreso fuera, sin aviso de la cosecha
+				it.insert(c + 4, {"label": K("AVISO DE COSECHA"), "right": K("SÍ") if aj.get("avisos") else K("NO")})
+				o = 1
+			it.insert(c + 4 + o, {"label": K("INFORMES DE ERRORES"), "right": K("SÍ") if aj.get("errores") else K("NO")})
+			it.insert(c + 5 + o, {"label": K("IDIOMA"), "right": IDIOMA_NOM[clampi(int(aj.get("idioma", 0)), 0, 2)]})   # F7
 		it.append({"label": K("VOLVER")})
 		i = await menu(it, {"cls": "start", "initial": i, "title": K("OPCIONES")})
 		if i < 0 or it[i].label == "VOLVER":
@@ -763,11 +766,11 @@ func elegir_personaje() -> void:
 	var ms := []
 	for m in Datos.MES_N:
 		ms.append(I18n.v(m).capitalize())
-	var m: int = await menu(ms, {"cls": "full", "cancel": false, "title": K("TU CUMPLEAÑOS: EL MES")})
+	var m: int = await menu(ms, {"cls": "centro", "cols": 3, "cancel": false, "title": K("TU CUMPLEAÑOS: EL MES")})   # 0.52: en rejilla, en el centro
 	var ds := []
 	for d in Datos.dias_mes(2028, m + 1):   # con el 29 de febrero
 		ds.append(str(d + 1))
-	var d: int = await menu(ds, {"cls": "full", "cancel": false, "title": K("TU CUMPLEAÑOS: EL DÍA")})
+	var d: int = await menu(ds, {"cls": "centro", "cols": 7, "cancel": false, "title": K("TU CUMPLEAÑOS: EL DÍA")})
 	S.cumple = {"d": d + 1, "m": m + 1}
 
 func new_game() -> void:

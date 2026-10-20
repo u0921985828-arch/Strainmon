@@ -129,6 +129,13 @@ func vista_libre() -> bool:
 func elige(op: String) -> bool:
 	if not await pasa(func(): return J.menu_box.visible):
 		return false
+	var nc := int(J.m_o.get("cols", 0))
+	if nc > 0:   # 0.52: en rejilla (el cumpleaños), con las cuatro flechas como en el móvil
+		var t: int = J.m_items.map(func(x): return x.label).find(op)
+		while t >= 0 and J.m_i / nc < t / nc:
+			await pulsa("down")
+		while t >= 0 and J.m_i < t:
+			await pulsa("right")
 	for k in J.m_items.size():
 		if J.m_items[J.m_i].label == op:
 			break
@@ -409,7 +416,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("OPCIONES"), 60)
 	await elige("OPCIONES")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
-	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "TAMAÑO DE TEXTO", "ZURDO", "DALTÓNICO", "SIN DESTELLOS"] + (["AVISO DE COSECHA", "INFORMES DE ERRORES", "IDIOMA"] if Datos.PLAY else []) + ["COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
+	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "TAMAÑO DE TEXTO", "ZURDO", "DALTÓNICO", "SIN DESTELLOS"] + (["INFORMES DE ERRORES", "IDIOMA"] if Datos.PLAY else []) + ["COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
 	await elige("MÚSICA")
 	await hasta(func(): return J.menu_box.visible, 60)
 	var so0 = J.sonido

@@ -346,9 +346,13 @@ func ajusta() -> void:
 	var k := floorf(s)
 	if k >= 2 and (k >= s * .94 or Datos.CAL):   # R11: con CAL, siempre entera (a 720p, 3 y no 3,93: los píxeles no bailan), con borde
 		s = k
+	elif Datos.CAL and k >= 1:   # 0.52 (lo pidió el usuario: «cuadrados todos los píxeles»): también en una ventana pequeña
+		s = k
 	var nsw := clampi(int(floor(w / s / 2)) * 2, 240, SW_MAX)
 	if nsw * s > w:
 		s = w / nsw
+		if Datos.CAL and floorf(s) >= 1:   # 0.52: estrecha (más alta que ancha), entera y con borde
+			s = floorf(s)
 	u = s
 	if nsw != SW:
 		SW = nsw
@@ -377,6 +381,8 @@ func ajusta() -> void:
 			G[n] = Rect2(V.x - r.end.x, r.position.y, r.size.x, r.size.y)
 	var kp: float = G.k * dp
 	us = clampf(G.med * dp / 120, us_min, s)
+	if Datos.CAL and us >= 1:   # 0.52 (lo pidió el usuario: «cuadrados todos los píxeles»): la UI (cajas, retratos, iconos), a un número entero de píxeles por punto
+		us = clampf(floorf(us), 1, maxf(1, floorf(s)))   # hacia abajo: el escenario de 240 us cabe entre los mandos
 	uiw = minf(cw, roundf(240 * us))
 	zona_cruz = G.dpad
 	zona_ab = G.ab
@@ -605,7 +611,7 @@ func _estilos() -> void:
 	pon_letra(dlg_nm_txt, negrita, 8 * us, Color.WHITE, 0, false)
 	caja_menu = caja(us, 5, 7)
 	menu_box.add_theme_stylebox_override("panel", StyleBoxEmpty.new() if menu_box.get_meta("cls", "") == "titulo" else caja_menu)
-	toast_box.add_theme_stylebox_override("panel", caja(us, 4, 10))
+	toast_box.add_theme_stylebox_override("panel", caja(us, 2, 4) if Datos.CAL else caja(us, 4, 10))   # 0.52: sin aire de más
 	var fo := fs_txt(9 * us)
 	pon_letra(toast_txt, letra, fo, INK)
 	toast_txt.add_theme_font_override("bold_font", negrita)
@@ -635,12 +641,12 @@ func _estilos() -> void:
 	pon_letra(import_pegar, letra, 8 * us, INK, 0, false)
 	import_pegar.custom_minimum_size = Vector2(48 * us, 16 * us)
 	pon_letra(import_small, letra, 7 * us, GRIS, 0, false)
-	lector.add_theme_stylebox_override("panel", caja(us, 5, 7))
-	lector.get_child(0).add_theme_constant_override("separation", roundi(4 * us))
+	lector.add_theme_stylebox_override("panel", caja(us, 1, 2) if Datos.CAL else caja(us, 5, 7))   # 0.52 (medido en píxeles: 6 u de aire): el margen justo
+	lector.get_child(0).add_theme_constant_override("separation", roundi((2 if Datos.CAL else 4) * us))
 	pon_letra(lector_ttl, negrita, 9 * us, LINEA, 0, false)
 	pon_letra(lector_pie, letra, 7 * us, GRIS, 0, false)
 	var fl := fs_txt(9 * us)
-	pon_letra(lector_txt, letra, fl, INK, 12.5 * us * fl / (9 * us), false)
+	pon_letra(lector_txt, letra, fl, INK, (11.0 if Datos.CAL else 12.5) * us * fl / (9 * us), false)   # 0.52: interlineado de 11 (4-9 u de hueco)
 	if endcard.visible:
 		_pinta_endcard()
 	if vc_info.visible:
@@ -1089,10 +1095,13 @@ func leer(t: String, texto: String) -> void:
 		lector_pie.text = I18n.v("▲▼ · B VOLVER") if lector_pags.size() == 1 else I18n.v("▲▼ ◀▶ · B VOLVER")
 		lector_txt.text = lector_pags[lector_i]
 		lector_sc.scroll_vertical = 0
+		if lector.visible:
+			_coloca()
 	ver.call(0)
 	lector.show()
 	hud.hide()
 	_coloca()
+	_coloca.call_deferred()   # 0.52: otra vez, con el texto ya a su ancho
 	var p := Motor.Prom.new()
 	push(func(b: String):
 		if b == "up" or b == "down":
@@ -1359,7 +1368,14 @@ func menu(items_: Array, o := {}) -> int:
 	var handler := func(b: String):
 		var g: bool = o.get("cls") == "battle"
 		var n := items.size()
-		if b == "up":
+		var nc: int = int(o.get("cols", 0)) if Datos.CAL else 0   # 0.52: en rejilla (el cumpleaños), las cuatro flechas
+		if nc > 0 and b in ["up", "down", "left", "right"]:
+			var j: int = st.i + {"up": -nc, "down": nc, "left": -1, "right": 1}[b]
+			if j >= 0 and j < n and (b in ["up", "down"] or j / nc == st.i / nc):
+				st.i = j
+				sfx("tick")
+				draw.call()
+		elif b == "up":
 			st.i = (st.i - 2 if st.i >= 2 else st.i) if g else posmod(st.i - 1, n)
 			sfx("tick")
 			draw.call()
@@ -1499,6 +1515,11 @@ func _pinta_menu(rows: int) -> void:
 				vis = maxi(1, floori((d - 10) / 14.5 + .01))
 	else:
 		vis = m_items.size()
+	var nc: int = int(o.get("cols", 0)) if Datos.CAL else 0   # 0.52 (lo pidió el usuario: «más ordenado»): en rejilla, todas y la caja de su tamaño
+	if nc > 0:
+		vis = m_items.size()
+		lh = 12 * us   # 0.52 (medido en píxeles: 7,5 u entre filas): la rejilla, más prieta
+		menu_box.add_theme_stylebox_override("panel", caja(us, 2, 3))
 	menu_box.set_meta("cabe", full and Datos.CAL and not o.has("rows") and vis >= m_items.size())
 	var fl: bool = (full and not menu_box.get_meta("cabe")) or vis < m_items.size()
 	if m_i < m_top:
@@ -1529,9 +1550,15 @@ func _pinta_menu(rows: int) -> void:
 		menu_col.add_child(hueco)
 	if fl:
 		menu_col.add_child(_flecha("▲" if m_top > 0 else "", "up"))
-	var lista: Container = GridContainer.new() if g else VBoxContainer.new()
-	if g:
-		lista.columns = 2
+	var lista: Container = GridContainer.new() if g or nc > 0 else VBoxContainer.new()
+	if g or nc > 0:
+		lista.columns = 2 if g else nc
+	var celda := 0.0
+	if nc > 0:
+		for it in m_items:
+			celda = maxf(celda, letra.get_string_size(it.label, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(fs)).x)
+		celda = ceilf(celda + 10 * us)
+		lista.add_theme_constant_override("h_separation", roundi(3 * us))   # entre columnas, no después de la última
 	lista.add_theme_constant_override("separation", 0)
 	lista.add_theme_constant_override("h_separation", 0)
 	lista.add_theme_constant_override("v_separation", 0)
@@ -1590,7 +1617,9 @@ func _pinta_menu(rows: int) -> void:
 			r.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 			pon_letra(r, letra, fs, GRIS)
 			rw = letra.get_string_size(r.text, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(fs)).x + 2 + 10 * us
-		if full or lw + rw + 22 * us > maxw:
+		if nc > 0:
+			f.custom_minimum_size.x = celda
+		elif full or lw + rw + 22 * us > maxw:
 			l.clip_text = true
 			l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 			l.custom_minimum_size = Vector2(minf(lw, maxf(20 * us, maxw - rw - 22 * us - (12 * us if it.get("ic") or it.get("sw") else 0.0))), 0)
@@ -1708,6 +1737,8 @@ func _coloca() -> void:
 			menu_box.reset_size()
 			if cls == "start":
 				menu_box.position = Vector2(R.end.x - 3 * us - menu_box.size.x, R.position.y + 3 * us)
+			elif cls == "centro":   # 0.52: la rejilla (el cumpleaños), en el centro
+				menu_box.position = (R.get_center() - menu_box.size / 2).round()
 			elif cls == "titulo":   # 1.35: centrados, abajo, sin subir del lema
 				menu_box.position = Vector2(roundf(R.get_center().x - menu_box.size.x / 2), maxf(_tit_fin() + 4 * us, R.end.y - 6 * us - menu_box.size.y))
 			else:
@@ -1716,6 +1747,31 @@ func _coloca() -> void:
 		lector.custom_minimum_size = R.size - Vector2(6 * us, 6 * us)
 		lector.size = lector.custom_minimum_size
 		lector.position = R.position + Vector2(3 * us, 3 * us)
+		if Datos.CAL:   # 0.52 (lo pidió el usuario: «lo que ocupe el texto y un extra por cada lado, pero no más»): si cabe, la caja, del ancho de su
+			# línea más larga y del alto de sus líneas, con el margen de la caja alrededor, en el centro
+			if lector_pags.size() == 1:   # sin scroll, sin ▲▼ (se vuelve a poner si no cabe)
+				lector_pie.text = I18n.v("B VOLVER")
+			var sb := lector.get_theme_stylebox("panel")
+			var lc: VBoxContainer = lector.get_child(0)
+			var mx: float = sb.get_margin(SIDE_LEFT) + sb.get_margin(SIDE_RIGHT)
+			var fnt := lector_txt.get_theme_font("font")
+			var fsz := lector_txt.get_theme_font_size("font_size")
+			var ancho: float = (lc.get_child(0) as Control).get_combined_minimum_size().x
+			for l in lector_txt.text.split("\n"):
+				ancho = maxf(ancho, fnt.get_string_size(l, HORIZONTAL_ALIGNMENT_LEFT, -1, fsz).x)
+			var w: float = minf(lector.size.x, ceilf(ancho + mx + 2 * us))
+			var resto: float = sb.get_margin(SIDE_TOP) + sb.get_margin(SIDE_BOTTOM) + (lc.get_child(0) as Control).get_combined_minimum_size().y + lc.get_theme_constant("separation")
+			lector_txt.size = Vector2(w - mx, 0)   # el ancho que tendrá: el alto de sus líneas
+			var txt_h: float = lector_txt.get_combined_minimum_size().y
+			var cabe := resto + txt_h < lector.size.y
+			# si cabe, sin barra de scroll (que le quitaría ancho al texto y otra línea)
+			lector_sc.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if cabe else ScrollContainer.SCROLL_MODE_AUTO
+			if cabe:
+				lector.custom_minimum_size = Vector2.ZERO
+				lector.size = Vector2(w, ceilf(resto + txt_h))
+				lector.position = (R.get_center() - lector.size / 2).round()
+			elif lector_pags.size() == 1:
+				lector_pie.text = I18n.v("▲▼ · B VOLVER")
 	if name_box.visible:
 		name_box.reset_size()
 		name_box.position = R.get_center() - name_box.size / 2
@@ -1749,11 +1805,13 @@ func coloca_toast() -> void:
 	if vc_info.visible:
 		lo = maxf(lo, escena.position.x + vc_info.position.x + vc_info.size.x + 3 * us)
 	var hi := R.end.x
-	var cajax := 2 * (10 + 2) * us
+	var cajax := 2 * ((4 if Datos.CAL else 10) + 2) * us
 	var plano := toast_txt.get_parsed_text()
 	var wl := 0.0
+	# 0.52: con la letra y el tamaño de verdad (TAMAÑO DE TEXTO) y en negrita, la más ancha: antes, «la tía» saltaba de línea
+	var fsz: int = toast_txt.get_theme_font_size("normal_font_size") if Datos.CAL else roundi(9 * us)
 	for linea in plano.split("\n"):
-		wl = maxf(wl, letra.get_string_size(linea, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(9 * us)).x + 2)
+		wl = maxf(wl, (negrita if Datos.CAL else letra).get_string_size(linea, HORIZONTAL_ALIGNMENT_LEFT, -1, fsz).x + 2)
 	wl = minf(wl, minf(210 * us - cajax, hi - lo - cajax))
 	toast_txt.custom_minimum_size = Vector2(wl, 0)
 	toast_txt.size = Vector2(wl, 0)
