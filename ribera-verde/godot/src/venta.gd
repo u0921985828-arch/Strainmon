@@ -885,9 +885,13 @@ func obj_local(x: int, y: int, o) -> bool:
 	if S.map.begins_with("club-"):
 		var k: String = S.map.substr(5)
 		var C: Dictionary = D.CLUBS[k]
-		if o == "mesita" and D.ORDEN_P.has(S.map) and aso().pres:   # 1.37 (lo pidió el usuario): de presidente, desde una mesita se ordena el local
+		var mio: bool = aso().pres if k == "rv" else (Datos.CAL and C.get("tuyo", false))   # KAIA, el tuyo, siempre
+		if o == "mesita" and D.ORDEN_P.has(S.map) and mio:   # 1.37 (lo pidió el usuario): de presidente, desde una mesita se ordena el local
 			if await ask(D.MUEBLE_CLUB[k].mesa, [K("Ordenar el local"), K("Nada")]) == 0:
 				await ordenar(S.map)
+			return true
+		if o == "vitrina" and k == "muelle" and mio:   # KAIA: la vitrina es tu dispensario
+			await dispensario_kaia(String(C.n))
 			return true
 		match o:
 			"tarros":

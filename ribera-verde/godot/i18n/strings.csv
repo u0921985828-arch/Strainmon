@@ -440,11 +440,30 @@ sfda0ba98,KAIA · dispensario,KAIA · dispensary
 sd397a6d6,SMS · KAIA,SMS · KAIA
 s175b5667,Se acabó lo del dispensario: {e} en total.,The dispensary ran out: {e} in total.
 s18e905f8,"Ya es otra película, sobrino: con la licencia, {n} te compra hasta {kg} al día, sin patrulleras y por el banco. Ven a verme.","Whole new ball game, kid: with the licence, {n} buys up to {kg} a day from you, no patrol boats and through the bank. Come see me."
-sed8b6d1e,"Tu club, jefe. En el dispensario quedan {g} de {n}, a {p} € el gramo. Llevamos {e}.","Your club, boss. The dispensary has {g} of {n} left, at {p} € a gram. We've taken {e}."
 s44c512bd,Bienvenido a KAIA. Aquí el dispensario lo llenas tú: déjame {g} g o más y los socios retiran {d} al día.,Welcome to KAIA. You stock the dispensary here: leave me {g} g or more and members take {d} a day.
 s04febd5c,¿Qué lote?,Which batch?
 s50932797,{n} a {p} € el gramo para los socios. ¿Cuánto dejas?,{n} at {p} € a gram for members. How much do you leave?
 s2a09d7ec,"Al dispensario. Cada mañana, {g} para los socios.","Into the dispensary. Every morning, {g} for the members."
+s0407b610,Rellenar,
+seddaa968,Subir el precio,
+s3352fb2b,Bajar el precio,
+s1fc45483,Retirar lo que queda,
+s487e035f,"Tu dispensario, jefe: {g} de {n} a {p} € el gramo. Salen unos {d} al día. Llevamos {e}.",
+scdf9da60,"No llevas más {n}. Para cambiar de género, retira lo que queda y deja otro.",
+s42a301a8,¿Cuánta {n} más dejas? Llevas {g}.,
+sc14844ca,¿Te llevas los {g} de {n} que quedan?,
+s87f8ff32,"Vaciado. El dispensario, a la espera de lo que traigas.",
+s7d5218b4,Marinero,
+s2cde5944,De barrio,
+sc04399aa,Industrial,
+s505e262a,Moderno,
+sf94c5dba,Clásico,
+sb75a6248,el de ahora,
+s69ccc367,KAIA · el diseño,
+scd9afde9,"Suelo, paredes y muebles {e}: {p} por transferencia, listo mañana. ¿Adelante?",
+s4a7bf43f,KAIA · reforma,
+sa86ce5c0,En la cuenta no llega para la reforma.,
+sde4c73b2,Mañana lo verás cambiado. Los socios ya están preguntando.,
 sbf12966a,"La licencia de cultivo y distribución: {p} por transferencia. Con ella, {n} te compra hasta {kg} al día, sin calor. ¿La sacas?","The growing and distribution licence: {p} by transfer. With it, {n} buys up to {kg} a day from you, no heat. Get it?"
 sb030ecc0,Licencia · cannabis,Licence · cannabis
 s6f9c612e,En la cuenta no llega. El ministerio no fía.,Your account won't cover it. The ministry gives no credit.
@@ -518,6 +537,8 @@ s5c469b60,{s} · {e} al día,{s} · {e} a day
 s28eedb05,"El sueldo de {n}. Con el bajo, su lealtad se resiente; con el alto, sube poco a poco.","{n}'s wage. On low, their loyalty suffers; on high, it rises little by little."
 sd887eb8e,El dispensario,The dispensary
 saa689dda,El almacén,The storeroom
+s898ad417,El diseño,
+sda690bb2,Ordenar el local,Arrange the venue
 sd9249f84,"¿Qué miramos, presidente?","What shall we look at, president?"
 sdcdb3bdc,"¿Qué miramos, jefe?","What shall we look at, boss?"
 s5d7bbb46,"{w} W · ilumina {l}×{l} cm · {g} g/W ({ga} abonando){crece}{thc} · riego ×{agua}
@@ -3105,7 +3126,6 @@ s0fb4e5c1,"Botes de abono por litros: MEATZA en azul, ORTUA BIO en verde.","Nutr
 sab4e15ef,Un neón verde: una hoja de siete puntas y GROW IBARBIDE debajo.,A green neon: a seven-point leaf with GROW IBARBIDE below.
 s30b85304,Un propagador con tapa: bandejas de alveolos con esquejes de muestra y su manta térmica.,A lidded propagator: cell trays with sample cuttings and a heat mat.
 s78e1b009,"La carpa de exposición: 120 × 120, con el LED de barras encendido y plantas de plástico dentro.","The display tent: 120 × 120, bar LED on and plastic plants inside."
-sda690bb2,Ordenar el local,Arrange the venue
 s1ce6ef86,Tarros de cristal con la etiqueta de cada variedad que ha pasado por el club.,Glass jars labelled with every strain that has passed through the club.
 s16eda643,"En la pizarra, a tiza: «Hoy, {n}».","On the chalkboard: ""Today, {n}""."
 se9071311,"NORMAS DE {n}
@@ -5112,6 +5132,8 @@ s852742fa,La mesa 2,Table 2
 sf220726c,La mesa 3,Table 3
 s6c44e7cf,La mesa 4,Table 4
 sd03524ba,El tanque del riego,The irrigation tank
+sb61b234e,Los sofás de la izquierda,
+sd467cb00,Los sofás de la derecha,
 sca19c6c2,Ahí no cabe.,It won't fit there.
 sc20453b7,Ahí ya hay algo.,Something's already there.
 s13045d4c,Ese hueco es para la carpa.,That spot is for the tent.
@@ -5770,6 +5792,7 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+sed8b6d1e,"Tu club, jefe. En el dispensario quedan {g} de {n}, a {p} € el gramo. Llevamos {e}.","Your club, boss. The dispensary has {g} of {n} left, at {p} € a gram. We've taken {e}."
 sa99a7bb0,"Tienes {n} de sobra en la mochila.
 Te la pago a {e} y la pongo a la venta.","You have {n} spare in your backpack.
 I'll pay {e} and put it up for sale."

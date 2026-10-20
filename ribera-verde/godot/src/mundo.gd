@@ -2411,6 +2411,10 @@ const GESTO_DE := {"regar": "regar", "plantar": "plantar", "sembrar": "sembrar",
 func gesto(_k: String, _o := {}) -> void:   # trama (1.54)
 	pass
 
+# la planta (S.pots[i]) o la variedad (sid) del próximo gesto: sale tal como es (tamaño, fase, colores, daños) o con sus colores
+var gesto_p = null
+var gesto_sid := ""
+
 func cifras_acceso(_k: String) -> String:   # trama
 	return ""
 
@@ -2523,6 +2527,9 @@ func plantilla_locales() -> void:
 
 func panel_club(_id: String, _N: String) -> void:
 	pass
+
+func kaia_estilo() -> String:   # eventos
+	return "itsaso"
 
 func carbon(_N: Dictionary) -> float:
 	return 100.0

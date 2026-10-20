@@ -2290,6 +2290,12 @@ func t_clima(cl: Dictionary) -> String:
 func talk_kaia(N: String) -> void:
 	pass
 
+func dispensario_kaia(_N: String) -> void:
+	pass
+
+func diseno_kaia(_N: String) -> void:
+	pass
+
 func tirar_lote(k: String, r: bool) -> void:
 	pass
 

@@ -392,6 +392,7 @@ func sacar_esqueje(i: int) -> void:
 	if not p.get("f"):
 		p.f = S.esquejes[-1].f
 	p.health = max(1, p.health - 5)
+	gesto_p = p
 	await gesto("esqueje")   # 1.54
 	sfx("sel")
 	await say(T("Cortas una punta de la {s}{e} y la pones a enraizar.\nPlántala antes del {d}: es la misma planta.", {"s": s.n, "e": nom_planta(p.f), "d": Datos.fd(S.day + D.ESQUEJE_DIAS + 1, S.day)}))
@@ -450,6 +451,7 @@ func pot_action(i: int) -> void:
 	var op: String = opts[c]
 	if op == "Regar":
 		var v := pos_plaza(i)
+		gesto_p = p
 		await accion("regar", {"id": "vfx-gotas", "x": v[0], "y": v[1] - 6})
 		p.water = 100
 		S.flags.gRiego = 1
@@ -462,6 +464,7 @@ func pot_action(i: int) -> void:
 		if S.items.insect > 0:
 			S.items.insect -= 1
 			p.pest = false
+			gesto_p = p
 			await gesto("tratar")   # 1.54
 			sfx("sel")
 			await say(K("Aplicas INSECTICIDA con guantes y mascarilla. Plaga eliminada."))
@@ -471,6 +474,7 @@ func pot_action(i: int) -> void:
 		if S.items.get("fungi", 0) > 0:
 			S.items.fungi -= 1
 			p.erase("bot")
+			gesto_p = p
 			await gesto("tratar")
 			sfx("sel")
 			await say(K("Quitas los cogollos con moho gris y aplicas el FUNGICIDA. Botritis parada."))
@@ -479,6 +483,7 @@ func pot_action(i: int) -> void:
 	elif op == "Preventivo":
 		S.items.prevent -= 1
 		p.prev = S.day + int(D.BOTRITIS.prev)
+		gesto_p = p
 		await gesto("tratar")
 		sfx("sel")
 		await say(T("Aplicas el PREVENTIVO: la botritis no la coge en {n} días.", {"n": int(D.BOTRITIS.prev)}))
@@ -643,6 +648,7 @@ func abonar(p: Dictionary, veg_k: Array) -> void:
 		if bio:
 			p.fo = 1
 		S.flags.gFlor = 1
+	gesto_p = p
 	await gesto("abonar")   # 1.54
 	sfx("sel")
 	var pk := I18n.v(String(D.PRODUCTOS[k].n)).to_upper()
@@ -787,6 +793,7 @@ func harvest(i: int) -> void:
 	var g := botritis_merma(p, gramos_planta(p, f))
 	var thc := Cultivo.thc_cosecha(S, p, f)
 	var v := pos_plaza(i)
+	gesto_p = p
 	await accion("cosechar")
 	await accion("oler", {"id": "vfx-brillo", "x": v[0], "y": v[1] - 12})
 	var sc := semillas_cosecha(p)
@@ -857,6 +864,7 @@ func estabilizar(k: String) -> void:
 	S.seeds[k] -= 2
 	if not S.seeds[k]:
 		S.seeds.erase(k)
+	gesto_sid = k
 	await accion("cruzar", {"id": "vfx-polen", "x": P.px + 8, "y": P.py - 4})
 	sfx("enc")
 	await fade(1, true)
@@ -1667,6 +1675,7 @@ func lab_action():
 		S.gen[r] = 1
 	if Datos.receta_de(S, A, Bk) and not S.rec.get(r):   # de receta, sacada en la mesa: falta cosecharla (capítulo 4)
 		S.rec[r] = 1
+	gesto_sid = A
 	await accion("cruzar", {"id": "vfx-polen", "x": P.px + 8, "y": P.py - 4})
 	sfx("enc")
 	await fade(1, true)

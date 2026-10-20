@@ -1083,7 +1083,7 @@ func obras_dia() -> void:
 		M_.alq = int(S.day) + 7
 	var L = M_.get("kaia")
 	if L is Dictionary:
-		var g = min(L.g, kaia_dia() * (D.VENTA_EXTR.dia if L.get("x") else 1.0))
+		var g = min(L.g, kaia_dia() * (D.VENTA_EXTR.dia if L.get("x") else 1.0) * kaia_tiron(L))
 		var e := Datos.jsround(g * L.pg)
 		L.g -= g
 		L.tot += e
@@ -1119,7 +1119,7 @@ func dispensario_kaia(N: String) -> void:
 	var M_: Dictionary = S.mar
 	var L = M_.get("kaia")
 	if L is Dictionary:
-		await say(T("Tu club, jefe. En el dispensario quedan {g} de {n}, a {p} € el gramo. Llevamos {e}.", {"g": g_txt(L.g), "n": extr_nombre(L.k, true) if L.get("x") else lot_nombre(L.k), "p": _dos(L.pg), "e": Datos.eur(L.tot)}), N)
+		await gestiona_kaia(N)
 		return
 	var VX: Dictionary = D.VENTA_EXTR
 	var lots := lotes_venta(K.g[0], VX.club_g[0])
@@ -1148,11 +1148,103 @@ func dispensario_kaia(N: String) -> void:
 	if j < 0 or j >= ops.size():
 		return
 	usa_lote(l, ops[j])
-	M_.kaia = {"k": k, "g": ops[j], "pg": pg, "tot": 0}
+	M_.kaia = {"k": k, "g": ops[j], "pg": pg, "p0": pg, "thc": float(b.thc), "tot": 0}
 	if x:
 		M_.kaia.x = true
 	sfx("sel")
 	await say(T("Al dispensario. Cada mañana, {g} para los socios.", {"g": g_txt(kaia_dia() * (VX.dia if x else 1.0))}), N)
+
+# lo que retiran los socios según el precio que pongas (lo pidió el usuario: «que actúes tú como encargado del dispensario»): al de la
+# casa (p0), lo de siempre; más caro, menos, y más barato, más (MAR.kaia.precio: el paso y los topes)
+func kaia_tiron(L: Dictionary) -> float:
+	if not L.get("p0"):
+		return 1.0
+	return clampf(pow(float(L.p0) / float(L.pg), 2.0), .4, 1.6)
+
+# el dispensario de KAIA, tuyo: lo que hay, rellenarlo con más del mismo lote, el precio y retirar lo que queda
+func gestiona_kaia(N: String) -> void:
+	var M_: Dictionary = S.mar
+	var KP: Dictionary = D.MAR.kaia.precio
+	while M_.get("kaia") is Dictionary:
+		var L: Dictionary = M_.kaia
+		var x := true if L.get("x") else false
+		var nm_: String = extr_nombre(L.k, true) if x else lot_nombre(L.k)
+		var dia: float = kaia_dia() * (D.VENTA_EXTR.dia if x else 1.0) * kaia_tiron(L)
+		var mas := lotes_venta(1, 1).filter(func(l): return l[0] == L.k and es_extr(l) == x)
+		var ops := [K("Rellenar"), K("Subir el precio"), K("Bajar el precio"), K("Retirar lo que queda"), K("Nada")]
+		var c: int = await ask(T("Tu dispensario, jefe: {g} de {n} a {p} € el gramo. Salen unos {d} al día. Llevamos {e}.", {"g": g_txt(L.g), "n": nm_, "p": _dos(L.pg), "d": g_txt(dia), "e": Datos.eur(L.tot)}), ops, N)
+		if c == 0:
+			if mas.is_empty():
+				await say(T("No llevas más {n}. Para cambiar de género, retira lo que queda y deja otro.", {"n": nm_}), N)
+				continue
+			var l: Array = mas[0]
+			var b: Dictionary = l[1]
+			var gs := []
+			for g in (D.VENTA_EXTR.club_g if x else D.MAR.kaia.g):
+				if g <= floor(b.g):
+					gs.append(int(g))
+			if gs.is_empty():
+				gs.append(int(floor(b.g)))
+			var o := gs.map(func(g): return "%d g" % g)
+			o.append(K("Nada"))
+			var j: int = await ask(T("¿Cuánta {n} más dejas? Llevas {g}.", {"n": nm_, "g": g_txt(b.g)}), o, N)
+			if j < 0 or j >= gs.size():
+				continue
+			L.thc = (float(L.get("thc", b.thc)) * L.g + float(b.thc) * gs[j]) / (L.g + gs[j])
+			usa_lote(l, gs[j])
+			L.g += gs[j]
+			sfx("sel")
+		elif c == 1 or c == 2:
+			var p0: float = float(L.get("p0", L.pg))
+			L.p0 = p0
+			var f: float = clampf(float(L.pg) / p0 + (float(KP.paso) if c == 1 else -float(KP.paso)), float(KP.min), float(KP.max))
+			L.pg = Datos.jsround(p0 * f * 100) / 100.0
+			sfx("sel")
+		elif c == 3:
+			if not await confirm(T("¿Te llevas los {g} de {n} que quedan?", {"g": g_txt(L.g), "n": nm_})):
+				continue
+			var thc: float = float(L.get("thc", strain(lot_sid(L.k)).thc))
+			if x:
+				add_rosin(L.k, L.g, thc)
+			else:
+				add_buds(L.k, L.g, thc)
+			M_.kaia = null
+			sfx("get")
+			await say(K("Vaciado. El dispensario, a la espera de lo que traigas."), N)
+			return
+		else:
+			return
+
+# el diseño de KAIA (lo pidió el usuario: «el diseño y todo»): el suelo, las paredes y los muebles de uno de los estilos de los clubs,
+# por MAR.kaia.dis.p y al día siguiente (S.mar.kd = estilo, S.mar.kdd = día); montar_club lo pone
+func kaia_estilos() -> Array:
+	return [["itsaso", K("Marinero")], ["kalea", K("De barrio")], ["fundicion", K("Industrial")], ["ensanche", K("Moderno")], ["", K("Clásico")]]
+
+func kaia_estilo() -> String:
+	var M_ = S.get("mar")
+	if not (M_ is Dictionary) or not M_.has("kd") or int(S.day) < int(M_.get("kdd", 0)):
+		return "itsaso"
+	return String(M_.kd)
+
+func diseno_kaia(N: String) -> void:
+	var E := kaia_estilos()
+	var ya := kaia_estilo()
+	var it := []
+	for e in E:
+		it.append({"label": e[1], "right": K("el de ahora") if e[0] == ya else Datos.eur(D.MAR.kaia.dis.p), "disabled": e[0] == ya})
+	it.append({"label": K("Nada")})
+	var i: int = await menu(it, {"cls": "right", "title": K("KAIA · el diseño")})
+	if i < 0 or i >= E.size() or E[i][0] == ya:
+		return
+	if not await confirm(T("Suelo, paredes y muebles {e}: {p} por transferencia, listo mañana. ¿Adelante?", {"e": E[i][1].to_lower(), "p": Datos.eur(D.MAR.kaia.dis.p)})):
+		return
+	if not cobro_banco(float(D.MAR.kaia.dis.p), K("KAIA · reforma")):
+		await say(K("En la cuenta no llega para la reforma."), N)
+		return
+	S.mar.kd = E[i][0]
+	S.mar.kdd = int(S.day) + 1
+	sfx("get")
+	await say(K("Mañana lo verás cambiado. Los socios ya están preguntando."), N)
 
 # la licencia, cuando ya hay ley
 func licencia_mar(N: String) -> void:
@@ -1418,12 +1510,19 @@ func _teclado(R: Array, V: Dictionary, t: float, T: Dictionary, cx: int, ty: int
 		_glifo(R, ch, bx + 4, by + 2 + (1 if p else 0), 1, "#303038")
 
 func gesto(k: String, o := {}) -> void:
+	var gp = gesto_p
+	var gsid := gesto_sid
+	gesto_p = null
+	gesto_sid = ""
 	if not Datos.CAL or not GESTOS.has(k):
 		return
+	var pl := gesto_planta(gp, gsid)
 	if gancho_acceso.is_valid():
 		gancho_acceso.call(k, str(o.get("m", "")), true)
+		if gancho_gesto.is_valid():
+			gancho_gesto.call(k, pl)
 		return
-	var V := {"k": k, "c": str(o.get("m", "")), "ok": true, "t0": M.reloj}
+	var V := {"k": k, "c": str(o.get("m", "")), "ok": true, "t0": M.reloj, "pl": pl}
 	var pr := Motor.Prom.new()
 	var st := {"fuera": false}
 	var cierra := func():
@@ -1444,6 +1543,72 @@ func gesto(k: String, o := {}) -> void:
 	await Motor.espera(pr)
 	ACCESO_V = null
 
+var gancho_gesto := Callable()   # (tipo, pl) · las pruebas miran la planta del gesto
+
+# la planta del gesto (lo pidió el usuario: «que salga tal y como está la planta»): la de la vista C de su carpa (img: su fotograma de
+# su alto, con los colores de su variedad, los daños y seca sin agua; la muerta, en marrones) y sus colores (cog, hoja) para la cola y
+# las genéricas; con solo la variedad (sid: la mesa de manicurar, la de cruces), solo los colores
+func gesto_planta(p, sid: String) -> Dictionary:
+	var o := {}
+	if p is Dictionary:
+		o.cog = Datos.color_cog(S, p)
+		o.hoja = Datos.hoja_planta(S, p)
+		var i := -1
+		for j in S.pots.size():
+			if is_same(S.pots[j], p):
+				i = j
+		if i < 0:
+			return o
+		o.i = i
+		var g = VistaC.geo(S, Cultivo.huecos(S)[i].c)
+		if g == null or VistaC.vista_c(S, g) == null:
+			return o
+		for q in g.pl:
+			if q.i == i and q.v.p != null:
+				var A = VistaC.Arte
+				if q.v.muerta:
+					o.img = A.recolor(A.aplasta(A.altura(q.v.p.n, q.v.hp)[1], q.v.hp), D.VC_SECA)
+				else:
+					o.img = VistaC.img_planta(S, p, q.v)
+	elif sid != "" and strain(sid):
+		o.cog = String(strain(sid).c)
+		o.hoja = Datos.hoja_de(S, sid)
+	return o
+
+# los verdes de los sprites del gesto (gestos.py) a los de la variedad: el cogollo de la planta genérica (la rampa clave, en verde) y el
+# de la cola (COG), y las hojas de la cola (HOJA)
+const GS_COG := {"#4e7a2e": -60, "#86b44e": 0, "#c2e088": 50, "#4a6a2a": -60, "#6a8e3a": -30, "#8ab456": 0, "#b4d47c": 50}
+const GS_HOJA := {"#1e3a1a": -70, "#2f5a26": -45, "#4f8a3a": -10, "#78b450": 25, "#a8d878": 55}
+var _gs_col := {}
+
+func _gs_color(n: String, pl: Dictionary) -> Image:
+	var f = Atlas.foto_misc(n)
+	if f == null or not pl.has("cog"):
+		return f.c if f else null
+	var k := "%s|%s|%s" % [n, pl.cog, pl.hoja]
+	if not _gs_col.has(k):
+		if _gs_col.size() > 64:
+			_gs_col.clear()
+		var m := {}
+		for c in GS_COG:
+			m[c] = Datos.shade(pl.cog, GS_COG[c]) if GS_COG[c] else pl.cog
+		for c in GS_HOJA:
+			m[c] = Datos.shade(pl.hoja, GS_HOJA[c])
+		if n.begins_with("gs-planta"):
+			m.merge(Datos.vc_tonos(pl.hoja), true)
+		_gs_col[k] = VistaC.Arte.recolor(f.c, m)
+	return _gs_col[k]
+
+# un sprite del gesto con los colores de la planta (si los hay)
+func _gspc(R: Array, n: String, x: float, y: float, V: Dictionary) -> void:
+	var pl: Dictionary = V.get("pl", {})
+	if not pl.has("cog"):
+		_gsp(R, n, x, y)
+		return
+	var im = _gs_color(n, pl)
+	if im:
+		R.append(["@", im, _gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), _gs])
+
 func _gsp(R: Array, n: String, x: float, y: float) -> void:
 	R.append(["@", n, _gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), _gs])
 
@@ -1452,10 +1617,16 @@ func _gsr(R: Array, x: float, y: float, w: int, h: int, c: String) -> void:
 	if r.size.x > 0 and r.size.y > 0:
 		R.append([r.position.x, r.position.y, r.size.x, r.size.y, c])
 
-# la maceta de tela con su planta (v: vegetativa, f: en flor, "": sin planta) en el suelo de la carpa
-func _gs_maceta(R: Array, pl: String, moja := false) -> void:
-	if pl != "":
-		_gsp(R, "gs-planta-" + pl, 36, -29)
+# la maceta de tela con su planta (v: vegetativa, f: en flor, "": sin planta) en el suelo de la carpa; con la planta del gesto, la de
+# verdad (su fotograma de la vista C, con el pie en la tierra de la maceta: las macetas de la vista C miden lo mismo que esta) o, sin ella,
+# la genérica con sus colores
+func _gs_maceta(R: Array, pl: String, moja := false, V := {}) -> void:
+	var gp: Dictionary = V.get("pl", {})
+	if gp.has("img"):
+		var im: Image = gp.img
+		R.append(["@", im, _gs.position.x + 56 - (im.get_width() >> 1), _gs.position.y + 67 - im.get_height(), _gs])
+	elif pl != "":
+		_gspc(R, "gs-planta-" + pl, 36, -29, V)
 	_gsp(R, "gs-maceta-m" if moja else "gs-maceta", 40, 60)
 
 func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
@@ -1464,7 +1635,7 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 	match k:
 		"regar":   # la regadera entra, se inclina y el agua cae del pitorro a la tierra, que se oscurece
 			_gsp(R, "gs-f-carpa", 0, 0)
-			_gs_maceta(R, "v", t > 600)
+			_gs_maceta(R, "v", t > 600, V)
 			var x: float = _mv(150, 70, t / 300.0) if t < 1000 else _mv(70, 150, (t - 1000) / 200.0)
 			_gsp(R, "gs-regadera-1" if t >= 300 and t < 1000 else "gs-regadera-0", x, 18)
 			if t > 320 and t < 1000:   # del pitorro (76, 48) a la tierra
@@ -1473,7 +1644,7 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 					_gsr(R, 75 - f * 8 + (d % 3), 48 + f * 15, 1, 2, "#8ac8f8" if d % 2 else "#5aa0e0")
 		"tratar":   # el pulverizador: dos apretones, la bruma hacia la planta y los bichos que caen
 			_gsp(R, "gs-f-carpa", 0, 0)
-			_gs_maceta(R, "v")
+			_gs_maceta(R, "v", false, V)
 			for i in 3:
 				if t < 650 + i * 120:
 					_gsp(R, "gs-bicho", [46, 60, 42][i], [26, 38, 46][i])
@@ -1485,7 +1656,7 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 					_gsp(R, "gs-bruma-%d" % mini(2, int(f * 3)), 70 - f * 24, 16 + f * 6)
 		"abonar":   # la botella baja, se inclina y el chorro ámbar cae a la tierra
 			_gsp(R, "gs-f-carpa", 0, 0)
-			_gs_maceta(R, "v")
+			_gs_maceta(R, "v", false, V)
 			if t < 250:
 				_gsp(R, "gs-botella-0", 34, _mv(-24, 30, t / 250.0))
 			elif t < 1000:
@@ -1523,37 +1694,37 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 				_gsp(R, "gs-mano", 46, 44 + Datos.jsround(sin((t - 820) / 90.0) * 2))
 		"esqueje":   # las tijeras cortan una rama y el esqueje va al vaso de agua
 			_gsp(R, "gs-f-carpa", 0, 0)
-			_gs_maceta(R, "v")
+			_gs_maceta(R, "v", false, V)
 			_gsp(R, "gs-vaso", 104, 62)
 			if t < 500:
 				_gsp(R, "gs-tijeras-1" if t > 420 else "gs-tijeras-0", _mv(150, 66, t / 300.0), 30)
 			else:
 				var f: float = (t - 500) / 500.0
-				_gsp(R, "gs-esqueje", _mv(56, 102, f), _mv(26, 48, f) - sin(clampf(f, 0, 1) * PI) * 10)
+				_gspc(R, "gs-esqueje", _mv(56, 102, f), _mv(26, 48, f) - sin(clampf(f, 0, 1) * PI) * 10, V)
 				_gsp(R, "gs-tijeras-1", _mv(66, 150, f), 30)
 		"cosechar":   # las tijeras cortan la cola de arriba y se la llevan
 			_gsp(R, "gs-f-carpa", 0, 0)
-			_gs_maceta(R, "f")
+			_gs_maceta(R, "f", false, V)
 			if t < 500:
 				_gsp(R, "gs-tijeras-1" if t > 420 else "gs-tijeras-0", _mv(150, 60, t / 300.0), 12)
 			else:
 				var f: float = (t - 500) / 600.0
-				_gsp(R, "gs-cola", _mv(40, 100, f), _mv(2, 8, f) - sin(clampf(f, 0, 1) * PI) * 6)
+				_gspc(R, "gs-cola", _mv(40, 100, f), _mv(2, 8, f) - sin(clampf(f, 0, 1) * PI) * 6, V)
 				_gsp(R, "gs-tijeras-1", _mv(60, 150, f), 12)
 		"manicurar":   # la cola en la mesa, cuatro tijeretazos, las hojitas caen y queda pelada
 			_gsp(R, "gs-f-mesa", 0, 0)
-			_gsp(R, "gs-cola-p" if t > 650 else "gs-cola", 56, 34)
+			_gspc(R, "gs-cola-p" if t > 650 else "gs-cola", 56, 34, V)
 			var P := [[78, 36], [34, 44], [80, 50], [32, 32]]
 			for i in 4:
 				var ts: float = 250 + i * 250
 				if t > ts:
-					_gsp(R, "gs-hojita", P[i][0] + 2 - i, minf(74, P[i][1] + 8 + (t - ts) * .08))
+					_gspc(R, "gs-hojita", P[i][0] + 2 - i, minf(74, P[i][1] + 8 + (t - ts) * .08), V)
 			var j: int = clampi(int((t - 125) / 250.0), 0, 3)
 			var cerr: bool = absf(t - (250 + j * 250)) < 60
 			_gsp(R, "gs-tijeras-1" if cerr else "gs-tijeras-0", P[j][0] - 8, P[j][1] - 4)
 		"polen":   # el pincel da vueltas sobre la cola de arriba y suelta el polen
 			_gsp(R, "gs-f-carpa", 0, 0)
-			_gs_maceta(R, "f")
+			_gs_maceta(R, "f", false, V)
 			for i in 10:
 				var ti: float = 150 + i * 90
 				if t > ti:

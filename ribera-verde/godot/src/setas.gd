@@ -1168,6 +1168,7 @@ func manicura_action():
 	var b: Dictionary = lots[i][1]
 	var m: int = mini(int(D.MANICURA.max), maxi(15, Datos.jsround(b.g * (1 - float(b.get("mc", 0))) * D.MANICURA.min)))
 	await say(K("Con las tijeras, cogollo a cogollo: fuera las hojitas con poca resina, que quede limpio y redondo."), K("MANICURA"))
+	gesto_sid = lot_sid(k)
 	await gesto("manicurar")   # 1.54
 	b.mc = 1
 	advance_time(m)

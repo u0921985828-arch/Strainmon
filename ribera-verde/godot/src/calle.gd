@@ -1705,7 +1705,23 @@ func coloca_gente(mapa: String) -> void:
 					e.x = g[0]; e.y = g[1]; e.px = g[0] * 16.0; e.py = g[1] * 16.0; e.hx = g[0]; e.hy = g[1]; e.fx = g[0]; e.fy = g[1]; e.dir = g[3]; e.moving = false
 					break
 
+var _kaia0 = null   # el club KAIA de serie (casillas y estilo), para cambiarle el diseño
+
 func montar_club(mapa: String) -> void:
+	if mapa == "club-muelle":   # el diseño de KAIA (S.mar.kd): suelo, paredes y muebles del estilo elegido
+		var mk: Dictionary = MAPS[mapa]
+		if _kaia0 == null:
+			_kaia0 = {"g": mk.g.duplicate(true), "est": mk.get("est")}
+		var e: String = kaia_estilo() if Datos.CAL and S != null else String(_kaia0.est)
+		var e0: String = String(_kaia0.est)
+		mk.est = e if e != "" else null
+		for y in int(mk.h):
+			for x in int(mk.w):
+				var t = _kaia0.g[y][x]
+				if t is String and t.ends_with("_" + e0):
+					mk.g[y][x] = t.trim_suffix("_" + e0) + ("_" + e if e != "" else "")
+				else:
+					mk.g[y][x] = t
 	if mapa.begins_with("club-") and D.ORDEN_P.has(mapa):
 		aplica_orden(mapa)
 	if mapa == "club-rv":   # 1.45 (lo pidió el usuario): el almacén del club, de presidente (MERCADO.alm)
