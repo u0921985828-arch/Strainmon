@@ -15,3 +15,4 @@ assets/gen_sheets/
 
 # modo absoluto: estado local del contador
 .modo-absoluto/
+ESTADO.md
