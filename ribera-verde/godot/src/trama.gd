@@ -1104,6 +1104,10 @@ func cerrar_copa() -> void:
 		if int(m.ch) == 6 and not S.misiones.has(m.id):
 			S.misiones[m.id] = 0
 
+# el texto de la misión; con CAL, el llano (dc: sin pH ni EC) si lo tiene
+func mision_desc(m: Dictionary) -> String:
+	return str(m.get("dc", m.d)) if Datos.CAL else str(m.d)
+
 func misiones_ver() -> Array:
 	if not S.flags.get("kiko1"):
 		return []
@@ -1293,7 +1297,7 @@ func objetivo_menu():
 		var mv := misiones_ver()
 		for i in mv.size():
 			var hecha: bool = S.misiones.has(mv[i].id)
-			it.append({"label": mv[i].t, "right": K("HECHA") if hecha else null, "desc": mv[i].d})
+			it.append({"label": mv[i].t, "right": K("HECHA") if hecha else null, "desc": mision_desc(mv[i])})
 			if not hecha and ini == 0:
 				ini = i + 1 + (1 if iti else 0)
 		if iti and itin_sig() != null:
