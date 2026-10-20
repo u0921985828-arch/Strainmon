@@ -214,6 +214,10 @@
   - `ui.gd`: `retrato_e`/`retrato_hab`/`retrato_ojo` y `_parpadeo` en `_process_ui`: 130 ms cada 3,6 s en tiempo real (no toca el reloj del juego ni el oráculo).
   - `tests/retratos.gd` (400): los estados de los 27, la celda de cada gesto con y sin boca, el parpadeo en la caja (y no escribiendo), los tapados y sin CAL.
 
+### APK de los gestos en primera persona · Godot 0.56.0 (código 75)
+- Lo pidió el usuario: «Entrega el apk», tras «Molaría que la vista sea POV». Batería entera 64/64 en verde antes de compilar.
+- `descargas/LandraceHunters.apk` (87,9 MB, firma v2/v3 con la upload key, el mismo paquete `com.landracehunters.game`).
+
 ### APK de las manos por el canto y el porro con o sin tabaco · Godot 0.55.0 (código 74)
 - Lo pidió el usuario: «Cumple todo lo pendiente y compila el apk para entregarlo aquí». Batería entera 64/64 en verde antes de compilar.
 - `descargas/LandraceHunters.apk` (87,9 MB, firma v2/v3 con la upload key, el mismo paquete `com.landracehunters.game`).
