@@ -114,6 +114,10 @@
 - **La silla del ordenador:** USAR EL ORDENADOR desde la silla de la tía o la gaming te sienta primero y te quedas sentado; sentado, el ordenador está en el menú (`sent_mesa`, `menu_sentado` en `calle.gd`). Sentado al ordenador ya no se ve con los brazos colgando: los codos fuera y las manos en la mesa, a los lados de la cabeza (`SENT_MESA` en `pinta.gd`, con los colores del fotograma y la ropa; en la gaming, más baja que su mesa, los antebrazos más largos, `brazos_mesa`). En la silla de la tía, la espalda empieza detrás del respaldo: los hombros asoman por encima (`SENT_GEO.silla`, cadera de 5 a 1). Prueba `tests/escala.gd`.
 - **Sin el bloqueo de la demo, por ahora:** el capítulo 4 ya no pide la compra única (`Retencion.DEMO := false`; `completo()` da el juego entero). El código se queda apagado y la prueba lo enciende; una partida que ya se quedó en la demo sigue desde START · JUEGO COMPLETO. Prueba `tests/retencion.gd`.
 
+### APK de lo que dijeron los que lo probaron · Godot 0.53.0 (código 72)
+- Lo pidió el usuario: «mándame un apk con lo ya actualizado, sin el bloqueo de la demo». El rastro sin tope, la silla del ordenador, la gente menos técnica y el juego entero sin la compra única (`Retencion.DEMO := false`).
+- `descargas/LandraceHunters.apk` y `dist/landrace-hunters.aab` firmados con la upload key, el mismo paquete `com.landracehunters.game`.
+
 ### Documento maestro (`docs/MAESTRO.md`), por tandas, con `Datos.CAL`
 - **[10] La letra:** reserva propia para flechas, ▲▼◀▶, ★, ≈ y −.
 - **[1] El personaje:** chico o chica y el cumpleaños al empezar (`S.sexo`, `S.cumple`), sin ventajas por sexo (solo cambia el aspecto); el regalo del cumpleaños una vez al año (el 29 de febrero, también); la protagonista con su sprite de PixelLab en el mapa y en el combate (`player-f`, `player-f-combate`), con boca, y la ropa cambia las mismas piezas. Prueba `tests/personaje.gd`.
