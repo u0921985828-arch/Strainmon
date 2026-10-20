@@ -676,7 +676,7 @@ sale('gs-f-carpa', f_carpa()); sale('gs-f-mesa', f_mesa()); sale('gs-f-cuarto', 
 sale('gs-f-cama-n', f_cama(False)); sale('gs-f-cama-d', f_cama(True))
 sale('gs-maceta', maceta()); sale('gs-maceta-m', maceta(True))
 sale('gs-planta-v', planta()); sale('gs-planta-f', planta(True))
-sale('gs-regadera-0', regadera(0)); sale('gs-regadera-1', regadera(1))
+# 0.55: la regadera a mano ya no sale (gs-regar, de PixelLab)
 sale('gs-spray-0', spray(0)); sale('gs-spray-1', spray(1))
 sale('gs-bong', bong())
 sale('gs-dormido-0', dormido(0)); sale('gs-dormido-1', dormido(1))

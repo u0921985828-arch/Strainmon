@@ -1532,7 +1532,7 @@ func gesto(k: String, o := {}) -> void:
 		if gancho_gesto.is_valid():
 			gancho_gesto.call(k, pl)
 		return
-	var V := {"k": k, "c": str(o.get("m", "")), "ok": true, "t0": M.reloj, "pl": pl}
+	var V := {"k": k, "c": str(o.get("m", "")), "ok": true, "t0": M.reloj, "pl": pl, "tab": bool(o.get("tab", false))}
 	var pr := Motor.Prom.new()
 	var st := {"fuera": false}
 	var cierra := func():
@@ -1622,6 +1622,23 @@ func _gspc(R: Array, n: String, x: float, y: float, V: Dictionary) -> void:
 func _gsp(R: Array, n: String, x: float, y: float) -> void:
 	R.append(["@", n, _gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), _gs])
 
+# 0.55: la mano de PixelLab en (x, y) y la manga alargada hasta el canto (derecho; el izquierdo, la del cliente, -i): nunca flota
+func _gsm(R: Array, n: String, x: float, y: float) -> void:
+	_gsp(R, n, x, y)
+	var f = Atlas.foto_misc(n)
+	if f == null:
+		return
+	var w: int = f.c.get_width()
+	var h: int = f.c.get_height()
+	var X: int = _gs.position.x + Datos.jsround(x)
+	var Y: int = _gs.position.y + Datos.jsround(y)
+	if n.ends_with("-i"):
+		for k in range(1, X - _gs.position.x + 1):
+			R.append(["@", n, X - k, Y, Rect2i(X - k, Y, 1, h).intersection(_gs)])
+	else:
+		for k in range(1, _gs.end.x - (X + w) + 1):
+			R.append(["@", n, X + k, Y, Rect2i(X + w - 1 + k, Y, 1, h).intersection(_gs)])
+
 func _gsr(R: Array, x: float, y: float, w: int, h: int, c: String) -> void:
 	var r := Rect2i(_gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), w, h).intersection(_gs)
 	if r.size.x > 0 and r.size.y > 0:
@@ -1654,75 +1671,72 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 					var f: float = fmod((t - 320) / 260.0 + d / 12.0, 1.0)
 					_gsr(R, x - 2 - f * 3 + (d % 3), y + 35 + f * (64 - y - 35), 1, 2, "#8ac8f8" if d % 2 else "#5aa0e0")
 			_gsp(R, "gs-regar", x, y)
-		"tratar":   # el pulverizador: dos apretones, la bruma hacia la planta y los bichos que caen
+		"tratar":   # el pulverizador en la mano: dos apretones, la bruma hacia la planta y los bichos que caen
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gs_maceta(R, "v", false, V)
 			for i in 3:
 				if t < 650 + i * 120:
 					_gsp(R, "gs-bicho", [46, 60, 42][i], [26, 38, 46][i])
 			var apr: bool = (t > 250 and t < 450) or (t > 600 and t < 800)
-			_gsp(R, "gs-spray-1" if apr else "gs-spray-0", _mv(150, 80, t / 220.0), 14)
+			var sx: float = _mv(150, 74, t / 220.0) if t < 1000 else _mv(74, 150, (t - 1000) / 200.0)
+			_gsm(R, "gm-spray", sx, 15 + (1 if apr else 0))   # la boquilla en (0, 5)
 			for p in [250.0, 600.0]:
 				var f: float = (t - p) / 500.0
 				if f > 0 and f < 1:
 					_gsp(R, "gs-bruma-%d" % mini(2, int(f * 3)), 70 - f * 24, 16 + f * 6)
-		"abonar":   # la botella baja, se inclina y el chorro ámbar cae a la tierra
+		"abonar":   # la mano trae la botella, la inclina sobre la maceta y el chorro ámbar cae a la tierra
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gs_maceta(R, "v", false, V)
-			if t < 250:
-				_gsp(R, "gs-botella-0", 34, _mv(-24, 30, t / 250.0))
-			elif t < 1000:
-				_gsp(R, "gs-botella-1", 30, 39)
-				if t > 300:
-					var largo: int = mini(12, int((t - 300) / 25.0))
-					_gsr(R, 51, 50, 1, largo, "#d89a3a")
-					_gsr(R, 52, 51, 1, maxi(0, largo - 2), "#a86a1a")
-			else:
-				_gsp(R, "gs-botella-0", 34, _mv(30, -24, (t - 1000) / 200.0))
-		"plantar":   # la plántula baja a la maceta, la tierra se aprieta con la mano; 1.57.2: dentro de la maceta, delante del canto de atrás
+			var bx: float = _mv(150, 52, t / 250.0) if t < 1000 else _mv(52, 150, (t - 1000) / 200.0)
+			if t > 300 and t < 1000:   # del tapón (0, 15) a la tierra (fila 64)
+				var largo: int = mini(18, int((t - 300) / 20.0))
+				_gsr(R, 51, 46, 1, largo, "#d89a3a")
+				_gsr(R, 52, 47, 1, maxi(0, largo - 2), "#a86a1a")
+			_gsm(R, "gm-abono", bx, 31)
+		"plantar":   # la plántula baja a la maceta, la mano aprieta la tierra; 1.57.2: dentro de la maceta, delante del canto de atrás
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gsp(R, "gs-maceta", 40, 60)
 			_gsp(R, "gs-brote", 36, _mv(-90, -28, t / 600.0))
 			if t > 600:   # la tierra alrededor del tallo
 				for i in 6:
 					_gsr(R, 49 + i * 3 + (1 if i > 2 else 0), 67 + (i % 2), 2, 1, "#3e2c1e" if i % 2 else "#56402a")
-			if t > 750:
-				_gsp(R, "gs-mano", 58, 38 + Datos.jsround(sin((t - 750) / 90.0) * 2))
-		"sembrar":   # 1.57.2 (lo pidió el usuario: «sería mejor echar una semilla al sembrar»): los dedos bajan con la semilla, la sueltan,
-			# cae a la tierra y la mano la tapa
+			if t > 650:   # los dedos (4, 22) aprietan la tierra junto al tallo
+				var px: float = _mv(150, 58, (t - 650) / 150.0)
+				_gsm(R, "gm-vacia", px, 40 + (Datos.jsround(sin((t - 800) / 90.0) * 2) if t > 800 else 0))
+		"sembrar":   # 1.57.2 (lo pidió el usuario: «sería mejor echar una semilla al sembrar»): la mano trae la semilla entre los dedos,
+			# la suelta, cae a la tierra y la mano la tapa
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gsp(R, "gs-maceta", 40, 60)
-			var hy: float = _mv(-26, 36, t / 400.0) if t < 650 else _mv(36, -26, (t - 650) / 200.0)
-			if t < 450:
-				_gsp(R, "gs-semilla", 51, hy + 16)
-			elif t < 900:
-				_gsp(R, "gs-semilla", 51, _mv(52, 62, (t - 450) / 200.0))
-			if t < 850:
-				_gsp(R, "gs-pinza-1" if t >= 420 else "gs-pinza-0", 44, hy)
+			if t >= 420 and t < 900:
+				_gsp(R, "gs-semilla", 51, _mv(48, 62, (t - 420) / 200.0))
 			if t > 900:   # tapada: un montoncito de tierra
 				_gsr(R, 53, 66, 5, 1, "#56402a")
 				_gsr(R, 52, 67, 7, 1, "#3e2c1e")
-			if t > 820 and t < 1150:
-				_gsp(R, "gs-mano", 46, 44 + Datos.jsround(sin((t - 820) / 90.0) * 2))
-		"esqueje":   # las tijeras cortan una rama y el esqueje va al vaso de agua
+			if t < 420:   # la semilla en (12, 21) de la mano
+				_gsm(R, "gm-semilla", _mv(150, 41, t / 400.0), 29)
+			elif t < 820:
+				_gsm(R, "gm-vacia", _mv(41, 150, (t - 600) / 200.0) if t > 600 else 41.0, 29)
+			elif t < 1150:
+				_gsm(R, "gm-vacia", 49, 42 + Datos.jsround(sin((t - 820) / 90.0) * 2))
+		"esqueje":   # las tijeras en la mano cortan una rama y el esqueje va al vaso de agua
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gs_maceta(R, "v", false, V)
 			_gsp(R, "gs-vaso", 104, 62)
-			if t < 500:
-				_gsp(R, "gs-tijeras-1" if t > 420 else "gs-tijeras-0", _mv(150, 66, t / 300.0), 30)
+			if t < 500:   # la punta en (0, 13)
+				_gsm(R, "gm-tij-c" if t > 420 else "gm-tij-a", _mv(150, 64, t / 300.0), 23)
 			else:
 				var f: float = (t - 500) / 500.0
 				_gspc(R, "gs-esqueje", _mv(56, 102, f), _mv(26, 48, f) - sin(clampf(f, 0, 1) * PI) * 10, V)
-				_gsp(R, "gs-tijeras-1", _mv(66, 150, f), 30)
+				_gsm(R, "gm-tij-c", _mv(64, 150, f), 23)
 		"cosechar":   # las tijeras cortan la cola de arriba y se la llevan
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gs_maceta(R, "f", false, V)
 			if t < 500:
-				_gsp(R, "gs-tijeras-1" if t > 420 else "gs-tijeras-0", _mv(150, 60, t / 300.0), 12)
+				_gsm(R, "gm-tij-c" if t > 420 else "gm-tij-a", _mv(150, 58, t / 300.0), 5)
 			else:
 				var f: float = (t - 500) / 600.0
 				_gspc(R, "gs-cola", _mv(40, 100, f), _mv(2, 8, f) - sin(clampf(f, 0, 1) * PI) * 6, V)
-				_gsp(R, "gs-tijeras-1", _mv(60, 150, f), 12)
+				_gsm(R, "gm-tij-c", _mv(58, 150, f), 5)
 		"manicurar":   # la cola en la mesa, cuatro tijeretazos, las hojitas caen y queda pelada
 			_gsp(R, "gs-f-mesa", 0, 0)
 			_gspc(R, "gs-cola-p" if t > 650 else "gs-cola", 56, 34, V)
@@ -1733,36 +1747,39 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 					_gspc(R, "gs-hojita", P[i][0] + 2 - i, minf(74, P[i][1] + 8 + (t - ts) * .08), V)
 			var j: int = clampi(int((t - 125) / 250.0), 0, 3)
 			var cerr: bool = absf(t - (250 + j * 250)) < 60
-			_gsp(R, "gs-tijeras-1" if cerr else "gs-tijeras-0", P[j][0] - 8, P[j][1] - 4)
-		"polen":   # el pincel da vueltas sobre la cola de arriba y suelta el polen
+			_gsm(R, "gm-tij-c" if cerr else "gm-tij-a", P[j][0], P[j][1] - 13)
+		"polen":   # el pincel en la mano da vueltas sobre la cola de arriba y suelta el polen
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gs_maceta(R, "f", false, V)
 			for i in 10:
 				var ti: float = 150 + i * 90
 				if t > ti:
 					_gsr(R, 48 + (i * 7) % 16, minf(60, 18 + (t - ti) * .03 + (i % 3)), 1, 1, "#f0d040" if i % 2 else "#e0b020")
-			_gsp(R, "gs-pincel", 55 + cos(t / 150.0) * 8, -4 + sin(t / 150.0) * 4)
+			var ex: float = minf(1.0, t / 200.0)   # entra desde el canto y luego da vueltas; la punta en (0, 14)
+			_gsm(R, "gm-pincel", _mv(150, 56, ex) + cos(t / 150.0) * 8 * ex, 2 + sin(t / 150.0) * 3 * ex)
 		"fumar":
-			_gesto_fumar(R, c, t)
-		"vender":   # la mano del cliente con el billete y la tuya con la bolsita; se cambian y se van
+			_gesto_fumar(R, c, t, bool(V.get("tab", false)))
+		"vender":   # la mano del cliente (izquierda) con el billete y la tuya (derecha) con la bolsita; se cambian y se van
 			_gsp(R, "gs-f-calle", 0, 0)
 			if t < 650:
-				_gsp(R, "gs-mano-billete", _mv(-48, 28, t / 400.0), 30)
-				_gsp(R, "gs-bolsita", _mv(144, 70, t / 400.0), 40)
+				_gsm(R, "gm-billete-i", _mv(-72, -4, t / 400.0), 30)
+				_gsm(R, "gm-bolsita", _mv(150, 70, t / 400.0), 38)
 			else:
 				var f: float = (t - 700) / 400.0
-				_gsp(R, "gs-bolsita-c", _mv(28, -48, f), 30)
-				_gsp(R, "gs-billete-m", _mv(70, 144, f), 40)
-		"pagar":   # del fajo salen cinco billetes, uno a uno, al montón, y la mano lo empuja
+				_gsm(R, "gm-bolsita-i", _mv(10, -60, f), 38)
+				_gsm(R, "gm-billete", _mv(66, 150, f), 30)
+		"pagar":   # tu mano va y viene: deja cinco billetes, uno a uno, en el montón, y lo empuja
 			_gsp(R, "gs-f-mesa", 0, 0)
 			_gsp(R, "gs-fajo", 14, 40)
 			for i in 5:
-				var ti: float = 150 + i * 200
-				if t > ti:
-					var f: float = (t - ti) / 180.0
-					_gsp(R, "gs-billete", _mv(16, 84 + (i % 2) * 3, f), _mv(38, 42 - i * 2, f))
+				var ti: float = 150 + i * 170
+				if t > ti + 85:
+					_gsp(R, "gs-billete", 84 + (i % 2) * 3, 42 - i * 2)
+				if t > ti and t <= ti + 170:
+					var f: float = (t - ti) / 170.0
+					_gsm(R, "gm-billete", 82 + absf(f - 0.5) * 2 * 68, 34 - i * 2)
 			if t > 1000:
-				_gsp(R, "gs-mano", _mv(144, 104, (t - 1000) / 200.0), 28)
+				_gsm(R, "gm-vacia", _mv(150, 100, (t - 1000) / 200.0), 32)
 		"dormir":   # en la cama, de noche (o la siesta, de día); respira y suben las zetas
 			_gsp(R, "gs-f-cama-d" if c == "siesta" else "gs-f-cama-n", 0, 0)
 			_gsp(R, "gs-dormido-%d" % (1 if fmod(t, 1000) > 500 else 0), 16, 30)   # 1.55.1: de lado, tapado, el pecho sube y baja
@@ -1770,21 +1787,29 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 				var f: float = fmod(t / 900.0 + i / 3.0, 1.0)
 				_gsp(R, "gs-z", 50 + f * 16 + sin(f * 6) * 2, 36 - f * 30)
 
-# fumar: el porro, la pipa o el bong, el mechero los enciende, la brasa y el humo; el vaporizador, su piloto y el vapor
-func _gesto_fumar(R: Array, m: String, t: float) -> void:
+# fumar: la mano con el porro, la pipa o el vaporizador (el bong, en la mesa), el mechero los enciende, la brasa y el humo; el
+# vaporizador, su piloto y el vapor. 0.55 (lo pidió el usuario: «si es con o sin tabaco se tiene que diferenciar»): el porro con tabaco,
+# la punta retorcida con hebras marrones y el humo gris; solo hierba, la punta en cono con hebras verdes y el humo más blanco
+func _gesto_fumar(R: Array, m: String, t: float, tab := false) -> void:
 	if m == "":
 		m = "porro"
 	_gsp(R, "gs-f-cuarto", 0, 0)
-	var x: float = _mv(144, 60, t / 150.0)
-	var punta := Vector2(x + 4, 55)   # la punta del porro o la cazoleta de la pipa, que entran con la mano
+	var x: float = _mv(150, 60, t / 150.0)   # la punta del porro o el borde de la pipa, que entran con la mano
+	var punta := Vector2(x, 55)
 	match m:
 		"porro":
-			_gsp(R, "gs-porro", x, 44)
+			_gsm(R, "gm-porro", x, 43)   # la punta en (0, 12)
+			for i in 4:   # las hebras de la punta
+				_gsr(R, x + 1 + i, 54 + (i % 2) * 2 - (1 if tab and i == 0 else 0), 1, 1, ["#8a5a2a", "#6a4020", "#a87040", "#5a3a1a"][i] if tab else ["#5a8a3a", "#3e6a2a", "#7aa04a", "#2e5a20"][i])
+			if tab:   # el papel retorcido
+				_gsr(R, x - 2, 54, 2, 1, "#e8e0d0")
 		"pipa":
-			punta = Vector2(x + 10, 55)
-			_gsp(R, "gs-pipa", x, 49)
+			punta = Vector2(x + 6, 55)
+			_gsm(R, "gm-pipa", x, 41)   # la boca de la cazoleta en (6, 14)
 		"vapo":
-			_gsp(R, "gs-vapo-1" if t > 300 and int(t / 250.0) % 2 else "gs-vapo-0", x, 44)
+			_gsm(R, "gm-vapo", x, 40)   # la boquilla en (0, 15)
+			if t > 300 and int(t / 250.0) % 2:
+				_gsr(R, x + 30, 51, 2, 1, "#60e070")
 		"bong":
 			punta = Vector2(63, 64)
 			_gsp(R, "gs-bong", 56, 40)
@@ -1806,3 +1831,5 @@ func _gesto_fumar(R: Array, m: String, t: float) -> void:
 			var f: float = (t - ti) / 900.0
 			if f < 1:
 				_gsp(R, "gs-humo-%d" % mini(2, int(f * 3)), sale.x - 12 - f * 6, sale.y - 14 - f * 36)
+				if m == "porro":   # el tono del humo: gris con tabaco, blanco solo hierba
+					_gsr(R, sale.x - 6 - f * 6, sale.y - 8 - f * 36, 3, 2, "#9a9a9a" if tab else "#f4f4f0")

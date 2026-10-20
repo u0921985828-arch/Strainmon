@@ -14,7 +14,25 @@ ELEGIDAS = {   # nombre en el atlas: (archivo, canto de la manga, giro en grados
 	'acc-llave-v0': ('llave-0.png', 'aba', -90),   # el candado: la llave sube desde abajo
 	'acc-llave-v1': ('llave-gira.png', 'aba', -90),
 	'acc-dedo': ('dedo-8.png', 'aba', 0),
+	# 0.55 (lo pidió el usuario: «cumple todo lo pendiente»): la mano de cada gesto, con la herramienta a la izquierda
+	'gm-spray': ('spray-2.png', 'der', 0),
+	'gm-abono': ('abono-4.png', 'der', 0),
+	'gm-tij-a': ('tijeras-2.png', 'der', 0),
+	'gm-tij-c': ('tijc-0.png', 'der', 0),
+	'gm-semilla': ('semilla-1.png', 'der', 0),
+	'gm-vacia': ('semvacia-0.png', 'der', 0),
+	'gm-porro': ('porro-1.png', 'der', 0),
+	'gm-pipa': ('pipa-1.png', 'der', 0),
+	'gm-vapo': ('vapo-0.png', 'der', 0),
+	'gm-billete': ('billete-2.png', 'der', 0),
+	'gm-bolsita': ('bolsita-7.png', 'der', 0),
+	'gm-pincel': ('pincel-2.png', 'der', 0),
+	# la mano del cliente: la misma en espejo, desde el canto izquierdo, con la manga azul
+	'gm-billete-i': ('billete-2.png', 'izq', 'espejo'),
+	'gm-bolsita-i': ('bolsita-7.png', 'izq', 'espejo'),
 }
+MANGA = [(105, 14, 55), (121, 26, 59)]   # la de llave-0 (oscura, clara): todas las mangas igual
+MANGA_CLI = [(38, 52, 104), (52, 72, 136)]
 
 def gris(c):
 	r, g, b, a = c
@@ -33,16 +51,46 @@ def limpia(im):
 			px[x, y] = (r, g, b, 255) if a >= 128 else (0, 0, 0, 0)
 	return im
 
+def manga(im, pal):
+	"""los rojos de la manga, a los dos tonos de la de llave-0 (o a los del cliente) por su luz"""
+	px = im.load(); W, H = im.size
+	es = lambda c: c[0] > 85 and c[1] < 45 and c[0] - c[1] > 60
+	cols = sorted({px[x, y][:3] for x in range(W) for y in range(H) if px[x, y][3] and es(px[x, y])}, key=sum)
+	if not cols:
+		return im
+	corte = (sum(cols[0]) + sum(cols[-1])) / 2
+	for x in range(W):
+		for y in range(H):
+			c = px[x, y]
+			if c[3] and es(c):
+				px[x, y] = pal[1 if sum(c[:3]) > corte else 0] + (255,)
+	return im
+
 def sale(n, f, canto, giro):
 	im = limpia(Image.open(os.path.join(C, f)).convert('RGBA'))
-	if giro:
+	if giro == 'espejo':
+		im = manga(im.transpose(Image.FLIP_LEFT_RIGHT), MANGA_CLI)
+	elif giro:
 		im = im.rotate(giro, expand=True)   # 90°: sin perder píxeles
+	if n.startswith('gm-') and giro != 'espejo':
+		im = manga(im, MANGA)
 	im = im.crop(im.getbbox())
+	if n == 'gm-vacia':   # la edición sin la semilla trae colores de más: a los de la mano con semilla
+		ref = Image.open(os.path.join(R, 'art', 'crudo', 'gestos', 'gm-semilla', 'unica', '00.png')).convert('RGBA')
+		pal = sorted({c[:3] for c in ref.getdata() if c[3]})
+		px = im.load()
+		for x in range(im.width):
+			for y in range(im.height):
+				c = px[x, y]
+				if c[3]:
+					px[x, y] = min(pal, key=lambda q: sum((q[i] - c[i]) ** 2 for i in range(3))) + (255,)
 	d = os.path.join(R, 'art', 'crudo', 'gestos', n, 'unica'); os.makedirs(d, exist_ok=True)
 	im.save(os.path.join(d, '00.png'))
 	px = im.load(); W, H = im.size
 	if canto == 'der':
 		ok = any(px[W - 1, y][3] for y in range(H))
+	elif canto == 'izq':
+		ok = any(px[0, y][3] for y in range(H))
 	else:
 		ok = any(px[x, H - 1][3] for x in range(W))
 	cols = len({px[x, y][:3] for x in range(W) for y in range(H) if px[x, y][3]})

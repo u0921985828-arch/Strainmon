@@ -86,6 +86,8 @@ func mano_canto(R: Array, pre: String, canto: String, x1: int, y1: int) -> bool:
 				return true
 			if canto == "aba" and int(e[3]) + f.c.get_height() >= y1:
 				return true
+			if canto == "izq" and int(e[2]) <= x1:
+				return true
 	return false
 
 func _corre() -> void:
@@ -194,6 +196,19 @@ func _corre() -> void:
 		abajo = maxi(abajo, g[1] + g[3] - gy)
 		en_maceta = en_maceta and g[0] - gx >= 44 and g[0] - gx <= 68
 	chk(en_maceta and abajo >= 60 and abajo <= 67, "regar: el agua cae en la tierra de la maceta (%d)" % abajo)
+	# 0.55: las manos de PixelLab de cada gesto llegan al canto (la tuya por la derecha; la del cliente, por la izquierda)
+	for q in [["tratar", "gm-spray", 600.0], ["abonar", "gm-abono", 600.0], ["plantar", "gm-vacia", 900.0], ["sembrar", "gm-semilla", 300.0],
+			["sembrar", "gm-vacia", 1000.0], ["esqueje", "gm-tij", 300.0], ["cosechar", "gm-tij", 700.0], ["manicurar", "gm-tij", 600.0],
+			["polen", "gm-pincel", 600.0], ["vender", "gm-bolsita", 500.0], ["pagar", "gm-billete", 400.0], ["pagar", "gm-vacia", 1250.0]]:
+		var W := {"k": q[0], "c": "", "ok": true, "t0": 0.0, "pl": {}}
+		chk(mano_canto(J.rects_acceso(W, q[2]), q[1], "der", gx + J.GS_W, 0), "%s: la mano (%s) entra por el canto derecho" % [q[0], q[1]])
+	chk(mano_canto(J.rects_acceso({"k": "vender", "c": "", "ok": true, "t0": 0.0, "pl": {}}, 500.0), "gm-billete-i", "izq", gx, 0), "vender: la mano del cliente entra por el canto izquierdo")
+	for m in ["porro", "pipa", "vapo"]:
+		chk(mano_canto(J.rects_acceso({"k": "fumar", "c": m, "ok": true, "t0": 0.0, "pl": {}}, 700.0), "gm-" + m, "der", gx + J.GS_W, 0), "fumar %s: la mano entra por el canto derecho" % m)
+	var con_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": true}, 800.0)
+	var sin_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": false}, 800.0)
+	chk(con_t != sin_t and tiene(con_t, "#8a5a2a") and not tiene(con_t, "#5a8a3a") and tiene(sin_t, "#5a8a3a") and tiene(con_t, "#9a9a9a") and tiene(sin_t, "#f4f4f0"), "el porro con tabaco y solo hierba se distinguen (hebras y humo)")
+	chk(not J.rects_acceso({"k": "regar", "c": "", "ok": true, "t0": 0.0, "pl": {}}, 600.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with("gs-regadera")), "la regadera vieja ya no sale")
 	# 3b · 1.54: cada acción de cerca. accion() lleva su gesto; catar, el porro; todos los dibujos, dentro y en movimiento
 	VIO.clear()
 	for q in [["regar", "regar"], ["plantar", "plantar"], ["cosechar", "cosechar"], ["cruzar", "polen"], ["vender", "vender"]]:

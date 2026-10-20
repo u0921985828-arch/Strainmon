@@ -932,6 +932,146 @@
    ],
    "ajuste": "exacto",
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_spray": {
+   "w": 53,
+   "h": 38,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_abono": {
+   "w": 61,
+   "h": 33,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_tij_a": {
+   "w": 74,
+   "h": 33,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_tij_c": {
+   "w": 75,
+   "h": 33,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_semilla": {
+   "w": 59,
+   "h": 27,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_vacia": {
+   "w": 59,
+   "h": 27,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_porro": {
+   "w": 65,
+   "h": 27,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_pipa": {
+   "w": 69,
+   "h": 28,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_vapo": {
+   "w": 76,
+   "h": 29,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_billete": {
+   "w": 71,
+   "h": 25,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_bolsita": {
+   "w": 56,
+   "h": 31,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_pincel": {
+   "w": 71,
+   "h": 26,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_billete_i": {
+   "w": 71,
+   "h": 25,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_bolsita_i": {
+   "w": 56,
+   "h": 31,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   }
  },
  "fases": [
@@ -11047,14 +11187,6 @@
      "celda": "gs_l"
     },
     {
-     "nombre": "gs-regadera-0",
-     "celda": "gs_g"
-    },
-    {
-     "nombre": "gs-regadera-1",
-     "celda": "gs_g"
-    },
-    {
      "nombre": "gs-spray-0",
      "celda": "gs_g"
     },
@@ -11121,6 +11253,62 @@
     {
      "nombre": "acc-dedo",
      "celda": "pl_acc_dedo"
+    },
+    {
+     "nombre": "gm-spray",
+     "celda": "pl_gm_spray"
+    },
+    {
+     "nombre": "gm-abono",
+     "celda": "pl_gm_abono"
+    },
+    {
+     "nombre": "gm-tij-a",
+     "celda": "pl_gm_tij_a"
+    },
+    {
+     "nombre": "gm-tij-c",
+     "celda": "pl_gm_tij_c"
+    },
+    {
+     "nombre": "gm-semilla",
+     "celda": "pl_gm_semilla"
+    },
+    {
+     "nombre": "gm-vacia",
+     "celda": "pl_gm_vacia"
+    },
+    {
+     "nombre": "gm-porro",
+     "celda": "pl_gm_porro"
+    },
+    {
+     "nombre": "gm-pipa",
+     "celda": "pl_gm_pipa"
+    },
+    {
+     "nombre": "gm-vapo",
+     "celda": "pl_gm_vapo"
+    },
+    {
+     "nombre": "gm-billete",
+     "celda": "pl_gm_billete"
+    },
+    {
+     "nombre": "gm-bolsita",
+     "celda": "pl_gm_bolsita"
+    },
+    {
+     "nombre": "gm-pincel",
+     "celda": "pl_gm_pincel"
+    },
+    {
+     "nombre": "gm-billete-i",
+     "celda": "pl_gm_billete_i"
+    },
+    {
+     "nombre": "gm-bolsita-i",
+     "celda": "pl_gm_bolsita_i"
     }
    ],
    "cubre": [
@@ -11165,8 +11353,6 @@
     "misc:gs-planta-f",
     "misc:gs-planta-v",
     "misc:gs-porro",
-    "misc:gs-regadera-0",
-    "misc:gs-regadera-1",
     "misc:gs-spray-0",
     "misc:gs-spray-1",
     "misc:gs-tijeras-0",
@@ -11183,7 +11369,21 @@
     "misc:acc-llave-1",
     "misc:acc-llave-v0",
     "misc:acc-llave-v1",
-    "misc:acc-dedo"
+    "misc:acc-dedo",
+    "misc:gm-spray",
+    "misc:gm-abono",
+    "misc:gm-tij-a",
+    "misc:gm-tij-c",
+    "misc:gm-semilla",
+    "misc:gm-vacia",
+    "misc:gm-porro",
+    "misc:gm-pipa",
+    "misc:gm-vapo",
+    "misc:gm-billete",
+    "misc:gm-bolsita",
+    "misc:gm-pincel",
+    "misc:gm-billete-i",
+    "misc:gm-bolsita-i"
    ],
    "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta) y piezas (manos, herramientas, plantas, humo, billetes)."
   },

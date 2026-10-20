@@ -641,7 +641,7 @@ func fumar_sentado() -> void:
 			S.items.tabaco = snappedf(float(S.items.tabaco) - 0.7, 0.1)
 	marca_cata(lk, r, lot_sid(lk), thc)   # fumarlo es catarlo
 	colocar(lot_sid(lk), (gx if r else gb) * thc * 10)   # MAESTRO [2]
-	await gesto("fumar", {"m": mk})   # 1.54
+	await gesto("fumar", {"m": mk, "tab": tab})   # 1.54; 0.55: con o sin tabaco, distinto
 	var b := boca_sentado()
 	for n in 3:
 		lanzar_vfx("vfx-humo-porro", b.x, b.y, M.reloj, S.map, true)
@@ -649,6 +649,8 @@ func fumar_sentado() -> void:
 	advance_time(15)
 	var t := (T("Te lías uno de {nom} con tabaco y te lo fumas sin prisa.", {"nom": nom}) if tab else T("Te lías uno de {nom} y te lo fumas sin prisa.", {"nom": nom})) if mk == "porro" else \
 		(T("Cargas la pipa de {nom} y le das unas caladas.", {"nom": nom}) if mk == "pipa" else (T("Cargas el bong de {nom} y le das unas caladas.", {"nom": nom}) if mk == "bong" else T("Cargas el vaporizador de {nom} y le das unas caladas.", {"nom": nom})))
+	if mk == "porro":   # 0.55 (lo pidió el usuario): con o sin tabaco se nota
+		t += T(" El tabaco rasca la garganta y tapa el sabor.") if tab else T(" Solo hierba: sabe a la variedad y sube más.")
 	if D.ZONAS.has(S.map):
 		S.heat = minf(100, S.heat + (1 if mk == "vapo" else 3))
 		heat_warn()

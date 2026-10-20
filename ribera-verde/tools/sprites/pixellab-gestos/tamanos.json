@@ -22,5 +22,61 @@
  "acc-dedo": [
   54,
   59
+ ],
+ "gm-spray": [
+  53,
+  38
+ ],
+ "gm-abono": [
+  61,
+  33
+ ],
+ "gm-tij-a": [
+  74,
+  33
+ ],
+ "gm-tij-c": [
+  75,
+  33
+ ],
+ "gm-semilla": [
+  59,
+  27
+ ],
+ "gm-vacia": [
+  59,
+  27
+ ],
+ "gm-porro": [
+  65,
+  27
+ ],
+ "gm-pipa": [
+  69,
+  28
+ ],
+ "gm-vapo": [
+  76,
+  29
+ ],
+ "gm-billete": [
+  71,
+  25
+ ],
+ "gm-bolsita": [
+  56,
+  31
+ ],
+ "gm-pincel": [
+  71,
+  26
+ ],
+ "gm-billete-i": [
+  71,
+  25
+ ],
+ "gm-bolsita-i": [
+  56,
+  31
  ]
 }
