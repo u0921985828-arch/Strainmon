@@ -1,4 +1,10 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__pixellab",
+      "mcp__pixellab-mcp"
+    ]
+  },
   "enabledMcpjsonServers": [
     "pixellab",
     "pixellab-mcp"
