@@ -73,7 +73,20 @@ func dentro1(e: Array) -> bool:
 	return e[0] >= 0 and e[1] >= 0 and e[0] + e[2] <= J.SW and e[1] + e[3] <= J.SH
 
 func tiene(R: Array, col: String) -> bool:
-	return R.any(func(e): return typeof(e[4]) == TYPE_STRING and e[4] == col)
+	return R.any(func(e): return typeof(e[0]) != TYPE_STRING and e[4] == col)
+
+# 0.55: la mano de PixelLab (un sprite que empieza por pre) llega al canto del panel: "der" o "aba"; nunca flota
+func mano_canto(R: Array, pre: String, canto: String, x1: int, y1: int) -> bool:
+	for e in R:
+		if typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with(pre):
+			var f = Atlas.foto_misc(e[1])
+			if f == null:
+				return false
+			if canto == "der" and int(e[2]) + f.c.get_width() >= x1:
+				return true
+			if canto == "aba" and int(e[3]) + f.c.get_height() >= y1:
+				return true
+	return false
 
 func _corre() -> void:
 	Juego.GUARDADO = "user://prueba-acceso.json"
@@ -143,7 +156,7 @@ func _corre() -> void:
 	V = {"k": "clave", "c": "4271", "ok": true, "t0": 0.0}
 	var T: Dictionary = J.tiempos_acceso(V)
 	chk(dentro(J.rects_acceso(V, 0)), "el teclado, dentro")
-	var ast := func(t): return J.rects_acceso(V, t).filter(func(q): return q[4] == "#80f080").size()
+	var ast := func(t): return J.rects_acceso(V, t).filter(func(q): return typeof(q[0]) != TYPE_STRING and q[4] == "#80f080").size()
 	chk(ast.call(0) == 0 and ast.call(T.t1 + 10) > 0 and ast.call(T.t1 + 10) < ast.call(T.t1 + 3 * J.ACC_TECLA + 10), "los asteriscos salen de uno en uno")
 	chk(tiene(J.rects_acceso(V, T.t1 + 20), "#58d080"), "la tecla pulsada, en verde")
 	chk(tiene(J.rects_acceso(V, T.clic - 10), "#c03030") and tiene(J.rects_acceso(V, T.clic + 10), "#40e060"), "el piloto: rojo y, al final, verde")
@@ -156,6 +169,31 @@ func _corre() -> void:
 	chk(dentro(J.rects_acceso(V, 0)) and tiene(J.rects_acceso(V, T.fin), "#40e060"), "la rueda: dentro y abre")
 	V = {"k": "candado", "c": "", "ok": true, "t0": 0.0}
 	chk(dentro(J.rects_acceso(V, 0)) and J.rects_acceso(V, 0) != J.rects_acceso(V, 1000), "el candado: dentro y se abre")
+	# 3a · 0.55 (lo pidió el usuario: «la regadera y la mano flotan… la llave… hacerlas con sprites de PixelLab»): la mano entra por
+	# el canto del panel en todos los momentos, y el agua de la regadera cae dentro de la maceta
+	var ax1: int = ((J.SW - J.ACC_W) >> 1) + J.ACC_W
+	var ay1: int = ((J.SH - J.ACC_H) >> 1) + J.ACC_H
+	for q in [["llave", "acc-llave-", "der"], ["candado", "acc-llave-v", "aba"], ["clave", "acc-dedo", "aba"], ["pin", "acc-dedo", "aba"], ["rueda", "acc-dedo", "aba"]]:
+		V = {"k": q[0], "c": "" if q[0] in ["llave", "candado"] else "4271", "ok": true, "t0": 0.0}
+		T = J.tiempos_acceso(V)
+		var bien := true
+		for ms in [0.0, T.fin * 0.3, T.fin * 0.6, T.fin - 1]:
+			bien = bien and mano_canto(J.rects_acceso(V, ms), q[1], q[2], ax1, ay1)
+		chk(bien, "%s: la mano entra por el canto (%s)" % [q[0], q[2]])
+	V = {"k": "llave", "c": "", "ok": true, "t0": 0.0}
+	chk(J.rects_acceso(V, 300).any(func(e): return typeof(e[0]) == TYPE_STRING and e[1] == "acc-llave-0") and J.rects_acceso(V, 900).any(func(e): return typeof(e[0]) == TYPE_STRING and e[1] == "acc-llave-1"), "la llave gira: la muñeca de canto")
+	V = {"k": "regar", "c": "", "ok": true, "t0": 0.0, "pl": {}}
+	var rg: Array = J.rects_acceso(V, 600)
+	var gx: int = (J.SW - J.GS_W) >> 1
+	var gy: int = (J.SH - J.GS_H) >> 1
+	chk(mano_canto(rg, "gs-regar", "der", gx + J.GS_W, 0), "regar: el brazo entra por el canto derecho")
+	var gotas: Array = rg.filter(func(e): return typeof(e[0]) != TYPE_STRING and (e[4] == "#8ac8f8" or e[4] == "#5aa0e0"))
+	var abajo: int = 0
+	var en_maceta := gotas.size() > 0
+	for g in gotas:
+		abajo = maxi(abajo, g[1] + g[3] - gy)
+		en_maceta = en_maceta and g[0] - gx >= 44 and g[0] - gx <= 68
+	chk(en_maceta and abajo >= 60 and abajo <= 67, "regar: el agua cae en la tierra de la maceta (%d)" % abajo)
 	# 3b · 1.54: cada acción de cerca. accion() lleva su gesto; catar, el porro; todos los dibujos, dentro y en movimiento
 	VIO.clear()
 	for q in [["regar", "regar"], ["plantar", "plantar"], ["cosechar", "cosechar"], ["cruzar", "polen"], ["vender", "vender"]]:

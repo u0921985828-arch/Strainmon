@@ -1584,7 +1584,7 @@ func npc_cond(d: Dictionary) -> bool:
 		"tono2":
 			return S.get("encargo") != null
 		"jurado":
-			return S.ch == 6
+			return S.ch == 6 or cup_hoy()   # MAESTRO [5]: y los días de la CannaCup
 		"julen":   # 1.23: en el piso hasta la primera cosecha; después, en el growshop
 			return (S.flags.get("kiko1") and not S.flags.get("harvest1")) if d.map == "home" else (true if S.flags.get("harvest1") else false)
 	if d.id.begins_with("est_") or d.id in ["camareraV", "vipA", "vipB", "gentD1", "gentD2", "gentD3"]:   # i18n-no · 1.47: el estanco, el reservado de GAUA y su gente de abajo
@@ -2676,3 +2676,30 @@ func piso_n(k: String) -> String:
 
 func look_rival(_R: Dictionary) -> Dictionary:
 	return {}
+
+func cult_apunta(_sid: String) -> void:   # MAESTRO [5], en copa.gd
+	pass
+
+func cup_hoy() -> bool:
+	return false
+
+func talk_cup() -> void:
+	pass
+
+func cup_aviso() -> void:
+	pass
+
+func cup_marcas() -> Array:
+	return []
+
+func energia_dia(_av: Array) -> void:
+	pass
+
+func energia_tienda() -> void:
+	pass
+
+func fam_menu() -> void:
+	pass
+
+func fam_cuenta() -> Array:
+	return [0, 0]

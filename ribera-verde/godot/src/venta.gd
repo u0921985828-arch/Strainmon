@@ -488,8 +488,10 @@ func cosecha_mesa(Me: Dictionary, i: int, w: Dictionary, so: float) -> Dictionar
 	var am := float(Me.get("am", 0)) / dn
 	var ao := float(Me.get("ao", 0)) / dn
 	var g: float = float(F.w) * float(F.gpw) * float(strain(lot_sid(Me.k)).y) / float(D.Y_MEDIA) * float(Me.y) * nave_g(w) / float(D.NAVE.g) \
-		* (1 + float(R.rend)) * so * (1 + float(D.ABONO.rend) * am + float(D.ABONO_BIO.rend) * ao)
-	var thc: float = Me.thc + float(F.thc) + float(R.thc) + float(D.ABONO.thc) * am + float(D.ABONO_BIO.thc) * ao
+		* (1 + float(R.rend)) * so * (1 + float(D.ABONO.rend) * am + float(D.ABONO_BIO.rend) * ao) * (1 + Cultivo.fam(S, "g"))
+	var thc: float = Me.thc * (1 + Cultivo.fam(S, "thc")) + float(F.thc) + float(R.thc) + float(D.ABONO.thc) * am + float(D.ABONO_BIO.thc) * ao
+	if Datos.CAL:   # MAESTRO [5]: cosechada, cuenta para su familia de la CannaDex
+		cult_apunta(lot_sid(Me.k))
 	return {"g": Datos.jsround(g * 10) / 10.0, "t": Datos.jsround(thc * 10) / 10.0}
 
 # los días que le quedan a la mesa hasta la cosecha

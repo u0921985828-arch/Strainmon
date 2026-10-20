@@ -134,6 +134,7 @@ func new_day() -> void:
 	if olor:
 		S.heat = min(100, S.heat + olor)
 		av.append(T("Olor a cogollo: calor +{n}", {"n": int(olor)}))
+	energia_dia(av)   # MAESTRO [5]: la potencia contratada
 	var sec := 0
 	for e in S.esquejes:
 		if S.day - e.dia > D.ESQUEJE_DIAS:
@@ -171,6 +172,7 @@ func new_day() -> void:
 	elif S.due > 0 and (S.deadline - S.day == 3 or S.deadline == S.day):   # 1.11: a 3 días y el último
 		queue("plazo", recuerdo_plazo)
 	queue("calor", heat_warn)   # 1.22: el olor de la noche también avisa
+	cup_aviso()   # MAESTRO [5]: la CannaCup
 	if es_cumple(S.day) and int(S.get("cumpleY", 0)) != int(Datos.fecha(S.day).y):   # i18n-no
 		queue("cumple", cumple_event)
 
@@ -189,7 +191,7 @@ func prob_botritis(i: int, ci: int, llueve: bool) -> float:
 		pr += float(B.lluvia)
 	if Cultivo.clima_carpa(S, ci, true).hr > float(B.hr):
 		pr += float(B.hr_p) * (float(B.sello) if c.get("sello") else 1.0)
-	return pr * (1 - float(D.IVS.res) * Cultivo.iv_f(p.get("f"), 3))
+	return pr * (1 - float(D.IVS.res) * Cultivo.iv_f(p.get("f"), 3)) * (1 - Cultivo.fam(S, "res"))
 
 func botritis_dia() -> void:
 	if not Datos.CAL or not D.has("BOTRITIS"):
@@ -805,6 +807,8 @@ func harvest(i: int) -> void:
 	if sh:
 		lk += "!"
 	add_buds(lk, g, thc)
+	if Datos.CAL:   # MAESTRO [5]: cuenta para su familia de la CannaDex
+		cult_apunta(p.sid)
 	if nn:
 		add_seeds(p.sid, nn)
 		if Datos.CAL and fe.get("iv"):
@@ -1236,8 +1240,13 @@ func tienda_online() -> void:
 			ienv = items.size() - ks.size() - vs.size()
 			items.append({"label": K("Envasadora al vacío") + (T(" · en casa") if tv else ""), "right": Datos.eur(VA.p), "disabled": tv,
 				"desc": K("Para envasar lo del maletero en bolsas selladas: en un registro de tráfico se nota menos.")})
+		if Datos.CAL:   # MAESTRO [5]: la potencia contratada
+			items.append({"label": K("La instalación eléctrica"), "ener": 1, "desc": K("Placas solares y generador insonorizado para el piso y la nave: lo que pasa de la potencia contratada deja firma térmica.")})
 		items.append({"label": K("Salir"), "desc": K("Con tarjeta, de la cuenta del banco.")})
 		i = await menu(items, {"cls": "full", "title": K("TIENDA ONLINE"), "title2": T("Muebles y transporte · en la cuenta {e}", {"e": Datos.eur(S.banco)}), "desc": true, "initial": i})
+		if i >= 0 and i < items.size() and items[i].get("ener"):
+			await energia_tienda()
+			continue
 		if i == ks.size() + vs.size():
 			if ar == null and await tarjeta(AR.p, K("Tienda online") + " · " + AR.n):
 				nevera().arcon = -(S.day + 1)   # pedido: el día en que llega, en negativo; 1, en casa

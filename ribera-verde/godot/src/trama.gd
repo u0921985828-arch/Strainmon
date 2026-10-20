@@ -870,6 +870,9 @@ func talk_molina():
 		await fade(0)
 
 func talk_jurado():
+	if cup_hoy() and S.ch != 6:   # MAESTRO [5]: la CannaCup
+		await talk_cup()
+		return
 	var N := K("JURADO")
 	await talk(N, [K("Esto es la COPA DE RIBERA, la de la asociación cannábica del barrio."), K("Para competir, trae 20 g de una sola variedad. Se analizan en laboratorio."), K("Marca a batir: DARKO, con AMNESIA HAZE, 26,8 % de THC.")])
 	var lots := bud_lots(20)

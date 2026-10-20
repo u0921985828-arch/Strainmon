@@ -326,6 +326,7 @@ func _corre() -> void:
 
 	# 8 · los clubs VIP: comprar en la puerta (cuenta), la noche a la cuenta, las mejoras
 	var zen: Dictionary = MT.vip.zen
+	S.prest = int(D.CUP.vip)   # MAESTRO [5]: el dueño solo vende con prestigio de la CannaCup (lo prueba familias.gd)
 	S.banco = int(zen.p) - 1
 	QUIERO = ["Comprarlo"]
 	var r0 = [null]

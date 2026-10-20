@@ -162,6 +162,48 @@ sd3dcfd09,Lo metes en el arcón y lo tapas con los sacos.,You put it in the ches
 s90031372,No llevas cogollos encima.,You have no buds on you.
 s4b05791e,El arcón está vacío.,The chest is empty.
 scb82bcdd,Lo sacas todo del arcón y lo guardas en la mochila.,You take everything out of the chest and put it in your backpack.
+s73721917,"CannaDex: {n}, completa. {b}","CannaDex: {n}, complete. {b}"
+s5e486c5d,Para siempre: un {v} % más de cogollo en todas tus cosechas.,Forever: {v} % more bud in all your harvests.
+s79c637ca,Para siempre: un {v} % más de THC en todas tus cosechas.,Forever: {v} % more THC in all your harvests.
+s0a834126,"Para siempre: la floración, un {v} % más rápida.",Forever: flowering {v} % faster.
+sf8566825,Para siempre: un {v} % menos de moho y botritis.,Forever: {v} % less mould and bud rot.
+sa9f9c49e, (conseguido), (done)
+s831311bf, Cosecha todas:, Harvest them all:
+s71f220da,Salir,Leave
+s68d77fec,"Cada variedad cuenta al cosecharla, en casa o en la nave.","Each strain counts when you harvest it, at home or in the warehouse."
+sb7a30418,CANNADEX · FAMILIAS,CANNADEX · FAMILIES
+sbe135fb7,{a}/{b} · prestigio {p} · {t} trofeos,{a}/{b} · prestige {p} · {t} trophies
+sf2c51381,una {t} de aroma {a},a {t} with a {a} aroma
+s3a4751ba,"Hoy es la CannaCup, en la plaza de Ribera Verde. Este trimestre se busca {p}.","The CannaCup is today, in the Ribera Verde square. This quarter they want {p}."
+s336c6411,"El {d}, CannaCup en la plaza de Ribera Verde. Este trimestre se busca {p}.","On {d}, CannaCup in the Ribera Verde square. This quarter they want {p}."
+s8fe97493,Trae {g} g de un tarro curado del todo.,Bring {g} g from a fully cured jar.
+s890fc039,SMS · ASOCIACIÓN,SMS · ASSOCIATION
+s8a4cdc6a,CannaCup en la plaza,CannaCup in the square
+s8dd83ecc,JURADO,JUDGE
+sf24a592d,Ya has presentado tu tarro en esta edición. Vuelve el próximo trimestre.,You have already entered a jar this edition. Come back next quarter.
+sd1076acc,Bienvenido a la CANNACUP de la asociación.,Welcome to the association's CANNACUP.
+s386ce97c,"Este trimestre buscamos {p}. Cuenta el THC y, encima, el perfil.","This quarter we want {p}. THC counts, and the profile on top."
+sfc9603fe,"Trae {g} g de un solo lote curado del todo, en tarro.","Bring {g} g of a single fully cured batch, in a jar."
+s950c1baf,Sin un tarro curado del todo no puedes competir. Cúralo y vuelve hoy mismo si te da tiempo.,Without a fully cured jar you can't compete. Cure it and come back today if you have time.
+s93150e70,Todavía no,Not yet
+s4fc6f726,¿Qué presentas?,What are you entering?
+s5f978161,Tú,You
+s6920efc3,El jurado ha catado y analizado.,The jury has tasted and tested.
+sb242e207,"{e}, el trofeo del {p}.º puesto y {n} de prestigio","{e}, the place {p} trophy and {n} prestige"
+se9a4e0a4,cupVip,
+s5d362a4d,"Con ese palmarés, en los clubs de Hiriburu ya saben quién eres.","With that record, the Hiriburu clubs know who you are."
+s06642cc8,Esta vez no hay podio. Vuelve el próximo trimestre con algo mejor.,No podium this time. Come back next quarter with something better.
+s21acd7eb,Gasóleo del generador ({s}): −{e},Generator diesel ({s}): −{e}
+sf0108ca4,{s}: {w} por encima de la potencia contratada. Firma térmica: calor +{c},{s}: {w} over the contracted power. Thermal signature: heat +{c}
+s652bef4d,{c} de {l} contratados,{c} of {l} contracted
+s7235b056, · se pasa {w}, · over by {w}
+sdf69d537, · puesto, · installed
+see4ed37b, · mañana, · tomorrow
+s8b7c4857,"Lo que se pasa de la potencia contratada lo nota la compañía, y la policía se entera.","The power company notices anything over the contracted power, and the police find out."
+s084147c7,LA INSTALACIÓN ELÉCTRICA,THE WIRING
+s42b882aa,En la cuenta {e},In the account {e}
+s6092151d,Tienda online,Online shop
+s224febdd,Pedido: {n} · lo instalan mañana,Ordered: {n} · installed tomorrow
 s457a182b,"Puerto Viejo, en la costa: el puerto, la lonja y el club de los marineros.","Puerto Viejo, on the coast: the harbour, the fish market and the sailors' club."
 sb6f597e2,"Ribera Verde, tu barrio, en la ría: el piso de la tía, el barrio alto y los astilleros.","Ribera Verde, your neighbourhood, on the estuary: your aunt's flat, the upper town and the shipyards."
 sc39b7de7,"Ibarbide, la ciudad grande: el Casco Viejo, el Ensanche y la Kale Zaharra.","Ibarbide, the big city: the Old Town, the Ensanche and Kale Zaharra."
@@ -605,7 +647,6 @@ s520771d4,O pínchala en el carro: allí aguanta {n} días.,Or stick it in the c
 s20676bad,Plaza vacía con una maceta de {m}.,Empty spot with a {m} pot.
 s2f31ad5f,Plantar,Plant
 sc0300166,Cambiar maceta,Change pot
-s71f220da,Salir,Leave
 s70ab0f1d,La {s} se ha secado del todo.,The {s} has dried out completely.
 se9b9b1e8,Retiras la planta muerta.,You remove the dead plant.
 s71bb313a,"{s}{e} lista para cosechar.
@@ -784,7 +825,6 @@ s0edfbd0a,"Moho en {l}: de noche la carpa pasa del {h} % de humedad. Un extracto
 s684caec3,Genoteca,Genoteca
 sb2036f54,Banco de semillas,Seed bank
 s2e467549,Notas de la tía,Aunt's notes
-s6092151d,Tienda online,Online shop
 sd4e10a30,Caja empotrada,Wall safe
 s3e57329b,Guardar partida,Save game
 s80fb9f90,Apagar,Shut down
@@ -853,9 +893,10 @@ sea5aaf56,El suelo y las paredes del piso: el instalador o el pintor vienen al d
 s2607fbf1,El camarote: almacén,The loft: storage
 s16008835,"Habilitar el camarote de arriba como almacén, las estanterías de tarros de cristal de 10 L y los sobres de humedad.","Fit out the loft upstairs as storage, the shelves of 10 L glass jars and the humidity packs."
 s210771fd, · hecho, · done
-see4ed37b, · mañana, · tomorrow
 s7cf87763,Envasadora al vacío,Vacuum sealer
 s83aaf052,Para envasar lo del maletero en bolsas selladas: en un registro de tráfico se nota menos.,To seal what's in the boot in bags: it shows less in a traffic search.
+s2c1cb4ca,La instalación eléctrica,The wiring
+sd1541010,Placas solares y generador insonorizado para el piso y la nave: lo que pasa de la potencia contratada deja firma térmica.,Solar panels and a silent generator for the flat and the warehouse: anything over the contracted power leaves a thermal signature.
 sfa78c4b9,"Con tarjeta, de la cuenta del banco.","By card, from your bank account."
 s3a1d6591,TIENDA ONLINE,ONLINE SHOP
 sb1ead1df,Muebles y transporte · en la cuenta {e},Furniture and transport · in the account {e}
@@ -1256,6 +1297,7 @@ sef306f58,Nuevo nombre de la variedad,New strain name
 s05fb587e,Ya hay una variedad con ese nombre.,There's already a strain with that name.
 sfaf1a92e,La {a} pasa a llamarse {v}.,{a} is now called {v}.
 s06bd6060,"Su cuaderno: las {n} variedades, lo que apuntó de cada una, las recetas de los cruces y dónde conseguir las semillas.","Her notebook: all {n} strains, her notes on each, the cross recipes and where to get the seeds."
+sc84eb8de,Las variedades por familias. Cosecha todas las de una familia y te quedas su bono para siempre.,Strains by family. Harvest every strain in a family and keep its bonus forever.
 sb5bb1ec3,Cata: {c},Tasting: {c}
 sedc3e140,Sin descubrir.,Not discovered.
 sb0d50c8e,Pulsa A para cambiarle el nombre.,Press A to rename it.
@@ -1436,6 +1478,7 @@ sbfa600de,«¿Buscas algo? Yo no he visto nada.»,“Looking for something? I ha
 sab18eb5d,«El alquiler aquí te come vivo.»,“The rent here eats you alive.”
 s6f2cd279,Cerrado. Una cámara te mira desde lo alto.,Closed. A camera watches you from up high.
 s17d6ee6d,Precinto del Ayuntamiento en la puerta: cerrado hasta el {d}.,Council seal on the door: closed until {d}.
+seaf1dc3f,{n}: SE TRASPASA. El dueño no vende a cualquiera: quiere a alguien con nombre en la CannaCup ({p} de prestigio; tienes {t}).,{n}: FOR SALE. The owner won't sell to just anyone: he wants someone with a name in the CannaCup ({p} prestige; you have {t}).
 s2497aad8,"{n}: SE TRASPASA. Local de copas con licencia hasta las 6, {p}. ¿Lo compras?","{n}: FOR SALE. Bar licensed until 6 a.m., {p}. Buy it?"
 s1782d7e9,Hacen falta {p} en la cuenta.,You need {p} in the account.
 s2513e9d1,"{n} es tuyo. {e} lo lleva por ti: lo que deje cada noche, a tu cuenta.","{n} is yours. {e} runs it for you: whatever it makes each night, into your account."
@@ -2253,7 +2296,6 @@ s7b5fde2c,El plazo se acabó. Don Baltasar ya te escribirá.,Time's up. Don Balt
 sf6630b37,"¿De día? ¿Tú estás loco? Vuelve de noche, a partir de las nueve.","In daylight? Are you crazy? Come back at night, after nine."
 s1d83c6c3,Don Baltasar dijo {g}. Llevas {l}. Vuelve con todo.,Don Baltasar said {g}. You've got {l}. Come back with all of it.
 se7665ef4,¿Entregas {g}? Toño se lleva primero los lotes más flojos.,Hand over {g}? Toño takes the weakest batches first.
-s93150e70,Todavía no,Not yet
 s680afe6f,+{e} · encargo de Don Baltasar,+{e} · Don Baltasar's job
 s51cea535,Contado. Don Baltasar estará contento.,All counted. Don Baltasar will be pleased.
 sab97e79f,No apareciste. Don Baltasar no se olvida.,You didn't show. Don Baltasar doesn't forget.
@@ -2759,13 +2801,11 @@ s68411b70,¿Con qué dinero? Vuelve cuando lo tengas.,With what money? Come back
 s0e76e0ef,Bien. Mis agentes mirarán hacia otro lado hasta el {f}.,Good. My officers will look the other way until {f}.
 s60b4086f,Tú sabrás. Mis agentes van a estar muy atentos.,Your call. My officers will be watching closely.
 s97f6d576,"Si me necesitas, estoy en la comisaría del barrio alto.","If you need me, I'm at the station in the upper barrio."
-s8dd83ecc,JURADO,JUDGE
 sfa98f26c,"Esto es la COPA DE RIBERA, la de la asociación cannábica del barrio.","This is the RIBERA CUP, run by the barrio's cannabis association."
 sa69c8cd4,"Para competir, trae 20 g de una sola variedad. Se analizan en laboratorio.","To enter, bring 20 g of a single strain. It gets lab tested."
 s54efdc64,"Marca a batir: DARKO, con AMNESIA HAZE, 26,8 % de THC.","Mark to beat: DARKO, with TORMENTA, 26.8 % THC."
 sb4a6864a,"Marca a batir: DARKO, con AMNESYA HAIZE, 26,8 % de THC.",
 s4a87a002,Vuelve cuando tengas 20 g de algo.,Come back when you have 20 g of something.
-s4fc6f726,¿Qué presentas?,What are you entering?
 s40511dc8,"Resultado del laboratorio. AMNESIA HAZE de Darko: 26,8 % de THC.",Lab result. Darko's TORMENTA: 26.8 % THC.
 sbfcf8158,"Resultado del laboratorio. AMNESYA HAIZE de Darko: 26,8 % de THC.",
 s6b1860f1,{s} de {N}: {p} % de THC.,{N}'s {s}: {p} % THC.
@@ -5690,6 +5730,24 @@ s6c6bf121,Rebajada,Cut
 s22feee2f,Muy rebajada,Heavily cut
 saec57005,Barata,Cheap
 sc64cc362,Cara,Expensive
+s2ae55220,Las del Kush,The Kush ones
+sa43c79a6,Las de Asia,The Asian ones
+s147a5307,Las de América,The American ones
+s476af330,Las de África,The African ones
+s7b79aa54,Las del olor fuerte,The strong-smelling ones
+s851bca9f,Las Haze,The Hazes
+s5cd5fcf2,Las Haize,The Haizes
+s05ae9f25,Las del norte,The northern ones
+s5a678bf5,Las blancas,The white ones
+s401a5c59,La leyenda,The legend
+s98e01229,Las autos,The autos
+s87704938,Txoko Berdea,Txoko Berdea
+se5ff5286,Huerta Oihana,Huerta Oihana
+s08de7e76,Los de Arratia,The Arratia crew
+s2cb6aa77,Generador diésel insonorizado,Silent diesel generator
+s55379088,"Cubre hasta 5 kW por encima de lo contratado, sin ruido: lo que pasa de la potencia no lo ve la compañía. Gasta gasóleo cada día que trabaja (en efectivo).","Covers up to 5 kW over the contract, silently: the power company never sees the excess. Burns diesel every day it runs (paid in cash)."
+s6bcc8de0,Placas solares,Solar panels
+s8784f2d5,"2,5 kW de placas con baterías: lo que pasa de la potencia contratada, hasta ahí, sale del tejado y no de la red. Sin gasto.","2.5 kW of panels with batteries: up to that, anything over the contracted power comes from the roof, not the grid. No running cost."
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -5793,6 +5851,8 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+sf8721a43,Las Skunk,The Skunks
+se9c33ce5,Las Skonk,The Skonks
 sed8b6d1e,"Tu club, jefe. En el dispensario quedan {g} de {n}, a {p} € el gramo. Llevamos {e}.","Your club, boss. The dispensary has {g} of {n} left, at {p} € a gram. We've taken {e}."
 sa99a7bb0,"Tienes {n} de sobra en la mochila.
 Te la pago a {e} y la pongo a la venta.","You have {n} spare in your backpack.

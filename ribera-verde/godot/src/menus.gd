@@ -184,6 +184,9 @@ func menu_genoteca(i0: int) -> int:
 	var items := []
 	if S.flags.get("diario"):   # sale bajo la almohada (1.25)
 		items.append({"label": K("DIARIO DE LA TÍA MAITE"), "right": "%d/%d" % [nr, DEX.size()], "ic": icono("guardar"), "diario": 1, "desc": T("Su cuaderno: las {n} variedades, lo que apuntó de cada una, las recetas de los cruces y dónde conseguir las semillas.", {"n": DEX.size()})})
+	if Datos.CAL:   # MAESTRO [5]: la CannaDex por familias
+		var fc: Array = fam_cuenta()
+		items.append({"label": K("CANNADEX · FAMILIAS"), "right": "%d/%d" % [fc[0], fc[1]], "ic": icono("guardar"), "fam": 1, "desc": K("Las variedades por familias. Cosecha todas las de una familia y te quedas su bono para siempre.")})
 	for j in DEX.size():
 		var k: String = DEX[j]
 		var s: Dictionary = D.STRAINS[k]
@@ -211,6 +214,8 @@ func menu_genoteca(i0: int) -> int:
 	vistas.append_array(cust)
 	if i >= 0 and i < items.size() and items[i].get("diario"):
 		await recetario()
+	elif i >= 0 and i < items.size() and items[i].get("fam"):
+		await fam_menu()
 	elif i >= 0 and i < items.size() and items[i].get("c"):
 		if not Datos.CAL or await ask(S.custom[items[i].c].n, [K("Ver la hoja"), K("Cambiar el nombre")]) == 1:
 			await renombrar_variedad(items[i].c)

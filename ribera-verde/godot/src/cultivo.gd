@@ -256,6 +256,7 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 		g *= float(Datos.carga().AUTO.rinde_1212)
 	if p.prog >= .65:   # MAESTRO [5]: el IV de floración
 		g *= 1 + float(Datos.carga().IVS.flor) * iv_f(p.get("f"), 2)
+		g *= 1 + fam(S, "flor")
 	if p.prog < 1:
 		if auto:
 			p.prog = minf(1, p.prog + g)
@@ -274,7 +275,7 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 		p.health += h
 	var D := Datos.carga()
 	if f.get("hr", 0) > D.HR_OK[1] and p.prog >= .65 and p.prog < 1:   # moho: humedad alta en floración (1.10)
-		p.health -= h * (f.hr - D.HR_OK[1]) * D.MOHO * float(f.get("moho", 1.0)) * (1 - float(D.IVS.res) * iv_f(p.get("f"), 3))   # MAESTRO [5]: resistencia a hongos
+		p.health -= h * (f.hr - D.HR_OK[1]) * D.MOHO * float(f.get("moho", 1.0)) * (1 - float(D.IVS.res) * iv_f(p.get("f"), 3)) * (1 - fam(S, "res"))   # MAESTRO [5]: resistencia a hongos
 	p.health = clampf(p.health, 0, 100)
 	if p.health <= 0:
 		p.dead = true
@@ -348,6 +349,26 @@ static func iv_f(fe, i: int) -> float:
 	if fe is Dictionary and fe.get("iv") is Array:
 		return (float(fe.iv[i]) - 16.0) / 15.0
 	return 0.0
+
+# MAESTRO [5]: el bono de las familias completas de la CannaDex (FAMILIAS; S.cult = las variedades cosechadas): la suma de los
+# de tipo b («g», «thc», «flor», «res»); 0 sin CAL o sin ninguna completa (×1: lo de antes no cambia)
+static func fam(S: Dictionary, b: String) -> float:
+	if not Datos.CAL or not (S.get("cult") is Dictionary) or S.cult.is_empty():
+		return 0.0
+	var t := 0.0
+	var F: Dictionary = Datos.carga().FAMILIAS
+	for k in F:
+		if String(F[k].b) == b and fam_llena(S, k):
+			t += float(F[k].v)
+	return t
+
+static func fam_llena(S: Dictionary, k: String) -> bool:
+	if not (S.get("cult") is Dictionary):
+		return false
+	for sid in Datos.carga().FAMILIAS[k].s:
+		if not S.cult.has(sid):
+			return false
+	return true
 
 # las semillas de una planta llevan lo mejor de ella a su línea; las de un cruce, lo mejor de las dos y un poco más (IVS.mejora)
 static func hereda_iv(S: Dictionary, sid: String, iv: Array) -> void:
@@ -427,12 +448,12 @@ static func cosecha(S: Dictionary, i: int) -> Dictionary:
 static func gramos_planta(S: Dictionary, p: Dictionary, f: Dictionary) -> int:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"y": 1}
-	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + abo_de(p.get("fo")).rend * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0))) * (1 + float(Datos.carga().IVS.prod) * iv_f(fe, 1))))
+	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + abo_de(p.get("fo")).rend * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0))) * (1 + float(Datos.carga().IVS.prod) * iv_f(fe, 1)) * (1 + fam(S, "g"))))
 
 static func thc_cosecha(S: Dictionary, p: Dictionary, f: Dictionary) -> float:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"t": 1}
-	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) * (1 + float(Datos.carga().IVS.pot) * iv_f(fe, 0)) + f.thc + abo_de(p.get("fo")).thc * fq(p)) * 10) / 10.0)
+	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) * (1 + float(Datos.carga().IVS.pot) * iv_f(fe, 0)) * (1 + fam(S, "thc")) + f.thc + abo_de(p.get("fo")).thc * fq(p)) * 10) / 10.0)
 
 static func plantas_vivas(S: Dictionary, ci: int) -> bool:
 	var H := huecos(S)

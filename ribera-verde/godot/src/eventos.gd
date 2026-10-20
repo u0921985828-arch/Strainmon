@@ -16,6 +16,7 @@ func marcas_cal() -> Array:
 		r.append({"d": int(S.day) if ventana_nave() else proxima_ventana(), "c": "#d08020", "t": T("se puede comprar la nave")})
 	if S.get("aso") is Dictionary and int(S.aso.get("asam", 0)):
 		r.append({"d": int(S.aso.asam), "c": "#a050b0", "t": T("asamblea de la asociación")})
+	r.append_array(cup_marcas())   # MAESTRO [5]
 	r.sort_custom(func(a, b): return a.d < b.d)
 	return r
 
@@ -1393,7 +1394,7 @@ func rects_acceso(V: Dictionary, now: float) -> Array:
 			R.append([cx - 5, cy - 18, 10, 6, "#8a6a28"])   # el pomo, encima
 			R.append([cx - 3, cy - 6, 6, 5, "#101010"])
 			R.append([cx - 1, cy - 2, 2, 7, "#101010"])
-			_llave_h(R, t, T, cx + 2, cy - 4, "#6a4a30")
+			_llave_h(R, t, T, cx, cy, Rect2i(cx + 3, y0, x0 + ACC_W - cx - 3, ACC_H))
 		"candado":   # la persiana de chapa y el candado: la llave sube por debajo, gira y salta el arco
 			R.append([x0, y0, ACC_W, ACC_H, "#7a7e86"])
 			for yy in range(y0 + 3, y0 + ACC_H, 5):
@@ -1408,7 +1409,7 @@ func rects_acceso(V: Dictionary, now: float) -> Array:
 			R.append([cx - 10, cy - 2, 20, 2, "#e0c060"])
 			R.append([cx - 10, cy + 14, 20, 2, "#806020"])
 			R.append([cx - 1, cy + 7, 3, 5, "#101010"])
-			_llave_v(R, t, T, cx - 1, cy + 12, "#7a7e86")
+			_llave_v(R, t, T, cx, cy, Rect2i(x0, cy + 12, ACC_W, y0 + ACC_H - cy - 12))
 		"clave", "pin":
 			_teclado(R, V, t, T, cx, y0 + (14 if k == "pin" else 6))
 		"rueda":   # la puerta de la caja: cuatro ruedas que se paran en su cifra y la manilla que gira
@@ -1441,38 +1442,36 @@ func rects_acceso(V: Dictionary, now: float) -> Array:
 					R.append([mx - 8 + q * 3, cy + 18 - q * 3, 3, 3, "#c8ccd4"])
 			else:   # tumbada: abierta
 				R.append([mx - 12, cy + 10, 24, 3, "#c8ccd4"])
+			# el dedo: en la rueda que se está parando y, al final, en la manilla
+			if t < T.clic:
+				_dedo(R, wx + clampi(floori((t - T.para) / T.cada) + 1, 0, n - 1) * 16 + 6, cy - 4)
+			else:
+				_dedo(R, mx + 4, cy + 14)
 	if (k == "llave" or k == "candado") and t >= T.gira and t < T.gira + 220:   # el clic
 		var py: int = cy - 4 if k == "llave" else cy + 9
 		for q in [[-8, 0, 3, 1], [6, 0, 3, 1], [0, -8, 1, 3], [0, 6, 1, 3], [-6, -6, 2, 2], [5, -6, 2, 2]]:
 			R.append([cx + q[0], py + q[1], q[2], q[3], "#f8e070"])
 	return R
 
-# la llave de lado: entra hasta la punta (px) y la cabeza gira (se ve de canto)
-func _llave_h(R: Array, t: float, T: Dictionary, px: int, py: int, fondo: String) -> void:
-	var kx: int = px + Datos.jsround((1 - _suave(t / T.entra)) * 18)
-	var a: float = _suave((t - T.entra) / (T.gira - T.entra)) * PI / 2
-	var bx: int = kx + 20
-	R.append([maxi(kx, px), py, bx - maxi(kx, px), 3, "#c8ccd4"])
-	R.append([maxi(kx, px), py + 2, bx - maxi(kx, px), 1, "#8a8e98"])
-	if a < PI / 4:
-		for o in [3, 7, 11, 15]:
-			if kx + o >= px:
-				R.append([kx + o, py + 3, 2, 2, "#a8acb4"])
-	var bw: int = maxi(2, Datos.jsround(10 * cos(a)))
-	R.append([bx + 5 - (bw >> 1), py - 4, bw, 11, "#c8ccd4"])
-	if bw > 5:
-		R.append([bx + 5 - 2, py, 4, 3, fondo])
+# 0.55 (lo pidió el usuario: «la llave… flotan»): la mano de PixelLab con la llave, la manga por el canto derecho del panel; entra
+# por el bombín (lo de dentro, recortado: cl empieza a la derecha del ojo de la cerradura) y gira (acc-llave-1, la muñeca de canto)
+func _llave_h(R: Array, t: float, T: Dictionary, cx: int, cy: int, cl: Rect2i) -> void:
+	var kx: int = cx - 14 + Datos.jsround((1 - _suave(t / T.entra)) * 34)
+	if t < T.entra + (T.gira - T.entra) * 0.5:
+		R.append(["@", "acc-llave-0", kx, cy - 21, cl])
+	else:
+		R.append(["@", "acc-llave-1", kx, cy - 22, cl])
 
-# la llave de abajo arriba (el candado)
-func _llave_v(R: Array, t: float, T: Dictionary, px: int, py: int, fondo: String) -> void:
-	var ky: int = py + Datos.jsround((1 - _suave(t / T.entra)) * 7) - 4
-	var a: float = _suave((t - T.entra) / (T.gira - T.entra)) * PI / 2
-	var by: int = ky + 14
-	R.append([px, maxi(ky, py), 3, by - maxi(ky, py), "#c8ccd4"])
-	var bw: int = maxi(2, Datos.jsround(9 * cos(a)))
-	R.append([px + 1 - (bw >> 1), by, bw, 9, "#c8ccd4"])
-	if bw > 5:
-		R.append([px - 1, by + 3, 4, 3, fondo])
+# la del candado, la misma mano girada: sube por debajo del ojo (cl empieza debajo) y gira
+func _llave_v(R: Array, t: float, T: Dictionary, cx: int, cy: int, cl: Rect2i) -> void:
+	var ky: int = cy + 3 + Datos.jsround((1 - _suave(t / T.entra)) * 20)
+	R.append(["@", "acc-llave-v0" if t < T.entra + (T.gira - T.entra) * 0.5 else "acc-llave-v1", cx - 7, ky, cl])
+
+# el dedo de PixelLab (acc-dedo: la yema en (2, 0), la manga por abajo a la derecha) en (x, y)
+func _dedo(R: Array, x: float, y: float) -> void:
+	var x0: int = (SW - ACC_W) >> 1
+	var y0: int = (SH - ACC_H) >> 1
+	R.append(["@", "acc-dedo", Datos.jsround(x) - 2, Datos.jsround(y), Rect2i(x0, y0, ACC_W, ACC_H)])
 
 # el teclado: pantalla con asteriscos, el piloto y 12 teclas; con la tarjeta (pin), la ranura arriba
 func _teclado(R: Array, V: Dictionary, t: float, T: Dictionary, cx: int, ty: int) -> void:
@@ -1510,6 +1509,15 @@ func _teclado(R: Array, V: Dictionary, t: float, T: Dictionary, cx: int, ty: int
 		if not p:
 			R.append([bx, by + 7, 11, 1, "#80808a"])
 		_glifo(R, ch, bx + 4, by + 2 + (1 if p else 0), 1, "#303038")
+	# el dedo: en la tecla que toca (bajado al pulsar), entre una y otra encima de la siguiente y, al acabar, abajo a la derecha
+	var n: int = c.length()
+	var ix: int = clampi(int((t - T.t1) / ACC_TECLA), 0, n - 1) if t >= T.t1 else 0
+	if n > 0 and t < T.clic:
+		var ti: int = teclas.find(c[ix])
+		var pul: bool = t >= T.t1 and fmod(t - T.t1, ACC_TECLA) < 150
+		_dedo(R, cx - 19 + (ti % 3) * 14 + 5, ty + 20 + (ti / 3) * 10 + (3 if pul else -2))
+	else:
+		_dedo(R, cx + 22, ty + 48)
 
 func gesto(k: String, o := {}) -> void:
 	var gp = gesto_p
@@ -1638,12 +1646,14 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 		"regar":   # la regadera entra, se inclina y el agua cae del pitorro a la tierra, que se oscurece
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gs_maceta(R, "v", t > 600, V)
-			var x: float = _mv(150, 70, t / 300.0) if t < 1000 else _mv(70, 150, (t - 1000) / 200.0)
-			_gsp(R, "gs-regadera-1" if t >= 300 and t < 1000 else "gs-regadera-0", x, 18)
-			if t > 320 and t < 1000:   # del pitorro (76, 48) a la tierra
-				for d in 9:
-					var f: float = fmod((t - 320) / 280.0 + d / 9.0, 1.0)
-					_gsr(R, 75 - f * 8 + (d % 3), 48 + f * 15, 1, 2, "#8ac8f8" if d % 2 else "#5aa0e0")
+			# 0.55: el brazo de PixelLab con la manga en el canto derecho (nunca flota) y la alcachofa encima de la tierra
+			var x: float = _mv(GS_W + 4, GS_W - 76, t / 300.0) if t < 1000 else _mv(GS_W - 76, GS_W + 4, (t - 1000) / 200.0)
+			var y: float = 14 + (sin((t - 300) / 140.0) if t > 300 and t < 1000 else 0.0)
+			if t > 320 and t < 1000:   # el chorro de la alcachofa (x, y + 35) a la tierra de la maceta (fila 64)
+				for d in 12:
+					var f: float = fmod((t - 320) / 260.0 + d / 12.0, 1.0)
+					_gsr(R, x - 2 - f * 3 + (d % 3), y + 35 + f * (64 - y - 35), 1, 2, "#8ac8f8" if d % 2 else "#5aa0e0")
+			_gsp(R, "gs-regar", x, y)
 		"tratar":   # el pulverizador: dos apretones, la bruma hacia la planta y los bichos que caen
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gs_maceta(R, "v", false, V)

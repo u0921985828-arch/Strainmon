@@ -872,6 +872,66 @@
    ],
    "ajuste": "pies",
    "nota": "MAESTRO [3]: el aparcamiento de cada pueblo (aparcamiento.py)"
+  },
+  "pl_gs_regar": {
+   "w": 76,
+   "h": 49,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_acc_llave_0": {
+   "w": 73,
+   "h": 27,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_acc_llave_1": {
+   "w": 71,
+   "h": 28,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_acc_llave_v0": {
+   "w": 27,
+   "h": 73,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_acc_llave_v1": {
+   "w": 28,
+   "h": 71,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_acc_dedo": {
+   "w": 54,
+   "h": 59,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   }
  },
  "fases": [
@@ -11037,6 +11097,30 @@
     {
      "nombre": "gs-pinza-1",
      "celda": "gs_m"
+    },
+    {
+     "nombre": "gs-regar",
+     "celda": "pl_gs_regar"
+    },
+    {
+     "nombre": "acc-llave-0",
+     "celda": "pl_acc_llave_0"
+    },
+    {
+     "nombre": "acc-llave-1",
+     "celda": "pl_acc_llave_1"
+    },
+    {
+     "nombre": "acc-llave-v0",
+     "celda": "pl_acc_llave_v0"
+    },
+    {
+     "nombre": "acc-llave-v1",
+     "celda": "pl_acc_llave_v1"
+    },
+    {
+     "nombre": "acc-dedo",
+     "celda": "pl_acc_dedo"
     }
    ],
    "cubre": [
@@ -11093,7 +11177,13 @@
     "misc:gs-z",
     "misc:gs-semilla",
     "misc:gs-pinza-0",
-    "misc:gs-pinza-1"
+    "misc:gs-pinza-1",
+    "misc:gs-regar",
+    "misc:acc-llave-0",
+    "misc:acc-llave-1",
+    "misc:acc-llave-v0",
+    "misc:acc-llave-v1",
+    "misc:acc-dedo"
    ],
    "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta) y piezas (manos, herramientas, plantas, humo, billetes)."
   },

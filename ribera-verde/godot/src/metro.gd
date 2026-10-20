@@ -474,6 +474,9 @@ func vip_puerta(k: String) -> bool:
 		await acceso("llave")
 		return true
 	atras_puerta()
+	if int(S.get("prest", 0)) < int(D.CUP.vip):   # MAESTRO [5]: sin palmarés en la CannaCup no te lo venden
+		await say(T("{n}: SE TRASPASA. El dueño no vende a cualquiera: quiere a alguien con nombre en la CannaCup ({p} de prestigio; tienes {t}).", {"n": R.n, "p": int(D.CUP.vip), "t": int(S.get("prest", 0))}))
+		return false
 	if await ask(T("{n}: SE TRASPASA. Local de copas con licencia hasta las 6, {p}. ¿Lo compras?", {"n": R.n, "p": Datos.eur(R.p)}), [K("Comprarlo"), K("Nada")]) != 0:
 		return false
 	if not cobro_banco(float(R.p), T("Compra · {n}", {"n": R.n})):

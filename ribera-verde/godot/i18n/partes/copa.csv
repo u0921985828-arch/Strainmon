@@ -1,0 +1,58 @@
+es,en
+"CannaDex: {n}, completa. {b}","CannaDex: {n}, complete. {b}"
+Para siempre: un {v} % más de cogollo en todas tus cosechas.,Forever: {v} % more bud in all your harvests.
+Para siempre: un {v} % más de THC en todas tus cosechas.,Forever: {v} % more THC in all your harvests.
+"Para siempre: la floración, un {v} % más rápida.",Forever: flowering {v} % faster.
+Para siempre: un {v} % menos de moho y botritis.,Forever: {v} % less mould and bud rot.
+ (conseguido), (done)
+ Cosecha todas:, Harvest them all:
+"Cada variedad cuenta al cosecharla, en casa o en la nave.","Each strain counts when you harvest it, at home or in the warehouse."
+CANNADEX · FAMILIAS,CANNADEX · FAMILIES
+{a}/{b} · prestigio {p} · {t} trofeos,{a}/{b} · prestige {p} · {t} trophies
+una {t} de aroma {a},a {t} with a {a} aroma
+"Hoy es la CannaCup, en la plaza de Ribera Verde. Este trimestre se busca {p}.","The CannaCup is today, in the Ribera Verde square. This quarter they want {p}."
+"El {d}, CannaCup en la plaza de Ribera Verde. Este trimestre se busca {p}.","On {d}, CannaCup in the Ribera Verde square. This quarter they want {p}."
+Trae {g} g de un tarro curado del todo.,Bring {g} g from a fully cured jar.
+SMS · ASOCIACIÓN,SMS · ASSOCIATION
+CannaCup en la plaza,CannaCup in the square
+Ya has presentado tu tarro en esta edición. Vuelve el próximo trimestre.,You have already entered a jar this edition. Come back next quarter.
+Bienvenido a la CANNACUP de la asociación.,Welcome to the association's CANNACUP.
+"Este trimestre buscamos {p}. Cuenta el THC y, encima, el perfil.","This quarter we want {p}. THC counts, and the profile on top."
+"Trae {g} g de un solo lote curado del todo, en tarro.","Bring {g} g of a single fully cured batch, in a jar."
+Sin un tarro curado del todo no puedes competir. Cúralo y vuelve hoy mismo si te da tiempo.,Without a fully cured jar you can't compete. Cure it and come back today if you have time.
+Tú,You
+El jurado ha catado y analizado.,The jury has tasted and tested.
+"{e}, el trofeo del {p}.º puesto y {n} de prestigio","{e}, the place {p} trophy and {n} prestige"
+"Con ese palmarés, en los clubs de Hiriburu ya saben quién eres.","With that record, the Hiriburu clubs know who you are."
+Esta vez no hay podio. Vuelve el próximo trimestre con algo mejor.,No podium this time. Come back next quarter with something better.
+Gasóleo del generador ({s}): −{e},Generator diesel ({s}): −{e}
+{s}: {w} por encima de la potencia contratada. Firma térmica: calor +{c},{s}: {w} over the contracted power. Thermal signature: heat +{c}
+{c} de {l} contratados,{c} of {l} contracted
+ · se pasa {w}, · over by {w}
+ · puesto, · installed
+"Lo que se pasa de la potencia contratada lo nota la compañía, y la policía se entera.","The power company notices anything over the contracted power, and the police find out."
+LA INSTALACIÓN ELÉCTRICA,THE WIRING
+En la cuenta {e},In the account {e}
+Pedido: {n} · lo instalan mañana,Ordered: {n} · installed tomorrow
+La instalación eléctrica,The wiring
+Placas solares y generador insonorizado para el piso y la nave: lo que pasa de la potencia contratada deja firma térmica.,Solar panels and a silent generator for the flat and the warehouse: anything over the contracted power leaves a thermal signature.
+Las variedades por familias. Cosecha todas las de una familia y te quedas su bono para siempre.,Strains by family. Harvest every strain in a family and keep its bonus forever.
+{n}: SE TRASPASA. El dueño no vende a cualquiera: quiere a alguien con nombre en la CannaCup ({p} de prestigio; tienes {t}).,{n}: FOR SALE. The owner won't sell to just anyone: he wants someone with a name in the CannaCup ({p} prestige; you have {t}).
+Las del Kush,The Kush ones
+Las de Asia,The Asian ones
+Las de América,The American ones
+Las de África,The African ones
+Las del olor fuerte,The strong-smelling ones
+Las Haze,The Hazes
+Las Haize,The Haizes
+Las del norte,The northern ones
+Las blancas,The white ones
+La leyenda,The legend
+Las autos,The autos
+Txoko Berdea,Txoko Berdea
+Huerta Oihana,Huerta Oihana
+Los de Arratia,The Arratia crew
+Generador diésel insonorizado,Silent diesel generator
+"Cubre hasta 5 kW por encima de lo contratado, sin ruido: lo que pasa de la potencia no lo ve la compañía. Gasta gasóleo cada día que trabaja (en efectivo).","Covers up to 5 kW over the contract, silently: the power company never sees the excess. Burns diesel every day it runs (paid in cash)."
+Placas solares,Solar panels
+"2,5 kW de placas con baterías: lo que pasa de la potencia contratada, hasta ahí, sale del tejado y no de la red. Sin gasto.","2.5 kW of panels with batteries: up to that, anything over the contracted power comes from the roof, not the grid. No running cost."

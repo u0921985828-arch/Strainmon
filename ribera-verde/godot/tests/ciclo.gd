@@ -581,8 +581,9 @@ func menu_start() -> void:
 	var l := etiquetas()
 	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "REGISTRO", "GUARDAR", "OPCIONES", "SALIR"])
 	await elige("GENOTECA")
-	check("Genoteca: %d filas, todas sin descubrir, y sin el diario de la tía (sale bajo la almohada)" % J.m_items.size(), J.m_items.size() == J.D.DEX.size()
-		and J.m_items.all(func(x): return x.label.ends_with("??????")))
+	var gv: Array = J.m_items.filter(func(x): return not x.get("fam"))   # MAESTRO [5]: con CAL, la fila de la CannaDex por familias
+	check("Genoteca: %d filas, todas sin descubrir, y sin el diario de la tía (sale bajo la almohada)" % gv.size(), gv.size() == J.D.DEX.size()
+		and gv.all(func(x): return x.label.ends_with("??????")) and J.m_items.size() == gv.size() + (1 if Datos.CAL else 0))
 	await pulsa("B")
 	await elige("MOCHILA")
 	check("Mochila: dinero, la mochila (1 kg), vida y lo de siempre", J.m_items.size() == 7 and J.m_items[0].right == "150 €" and J.m_items[1].right == "0 de 1 kg")
