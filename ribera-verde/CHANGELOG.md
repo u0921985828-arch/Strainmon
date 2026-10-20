@@ -214,6 +214,9 @@
   - `ui.gd`: `retrato_e`/`retrato_hab`/`retrato_ojo` y `_parpadeo` en `_process_ui`: 130 ms cada 3,6 s en tiempo real (no toca el reloj del juego ni el oráculo).
   - `tests/retratos.gd` (400): los estados de los 27, la celda de cada gesto con y sin boca, el parpadeo en la caja (y no escribiendo), los tapados y sin CAL.
 
+- **La planta dentro de la maceta en los gestos** (lo pidió el usuario: «el sprite de la planta se queda detrás del de la maceta… partir la maceta en dos, la trasera y delantera»): la maceta se pinta en dos mitades recortadas (`_gs_mac`, `GS_MAC_CORTE` = 8: el canto de atrás y la tierra, filas 0-7, detrás; el canto de delante y el cuerpo, delante) con la planta, el brote o la semilla entre las dos, en regar, tratar, abonar, plantar, sembrar, esqueje, cosechar y polinizar. `tests/acceso.gd` (97): en los ocho, lo de dentro va entre las dos mitades y las mitades se tocan sin pisarse.
+- **Cada abono en su fase** (lo pidió el usuario: «en crecimiento no debe estar permitido echar abono de floración, y lo mismo en floración; mecánicas algo más simples»; con `Datos.CAL`): en crecimiento (hasta el 65 %) solo el de CRECIMIENTO y en floración solo el de FLORACIÓN; ABONAR sale si falta el de su fase y, sin él, lo dice y no echa el otro (antes, en crecimiento ya abonada o sin el de crecimiento, echaba el de floración). Sin CAL, como antes. Prueba nueva `tests/abono_fase.gd` (17; 4 fallos con el código de antes).
+
 ### APK de los gestos en primera persona · Godot 0.56.0 (código 75)
 - Lo pidió el usuario: «Entrega el apk», tras «Molaría que la vista sea POV». Batería entera 64/64 en verde antes de compilar.
 - `descargas/LandraceHunters.apk` (87,9 MB, firma v2/v3 con la upload key, el mismo paquete `com.landracehunters.game`).

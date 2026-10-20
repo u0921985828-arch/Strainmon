@@ -1695,14 +1695,24 @@ func _gsr(R: Array, x: float, y: float, w: int, h: int, c: String) -> void:
 # la maceta de tela con su planta (v: vegetativa, f: en flor, "": sin planta) en el suelo de la carpa; con la planta del gesto, la de
 # verdad (su fotograma de la vista C, con el pie en la tierra de la maceta: las macetas de la vista C miden lo mismo que esta) o, sin ella,
 # la genérica con sus colores
+# la maceta en dos capas (lo pidió el usuario: «partir la maceta en dos, la trasera y delantera»): el canto de atrás y la tierra
+# (filas 0-7 del sprite, en (40, 60)) detrás de la planta y el canto de delante y el cuerpo (de la 8 abajo) delante
+const GS_MAC_CORTE := 8
+func _gs_mac(R: Array, n: String, delante: bool) -> void:
+	var y: int = _gs.position.y + 60 + GS_MAC_CORTE
+	var c := Rect2i(_gs.position.x, y, _gs.size.x, _gs.end.y - y) if delante else Rect2i(_gs.position.x, _gs.position.y, _gs.size.x, y - _gs.position.y)
+	R.append(["@", n, _gs.position.x + 40, _gs.position.y + 60, c])
+
 func _gs_maceta(R: Array, pl: String, moja := false, V := {}) -> void:
+	var n: String = "gs-maceta-m" if moja else "gs-maceta"
+	_gs_mac(R, n, false)
 	var gp: Dictionary = V.get("pl", {})
 	if gp.has("img"):
 		var im: Image = gp.img
 		R.append(["@", im, _gs.position.x + 56 - (im.get_width() >> 1), _gs.position.y + 67 - im.get_height(), _gs])
 	elif pl != "":
 		_gspc(R, "gs-planta-" + pl, 36, -29, V)
-	_gsp(R, "gs-maceta-m" if moja else "gs-maceta", 40, 60)
+	_gs_mac(R, n, true)
 
 func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 	var k: String = V.k
@@ -1744,23 +1754,25 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 			_gsm(R, "gm-abono", 51 + e, 21 + e)   # el tapón en (1, 25)
 		"plantar":   # la plántula baja a la maceta, la mano aprieta la tierra; 1.57.2: dentro de la maceta, delante del canto de atrás
 			_gsp(R, "gs-f-carpa", 0, 0)
-			_gsp(R, "gs-maceta", 40, 60)
+			_gs_mac(R, "gs-maceta", false)
 			_gsp(R, "gs-brote", 36, _mv(-90, -28, t / 600.0))
 			if t > 600:   # la tierra alrededor del tallo
 				for i in 6:
 					_gsr(R, 49 + i * 3 + (1 if i > 2 else 0), 67 + (i % 2), 2, 1, "#3e2c1e" if i % 2 else "#56402a")
+			_gs_mac(R, "gs-maceta", true)
 			if t > 650:   # los dedos (2, 10) aprietan la tierra junto al tallo
 				var e: float = _mv(60, 0, (t - 650) / 150.0)
 				_gsm(R, "gm-vacia", 58 + e, 52 + e + (Datos.jsround(sin((t - 800) / 90.0) * 2) if t > 800 else 0))
 		"sembrar":   # 1.57.2 (lo pidió el usuario: «sería mejor echar una semilla al sembrar»): la mano trae la semilla entre los dedos,
 			# la suelta, cae a la tierra y la mano la tapa
 			_gsp(R, "gs-f-carpa", 0, 0)
-			_gsp(R, "gs-maceta", 40, 60)
+			_gs_mac(R, "gs-maceta", false)
 			if t >= 420 and t < 900:
 				_gsp(R, "gs-semilla", 51, _mv(48, 62, (t - 420) / 200.0))
 			if t > 900:   # tapada: un montoncito de tierra
 				_gsr(R, 53, 66, 5, 1, "#56402a")
 				_gsr(R, 52, 67, 7, 1, "#3e2c1e")
+			_gs_mac(R, "gs-maceta", true)
 			if t < 420:   # la semilla en (7, 18) de la mano
 				var e: float = _mv(70, 0, t / 400.0)
 				_gsm(R, "gm-semilla", 44 + e, 30 + e)

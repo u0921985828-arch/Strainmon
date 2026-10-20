@@ -437,7 +437,10 @@ func pot_action(i: int) -> void:
 			if S.items.get(k, 0) > 0:
 				veg_k.append(k)
 	var opts := [K("Regar")]
-	if not p.fert or veg_k.size():
+	if Datos.CAL:   # cada abono en su fase (lo pidió el usuario: «en crecimiento no debe estar permitido echar abono de floración»)
+		if (not _fv(p) > 0) if p.prog < .65 else not p.fert:
+			opts.append(K("Abonar"))
+	elif not p.fert or veg_k.size():
 		opts.append(K("Abonar"))
 	if p.pest:
 		opts.append(K("Tratar plaga"))
@@ -607,6 +610,9 @@ func abono_q(bio = 0) -> float:
 
 # (09-cultivo: abonar): el de crecimiento (veg_k: los que hay, en vegetativo y sin él) o el de floración; con dos marcas, eliges
 func abonar(p: Dictionary, veg_k: Array) -> void:
+	if Datos.CAL and p.prog < .65 and veg_k.is_empty():   # en crecimiento, solo el de crecimiento
+		await say(K("En crecimiento solo le va el abono de CRECIMIENTO, y no te queda. El de FLORACIÓN, cuando florezca."))
+		return
 	var veg := veg_k.size() > 0
 	var ks := veg_k
 	if not veg:

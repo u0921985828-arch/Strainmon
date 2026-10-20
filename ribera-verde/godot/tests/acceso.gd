@@ -233,6 +233,26 @@ func _corre() -> void:
 	var sin_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": false}, 800.0)
 	chk(con_t != sin_t and tiene(con_t, "#8a5a2a") and not tiene(con_t, "#5a8a3a") and tiene(sin_t, "#5a8a3a") and tiene(con_t, "#9a9a9a") and tiene(sin_t, "#f4f4f0"), "el porro con tabaco y solo hierba se distinguen (hebras y humo)")
 	chk(not J.rects_acceso({"k": "regar", "c": "", "ok": true, "t0": 0.0, "pl": {}}, 600.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and (String(e[1]).begins_with("gs-regadera") or e[1] == "gs-regar")), "la regadera vieja (y la de perfil) ya no sale")
+	# la maceta en dos capas (lo pidió el usuario: «el sprite de la planta se queda detrás del de la maceta»): el canto de atrás y la
+	# tierra, la planta (o el brote, o la semilla) y, delante, el canto de delante y el cuerpo; las dos mitades se tocan sin pisarse
+	for q in [["regar", 600.0, "gs-planta"], ["tratar", 600.0, "gs-planta"], ["abonar", 600.0, "gs-planta"], ["plantar", 900.0, "gs-brote"],
+			["sembrar", 600.0, "gs-semilla"], ["esqueje", 300.0, "gs-planta"], ["cosechar", 700.0, "gs-planta"], ["polen", 600.0, "gs-planta"]]:
+		var Rm: Array = J.rects_acceso({"k": q[0], "c": "", "ok": true, "t0": 0.0, "pl": {}}, q[1])
+		var im := []
+		var ip := -1
+		for i in Rm.size():
+			var em: Array = Rm[i]
+			if typeof(em[0]) == TYPE_STRING and typeof(em[1]) == TYPE_STRING:
+				if String(em[1]).begins_with("gs-maceta"):
+					im.append(i)
+				elif String(em[1]).begins_with(q[2]) and ip < 0:
+					ip = i
+		var bien: bool = im.size() == 2 and ip > im[0] and ip < im[1]
+		if bien:
+			var a: Rect2i = Rm[im[0]][4]
+			var b: Rect2i = Rm[im[1]][4]
+			bien = a.end.y == b.position.y and a.end.y == gy + 60 + J.GS_MAC_CORTE
+		chk(bien, "%s: %s entre las dos mitades de la maceta (%s, %d)" % [q[0], q[2], im, ip])
 	# 3b · 1.54: cada acción de cerca. accion() lleva su gesto; catar, el porro; todos los dibujos, dentro y en movimiento
 	VIO.clear()
 	for q in [["regar", "regar"], ["plantar", "plantar"], ["cosechar", "cosechar"], ["cruzar", "polen"], ["vender", "vender"]]:
