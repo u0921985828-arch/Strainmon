@@ -162,8 +162,9 @@ static func frame_de(g, s: String, dir: String, t: float, o := {}):
 	return {"c": espejo(ks[i]) if r[1] != esp else frame(ks[i]), "i": i, "n": n, "cel": cel}
 
 # cambia colores exactos (rampa clave → rampa destino); una vez por fotograma y rampa
-static func con_rampa(c: Image, mapa: Dictionary, id: String) -> Image:
-	var k := "%d|%s" % [c.get_instance_id(), id]
+# iris: un color que no se cambia junto al blanco del ojo o a la piel (la protagonista lleva el iris del color de su pelo)
+static func con_rampa(c: Image, mapa: Dictionary, id: String, iris: int = -1) -> Image:
+	var k := "%d|%s|%d" % [c.get_instance_id(), id, iris]
 	if rec.has(k):
 		return rec[k]
 	var o := c.duplicate()
@@ -177,10 +178,20 @@ static func con_rampa(c: Image, mapa: Dictionary, id: String) -> Image:
 				continue
 			var n: int = (p.r8 << 16) | (p.g8 << 8) | p.b8
 			if tb.has(n):
+				if n == iris and _junto_blanco(c, x, y):
+					continue
 				var b: int = tb[n]
 				o.set_pixel(x, y, Color8((b >> 16) & 255, (b >> 8) & 255, b & 255, p.a8))
 	rec[k] = o
 	return o
+
+static func _junto_blanco(c: Image, x: int, y: int) -> bool:
+	for dx in [-1, 1]:
+		if x + dx >= 0 and x + dx < c.get_width():
+			var q: Color = c.get_pixel(x + dx, y)
+			if q.a8 > 0 and ((q.r8 == 0xf4 and q.g8 == 0xf4 and q.b8 == 0xf4) or (q.r8 == 0xe8 and q.g8 == 0xb8 and q.b8 == 0x94)):
+				return true
+	return false
 
 static func foto_misc(n: String):
 	if not ok:

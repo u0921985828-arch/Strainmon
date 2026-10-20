@@ -1355,7 +1355,7 @@ func ropa_c(f, g):
 	if r == null:
 		return f
 	var o: Dictionary = f.duplicate()
-	o.c = Atlas.con_rampa(f.c, r[0], "ropa|" + r[1])
+	o.c = Atlas.con_rampa(f.c, r[0], "ropa|" + r[1], 0x5c3a28 if g == "player-f" else -1)   # i18n-no
 	return o
 
 # MAESTRO [1]: la protagonista tiene su sprite de PixelLab (player-f en el mapa, player-f-combate de espaldas en el combate)
