@@ -205,6 +205,21 @@ func _corre() -> void:
 	chk(mano_canto(J.rects_acceso({"k": "vender", "c": "", "ok": true, "t0": 0.0, "pl": {}}, 500.0), "gm-billete-i", "izq", gx, 0), "vender: la mano del cliente entra por el canto izquierdo")
 	for m in ["porro", "pipa", "vapo"]:
 		chk(mano_canto(J.rects_acceso({"k": "fumar", "c": m, "ok": true, "t0": 0.0, "pl": {}}, 700.0), "gm-" + m, "der", gx + J.GS_W, 0), "fumar %s: la mano entra por el canto derecho" % m)
+	for m in ["porro", "pipa", "bong"]:   # el mechero, en la otra mano, desde abajo; encendido en el centro
+		var W := {"k": "fumar", "c": m, "ok": true, "t0": 0.0, "pl": {}}
+		var bien := true
+		for ms in [80.0, 300.0, 600.0]:
+			bien = bien and mano_canto(J.rects_acceso(W, ms), "gm-mech", "aba", 0, gy + J.GS_H)
+		chk(bien and J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and e[1] == "gm-mech1-ab") and not J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with("gs-mechero")), "fumar %s: el mechero en la mano, desde el canto de abajo" % m)
+	var pg := {"k": "pagar", "c": "", "ok": true, "t0": 0.0, "pl": {}}
+	var al_fajo := false
+	var con_billete := false
+	for ms in range(150, 1000, 10):
+		for q in J.rects_acceso(pg, float(ms)):
+			if typeof(q[0]) == TYPE_STRING and typeof(q[1]) == TYPE_STRING and q[2] - gx <= 24:
+				al_fajo = al_fajo or q[1] == "gm-vacia"
+				con_billete = con_billete or q[1] == "gm-billete"
+	chk(al_fajo and con_billete, "pagar: la mano va al fajo y coge el billete")
 	var con_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": true}, 800.0)
 	var sin_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": false}, 800.0)
 	chk(con_t != sin_t and tiene(con_t, "#8a5a2a") and not tiene(con_t, "#5a8a3a") and tiene(sin_t, "#5a8a3a") and tiene(con_t, "#9a9a9a") and tiene(sin_t, "#f4f4f0"), "el porro con tabaco y solo hierba se distinguen (hebras y humo)")

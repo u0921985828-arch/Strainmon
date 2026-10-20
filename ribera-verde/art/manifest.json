@@ -1072,6 +1072,26 @@
    ],
    "ajuste": "exacto",
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_mech1_ab": {
+   "w": 34,
+   "h": 79,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_mech0_ab": {
+   "w": 34,
+   "h": 79,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   }
  },
  "fases": [
@@ -11309,6 +11329,14 @@
     {
      "nombre": "gm-bolsita-i",
      "celda": "pl_gm_bolsita_i"
+    },
+    {
+     "nombre": "gm-mech1-ab",
+     "celda": "pl_gm_mech1_ab"
+    },
+    {
+     "nombre": "gm-mech0-ab",
+     "celda": "pl_gm_mech0_ab"
     }
    ],
    "cubre": [
@@ -11383,7 +11411,9 @@
     "misc:gm-bolsita",
     "misc:gm-pincel",
     "misc:gm-billete-i",
-    "misc:gm-bolsita-i"
+    "misc:gm-bolsita-i",
+    "misc:gm-mech1-ab",
+    "misc:gm-mech0-ab"
    ],
    "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta) y piezas (manos, herramientas, plantas, humo, billetes)."
   },

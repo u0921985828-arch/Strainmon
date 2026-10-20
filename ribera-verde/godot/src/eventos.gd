@@ -1622,7 +1622,7 @@ func _gspc(R: Array, n: String, x: float, y: float, V: Dictionary) -> void:
 func _gsp(R: Array, n: String, x: float, y: float) -> void:
 	R.append(["@", n, _gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), _gs])
 
-# 0.55: la mano de PixelLab en (x, y) y la manga alargada hasta el canto (derecho; el izquierdo, la del cliente, -i): nunca flota
+# 0.55: la mano de PixelLab en (x, y) y la manga alargada hasta el canto (derecho; el izquierdo, la del cliente, -i; el de abajo, -ab): nunca flota
 func _gsm(R: Array, n: String, x: float, y: float) -> void:
 	_gsp(R, n, x, y)
 	var f = Atlas.foto_misc(n)
@@ -1635,6 +1635,9 @@ func _gsm(R: Array, n: String, x: float, y: float) -> void:
 	if n.ends_with("-i"):
 		for k in range(1, X - _gs.position.x + 1):
 			R.append(["@", n, X - k, Y, Rect2i(X - k, Y, 1, h).intersection(_gs)])
+	elif n.ends_with("-ab"):   # desde abajo: la manga, hasta el canto de abajo
+		for k in range(1, _gs.end.y - (Y + h) + 1):
+			R.append(["@", n, X, Y + k, Rect2i(X, Y + h - 1 + k, w, 1).intersection(_gs)])
 	else:
 		for k in range(1, _gs.end.x - (X + w) + 1):
 			R.append(["@", n, X + k, Y, Rect2i(X + w - 1 + k, Y, 1, h).intersection(_gs)])
@@ -1768,18 +1771,23 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 				var f: float = (t - 700) / 400.0
 				_gsm(R, "gm-bolsita-i", _mv(10, -60, f), 38)
 				_gsm(R, "gm-billete", _mv(66, 150, f), 30)
-		"pagar":   # tu mano va y viene: deja cinco billetes, uno a uno, en el montón, y lo empuja
+		"pagar":   # tu mano va y viene: coge un billete del fajo, lo deja en el montón (cinco veces) y lo empuja
 			_gsp(R, "gs-f-mesa", 0, 0)
 			_gsp(R, "gs-fajo", 14, 40)
 			for i in 5:
 				var ti: float = 150 + i * 170
-				if t > ti + 85:
+				if t > ti + 153:
 					_gsp(R, "gs-billete", 84 + (i % 2) * 3, 42 - i * 2)
 				if t > ti and t <= ti + 170:
 					var f: float = (t - ti) / 170.0
-					_gsm(R, "gm-billete", 82 + absf(f - 0.5) * 2 * 68, 34 - i * 2)
+					if f < 0.4:   # vacía, al fajo (los dedos en (4, 10))
+						_gsm(R, "gm-vacia", _mv(150.0 if i == 0 else 84.0, 20, f / 0.4), 32)
+					elif f < 0.9:   # con el billete (su canto en (0, 9)), del fajo al montón
+						_gsm(R, "gm-billete", _mv(20, 84, (f - 0.5) / 0.4) if f > 0.5 else 20.0, 34 - i * 2)
+					else:
+						_gsm(R, "gm-vacia", 84, 32)
 			if t > 1000:
-				_gsm(R, "gm-vacia", _mv(150, 100, (t - 1000) / 200.0), 32)
+				_gsm(R, "gm-vacia", _mv(84, 100, (t - 1000) / 200.0), 32)
 		"dormir":   # en la cama, de noche (o la siesta, de día); respira y suben las zetas
 			_gsp(R, "gs-f-cama-d" if c == "siesta" else "gs-f-cama-n", 0, 0)
 			_gsp(R, "gs-dormido-%d" % (1 if fmod(t, 1000) > 500 else 0), 16, 30)   # 1.55.1: de lado, tapado, el pecho sube y baja
@@ -1817,11 +1825,13 @@ func _gesto_fumar(R: Array, m: String, t: float, tab := false) -> void:
 				for i in 4:
 					var f: float = fmod(t / 400.0 + i / 4.0, 1.0)
 					_gsp(R, "gs-burbuja", 74 + (i * 3) % 9, 82 - f * 8)
-	if m != "vapo":
+	if m != "vapo":   # 0.55: la otra mano sube con el mechero (la llama, en (24, 0)), lo enciende y baja
 		if t > 150 and t < 500:
-			_gsp(R, "gs-mechero-1", punta.x - 11, punta.y + 1)
+			_gsm(R, "gm-mech1-ab", punta.x - 24, punta.y - 2)
 		elif t <= 150:
-			_gsp(R, "gs-mechero-0", punta.x - 11, _mv(100, punta.y + 1, t / 150.0))
+			_gsm(R, "gm-mech0-ab", punta.x - 24, _mv(GS_H + 2, punta.y - 2, t / 150.0))
+		elif t < 700:
+			_gsm(R, "gm-mech0-ab", punta.x - 24, _mv(punta.y - 2, GS_H + 2, (t - 500) / 200.0))
 		if t > 300:   # la brasa
 			_gsr(R, punta.x - 1, punta.y - 1, 2, 2, "#ffb040" if int(t / 150.0) % 2 else "#f86a20")
 	var sale := Vector2(80, 44) if m == "bong" else punta   # el humo del bong sale por arriba del tubo

@@ -30,6 +30,9 @@ ELEGIDAS = {   # nombre en el atlas: (archivo, canto de la manga, giro en grados
 	# la mano del cliente: la misma en espejo, desde el canto izquierdo, con la manga azul
 	'gm-billete-i': ('billete-2.png', 'izq', 'espejo'),
 	'gm-bolsita-i': ('bolsita-7.png', 'izq', 'espejo'),
+	# la otra mano con el mechero, desde abajo: encendido y el mismo sin la llama (-ab: la manga en el canto de abajo)
+	'gm-mech1-ab': ('mechero-6.png', 'aba', 0),
+	'gm-mech0-ab': ('mechero-6.png', 'aba', 'apaga'),
 }
 MANGA = [(105, 14, 55), (121, 26, 59)]   # la de llave-0 (oscura, clara): todas las mangas igual
 MANGA_CLI = [(38, 52, 104), (52, 72, 136)]
@@ -67,14 +70,26 @@ def manga(im, pal):
 	return im
 
 def sale(n, f, canto, giro):
+	caja = None
 	im = limpia(Image.open(os.path.join(C, f)).convert('RGBA'))
 	if giro == 'espejo':
 		im = manga(im.transpose(Image.FLIP_LEFT_RIGHT), MANGA_CLI)
+	elif giro == 'apaga':   # fuera la llama: lo naranja y amarillo por encima del mechero morado
+		px = im.load(); W, H = im.size
+		caja = im.getbbox()   # el mismo recorte que el encendido: no salta al cambiar
+		mor = [(x, y) for x in range(W) for y in range(H) if px[x, y][3] and px[x, y][2] > 120 and px[x, y][0] < 170 and px[x, y][2] > px[x, y][1] + 40]
+		top = min(y for x, y in mor)
+		x0 = min(x for x, y in mor) - 3; x1 = max(x for x, y in mor) + 1
+		for x in range(max(0, x0), min(W, x1 + 1)):
+			for y in range(top):
+				px[x, y] = (0, 0, 0, 0)
 	elif giro:
 		im = im.rotate(giro, expand=True)   # 90°: sin perder píxeles
 	if n.startswith('gm-') and giro != 'espejo':
 		im = manga(im, MANGA)
-	im = im.crop(im.getbbox())
+	im = im.crop(caja if giro == 'apaga' else im.getbbox())
+	if n.startswith('gm-mech'):   # la mano izquierda: el puño a la izquierda del mechero, sin tapar la del porro
+		im = im.transpose(Image.FLIP_LEFT_RIGHT)
 	if n == 'gm-vacia':   # la edición sin la semilla trae colores de más: a los de la mano con semilla
 		ref = Image.open(os.path.join(R, 'art', 'crudo', 'gestos', 'gm-semilla', 'unica', '00.png')).convert('RGBA')
 		pal = sorted({c[:3] for c in ref.getdata() if c[3]})
