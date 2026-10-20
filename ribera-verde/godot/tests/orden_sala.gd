@@ -118,6 +118,7 @@ func _corre() -> void:
 		S.nave.ma = []
 	if S.get("aso") is Dictionary:
 		S.aso.pres = true
+	S.mar = {"b": ["txalupa"], "rep": 0, "kg": 0.0, "env": [], "ped": null, "pd": 0, "paso": 0, "fin": 0, "n": 0, "ob": {"club": 0}, "oba": {"club": 0}}   # KAIA, el tuyo
 	J.oraculo = true
 	J.gancho_menu = _menu
 	J.gancho_texto = func(_t, _nm): pass

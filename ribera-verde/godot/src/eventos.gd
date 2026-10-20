@@ -1115,6 +1115,8 @@ func talk_kaia(N: String) -> void:
 	await dispensario_kaia(N)
 
 func dispensario_kaia(N: String) -> void:
+	if not (S.get("mar") is Dictionary):
+		return
 	var K: Dictionary = D.MAR.kaia
 	var M_: Dictionary = S.mar
 	var L = M_.get("kaia")
