@@ -1,12 +1,14 @@
 # Landrace Hunters — MAESTRO [8]: los retratos de diálogo, uno por muñeco del mapa (el grupo del atlas: cubre «look:…»), sacados
 # con PixelLab (create_portrait_character, character_to_portrait, 64 × 64, 24 colores) del sprite de frente de cada uno.
 # Los originales están en tools/sprites/retratos/<grupo>.png; esto los junta en godot/arte/retratos.png + retratos.json
-# ({"w": 64, "grupos": {grupo: [x, y]}}) y quita la línea clara que deja PixelLab en el canto de abajo de alguno.
+# ({"w": 64, "grupos": {grupo: [x, y]}}), quita la línea clara que deja PixelLab en el canto de abajo de alguno y deja el
+# contorno de fuera en 1 píxel (PixelLab lo saca de 2 en el pelo y los hombros, y sobre el blanco de la caja queda grueso).
 # Los estados (tools/sprites/retratos/estados/<grupo>-<estado>.png, inpaint de PixelLab sobre cada busto: n1 hablando,
 # p parpadeo, a0/e0/d0 contento, enfadado y dudando, a1/e1/d1 lo mismo hablando) van debajo, una fila por grupo, en
 # "estados": {grupo: {estado: [x, y]}}.
 # Uso: python3 -I tools/retratos.py
 import json, os
+from collections import Counter
 from PIL import Image
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -26,6 +28,31 @@ def abre(ruta):
         if len(claros) > W // 2:
             for x in claros:
                 px[x, y] = (0, 0, 0, 0)
+    return fino(im)
+
+
+def oscuro(p):
+    return p[3] and sum(p[:3]) < 150
+
+
+# el contorno de fuera, de 1 píxel: lo oscuro que no toca el vacío pero sí al contorno que lo toca toma el color de dentro
+def fino(im):
+    px = im.load()
+    vacio = lambda x, y: not (0 <= x < W and y < W) or y < 0 or px[x, y][3] == 0
+    N4 = ((1, 0), (-1, 0), (0, 1), (0, -1))
+    fuera = {(x, y) for x in range(W) for y in range(W)
+             if oscuro(px[x, y]) and any(vacio(x + a, y + b) and y + b < W for a, b in N4)}
+    cambia = {}
+    for x in range(W):
+        for y in range(W):
+            if (x, y) in fuera or not oscuro(px[x, y]) or not any((x + a, y + b) in fuera for a, b in N4):
+                continue
+            c = Counter(px[x + a, y + b] for a in (-1, 0, 1) for b in (-1, 0, 1)
+                        if (a or b) and 0 <= x + a < W and 0 <= y + b < W and px[x + a, y + b][3] and not oscuro(px[x + a, y + b]))
+            if c:
+                cambia[(x, y)] = c.most_common(1)[0][0]
+    for k, v in cambia.items():
+        px[k] = v
     return im
 
 
