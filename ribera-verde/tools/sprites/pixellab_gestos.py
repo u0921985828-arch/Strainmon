@@ -14,25 +14,27 @@ ELEGIDAS = {   # nombre en el atlas: (archivo, canto de la manga, giro en grados
 	'acc-llave-v0': ('llave-0.png', 'aba', -90),   # el candado: la llave sube desde abajo
 	'acc-llave-v1': ('llave-gira.png', 'aba', -90),
 	'acc-dedo': ('dedo-8.png', 'aba', 0),
-	# 0.55 (lo pidió el usuario: «cumple todo lo pendiente»): la mano de cada gesto, con la herramienta a la izquierda
-	'gm-spray': ('spray-2.png', 'der', 0),
-	'gm-abono': ('abono-4.png', 'der', 0),
-	'gm-tij-a': ('tijeras-2.png', 'der', 0),
-	'gm-tij-c': ('tijc-0.png', 'der', 0),
-	'gm-semilla': ('semilla-1.png', 'der', 0),
-	'gm-vacia': ('semvacia-0.png', 'der', 0),
-	'gm-porro': ('porro-1.png', 'der', 0),
-	'gm-pipa': ('pipa-1.png', 'der', 0),
-	'gm-vapo': ('vapo-0.png', 'der', 0),
-	'gm-billete': ('billete-2.png', 'der', 0),
-	'gm-bolsita': ('bolsita-7.png', 'der', 0),
-	'gm-pincel': ('pincel-2.png', 'der', 0),
-	# la mano del cliente: la misma en espejo, desde el canto izquierdo, con la manga azul
-	'gm-billete-i': ('billete-2.png', 'izq', 'espejo'),
-	'gm-bolsita-i': ('bolsita-7.png', 'izq', 'espejo'),
-	# la otra mano con el mechero, desde abajo: encendido y el mismo sin la llama (-ab: la manga en el canto de abajo)
-	'gm-mech1-ab': ('mechero-6.png', 'aba', 0),
-	'gm-mech0-ab': ('mechero-6.png', 'aba', 'apaga'),
+	# 0.56 (lo pidió el usuario: «molaría que la vista sea POV»): en primera persona, tu antebrazo entra en diagonal desde la esquina
+	# de abajo a la derecha con la herramienta en la mano, arriba a la izquierda (canto 'pov': la manga toca el canto de abajo y el derecho)
+	'gm-regar': ('pv-regar2-15.png', 'pov', 0),
+	'gm-spray': ('pv-spray-5.png', 'pov', 0),
+	'gm-abono': ('pv-abono2-12.png', 'pov', 0),
+	'gm-tij-a': ('pv-tij-6.png', 'pov', 0),
+	'gm-tij-c': ('pv-tijc-0.png', 'pov', 'caja:pv-tij-6.png'),   # el mismo recorte que las abiertas: la mano no salta al cerrar
+	'gm-semilla': ('pv-semilla-1.png', 'pov', 0),
+	'gm-vacia': ('pv-vacia-0.png', 'pov', 0),
+	'gm-porro': ('pv-porro-1.png', 'pov', 0),
+	'gm-pipa': ('pv-pipa-0.png', 'pov', 0),
+	'gm-vapo': ('pv-vapo-0.png', 'pov', 0),
+	'gm-billete': ('pv-billete-0.png', 'pov', 0),
+	'gm-bolsita': ('pv-bolsita-0.png', 'pov', 0),
+	'gm-pincel': ('pv-pincel-0.png', 'pov', 0),
+	# la mano del cliente, enfrente: la misma girada media vuelta, desde la esquina de arriba a la izquierda, con la manga azul
+	'gm-billete-i': ('pv-billete-0.png', 'pov-i', 'vuelta'),
+	'gm-bolsita-i': ('pv-bolsita-0.png', 'pov-i', 'vuelta'),
+	# tu otra mano con el mechero, en espejo, desde la esquina de abajo a la izquierda: encendido y el mismo sin la llama
+	'gm-mech1-ab': ('pv-mech-0.png', 'pov-ab', 0),
+	'gm-mech0-ab': ('pv-mech-0.png', 'pov-ab', 'apaga'),
 }
 MANGA = [(105, 14, 55), (121, 26, 59)]   # la de llave-0 (oscura, clara): todas las mangas igual
 MANGA_CLI = [(38, 52, 104), (52, 72, 136)]
@@ -74,6 +76,8 @@ def sale(n, f, canto, giro):
 	im = limpia(Image.open(os.path.join(C, f)).convert('RGBA'))
 	if giro == 'espejo':
 		im = manga(im.transpose(Image.FLIP_LEFT_RIGHT), MANGA_CLI)
+	elif giro == 'vuelta':
+		im = manga(im.rotate(180), MANGA_CLI)
 	elif giro == 'apaga':   # fuera la llama: lo naranja y amarillo por encima del mechero morado
 		px = im.load(); W, H = im.size
 		caja = im.getbbox()   # el mismo recorte que el encendido: no salta al cambiar
@@ -83,9 +87,13 @@ def sale(n, f, canto, giro):
 		for x in range(max(0, x0), min(W, x1 + 1)):
 			for y in range(top):
 				px[x, y] = (0, 0, 0, 0)
+	elif isinstance(giro, str) and giro.startswith('caja:'):
+		caja = limpia(Image.open(os.path.join(C, giro[5:])).convert('RGBA')).getbbox()
+		caja = tuple(min(a, b) if i < 2 else max(a, b) for i, (a, b) in enumerate(zip(caja, im.getbbox())))
+		giro = 'apaga'   # recorta con la caja
 	elif giro:
 		im = im.rotate(giro, expand=True)   # 90°: sin perder píxeles
-	if n.startswith('gm-') and giro != 'espejo':
+	if n.startswith('gm-') and giro not in ('espejo', 'vuelta'):
 		im = manga(im, MANGA)
 	im = im.crop(caja if giro == 'apaga' else im.getbbox())
 	if n.startswith('gm-mech'):   # la mano izquierda: el puño a la izquierda del mechero, sin tapar la del porro
@@ -106,6 +114,12 @@ def sale(n, f, canto, giro):
 		ok = any(px[W - 1, y][3] for y in range(H))
 	elif canto == 'izq':
 		ok = any(px[0, y][3] for y in range(H))
+	elif canto == 'pov-i':   # la manga, en la fila de arriba (el cliente) o en la de abajo (las tuyas), del lado de su esquina
+		ok = any(px[x, 0][3] for x in range(W // 2))
+	elif canto == 'pov':
+		ok = any(px[x, H - 1][3] for x in range(W // 2, W))
+	elif canto == 'pov-ab':
+		ok = any(px[x, H - 1][3] for x in range(W // 2))
 	else:
 		ok = any(px[x, H - 1][3] for x in range(W))
 	cols = len({px[x, y][:3] for x in range(W) for y in range(H) if px[x, y][3]})

@@ -88,6 +88,15 @@ func mano_canto(R: Array, pre: String, canto: String, x1: int, y1: int) -> bool:
 				return true
 			if canto == "izq" and int(e[2]) <= x1:
 				return true
+			# 0.56, en primera persona: lo pintado de la mano (con la manga alargada) toca el canto de abajo o el derecho (pov), el de abajo
+			# (pov-ab, la del mechero) o el de arriba o el izquierdo (pov-i, la del cliente)
+			var r: Rect2i = e[4]
+			if canto == "pov" and (r.end.y >= y1 or r.end.x >= x1):
+				return true
+			if canto == "pov-ab" and r.end.y >= y1:
+				return true
+			if canto == "pov-i" and (r.position.y <= y1 or r.position.x <= x1):
+				return true
 	return false
 
 func _corre() -> void:
@@ -188,7 +197,7 @@ func _corre() -> void:
 	var rg: Array = J.rects_acceso(V, 600)
 	var gx: int = (J.SW - J.GS_W) >> 1
 	var gy: int = (J.SH - J.GS_H) >> 1
-	chk(mano_canto(rg, "gs-regar", "der", gx + J.GS_W, 0), "regar: el brazo entra por el canto derecho")
+	chk(mano_canto(rg, "gm-regar", "pov", gx + J.GS_W, gy + J.GS_H), "regar: el brazo entra desde la esquina de abajo (en primera persona)")
 	var gotas: Array = rg.filter(func(e): return typeof(e[0]) != TYPE_STRING and (e[4] == "#8ac8f8" or e[4] == "#5aa0e0"))
 	var abajo: int = 0
 	var en_maceta := gotas.size() > 0
@@ -201,15 +210,15 @@ func _corre() -> void:
 			["sembrar", "gm-vacia", 1000.0], ["esqueje", "gm-tij", 300.0], ["cosechar", "gm-tij", 700.0], ["manicurar", "gm-tij", 600.0],
 			["polen", "gm-pincel", 600.0], ["vender", "gm-bolsita", 500.0], ["pagar", "gm-billete", 400.0], ["pagar", "gm-vacia", 1250.0]]:
 		var W := {"k": q[0], "c": "", "ok": true, "t0": 0.0, "pl": {}}
-		chk(mano_canto(J.rects_acceso(W, q[2]), q[1], "der", gx + J.GS_W, 0), "%s: la mano (%s) entra por el canto derecho" % [q[0], q[1]])
-	chk(mano_canto(J.rects_acceso({"k": "vender", "c": "", "ok": true, "t0": 0.0, "pl": {}}, 500.0), "gm-billete-i", "izq", gx, 0), "vender: la mano del cliente entra por el canto izquierdo")
+		chk(mano_canto(J.rects_acceso(W, q[2]), q[1], "pov", gx + J.GS_W, gy + J.GS_H), "%s: la mano (%s) entra desde la esquina de abajo" % [q[0], q[1]])
+	chk(mano_canto(J.rects_acceso({"k": "vender", "c": "", "ok": true, "t0": 0.0, "pl": {}}, 500.0), "gm-billete-i", "pov-i", gx, gy), "vender: la mano del cliente entra desde la esquina de arriba")
 	for m in ["porro", "pipa", "vapo"]:
-		chk(mano_canto(J.rects_acceso({"k": "fumar", "c": m, "ok": true, "t0": 0.0, "pl": {}}, 700.0), "gm-" + m, "der", gx + J.GS_W, 0), "fumar %s: la mano entra por el canto derecho" % m)
+		chk(mano_canto(J.rects_acceso({"k": "fumar", "c": m, "ok": true, "t0": 0.0, "pl": {}}, 700.0), "gm-" + m, "pov", gx + J.GS_W, gy + J.GS_H), "fumar %s: la mano entra desde la esquina de abajo" % m)
 	for m in ["porro", "pipa", "bong"]:   # el mechero, en la otra mano, desde abajo; encendido en el centro
 		var W := {"k": "fumar", "c": m, "ok": true, "t0": 0.0, "pl": {}}
 		var bien := true
 		for ms in [80.0, 300.0, 600.0]:
-			bien = bien and mano_canto(J.rects_acceso(W, ms), "gm-mech", "aba", 0, gy + J.GS_H)
+			bien = bien and mano_canto(J.rects_acceso(W, ms), "gm-mech", "pov-ab", 0, gy + J.GS_H)
 		chk(bien and J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and e[1] == "gm-mech1-ab") and not J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with("gs-mechero")), "fumar %s: el mechero en la mano, desde el canto de abajo" % m)
 	var pg := {"k": "pagar", "c": "", "ok": true, "t0": 0.0, "pl": {}}
 	var al_fajo := false
@@ -223,7 +232,7 @@ func _corre() -> void:
 	var con_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": true}, 800.0)
 	var sin_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": false}, 800.0)
 	chk(con_t != sin_t and tiene(con_t, "#8a5a2a") and not tiene(con_t, "#5a8a3a") and tiene(sin_t, "#5a8a3a") and tiene(con_t, "#9a9a9a") and tiene(sin_t, "#f4f4f0"), "el porro con tabaco y solo hierba se distinguen (hebras y humo)")
-	chk(not J.rects_acceso({"k": "regar", "c": "", "ok": true, "t0": 0.0, "pl": {}}, 600.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with("gs-regadera")), "la regadera vieja ya no sale")
+	chk(not J.rects_acceso({"k": "regar", "c": "", "ok": true, "t0": 0.0, "pl": {}}, 600.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and (String(e[1]).begins_with("gs-regadera") or e[1] == "gs-regar")), "la regadera vieja (y la de perfil) ya no sale")
 	# 3b · 1.54: cada acción de cerca. accion() lleva su gesto; catar, el porro; todos los dibujos, dentro y en movimiento
 	VIO.clear()
 	for q in [["regar", "regar"], ["plantar", "plantar"], ["cosechar", "cosechar"], ["cruzar", "polen"], ["vender", "vender"]]:

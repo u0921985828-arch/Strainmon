@@ -934,8 +934,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_spray": {
-   "w": 53,
-   "h": 38,
+   "w": 46,
+   "h": 53,
    "ancla": [
     0,
     0
@@ -944,8 +944,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_abono": {
-   "w": 61,
-   "h": 33,
+   "w": 46,
+   "h": 58,
    "ancla": [
     0,
     0
@@ -954,8 +954,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_tij_a": {
-   "w": 74,
-   "h": 33,
+   "w": 57,
+   "h": 61,
    "ancla": [
     0,
     0
@@ -964,8 +964,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_tij_c": {
-   "w": 75,
-   "h": 33,
+   "w": 57,
+   "h": 61,
    "ancla": [
     0,
     0
@@ -974,8 +974,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_semilla": {
-   "w": 59,
-   "h": 27,
+   "w": 52,
+   "h": 57,
    "ancla": [
     0,
     0
@@ -984,8 +984,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_vacia": {
-   "w": 59,
-   "h": 27,
+   "w": 48,
+   "h": 48,
    "ancla": [
     0,
     0
@@ -994,8 +994,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_porro": {
-   "w": 65,
-   "h": 27,
+   "w": 54,
+   "h": 47,
    "ancla": [
     0,
     0
@@ -1004,8 +1004,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_pipa": {
-   "w": 69,
-   "h": 28,
+   "w": 51,
+   "h": 50,
    "ancla": [
     0,
     0
@@ -1014,8 +1014,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_vapo": {
-   "w": 76,
-   "h": 29,
+   "w": 48,
+   "h": 59,
    "ancla": [
     0,
     0
@@ -1024,8 +1024,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_billete": {
-   "w": 71,
-   "h": 25,
+   "w": 60,
+   "h": 57,
    "ancla": [
     0,
     0
@@ -1034,8 +1034,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_bolsita": {
-   "w": 56,
-   "h": 31,
+   "w": 49,
+   "h": 49,
    "ancla": [
     0,
     0
@@ -1044,8 +1044,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_pincel": {
-   "w": 71,
-   "h": 26,
+   "w": 63,
+   "h": 50,
    "ancla": [
     0,
     0
@@ -1054,8 +1054,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_billete_i": {
-   "w": 71,
-   "h": 25,
+   "w": 60,
+   "h": 57,
    "ancla": [
     0,
     0
@@ -1064,8 +1064,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_bolsita_i": {
-   "w": 56,
-   "h": 31,
+   "w": 49,
+   "h": 49,
    "ancla": [
     0,
     0
@@ -1074,8 +1074,8 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_mech1_ab": {
-   "w": 34,
-   "h": 79,
+   "w": 46,
+   "h": 54,
    "ancla": [
     0,
     0
@@ -1084,8 +1084,18 @@
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
   },
   "pl_gm_mech0_ab": {
-   "w": 34,
-   "h": 79,
+   "w": 46,
+   "h": 54,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_gm_regar": {
+   "w": 52,
+   "h": 43,
    "ancla": [
     0,
     0
@@ -11337,6 +11347,10 @@
     {
      "nombre": "gm-mech0-ab",
      "celda": "pl_gm_mech0_ab"
+    },
+    {
+     "nombre": "gm-regar",
+     "celda": "pl_gm_regar"
     }
    ],
    "cubre": [
@@ -11413,7 +11427,8 @@
     "misc:gm-billete-i",
     "misc:gm-bolsita-i",
     "misc:gm-mech1-ab",
-    "misc:gm-mech0-ab"
+    "misc:gm-mech0-ab",
+    "misc:gm-regar"
    ],
    "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta) y piezas (manos, herramientas, plantas, humo, billetes)."
   },
