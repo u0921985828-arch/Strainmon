@@ -1,6 +1,6 @@
 # Ribera Verde (Godot) — MAESTRO [8]: los retratos de diálogo son el muñeco del mapa en grande (bustos de PixelLab de
 # arte/retratos.png, uno por grupo de sprite del atlas): cada look tiene el suyo, el de la calle por su hash y de su sexo,
-# la boca al hablar, el parpadeo y los gestos (los estados, con CAL; sin ellos, el vaivén), el busto al lado de la caja, a su izquierda, con el nombre en su hombro; sin busto, el dibujado.
+# la boca al hablar, el parpadeo y los gestos (los estados, con CAL; sin ellos, el vaivén), la ficha dentro de la caja: el retrato enmarcado con el nombre en la cinta de su pie; sin busto, el dibujado.
 #   con xvfb (la caja se coloca con la ventana): $GODOT --path godot --rendering-driver opengl3 --audio-driver Dummy
 #   --resolution 1560x720 --script res://tests/retratos.gd -- --sin-arranque [--pintar <dir>] → «retratos: N comprobaciones, 0 fallos»
 extends SceneTree
@@ -186,7 +186,7 @@ func _corre() -> void:
 	# 5 · sin busto (un look sin muñeco), el dibujado de siempre
 	var tz: ImageTexture = Retrato.textura({"id": "zz-nadie", "skin": "#e0b080"}, false, 0)
 	chk(Retrato.grupo({"id": "zz-nadie"}, false) == "" and tz.get_width() == Retrato.W, "sin busto, el dibujado")
-	# 6 · en pantalla: el busto al lado de la caja, a su izquierda y de pie sobre su canto de abajo; el nombre, en el hombro que toca a la caja
+	# 6 · en pantalla: la ficha dentro de la caja, a la izquierda (el retrato enmarcado y el nombre en la cinta de su pie); el texto, a su derecha
 	J.oraculo = false
 	J.gancho_texto = Callable()
 	J.habla_look = D.LOOKS.kid
@@ -198,15 +198,16 @@ func _corre() -> void:
 	var R: TextureRect = J.retrato
 	chk(R.visible and R.texture != null and R.texture.get_width() == 64, "busto a la vista")
 	chk(absf(R.size.x - 64 * us) < 0.5 and absf(R.size.y - 64 * us) < 0.5, "a 1:1 en u (%s, us %s)" % [R.size, us])
-	var bajo: float = R.position.y + R.size.y
-	var caja_b: float = J.dlg.position.y + J.dlg.size.y
-	chk(absf(bajo - caja_b) <= 2 * us + 0.5, "de pie sobre el canto de abajo de la caja (%s / %s)" % [bajo, caja_b])
-	chk(J.retrato_marco.position.x + J.retrato_marco.size.x <= J.dlg.position.x + 0.5, "al lado de la caja, fuera (%s / %s)" % [J.retrato_marco.get_rect(), J.dlg.position.x])
+	var M: Rect2 = J.retrato_marco.get_rect()
+	var C: Rect2 = Rect2(J.dlg.position, J.dlg.size)
+	chk(C.grow(-3 * us).encloses(M), "la ficha, entera dentro de la caja (%s / %s)" % [M, C])
+	chk(absf((M.position.y - C.position.y) - (C.end.y - M.end.y)) <= us + 0.5, "centrada en alto (%s / %s)" % [M.position.y - C.position.y, C.end.y - M.end.y])
+	chk(M.position.x - C.position.x <= 8 * us and M.end.x < C.position.x + C.size.x * 0.5, "a la izquierda")
 	var ml: float = J.dlg.get_theme_stylebox("panel").content_margin_left
-	chk(ml <= 12 * us + 0.5, "el texto, desde el canto de la caja (%s)" % ml)
+	chk(C.position.x + ml >= M.end.x + 4 * us, "el texto, a su derecha (%s)" % ml)
 	var N: Rect2 = J.dlg_nm.get_rect()
-	chk(N.intersects(R.get_rect()) and N.end.x > R.position.x + R.size.x and N.get_center().y >= R.get_rect().get_center().y, "el nombre, en el hombro que toca a la caja (%s / %s)" % [N, R.get_rect()])
-	chk(J.dlg_nm.get_index() > R.get_index(), "el nombre, por encima del busto")
+	chk(absf(N.position.x - M.position.x) < 0.5 and absf(N.size.x - M.size.x) < 0.5 and absf(N.end.y - M.end.y) < 0.5, "el nombre, en la cinta del pie del retrato (%s / %s)" % [N, M])
+	chk(J.dlg_nm.get_index() > R.get_index() and J.dlg_nm_txt.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER, "la cinta, encima y centrada")
 	chk(R.position.y >= 0, "dentro de la pantalla")
 	if dir != "":
 		await pinta(dir, "unai")

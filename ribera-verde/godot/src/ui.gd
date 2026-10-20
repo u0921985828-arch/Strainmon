@@ -1247,6 +1247,7 @@ func type_text(text: String, name_ := "") -> void:
 # MAESTRO [8]: el retrato (con Datos.CAL, fuera de las pruebas contra el HTML): quien habla por su nombre o con quien hablas en
 # vivo (retrato_de, en mundo.gd), con el gesto por el tono de lo que dice (Retrato.expresion)
 const RETRATO_W := 32
+const RETRATO_M := 5   # el margen de la ficha del retrato al canto de la caja de diálogo (u)
 
 # el ancho del retrato en u: el del busto (64) o RETRATO_W el dibujado
 func retrato_w() -> int:
@@ -1702,32 +1703,36 @@ func _coloca() -> void:
 		return
 	var R := ui_rect()
 	if dlg.visible:
-		# con el busto, el retrato va al lado de la caja, a su izquierda y de pie sobre su canto de abajo, y la caja empieza a su
-		# derecha; el nombre, en la pestaña sobre el hombro del busto que toca a la caja
+		# con el busto, la ficha va dentro de la caja, a la izquierda: el retrato en su marco, a RETRATO_M u del canto, y el nombre
+		# en una cinta del ancho del marco pegada a su pie; el texto, a su derecha. La caja crece hasta el alto de la ficha.
 		var rw := retrato_w()
-		var ri := (rw + 5) * us if retrato.visible else 0.0
-		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us - ri, 44 * us)
-		dlg.size = Vector2(R.size.x - 6 * us - ri, 0)
+		var con := retrato.visible
+		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us, (rw + 2 + 2 * RETRATO_M if con else 44) * us)
+		dlg.size = Vector2(R.size.x - 6 * us, 0)
 		# en el combate, el texto no pasa por debajo del menú de la derecha (118 de ancho): .dlg con padding-right 126 en el CSS
 		var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
 		dlg.get_theme_stylebox("panel").content_margin_right = ((126 if bt else 10) + 2) * us
-		dlg.get_theme_stylebox("panel").content_margin_left = (10 + 2) * us
+		dlg.get_theme_stylebox("panel").content_margin_left = ((RETRATO_M + rw + 2 + 7) if con else (10 + 2)) * us
 		dlg.reset_size()
-		dlg.size.x = R.size.x - 6 * us - ri
-		dlg.position = Vector2(R.position.x + 3 * us + ri, R.end.y - 3 * us - dlg.size.y)
+		dlg.size.x = R.size.x - 6 * us
+		dlg.position = Vector2(R.position.x + 3 * us, R.end.y - 3 * us - dlg.size.y)
+		dlg_nm_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER if con else HORIZONTAL_ALIGNMENT_LEFT
+		dlg_nm.add_theme_stylebox_override("panel", plana(LINEA, 0 if con else 3 * us, 2.5 * us, 5 * us))
+		dlg_nm.custom_minimum_size = Vector2((rw + 2) * us if con else 0.0, 0)
 		dlg_nm.reset_size()
 		dlg_nm.position = dlg.position + Vector2(6 * us, -12 * us)
-		if retrato.visible:
+		if con:
 			retrato.size = Vector2(rw, rw) * us
-			retrato.position = Vector2(R.position.x + 4 * us, dlg.position.y + dlg.size.y - (rw + 1) * us)
+			retrato.position = dlg.position + Vector2(RETRATO_M + 1, floorf((dlg.size.y / us - rw) / 2)) * us
 			var sm := StyleBoxFlat.new()
 			sm.bg_color = Retrato.FONDO
-			sm.border_color = Retrato.BORDE
+			sm.border_color = LINEA
 			sm.set_border_width_all(maxi(1, int(us)))
 			retrato_marco.add_theme_stylebox_override("panel", sm)
 			retrato_marco.position = retrato.position - Vector2(us, us)
 			retrato_marco.size = retrato.size + Vector2(2 * us, 2 * us)
-			dlg_nm.position = retrato.position + retrato.size - dlg_nm.size + Vector2(8 * us, -6 * us)
+			dlg_nm.size.x = retrato_marco.size.x
+			dlg_nm.position = retrato_marco.position + Vector2(0, retrato_marco.size.y - dlg_nm.size.y)
 		dlg_more.position = dlg.position + dlg.size - Vector2(8 * us + 8 * us, 4 * us + 5 * us)
 		dlg_more.size = Vector2(8 * us, 7 * us)
 		# La primera vez, el texto aún no sabe su ancho y el cuadro sale de toda la pantalla; se recoloca al fotograma siguiente
