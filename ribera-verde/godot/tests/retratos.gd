@@ -142,6 +142,18 @@ func _corre() -> void:
 		var Rv: Dictionary = D.RIVALES[z]
 		var rr = J.retrato_de(str(Rv.n))
 		chk(rr is Array and Retrato.grupo(rr[0], rr[1]) == Atlas.grupo_look(J.look_rival(Rv)), "rival %s, el de su pelea" % Rv.n)
+	# los ladrones de la calle (lo vio el usuario: «me ha salido un tío con sombrero»): el encapuchado de la pelea, no un cliente
+	for nl in D.THIEVES:
+		for s in 4:
+			J.B = {"kind": "thief", "name": nl, "look": Datos.rand_look("th%d" % s, "thief")}
+			var rl = J.retrato_de(nl)
+			var gl := Retrato.grupo(rl[0], rl[1]) if rl is Array else ""
+			chk(gl.begins_with("ladron") and gl.ends_with("-combate"), "%s, con capucha (%s)" % [nl, gl])
+	for nc in D.COPS:
+		J.B = {"kind": "police", "name": nc, "look": D.LOOKS.cop}
+		var rc = J.retrato_de(nc)
+		chk(rc is Array and Retrato.grupo(rc[0], rc[1]) == "cop", "%s, el agente" % nc)
+	J.B = null
 	# 4 · la textura: el busto de 64, en caché; sin CAL, el vaivén de 1 px al hablar
 	var t0: ImageTexture = Retrato.textura(D.LOOKS.kid, false, 0, 0)
 	chk(t0.get_width() == 64 and t0.get_height() == 64, "busto de 64")

@@ -270,6 +270,8 @@ func retrato_de(n: String):
 		k = k.substr(4)
 	if k == "" or k in NO_PERSONA:
 		return null
+	if B is Dictionary and B.get("kind") in ["thief", "police"] and B.get("look") is Dictionary and _llano(str(B.get("name", ""))) == k:
+		return [B.look, mujer_look(B.look)]   # el ladrón de la pelea, con su capucha, y el agente (no un cliente al azar)
 	if _looks_n.is_empty():
 		for d in D.NPCDEF:
 			if d.get("look") is String and not _looks_n.has(_llano(str(d.id))):

@@ -91,6 +91,8 @@ static func grupo(look: Dictionary, mujer: bool) -> String:
 	_carga()
 	Atlas.carga()
 	var g = Atlas.grupo_look(look)
+	if g is String and not bustos.has(g) and bustos.has(g + "-combate"):   # los ladrones: solo tienen el busto de combate
+		g += "-combate"
 	if not (g is String) or not bustos.has(g):
 		return ""
 	if g.begins_with("cliente") and (g in CHICAS) != mujer:
