@@ -188,7 +188,12 @@ func _corre() -> void:
 	chk(D2.f == "2026-10-20" and D2.ok.is_empty() and D2.c.is_empty() and D2.o != ids, "diarios: otro día, otros y a cero (%s)" % [D2.o])
 	chk(J.diarios_txt() == "0/3", "diarios: en OBJETIVO, 0/3 (%s)" % J.diarios_txt())
 
-	# 4 · la demo (capítulos 1-3) y la compra única
+	# 4 · la demo (capítulos 1-3) y la compra única; apagada (lo pidió el usuario), no corta: se enciende para probarla
+	Retencion.DEMO = false
+	J.aj.completo = false
+	PL.comprado = false
+	chk(J.completo(), "sin el bloqueo de la demo, el juego entero")
+	Retencion.DEMO = true
 	J.S = S0.duplicate(true)
 	J.S.ch = 3
 	J.aj.completo = false
