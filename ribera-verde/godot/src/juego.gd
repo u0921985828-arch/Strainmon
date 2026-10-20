@@ -712,7 +712,7 @@ var PRIVACIDAD: String = I18n.K("""Landrace Hunters no vende, no alquila y no us
 · Se juega sin conexión y sin anuncios. Los capítulos 1 a 3 son gratis; el juego completo es una compra única por Google Play: la tarjeta y el pago los gestiona Google, nosotros solo sabemos que está comprado.
 · Play Games (si inicias sesión): los logros y la partida en la nube se guardan en tu cuenta de Google Play Juegos.
 · Informes de errores (OPCIONES · INFORMES DE ERRORES, apagados de serie): si los activas y el juego falla, se envía un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y lo que fallaba), sin tu nombre, cuenta ni partida. Se apagan en el mismo sitio.
-· Aviso de cosecha (OPCIONES · AVISO DE COSECHA, apagado de serie): el móvil te avisa cuando tus plantas están listas. Pide el permiso de notificaciones solo si lo activas; el aviso se programa en el propio móvil.
+· Sin avisos: esta versión no manda notificaciones ni pide ese permiso.
 · La partida y los ajustes se guardan en este móvil, en la carpeta privada de la app. Se borran al desinstalarla (o desde OPCIONES · BORRAR PARTIDA).
 · Si tienes activada la copia de seguridad de Android, el sistema la guarda en tu cuenta de Google (no pasa por nosotros).
 

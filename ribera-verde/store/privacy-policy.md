@@ -12,10 +12,9 @@ vende ni comparte datos con fines publicitarios.
 | **Compra del juego completo** | Solo si compras el juego completo (los capítulos 1 a 3 son gratis) | Google Play (Facturación de Google Play) | El pago y la tarjeta los gestiona Google. El juego solo recibe que la compra está hecha |
 | **Play Games** (logros y partida en la nube) | Solo si inicias sesión en Google Play Juegos | Google | Tu perfil de Play Juegos, los logros desbloqueados y la copia de la partida que guardas en la nube |
 | **Informes de errores** | Solo si los activas (OPCIONES · INFORMES DE ERRORES; apagados de serie) | Sentry (Functional Software, Inc.), como encargado | Cuando el juego falla: el modelo del móvil, la versión de Android y del juego, el error técnico y los últimos pasos de la partida (p. ej. «capítulo 2», «primera cosecha»). Sin nombre, cuenta, ubicación, partida ni identificadores publicitarios. Se borran a los 90 días |
-| **Aviso de cosecha** | Solo si lo activas (OPCIONES · AVISO DE COSECHA; apagado de serie) | Nadie: se programa en el propio móvil | Ninguno. Pide el permiso de notificaciones al activarlo |
 
-Los permisos que pide la app: internet (para la compra, Play Games y los informes, si se usan), notificaciones (solo al
-activar el aviso) y vibrar (los mandos). Ni ubicación, ni contactos, ni cámara, ni micrófono, ni almacenamiento.
+Los permisos que pide la app: internet (para la compra, Play Games y los informes, si se usan) y vibrar (los mandos). Esta
+versión no manda notificaciones ni pide ese permiso. Ni ubicación, ni contactos, ni cámara, ni micrófono, ni almacenamiento.
 
 ## Qué guarda en el móvil
 
@@ -62,11 +61,9 @@ for advertising.
 - **Crash reports**, only if you turn them on (OPTIONS · INFORMES DE ERRORES; off by default): when the game crashes, the device
   model, Android and game version, the technical error and the last game milestones are sent to Sentry (Functional Software,
   Inc.) as processor. No name, account, location, save data or advertising IDs. Deleted after 90 days.
-- **Harvest reminder**, only if you turn it on (off by default): scheduled on the device itself; asks for the notification
-  permission when enabled. No data leaves the phone.
 
-**Permissions:** internet (purchase, Play Games and crash reports, if used), notifications (only when the reminder is enabled)
-and vibration (controls).
+**Permissions:** internet (purchase, Play Games and crash reports, if used) and vibration (controls). This version sends no
+notifications and never asks for that permission.
 
 **What it stores on the device:** the save game (`partida.json`) and the settings (`ajustes.json`), in the app's private
 folder. If Android backup is on, the system copies them, encrypted, to your Google account; the author has no access. They are

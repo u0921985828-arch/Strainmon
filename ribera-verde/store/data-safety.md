@@ -31,7 +31,7 @@ Notas para la consola:
 
 | Campo | Respuesta |
 |---|---|
-| Permisos | `INTERNET` (de las bibliotecas de Google y Sentry), `POST_NOTIFICATIONS` (solo se pide al activar el aviso de cosecha), `VIBRATE`, `com.android.vending.BILLING` |
+| Permisos | `INTERNET` (de las bibliotecas de Google y Sentry), `POST_NOTIFICATIONS` (la declara el plugin; esta versión no la pide nunca: el aviso de cosecha está apagado), `VIBRATE`, `com.android.vending.BILLING` |
 | Anuncios | No contiene anuncios |
 | Compras en la aplicación | Sí: una compra única, «Juego completo» (no consumible) |
 | Acceso a la app | Los capítulos 1 a 3 sin credenciales; el resto, tras la compra. Para la revisión: cuenta de tester de licencias (ver `play-console.md`) |

@@ -209,7 +209,7 @@ func _corre() -> void:
 	chk(absf(N.position.x - M.position.x) < 0.5 and absf(N.size.x - M.size.x) < 0.5 and absf(N.end.y - M.end.y) < 0.5, "el nombre, en la cinta del pie del retrato (%s / %s)" % [N, M])
 	chk(J.dlg_nm.get_index() > R.get_index() and J.dlg_nm_txt.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER, "la cinta, encima y centrada")
 	var cs: StyleBox = J.dlg_nm.get_theme_stylebox("panel")
-	chk(cs.content_margin_top < cs.content_margin_left and cs.content_margin_bottom < cs.content_margin_right, "la cinta, menos aire arriba y abajo que a los lados (%s)" % [cs])
+	chk(cs.content_margin_top + cs.content_margin_bottom < 1.0 and cs.content_margin_left >= 4 * us and cs.content_margin_right >= 4 * us, "la cinta, sin aire arriba ni abajo y con aire a los lados (%s %s / %s %s)" % [cs.content_margin_top, cs.content_margin_bottom, cs.content_margin_left, cs.content_margin_right])
 	chk(R.position.y >= 0, "dentro de la pantalla")
 	if dir != "":
 		await pinta(dir, "unai")

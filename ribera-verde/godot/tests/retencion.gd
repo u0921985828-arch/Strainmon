@@ -96,6 +96,7 @@ func _corre() -> void:
 	Retencion.AHORA = 1_800_000_000.0
 	# 0.52 (lo pidió el usuario): de serie, con la app cerrada no pasa nada: ni crecen, ni pantalla, ni aviso
 	Retencion.OFFLINE = false
+	chk(not Retencion.OFFLINE and not J.PRIVACIDAD.contains("AVISO DE COSECHA") and J.PRIVACIDAD.contains("Sin avisos"), "privacidad: sin el aviso de cosecha, que no está")
 	J.S = S0.duplicate(true)
 	J.S.pots[0] = planta(.4, 50.0, false)
 	var pr0 := float(J.S.pots[0].prog)
