@@ -1717,7 +1717,7 @@ func _coloca() -> void:
 		dlg.size.x = R.size.x - 6 * us
 		dlg.position = Vector2(R.position.x + 3 * us, R.end.y - 3 * us - dlg.size.y)
 		dlg_nm_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER if con else HORIZONTAL_ALIGNMENT_LEFT
-		dlg_nm.add_theme_stylebox_override("panel", plana(LINEA, 0 if con else 3 * us, 2.5 * us, 5 * us))
+		dlg_nm.add_theme_stylebox_override("panel", plana(LINEA, 0, 0, 5 * us) if con else plana(LINEA, 3 * us, 2.5 * us, 5 * us))
 		dlg_nm.custom_minimum_size = Vector2((rw + 2) * us if con else 0.0, 0)
 		dlg_nm.reset_size()
 		dlg_nm.position = dlg.position + Vector2(6 * us, -12 * us)
