@@ -94,13 +94,19 @@
 - Prueba nueva `tests/saltar.gd` (25; con el código de antes, 13 fallos).
 - `descargas/LandraceHunters.apk` (`apk-instalar.py` + `zipalign -P 16` + `apksigner`, la misma firma y el mismo paquete que la 0.50.0) y el plugin de WordPress 1.5.5 con esta versión (`tools/wordpress.js` pasa a Godot 4.7: el motor web sin hilos sale de la plantilla instalada, con `index.audio.position.worklet.js`).
 
-### Píxeles cuadrados y cajas sin aire · Godot 0.52 (en curso, sin APK)
+### Píxeles cuadrados y cajas sin aire · Godot 0.52.0 (código 71)
 - **Todos los píxeles cuadrados** (lo pidió el usuario: «tienen que ser cuadrados todos los píxeles»; con `Datos.CAL`): el mundo, siempre a un número entero de píxeles de pantalla por píxel del juego, también en una ventana pequeña o estrecha (`ajusta`); y la UI (cajas, retratos, iconos, HUD), igual: `us` redondeado a entero (antes, 3,4 o 4,43 en un móvil: el retrato de 64 salía a 283 px y sus píxeles, de 4 y 5).
 - **Las cajas, del tamaño del texto** (lo pidió el usuario: «lo que ocupe el texto y un extra por cada lado, pero no más»; medido en píxeles con la captura: 6 u de margen, 4-9 u entre líneas y la caja a toda pantalla con 4 líneas): el lector (MIENTRAS ESTABAS FUERA, créditos…) del ancho de su línea más larga y del alto de sus líneas, en el centro, con 3-4 u de margen, interlineado de 11 y sin ▲▼ ni barra de scroll si cabe (a toda pantalla y con scroll si no); el aviso de arriba (ITINERARIO…) con 4 u de margen y medido con su letra de verdad (antes «tía» saltaba de línea).
 - **El cumpleaños, en rejilla** (lo pidió el usuario: «más ordenado»): los meses de 3 en 3 y los días de 7 en 7 en una caja de su tamaño en el centro, con las cuatro flechas (`menu(…, {"cls": "centro", "cols": n})`), en vez de una lista a toda pantalla.
 - **La UI hacia abajo** (`floorf`, no `round`): el escenario de 240 us cabe siempre entre los mandos (en un 2400 × 1080 a 420 ppp, us 3).
 - **Fuera el progreso sin jugar** (lo pidió el usuario: «pierde el sentido… igual se te secan las plantas»; venía del U7 del plan): `Retencion.OFFLINE := false` apaga MIENTRAS ESTABAS FUERA, el crecimiento con la app cerrada, el aviso de cosecha y la opción AVISO DE COSECHA; `tests/retencion.gd` comprueba las dos cosas.
 - Prueba nueva `tests/pixel.gd` (180, en `tools/tests.sh`): diez pantallas (seis móviles y cuatro ventanas), escala entera del mundo y de la UI, el retrato múltiplo exacto, el lector corto sin aire y centrado, el largo a toda altura, y la rejilla del cumpleaños.
+
+### Retratos con caras y privacidad sin avisos · Godot 0.52.0 (código 71)
+- **Los 26 retratos con sus caras** (lo pidió el usuario: «hazlo con los otros 26»): cada personaje, como Kiko, con su busto de PixelLab fiel al muñeco y a la historia, contorno de 1 px y 8 estados (hablando, parpadeo, contento, enfadado y dudando, dos de cada gesto) sacados de las animaciones de voz y del retoque de imagen de PixelLab (`tools/sprites/retratos/estados/`); el atlas, 27 retratos y 204 estados.
+- **La cinta del nombre, sin aire arriba ni abajo** (lo pidió el usuario: «que el espacio de arriba y abajo del texto sea más pequeño que el de los lados»): 0 en vertical y 5 u a los lados; `tests/retratos.gd` lo exige (falla con la de antes).
+- **Privacidad y ficha sin el aviso de cosecha**: apagado desde la 0.52 (`Retencion.OFFLINE`), el texto de PRIVACIDAD del juego, `store/privacy-policy.md` y `store/data-safety.md` ya no lo ofrecen; `tests/retencion.gd` lo comprueba (falla con el texto de antes).
+- `descargas/LandraceHunters.apk` y `dist/landrace-hunters.aab` firmados con la upload key, el mismo paquete `com.landracehunters.game`.
 
 ### Documento maestro (`docs/MAESTRO.md`), por tandas, con `Datos.CAL`
 - **[10] La letra:** reserva propia para flechas, ▲▼◀▶, ★, ≈ y −.
