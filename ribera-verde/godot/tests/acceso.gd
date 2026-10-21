@@ -76,14 +76,28 @@ func tiene(R: Array, col: String) -> bool:
 	return R.any(func(e): return typeof(e[0]) != TYPE_STRING and e[4] == col)
 
 # 0.55: la mano de PixelLab (un sprite que empieza por pre) llega al canto del panel: "der" o "aba"; nunca flota
+func brazo_fundido(im: Image, arriba: bool) -> bool:
+	if im.get_height() != J.GS_BRAZO_L:
+		return false
+	var cuenta := func(y: int) -> int:
+		var c := 0
+		for x in im.get_width():
+			var a: float = im.get_pixel(x, y).a
+			if a > 0.0 and a < 1.0:
+				return -1000
+			c += 1 if a > 0.0 else 0
+		return c
+	var h: int = im.get_height()
+	var cerca: int = cuenta.call(h - 1 if arriba else 0)
+	var lejos: int = cuenta.call(0 if arriba else h - 1)
+	return cerca >= 3 and lejos >= 0 and lejos * 4 <= cerca
+
 func mano_canto(R: Array, pre: String, canto: String, x1: int, y1: int) -> bool:
 	for e in R:
-		if typeof(e[0]) == TYPE_STRING and e[1] is Image and e.size() > 5 and String(e[5]).begins_with(pre):   # el antebrazo en perspectiva
-			var rb := Rect2i(int(e[2]), int(e[3]), e[1].get_width(), e[1].get_height()).intersection(e[4])
-			if canto == "pov" and (rb.end.y >= y1 or rb.end.x >= x1):
-				return true
-			if canto == "pov-ab" and rb.end.y >= y1:
-				return true
+		if typeof(e[0]) == TYPE_STRING and e[1] is Image and e.size() > 5 and String(e[5]).begins_with(pre):
+			# el brazo (lo pidió el usuario: «que se desvanezca… las mismas proporciones en cada sprite»): igual de largo en todas las manos,
+			# entero junto a la manga y casi nada en la otra punta (la de arriba en la del cliente), sin semitransparencias
+			return brazo_fundido(e[1], canto == "pov-i")
 		if typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with(pre):
 			var f = Atlas.foto_misc(e[1])
 			if f == null:

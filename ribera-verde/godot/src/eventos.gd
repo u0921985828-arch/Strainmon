@@ -1636,32 +1636,23 @@ func _gsm(R: Array, n: String, x: float, y: float) -> void:
 	var Y: int = _gs.position.y + Datos.jsround(y)
 	var arriba: bool = n.ends_with("-i")
 	var ys: int = M[0]
-	var lejos: int = (Y + ys - _gs.position.y) if arriba else (_gs.end.y - 1 - (Y + ys))
-	if lejos <= 0:
-		return
-	if not arriba:   # la tuya, en perspectiva: el antebrazo se ensancha hacia el canto (más cerca de los ojos), en una imagen
-		var B: Array = _gs_brazo(n, f.c, M, lejos)   # [imagen, x de su esquina respecto a X]
-		R.append(["@", B[0], X + B[1], Y + ys + 1, _gs, n])
-		return
-	for k in range(1, lejos + 1):
-		var fy: int = Y + ys + (-k if arriba else k)
-		var dx: int = Datos.jsround(M[3] * k)
-		var r := Rect2i(X + dx + M[1], fy, M[2] - M[1] + 1, 1).intersection(_gs)
-		if r.size.x <= 0:
-			break
-		R.append(["@", n, X + dx, fy - ys, r])
+	# lo pidió el usuario: «que se desvanezca por la parte del brazo… las mismas proporciones de mano y brazo en cada sprite»: el brazo,
+	# de GS_BRAZO_L filas en todas las manos, se funde en tramado (sin semitransparencias) y se acaba en el mismo punto
+	var B: Array = _gs_brazo(n, f.c, M, arriba)   # [imagen, x de su esquina respecto a X]
+	R.append(["@", B[0], X + B[1], (Y + ys - GS_BRAZO_L) if arriba else (Y + ys + 1), _gs, n])
 
-# el antebrazo visto en perspectiva (lo pidió el usuario: «más cortos y anchos hacia abajo»): fila a fila desde el corte de la manga
-# hasta el canto, corrido con su pendiente y cada vez más ancho (GS_BRAZO px por fila); la fila de la manga se estira por dentro y
-# los cantos de 1 px (el contorno) se quedan
+# el antebrazo visto en perspectiva (lo pidió el usuario: «más cortos y anchos hacia abajo»): fila a fila desde el corte de la manga,
+# corrido con su pendiente y cada vez más ancho (GS_BRAZO px por fila; la del cliente, de frente, igual de ancha); la fila de la manga
+# se estira por dentro y los cantos de 1 px (el contorno) se quedan. Entero GS_BRAZO_FIRME filas y luego se deshace en un tramado de
+# Bayer 4 × 4 hasta GS_BRAZO_L
 const GS_BRAZO := 0.7
+const GS_BRAZO_L := 18
+const GS_BRAZO_FIRME := 5
+const GS_BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 var _gs_br := {}
-func _gs_brazo(n: String, im: Image, M: Array, lejos: int) -> Array:
-	var key := "%s|%d" % [n, lejos]
-	if _gs_br.has(key):
-		return _gs_br[key]
-	if _gs_br.size() > 64:
-		_gs_br.clear()
+func _gs_brazo(n: String, im: Image, M: Array, arriba: bool) -> Array:
+	if _gs_br.has(n):
+		return _gs_br[n]
 	var ys: int = M[0]
 	var x0: int = M[1]
 	var w0: int = M[2] - M[1] + 1
@@ -1671,22 +1662,26 @@ func _gs_brazo(n: String, im: Image, M: Array, lejos: int) -> Array:
 	var lo := 1 << 20
 	var hi := -(1 << 20)
 	var L := []
-	for k in range(1, lejos + 1):
-		var wk: int = w0 + int(GS_BRAZO * k)
+	for k in range(1, GS_BRAZO_L + 1):
+		var wk: int = w0 + (0 if arriba else int(GS_BRAZO * k))
 		var c: float = x0 + w0 / 2.0 + M[3] * k
 		var a: int = int(floor(c - wk / 2.0))
 		L.append([a, wk])
 		lo = mini(lo, a)
 		hi = maxi(hi, a + wk)
-	var out := Image.create(maxi(1, hi - lo), maxi(1, lejos), false, Image.FORMAT_RGBA8)
+	var out := Image.create(maxi(1, hi - lo), GS_BRAZO_L, false, Image.FORMAT_RGBA8)
 	for k in L.size():
 		var a: int = L[k][0]
 		var wk: int = L[k][1]
+		var fy: int = (GS_BRAZO_L - 1 - k) if arriba else k
+		var fu: float = clampf(float(k + 1 - GS_BRAZO_FIRME) / float(GS_BRAZO_L - GS_BRAZO_FIRME + 1), 0.0, 1.0)   # 0 entero, 1 nada
 		for i in wk:
+			if (GS_BAYER[(k % 4) * 4 + ((a - lo + i) % 4)] + 0.5) / 16.0 < fu:
+				continue
 			var j: int = 0 if i == 0 else (w0 - 1 if i == wk - 1 else clampi(1 + int((i - 1) * (w0 - 2) / float(maxi(1, wk - 2))), 1, w0 - 2))
-			out.set_pixel(a - lo + i, k, fila[j])
-	_gs_br[key] = [out, lo]
-	return _gs_br[key]
+			out.set_pixel(a - lo + i, fy, fila[j])
+	_gs_br[n] = [out, lo]
+	return _gs_br[n]
 
 # el corte de la manga: la fila (de las 20 del canto) donde ya es entera, el tramo de esa fila que es manga (el del lado de su esquina:
 # el derecho la tuya, el izquierdo la del mechero y la del cliente) y lo que se corre en x por cada fila hacia fuera
