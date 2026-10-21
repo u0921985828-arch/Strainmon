@@ -2,6 +2,9 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El APK y WordPress, como Play pero sin el bloqueo (lo pidió el usuario)
+- El bloqueo de la demo (el corte del capítulo 4 y la compra única) solo en el AAB de Google Play: `Retencion.DEMO` sale de la marca de exportación `tienda`. `tools/godot-aab.js` exporta dos veces: el AAB de Play con la marca y otro sin ella del que sale el APK universal. WordPress se exporta sin la marca. Los tres, con el mismo contenido (`Datos.PLAY`). Prueba `tests/retencion.gd` (47/0).
+
 ### El colocón se nota en el combate y combates más llevaderos (lo pidió el usuario)
 - Colocado de índica, los golpes duelen un 25 % menos pero aciertas, esquivas y huyes peor; de sativa, aciertas, esquivas y huyes mejor; borracho, aciertas y esquivas peor (`FISIO.comb`, `mod_comb`). Un aviso al empezar la pelea y el ojo, el humo y la borrachera también en la pantalla del combate.
 - Ladrones y rivales con un 20 % menos de vida y de golpe (`COMBATE7.facil`): en el capítulo 8, sin subir de nivel y a puñetazos, se ganan unas 42 de 60 peleas (antes, unas 13). Prueba `tests/combate_colocon.gd`; `colocon.gd` y `estados.gd` al día.

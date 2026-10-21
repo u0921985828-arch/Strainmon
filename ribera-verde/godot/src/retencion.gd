@@ -10,9 +10,10 @@ const Plataforma = preload("res://src/plataforma.gd")
 # 0.52 (lo pidió el usuario: «pierde el sentido… igual se te secan las plantas»): con la app cerrada no pasa nada, ni crecen las
 # plantas ni hay aviso de la cosecha; al volver, todo donde lo dejaste. El código se queda, apagado (las pruebas lo encienden)
 static var OFFLINE := false
-# (lo pidió el usuario: «quita el bloqueo de la demo por ahora»): sin el corte del capítulo 4 ni la compra única; el código se
-# queda, apagado (las pruebas lo encienden). Una partida que ya se quedó en la demo sigue desde START · JUEGO COMPLETO
-static var DEMO := false
+# La demo (corte del capítulo 4 y compra única) solo en el AAB de Google Play, que se exporta con la marca «tienda»
+# (tools/godot-aab.js); el APK y WordPress, iguales a Play pero sin el bloqueo (lo pidió el usuario). Una partida que ya se
+# quedó en la demo sigue desde START · JUEGO COMPLETO
+static var DEMO := OS.has_feature("tienda")
 static var HOY := ""        # las pruebas fijan la fecha (AAAA-MM-DD); vacía, la del móvil
 static var AHORA := -1.0    # las pruebas fijan la hora unix; negativa, la del móvil
 var plat_n: Node = null

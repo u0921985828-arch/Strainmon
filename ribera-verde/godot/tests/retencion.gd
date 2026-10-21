@@ -188,7 +188,10 @@ func _corre() -> void:
 	chk(D2.f == "2026-10-20" and D2.ok.is_empty() and D2.c.is_empty() and D2.o != ids, "diarios: otro día, otros y a cero (%s)" % [D2.o])
 	chk(J.diarios_txt() == "0/3", "diarios: en OBJETIVO, 0/3 (%s)" % J.diarios_txt())
 
-	# 4 · la demo (capítulos 1-3) y la compra única; apagada (lo pidió el usuario), no corta: se enciende para probarla
+	# 4 · la demo (capítulos 1-3) y la compra única: solo con la marca «tienda» (el AAB de Play); sin ella (APK, WordPress y aquí),
+	# apagada: no corta. Se enciende para probarla
+	chk(not OS.has_feature("tienda") and Retencion.DEMO == false, "sin la marca «tienda», sin el bloqueo de la demo")
+	chk(FileAccess.get_file_as_string("res://src/retencion.gd").contains("static var DEMO := OS.has_feature(\"tienda\")"), "la demo va por la marca «tienda»")
 	Retencion.DEMO = false
 	J.aj.completo = false
 	PL.comprado = false

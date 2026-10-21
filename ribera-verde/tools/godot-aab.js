@@ -12,7 +12,7 @@
        keystore nunca va al repo. Sin ellas, sale el AAB sin firmar y el APK con la clave de depuración de Godot.
     4. bundletool (BUNDLETOOL=…jar) saca el APK universal; se comprueba la alineación de 16 KB (zipalign -c -P 16 y los LOAD de
        cada .so) y targetSdkVersion 36 con aapt2 dump badging.
-  Sale: dist/landrace-hunters.aab y dist/landrace-hunters.apk.   Uso: node tools/godot-aab.js
+  Sale: dist/landrace-hunters.aab (Play, con la marca «tienda»: la demo) y dist/landrace-hunters.apk (sin ella, sin el bloqueo).   Uso: node tools/godot-aab.js
 */
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -72,18 +72,29 @@ if (fs.existsSync(AJ)) {
 }
 const TMP = path.join(SAL, 'godot-aab');
 fs.rmSync(TMP, { recursive: true, force: true });fs.mkdirSync(TMP, { recursive: true });
-const crudo = path.join(TMP, 'sin-firmar.aab');
+const crudo = path.join(TMP, 'sin-firmar.aab'), libre = path.join(TMP, 'sin-firmar-libre.aab');
 const env = { ...process.env, ANDROID_HOME: SDK, JAVA_HOME };
 delete env.ANDROID_SDK_ROOT;
 const args = ['--headless', '--path', GD];
 if (!fs.existsSync(path.join(GD, 'android', 'build', 'build.gradle'))) args.push('--install-android-build-template');
-let log = '';
-try { log = run(GODOT, [...args, '--export-release', 'Android', crudo], { env }); }
-catch (e) { log = (e.stdout || '') + (e.stderr || ''); }
-if (!fs.existsSync(crudo)) { console.error(log.slice(-6000)); throw new Error('Godot no ha exportado el AAB'); }
+// dos exportaciones (lo pidió el usuario): el AAB de Play con la marca «tienda» (Retencion.DEMO: el bloqueo de la demo) y otro
+// igual sin ella, del que sale el APK universal (como WordPress, sin el bloqueo). export_presets.cfg vuelve a como estaba
+const PRE = path.join(GD, 'export_presets.cfg'), pre0 = fs.readFileSync(PRE, 'utf8');
+if (!/^custom_features=""$/m.test(pre0)) throw new Error('export_presets.cfg: se espera custom_features="" en el preset Android');
+function exporta(dest, marca) {
+  fs.writeFileSync(PRE, pre0.replace(/^custom_features=""$/m, `custom_features="${marca}"`));
+  let log = '';
+  try { log = run(GODOT, [...args, '--export-release', 'Android', dest], { env }); }
+  catch (e) { log = (e.stdout || '') + (e.stderr || ''); }
+  finally { fs.writeFileSync(PRE, pre0); }
+  if (!fs.existsSync(dest)) { console.error(log.slice(-6000)); throw new Error('Godot no ha exportado el AAB'); }
+  iconos(dest);
+}
+exporta(crudo, 'tienda');
+exporta(libre, '');
 
 // 2 · iconos nítidos en el AAB (webp sin pérdida, al tamaño que dejó Godot)
-{
+function iconos(crudo) {
   const DE = { 'icon': ['icono-48.png'], 'icon_foreground': ['icono-delante-72.png'], 'icon_background': ['icono-fondo-72.png'], 'icon_monochrome': ['icono-delante-72.png', true] };
   const ents = run('unzip', ['-Z1', crudo]).split('\n').filter(e => /^base\/res\/mipmap[^/]*\/icon(_foreground|_background|_monochrome)?\.webp$/.test(e));
   if (ents.length < 20) throw new Error('el AAB no trae los iconos esperados: ' + ents.join(', '));
@@ -99,6 +110,7 @@ if (!fs.existsSync(crudo)) { console.error(log.slice(-6000)); throw new Error('G
   lista.forEach((l, i) => fs.writeFileSync(l[0], PNG.sync.write(vecino(l[2], lados[i], l[3]))));
   run('python3', ['-I', '-c', 'import sys\nfrom PIL import Image\na=sys.argv[1:]\nfor p,w in zip(a[::2],a[1::2]):\n  im=Image.open(p)\n  im=im.convert("RGB") if w.endswith("icon_background.webp") else im.convert("RGBA")\n  im.save(w,"WEBP",lossless=True,quality=100)', ...lista.flatMap(l => [l[0], l[1]])]);
   execFileSync('zip', ['-q', '-0', crudo, ...ents], { cwd: TMP });
+  for (const l of lista) { fs.rmSync(l[0], { force: true }); fs.rmSync(l[1], { force: true }); }
 }
 
 // 3 · firma con la upload key (jarsigner, como Gradle)
@@ -117,7 +129,7 @@ if (firmado) {
 } else console.warn('AVISO: sin LH_KEYSTORE*: el AAB sale sin firmar (Play no lo acepta) y el APK con la clave de depuración');
 
 // 4 · APK universal, 16 KB y targetSdk
-run('java', ['-jar', BUNDLETOOL, 'build-apks', '--bundle=' + AAB, '--output=' + APKS, '--mode=universal', '--overwrite', ...ks], { env: envF });
+run('java', ['-jar', BUNDLETOOL, 'build-apks', '--bundle=' + libre, '--output=' + APKS, '--mode=universal', '--overwrite', ...ks], { env: envF });
 run('unzip', ['-o', '-q', APKS, 'universal.apk', '-d', TMP]);
 fs.copyFileSync(path.join(TMP, 'universal.apk'), APK);
 const za = run(path.join(BT, 'zipalign'), ['-c', '-P', '16', '-v', '4', APK]);
