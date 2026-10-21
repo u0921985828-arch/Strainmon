@@ -159,11 +159,41 @@ func _corre() -> void:
 	var bordes := 0
 	for y in 12:
 		for x in 30:
-			if (x < int(H.seto[0]) or x > int(H.seto[2]) or y <= int(H.seto[1])) and not (m.o[y][x] in ["monte", "monte2"]):
+			if (x < int(H.seto[0]) - 1 or x > int(H.seto[2]) + 1 or y <= int(H.seto[1])) and not (m.o[y][x] in ["monte", "monte2"]):
 				bordes += 1
 			if x >= int(H.seto[0]) and x <= int(H.seto[2]) and y > int(H.seto[3]) and m.o[y][x] != null:
 				bordes += 1
-	chk(bordes == 0, "alrededor de la huerta, el monte, y debajo del seto nada que tape la última fila (%d casillas mal)" % bordes)
+			if (x == int(H.seto[0]) - 1 or x == int(H.seto[2]) + 1) and y > int(H.seto[1]) and m.o[y][x] != null:
+				bordes += 1   # una casilla de hierba a cada lado del seto: el monte no lo tapa
+	chk(bordes == 0, "alrededor de la huerta, el monte (y hierba junto al seto), y debajo del seto nada que tape la última fila (%d casillas mal)" % bordes)
+	# el seto de PixelLab por piezas: los lados con su remate arriba, las esquinas y el tramo de abajo con sus remates junto al camino
+	var sx0: int = int(H.seto[0])
+	var sx1: int = int(H.seto[2])
+	var sy0: int = int(H.seto[1])
+	var sy1: int = int(H.seto[3])
+	var malp := []
+	for y in range(sy0 + 1, sy1):
+		var iz = m.o[y][sx0]
+		var de = m.o[y][sx1]
+		if not (iz is String and iz.begins_with("setoV0" if y == sy0 + 1 else "setoV") and not iz.begins_with("setoVd")):
+			malp.append([sx0, y, iz])
+		if not (de is String and de.begins_with("setoV0d" if y == sy0 + 1 else "setoVd")):
+			malp.append([sx1, y, de])
+	if m.o[sy1][sx0] != "setoL" or m.o[sy1][sx1] != "setoR":
+		malp.append(["esquinas", m.o[sy1][sx0], m.o[sy1][sx1]])
+	for x in range(sx0 + 1, sx1):
+		var pq = m.o[sy1][x]
+		var debe: String = "" if x in [int(H.camino), int(H.camino) + 1] else ("setoHd" if x == int(H.camino) - 1 else ("setoHi" if x == int(H.camino) + 2 else "setoH"))
+		if (debe == "" and pq != null) or (debe != "" and not (pq is String and pq.begins_with(debe))):
+			malp.append([x, sy1, pq])
+	chk(malp.is_empty(), "el seto por piezas en su sitio: %s" % [malp])
+	var sinarte := []
+	var At = load("res://src/atlas.gd")
+	At.carga()
+	for k in ["setoV", "setoV2", "setoV0", "setoL", "setoH", "setoH2", "setoHd", "setoVd", "setoVd2", "setoV0d", "setoR", "setoHi"]:
+		if At.cubre("obj:" + k) == null:
+			sinarte.append(k)
+	chk(sinarte.is_empty(), "las piezas del seto, en el atlas (seto-huerta): faltan %s" % [sinarte])
 	var zarzas := 0
 	for b in H.bancales:
 		for y in range(int(b[1]), int(b[3]) + 1):

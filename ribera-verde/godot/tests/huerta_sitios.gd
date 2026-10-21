@@ -193,14 +193,17 @@ func _corre() -> void:
 			if f == null:
 				continue
 			var an: Array = f.cel.ancla
-			chk(f.c.get_size() == Vector2i(48, 56) and int(an[0]) == 16 and int(an[1]) == 55, "%s: 48 × 56 con el ancla en (16, 55) (%s, %s)" % [k, f.c.get_size(), an])
+			chk(f.c.get_size() == Vector2i(48, 64) and int(an[0]) == 16 and int(an[1]) == 55, "%s: 48 × 64 con el ancla en (16, 55) (%s, %s)" % [k, f.c.get_size(), an])
 			# en la casilla (x, y) se pinta en (x·16 + 8 − 16, y·16 + 15 − 55): el pie (24, 40) cae en ((x + 1)·16, y·16)
 			chk(8 - int(an[0]) + 24 == 16 and 15 - int(an[1]) + 40 == 0, "%s: el pie en el centro del bloque" % k)
 			var u: Rect2i = f.c.get_used_rect()
 			var cx: float = u.position.x + u.size.x / 2.0
 			if fa >= 2:
 				chk(absf(cx - 24) <= 1.5, "%s: centrada en el pie (centro %.1f)" % [k, cx])
-				chk(u.end.y <= 52 and u.end.y >= 41, "%s: el pie en la tierra (abajo en %d)" % [k, u.end.y])
+				chk(u.end.y <= 63 and u.end.y >= 41, "%s: el pie en la tierra (abajo en %d)" % [k, u.end.y])
+			if fa >= 3:   # lo pidió el usuario: «las plantas deben estar también en medio de los bancales»: la mata, centrada en el pie
+				var cy: float = u.position.y + u.size.y / 2.0
+				chk(absf(cy - 40) <= 2.5, "%s: en medio de su bancal (centro %.1f, el pie en 40)" % [k, cy])
 			if fa == 5:
 				chk(u.size.x >= 32 and u.size.x <= 40, "%s: la planta hecha ocupa su bloque, con hueco hasta la de al lado (%d px)" % [k, u.size.x])
 				chk(wm > 0 and u.size.x > 2 * wm / 3, "%s: más grande que una de la mesa de la nave (%d > %d)" % [k, u.size.x, 2 * wm / 3])
@@ -213,6 +216,11 @@ func _corre() -> void:
 		var tb: Image = J.pintor._tinte_planta(f5, pb).c
 		chk(ta.get_data() != f5.c.get_data(), "con el color de su variedad (%s)" % sids[0])
 		chk(Datos.color_cog(S, pa) == Datos.color_cog(S, pb) or ta.get_data() != tb.get_data(), "dos variedades, dos colores")
+		# el bancal, con su canto también junto al camino de tierra (con CAL, _mascara): la casilla de arriba a la derecha del bancal 0
+		var bc: Array = H.bancales[0]
+		var mh: Dictionary = J.MAPS.huerta
+		chk(String(mh.g[int(bc[1])][int(bc[2])]) in ["surco", "surcoV"] and mh.g[int(bc[1])][int(bc[2]) + 1] == "dirt", "el bancal 0 da al camino: %s" % [mh.g[int(bc[1])].slice(int(bc[2]), int(bc[2]) + 2)])
+		chk(J.pintor._mascara(mh, int(bc[2]), int(bc[1])) & 8 != 0, "el bancal, con su canto junto al camino (máscara %d)" % J.pintor._mascara(mh, int(bc[2]), int(bc[1])))
 	else:
 		chk(false, "sin pintor")
 	# 4 · los tubos del goteo, centrados

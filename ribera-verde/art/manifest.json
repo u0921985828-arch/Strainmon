@@ -1235,13 +1235,13 @@
   },
   "planta_huerta": {
    "w": 48,
-   "h": 56,
+   "h": 64,
    "ancla": [
     16,
     55
    ],
    "ajuste": "exacto",
-   "nota": "plantas de la huerta en el suelo a 16 px/m: la mata centrada en el pie del tallo (24, 40), que cae en el centro de su sitio de 2 × 2 casillas; el lienzo baja 15 px para la sombra y las hojas caídas"
+   "nota": "plantas de la huerta en el suelo a 16 px/m: la mata centrada en el pie del tallo (24, 40), que cae en el centro de su sitio de 2 × 2 casillas, y la copa en medio del bancal; el lienzo baja 23 px para la copa, la sombra y las hojas caídas"
   }
  },
  "fases": [
@@ -1467,6 +1467,19 @@
      ],
      "fps": 8,
      "bucle": false
+    },
+    {
+     "nombre": "teclea",
+     "herramienta": "create_image_pro",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 1,
+     "bucle": false,
+     "frames": 1,
+     "accion": "back view, sitting and typing on a keyboard on a desk in front: elbows bent and slightly out at waist height, forearms forward (on screen, up and inward), hands in front of the chest; references: base north frame + arm pose; palette of the base",
+     "origen": "create_image_pro 40bfd74b, candidato 6",
+     "nota": "sentado al ordenador de la tía o al gaming (_pj_sentado, mesa); colores al base con tools/sprites/pixellab_teclea.py para que ROPA los cambie"
     }
    ],
    "estado": "aprobado",
@@ -4047,6 +4060,85 @@
    "coste_real": 28
   },
   {
+   "id": "player-combate-r",
+   "tipo": "combate",
+   "fase": "F6",
+   "herramienta": "importado",
+   "cubre": [],
+   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 8167d2cd-ff4b-49ec-b242-d9778ecc74de), pasado a la paleta del grupo y encajado en la celda de combate",
+   "descripcion": "el protagonista de espaldas, a unas 6 cabezas: gorra verde, pelo oscuro, camiseta roja, vaqueros y zapatillas blancas",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "golpe",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "patada",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "spray",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "comer",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "desmayo",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "notas": "Lo pidió el usuario: «Habría que mejorar los sprites de los combates, que realmente sean más realistas». Sin cubre: solo lo usa grupo_combate (policia.gd) con Datos.CAL; el de siempre se queda para el oráculo."
+  },
+  {
    "id": "player-f",
    "tipo": "personaje",
    "fase": "MAESTRO-1",
@@ -4211,6 +4303,19 @@
      ],
      "fps": 8,
      "bucle": false
+    },
+    {
+     "nombre": "teclea",
+     "herramienta": "create_image_pro",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 1,
+     "bucle": false,
+     "frames": 1,
+     "accion": "back view, sitting and typing on a keyboard on a desk in front: elbows bent and slightly out at waist height, forearms forward (on screen, up and inward), hands in front of the chest; references: base north frame + arm pose; palette of the base",
+     "origen": "create_image_pro fda2b854, candidato 22",
+     "nota": "sentado al ordenador de la tía o al gaming (_pj_sentado, mesa); colores al base con tools/sprites/pixellab_teclea.py para que ROPA los cambie"
     }
    ]
   },
@@ -4328,6 +4433,85 @@
    ]
   },
   {
+   "id": "player-f-combate-r",
+   "tipo": "combate",
+   "fase": "F6",
+   "herramienta": "importado",
+   "cubre": [],
+   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 6565e276-37be-458c-8e34-d2412322cbc9), pasado a la paleta del grupo y encajado en la celda de combate",
+   "descripcion": "la protagonista de espaldas, a unas 6 cabezas, con la misma ropa que el protagonista (la cambia ROPA)",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "golpe",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "patada",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "spray",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "comer",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "desmayo",
+     "herramienta": "importado",
+     "direcciones": [
+      "north"
+     ],
+     "fps": 8,
+     "bucle": false
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "notas": "Lo pidió el usuario: «Habría que mejorar los sprites de los combates, que realmente sean más realistas». Sin cubre: solo lo usa grupo_combate (policia.gd) con Datos.CAL; el de siempre se queda para el oráculo."
+  },
+  {
    "id": "ladron1-combate",
    "tipo": "combate",
    "fase": "F6",
@@ -4436,6 +4620,58 @@
    "coste_real": 26
   },
   {
+   "id": "ladron1-combate-r",
+   "tipo": "combate",
+   "fase": "F6",
+   "herramienta": "importado",
+   "cubre": [],
+   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, fae879e5-84db-4de3-81d4-dd3a840a6f38), pasado a la paleta del grupo y encajado en la celda de combate",
+   "descripcion": "ladrón con pasamontañas y sudadera gris, puños arriba",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "ataque",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "huir",
+     "herramienta": "importado",
+     "direcciones": [
+      "east"
+     ],
+     "fps": 12,
+     "bucle": true
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "notas": "Lo pidió el usuario: «Habría que mejorar los sprites de los combates, que realmente sean más realistas». Sin cubre: solo lo usa grupo_combate (policia.gd) con Datos.CAL; el de siempre se queda para el oráculo."
+  },
+  {
    "id": "darko-combate",
    "tipo": "combate",
    "fase": "F6",
@@ -4488,6 +4724,58 @@
    "familia": "importado",
    "coste_real": 0,
    "notas": "1.21: antes Darko peleaba con el sprite del ladrón 1. Pedido por el usuario: «Darko en combate»."
+  },
+  {
+   "id": "darko-combate-r",
+   "tipo": "combate",
+   "fase": "F6",
+   "herramienta": "importado",
+   "cubre": [],
+   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 9cefe390-67e4-4a5d-ab34-1b0c1ef1c8f4), pasado a la paleta del grupo y encajado en la celda de combate",
+   "descripcion": "Darko: sudadera negra con capucha, pañuelo rojo y puños arriba",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "ataque",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "huir",
+     "herramienta": "importado",
+     "direcciones": [
+      "east"
+     ],
+     "fps": 12,
+     "bucle": true
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "notas": "Lo pidió el usuario: «Habría que mejorar los sprites de los combates, que realmente sean más realistas». Sin cubre: solo lo usa grupo_combate (policia.gd) con Datos.CAL; el de siempre se queda para el oráculo."
   },
   {
    "id": "ladron2-combate",
@@ -4597,6 +4885,58 @@
    "coste_real": 25
   },
   {
+   "id": "ladron2-combate-r",
+   "tipo": "combate",
+   "fase": "F6",
+   "herramienta": "importado",
+   "cubre": [],
+   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, de27028f-fe07-4824-937f-bea9d16ec1c8), pasado a la paleta del grupo y encajado en la celda de combate",
+   "descripcion": "ladrón con capucha morada, puños arriba",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "ataque",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "huir",
+     "herramienta": "importado",
+     "direcciones": [
+      "east"
+     ],
+     "fps": 12,
+     "bucle": true
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "notas": "Lo pidió el usuario: «Habría que mejorar los sprites de los combates, que realmente sean más realistas». Sin cubre: solo lo usa grupo_combate (policia.gd) con Datos.CAL; el de siempre se queda para el oráculo."
+  },
+  {
    "id": "ladron3-combate",
    "tipo": "combate",
    "fase": "F6",
@@ -4703,6 +5043,58 @@
     "notas_animacion": "v3 a medida, keep_first_frame false; plantillas no (en F1 salían de espaldas). Si un fotograma (encajado por los pies del primero) se sale de la celda por arriba, se baja lo justo (1 px en 3 fotogramas de ladrones)."
    },
    "coste_real": 26
+  },
+  {
+   "id": "ladron3-combate-r",
+   "tipo": "combate",
+   "fase": "F6",
+   "herramienta": "importado",
+   "cubre": [],
+   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 08d2157f-5d73-41d0-a061-11b46808a10e), pasado a la paleta del grupo y encajado en la celda de combate",
+   "descripcion": "ladrón con capucha verde y pañuelo, puños arriba",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": true
+    },
+    {
+     "nombre": "ataque",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 12,
+     "bucle": false
+    },
+    {
+     "nombre": "herido",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "huir",
+     "herramienta": "importado",
+     "direcciones": [
+      "east"
+     ],
+     "fps": 12,
+     "bucle": true
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "notas": "Lo pidió el usuario: «Habría que mejorar los sprites de los combates, que realmente sean más realistas». Sin cubre: solo lo usa grupo_combate (policia.gd) con Datos.CAL; el de siempre se queda para el oráculo."
   },
   {
    "id": "policia-combate",
@@ -4826,6 +5218,67 @@
     "notas_animacion": "v3 a medida, keep_first_frame false; plantillas no (en F1 salían de espaldas). Si un fotograma (encajado por los pies del primero) se sale de la celda por arriba, se baja lo justo (1 px en 3 fotogramas de ladrones)."
    },
    "coste_real": 26
+  },
+  {
+   "id": "policia-combate-r",
+   "tipo": "combate",
+   "fase": "F6",
+   "herramienta": "importado",
+   "cubre": [],
+   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, f27100a4-407a-4ea9-9511-70ac26c6cd93), pasado a la paleta del grupo y encajado en la celda de combate",
+   "descripcion": "agente de uniforme azul con gorra de plato y libreta",
+   "celda": "combate",
+   "animaciones": [
+    {
+     "nombre": "idle",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 4,
+     "bucle": true
+    },
+    {
+     "nombre": "alto",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 10,
+     "bucle": false
+    },
+    {
+     "nombre": "multa",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "soborno",
+     "herramienta": "importado",
+     "direcciones": [
+      "south"
+     ],
+     "fps": 8,
+     "bucle": false
+    },
+    {
+     "nombre": "perseguir",
+     "herramienta": "importado",
+     "direcciones": [
+      "east"
+     ],
+     "fps": 12,
+     "bucle": true
+    }
+   ],
+   "estado": "aprobado",
+   "familia": "importado",
+   "coste_real": 0,
+   "notas": "Lo pidió el usuario: «Habría que mejorar los sprites de los combates, que realmente sean más realistas». Sin cubre: solo lo usa grupo_combate (policia.gd) con Datos.CAL; el de siempre se queda para el oráculo."
   },
   {
    "id": "fondo-combate-ladron",
@@ -11937,6 +12390,49 @@
    "ajuste_por_sprite": {
     "barraTb": "exacto",
     "botTb": "exacto"
+   }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "create_image_pro",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 30,
+   "max_colores": 32,
+   "origen": "PixelLab create_image_pro (job d6e1acbe, candidata 35 de 64: la esquina └ de 32 × 32) cortada en piezas por python3 -I tools/sprites/pixellab_setos.py",
+   "notas": "Lo pidió el usuario: «Los setos también habría que ajustarlos incluso hacer los sprites con pixel lab también». Las piezas salen de una sola esquina para que casen en textura y paleta; los del lado derecho, en espejo; solo con Datos.CAL (la huerta).",
+   "id": "seto-huerta",
+   "tipo": "objeto",
+   "celda": "objeto_alto",
+   "descripcion": "El seto recortado de la huerta de la tía a 3/4 desde arriba: tramos verticales (dos variantes) con su remate, las esquinas, el tramo de abajo (dos variantes) y sus remates junto al camino.",
+   "cubre": [
+    "obj:setoV",
+    "obj:setoV2",
+    "obj:setoV0",
+    "obj:setoL",
+    "obj:setoH",
+    "obj:setoH2",
+    "obj:setoHd",
+    "obj:setoVd",
+    "obj:setoVd2",
+    "obj:setoV0d",
+    "obj:setoR",
+    "obj:setoHi"
+   ],
+   "ajuste_por_sprite": {
+    "setoV": "exacto",
+    "setoV2": "exacto",
+    "setoV0": "exacto",
+    "setoL": "exacto",
+    "setoH": "exacto",
+    "setoH2": "exacto",
+    "setoHd": "exacto",
+    "setoVd": "exacto",
+    "setoVd2": "exacto",
+    "setoV0d": "exacto",
+    "setoR": "exacto",
+    "setoHi": "exacto"
    }
   }
  ],

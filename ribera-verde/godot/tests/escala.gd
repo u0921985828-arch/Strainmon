@@ -235,12 +235,29 @@ func _corre() -> void:
 	QUIERO = ["Usar el ordenador"]
 	chk(corre(func(): J.interact()) and MENUS.size() >= 2 and MENUS[0] == ["Sentarte", "Usar el ordenador", "Nada"], "la silla: el ordenador %s" % [MENUS.slice(0, 2)])
 	# (lo pidió el usuario: «cuando usas el ordenador no te sientas»): para usarlo te sientas y te quedas sentado, con las manos
-	# en la mesa (SENT_MESA: de la mano, arriba, al codo); sentado, el ordenador también está en el menú
+	# en la mesa; sentado, el ordenador también está en el menú
 	chk(J.SENT != null and J.SENT.get("k") == "silla" and J.SENT.d == "norte" and J.P.dir == "up", "usando el ordenador, sentado %s" % [J.SENT])
 	chk(J.sent_mesa(), "sentado al ordenador: las manos en la mesa")
-	var sm: Array = J.pintor.SENT_MESA
-	chk(sm.size() == 13 and sm[1].contains("j") and sm[-1].contains(","), "las manos arriba y el brazo que colgaba, borrado")
-	chk(J.pintor.brazos_mesa("sillaG").size() == sm.size() + J.pintor.SENT_MESA_G, "en la gaming, más baja que su mesa, los antebrazos más largos")
+	# (lo pidió el usuario: «Has primero el Sprite del jugador con los brazos puestos y después lo sientas en la silla»): el
+	# fotograma «teclea» de PixelLab (SENT_MESA), con los codos abiertos (más ancho que el base), para el chico y la chica; sin
+	# mesa, el base; con los colores de la ropa (ROPA) en la camiseta, la gorra y el pantalón
+	var At = load("res://src/atlas.gd")
+	for sx in ["m", "f"]:
+		J.S.sexo = sx
+		var gr = J.grupo_pj()
+		var fmt = J.pintor.frame_sentado(gr, true)
+		var fbt = At.frame_de(gr, "base", "north", 0, {"i": 0})
+		var cmt := {}
+		if fmt:
+			var imt: Image = fmt.c
+			for y in imt.get_height():
+				for x in imt.get_width():
+					if imt.get_pixel(x, y).a8 > 0:
+						cmt[imt.get_pixel(x, y).to_html(false)] = 1
+		chk(fmt != null and fbt != null and fmt.c != fbt.c and fmt.c.get_used_rect().size.x >= fbt.c.get_used_rect().size.x + 4, "%s: al ordenador, el fotograma con los brazos puestos (%s)" % [gr, fmt.c.get_used_rect() if fmt else null])
+		chk(cmt.has("c83839") and cmt.has("a03031") and cmt.has("5aa861") and cmt.has("2a8a5b") and cmt.has("36466f"), "%s: tecleando, con los colores de la ropa" % gr)
+		chk(J.pintor.frame_sentado(gr, false).c == fbt.c, "%s: sin mesa, el base" % gr)
+	J.S.erase("sexo")
 	chk(int(J.sent_geo("silla")[1]) <= 2, "en la silla de la tía, los hombros por encima del respaldo (cadera %d)" % int(J.sent_geo("silla")[1]))
 	MENUS = []
 	QUIERO = ["Usar el ordenador"]

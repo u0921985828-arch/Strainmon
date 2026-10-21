@@ -278,13 +278,20 @@ func mapa_huerta() -> Dictionary:
 		o.append([])
 		for x in W:
 			g[y].append("grass")   # i18n-no
-			var dentro: bool = x >= x0 and x <= x1 and y > y0   # debajo del seto, hierba: el monte taparía lo de la última fila
+			# debajo del seto, hierba: el monte taparía lo de la última fila; y una casilla de hierba a cada lado del seto, que el
+			# monte no lo tape
+			var dentro: bool = x >= x0 - 1 and x <= x1 + 1 and y > y0
 			o[y].append(null if dentro else ("monte" if (x * 7 + y * 3) % 5 < 3 else "monte2"))   # i18n-no
-	for y in range(y0 + 1, y1 + 1):
-		o[y][x0] = "seto"   # i18n-no
-		o[y][x1] = "seto"   # i18n-no
+	# el seto de PixelLab por piezas (seto-huerta, pixellab_setos.py): los tramos de los lados con su remate arriba, las esquinas y el
+	# tramo de abajo con sus remates junto al camino; dos variantes alternas para que no se vea la repetición
+	for y in range(y0 + 1, y1):
+		var v: String = "" if y == y0 + 1 else ("2" if y % 2 else "")   # i18n-no
+		o[y][x0] = ("setoV0" if y == y0 + 1 else "setoV") + v   # i18n-no
+		o[y][x1] = ("setoV0d" if y == y0 + 1 else "setoVd") + v   # i18n-no
+	o[y1][x0] = "setoL"   # i18n-no
+	o[y1][x1] = "setoR"   # i18n-no
 	for x in range(x0 + 1, x1):
-		o[y1][x] = "seto"   # i18n-no
+		o[y1][x] = "setoHd" if x == cx - 1 else ("setoHi" if x == cx + 2 else ("setoH2" if x % 2 else "setoH"))   # i18n-no
 	for y in range(y0 + 1, H):
 		g[y][cx] = "dirt"   # i18n-no
 		g[y][cx + 1] = "dirt"   # i18n-no
@@ -380,7 +387,7 @@ func huerta_f(p, i := -1) -> Dictionary:
 func huerta_hu(i: int) -> Dictionary:
 	var s: Array = HUERTA.sitios[i]
 	var p = huerta_s().p[i]
-	return {"l": huerta_s().p, "v": [(int(s[0]) + 1) * 16, int(s[1]) * 16 - 6], "f": huerta_f(p, i)}   # el centro de la mata
+	return {"l": huerta_s().p, "v": [(int(s[0]) + 1) * 16, int(s[1]) * 16], "f": huerta_f(p, i)}   # el centro de la mata, en el pie
 
 func plants_advance(mn: int) -> void:
 	super(mn)

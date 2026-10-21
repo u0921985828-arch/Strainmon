@@ -105,7 +105,7 @@ func _corre() -> void:
 	var gf = J.grupo_pj()
 	var cf = J.grupo_combate("P")
 	J.B = null
-	chk(gm == "player" and cm == "player-combate" and gf == "player-f" and cf == "player-f-combate", "grupos %s %s %s %s" % [gm, cm, gf, cf])
+	chk(gm == "player" and cm == "player-combate-r" and gf == "player-f" and cf == "player-f-combate-r", "grupos %s %s %s %s" % [gm, cm, gf, cf])   # con CAL, los de PixelLab (combate_r.gd)
 	var faltan := []
 	for an in anims:
 		for d in Atlas.d.anims.player[an].dirs:

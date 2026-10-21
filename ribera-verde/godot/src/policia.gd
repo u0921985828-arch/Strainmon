@@ -25,6 +25,10 @@ func prompt(t: String) -> void:
 	_coloca.call_deferred()
 
 func grupo_combate(who: String):
+	var g = _grupo_combate(who)
+	return g + "-r" if g and Datos.CAL and Atlas.d.anims.has(g + "-r") else g   # los de PixelLab a unas 6 cabezas (pixellab_combate.py)
+
+func _grupo_combate(who: String):
 	if not Atlas.ok or B == null:
 		return null
 	if who == "P":

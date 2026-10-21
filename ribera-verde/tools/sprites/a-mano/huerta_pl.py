@@ -7,7 +7,7 @@
 # de su sitio del bancal (la índica, 2 m de ancho y 1,4 de alto; la sativa, 1,6 y 2; la híbrida, entre las dos). Por pisos de ramas,
 # de abajo arriba, cada uno con sus hojas de abanico alrededor (las de detrás, en sombra; las de delante, a la luz de arriba a la
 # izquierda), el tallo, el alcorque de tierra mientras es pequeña y, en flor, las colas en la punta de cada rama.
-#  · huerta-pl (planta_huerta, 48 × 56; el pie del tallo en (24, 40), el centro de su sitio de 2 × 2 casillas; el ancla (16, 55),
+#  · huerta-pl (planta_huerta, 48 × 64; el pie del tallo en (24, 40), el centro de su sitio de 2 × 2 casillas; el ancla (16, 55),
 #    el centro de abajo de la casilla de abajo a la izquierda): hg-<porte i|h|s>-<fase 1-5>: 1 la plántula, 2 creciendo, 3 el
 #    arbusto en vegetativo, 4 en flor (las colas pequeñas, con los pelos blancos), 5 madura (las colas gordas, con los pelos naranjas,
 #    y las hojas de abajo amarillas). La seca la pinta el juego en pardos (_seca en pinta.gd).
@@ -21,7 +21,7 @@ PO, PD, PM, PL, PH, PT, PS = '#0d2620', '#1b4630', '#2f7038', '#57a33e', '#94d25
 PP, PQ, PR, PN, PF = '#ff5cff', '#d020c8', '#80107a', '#f08a3c', '#f2f4dc'
 AMA = {PL: '#c8b040', PM: '#a08a2a', PH: '#e0d070', PD: '#7a6a20'}   # las hojas de abajo de la madura (huerto.py)
 TIERRA = ('#4a3020', '#5a3c22', '#6e4a2a', '#906238')               # el alcorque, como la tierra cavada (SURCO_V de pinta.gd)
-W, H, BX, BY = 48, 56, 24, 40
+W, H, BX, BY = 48, 64, 24, 40
 
 PORTE = {   # la copa por fase (semiejes en px; la de la planta hecha, 2 × 2 m), sus lóbulos (dx, dy, rx, ry en partes de la copa),
             # la hoja de abanico grande (hacia arriba; T la punta de los dedos, c la hoja, + el rabillo) y las colas (ancho, alto)
@@ -95,7 +95,9 @@ def planta(porte, fase):
         return G
     rx, ry = C['rx'][fase], C['ry'][fase]
     fr = C['fr'] if fase > 2 else 2
-    cx, cy = BX, BY + fr - ry                                     # la copa: lo de delante, fr px por delante del pie
+    # la copa, en medio de su bancal (lo pidió el usuario: «las plantas deben estar también en medio de los bancales»): centrada en el
+    # pie, que es el centro del bancal; la grande, 2 px más abajo, que las colas de arriba suben la mata
+    cx, cy = BX, BY + (2 if fase >= 3 else 0)
     def forma(x, y, m=1.0):   # ¿dentro de la copa? la sativa, más estrecha arriba; la índica, más ancha abajo
         u, v = (x - cx) / rx, (y - cy) / ry
         if porte == 's': u /= 1 - .32 * max(0, -v)
