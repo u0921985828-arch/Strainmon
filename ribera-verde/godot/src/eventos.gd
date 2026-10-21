@@ -1692,9 +1692,6 @@ func _gsr(R: Array, x: float, y: float, w: int, h: int, c: String) -> void:
 	if r.size.x > 0 and r.size.y > 0:
 		R.append([r.position.x, r.position.y, r.size.x, r.size.y, c])
 
-# la maceta de tela con su planta (v: vegetativa, f: en flor, "": sin planta) en el suelo de la carpa; con la planta del gesto, la de
-# verdad (su fotograma de la vista C, con el pie en la tierra de la maceta: las macetas de la vista C miden lo mismo que esta) o, sin ella,
-# la genérica con sus colores
 # la maceta en dos capas (lo pidió el usuario: «partir la maceta en dos, la trasera y delantera»): el canto de atrás y la tierra
 # (filas 0-7 del sprite, en (40, 60)) detrás de la planta y el canto de delante y el cuerpo (de la 8 abajo) delante
 const GS_MAC_CORTE := 8
@@ -1703,6 +1700,9 @@ func _gs_mac(R: Array, n: String, delante: bool) -> void:
 	var c := Rect2i(_gs.position.x, y, _gs.size.x, _gs.end.y - y) if delante else Rect2i(_gs.position.x, _gs.position.y, _gs.size.x, y - _gs.position.y)
 	R.append(["@", n, _gs.position.x + 40, _gs.position.y + 60, c])
 
+# la maceta de tela con su planta (v: vegetativa, f: en flor, "": sin planta) en el suelo de la carpa; con la planta del gesto, la de
+# verdad (su fotograma de la vista C, con el pie en la tierra de la maceta: las macetas de la vista C miden lo mismo que esta) o, sin ella,
+# la genérica con sus colores
 func _gs_maceta(R: Array, pl: String, moja := false, V := {}) -> void:
 	var n: String = "gs-maceta-m" if moja else "gs-maceta"
 	_gs_mac(R, n, false)
