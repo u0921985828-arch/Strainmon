@@ -77,7 +77,7 @@ func tiene(R: Array, col: String) -> bool:
 
 # 0.55: la mano de PixelLab (un sprite que empieza por pre) llega al canto del panel: "der" o "aba"; nunca flota
 func brazo_fundido(im: Image, arriba: bool) -> bool:
-	if im.get_height() != J.GS_BRAZO_L:
+	if im.get_height() < J.GS_BRAZO_L / 2 or im.get_height() > J.GS_BRAZO_L + 8:   # el largo es el del eje (con la pendiente, algo menos de alto)
 		return false
 	var cuenta := func(y: int) -> int:
 		var c := 0
@@ -88,9 +88,16 @@ func brazo_fundido(im: Image, arriba: bool) -> bool:
 			c += 1 if a > 0.0 else 0
 		return c
 	var h: int = im.get_height()
-	var cerca: int = cuenta.call(h - 1 if arriba else 0)
-	var lejos: int = cuenta.call(0 if arriba else h - 1)
-	return cerca >= 3 and lejos >= 0 and lejos * 4 <= cerca
+	var cerca := 0   # las tres filas junto a la manga y las tres de la punta
+	var lejos := 0
+	for i in 3:
+		var c1: int = cuenta.call(h - 1 - i if arriba else i)
+		var c2: int = cuenta.call(i if arriba else h - 1 - i)
+		if c1 < 0 or c2 < 0:
+			return false
+		cerca += c1
+		lejos += c2
+	return cerca >= 9 and lejos * 3 <= cerca
 
 func mano_canto(R: Array, pre: String, canto: String, x1: int, y1: int) -> bool:
 	for e in R:

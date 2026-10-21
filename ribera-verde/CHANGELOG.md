@@ -219,6 +219,8 @@
 
 - **Los brazos en perspectiva** (lo pidió el usuario: «más cortos y anchos hacia abajo»): la manga de tu mano se alarga en una imagen que se ensancha 0,7 px por fila hacia el canto de abajo, como un antebrazo visto desde los ojos (`_gs_brazo`, `GS_BRAZO`, con caché por mano y largo), y las manos van más bajas en regar, tratar, abonar y polinizar para que el brazo sea más corto; la del cliente (`-i`), como antes. `tests/acceso.gd` (97): la manga llega al canto también como imagen.
 
+- **El brazo se desvanece** (lo pidió el usuario: «que se desvanezca por la parte del brazo… las mismas proporciones de mano y brazo en cada sprite» y «tiene que quedar bien»): en todas las manos, también la del cliente, el brazo sigue el eje de su manga y mide lo mismo por ese eje (`GS_BRAZO_L` = 20 px), con el contorno de 1 px a los lados y el relleno de la manga estirado; se ensancha `GS_BRAZO` = 0,45 px por fila (el del cliente, no), va entero hasta `GS_BRAZO_FIRME` = 8 y se deshace en bandas de tramado de Bayer 4 × 4 (3/4, 1/2, 1/4) cortadas a escuadra con el eje, sin semitransparencias ni llegar al canto. `tests/acceso.gd` (97, `brazo_fundido`): cada brazo con su largo, entero junto a la manga y con menos de un tercio en la punta.
+
 ### APK de los gestos en primera persona · Godot 0.56.0 (código 75)
 - Lo pidió el usuario: «Entrega el apk», tras «Molaría que la vista sea POV». Batería entera 64/64 en verde antes de compilar.
 - `descargas/LandraceHunters.apk` (87,9 MB, firma v2/v3 con la upload key, el mismo paquete `com.landracehunters.game`).
