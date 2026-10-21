@@ -71,6 +71,24 @@ def manga(im, pal):
 				px[x, y] = pal[1 if sum(c[:3]) > corte else 0] + (255,)
 	return im
 
+PULGAR = ['..kkkkkk',   # la yema sobre la rueda, con la uña; la llama, dos píxeles a la derecha
+	'.kssssUk',
+	'kssssUUk',
+	'ssssDDkk',
+	'sssDkk']
+def pulgar(im):
+	px = im.load(); W, H = im.size
+	fl = [(x, y, px[x, y]) for x in range(W) for y in range(7) if px[x, y][3] and (px[x, y][0] > 200 and px[x, y][2] < 100 or x >= 33)]
+	for x, y, c in fl:
+		px[x, y] = (0, 0, 0, 0)
+	for x, y, c in fl:
+		px[x + 2, y] = c
+	tono = {'k': (0, 0, 0, 255), 's': (230, 166, 128, 255), 'D': (205, 124, 102, 255), 'U': (244, 200, 176, 255)}
+	for j, fila in enumerate(PULGAR):
+		for i, ch in enumerate(fila):
+			if ch in tono:
+				px[28 + i, 5 + j] = tono[ch]
+	return im
 def sale(n, f, canto, giro):
 	caja = None
 	im = limpia(Image.open(os.path.join(C, f)).convert('RGBA'))
@@ -98,6 +116,8 @@ def sale(n, f, canto, giro):
 	im = im.crop(caja if giro == 'apaga' else im.getbbox())
 	if n.startswith('gm-mech'):   # la mano izquierda: el puño a la izquierda del mechero, sin tapar la del porro
 		im = im.transpose(Image.FLIP_LEFT_RIGHT)
+	if n == 'gm-mech1-ab':   # lo pidió el usuario («a la hora de encender el mechero, desaparece el dedo gordo»): el pulgar, encima de la rueda
+		im = pulgar(im)
 	if n == 'gm-vacia':   # la edición sin la semilla trae colores de más: a los de la mano con semilla
 		ref = Image.open(os.path.join(R, 'art', 'crudo', 'gestos', 'gm-semilla', 'unica', '00.png')).convert('RGBA')
 		pal = sorted({c[:3] for c in ref.getdata() if c[3]})

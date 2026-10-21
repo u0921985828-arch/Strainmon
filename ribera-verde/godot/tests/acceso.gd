@@ -283,6 +283,50 @@ func _corre() -> void:
 	var con_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": true}, 800.0)
 	var sin_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": false}, 800.0)
 	chk(con_t != sin_t and tiene(con_t, "#8a5a2a") and not tiene(con_t, "#5a8a3a") and tiene(sin_t, "#5a8a3a") and tiene(con_t, "#9a9a9a") and tiene(sin_t, "#f4f4f0"), "el porro con tabaco y solo hierba se distinguen (hebras y humo)")
+	# y el cuerpo del porro (lo pidió el usuario: «el peta sin tabaco va a ser verde; en el peta con tabaco se verá que es marrón y verde
+	# detrás del papel»)
+	var imp := func(R: Array) -> Image:
+		for q in R:
+			if nombre_e(q) == "gm-porro":
+				return q[1]
+		return null
+	var ps: Image = imp.call(sin_t)
+	var pc: Image = imp.call(con_t)
+	var cs := [0, 0]   # lo que cambia entre los dos (el cuerpo): verdes y marrones
+	var cc := [0, 0]
+	if ps != null and pc != null and ps.get_size() == pc.get_size():
+		for y in ps.get_height():
+			for x in ps.get_width():
+				if ps.get_pixel(x, y) == pc.get_pixel(x, y):
+					continue
+				for par in [[ps.get_pixel(x, y), cs], [pc.get_pixel(x, y), cc]]:
+					var c: Color = par[0]
+					if c.a > 0.5 and c.g > c.r + 0.08 and c.g > c.b + 0.08:
+						par[1][0] += 1
+					elif c.a > 0.5 and c.r > c.g + 0.08 and c.g > c.b + 0.08:
+						par[1][1] += 1
+	chk(cs[0] >= 20 and cs[1] == 0 and cc[1] >= 10 and cc[0] >= 3, "el porro: verde sin tabaco %s, marrón y verde con tabaco %s" % [cs, cc])
+	# el pulgar en el mechero encendido (lo pidió el usuario: «a la hora de encender el mechero, desaparece el dedo gordo»): la yema
+	# encima de la cabeza de metal, y la llama sin tapar
+	var mf = Atlas.foto_misc("gm-mech1-ab")
+	var pulgar := 0   # piel en las 4 filas de encima de la cabeza de metal, sobre su canto izquierdo (la rueda)
+	var llama := 0
+	if mf != null:
+		var mi: Image = mf.c
+		var hx := 999
+		var hy := 999
+		for y in mi.get_height():
+			for x in mi.get_width():
+				var c := mi.get_pixel(x, y)
+				llama += 1 if c.a > 0.5 and c.r > 0.8 and c.b < 0.4 and c.g < 0.9 else 0
+				if c.a > 0.5 and absf(c.r - c.g) < 0.06 and absf(c.g - c.b) < 0.1 and c.r > 0.45 and c.r < 0.75:
+					hx = mini(hx, x)
+					hy = mini(hy, y)
+		for y in range(maxi(0, hy - 4), hy):
+			for x in range(maxi(0, hx - 1), mini(mi.get_width(), hx + 3)):
+				var q := mi.get_pixel(x, y)
+				pulgar += 1 if q.a > 0.5 and q.r > 0.8 and q.g > 0.55 and q.g < 0.82 and q.b > 0.38 and q.b < 0.72 else 0
+	chk(pulgar >= 4 and llama >= 6, "el mechero encendido: el pulgar sobre la rueda (%d px) y la llama (%d px)" % [pulgar, llama])
 	chk(not J.rects_acceso({"k": "regar", "c": "", "ok": true, "t0": 0.0, "pl": {}}, 600.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and (String(e[1]).begins_with("gs-regadera") or e[1] == "gs-regar")), "la regadera vieja (y la de perfil) ya no sale")
 	# la maceta en dos capas (lo pidió el usuario: «el sprite de la planta se queda detrás del de la maceta»): el canto de atrás y la
 	# tierra, la planta (o el brote, o la semilla) y, delante, el canto de delante y el cuerpo; las dos mitades se tocan sin pisarse
@@ -328,11 +372,11 @@ func _corre() -> void:
 	chk(corre(func(): await J.acceso("clave", "1234")) and J.ACCESO_V == null, "A lo pasa")
 	chk(M.reloj - t0 < 1000, "sin esperar al final (%d ms)" % int(M.reloj - t0))
 	if dir != "":
-		for k in ["llave", "candado", "clave", "pin", "rueda"] + J.GESTOS.keys() + ["fumar:pipa", "fumar:bong", "fumar:vapo", "dormir:siesta"]:
+		for k in ["llave", "candado", "clave", "pin", "rueda"] + J.GESTOS.keys() + ["fumar:pipa", "fumar:bong", "fumar:vapo", "fumar:porro:tab", "dormir:siesta"]:
 			var kk: String = k.split(":")[0]
-			var W := {"k": kk, "c": k.split(":")[1] if ":" in k else ("1998" if k == "rueda" else ("" if J.GESTOS.has(k) else "4271")), "ok": true, "t0": 0.0}
+			var W := {"k": kk, "c": k.split(":")[1] if ":" in k else ("1998" if k == "rueda" else ("" if J.GESTOS.has(k) else "4271")), "ok": true, "t0": 0.0, "tab": k.ends_with(":tab")}
 			var TT: Dictionary = J.tiempos_acceso(W)
-			for ms in ([0.0, (TT.get("entra", TT.get("t1", TT.get("para", 0.0))) as float) + 80, float(TT.fin)] if not J.GESTOS.has(kk) else [150.0, float(TT.fin) * .5, float(TT.fin) * .85]):
+			for ms in ([0.0, (TT.get("entra", TT.get("t1", TT.get("para", 0.0))) as float) + 80, float(TT.fin)] if not J.GESTOS.has(kk) else [150.0, 400.0, float(TT.fin) * .5, float(TT.fin) * .85]):
 				J.ACCESO_V = W.duplicate()
 				J.ACCESO_V.t0 = M.reloj - ms
 				for q in 2:

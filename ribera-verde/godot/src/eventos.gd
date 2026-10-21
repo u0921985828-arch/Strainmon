@@ -1671,7 +1671,7 @@ func _gsp(R: Array, n: String, x: float, y: float) -> void:
 # muñeca, tiene que ir hasta el final y completarlo con un giro circular… que sea como un cilindro… que no tenga esos picos en la
 # manga»): la manga del sprite se quita desde el puño y en su lugar va un cilindro del ancho del puño, recto por la dirección de la
 # manga, con la raya negra a los dos lados y la punta en media luna, del mismo largo en todas las manos. Una sola imagen por mano
-func _gsm(R: Array, n: String, x: float, y: float) -> void:
+func _gsm(R: Array, n: String, x: float, y: float, relleno := "") -> void:
 	var f = Atlas.foto_misc(n)
 	if f == null:
 		_gsp(R, n, x, y)
@@ -1679,7 +1679,29 @@ func _gsm(R: Array, n: String, x: float, y: float) -> void:
 	var X: int = _gs.position.x + Datos.jsround(x)
 	var Y: int = _gs.position.y + Datos.jsround(y)
 	var C: Array = _gs_cilindro(n, f.c)   # [imagen, esquina, geometría]
-	R.append(["@", C[0], X + C[1].x, Y + C[1].y, _gs, n, C[2]])
+	var im: Image = C[0] if relleno == "" else _gs_relleno(n, C[0], relleno)
+	R.append(["@", im, X + C[1].x, Y + C[1].y, _gs, n, C[2]])
+
+# lo que se ve detrás del papel del porro (lo pidió el usuario: «el peta sin tabaco va a ser verde; en el peta con tabaco se verá
+# que es marrón y verde detrás del papel»): el papel (claro y sin color) se tiñe por motas de hierba, o de hierba y tabaco
+const GS_HIERBA := ["#7cb04a", "#5a8a30", "#98c860", "#6a9e3c"]   # lo pidió el usuario: sin tabaco, verde detrás del papel
+const GS_TABACO := ["#8a5a2c", "#6a9a3a", "#a87040", "#704820", "#8a5a2c"]   # con tabaco, marrón con verde
+var _gs_rl := {}
+func _gs_relleno(n: String, im: Image, relleno: String) -> Image:
+	var k: String = n + "|" + relleno
+	if _gs_rl.has(k):
+		return _gs_rl[k]
+	var out: Image = im.duplicate()
+	var tonos: Array = GS_TABACO if relleno == "tabaco" else GS_HIERBA
+	for y in out.get_height():
+		for x in out.get_width():
+			var p: Color = out.get_pixel(x, y)
+			if p.a < 0.5 or p.s > 0.15 or p.get_luminance() < 0.6:
+				continue
+			var m: Color = Color(tonos[(x * 7 + y * 13 + (x * y) % 5) % tonos.size()])
+			out.set_pixel(x, y, p.lerp(m, 0.72))   # el papel deja ver lo de dentro: un poco de blanco encima
+	_gs_rl[k] = out
+	return out
 
 # el negro del contorno de la mano: el color opaco más oscuro del sprite
 var _gs_ng := {}
@@ -2151,7 +2173,7 @@ func _gesto_fumar(R: Array, m: String, t: float, tab := false) -> void:
 	var punta := Vector2(x + 1, 55 + e)
 	match m:
 		"porro":
-			_gsm(R, "gm-porro", x, 25 + e)   # la punta en (1, 30)
+			_gsm(R, "gm-porro", x, 25 + e, "tabaco" if tab else "hierba")   # la punta en (1, 30)
 			for i in 4:   # las hebras de la punta
 				_gsr(R, punta.x - 1 + i, punta.y - 1 + (i % 2) * 2 - (1 if tab and i == 0 else 0), 1, 1, ["#8a5a2a", "#6a4020", "#a87040", "#5a3a1a"][i] if tab else ["#5a8a3a", "#3e6a2a", "#7aa04a", "#2e5a20"][i])
 			if tab:   # el papel retorcido
