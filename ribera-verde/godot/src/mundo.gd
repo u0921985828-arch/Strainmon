@@ -1436,9 +1436,11 @@ func beber_alc(p: float) -> void:
 		S.borr = minf(float(D.FISIO.tope), borr() + p)
 
 # lo que sube fumar o catar: los mg de THC (g × % × 10) por FISIO.colo; el perfil, la media de lo fumado por lo que sube cada vez
+var humo_ms := -1e9
 func colocar(sid: String, mg: float) -> void:
 	if not Datos.CAL or mg <= 0:
 		return
+	humo_ms = Time.get_ticks_msec()   # el humo en la pantalla (vision_borracho)
 	var c0 := colo()
 	var sube := minf(float(D.FISIO.tope) - c0, mg * float(D.FISIO.colo))
 	if sube <= 0:

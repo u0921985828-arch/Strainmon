@@ -115,9 +115,25 @@ func vision_k() -> float:
 		return 0.0
 	return clampf((b - float(D.FISIO.vision)) / (float(D.FISIO.tope) - float(D.FISIO.vision)), 0.15, 1.0)
 
+# (lo pidió el usuario) el colocón: de FISIO.efecto para arriba, la pantalla con forma de ojo, más cerrado cuanto más colocado
+# (ojo_k, 0 a 1); al fumar, humo difuminado que se va en HUMO_MS (humo_k, desde humo_ms, que pone colocar)
+const HUMO_MS := 7000.0
+func ojo_k() -> float:
+	var c := colo()
+	if not (mode in ["world", "carpa"]) or c < float(D.FISIO.efecto):
+		return 0.0
+	return clampf((c - float(D.FISIO.efecto)) / (float(D.FISIO.tope) - float(D.FISIO.efecto)), 0.1, 1.0)
+
+func humo_k() -> float:
+	if not Datos.CAL or not (mode in ["world", "carpa"]):
+		return 0.0
+	return clampf(1.0 - (Time.get_ticks_msec() - humo_ms) / HUMO_MS, 0.0, 1.0)
+
 func vision_borracho() -> void:
 	var k := vision_k()
-	if k <= 0:
+	var o := ojo_k()
+	var h := humo_k()
+	if k <= 0 and o <= 0 and h <= 0:
 		if pantalla.material:
 			pantalla.material = null
 		return
@@ -127,6 +143,8 @@ func vision_borracho() -> void:
 	if pantalla.material != vision_mat:
 		pantalla.material = vision_mat
 	vision_mat.set_shader_parameter("k", k)
+	vision_mat.set_shader_parameter("ojo", o)
+	vision_mat.set_shader_parameter("humo", h)
 	vision_mat.set_shader_parameter("t", M.reloj / 1000.0)
 
 var quieto_n := 0
