@@ -1431,29 +1431,39 @@ func rects_acceso(V: Dictionary, now: float) -> Array:
 	match k:
 		"llave":   # la puerta, el escudo y el bombín de cada cerradura; la llave entra por la derecha y gira sus vueltas
 			var cer: String = cerradura(V)
-			_puerta_llave(R, cer, x0, y0, cx, cy)
+			if Atlas.foto_misc("acc-f-" + cer) != null:   # la puerta a mano, como los fondos de los gestos (gestos.py)
+				R.append(["@", "acc-f-" + cer, x0, y0, Rect2i(x0, y0, ACC_W, ACC_H)])
+			else:
+				_puerta_llave(R, cer, x0, y0, cx, cy)
 			_llave_h(R, t, T, cx, cy, Rect2i(cx + 3, y0, x0 + ACC_W - cx - 3, ACC_H), cer)
 		"candado":   # la persiana (la nave) o la puerta gris (el bajo) y su candado: la llave sube por debajo, gira y salta el arco
 			var cer: String = cerradura(V)
 			var gr: bool = cer == "nave"   # el de la nave, grande y de acero; el del bajo, pequeño y de latón
-			if gr:
+			if Atlas.foto_misc("acc-f-" + cer) != null:   # la persiana o la puerta, a mano y con su pasador (gestos.py)
+				R.append(["@", "acc-f-" + cer, x0, y0, Rect2i(x0, y0, ACC_W, ACC_H)])
+			elif gr:
 				R.append([x0, y0, ACC_W, ACC_H, "#7a7e86"])
 				for yy in range(y0 + 3, y0 + ACC_H, 5):
 					R.append([x0, yy, ACC_W, 1, "#5e626a"])
+				R.append([x0, cy - 6, ACC_W, 4, "#9a9ea6"])   # el pasador
 			else:
 				R.append([x0, y0, ACC_W, ACC_H, "#5e6466"])
 				R.append([x0 + 8, y0 + 8, ACC_W - 16, ACC_H - 16, "#686e70"])
 				R.append([x0 + 8, y0 + 8, ACC_W - 16, 1, "#7a8082"])
-			R.append([x0, cy - 6, ACC_W, 4, "#9a9ea6"])   # el pasador
+				R.append([x0, cy - 6, ACC_W, 4, "#9a9ea6"])   # el pasador
 			var aw: int = 8 if gr else 5   # medio ancho del arco
 			var ag: int = 3 if gr else 2   # grosor
 			var lift: int = Datos.jsround(_suave((t - T.gira) / 160.0) * 6) if V.ok else 0
+			var cw: int = 11 if gr else 7   # medio ancho del cuerpo
+			var ch: int = 18 if gr else 13
+			R.append([cx - aw - 1, cy - 16 - lift, aw * 2 + 2, ag + 2, "#2a2a34"])   # el contorno, como los sprites
+			R.append([cx - aw - 1, cy - 16 - lift, ag + 2, 15, "#2a2a34"])
+			R.append([cx + aw - ag - 1, cy - 16 - lift, ag + 2, 15 + lift, "#2a2a34"])
+			R.append([cx - cw - 1, cy - 3, cw * 2 + 2, ch + 2, "#2a2a34"])
 			R.append([cx - aw, cy - 15 - lift, aw * 2, ag, "#b8bcc4"])
 			R.append([cx - aw, cy - 15 - lift, ag, 13, "#b8bcc4"])
 			R.append([cx + aw - ag, cy - 15 - lift, ag, 13 + lift, "#b8bcc4"])
 			R.append([cx - aw + 1, cy - 15 - lift, 1, 13, "#e0e4ec"])
-			var cw: int = 11 if gr else 7   # medio ancho del cuerpo
-			var ch: int = 18 if gr else 13
 			var cu: Array = ["#8a9098", "#b8bec6", "#5a6068"] if gr else ["#c09838", "#e0c060", "#806020"]
 			R.append([cx - cw, cy - 2, cw * 2, ch, cu[0]])
 			R.append([cx - cw, cy - 2, cw * 2, 2, cu[1]])

@@ -302,7 +302,8 @@ func _corre() -> void:
 					if nm.ends_with("1") and not antes.ends_with("1") and float(ms) < T.gira:
 						cantos += 1
 					antes = nm
-		fondos[J.rects_acceso(V, 0.0)[1][4]] = true
+		var f1: Array = J.rects_acceso(V, 0.0)[1]   # la puerta: su sprite a mano (acc-f-<cerradura>) o, sin él, su color
+		fondos[f1[1] if typeof(f1[0]) == TYPE_STRING else f1[4]] = true
 		chk(suyas and cantos == int(J.CERRADURA[cer].v) and Atlas.foto_misc("acc-llave-%s-%s" % [cer, "v1" if kc == "candado" else "1"]) != null, "%s: su llave y %d vueltas (%d)" % [cer, int(J.CERRADURA[cer].v), cantos])
 	chk(fondos.size() == J.CERRADURA.size(), "cada cerradura, su puerta: %s" % [fondos.keys()])
 	chk(J.CERRADURA.local.v != J.CERRADURA.portal.v and J.CERRADURA.franco.v == 3, "las vueltas: el portal, una; los locales, dos; la blindada, tres")

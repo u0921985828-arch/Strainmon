@@ -1222,6 +1222,16 @@
    ],
    "ajuste": "exacto",
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "acc_fondo": {
+   "w": 104,
+   "h": 84,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "0.56: la puerta de cada cerradura y la persiana de la nave (gestos.py), del tamaño del panel de acceso"
   }
  },
  "fases": [
@@ -11519,6 +11529,30 @@
     {
      "nombre": "gm-regar",
      "celda": "pl_gm_regar"
+    },
+    {
+     "nombre": "acc-f-portal",
+     "celda": "acc_fondo"
+    },
+    {
+     "nombre": "acc-f-local",
+     "celda": "acc_fondo"
+    },
+    {
+     "nombre": "acc-f-club",
+     "celda": "acc_fondo"
+    },
+    {
+     "nombre": "acc-f-franco",
+     "celda": "acc_fondo"
+    },
+    {
+     "nombre": "acc-f-nave",
+     "celda": "acc_fondo"
+    },
+    {
+     "nombre": "acc-f-setas",
+     "celda": "acc_fondo"
     }
    ],
    "cubre": [
@@ -11608,7 +11642,13 @@
     "misc:gm-bolsita-i",
     "misc:gm-mech1-ab",
     "misc:gm-mech0-ab",
-    "misc:gm-regar"
+    "misc:gm-regar",
+    "misc:acc-f-portal",
+    "misc:acc-f-local",
+    "misc:acc-f-club",
+    "misc:acc-f-franco",
+    "misc:acc-f-nave",
+    "misc:acc-f-setas"
    ],
    "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta) y piezas (manos, herramientas, plantas, humo, billetes)."
   },
