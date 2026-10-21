@@ -165,6 +165,23 @@ sd3dcfd09,Lo metes en el arcón y lo tapas con los sacos.,You put it in the ches
 s90031372,No llevas cogollos encima.,You have no buds on you.
 s4b05791e,El arcón está vacío.,The chest is empty.
 scb82bcdd,Lo sacas todo del arcón y lo guardas en la mochila.,You take everything out of the chest and put it in your backpack.
+s3765acfa,BOTRITIS,BOTRYTIS
+sf258dd74,"Detrás del garaje, entre las zarzas, asoma una cancilla vieja de madera. Al otro lado se ven bancales comidos por la hierba.","Behind the garage, among the brambles, an old wooden gate peeks out. On the other side you can see beds overrun with weeds."
+s4e48f41c,Abrirte paso,Push through
+s66390b2b,Dejarlo,Leave it
+s6bec3457,Apartas las zarzas y empujas la cancilla: la huerta de la tía. Hace años que nadie la toca.,You pull the brambles aside and push the gate: your aunt's vegetable garden. Nobody has touched it in years.
+s27ff1a11,"Alguien ha escrito a lápiz debajo: «La huerta de Maite, detrás del garaje».","Someone has written underneath in pencil: “Maite's garden, behind the garage”."
+s53fae227,"Los bancales de la tía, comidos por las zarzas y la hierba. Limpiarlos te lleva unas {h} horas.","Your aunt's beds, overrun with brambles and weeds. Clearing them takes you about {h} hours."
+s1e1c7f17,Desbrozar,Clear them
+s98cb2b65,"Arrancas las zarzas, cavas y dejas la tierra en surcos. Caben ocho plantas al sol.","You pull out the brambles, dig and leave the soil in furrows. There's room for eight plants in the sun."
+s452284b7,Un bidón azul con una manguera que llega del grifo del garaje.,A blue drum with a hose running from the garage tap.
+s25383d11,Un bidón con la manguera del grifo del garaje. Regar las {n} plantas te lleva media hora.,A drum with the hose from the garage tap. Watering the {n} plants takes you half an hour.
+sb1a02a87,Regar todas,Water them all
+scf4e1cf9,Riegas toda la huerta. Agua al 100%.,You water the whole garden. Water at 100%.
+s73d909ac,"Las herramientas de la tía: una azada, unas tijeras de podar y unos guantes de jardín gastados.","Your aunt's tools: a hoe, pruning shears and worn gardening gloves."
+s4bf5ce22,Sacos de compost que la tía dejó hechos tierra. La huerta no necesita más.,"Bags of compost your aunt left, now turned to soil. The garden needs nothing more."
+s03920724,Un cubo con una pala de mano dentro.,A bucket with a hand trowel inside.
+s3269e3a7,Un manzano viejo que sigue dando manzanas pequeñas y ácidas.,"An old apple tree that still gives small, sour apples."
 s73721917,"CannaDex: {n}, completa. {b}","CannaDex: {n}, complete. {b}"
 s5e486c5d,Para siempre: un {v} % más de cogollo en todas tus cosechas.,Forever: {v} % more bud in all your harvests.
 s79c637ca,Para siempre: un {v} % más de THC en todas tus cosechas.,Forever: {v} % more THC in all your harvests.
@@ -244,7 +261,6 @@ s155aeee2,Floración,Flowering
 s606c9e88,DEX,
 s9c2c1caf,RECIPES,
 s808a2361,BANCO,BANK
-s3765acfa,BOTRITIS,BOTRYTIS
 s9affa116,SHOP,SHOP
 scfd02651,METRO,METRO
 s3c69629d,KAIA,
@@ -1066,7 +1082,6 @@ s872e1ec3,Mañana entran en la cuenta {e} como ingresos de la {n}.,Tomorrow {e} 
 s346d9a6d,Mañana entran en la cuenta {e} como ingresos {n}.,Tomorrow {e} goes into the account as takings from {n}.
 s84aa058e,¿Dejas {n}? Te devuelven la fianza a la cuenta; lo de la caja de hoy se queda en el negocio.,Give up {n}? The deposit goes back to your account; today's till stays with the business.
 s83c6d97b,¿Dejas {n}? Te devuelven la fianza a la cuenta.,Give up {n}? The deposit goes back to your account.
-s66390b2b,Dejarlo,Leave it
 s2119a1df,Has dejado {n}.,You've given up {n}.
 s3420c027,Las cuentas,The accounts
 sfa74ce22,Reponer género,Restock

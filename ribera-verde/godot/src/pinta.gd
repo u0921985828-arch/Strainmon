@@ -257,6 +257,8 @@ func _mundo() -> void:
 	var ty0 := floori(cam.y / 16.0)
 	var list := []
 	var sombras := []
+	var tras := []   # con CAL, los árboles de detrás de un edificio (m.tras, de mundo.gd): antes que los edificios
+	var mt: Dictionary = m.get("tras", {}) if Datos.CAL else {}
 	# hasta 6 filas por debajo y 2 casillas a cada lado de la pantalla (1.10, 14-render.js): los objetos altos (el árbol, de 6
 	# filas; el monte, 3 de ancho) se ven aunque su pie esté fuera
 	for ty in range(ty0, ty0 + ceili(SH / 16.0) + 7):
@@ -272,9 +274,11 @@ func _mundo() -> void:
 				_arte_orilla(m, k, tx, ty, sx, sy)
 			var o = m.o[ty][tx]
 			if o and o != "carpa":
-				_arte_obj(o, tx, ty, list, sombras)
+				_arte_obj(o, tx, ty, tras if mt.has("%d,%d" % [tx, ty]) else list, sombras)
 	for r in sombras:
 		_rect(r[0], r[1], r[2], r[3], Color8(0, 0, 0, 56))
+	for o in tras:
+		o[1].call()
 	if S.map == "disco-vip":
 		_cristalera(m, tx0, ty0)
 	_arte_edificios(m)
@@ -404,7 +408,7 @@ func _tiempo(now: float) -> void:
 # al aire libre: las zonas de la calle y, con CAL (MAESTRO [4]), el muelle de Puerto Viejo, que ya no está siempre a pleno sol:
 # el atardecer, el tiempo, la noche y sus farolas como en la calle
 func _al_raso() -> bool:
-	return J.D.ZONAS.has(J.S.map) or (Datos.CAL and (J.S.map in ["muelle", "comarcal"] or J.S.map.begins_with("carr-")))
+	return J.D.ZONAS.has(J.S.map) or (Datos.CAL and (J.S.map in ["muelle", "comarcal", "huerta"] or J.S.map.begins_with("carr-")))
 
 func _farolas_mapa() -> Array:   # las farolas de un mapa sin LAMPS: las «lamp» que tenga
 	var o := []
@@ -955,6 +959,9 @@ const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadr
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
 const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "mesaTb", "taburTb", "barrilTb", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz", "trim", "prensaM", "tamizM", "mallas", "lavadora", "staticM", "armS", "mesaS"]  # i18n-no
 func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
+	var seca: bool = Datos.CAL and o.begins_with("hs")   # la planta muerta de la huerta (campo.gd): la de hp, parda
+	if seca:
+		o = "hp" + o.substr(2)
 	var gr = Atlas.cubre("obj:" + o)
 	if not gr:
 		return
@@ -996,6 +1003,8 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		f = Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})
 	if f == null:
 		return
+	if seca:
+		f = {"c": _seca(f.c), "cel": f.cel}
 	var xp: int = tx * 16 + 8 + d.dx - cam.x
 	if Datos.CAL and o == "bench":   # 1.50: el banco de 1,6 m sobresale de su casilla; pegado al borde del mapa, hacia dentro
 		xp += 5 if tx == 0 else (-5 if tx == int(J.MAPS[J.S.map].w) - 1 else 0)
@@ -1023,6 +1032,22 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl, J.mesa_idx(tx, ty) if o == "mesaN" else -1, fm, ex)])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
 		_pinta_mesa(f, xp, yp, pl, J.mesa_idx(tx, ty) if o == "mesaN" else -1, fm, ex)
+
+# la planta seca: los mismos píxeles en cuatro pardos por su luz (el contorno, el más oscuro)
+const SECA := [Color8(48, 32, 20), Color8(102, 72, 40), Color8(146, 110, 64), Color8(184, 152, 100)]
+static var _seca_c := {}
+static func _seca(c: Image) -> Image:
+	var k := c.get_instance_id()
+	if not _seca_c.has(k):
+		var o: Image = c.duplicate()
+		for y in o.get_height():
+			for x in o.get_width():
+				var q: Color = o.get_pixel(x, y)
+				if q.a > 0:
+					var l: float = (q.r + q.g + q.b) / 3.0
+					o.set_pixel(x, y, SECA[0 if l < .22 else (1 if l < .42 else (2 if l < .62 else 3))])
+		_seca_c[k] = o
+	return _seca_c[k]
 
 # (lo pidió el usuario: «que se note que es el sprite y lo que trae»): d-<objeto>-<mapa>-<tramo>, d-<objeto>-<mapa>,
 # d-<objeto>-<tramo> o d-<objeto>, de detalle.py (grupos detalle-alto y detalle-16); el tramo, por la columna (los mostradores)

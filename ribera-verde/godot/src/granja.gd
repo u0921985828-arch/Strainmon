@@ -329,7 +329,9 @@ func _own() -> Array:
 			o.append([k, S.seeds[k]])
 	return o
 
-func plantar(i: int) -> void:
+# hu (con CAL, la huerta de campo.gd): {l: sus plantas, v: dónde se ve, f: sus factores}; sin él, las plazas de las carpas
+func plantar(i: int, hu = null) -> void:
+	var L: Array = hu.l if hu else S.pots
 	var own := _own()
 	var esq := []   # [esqueje, 1 si es de las bandejas del carro]
 	for e in S.esquejes:
@@ -359,7 +361,7 @@ func plantar(i: int) -> void:
 		var e: Dictionary = esq[j - own.size()][0]
 		var l: Array = S.bandejas if esq[j - own.size()][1] else S.esquejes
 		l.remove_at(l.find(e))
-		S.pots[i] = {"sid": e.sid, "prog": .12, "water": 70, "health": 100, "fert": false, "pest": false, "f": e.f}   # ya enraizado: empieza de plántula
+		L[i] = {"sid": e.sid, "prog": .12, "water": 70, "health": 100, "fert": false, "pest": false, "f": e.f}   # ya enraizado: empieza de plántula
 		sfx("sel")
 		await accion("plantar")
 		await say(T("Plantas el esqueje de {s}{e}.", {"s": strain(e.sid).n, "e": etiq(e.f)}))
@@ -369,11 +371,11 @@ func plantar(i: int) -> void:
 	S.seeds[sid] -= 1
 	if not S.seeds[sid]:
 		S.seeds.erase(sid)
-	S.pots[i] = {"sid": sid, "prog": 0, "water": 70, "health": 100, "fert": false, "pest": false, "f": roll_feno(sid)}
-	estrella_regalo(sid, S.pots[i].f)
+	L[i] = {"sid": sid, "prog": 0, "water": 70, "health": 100, "fert": false, "pest": false, "f": roll_feno(sid)}
+	estrella_regalo(sid, L[i].f)
 	sfx("sel")
 	await accion("sembrar" if Datos.CAL else "plantar")   # 1.57.2: la semilla a la tierra
-	await say(T("Has plantado {s}{e}.", {"s": strain(sid).n, "e": nom_planta(S.pots[i].f)}))
+	await say(T("Has plantado {s}{e}.", {"s": strain(sid).n, "e": nom_planta(L[i].f)}))
 	await pista_barras()
 
 # con la primera planta, qué dice su barra
@@ -384,8 +386,8 @@ func pista_barras() -> void:
 	await say(K("Cada planta lleva su barra: arriba, el agua (roja: toca regar); abajo, la cosecha (dorada: lista)."))
 	await say(K("Si le sale plaga, verás una «!» roja y manchas en las hojas. Trátala con INSECTICIDA."))
 
-func sacar_esqueje(i: int) -> void:
-	var p: Dictionary = S.pots[i]
+func sacar_esqueje(i: int, hu = null) -> void:
+	var p: Dictionary = (hu.l if hu else S.pots)[i]
 	var s = strain(p.sid)
 	if S.esquejes.size() >= 12:
 		await say(K("El propagador está lleno: 12 esquejes. Planta alguno antes."))
@@ -404,28 +406,29 @@ func sacar_esqueje(i: int) -> void:
 func stage_name(p: Dictionary) -> String:
 	return Cultivo.stage_name(p)
 
-func pot_action(i: int) -> void:
-	var p = S.pots[i]
+func pot_action(i: int, hu = null) -> void:
+	var L: Array = hu.l if hu else S.pots
+	var p = L[i]
 	if p == null:
-		if macetas_libres(i, false).size():
+		if not hu and macetas_libres(i, false).size():
 			var c: int = await ask(T("Plaza vacía con una maceta de {m}.", {"m": D.MACETAS[S.macetas[i]].n}), [K("Plantar"), K("Cambiar maceta"), K("Salir")])
 			if c == 1:
 				await cambiar_maceta(i)
 				return
 			if c != 0:
 				return
-		await plantar(i)
+		await plantar(i, hu)
 		return
 	var s = strain(p.sid)
 	if p.get("dead"):
 		await say(T("La {s} se ha secado del todo.", {"s": s.n}))
-		S.pots[i] = null
+		L[i] = null
 		await say(K("Retiras la planta muerta."))
 		return
 	if p.prog >= 1:
 		var c: int = await ask(T("{s}{e} lista para cosechar.\nSalud {h}% · Agua {w}%", {"s": s.n, "e": etiq(p.get("f")), "h": Datos.jsround(p.health), "w": Datos.jsround(p.water)}), [K("Cosechar"), K("Nombrar"), K("Esperar")])
 		if c == 0:
-			await harvest(i)
+			await harvest(i, hu)
 		elif c == 1:
 			if not p.get("f"):
 				p.f = roll_feno(p.sid)
@@ -455,7 +458,7 @@ func pot_action(i: int) -> void:
 		"h": Datos.jsround(p.health), "pl": (T(" · PLAGA") if p.pest else "") + (T(" · BOTRITIS") if Datos.CAL and p.get("bot") else "")}), opts)
 	var op: String = opts[c]
 	if op == "Regar":
-		var v := pos_plaza(i)
+		var v: Array = hu.v if hu else pos_plaza(i)
 		gesto_p = p
 		await accion("regar", {"id": "vfx-gotas", "x": v[0], "y": v[1] - 6})
 		p.water = 100
@@ -493,14 +496,14 @@ func pot_action(i: int) -> void:
 		sfx("sel")
 		await say(T("Aplicas el PREVENTIVO: la botritis no la coge en {n} días.", {"n": int(D.BOTRITIS.prev)}))
 	elif op == "Sacar esqueje":
-		await sacar_esqueje(i)
+		await sacar_esqueje(i, hu)
 	elif op == "Nombrar":
 		if not p.get("f"):
 			p.f = roll_feno(p.sid)
 		await nombrar_planta(p.f)
 	elif op == "Arrancar":
 		if await ask(K("¿Seguro que quieres arrancarla?"), [K("Sí"), K("No")]) == 0:
-			S.pots[i] = null
+			L[i] = null
 			await say(K("Arrancas la planta."))
 
 # tierra (1.10): como mucho LITROS_M2 litros por m² de suelo en cada carpa, sumando todas sus macetas
@@ -791,16 +794,17 @@ func semillas_cosecha(p: Dictionary) -> Dictionary:
 		nn = ri(1, 3)
 	return {"cria": cria, "fem": fem, "n": nn}
 
-func harvest(i: int) -> void:
-	var p: Dictionary = S.pots[i]
+func harvest(i: int, hu = null) -> void:
+	var L: Array = hu.l if hu else S.pots
+	var p: Dictionary = L[i]
 	cuenta("cosecha")
 	var s = strain(p.sid)
-	var f := factores(i)
+	var f: Dictionary = hu.f if hu else factores(i)
 	var fe: Dictionary = p.f if p.get("f") else {"t": 1, "y": 1}
 	var cl := Cultivo.clase_feno(p.get("f"))
 	var g := botritis_merma(p, gramos_planta(p, f))
 	var thc := Cultivo.thc_cosecha(S, p, f)
-	var v := pos_plaza(i)
+	var v: Array = hu.v if hu else pos_plaza(i)
 	gesto_p = p
 	await accion("cosechar")
 	await accion("oler", {"id": "vfx-brillo", "x": v[0], "y": v[1] - 12})
@@ -825,7 +829,7 @@ func harvest(i: int) -> void:
 		mover_lote(S.buds, S.caja.buds, lk, a_caja)
 	if p.get("f") and p.f.get("id"):
 		S.fenos[str(int(p.f.id))] = cl
-	S.pots[i] = null
+	L[i] = null
 	sfx("get")
 	if S.rec.get(p.sid) == 1:   # una variedad de receta sacada en la mesa, cosechada (capítulo 4)
 		S.rec[p.sid] = 2

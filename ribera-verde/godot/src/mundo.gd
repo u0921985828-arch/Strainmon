@@ -1980,9 +1980,75 @@ func montar_atrezo(k: String) -> void:
 		if m.o[a[1]][a[0]] == null:
 			m.o[a[1]][a[0]] = a[2]
 
+# (lo preguntó el usuario: «los árboles no pueden estar encima de los edificios, ¿no?»): con CAL, ningún árbol, manzano ni mata del
+# monte se pinta encima de un edificio (sus píxeles, con el desfase, el espejo y el ancla de pinta.gd). Los que tienen el pie detrás o
+# al lado (por encima de la última fila del edificio) van en m.tras y se pintan antes que los edificios, que los tapan; los de delante,
+# cuya copa taparía la fachada, se quitan (en _arb0, y vuelven sin CAL). Se rehace si cambian los edificios del mapa
+const ARBOLES := ["tree", "tree2", "manzano", "monte", "monte2"]   # i18n-no
+const Pintor = preload("res://src/pinta.gd")
+var _arb0 := {}   # mapa → [[x, y, el que se quitó]]
+var _arb_k := {}  # mapa → los edificios con los que se calculó
+
+func arboles_fuera(k: String) -> void:
+	if not MAPS.has(k):
+		return
+	var m: Dictionary = MAPS[k]
+	var bl: Array = m.get("blds", [])
+	var clave := str(bl)
+	if Datos.CAL and (_arb_k.get(k) == clave or not Atlas.carga()):
+		return
+	for q in _arb0.get(k, []):
+		m.o[q[1]][q[0]] = q[2]
+	_arb0.erase(k)
+	_arb_k.erase(k)
+	m.erase("tras")
+	if not Datos.CAL:
+		return
+	_arb_k[k] = clave
+	_arb0[k] = []
+	m.tras = {}
+	var ed := []   # [esquina en px, su imagen, la fila de debajo de su última fila]
+	for b in bl:
+		var f = Atlas.frame_de("edificio-" + String(b.get("fachada", b.id)), "base", "unica", 0, {"i": 0})
+		if f != null:
+			ed.append([Vector2i(int(b.x0) * 16, int(b.y0) * 16), f.c, int(b.y0) + int(b.h)])
+	if ed.is_empty():
+		return
+	for ty in int(m.h):
+		for tx in int(m.w):
+			var o = m.o[ty][tx]
+			if not (o in ARBOLES):
+				continue
+			var d: Dictionary = Pintor.desfase(o, tx, ty)
+			var f = Atlas.frame_de(Atlas.cubre("obj:" + o), o, "unica", 0, {"i": 0, "esp": d.esp})
+			if f == null:
+				continue
+			var p := Vector2i(tx * 16 + 8 + int(d.dx) - int(f.cel.ancla[0]), ty * 16 + 15 + int(d.dy) - int(f.cel.ancla[1]))
+			var pisa := false
+			var delante := false
+			for e in ed:
+				if _pisa(f.c, p, e[1], e[0]):
+					pisa = true
+					delante = delante or ty >= int(e[2])
+			if delante:
+				_arb0[k].append([tx, ty, o])
+				m.o[ty][tx] = null
+			elif pisa:
+				m.tras["%d,%d" % [tx, ty]] = true
+
+# ¿se tocan dos imágenes (a en pa, b en pb) en algún píxel con algo?
+static func _pisa(a: Image, pa: Vector2i, b: Image, pb: Vector2i) -> bool:
+	var r := Rect2i(pa, a.get_size()).intersection(Rect2i(pb, b.get_size()))
+	for y in range(r.position.y, r.end.y):
+		for x in range(r.position.x, r.end.x):
+			if a.get_pixel(x - pa.x, y - pa.y).a > 0 and b.get_pixel(x - pb.x, y - pb.y).a > 0:
+				return true
+	return false
+
 func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	SENT = null   # 1.49: al cambiar de sitio, de pie
 	S.map = name_
+	montar_huerta(name_)   # con CAL, la huerta de la tía (campo.gd): la cancilla del pueblo y su mapa
 	if name_ == "home":
 		montar_casa()
 	if name_ == "nave":
@@ -2021,6 +2087,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	montar_carreteras(name_)   # la red de carreteras que se andan (CARRETERAS)
 	montar_garaje(name_)
 	montar_aparcamiento(name_)
+	arboles_fuera(name_)   # con CAL, ningún árbol encima de un edificio
 	P.x = x
 	P.y = y
 	P.px = x * 16.0
@@ -2535,6 +2602,9 @@ func montar_carreteras(_mapa: String) -> void:   # en campo.gd
 
 func campo_obj(_x: int, _y: int, _o) -> bool:   # MAESTRO [4], en campo.gd
 	return false
+
+func montar_huerta(_k: String) -> void:   # la huerta de la tía, en campo.gd
+	pass
 
 # MAESTRO [6], en gestion.gd
 func staff_ok() -> bool:
