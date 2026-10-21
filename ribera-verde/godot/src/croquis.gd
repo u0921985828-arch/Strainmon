@@ -61,15 +61,21 @@ static var PUEBLOS := {
 	"errotabarri": {"p": [194, 84], "d": I18n.K("Errotabarri, la aldea del molino viejo, al final de la pista.")},
 }
 # los caminos entre pueblos (con Datos.CAL; lo pidió el usuario: «en el mapa se deberían de ver los caminos que conectan los
-# pueblos»): [de, a, curva, tipo]; carretera, con su borde y el centro claro (y un puente al cruzar la ría); pista, de tierra
-const CAMINOS := [["town", "puerto", 7, "c"], ["town", "ibarbide", -6, "c"], ["town", "valdehierro", 6, "c"], ["town", "mendialde", -4, "c"],
-	["puerto", "valdehierro", -5, "c"], ["valdehierro", "mendialde", 5, "c"], ["ibarbide", "errotabarri", 6, "c"], ["mendialde", "errotabarri", -6, "p"]]
+# pueblos… hay mapas que conectan ciertos pueblos, eso se tiene que ver reflejado»): solo los de verdad del juego, [de, a, curva,
+# tipo, mapa]. Las carreteras del autobús desde Ribera Verde (PARADAS, con sus minutos encima) y la carretera comarcal, el mapa
+# `comarcal` que se anda de Mendialde a Errotabarri (CAMPO, desde CAMPO.ch), con el caserío abandonado (`refugio`) a un lado;
+# la autopista a Hiriburu (METRO) sale por el borde desde Ibarbide cuando se abre. Lo que aún no se abre, en gris.
+const CAMINOS := [["town", "puerto", 7, "c", ""], ["town", "ibarbide", -6, "c", ""], ["town", "valdehierro", 6, "c", ""], ["town", "mendialde", -12, "c", ""],
+	["town", "errotabarri", 10, "c", ""], ["mendialde", "errotabarri", -6, "m", "comarcal"]]
 const C_BORDE := Color8(92, 78, 62)
 const C_CENTRO := Color8(244, 236, 210)
 const C_PUENTE := Color8(70, 56, 44)
 const C_PISTA := Color8(168, 132, 86)
-# por dónde va el autobús desde Ribera Verde (para poner sus minutos encima del camino)
-const RUTA := {"errotabarri": ["mendialde", "errotabarri"]}
+const C_GRIS := Color8(160, 150, 130)       # sin abrir: el borde
+const C_GRIS_C := Color8(208, 200, 180)     # y el centro
+const C_COMARCAL := Color8(196, 150, 70)    # el centro de la comarcal, que se anda (amarillo de carretera de monte)
+const REFUGIO_T := 0.42                     # el caserío abandonado, por dónde de la comarcal
+const AUTOPISTA := [[202, 30], [214, 26], [MW - 4, 22]]   # de Ibarbide al borde, hacia Hiriburu
 
 static func camino_pts(c: Array) -> Array:
 	var a := Vector2(PUEBLOS[c[0]].p[0], PUEBLOS[c[0]].p[1])
@@ -82,19 +88,41 @@ static func camino_pts(c: Array) -> Array:
 		r.append(a.lerp(m, t).lerp(m.lerp(b, t), t))
 	return r
 
-static func _camino(im: Image, c: Array) -> void:
+static func _camino(im: Image, c: Array, ok := true) -> void:
 	var pts := camino_pts(c)
-	if c[3] == "p":   # la pista: 1 px de tierra
-		for q in pts:
-			_px(im, int(round(q.x)), int(round(q.y)), C_PISTA)
-		return
+	_carretera(im, pts, ok, C_COMARCAL if c[3] == "m" else C_CENTRO)
+
+static func _carretera(im: Image, pts: Array, ok: bool, centro: Color) -> void:
 	for q in pts:   # el borde (3 × 3) y luego el centro
 		for d in [Vector2i(-1, 0), Vector2i(1, 0), Vector2i(0, -1), Vector2i(0, 1)]:
 			var x: int = int(round(q.x)) + d.x
 			var y: int = int(round(q.y)) + d.y
-			_px(im, x, y, C_PUENTE if es_mar(x, y) else C_BORDE)
+			_px(im, x, y, (C_PUENTE if es_mar(x, y) else C_BORDE) if ok else C_GRIS)
 	for q in pts:
-		_px(im, int(round(q.x)), int(round(q.y)), C_CENTRO)
+		_px(im, int(round(q.x)), int(round(q.y)), centro if ok else C_GRIS_C)
+
+# los puntos de la autopista (dos tramos rectos)
+static func autopista_pts() -> Array:
+	var r := []
+	for i in AUTOPISTA.size() - 1:
+		var a := Vector2(AUTOPISTA[i][0], AUTOPISTA[i][1])
+		var b := Vector2(AUTOPISTA[i + 1][0], AUTOPISTA[i + 1][1])
+		var n := int(a.distance_to(b) * 1.3) + 1
+		for j in n:
+			r.append(a.lerp(b, float(j) / n))
+	r.append(Vector2(AUTOPISTA[-1][0], AUTOPISTA[-1][1]))
+	return r
+
+# el sitio del caserío abandonado, al lado de la comarcal
+static func refugio_p() -> Vector2i:
+	var pts := camino_pts(CAMINOS[5])
+	var q: Vector2 = pts[int(pts.size() * REFUGIO_T)]
+	return Vector2i(int(q.x) - 2, int(q.y) - 7)
+
+static func camino_ok(D: Dictionary, ch: int, c: Array) -> bool:
+	if c[4] == "comarcal":
+		return D.has("CAMPO") and ch >= int(D.CAMPO.ch)
+	return abierto(D, ch, c[1])
 
 const ORDEN := ["puerto", "town", "ibarbide", "errotabarri", "mendialde", "valdehierro"]
 const ZONA := {"town": "town", "alto": "town", "astilleros": "town", "home": "town", "shop": "town", "bar": "town", "txaro": "town",
@@ -168,7 +196,7 @@ static func es_mar(x: int, y: int) -> bool:
 	return absf(x - rx) < w
 
 # la imagen del croquis para el capítulo ch (la cachea pinta.gd)
-static func imagen(D: Dictionary, ch: int) -> Image:
+static func imagen(D: Dictionary, ch: int, metro := false) -> Image:
 	var im := Image.create(MW, MH, false, Image.FORMAT_RGBA8)
 	var papel := Color8(226, 212, 172)
 	for y in MH:
@@ -222,26 +250,32 @@ static func imagen(D: Dictionary, ch: int) -> Image:
 					_px(im, c[0] + xx, c[1] + yy, Color8(176, 168, 96))
 		for xx in c[2]:
 			_px(im, c[0] + xx, c[1] - 1, Color8(140, 120, 80))
-	if Datos.CAL:   # los caminos, y encima de cada uno los minutos de su autobús desde Ribera Verde
+	if Datos.CAL:   # los caminos de verdad, y encima de los del autobús sus minutos desde Ribera Verde
+		if metro:
+			_carretera(im, autopista_pts(), true, C_CENTRO)
+			var hb := I18n.v("HIRIBURU")
+			_txt(im, MW - 4 - ancho(hb), 14, hb, Color8(40, 30, 24), papel)
 		for c in CAMINOS:
-			if c[3] == "p":
-				_camino(im, c)
+			_camino(im, c, camino_ok(D, ch, c))
 		for c in CAMINOS:
-			if c[3] == "c":
-				_camino(im, c)
-		for k in ORDEN:
-			if k == "town":
-				continue
-			var tr: Array = RUTA.get(k, ["town", k])
-			var cm: Array = []
-			for c in CAMINOS:
-				if (c[0] == tr[0] and c[1] == tr[1]) or (c[1] == tr[0] and c[0] == tr[1]):
-					cm = c
-			var pts := camino_pts(cm)
+			var pts := camino_pts(c)
 			var m: Vector2 = pts[pts.size() / 2]
-			var col := Color8(122, 58, 40) if abierto(D, ch, k) else Color8(160, 150, 130)
-			var t := "%d'" % int(D.PARADAS[k].min)
-			_txt(im, int(m.x) - ancho(t) / 2 + 3, int(m.y) - 8, t, col, papel)
+			var ok := camino_ok(D, ch, c)
+			var col := Color8(122, 58, 40) if ok else Color8(160, 150, 130)
+			if c[4] == "comarcal":   # su nombre, y el caserío abandonado a un lado (una casa sin tejado)
+				var t := I18n.v("COMARCAL")
+				_txt(im, int(m.x) - ancho(t) / 2, int(m.y) + 4, t, col, papel)
+				var r := refugio_p()
+				_caja(im, r.x, r.y, 4, 3, Color8(120, 100, 84) if ok else C_GRIS)
+				_px(im, r.x + 1, r.y + 1, Color8(40, 30, 24))
+				_px(im, r.x + 3, r.y - 1, Color8(96, 80, 60) if ok else C_GRIS)
+				continue
+			var t := "%d'" % int(D.PARADAS[c[1]].min)
+			var dv: Vector2 = pts[-1] - pts[0]
+			if absf(dv.y) > absf(dv.x):   # en las que bajan, al lado (y no encima del nombre del pueblo)
+				_txt(im, int(m.x) - ancho(t) - 3, int(m.y) - 2, t, col, papel)
+			else:
+				_txt(im, int(m.x) - ancho(t) / 2 + 3, int(m.y) - 8, t, col, papel)
 	# las líneas de autobús, desde Ribera Verde, a trazos (en gris si aún no hay línea), con sus minutos
 	var rv: Array = PUEBLOS.town.p
 	for k in ([] if Datos.CAL else ORDEN):

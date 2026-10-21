@@ -539,11 +539,12 @@ func _encima() -> void:
 		for e in J.rects_armario():
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.MAPA_V != null:   # 1.42: el mapa de la comarca, un croquis (croquis.gd)
-		var kc := "croquis|%d" % int(J.S.ch)
+		var mt: bool = J.metro_ya()   # con la autopista a Hiriburu
+		var kc := "croquis|%d|%s" % [int(J.S.ch), mt]
 		if not cache.has(kc):
 			if cache.size() > 512:   # R7: tope
 				cache.clear()
-			cache[kc] = Croquis.imagen(J.D, int(J.S.ch))
+			cache[kc] = Croquis.imagen(J.D, int(J.S.ch), mt)
 		var al: int = J.alto_libre()
 		var o := Croquis.origen_mapa(J.SW, al)
 		_img(cache[kc], o.x, o.y)

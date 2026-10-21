@@ -120,8 +120,8 @@ func _corre() -> void:
 		chk(not Croquis.es_mar(q[0], q[1]), k + " en tierra")
 	# 5b · los caminos (lo pidió el usuario: «en el mapa se deberían de ver los caminos que conectan los pueblos»): desde Ribera
 	# Verde, por los píxeles de camino, se llega a todos los pueblos
-	var CAM := [Croquis.C_BORDE, Croquis.C_CENTRO, Croquis.C_PUENTE, Croquis.C_PISTA]
-	var PASA := CAM + [Color8(226, 212, 172), Color8(40, 30, 24), Color8(120, 114, 104), Color8(122, 58, 40), Color8(160, 150, 130)]   # y por debajo de los rótulos
+	var CAM := [Croquis.C_BORDE, Croquis.C_CENTRO, Croquis.C_PUENTE, Croquis.C_COMARCAL]
+	var PASA := CAM + [Color8(226, 212, 172), Color8(40, 30, 24), Color8(120, 114, 104), Color8(122, 58, 40), Color8(160, 150, 130), Color8(150, 64, 48), Color8(96, 40, 32)]   # y por debajo de los rótulos y por las casas (los caminos se juntan en el pueblo)
 	var ini: Vector2 = Croquis.camino_pts(Croquis.CAMINOS[0])[12]
 	var vis := {Vector2i(ini): true}
 	var cola := [Vector2i(ini)]
@@ -144,6 +144,33 @@ func _corre() -> void:
 				llega = true
 				break
 		chk(llega, "un camino llega a %s (a %d px)" % [k, int(dm)])
+	# los caminos son los mapas del juego (lo pidió el usuario: «hay mapas que conectan ciertos pueblos, eso se tiene que ver
+	# reflejado»): la comarcal entre Mendialde y Errotabarri (el mapa `comarcal`, que se anda) con su caserío, la autopista a Hiriburu
+	# solo cuando se abre y ningún camino inventado (Puerto Viejo – Valdehierro, Ibarbide – Errotabarri)
+	var cm: Array = Croquis.CAMINOS.filter(func(c): return c[4] == "comarcal")
+	chk(cm.size() == 1 and [cm[0][0], cm[0][1]].has("mendialde") and [cm[0][0], cm[0][1]].has("errotabarri") and J.D.CAMPO.mapa == "comarcal", "la comarcal, entre Mendialde y Errotabarri")
+	var cc := 0
+	for q in Croquis.camino_pts(cm[0]):
+		if im8.get_pixel(int(round(q.x)), int(round(q.y))) == Croquis.C_COMARCAL:
+			cc += 1
+	chk(cc > 20, "la comarcal se ve con su color (%d px)" % cc)
+	var im1 := Croquis.imagen(J.D, int(J.D.CAMPO.ch) - 1)
+	var q1: Vector2 = Croquis.camino_pts(cm[0])[10]
+	chk(im1.get_pixel(int(round(q1.x)), int(round(q1.y))) == Croquis.C_GRIS_C, "antes del capítulo %d, la comarcal en gris" % int(J.D.CAMPO.ch))
+	var rf := Croquis.refugio_p()
+	chk(im8.get_pixel(rf.x, rf.y) == Color8(120, 100, 84), "el caserío abandonado, junto a la comarcal")
+	for par in [["puerto", "valdehierro"], ["ibarbide", "errotabarri"], ["valdehierro", "mendialde"]]:
+		chk(not Croquis.CAMINOS.any(func(c): return par.has(c[0]) and par.has(c[1])), "sin camino inventado %s – %s" % par)
+	var im8m := Croquis.imagen(J.D, 8, true)
+	var fin: Array = Croquis.AUTOPISTA[-1]
+	chk(im8m.get_pixel(fin[0], fin[1]) == Croquis.C_CENTRO and im8.get_pixel(fin[0], fin[1]) != Croquis.C_CENTRO, "la autopista a Hiriburu, solo con la ciudad abierta")
+	if arg("--croquis") != "":   # el croquis a 4 ×: antes de la comarcal, en el capítulo 8 y con Hiriburu
+		for ec in [["1", im1], ["8", im8], ["8-hiriburu", im8m]]:
+			var g: Image = ec[1].duplicate()
+			g.resize(Croquis.MW * 4, Croquis.MH * 4, Image.INTERPOLATE_NEAREST)
+			g.save_png(arg("--croquis").path_join("croquis-%s.png" % ec[0]))
+	for c in Croquis.CAMINOS:
+		chk(c[4] != "" or J.D.PARADAS.has(c[1]), "%s – %s: una línea del autobús" % [c[0], c[1]])
 	var MV := {"i": 0}
 	for i in Croquis.ORDEN.size():
 		var r3: Array = Croquis.rects_mapa(J.SW, MV, "town")
