@@ -443,7 +443,7 @@ func _manchas() -> void:
 		return
 	var m: Dictionary = J.MAPS[J.S.map]
 	for t in m.get("carpas", []):
-		if not J.plantas_vivas(t.ci):
+		if not Cultivo.foco_on(J.S, t.ci):
 			continue
 		var xc: int = (t.x0 + t.x1 + 1) * 8 - cam.x
 		var yb: int = t.y * 16 + 15 - cam.y
@@ -1039,7 +1039,7 @@ func _carpa_mapa(t: Dictionary) -> void:
 	else:
 		var c := Procedural.carpa_mapa(t.t)
 		_img(c, xc - (c.get_width() >> 1), yb - c.get_height() + 1)
-	if J.plantas_vivas(t.ci):
+	if Cultivo.foco_on(J.S, t.ci):
 		var tipo: String = J.D.FOCOS[J.S.carpas[t.ci].foco].tipo
 		_rect(xc - 3, yb + 1, 6, 1, css(J.D.FOCO_LUZ[tipo] + ".6)"))
 
@@ -1694,7 +1694,7 @@ func _carpa_fondo() -> void:
 		_img(cv, g.x0 - 1, g.yf + 2 - cv.get_height())
 	if c.get("goteo") and g.has("plata"):
 		_goteo()
-	for e in Vista.temporizador(g.tx, g.ty, Cultivo.ciclo_de(c), J.plantas_vivas(J.VC.ci)):
+	for e in Vista.temporizador(g.tx, g.ty, Cultivo.ciclo_de(c), Cultivo.foco_on(J.S, J.VC.ci)):
 		_rect(e[0], e[1], e[2], e[3], e[4])
 	if Cultivo.kit_de(c) != "":
 		var e := Procedural.extra34("filtro")
@@ -1781,7 +1781,7 @@ func _ramal(lg: Array, fila, al: float, clip: Rect2i) -> void:
 
 # el cono de luz del foco encendido (dentro de la carpa): trapecio con degradado vertical, sumado ('lighter')
 func _cono() -> void:
-	if not J.plantas_vivas(J.VC.ci):
+	if not Cultivo.foco_on(J.S, J.VC.ci):
 		return
 	var D: Dictionary = J.D
 	var c: Dictionary = g.c

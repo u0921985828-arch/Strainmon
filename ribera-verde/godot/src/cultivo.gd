@@ -462,6 +462,27 @@ static func plantas_vivas(S: Dictionary, ci: int) -> bool:
 			return true
 	return false
 
+# el foco encendido (con CAL, por el temporizador): con plantas vivas y dentro de sus horas de luz, desde las 6:00: 18/6 hasta las
+# 24:00 y 12/12 hasta las 18:00; en automático, 18/6 mientras ninguna florece y 12/12 en cuanto una pasa a floración. Sin CAL, como
+# el HTML: encendido siempre que haya plantas vivas
+const LUZ_DESDE := 6 * 60
+static func foco_on(S: Dictionary, ci: int) -> bool:
+	if not plantas_vivas(S, ci):
+		return false
+	if not Datos.CAL:
+		return true
+	return posmod(int(S.min) - LUZ_DESDE, 24 * 60) < horas_luz(S, ci) * 60
+
+static func horas_luz(S: Dictionary, ci: int) -> int:
+	var k := ciclo_de(S.carpas[ci])
+	if k == "auto":
+		var H := huecos(S)
+		for i in H.size():
+			if H[i].c == ci and i < S.pots.size() and S.pots[i] != null and not S.pots[i].get("dead") and plant_stage(S.pots[i]) >= 3:
+				return 12
+		return 18
+	return 12 if k == "flor" else 18
+
 # € de luz al día de la carpa ci con plantas (foco H_LUZ horas; extras, día y noche)
 static func luz_carpa(S: Dictionary, ci: int) -> int:
 	var D := Datos.carga()

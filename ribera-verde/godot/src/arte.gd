@@ -376,50 +376,6 @@ static func luz_baja(t: String, vc: Dictionary) -> Image:
 	cache[k] = o
 	return o
 
-# lo que reflejan las paredes plateadas (con CAL): la distancia (en casillas de 8 vecinos) de cada píxel al haz de la luz L, en
-# escalones como el pixel art: en el haz, 1; a 3 px, .78; a 7, .62; a 12, .52; más lejos, amb (el shader de la vista C la usa)
-const REFLEJO := [[0, 1.0], [3, .78], [7, .62], [12, .52]]
-static func reflejo(L: Image, amb: float) -> Image:
-	var k := "refl|%d|%s" % [L.get_instance_id(), amb]
-	if cache.has(k):
-		return cache[k]
-	var W := L.get_width()
-	var H := L.get_height()
-	var d := PackedInt32Array()
-	d.resize(W * H)
-	for y in H:
-		for x in W:
-			d[y * W + x] = 0 if L.get_pixel(x, y).a8 else 9999
-	for y in H:   # dos pasadas de chaflán (Chebyshev)
-		for x in W:
-			var i := y * W + x
-			if x > 0: d[i] = mini(d[i], d[i - 1] + 1)
-			if y > 0:
-				d[i] = mini(d[i], d[i - W] + 1)
-				if x > 0: d[i] = mini(d[i], d[i - W - 1] + 1)
-				if x < W - 1: d[i] = mini(d[i], d[i - W + 1] + 1)
-	for y in range(H - 1, -1, -1):
-		for x in range(W - 1, -1, -1):
-			var i := y * W + x
-			if x < W - 1: d[i] = mini(d[i], d[i + 1] + 1)
-			if y < H - 1:
-				d[i] = mini(d[i], d[i + W] + 1)
-				if x < W - 1: d[i] = mini(d[i], d[i + W + 1] + 1)
-				if x > 0: d[i] = mini(d[i], d[i + W - 1] + 1)
-	var o := Image.create(W, H, false, Image.FORMAT_L8)
-	for y in H:
-		for x in W:
-			var v := amb
-			for e in REFLEJO:
-				if d[y * W + x] <= int(e[0]):
-					v = maxf(amb, float(e[1]))
-					break
-			o.set_pixel(x, y, Color(v, v, v))
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = o
-	return o
-
 # de dónde cuelga la campana (vcCuelga): la primera y la última columna con algo de su fila de arriba (las cuerdas de los LED) y esa fila
 const VC_CUERDA := Color8(28, 29, 34)
 const VC_POLEA := [Color8(58, 60, 68), Color8(122, 133, 132)]   # cuerpo y brillo de la rueda

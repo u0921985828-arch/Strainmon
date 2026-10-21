@@ -22,25 +22,21 @@ const OSC := Color8(0x26, 0x26, 0x2e)
 const SEL_TEMP := -2   # VC.sel del temporizador (1.10)
 const RUEDA := [[3, 0], [4, 0], [5, 1], [6, 2], [6, 3], [6, 4], [5, 5], [4, 6], [3, 6], [2, 6], [1, 5], [0, 4], [0, 3], [0, 2], [1, 1], [2, 0]]
 const VACIO := Color8(0x4a, 0x4a, 0x56)
-# con CAL, la carpa sin el baño de luz: lo que no ilumina el haz (ni reflejan las paredes cerca de él), a AMB; apagada, a AMB_OFF
-const AMB := .42
-const AMB_OFF := .16
+# con CAL, en las horas de noche del temporizador (Cultivo.foco_on), la carpa a oscuras: lo que se ve, a NOCHE_C
+const NOCHE_C := .16
 
 const OVERLAY := """// i18n-no
 shader_type canvas_item;
 uniform sampler2D pantalla : hint_screen_texture, filter_nearest;
 uniform float fuerza = 1.0;
-uniform float amb = 1.0;
-uniform sampler2D refl : filter_nearest;
+uniform float oscuro = 1.0;
 void fragment() {
 	vec4 s = texture(TEXTURE, UV);
 	vec3 b = texture(pantalla, SCREEN_UV).rgb;
 	vec3 m = 2.0 * b * s.rgb;
 	vec3 n = 1.0 - 2.0 * (1.0 - b) * (1.0 - s.rgb);
 	vec3 o = mix(m, n, step(vec3(0.5000001), b));
-	// con CAL: lo que no toca la luz, a oscuras; cerca del haz, lo que reflejan las paredes plateadas (refl: Arte.reflejo)
-	float k = amb < 1.0 ? max(texture(refl, UV).r, amb) : 1.0;
-	COLOR = vec4(mix(b, o, s.a * fuerza) * k, 1.0);
+	COLOR = vec4(mix(b, o, s.a * fuerza) * oscuro, 1.0);   // oscuro: la noche del temporizador (con CAL)
 }
 """
 
@@ -390,19 +386,16 @@ func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240, alto := 1
 	var ox := (sw - 240) >> 1
 	for n in [base, luz, encima]:
 		n.position = Vector2(ox, sh - 160)
-	var on := Cultivo.plantas_vivas(S, VC.ci)
+	var on := Cultivo.foco_on(S, VC.ci)
 	luz.visible = on and g.vc != null
-	luz.material.set_shader_parameter("amb", AMB if Datos.CAL else 1.0)
+	luz.material.set_shader_parameter("oscuro", 1.0)
 	if luz.visible:
 		luz.texture = Arte.tex("luz|%s|%s|%d|%d" % [g.c.t, g.vc.tipo, g.vc.foco.a, g.vc.fy], Arte.luz(g.c.t, g.vc))
 		luz.material.set_shader_parameter("fuerza", Datos.carga().LUZ_C.get(g.vc.tipo, [0, 1])[1])
-		if Datos.CAL:
-			luz.material.set_shader_parameter("refl", Arte.tex("refl|%s|%s|%d|%d" % [g.c.t, g.vc.tipo, g.vc.foco.a, g.vc.fy], Arte.reflejo(Arte.luz(g.c.t, g.vc), AMB)))
-	elif Datos.CAL and g.vc != null:   # apagada: la carpa entera a oscuras, sin haz
+	elif g.vc != null and Cultivo.plantas_vivas(S, VC.ci):   # la noche del temporizador: sin haz y a oscuras
 		luz.visible = true
-		luz.texture = Arte.tex("luz|negra", Image.create(240, 160, false, Image.FORMAT_RGBA8))
-		luz.material.set_shader_parameter("amb", AMB_OFF)
-		luz.material.set_shader_parameter("refl", Arte.tex("refl|negra", Image.create(240, 160, false, Image.FORMAT_L8)))
+		luz.texture = Arte.tex("luz|vacia", Image.create(240, 160, false, Image.FORMAT_RGBA8))
+		luz.material.set_shader_parameter("oscuro", NOCHE_C)
 	base.queue_redraw()
 	encima.queue_redraw()
 
@@ -413,7 +406,7 @@ func _pinta_base() -> void:
 		return
 	base.draw_texture(Arte.tex("pared|" + g.c.t, Arte.fondo(g.c.t, g.vc, "pared")), Vector2.ZERO)
 	var c: Dictionary = g.c
-	for e in temporizador(g.tx, g.ty, Cultivo.ciclo_de(c), Cultivo.plantas_vivas(S, VC.ci)):
+	for e in temporizador(g.tx, g.ty, Cultivo.ciclo_de(c), Cultivo.foco_on(S, VC.ci)):
 		base.draw_rect(Rect2(e[0], e[1], e[2], e[3]), e[4])
 	var D := Datos.carga()
 	var xr: int = g.vc.xl + g.vc.w
@@ -545,7 +538,7 @@ func _pinta_encima() -> void:
 	if g.is_empty() or g.vc == null:
 		return
 	var D := Datos.carga()
-	var on := Cultivo.plantas_vivas(S, VC.ci)
+	var on := Cultivo.foco_on(S, VC.ci)
 	var fc := Arte.foto(g.vc.foco.n)
 	var im := fc if on else Arte.apagado(fc)
 	# la campana, con la boca en fy; bajada, cuelga de dos poleas del techo (poleas) y luego se pinta ella
