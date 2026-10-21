@@ -225,7 +225,7 @@ func _corre() -> void:
 	chk(corre(func(): await J.object_action(s0[0], s0[1])), "plantar en el sitio 0")
 	var p0 = J.huerta_s().p[0]
 	chk(p0 is Dictionary and p0.sid == sid and int(S.seeds.get(sid, 0)) == 2, "plantada la %s (%s)" % [sid, p0])
-	chk(String(J.MAPS.huerta.o[s0[1]][s0[0]]).begins_with("hp") and String(J.MAPS.huerta.o[s0[1]][s0[0]]).ends_with("-1"), "se ve la plántula: %s" % J.MAPS.huerta.o[s0[1]][s0[0]])
+	chk(String(J.MAPS.huerta.o[s0[1]][s0[0]]).begins_with("hg-") and String(J.MAPS.huerta.o[s0[1]][s0[0]]).ends_with("-1"), "se ve la plántula: %s" % J.MAPS.huerta.o[s0[1]][s0[0]])
 	var pr0: float = float(p0.prog)
 	J.plants_advance(60)
 	chk(float(p0.prog) > pr0, "crece con el reloj del juego (plants_advance): %s → %s" % [pr0, p0.prog])
@@ -276,7 +276,7 @@ func _corre() -> void:
 	chk(corre(func(): await J.object_action(s0[0], s0[1])), "cosechar la de abril")
 	var gt := gramos_de(sid)
 	chk(J.huerta_s().p[0] == null and gt - g0 >= ga * .5, "cosechada: %s g de %s (esperaba unos %d)" % [gt - g0, sid, ga])
-	chk(J.MAPS.huerta.o[s0[1]][s0[0]] == null, "el sitio, vacío")
+	chk(J.MAPS.huerta.o[s0[1]][s0[0]] == "hgx", "el sitio, vacío (sólido y sin dibujo)")
 	# 8 · la helada y la nieve (al amanecer, por la mínima de ayer)
 	J.huerta_s().p[2] = Cultivo.nueva_planta(S, sid)
 	var p2 = J.huerta_s().p[2]
@@ -303,11 +303,11 @@ func _corre() -> void:
 	J.huerta_objs()
 	var s2: Array = H.sitios[2]
 	var so: String = String(J.MAPS.huerta.o[s2[1]][s2[0]])
-	chk(so.begins_with("hs"), "la muerta, hs: %s" % so)
+	chk(so.begins_with("hgs-"), "la muerta, hgs: %s" % so)
 	var Atlas = load("res://src/atlas.gd")
 	Atlas.carga()
-	var fr = Atlas.frame_de(Atlas.cubre("obj:hp" + so.substr(2)), "hp" + so.substr(2), "unica", 0, {"i": 0})
-	chk(fr != null, "su dibujo, el de hp" + so.substr(2))
+	var fr = Atlas.frame_de(Atlas.cubre("obj:hg-" + so.substr(4)), "hg-" + so.substr(4), "unica", 0, {"i": 0})
+	chk(fr != null, "su dibujo, el de hg-" + so.substr(4))
 	if fr != null:
 		var im: Image = Pintor._seca(fr.c)
 		var verdes := 0
@@ -319,12 +319,12 @@ func _corre() -> void:
 		chk(verdes == 0 and im.get_size() == fr.c.get_size(), "parda: ningún píxel verde (%d)" % verdes)
 	QUIERO = []
 	chk(corre(func(): await J.object_action(s2[0], s2[1])), "retirar la seca")
-	chk(J.huerta_s().p[2] == null and J.MAPS.huerta.o[s2[1]][s2[0]] == null, "retirada")
+	chk(J.huerta_s().p[2] == null and J.MAPS.huerta.o[s2[1]][s2[0]] == "hgx", "retirada")
 	# 10 · guardada y cargada (JSON), sigue igual
 	var cp = JSON.parse_string(JSON.stringify(S.huerta))
 	S.huerta = cp
 	J.enter_map("huerta", ll.x, ll.y, "up")
-	chk(String(J.MAPS.huerta.o[s1[1]][s1[0]]).begins_with("hp"), "tras guardar y cargar, la de julio sigue: %s" % J.MAPS.huerta.o[s1[1]][s1[0]])
+	chk(String(J.MAPS.huerta.o[s1[1]][s1[0]]).begins_with("hg-"), "tras guardar y cargar, la de julio sigue: %s" % J.MAPS.huerta.o[s1[1]][s1[0]])
 	chk(J.MAPS.huerta.g[int(H.bancales[0][1])][int(H.bancales[0][0])] == "surco", "y desbrozada")
 	# 11 · al raso: el tiempo y la noche
 	S.map = "huerta"

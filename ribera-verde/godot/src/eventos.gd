@@ -1495,6 +1495,7 @@ func rects_acceso(V: Dictionary, now: float) -> Array:
 	var cy: int = y0 + (ACC_H >> 1)
 	var k: String = V.k
 	var c: String = str(V.c)
+	_gs_sol = false
 	if GESTOS.has(k):   # 1.54: el plano de detalle de cada acción; 1.54.1, de sprites, a 144 × 96
 		_gs = Rect2i((SW - GS_W) >> 1, (SH - GS_H) >> 1, GS_W, GS_H)
 		R.append([_gs.position.x - 2, _gs.position.y - 2, GS_W + 4, GS_H + 4, "#26262e"])
@@ -1741,7 +1742,7 @@ func gesto(k: String, o := {}) -> void:
 		if gancho_gesto.is_valid():
 			gancho_gesto.call(k, pl)
 		return
-	var V := {"k": k, "c": str(o.get("m", "")), "ok": true, "t0": M.reloj, "pl": pl, "tab": bool(o.get("tab", false))}
+	var V := {"k": k, "c": str(o.get("m", "")), "ok": true, "t0": M.reloj, "pl": pl, "tab": bool(o.get("tab", false)), "sol": gesto_sol()}
 	var pr := Motor.Prom.new()
 	var st := {"fuera": false}
 	var cierra := func():
@@ -1829,6 +1830,8 @@ func _gspc(R: Array, n: String, x: float, y: float, V: Dictionary) -> void:
 		R.append(["@", im, _gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), _gs])
 
 func _gsp(R: Array, n: String, x: float, y: float) -> void:
+	if _gs_sol and n == "gs-f-carpa":   # i18n-no
+		n = "gs-f-huerta"   # i18n-no
 	R.append(["@", n, _gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), _gs])
 
 # la mano de PixelLab, en primera persona, en (x, y), con su antebrazo (lo pidió el usuario: «desde que empieza el ángulo desde la
@@ -2121,6 +2124,8 @@ func _gs_manga(n: String, im: Image) -> Array:
 	return _gs_mg[n]
 
 func _gsr(R: Array, x: float, y: float, w: int, h: int, c: String) -> void:
+	if _gs_sol:
+		c = GS_TIERRA_SOL.get(c, c)
 	var r := Rect2i(_gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), w, h).intersection(_gs)
 	if r.size.x > 0 and r.size.y > 0:
 		R.append([r.position.x, r.position.y, r.size.x, r.size.y, c])
@@ -2129,6 +2134,8 @@ func _gsr(R: Array, x: float, y: float, w: int, h: int, c: String) -> void:
 # (filas 0-7 del sprite, en (40, 60)) detrás de la planta y el canto de delante y el cuerpo (de la 8 abajo) delante
 const GS_MAC_CORTE := 8
 func _gs_mac(R: Array, n: String, delante: bool) -> void:
+	if _gs_sol:
+		n = n.replace("gs-maceta", "gs-tierra")   # i18n-no
 	var y: int = _gs.position.y + 60 + GS_MAC_CORTE
 	var c := Rect2i(_gs.position.x, y, _gs.size.x, _gs.end.y - y) if delante else Rect2i(_gs.position.x, _gs.position.y, _gs.size.x, y - _gs.position.y)
 	R.append(["@", n, _gs.position.x + 40, _gs.position.y + 60, c])
@@ -2147,7 +2154,16 @@ func _gs_maceta(R: Array, pl: String, moja := false, V := {}) -> void:
 		_gspc(R, "gs-planta-" + pl, 36, -29, V)
 	_gs_mac(R, n, true)
 
+# en la huerta (lo pidió el usuario: «No van por macetas sino que se plantan en el suelo… únicamente la luz del sol»), el plano de
+# cerca al sol (gs-f-huerta) y la planta en la tierra del bancal (gs-tierra, en el sitio de la maceta); la tierra que se aprieta o
+# tapa la semilla, en los tonos del bancal. gesto_sol, en campo.gd
+var _gs_sol := false
+const GS_TIERRA_SOL := {"#3e2c1e": "#5a3c22", "#56402a": "#906238"}   # i18n-no
+func gesto_sol() -> bool:
+	return false
+
 func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
+	_gs_sol = bool(V.get("sol", false))
 	var k: String = V.k
 	var c: String = str(V.c)
 	match k:

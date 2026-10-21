@@ -1232,6 +1232,16 @@
    ],
    "ajuste": "exacto",
    "nota": "0.56: la puerta de cada cerradura y la persiana de la nave (gestos.py), del tamaño del panel de acceso"
+  },
+  "planta_huerta": {
+   "w": 48,
+   "h": 56,
+   "ancla": [
+    16,
+    55
+   ],
+   "ajuste": "exacto",
+   "nota": "plantas de la huerta en el suelo a 16 px/m: la mata centrada en el pie del tallo (24, 40), que cae en el centro de su sitio de 2 × 2 casillas; el lienzo baja 15 px para la sombra y las hojas caídas"
   }
  },
  "fases": [
@@ -11553,6 +11563,18 @@
     {
      "nombre": "acc-f-setas",
      "celda": "acc_fondo"
+    },
+    {
+     "nombre": "gs-f-huerta",
+     "celda": "gs_fondo"
+    },
+    {
+     "nombre": "gs-tierra",
+     "celda": "gs_c"
+    },
+    {
+     "nombre": "gs-tierra-m",
+     "celda": "gs_c"
     }
    ],
    "cubre": [
@@ -11648,9 +11670,12 @@
     "misc:acc-f-club",
     "misc:acc-f-franco",
     "misc:acc-f-nave",
-    "misc:acc-f-setas"
+    "misc:acc-f-setas",
+    "misc:gs-f-huerta",
+    "misc:gs-tierra",
+    "misc:gs-tierra-m"
    ],
-   "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta) y piezas (manos, herramientas, plantas, humo, billetes)."
+   "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta, la huerta al sol) y piezas (manos, herramientas, plantas, humo, billetes)."
   },
   {
    "fase": "F9",
@@ -11806,6 +11831,56 @@
     "herrH": "exacto",
     "motoA": "exacto",
     "bombaS": "exacto"
+   }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/huerta_pl.py",
+   "estilo_ref": "las plantas de las mesas de la nave (planta_mesa): la mata desde arriba con la hoja de abanico, las colas y el tinte por variedad",
+   "notas": "Lo pidió el usuario: «El cultivo tiene que ser igual que en la nave digamos, pero solo que no hay focos, está únicamente la luz del sol. No van por macetas sino que se plantan en el suelo pero se hacen más grandes cada planta y la distancia de una a otra es de una baldosa, en los bancales que has hecho en el mapa, bien centradas». Por porte (i índica, h híbrida, s sativa) y por fase (1 plantón, 2-3 crecimiento, 4 flor, 5 madura); el tinte por variedad sale de la rampa de la vista C en pinta.gd; solo con Datos.CAL.",
+   "id": "huerta-pl",
+   "tipo": "objeto",
+   "celda": "planta_huerta",
+   "descripcion": "Las plantas de la huerta en el suelo, sin maceta: tres portes y cinco fases, más grandes que las de las mesas de la nave.",
+   "cubre": [
+    "obj:hg-i-1",
+    "obj:hg-i-2",
+    "obj:hg-i-3",
+    "obj:hg-i-4",
+    "obj:hg-i-5",
+    "obj:hg-h-1",
+    "obj:hg-h-2",
+    "obj:hg-h-3",
+    "obj:hg-h-4",
+    "obj:hg-h-5",
+    "obj:hg-s-1",
+    "obj:hg-s-2",
+    "obj:hg-s-3",
+    "obj:hg-s-4",
+    "obj:hg-s-5"
+   ],
+   "ajuste_por_sprite": {
+    "hg-i-1": "exacto",
+    "hg-i-2": "exacto",
+    "hg-i-3": "exacto",
+    "hg-i-4": "exacto",
+    "hg-i-5": "exacto",
+    "hg-h-1": "exacto",
+    "hg-h-2": "exacto",
+    "hg-h-3": "exacto",
+    "hg-h-4": "exacto",
+    "hg-h-5": "exacto",
+    "hg-s-1": "exacto",
+    "hg-s-2": "exacto",
+    "hg-s-3": "exacto",
+    "hg-s-4": "exacto",
+    "hg-s-5": "exacto"
    }
   },
   {

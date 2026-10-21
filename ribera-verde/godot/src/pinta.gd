@@ -961,53 +961,63 @@ static func surco_img(tx: int, ty: int, v := false) -> Image:
 				im.set_pixel(px, py, css(C[3]))
 	return im
 
-# el goteo de la huerta (campo.gd, HUERTA_MEJ.goteo): la manguera negra por el suelo desde la bomba hasta el camino, por el borde del
-# camino abajo y un ramal al pie de cada fila de sitios, con un gotero en cada uno y, si queda agua y hay planta, la gota
+# el goteo de la huerta (campo.gd, HUERTA_MEJ.goteo): la manguera negra por el suelo desde la bomba hasta el camino, por el medio del
+# camino abajo y un ramal por cada fila de bancales, con un gotero en cada sitio y, si queda agua y hay planta, la gota
 const MANG_C := ["#44444e", "#1e1e24", "#76b4f2"]
 
+# lo pidió el usuario: «Los tubos no están muy centrados que digamos no? Ajustalos bien a los bancales». Los tubos de 2 px, centrados:
+# la principal por el medio de la fila de debajo de la bomba, el tronco por el medio del camino y un ramal por la línea del medio de
+# cada fila de bancales (la del pie de las plantas, campo.gd), con el mismo margen a los dos lados; el gotero, en el centro de cada sitio
 func _manguera_huerta() -> void:
-	var H: Dictionary = J.HUERTA
 	var ox: float = -cam.x
 	var oy: float = -cam.y
-	var hl := func(x0: int, x1: int, y: int) -> void:
-		_rect(mini(x0, x1) + ox, y + oy, absi(x1 - x0) + 1, 1, css(MANG_C[0]))
-		_rect(mini(x0, x1) + ox, y + 1 + oy, absi(x1 - x0) + 1, 1, css(MANG_C[1]))
-	var vl := func(x: int, y0: int, y1: int) -> void:
-		_rect(x + ox, mini(y0, y1) + oy, 1, absi(y1 - y0) + 1, css(MANG_C[0]))
-		_rect(x + 1 + ox, mini(y0, y1) + oy, 1, absi(y1 - y0) + 1, css(MANG_C[1]))
-	var b: Array = J.HUERTA_MEJ.goteo.x[0]
-	var bx: int = int(b[0]) * 16 + 10
-	var cx: int = int(H.camino) * 16 + 1
-	var y0: int = (int(b[1]) + 1) * 16 + 12   # la principal, en la fila de debajo de la bomba
-	var filas := {}
+	var tb := tubos_huerta(J.HUERTA, J.HUERTA_MEJ, J.huerta_m("ibc"))
+	for q in tb.h:   # de x0 a x1, con el centro en la raya entre y e y + 1
+		_rect(int(q[0]) + ox, int(q[2]) + oy, int(q[1]) - int(q[0]) + 1, 1, css(MANG_C[0]))
+		_rect(int(q[0]) + ox, int(q[2]) + 1 + oy, int(q[1]) - int(q[0]) + 1, 1, css(MANG_C[1]))
+	for q in tb.v:
+		_rect(int(q[0]) + ox, int(q[1]) + oy, 1, int(q[2]) - int(q[1]) + 1, css(MANG_C[0]))
+		_rect(int(q[0]) + 1 + ox, int(q[1]) + oy, 1, int(q[2]) - int(q[1]) + 1, css(MANG_C[1]))
+	var agua: bool = float(J.huerta_s().get("agua", 0)) > 0
+	for i in tb.g.size():
+		var gx: int = tb.g[i][0]
+		var gy: int = tb.g[i][1]
+		_rect(gx + ox, gy - 1 + oy, 2, 4, css(MANG_C[1]))   # el gotero, en el centro del sitio (la mata lo tapa)
+		if agua and J.huerta_s().p[i] is Dictionary:
+			_rect(gx + ox, gy + 3 + oy, 1, 1, css(MANG_C[2]))   # la gota
+
+# los tubos de 2 px: h [x0, x1, y] de x0 a x1 en las filas y e y + 1; v [x, y0, y1] en las columnas x y x + 1; g [x, y], los goteros
+static func tubos_huerta(H: Dictionary, HM: Dictionary, n_ibc: int) -> Dictionary:
+	var r := {"h": [], "v": [], "g": []}
+	var b: Array = HM.goteo.x[0]
+	var bx: int = int(b[0]) * 16 + 7   # el medio de la casilla de la bomba
+	var cx: int = int(H.camino) * 16 + 15   # el medio del camino (2 casillas)
+	var y0: int = (int(b[1]) + 1) * 16 + 7   # la principal, por el medio de la fila de debajo de la bomba
 	var xa := 9999
 	var xb := 0
 	for q in H.bancales:
-		xa = mini(xa, int(q[0]) * 16 + 5)
-		xb = maxi(xb, int(q[2]) * 16 + 10)
+		xa = mini(xa, int(q[0]) * 16 + MANG_MARGEN)
+		xb = maxi(xb, (int(q[2]) + 1) * 16 - 1 - MANG_MARGEN)
+	var filas := {}
 	for s in H.sitios:
-		filas[int(s[1])] = true
+		filas[int(s[1]) * 16 - 1] = true   # el pie de las plantas: la raya entre las dos filas del bancal
 	var yf: int = 0
 	for f in filas:
-		yf = maxi(yf, int(f) * 16 + 13)
-	vl.call(bx, (int(b[1]) + 1) * 16 - 2, y0)
-	hl.call(bx, cx, y0)
-	var xi: Array = J.HUERTA_MEJ.ibc.x
-	for j in mini(J.huerta_m("ibc"), xi.size()):   # los depósitos de 1000 L, de su válvula a la principal
-		var ix: int = int(xi[j][0]) * 16 + 8
-		vl.call(ix, (int(xi[j][1]) + 1) * 16 - 4, y0)
-		hl.call(cx, ix, y0)
-	vl.call(cx, y0, yf)
+		yf = maxi(yf, int(f))
+	r.v.append([bx, (int(b[1]) + 1) * 16 - 2, y0])
+	r.h.append([mini(bx, cx), maxi(bx, cx), y0])
+	var xi: Array = HM.ibc.x
+	for j in mini(n_ibc, xi.size()):   # los depósitos de 1000 L, de su válvula a la principal
+		var ix: int = int(xi[j][0]) * 16 + 7
+		r.v.append([ix, (int(xi[j][1]) + 1) * 16 - 4, y0])
+		r.h.append([mini(cx, ix), maxi(cx, ix), y0])
+	r.v.append([cx, y0, yf + 1])
 	for f in filas:
-		hl.call(xa, xb, int(f) * 16 + 13)
-	var agua: bool = float(J.huerta_s().get("agua", 0)) > 0
-	for i in H.sitios.size():
-		var s: Array = H.sitios[i]
-		var gx: int = int(s[0]) * 16 + 11
-		var gy: int = int(s[1]) * 16 + 13
-		_rect(gx + ox, gy - 1 + oy, 2, 3, css(MANG_C[1]))   # el gotero
-		if agua and J.huerta_s().p[i] is Dictionary:
-			_rect(gx + ox, gy + 2 + oy, 1, 1, css(MANG_C[2]))   # la gota
+		r.h.append([xa, xb, int(f)])
+	for s in H.sitios:
+		r.g.append([(int(s[0]) + 1) * 16 - 1, int(s[1]) * 16 - 1])
+	return r
+const MANG_MARGEN := 10   # px de bancal a cada lado del ramal: dentro de la tierra que se ve (la hierba de la orilla tapa 6)
 
 # los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
 const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13, "fotoMaite": -10, "extrN": -14, "extrG": -14, "filtroN": -12, "ctrlN": -12, "fotoK": -13, "ojoBuey": -13, "timon": -13, "red": -13, "diana": -13, "engranaje": -13, "neonH": -13, "copas": -16, "tuboS": -13, "botesW": -16, "neonG": -13}   # 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared; 1.34: lo de las paredes de los clubs, del bajo y de los grows
@@ -1016,9 +1026,9 @@ const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadr
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
 const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "mesaTb", "taburTb", "barrilTb", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz", "trim", "prensaM", "tamizM", "mallas", "lavadora", "staticM", "armS", "mesaS"]  # i18n-no
 func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
-	var seca: bool = Datos.CAL and o.begins_with("hs")   # la planta muerta de la huerta (campo.gd): la de hp, parda
+	var seca: bool = Datos.CAL and o.begins_with("hgs-")   # la planta muerta de la huerta (campo.gd): la de hg, parda
 	if seca:
-		o = "hp" + o.substr(2)
+		o = "hg-" + o.substr(4)
 	var gr = Atlas.cubre("obj:" + o)
 	if not gr:
 		return
@@ -1060,6 +1070,10 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		f = Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})
 	if f == null:
 		return
+	if Datos.CAL and o.begins_with("hg-") and not seca:   # la de la huerta, con el tono de hoja y el cogollo de su variedad
+		var hi: int = J.huerta_idx(tx, ty)
+		if hi >= 0 and J.huerta_s().p[hi] is Dictionary:
+			f = _tinte_planta(f, J.huerta_s().p[hi])
 	if seca:
 		f = {"c": _seca(f.c), "cel": f.cel}
 	var xp: int = tx * 16 + 8 + d.dx - cam.x
@@ -1186,6 +1200,12 @@ func _plantas_mesa(gr, i: int, fm: int):
 	var f = Atlas.frame_de(gr, "plantasN-1" if fm == 1 else "plantasN-%d-%s" % [fm, Datos.porte_planta(S_, p)], "unica", 0, {"i": 0})  # i18n-no
 	if f == null:
 		return null
+	return _tinte_planta(f, p)
+
+# los colores de la planta A del dibujo (las de la nave, las de la huerta) pasados a los de la variedad de p: el cogollo por la rampa
+# de la vista C y los verdes por el tono de su hoja
+func _tinte_planta(f: Dictionary, p: Dictionary) -> Dictionary:
+	var S_: Dictionary = J.S
 	var s = Datos.strain(S_, p.sid)
 	var rk = Atlas.d.get("rampas", {}).get("carpa-c-plantas-a", {}).get("cogollo")
 	if rk == null or s == null:

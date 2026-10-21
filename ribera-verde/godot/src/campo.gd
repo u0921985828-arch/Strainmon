@@ -192,7 +192,7 @@ func escondite() -> void:
 # floración, la botritis. Sin luz que pagar ni olor en casa. S.huerta: {v: el día que la encontraste, l: el que la desbrozaste,
 # p: las plantas de los sitios}
 const HUERTA := {"mapa": "huerta", "w": 30, "h": 12, "seto": [7, 1, 22, 10], "camino": 14, "puerta": [9, 1], "senda": [[9, 0], [9, 2]], "llega": [15, 9], "sale": [9, 2],   # i18n-no
-	"sitios": [[10, 4], [12, 4], [17, 4], [19, 4], [10, 8], [12, 8], [17, 8], [19, 8]], "bancales": [[9, 4, 13, 5], [16, 4, 20, 5], [9, 7, 13, 8], [16, 7, 20, 8]],
+	"sitios": [[9, 5], [12, 5], [16, 5], [19, 5], [9, 8], [12, 8], [16, 8], [19, 8]], "bancales": [[9, 4, 13, 5], [16, 4, 20, 5], [9, 7, 13, 8], [16, 7, 20, 8]],
 	"atrezo": [[8, 3, "bidonT"], [8, 9, "cuboS"], [21, 3, "manzano"], [21, 9, "crate"], [20, 9, "sacos"]],   # i18n-no
 	"desbroce": 240, "riego": 30, "veg": [420, 805], "g": 250, "cap": 500, "veg_dias": 60,
 	"agua": [.2, .2, .3, .35, .45, .6, .7, .7, .5, .35, .25, .2], "plaga": 1.2, "helada": 25, "nieve": 50}
@@ -205,7 +205,7 @@ var _town19 = null   # lo que había en town en la cancilla y la senda, para dej
 # agua; las herramientas cavan un sitio vacío (herr.min) y la motoazada labra todos los vacíos (moto.min): la tierra trabajada
 # (S.huerta.t: 0, 1 cavada, 2 labrada) da g más de cosecha hasta que el sitio se vacía. Dibujos en huerta_mej.py; x, dónde van.
 const HUERTA_MEJ := {"bidon": {"p": 35, "l": 100, "max": 3, "x": [[9, 2], [10, 2], [11, 2]]}, "ibc": {"p": 95, "l": 1000, "max": 2, "x": [[17, 2], [19, 2]]},   # i18n-no
-	"goteo": {"p": 150, "x": [[12, 2]]}, "herr": {"p": 60, "g": .15, "min": 45, "x": [[8, 6]]}, "moto": {"p": 490, "g": .3, "min": 40, "x": [[21, 6]]},   # i18n-no
+	"goteo": {"p": 150, "x": [[12, 2]]}, "herr": {"p": 60, "g": .15, "min": 45, "x": [[8, 6]]}, "moto": {"p": 490, "g": .3, "min": 40, "x": [[21, 4]]},   # i18n-no
 	"caudal": 15, "umbral": 50, "litros": [3, 17]}
 const HUERTA_SPR := {"bidon": "bidonA", "goteo": "bombaS", "herr": "herrH", "moto": "motoA"}   # i18n-no
 
@@ -304,11 +304,8 @@ func mapa_huerta() -> Dictionary:
 	for x in [cx, cx + 1]:
 		m.doors["%d,%d" % [x, y1]] = {"to": "town", "x": int(HUERTA.sale[0]), "y": int(HUERTA.sale[1]), "dir": "down"}   # i18n-no
 	if lista:
-		for i in HUERTA.sitios.size():
-			var s: Array = HUERTA.sitios[i]
-			o[int(s[1])][int(s[0])] = sprite_huerta(huerta_s().p[i])
 		m.o = o
-		huerta_mejoras(m)
+		huerta_objs(m)
 	return m
 
 # las mejoras que hay, en su sitio (HUERTA_MEJ.x), el depósito de 1000 L con el agua por cuartos, y la tierra trabajada más oscura
@@ -322,26 +319,49 @@ func huerta_mejoras(m: Dictionary) -> void:
 		for j in xs.size():
 			m.o[int(xs[j][1])][int(xs[j][0])] = (("ibcD-%d" % q) if k == "ibc" else HUERTA_SPR[k]) if j < huerta_m(k) else null   # i18n-no
 	for i in HUERTA.sitios.size():
-		var s: Array = HUERTA.sitios[i]
-		m.g[int(s[1])][int(s[0])] = "surcoV" if huerta_t(i) > 0 else "surco"   # i18n-no
+		for c in huerta_bloque(i):
+			m.g[int(c[1])][int(c[0])] = "surcoV" if huerta_t(i) > 0 else "surco"   # i18n-no
 
-# hp<v>-<fase> (huerto.py, como las salvajes): v por el % índica, la fase por el progreso; seca, hs<v>-<fase> (pinta.gd la pinta parda)
+# lo pidió el usuario: «se plantan en el suelo pero se hacen más grandes cada planta y la distancia de una a otra es de una baldosa,
+# en los bancales que has hecho en el mapa, bien centradas». Cada sitio es un bloque de 2 × 2 casillas (HUERTA.sitios, la de abajo a la
+# izquierda), dos por bancal con una casilla libre en medio: la planta se pinta en esa casilla con el pie del tallo en el centro del
+# bloque (huerta_pl.py) y las otras tres llevan hgx, sólido y sin dibujo, como la planta, que no se pisa
+func gesto_sol() -> bool:   # el plano de cerca de la huerta, al sol y en la tierra (eventos.gd)
+	return Datos.CAL and S != null and S.get("map") == HUERTA.mapa
+
+func huerta_bloque(i: int) -> Array:
+	var s: Array = HUERTA.sitios[i]
+	var x: int = int(s[0])
+	var y: int = int(s[1])
+	return [[x, y], [x + 1, y], [x, y - 1], [x + 1, y - 1]]
+
+func huerta_idx(x: int, y: int) -> int:   # el sitio cuyo bloque tiene la casilla (x, y), o -1
+	for i in HUERTA.sitios.size():
+		if huerta_bloque(i).any(func(c): return int(c[0]) == x and int(c[1]) == y):
+			return i
+	return -1
+
+# hg-<porte>-<fase> (huerta_pl.py): el porte por la variedad (y el fenotipo), la fase por el progreso; seca, hgs-… (pinta.gd la pinta
+# parda); pinta.gd le pone el tono de hoja y el color de cogollo de su variedad, como a las de las mesas de la nave
 func sprite_huerta(p):
 	if not (p is Dictionary):
 		return null
-	var ind: float = float(Datos.ind_de(S, p.sid))
-	var v: int = 0 if ind >= 70 else (1 if ind <= 30 else 2)
 	var fa: int = 1 if p.prog < .12 else (2 if p.prog < .35 else (3 if p.prog < .65 else (4 if p.prog < 1 else 5)))
-	return ("hs%d-%d" if p.get("dead") else "hp%d-%d") % [v, fa]   # i18n-no
+	return ("hgs-%s-%d" if p.get("dead") else "hg-%s-%d") % [Datos.porte_planta(S, p), fa]   # i18n-no
 
-func huerta_objs() -> void:
-	if not MAPS.has(HUERTA.mapa) or not huerta_lista():
-		return
-	var o: Array = MAPS[HUERTA.mapa].o
+func huerta_objs(m = null) -> void:
+	if m == null:
+		if not MAPS.has(HUERTA.mapa) or not huerta_lista():
+			return
+		m = MAPS[HUERTA.mapa]
 	for i in HUERTA.sitios.size():
 		var s: Array = HUERTA.sitios[i]
-		o[int(s[1])][int(s[0])] = sprite_huerta(huerta_s().p[i])
-	huerta_mejoras(MAPS[HUERTA.mapa])
+		for c in huerta_bloque(i):
+			m.o[int(c[1])][int(c[0])] = "hgx"   # i18n-no
+		var sp = sprite_huerta(huerta_s().p[i])
+		if sp != null:
+			m.o[int(s[1])][int(s[0])] = sp
+	huerta_mejoras(m)
 
 func huerta_veg(dia: int) -> bool:   # ¿días largos? (dentro de HUERTA.veg, mes × 100 + día)
 	var f := Datos.fecha(dia)
@@ -360,7 +380,7 @@ func huerta_f(p, i := -1) -> Dictionary:
 func huerta_hu(i: int) -> Dictionary:
 	var s: Array = HUERTA.sitios[i]
 	var p = huerta_s().p[i]
-	return {"l": huerta_s().p, "v": [int(s[0]) * 16 + 8, int(s[1]) * 16 - 8], "f": huerta_f(p, i)}
+	return {"l": huerta_s().p, "v": [(int(s[0]) + 1) * 16, int(s[1]) * 16 - 6], "f": huerta_f(p, i)}   # el centro de la mata
 
 func plants_advance(mn: int) -> void:
 	super(mn)
@@ -568,32 +588,31 @@ func huerta_obj(x: int, y: int, o) -> bool:
 				sfx("get")
 				await say(K("Arrancas las zarzas, cavas y dejas la tierra en surcos. Caben ocho plantas al sol."))
 			return true
-	for i in HUERTA.sitios.size():
-		var s: Array = HUERTA.sitios[i]
-		if huerta_lista() and int(s[0]) == x and int(s[1]) == y:
-			var antes = huerta_s().p[i]
-			if antes == null and (huerta_m("moto") and huerta_t(i) < 2 or huerta_m("herr") and huerta_t(i) < 1):
-				var ops := []
-				if huerta_m("moto") and huerta_t(i) < 2:
-					ops.append(K("Labrar con la motoazada"))
-				if huerta_m("herr") and huerta_t(i) < 1:
-					ops.append(K("Cavar la tierra"))
-				ops.append_array([K("Plantar"), K("Salir")])
-				var c: int = await ask(K("Un sitio vacío, con la tierra sin trabajar.") if huerta_t(i) == 0 else K("Un sitio vacío, con la tierra cavada a mano."), ops)
-				var op: String = ops[c] if c >= 0 else "Salir"   # i18n-no
-				if op == "Labrar con la motoazada":
-					await huerta_trabaja(huerta_vacios(2), 2, int(HUERTA_MEJ.moto.min))
-					return true
-				if op == "Cavar la tierra":
-					await huerta_trabaja([i], 1, int(HUERTA_MEJ.herr.min))
-					return true
-				if op != "Plantar":
-					return true
-			await pot_action(i, huerta_hu(i))
-			if Datos.CAL and antes != null and huerta_s().p[i] == null:   # cosechada o arrancada: la tierra, otra vez sin trabajar
-				huerta_s().t[i] = 0
-			huerta_objs()
-			return true
+	var i := huerta_idx(x, y)
+	if huerta_lista() and i >= 0:
+		var antes = huerta_s().p[i]
+		if antes == null and (huerta_m("moto") and huerta_t(i) < 2 or huerta_m("herr") and huerta_t(i) < 1):
+			var ops := []
+			if huerta_m("moto") and huerta_t(i) < 2:
+				ops.append(K("Labrar con la motoazada"))
+			if huerta_m("herr") and huerta_t(i) < 1:
+				ops.append(K("Cavar la tierra"))
+			ops.append_array([K("Plantar"), K("Salir")])
+			var c: int = await ask(K("Un sitio vacío, con la tierra sin trabajar.") if huerta_t(i) == 0 else K("Un sitio vacío, con la tierra cavada a mano."), ops)
+			var op: String = ops[c] if c >= 0 else "Salir"   # i18n-no
+			if op == "Labrar con la motoazada":
+				await huerta_trabaja(huerta_vacios(2), 2, int(HUERTA_MEJ.moto.min))
+				return true
+			if op == "Cavar la tierra":
+				await huerta_trabaja([i], 1, int(HUERTA_MEJ.herr.min))
+				return true
+			if op != "Plantar":
+				return true
+		await pot_action(i, huerta_hu(i))
+		if Datos.CAL and antes != null and huerta_s().p[i] == null:   # cosechada o arrancada: la tierra, otra vez sin trabajar
+			huerta_s().t[i] = 0
+		huerta_objs()
+		return true
 	if huerta_lista() and (o == "bidonA" or String(o).begins_with("ibcD-")):   # i18n-no
 		var h := huerta_s()
 		var cap := huerta_cap()

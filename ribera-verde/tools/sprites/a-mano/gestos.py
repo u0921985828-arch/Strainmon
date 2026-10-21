@@ -4,11 +4,12 @@
 # como el almacén y el móvil. El juego (trama.gd, `_gesto_spr`) compone el fondo y mueve las piezas por el reloj.
 #  · Fondos (gs_fondo, 128 × 80, ancla arriba a la izquierda): gs-f-carpa (la carpa plateada por dentro, con la bandeja y la luz),
 #    gs-f-mesa (la mesa de la tía contra la pared), gs-f-cuarto (el salón de noche, el sofá), gs-f-calle (la pared de ladrillo y la
-#    acera), gs-f-cama-n y gs-f-cama-d (la cama de noche y de siesta); acc-f-<cerradura> (acc_fondo, 104 × 84), la puerta de cada
-#    cerradura y la persiana de la nave.
-#  · Piezas (gs_g 48 × 48, gs_m 24 × 24, gs_s 8 × 8): la maceta de tela, seca y regada, la planta en vegetativo y en flor, el brote,
-#    las manos con la regadera, el pulverizador, la botella de abono, el esqueje, las tijeras de podar, el cogollo con hojas y
-#    pelado, el pincel, el porro, la pipa, el bong, el vapo, el mechero, el humo, la bolsita, los billetes, la cabeza dormida y la Z.
+#    acera), gs-f-cama-n y gs-f-cama-d (la cama de noche y de siesta), gs-f-huerta (la huerta al sol); acc-f-<cerradura>
+#    (acc_fondo, 104 × 84), la puerta de cada cerradura y la persiana de la nave.
+#  · Piezas (gs_g 48 × 48, gs_m 24 × 24, gs_s 8 × 8): la maceta de tela, seca y regada, la tierra de la huerta (gs-tierra), la
+#    planta en vegetativo y en flor, el brote, las manos con la regadera, el pulverizador, la botella de abono, el esqueje, las
+#    tijeras de podar, el cogollo con hojas y pelado, el pincel, el porro, la pipa, el bong, el vapo, el mechero, el humo,
+#    la bolsita, los billetes, la cabeza dormida y la Z.
 # Sale a art/crudo/gestos/<sprite>/unica/00.png (después, node tools/sprites/procesar.js gestos --atlas --atlas-dir godot/arte)
 import os, sys, glob, math
 from PIL import Image
@@ -819,12 +820,100 @@ def f_puerta_bajo():
     pasador(L, CY - 6)
     return L
 
+# ── la huerta (lo pidió el usuario: «El cultivo tiene que ser igual que en la nave digamos, pero solo que no hay focos, está
+# únicamente la luz del sol. No van por macetas sino que se plantan en el suelo»): el plano de cerca al sol y la planta en la tierra ──
+SUELO = ('#4a3020', '#5a3c22', '#6e4a2a', '#906238', '#b47c4c', '#d29a62')   # la tierra del bancal (surco y surcoV de pinta.gd)
+SUELO_M = ('#24160c', '#30200f', '#3e2a16', '#52381e')                         # la del hoyo, regada
+CIELO = ('#8cc4ec', '#a8d4f2', '#c4e2f6', '#dceef8')
+MONTE = ('#1e4a2a', '#2a5e30', '#3a7a3a', '#5a9a48', '#86c060')
+
+def f_huerta():
+    """la huerta de la tía al sol (144 × 96): el cielo con dos nubes, el monte, el seto en matas y la tierra del bancal en surcos
+    que se abren hacia delante, con la luz arriba a la izquierda"""
+    L = lz(144, 96)
+    R = azar(57)
+    for y in range(30):
+        for x in range(144):
+            L.p(x, y, tono(CIELO, .1 + y / 30 * .85))
+    for (cx, cy, w) in ((28, 7, 13), (100, 5, 17), (132, 12, 8)):
+        for x in range(cx - w, cx + w + 1):
+            for y in range(cy - 3, cy + 3):
+                if ((x - cx) / w) ** 2 + ((y - cy + .5) / 2.6) ** 2 < 1: L.p(x, y, '#f6fbfd' if y < cy else '#e2eff7')
+    mo = lz(144, 96)
+    for i, cx in enumerate(range(-6, 152, 13)):   # el monte del fondo, en copas
+        cy = 21 + (i * 5) % 7; r = 9 + (i * 3) % 4
+        ovalo(mo, cx, cy, r, r * .85, MONTE[:4], -.15)
+    mo.r(0, 26, 144, 10, MONTE[0])
+    L.pega(mo, 0, 0)
+    se = lz(144, 96)   # el seto de la huerta, en matas redondas
+    for i, cx in enumerate(range(-3, 150, 8)):
+        ovalo(se, cx, 33 + (i % 2), 5.5, 4.5, MONTE[1:], .1)
+    se.r(0, 34, 144, 10, MONTE[1])
+    for x in range(0, 144, 3): se.p(x + (x // 3) % 2, 36 + (x * 7) % 5, MONTE[2])
+    L.pega(se, 0, 0)
+    L.r(0, 44, 144, 52, SUELO[2])
+    y = 44   # la tierra: surcos cada vez más anchos hacia delante (su loma al sol, la ladera y el fondo en sombra)
+    k = 0
+    while y < 96:
+        h = int(3 + (y - 44) * .16)
+        for j in range(h):
+            t = j / h
+            for x in range(144):
+                w = int(round(.8 * math.sin(x * .09 + k * 1.7)))
+                yy = y + j + w
+                if yy < 44 or yy > 95: continue
+                c = SUELO[4] if t < .2 else (SUELO[3] if t < .55 else (SUELO[2] if t < .85 else SUELO[1]))
+                if x < 30 and t < .2 and k % 2: c = SUELO[5]
+                r = R()
+                if r < .03: c = SUELO[min(5, SUELO.index(c) + 1)]
+                elif r < .06: c = SUELO[max(0, SUELO.index(c) - 1)]
+                L.p(x, yy, c)
+        y += h; k += 1
+    L.hl(0, 143, 44, MONTE[0])   # la sombra del seto
+    for (x, yy) in ((14, 52), (101, 58), (126, 79), (22, 88), (88, 90), (6, 70)):   # piedrecitas
+        L.p(x, yy, '#a8a090'); L.p(x + 1, yy, '#7a7468')
+    return L
+
+def tierra(moj=False):
+    """la planta en la tierra del bancal, en el sitio de la maceta (32 × 32; la planta sale de (16, 7)): el alcorque, un anillo de
+    tierra suelta alrededor del pie con la luz arriba a la izquierda, el hoyo en medio (regado, oscuro y con brillos) y la sombra
+    del anillo delante"""
+    L = lz(32, 32)
+    R = azar(61 if moj else 59)
+    cx, cy, rx, ry = 16, 7.5, 14.5, 5.8
+    for y in range(16):
+        for x in range(32):
+            nx, ny = (x + .5 - cx) / rx, (y + .5 - cy) / ry
+            rr = math.hypot(nx, ny)
+            if rr > 1:
+                if ny > 0 and rr < 1.12 and abs(nx) < .9: L.p(x, y, SUELO[1])   # la sombra del anillo
+                continue
+            if rr < .58:   # el hoyo
+                q = SUELO_M if moj else SUELO[1:5]
+                c = q[2] if ny < -.2 else (q[1] if rr > .4 else q[2])
+                if ny < -.25 and rr > .35: c = q[0]   # el borde de detrás, en sombra
+                L.p(x, y, c)
+                continue
+            sg = 1 if rr > .8 else -1   # la ladera de fuera o la de dentro
+            lam = sg * (-.6 * nx - .55 * ny) / max(rr, .01)
+            alt = 1 - abs(rr - .8) / .22
+            v = .5 + .42 * lam + .18 * alt + (R() - .5) * .12
+            L.p(x, y, SUELO[max(0, min(5, int(v * 6)))])
+    for (x, y) in ((6, 4), (25, 10), (9, 11), (22, 3)):   # terrones
+        if L.g(x, y)[3]: L.p(x, y, SUELO[5]); L.p(x + 1, y, SUELO[3])
+    if moj:
+        for (x, y) in ((12, 6), (19, 8), (15, 9)):
+            if L.g(x, y)[3]: L.p(x, y, AGUA[2])
+    return L
+
+
 # ── a la salida ──
 sale('gs-f-carpa', f_carpa()); sale('gs-f-mesa', f_mesa()); sale('gs-f-cuarto', f_cuarto()); sale('gs-f-calle', f_calle())
 sale('gs-f-cama-n', f_cama(False)); sale('gs-f-cama-d', f_cama(True))
 sale('acc-f-portal', f_puerta_portal()); sale('acc-f-local', f_puerta_local()); sale('acc-f-club', f_puerta_club())
 sale('acc-f-franco', f_puerta_franco()); sale('acc-f-nave', f_persiana()); sale('acc-f-setas', f_puerta_bajo())
 sale('gs-maceta', maceta()); sale('gs-maceta-m', maceta(True))
+sale('gs-f-huerta', f_huerta()); sale('gs-tierra', tierra()); sale('gs-tierra-m', tierra(True))
 sale('gs-planta-v', planta()); sale('gs-planta-f', planta(True))
 # 0.55: la regadera a mano ya no sale (gs-regar, de PixelLab)
 sale('gs-spray-0', spray(0)); sale('gs-spray-1', spray(1))
