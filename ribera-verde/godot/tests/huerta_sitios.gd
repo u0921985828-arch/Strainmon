@@ -107,7 +107,7 @@ func _corre() -> void:
 		var b: Array = H.bancales[k]
 		var ss: Array = por_bancal.get(k, [])
 		chk(ss.size() == 2, "bancal %d: dos sitios (%s)" % [k, ss])
-		chk(int(b[3]) - int(b[1]) == 1, "bancal %d: dos filas, las de los bloques" % k)
+		chk(int(b[3]) - int(b[1]) == 3 and int(b[2]) - int(b[0]) == 6, "bancal %d: 7 × 4, los bloques con una casilla de tierra alrededor" % k)
 		if ss.size() == 2:
 			var a: Array = H.sitios[ss[0]]
 			var c: Array = H.sitios[ss[1]]
@@ -125,6 +125,33 @@ func _corre() -> void:
 	fk.sort()
 	for j in range(1, fk.size()):
 		chk(int(fk[j]) - int(filas[fk[j - 1]]) - 1 == 1, "entre filas de bancales, una baldosa libre (%d → %d)" % [filas[fk[j - 1]], fk[j]])
+	# la mata entera dentro de su bancal (lo dijo el usuario: «Me parece como que están fuera las plantas no?»): cada píxel pintado de
+	# cada hg-<porte>-<fase>, puesto en cada sitio como lo pinta _arte_obj (x·16 + 8, y·16 + 15 menos el ancla), cae dentro del
+	# bancal con MARGEN px de tierra por los cuatro lados
+	var MARGEN := 4
+	var hgs: Array = Atlas.d.cubre.keys().filter(func(k): return String(k).begins_with("obj:hg-"))
+	chk(hgs.size() >= 15, "los dibujos de la huerta (%d)" % hgs.size())
+	for i in H.sitios.size():
+		var s: Array = H.sitios[i]
+		var b: Array = []
+		for bb in H.bancales:
+			if J.huerta_bloque(i).all(func(c): return int(c[0]) >= int(bb[0]) and int(c[0]) <= int(bb[2]) and int(c[1]) >= int(bb[1]) and int(c[1]) <= int(bb[3])):
+				b = bb
+		if b.is_empty():
+			continue
+		var fuera := []
+		for k in hgs:
+			var o: String = String(k).substr(4)
+			var f = Atlas.frame_de(Atlas.cubre(k), o, "unica", 0, {"i": 0})
+			if f == null:
+				fuera.append(o + " sin dibujo")
+				continue
+			var r: Rect2i = f.c.get_used_rect()
+			var x0: int = int(s[0]) * 16 + 8 - int(f.cel.ancla[0]) + r.position.x
+			var y0: int = int(s[1]) * 16 + 15 - int(f.cel.ancla[1]) + r.position.y
+			if x0 < int(b[0]) * 16 + MARGEN or y0 < int(b[1]) * 16 + MARGEN or x0 + r.size.x > (int(b[2]) + 1) * 16 - MARGEN or y0 + r.size.y > (int(b[3]) + 1) * 16 - MARGEN:
+				fuera.append("%s (%d..%d, %d..%d)" % [o, x0, x0 + r.size.x, y0, y0 + r.size.y])
+		chk(fuera.is_empty(), "sitio %d: la mata entera dentro del bancal %s, con %d px de margen %s" % [i, b, MARGEN, fuera])
 	# 2 · el mapa con lo plantado: el dibujo en la casilla de abajo a la izquierda, hgx en las otras tres; sólidas las cuatro
 	var B: Array = D.BANCO
 	var sids := [String(B[0][0]), String(B[1][0]), String(B[2][0])]
@@ -159,7 +186,7 @@ func _corre() -> void:
 				if J.huerta_idx(x, y) < 0:
 					libres += 1
 					chk(m.o[y][x] == null, "la casilla libre del bancal (%d, %d), sin nada" % [x, y])
-	chk(libres == 2 * H.bancales.size(), "una columna libre por bancal (%d casillas)" % libres)
+	chk(libres == 20 * H.bancales.size(), "en cada bancal, 20 casillas libres: el borde y la columna del medio (%d casillas)" % libres)
 	# se llega a cada sitio (una casilla del bloque junto a una que se pisa)
 	var vis := {Vector2i(int(ll[0]), int(ll[1])): true}
 	var cola := [Vector2i(int(ll[0]), int(ll[1]))]

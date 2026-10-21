@@ -191,9 +191,9 @@ func escondite() -> void:
 # vegetativo, más gramos (HUERTA.g, hasta HUERTA.cap). La lluvia las riega; la helada y la nieve les quitan salud; con lluvia en
 # floración, la botritis. Sin luz que pagar ni olor en casa. S.huerta: {v: el día que la encontraste, l: el que la desbrozaste,
 # p: las plantas de los sitios}
-const HUERTA := {"mapa": "huerta", "w": 30, "h": 12, "seto": [7, 1, 22, 10], "camino": 14, "puerta": [9, 1], "senda": [[9, 0], [9, 2]], "llega": [15, 9], "sale": [9, 2],   # i18n-no
-	"sitios": [[9, 5], [12, 5], [16, 5], [19, 5], [9, 8], [12, 8], [16, 8], [19, 8]], "bancales": [[9, 4, 13, 5], [16, 4, 20, 5], [9, 7, 13, 8], [16, 7, 20, 8]],
-	"atrezo": [[8, 3, "bidonT"], [8, 9, "cuboS"], [21, 3, "manzano"], [21, 9, "crate"], [20, 9, "sacos"]],   # i18n-no
+const HUERTA := {"mapa": "huerta", "w": 30, "h": 16, "seto": [5, 1, 24, 14], "camino": 14, "puerta": [9, 1], "senda": [[9, 0], [9, 2]], "llega": [15, 13], "sale": [9, 2],   # i18n-no
+	"sitios": [[8, 6], [11, 6], [17, 6], [20, 6], [8, 11], [11, 11], [17, 11], [20, 11]], "bancales": [[7, 4, 13, 7], [16, 4, 22, 7], [7, 9, 13, 12], [16, 9, 22, 12]],
+	"atrezo": [[8, 3, "bidonT"], [8, 13, "cuboS"], [21, 3, "manzano"], [21, 13, "crate"], [20, 13, "sacos"]],   # i18n-no
 	"desbroce": 240, "riego": 30, "veg": [420, 805], "g": 250, "cap": 500, "veg_dias": 60,
 	"agua": [.2, .2, .3, .35, .45, .6, .7, .7, .5, .35, .25, .2], "plaga": 1.2, "helada": 25, "nieve": 50}
 var _town19 = null   # lo que había en town en la cancilla y la senda, para dejarlo como estaba sin CAL
@@ -205,9 +205,9 @@ var _town19 = null   # lo que había en town en la cancilla y la senda, para dej
 # agua; las herramientas cavan un sitio vacío (herr.min) y la motoazada labra todos los vacíos (moto.min): la tierra trabajada
 # (S.huerta.t: 0, 1 cavada, 2 labrada) da g más de cosecha hasta que el sitio se vacía. Dibujos en huerta_mej.py; x, dónde van.
 const HUERTA_MEJ := {"bidon": {"p": 35, "l": 100, "max": 3, "x": [[9, 2], [10, 2], [11, 2]]}, "ibc": {"p": 95, "l": 1000, "max": 2, "x": [[17, 2], [19, 2]]},   # i18n-no
-	"goteo": {"p": 150, "x": [[12, 2]]}, "herr": {"p": 60, "g": .15, "min": 45, "x": [[8, 6]]}, "moto": {"p": 490, "g": .3, "min": 40, "x": [[21, 4]]},   # i18n-no
-	"amp": {"p": 1200, "dy": 6, "bancales": [[9, 10, 13, 11], [16, 10, 20, 11], [9, 13, 13, 14], [16, 13, 20, 14]],   # i18n-no
-		"sitios": [[9, 11], [12, 11], [16, 11], [19, 11], [9, 14], [12, 14], [16, 14], [19, 14]]},
+	"goteo": {"p": 150, "x": [[12, 2]]}, "herr": {"p": 60, "g": .15, "min": 45, "x": [[6, 8]]}, "moto": {"p": 490, "g": .3, "min": 40, "x": [[23, 8]]},   # i18n-no
+	"amp": {"p": 1200, "dy": 10, "bancales": [[7, 14, 13, 17], [16, 14, 22, 17], [7, 19, 13, 22], [16, 19, 22, 22]],   # i18n-no
+		"sitios": [[8, 16], [11, 16], [17, 16], [20, 16], [8, 21], [11, 21], [17, 21], [20, 21]]},
 	"caudal": 15, "umbral": 50, "litros": [3, 17]}
 const HUERTA_SPR := {"bidon": "bidonA", "goteo": "bombaS", "herr": "herrH", "moto": "motoA"}   # i18n-no
 
@@ -363,7 +363,9 @@ func huerta_mejoras(m: Dictionary) -> void:
 # lo pidió el usuario: «se plantan en el suelo pero se hacen más grandes cada planta y la distancia de una a otra es de una baldosa,
 # en los bancales que has hecho en el mapa, bien centradas». Cada sitio es un bloque de 2 × 2 casillas (HUERTA.sitios, la de abajo a la
 # izquierda), dos por bancal con una casilla libre en medio: la planta se pinta en esa casilla con el pie del tallo en el centro del
-# bloque (huerta_pl.py) y las otras tres llevan hgx, sólido y sin dibujo, como la planta, que no se pisa
+# bloque (huerta_pl.py) y las otras tres llevan hgx, sólido y sin dibujo, como la planta, que no se pisa. Y (lo dijo el usuario: «Me
+# parece como que están fuera las plantas no?») una casilla de tierra alrededor de los dos bloques, bancales de 7 × 4: la mata entera
+# (hasta 20 px a los lados del pie y 23 por encima) queda dentro del bancal
 func gesto_sol() -> bool:   # el plano de cerca de la huerta, al sol y en la tierra (eventos.gd)
 	return Datos.CAL and S != null and S.get("map") == HUERTA.mapa
 

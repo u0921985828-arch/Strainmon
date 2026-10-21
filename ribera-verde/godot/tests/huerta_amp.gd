@@ -200,6 +200,7 @@ func _corre() -> void:
 			chk(xb - (xa + 2) == 1, "bancal %d: una baldosa libre entre las dos" % k)
 			chk((xa + 1) * 16 + (xb + 1) * 16 == (int(b[0]) + int(b[2]) + 1) * 16, "bancal %d: simétricas" % k)
 			chk(int(a[1]) * 16 == (int(b[1]) + int(b[3]) + 1) * 8, "bancal %d: el pie en la línea del medio" % k)
+			chk(int(b[3]) - int(b[1]) == 3 and xa - int(b[0]) == 1 and int(b[2]) - (xb + 1) == 1, "bancal %d: 7 × 4, una casilla de tierra alrededor (%s)" % [k, b])
 	var celdas := {}
 	for b in A.bancales:   # ningún bancal encima de otro, ni del camino, ni del seto
 		for y in range(int(b[1]), int(b[3]) + 1):

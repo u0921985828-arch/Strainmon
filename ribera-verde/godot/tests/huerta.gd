@@ -155,7 +155,7 @@ func _corre() -> void:
 	var ll: Vector2i = Vector2i(int(H.llega[0]), int(H.llega[1]))
 	J.enter_map("huerta", ll.x, ll.y, "up")
 	var m: Dictionary = J.MAPS.huerta
-	chk(int(m.w) == 30 and int(m.h) == 12 and m.g.size() == 12 and m.g[0].size() == 30, "el mapa de 30 × 12")
+	chk(int(m.w) == 30 and int(m.h) == 16 and m.g.size() == 16 and m.g[0].size() == 30, "el mapa de 30 × 16")
 	var bordes := 0
 	for y in 12:
 		for x in 30:
@@ -212,7 +212,7 @@ func _corre() -> void:
 		var c: Vector2i = cola.pop_front()
 		for dd in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
 			var v: Vector2i = c + dd
-			if v.x < 0 or v.y < 0 or v.x >= 30 or v.y >= 12 or vis.has(v) or m.o[v.y][v.x] != null or J.tile_solid(m, v.x, v.y):
+			if v.x < 0 or v.y < 0 or v.x >= int(m.w) or v.y >= int(m.h) or vis.has(v) or m.o[v.y][v.x] != null or J.tile_solid(m, v.x, v.y):
 				continue
 			vis[v] = true
 			cola.append(v)
@@ -223,8 +223,8 @@ func _corre() -> void:
 		return false
 	for o in H.atrezo:
 		chk(junto.call(o[0], o[1]) and m.o[o[1]][o[0]] == o[2], "se llega a %s" % [o])
-	for st in H.sitios:
-		chk(junto.call(st[0], st[1]), "se llega al sitio %s" % [st])
+	for i in H.sitios.size():   # a alguna casilla de su bloque de 2 × 2, entre las zarzas
+		chk(J.huerta_bloque(i).any(func(c): return junto.call(int(c[0]), int(c[1]))), "se llega al sitio %s" % [H.sitios[i]])
 	chk(vis.has(Vector2i(int(H.camino), ys)), "se llega a la salida")
 	var bi: Array = H.atrezo[0]
 	LOG.clear()
@@ -244,7 +244,7 @@ func _corre() -> void:
 			for x in range(int(b[0]), int(b[2]) + 1):
 				surcos += 1 if m.g[y][x] == "surco" else 0
 				quedan += 1 if m.o[y][x] == "bush" else 0
-	chk(surcos == 40 and quedan == 0, "desbrozada: 40 casillas de surco (%d) y ninguna zarza (%d)" % [surcos, quedan])
+	chk(surcos == 112 and quedan == 0, "desbrozada: 112 casillas de surco (%d) y ninguna zarza (%d)" % [surcos, quedan])
 	# 4 · plantar en abril (el día 1 es el 20 de abril)
 	var sid: String = String(D.BANCO[0][0])
 	S.seeds = {sid: 3}
