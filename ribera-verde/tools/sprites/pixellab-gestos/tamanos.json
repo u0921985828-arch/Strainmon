@@ -90,5 +90,53 @@
  "gm-mech0-ab": [
   46,
   54
+ ],
+ "acc-llave-portal-0": [
+  73,
+  27
+ ],
+ "acc-llave-portal-1": [
+  71,
+  28
+ ],
+ "acc-llave-local-0": [
+  73,
+  27
+ ],
+ "acc-llave-local-1": [
+  71,
+  28
+ ],
+ "acc-llave-club-0": [
+  73,
+  27
+ ],
+ "acc-llave-club-1": [
+  71,
+  28
+ ],
+ "acc-llave-franco-0": [
+  73,
+  27
+ ],
+ "acc-llave-franco-1": [
+  71,
+  28
+ ],
+ "acc-llave-nave-v0": [
+  27,
+  73
+ ],
+ "acc-llave-nave-v1": [
+  28,
+  71
+ ],
+ "acc-llave-setas-v0": [
+  27,
+  73
+ ],
+ "acc-llave-setas-v1": [
+  28,
+  71
  ]
 }

@@ -274,7 +274,7 @@ func on_step_end() -> void:
 		else:
 			run(func():
 				if door.to == "home" and S.map != "home":   # 1.53: la llave del piso
-					await acceso("llave")
+					await acceso("llave", "portal")
 				await warp(door))
 		return
 	if (S.map == "disco" or S.map == "disco-vip") and not disco_abierta():

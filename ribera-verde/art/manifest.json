@@ -1102,6 +1102,126 @@
    ],
    "ajuste": "exacto",
    "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+  },
+  "pl_acc_llave_portal_0": {
+   "w": 73,
+   "h": 27,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_portal_1": {
+   "w": 71,
+   "h": 28,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_local_0": {
+   "w": 73,
+   "h": 27,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_local_1": {
+   "w": 71,
+   "h": 28,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_club_0": {
+   "w": 73,
+   "h": 27,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_club_1": {
+   "w": 71,
+   "h": 28,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_franco_0": {
+   "w": 73,
+   "h": 27,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_franco_1": {
+   "w": 71,
+   "h": 28,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_nave_v0": {
+   "w": 27,
+   "h": 73,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_nave_v1": {
+   "w": 28,
+   "h": 71,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_setas_v0": {
+   "w": 27,
+   "h": 73,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+  },
+  "pl_acc_llave_setas_v1": {
+   "w": 28,
+   "h": 71,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
   }
  },
  "fases": [
@@ -11281,6 +11401,54 @@
      "celda": "pl_acc_llave_v1"
     },
     {
+     "nombre": "acc-llave-portal-0",
+     "celda": "pl_acc_llave_portal_0"
+    },
+    {
+     "nombre": "acc-llave-portal-1",
+     "celda": "pl_acc_llave_portal_1"
+    },
+    {
+     "nombre": "acc-llave-local-0",
+     "celda": "pl_acc_llave_local_0"
+    },
+    {
+     "nombre": "acc-llave-local-1",
+     "celda": "pl_acc_llave_local_1"
+    },
+    {
+     "nombre": "acc-llave-club-0",
+     "celda": "pl_acc_llave_club_0"
+    },
+    {
+     "nombre": "acc-llave-club-1",
+     "celda": "pl_acc_llave_club_1"
+    },
+    {
+     "nombre": "acc-llave-franco-0",
+     "celda": "pl_acc_llave_franco_0"
+    },
+    {
+     "nombre": "acc-llave-franco-1",
+     "celda": "pl_acc_llave_franco_1"
+    },
+    {
+     "nombre": "acc-llave-nave-v0",
+     "celda": "pl_acc_llave_nave_v0"
+    },
+    {
+     "nombre": "acc-llave-nave-v1",
+     "celda": "pl_acc_llave_nave_v1"
+    },
+    {
+     "nombre": "acc-llave-setas-v0",
+     "celda": "pl_acc_llave_setas_v0"
+    },
+    {
+     "nombre": "acc-llave-setas-v1",
+     "celda": "pl_acc_llave_setas_v1"
+    },
+    {
      "nombre": "acc-dedo",
      "celda": "pl_acc_dedo"
     },
@@ -11411,6 +11579,18 @@
     "misc:acc-llave-1",
     "misc:acc-llave-v0",
     "misc:acc-llave-v1",
+    "misc:acc-llave-portal-0",
+    "misc:acc-llave-portal-1",
+    "misc:acc-llave-local-0",
+    "misc:acc-llave-local-1",
+    "misc:acc-llave-club-0",
+    "misc:acc-llave-club-1",
+    "misc:acc-llave-franco-0",
+    "misc:acc-llave-franco-1",
+    "misc:acc-llave-nave-v0",
+    "misc:acc-llave-nave-v1",
+    "misc:acc-llave-setas-v0",
+    "misc:acc-llave-setas-v1",
     "misc:acc-dedo",
     "misc:gm-spray",
     "misc:gm-abono",

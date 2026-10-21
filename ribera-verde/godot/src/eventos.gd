@@ -1351,8 +1351,9 @@ func tiempos_acceso(V: Dictionary) -> Dictionary:
 		return {"fin": float(GESTOS[k])}
 	var n: int = maxi(1, str(V.c).length())
 	match k:
-		"llave", "candado":
-			return {"entra": 420.0, "gira": 760.0, "fin": 1000.0}
+		"llave", "candado":   # cada vuelta, ACC_VUELTA ms; el último cerrojo (gira) suena al acabar la última
+			var vu: int = int(CERRADURA[cerradura(V)].v)
+			return {"entra": 420.0, "vueltas": vu, "gira": 420.0 + vu * ACC_VUELTA, "fin": 660.0 + vu * ACC_VUELTA}
 		"clave":
 			return {"t1": 150.0, "clic": 150.0 + n * ACC_TECLA + 60, "fin": 150.0 + n * ACC_TECLA + 360}
 		"pin":
@@ -1383,7 +1384,8 @@ func acceso(k: String, c := "", ok := true) -> void:
 	match k:
 		"llave", "candado":
 			suena.call(T.entra, "tick")
-			suena.call(T.gira, "llave")
+			for i in int(T.vueltas):   # un cerrojo por vuelta
+				suena.call(T.entra + (i + 1) * ACC_VUELTA, "llave")
 		"clave", "pin":
 			for i in str(c).length():
 				suena.call(T.t1 + i * ACC_TECLA, "tecla")
@@ -1427,34 +1429,39 @@ func rects_acceso(V: Dictionary, now: float) -> Array:
 		return R
 	R.append([x0 - 2, y0 - 2, ACC_W + 4, ACC_H + 4, "#26262e"])
 	match k:
-		"llave":   # la puerta de madera, el escudo de latón y la llave que entra por la derecha y gira
-			R.append([x0, y0, ACC_W, ACC_H, "#6a4a30"])
-			for xx in range(x0 + 11, x0 + ACC_W, 12):
-				R.append([xx, y0, 1, ACC_H, "#5a3c26"])
-			R.append([cx - 8, cy - 22, 16, 44, "#b08a3a"])
-			R.append([cx - 8, cy - 22, 16, 1, "#d8b860"])
-			R.append([cx - 8, cy - 22, 1, 44, "#d8b860"])
-			R.append([cx - 8, cy + 21, 16, 1, "#7a5a20"])
-			R.append([cx + 7, cy - 22, 1, 44, "#7a5a20"])
-			R.append([cx - 5, cy - 18, 10, 6, "#8a6a28"])   # el pomo, encima
-			R.append([cx - 3, cy - 6, 6, 5, "#101010"])
-			R.append([cx - 1, cy - 2, 2, 7, "#101010"])
-			_llave_h(R, t, T, cx, cy, Rect2i(cx + 3, y0, x0 + ACC_W - cx - 3, ACC_H))
-		"candado":   # la persiana de chapa y el candado: la llave sube por debajo, gira y salta el arco
-			R.append([x0, y0, ACC_W, ACC_H, "#7a7e86"])
-			for yy in range(y0 + 3, y0 + ACC_H, 5):
-				R.append([x0, yy, ACC_W, 1, "#5e626a"])
+		"llave":   # la puerta, el escudo y el bombín de cada cerradura; la llave entra por la derecha y gira sus vueltas
+			var cer: String = cerradura(V)
+			_puerta_llave(R, cer, x0, y0, cx, cy)
+			_llave_h(R, t, T, cx, cy, Rect2i(cx + 3, y0, x0 + ACC_W - cx - 3, ACC_H), cer)
+		"candado":   # la persiana (la nave) o la puerta gris (el bajo) y su candado: la llave sube por debajo, gira y salta el arco
+			var cer: String = cerradura(V)
+			var gr: bool = cer == "nave"   # el de la nave, grande y de acero; el del bajo, pequeño y de latón
+			if gr:
+				R.append([x0, y0, ACC_W, ACC_H, "#7a7e86"])
+				for yy in range(y0 + 3, y0 + ACC_H, 5):
+					R.append([x0, yy, ACC_W, 1, "#5e626a"])
+			else:
+				R.append([x0, y0, ACC_W, ACC_H, "#5e6466"])
+				R.append([x0 + 8, y0 + 8, ACC_W - 16, ACC_H - 16, "#686e70"])
+				R.append([x0 + 8, y0 + 8, ACC_W - 16, 1, "#7a8082"])
 			R.append([x0, cy - 6, ACC_W, 4, "#9a9ea6"])   # el pasador
+			var aw: int = 8 if gr else 5   # medio ancho del arco
+			var ag: int = 3 if gr else 2   # grosor
 			var lift: int = Datos.jsround(_suave((t - T.gira) / 160.0) * 6) if V.ok else 0
-			R.append([cx - 8, cy - 15 - lift, 16, 3, "#b8bcc4"])
-			R.append([cx - 8, cy - 15 - lift, 3, 13, "#b8bcc4"])
-			R.append([cx + 5, cy - 15 - lift, 3, 13 + (lift if lift else 0), "#b8bcc4"])
-			R.append([cx - 7, cy - 15 - lift, 1, 13, "#e0e4ec"])
-			R.append([cx - 10, cy - 2, 20, 18, "#c09838"])
-			R.append([cx - 10, cy - 2, 20, 2, "#e0c060"])
-			R.append([cx - 10, cy + 14, 20, 2, "#806020"])
+			R.append([cx - aw, cy - 15 - lift, aw * 2, ag, "#b8bcc4"])
+			R.append([cx - aw, cy - 15 - lift, ag, 13, "#b8bcc4"])
+			R.append([cx + aw - ag, cy - 15 - lift, ag, 13 + lift, "#b8bcc4"])
+			R.append([cx - aw + 1, cy - 15 - lift, 1, 13, "#e0e4ec"])
+			var cw: int = 11 if gr else 7   # medio ancho del cuerpo
+			var ch: int = 18 if gr else 13
+			var cu: Array = ["#8a9098", "#b8bec6", "#5a6068"] if gr else ["#c09838", "#e0c060", "#806020"]
+			R.append([cx - cw, cy - 2, cw * 2, ch, cu[0]])
+			R.append([cx - cw, cy - 2, cw * 2, 2, cu[1]])
+			R.append([cx - cw, cy + ch - 4, cw * 2, 2, cu[2]])
+			if gr:   # el de acero, con su escudo de latón en el ojo
+				R.append([cx - 3, cy + 5, 7, 9, "#c09838"])
 			R.append([cx - 1, cy + 7, 3, 5, "#101010"])
-			_llave_v(R, t, T, cx, cy, Rect2i(x0, cy + 12, ACC_W, y0 + ACC_H - cy - 12))
+			_llave_v(R, t, T, cx, cy, Rect2i(x0, cy + 12, ACC_W, y0 + ACC_H - cy - 12), cer)
 		"clave", "pin":
 			_teclado(R, V, t, T, cx, y0 + (14 if k == "pin" else 6))
 		"rueda":   # la puerta de la caja: cuatro ruedas que se paran en su cifra y la manilla que gira
@@ -1500,17 +1507,91 @@ func rects_acceso(V: Dictionary, now: float) -> Array:
 
 # 0.55 (lo pidió el usuario: «la llave… flotan»): la mano de PixelLab con la llave, la manga por el canto derecho del panel; entra
 # por el bombín (lo de dentro, recortado: cl empieza a la derecha del ojo de la cerradura) y gira (acc-llave-1, la muñeca de canto)
-func _llave_h(R: Array, t: float, T: Dictionary, cx: int, cy: int, cl: Rect2i) -> void:
+func _llave_h(R: Array, t: float, T: Dictionary, cx: int, cy: int, cl: Rect2i, cer := "portal") -> void:
 	var kx: int = cx - 14 + Datos.jsround((1 - _suave(t / T.entra)) * 34)
-	if t < T.entra + (T.gira - T.entra) * 0.5:
-		R.append(["@", "acc-llave-0", kx, cy - 21, cl])
-	else:
-		R.append(["@", "acc-llave-1", kx, cy - 22, cl])
+	R.append(["@", "acc-llave-%s-%d" % [cer, _llave_giro(t, T)], kx, cy - 21 - _llave_giro(t, T), cl])
+
+# en qué punto de la vuelta va: 0 de plano (entrando y a media vuelta), 1 de canto; al acabar, de canto
+func _llave_giro(t: float, T: Dictionary) -> int:
+	if t < T.entra:
+		return 0
+	if t >= T.gira:
+		return 1
+	return 1 if int((t - T.entra) / (ACC_VUELTA * 0.5)) % 2 == 0 else 0
 
 # la del candado, la misma mano girada: sube por debajo del ojo (cl empieza debajo) y gira
-func _llave_v(R: Array, t: float, T: Dictionary, cx: int, cy: int, cl: Rect2i) -> void:
+func _llave_v(R: Array, t: float, T: Dictionary, cx: int, cy: int, cl: Rect2i, cer := "nave") -> void:
 	var ky: int = cy + 3 + Datos.jsround((1 - _suave(t / T.entra)) * 20)
-	R.append(["@", "acc-llave-v0" if t < T.entra + (T.gira - T.entra) * 0.5 else "acc-llave-v1", cx - 7, ky, cl])
+	R.append(["@", "acc-llave-%s-v%d" % [cer, _llave_giro(t, T)], cx - 7, ky, cl])
+
+# cada cerradura (lo pidió el usuario: «personalizado para abrir una cerradura u otra, y el tipo de llave que concuerde con la
+# cerradura»): sus vueltas y su llave (acc-llave-<cerradura>-*, pixellab_gestos.py); la puerta y el escudo, en _puerta_llave
+const ACC_VUELTA := 300.0
+const CERRADURA := {
+	"portal": {"v": 1},   # el portal del piso: bombín de latón y llave de serreta
+	"local": {"v": 2},    # los locales: puerta de aluminio y cristal, bombín europeo y llave de seguridad
+	"club": {"v": 2},     # los clubs tuyos: puerta lacada negra, roseta cromada y llave de seguridad de cabeza negra
+	"franco": {"v": 3},   # el piso franco: puerta blindada, escudo de seguridad y llave de gorjas, tres vueltas
+	"nave": {"v": 1},     # el candado grande de acero de la persiana de la nave
+	"setas": {"v": 1},    # el candado pequeño de latón del bajo
+}
+func cerradura(V: Dictionary) -> String:
+	var c: String = str(V.get("c", ""))
+	if CERRADURA.has(c):
+		return c
+	return "nave" if V.k == "candado" else "portal"
+
+func _puerta_llave(R: Array, cer: String, x0: int, y0: int, cx: int, cy: int) -> void:
+	match cer:
+		"local":   # aluminio con el cristal arriba y el bombín europeo en una placa estrecha
+			R.append([x0, y0, ACC_W, ACC_H, "#a0a6ae"])
+			R.append([x0 + 6, y0 + 4, ACC_W - 12, 30, "#5a7a90"])
+			R.append([x0 + 10, y0 + 6, 2, 26, "#8aaabe"])
+			R.append([x0 + 16, y0 + 6, 1, 26, "#8aaabe"])
+			R.append([x0, y0 + 36, ACC_W, 1, "#7a8088"])
+			R.append([cx - 5, cy - 20, 10, 42, "#c8ccd4"])
+			R.append([cx - 5, cy - 20, 10, 1, "#eceff4"])
+			R.append([cx + 4, cy - 20, 1, 42, "#8a9098"])
+			R.append([cx - 9, cy - 16, 18, 3, "#d8dce4"])   # la manilla
+			R.append([cx - 3, cy - 7, 6, 10, "#101010"])   # el bombín europeo
+			R.append([cx - 2, cy - 6, 4, 8, "#b0b4bc"])
+			R.append([cx - 2, cy - 3, 4, 1, "#202024"])
+		"club":   # lacada negra, roseta cromada
+			R.append([x0, y0, ACC_W, ACC_H, "#1e1e24"])
+			for xx in [x0 + 14, x0 + ACC_W - 15]:
+				R.append([xx, y0, 1, ACC_H, "#34343c"])
+			R.append([cx - 12, cy - 18, 24, 3, "#c8ccd4"])   # el tirador
+			R.append([cx - 12, cy - 18, 24, 1, "#eceff4"])
+			R.append([cx - 7, cy - 7, 14, 14, "#9aa0a8"])
+			R.append([cx - 6, cy - 6, 12, 12, "#c8ccd4"])
+			R.append([cx - 6, cy - 6, 12, 1, "#eceff4"])
+			R.append([cx - 2, cy - 4, 4, 7, "#101010"])
+			R.append([cx - 1, cy - 3, 2, 5, "#b0b4bc"])
+			R.append([cx - 1, cy - 1, 2, 1, "#202024"])
+		"franco":   # blindada: cuarterones, escudo de seguridad redondo y la bocallave de la de gorjas
+			R.append([x0, y0, ACC_W, ACC_H, "#4a5058"])
+			for q in [[6, 4], [ACC_W / 2 + 3, 4], [6, ACC_H / 2 + 2], [ACC_W / 2 + 3, ACC_H / 2 + 2]]:
+				R.append([x0 + q[0], y0 + q[1], ACC_W / 2 - 9, ACC_H / 2 - 6, "#565e68"])
+				R.append([x0 + q[0], y0 + q[1], ACC_W / 2 - 9, 1, "#6a727c"])
+			R.append([cx - 11, cy - 11, 22, 22, "#c8ccd4"])
+			R.append([cx - 10, cy - 10, 20, 20, "#202024"])
+			R.append([cx - 10, cy - 10, 20, 1, "#3a3a42"])
+			R.append([cx - 4, cy - 6, 8, 12, "#3a3a42"])   # la tapa giratoria, abierta
+			R.append([cx - 1, cy - 6, 3, 10, "#050505"])
+			R.append([cx - 3, cy - 3, 7, 3, "#050505"])
+		_:   # el portal: madera, escudo de latón y bombín de latón
+			R.append([x0, y0, ACC_W, ACC_H, "#6a4a30"])
+			for xx in range(x0 + 11, x0 + ACC_W, 12):
+				R.append([xx, y0, 1, ACC_H, "#5a3c26"])
+			R.append([cx - 8, cy - 22, 16, 44, "#b08a3a"])
+			R.append([cx - 8, cy - 22, 16, 1, "#d8b860"])
+			R.append([cx - 8, cy - 22, 1, 44, "#d8b860"])
+			R.append([cx - 8, cy + 21, 16, 1, "#7a5a20"])
+			R.append([cx + 7, cy - 22, 1, 44, "#7a5a20"])
+			R.append([cx - 5, cy - 18, 10, 6, "#8a6a28"])   # el pomo, encima
+			R.append([cx - 4, cy - 6, 8, 9, "#7a5a20"])   # el bombín redondo, con su ranura
+			R.append([cx - 3, cy - 5, 6, 7, "#c8a048"])
+			R.append([cx - 3, cy - 2, 6, 2, "#101010"])
 
 # el dedo de PixelLab (acc-dedo: la yema en (2, 0), la manga por abajo a la derecha) en (x, y)
 func _dedo(R: Array, x: float, y: float) -> void:
@@ -1800,11 +1881,18 @@ func _gs_cilindro(n: String, im: Image) -> Array:
 		var k: int = im.get_pixel(q.x, q.y).to_rgba32()
 		cuenta[k] = cuenta.get(k, 0) + 1
 	var kp: int = 0
+	var dorado := func(k: int) -> bool:   # el puño es dorado: si lo hay, ese (si no, en el porro y el mechero salía la piel)
+		var p := Color.hex(k)
+		return p.h > 0.08 and p.h < 0.18 and p.s > 0.4 and p.v > 0.55
 	for k in cuenta:
-		if kp == 0 or cuenta[k] > cuenta[kp]:
+		if kp == 0 or (dorado.call(k) and not dorado.call(kp)) or (dorado.call(k) == dorado.call(kp) and cuenta[k] > cuenta[kp]):
 			kp = k
 	var cp := Color.hex(kp)
-	puno = puno.filter(func(q): var p: Color = im.get_pixel(q.x, q.y); return Vector3(p.r - cp.r, p.g - cp.g, p.b - cp.b).length() < 0.3)
+	var de_puno := func(p: Color) -> bool:   # dorado, por el tono (por la distancia, la piel también lo parecía)
+		if dorado.call(kp):
+			return dorado.call(p.to_rgba32())
+		return Vector3(p.r - cp.r, p.g - cp.g, p.b - cp.b).length() < 0.3
+	puno = puno.filter(func(q): return de_puno.call(im.get_pixel(q.x, q.y)))
 	var c := Vector2.ZERO
 	for q in puno:
 		c += Vector2(q) + Vector2(0.5, 0.5)
@@ -1843,6 +1931,9 @@ func _gs_cilindro(n: String, im: Image) -> Array:
 		var d: Vector2 = Vector2(q) + Vector2(0.5, 0.5) - c
 		var k: int = roundi(d.dot(pe))
 		tras[k] = minf(tras.get(k, 0.0), d.dot(ax))
+	var tdel := 0.0   # lo más adelante del puño (hacia la manga): hasta ahí, lo dorado se queda
+	for q in puno:
+		tdel = maxf(tdel, (Vector2(q) + Vector2(0.5, 0.5) - c).dot(ax))
 	var t0 := func(sv: float) -> float:   # dónde empieza el brazo a esa altura del puño
 		return tras.get(roundi(sv), 0.0)
 	# la raya negra de la manga vieja, más allá del puño, también fuera (si no, quedan picos al lado del cilindro)
@@ -1882,8 +1973,9 @@ func _gs_cilindro(n: String, im: Image) -> Array:
 			if tq > -3.0 and not oscuro.call(p) and p.s > 0.2 and mismo_tono.call(p):
 				continue   # y sus restos sueltos, en cualquier tono de la tela
 			var sq: float = (Vector2(x, y) + Vector2(0.5, 0.5) - c).dot(pe)
-			if tq > maxf(t0.call(sq), 0.0) + 0.5 and absf(sq) < ra:
-				continue   # dentro del cilindro, solo el cilindro
+			var oro: bool = tq <= tdel + 0.5 and de_puno.call(p)
+			if tq > maxf(t0.call(sq), 0.0) + 0.5 and absf(sq) < ra and not oro:
+				continue   # dentro del cilindro, solo el cilindro (el puño dorado, entero: lo pidió el usuario, «el dorado de la manga desaparece»)
 			out.set_pixel(x - o.x, y - o.y, p)
 	for vuelta in 2:   # la raya negra que se ha quedado sin nada que rodear
 		var fuera: Array = []

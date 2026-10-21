@@ -720,15 +720,17 @@ func entra_local(d: Dictionary):
 				return
 	match t:   # 1.53: lo tuyo se abre con su llave, su candado o su clave
 		"nave":
-			await acceso("candado")
+			await acceso("candado", "nave")
 			await acceso("clave", cifras_acceso("nave"))
 		"setas":
-			await acceso("candado")
-		"neg", "franco":
-			await acceso("llave")
+			await acceso("candado", "setas")
+		"neg":
+			await acceso("llave", "local")
+		"franco":
+			await acceso("llave", "franco")
 		"club":
 			if D.CLUBS[gk[1]].get("tuyo"):
-				await acceso("llave")
+				await acceso("llave", "club")
 	await warp(d)
 
 func atras_puerta() -> void:

@@ -471,7 +471,7 @@ func vip_puerta(k: String) -> bool:
 			atras_puerta()
 			await say(T("Precinto del Ayuntamiento en la puerta: cerrado hasta el {d}.", {"d": Datos.fd(int(M_.vip[k].cl), S.day)}))
 			return false
-		await acceso("llave")
+		await acceso("llave", "club")
 		return true
 	atras_puerta()
 	if int(S.get("prest", 0)) < int(D.CUP.vip):   # MAESTRO [5]: sin palmarés en la CannaCup no te lo venden

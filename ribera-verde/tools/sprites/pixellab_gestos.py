@@ -146,6 +146,94 @@ def sale(n, f, canto, giro):
 	print(n, im.size, cols, 'colores', 'manga en el canto' if ok else 'SIN MANGA EN EL CANTO')
 	return im.size
 
+# cada cerradura, su llave (lo pidió el usuario: «el tipo de llave también que concuerde con la cerradura»): la cabeza de PixelLab
+# repintada con el metal de cada una y la hoja nueva a mano: la de serreta del portal, las de seguridad con cazoletas (los locales;
+# los clubs, con la cabeza negra), la de gorjas de la puerta blindada (el franco) y las de candado (la nave, grande; el bajo, pequeña)
+import colorsys
+K=(0,0,0,255)
+PAL={  # (oscuro, medio, claro, brillo)
+ 'latón': [(122,82,30),(176,128,52),(218,174,84),(246,218,140)],
+ 'níquel':[(92,96,104),(150,156,166),(196,202,210),(236,240,246)],
+ 'acero': [(52,56,64),(88,94,104),(126,134,146),(176,184,196)],
+ 'negro': [(20,20,24),(40,40,46),(62,62,70),(96,96,106)],
+}
+TIPOS={  # cabeza, hoja, forma de la hoja, largo
+ 'portal': ('latón','latón','serreta',18),
+ 'local':  ('níquel','níquel','puntos',18),
+ 'club':   ('negro','níquel','puntos',18),
+ 'franco': ('acero','acero','gorjas',18),
+ 'nave':   ('níquel','níquel','candado',14),
+ 'setas':  ('latón','latón','candado',11),
+}
+def es_laton(c):
+	r,g,b,a=c
+	if a<128: return False
+	h,s,v=colorsys.rgb_to_hsv(r/255,g/255,b/255)
+	return 0.085<=h<=0.17 and s>0.35 and v>0.3
+def lum(c): return (c[0]*3+c[1]*6+c[2])/10
+def llave_tipo(im, tipo, girada):
+	im=im.copy(); px=im.load(); W,H=im.size
+	cab,hoja,forma,L=TIPOS[tipo]
+	yt=18 if girada else 17   # la raya de arriba de la hoja
+	xb=20 if girada else 18   # donde la hoja entra en la cabeza
+	# 1 · la cabeza: lo de latón de la zona de la llave, por su luz, a la paleta
+	for x in range(0,30):
+		for y in range(12,H):
+			c=px[x,y]
+			if es_laton(c):
+				l=lum(c); p=PAL[cab]
+				px[x,y]=p[0 if l<110 else 1 if l<160 else 2 if l<200 else 3]+(255,)
+	# 2 · fuera la hoja vieja
+	for x in range(0,xb):
+		for y in range(yt-1,min(H,yt+7)):
+			px[x,y]=(0,0,0,0)
+	# 3 · la hoja nueva, de xb hacia la izquierda
+	p=PAL[hoja]
+	x0=xb-L
+	def put(x,y,c):
+		if 0<=x<W and 0<=y<H: px[x,y]=c if len(c)==4 else c+(255,)
+	if forma in('serreta','puntos','candado'):
+		alto=3 if forma!='puntos' else 4
+		for x in range(x0,xb):
+			put(x,yt,K); put(x,yt+alto+1,K)
+			put(x,yt+1,p[3] if forma!='puntos' else p[2])
+			for j in range(2,alto+1): put(x,yt+j,p[1] if j<alto else p[0])
+		# la punta, en bisel
+		put(x0,yt,(0,0,0,0)); put(x0-1,yt+1,K); put(x0-1,yt+2,K)
+		if alto==4: put(x0-1,yt+3,K)
+		put(x0,yt+alto+1,(0,0,0,0)); put(x0,yt+alto,K)
+		if forma=='serreta':   # los dientes, por abajo
+			for x in range(x0+2,xb-3):
+				if (x-x0)%3!=2: put(x,yt+alto+1,p[1]); put(x,yt+alto+2,K)
+				if (x-x0)%3==0: put(x,yt+alto+2,p[0]); put(x,yt+alto+3,K)
+		elif forma=='puntos':  # las cazoletas de la llave de seguridad
+			for x in range(x0+2,xb-2,3): put(x,yt+2,p[0]); put(x+1,yt+3,p[0])
+		else:   # candado: dientes cortos
+			for x in range(x0+2,xb-2,2): put(x,yt+alto+1,p[1]); put(x,yt+alto+2,K)
+	elif forma=='gorjas':   # caña redonda y el paletón doble en la punta
+		for x in range(x0+5,xb):
+			put(x,yt+1,K); put(x,yt+2,p[3]); put(x,yt+3,p[1]); put(x,yt+4,K)
+		for x in range(x0,x0+6):
+			for y in range(yt-2,yt+8): put(x,y,p[1] if (y-yt)%3 else p[2])
+			put(x,yt-3,K); put(x,yt+8,K)
+		for y in range(yt-2,yt+8): put(x0-1,y,K); put(x0+6,y,K if not (yt+1<=y<=yt+4) else p[1])
+		put(x0+2,yt-2,K); put(x0+2,yt-1,K); put(x0+3,yt+7,K); put(x0+3,yt+6,K)   # las muescas
+	return im
+LLAVES_V = ('nave', 'setas')   # las de candado, de pie, como acc-llave-v0/v1
+def llaves():
+	for t in TIPOS:
+		for i in (0, 1):
+			d0 = os.path.join(R, 'art', 'crudo', 'gestos', 'acc-llave-%d' % i, 'unica', '00.png')
+			im = llave_tipo(Image.open(d0).convert('RGBA'), t, i == 1)
+			n = 'acc-llave-%s-%d' % (t, i)
+			if t in LLAVES_V:
+				im = im.rotate(-90, expand=True)
+				n = 'acc-llave-%s-v%d' % (t, i)
+			d = os.path.join(R, 'art', 'crudo', 'gestos', n, 'unica')   # sin recortar: la mano, donde la de serie; os.makedirs(d, exist_ok=True)
+			im.save(os.path.join(d, '00.png'))
+			yield n, im.size
+
 if __name__ == '__main__':
 	tam = {n: sale(n, *v) for n, v in ELEGIDAS.items()}
+	tam.update(dict(llaves()))
 	json.dump({k: list(v) for k, v in tam.items()}, open(os.path.join(C, '..', 'tamanos.json'), 'w'), indent=1)

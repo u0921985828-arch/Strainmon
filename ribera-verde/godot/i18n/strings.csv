@@ -422,9 +422,15 @@ s1808ea8a,"{b} está en el mar, camino de {r}. Vuelve el {d}.","{b} is at sea, h
 s6a4e9f9a,{d} días de viaje con {b}.,{d} days at sea with {b}.
 s5809a6c0,¿A dónde?,Where to?
 sa9e0077b,Zarpar ({kg}),Set sail ({kg})
+s448dfe81,Descargar,Unload
+s4161fb99,"Lo de la bodega, otra vez encima (lo que te quepa).","What's in the hold, back on you (whatever fits)."
+sc6d4c6a2,Dejarlo cargado,Leave it loaded
 se60ec26e,La carga · {a} de {b},Cargo · {a} of {b}
 s9c0f6ab7,¿Cuánto de {n}?,How much {n}?
 s60f43198,La bodega va llena.,The hold is full.
+s4ac51d27,Sacas {g} de la bodega.,You take {g} out of the hold.
+saed69c3e,No te cabe todo: el resto se queda a bordo.,Not everything fits: the rest stays on board.
+s0091c646,"Lo dejas en la bodega: {kg} a bordo de {b}, listos para zarpar cuando vuelvas.","You leave it in the hold: {kg} on board {b}, ready to sail when you come back."
 sb1aaa35f,Sueltas amarras. {b} sale hacia {r} con {kg}: llega el {d}.,You cast off. {b} heads for {r} with {kg}: arrives {d}.
 scd28d831, Es el pedido de la semana., It's this week's order.
 s88458006, El último trabajo de Koldo., Koldo's last job.
@@ -1155,11 +1161,14 @@ sd8588689,"Sí, enviar","Yes, send"
 s05451559,¿Borrar la partida guardada? No se puede deshacer.,Delete the saved game? It can't be undone.
 s7cad5cfd,"Sí, borrarla","Yes, delete it"
 s01f50212,Partida borrada.,Game deleted.
-se5cb9f38,"LANDRACE HUNTERS · genética de barrio
+sfe29142c,"LANDRACE HUNTERS · genética de barrio
 Versión {v} para Android
 
-Un juego de Eddie.
-Hecho con Godot Engine y con la ayuda de Claude Code (Anthropic).
+Un juego desarrollado por WolfCade.
+Hecho con Godot Engine.
+
+AGRADECIMIENTOS
+A los beta testers Kerman, Ibai, Adrián y Urko.
 
 ARTE
 Personajes, escenarios y objetos: PixelLab (pixellab.ai), revisados y retocados a mano. Carpas por dentro, plantas, equipo, muebles, iconos y el icono de la app: dibujados a mano, píxel a píxel.
@@ -1178,8 +1187,11 @@ El cultivo y la venta de cannabis son delito en muchos países. Este juego no an
 Gracias por jugar.","LANDRACE HUNTERS · neighbourhood genetics
 Version {v} for Android
 
-A game by Eddie.
-Made with Godot Engine and with help from Claude Code (Anthropic).
+A game developed by WolfCade.
+Made with Godot Engine.
+
+THANKS
+To our beta testers Kerman, Ibai, Adrián and Urko.
 
 ART
 Characters, scenery and objects: PixelLab (pixellab.ai), reviewed and touched up by hand. Tent interiors, plants, equipment, furniture, icons and the app icon: drawn by hand, pixel by pixel.
@@ -5941,9 +5953,3 @@ sf45cf29a,Análisis,Analysis
 s1c48efeb,Pipas y bongs,Pipes and bongs
 s960219e1,Comida,Food
 s137508f0,Defensa,Self-defence
-s448dfe81,Descargar,Unload
-s4161fb99,"Lo de la bodega, otra vez encima (lo que te quepa).","What's in the hold, back on you (whatever fits)."
-sc6d4c6a2,Dejarlo cargado,Leave it loaded
-s4ac51d27,Sacas {g} de la bodega.,You take {g} out of the hold.
-saed69c3e,No te cabe todo: el resto se queda a bordo.,Not everything fits: the rest stays on board.
-s0091c646,"Lo dejas en la bodega: {kg} a bordo de {b}, listos para zarpar cuando vuelvas.","You leave it in the hold: {kg} on board {b}, ready to sail when you come back."

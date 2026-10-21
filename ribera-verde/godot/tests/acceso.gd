@@ -185,12 +185,12 @@ func _corre() -> void:
 	J.P.x = 5
 	J.P.y = 8
 	VIO.clear()
-	chk(corre(func(): J.on_step_end()) and S.map == "home" and tipos() == ["llave"], "el portal del piso: %s %s" % [S.map, VIO])
+	chk(corre(func(): J.on_step_end()) and S.map == "home" and tipos() == ["llave"] and VIO[0][1] == "portal", "el portal del piso: %s %s" % [S.map, VIO])
 	entra("valdehierro", 12, 8)
 	J.P.x = 12
 	J.P.y = 7
 	VIO.clear()
-	chk(corre(func(): await J.entra_local(J.MAPS.valdehierro.doors["12,7"])) and S.map == "nave" and tipos() == ["candado", "clave"], "la nave: %s %s" % [S.map, VIO])
+	chk(corre(func(): await J.entra_local(J.MAPS.valdehierro.doors["12,7"])) and S.map == "nave" and tipos() == ["candado", "clave"] and VIO[0][1] == "nave", "la nave: %s %s" % [S.map, VIO])
 	chk(VIO.size() == 2 and str(VIO[1][1]).length() == 4 and VIO[1][1] == J.cifras_acceso("nave"), "la alarma, 4 cifras siempre iguales")
 	VIO.clear()
 	chk(corre(func(): await J.cajero()) and tipos() == ["pin"], "el cajero: %s" % [VIO])
@@ -235,7 +235,7 @@ func _corre() -> void:
 	# el canto del panel en todos los momentos, y el agua de la regadera cae dentro de la maceta
 	var ax1: int = ((J.SW - J.ACC_W) >> 1) + J.ACC_W
 	var ay1: int = ((J.SH - J.ACC_H) >> 1) + J.ACC_H
-	for q in [["llave", "acc-llave-", "der"], ["candado", "acc-llave-v", "aba"], ["clave", "acc-dedo", "aba"], ["pin", "acc-dedo", "aba"], ["rueda", "acc-dedo", "aba"]]:
+	for q in [["llave", "acc-llave-", "der"], ["candado", "acc-llave-nave-v", "aba"], ["clave", "acc-dedo", "aba"], ["pin", "acc-dedo", "aba"], ["rueda", "acc-dedo", "aba"]]:
 		V = {"k": q[0], "c": "" if q[0] in ["llave", "candado"] else "4271", "ok": true, "t0": 0.0}
 		T = J.tiempos_acceso(V)
 		var bien := true
@@ -243,7 +243,49 @@ func _corre() -> void:
 			bien = bien and mano_canto(J.rects_acceso(V, ms), q[1], q[2], ax1, ay1)
 		chk(bien, "%s: la mano entra por el canto (%s)" % [q[0], q[2]])
 	V = {"k": "llave", "c": "", "ok": true, "t0": 0.0}
-	chk(J.rects_acceso(V, 300).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and e[1] == "acc-llave-0") and J.rects_acceso(V, 900).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and e[1] == "acc-llave-1"), "la llave gira: la muñeca de canto")
+	chk(J.rects_acceso(V, 300).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and e[1] == "acc-llave-portal-0") and J.rects_acceso(V, 900).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and e[1] == "acc-llave-portal-1"), "la llave gira: la muñeca de canto")
+	# el puño dorado, entero en todas las manos (lo pidió el usuario: «en la animación de encender el porro, el dorado de la manga
+	# desaparece, en una mano como en otra»): lo dorado del sprite de PixelLab sigue en la mano con el brazo en cilindro
+	var sin_oro := []
+	for nm in ["gm-porro", "gm-mech1-ab", "gm-mech0-ab", "gm-pipa", "gm-vapo", "gm-regar", "gm-billete", "gm-semilla", "gm-pincel", "gm-tij-a"]:
+		var fo = Atlas.foto_misc(nm)
+		if fo == null:
+			sin_oro.append(nm + " (sin sprite)")
+			continue
+		var cuenta_oro := func(im: Image) -> int:
+			var k := 0
+			for y in im.get_height():
+				for x in im.get_width():
+					var c := im.get_pixel(x, y)
+					k += 1 if c.a > 0.5 and c.h > 0.08 and c.h < 0.18 and c.s > 0.4 and c.v > 0.55 and c.g > 0.55 else 0
+			return k
+		var antes_o: int = cuenta_oro.call(fo.c)
+		var despues_o: int = cuenta_oro.call(J._gs_cilindro(nm, fo.c)[0])
+		if despues_o < antes_o * 0.8:
+			sin_oro.append("%s %d→%d" % [nm, antes_o, despues_o])
+	chk(sin_oro.is_empty(), "el puño dorado, entero: %s" % [sin_oro])
+	# cada cerradura, su llave y sus vueltas (lo pidió el usuario: «personalizado para abrir una cerradura u otra, y el tipo de llave
+	# que concuerde con la cerradura»): la llave de su cerradura, de plano y de canto tantas veces como vueltas, y su puerta
+	var fondos := {}
+	for cer in J.CERRADURA:
+		var kc: String = "candado" if cer in ["nave", "setas"] else "llave"
+		V = {"k": kc, "c": cer, "ok": true, "t0": 0.0}
+		T = J.tiempos_acceso(V)
+		var suyas := true
+		var cantos := 0
+		var antes := ""
+		for ms in range(0, int(T.fin), 10):
+			for q in J.rects_acceso(V, float(ms)):
+				var nm := nombre_e(q)
+				if nm.begins_with("acc-llave"):
+					suyas = suyas and nm.begins_with("acc-llave-%s-" % cer)
+					if nm.ends_with("1") and not antes.ends_with("1") and float(ms) < T.gira:
+						cantos += 1
+					antes = nm
+		fondos[J.rects_acceso(V, 0.0)[1][4]] = true
+		chk(suyas and cantos == int(J.CERRADURA[cer].v) and Atlas.foto_misc("acc-llave-%s-%s" % [cer, "v1" if kc == "candado" else "1"]) != null, "%s: su llave y %d vueltas (%d)" % [cer, int(J.CERRADURA[cer].v), cantos])
+	chk(fondos.size() == J.CERRADURA.size(), "cada cerradura, su puerta: %s" % [fondos.keys()])
+	chk(J.CERRADURA.local.v != J.CERRADURA.portal.v and J.CERRADURA.franco.v == 3, "las vueltas: el portal, una; los locales, dos; la blindada, tres")
 	V = {"k": "regar", "c": "", "ok": true, "t0": 0.0, "pl": {}}
 	var rg: Array = J.rects_acceso(V, 600)
 	var gx: int = (J.SW - J.GS_W) >> 1
@@ -372,7 +414,7 @@ func _corre() -> void:
 	chk(corre(func(): await J.acceso("clave", "1234")) and J.ACCESO_V == null, "A lo pasa")
 	chk(M.reloj - t0 < 1000, "sin esperar al final (%d ms)" % int(M.reloj - t0))
 	if dir != "":
-		for k in ["llave", "candado", "clave", "pin", "rueda"] + J.GESTOS.keys() + ["fumar:pipa", "fumar:bong", "fumar:vapo", "fumar:porro:tab", "dormir:siesta"]:
+		for k in ["llave", "llave:local", "llave:club", "llave:franco", "candado", "candado:setas", "clave", "pin", "rueda"] + J.GESTOS.keys() + ["fumar:pipa", "fumar:bong", "fumar:vapo", "fumar:porro:tab", "dormir:siesta"]:
 			var kk: String = k.split(":")[0]
 			var W := {"k": kk, "c": k.split(":")[1] if ":" in k else ("1998" if k == "rueda" else ("" if J.GESTOS.has(k) else "4271")), "ok": true, "t0": 0.0, "tab": k.ends_with(":tab")}
 			var TT: Dictionary = J.tiempos_acceso(W)

@@ -689,8 +689,11 @@ var VERSION: String = ProjectSettings.get_setting("application/config/version", 
 var CREDITOS: String = I18n.K("""LANDRACE HUNTERS · genética de barrio
 Versión {v} para Android
 
-Un juego de Eddie.
-Hecho con Godot Engine y con la ayuda de Claude Code (Anthropic).
+Un juego desarrollado por WolfCade.
+Hecho con Godot Engine.
+
+AGRADECIMIENTOS
+A los beta testers Kerman, Ibai, Adrián y Urko.
 
 ARTE
 Personajes, escenarios y objetos: PixelLab (pixellab.ai), revisados y retocados a mano. Carpas por dentro, plantas, equipo, muebles, iconos y el icono de la app: dibujados a mano, píxel a píxel.

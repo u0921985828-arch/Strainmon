@@ -1,6 +1,6 @@
 # Política de privacidad · Landrace Hunters
 
-Última revisión: 19 de octubre de 2026 · App: Landrace Hunters (Android, `com.landracehunters.game`) · Autor: Eddie
+Última revisión: 19 de octubre de 2026 · App: Landrace Hunters (Android, `com.landracehunters.game`) · Desarrollador: WolfCade
 
 Landrace Hunters es un juego para un solo jugador que se juega sin conexión. No tiene anuncios ni estadísticas de uso, y no
 vende ni comparte datos con fines publicitarios.
@@ -48,7 +48,7 @@ Para cualquier duda sobre esta política, escribe a la dirección de contacto de
 
 # Privacy policy · Landrace Hunters (English)
 
-Last revised: 19 October 2026 · App: Landrace Hunters (Android, `com.landracehunters.game`) · Author: Eddie
+Last revised: 19 October 2026 · App: Landrace Hunters (Android, `com.landracehunters.game`) · Developer: WolfCade
 
 Landrace Hunters is a single-player game that plays offline. It has no ads or usage analytics and does not sell or share data
 for advertising.
