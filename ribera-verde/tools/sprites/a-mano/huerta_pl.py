@@ -7,7 +7,7 @@
 # de su sitio del bancal (la índica, 2 m de ancho y 1,4 de alto; la sativa, 1,6 y 2; la híbrida, entre las dos). Por pisos de ramas,
 # de abajo arriba, cada uno con sus hojas de abanico alrededor (las de detrás, en sombra; las de delante, a la luz de arriba a la
 # izquierda), el tallo, el alcorque de tierra mientras es pequeña y, en flor, las colas en la punta de cada rama.
-#  · huerta-pl (planta_huerta, 48 × 64; el pie del tallo en (24, 40), el centro de su sitio de 2 × 2 casillas; el ancla (16, 55),
+#  · huerta-pl (planta_huerta, 48 × 64; el pie del tallo en la raya entre las columnas 23 y 24 de la fila 40, el centro de su sitio de 2 × 2 casillas (al_eje); el ancla (16, 55),
 #    el centro de abajo de la casilla de abajo a la izquierda): hg-<porte i|h|s>-<fase 1-5>: 1 la plántula, 2 creciendo, 3 el
 #    arbusto en vegetativo, 4 en flor (las colas pequeñas, con los pelos blancos), 5 madura (las colas gordas, con los pelos naranjas,
 #    y las hojas de abajo amarillas). La seca la pinta el juego en pardos (_seca en pinta.gd).
@@ -155,7 +155,19 @@ def planta(porte, fase):
     G.pega(Pl, 0, 0)
     return G
 
-SAL = {f'hg-{p}-{f}': planta(p, f) for p in 'ihs' for f in range(1, 6)}
+def al_eje(L):
+    """lo pidió el usuario («el tallo de la planta no está centrado no?»): la planta se dibuja simétrica alrededor de la columna BX, que
+    quedaba medio píxel a la derecha del centro del bloque (la raya entre las columnas BX − 1 y BX). Lo de la izquierda del eje pasa una
+    columna a la izquierda y la columna del eje se dobla: el tallo, de 2 px, y la mata, simétricas alrededor de la raya"""
+    from PIL import Image
+    o = Image.new('RGBA', L.im.size, (0, 0, 0, 0))
+    o.paste(L.im.crop((1, 0, BX + 1, H)), (0, 0))
+    o.paste(L.im.crop((BX, 0, W, H)), (BX, 0))
+    L.im = o
+    L.px = o.load()
+    return L
+
+SAL = {f'hg-{p}-{f}': al_eje(planta(p, f)) for p in 'ihs' for f in range(1, 6)}
 
 def escribe(raiz=None):
     for n, L in SAL.items():

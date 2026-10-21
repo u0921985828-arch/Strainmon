@@ -198,8 +198,16 @@ func _corre() -> void:
 			chk(8 - int(an[0]) + 24 == 16 and 15 - int(an[1]) + 40 == 0, "%s: el pie en el centro del bloque" % k)
 			var u: Rect2i = f.c.get_used_rect()
 			var cx: float = u.position.x + u.size.x / 2.0
+			# lo pidió el usuario («el tallo de la planta no está centrado no?»): la mata, simétrica alrededor de la raya entre las
+			# columnas 23 y 24, el centro del bloque (no de la columna 24, medio píxel a la derecha); la plántula, con el tallo en las dos
+			chk(cx == 24.0, "%s: centrada en el centro del bloque (centro %.1f, quiero 24)" % [k, cx])
+			if fa == 1:
+				var tl := []
+				for x in 48:
+					if f.c.get_pixel(x, 37).to_html(false) in ["71984a", "3b5a2e"]:
+						tl.append(x)
+				chk(tl == [23, 24], "%s: el tallo en las columnas 23 y 24 (%s)" % [k, tl])
 			if fa >= 2:
-				chk(absf(cx - 24) <= 1.5, "%s: centrada en el pie (centro %.1f)" % [k, cx])
 				chk(u.end.y <= 63 and u.end.y >= 41, "%s: el pie en la tierra (abajo en %d)" % [k, u.end.y])
 			if fa >= 3:   # lo pidió el usuario: «las plantas deben estar también en medio de los bancales»: la mata, centrada en el pie
 				var cy: float = u.position.y + u.size.y / 2.0

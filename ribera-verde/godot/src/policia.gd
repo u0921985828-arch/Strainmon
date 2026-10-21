@@ -28,6 +28,21 @@ func grupo_combate(who: String):
 	var g = _grupo_combate(who)
 	return g + "-r" if g and Datos.CAL and Atlas.d.anims.has(g + "-r") else g   # los de PixelLab a unas 6 cabezas (pixellab_combate.py)
 
+# Con CAL, el combate en su lado (lo pidió el usuario: «a la izquierda arriba el enemigo, a la derecha abajo el personaje»): la escena
+# en espejo (lado_x), y cada golpe hacia el rival: el del protagonista hacia la izquierda y el del enemigo hacia la derecha. Las
+# animaciones de PixelLab que salieron hacia el otro lado van en espejo (COMB_ESPEJO; la caída, no: cae lejos del enemigo) y, al
+# huir, el enemigo corre hacia la izquierda (su «east», en espejo)
+const COMB_ESPEJO := {"player-combate-r": ["base", "idle", "golpe", "patada", "spray", "herido", "comer"],
+	"player-f-combate-r": ["patada", "spray"], "ladron2-combate-r": ["base", "idle", "ataque", "herido"]}
+
+func comb_espejo(g, n: String) -> bool:
+	if not Datos.CAL or not g:
+		return false
+	return (n in COMB_ESPEJO.get(g, [])) != (n == "huir")
+
+static func lado_x(x: float) -> float:
+	return 240 - x if Datos.CAL else x
+
 func _grupo_combate(who: String):
 	if not Atlas.ok or B == null:
 		return null
@@ -49,7 +64,9 @@ func b_anim(who: String, nn: String) -> float:
 
 func vfx_combate(id: String, x: float, y: float) -> void:
 	if Atlas.ok:
-		lanzar_vfx(id, x, y, M.reloj, "*", false)
+		lanzar_vfx(id, lado_x(x), y, M.reloj, "*", false)
+		if Datos.CAL and vfx.size() and vfx[-1].id == id:   # el espray sale del protagonista: con el combate en su lado, de la derecha
+			vfx[-1]["esp"] = true
 
 func battle(kind):
 	if gancho_combate.is_valid():

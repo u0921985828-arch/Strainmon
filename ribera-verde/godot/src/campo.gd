@@ -206,20 +206,50 @@ var _town19 = null   # lo que había en town en la cancilla y la senda, para dej
 # (S.huerta.t: 0, 1 cavada, 2 labrada) da g más de cosecha hasta que el sitio se vacía. Dibujos en huerta_mej.py; x, dónde van.
 const HUERTA_MEJ := {"bidon": {"p": 35, "l": 100, "max": 3, "x": [[9, 2], [10, 2], [11, 2]]}, "ibc": {"p": 95, "l": 1000, "max": 2, "x": [[17, 2], [19, 2]]},   # i18n-no
 	"goteo": {"p": 150, "x": [[12, 2]]}, "herr": {"p": 60, "g": .15, "min": 45, "x": [[8, 6]]}, "moto": {"p": 490, "g": .3, "min": 40, "x": [[21, 4]]},   # i18n-no
+	"amp": {"p": 1200, "dy": 6, "bancales": [[9, 10, 13, 11], [16, 10, 20, 11], [9, 13, 13, 14], [16, 13, 20, 14]],   # i18n-no
+		"sitios": [[9, 11], [12, 11], [16, 11], [19, 11], [9, 14], [12, 14], [16, 14], [19, 14]]},
 	"caudal": 15, "umbral": 50, "litros": [3, 17]}
 const HUERTA_SPR := {"bidon": "bidonA", "goteo": "bombaS", "herr": "herrH", "moto": "motoA"}   # i18n-no
+
+# la huerta ampliada (lo pidió el usuario: «Molaría que fuese ampliable en espacio la huerta, para poder plantar por lo menos el doble
+# de plantas»): la obra de la tienda (HUERTA_MEJ.amp, al día siguiente) baja el seto amp.dy casillas por el monte de abajo y deja cuatro
+# bancales más con ocho sitios más (16); los de siempre no se mueven (S.huerta.p y t van por su número) y la salida, la llegada y lo
+# que había junto al seto de abajo bajan con él. huerta_def(): HUERTA, o la ampliada (hecha una vez)
+var _huerta_a = null
+
+func huerta_amp() -> bool:
+	return Datos.CAL and S != null and S.get("huerta") is Dictionary and S.huerta.get("m") is Dictionary and int(S.huerta.m.get("amp", 0)) > 0
+
+func huerta_def() -> Dictionary:
+	if not huerta_amp():
+		return HUERTA
+	if _huerta_a == null:
+		var A: Dictionary = HUERTA_MEJ.amp
+		var dy: int = A.dy
+		var y1: int = HUERTA.seto[3]
+		var h: Dictionary = HUERTA.duplicate(true)
+		h.h = int(HUERTA.h) + dy
+		h.seto[3] = y1 + dy
+		h.llega[1] = int(HUERTA.llega[1]) + dy
+		h.sitios = h.sitios + A.sitios.duplicate(true)
+		h.bancales = h.bancales + A.bancales.duplicate(true)
+		for a in h.atrezo:
+			if int(a[1]) == y1 - 1:
+				a[1] = int(a[1]) + dy
+		_huerta_a = h
+	return _huerta_a
 
 func huerta_s() -> Dictionary:
 	if not (S.get("huerta") is Dictionary):
 		S.huerta = {"v": 0, "l": 0, "p": []}
 	var h: Dictionary = S.huerta
-	while h.p.size() < HUERTA.sitios.size():
+	while h.p.size() < huerta_def().sitios.size():
 		h.p.append(null)
 	if Datos.CAL:   # las mejoras
 		for k in ["m", "ped", "agua", "t"]:   # i18n-no
 			if not h.has(k):
 				h[k] = {} if k == "m" else ([] if k == "ped" else (0.0 if k == "agua" else []))
-		while h.t.size() < HUERTA.sitios.size():
+		while h.t.size() < huerta_def().sitios.size():
 			h.t.append(0)
 	return h
 
@@ -254,7 +284,7 @@ func montar_huerta(k: String) -> void:
 			m.g[cs[i][1]][cs[i][0]] = "dirt" if huerta_vista() else _town19[i][0]   # i18n-no
 			m.o[cs[i][1]][cs[i][0]] = null if huerta_vista() else _town19[i][1]
 		if huerta_vista():
-			m.doors[kq] = {"to": HUERTA.mapa, "x": int(HUERTA.llega[0]), "y": int(HUERTA.llega[1]), "dir": "up"}
+			m.doors[kq] = {"to": HUERTA.mapa, "x": int(huerta_def().llega[0]), "y": int(huerta_def().llega[1]), "dir": "up"}
 		else:
 			m.doors.erase(kq)
 	if k == HUERTA.mapa:
@@ -264,13 +294,14 @@ func montar_huerta(k: String) -> void:
 # medio hasta la salida de abajo y los cuatro bancales (con zarzas y hierba alta hasta que la desbrozas; luego, la tierra arada con
 # lo plantado)
 func mapa_huerta() -> Dictionary:
-	var W: int = HUERTA.w
-	var H: int = HUERTA.h
-	var x0: int = HUERTA.seto[0]
-	var y0: int = HUERTA.seto[1]
-	var x1: int = HUERTA.seto[2]
-	var y1: int = HUERTA.seto[3]
-	var cx: int = HUERTA.camino
+	var HD := huerta_def()
+	var W: int = HD.w
+	var H: int = HD.h
+	var x0: int = HD.seto[0]
+	var y0: int = HD.seto[1]
+	var x1: int = HD.seto[2]
+	var y1: int = HD.seto[3]
+	var cx: int = HD.camino
 	var g := []
 	var o := []
 	for y in H:
@@ -299,17 +330,17 @@ func mapa_huerta() -> Dictionary:
 			o[y][cx] = null
 			o[y][cx + 1] = null
 	var lista := huerta_lista()
-	for b in HUERTA.bancales:
+	for b in HD.bancales:
 		for y in range(int(b[1]), int(b[3]) + 1):
 			for x in range(int(b[0]), int(b[2]) + 1):
 				g[y][x] = "surco" if lista else "tallgrass"   # i18n-no
 				if not lista and (x + y) % 2 == 0:
 					o[y][x] = "bush"   # i18n-no
-	for a in HUERTA.atrezo:   # el bidón con la manguera del grifo del garaje, el cubo, el manzano, las herramientas y el compost
+	for a in HD.atrezo:   # el bidón con la manguera del grifo del garaje, el cubo, el manzano, las herramientas y el compost
 		o[int(a[1])][int(a[0])] = a[2]
 	var m := {"name": HUERTA.mapa, "w": W, "h": H, "g": g, "o": o, "exits": {}, "doors": {}, "music": "town", "blds": [], "est": null}   # i18n-no
 	for x in [cx, cx + 1]:
-		m.doors["%d,%d" % [x, y1]] = {"to": "town", "x": int(HUERTA.sale[0]), "y": int(HUERTA.sale[1]), "dir": "down"}   # i18n-no
+		m.doors["%d,%d" % [x, y1]] = {"to": "town", "x": int(HD.sale[0]), "y": int(HD.sale[1]), "dir": "down"}   # i18n-no
 	if lista:
 		m.o = o
 		huerta_objs(m)
@@ -325,7 +356,7 @@ func huerta_mejoras(m: Dictionary) -> void:
 		var xs: Array = HUERTA_MEJ[k].x
 		for j in xs.size():
 			m.o[int(xs[j][1])][int(xs[j][0])] = (("ibcD-%d" % q) if k == "ibc" else HUERTA_SPR[k]) if j < huerta_m(k) else null   # i18n-no
-	for i in HUERTA.sitios.size():
+	for i in huerta_def().sitios.size():
 		for c in huerta_bloque(i):
 			m.g[int(c[1])][int(c[0])] = "surcoV" if huerta_t(i) > 0 else "surco"   # i18n-no
 
@@ -337,14 +368,15 @@ func gesto_sol() -> bool:   # el plano de cerca de la huerta, al sol y en la tie
 	return Datos.CAL and S != null and S.get("map") == HUERTA.mapa
 
 func huerta_bloque(i: int) -> Array:
-	var s: Array = HUERTA.sitios[i]
+	var s: Array = huerta_def().sitios[i]
 	var x: int = int(s[0])
 	var y: int = int(s[1])
 	return [[x, y], [x + 1, y], [x, y - 1], [x + 1, y - 1]]
 
 func huerta_idx(x: int, y: int) -> int:   # el sitio cuyo bloque tiene la casilla (x, y), o -1
-	for i in HUERTA.sitios.size():
-		if huerta_bloque(i).any(func(c): return int(c[0]) == x and int(c[1]) == y):
+	var st: Array = huerta_def().sitios
+	for i in st.size():
+		if (x == int(st[i][0]) or x == int(st[i][0]) + 1) and (y == int(st[i][1]) or y == int(st[i][1]) - 1):
 			return i
 	return -1
 
@@ -361,8 +393,8 @@ func huerta_objs(m = null) -> void:
 		if not MAPS.has(HUERTA.mapa) or not huerta_lista():
 			return
 		m = MAPS[HUERTA.mapa]
-	for i in HUERTA.sitios.size():
-		var s: Array = HUERTA.sitios[i]
+	for i in huerta_def().sitios.size():
+		var s: Array = huerta_def().sitios[i]
 		for c in huerta_bloque(i):
 			m.o[int(c[1])][int(c[0])] = "hgx"   # i18n-no
 		var sp = sprite_huerta(huerta_s().p[i])
@@ -385,7 +417,7 @@ func huerta_f(p, i := -1) -> Dictionary:
 		"agua": float(HUERTA.agua[int(Datos.fecha(S.day).m) - 1]), "plaga": float(HUERTA.plaga), "hr": 50.0, "moho": 1.0, "ciclo": "veg" if huerta_veg(S.day) else "flor"}   # i18n-no
 
 func huerta_hu(i: int) -> Dictionary:
-	var s: Array = HUERTA.sitios[i]
+	var s: Array = huerta_def().sitios[i]
 	var p = huerta_s().p[i]
 	return {"l": huerta_s().p, "v": [(int(s[0]) + 1) * 16, int(s[1]) * 16], "f": huerta_f(p, i)}   # el centro de la mata, en el pie
 
@@ -456,16 +488,18 @@ func llega_huerta() -> void:
 		return
 	if MAPS.has(HUERTA.mapa):
 		MAPS[HUERTA.mapa] = mapa_huerta()
+	if huerta_amp():   # la llegada desde la cancilla, al camino de la huerta ampliada
+		montar_huerta("town")   # i18n-no
 	var L := [T("Te dejan en la huerta lo que pediste: {l}.", {"l": _lista(ll)})]
 	queue("huerta", func():
 		sfx("get")
 		await say(L[0]), [["", L]])
 
 func huerta_mej_n(k: String) -> String:
-	return {"bidon": K("Bidón azul de 100 L"), "ibc": K("Depósito de 1000 L"), "goteo": K("Goteo con bomba solar"), "herr": K("Herramientas de huerta"), "moto": K("Motoazada")}[k]   # i18n-no
+	return {"bidon": K("Bidón azul de 100 L"), "ibc": K("Depósito de 1000 L"), "goteo": K("Goteo con bomba solar"), "herr": K("Herramientas de huerta"), "moto": K("Motoazada"), "amp": K("Ampliar la huerta")}[k]   # i18n-no
 
 func huerta_mej_art(k: String) -> String:
-	return {"bidon": K("un bidón azul de 100 L"), "ibc": K("un depósito de 1000 L"), "goteo": K("el goteo con la bomba solar"), "herr": K("la laya, la azada y el rastrillo"), "moto": K("la motoazada")}[k]   # i18n-no
+	return {"bidon": K("un bidón azul de 100 L"), "ibc": K("un depósito de 1000 L"), "goteo": K("el goteo con la bomba solar"), "herr": K("la laya, la azada y el rastrillo"), "moto": K("la motoazada"), "amp": K("la obra: el seto más abajo y cuatro bancales más")}[k]   # i18n-no
 
 func huerta_mej_d(k: String) -> String:
 	if k == "bidon":   # i18n-no
@@ -474,6 +508,8 @@ func huerta_mej_d(k: String) -> String:
 		return K("Un depósito de segunda mano, lavado, en su jaula de acero y su palé: una tonelada de agua para el verano.")
 	if k == "goteo":   # i18n-no
 		return K("Tubería con un gotero por planta, filtro, programador y bomba con placa solar: riega cada planta cuando la tierra se seca, mientras quede agua en los depósitos.")
+	if k == "amp":   # i18n-no
+		return T("Una cuadrilla desbroza el monte de abajo, baja el seto y hace cuatro bancales más: {n} sitios en vez de {a}. Al día siguiente, lista.", {"n": HUERTA.sitios.size() + HUERTA_MEJ.amp.sitios.size(), "a": HUERTA.sitios.size()})
 	var p: int = Datos.jsround(float(HUERTA_MEJ[k].g) * 100)
 	if k == "herr":   # i18n-no
 		return T("Laya, azada y rastrillo para cavar cada sitio antes de plantar: la tierra suelta da un {p} % más de cosecha.", {"p": p})
@@ -481,7 +517,7 @@ func huerta_mej_d(k: String) -> String:
 
 # la tienda online → La huerta: con tarjeta y al día siguiente
 func huerta_tienda() -> void:
-	var ks := ["bidon", "ibc", "goteo", "herr", "moto"]   # i18n-no
+	var ks := ["bidon", "ibc", "goteo", "herr", "moto", "amp"]   # i18n-no
 	var i := 0
 	while true:
 		var items := []
@@ -498,7 +534,7 @@ func huerta_tienda() -> void:
 			var lb := huerta_mej_n(k) + (" · %d/%d" % [ya + pd, mx] if mx > 1 else (T(" · en la huerta") if ya else "")) + (T(" · pedido") if pd else "")
 			items.append({"label": lb, "right": Datos.eur(M.p), "disabled": ya + pd >= mx or falta != "", "desc": huerta_mej_d(k) + falta})
 		items.append({"label": K("Volver")})
-		i = await menu(items, {"cls": "full", "title": K("LA HUERTA"), "title2": T("Depósitos, riego y herramientas · en la cuenta {e}", {"e": Datos.eur(S.banco)}), "desc": true, "initial": i})
+		i = await menu(items, {"cls": "full", "title": K("LA HUERTA"), "title2": T("Depósitos, riego, herramientas y obra · en la cuenta {e}", {"e": Datos.eur(S.banco)}), "desc": true, "initial": i})
 		if i < 0 or i >= ks.size():
 			return
 		if items[i].disabled:
@@ -513,7 +549,7 @@ func huerta_tienda() -> void:
 # los sitios vacíos con la tierra por debajo de nv
 func huerta_vacios(nv: int) -> Array:
 	var r := []
-	for i in HUERTA.sitios.size():
+	for i in huerta_def().sitios.size():
 		if huerta_s().p[i] == null and huerta_t(i) < nv:
 			r.append(i)
 	return r
@@ -583,7 +619,7 @@ func huerta_obj(x: int, y: int, o) -> bool:
 		return false
 	if not huerta_lista():
 		var en_bancal := false
-		for b in HUERTA.bancales:
+		for b in huerta_def().bancales:
 			en_bancal = en_bancal or (x >= int(b[0]) and x <= int(b[2]) and y >= int(b[1]) and y <= int(b[3]))
 		if en_bancal:
 			if await ask(T("Los bancales de la tía, comidos por las zarzas y la hierba. Limpiarlos te lleva unas {h} horas.", {"h": int(HUERTA.desbroce) / 60}), [K("Desbrozar"), K("Dejarlo")]) == 0:

@@ -81,6 +81,11 @@ func _corre() -> void:
 			# el jugador está de pie abajo (pies en la fila 142 de 160, 64 px de alto): la caja, entera por encima de su cintura
 			if rp.end.y > es.position.y + es.size.y * .6 or rp.intersects(re):
 				cortes.append("combate: la caja de EDDIE en %s tapa al jugador o a la del enemigo (%s)" % [rp, re])
+			# con CAL, el combate en su lado (el enemigo arriba a la izquierda, hasta la columna 94; el protagonista abajo a la derecha, con la
+			# gorra en la fila 86): las dos cajas, a la derecha del enemigo y por encima de la gorra
+			var k := es.size.x / 240
+			if Datos.CAL and (minf(rp.position.x, re.position.x) < es.position.x + 96 * k or maxf(rp.end.y, re.end.y) > es.position.y + 86 * k):
+				cortes.append("combate: las cajas (%s, %s) tapan al enemigo o al protagonista (escena %s)" % [re, rp, es])
 		_mira_hueco(p)
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(dir.path_join("ui-%d-%s-%s.png" % [n + 1, p, idioma]))
@@ -131,7 +136,8 @@ func _todos(n: Node) -> Array:
 	return r
 
 func _monta(e: Dictionary) -> void:
-	J.SW = int(e.get("sw", J.SW))
+	# el ancho de la escena, el de la pantalla (ajusta), no el de la del oráculo (240): si no, se pinta a la izquierda y las cajas, que
+	# van por la escena centrada, parecen fuera
 	J.S = e.S
 	J.B = e.B
 	J.VC = e.VC

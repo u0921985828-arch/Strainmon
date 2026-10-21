@@ -975,7 +975,7 @@ const MANG_C := ["#44444e", "#1e1e24", "#76b4f2"]
 func _manguera_huerta() -> void:
 	var ox: float = -cam.x
 	var oy: float = -cam.y
-	var tb := tubos_huerta(J.HUERTA, J.HUERTA_MEJ, J.huerta_m("ibc"))
+	var tb := tubos_huerta(J.huerta_def(), J.HUERTA_MEJ, J.huerta_m("ibc"))
 	for q in tb.h:   # de x0 a x1, con el centro en la raya entre y e y + 1
 		_rect(int(q[0]) + ox, int(q[2]) + oy, int(q[1]) - int(q[0]) + 1, 1, css(MANG_C[0]))
 		_rect(int(q[0]) + ox, int(q[2]) + 1 + oy, int(q[1]) - int(q[0]) + 1, 1, css(MANG_C[1]))
@@ -1843,7 +1843,7 @@ func _vfx(c, capa: String) -> void:
 		var fi := floori(t * (a.fps if a.get("fps") else 10) / 1000.0)
 		var dy := floori(fi / 3.0) if v.sube else 0
 		var dx := floori(fi / 6.0) if v.sube and capa == "town" else 0
-		_dibujar(v.id, "efecto", "unica", t, v.x - c.x + dx, v.y - c.y - dy)
+		_dibujar(v.id, "efecto", "unica", t, v.x - c.x + dx, v.y - c.y - dy, {"esp": true} if v.get("esp") else {})
 
 # de día, por dónde mira cada agente (de noche, no: sigilo); con la alarma, ninguno (pintarVistas, 10b-patrulla)
 func _vistas() -> void:
@@ -1877,23 +1877,26 @@ func _combate() -> void:
 	var fo = Atlas.cubre("combate:fondo-" + ("ladron" if B.kind == "thief" else "policia")) if Atlas.ok else null
 	var ff = Atlas.frame_de(fo, "base", "unica", 0, {"i": 0}) if fo else null
 	if ff:
-		_fondo_ancho(ff.c, J.D.CORTES_COMBATE)
+		if Datos.CAL:   # con CAL, en su lado (J.lado_x): el fondo en espejo, con sus plataformas, y los cortes de los lados cambiados
+			_fondo_ancho(_espejo_img(ff.c), J.D.CORTES_COMBATE.map(func(c): return [c[0], c[1], {"izq": "dch", "dch": "izq"}.get(c[2], c[2])]))
+		else:
+			_fondo_ancho(ff.c, J.D.CORTES_COMBATE)
 	L.draw_set_transform(Vector2(OX(), OY()))
 	var k := minf(1, float(B.t) / 700)
 	var e := 1 - pow(1 - k, 3)
-	var ex := Datos.jsround(154 - (1 - e) * 180)
-	var px := Datos.jsround(40 + (1 - e) * 190)
+	var ex := Datos.jsround(J.lado_x(154 - (1 - e) * 180 + 24))
+	var px := Datos.jsround(J.lado_x(40 + (1 - e) * 190 + 24))
 	var fE = _comb_frame("E")
 	var fP = J.ropa_c(_comb_frame("P"), J.grupo_combate("P"))
 	var sh := Datos.jsround(sin(float(B.shakeP) / 18) * 3) if B.shakeP > 0 and not Vista.CALMA else 0
 	var parpadea: bool = B.flashE > 0 and floori(float(B.flashE) / 70) % 2 == 0 and not Vista.CALMA   # U5: SIN DESTELLOS
 	if fE:
-		if B.get("gone") and B.get("aE") and B.aE.n == "huir":
-			_pinta(fE, ex + 24 + Datos.jsround((now - B.aE.t0) * .12), 66)
+		if B.get("gone") and B.get("aE") and B.aE.n == "huir":   # huye hacia fuera: con CAL, hacia la izquierda
+			_pinta(fE, ex + (-1 if Datos.CAL else 1) * Datos.jsround((now - B.aE.t0) * .12), 66)
 		elif not B.get("gone") and not parpadea:
-			_pinta(fE, ex + 24, 66)
+			_pinta(fE, ex, 66)
 	if fP:
-		_pinta(fP, px + 24 + sh, 142)
+		_pinta(fP, px + sh, 142)
 	if Atlas.ok:
 		_vfx({"x": 0, "y": 0}, "*")
 
@@ -1907,10 +1910,19 @@ func _comb_frame(who: String):
 	if a:
 		var t: float = now - a.t0
 		if t < Atlas.duracion(gr, a.n) or a.n == "desmayo":
-			return Atlas.frame_de(gr, a.n, "east" if a.n == "huir" else dir, t, {"bucle": a.n == "huir"})
+			return Atlas.frame_de(gr, a.n, "east" if a.n == "huir" else dir, t, {"bucle": a.n == "huir", "esp": J.comb_espejo(gr, a.n)})
 		B["a" + who] = null
-	var f = Atlas.frame_de(gr, "idle", dir, now, {"bucle": true})
-	return f if f else Atlas.frame_de(gr, "base", dir, 0, {"i": 0})
+	var f = Atlas.frame_de(gr, "idle", dir, now, {"bucle": true, "esp": J.comb_espejo(gr, "idle")})
+	return f if f else Atlas.frame_de(gr, "base", dir, 0, {"i": 0, "esp": J.comb_espejo(gr, "base")})
+
+# una imagen en espejo, una vez (el fondo del combate en su lado)
+func _espejo_img(img: Image) -> Image:
+	var k := "esp|%d" % img.get_instance_id()
+	if not cache.has(k):
+		var o := img.duplicate()
+		o.flip_x()
+		cache[k] = o
+	return cache[k]
 
 # ---------- título e intro ----------
 # el azul del título (1.35, renderDemo): por bandas, más opaco arriba, donde va el rótulo

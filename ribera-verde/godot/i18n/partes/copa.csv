@@ -122,7 +122,7 @@ Antes hacen falta las herramientas.","
 You need the tools first."
  · en la huerta, · at the garden
 LA HUERTA,THE GARDEN
-"Depósitos, riego y herramientas · en la cuenta {e}","Tanks, irrigation and tools · in your account {e}"
+"Depósitos, riego, herramientas y obra · en la cuenta {e}","Tanks, irrigation, tools and works · in your account {e}"
 "Cavas a fondo, rompes los terrones y lo dejas rastrillado: la tierra, suelta y oscura.","You dig deep, break up the clods and rake it over: the soil, loose and dark."
 La motoazada levanta la tierra a un palmo de hondo y la deja mullida.,The tiller turns the soil a hand deep and leaves it fluffy.
 Labrar con la motoazada,Till with the tiller
@@ -147,3 +147,6 @@ Labrar,Till
 "Las herramientas de la tía: una azada con el mango partido, unas tijeras de podar y unos guantes de jardín gastados. Las buenas, en la tienda online.","Your aunt's tools: a hoe with a broken handle, pruning shears and worn gardening gloves. Good ones, in the online shop."
 "La huerta: depósitos, riego y herramientas","The garden: tanks, irrigation and tools"
 "Bidones y depósitos de agua, el goteo con bomba solar, las herramientas y la motoazada: llegan al día siguiente a la huerta.","Water drums and tanks, drip irrigation with a solar pump, the tools and the rotary tiller: they arrive at the garden the next day."
+Ampliar la huerta,Expand the garden
+la obra: el seto más abajo y cuatro bancales más,the works: the hedge moved further down and four more beds
+"Una cuadrilla desbroza el monte de abajo, baja el seto y hace cuatro bancales más: {n} sitios en vez de {a}. Al día siguiente, lista.","A crew clears the scrub below, moves the hedge down and builds four more beds: {n} spots instead of {a}. Ready the next day."

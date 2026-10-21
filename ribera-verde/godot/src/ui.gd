@@ -111,6 +111,7 @@ var uiw := 240.0
 var ut := 0.0
 var tt := 0.0
 var bp_r := 0.0   # de la caja de vida del jugador al borde derecho de la escena (--bpr)
+var be_r := 0.0   # con CAL: de las dos cajas de vida (arriba a la derecha) al borde derecho de la escena
 var scr := Rect2(0, 0, 240, SH)
 const CRUZ_HUECO := .16   # el hueco entre cada flecha y el cuadrado del medio, en brazos de la cruz (1.40)
 var zona_cruz := Rect2()   # zonas de toque de la cruceta y de A/B, y la cruz que se ve
@@ -456,6 +457,14 @@ func ajusta() -> void:
 		if r.position.y < bb + kp and r.end.y > bb - 46 * s - kp:
 			bp_r = maxf(bp_r, er - r.position.x + kp)
 	bp_r = roundf(minf(bp_r, 130 * s))
+	# con CAL (el combate en su lado: el enemigo arriba a la izquierda y el protagonista abajo a la derecha), las dos cajas de vida,
+	# una encima de otra, arriba a la derecha (de 4 a 84 u): a la izquierda de SONIDO, START, MÓVIL, A o B si les caen encima
+	be_r = 6 * s
+	for n in ["sonido", "start", "movil", "A", "B"]:
+		var r: Rect2 = G[n]
+		if r.position.y < ye + 84 * s + kp and r.end.y > ye + 4 * s - kp and r.end.x > er - 110 * s and r.position.x < er:
+			be_r = maxf(be_r, er - r.position.x + kp)
+	be_r = roundf(minf(be_r, 130 * s))
 	for n in [fade_el, wipe, endcard]:
 		_pon(n, scr.position, scr.size)
 	_pon(escena, Vector2(x + cw / 2 - 120 * u, ye), Vector2(240 * u, 160 * u))
@@ -1840,7 +1849,15 @@ func _coloca() -> void:
 		vc_info.size = Vector2(66 * u, 0)
 		vc_info.reset_size()
 		vc_info.size.x = 66 * u
-	if bE.visible:
+	if bE.visible and Datos.CAL:   # el enemigo arriba a la izquierda: su caja y, debajo, la del jugador, arriba a la derecha
+		bE.reset_size()
+		bP.reset_size()
+		var w := maxf(bE.size.x, bP.size.x)
+		bE.position = Vector2(escena.size.x - be_r - w, 4 * u)
+		bP.position = Vector2(bE.position.x, bE.position.y + bE.size.y + 3 * u)   # acaba en la fila 82: la gorra del protagonista, en la 86
+		bE.size.x = w
+		bP.size.x = w
+	elif bE.visible:
 		bE.reset_size()
 		bE.position = Vector2(6 * u, 8 * u)
 		bP.reset_size()

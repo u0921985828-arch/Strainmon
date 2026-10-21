@@ -171,14 +171,17 @@ s633e594e,Depósito de 1000 L,1000 L tank
 sb9b47b26,Goteo con bomba solar,Drip irrigation with solar pump
 scfbf0b6a,Herramientas de huerta,Garden tools
 sf37b4b21,Motoazada,Rotary tiller
+sc6a713fd,Ampliar la huerta,Expand the garden
 sec60d927,un bidón azul de 100 L,a blue 100 L drum
 s3d2e6fc2,un depósito de 1000 L,a 1000 L tank
 s1c52750f,el goteo con la bomba solar,the drip irrigation with the solar pump
 s297f583f,"la laya, la azada y el rastrillo","the digging fork, the hoe and the rake"
 s1f0970e2,la motoazada,the rotary tiller
+s397680e8,la obra: el seto más abajo y cuatro bancales más,the works: the hedge moved further down and four more beds
 s3083c1f9,"De polietileno, sobre dos bloques y con su grifo. Se llena con la manguera del garaje.","Polyethylene, on two blocks and with its tap. Filled with the garage hose."
 s671f1296,"Un depósito de segunda mano, lavado, en su jaula de acero y su palé: una tonelada de agua para el verano.","A second-hand tank, washed, in its steel cage and on its pallet: a tonne of water for the summer."
 s88469974,"Tubería con un gotero por planta, filtro, programador y bomba con placa solar: riega cada planta cuando la tierra se seca, mientras quede agua en los depósitos.","Pipe with one dripper per plant, filter, timer and pump with a solar panel: it waters each plant when the soil dries out, as long as there is water left in the tanks."
+s9f3654e6,"Una cuadrilla desbroza el monte de abajo, baja el seto y hace cuatro bancales más: {n} sitios en vez de {a}. Al día siguiente, lista.","A crew clears the scrub below, moves the hedge down and builds four more beds: {n} spots instead of {a}. Ready the next day."
 s12610c0a,"Laya, azada y rastrillo para cavar cada sitio antes de plantar: la tierra suelta da un {p} % más de cosecha.","Digging fork, hoe and rake to dig each spot before planting: loose soil gives {p}% more harvest."
 s20e14ee8,"De gasolina: labra todos los sitios vacíos de una vez y más hondo que a mano, un {p} % más de cosecha.","Petrol-powered: it tills every empty spot at once and deeper than by hand, {p}% more harvest."
 s06a9a5d8,"
@@ -191,7 +194,7 @@ s4233ba58, · en la huerta, · at the garden
 s5c461127, · pedido, · ordered
 sf77a797e,Volver,Back
 sfb236c6f,LA HUERTA,THE GARDEN
-scd2e99f5,"Depósitos, riego y herramientas · en la cuenta {e}","Tanks, irrigation and tools · in your account {e}"
+s99ea8f2c,"Depósitos, riego, herramientas y obra · en la cuenta {e}","Tanks, irrigation, tools and works · in your account {e}"
 s6092151d,Tienda online,Online shop
 s61b3ec3e,Pedido: {n} · llega mañana,Ordered: {n} · arrives tomorrow
 sba950df0,"Cavas a fondo, rompes los terrones y lo dejas rastrillado: la tierra, suelta y oscura.","You dig deep, break up the clods and rake it over: the soil, loose and dark."
@@ -6048,6 +6051,7 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+scd2e99f5,"Depósitos, riego y herramientas · en la cuenta {e}","Tanks, irrigation and tools · in your account {e}"
 s73d909ac,"Las herramientas de la tía: una azada, unas tijeras de podar y unos guantes de jardín gastados.","Your aunt's tools: a hoe, pruning shears and worn gardening gloves."
 sf8721a43,Las Skunk,The Skunks
 se9c33ce5,Las Skonk,The Skonks
