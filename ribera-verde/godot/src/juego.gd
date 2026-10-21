@@ -66,10 +66,12 @@ func arranque() -> void:
 	if mode != "carga":   # otra cosa la cambió (las pruebas)
 		for k in vis:
 			botones[k].visible = vis[k]
+		mandos_raton()
 		return
 	await fade(1)
 	for k in vis:
 		botones[k].visible = vis[k]
+	mandos_raton()
 	show_title()
 	await fade(0)
 

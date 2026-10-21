@@ -13,7 +13,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
-1.5.6 — Landrace Hunters (Godot 0.57.0): en el ordenador, W A S D mueven (como las flechas), el clic izquierdo es A y el derecho es B (el derecho ya no abre el menú del navegador); y todo lo de la 0.52 a la 0.57 (retratos, gestos en primera persona, la bodega del barco por tandas, las llaves por cerradura y las puertas dibujadas).
+1.5.6 — Landrace Hunters (Godot 0.57.0): desde el ordenador (sin pantalla táctil), sin la cruceta ni A/B en pantalla: W A S D mueven (como las flechas), el clic izquierdo es A y el derecho es B (el derecho ya no abre el menú del navegador), M o Tab START y P el MÓVIL; en el móvil, los mandos de siempre; y todo lo de la 0.52 a la 0.57 (retratos, gestos en primera persona, la bodega del barco por tandas, las llaves por cerradura y las puertas dibujadas).
 1.5.5 — Landrace Hunters (Godot 0.51.0): saltar el tutorial al empezar (el primer cultivo ya hecho), la partida guardada que no se pierde al actualizar y los retratos con gestos de quien habla.
 1.5.4 — Landrace Hunters 1.57.2 (Godot 0.47.1): la calle del juego en la carga con un bancal de exterior por la fecha, el taller por zonas y a la escala del coche, la taberna de Puerto Viejo con mesas y sillas en las que te sientas, la semilla al sembrar y la escalera del sótano hacia la derecha.
 1.5.3 — Landrace Hunters 1.57 (Godot 0.47.0): la carga en la carretera y el título con más atrezo, el viaje de perfil, los tubos de las carpas con codos y los mandos más grandes, donde caen los pulgares.

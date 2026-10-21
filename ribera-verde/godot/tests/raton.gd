@@ -2,6 +2,8 @@
 # botón A y B, que sea el clic izquierdo y derecho»).
 #  · W A S D son las flechas; el clic izquierdo en el mundo es A y el derecho es B (también encima de un menú); el izquierdo
 #    sobre un mando aprieta ese mando y no A; el ratón que Godot imita con un dedo no aprieta nada.
+#  · En la web del ordenador (sin pantalla táctil; aquí, UI.RATON_PRUEBA) la cruceta y A/B no se ven ni ocupan sitio: el clic
+#    donde estaba la cruceta es A, el derecho donde estaba A es B; START, MÓVIL y SONIDO se quedan.
 #   $GODOT --headless --path godot --script res://tests/raton.gd -- --sin-arranque   → «raton: N comprobaciones, 0 fallos»
 extends SceneTree
 
@@ -95,6 +97,26 @@ func _corre() -> void:
 	for i in 3:
 		await process_frame
 	chk(st.r == -1, "clic derecho encima del menú lo cierra: %s" % [st.r])
+
+	# la web del ordenador: sin cruceta ni A/B
+	var pa: Vector2 = J.botones["A"].get_global_rect().get_center()
+	var pc: Vector2 = J.botones["left"].get_global_rect().get_center()
+	J.set("RATON_PRUEBA", true)
+	J.ajusta()
+	var ocultos := true
+	for k in ["up", "down", "left", "right", "mid", "A", "B"]:
+		ocultos = ocultos and not J.botones[k].visible
+	chk(ocultos, "la cruceta y A/B no se ven en la web del ordenador")
+	chk(J.botones["START"].visible and J.botones["SONIDO"].visible, "START y SONIDO sí")
+	chk(J.zona_cruz.size == Vector2.ZERO and J.zona_ab.size == Vector2.ZERO, "la cruceta y A/B no ocupan sitio")
+	J.handlers.clear()
+	J.push(func(b): got.append(b))
+	got.clear()
+	chk(J.mando_en(pc) == "", "donde estaba la cruceta no hay mando")
+	raton(MOUSE_BUTTON_LEFT, pc)
+	raton(MOUSE_BUTTON_RIGHT, pa)
+	chk(got == ["A", "B"], "donde estaban la cruceta y A, el clic es A y B: %s" % [got])
+	J.set("RATON_PRUEBA", false)
 
 	print("raton: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:

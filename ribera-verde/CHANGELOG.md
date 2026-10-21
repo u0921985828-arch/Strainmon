@@ -232,7 +232,8 @@
 
 ### Teclado y ratón en el ordenador · plugin de WordPress 1.5.6
 - Lo pidió el usuario: «el juego con los controles conectados al AWSD y el botón A y B, que sea el clic izquierdo y derecho». W A S D ya eran las flechas; ahora el clic izquierdo que no cae en un mando, un menú ni el diálogo es A y el derecho es B en cualquier sitio, también encima de un menú (`RATON`, `_raton` en `ui.gd`); el ratón que Godot imita con un dedo no aprieta nada. En la página del plugin, el clic derecho ya no abre el menú del navegador (`oncontextmenu` en el canvas). Prueba `tests/raton.gd` (7; 3 fallos antes).
-- `descargas/landrace-hunters-1.5.6.zip` (28 MB, `node tools/wordpress.js`), con el Godot 0.57.0 y lo de arriba; probado en Chromium: el clic izquierdo pasa el aviso, S y W mueven la opción y el derecho cierra el menú.
+- Desde el ordenador (lo pidió el usuario: «cuando se entra desde el ordenador a la web»): en el navegador sin pantalla táctil, la cruceta y A/B no se pintan ni ocupan sitio (`solo_raton`, `mandos_raton` en `ui.gd`; el escenario de diálogos y menús, a la escala de la pantalla); START, MÓVIL y SONIDO se quedan. En el móvil y la tableta, los mandos de siempre. `tests/raton.gd` con `RATON_PRUEBA` (12; 2 fallos antes).
+- `descargas/landrace-hunters-1.5.6.zip` (28 MB, `node tools/wordpress.js`), con el Godot 0.57.0 y lo de arriba; probado en Chromium de escritorio: sin la cruceta ni A/B, el clic izquierdo pasa el aviso, S y W mueven la opción y el derecho cierra el menú.
 
 ### APK de las muñecas y las puertas · Godot 0.57.0 (código 76)
 - Lo pidió el usuario: «pásame el APK cuando esté». Batería entera 66/66 en verde antes de compilar.

@@ -316,6 +316,20 @@ static var ZONA_PRUEBA := []
 static func es_movil() -> bool:
 	return DPI_PRUEBA > 0 or OS.has_feature("mobile") or OS.has_feature("web_android") or OS.has_feature("web_ios")
 
+# (lo pidió el usuario: «cuando se entra desde el ordenador a la web»): sin pantalla táctil, en el navegador del ordenador, se juega
+# con W A S D y el ratón (clic izquierdo A, derecho B): la cruceta y A/B no se pintan ni ocupan sitio; START, MÓVIL y SONIDO, sí
+static var RATON_PRUEBA := false
+static func solo_raton() -> bool:
+	return RATON_PRUEBA or OS.has_feature("web") and not es_movil() and not DisplayServer.is_touchscreen_available()
+
+const MANDOS_TACTILES := ["up", "down", "left", "right", "mid", "A", "B"]
+func mandos_raton() -> void:
+	if not solo_raton():
+		return
+	for k in MANDOS_TACTILES:
+		if botones.has(k):
+			botones[k].visible = false
+
 func _zona_segura() -> Array:
 	if ZONA_PRUEBA.size() == 4:
 		return ZONA_PRUEBA
@@ -389,9 +403,11 @@ func ajusta() -> void:
 	us = clampf(G.med * dp / 120, us_min, s)
 	if Datos.CAL and us >= 1:   # 0.52 (lo pidió el usuario: «cuadrados todos los píxeles»): la UI (cajas, retratos, iconos), a un número entero de píxeles por punto
 		us = clampf(floorf(us), 1, maxf(1, floorf(s)))   # hacia abajo: el escenario de 240 us cabe entre los mandos
+	if solo_raton():   # sin cruceta ni A/B a los lados, el escenario de diálogos y menús, a la escala de la pantalla
+		us = maxf(1, floorf(s)) if Datos.CAL else s
 	uiw = minf(cw, roundf(240 * us))
-	zona_cruz = G.dpad
-	zona_ab = G.ab
+	zona_cruz = Rect2() if solo_raton() else G.dpad
+	zona_ab = Rect2() if solo_raton() else G.ab
 	cruz = G.cruz
 	var a: float = cruz.size.x / 3
 	# (lo pidió el usuario: «más ergonómicos, más espaciadas las flechas del cuadrado del medio»): cada flecha, una tecla suelta
@@ -444,6 +460,7 @@ func ajusta() -> void:
 		_pon(n, scr.position, scr.size)
 	_pon(escena, Vector2(x + cw / 2 - 120 * u, ye), Vector2(240 * u, 160 * u))
 	_pon(titulo, Vector2.ZERO, escena.size)
+	mandos_raton()
 	_estilos()
 	if menu_redraw.is_valid():
 		menu_redraw.call()
