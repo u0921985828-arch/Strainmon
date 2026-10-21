@@ -42,6 +42,7 @@ func _ready() -> void:
 	super()
 	MAPS = D.MAPS.duplicate(true)
 	Datos.enteros(MAPS)
+	mapa_nave_r()
 
 # ---------- utilidades (00-nucleo) ----------
 static func mayus(t: String) -> String:
@@ -270,6 +271,8 @@ func retrato_de(n: String):
 		k = k.substr(4)
 	if k == "" or k in NO_PERSONA:
 		return null
+	if habla_look is Dictionary and k in etiquetas_ct():   # el cliente con el que hablas (TURISTA, PIJO…): su muñeco, no el NPC turista
+		return [habla_look, mujer_look(habla_look)]
 	if B is Dictionary and B.get("kind") in ["thief", "police"] and B.get("look") is Dictionary and _llano(str(B.get("name", ""))) == k:
 		return [B.look, mujer_look(B.look)]   # el ladrón de la pelea, con su capucha, y el agente (no un cliente al azar)
 	if _looks_n.is_empty():
@@ -304,6 +307,17 @@ func retrato_de(n: String):
 	if " " in k or k.length() < 3:
 		return null
 	return [Datos.rand_look("ret" + k, "client"), mujer_nombre(k)]
+
+var _etq_ct := []
+func etiquetas_ct() -> Array:
+	if _etq_ct.is_empty():
+		for t in D.CTYPES:
+			_etq_ct.append(_llano(str(D.CTYPES[t].label)))
+			_etq_ct.append(_llano(Datos.tp(str(D.CTYPES[t].label))))
+		for t in D.GENERO.ctM:
+			_etq_ct.append(_llano(str(D.GENERO.ctM[t])))
+			_etq_ct.append(_llano(Datos.tp(str(D.GENERO.ctM[t]))))
+	return _etq_ct
 
 # PIJA, CATADORA: la etiqueta del tipo de cliente, en femenino si es una chica (1.43.3)
 func etiqueta_ct(t: String, m: bool) -> String:
@@ -809,6 +823,24 @@ func montar_nave() -> void:
 			n.o[int(q[1])][int(q[0])] = "estanteC"   # i18n-no
 			ne -= 1
 	montar_puertas("nave")   # 1.51: el despacho y la habitación, detrás de sus puertas
+
+# (lo pidió el usuario: «cuando lo vayas a alquilar, entres al local y por reformar»): la nave sin alquilar por dentro (nave-r),
+# la de siempre sin muebles y con los trastos del último inquilino; se entra con Arrieta (talk_nave), no por la persiana
+const NAVE_RUINA := [[0, 2, "crate"], [1, 2, "cajasT"], [4, 2, "sacos"], [5, 2, "crate"], [9, 2, "bidonT"], [10, 2, "barrilT"],
+	[14, 2, "neumT"], [16, 2, "cajasT"], [17, 2, "crate"], [2, 5, "neumT"], [11, 4, "garrafa"], [12, 5, "cuboS"], [15, 6, "crate"], [16, 6, "sacos"]]   # i18n-no
+
+func mapa_nave_r() -> void:
+	if not D.MAPS.has("nave"):
+		return
+	var m: Dictionary = D.MAPS.nave.duplicate(true)
+	Datos.enteros(m)
+	m.name = "nave-r"
+	for y in m.h:
+		for x in m.w:
+			m.o[y][x] = null
+	for q in NAVE_RUINA:
+		m.o[q[1]][q[0]] = q[2]
+	MAPS["nave-r"] = m
 
 # MAESTRO [8]: el despacho de lujo (DESPACHO): la tarima, las paredes, la alfombra y los muebles, sobre la copia del de siempre
 var _desp0 = null
@@ -1953,6 +1985,10 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_casa()
 	if name_ == "nave":
 		montar_nave()
+	if Datos.CAL and name_ == "valdehierro" and S.flags.get("naveVer"):   # de ver la nave por dentro: Arrieta, en la calle, pregunta
+		S.flags.erase("naveVer")
+		if S.get("nave") == null:
+			queue("naveVer", func(): await nave_vista())
 	if name_ == "alto":
 		montar_alto()
 	if name_ == "camarote":
@@ -2223,6 +2259,9 @@ func naveros() -> Array:
 
 func navero_de(_i: int):
 	return null
+
+func nave_vista() -> void:
+	pass
 
 func entra_local(_d):
 	pass

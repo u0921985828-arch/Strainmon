@@ -899,7 +899,7 @@ func _arte_edificios(m: Dictionary) -> void:
 		var gp: String = "edificio-" + b.get("puerta", b.id)
 		if b.get("doorX") != null and Atlas.anim_de(gp, "puerta"):
 			var dy: int = b.y0 + b.h - 1
-			var abierta: bool = J.P.x >= b.doorX and J.P.x <= b.doorX + (1 if b.get("ancha") else 0) and (J.P.y == dy or J.P.y == dy + 1)
+			var abierta: bool = J.P.x >= b.doorX and J.P.x <= b.doorX + (1 if b.get("ancha") else 0) and (J.P.y == dy or J.P.y == dy + 1) and not J.puerta_cerrada(m, b)
 			var p = Atlas.frame_de(gp, "puerta", "unica", 0, {"i": -1 if abierta else 0})
 			if p:
 				_img(_sin_pared(p.c, "%s|%d" % [gp, p.i]) if b.get("mascara") else p.c, b.doorX * 16 - 8 + b.get("dx", 0) - cam.x, (dy + 1) * 16 - 32 - cam.y)

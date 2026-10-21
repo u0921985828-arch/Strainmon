@@ -124,6 +124,19 @@ func _corre() -> void:
 			J.habla_look = J.mk_ent(d).look
 			var rp = J.retrato_de("LA PRESIDENCIA")
 			chk(rp is Array and Retrato.grupo(rp[0], rp[1]) == Atlas.grupo_look(J.habla_look), "%s, el del mapa" % d.id)
+	# 3c · lo vio el usuario: un cliente de la calle (TURISTA, PIJO…) con el retrato del muñeco con el que hablas, no el del NPC turista
+	var lbls := []
+	for t in D.CTYPES:
+		lbls.append(str(D.CTYPES[t].label))
+	for t in D.GENERO.ctM:
+		lbls.append(str(D.GENERO.ctM[t]))
+	for i in 6:
+		var Lc: Dictionary = Datos.rand_look("ret-cli%d" % i, "client")
+		J.habla_look = Lc
+		var gc := Retrato.grupo(Lc, J.mujer_look(Lc))
+		for lb in lbls:
+			var rc = J.retrato_de(lb)
+			chk(rc is Array and Retrato.grupo(rc[0], rc[1]) == gc, "cliente %s %d: el del muñeco (%s)" % [lb, i, gc])
 	J.habla_look = null
 	var nom0 = J.S.get("name")
 	var sx0 = J.S.get("sexo")

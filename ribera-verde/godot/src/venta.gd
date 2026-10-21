@@ -536,7 +536,14 @@ func talk_nave() -> void:
 		return
 	if N == null:
 		var e: float = D.NAVE.fianza + recibo_nave()   # 1.35: la fianza y la primera semana; después, cada RECIBO.dias, en efectivo
-		if await ask(T("La nave está vacía: {f} de fianza y {r} cada {d} días, en efectivo; el primero, ahora. Paso a cobrar y te aviso antes. Sin preguntas.", {"f": Datos.eur(D.NAVE.fianza), "r": Datos.eur(recibo_nave()), "d": n(D.RECIBO.dias)}), [K("Alquilarla"), K("No")], A) != 0:
+		var oa := [K("Alquilarla"), K("Verla por dentro"), K("No")] if Datos.CAL else [K("Alquilarla"), K("No")]
+		var ra: int = await ask(T("La nave está vacía: {f} de fianza y {r} cada {d} días, en efectivo; el primero, ahora. Paso a cobrar y te aviso antes. Sin preguntas.", {"f": Datos.eur(D.NAVE.fianza), "r": Datos.eur(recibo_nave()), "d": n(D.RECIBO.dias)}), oa, A)
+		if Datos.CAL and ra == 1:   # (lo pidió el usuario): verla antes, por reformar
+			await say(K("Vamos, te abro. Está como la dejó el último: polvo y trastos. Si te la quedas, la vacío y te meto las mesas."), A)
+			S.flags.naveVer = 1
+			await warp({"to": "nave-r", "x": 6, "y": 6, "dir": "up"})
+			return
+		if ra != 0:
 			return
 		if S.money < e:
 			sfx("bad")
@@ -733,6 +740,40 @@ func entra_local(d: Dictionary):
 				await acceso("llave", "club")
 	await warp(d)
 
+# Arrieta, al salir de verla por dentro
+func nave_vista() -> void:
+	await say(K("¿Qué? Con una limpieza y las mesas, queda como nueva."), K("ARRIETA"))
+	await talk_nave()
+
+# (lo pidió el usuario: «no se debería poder abrir la puerta, como en los locales que no están alquilados»): con CAL, la puerta de
+# un local cerrado no se abre aunque estés delante (pinta.gd, _arte_edificios); las mismas condiciones que entra_local
+func puerta_cerrada(m: Dictionary, b: Dictionary) -> bool:
+	if not Datos.CAL or S == null or b.get("doorX") == null:
+		return false
+	var dy: int = int(b.y0) + int(b.h) - 1
+	for dx in [0, 1]:
+		var d = m.get("doors", {}).get("%d,%d" % [int(b.doorX) + dx, dy])
+		if d is Dictionary and d.get("gate"):
+			return gate_cerrado(str(d.gate))
+	return false
+
+func gate_cerrado(g: String) -> bool:
+	var gk := g.split(":")
+	match gk[0]:
+		"nave":
+			return S.get("nave") == null
+		"neg":
+			return gk.size() > 1 and not S.loc.has(gk[1])
+		"setas":
+			return S.get("setas") == null or Datos.PLAY
+		"franco":
+			return not mar_ok() or int(S.mar.paso) < 1
+		"club":
+			return gk.size() > 1 and D.CLUBS.has(gk[1]) and S.ch < int(D.CLUBS[gk[1]].ch)
+		"disco":
+			return S.ch < int(D.DISCO.ch) or not disco_abierta()
+	return false
+
 func atras_puerta() -> void:
 	var y: int = P.y + 1
 	P.fy = y
@@ -747,6 +788,9 @@ func obj_local(x: int, y: int, o) -> bool:
 	if o == null:
 		return false
 	var txt := ""
+	if S.map == "nave-r":   # la nave sin alquilar: los trastos del último
+		await say(K("Neumáticos viejos y bidones vacíos.") if o in ["neumT", "bidonT", "barrilT"] else (K("Sacos rotos de algo que ya no se sabe qué era.") if o == "sacos" else K("Cajas con polvo del último inquilino. Si la alquilas, Arrieta las saca.")))
+		return true
 	if Datos.CAL and await obj_vip(o):   # MAESTRO [9]
 		return true
 	if Datos.CAL and S.map == "nave" and o == "estanteC":   # MAESTRO [8]: las estanterías de tarros de la nave
