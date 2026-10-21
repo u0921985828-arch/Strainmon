@@ -1633,35 +1633,54 @@ func _gsm(R: Array, n: String, x: float, y: float) -> void:
 	var M: Array = _gs_manga(n, f.c)   # [fila, x0, x1, pendiente]
 	var X: int = _gs.position.x + Datos.jsround(x)
 	var Y: int = _gs.position.y + Datos.jsround(y)
-	var B: Array = _gs_brazo(n, f.c, M, n.ends_with("-i"))   # [imagen, esquina respecto a (X, Y)]
+	var B: Array = _gs_brazo(n, f.c, M, X, Y)   # [imagen, esquina respecto a (X, Y)]
 	R.append(["@", B[0], X + B[1].x, Y + B[1].y, _gs, n])
 
-# el antebrazo (lo pidió el usuario: «más cortos y anchos hacia abajo» y «que se desvanezca… las mismas proporciones de mano y brazo
-# en cada sprite»): desde el corte de la manga sigue su eje (la pendiente de la manga), se ensancha GS_BRAZO px por fila (el del cliente,
-# de frente, no) con el contorno de 1 px a los lados y el relleno de la fila de la manga estirado; mide GS_BRAZO_L px por el eje en todas
-# las manos, entero hasta GS_BRAZO_FIRME y luego se deshace en cuatro bandas de tramado (3/4, 1/2, 1/4 y nada, Bayer 4 × 4) cortadas
-# a escuadra con el eje, no en horizontal
-const GS_BRAZO := 0.45
-const GS_BRAZO_L := 20
-const GS_BRAZO_FIRME := 8
+# el hombro de cada mano, fuera del panel: el tuyo abajo a la derecha, el de la mano del mechero abajo a la izquierda, el del cliente
+# arriba a la izquierda (enfrente); el brazo va del corte de la manga hacia él
+func _gs_hombro(n: String) -> Vector2:
+	if n.ends_with("-i"):
+		return Vector2(_gs.position.x - 40, _gs.position.y - 50)
+	if n.ends_with("-ab"):
+		return Vector2(_gs.position.x + 10, _gs.end.y + 70)
+	return Vector2(_gs.end.x + 30, _gs.end.y + 60)
+
+# el antebrazo (lo pidió el usuario: «más cortos y anchos hacia abajo», «que se desvanezca… las mismas proporciones de mano y brazo en
+# cada sprite» y «acortar el brazo de manera redonda al final y desvanecerlo así»): del corte de la manga hacia el hombro, con el
+# contorno de 1 px a los lados y el relleno de la fila de la manga estirado; se ensancha GS_BRAZO px por px de eje (el del cliente,
+# que está enfrente, no), mide GS_BRAZO_L px por el eje en todas las manos y acaba en media luna (la punta redonda); las últimas
+# GS_BRAZO_FUNDE px antes de la punta se deshacen en tres bandas de tramado (3/4, 1/2, 1/4, Bayer 4 × 4) que siguen la curva, sin
+# el contorno (que en el tramado quedaría en puntos negros sueltos)
+const GS_BRAZO := 0.4
+const GS_BRAZO_L := 22
+const GS_BRAZO_FUNDE := 6
 const GS_BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 var _gs_br := {}
-func _gs_brazo(n: String, im: Image, M: Array, arriba: bool) -> Array:
-	if _gs_br.has(n):
-		return _gs_br[n]
+func _gs_brazo(n: String, im: Image, M: Array, X: int, Y: int) -> Array:
 	var ys: int = M[0]
 	var x0: int = M[1]
 	var w0: int = M[2] - M[1] + 1
+	var arriba: bool = n.ends_with("-i")
+	var O := Vector2(x0 + w0 / 2.0, ys + (0.0 if arriba else 1.0))   # el centro del corte de la manga, en el sprite
+	var ax: Vector2 = (_gs_hombro(n) - Vector2(X, Y) - O).normalized()
+	if (ax.y < 0.2) if not arriba else (ax.y > -0.2):   # nunca de lado ni hacia atrás: sale del corte hacia fuera
+		ax = Vector2(ax.x, 0.2 if not arriba else -0.2).normalized()
+	var ang: int = int(round(rad_to_deg(ax.angle()) / 3.0))
+	var key := "%s|%d" % [n, ang]
+	if _gs_br.has(key):
+		return _gs_br[key]
+	if _gs_br.size() > 96:
+		_gs_br.clear()
+	ax = Vector2.from_angle(deg_to_rad(ang * 3.0))
 	var fila := []
 	for i in w0:
 		fila.append(im.get_pixel(x0 + i, ys))
 	var sy: float = -1.0 if arriba else 1.0
-	var nrm: float = sqrt(M[3] * M[3] + 1.0)
-	var ax := Vector2(M[3], sy) / nrm   # el eje del brazo, hacia fuera
-	var pe := Vector2(-ax.y, ax.x)        # a escuadra con él
-	var co: float = 1.0 / nrm             # de una fila al eje
-	var O := Vector2(x0 + w0 / 2.0, ys + (0.0 if arriba else 1.0))   # el centro del corte de la manga
+	var pe := Vector2(-ax.y, ax.x)          # a escuadra con el eje
+	var co: float = absf(ax.y)               # el corte es horizontal: su ancho a escuadra es w0 × co
 	var ab: float = 0.0 if arriba else GS_BRAZO
+	var R_: float = (w0 + ab * GS_BRAZO_L) * co / 2.0   # el radio de la punta
+	var Lc: float = GS_BRAZO_L - R_                     # donde empieza la media luna
 	var mx: int = GS_BRAZO_L + w0
 	var cx: int = x0 - mx
 	var cy: int = (ys - mx) if arriba else (ys + 1)
@@ -1672,27 +1691,29 @@ func _gs_brazo(n: String, im: Image, M: Array, arriba: bool) -> Array:
 			if d.y * sy <= 0.0:
 				continue
 			var t: float = d.dot(ax)
-			if t > GS_BRAZO_L:
-				continue
-			var ancho: float = (w0 + ab * maxf(0.0, t) * co) * co   # a escuadra con el eje: en horizontal sale la fila de la manga
 			var sp: float = d.dot(pe)
-			if absf(sp) > ancho / 2.0:
+			var me: float = (w0 + ab * clampf(t, 0.0, Lc)) * co / 2.0   # medio ancho aquí
+			var fin: float   # hasta dónde llega el brazo por el eje en esta línea (la media luna)
+			if absf(sp) > me:
 				continue
-			var fu: float = clampf(ceilf((t - GS_BRAZO_FIRME) / float(GS_BRAZO_L - GS_BRAZO_FIRME) * 4.0) / 4.0, 0.0, 1.0)
+			fin = Lc + sqrt(maxf(0.0, R_ * R_ - sp * sp)) if R_ > 0.0 else Lc
+			if t > fin:
+				continue
+			var fu: float = clampf(ceilf((t - (fin - GS_BRAZO_FUNDE)) / GS_BRAZO_FUNDE * 3.0) / 4.0, 0.0, 1.0)   # 1/4, 1/2, 3/4 fuera
 			if fu > 0.0 and (GS_BAYER[(py % 4) * 4 + (px % 4)] + 0.5) / 16.0 < fu:
 				continue
 			var j: int
-			if absf(sp) > ancho / 2.0 - co:   # el contorno, el del lado que toca
+			if absf(sp) > me - 1.0 and fu == 0.0:   # el contorno de los lados, solo donde el brazo es entero (en el tramado, puntos sueltos)
 				j = 0 if (sp < 0.0) == (pe.x > 0.0) else w0 - 1
 			else:
-				var u: float = (sp / ancho + 0.5) if pe.x > 0.0 else (0.5 - sp / ancho)
+				var u: float = (sp / (2.0 * me) + 0.5) if pe.x > 0.0 else (0.5 - sp / (2.0 * me))
 				j = clampi(1 + int(u * (w0 - 2)), 1, w0 - 2)
 			out.set_pixel(px, py, fila[j])
 	var ur: Rect2i = out.get_used_rect()
 	if ur.size.x <= 0:
 		ur = Rect2i(0, 0, 1, 1)
-	_gs_br[n] = [out.get_region(ur), Vector2i(cx + ur.position.x, cy + ur.position.y)]
-	return _gs_br[n]
+	_gs_br[key] = [out.get_region(ur), Vector2i(cx + ur.position.x, cy + ur.position.y)]
+	return _gs_br[key]
 
 # el corte de la manga: la fila (de las 20 del canto) donde ya es entera, el tramo de esa fila que es manga (el del lado de su esquina:
 # el derecho la tuya, el izquierdo la del mechero y la del cliente) y lo que se corre en x por cada fila hacia fuera
