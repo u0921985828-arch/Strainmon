@@ -1700,6 +1700,8 @@ func _gs_negro(im: Image) -> Color:
 
 # el largo del antebrazo desde el centro del puño, igual en todas las manos (con la media luna de la punta)
 const GS_CIL_L := 30
+var gs_funde := 0   # px del final del brazo que se deshacen en tramado (0: sin degradado)
+const GS_BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 var _gs_cl := {}
 func _gs_cilindro(n: String, im: Image) -> Array:
 	if _gs_cl.has(n):
@@ -1785,22 +1787,42 @@ func _gs_cilindro(n: String, im: Image) -> Array:
 	for q in puno:
 		c += Vector2(q) + Vector2(0.5, 0.5)
 	c /= maxf(1.0, puno.size())
+	# el eje: de través al puño (la raya dorada va de lado a lado de la manga), hacia donde estaba la manga
 	var ax: Vector2 = (gm - c).normalized() if puno.size() >= 3 and gm != c else Vector2(1, 1).normalized()
+	if puno.size() >= 3:
+		var sxx := 0.0
+		var syy := 0.0
+		var sxy := 0.0
+		for q in puno:
+			var d: Vector2 = Vector2(q) + Vector2(0.5, 0.5) - c
+			sxx += d.x * d.x
+			syy += d.y * d.y
+			sxy += d.x * d.y
+		var u := Vector2.from_angle(0.5 * atan2(2.0 * sxy, sxx - syy))   # lo largo del puño
+		var n2 := Vector2(-u.y, u.x)
+		ax = n2 if n2.dot(gm - c) >= 0.0 else -n2
 	var pe := Vector2(-ax.y, ax.x)
 	var smin := 99.0
 	var smax := -99.0
-	for q in manga:   # el ancho: el de la manga junto al puño, con su raya
+	for q in puno:   # el ancho: el del puño, y la raya por fuera
 		var d: Vector2 = Vector2(q) + Vector2(0.5, 0.5) - c
-		if d.dot(ax) > 0.0 and d.dot(ax) < 5.0:
-			smin = minf(smin, d.dot(pe) - 0.5)
-			smax = maxf(smax, d.dot(pe) + 0.5)
+		smin = minf(smin, d.dot(pe) - 0.5)
+		smax = maxf(smax, d.dot(pe) + 0.5)
 	if smax < smin:
 		smin = -(M[2] - M[1] + 1) / 2.0
 		smax = -smin
-	var ra: float = (smax - smin) / 2.0   # el radio: media manga junto al puño, con la raya
+	var ra: float = (smax - smin) / 2.0 + 1.0   # el radio: medio puño y la raya
 	c += pe * (smax + smin) / 2.0
 	var L: float = GS_CIL_L
 	var tc: float = L - ra   # el centro de la media luna
+	# la raya del puño casi nunca va de través: por detrás del puño, el cilindro también (si no, queda un hueco en un lado)
+	var tras := {}   # por cada altura del puño, lo más atrás de él
+	for q in puno:
+		var d: Vector2 = Vector2(q) + Vector2(0.5, 0.5) - c
+		var k: int = roundi(d.dot(pe))
+		tras[k] = minf(tras.get(k, 0.0), d.dot(ax))
+	var t0 := func(sv: float) -> float:   # dónde empieza el brazo a esa altura del puño
+		return tras.get(roundi(sv), 0.0)
 	# la raya negra de la manga vieja, más allá del puño, también fuera (si no, quedan picos al lado del cilindro)
 	var cola2: Array = manga.keys()
 	while not cola2.is_empty():
@@ -1833,17 +1855,31 @@ func _gs_cilindro(n: String, im: Image) -> Array:
 			if p.a < 0.5:
 				continue
 			var tq: float = (Vector2(x, y) + Vector2(0.5, 0.5) - c).dot(ax)
-			if manga.has(Vector2i(x, y)) and tq > 0.0:
-				continue   # la manga de PixelLab, fuera desde el puño
-			if tq > 0.5 and not oscuro.call(p) and p.s > 0.2 and mismo_tono.call(p):
+			if manga.has(Vector2i(x, y)):
+				continue   # la manga de PixelLab, fuera entera (también el pico que asoma por detrás del puño)
+			if tq > -3.0 and not oscuro.call(p) and p.s > 0.2 and mismo_tono.call(p):
 				continue   # y sus restos sueltos, en cualquier tono de la tela
+			var sq: float = (Vector2(x, y) + Vector2(0.5, 0.5) - c).dot(pe)
+			if tq > maxf(t0.call(sq), 0.0) + 0.5 and absf(sq) < ra:
+				continue   # dentro del cilindro, solo el cilindro
 			out.set_pixel(x - o.x, y - o.y, p)
 	for vuelta in 2:   # la raya negra que se ha quedado sin nada que rodear
 		var fuera: Array = []
 		for py in out.get_height():
 			for px in out.get_width():
 				var p: Color = out.get_pixel(px, py)
-				if p.a < 0.5 or not oscuro.call(p) or (Vector2(px + o.x, py + o.y) + Vector2(0.5, 0.5) - c).dot(ax) <= 0.5:
+				if p.a < 0.5:
+					continue
+				var nadie := true   # un píxel suelto, sin nada al lado
+				for ey in [-1, 0, 1]:
+					for ex in [-1, 0, 1]:
+						var z := Vector2i(px + ex, py + ey)
+						if (ex != 0 or ey != 0) and z.x >= 0 and z.y >= 0 and z.x < out.get_width() and z.y < out.get_height() and out.get_pixel(z.x, z.y).a > 0.5:
+							nadie = false
+				if nadie:
+					fuera.append(Vector2i(px, py))
+					continue
+				if not oscuro.call(p) or (Vector2(px + o.x, py + o.y) + Vector2(0.5, 0.5) - c).dot(ax) <= -4.0:
 					continue
 				var solo := true
 				for ey in [-1, 0, 1]:
@@ -1864,7 +1900,7 @@ func _gs_cilindro(n: String, im: Image) -> Array:
 			var d := Vector2(px + o.x, py + o.y) + Vector2(0.5, 0.5) - c
 			var t: float = d.dot(ax)
 			var s: float = d.dot(pe)
-			if t < 0.0 or absf(s) > ra:
+			if t < t0.call(s) or absf(s) > ra:
 				continue
 			var borde: float = ra - absf(s)   # lo que falta para salirse por el lado o por la media luna
 			if t > tc:
@@ -1872,6 +1908,10 @@ func _gs_cilindro(n: String, im: Image) -> Array:
 				if rr > ra:
 					continue
 				borde = ra - rr
+			if gs_funde > 0 and t > L - gs_funde:   # el degradado: cada vez menos píxeles hacia la punta
+				var nivel: float = (L - t) / float(gs_funde)
+				if GS_BAYER[(py % 4) * 4 + (px % 4)] >= int(nivel * 16.0):
+					continue
 			if borde < 1.0:
 				out.set_pixel(px, py, neg)
 				continue

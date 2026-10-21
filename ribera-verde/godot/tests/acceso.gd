@@ -100,14 +100,19 @@ func brazo_cilindro(im: Image, g: Dictionary) -> bool:
 				return false   # un pico de la manga vieja
 	# de dentro afuera por cada lado y por la punta: lo último pintado es la raya negra y luego, nada
 	var borde := func(m: Vector2, dir: Vector2, desde: float, hasta: float) -> bool:
-		var ultimo := Color(0, 0, 0, 0)
+		var ultimo := Vector2(-1, -1)
 		var k: float = desde
 		while k <= hasta:
-			var q: Color = px.call(m + dir * k)
-			if q.a > 0.5:
-				ultimo = q
+			if px.call(m + dir * k).a > 0.5:
+				ultimo = (m + dir * k).floor()
 			k += 0.25
-		return ultimo.a > 0.5 and ultimo.get_luminance() < 0.2 and px.call(m + dir * (hasta + 0.75)).a < 0.5
+		if ultimo.x < 0 or px.call(m + dir * (hasta + 0.75)).a > 0.5:
+			return false
+		for e in [Vector2.ZERO, Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:   # la raya, en ese píxel o al lado (en diagonal va en escalera)
+			var q: Color = px.call(ultimo + e + Vector2(0.5, 0.5))
+			if q.a > 0.5 and q.get_luminance() < 0.2:
+				return true
+		return false
 	for t in range(int(r) + 2, int(L - r)):   # desde donde ya no está la mano
 		var m := c + ax * (t + 0.5)
 		for lado in [-1.0, 1.0]:
