@@ -230,6 +230,10 @@
 
 - **Las puertas, dibujadas como los gestos** (lo pidió el usuario: «los fondos del candado y de las cerraduras… se nota que no se ha creado con lo mismo»): `acc-f-<cerradura>` a mano en `gestos.py` (104 × 84, celda `acc_fondo`, con el contorno, la luz arriba a la izquierda y 3-4 tonos por material: el portal de tablas con el escudo de latón, el local de aluminio con el cristal, el club lacado con la roseta, el franco blindado, la persiana de la nave y la chapa del bajo con su pasador); el candado, con contorno. `tests/acceso.gd` 109/0.
 
+### APK de la huerta y el combate · Godot 0.58.0 (código 78)
+- Lo pidió el usuario: «Saca la APK no?». Lleva la huerta (bancales de 7 × 4 con las matas dentro, ampliable a 16 sitios, setos de PixelLab, riego centrado, tallo en el centro), el combate en su lado (enemigo arriba a la izquierda, protagonista abajo a la derecha), el retrato del cliente y la nave cerrada hasta alquilarla. Batería entera en verde (bat17: 80 suites, 0 fallos).
+- `descargas/LandraceHunters.apk` (88,6 MB, `apk-instalar.py` + `zipalign -P 16` + `apksigner`, la misma firma y el mismo paquete que la 0.57.1); AAB firmado de 81,8 MB, targetSdk 36, 16 KB en las 4 `.so`.
+
 ### APK del teclado y el ratón · Godot 0.57.1 (código 77)
 - Lo pidió el usuario: «pásame también el APK con esto». En el móvil no cambia nada (la cruceta y A/B, como siempre); con un ratón o un teclado conectados, el clic izquierdo es A, el derecho B y W A S D las flechas. Batería entera en verde (67) y las de pantalla y mandos repetidas con el cambio.
 - `descargas/LandraceHunters.apk` (88 MB, `apk-instalar.py` + `zipalign -P 16` + `apksigner`, la misma firma y el mismo paquete que la 0.57.0); AAB firmado de 81 MB, targetSdk 36, 16 KB en las 4 `.so`.
