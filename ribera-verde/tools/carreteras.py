@@ -39,17 +39,27 @@ def h(x, y, s):
 	return (v & 0xffff) / 65535.0
 
 
-# las curvas (lo pidió el usuario: «molaría que los caminos no siempre sean rectos»): [columna, ±1] — la calzada baja (+1) o sube
-# (−1) una fila en las columnas x y x + 1; los extremos siguen en las filas 6 y 7 (las salidas). Va en piezas de 2 × 3 casillas
-# «cv<R|O|P>-<d|u>-<columna><fila>» (asfalto, roto o pista) que pinta.gd dibuja en curva.
+# las curvas (lo pidió el usuario: «molaría que los caminos no siempre sean rectos» y, después, «más tramos rectos»): [columna, ±1] —
+# la calzada baja (+1) o sube (−1) una fila a lo largo de PIEZA columnas desde x; entre curva y curva, tramos rectos largos; los
+# extremos siguen en las filas 6 y 7 (las salidas). Va en piezas de PIEZA × 3 casillas «cv<R|O|P>-<d|u>-<columna><fila>» (asfalto,
+# roto o pista) que pinta.gd dibuja en curva suave, con escalones limpios.
+PIEZA = 4
 CURVAS = {
-	"costa": [(6, 1), (12, 1), (21, -1), (27, -1), (31, -1), (35, 1)],
-	"valle": [(5, -1), (10, -1), (18, 1), (23, 1), (29, 1), (34, -1)],
-	"monte": [(4, 1), (9, 1), (15, -1), (19, -1), (23, -1), (27, -1), (31, 1), (35, 1)],
+	"costa": [(9, -1), (27, 1)],
+	"valle": [(7, 1), (25, -1)],
+	"monte": [(12, -1), (24, 1)],
 	"general": [],
-	"molino": [(6, -1), (11, -1), (17, 1), (24, 1), (30, 1), (34, -1)],
-	"acantilado": [(5, 1), (12, 1), (19, -1), (23, -1), (28, -1), (33, 1)],
-	"ribera": [(5, -1), (11, -1), (20, 1), (26, 1), (31, 1), (35, -1)],
+	"molino": [(10, 1), (26, -1)],
+	"acantilado": [(8, -1), (28, 1)],
+	"ribera": [(12, 1), (29, -1)],
+}
+
+
+# las vallas seguidas: [primera columna, largo, fila] — los prados del valle y del molino y la barandilla del acantilado sobre el mar
+VALLAS = {
+	"valle": [(13, 10, 11), (29, 8, 3)],
+	"molino": [(2, 7, 3), (15, 10, 11)],
+	"acantilado": [(2, W - 4, 2)],
 }
 
 
@@ -63,14 +73,15 @@ def calzada_de(paisaje):
 		if x in pasos:
 			d = pasos[x]
 			arriba = top if d > 0 else top - 1
-			for c in (0, 1):
+			for c in range(PIEZA):
 				col[x + c] = (list(range(arriba, arriba + 3)), (d, c, arriba))
 			top += d
-			x += 2
+			x += PIEZA
 			continue
 		col[x] = ([top, top + 1], None)
 		x += 1
 	assert top == RY, paisaje
+	assert all(col[x][1] is None and col[x][0] == [RY, RY + 1] for x in (0, 1, W - 2, W - 1)), paisaje   # las salidas, rectas
 	return col
 
 
@@ -114,26 +125,44 @@ def mapa(k, nombre, paisaje, musica):
 		for x in range(1, W - 1):
 			g[RY - 1][x] = "walk"
 			g[RY + 2][x] = "walk"
-	# lo de los lados: nunca en la calzada ni a 2 filas de ella (no corta el paso)
-	cosas = {"costa": ["bench", "lamp", "bush", "fence"], "valle": ["crate", "fence", "tree2", "bush"], "monte": ["tree", "tree2", "manzano", "bush"],
-		"general": ["lamp", "seto", "tree", "bench"], "molino": ["manzano", "fence", "tree", "bush"], "acantilado": ["tree2", "bush", "fence", "tree"],
-		"ribera": ["tree", "tree2", "bush", "bench"]}[paisaje]
+	# lo de los lados (lo pidió el usuario: «un poco mal los sprites, hazlo mejor»): primero lo puesto con sentido —las vallas de
+	# los prados y la barandilla del acantilado, seguidas y paralelas a la calzada, las farolas de la general en la acera de arriba y
+	# los bancos de la ribera mirando al río—; después, suelto, solo lo del campo (árboles, matas, frutales, setos), nunca en
+	# la calzada ni a 2 filas de ella ni pegado a lo puesto
+	def dist(x, y):
+		return min(abs(y - r) for c in (x - 1, x, x + 1) if 0 <= c < W for r in col[c][0])
+
+	def pon(x, y, cosa, minimo=3):
+		assert 2 <= x < W - 2 and 1 <= y < H - 1 and g[y][x] == "grass" and o[y][x] is None and dist(x, y) >= minimo, (paisaje, x, y, cosa)
+		o[y][x] = cosa
+
+	for x0, largo, y in VALLAS.get(paisaje, []):
+		for x in range(x0, x0 + largo):
+			pon(x, y, "fence")
+	if paisaje == "ribera":   # dos bancos entre la carretera y el río, mirando al agua (no delante del puente)
+		for x in (18, 21):
+			pon(x, col[x][0][1] + 1, "bench", 1)
+	if paisaje == "general":   # las farolas en la acera de arriba, como en el pueblo
+		for x in range(3, W - 2, 6):
+			assert g[RY - 1][x] == "walk" and o[RY - 1][x] is None
+			o[RY - 1][x] = "lamp"
+	cosas = {"costa": ["bush"], "valle": ["tree2", "bush", "tree"], "monte": ["tree", "tree2", "manzano", "bush"], "general": ["seto", "tree"],
+		"molino": ["manzano", "tree", "bush"], "acantilado": ["tree2", "bush"], "ribera": ["tree", "tree2", "bush"]}[paisaje]
 	suelo = {"costa": "flowers", "valle": "tallgrass", "monte": "tallgrass", "general": "flowers", "molino": "flowers", "acantilado": "tallgrass", "ribera": "flowers"}[paisaje]
 	sid = sum(ord(c) for c in k)
+	puesto = [(x, y) for y in range(H) for x in range(W) if o[y][x] in ("fence", "lamp", "bench")]
 	for y in range(1, H - 1):
 		for x in range(2, W - 2):
-			cerca = [r for c in (x - 1, x, x + 1) for r in col[c][0]]
-			if min(abs(y - r) for r in cerca) <= 2 or g[y][x] != "grass":
+			if dist(x, y) <= 2 or g[y][x] != "grass" or o[y][x] is not None:
 				continue
 			r = h(x, y, sid)
-			if paisaje == "general" and y in (RY - 2, RY + 3) and x % 6 == 3:
-				o[y][x] = "lamp"
-			elif r < 0.12:
+			if r < 0.1 and all(abs(x - a) > 1 or abs(y - b) > 1 for a, b in puesto):
 				c = cosas[int(h(y, x, sid + 1) * len(cosas)) % len(cosas)]
-				if c in ("tree", "tree2", "manzano") and y > min(cerca) - 2:   # la copa (6 filas) no tapa la calzada: árboles solo por encima
+				cerca = min(r for c2 in (x - 1, x, x + 1) for r in col[c2][0])
+				if c in ("tree", "tree2", "manzano") and y > cerca - 2:   # la copa (6 filas) no tapa la calzada: árboles solo por encima
 					c = "bush"
 				o[y][x] = c
-			elif r < 0.2:
+			elif r < 0.18:
 				g[y][x] = suelo
 	return {"name": nombre, "w": W, "h": H, "g": [list(r) for r in g], "o": o, "exits": {}, "doors": {}, "music": musica, "blds": [], "est": None}
 

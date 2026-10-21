@@ -98,21 +98,55 @@ func _corre() -> void:
 		chk(int(R.ch) == max(int(D.PARADAS[R.a].cap), int(D.PARADAS[R.b].cap)), "%s: se abre con los dos autobuses (cap. %d)" % [id, int(R.ch)])
 		J.enter_map(id, 1, 6, "right")
 		chk(llega(m, Vector2i(1, 6), Vector2i(int(m.w) - 2, 7)), "%s: se anda de punta a punta" % id)
-		var filas := {}   # lo pidió el usuario: «molaría que los caminos no siempre sean rectos»
+		var filas := {}   # lo pidió el usuario: «molaría que los caminos no siempre sean rectos» y, después, «más tramos rectos»
 		var curvas := 0
+		var tramos := []   # [curva?, columnas seguidas]
 		for x in int(m.w):
 			var top := -1
+			var es_cv := false
 			for y in int(m.h):
 				var t: String = m.g[y][x]
 				if t.begins_with("cv"):
 					curvas += 1
+					es_cv = true
 					chk(not J.tile_solid(m, x, y), "%s (%d, %d): la curva se pisa" % [id, x, y])
 				elif top < 0 and t in ["roadT", "rotoT", "pista"]:
 					top = y
 			if top >= 0:
 				filas[top] = true
-		chk(id == "carr-general" or filas.size() >= 3, "%s: no es recta (filas %s)" % [id, filas.keys()])
+			if tramos.is_empty() or tramos[-1][0] != es_cv:
+				tramos.append([es_cv, 0])
+			tramos[-1][1] += 1
+		chk(id == "carr-general" or filas.size() >= 2, "%s: no es recta (filas %s)" % [id, filas.keys()])
 		chk(curvas > 0 or id == "carr-general", "%s: la calzada en curva por piezas, también la pista (%d)" % [id, curvas])
+		var rectos: Array = tramos.filter(func(q): return not q[0]).map(func(q): return q[1])
+		chk(tramos.all(func(q): return not q[0] or q[1] % 4 == 0), "%s: cada curva, de 4 casillas de largo (%s)" % [id, tramos])
+		chk(rectos.max() >= 8 and rectos.min() >= 3, "%s: tramos rectos largos (%s)" % [id, rectos])
+		var sueltas := 0   # las vallas, seguidas; nada del campo pegado a la calzada (solo farolas y bancos, a propósito)
+		for y in int(m.h):
+			for x in int(m.w):
+				var ob = m.o[y][x]
+				if ob == "fence" and not (x > 0 and m.o[y][x - 1] == "fence") and not (x < int(m.w) - 1 and m.o[y][x + 1] == "fence"):
+					sueltas += 1
+				if ob != null and not String(ob).begins_with("monte") and not ob in ["lamp", "bench"]:
+					for dy in [-2, -1, 1, 2]:
+						if y + dy >= 0 and y + dy < int(m.h) and String(m.g[y + dy][x]).substr(0, 2) in ["ro", "pi", "cv"]:
+							sueltas += 1
+		chk(sueltas == 0, "%s: sin vallas sueltas ni estorbos pegados a la calzada (%d)" % [id, sueltas])
+	# la S de las curvas: de 0 a 16 sin saltos de más de 1 px y con los escalones limpios (de largos a cortos y de cortos a largos)
+	var P = preload("res://src/pinta.gd")
+	var tab: PackedInt32Array = P._cv_tabla()
+	var esc := []
+	for i in tab.size():
+		if i == 0 or tab[i] != tab[i - 1]:
+			esc.append(0)
+		esc[-1] += 1
+	chk(tab.size() == 64 and tab[0] == 0 and tab[63] == 16, "la curva baja una fila en 64 px (%d, %d, %d)" % [tab.size(), tab[0], tab[-1]])
+	var limpia := esc.size() == 17
+	for i in range(1, esc.size()):
+		if i <= 8 and esc[i] > esc[i - 1] or i > 8 and esc[i] < esc[i - 1]:
+			limpia = false
+	chk(limpia, "escalones limpios: %s" % [esc])
 	var pueblos := ["town", "puerto", "valdehierro", "mendialde", "errotabarri", "ibarbide"]
 	var con := {}
 	for p in pares.keys() + [[D.CAMPO.puertas.keys()[0], D.CAMPO.puertas.keys()[1]]]:

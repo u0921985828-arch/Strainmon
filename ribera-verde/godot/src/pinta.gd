@@ -683,16 +683,40 @@ func _canto_hierba(tx: int, ty: int, sx: int, sy: int) -> void:
 # orgánico (1.10, 01b-arte.js): el mismo hash de casilla que el HTML (hashT) para que nada vaya a compás de la rejilla: qué
 # variante de un firme sale (la 0, la lisa, la que más), qué detalle lleva la hierba y dónde, y cuánto se corre (y si va en
 # espejo) cada árbol y cada monte
-# Las curvas de las carreteras (lo pidió el usuario: «molaría que los caminos no siempre sean rectos»; tools/carreteras.py): piezas
-# de 2 × 3 casillas «cv<R|O|P>-<d|u>-<columna><fila>» en las que la calzada (asfalto R, roto O o pista P) baja (d) o sube (u) una fila. Cada
-# columna de píxeles copia la de la calzada recta corrida o px (suave, en S), sobre la hierba y con el canto de la hierba.
+# Las curvas de las carreteras (lo pidió el usuario: «molaría que los caminos no siempre sean rectos», luego «más tramos rectos» y
+# «hazlo mejor»; tools/carreteras.py): piezas de CV_PIEZA × 3 casillas «cv<R|O|P>-<d|u>-<columna><fila>» en las que la calzada (asfalto
+# R, roto O o pista P) baja (d) o sube (u) una fila. Cada columna de píxeles copia la de la calzada recta corrida o px, sobre la hierba y
+# con el canto de la hierba; o sale de una S suave con los escalones limpios del pixel art (de largos a cortos hasta el medio y de
+# cortos a largos después, sin 2-1-2: _cv_tabla).
+const CV_PIEZA := 4
+static var _CV_T := PackedInt32Array()
 static func _cv(k: String) -> Dictionary:
 	var p := k.split("-")
 	return {"t": p[0].substr(2, 1), "d": p[1] == "d", "c": int(p[2].substr(0, 1)), "r": int(p[2].substr(1, 1))}
 
+static func _cv_tabla() -> PackedInt32Array:
+	if _CV_T.size():
+		return _CV_T
+	var n: int = CV_PIEZA * 16
+	var tramos := []   # cuántas columnas en cada altura, de 0 a 16
+	tramos.resize(17)
+	tramos.fill(0)
+	for i in n:
+		var t: float = (i + 0.5) / n
+		tramos[roundi(16.0 * t * t * (3.0 - 2.0 * t))] += 1
+	var a: Array = tramos.slice(0, 8)
+	a.sort()
+	a.reverse()
+	var b: Array = tramos.slice(9, 17)
+	b.sort()
+	var t2: Array = a + [tramos[8]] + b
+	for v in 17:
+		for i in t2[v]:
+			_CV_T.append(v)
+	return _CV_T
+
 static func _cv_o(cv: Dictionary, px: int) -> int:
-	var t: float = (cv.c * 16 + px + 0.5) / 32.0
-	var o := roundi(16.0 * t * t * (3.0 - 2.0 * t))
+	var o: int = _cv_tabla()[cv.c * 16 + px]
 	return o if cv.d else 16 - o
 
 func _curva(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
@@ -713,21 +737,26 @@ func _curva(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 	if fr[0] == null or fr[1] == null:
 		return false
 	var arriba: int = ty - cv.r
-	var tyr: int = arriba + (0 if cv.d == (cv.c == 0) else 1)   # la fila de arriba de la calzada recta de ese lado
+	var tyr: int = arriba + (0 if cv.d == (cv.c < CV_PIEZA >> 1) else 1)   # la fila de arriba de la calzada recta de ese lado
 	var c1 := Color8(0x5a, 0xa0, 0x4e)
 	var c2 := Color8(0x72, 0xbc, 0x5e)
 	var y0: int = cv.r * 16
-	var mg: int = 2 if cv.t == "P" else 0   # la pista, 2 px más estrecha por cada lado: lo que se come su orilla en la recta
+	var ov := []   # la pista, con la orilla de hierba de la recta (tierra-03 arriba, tierra-12 abajo) corrida igual que la tierra
+	if cv.t == "P" and Atlas.ok:
+		for mk in [3, 12]:
+			ov.append(Atlas.frame_de("tileset-transiciones", "tierra-%02d" % mk, "unica", 0, {"i": 0}))
 	for px in 16:
 		var o := _cv_o(cv, px)
 		for i in 2:
-			var a: int = maxi(maxi(o + i * 16, y0), o + mg)
-			var b: int = mini(mini(o + i * 16 + 16, y0 + 16), o + 32 - mg)
+			var a: int = maxi(o + i * 16, y0)
+			var b: int = mini(o + i * 16 + 16, y0 + 16)
 			if a >= b:
 				continue
 			var ys: int = tyr + i
 			var x0: int = ((tx & 3) + 4 * (ys & 3)) * 16 if mo else (variante(nom[i], tx, ys) * 16 if fr[i].c.get_width() > 16 else 0)
 			Atlas.dibuja(L, fr[i].c, Rect2(sx + px, sy + a - y0, 1, b - a), Rect2(x0 + px, a - o - i * 16, 1, b - a))
+			if ov.size() == 2 and ov[i] != null:
+				Atlas.dibuja(L, ov[i].c, Rect2(sx + px, sy + a - y0, 1, b - a), Rect2(px, a - o - i * 16, 1, b - a))
 		for q in ([] if cv.t == "P" else [[o - 1, c1], [o - 2, c2], [o + 32, c1], [o + 33, c2]]):   # la pista, sin canto (como su orilla)
 			if q[0] >= y0 and q[0] < y0 + 16:
 				_rect(sx + px, sy + q[0] - y0, 1, 1, q[1])
