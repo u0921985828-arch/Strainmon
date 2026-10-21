@@ -68,8 +68,8 @@ func dentro(R: Array) -> bool:
 	return R.all(func(e): return dentro1(e))
 
 func dentro1(e: Array) -> bool:
-	if typeof(e[0]) == TYPE_STRING:   # 1.54.1: un sprite ['@', n, x, y, recorte]
-		return Atlas.foto_misc(e[1]) != null and Rect2i(0, 0, J.SW, J.SH).encloses(e[4])
+	if typeof(e[0]) == TYPE_STRING:   # 1.54.1: un sprite ['@', n, x, y, recorte] (o una imagen: el antebrazo, la planta)
+		return (e[1] is Image or Atlas.foto_misc(e[1]) != null) and Rect2i(0, 0, J.SW, J.SH).encloses(e[4])
 	return e[0] >= 0 and e[1] >= 0 and e[0] + e[2] <= J.SW and e[1] + e[3] <= J.SH
 
 func tiene(R: Array, col: String) -> bool:
@@ -78,6 +78,12 @@ func tiene(R: Array, col: String) -> bool:
 # 0.55: la mano de PixelLab (un sprite que empieza por pre) llega al canto del panel: "der" o "aba"; nunca flota
 func mano_canto(R: Array, pre: String, canto: String, x1: int, y1: int) -> bool:
 	for e in R:
+		if typeof(e[0]) == TYPE_STRING and e[1] is Image and e.size() > 5 and String(e[5]).begins_with(pre):   # el antebrazo en perspectiva
+			var rb := Rect2i(int(e[2]), int(e[3]), e[1].get_width(), e[1].get_height()).intersection(e[4])
+			if canto == "pov" and (rb.end.y >= y1 or rb.end.x >= x1):
+				return true
+			if canto == "pov-ab" and rb.end.y >= y1:
+				return true
 		if typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with(pre):
 			var f = Atlas.foto_misc(e[1])
 			if f == null:
@@ -90,7 +96,7 @@ func mano_canto(R: Array, pre: String, canto: String, x1: int, y1: int) -> bool:
 				return true
 			# 0.56, en primera persona: lo pintado de la mano (con la manga alargada) toca el canto de abajo o el derecho (pov), el de abajo
 			# (pov-ab, la del mechero) o el de arriba o el izquierdo (pov-i, la del cliente)
-			var r: Rect2i = e[4]
+			var r: Rect2i = Rect2i(int(e[2]), int(e[3]), f.c.get_width(), f.c.get_height()).intersection(e[4])
 			if canto == "pov" and (r.end.y >= y1 or r.end.x >= x1):
 				return true
 			if canto == "pov-ab" and r.end.y >= y1:
@@ -192,7 +198,7 @@ func _corre() -> void:
 			bien = bien and mano_canto(J.rects_acceso(V, ms), q[1], q[2], ax1, ay1)
 		chk(bien, "%s: la mano entra por el canto (%s)" % [q[0], q[2]])
 	V = {"k": "llave", "c": "", "ok": true, "t0": 0.0}
-	chk(J.rects_acceso(V, 300).any(func(e): return typeof(e[0]) == TYPE_STRING and e[1] == "acc-llave-0") and J.rects_acceso(V, 900).any(func(e): return typeof(e[0]) == TYPE_STRING and e[1] == "acc-llave-1"), "la llave gira: la muñeca de canto")
+	chk(J.rects_acceso(V, 300).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and e[1] == "acc-llave-0") and J.rects_acceso(V, 900).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and e[1] == "acc-llave-1"), "la llave gira: la muñeca de canto")
 	V = {"k": "regar", "c": "", "ok": true, "t0": 0.0, "pl": {}}
 	var rg: Array = J.rects_acceso(V, 600)
 	var gx: int = (J.SW - J.GS_W) >> 1
@@ -208,7 +214,7 @@ func _corre() -> void:
 	# 0.55: las manos de PixelLab de cada gesto llegan al canto (la tuya por la derecha; la del cliente, por la izquierda)
 	for q in [["tratar", "gm-spray", 600.0], ["abonar", "gm-abono", 600.0], ["plantar", "gm-vacia", 900.0], ["sembrar", "gm-semilla", 300.0],
 			["sembrar", "gm-vacia", 1000.0], ["esqueje", "gm-tij", 300.0], ["cosechar", "gm-tij", 700.0], ["manicurar", "gm-tij", 600.0],
-			["polen", "gm-pincel", 600.0], ["vender", "gm-bolsita", 500.0], ["pagar", "gm-billete", 400.0], ["pagar", "gm-vacia", 1250.0]]:
+			["polen", "gm-pincel", 600.0], ["vender", "gm-bolsita", 500.0], ["pagar", "gm-billete", 400.0], ["pagar", "gm-vacia", 1100.0]]:
 		var W := {"k": q[0], "c": "", "ok": true, "t0": 0.0, "pl": {}}
 		chk(mano_canto(J.rects_acceso(W, q[2]), q[1], "pov", gx + J.GS_W, gy + J.GS_H), "%s: la mano (%s) entra desde la esquina de abajo" % [q[0], q[1]])
 	chk(mano_canto(J.rects_acceso({"k": "vender", "c": "", "ok": true, "t0": 0.0, "pl": {}}, 500.0), "gm-billete-i", "pov-i", gx, gy), "vender: la mano del cliente entra desde la esquina de arriba")
@@ -219,7 +225,7 @@ func _corre() -> void:
 		var bien := true
 		for ms in [80.0, 300.0, 600.0]:
 			bien = bien and mano_canto(J.rects_acceso(W, ms), "gm-mech", "pov-ab", 0, gy + J.GS_H)
-		chk(bien and J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and e[1] == "gm-mech1-ab") and not J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with("gs-mechero")), "fumar %s: el mechero en la mano, desde el canto de abajo" % m)
+		chk(bien and J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and e[1] == "gm-mech1-ab") and not J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with("gs-mechero")), "fumar %s: el mechero en la mano, desde el canto de abajo" % m)
 	var pg := {"k": "pagar", "c": "", "ok": true, "t0": 0.0, "pl": {}}
 	var al_fajo := false
 	var con_billete := false

@@ -1637,6 +1637,12 @@ func _gsm(R: Array, n: String, x: float, y: float) -> void:
 	var arriba: bool = n.ends_with("-i")
 	var ys: int = M[0]
 	var lejos: int = (Y + ys - _gs.position.y) if arriba else (_gs.end.y - 1 - (Y + ys))
+	if lejos <= 0:
+		return
+	if not arriba:   # la tuya, en perspectiva: el antebrazo se ensancha hacia el canto (más cerca de los ojos), en una imagen
+		var B: Array = _gs_brazo(n, f.c, M, lejos)   # [imagen, x de su esquina respecto a X]
+		R.append(["@", B[0], X + B[1], Y + ys + 1, _gs, n])
+		return
 	for k in range(1, lejos + 1):
 		var fy: int = Y + ys + (-k if arriba else k)
 		var dx: int = Datos.jsround(M[3] * k)
@@ -1644,6 +1650,43 @@ func _gsm(R: Array, n: String, x: float, y: float) -> void:
 		if r.size.x <= 0:
 			break
 		R.append(["@", n, X + dx, fy - ys, r])
+
+# el antebrazo visto en perspectiva (lo pidió el usuario: «más cortos y anchos hacia abajo»): fila a fila desde el corte de la manga
+# hasta el canto, corrido con su pendiente y cada vez más ancho (GS_BRAZO px por fila); la fila de la manga se estira por dentro y
+# los cantos de 1 px (el contorno) se quedan
+const GS_BRAZO := 0.7
+var _gs_br := {}
+func _gs_brazo(n: String, im: Image, M: Array, lejos: int) -> Array:
+	var key := "%s|%d" % [n, lejos]
+	if _gs_br.has(key):
+		return _gs_br[key]
+	if _gs_br.size() > 64:
+		_gs_br.clear()
+	var ys: int = M[0]
+	var x0: int = M[1]
+	var w0: int = M[2] - M[1] + 1
+	var fila := []
+	for i in w0:
+		fila.append(im.get_pixel(x0 + i, ys))
+	var lo := 1 << 20
+	var hi := -(1 << 20)
+	var L := []
+	for k in range(1, lejos + 1):
+		var wk: int = w0 + int(GS_BRAZO * k)
+		var c: float = x0 + w0 / 2.0 + M[3] * k
+		var a: int = int(floor(c - wk / 2.0))
+		L.append([a, wk])
+		lo = mini(lo, a)
+		hi = maxi(hi, a + wk)
+	var out := Image.create(maxi(1, hi - lo), maxi(1, lejos), false, Image.FORMAT_RGBA8)
+	for k in L.size():
+		var a: int = L[k][0]
+		var wk: int = L[k][1]
+		for i in wk:
+			var j: int = 0 if i == 0 else (w0 - 1 if i == wk - 1 else clampi(1 + int((i - 1) * (w0 - 2) / float(maxi(1, wk - 2))), 1, w0 - 2))
+			out.set_pixel(a - lo + i, k, fila[j])
+	_gs_br[key] = [out, lo]
+	return _gs_br[key]
 
 # el corte de la manga: la fila (de las 20 del canto) donde ya es entera, el tramo de esa fila que es manga (el del lado de su esquina:
 # el derecho la tuya, el izquierdo la del mechero y la del cliente) y lo que se corre en x por cada fila hacia fuera
@@ -1724,7 +1767,7 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 			# 0.56: en primera persona, tu brazo desde la esquina de abajo a la derecha y la alcachofa (0, 25) encima de la tierra
 			var e: float = _mv(70, 0, t / 300.0) if t < 1000 else _mv(0, 70, (t - 1000) / 200.0)
 			var x: float = 58 + e
-			var y: float = 10 + e + (sin((t - 300) / 140.0) if t > 300 and t < 1000 else 0.0)
+			var y: float = 18 + e + (sin((t - 300) / 140.0) if t > 300 and t < 1000 else 0.0)
 			if t > 320 and t < 1000:   # el chorro de la alcachofa (x, y + 27) a la tierra de la maceta (fila 64)
 				for d in 12:
 					var f: float = fmod((t - 320) / 260.0 + d / 12.0, 1.0)
@@ -1738,20 +1781,20 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 					_gsp(R, "gs-bicho", [46, 60, 42][i], [26, 38, 46][i])
 			var apr: bool = (t > 250 and t < 450) or (t > 600 and t < 800)
 			var e: float = _mv(70, 0, t / 220.0) if t < 1000 else _mv(0, 70, (t - 1000) / 200.0)
-			_gsm(R, "gm-spray", 72 + e, 13 + e + (1 if apr else 0))   # la boquilla en (0, 2)
+			_gsm(R, "gm-spray", 72 + e, 20 + e + (1 if apr else 0))   # la boquilla en (0, 2)
 			for p in [250.0, 600.0]:
 				var f: float = (t - p) / 500.0
 				if f > 0 and f < 1:
-					_gsp(R, "gs-bruma-%d" % mini(2, int(f * 3)), 70 - f * 24, 16 + f * 6)
+					_gsp(R, "gs-bruma-%d" % mini(2, int(f * 3)), 70 - f * 24, 23 + f * 6)
 		"abonar":   # la mano trae la botella, la inclina sobre la maceta y el chorro ámbar cae a la tierra
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gs_maceta(R, "v", false, V)
 			var e: float = _mv(70, 0, t / 250.0) if t < 1000 else _mv(0, 70, (t - 1000) / 200.0)
 			if t > 300 and t < 1000:   # del tapón (0, 15) a la tierra (fila 64)
-				var largo: int = mini(18, int((t - 300) / 20.0))
-				_gsr(R, 51, 46, 1, largo, "#d89a3a")
-				_gsr(R, 52, 47, 1, maxi(0, largo - 2), "#a86a1a")
-			_gsm(R, "gm-abono", 51 + e, 21 + e)   # el tapón en (1, 25)
+				var largo: int = mini(12, int((t - 300) / 20.0))
+				_gsr(R, 51, 52, 1, largo, "#d89a3a")
+				_gsr(R, 52, 53, 1, maxi(0, largo - 2), "#a86a1a")
+			_gsm(R, "gm-abono", 51 + e, 27 + e)   # el tapón en (1, 25)
 		"plantar":   # la plántula baja a la maceta, la mano aprieta la tierra; 1.57.2: dentro de la maceta, delante del canto de atrás
 			_gsp(R, "gs-f-carpa", 0, 0)
 			_gs_mac(R, "gs-maceta", false)
@@ -1819,9 +1862,9 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 			for i in 10:
 				var ti: float = 150 + i * 90
 				if t > ti:
-					_gsr(R, 48 + (i * 7) % 16, minf(60, 18 + (t - ti) * .03 + (i % 3)), 1, 1, "#f0d040" if i % 2 else "#e0b020")
+					_gsr(R, 48 + (i * 7) % 16, minf(60, 28 + (t - ti) * .03 + (i % 3)), 1, 1, "#f0d040" if i % 2 else "#e0b020")
 			var ex: float = minf(1.0, t / 200.0)   # entra desde la esquina y luego da vueltas; la punta en (0, 14)
-			_gsm(R, "gm-pincel", 56 + (1 - ex) * 70 + cos(t / 150.0) * 8 * ex, 2 + (1 - ex) * 70 + sin(t / 150.0) * 3 * ex)
+			_gsm(R, "gm-pincel", 56 + (1 - ex) * 70 + cos(t / 150.0) * 8 * ex, 12 + (1 - ex) * 70 + sin(t / 150.0) * 3 * ex)
 		"fumar":
 			_gesto_fumar(R, c, t, bool(V.get("tab", false)))
 		"vender":   # la mano del cliente (enfrente, desde arriba a la izquierda) con el billete y la tuya (desde abajo a la derecha) con
