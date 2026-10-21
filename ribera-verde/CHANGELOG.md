@@ -230,6 +230,10 @@
 
 - **Las puertas, dibujadas como los gestos** (lo pidió el usuario: «los fondos del candado y de las cerraduras… se nota que no se ha creado con lo mismo»): `acc-f-<cerradura>` a mano en `gestos.py` (104 × 84, celda `acc_fondo`, con el contorno, la luz arriba a la izquierda y 3-4 tonos por material: el portal de tablas con el escudo de latón, el local de aluminio con el cristal, el club lacado con la roseta, el franco blindado, la persiana de la nave y la chapa del bajo con su pasador); el candado, con contorno. `tests/acceso.gd` 109/0.
 
+### Teclado y ratón en el ordenador · plugin de WordPress 1.5.6
+- Lo pidió el usuario: «el juego con los controles conectados al AWSD y el botón A y B, que sea el clic izquierdo y derecho». W A S D ya eran las flechas; ahora el clic izquierdo que no cae en un mando, un menú ni el diálogo es A y el derecho es B en cualquier sitio, también encima de un menú (`RATON`, `_raton` en `ui.gd`); el ratón que Godot imita con un dedo no aprieta nada. En la página del plugin, el clic derecho ya no abre el menú del navegador (`oncontextmenu` en el canvas). Prueba `tests/raton.gd` (7; 3 fallos antes).
+- `descargas/landrace-hunters-1.5.6.zip` (28 MB, `node tools/wordpress.js`), con el Godot 0.57.0 y lo de arriba; probado en Chromium: el clic izquierdo pasa el aviso, S y W mueven la opción y el derecho cierra el menú.
+
 ### APK de las muñecas y las puertas · Godot 0.57.0 (código 76)
 - Lo pidió el usuario: «pásame el APK cuando esté». Batería entera 66/66 en verde antes de compilar.
 - `descargas/LandraceHunters.apk` (88 MB, `apk-instalar.py` + `zipalign -P 16` + `apksigner`, la misma firma y el mismo paquete que la 0.56.0); AAB firmado de 81 MB, targetSdk 36, 16 KB en las 4 `.so`.

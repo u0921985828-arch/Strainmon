@@ -719,6 +719,16 @@ const TECLAS := {KEY_UP: "up", KEY_DOWN: "down", KEY_LEFT: "left", KEY_RIGHT: "r
 	KEY_Z: "A", KEY_SPACE: "A", KEY_ENTER: "A", KEY_KP_ENTER: "A", KEY_J: "A", KEY_X: "B", KEY_ESCAPE: "B", KEY_BACKSPACE: "B", KEY_K: "B", KEY_SHIFT: "B",
 	KEY_M: "START", KEY_TAB: "START", KEY_P: "MOVIL"}   # i18n-no
 const DIRS := ["up", "down", "left", "right"]
+# en el ordenador (lo pidió el usuario: «los botones A y B, el clic izquierdo y el derecho»): el izquierdo que no cae en un mando,
+# un menú ni el diálogo (esos lo atienden antes) es A; el derecho es B en cualquier sitio (_input, antes que los menús); el ratón
+# que Godot imita con un dedo, no
+const RATON := {MOUSE_BUTTON_LEFT: "A", MOUSE_BUTTON_RIGHT: "B"}
+func _raton(e: InputEventMouseButton) -> void:
+	var b: String = RATON[e.button_index]
+	get_viewport().set_input_as_handled()
+	set_held(b, e.pressed)
+	if e.pressed:
+		press(b)
 
 func set_held(b: String, v: bool) -> void:
 	if held.has(b):
@@ -758,6 +768,9 @@ func _unhandled_input(e: InputEvent) -> void:
 	if e is InputEventJoypadButton or e is InputEventJoypadMotion:
 		_joy(e)
 		return
+	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT and e.device != InputEvent.DEVICE_ID_EMULATION:
+		_raton(e)
+		return
 	if not (e is InputEventKey) or not TECLAS.has(e.keycode):
 		return
 	if (name_box.visible and name_in.has_focus()) or (import_box.visible and import_te.has_focus()):
@@ -784,6 +797,9 @@ func _input(e: InputEvent) -> void:
 	if (name_box.visible or import_box.visible) and e is InputEventKey and e.pressed and not e.echo and e.keycode == KEY_ESCAPE:   # Esc = B en la caja de texto
 		get_viewport().set_input_as_handled()
 		press("B")
+		return
+	if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_RIGHT and e.device != InputEvent.DEVICE_ID_EMULATION:
+		_raton(e)
 		return
 	var dedo = null
 	if e is InputEventScreenTouch:
