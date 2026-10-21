@@ -58,14 +58,12 @@ func montar_carreteras(mapa: String) -> void:
 			m.exits[k] = {"to": String(q[2]), "x": int(q[3]), "y": int(q[4]), "dir": "right" if int(q[3]) <= 1 else "left", "lado": String(q[5])}
 		elif m.exits.has(k) and String(m.exits[k].to) == String(q[2]):
 			m.exits.erase(k)
-	if mapa == "errotabarri" and abiertas.has("15,0"):   # la salida del norte pasa por la fila 1
-		abiertas["15,1"] = true
-	for c in C.abre.get(mapa, []):
+	for c in C.abre.get(mapa, []):   # [x, y, la salida que la abre]: la del norte de Errotabarri pasa por la fila 1
 		var x := int(c[0])
 		var y := int(c[1])
 		var k := "%d,%d" % [x, y]
 		var ko := mapa + "|" + k
-		if abiertas.has(k):
+		if abiertas.has("%d,%d" % [int(c[2]), int(c[3])]):
 			if not CARR_ORIG.has(ko):
 				CARR_ORIG[ko] = [m.g[y][x], m.o[y][x]]
 			var dx := 1 if x == 0 else (-1 if x == int(m.w) - 1 else 0)

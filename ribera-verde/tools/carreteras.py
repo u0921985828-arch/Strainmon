@@ -26,8 +26,9 @@ RUTAS = [
 	["acantilado", "Pista de los acantilados", ("valdehierro", [(0, 9), (0, 10)], "left"), ("puerto", [(0, 10), (0, 11)], "left"), "acantilado"],
 	["ribera", "Carretera de la ribera", ("ibarbide", [(38, 29)], "down"), ("errotabarri", [(35, 11), (35, 12)], "right"), "ribera"],
 ]
-# casillas de más que se abren hacia dentro (la salida del norte de Errotabarri pasa por la fila 1)
-ABRE_MAS = {"errotabarri": [(15, 1)]}
+# casillas de más que se abren hacia dentro (la salida del norte de Errotabarri pasa por la fila 1; la de Puerto Viejo, por (38, 13),
+# que antes del muelle es monte)
+ABRE_MAS = {"errotabarri": [((15, 1), (15, 0))], "puerto": [((38, 13), (39, 13))]}   # (casilla, la salida que la abre)
 DV = {"left": (-1, 0), "right": (1, 0), "up": (0, -1), "down": (0, 1)}
 OPUESTO = {"left": "right", "right": "left", "up": "down", "down": "up"}
 
@@ -38,13 +39,55 @@ def h(x, y, s):
 	return (v & 0xffff) / 65535.0
 
 
+# las curvas (lo pidió el usuario: «molaría que los caminos no siempre sean rectos»): [columna, ±1] — la calzada baja (+1) o sube
+# (−1) una fila en las columnas x y x + 1; los extremos siguen en las filas 6 y 7 (las salidas). Va en piezas de 2 × 3 casillas
+# «cv<R|O|P>-<d|u>-<columna><fila>» (asfalto, roto o pista) que pinta.gd dibuja en curva.
+CURVAS = {
+	"costa": [(6, 1), (12, 1), (21, -1), (27, -1), (31, -1), (35, 1)],
+	"valle": [(5, -1), (10, -1), (18, 1), (23, 1), (29, 1), (34, -1)],
+	"monte": [(4, 1), (9, 1), (15, -1), (19, -1), (23, -1), (27, -1), (31, 1), (35, 1)],
+	"general": [],
+	"molino": [(6, -1), (11, -1), (17, 1), (24, 1), (30, 1), (34, -1)],
+	"acantilado": [(5, 1), (12, 1), (19, -1), (23, -1), (28, -1), (33, 1)],
+	"ribera": [(5, -1), (11, -1), (20, 1), (26, 1), (31, 1), (35, -1)],
+}
+
+
+def calzada_de(paisaje):
+	"""Por columna, las filas de la calzada y, en las curvas, la pieza: {x: (filas, pieza o None)}."""
+	pasos = dict(CURVAS[paisaje])
+	top = RY
+	col = {}
+	x = 0
+	while x < W:
+		if x in pasos:
+			d = pasos[x]
+			arriba = top if d > 0 else top - 1
+			for c in (0, 1):
+				col[x + c] = (list(range(arriba, arriba + 3)), (d, c, arriba))
+			top += d
+			x += 2
+			continue
+		col[x] = ([top, top + 1], None)
+		x += 1
+	assert top == RY, paisaje
+	return col
+
+
 def mapa(k, nombre, paisaje, musica):
 	g = [["grass"] * W for _ in range(H)]
 	o = [[None] * W for _ in range(H)]
-	calzada = {"costa": ("roadT", "roadB"), "valle": ("rotoT", "rotoB"), "monte": ("roadT", "roadB"), "general": ("roadT", "roadB"),
-		"molino": ("pista", "pista"), "acantilado": ("pista", "pista"), "ribera": ("roadT", "roadB")}[paisaje]
+	tipo = {"costa": ("roadT", "roadB", "R"), "valle": ("rotoT", "rotoB", "O"), "monte": ("roadT", "roadB", "R"), "general": ("roadT", "roadB", "R"),
+		"molino": ("pista", "pista", "P"), "acantilado": ("pista", "pista", "P"), "ribera": ("roadT", "roadB", "R")}[paisaje]
+	col = calzada_de(paisaje)
 	for x in range(W):
-		g[RY][x], g[RY + 1][x] = calzada
+		filas, pieza = col[x]
+		if pieza is None:
+			g[filas[0]][x], g[filas[1]][x] = tipo[0], tipo[1]
+		else:
+			d, c, arriba = pieza
+			for r, y in enumerate(filas):
+				g[y][x] = "cv%s-%s-%d%d" % (tipo[2], "d" if d > 0 else "u", c, r)
 	# el borde: monte, salvo los dos extremos de la calzada
 	for x in range(W):
 		for y in (0, H - 1):
@@ -57,11 +100,13 @@ def mapa(k, nombre, paisaje, musica):
 	agua = {"costa": range(0, 3), "acantilado": range(0, 2), "ribera": range(10, 12)}.get(paisaje, range(0))
 	for y in agua:
 		for x in range(W):
+			assert g[y][x] == "grass", (paisaje, x, y)
 			g[y][x] = "water"
 			o[y][x] = None
 	if paisaje == "costa":   # la arena junto al mar
 		for x in range(1, W - 1):
-			g[3][x] = "dirt"
+			if g[3][x] == "grass":
+				g[3][x] = "dirt"
 	if paisaje == "ribera":   # el puente viejo sobre el río, a un lado
 		for y in (10, 11):
 			g[y][24] = "bridgeT" if y == 10 else "bridgeB"
@@ -69,7 +114,7 @@ def mapa(k, nombre, paisaje, musica):
 		for x in range(1, W - 1):
 			g[RY - 1][x] = "walk"
 			g[RY + 2][x] = "walk"
-	# lo de los lados: nunca en la calzada ni en la fila de al lado (no corta el paso)
+	# lo de los lados: nunca en la calzada ni a 2 filas de ella (no corta el paso)
 	cosas = {"costa": ["bench", "lamp", "bush", "fence"], "valle": ["crate", "fence", "tree2", "bush"], "monte": ["tree", "tree2", "manzano", "bush"],
 		"general": ["lamp", "seto", "tree", "bench"], "molino": ["manzano", "fence", "tree", "bush"], "acantilado": ["tree2", "bush", "fence", "tree"],
 		"ribera": ["tree", "tree2", "bush", "bench"]}[paisaje]
@@ -77,14 +122,15 @@ def mapa(k, nombre, paisaje, musica):
 	sid = sum(ord(c) for c in k)
 	for y in range(1, H - 1):
 		for x in range(2, W - 2):
-			if abs(y - RY - 0.5) < 2.6 or g[y][x] != "grass":
+			cerca = [r for c in (x - 1, x, x + 1) for r in col[c][0]]
+			if min(abs(y - r) for r in cerca) <= 2 or g[y][x] != "grass":
 				continue
 			r = h(x, y, sid)
 			if paisaje == "general" and y in (RY - 2, RY + 3) and x % 6 == 3:
 				o[y][x] = "lamp"
 			elif r < 0.12:
 				c = cosas[int(h(y, x, sid + 1) * len(cosas)) % len(cosas)]
-				if c in ("tree", "tree2", "manzano") and y > 4:   # la copa (6 filas) no tapa la calzada ni la acera: árboles solo arriba
+				if c in ("tree", "tree2", "manzano") and y > min(cerca) - 2:   # la copa (6 filas) no tapa la calzada: árboles solo por encima
 					c = "bush"
 				o[y][x] = c
 			elif r < 0.2:
@@ -119,11 +165,11 @@ def main():
 	abre = {}
 	for pueblo, ps in puertas.items():
 		for q in ps:
-			abre.setdefault(pueblo, []).append([q[0], q[1]])
+			abre.setdefault(pueblo, []).append([q[0], q[1], q[0], q[1]])
 	for pueblo, cs in ABRE_MAS.items():
-		for c in cs:
-			abre.setdefault(pueblo, []).append(list(c))
-	D["CARRETERAS"] = {"_": "La red de carreteras que se andan (con Datos.CAL; tools/carreteras.py): rutas por mapa y, por pueblo, las salidas [x, y, carretera, llegada x, llegada y, lado] y las casillas del borde que se abren [x, y].",
+		for c, s in cs:
+			abre.setdefault(pueblo, []).append([c[0], c[1], s[0], s[1]])
+	D["CARRETERAS"] = {"_": "La red de carreteras que se andan (con Datos.CAL; tools/carreteras.py): rutas por mapa y, por pueblo, las salidas [x, y, carretera, llegada x, llegada y, lado] y las casillas del borde que se abren [x, y, la salida que la abre x, y].",
 		"rutas": rutas, "puertas": puertas, "abre": abre}
 	s = json.dumps(D, ensure_ascii=False, separators=(",", ":"))
 	open(DATOS, "w", encoding="utf-8").write(s)

@@ -613,6 +613,8 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 	if k == "cristalV":   # 1.47: el suelo de cristal del reservado: debajo, la pista de GAUA (y encima, _cristalera)
 		var md: Dictionary = J.MAPS.disco
 		return _arte_tile(md.g[ty][tx] if ty < md.g.size() and tx < md.g[ty].size() else "floorD", tx, ty, sx, sy)  # i18n-no
+	if k.begins_with("cv"):
+		return _curva(k, tx, ty, sx, sy)
 	var an = Atlas.sobre.get("tile:" + k)
 	if an:
 		var a = Atlas.anim_de(an[0][0], an[0][1])
@@ -658,6 +660,15 @@ func _canto_hierba(tx: int, ty: int, sx: int, sy: int) -> void:
 	for q in [[0, -1], [0, 1], [-1, 0], [1, 0]]:
 		var nx: int = tx + q[0]
 		var ny: int = ty + q[1]
+		if nx >= 0 and ny >= 0 and nx < m.w and ny < m.h and q[0] == 0 and m.g[ny][nx].begins_with("cv"):   # la curva: solo donde llega la calzada
+			var cv: Dictionary = _cv(m.g[ny][nx])
+			for px in (0 if cv.t == "P" else 16):
+				var o := _cv_o(cv, px)
+				if q[1] == 1 and cv.r == 0 and o == 0:
+					_rect(sx + px, sy + 15, 1, 1, c1); _rect(sx + px, sy + 14, 1, 1, c2)
+				elif q[1] == -1 and cv.r == 2 and o == 16:
+					_rect(sx + px, sy, 1, 1, c1); _rect(sx + px, sy + 1, 1, 1, c2)
+			continue
 		if nx < 0 or ny < 0 or nx >= m.w or ny >= m.h or not DURO.has(m.g[ny][nx]):
 			continue
 		if q[1] == -1:
@@ -672,6 +683,56 @@ func _canto_hierba(tx: int, ty: int, sx: int, sy: int) -> void:
 # orgánico (1.10, 01b-arte.js): el mismo hash de casilla que el HTML (hashT) para que nada vaya a compás de la rejilla: qué
 # variante de un firme sale (la 0, la lisa, la que más), qué detalle lleva la hierba y dónde, y cuánto se corre (y si va en
 # espejo) cada árbol y cada monte
+# Las curvas de las carreteras (lo pidió el usuario: «molaría que los caminos no siempre sean rectos»; tools/carreteras.py): piezas
+# de 2 × 3 casillas «cv<R|O|P>-<d|u>-<columna><fila>» en las que la calzada (asfalto R, roto O o pista P) baja (d) o sube (u) una fila. Cada
+# columna de píxeles copia la de la calzada recta corrida o px (suave, en S), sobre la hierba y con el canto de la hierba.
+static func _cv(k: String) -> Dictionary:
+	var p := k.split("-")
+	return {"t": p[0].substr(2, 1), "d": p[1] == "d", "c": int(p[2].substr(0, 1)), "r": int(p[2].substr(1, 1))}
+
+static func _cv_o(cv: Dictionary, px: int) -> int:
+	var t: float = (cv.c * 16 + px + 0.5) / 32.0
+	var o := roundi(16.0 * t * t * (3.0 - 2.0 * t))
+	return o if cv.d else 16 - o
+
+func _curva(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
+	var cv := _cv(k)
+	var mo: bool = Datos.CAL and cv.t == "R"
+	var fg = Atlas.frame_de("exterior-mosaico", "mo-grass", "unica", 0, {"i": 0}) if Datos.CAL else null
+	if fg:
+		Atlas.dibuja(L, fg.c, Rect2(sx, sy, 16, 16), Rect2(((tx & 3) + 4 * (ty & 3)) * 16, 0, 16, 16))
+	else:
+		var fh = Atlas.frame_de(Atlas.cubre("tile:grass"), "grass", "unica", 0, {"i": 0})
+		if fh == null:
+			return false
+		Atlas.dibuja(L, fh.c, Rect2(sx, sy, 16, 16))
+	var nom: Array = {"R": ["roadT", "roadB"], "O": ["rotoT", "rotoB"], "P": ["pista", "pista"]}[cv.t]
+	var fr := []
+	for n in nom:
+		fr.append(Atlas.frame_de("exterior-mosaico", "mo-" + n, "unica", 0, {"i": 0}) if mo else Atlas.frame_de(Atlas.cubre("tile:" + n), n, "unica", 0, {"i": 0}))
+	if fr[0] == null or fr[1] == null:
+		return false
+	var arriba: int = ty - cv.r
+	var tyr: int = arriba + (0 if cv.d == (cv.c == 0) else 1)   # la fila de arriba de la calzada recta de ese lado
+	var c1 := Color8(0x5a, 0xa0, 0x4e)
+	var c2 := Color8(0x72, 0xbc, 0x5e)
+	var y0: int = cv.r * 16
+	var mg: int = 2 if cv.t == "P" else 0   # la pista, 2 px más estrecha por cada lado: lo que se come su orilla en la recta
+	for px in 16:
+		var o := _cv_o(cv, px)
+		for i in 2:
+			var a: int = maxi(maxi(o + i * 16, y0), o + mg)
+			var b: int = mini(mini(o + i * 16 + 16, y0 + 16), o + 32 - mg)
+			if a >= b:
+				continue
+			var ys: int = tyr + i
+			var x0: int = ((tx & 3) + 4 * (ys & 3)) * 16 if mo else (variante(nom[i], tx, ys) * 16 if fr[i].c.get_width() > 16 else 0)
+			Atlas.dibuja(L, fr[i].c, Rect2(sx + px, sy + a - y0, 1, b - a), Rect2(x0 + px, a - o - i * 16, 1, b - a))
+		for q in ([] if cv.t == "P" else [[o - 1, c1], [o - 2, c2], [o + 32, c1], [o + 33, c2]]):   # la pista, sin canto (como su orilla)
+			if q[0] >= y0 and q[0] < y0 + 16:
+				_rect(sx + px, sy + q[0] - y0, 1, 1, q[1])
+	return true
+
 static func hash_t(x: int, y: int) -> int:
 	var a := (x * 1103 + y * 2459 + x * y * 31) % 9973
 	return (a * a + x * 7 + y * 3) % 9973

@@ -98,6 +98,21 @@ func _corre() -> void:
 		chk(int(R.ch) == max(int(D.PARADAS[R.a].cap), int(D.PARADAS[R.b].cap)), "%s: se abre con los dos autobuses (cap. %d)" % [id, int(R.ch)])
 		J.enter_map(id, 1, 6, "right")
 		chk(llega(m, Vector2i(1, 6), Vector2i(int(m.w) - 2, 7)), "%s: se anda de punta a punta" % id)
+		var filas := {}   # lo pidió el usuario: «molaría que los caminos no siempre sean rectos»
+		var curvas := 0
+		for x in int(m.w):
+			var top := -1
+			for y in int(m.h):
+				var t: String = m.g[y][x]
+				if t.begins_with("cv"):
+					curvas += 1
+					chk(not J.tile_solid(m, x, y), "%s (%d, %d): la curva se pisa" % [id, x, y])
+				elif top < 0 and t in ["roadT", "rotoT", "pista"]:
+					top = y
+			if top >= 0:
+				filas[top] = true
+		chk(id == "carr-general" or filas.size() >= 3, "%s: no es recta (filas %s)" % [id, filas.keys()])
+		chk(curvas > 0 or id == "carr-general", "%s: la calzada en curva por piezas, también la pista (%d)" % [id, curvas])
 	var pueblos := ["town", "puerto", "valdehierro", "mendialde", "errotabarri", "ibarbide"]
 	var con := {}
 	for p in pares.keys() + [[D.CAMPO.puertas.keys()[0], D.CAMPO.puertas.keys()[1]]]:
@@ -106,6 +121,9 @@ func _corre() -> void:
 	chk(pueblos.all(func(p): return con.get(p, 0) >= 2), "cada pueblo con dos caminos o más, con la comarcal (%s)" % [con])
 	# 2 · en cada pueblo, la salida abierta, que se pisa y se llega a ella desde la parada del autobús
 	for p in C.puertas:
+		S.ch = 0   # el capítulo justo en que se abren (antes del muelle, que abre el borde de Puerto Viejo por su cuenta)
+		for q in C.puertas[p]:
+			S.ch = maxi(S.ch, int(C.rutas[q[2]].ch))
 		J.enter_map(p, int(D.PARADAS[p].a[0]), int(D.PARADAS[p].a[1]), "down")
 		var m: Dictionary = J.MAPS[p]
 		for q in C.puertas[p]:
