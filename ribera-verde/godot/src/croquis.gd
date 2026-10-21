@@ -60,13 +60,14 @@ static var PUEBLOS := {
 	"mendialde": {"p": [122, 94], "d": I18n.K("Mendialde, el pueblo del monte: el caserío donde empezó todo.")},
 	"errotabarri": {"p": [194, 84], "d": I18n.K("Errotabarri, la aldea del molino viejo, al final de la pista.")},
 }
-# los caminos entre pueblos (con Datos.CAL; lo pidió el usuario: «en el mapa se deberían de ver los caminos que conectan los
-# pueblos… hay mapas que conectan ciertos pueblos, eso se tiene que ver reflejado»): solo los de verdad del juego, [de, a, curva,
-# tipo, mapa]. Las carreteras del autobús desde Ribera Verde (PARADAS, con sus minutos encima) y la carretera comarcal, el mapa
-# `comarcal` que se anda de Mendialde a Errotabarri (CAMPO, desde CAMPO.ch), con el caserío abandonado (`refugio`) a un lado;
-# la autopista a Hiriburu (METRO) sale por el borde desde Ibarbide cuando se abre. Lo que aún no se abre, en gris.
-const CAMINOS := [["town", "puerto", 7, "c", ""], ["town", "ibarbide", -6, "c", ""], ["town", "valdehierro", 6, "c", ""], ["town", "mendialde", -12, "c", ""],
-	["town", "errotabarri", 10, "c", ""], ["mendialde", "errotabarri", -6, "m", "comarcal"]]
+# los caminos entre pueblos (con Datos.CAL; lo pidió el usuario: «hay mapas que conectan ciertos pueblos, eso se tiene que ver
+# reflejado en el mapa» y «no hay más caminos entre los demás pueblos? Habría que crearlos»): cada uno, un mapa que se anda,
+# [de, a, curva, tipo, mapa]: las carreteras (tipo c) y las pistas de tierra (p) de CARRETERAS (tools/carreteras.py), con los
+# minutos del autobús encima de las que salen de Ribera Verde, y la comarcal (CAMPO), con su nombre y el caserío abandonado
+# (`refugio`) a un lado. La autopista a Hiriburu (METRO) sale por el borde desde Ibarbide cuando se abre. Lo cerrado, en gris.
+const CAMINOS := [["town", "puerto", 7, "c", "carr-costa"], ["town", "ibarbide", -6, "c", "carr-general"], ["town", "valdehierro", 6, "c", "carr-valle"],
+	["town", "mendialde", -12, "c", "carr-monte"], ["town", "errotabarri", 10, "p", "carr-molino"], ["mendialde", "errotabarri", -6, "m", "comarcal"],
+	["puerto", "valdehierro", -6, "p", "carr-acantilado"], ["ibarbide", "errotabarri", 7, "c", "carr-ribera"]]
 const C_BORDE := Color8(92, 78, 62)
 const C_CENTRO := Color8(244, 236, 210)
 const C_PUENTE := Color8(70, 56, 44)
@@ -90,7 +91,7 @@ static func camino_pts(c: Array) -> Array:
 
 static func _camino(im: Image, c: Array, ok := true) -> void:
 	var pts := camino_pts(c)
-	_carretera(im, pts, ok, C_COMARCAL if c[3] == "m" else C_CENTRO)
+	_carretera(im, pts, ok, C_COMARCAL if c[3] == "m" else (C_PISTA if c[3] == "p" else C_CENTRO))
 
 static func _carretera(im: Image, pts: Array, ok: bool, centro: Color) -> void:
 	for q in pts:   # el borde (3 × 3) y luego el centro
@@ -122,6 +123,8 @@ static func refugio_p() -> Vector2i:
 static func camino_ok(D: Dictionary, ch: int, c: Array) -> bool:
 	if c[4] == "comarcal":
 		return D.has("CAMPO") and ch >= int(D.CAMPO.ch)
+	if D.has("CARRETERAS") and D.CARRETERAS.rutas.has(c[4]):
+		return ch >= int(D.CARRETERAS.rutas[c[4]].ch)
 	return abierto(D, ch, c[1])
 
 const ORDEN := ["puerto", "town", "ibarbide", "errotabarri", "mendialde", "valdehierro"]
@@ -132,7 +135,9 @@ const ZONA := {"town": "town", "alto": "town", "astilleros": "town", "home": "to
 	"club-ibar": "ibarbide", "club-ens": "ibarbide", "disco": "ibarbide", "setas": "ibarbide",
 	"disco-vip": "ibarbide", "est-rv": "town", "est-puerto": "puerto", "est-valde": "valdehierro", "est-mendi": "mendialde", "est-erro": "errotabarri", "est-ibar": "ibarbide",   # 1.47
 	"pasillo": "town", "sotano": "town", "cuarto-t": "valdehierro", "nave-d": "valdehierro", "nave-h": "valdehierro", "muelle": "puerto", "franco": "puerto",   # 1.51
-	"metropoli": "metropoli", "vip-zen": "metropoli", "vip-ila": "metropoli"}   # MAESTRO [9]: la ciudad no sale en el croquis (la chincheta, en Ibarbide)
+	"metropoli": "metropoli", "vip-zen": "metropoli", "vip-ila": "metropoli",
+	"comarcal": "mendialde", "refugio": "mendialde", "carr-costa": "puerto", "carr-valle": "valdehierro", "carr-monte": "mendialde",   # las carreteras: el pueblo más cerca
+	"carr-general": "ibarbide", "carr-molino": "errotabarri", "carr-acantilado": "puerto", "carr-ribera": "errotabarri"}   # MAESTRO [9]: la ciudad no sale en el croquis (la chincheta, en Ibarbide)
 
 static func pueblo_de(mapa: String) -> String:
 	return ZONA.get(mapa, "town")
@@ -269,6 +274,8 @@ static func imagen(D: Dictionary, ch: int, metro := false) -> Image:
 				_caja(im, r.x, r.y, 4, 3, Color8(120, 100, 84) if ok else C_GRIS)
 				_px(im, r.x + 1, r.y + 1, Color8(40, 30, 24))
 				_px(im, r.x + 3, r.y - 1, Color8(96, 80, 60) if ok else C_GRIS)
+				continue
+			if c[0] != "town":   # las que no salen de Ribera Verde, sin autobús encima
 				continue
 			var t := "%d'" % int(D.PARADAS[c[1]].min)
 			var dv: Vector2 = pts[-1] - pts[0]

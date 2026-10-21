@@ -402,7 +402,7 @@ func _tiempo(now: float) -> void:
 # al aire libre: las zonas de la calle y, con CAL (MAESTRO [4]), el muelle de Puerto Viejo, que ya no está siempre a pleno sol:
 # el atardecer, el tiempo, la noche y sus farolas como en la calle
 func _al_raso() -> bool:
-	return J.D.ZONAS.has(J.S.map) or (Datos.CAL and J.S.map in ["muelle", "comarcal"])
+	return J.D.ZONAS.has(J.S.map) or (Datos.CAL and (J.S.map in ["muelle", "comarcal"] or J.S.map.begins_with("carr-")))
 
 func _farolas_mapa() -> Array:   # las farolas de un mapa sin LAMPS: las «lamp» que tenga
 	var o := []

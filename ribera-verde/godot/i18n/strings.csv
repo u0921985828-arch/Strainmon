@@ -146,6 +146,7 @@ sbd1f9630,sinVer,
 s4df66c9c,PUERTAS_INT,
 sdc9578fe,almC,
 sde43f51a,CAMPO,CAMPO
+sb65311bb,CARRETERAS,
 s7e63f8d8,Un camastro con una manta de lana. Aquí no te busca nadie.,A cot with a wool blanket. Nobody looks for you here.
 s661dd807,Una mesa de castaño con un candil. Alguien dejó un mapa de la comarca con los claros marcados en lápiz.,A chestnut table with an oil lamp. Someone left a map of the county with the clearings marked in pencil.
 s1178d002,"Por la ventana, la carretera comarcal y el monte.","Through the window, the county road and the hills."
@@ -4141,6 +4142,13 @@ s9de53392,Caserío abandonado,Abandoned farmhouse
 sadcfbd05,Hiriburu,Hiriburu
 s0c2032d1,Club Zenit,Club Zenit
 sb619fb10,Club Ilargi,Club Ilargi
+s1b330732,Carretera de la costa,Coast road
+sc13ab548,Carretera del valle,Valley road
+sb74a28df,Carretera del monte,Mountain road
+s862791dd,La general,The main road
+s44d7374a,Carretera del molino,Mill road
+sf544e072,Pista de los acantilados,Cliff track
+sf31f4075,Carretera de la ribera,Riverside road
 s30a02292,ESTUDIANTE,STUDENT
 sf07acb89,Hola. Me ha dicho un amigo que tienes.,Hi. A friend said you've got some.
 s42927016,"Aupa, ¿tienes algo? Voy justo de dinero.","Hey, got anything? I'm a bit short on cash."
@@ -5799,6 +5807,7 @@ s2cb6aa77,Generador diésel insonorizado,Silent diesel generator
 s55379088,"Cubre hasta 5 kW por encima de lo contratado, sin ruido: lo que pasa de la potencia no lo ve la compañía. Gasta gasóleo cada día que trabaja (en efectivo).","Covers up to 5 kW over the contract, silently: the power company never sees the excess. Burns diesel every day it runs (paid in cash)."
 s6bcc8de0,Placas solares,Solar panels
 s8784f2d5,"2,5 kW de placas con baterías: lo que pasa de la potencia contratada, hasta ahí, sale del tejado y no de la red. Sin gasto.","2.5 kW of panels with batteries: up to that, anything over the contracted power comes from the roof, not the grid. No running cost."
+s4979bd31,"La red de carreteras que se andan (con Datos.CAL; tools/carreteras.py): rutas por mapa y, por pueblo, las salidas [x, y, carretera, llegada x, llegada y, lado] y las casillas del borde que se abren [x, y].",
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.

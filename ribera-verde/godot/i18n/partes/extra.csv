@@ -630,3 +630,11 @@ Encargo: {g} g del {t} % para arriba antes del {d}. Paga {e}.,"Order: {g} g, {t}
 Un pastor de Mendialde busca 5 g de algo fuerte (18 % de THC o más) para dormir en la borda.,A Mendialde shepherd wants 5 g of something strong (18 % THC or more) to sleep in his hut.
 "5 gramos de algo fuerte, de lo que tumba.","5 grams of something strong, the kind that knocks you out."
 ¿Seguro que le vendes {x} por {e}? Lo vendido no se recupera.,Sure you want to sell him {x} for {e}? Once sold, it's gone.
+
+Carretera de la costa,Coast road
+Carretera del valle,Valley road
+Carretera del monte,Mountain road
+La general,The main road
+Carretera del molino,Mill road
+Pista de los acantilados,Cliff track
+Carretera de la ribera,Riverside road

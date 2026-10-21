@@ -120,7 +120,7 @@ func _corre() -> void:
 		chk(not Croquis.es_mar(q[0], q[1]), k + " en tierra")
 	# 5b · los caminos (lo pidió el usuario: «en el mapa se deberían de ver los caminos que conectan los pueblos»): desde Ribera
 	# Verde, por los píxeles de camino, se llega a todos los pueblos
-	var CAM := [Croquis.C_BORDE, Croquis.C_CENTRO, Croquis.C_PUENTE, Croquis.C_COMARCAL]
+	var CAM := [Croquis.C_BORDE, Croquis.C_CENTRO, Croquis.C_PUENTE, Croquis.C_COMARCAL, Croquis.C_PISTA]
 	var PASA := CAM + [Color8(226, 212, 172), Color8(40, 30, 24), Color8(120, 114, 104), Color8(122, 58, 40), Color8(160, 150, 130), Color8(150, 64, 48), Color8(96, 40, 32)]   # y por debajo de los rótulos y por las casas (los caminos se juntan en el pueblo)
 	var ini: Vector2 = Croquis.camino_pts(Croquis.CAMINOS[0])[12]
 	var vis := {Vector2i(ini): true}
@@ -159,8 +159,10 @@ func _corre() -> void:
 	chk(im1.get_pixel(int(round(q1.x)), int(round(q1.y))) == Croquis.C_GRIS_C, "antes del capítulo %d, la comarcal en gris" % int(J.D.CAMPO.ch))
 	var rf := Croquis.refugio_p()
 	chk(im8.get_pixel(rf.x, rf.y) == Color8(120, 100, 84), "el caserío abandonado, junto a la comarcal")
-	for par in [["puerto", "valdehierro"], ["ibarbide", "errotabarri"], ["valdehierro", "mendialde"]]:
-		chk(not Croquis.CAMINOS.any(func(c): return par.has(c[0]) and par.has(c[1])), "sin camino inventado %s – %s" % par)
+	for c in Croquis.CAMINOS:   # cada camino, un mapa que se anda entre esos dos pueblos (ninguno inventado)
+		var R = J.D.CARRETERAS.rutas.get(c[4])
+		chk(J.MAPS.has(c[4]) and (c[4] == "comarcal" or (R != null and [R.a, R.b].has(c[0]) and [R.a, R.b].has(c[1]))), "%s – %s: el mapa %s" % [c[0], c[1], c[4]])
+	chk(J.D.CARRETERAS.rutas.keys().all(func(r): return Croquis.CAMINOS.any(func(c): return c[4] == r)), "todas las carreteras, en el croquis")
 	var im8m := Croquis.imagen(J.D, 8, true)
 	var fin: Array = Croquis.AUTOPISTA[-1]
 	chk(im8m.get_pixel(fin[0], fin[1]) == Croquis.C_CENTRO and im8.get_pixel(fin[0], fin[1]) != Croquis.C_CENTRO, "la autopista a Hiriburu, solo con la ciudad abierta")
@@ -169,8 +171,6 @@ func _corre() -> void:
 			var g: Image = ec[1].duplicate()
 			g.resize(Croquis.MW * 4, Croquis.MH * 4, Image.INTERPOLATE_NEAREST)
 			g.save_png(arg("--croquis").path_join("croquis-%s.png" % ec[0]))
-	for c in Croquis.CAMINOS:
-		chk(c[4] != "" or J.D.PARADAS.has(c[1]), "%s – %s: una línea del autobús" % [c[0], c[1]])
 	var MV := {"i": 0}
 	for i in Croquis.ORDEN.size():
 		var r3: Array = Croquis.rects_mapa(J.SW, MV, "town")
