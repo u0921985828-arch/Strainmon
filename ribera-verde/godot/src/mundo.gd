@@ -2713,6 +2713,15 @@ func carta(bb: String) -> Array:
 func arma_rival() -> void:
 	pass
 
+func mod_comb() -> Dictionary:
+	return {"acc": 0.0, "esq": 0.0, "huir": 0.0, "recibe": 1.0}
+
+func facil_combate() -> void:
+	pass
+
+func aviso_colocon() -> void:
+	pass
+
 func aturdido() -> bool:
 	return false
 

@@ -3448,6 +3448,9 @@ s0fbea56b,«¿No traes {g} g del {t} % para arriba? Entonces nada.»,“No {g} g
 sb0c83104,¿Qué le llevas?,What do you bring them?
 sc64eb865,"Viene en diez minutos, mira el material y te paga {e}. «Ya me dijeron que eras de fiar.»","They come in ten minutes, check the stuff and pay you {e}. “They told me you could be trusted.”"
 s9c28aa17,COMBATE7,COMBATE7
+s9e3004b8,"Vas colocado de índica: los golpes casi no los notas, pero vas lento.","You're stoned on indica: you barely feel the hits, but you're slow."
+s925d3f54,Vas colocado de sativa: lo ves todo venir.,You're high on sativa: you see everything coming.
+s9d933803,Y vas borracho: te cuesta acertar.,And you're drunk: it's hard to land a hit.
 sea73634c," Con el bate, se nota."," With the bat, it shows."
 s172c5f58," Con la cadena, se nota."," With the chain, it shows."
 s5ff98b0f,{b} se queda aturdido.,{b} is stunned.

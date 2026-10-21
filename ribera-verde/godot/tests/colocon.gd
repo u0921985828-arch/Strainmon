@@ -96,7 +96,7 @@ func _corre() -> void:
 	J.vision_borracho()
 	chk(J.pantalla.material is ShaderMaterial and J.vision_mat.shader.code.contains("uniform float ojo") and J.vision_mat.get_shader_parameter("ojo") == 1.0, "con el filtro del ojo")
 	J.mode = "battle"
-	chk(J.ojo_k() == 0.0, "en el combate, sin ojo")
+	chk(J.ojo_k() > 0.0, "en el combate, también el ojo (lo pidió el usuario)")
 	J.mode = "world"
 	# 3 · el humo: al fumar (colocar) sale entero y se va en HUMO_MS
 	S.erase("colo")

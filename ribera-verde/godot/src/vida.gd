@@ -381,6 +381,43 @@ func arma() -> String:
 			return k
 	return ""
 
+# lo que el colocón (y la borrachera) cambia en la pelea: puntería, esquiva, huida y lo que duele (FISIO.comb)
+func mod_comb() -> Dictionary:
+	var r := {"acc": 0.0, "esq": 0.0, "huir": 0.0, "recibe": 1.0}
+	if not c7():
+		return r
+	var C: Dictionary = D.FISIO.comb
+	var l := []
+	if efecto() != "":
+		l.append(C[efecto()])
+	if borr() > float(D.FISIO.vision):
+		l.append(C.borr)
+	for m in l:
+		r.acc += float(m.acc)
+		r.esq += float(m.esq)
+		r.huir += float(m.huir)
+		r.recibe *= float(m.recibe)
+	return r
+
+# los ladrones y rivales, más llevaderos (COMBATE7.facil): menos vida y golpes más flojos
+func facil_combate() -> void:
+	if not c7():
+		return
+	var F: Dictionary = D.COMBATE7.facil
+	B.hpMax = maxi(8, int(round(B.hpMax * float(F.vida))))
+	B.hp = B.hpMax
+	B.atk = [maxi(1, int(round(B.atk[0] * float(F.atk)))), maxi(2, int(round(B.atk[1] * float(F.atk))))]
+
+func aviso_colocon() -> void:
+	if not c7():
+		return
+	if efecto() == "indica":
+		await say(K("Vas colocado de índica: los golpes casi no los notas, pero vas lento."))
+	elif efecto() == "sativa":
+		await say(K("Vas colocado de sativa: lo ves todo venir."))
+	if borr() > float(D.FISIO.vision):
+		await say(K("Y vas borracho: te cuesta acertar."))
+
 func arma_rival() -> void:
 	if not c7() or B.get("jefe"):
 		return

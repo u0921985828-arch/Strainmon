@@ -111,7 +111,7 @@ const VISION_SH := preload("res://src/vision.gdshader")
 var vision_mat: ShaderMaterial = null
 func vision_k() -> float:
 	var b := borr()
-	if mode != "world" or b <= float(D.FISIO.vision):
+	if not (mode in ["world", "battle"]) or b <= float(D.FISIO.vision):
 		return 0.0
 	return clampf((b - float(D.FISIO.vision)) / (float(D.FISIO.tope) - float(D.FISIO.vision)), 0.15, 1.0)
 
@@ -120,12 +120,12 @@ func vision_k() -> float:
 const HUMO_MS := 7000.0
 func ojo_k() -> float:
 	var c := colo()
-	if not (mode in ["world", "carpa"]) or c < float(D.FISIO.efecto):
+	if not (mode in ["world", "carpa", "battle"]) or c < float(D.FISIO.efecto):
 		return 0.0
 	return clampf((c - float(D.FISIO.efecto)) / (float(D.FISIO.tope) - float(D.FISIO.efecto)), 0.1, 1.0)
 
 func humo_k() -> float:
-	if not Datos.CAL or not (mode in ["world", "carpa"]):
+	if not Datos.CAL or not (mode in ["world", "carpa", "battle"]):
 		return 0.0
 	return clampf(1.0 - (Time.get_ticks_msec() - humo_ms) / HUMO_MS, 0.0, 1.0)
 

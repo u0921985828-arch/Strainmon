@@ -99,6 +99,7 @@ func battle(kind):
 		B.atk = [2 + (ch >> 2) + dd + rr, 4 + (ch >> 1) + dd + rr]
 		if Datos.CAL:
 			arma_rival()   # MAESTRO [7]: a veces, con navaja
+			facil_combate()
 	mode = "battle"
 	update_hud()
 	wipe_fuera()
@@ -117,6 +118,8 @@ func battle(kind):
 		b_anim("E", "alto")
 		await say(T("{n} te da el alto.", {"n": B.name}))
 		await say(pick([K("«Control rutinario. ¿Llevas algo encima?»"), K("«Documentación. Y vacía los bolsillos.»"), K("«Aquí huele a marihuana. ¿Es tuya?»")]), B.name)
+	if Datos.CAL and B.kind == "thief":
+		await aviso_colocon()
 	while not res:
 		if B.kind == "thief":
 			res = await thief_round()
@@ -177,6 +180,8 @@ func enemy_hits():
 	B.carga = 0
 	B.furia = 0
 	var dd: int = int(ceil(dmg / 2.0)) if B.get("cubre") else dmg
+	if Datos.CAL:
+		dd = maxi(1, int(round(dd * float(mod_comb().recibe))))
 	if B.get("cubre"):   # CUBRIRSE (1.16)
 		B.cubre = 0
 		await say(K("Te cubres: el golpe duele la mitad."))
@@ -237,7 +242,7 @@ func thief_round():
 		var k = B.get("contra")
 		B.guardia = 0
 		B.contra = 0
-		if g or k or Cultivo.azar() < minf(float(D.PELEA.accMax), mv.acc + int(S.pelea.ref) * float(D.PELEA.acc)):   # la fuerza suma al golpe y los reflejos, a la puntería (1.18)
+		if g or k or Cultivo.azar() < minf(float(D.PELEA.accMax), mv.acc + int(S.pelea.ref) * float(D.PELEA.acc) + float(mod_comb().acc)):   # la fuerza suma al golpe y los reflejos, a la puntería (1.18)
 			var d: int = ri(mv.d[0], mv.d[1]) + int(S.pelea.fue) + (int(D.PELEA.contra) if k else 0) + (arma_d() if Datos.CAL else 0)
 			if k:
 				await say(K("Le pillas abierto."))
@@ -303,7 +308,7 @@ func thief_round():
 			B.furia = 1
 			await say(K("«A mí no me amenaza nadie.»") if B.get("jefe") else K("«¿A mí? Ahora vas a ver.»"))
 	elif c == 3:
-		if Cultivo.azar() < minf(float(D.PELEA.huirMax), .5 + int(S.pelea.ref) * float(D.PELEA.huir)):
+		if Cultivo.azar() < minf(float(D.PELEA.huirMax), .5 + int(S.pelea.ref) * float(D.PELEA.huir) + float(mod_comb().huir)):
 			sfx("door")
 			await say(K("Consigues escapar."))
 			return "flee"
@@ -349,7 +354,7 @@ func nivel_pelea() -> int:
 	return D.PELEA.nv.filter(func(v): return x >= int(v)).size()
 
 func prob_esquiva() -> float:
-	return float(D.PELEA.esq0) + int(S.pelea.ref) * float(D.PELEA.esq)
+	return float(D.PELEA.esq0) + int(S.pelea.ref) * float(D.PELEA.esq) + float(mod_comb().esq)
 
 func prob_amenaza() -> float:
 	return clampf(float(D.PELEA.amen0) + (1 - float(B.hp) / float(B.hpMax)) * float(D.PELEA.amen) + int(S.pelea.fue) * float(D.PELEA.amenF), float(D.PELEA.amen0), float(D.PELEA.amenMax))

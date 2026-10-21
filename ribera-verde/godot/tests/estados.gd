@@ -130,7 +130,9 @@ func _corre() -> void:
 	S.borr = 80.0
 	chk(J.vision_k() > 0 and J.vision_k() < 1, "a 80, a medias: %s" % J.vision_k())
 	J.mode = "battle"
-	chk(J.vision_k() == 0.0, "fuera del mapa, sin filtro")
+	chk(J.vision_k() > 0.0, "en combate, también el filtro (lo pidió el usuario)")
+	J.mode = "carpa"
+	chk(J.vision_k() == 0.0, "en la carpa, sin filtro")
 	J.mode = "world"
 	S.borr = 0.0
 	J.vision_borracho()
