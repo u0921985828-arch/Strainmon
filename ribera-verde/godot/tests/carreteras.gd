@@ -184,6 +184,135 @@ func _corre() -> void:
 			var px: int = J.P.x
 			var py: int = J.P.y
 			chk(not J.tile_solid(J.MAPS[otro], px, py), "%s: se llega a una casilla libre (%d, %d)" % [otro, px, py])
+	# 4 · la playa y los biomas (lo pidió el usuario: «la playa molaría que no sea todo el rato recta, que haya alguna zona más entrada
+	# de la arena… más al interior será más verde todo» y «diferentes biomas… zona playa, o zona más de monte, o zona más de llano,
+	# zona más de tierra, pero poco más»)
+	var bio := {}
+	for id in C.rutas:
+		bio[id] = String(C.rutas[id].get("bioma", ""))
+	chk(bio["carr-costa"] == "playa" and bio["carr-acantilado"] == "playa" and bio["carr-monte"] == "monte" and bio["carr-molino"] == "tierra" and bio["carr-valle"] == "llano", "cada carretera, su bioma (%s)" % [bio])
+	chk(bio.values().all(func(b): return b in ["playa", "monte", "llano", "tierra"]) and ["playa", "monte", "llano", "tierra"].all(func(b): return bio.values().has(b)), "los cuatro biomas, y nada más")
+	var cuenta := func(m: Dictionary, tipos: Array, y0 := 0, y1 := 99) -> int:
+		var c := 0
+		for y in range(y0, mini(y1, int(m.h))):
+			for x in int(m.w):
+				if tipos.has(m.g[y][x]) or tipos.has(m.o[y][x]):
+					c += 1
+		return c
+	var calzada := func(m: Dictionary, x: int, y: int) -> bool:   # ¿hay calzada a una fila o menos (en esa columna o en las de al lado)?
+		for dx in [-1, 0, 1]:
+			for dy in [-1, 0, 1]:
+				var cx: int = x + dx
+				var cy: int = y + dy
+				if cx >= 0 and cy >= 0 and cx < int(m.w) and cy < int(m.h) and String(m.g[cy][cx]).substr(0, 2) in ["ro", "pi", "cv"]:
+					return true
+		return false
+	var tramos_de := func(v: Array) -> Array:   # los largos de los tramos seguidos de valores iguales
+		var o := []
+		for i in v.size():
+			if i == 0 or v[i] != v[i - 1]:
+				o.append(0)
+			o[-1] += 1
+		return o
+	for id in C.rutas:
+		var m: Dictionary = J.MAPS[id]
+		var ar: int = cuenta.call(m, ["arena"])
+		chk((ar > 0) == (bio[id] == "playa"), "%s: arena solo en la playa (%d)" % [id, ar])
+		var lejos := true
+		for y in int(m.h):
+			for x in int(m.w):
+				if m.g[y][x] == "arena" and calzada.call(m, x, y):
+					lejos = false
+		chk(lejos, "%s: la arena, a una fila de hierba de la calzada como poco" % id)
+	var mc: Dictionary = J.MAPS["carr-costa"]
+	var prof := []
+	var ancho := []
+	var debajo := true
+	for x in int(mc.w):
+		var p := 0
+		while p < int(mc.h) and mc.g[p][x] == "water":
+			p += 1
+		prof.append(p)
+		var a := 0
+		while p + a < int(mc.h) and mc.g[p + a][x] == "arena":
+			a += 1
+		ancho.append(a)
+		if a == 0:
+			debajo = false
+	var pv: Array = prof.duplicate()
+	var av: Array = ancho.duplicate()
+	pv.sort()
+	av.sort()
+	chk(pv[0] != pv[-1] and av[0] != av[-1], "costa: el agua entra más o menos (%s) y la arena, más o menos ancha (%s)" % [prof, ancho])
+	chk(debajo, "costa: toda el agua, con su playa debajo (%s)" % [ancho])
+	chk(tramos_de.call(prof).all(func(l): return l >= 2), "costa: sin salientes de una casilla en el agua (%s)" % [tramos_de.call(prof)])
+	var verde_abajo: int = cuenta.call(mc, ["tallgrass", "flowers"], 8)
+	chk(verde_abajo >= 40, "costa: hacia el interior, lo verde (%d casillas de hierba alta y flores)" % verde_abajo)
+	var ma: Dictionary = J.MAPS["carr-acantilado"]
+	var calas := 0
+	var acant := 0
+	for x in int(ma.w):
+		if ma.g[2][x] == "grass" and ma.g[1][x] == "water":
+			acant += 1
+		if ma.g[3][x] == "arena" and (x == 0 or ma.g[3][x - 1] != "arena"):
+			calas += 1
+	chk(calas >= 2 and acant >= 10, "acantilados: dos calas con su playa (%d) y el resto, roca sobre el mar (%d)" % [calas, acant])
+	var mm: Dictionary = J.MAPS["carr-molino"]
+	var su: int = cuenta.call(mm, ["surco"])
+	var sueltos := 0
+	for y in int(mm.h):
+		for x in int(mm.w):
+			if mm.g[y][x] != "surco":
+				continue
+			var en_bloque := false
+			for oy in [-1, 0]:
+				for ox in [-1, 0]:
+					var ok := true
+					for dy in 2:
+						for dx in 2:
+							var cx: int = x + ox + dx
+							var cy: int = y + oy + dy
+							if cx < 0 or cy < 0 or cx >= int(mm.w) or cy >= int(mm.h) or mm.g[cy][cx] != "surco":
+								ok = false
+					en_bloque = en_bloque or ok
+			if not en_bloque:
+				sueltos += 1
+	chk(su >= 20 and sueltos == 0, "tierra: bancales de tierra arada de 2 × 2 o más (%d casillas, %d sueltas)" % [su, sueltos])
+	chk(J.MAPS.keys().filter(func(k): return String(k).begins_with("carr-") and k != "carr-molino").all(func(k): return cuenta.call(J.MAPS[k], ["surco"]) == 0), "los surcos, solo en la tierra")
+	var arboles := func(m: Dictionary) -> int:
+		return cuenta.call(m, ["tree", "tree2", "manzano"])
+	chk(arboles.call(J.MAPS["carr-monte"]) >= 15 and arboles.call(J.MAPS["carr-monte"]) >= 3 * arboles.call(J.MAPS["carr-valle"]), "el monte, el bosque (%d árboles; el valle, %d)" % [arboles.call(J.MAPS["carr-monte"]), arboles.call(J.MAPS["carr-valle"])])
+	chk(cuenta.call(J.MAPS["carr-valle"], ["flowers", "tallgrass"]) >= 50, "el llano, prados con flores (%d)" % cuenta.call(J.MAPS["carr-valle"], ["flowers", "tallgrass"]))
+	# la orilla, por código: agua (transparente), espuma, arena mojada y seca, y la línea, no recta; la ola se mueve
+	var ag := [[true, true, true], [false, false, false], [false, false, false]]
+	var no := [[false, false, false], [false, false, false], [false, false, false]]
+	var im: Image = P.playa_img(ag, no, 5, 2, 0)
+	var colores := {}
+	var primera := {}
+	for x in 16:
+		for y in 16:
+			var c: Color = im.get_pixel(x, y)
+			if c.a == 0:
+				colores["agua"] = true
+				continue
+			if not primera.has(x):
+				primera[x] = y
+			for par in [["espuma", P.ESPUMA_C], ["mojada", P.MOJADA_C], ["seca", P.ARENA_C]]:
+				if par[1].any(func(h): return P.css(h) == c):
+					colores[par[0]] = true
+	chk(colores.has("agua") and colores.has("espuma") and colores.has("mojada") and colores.has("seca"), "la orilla: agua, espuma, mojada y seca (%s)" % [colores.keys()])
+	var pr: Array = primera.values()
+	pr.sort()
+	chk(pr.size() == 16 and pr[0] != pr[-1], "la orilla no va recta (%s)" % [pr])
+	chk(P.playa_img(ag, no, 5, 2, 0).get_data() != P.playa_img(ag, no, 5, 2, 2).get_data(), "la ola se mueve")
+	var sim: Image = P.surco_img(3, 1)
+	var hay := {}
+	for x in 16:
+		for y in 16:
+			for i in 2:
+				if sim.get_pixel(x, y) == P.css(P.SURCO_C[i]):
+					hay[i] = true
+	chk(hay.size() == 2, "los surcos: caballón con su luz y su sombra")
 	# 5 · sin CAL, ninguna
 	S.ch = 9
 	Datos.CAL = false

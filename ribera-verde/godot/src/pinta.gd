@@ -22,7 +22,7 @@ const Hoja = preload("res://src/hoja.gd")
 
 const SH := 180   # 1.12 (ui.gd); las escenas de 240 × 160 van abajo: OY
 const DIR4 := {"down": "south", "up": "north", "left": "west", "right": "east"}
-const TRANS := {"water": "agua", "dirt": "tierra", "plaza": "plaza", "pista": "tierra"}
+const TRANS := {"water": "agua", "dirt": "tierra", "plaza": "plaza", "pista": "tierra", "arena": "plaza", "surco": "tierra"}
 const HIERBA := ["grass", "flowers", "tallgrass"]
 const FUMA := ["fum", "puro", "pipa", "vap"]
 
@@ -267,6 +267,8 @@ func _mundo() -> void:
 			var sy: int = ty * 16 - cam.y
 			var k: String = m.g[ty][tx]
 			if _arte_tile(k, tx, ty, sx, sy):
+				if k == "water":
+					_playa_agua(m, tx, ty, sx, sy)
 				_arte_orilla(m, k, tx, ty, sx, sy)
 			var o = m.o[ty][tx]
 			if o and o != "carpa":
@@ -615,6 +617,17 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 		return _arte_tile(md.g[ty][tx] if ty < md.g.size() and tx < md.g[ty].size() else "floorD", tx, ty, sx, sy)  # i18n-no
 	if k.begins_with("cv"):
 		return _curva(k, tx, ty, sx, sy)
+	if k == "arena":   # la playa: debajo, el agua si la toca; encima, la arena con su orilla (_playa)
+		var ma: Dictionary = J.MAPS[J.S.map]
+		var ag := _vecinas(ma, tx, ty, ["water"])
+		if ag.any(func(f): return f.has(true)):
+			_arte_tile("water", tx, ty, sx, sy)
+		_img(_playa(tx, ty, ag, _vecinas(ma, tx, ty, HIERBA)), sx, sy)
+		return true
+	if k == "surco":   # la tierra arada de los bancales: la tierra y, encima, sus surcos
+		_arte_tile("dirt", tx, ty, sx, sy)
+		_img(_surco(tx, ty), sx, sy)
+		return true
 	var an = Atlas.sobre.get("tile:" + k)
 	if an:
 		var a = Atlas.anim_de(an[0][0], an[0][1])
@@ -730,7 +743,7 @@ func _curva(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 		if fh == null:
 			return false
 		Atlas.dibuja(L, fh.c, Rect2(sx, sy, 16, 16))
-	var nom: Array = {"R": ["roadT", "roadB"], "O": ["rotoT", "rotoB"], "P": ["pista", "pista"]}[cv.t]
+	var nom: Array = {"R": ["roadT", "roadB"], "O": ["rotoT", "rotoB"], "P": ["pista", "pista"]}[cv.t]   # i18n-no
 	var fr := []
 	for n in nom:
 		fr.append(Atlas.frame_de("exterior-mosaico", "mo-" + n, "unica", 0, {"i": 0}) if mo else Atlas.frame_de(Atlas.cubre("tile:" + n), n, "unica", 0, {"i": 0}))
@@ -809,6 +822,131 @@ func _arte_orilla(m: Dictionary, k: String, tx: int, ty: int, sx: int, sy: int) 
 	var f = Atlas.frame_de("tileset-transiciones", TRANS[k] + "-%02d" % mk, "unica", 0, {"i": 0})
 	if f:
 		Atlas.dibuja(L, f.c, Rect2(sx, sy, 16, 16))
+
+# La playa (lo pidió el usuario: «la playa molaría que no sea todo el rato recta… más al interior será más verde todo»): la arena
+# («arena» de tools/carreteras.py), clara y con su grano, por código. La orilla no va por casillas: el agua es la media de las casillas
+# de agua en PLAYA_R px alrededor de cada píxel (las esquinas salen redondas) más una ola suave que se mueve; de fuera adentro, el agua,
+# la espuma, la arena mojada y la seca, y donde toca la hierba, matas de duna y la orilla de la plaza (TRANS)
+const PLAYA_R := 10
+const PLAYA_FASES := 4
+const ARENA_C := ["#ecd8a6", "#e2cb94", "#f5e6bf", "#d3b983", "#fffaf0"]
+const MOJADA_C := ["#cdb27c", "#bfa36e"]
+const ESPUMA_C := ["#f6fbff", "#cfe6f6"]
+const MATA_C := ["#4f8f46", "#6cae58", "#8acb6c"]
+var _playa_c := {}
+
+func _vecinas(m: Dictionary, tx: int, ty: int, tipos: Array) -> Array:   # 3 × 3: ¿es de esos tipos? (fuera del mapa, la del borde)
+	var r := []
+	for j in 3:
+		var fila := []
+		for i in 3:
+			var x: int = clampi(tx + i - 1, 0, int(m.w) - 1)
+			var y: int = clampi(ty + j - 1, 0, int(m.h) - 1)
+			fila.append(tipos.has(m.g[y][x]))
+		r.append(fila)
+	return r
+
+func _playa_agua(m: Dictionary, tx: int, ty: int, sx: int, sy: int) -> void:   # el agua que toca la arena: encima, la arena que le entra
+	if not Datos.CAL or not _vecinas(m, tx, ty, ["arena"]).any(func(f): return f.has(true)):
+		return
+	_img(_playa(tx, ty, _vecinas(m, tx, ty, ["water"]), _vecinas(m, tx, ty, HIERBA)), sx, sy)
+
+func _playa(tx: int, ty: int, ag: Array, hi: Array) -> Image:
+	var f: int = int(now / 520.0) % PLAYA_FASES
+	var k := "%s|%d|%d|%d|%s|%s" % [J.S.map, tx, ty, f, ag, hi]
+	if not _playa_c.has(k):
+		if _playa_c.size() > 1500:   # R7: tope
+			_playa_c.clear()
+		_playa_c[k] = playa_img(ag, hi, tx, ty, f)
+	return _playa_c[k]
+
+# la orilla de una casilla: ag y hi, 3 × 3 de agua y de hierba alrededor (la casilla en el centro); f, la fase de la ola. Lo del agua,
+# transparente (se ve el agua de debajo). Estática para las pruebas (tests/carreteras.gd)
+static func playa_img(ag: Array, hi: Array, tx: int, ty: int, f: int) -> Image:
+	var im := Image.create(16, 16, false, Image.FORMAT_RGBA8)
+	var R := PLAYA_R
+	var n: float = (2 * R + 1) * (2 * R + 1)
+	var verde: bool = hi.any(func(q): return q.has(true))
+	for py in 16:
+		for px in 16:
+			var X: int = tx * 16 + px
+			var Y: int = ty * 16 + py
+			var w := 0
+			for j in 3:
+				for i in 3:
+					if ag[j][i]:
+						var ax: int = maxi((i - 1) * 16, px - R)
+						var bx: int = mini((i - 1) * 16 + 16, px + R + 1)
+						var ay: int = maxi((j - 1) * 16, py - R)
+						var by: int = mini((j - 1) * 16 + 16, py + R + 1)
+						if bx > ax and by > ay:
+							w += (bx - ax) * (by - ay)
+			var v: float = w / n - 0.5 + 0.12 * sin(X * 0.09 + Y * 0.05) + 0.06 * sin(X * 0.23 + Y * 0.11) + 0.03 * sin(X * 0.61 - Y * 0.29) + 0.035 * sin(X * 0.37 + f * TAU / PLAYA_FASES)
+			if v > 0:
+				continue
+			var h := hash_t(X, Y)
+			var c: String
+			if v > -0.07:
+				c = ESPUMA_C[1 if h % 4 == 0 else 0]
+			elif v > -0.2:
+				c = MOJADA_C[1 if h % 6 == 0 else 0]
+			elif h % 31 == 0:
+				c = ARENA_C[3]
+			elif h % 47 == 0 and v < -0.45:
+				c = ARENA_C[4]   # una concha
+			elif h % 9 == 0:
+				c = ARENA_C[1]
+			elif h % 13 == 0:
+				c = ARENA_C[2]
+			else:
+				c = ARENA_C[0]
+			im.set_pixel(px, py, css(c))
+	if verde:   # junto a la hierba, matas de duna: más cuanto más hierba alrededor
+		var nh := 0
+		for q in hi:
+			for b in q:
+				nh += int(b)
+		var hm := hash_t(tx * 7 + 3, ty * 5 + 1)
+		for t in mini(1 + nh / 3, 3):
+			var mx: int = 2 + (hm >> (t * 3)) % 12
+			var my: int = 4 + (hm / (7 + t * 5)) % 10
+			if im.get_pixel(mx, my).a == 0 or im.get_pixel(mx, my) != css(ARENA_C[0]) and im.get_pixel(mx, my) != css(ARENA_C[1]) and im.get_pixel(mx, my) != css(ARENA_C[2]):
+				continue
+			for d in [[0, 0, 0], [-1, -1, 1], [1, -1, 1], [0, -2, 2], [-2, -2, 2], [2, -3, 2], [0, 1, 0]]:
+				var x: int = mx + d[0]
+				var y: int = my + d[1]
+				if x >= 0 and y >= 0 and x < 16 and y < 16 and im.get_pixel(x, y).a > 0:
+					im.set_pixel(x, y, css(MATA_C[d[2]]))
+	return im
+
+# la tierra arada («surco» de tools/carreteras.py, lo pidió el usuario: «zona más de tierra»): sobre la tierra, cada 4 px un caballón
+# con su luz arriba y su sombra abajo, que no va del todo recto, y algún terrón
+const SURCO_C := ["#d29a62", "#a8703f", "#9e7650"]
+var _surco_c := {}
+
+func _surco(tx: int, ty: int) -> Image:
+	var k := "%d|%d" % [tx, ty]
+	if not _surco_c.has(k):
+		if _surco_c.size() > 600:   # R7: tope
+			_surco_c.clear()
+		_surco_c[k] = surco_img(tx, ty)
+	return _surco_c[k]
+
+static func surco_img(tx: int, ty: int) -> Image:
+	var im := Image.create(16, 16, false, Image.FORMAT_RGBA8)
+	for px in 16:
+		var X: int = tx * 16 + px
+		var o: int = 1 if sin(X * 0.21 + ty * 1.7) > 0.55 else 0   # el surco, un poco torcido
+		for py in 16:
+			var r: int = (py + o) % 4
+			var h := hash_t(X, ty * 16 + py)
+			if r == 0:
+				im.set_pixel(px, py, css(SURCO_C[0]))
+			elif r == 3:
+				im.set_pixel(px, py, css(SURCO_C[1]))
+			elif h % 37 == 0:
+				im.set_pixel(px, py, css(SURCO_C[2]))   # un terrón
+	return im
 
 # los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
 const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13, "fotoMaite": -10, "extrN": -14, "extrG": -14, "filtroN": -12, "ctrlN": -12, "fotoK": -13, "ojoBuey": -13, "timon": -13, "red": -13, "diana": -13, "engranaje": -13, "neonH": -13, "copas": -16, "tuboS": -13, "botesW": -16, "neonG": -13}   # 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared; 1.34: lo de las paredes de los clubs, del bajo y de los grows

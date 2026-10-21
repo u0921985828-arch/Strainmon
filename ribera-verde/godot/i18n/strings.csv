@@ -332,10 +332,12 @@ se8de561d,Multa · {p},Fine · {p}
 se7bf68e4,"Multa del Ayuntamiento de {p}: {a} lleva más de {d} días en el aparcamiento de la parada. {e}, cobrados de lo que tienes.","Fine from {p} town hall: {a} has been in the car park by the stop for more than {d} days. {e}, taken from what you have."
 s05644715,Te quedan a deber {f}.,You still owe {f}.
 sef20a6ff,{m} min · {e},{m} min · {e}
+sdea0a836,Por la carretera a {p},By road to {p}
+sa99e72c6,al volante · {e},driving · {e}
 s690b2b4b,¿A dónde vas?,Where to?
+s6ce3fd9b,SMS · TALLER,SMS · GARAGE
 sd298526b,Gasolinera,Petrol station
 s00f9e362,Para la gasolina hacen falta {e} y no te llega.,Fuel costs {e} and you're short.
-s6ce3fd9b,SMS · TALLER,SMS · GARAGE
 sa231b90a,la revisión de {km} km (aceite y filtros),the {km} km service (oil and filters)
 s1e56d38e,neumáticos nuevos a los {km} km,new tyres at {km} km
 s0002b805,Taller · {n},Garage · {n}
@@ -4143,10 +4145,82 @@ sadcfbd05,Hiriburu,Hiriburu
 s0c2032d1,Club Zenit,Club Zenit
 sb619fb10,Club Ilargi,Club Ilargi
 s1b330732,Carretera de la costa,Coast road
+s59025c2b,cvR-u-00,
+s40196d6a,cvR-u-10,
+s6b343ea9,cvR-u-20,
+s722f0fe8,cvR-u-30,
+sb1a76cd1,cvR-d-00,
+sa8bc5d90,cvR-d-10,
+s83910e53,cvR-d-20,
+s9a8a3f12,cvR-d-30,
+s2e056cbd,cvR-u-01,
+s371e5dfc,cvR-u-11,
+s1c330e3f,cvR-u-21,
+s05283f7e,cvR-u-31,
+sc6a05c47,cvR-d-01,
+sdfbb6d06,cvR-d-11,
+sf4963ec5,cvR-d-21,
+sed8d0f84,cvR-d-31,
+sb70c3d07,cvR-u-02,
+sae170c46,cvR-u-12,
+s853a5f85,cvR-u-22,
+s9c216ec4,cvR-u-32,
+s5fa90dfd,cvR-d-02,
+s46b23cbc,cvR-d-12,
+s6d9f6f7f,cvR-d-22,
+s74845e3e,cvR-d-32,
 sc13ab548,Carretera del valle,Valley road
+s0eef7d94,cvO-d-00,
+s17f44cd5,cvO-d-10,
+s3cd91f16,cvO-d-20,
+s25c22e57,cvO-d-30,
+se64a4d6e,cvO-u-00,
+sff517c2f,cvO-u-10,
+sd47c2fec,cvO-u-20,
+scd671ead,cvO-u-30,
+s79e84d02,cvO-d-01,
+s60f37c43,cvO-d-11,
+s4bde2f80,cvO-d-21,
+s52c51ec1,cvO-d-31,
+s914d7df8,cvO-u-01,
+s88564cb9,cvO-u-11,
+sa37b1f7a,cvO-u-21,
+sba602e3b,cvO-u-31,
+se0e11cb8,cvO-d-02,
+sf9fa2df9,cvO-d-12,
+sd2d77e3a,cvO-d-22,
+scbcc4f7b,cvO-d-32,
+s08442c42,cvO-u-02,
+s115f1d03,cvO-u-12,
+s3a724ec0,cvO-u-22,
+s23697f81,cvO-u-32,
 sb74a28df,Carretera del monte,Mountain road
 s862791dd,La general,The main road
 s44d7374a,Carretera del molino,Mill road
+sfc6fcdda,cvP-d-00,
+se574fc9b,cvP-d-10,
+sce59af58,cvP-d-20,
+sd7429e19,cvP-d-30,
+s14cafd20,cvP-u-00,
+s0dd1cc61,cvP-u-10,
+s26fc9fa2,cvP-u-20,
+s3fe7aee3,cvP-u-30,
+s8b68fd4c,cvP-d-01,
+s9273cc0d,cvP-d-11,
+sb95e9fce,cvP-d-21,
+sa045ae8f,cvP-d-31,
+s63cdcdb6,cvP-u-01,
+s7ad6fcf7,cvP-u-11,
+s51fbaf34,cvP-u-21,
+s48e09e75,cvP-u-31,
+s1261acf6,cvP-d-02,
+s0b7a9db7,cvP-d-12,
+s2057ce74,cvP-d-22,
+s394cff35,cvP-d-32,
+sfac49c0c,cvP-u-02,
+se3dfad4d,cvP-u-12,
+sc8f2fe8e,cvP-u-22,
+sd1e9cfcf,cvP-u-32,
 sf544e072,Pista de los acantilados,Cliff track
 sf31f4075,Carretera de la ribera,Riverside road
 s30a02292,ESTUDIANTE,STUDENT
@@ -5807,7 +5881,7 @@ s2cb6aa77,Generador diésel insonorizado,Silent diesel generator
 s55379088,"Cubre hasta 5 kW por encima de lo contratado, sin ruido: lo que pasa de la potencia no lo ve la compañía. Gasta gasóleo cada día que trabaja (en efectivo).","Covers up to 5 kW over the contract, silently: the power company never sees the excess. Burns diesel every day it runs (paid in cash)."
 s6bcc8de0,Placas solares,Solar panels
 s8784f2d5,"2,5 kW de placas con baterías: lo que pasa de la potencia contratada, hasta ahí, sale del tejado y no de la red. Sin gasto.","2.5 kW of panels with batteries: up to that, anything over the contracted power comes from the roof, not the grid. No running cost."
-s4979bd31,"La red de carreteras que se andan (con Datos.CAL; tools/carreteras.py): rutas por mapa y, por pueblo, las salidas [x, y, carretera, llegada x, llegada y, lado] y las casillas del borde que se abren [x, y].",
+s86aca0e1,"La red de carreteras que se andan (con Datos.CAL; tools/carreteras.py): rutas por mapa y, por pueblo, las salidas [x, y, carretera, llegada x, llegada y, lado] y las casillas del borde que se abren [x, y, la salida que la abre x, y].",
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.

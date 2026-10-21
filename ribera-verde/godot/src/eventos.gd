@@ -313,17 +313,20 @@ func conducir(k):
 	for x in ds:
 		var t := tramo(aqui, x, k)
 		it.append({"label": D.PARADAS[x].n, "right": T("{m} min · {e}", {"m": t.min, "e": Datos.eur(t.eur)})})
+	var rs := carreteras_de(aqui)
+	for q in rs:
+		var t := tramo_carretera(aqui, otro_lado(q), k)
+		it.append({"label": T("Por la carretera a {p}", {"p": D.PARADAS[otro_lado(q)].n}), "right": T("al volante · {e}", {"e": Datos.eur(t.eur)})})
 	it.append({"label": K("Nada")})
 	var i: int = await menu(it, {"cls": "right", "title": K("¿A dónde vas?")})
+	if i >= ds.size() and i < ds.size() + rs.size():
+		await al_volante(k, rs[i - ds.size()])
+		return
 	if i < 0 or i >= ds.size():
 		return
 	var x: String = ds[i]
 	var t := tramo(aqui, x, k)
-	if S.money >= t.eur:   # la gasolina: en efectivo o con tarjeta
-		S.money -= t.eur
-	elif not cobro_banco(t.eur, K("Gasolinera")):
-		sfx("bad")
-		await say(T("Para la gasolina hacen falta {e} y no te llega.", {"e": Datos.eur(t.eur)}))
+	if not await gasolina(t.eur):
 		return
 	var taller := kilometros(k, int(t.km))
 	sfx("door")
@@ -352,6 +355,76 @@ func conducir(k):
 		await talk(K("SMS · TALLER"), [taller])
 	await control_trafico(k)
 	await metro_llegada()   # MAESTRO [9]: las bandas de la ciudad
+
+# la gasolina: en efectivo o con tarjeta
+func gasolina(e: int) -> bool:
+	if S.money >= e:
+		S.money -= e
+		return true
+	if cobro_banco(e, K("Gasolinera")):
+		return true
+	sfx("bad")
+	await say(T("Para la gasolina hacen falta {e} y no te llega.", {"e": Datos.eur(e)}))
+	return false
+
+# Al volante por las carreteras (con CAL; lo pidió el usuario: «por esos caminos sí que se puede utilizar tanto el coche como la moto,
+# como el otro coche, como el superdeportivo, lo que sea»): desde el garaje o el aparcamiento, sales por la carretera de ese pueblo
+# (CARRETERAS.puertas, abierta con los dos autobuses) y la recorres al volante, solo por la calzada (fuera_calzada); al salir por un
+# extremo, el vehículo se queda aparcado en ese pueblo (volante_llega, desde warp). La gasolina y los km, al salir: los de
+# CONCE.km entre los dos (8 como poco); sin peaje
+func carreteras_de(aqui: String) -> Array:
+	var o := []
+	if Datos.CAL and D.has("CARRETERAS"):
+		for q in D.CARRETERAS.puertas.get(aqui, []):   # una por carretera (la primera casilla de su salida)
+			if S.ch >= int(D.CARRETERAS.rutas[q[2]].ch) and not o.any(func(p): return p[2] == q[2]):
+				o.append(q)
+	return o
+
+func otro_lado(q: Array) -> String:   # el pueblo del otro extremo de la carretera de esa salida
+	var R: Dictionary = D.CARRETERAS.rutas[q[2]]
+	return String(R.b) if String(R.a) == S.map else String(R.a)
+
+func tramo_carretera(a: String, b: String, k: String) -> Dictionary:
+	var km: int = maxi(8, absi(int(D.CONCE.km[a]) - int(D.CONCE.km[b])))
+	return {"km": km, "eur": maxi(1, roundi(km * float(D.CONCE.v[k].l) / 100.0 * float(D.CONCE.litro)))}
+
+func al_volante(k: String, q: Array) -> void:
+	var t := tramo_carretera(S.map, otro_lado(q), k)
+	if not await gasolina(t.eur):
+		return
+	S.volante = {"k": k, "de": S.map, "tl": kilometros(k, int(t.km))}
+	sfx("door")
+	await fade(1)
+	enter_map(String(q[2]), int(q[3]), int(q[4]), "right" if int(q[3]) <= 1 else "left")
+	update_hud()
+	await wait(80)
+	await fade(0)
+
+func volante_llega(w: Dictionary):   # saliendo de la carretera al volante: aparcado en el pueblo al que llegas; {k, a: dónde apareces, tl}
+	var v = S.get("volante")
+	if not (v is Dictionary) or String(w.to).begins_with("carr-"):
+		return null
+	S.erase("volante")
+	var k: String = v.k
+	var x: String = w.to
+	if not Datos.CAL or not coche_ya(k) or not D.PARADAS.has(x):
+		return null
+	S.coches[k].en = x
+	S.coches[k].ap = S.day   # el día que lo aparcas (multa_aparcado)
+	var a: Array
+	if x == GARAJE:
+		a = [GARAJE_B.x0 + 1, GARAJE_B.y0 + GARAJE_B.h, "down"]
+	else:
+		montar_aparcamiento(x)
+		a = llegada_parque(x, k)
+	return {"k": k, "a": a, "tl": String(v.get("tl", ""))}
+
+func volante_fin(vo: Dictionary) -> void:
+	await caida_moto(vo.k)
+	if vo.tl != "":
+		sfx("bad")
+		await talk(K("SMS · TALLER"), [vo.tl])
+	await control_trafico(vo.k)
 
 # Los km de cada vehículo; al pasar cada CONCE.v[k].revKm, la revisión (aceite y filtros), y cada neuKm, los neumáticos
 func kilometros(k: String, km: int) -> String:

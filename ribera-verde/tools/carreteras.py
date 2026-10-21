@@ -59,7 +59,33 @@ CURVAS = {
 VALLAS = {
 	"valle": [(13, 10, 11), (29, 8, 3)],
 	"molino": [(2, 7, 3), (15, 10, 11)],
-	"acantilado": [(2, W - 4, 2)],
+	"acantilado": [(2, 10, 2), (19, 14, 2)],   # partida por las dos calas
+}
+
+# los biomas (lo pidió el usuario: «diferentes biomas, dentro de lo realista de la zona… zona playa, o zona más de monte, o zona más
+# de llano, zona más de tierra, pero poco más»)
+BIOMA = {"costa": "playa", "acantilado": "playa", "monte": "monte", "valle": "llano", "ribera": "llano", "general": "llano", "molino": "tierra"}
+
+# la playa (lo pidió el usuario: «la playa molaría que no sea todo el rato recta, que haya alguna zona más entrada de la arena… más al
+# interior será más verde todo»): por tramos de columnas (de 2 o más, sin salientes de una casilla) [desde, hasta, filas de agua, última
+# fila de arena]; la arena, nunca a menos de una fila de hierba de la calzada; sin arena (última < filas de agua), el acantilado
+PLAYA = {
+	"costa": [(0, 1, 2, 3), (2, 5, 2, 4), (6, 8, 3, 4), (9, 12, 2, 3), (13, 16, 3, 3), (17, 20, 2, 3), (21, 26, 3, 3), (27, 30, 2, 3), (31, 39, 2, 4)],
+	"acantilado": [(0, 11, 2, 1), (12, 13, 2, 3), (14, 16, 3, 3), (17, 18, 2, 3), (19, 32, 2, 1), (33, 34, 2, 4), (35, 36, 3, 4), (37, 38, 2, 4), (39, 39, 2, 1)],
+}
+
+# los bancales de la tierra arada del molino («surco», con sus surcos en pinta.gd): [desde, hasta, fila de arriba, fila de abajo], de 2 × 2 o más
+BANCALES = {"molino": [(2, 8, 1, 2), (14, 21, 1, 3), (30, 36, 1, 3)]}   # por encima de la calzada (abajo los tapa el monte)
+
+# lo suelto, por paisaje: lo que se pone, cuánto por encima de la calzada y por debajo; el suelo (hierba alta, flores) y cuánto
+SUELTO = {
+	"costa": (["bush"], 0.0, 0.06, ["tallgrass", "flowers", "tallgrass"], 0.34),   # bajo la calzada, hacia el interior, lo verde
+	"acantilado": (["tree2", "bush"], 0.06, 0.1, ["tallgrass"], 0.22),
+	"monte": (["tree", "tree2", "manzano", "tree"], 0.26, 0.1, ["tallgrass"], 0.36),   # el bosque, encima; debajo, matas
+	"valle": (["tree2", "bush", "tree"], 0.04, 0.05, ["flowers", "tallgrass", "flowers"], 0.32),   # prados con flores
+	"ribera": (["tree", "tree2", "bush"], 0.07, 0.05, ["flowers", "tallgrass"], 0.24),
+	"general": (["seto", "tree"], 0.1, 0.1, ["flowers"], 0.18),
+	"molino": (["manzano", "tree", "bush"], 0.05, 0.05, ["flowers"], 0.08),   # la tierra: bancales y poco más
 }
 
 
@@ -91,6 +117,10 @@ def mapa(k, nombre, paisaje, musica):
 	tipo = {"costa": ("roadT", "roadB", "R"), "valle": ("rotoT", "rotoB", "O"), "monte": ("roadT", "roadB", "R"), "general": ("roadT", "roadB", "R"),
 		"molino": ("pista", "pista", "P"), "acantilado": ("pista", "pista", "P"), "ribera": ("roadT", "roadB", "R")}[paisaje]
 	col = calzada_de(paisaje)
+
+	def dist(x, y):
+		return min(abs(y - r) for c in (x - 1, x, x + 1) if 0 <= c < W for r in col[c][0])
+
 	for x in range(W):
 		filas, pieza = col[x]
 		if pieza is None:
@@ -107,17 +137,23 @@ def mapa(k, nombre, paisaje, musica):
 		for x in (0, W - 1):
 			if y not in (RY, RY + 1):
 				o[y][x] = "monte" if (x + y) % 2 == 0 else "monte2"
-	# el agua (el mar arriba en la costa y los acantilados; el río abajo en la ribera), sin monte encima
-	agua = {"costa": range(0, 3), "acantilado": range(0, 2), "ribera": range(10, 12)}.get(paisaje, range(0))
-	for y in agua:
-		for x in range(W):
-			assert g[y][x] == "grass", (paisaje, x, y)
-			g[y][x] = "water"
-			o[y][x] = None
-	if paisaje == "costa":   # la arena junto al mar
-		for x in range(1, W - 1):
-			if g[3][x] == "grass":
-				g[3][x] = "dirt"
+	# el agua (el mar arriba en la costa y los acantilados, con la playa; el río abajo en la ribera), sin monte encima
+	for x0, x1, prof, fin in PLAYA.get(paisaje, []):
+		for x in range(x0, x1 + 1):
+			for y in range(H):
+				if y < prof or y <= fin and dist(x, y) >= 2:
+					assert g[y][x] == "grass", (paisaje, x, y)
+					g[y][x], o[y][x] = "water" if y < prof else "arena", None
+	if paisaje == "ribera":
+		for y in (10, 11):
+			for x in range(W):
+				assert g[y][x] == "grass", (paisaje, x, y)
+				g[y][x], o[y][x] = "water", None
+	for x0, x1, y0, y1 in BANCALES.get(paisaje, []):   # la tierra arada
+		for y in range(y0, y1 + 1):
+			for x in range(x0, x1 + 1):
+				assert g[y][x] == "grass" and o[y][x] is None and dist(x, y) >= 3, (paisaje, x, y)
+				g[y][x] = "surco"
 	if paisaje == "ribera":   # el puente viejo sobre el río, a un lado
 		for y in (10, 11):
 			g[y][24] = "bridgeT" if y == 10 else "bridgeB"
@@ -129,9 +165,6 @@ def mapa(k, nombre, paisaje, musica):
 	# los prados y la barandilla del acantilado, seguidas y paralelas a la calzada, las farolas de la general en la acera de arriba y
 	# los bancos de la ribera mirando al río—; después, suelto, solo lo del campo (árboles, matas, frutales, setos), nunca en
 	# la calzada ni a 2 filas de ella ni pegado a lo puesto
-	def dist(x, y):
-		return min(abs(y - r) for c in (x - 1, x, x + 1) if 0 <= c < W for r in col[c][0])
-
 	def pon(x, y, cosa, minimo=3):
 		assert 2 <= x < W - 2 and 1 <= y < H - 1 and g[y][x] == "grass" and o[y][x] is None and dist(x, y) >= minimo, (paisaje, x, y, cosa)
 		o[y][x] = cosa
@@ -146,9 +179,7 @@ def mapa(k, nombre, paisaje, musica):
 		for x in range(3, W - 2, 6):
 			assert g[RY - 1][x] == "walk" and o[RY - 1][x] is None
 			o[RY - 1][x] = "lamp"
-	cosas = {"costa": ["bush"], "valle": ["tree2", "bush", "tree"], "monte": ["tree", "tree2", "manzano", "bush"], "general": ["seto", "tree"],
-		"molino": ["manzano", "tree", "bush"], "acantilado": ["tree2", "bush"], "ribera": ["tree", "tree2", "bush"]}[paisaje]
-	suelo = {"costa": "flowers", "valle": "tallgrass", "monte": "tallgrass", "general": "flowers", "molino": "flowers", "acantilado": "tallgrass", "ribera": "flowers"}[paisaje]
+	cosas, p_arriba, p_abajo, suelo, p_suelo = SUELTO[paisaje]
 	sid = sum(ord(c) for c in k)
 	puesto = [(x, y) for y in range(H) for x in range(W) if o[y][x] in ("fence", "lamp", "bench")]
 	for y in range(1, H - 1):
@@ -156,14 +187,14 @@ def mapa(k, nombre, paisaje, musica):
 			if dist(x, y) <= 2 or g[y][x] != "grass" or o[y][x] is not None:
 				continue
 			r = h(x, y, sid)
-			if r < 0.1 and all(abs(x - a) > 1 or abs(y - b) > 1 for a, b in puesto):
+			cerca = min(r for c2 in (x - 1, x, x + 1) for r in col[c2][0])
+			if r < (p_arriba if y < cerca else p_abajo) and all(abs(x - a) > 1 or abs(y - b) > 1 for a, b in puesto):
 				c = cosas[int(h(y, x, sid + 1) * len(cosas)) % len(cosas)]
-				cerca = min(r for c2 in (x - 1, x, x + 1) for r in col[c2][0])
 				if c in ("tree", "tree2", "manzano") and y > cerca - 2:   # la copa (6 filas) no tapa la calzada: árboles solo por encima
 					c = "bush"
 				o[y][x] = c
-			elif r < 0.18:
-				g[y][x] = suelo
+			elif h(x, y, sid + 2) < p_suelo:
+				g[y][x] = suelo[int(h(x, y, sid + 3) * len(suelo)) % len(suelo)]
 	return {"name": nombre, "w": W, "h": H, "g": [list(r) for r in g], "o": o, "exits": {}, "doors": {}, "music": musica, "blds": [], "est": None}
 
 
@@ -190,7 +221,7 @@ def main():
 				m["exits"]["%d,%d" % (ex, fila)] = {"to": pueblo, "x": bx - dx, "y": by - dy, "dir": OPUESTO[lado], "lado": lado_mapa}
 		M[mid] = m
 		ch = max(int(P[A[0]]["cap"]), int(P[B[0]]["cap"]))
-		rutas[mid] = {"n": nombre, "a": A[0], "b": B[0], "ch": ch, "k": k}
+		rutas[mid] = {"n": nombre, "a": A[0], "b": B[0], "ch": ch, "k": k, "bioma": BIOMA[paisaje]}
 	abre = {}
 	for pueblo, ps in puertas.items():
 		for q in ps:

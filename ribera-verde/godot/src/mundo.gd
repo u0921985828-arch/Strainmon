@@ -2055,10 +2055,16 @@ func map_music() -> String:
 func warp(w: Dictionary) -> void:
 	sfx("door")
 	await fade(1)
-	enter_map(w.to, w.x, w.y, w.dir)
+	var vo = volante_llega(w)   # con CAL, al volante por una carretera: aparcado en el pueblo al que llegas (eventos.gd)
+	if vo:
+		enter_map(w.to, int(vo.a[0]), int(vo.a[1]), vo.a[2])
+	else:
+		enter_map(w.to, w.x, w.y, w.dir)
 	update_hud()
 	await wait(80)
 	await fade(0)
+	if vo:
+		await volante_fin(vo)
 
 var paso_sobra := 0.0
 
@@ -2309,6 +2315,12 @@ func coches_mios() -> Array:
 	return []
 
 func conducir(_k):
+	pass
+
+func volante_llega(_w: Dictionary):   # con CAL, en eventos.gd
+	return null
+
+func volante_fin(_vo: Dictionary) -> void:
 	pass
 
 func coche_menu(_k: String):   # MAESTRO [3], en eventos.gd

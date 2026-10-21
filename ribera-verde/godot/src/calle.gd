@@ -56,7 +56,7 @@ func try_move(d: String) -> void:
 		return
 	var nx: int = P.x + dv[0]
 	var ny: int = P.y + dv[1]
-	if tile_solid(m, nx, ny) or ent_at(nx, ny) or coche_en(nx, ny) != "":
+	if tile_solid(m, nx, ny) or ent_at(nx, ny) or coche_en(nx, ny) != "" or fuera_calzada(m, nx, ny):
 		if M.reloj - P.bumpT > 350:
 			sfx("bump")
 			P.bumpT = M.reloj
@@ -73,10 +73,14 @@ func try_move(d: String) -> void:
 	P.dur = paso_ms()
 	P.parity ^= 1
 
-# el patinete o la bici (1.13, vehiculo() de 12c-salon): en la calle (ZONAS), el mejor que tengas
+# el patinete o la bici (1.13, vehiculo() de 12c-salon): en la calle (ZONAS), el mejor que tengas; con CAL, también por las
+# carreteras, y en ellas, al volante (S.volante, eventos.gd), el coche o la moto
 func vehiculo():
 	var v = S.get("veh")
-	if not D.ZONAS.has(S.map):
+	var carr: bool = Datos.CAL and String(S.map).begins_with("carr-")
+	if carr and S.get("volante") is Dictionary and coche_ya(String(S.volante.k)) and D.VEHICULOS.has(String(S.volante.k)):
+		return String(S.volante.k)
+	if not D.ZONAS.has(S.map) and not carr:
 		return null
 	if not Datos.CAL:   # MAESTRO [3]: con CAL, los del concesionario no van por el mapa: del garaje o del aparcamiento, de pueblo a pueblo
 		for k in ["deportivo", "berlina", "utilitario", "moto"]:   # 1.43: lo del concesionario, antes que nada (el mejor que tengas)
@@ -88,6 +92,13 @@ func vehiculo():
 		if v.get(k) and float(v[k]) <= S.day:
 			return k
 	return null
+
+# al volante por una carretera, el coche y la moto, solo por la calzada (la bici y el patinete, por donde quieras)
+func fuera_calzada(m: Dictionary, x: int, y: int) -> bool:
+	if not String(S.map).begins_with("carr-") or not (S.get("volante") is Dictionary):
+		return false
+	var v = vehiculo()
+	return v != null and not v in ["bici", "patinete"] and not String(m.g[y][x]).substr(0, 2) in ["ro", "pi", "cv"]
 
 # MAESTRO [3] (lo pidió el usuario: «tiene que estar en el garaje y del garaje viajas al otro pueblo, y se queda estacionado en un
 # aparcamiento; no se usa por el mapa»): cada vehículo del concesionario está en un pueblo (S.coches[k].en; sin él, GARAJE, el de
