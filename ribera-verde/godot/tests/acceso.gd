@@ -76,35 +76,54 @@ func tiene(R: Array, col: String) -> bool:
 	return R.any(func(e): return typeof(e[0]) != TYPE_STRING and e[4] == col)
 
 # 0.55: la mano de PixelLab (un sprite que empieza por pre) llega al canto del panel: "der" o "aba"; nunca flota
-func brazo_fundido(im: Image, arriba: bool) -> bool:
-	if im.get_height() < J.GS_BRAZO_L / 2 or im.get_height() > J.GS_BRAZO_L + 8:   # el largo es el del eje (con la pendiente, algo menos de alto)
-		return false
-	var cuenta := func(y: int) -> int:
-		var c := 0
+# el antebrazo (lo pidió el usuario: «hasta el final y completarlo con un giro circular… como un cilindro… que no tenga esos picos en la
+# manga»): del ancho del puño todo el largo, con la raya negra a los dos lados y la media luna negra en la punta, nada después, sin
+# semitransparencias y sin restos de la manga de PixelLab fuera del cilindro
+func brazo_cilindro(im: Image, g: Dictionary) -> bool:
+	var c: Vector2 = g.c
+	var ax: Vector2 = g.ax
+	var pe := Vector2(-ax.y, ax.x)
+	var r: float = g.r
+	var L: float = g.l
+	var px := func(p: Vector2) -> Color:
+		var q := Vector2i(floori(p.x), floori(p.y))
+		if q.x < 0 or q.y < 0 or q.x >= im.get_width() or q.y >= im.get_height():
+			return Color(0, 0, 0, 0)
+		return im.get_pixel(q.x, q.y)
+	for y in im.get_height():
 		for x in im.get_width():
 			var a: float = im.get_pixel(x, y).a
 			if a > 0.0 and a < 1.0:
-				return -1000
-			c += 1 if a > 0.0 else 0
-		return c
-	var h: int = im.get_height()
-	var cerca := 0   # las tres filas junto a la manga y las tres de la punta
-	var lejos := 0
-	for i in 3:
-		var c1: int = cuenta.call(h - 1 - i if arriba else i)
-		var c2: int = cuenta.call(i if arriba else h - 1 - i)
-		if c1 < 0 or c2 < 0:
-			return false
-		cerca += c1
-		lejos += c2
-	return cerca >= 9 and lejos * 3 <= cerca
+				return false
+			var d := Vector2(x + 0.5, y + 0.5) - c
+			if a > 0.5 and g.tela.has(im.get_pixel(x, y).to_rgba32()) and d.dot(ax) > 1.0 and absf(d.dot(pe)) > r + 0.5:
+				return false   # un pico de la manga vieja
+	# de dentro afuera por cada lado y por la punta: lo último pintado es la raya negra y luego, nada
+	var borde := func(m: Vector2, dir: Vector2, desde: float, hasta: float) -> bool:
+		var ultimo := Color(0, 0, 0, 0)
+		var k: float = desde
+		while k <= hasta:
+			var q: Color = px.call(m + dir * k)
+			if q.a > 0.5:
+				ultimo = q
+			k += 0.25
+		return ultimo.a > 0.5 and ultimo.get_luminance() < 0.2 and px.call(m + dir * (hasta + 0.75)).a < 0.5
+	for t in range(int(r) + 2, int(L - r)):   # desde donde ya no está la mano
+		var m := c + ax * (t + 0.5)
+		for lado in [-1.0, 1.0]:
+			if not borde.call(m, pe * lado, r - 2.0, r + 1.0):
+				return false
+	return borde.call(c, ax, L - 2.0, L + 1.0)
+
+func nombre_e(e: Array) -> String:
+	if typeof(e[0]) != TYPE_STRING:
+		return ""
+	return String(e[1]) if typeof(e[1]) == TYPE_STRING else (String(e[5]) if e.size() > 5 else "")
 
 func mano_canto(R: Array, pre: String, canto: String, x1: int, y1: int) -> bool:
 	for e in R:
-		if typeof(e[0]) == TYPE_STRING and e[1] is Image and e.size() > 5 and String(e[5]).begins_with(pre):
-			# el brazo (lo pidió el usuario: «que se desvanezca… las mismas proporciones en cada sprite»): igual de largo en todas las manos,
-			# entero junto a la manga y casi nada en la otra punta (la de arriba en la del cliente), sin semitransparencias
-			return brazo_fundido(e[1], canto == "pov-i")
+		if typeof(e[0]) == TYPE_STRING and e[1] is Image and e.size() > 6 and String(e[5]).begins_with(pre):
+			return brazo_cilindro(e[1], e[6])
 		if typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with(pre):
 			var f = Atlas.foto_misc(e[1])
 			if f == null:
@@ -246,15 +265,15 @@ func _corre() -> void:
 		var bien := true
 		for ms in [80.0, 300.0, 600.0]:
 			bien = bien and mano_canto(J.rects_acceso(W, ms), "gm-mech", "pov-ab", 0, gy + J.GS_H)
-		chk(bien and J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and e[1] == "gm-mech1-ab") and not J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with("gs-mechero")), "fumar %s: el mechero en la mano, desde el canto de abajo" % m)
+		chk(bien and J.rects_acceso(W, 300.0).any(func(e): return nombre_e(e) == "gm-mech1-ab") and not J.rects_acceso(W, 300.0).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and String(e[1]).begins_with("gs-mechero")), "fumar %s: el mechero en la mano, desde el canto de abajo" % m)
 	var pg := {"k": "pagar", "c": "", "ok": true, "t0": 0.0, "pl": {}}
 	var al_fajo := false
 	var con_billete := false
 	for ms in range(150, 1000, 10):
 		for q in J.rects_acceso(pg, float(ms)):
-			if typeof(q[0]) == TYPE_STRING and typeof(q[1]) == TYPE_STRING and q[2] - gx <= 24:
-				al_fajo = al_fajo or q[1] == "gm-vacia"
-				con_billete = con_billete or q[1] == "gm-billete"
+			if nombre_e(q) != "" and q[2] - gx <= 24:
+				al_fajo = al_fajo or nombre_e(q) == "gm-vacia"
+				con_billete = con_billete or nombre_e(q) == "gm-billete"
 	chk(al_fajo and con_billete, "pagar: la mano va al fajo y coge el billete")
 	var con_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": true}, 800.0)
 	var sin_t: Array = J.rects_acceso({"k": "fumar", "c": "porro", "ok": true, "t0": 0.0, "pl": {}, "tab": false}, 800.0)

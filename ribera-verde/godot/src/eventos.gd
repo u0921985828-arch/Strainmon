@@ -769,6 +769,21 @@ func mar_noray(x: int) -> void:
 		return
 	await cargar_envio(B)
 
+# la bodega de cada barco (con CAL): lo cargado y aún sin zarpar, por lotes
+func bodega(k: String) -> Dictionary:
+	if not S.mar.has("bod"):
+		S.mar.bod = {}
+	if not S.mar.bod.has(k):
+		S.mar.bod[k] = {}
+	return S.mar.bod[k]
+
+func bodega_g(k: String) -> float:
+	var g := 0.0
+	if S.get("mar") is Dictionary and S.mar.has("bod") and S.mar.bod.has(k):
+		for l in S.mar.bod[k].values():
+			g += float(l.g)
+	return g
+
 func cargar_envio(B: Dictionary) -> void:
 	var R: Dictionary = D.MAR
 	var rs := rutas_mar()
@@ -784,28 +799,57 @@ func cargar_envio(B: Dictionary) -> void:
 	var carga := []   # [k, g, thc, calidad]
 	var tot := 0
 	var cap: int = int(B.kg) * 1000
+	# lo pidió el usuario («que tú metas esos 10, puedas salir del menú y volver a meter más»): con CAL, lo que cargas pasa de la
+	# mochila a la bodega del barco (S.mar.bod[barco], lotes como los de la caja) y se queda ahí hasta zarpar; se puede descargar
+	var bod: Dictionary = bodega(B.k) if Datos.CAL else {}
 	while true:
+		if Datos.CAL:
+			tot = int(round(bodega_g(B.k)))
 		var lots := bud_lots(1)
 		lots = lots.filter(func(l): return carga.all(func(c): return c[0] != l[0]))
 		var it := lots.map(venta_item)
 		if tot >= int(R.min):
 			it.append({"label": T("Zarpar ({kg})", {"kg": _kg(tot)})})
-		it.append({"label": K("Nada")})
+		if Datos.CAL and tot > 0:
+			it.append({"label": K("Descargar"), "desc": K("Lo de la bodega, otra vez encima (lo que te quepa).")})
+		it.append({"label": K("Nada") if tot == 0 or not Datos.CAL else K("Dejarlo cargado")})
 		var i: int = await menu(it, {"cls": "right", "title": T("La carga · {a} de {b}", {"a": _kg(tot), "b": _kg(cap)})})
 		if i >= 0 and i < lots.size():
 			var l: Array = lots[i]
 			var g = await cuanto(T("¿Cuánto de {n}?", {"n": lot_nombre(l[0])}), mini(int(floor(l[1].g)), cap - tot), [250, 500, 1000, 2000, 5000, 10000, 20000], func(v): return _kg(int(v)))
 			if g > 0:
-				carga.append([l[0], int(g), float(l[1].thc), calidad(l[1], true)])
-				tot += int(g)
-			if tot >= cap:
+				if Datos.CAL:
+					mover_lote(S.buds, bod, l[0], float(g))
+					sfx("sel")
+				else:
+					carga.append([l[0], int(g), float(l[1].thc), calidad(l[1], true)])
+					tot += int(g)
+			if (int(round(bodega_g(B.k))) if Datos.CAL else tot) >= cap:
 				await say(K("La bodega va llena."))
 			continue
 		if i == lots.size() and tot >= int(R.min):
 			break
+		if Datos.CAL and tot > 0 and i == lots.size() + (1 if tot >= int(R.min) else 0):
+			var q := 0.0
+			for k in bod.keys():
+				var g: float = minf(floor(float(bod[k].g)), floor(libre_mochila()))
+				if g < 1:
+					break
+				mover_lote(bod, S.buds, k, g)
+				q += g
+			update_hud()
+			await say(T("Sacas {g} de la bodega.", {"g": g_txt(q)}) + ((" " + K("No te cabe todo: el resto se queda a bordo.")) if bodega_g(B.k) >= 1 else "") if q >= 1 else K("No te cabe nada más encima."))
+			continue
+		if Datos.CAL and tot > 0:
+			update_hud()
+			await say(T("Lo dejas en la bodega: {kg} a bordo de {b}, listos para zarpar cuando vuelvas.", {"kg": _kg(tot), "b": B.n}))
 		return
 	if tot < int(R.min):
 		return
+	if Datos.CAL:   # zarpa con toda la bodega
+		for k in bod:
+			carga.append([k, float(bod[k].g), float(bod[k].thc), calidad(bod[k], true)])
+		S.mar.bod.erase(B.k)
 	var rt: Dictionary = R.rutas[ri_]
 	var P_ = S.mar.ped
 	var ped: bool = P_ is Dictionary and int(P_.r) == ri_ and tot >= int(P_.g) and S.day <= int(P_.d) and carga.all(func(c): return c[2] >= float(P_.thc))
@@ -813,7 +857,8 @@ func cargar_envio(B: Dictionary) -> void:
 	var e := 0.0
 	for c in carga:
 		e += precio_mayor(c[2]) * c[3] * float(rt.px) * c[1]
-		use_buds(c[0], c[1])
+		if not Datos.CAL:
+			use_buds(c[0], c[1])
 	if ped:
 		e *= float(R.ped.bonus)
 		S.mar.ped = null
@@ -1622,98 +1667,221 @@ func _gspc(R: Array, n: String, x: float, y: float, V: Dictionary) -> void:
 func _gsp(R: Array, n: String, x: float, y: float) -> void:
 	R.append(["@", n, _gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), _gs])
 
-# 0.56 (lo pidió el usuario: «molaría que la vista sea POV»): la mano de PixelLab, en primera persona, en (x, y) y la manga alargada
-# hasta el canto con su misma inclinación: la tuya, hacia la esquina de abajo a la derecha (la del mechero, -ab, a la izquierda); la del
-# cliente, -i, hacia la de arriba a la izquierda. Fila a fila, el corte entero de la manga corrido lo que se corre la manga: nunca flota
+# la mano de PixelLab, en primera persona, en (x, y), con su antebrazo (lo pidió el usuario: «desde que empieza el ángulo desde la
+# muñeca, tiene que ir hasta el final y completarlo con un giro circular… que sea como un cilindro… que no tenga esos picos en la
+# manga»): la manga del sprite se quita desde el puño y en su lugar va un cilindro del ancho del puño, recto por la dirección de la
+# manga, con la raya negra a los dos lados y la punta en media luna, del mismo largo en todas las manos. Una sola imagen por mano
 func _gsm(R: Array, n: String, x: float, y: float) -> void:
-	_gsp(R, n, x, y)
 	var f = Atlas.foto_misc(n)
 	if f == null:
+		_gsp(R, n, x, y)
 		return
-	var M: Array = _gs_manga(n, f.c)   # [fila, x0, x1, pendiente]
 	var X: int = _gs.position.x + Datos.jsround(x)
 	var Y: int = _gs.position.y + Datos.jsround(y)
-	var B: Array = _gs_brazo(n, f.c, M, X, Y)   # [imagen, esquina respecto a (X, Y)]
-	R.append(["@", B[0], X + B[1].x, Y + B[1].y, _gs, n])
+	var C: Array = _gs_cilindro(n, f.c)   # [imagen, esquina, geometría]
+	R.append(["@", C[0], X + C[1].x, Y + C[1].y, _gs, n, C[2]])
 
-# el hombro de cada mano, fuera del panel: el tuyo abajo a la derecha, el de la mano del mechero abajo a la izquierda, el del cliente
-# arriba a la izquierda (enfrente); el brazo va del corte de la manga hacia él
-func _gs_hombro(n: String) -> Vector2:
-	if n.ends_with("-i"):
-		return Vector2(_gs.position.x - 40, _gs.position.y - 50)
-	if n.ends_with("-ab"):
-		return Vector2(_gs.position.x + 10, _gs.end.y + 70)
-	return Vector2(_gs.end.x + 30, _gs.end.y + 60)
+# el negro del contorno de la mano: el color opaco más oscuro del sprite
+var _gs_ng := {}
+func _gs_negro(im: Image) -> Color:
+	var k: int = im.get_instance_id()
+	if _gs_ng.has(k):
+		return _gs_ng[k]
+	var c := Color(0.1, 0.1, 0.12)
+	var lm := 9.0
+	for y in im.get_height():
+		for x in im.get_width():
+			var p: Color = im.get_pixel(x, y)
+			if p.a > 0.5 and p.get_luminance() < lm:
+				lm = p.get_luminance()
+				c = Color(p.r, p.g, p.b, 1.0)
+	_gs_ng[k] = c
+	return c
 
-# el antebrazo (lo pidió el usuario: «más cortos y anchos hacia abajo», «que se desvanezca… las mismas proporciones de mano y brazo en
-# cada sprite» y «acortar el brazo de manera redonda al final y desvanecerlo así»): del corte de la manga hacia el hombro, con el
-# contorno de 1 px a los lados y el relleno de la fila de la manga estirado; se ensancha GS_BRAZO px por px de eje (el del cliente,
-# que está enfrente, no), mide GS_BRAZO_L px por el eje en todas las manos y acaba en media luna (la punta redonda); las últimas
-# GS_BRAZO_FUNDE px antes de la punta se deshacen en tres bandas de tramado (3/4, 1/2, 1/4, Bayer 4 × 4) que siguen la curva, sin
-# el contorno (que en el tramado quedaría en puntos negros sueltos)
-const GS_BRAZO := 0.4
-const GS_BRAZO_L := 22
-const GS_BRAZO_FUNDE := 6
-const GS_BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
-var _gs_br := {}
-func _gs_brazo(n: String, im: Image, M: Array, X: int, Y: int) -> Array:
-	var ys: int = M[0]
-	var x0: int = M[1]
-	var w0: int = M[2] - M[1] + 1
-	var arriba: bool = n.ends_with("-i")
-	var O := Vector2(x0 + w0 / 2.0, ys + (0.0 if arriba else 1.0))   # el centro del corte de la manga, en el sprite
-	var ax: Vector2 = (_gs_hombro(n) - Vector2(X, Y) - O).normalized()
-	if (ax.y < 0.2) if not arriba else (ax.y > -0.2):   # nunca de lado ni hacia atrás: sale del corte hacia fuera
-		ax = Vector2(ax.x, 0.2 if not arriba else -0.2).normalized()
-	var ang: int = int(round(rad_to_deg(ax.angle()) / 3.0))
-	var key := "%s|%d" % [n, ang]
-	if _gs_br.has(key):
-		return _gs_br[key]
-	if _gs_br.size() > 96:
-		_gs_br.clear()
-	ax = Vector2.from_angle(deg_to_rad(ang * 3.0))
+# el largo del antebrazo desde el centro del puño, igual en todas las manos (con la media luna de la punta)
+const GS_CIL_L := 30
+var _gs_cl := {}
+func _gs_cilindro(n: String, im: Image) -> Array:
+	if _gs_cl.has(n):
+		return _gs_cl[n]
+	var w: int = im.get_width()
+	var h: int = im.get_height()
+	var M: Array = _gs_manga(n, im)   # [fila, x0, x1, pendiente]
+	var neg: Color = _gs_negro(im)
+	var oscuro := func(p: Color) -> bool:
+		return p.get_luminance() < neg.get_luminance() + 0.06
+	# los colores de la manga: los del corte (todos sus tonos de lado a lado), menos el negro
+	var tela := {}
 	var fila := []
-	for i in w0:
-		fila.append(im.get_pixel(x0 + i, ys))
-	var sy: float = -1.0 if arriba else 1.0
-	var pe := Vector2(-ax.y, ax.x)          # a escuadra con el eje
-	var co: float = absf(ax.y)               # el corte es horizontal: su ancho a escuadra es w0 × co
-	var ab: float = 0.0 if arriba else GS_BRAZO
-	var R_: float = (w0 + ab * GS_BRAZO_L) * co / 2.0   # el radio de la punta
-	var Lc: float = GS_BRAZO_L - R_                     # donde empieza la media luna
-	var mx: int = GS_BRAZO_L + w0
-	var cx: int = x0 - mx
-	var cy: int = (ys - mx) if arriba else (ys + 1)
-	var out := Image.create(w0 + 2 * mx, mx, false, Image.FORMAT_RGBA8)
-	for py in mx:
+	var veces := {}   # el tono de la tela: el del color que más sale en el corte (el puño dorado o la piel, si asoman, no)
+	for x in range(M[1], M[2] + 1):
+		var p: Color = im.get_pixel(x, M[0])
+		if p.a > 0.5 and not oscuro.call(p):
+			veces[p.to_rgba32()] = veces.get(p.to_rgba32(), 0) + 1
+	var km: int = 0
+	for k in veces:
+		if km == 0 or veces[k] > veces[km]:
+			km = k
+	var hm: float = Color.hex(km).h
+	var mismo_tono := func(p: Color) -> bool:
+		var dh: float = absf(p.h - hm)
+		return minf(dh, 1.0 - dh) < 0.08
+	for x in range(M[1], M[2] + 1):
+		var p: Color = im.get_pixel(x, M[0])
+		if p.a > 0.5 and not oscuro.call(p) and mismo_tono.call(p):
+			tela[p.to_rgba32()] = true
+			fila.append(p)
+	if fila.is_empty():
+		fila.append(neg)
+	var es_tela := func(x: int, y: int) -> bool:   # todos los tonos de la manga: su color, con sus luces y sombras
+		if x < 0 or y < 0 or x >= w or y >= h:
+			return false
+		var p: Color = im.get_pixel(x, y)
+		return p.a > 0.5 and not oscuro.call(p) and p.s > 0.35 and mismo_tono.call(p)
+	# la manga del sprite: desde el corte por sus colores, y el negro que la toca
+	var manga := {}
+	var cola: Array = []
+	for x in range(M[1], M[2] + 1):
+		if im.get_pixel(x, M[0]).a > 0.5:
+			manga[Vector2i(x, M[0])] = true
+			cola.append(Vector2i(x, M[0]))
+	var V4 := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
+	while not cola.is_empty():
+		var q: Vector2i = cola.pop_back()
+		for d in V4:
+			var r: Vector2i = q + d
+			if manga.has(r) or r.x < 0 or r.y < 0 or r.x >= w or r.y >= h or im.get_pixel(r.x, r.y).a < 0.5:
+				continue
+			var ok: bool = es_tela.call(r.x, r.y)
+			if not ok and oscuro.call(im.get_pixel(r.x, r.y)):
+				for e in V4:
+					ok = ok or es_tela.call(r.x + e.x, r.y + e.y)
+			if ok:
+				manga[r] = true
+				cola.append(r)
+	# el puño: lo pintado que no es manga ni negro y toca la manga
+	var puno: Array = []
+	var gm := Vector2.ZERO
+	for q in manga:
+		gm += Vector2(q) + Vector2(0.5, 0.5)
+		for d in V4:
+			var r: Vector2i = q + d
+			if r.x >= 0 and r.y >= 0 and r.x < w and r.y < h and not manga.has(r) and im.get_pixel(r.x, r.y).a > 0.5 \
+					and not oscuro.call(im.get_pixel(r.x, r.y)) and not puno.has(r):
+				puno.append(r)
+	gm /= maxf(1.0, manga.size())
+	# solo el color del puño (el que más toca la manga) y sus tonos: ni la piel ni lo que lleva la mano
+	var cuenta := {}
+	for q in puno:
+		var k: int = im.get_pixel(q.x, q.y).to_rgba32()
+		cuenta[k] = cuenta.get(k, 0) + 1
+	var kp: int = 0
+	for k in cuenta:
+		if kp == 0 or cuenta[k] > cuenta[kp]:
+			kp = k
+	var cp := Color.hex(kp)
+	puno = puno.filter(func(q): var p: Color = im.get_pixel(q.x, q.y); return Vector3(p.r - cp.r, p.g - cp.g, p.b - cp.b).length() < 0.3)
+	var c := Vector2.ZERO
+	for q in puno:
+		c += Vector2(q) + Vector2(0.5, 0.5)
+	c /= maxf(1.0, puno.size())
+	var ax: Vector2 = (gm - c).normalized() if puno.size() >= 3 and gm != c else Vector2(1, 1).normalized()
+	var pe := Vector2(-ax.y, ax.x)
+	var smin := 99.0
+	var smax := -99.0
+	for q in manga:   # el ancho: el de la manga junto al puño, con su raya
+		var d: Vector2 = Vector2(q) + Vector2(0.5, 0.5) - c
+		if d.dot(ax) > 0.0 and d.dot(ax) < 5.0:
+			smin = minf(smin, d.dot(pe) - 0.5)
+			smax = maxf(smax, d.dot(pe) + 0.5)
+	if smax < smin:
+		smin = -(M[2] - M[1] + 1) / 2.0
+		smax = -smin
+	var ra: float = (smax - smin) / 2.0   # el radio: media manga junto al puño, con la raya
+	c += pe * (smax + smin) / 2.0
+	var L: float = GS_CIL_L
+	var tc: float = L - ra   # el centro de la media luna
+	# la raya negra de la manga vieja, más allá del puño, también fuera (si no, quedan picos al lado del cilindro)
+	var cola2: Array = manga.keys()
+	while not cola2.is_empty():
+		var q: Vector2i = cola2.pop_back()
+		for dy in [-1, 0, 1]:
+			for dx in [-1, 0, 1]:
+				var r := Vector2i(q.x + dx, q.y + dy)
+				if manga.has(r) or r.x < 0 or r.y < 0 or r.x >= w or r.y >= h or im.get_pixel(r.x, r.y).a < 0.5:
+					continue
+				if oscuro.call(im.get_pixel(r.x, r.y)) and (Vector2(r) + Vector2(0.5, 0.5) - c).dot(ax) > 0.5:
+					var junto := false   # la raya del puño y de la mano se queda
+					for ey in [-1, 0, 1]:
+						for ex in [-1, 0, 1]:
+							var z := Vector2i(r.x + ex, r.y + ey)
+							if z.x >= 0 and z.y >= 0 and z.x < w and z.y < h and not manga.has(z) and im.get_pixel(z.x, z.y).a > 0.5 \
+									and not oscuro.call(im.get_pixel(z.x, z.y)):
+								junto = true
+					if not junto:
+						manga[r] = true
+						cola2.append(r)
+	# el lienzo: el sprite y el cilindro
+	var bb := Rect2(Vector2.ZERO, Vector2(w, h))
+	for p in [c + pe * ra, c - pe * ra, c + ax * L + pe * ra, c + ax * L - pe * ra]:
+		bb = bb.expand(p)
+	var o := Vector2i(floori(bb.position.x) - 1, floori(bb.position.y) - 1)
+	var out := Image.create(ceili(bb.end.x) - o.x + 1, ceili(bb.end.y) - o.y + 1, false, Image.FORMAT_RGBA8)
+	for y in h:
+		for x in w:
+			var p: Color = im.get_pixel(x, y)
+			if p.a < 0.5:
+				continue
+			var tq: float = (Vector2(x, y) + Vector2(0.5, 0.5) - c).dot(ax)
+			if manga.has(Vector2i(x, y)) and tq > 0.0:
+				continue   # la manga de PixelLab, fuera desde el puño
+			if tq > 0.5 and not oscuro.call(p) and p.s > 0.2 and mismo_tono.call(p):
+				continue   # y sus restos sueltos, en cualquier tono de la tela
+			out.set_pixel(x - o.x, y - o.y, p)
+	for vuelta in 2:   # la raya negra que se ha quedado sin nada que rodear
+		var fuera: Array = []
+		for py in out.get_height():
+			for px in out.get_width():
+				var p: Color = out.get_pixel(px, py)
+				if p.a < 0.5 or not oscuro.call(p) or (Vector2(px + o.x, py + o.y) + Vector2(0.5, 0.5) - c).dot(ax) <= 0.5:
+					continue
+				var solo := true
+				for ey in [-1, 0, 1]:
+					for ex in [-1, 0, 1]:
+						var z := Vector2i(px + ex, py + ey)
+						if z.x >= 0 and z.y >= 0 and z.x < out.get_width() and z.y < out.get_height():
+							var pz: Color = out.get_pixel(z.x, z.y)
+							if pz.a > 0.5 and not oscuro.call(pz):
+								solo = false
+				if solo:
+					fuera.append(Vector2i(px, py))
+		for q in fuera:
+			out.set_pixel(q.x, q.y, Color(0, 0, 0, 0))
+	for py in out.get_height():
 		for px in out.get_width():
-			var d := Vector2(cx + px + 0.5, cy + py + 0.5) - O
-			if d.y * sy <= 0.0:
+			if out.get_pixel(px, py).a > 0.5:
 				continue
+			var d := Vector2(px + o.x, py + o.y) + Vector2(0.5, 0.5) - c
 			var t: float = d.dot(ax)
-			var sp: float = d.dot(pe)
-			var me: float = (w0 + ab * clampf(t, 0.0, Lc)) * co / 2.0   # medio ancho aquí
-			var fin: float   # hasta dónde llega el brazo por el eje en esta línea (la media luna)
-			if absf(sp) > me:
+			var s: float = d.dot(pe)
+			if t < 0.0 or absf(s) > ra:
 				continue
-			fin = Lc + sqrt(maxf(0.0, R_ * R_ - sp * sp)) if R_ > 0.0 else Lc
-			if t > fin:
+			var borde: float = ra - absf(s)   # lo que falta para salirse por el lado o por la media luna
+			if t > tc:
+				var rr: float = Vector2(t - tc, s).length()
+				if rr > ra:
+					continue
+				borde = ra - rr
+			if borde < 1.0:
+				out.set_pixel(px, py, neg)
 				continue
-			var fu: float = clampf(ceilf((t - (fin - GS_BRAZO_FUNDE)) / GS_BRAZO_FUNDE * 3.0) / 4.0, 0.0, 1.0)   # 1/4, 1/2, 3/4 fuera
-			if fu > 0.0 and (GS_BAYER[(py % 4) * 4 + (px % 4)] + 0.5) / 16.0 < fu:
-				continue
-			var j: int
-			if absf(sp) > me - 1.0 and fu == 0.0:   # el contorno de los lados, solo donde el brazo es entero (en el tramado, puntos sueltos)
-				j = 0 if (sp < 0.0) == (pe.x > 0.0) else w0 - 1
-			else:
-				var u: float = (sp / (2.0 * me) + 0.5) if pe.x > 0.0 else (0.5 - sp / (2.0 * me))
-				j = clampi(1 + int(u * (w0 - 2)), 1, w0 - 2)
-			out.set_pixel(px, py, fila[j])
-	var ur: Rect2i = out.get_used_rect()
-	if ur.size.x <= 0:
-		ur = Rect2i(0, 0, 1, 1)
-	_gs_br[key] = [out.get_region(ur), Vector2i(cx + ur.position.x, cy + ur.position.y)]
-	return _gs_br[key]
+			var u: float = (s / (2.0 * ra) + 0.5) if pe.x > 0.0 else (0.5 - s / (2.0 * ra))
+			out.set_pixel(px, py, fila[clampi(int(u * fila.size()), 0, fila.size() - 1)])
+	for q in manga:
+		if es_tela.call(q.x, q.y):
+			tela[im.get_pixel(q.x, q.y).to_rgba32()] = true
+	_gs_cl[n] = [out, o, {"c": c - Vector2(o), "ax": ax, "r": ra, "l": L, "tela": tela}]
+	return _gs_cl[n]
 
 # el corte de la manga: la fila (de las 20 del canto) donde ya es entera, el tramo de esa fila que es manga (el del lado de su esquina:
 # el derecho la tuya, el izquierdo la del mechero y la del cliente) y lo que se corre en x por cada fila hacia fuera

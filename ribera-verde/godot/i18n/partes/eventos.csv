@@ -204,3 +204,9 @@ Con papeles. Treinta años escondiéndonos y ahora te dan un sello. Maite se par
 "{n} · hoy, hasta {kg}","{n} · today, up to {kg}"
 Venta · {n},Sale · {n}
 "{kg} de {l}, con factura: {e} a la cuenta.","{kg} of {l}, invoiced: {e} to your account."
+Descargar,Unload
+"Lo de la bodega, otra vez encima (lo que te quepa).","What's in the hold, back on you (whatever fits)."
+Dejarlo cargado,Leave it loaded
+Sacas {g} de la bodega.,You take {g} out of the hold.
+No te cabe todo: el resto se queda a bordo.,Not everything fits: the rest stays on board.
+"Lo dejas en la bodega: {kg} a bordo de {b}, listos para zarpar cuando vuelvas.","You leave it in the hold: {kg} on board {b}, ready to sail when you come back."
