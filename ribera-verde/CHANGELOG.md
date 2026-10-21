@@ -2,6 +2,9 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Plugin de WordPress 1.5.7
+- `landrace-hunters` 1.5.7 con el Godot 0.58.0 (`node tools/wordpress.js` → `descargas/landrace-hunters-1.5.7.zip`, 30 MB): probado en Chromium, carga el aviso de edad y el título.
+
 ### Fase 1 · plataforma
 - **Godot 4.7** (antes 4.3): el proyecto, las pruebas y la exportación; `.uid` de los scripts en el repo. Arreglos por el cambio de versión: `prueba.gd` compara los números por su valor (4.4+ escribe `1.0` donde 4.3 escribía `1`) y `paginas()` de `ui.gd` cuenta los saltos de línea y parte las líneas de más de 3.500 letras (una página de las licencias salía de 3.501).
 - **AAB con la plantilla Gradle** (`tools/godot-aab.js`, `npm run godot:aab`; sustituye a `godot-apk.js`): paquete `com.landracehunters.game`, targetSdk 36, minSdk 24, arm64-v8a y armeabi-v7a, icono monocromo de Android 13, iconos por vecino más próximo dentro del AAB, firma con la upload key (variables `LH_KEYSTORE*` o `LH_ENV`, la keystore fuera del repo; se niega a usar una dentro) y comprobaciones: páginas de 16 KB (`zipalign -P 16` y `readelf` en las `.so` de 64 bits) y targetSdk 36 en el manifiesto. Saca también el APK universal con bundletool para probar en el móvil.
