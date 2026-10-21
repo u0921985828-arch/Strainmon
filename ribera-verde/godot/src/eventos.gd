@@ -1847,7 +1847,7 @@ func _gs_cilindro(n: String, im: Image) -> Array:
 	var manga := {}
 	var cola: Array = []
 	for x in range(M[1], M[2] + 1):
-		if im.get_pixel(x, M[0]).a > 0.5:
+		if es_tela.call(x, M[0]):   # solo la tela del corte (si la mano llega a esa fila, la mano no: se quedaba sin una fila entera)
 			manga[Vector2i(x, M[0])] = true
 			cola.append(Vector2i(x, M[0]))
 	var V4 := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
