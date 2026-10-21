@@ -232,6 +232,7 @@
 
 ### APK de las muñecas y las puertas · Godot 0.57.0 (código 76)
 - Lo pidió el usuario: «pásame el APK cuando esté». Batería entera 66/66 en verde antes de compilar.
+- `descargas/LandraceHunters.apk` (88 MB, `apk-instalar.py` + `zipalign -P 16` + `apksigner`, la misma firma y el mismo paquete que la 0.56.0); AAB firmado de 81 MB, targetSdk 36, 16 KB en las 4 `.so`.
 
 ### APK de los gestos en primera persona · Godot 0.56.0 (código 75)
 - Lo pidió el usuario: «Entrega el apk», tras «Molaría que la vista sea POV». Batería entera 64/64 en verde antes de compilar.
