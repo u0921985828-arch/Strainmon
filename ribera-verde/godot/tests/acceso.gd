@@ -116,7 +116,7 @@ func brazo_cilindro(im: Image, g: Dictionary) -> bool:
 	for t in range(int(r) + 2, int(L - r)):   # desde donde ya no está la mano
 		var m := c + ax * (t + 0.5)
 		for lado in [-1.0, 1.0]:
-			if not borde.call(m, pe * lado, r - 2.0, r + 1.0):
+			if not borde.call(m, pe * lado, r - 2.0, r + 2.0):   # la raya del sprite de PixelLab, seguida: puede ir un píxel más allá
 				return false
 	return borde.call(c, ax, L - 2.0, L + 1.0)
 
@@ -264,6 +264,26 @@ func _corre() -> void:
 		if despues_o < antes_o * 0.8:
 			sin_oro.append("%s %d→%d" % [nm, antes_o, despues_o])
 	chk(sin_oro.is_empty(), "el puño dorado, entero: %s" % [sin_oro])
+	# la muñeca, la del sprite (lo pidió el usuario: «sigue esas dos líneas del brazo, del sprite original, y luego lo cierras; no tienes
+	# por qué abrir una nueva línea desde la muñeca»): nada del sprite de PixelLab cambia hasta la punta, solo se alarga
+	var tocadas := []
+	for nm in ["gm-abono", "gm-billete", "gm-billete-i", "gm-bolsita", "gm-bolsita-i", "gm-mech0-ab", "gm-mech1-ab", "gm-pincel", "gm-pipa", "gm-porro", "gm-regar", "gm-semilla", "gm-spray", "gm-tij-a", "gm-tij-c", "gm-vacia", "gm-vapo"]:
+		var fo = Atlas.foto_misc(nm)
+		if fo == null:
+			tocadas.append(nm + " (sin sprite)")
+			continue
+		var C: Array = J._gs_cilindro(nm, fo.c)
+		var g: Dictionary = C[2]
+		var mal := 0
+		for y in fo.c.get_height():
+			for x in fo.c.get_width():
+				var p: Color = fo.c.get_pixel(x, y)
+				var t: float = (Vector2(x - C[1].x, y - C[1].y) + Vector2(0.5, 0.5) - g.c).dot(g.ax)
+				if p.a > 0.5 and t < g.l - 2.0 * g.r and C[0].get_pixel(x - C[1].x, y - C[1].y) != p:
+					mal += 1
+		if mal > 0:
+			tocadas.append("%s %d px" % [nm, mal])
+	chk(tocadas.is_empty(), "la muñeca y la manga, las del sprite: %s" % [tocadas])
 	# cada cerradura, su llave y sus vueltas (lo pidió el usuario: «personalizado para abrir una cerradura u otra, y el tipo de llave
 	# que concuerde con la cerradura»): la llave de su cerradura, de plano y de canto tantas veces como vueltas, y su puerta
 	var fondos := {}

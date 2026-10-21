@@ -4,7 +4,8 @@
 # como el almacén y el móvil. El juego (trama.gd, `_gesto_spr`) compone el fondo y mueve las piezas por el reloj.
 #  · Fondos (gs_fondo, 128 × 80, ancla arriba a la izquierda): gs-f-carpa (la carpa plateada por dentro, con la bandeja y la luz),
 #    gs-f-mesa (la mesa de la tía contra la pared), gs-f-cuarto (el salón de noche, el sofá), gs-f-calle (la pared de ladrillo y la
-#    acera), gs-f-cama-n y gs-f-cama-d (la cama de noche y de siesta).
+#    acera), gs-f-cama-n y gs-f-cama-d (la cama de noche y de siesta); acc-f-<cerradura> (acc_fondo, 104 × 84), la puerta de cada
+#    cerradura y la persiana de la nave.
 #  · Piezas (gs_g 48 × 48, gs_m 24 × 24, gs_s 8 × 8): la maceta de tela, seca y regada, la planta en vegetativo y en flor, el brote,
 #    las manos con la regadera, el pulverizador, la botella de abono, el esqueje, las tijeras de podar, el cogollo con hojas y
 #    pelado, el pincel, el porro, la pipa, el bong, el vapo, el mechero, el humo, la bolsita, los billetes, la cabeza dormida y la Z.
@@ -671,9 +672,158 @@ def f_cama(dia):
     L.pega(con(e), 0, 0)
     return L
 
+# ── las puertas de abrir con llave (lo pidió el usuario: «los fondos del candado y de las cerraduras… se nota que no se ha creado
+# con lo mismo»): 104 × 84 como el panel de acceso (ACC_W × ACC_H), la cerradura en el centro (52, 42), con el contorno y la luz
+# arriba a la izquierda de los demás fondos; la llave y el candado los pinta el juego encima
+LATON = ('#6a4a18', '#9a7228', '#c8a048', '#ecd078')
+CROMO = ('#5a606a', '#8a929c', '#c0c8d0', '#eef2f6')
+AW, AH, CX, CY = 104, 84, 52, 42
+
+def jamba(L, x, w, r):
+    """el marco a un lado: el canto de luz, la cara y la sombra que deja en la puerta"""
+    caja(L, x, 0, w, AH, r)
+    L.vl(x + w, 0, AH - 1, r[0])
+
+def tornillo(L, x, y, r=LATON):
+    L.p(x, y, r[0]); L.p(x - 1, y, r[3]); L.p(x, y - 1, r[3])
+
+def bombin_redondo(L, r=LATON):
+    ovalo(L, CX, CY - 2, 4.5, 4.5, r)
+    L.r(CX - 3, CY - 2, 6, 2, K)
+
+def f_puerta_portal():
+    """el portal del piso: madera de tablas con veta, un cuarterón, el escudo largo de latón con el pomo y el bombín"""
+    L = lz(AW, AH)
+    R = azar(41)
+    for y in range(AH):
+        for x in range(AW):
+            t = x // 13
+            veta = (y + t * 29 + int(2 * math.sin(x * .9 + t))) % 19
+            c = MAD[1] if t % 2 == 0 else '#7e522c'
+            if veta in (0, 9) or R() < .02: c = MAD[0]
+            if x % 13 == 0: c = '#4a3018'
+            if x % 13 == 1: c = MAD[2]
+            L.p(x, y, c)
+    pan = lz(AW, AH)   # el cuarterón de arriba, en relieve
+    caja(pan, 14, 6, 76, 20, ('#4a3018', MAD[1], MAD[2], MAD[3]))
+    L.pega(pan, 0, 0)
+    jamba(L, 0, 7, ('#3a2a1a', '#5a3e26', '#7a5a38', '#9a7a50'))
+    e = lz(AW, AH)   # el escudo
+    caja(e, CX - 8, CY - 22, 16, 44, LATON)
+    for (x, y) in ((CX - 5, CY - 19), (CX + 4, CY + 18)): tornillo(e, x, y)
+    ovalo(e, CX, CY - 14, 5, 4, LATON, .1)        # el pomo
+    bombin_redondo(e)
+    L.pega(con(e), 0, 0)
+    return L
+
+def f_puerta_local():
+    """el local: perfil de aluminio, el cristal arriba con sus brillos, el panel de abajo y la placa estrecha con la manilla"""
+    L = lz(AW, AH)
+    for y in range(AH):
+        for x in range(AW):
+            L.p(x, y, tono(CROMO, .58 - y / AH * .18 + (.06 if (x + y) % 9 == 0 else 0)))
+    cr = lz(AW, AH)   # el cristal, con la calle reflejada
+    caja(cr, 8, 4, AW - 16, 30, CROMO)
+    for y in range(6, 33):
+        for x in range(10, AW - 10):
+            c = tono(VIDRIO, .3 + (y - 6) / 27 * .25)
+            if (x - y) % 23 in (0, 1, 2) or (x - y) % 23 == 6: c = VIDRIO[3]
+            cr.p(x, y, c)
+    L.pega(con(cr), 0, 0)
+    caja(L, 8, 40, AW - 16, AH - 46, CROMO)
+    jamba(L, 0, 6, CROMO)
+    e = lz(AW, AH)
+    caja(e, CX - 5, CY - 20, 10, 42, CROMO)
+    caja(e, CX - 10, CY - 17, 20, 4, CROMO)       # la manilla
+    caja(e, CX - 3, CY - 7, 6, 10, ('#101014', '#202024', '#9aa2aa', '#c8ccd4'))   # el bombín europeo
+    e.r(CX - 2, CY - 3, 4, 1, K)
+    L.pega(con(e), 0, 0)
+    return L
+
+def f_puerta_club():
+    """el club: lacada en negro con el brillo en vertical, dos junquillos, el tirador y la roseta cromada"""
+    L = lz(AW, AH)
+    LACA = ('#121216', '#1e1e24', '#2c2c34', '#4a4a56')
+    for y in range(AH):
+        for x in range(AW):
+            v = .3 + (.55 if 22 <= x <= 25 else 0) + (.3 if x in (21, 26) else 0) - y / AH * .1
+            L.p(x, y, tono(LACA, v))
+    for xx in (14, AW - 15):
+        L.vl(xx, 0, AH - 1, LACA[0]); L.vl(xx + 1, 0, AH - 1, LACA[3])
+    jamba(L, 0, 6, ('#2a1a10', '#3a2a1a', '#5a3e26', '#7a5a38'))
+    e = lz(AW, AH)
+    caja(e, CX - 13, CY - 19, 26, 4, CROMO)       # el tirador
+    ovalo(e, CX, CY, 8, 8, CROMO)                 # la roseta
+    e.r(CX - 2, CY - 4, 4, 7, K); e.r(CX - 1, CY - 3, 2, 5, CROMO[2]); e.p(CX - 1, CY - 1, K); e.p(CX, CY - 1, K)
+    L.pega(con(e), 0, 0)
+    return L
+
+def f_puerta_franco():
+    """el piso franco: blindada en gris acero, cuatro cuarterones en relieve y el escudo de seguridad redondo"""
+    L = lz(AW, AH)
+    AC = ('#2e333a', '#454c55', '#5c646e', '#7a838e')
+    for y in range(AH):
+        for x in range(AW):
+            L.p(x, y, tono(AC, .45 + (.08 if (x * 3 + y * 7) % 31 == 0 else 0)))
+    pan = lz(AW, AH)
+    for (qx, qy) in ((10, 4), (AW // 2 + 4, 4), (10, AH // 2 + 2), (AW // 2 + 4, AH // 2 + 2)):
+        caja(pan, qx, qy, AW // 2 - 14, AH // 2 - 7, AC)
+    L.pega(pan, 0, 0)
+    jamba(L, 0, 6, AC)
+    e = lz(AW, AH)
+    ovalo(e, CX, CY, 11, 11, CROMO)
+    ovalo(e, CX, CY, 9, 9, ('#101014', '#1e1e24', '#2c2c34', '#3a3a44'))
+    caja(e, CX - 4, CY - 6, 8, 12, ('#1e1e24', '#2c2c34', '#4a4a56', '#5a5a66'))   # la tapa giratoria, abierta
+    e.r(CX - 1, CY - 6, 3, 10, '#050505'); e.r(CX - 3, CY - 3, 7, 3, '#050505')
+    L.pega(con(e), 0, 0)
+    return L
+
+def pasador(L, y):
+    """el pasador del candado, atornillado"""
+    p = lz(AW, AH)
+    caja(p, 0, y, AW, 5, MET)
+    for x in (10, 30, AW - 31, AW - 11): tornillo(p, x, y + 2, MET)
+    caja(p, CX - 4, y - 3, 8, 11, MET)            # la hembrilla del arco
+    L.pega(con(p), 0, 0)
+
+def f_persiana():
+    """la nave: la persiana metálica de lamas, con su luz y su sombra en cada una, la guía al lado y el pasador"""
+    L = lz(AW, AH)
+    for y in range(AH):
+        f = y % 6
+        for x in range(AW):
+            L.p(x, y, (MET[3], MET[2], MET[2], MET[1], MET[1], MET[0])[f])
+    R = azar(53)
+    for _ in range(40):
+        x, y = int(R() * AW), int(R() * AH)
+        L.p(x, y, '#8a6a4a')                       # la roña
+    jamba(L, 0, 7, MET)
+    pasador(L, CY - 6)
+    return L
+
+def f_puerta_bajo():
+    """el bajo de las setas: la puerta de chapa gris con su cuarterón, algo de óxido, y el pasador"""
+    L = lz(AW, AH)
+    CH = ('#3e4446', '#555c5e', '#6a7274', '#8a9294')
+    for y in range(AH):
+        for x in range(AW):
+            L.p(x, y, tono(CH, .45 - y / AH * .1))
+    pan = lz(AW, AH)
+    caja(pan, 12, 8, AW - 24, AH - 16, CH)
+    L.pega(pan, 0, 0)
+    R = azar(59)
+    for _ in range(30):
+        x, y = int(R() * AW), int(AH * .6 + R() * AH * .4)
+        L.p(min(AW - 1, x), min(AH - 1, y), '#7a4a2a' if R() < .6 else '#9a6038')
+    jamba(L, 0, 6, CH)
+    pasador(L, CY - 6)
+    return L
+
 # ── a la salida ──
 sale('gs-f-carpa', f_carpa()); sale('gs-f-mesa', f_mesa()); sale('gs-f-cuarto', f_cuarto()); sale('gs-f-calle', f_calle())
 sale('gs-f-cama-n', f_cama(False)); sale('gs-f-cama-d', f_cama(True))
+sale('acc-f-portal', f_puerta_portal()); sale('acc-f-local', f_puerta_local()); sale('acc-f-club', f_puerta_club())
+sale('acc-f-franco', f_puerta_franco()); sale('acc-f-nave', f_persiana()); sale('acc-f-setas', f_puerta_bajo())
 sale('gs-maceta', maceta()); sale('gs-maceta-m', maceta(True))
 sale('gs-planta-v', planta()); sale('gs-planta-f', planta(True))
 # 0.55: la regadera a mano ya no sale (gs-regar, de PixelLab)
