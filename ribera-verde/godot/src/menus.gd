@@ -14,7 +14,7 @@ func start_menu():
 		for k in D.DEX:
 			if S.disc.get(k):
 				desc += 1
-		var it := [{"label": K("GENOTECA"), "right": "%d/%d" % [desc, D.DEX.size()], "ic": icono("cogollo")}, {"label": K("MOCHILA"), "right": _kg(int(floor(peso_encima()))), "ic": icono("bolsa")},
+		var it := [{"label": K("CANNADEX") if Datos.CAL else K("GENOTECA"), "right": "%d/%d" % [desc, D.DEX.size()], "ic": icono("cogollo")}, {"label": K("MOCHILA"), "right": _kg(int(floor(peso_encima()))), "ic": icono("bolsa")},
 			{"label": K("MÓVIL"), "right": T("{n} SMS", {"n": ns}) if ns else null, "ic": icono("movil")}, {"label": K("PLANTAS"), "right": str(vivas), "ic": icono("maceta")},
 			{"label": K("OBJETIVO"), "right": T("cap. {n}", {"n": int(S.ch)}), "ic": icono("trofeo")}, {"label": K("GUARDAR"), "ic": icono("guardar")},
 			{"label": K("OPCIONES"), "ic": icono("altavoz")}, {"label": K("SALIR"), "ic": icono("salir")}]
@@ -33,7 +33,7 @@ func start_menu():
 		if it[i].label == "REGISTRO":
 			await leer(K("REGISTRO"), "\n\n".join(PackedStringArray(_registro_inv())) if registro.size() else K("Todavía no has hablado con nadie."))
 			continue
-		var k: int = ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "OPCIONES"].find(it[i].label)   # i18n-no
+		var k: int = ["CANNADEX" if Datos.CAL else "GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "GUARDAR", "OPCIONES"].find(it[i].label)   # i18n-no
 		var i0 := i
 		i = k
 		if i == 0:
@@ -169,11 +169,197 @@ func renombrar_variedad(k: String) -> void:
 	await say(T("La {a} pasa a llamarse {v}.", {"a": a, "v": v}))
 
 func genoteca():
+	if Datos.CAL:
+		await cannadex()
+		return
 	var i := 0
 	while true:
 		i = await menu_genoteca(i)
 		if i < 0:
 			break
+
+# La CannaDex (con Datos.CAL; lo pidió el usuario: «juntarlo todo… catalogarlo por zonas o por los cruces»): la Genoteca, el diario
+# de la tía Maite y las familias en un solo sitio. Cada variedad, con lo que se sabe de ella: su ficha (descubierta), la nota de la
+# tía (con el diario), las recetas o dónde están sus semillas, su familia y la cata. Por familias, por generación, todas y tus cruces.
+func dex_ver(k: String) -> bool:
+	return S.disc.get(k) or S.flags.get("diario")
+
+func dex_familia(k: String) -> String:
+	for f in D.FAMILIAS:
+		if D.FAMILIAS[f].s.has(k):
+			return f
+	return ""
+
+func dex_cosechada(k: String) -> bool:
+	return S.get("cult") is Dictionary and S.cult.has(k)
+
+func dex_desc(k: String, R: Dictionary, todo := false) -> String:
+	if not dex_ver(k):
+		return K("Sin descubrir.")
+	var s: Dictionary = D.STRAINS[k]
+	var l := []
+	if S.disc.get(k):
+		l.append(strain_line(k))
+		if todo and s.get("h"):
+			l.append(s.h)
+	var nota := diario_txt(k).strip_edges()
+	if S.flags.get("diario") and nota != "":
+		l.append(nota)
+	l.append(T("Receta: {r}.", {"r": (" " + T("o") + " ").join(PackedStringArray(R[k].map(func(o): return receta_txt(o))))}) if R.has(k) else donde_semilla(k))
+	var f := dex_familia(k)
+	if f != "":
+		l.append(T("Familia: {f} · {c}", {"f": I18n.v(String(D.FAMILIAS[f].n)), "c": K("cosechada") if dex_cosechada(k) else K("sin cosechar")}))
+	if S.catas.has(k):
+		l.append(T("Cata: {c}", {"c": S.catas[k]}))
+	return "\n".join(PackedStringArray(l))
+
+func dex_fila(k: String, R: Dictionary) -> Dictionary:
+	var nn := "%02d" % (D.DEX.find(k) + 1)
+	var s: Dictionary = D.STRAINS[k]
+	if not dex_ver(k):
+		return {"label": nn + " ??????", "desc": K("Sin descubrir."), "k": k}
+	var it := {"label": "%s %s%s" % [nn, s.n, " ✓" if dex_cosechada(k) else ""], "right": (Datos.pct(s.thc) + "%") if S.disc.get(k) else tipo_diario(k, R), "ic": ic_cog(k), "k": k, "desc": dex_desc(k, R)}
+	if S.disc.get(k):
+		it.sw = s.c
+	return it
+
+# los grupos por generación: landraces, 1.ª a 4.ª, autoflorecientes y las demás
+func dex_generaciones() -> Array:
+	var G := [[K("Landraces"), []], [K("1.ª generación"), []], [K("2.ª generación"), []], [K("3.ª generación"), []], [K("4.ª generación"), []], [K("Autoflorecientes"), []], [K("Otras"), []]]
+	for k in D.DEX:
+		var s: Dictionary = D.STRAINS[k]
+		var g := 6
+		if s.get("auto"):
+			g = 5
+		elif s.get("tipo") == "landrace":
+			g = 0
+		elif s.get("gen"):
+			g = clampi(int(s.gen), 1, 4)
+		G[g][1].append(k)
+	return G.filter(func(x): return x[1].size() > 0)
+
+func dex_cuenta(ks: Array) -> String:
+	return "%d/%d" % [ks.filter(func(k): return S.disc.get(k)).size(), ks.size()]
+
+func cannadex() -> void:
+	var i := 0
+	while true:
+		var cust := []
+		for k in S.custom:
+			if S.disc.get(k):
+				cust.append(k)
+		var fc: Array = fam_cuenta()
+		var items := [{"label": K("POR FAMILIAS"), "right": "%d/%d" % [fc[0], fc[1]], "ic": icono("cogollo"), "q": "fam",
+				"desc": K("Las variedades por su zona de origen y por sus líneas de cruces. Cosecha todas las de una familia y te quedas su bono para siempre.")},
+			{"label": K("POR GENERACIÓN"), "right": dex_cuenta(D.DEX), "ic": icono("cogollo"), "q": "gen", "desc": K("Las landraces y los cruces de 1.ª a 4.ª generación, las autoflorecientes y las demás.")},
+			{"label": K("TODAS"), "right": dex_cuenta(D.DEX), "ic": icono("cogollo"), "q": "todas", "desc": K("Todas las variedades, en su orden.")}]
+		if cust.size():
+			items.append({"label": K("TUS CRUCES"), "right": str(cust.size()), "ic": icono("cogollo"), "q": "cust", "desc": K("Las variedades que has sacado tú en la mesa de cruces.")})
+		if S.flags.get("pagina"):   # la página que falta (1.17)
+			items.append({"label": K("LA ÚLTIMA PÁGINA"), "ic": icono("guardar"), "q": "pagina", "desc": "«%s»" % I18n.v(D.PAGINA)})
+		items.append({"label": K("Volver"), "desc": ""})
+		var t2 := T("{a}/{b} · {c} propias", {"a": D.DEX.filter(func(k): return S.disc.get(k)).size(), "b": D.DEX.size(), "c": cust.size()})
+		i = await menu(items, {"cls": "full", "title": K("CANNADEX"), "title2": t2, "desc": true, "initial": i})
+		if i < 0 or i >= items.size() or not items[i].has("q"):
+			return
+		match items[i].q:
+			"fam":
+				await dex_familias()
+			"gen":
+				var G := dex_generaciones()
+				var j := 0
+				while true:
+					var it2 := []
+					for g in G:
+						it2.append({"label": g[0], "right": dex_cuenta(g[1]), "desc": ", ".join(PackedStringArray(g[1].map(func(k): return D.STRAINS[k].n if dex_ver(k) else "??????")))})
+					it2.append({"label": K("Volver"), "desc": ""})
+					j = await menu(it2, {"cls": "full", "title": K("POR GENERACIÓN"), "title2": dex_cuenta(D.DEX), "desc": true, "initial": j})
+					if j < 0 or j >= G.size():
+						break
+					await dex_lista(G[j][1], String(G[j][0]).to_upper())
+			"todas":
+				await dex_lista(D.DEX, K("TODAS"))
+			"cust":
+				await dex_cruces(cust)
+			"pagina":
+				await leer(K("LA ÚLTIMA PÁGINA"), "«%s»" % I18n.v(D.PAGINA))
+
+func dex_familias() -> void:
+	var i := 0
+	var ks: Array = D.FAMILIAS.keys()
+	while true:
+		var items := []
+		for k in ks:
+			var F: Dictionary = D.FAMILIAS[k]
+			var c: int = F.s.filter(func(sid): return dex_cosechada(sid)).size()
+			var ok: bool = c == F.s.size()
+			items.append({"label": ("★ " if ok else "") + I18n.v(String(F.n)), "right": "%d/%d" % [c, F.s.size()],
+				"desc": fam_bono_txt(F) + (T(" (conseguido)") if ok else "") + "\n" + ", ".join(PackedStringArray(F.s.map(func(sid): return (("✓ " if dex_cosechada(sid) else "") + strain(sid).n) if dex_ver(sid) else "??????")))})
+		items.append({"label": K("Volver"), "desc": K("Cada variedad cuenta al cosecharla, en casa o en la nave.")})
+		var fc := fam_cuenta()
+		i = await menu(items, {"cls": "full", "title": K("POR FAMILIAS"), "title2": T("{a}/{b} · prestigio {p} · {t} trofeos", {"a": fc[0], "b": fc[1], "p": int(S.get("prest", 0)), "t": cup_trofeos().size()}), "desc": true, "initial": i})
+		if i < 0 or i >= ks.size():
+			return
+		var F: Dictionary = D.FAMILIAS[ks[i]]
+		await dex_lista(F.s.filter(func(sid): return D.STRAINS.has(sid)), I18n.v(String(F.n)).to_upper(), fam_bono_txt(F))
+
+# una lista de variedades: A abre la hoja (descubierta), lo que entra (con receta) o todo lo apuntado
+func dex_lista(ks: Array, titulo: String, t2 := "") -> void:
+	var R := recetas()
+	var i := 0
+	while true:
+		var items := []
+		for k in ks:
+			items.append(dex_fila(k, R))
+		items.append({"label": K("Volver"), "desc": ""})
+		i = await menu(items, {"cls": "full", "title": titulo, "title2": t2 if t2 != "" else dex_cuenta(ks), "desc": true, "initial": i})
+		if i < 0 or i >= ks.size():
+			return
+		var k: String = ks[i]
+		if not dex_ver(k):
+			continue
+		var op := []
+		if S.disc.get(k):
+			op.append(K("Ver la hoja"))
+		if R.has(k):
+			op.append(K("Lo que entra"))
+		op.append(K("Leerlo todo"))
+		var c: String = op[0] if op.size() == 1 else op[await ask(D.STRAINS[k].n, op)]
+		if c == "Ver la hoja":
+			var vistas: Array = ks.filter(func(x): return S.disc.get(x))
+			await ficha_variedad(vistas, vistas.find(k))
+		elif c == "Lo que entra":
+			await dex_entra(k, R)
+		else:
+			await leer(D.STRAINS[k].n.to_upper(), dex_desc(k, R, true))
+
+func dex_entra(t: String, R: Dictionary) -> void:
+	var ks := []
+	for o in R[t]:
+		for k in o.k:
+			if not ks.has(k):
+				ks.append(k)
+	var it2 := []
+	for k in ks:
+		it2.append({"label": ("✓ " if S.disc.get(k) else "  ") + D.STRAINS[k].n, "right": ("×" + n(S.seeds[k])) if S.seeds.get(k) else "", "sw": D.STRAINS[k].c, "ic": ic_cog(k), "desc": donde_semilla(k)})
+	it2.append({"label": K("Volver"), "desc": ""})
+	await menu(it2, {"cls": "full", "title": D.STRAINS[t].n.to_upper(), "title2": K("lo que entra"), "desc": true})
+
+func dex_cruces(cust: Array) -> void:
+	var i := 0
+	while true:
+		var items := []
+		for k in cust:
+			var s: Dictionary = S.custom[k]
+			items.append({"label": "★ " + s.n, "right": Datos.pct(s.thc) + "%", "sw": s.c, "ic": ic_cog(k), "desc": strain_line(k) + "\n" + T("Pulsa A para ver la hoja o cambiarle el nombre."), "c": k})
+		items.append({"label": K("Volver"), "desc": ""})
+		i = await menu(items, {"cls": "full", "title": K("TUS CRUCES"), "title2": str(cust.size()), "desc": true, "initial": i})
+		if i < 0 or i >= cust.size():
+			return
+		if await ask(S.custom[cust[i]].n, [K("Ver la hoja"), K("Cambiar el nombre")]) == 1:
+			await renombrar_variedad(cust[i])
+		else:
+			await ficha_variedad(cust, i)
 
 func menu_genoteca(i0: int) -> int:
 	var DEX: Array = D.DEX

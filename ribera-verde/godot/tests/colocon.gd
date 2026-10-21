@@ -125,6 +125,53 @@ func _corre() -> void:
 				J.vision_borracho()
 				await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png(dir.path_join("colocon-%d.png" % i))
+	# 4b · en pixel art, como el juego (lo pidió el usuario: «los efectos… del mismo estilo que el juego»): el filtro sobre una
+	# pantalla de 60 × 45 a 4 ×, cada píxel del juego de un solo color (sin degradados entre medias) y con pocos colores nuevos
+	if DisplayServer.get_name() != "headless":
+		var sh: Shader = load(a[a.find("--shader") + 1]) if a.find("--shader") >= 0 else J.VISION_SH
+		var src := Image.create(60, 45, false, Image.FORMAT_RGBA8)
+		var pal := [Color8(70, 120, 60), Color8(150, 110, 70), Color8(200, 190, 160), Color8(60, 70, 110)]
+		for y in 45:
+			for x in 60:
+				src.set_pixel(x, y, pal[(x / 7 + y / 5) % pal.size()])
+		var sv := SubViewport.new()
+		sv.size = Vector2i(240, 180)
+		sv.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		root.add_child(sv)
+		var tr := TextureRect.new()
+		tr.texture = ImageTexture.create_from_image(src)
+		tr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		tr.stretch_mode = TextureRect.STRETCH_SCALE
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.size = Vector2(240, 180)
+		var mt := ShaderMaterial.new()
+		mt.shader = sh
+		tr.material = mt
+		sv.add_child(tr)
+		for caso in [[0.6, 0.0], [0.3, 1.0], [1.0, 0.7]]:
+			mt.set_shader_parameter("ojo", caso[0])
+			mt.set_shader_parameter("humo", caso[1])
+			mt.set_shader_parameter("t", 3.7)
+			for f in 3:
+				await RenderingServer.frame_post_draw
+			var im := sv.get_texture().get_image()
+			im.convert(Image.FORMAT_RGBA8)
+			var rotos := 0
+			var cols := {}
+			for by in 45:
+				for bx in 60:
+					var c0 := im.get_pixel(bx * 4, by * 4)
+					cols[c0.to_html()] = 1
+					for dy in 4:
+						for dx in 4:
+							if im.get_pixel(bx * 4 + dx, by * 4 + dy) != c0:
+								rotos += 1
+			chk(rotos == 0, "ojo %s humo %s: cada píxel del juego, de un color (%d sueltos)" % [caso[0], caso[1], rotos])
+			chk(cols.size() <= 40, "ojo %s humo %s: pocos colores, sin degradados (%d)" % [caso[0], caso[1], cols.size()])
+			if dir != "":
+				im.resize(720, 540, Image.INTERPOLATE_NEAREST)
+				im.save_png(dir.path_join("colocon-pixel-%s-%s.png" % caso))
+		sv.queue_free()
 	# 5 · sin CAL, nada
 	Datos.CAL = false
 	S.colo = 90.0

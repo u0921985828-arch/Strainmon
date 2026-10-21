@@ -409,7 +409,7 @@ func discover(sid: String) -> void:
 		var cu := ""   # 1.25: cuántas de la Genoteca llevas
 		if D.STRAINS.has(sid):
 			cu = " · %d/%d" % [D.DEX.filter(func(k): return S.disc.get(k)).size(), D.DEX.size()]
-		toast(T("<small>NUEVA EN LA GENOTECA{cu}</small>", {"cu": cu}) + esc(strain(sid).n))
+		toast((T("<small>NUEVA EN LA CANNADEX{cu}</small>", {"cu": cu}) if Datos.CAL else T("<small>NUEVA EN LA GENOTECA{cu}</small>", {"cu": cu})) + esc(strain(sid).n))
 		queue("historia", check_story)
 
 func add_seeds(sid: String, k: int) -> void:
@@ -826,7 +826,7 @@ func montar_nave() -> void:
 
 # (lo pidió el usuario: «cuando lo vayas a alquilar, entres al local y por reformar»): la nave sin alquilar por dentro (nave-r),
 # la de siempre sin muebles y con los trastos del último inquilino; se entra con Arrieta (talk_nave), no por la persiana
-const NAVE_RUINA := [[0, 2, "crate"], [1, 2, "cajasT"], [4, 2, "sacos"], [5, 2, "crate"], [9, 2, "bidonT"], [10, 2, "barrilT"],
+const NAVE_RUINA := [[0, 2, "crate"], [1, 2, "cajasT"], [4, 2, "sacos"], [5, 2, "crate"], [9, 2, "bidonT"], [10, 2, "barrilT"],   # i18n-no
 	[14, 2, "neumT"], [16, 2, "cajasT"], [17, 2, "crate"], [2, 5, "neumT"], [11, 4, "garrafa"], [12, 5, "cuboS"], [15, 6, "crate"], [16, 6, "sacos"]]   # i18n-no
 
 func mapa_nave_r() -> void:
@@ -1990,7 +1990,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	if Datos.CAL and name_ == "valdehierro" and S.flags.get("naveVer"):   # de ver la nave por dentro: Arrieta, en la calle, pregunta
 		S.flags.erase("naveVer")
 		if S.get("nave") == null:
-			queue("naveVer", func(): await nave_vista())
+			queue("naveVer", func(): await nave_vista())   # i18n-no
 	if name_ == "alto":
 		montar_alto()
 	if name_ == "camarote":
@@ -2744,3 +2744,9 @@ func fam_menu() -> void:
 
 func fam_cuenta() -> Array:
 	return [0, 0]
+
+func fam_bono_txt(_F: Dictionary) -> String:
+	return ""
+
+func cup_trofeos() -> Array:
+	return []

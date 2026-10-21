@@ -939,7 +939,7 @@ func almohada() -> void:
 	sfx("get")
 	await say(K("Un cuaderno de tapas verdes, gastado de tanto abrirlo: «Cuaderno de cultivo · M.». El diario de la tía Maite."))
 	await say(K("Una página por cada variedad que conoció: lo que apuntó de ella, las recetas de sus cruces y dónde guardaba las semillas que no se venden."))
-	await say(K("Lo tienes en START → GENOTECA. Algunas landraces no están en ningún banco: habrá que buscarlas."))
+	await say(K("Lo tienes en START → CANNADEX. Algunas landraces no están en ningún banco: habrá que buscarlas.") if Datos.CAL else K("Lo tienes en START → GENOTECA. Algunas landraces no están en ningún banco: habrá que buscarlas."))
 
 static func _lista(L: Array) -> String:
 	return L[0] if L.size() == 1 else I18n.T("{a} y {b}", {"a": ", ".join(L.slice(0, -1)), "b": L[-1]})
@@ -1005,7 +1005,7 @@ func aviso_plaga(antes: Array) -> void:
 
 # ---------- PC ----------
 func pc_action():
-	var o := [K("Genoteca")]
+	var o := [K("CannaDex") if Datos.CAL else K("Genoteca")]
 	if S.ch >= 2:
 		o.append(K("Banco de semillas"))
 	o.append_array([K("Notas de la tía"), K("Tienda online")])
@@ -1013,7 +1013,7 @@ func pc_action():
 		o.append(K("Caja empotrada"))
 	o.append_array([K("Guardar partida"), K("Apagar")])
 	var c: String = o[await ask(K("El ordenador de la tía. Tiene su registro de cultivos de veinte años."), o)]
-	if c == "Genoteca":
+	if c == "Genoteca" or c == "CannaDex":
 		await genoteca()
 	elif c == "Banco de semillas":
 		await banco_semillas()

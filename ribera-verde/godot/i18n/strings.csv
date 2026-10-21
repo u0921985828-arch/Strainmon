@@ -815,6 +815,7 @@ sedc4ad33, · Partida guardada, · Game saved
 s7774c98b,Das vueltas y más vueltas. Al ahuecar la almohada notas algo duro dentro de la funda.,"You toss and turn. Plumping the pillow, you feel something hard inside the case."
 s707b6288,"Un cuaderno de tapas verdes, gastado de tanto abrirlo: «Cuaderno de cultivo · M.». El diario de la tía Maite.","A green-covered notebook, worn from use: «Growing notebook · M.». Aunt Maite's diary."
 s94834d9f,"Una página por cada variedad que conoció: lo que apuntó de ella, las recetas de sus cruces y dónde guardaba las semillas que no se venden.","A page for every strain she knew: her notes on it, the recipes for her crosses and where she kept the seeds you can't buy."
+sc3cf332d,Lo tienes en START → CANNADEX. Algunas landraces no están en ningún banco: habrá que buscarlas.,It's in START → CANNADEX. Some landraces aren't in any bank: you'll have to hunt them down.
 s5599431a,Lo tienes en START → GENOTECA. Algunas landraces no están en ningún banco: habrá que buscarlas.,It's in START → GENOTECA. Some landraces aren't in any seed bank: you'll have to find them.
 s8596618c,"la {s} ({c}, plaza {p})","the {s} ({c}, spot {p})"
 sc28721f2,la {s} (plaza {p}),the {s} (spot {p})
@@ -831,6 +832,7 @@ s6f25226e,Se ha secado del todo {l}. Retírala con A.,{l} has dried out complete
 s0f770524,Botritis en {l}: moho gris en los cogollos. Trátala con FUNGICIDA; el PREVENTIVO y el sellado de la carpa la evitan.,Botrytis in {l}: grey mould in the buds. Treat it with FUNGICIDE; the PREVENTIVE and sealing the tent prevent it.
 s8fa8ec3b,Sigue la botritis en {l}: pierde salud cada día y cosecharás menos.,Botrytis persists in {l}: it loses health every day and you will harvest less.
 s0edfbd0a,"Moho en {l}: de noche la carpa pasa del {h} % de humedad. Un extractor a su medida con intractor, un ventilador o un deshumidificador la bajan.","Mould on {l}: at night the tent goes over {h} % humidity. A matching extractor with an intake fan, a fan or a dehumidifier bring it down."
+s495029a6,CannaDex,CannaDex
 s684caec3,Genoteca,Genoteca
 sb2036f54,Banco de semillas,Seed bank
 s2e467549,Notas de la tía,Aunt's notes
@@ -1282,6 +1284,7 @@ s4929112a, · {g} g rosin, · {g} g rosin
 s52e4628c,EFECTIVO,CASH
 s26e3f421,FLORES,BUDS
 s99a32bef,ROSIN,ROSIN
+s4e58915c,CANNADEX,CANNADEX
 s570950d9,GENOTECA,GENEBANK
 s2511e675,MOCHILA,BAG
 s35a4cfa5,MÓVIL,PHONE
@@ -1311,14 +1314,37 @@ sf9d95ae5,lo que entra,what goes in
 sef306f58,Nuevo nombre de la variedad,New strain name
 s05fb587e,Ya hay una variedad con ese nombre.,There's already a strain with that name.
 sfaf1a92e,La {a} pasa a llamarse {v}.,{a} is now called {v}.
-s06bd6060,"Su cuaderno: las {n} variedades, lo que apuntó de cada una, las recetas de los cruces y dónde conseguir las semillas.","Her notebook: all {n} strains, her notes on each, the cross recipes and where to get the seeds."
-sc84eb8de,Las variedades por familias. Cosecha todas las de una familia y te quedas su bono para siempre.,Strains by family. Harvest every strain in a family and keep its bonus forever.
-sb5bb1ec3,Cata: {c},Tasting: {c}
 sedc3e140,Sin descubrir.,Not discovered.
-sb0d50c8e,Pulsa A para cambiarle el nombre.,Press A to rename it.
+s6ac5013d,Receta: {r}.,Recipe: {r}.
+sb68ea4ea,Familia: {f} · {c},Family: {f} · {c}
+s5da4c38c,cosechada,harvested
+s1c031f33,sin cosechar,not harvested
+sb5bb1ec3,Cata: {c},Tasting: {c}
+s119dd7b8,Landraces,Landraces
+s50c03ffc,1.ª generación,1st generation
+s79088b0e,2.ª generación,2nd generation
+sd7601a9f,3.ª generación,3rd generation
+s2a99e2ea,4.ª generación,4th generation
+se5d5a345,Autoflorecientes,Autoflowering
+s1a43c910,Otras,Others
+s632c1c71,POR FAMILIAS,BY FAMILY
+sea204f5f,Las variedades por su zona de origen y por sus líneas de cruces. Cosecha todas las de una familia y te quedas su bono para siempre.,
+s1eada0aa,POR GENERACIÓN,BY GENERATION
+s8e009714,"Las landraces y los cruces de 1.ª a 4.ª generación, las autoflorecientes y las demás.","Landraces and 1st to 4th generation crosses, autoflowers and the rest."
+sa4558d6b,TODAS,ALL
+s34150029,"Todas las variedades, en su orden.","Every strain, in order."
+s45d814aa,TUS CRUCES,YOUR CROSSES
+s48ec4192,Las variedades que has sacado tú en la mesa de cruces.,
+s6e55b5c5,LA ÚLTIMA PÁGINA,THE LAST PAGE
 s384f2b34,{a}/{b} · {c} propias,{a}/{b} · {c} your own
 sbda0b4c2,Ver la hoja,See the leaf
+se1e8811d,Lo que entra,What goes in
+s77a57a50,Leerlo todo,Read it all
+s30599b42,Pulsa A para ver la hoja o cambiarle el nombre.,Press A to see the sheet or rename it.
 s8544cf85,Cambiar el nombre,Rename
+s06bd6060,"Su cuaderno: las {n} variedades, lo que apuntó de cada una, las recetas de los cruces y dónde conseguir las semillas.","Her notebook: all {n} strains, her notes on each, the cross recipes and where to get the seeds."
+sc84eb8de,Las variedades por familias. Cosecha todas las de una familia y te quedas su bono para siempre.,Strains by family. Harvest every strain in a family and keep its bonus forever.
+sb0d50c8e,Pulsa A para cambiarle el nombre.,Press A to rename it.
 s4ca50e41,"Autofloreciente: florece por la edad, sin cambiar la luz.","Autoflower: blooms by age, no light change needed."
 s828f7fbb,HIBRIDO SATIVA,SATIVA HYBRID
 s7fbc8d96,EQUILIBRADO,BALANCED
@@ -1757,6 +1783,7 @@ s8cfe2b25,"THC {thc}% · ~{gm} g/m² · {d} días · Resist. {r}%
 {gn}{pa}: {gd}. Star: 1 in ~{uno}.
 {o}"
 sd11be8ca,{g}.ª generación · {o},Gen {g} · {o}
+sa587b788,<small>NUEVA EN LA CANNADEX{cu}</small>,<small>NEW IN THE CANNADEX{cu}</small>
 s6b714594,<small>NUEVA EN LA GENOTECA{cu}</small>,<small>NEW IN THE GENEBANK{cu}</small>
 sd0873cc4, (rara), (rare)
 s91fa5a5c,Curada en la caja fuerte: {l},Cured in the safe: {l}
@@ -1888,6 +1915,7 @@ sc07adc76,"La máquina de café de la espera: solo, cortado y chocolate. El de c
 sa4aa04d0,Un sofá.,A sofa.
 sb4fcf685,Un sillón.,An armchair.
 s7273a170,Una silla.,A chair.
+s3197fb97,naveVer,
 sb4168386,sofaF,sofaF
 sa9a193e2,sofaV,sofaV
 sb37b479f,sofaB,sofaB
@@ -3112,8 +3140,10 @@ s01168bef,cosecha en {d} días,harvest in {d} days
 s36962a83,"Sin nadie que las cuide, se han muerto {n} madres de la nave.","With nobody tending them, {n} warehouse mothers have died."
 s72a1c2dd,"Sin nadie que la cuide, se ha muerto una madre de la nave.","With nobody tending it, a warehouse mother has died."
 sbfff8767,"La nave no se alquila. Ahora mismo, no.",The warehouse isn't for rent. Not right now.
-sb6e607dc,"La nave está vacía: {f} de fianza y {r} cada {d} días, en efectivo; el primero, ahora. Paso a cobrar y te aviso antes. Sin preguntas.","The warehouse is empty: {f} deposit and {r} every {d} days, cash; the first one now. I come round to collect and warn you first. No questions."
 sa2248539,Alquilarla,Rent it
+s72005cac,Verla por dentro,
+sb6e607dc,"La nave está vacía: {f} de fianza y {r} cada {d} días, en efectivo; el primero, ahora. Paso a cobrar y te aviso antes. Sin preguntas.","The warehouse is empty: {f} deposit and {r} every {d} days, cash; the first one now. I come round to collect and warn you first. No questions."
+s4e77ee77,"Vamos, te abro. Está como la dejó el último: polvo y trastos. Si te la quedas, la vacío y te meto las mesas.",
 s7cd159a3,la llave de la nave,the warehouse key
 s1d9bf67c,"Dentro hay {n} mesas de cultivo, una por persona. Pon a tu gente desde el móvil y planta tú lo que quieras.","Inside there are {n} grow tables, one per person. Assign your crew from the phone and plant whatever you like."
 sf1e231ba,Dejar la nave,Give up the warehouse
@@ -3146,6 +3176,10 @@ s4ab5a04a,Una puerta gris con un candado. No es la tuya.,A grey door with a padl
 s4374da3b,"La puerta del bajo de Txomin, con un candado. La llave te la da él, si lo alquilas.","The door to Txomin's basement, padlocked. He gives you the key if you rent it."
 sd3654415,"Cerrado. En el cristal, el cartel de SE TRASPASA.",Closed. A BUSINESS FOR SALE sign hangs in the window.
 sa8adefc7,{n} abre de 23:00 a 6:00.,{n} opens from 23:00 to 6:00.
+s42cd9c20,"¿Qué? Con una limpieza y las mesas, queda como nueva.",
+s210335de,Neumáticos viejos y bidones vacíos.,
+s56a40d26,Sacos rotos de algo que ya no se sabe qué era.,
+sf2a6cfcb,"Cajas con polvo del último inquilino. Si la alquilas, Arrieta las saca.",
 sd33dfb7f,cajaD,cajaD
 s65fc8191,"Redes de la cofradía, remendadas mil veces.","The fishermen's guild nets, mended a thousand times."
 se8bccce5,"Nasas para el bogavante, apiladas a secar.","Lobster pots, stacked to dry."
@@ -5931,7 +5965,6 @@ sd13db6e8,primavera,spring
 s933b44a2,verano,summer
 s45a8294e,invierno,winter
 sc9686f8d,Tabaco,Tobacco
-se5d5a345,Autoflorecientes,Autoflowering
 s9fd31cb8,Índicas,Indicas
 se31360af,Sativas,Sativas
 s2b22fb20,Híbridas,Hybrids

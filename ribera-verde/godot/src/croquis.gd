@@ -60,6 +60,42 @@ static var PUEBLOS := {
 	"mendialde": {"p": [122, 94], "d": I18n.K("Mendialde, el pueblo del monte: el caserío donde empezó todo.")},
 	"errotabarri": {"p": [194, 84], "d": I18n.K("Errotabarri, la aldea del molino viejo, al final de la pista.")},
 }
+# los caminos entre pueblos (con Datos.CAL; lo pidió el usuario: «en el mapa se deberían de ver los caminos que conectan los
+# pueblos»): [de, a, curva, tipo]; carretera, con su borde y el centro claro (y un puente al cruzar la ría); pista, de tierra
+const CAMINOS := [["town", "puerto", 7, "c"], ["town", "ibarbide", -6, "c"], ["town", "valdehierro", 6, "c"], ["town", "mendialde", -4, "c"],
+	["puerto", "valdehierro", -5, "c"], ["valdehierro", "mendialde", 5, "c"], ["ibarbide", "errotabarri", 6, "c"], ["mendialde", "errotabarri", -6, "p"]]
+const C_BORDE := Color8(92, 78, 62)
+const C_CENTRO := Color8(244, 236, 210)
+const C_PUENTE := Color8(70, 56, 44)
+const C_PISTA := Color8(168, 132, 86)
+# por dónde va el autobús desde Ribera Verde (para poner sus minutos encima del camino)
+const RUTA := {"errotabarri": ["mendialde", "errotabarri"]}
+
+static func camino_pts(c: Array) -> Array:
+	var a := Vector2(PUEBLOS[c[0]].p[0], PUEBLOS[c[0]].p[1])
+	var b := Vector2(PUEBLOS[c[1]].p[0], PUEBLOS[c[1]].p[1])
+	var m := (a + b) / 2 + (b - a).orthogonal().normalized() * float(c[2])
+	var n := int(a.distance_to(b) * 1.3) + 2
+	var r := []
+	for i in n + 1:
+		var t := float(i) / n
+		r.append(a.lerp(m, t).lerp(m.lerp(b, t), t))
+	return r
+
+static func _camino(im: Image, c: Array) -> void:
+	var pts := camino_pts(c)
+	if c[3] == "p":   # la pista: 1 px de tierra
+		for q in pts:
+			_px(im, int(round(q.x)), int(round(q.y)), C_PISTA)
+		return
+	for q in pts:   # el borde (3 × 3) y luego el centro
+		for d in [Vector2i(-1, 0), Vector2i(1, 0), Vector2i(0, -1), Vector2i(0, 1)]:
+			var x: int = int(round(q.x)) + d.x
+			var y: int = int(round(q.y)) + d.y
+			_px(im, x, y, C_PUENTE if es_mar(x, y) else C_BORDE)
+	for q in pts:
+		_px(im, int(round(q.x)), int(round(q.y)), C_CENTRO)
+
 const ORDEN := ["puerto", "town", "ibarbide", "errotabarri", "mendialde", "valdehierro"]
 const ZONA := {"town": "town", "alto": "town", "astilleros": "town", "home": "town", "shop": "town", "bar": "town", "txaro": "town",
 	"comisaria": "town", "almacen": "town", "club-rv": "town", "puerto": "puerto", "club-puerto": "puerto",
@@ -186,9 +222,29 @@ static func imagen(D: Dictionary, ch: int) -> Image:
 					_px(im, c[0] + xx, c[1] + yy, Color8(176, 168, 96))
 		for xx in c[2]:
 			_px(im, c[0] + xx, c[1] - 1, Color8(140, 120, 80))
+	if Datos.CAL:   # los caminos, y encima de cada uno los minutos de su autobús desde Ribera Verde
+		for c in CAMINOS:
+			if c[3] == "p":
+				_camino(im, c)
+		for c in CAMINOS:
+			if c[3] == "c":
+				_camino(im, c)
+		for k in ORDEN:
+			if k == "town":
+				continue
+			var tr: Array = RUTA.get(k, ["town", k])
+			var cm: Array = []
+			for c in CAMINOS:
+				if (c[0] == tr[0] and c[1] == tr[1]) or (c[1] == tr[0] and c[0] == tr[1]):
+					cm = c
+			var pts := camino_pts(cm)
+			var m: Vector2 = pts[pts.size() / 2]
+			var col := Color8(122, 58, 40) if abierto(D, ch, k) else Color8(160, 150, 130)
+			var t := "%d'" % int(D.PARADAS[k].min)
+			_txt(im, int(m.x) - ancho(t) / 2 + 3, int(m.y) - 8, t, col, papel)
 	# las líneas de autobús, desde Ribera Verde, a trazos (en gris si aún no hay línea), con sus minutos
 	var rv: Array = PUEBLOS.town.p
-	for k in ORDEN:
+	for k in ([] if Datos.CAL else ORDEN):
 		if k == "town":
 			continue
 		var pp: Array = PUEBLOS[k].p

@@ -118,6 +118,32 @@ func _corre() -> void:
 	for k in Croquis.ORDEN:
 		var q: Array = Croquis.PUEBLOS[k].p
 		chk(not Croquis.es_mar(q[0], q[1]), k + " en tierra")
+	# 5b · los caminos (lo pidió el usuario: «en el mapa se deberían de ver los caminos que conectan los pueblos»): desde Ribera
+	# Verde, por los píxeles de camino, se llega a todos los pueblos
+	var CAM := [Croquis.C_BORDE, Croquis.C_CENTRO, Croquis.C_PUENTE, Croquis.C_PISTA]
+	var PASA := CAM + [Color8(226, 212, 172), Color8(40, 30, 24), Color8(120, 114, 104), Color8(122, 58, 40), Color8(160, 150, 130)]   # y por debajo de los rótulos
+	var ini: Vector2 = Croquis.camino_pts(Croquis.CAMINOS[0])[12]
+	var vis := {Vector2i(ini): true}
+	var cola := [Vector2i(ini)]
+	while cola.size():
+		var a: Vector2i = cola.pop_back()
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 1), Vector2i(-1, -1), Vector2i(1, -1), Vector2i(-1, 1)]:
+			var b: Vector2i = a + d
+			if b.x < 0 or b.y < 0 or b.x >= Croquis.MW or b.y >= Croquis.MH or vis.has(b) or not PASA.has(im8.get_pixel(b.x, b.y)):
+				continue
+			vis[b] = true
+			cola.append(b)
+	chk(vis.keys().filter(func(v): return CAM.has(im8.get_pixel(v.x, v.y))).size() > 500 and CAM.has(im8.get_pixel(int(ini.x), int(ini.y))), "hay caminos en el croquis (%d px)" % vis.size())
+	for k in Croquis.ORDEN:
+		var q: Array = Croquis.PUEBLOS[k].p
+		var llega := false
+		var dm := 999.0
+		for v in vis:
+			dm = minf(dm, Vector2(v).distance_to(Vector2(q[0], q[1])))
+			if Vector2(v).distance_to(Vector2(q[0], q[1])) <= 12:   # las casas del pueblo tapan el final
+				llega = true
+				break
+		chk(llega, "un camino llega a %s (a %d px)" % [k, int(dm)])
 	var MV := {"i": 0}
 	for i in Croquis.ORDEN.size():
 		var r3: Array = Croquis.rects_mapa(J.SW, MV, "town")

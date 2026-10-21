@@ -789,7 +789,7 @@ func obj_local(x: int, y: int, o) -> bool:
 		return false
 	var txt := ""
 	if S.map == "nave-r":   # la nave sin alquilar: los trastos del último
-		await say(K("Neumáticos viejos y bidones vacíos.") if o in ["neumT", "bidonT", "barrilT"] else (K("Sacos rotos de algo que ya no se sabe qué era.") if o == "sacos" else K("Cajas con polvo del último inquilino. Si la alquilas, Arrieta las saca.")))
+		await say(K("Neumáticos viejos y bidones vacíos.") if o in ["neumT", "bidonT", "barrilT"] else (K("Sacos rotos de algo que ya no se sabe qué era.") if o == "sacos" else K("Cajas con polvo del último inquilino. Si la alquilas, Arrieta las saca.")))   # i18n-no
 		return true
 	if Datos.CAL and await obj_vip(o):   # MAESTRO [9]
 		return true

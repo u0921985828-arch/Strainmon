@@ -579,12 +579,17 @@ func menu_start() -> void:
 	await pulsa("START")
 	await foto("3b-start")
 	var l := etiquetas()
-	check("START abre el menú (%s)" % ", ".join(l), l == ["GENOTECA", "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "REGISTRO", "GUARDAR", "OPCIONES", "SALIR"])
-	await elige("GENOTECA")
-	var gv: Array = J.m_items.filter(func(x): return not x.get("fam"))   # MAESTRO [5]: con CAL, la fila de la CannaDex por familias
+	var gen := "CANNADEX" if Datos.CAL else "GENOTECA"   # con CAL, la CannaDex única (Genoteca, diario y familias)
+	check("START abre el menú (%s)" % ", ".join(l), l == [gen, "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "REGISTRO", "GUARDAR", "OPCIONES", "SALIR"])
+	await elige(gen)
+	if Datos.CAL:
+		await elige("TODAS")
+	var gv: Array = J.m_items.filter(func(x): return x.label != "Volver")
 	check("Genoteca: %d filas, todas sin descubrir, y sin el diario de la tía (sale bajo la almohada)" % gv.size(), gv.size() == J.D.DEX.size()
-		and gv.all(func(x): return x.label.ends_with("??????")) and J.m_items.size() == gv.size() + (1 if Datos.CAL else 0))
+		and gv.all(func(x): return x.label.ends_with("??????")))
 	await pulsa("B")
+	if Datos.CAL:
+		await pulsa("B")
 	await elige("MOCHILA")
 	check("Mochila: dinero, la mochila (1 kg), vida y lo de siempre", J.m_items.size() == 7 and J.m_items[0].right == "150 €" and J.m_items[1].right == "0 de 1 kg")
 	await pulsa("B")
@@ -860,7 +865,7 @@ func ciclo() -> void:
 		check("noche %d: %d secas nuevas y %s" % [noches, nuevas_secas.size(), "aviso" if aviso_s != "" else "sin aviso"], (aviso_s != "") == (nuevas_secas.size() > 0) and nuevas_secas.all(func(m): return aviso_s.contains(m)))
 		if noches == 1:
 			await check_aviso("al despertar")
-			check("noche 1: el diario de la tía Maite, bajo la almohada", S.flags.get("diario") == S.day and textos.any(func(t): return t.contains("almohada")) and textos.any(func(t): return t.contains("START → GENOTECA")))
+			check("noche 1: el diario de la tía Maite, bajo la almohada", S.flags.get("diario") == S.day and textos.any(func(t): return t.contains("almohada")) and textos.any(func(t): return t.contains("START → CANNADEX" if Datos.CAL else "START → GENOTECA")))
 		print("noche %d: " % noches, S.pots.map(func(p): return "-" if p == null else "%s %.2f a%d s%d%s%s" % [p.sid, p.prog, p.water, p.health, " P" if p.pest else "", " M" if p.get("dead") else ""]))
 		# vuelta a la carpa
 		var ok_vuelta := await anda(frente)
