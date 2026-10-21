@@ -1250,12 +1250,17 @@ func tienda_online() -> void:
 			ienv = items.size() - ks.size() - vs.size()
 			items.append({"label": K("Envasadora al vacío") + (T(" · en casa") if tv else ""), "right": Datos.eur(VA.p), "disabled": tv,
 				"desc": K("Para envasar lo del maletero en bolsas selladas: en un registro de tráfico se nota menos.")})
+		if huerta_lista():   # la huerta de la tía: depósitos, riego y herramientas
+			items.append({"label": K("La huerta: depósitos, riego y herramientas"), "huerta": 1, "desc": K("Bidones y depósitos de agua, el goteo con bomba solar, las herramientas y la motoazada: llegan al día siguiente a la huerta.")})
 		if Datos.CAL:   # MAESTRO [5]: la potencia contratada
 			items.append({"label": K("La instalación eléctrica"), "ener": 1, "desc": K("Placas solares y generador insonorizado para el piso y la nave: lo que pasa de la potencia contratada deja firma térmica.")})
 		items.append({"label": K("Salir"), "desc": K("Con tarjeta, de la cuenta del banco.")})
 		i = await menu(items, {"cls": "full", "title": K("TIENDA ONLINE"), "title2": T("Muebles y transporte · en la cuenta {e}", {"e": Datos.eur(S.banco)}), "desc": true, "initial": i})
 		if i >= 0 and i < items.size() and items[i].get("ener"):
 			await energia_tienda()
+			continue
+		if i >= 0 and i < items.size() and items[i].get("huerta"):
+			await huerta_tienda()
 			continue
 		if i == ks.size() + vs.size():
 			if ar == null and await tarjeta(AR.p, K("Tienda online") + " · " + AR.n):

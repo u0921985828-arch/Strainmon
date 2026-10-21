@@ -165,6 +165,37 @@ sd3dcfd09,Lo metes en el arcón y lo tapas con los sacos.,You put it in the ches
 s90031372,No llevas cogollos encima.,You have no buds on you.
 s4b05791e,El arcón está vacío.,The chest is empty.
 scb82bcdd,Lo sacas todo del arcón y lo guardas en la mochila.,You take everything out of the chest and put it in your backpack.
+s290dfee7,Te dejan en la huerta lo que pediste: {l}.,They leave what you ordered at the vegetable garden: {l}.
+s0830061a,Bidón azul de 100 L,Blue 100 L drum
+s633e594e,Depósito de 1000 L,1000 L tank
+sb9b47b26,Goteo con bomba solar,Drip irrigation with solar pump
+scfbf0b6a,Herramientas de huerta,Garden tools
+sf37b4b21,Motoazada,Rotary tiller
+sec60d927,un bidón azul de 100 L,a blue 100 L drum
+s3d2e6fc2,un depósito de 1000 L,a 1000 L tank
+s1c52750f,el goteo con la bomba solar,the drip irrigation with the solar pump
+s297f583f,"la laya, la azada y el rastrillo","the digging fork, the hoe and the rake"
+s1f0970e2,la motoazada,the rotary tiller
+s3083c1f9,"De polietileno, sobre dos bloques y con su grifo. Se llena con la manguera del garaje.","Polyethylene, on two blocks and with its tap. Filled with the garage hose."
+s671f1296,"Un depósito de segunda mano, lavado, en su jaula de acero y su palé: una tonelada de agua para el verano.","A second-hand tank, washed, in its steel cage and on its pallet: a tonne of water for the summer."
+s88469974,"Tubería con un gotero por planta, filtro, programador y bomba con placa solar: riega cada planta cuando la tierra se seca, mientras quede agua en los depósitos.","Pipe with one dripper per plant, filter, timer and pump with a solar panel: it waters each plant when the soil dries out, as long as there is water left in the tanks."
+s12610c0a,"Laya, azada y rastrillo para cavar cada sitio antes de plantar: la tierra suelta da un {p} % más de cosecha.","Digging fork, hoe and rake to dig each spot before planting: loose soil gives {p}% more harvest."
+s20e14ee8,"De gasolina: labra todos los sitios vacíos de una vez y más hondo que a mano, un {p} % más de cosecha.","Petrol-powered: it tills every empty spot at once and deeper than by hand, {p}% more harvest."
+s06a9a5d8,"
+Antes hace falta un depósito.","
+You need a tank first."
+s117e12d4,"
+Antes hacen falta las herramientas.","
+You need the tools first."
+s4233ba58, · en la huerta, · at the garden
+s5c461127, · pedido, · ordered
+sf77a797e,Volver,Back
+sfb236c6f,LA HUERTA,THE GARDEN
+scd2e99f5,"Depósitos, riego y herramientas · en la cuenta {e}","Tanks, irrigation and tools · in your account {e}"
+s6092151d,Tienda online,Online shop
+s61b3ec3e,Pedido: {n} · llega mañana,Ordered: {n} · arrives tomorrow
+sba950df0,"Cavas a fondo, rompes los terrones y lo dejas rastrillado: la tierra, suelta y oscura.","You dig deep, break up the clods and rake it over: the soil, loose and dark."
+sa3b735e4,La motoazada levanta la tierra a un palmo de hondo y la deja mullida.,The tiller turns the soil a hand deep and leaves it fluffy.
 s3765acfa,BOTRITIS,BOTRYTIS
 sf258dd74,"Detrás del garaje, entre las zarzas, asoma una cancilla vieja de madera. Al otro lado se ven bancales comidos por la hierba.","Behind the garage, among the brambles, an old wooden gate peeks out. On the other side you can see beds overrun with weeds."
 s4e48f41c,Abrirte paso,Push through
@@ -174,11 +205,32 @@ s27ff1a11,"Alguien ha escrito a lápiz debajo: «La huerta de Maite, detrás del
 s53fae227,"Los bancales de la tía, comidos por las zarzas y la hierba. Limpiarlos te lleva unas {h} horas.","Your aunt's beds, overrun with brambles and weeds. Clearing them takes you about {h} hours."
 s1e1c7f17,Desbrozar,Clear them
 s98cb2b65,"Arrancas las zarzas, cavas y dejas la tierra en surcos. Caben ocho plantas al sol.","You pull out the brambles, dig and leave the soil in furrows. There's room for eight plants in the sun."
+s683d016a,Labrar con la motoazada,Till with the tiller
+s4c795737,Cavar la tierra,Dig the soil
+s2f31ad5f,Plantar,Plant
+s71f220da,Salir,Leave
+sfc010ec1,"Un sitio vacío, con la tierra sin trabajar.","An empty spot, the soil unworked."
+s2f6ea57d,"Un sitio vacío, con la tierra cavada a mano.","An empty spot, the soil dug by hand."
+sd496b230,Los depósitos de la huerta: {a} de {c} L.,The garden tanks: {a} of {c} L.
+s5a386d7e, El goteo tira de aquí., The drip irrigation draws from here.
+s8b3c2780, Están llenos., They are full.
+s47e1a52b,Llenarlos con la manguera del garaje te lleva {m} min.,Filling them with the garage hose takes you {m} min.
+sbd5b0f61,Llenarlos,Fill them
+s462c95aa,Depósitos llenos: {c} L.,Tanks full: {c} L.
+s1d24527b,"La placa solar mueve la bomba del goteo: cada planta recibe agua cuando la tierra se seca, mientras quede en los depósitos ({a} de {c} L).","The solar panel drives the drip pump: each plant gets water when the soil dries out, as long as there is some left in the tanks ({a} of {c} L)."
+s4f898068,"La laya, la azada y el rastrillo. No queda ningún sitio vacío sin cavar.","The digging fork, the hoe and the rake. There is no empty spot left to dig."
+s7720eac5,"La laya, la azada y el rastrillo. Cavar los {n} sitios vacíos te lleva {m} min.","The digging fork, the hoe and the rake. Digging the {n} empty spots takes you {m} min."
+sfba9f7f2,"La laya, la azada y el rastrillo. Cavar el sitio vacío te lleva {m} min.","The digging fork, the hoe and the rake. Digging the empty spot takes you {m} min."
+sc87a1bf6,Cavar,Dig
+s64dbf7f6,La motoazada. No queda ningún sitio vacío por labrar.,The rotary tiller. There is no empty spot left to till.
+se8b3ec09,La motoazada. Labrar los {n} sitios vacíos te lleva {m} min.,The rotary tiller. Tilling the {n} empty spots takes you {m} min.
+se9c17dac,La motoazada. Labrar el sitio vacío te lleva {m} min.,The rotary tiller. Tilling the empty spot takes you {m} min.
+s69bdfc09,Labrar,Till
 s452284b7,Un bidón azul con una manguera que llega del grifo del garaje.,A blue drum with a hose running from the garage tap.
 s25383d11,Un bidón con la manguera del grifo del garaje. Regar las {n} plantas te lleva media hora.,A drum with the hose from the garage tap. Watering the {n} plants takes you half an hour.
 sb1a02a87,Regar todas,Water them all
 scf4e1cf9,Riegas toda la huerta. Agua al 100%.,You water the whole garden. Water at 100%.
-s73d909ac,"Las herramientas de la tía: una azada, unas tijeras de podar y unos guantes de jardín gastados.","Your aunt's tools: a hoe, pruning shears and worn gardening gloves."
+s435af587,"Las herramientas de la tía: una azada con el mango partido, unas tijeras de podar y unos guantes de jardín gastados. Las buenas, en la tienda online.","Your aunt's tools: a hoe with a broken handle, pruning shears and worn gardening gloves. Good ones, in the online shop."
 s4bf5ce22,Sacos de compost que la tía dejó hechos tierra. La huerta no necesita más.,"Bags of compost your aunt left, now turned to soil. The garden needs nothing more."
 s03920724,Un cubo con una pala de mano dentro.,A bucket with a hand trowel inside.
 s3269e3a7,Un manzano viejo que sigue dando manzanas pequeñas y ácidas.,"An old apple tree that still gives small, sour apples."
@@ -189,7 +241,6 @@ s0a834126,"Para siempre: la floración, un {v} % más rápida.",Forever: floweri
 sf8566825,Para siempre: un {v} % menos de moho y botritis.,Forever: {v} % less mould and bud rot.
 sa9f9c49e, (conseguido), (done)
 s831311bf, Cosecha todas:, Harvest them all:
-s71f220da,Salir,Leave
 s68d77fec,"Cada variedad cuenta al cosecharla, en casa o en la nave.","Each strain counts when you harvest it, at home or in the warehouse."
 sb7a30418,CANNADEX · FAMILIAS,CANNADEX · FAMILIES
 sbe135fb7,{a}/{b} · prestigio {p} · {t} trofeos,{a}/{b} · prestige {p} · {t} trophies
@@ -222,7 +273,6 @@ see4ed37b, · mañana, · tomorrow
 s8b7c4857,"Lo que se pasa de la potencia contratada lo nota la compañía, y la policía se entera.","The power company notices anything over the contracted power, and the police find out."
 s084147c7,LA INSTALACIÓN ELÉCTRICA,THE WIRING
 s42b882aa,En la cuenta {e},In the account {e}
-s6092151d,Tienda online,Online shop
 s224febdd,Pedido: {n} · lo instalan mañana,Ordered: {n} · installed tomorrow
 s457a182b,"Puerto Viejo, en la costa: el puerto, la lonja y el club de los marineros.","Puerto Viejo, on the coast: the harbour, the fish market and the sailors' club."
 sb6f597e2,"Ribera Verde, tu barrio, en la ría: el piso de la tía, el barrio alto y los astilleros.","Ribera Verde, your neighbourhood, on the estuary: your aunt's flat, the upper town and the shipyards."
@@ -288,7 +338,6 @@ s754f50bc,"{n} esquejes de {v}{f}, cortados el {d}, en tacos de turba con su tap
 saf4a0ac6,Ya tienen raíces: la mesa {m} vuelve a empezar con ellos al cosecharse.,Rooted: table {m} starts over with them after harvest.
 s6f32040c,Les faltan un día para echar raíces.,One more day until they root.
 sba987d19,Les faltan {d} días para echar raíces.,{d} more days until they root.
-sf77a797e,Volver,Back
 sf4b87016,BANDEJAS DE CLONES,CLONE TRAYS
 s1d8da779,{a} de {b},{a} of {b}
 s71544312,"{d}
@@ -674,7 +723,6 @@ Plántala antes del {d}: es la misma planta.","You cut a tip off the {s}{e} and 
 Plant it before {d}: it's the same plant."
 s520771d4,O pínchala en el carro: allí aguanta {n} días.,Or stick it in the cart: it lasts {n} days there.
 s20676bad,Plaza vacía con una maceta de {m}.,Empty spot with a {m} pot.
-s2f31ad5f,Plantar,Plant
 sc0300166,Cambiar maceta,Change pot
 s70ab0f1d,La {s} se ha secado del todo.,The {s} has dried out completely.
 se9b9b1e8,Retiras la planta muerta.,You remove the dead plant.
@@ -887,7 +935,6 @@ s9b786ba6,Cambiar {q},Change {q}
 s5d087e9e,Cambias {q} del {m}: {v}.,You change {q} of the {m}: {v}.
 sfbcb0797,Cambias {q} de {m}: {v}.,You change {q} of the {m}: {v}.
 sdde6ecee,Listo,Done
-s5c461127, · pedido, · ordered
 s30b28fc8, · en casa, · at home
 s0fe9a2c7,"
 {q} viene mañana.","
@@ -927,12 +974,13 @@ s16008835,"Habilitar el camarote de arriba como almacén, las estanterías de ta
 s210771fd, · hecho, · done
 s7cf87763,Envasadora al vacío,Vacuum sealer
 s83aaf052,Para envasar lo del maletero en bolsas selladas: en un registro de tráfico se nota menos.,To seal what's in the boot in bags: it shows less in a traffic search.
+s20cf94a8,"La huerta: depósitos, riego y herramientas","The garden: tanks, irrigation and tools"
+s82853181,"Bidones y depósitos de agua, el goteo con bomba solar, las herramientas y la motoazada: llegan al día siguiente a la huerta.","Water drums and tanks, drip irrigation with a solar pump, the tools and the rotary tiller: they arrive at the garden the next day."
 s2c1cb4ca,La instalación eléctrica,The wiring
 sd1541010,Placas solares y generador insonorizado para el piso y la nave: lo que pasa de la potencia contratada deja firma térmica.,Solar panels and a silent generator for the flat and the warehouse: anything over the contracted power leaves a thermal signature.
 sfa78c4b9,"Con tarjeta, de la cuenta del banco.","By card, from your bank account."
 s3a1d6591,TIENDA ONLINE,ONLINE SHOP
 sb1ead1df,Muebles y transporte · en la cuenta {e},Furniture and transport · in the account {e}
-s61b3ec3e,Pedido: {n} · llega mañana,Ordered: {n} · arrives tomorrow
 s6d058a0e,Pedido: {n} · los obreros vienen mañana,Ordered: {n} · the builders come tomorrow
 sed705066,"La envasadora, en casa: se usa desde el maletero.",The sealer is at home: use it from the boot.
 sfe38af21, · {n} mañana, · {n} tomorrow
@@ -6000,6 +6048,7 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+s73d909ac,"Las herramientas de la tía: una azada, unas tijeras de podar y unos guantes de jardín gastados.","Your aunt's tools: a hoe, pruning shears and worn gardening gloves."
 sf8721a43,Las Skunk,The Skunks
 se9c33ce5,Las Skonk,The Skonks
 sed8b6d1e,"Tu club, jefe. En el dispensario quedan {g} de {n}, a {p} € el gramo. Llevamos {e}.","Your club, boss. The dispensary has {g} of {n} left, at {p} € a gram. We've taken {e}."

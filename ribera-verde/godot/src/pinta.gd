@@ -22,7 +22,7 @@ const Hoja = preload("res://src/hoja.gd")
 
 const SH := 180   # 1.12 (ui.gd); las escenas de 240 × 160 van abajo: OY
 const DIR4 := {"down": "south", "up": "north", "left": "west", "right": "east"}
-const TRANS := {"water": "agua", "dirt": "tierra", "plaza": "plaza", "pista": "tierra", "arena": "plaza", "surco": "tierra"}
+const TRANS := {"water": "agua", "dirt": "tierra", "plaza": "plaza", "pista": "tierra", "arena": "plaza", "surco": "tierra", "surcoV": "tierra"}   # i18n-no
 const HIERBA := ["grass", "flowers", "tallgrass"]
 const FUMA := ["fum", "puro", "pipa", "vap"]
 
@@ -277,6 +277,8 @@ func _mundo() -> void:
 				_arte_obj(o, tx, ty, tras if mt.has("%d,%d" % [tx, ty]) else list, sombras)
 	for r in sombras:
 		_rect(r[0], r[1], r[2], r[3], Color8(0, 0, 0, 56))
+	if Datos.CAL and S.map == "huerta" and J.huerta_m("goteo") > 0:   # el goteo de la huerta, en el suelo
+		_manguera_huerta()
 	for o in tras:
 		o[1].call()
 	if S.map == "disco-vip":
@@ -628,9 +630,9 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 			_arte_tile("water", tx, ty, sx, sy)
 		_img(_playa(tx, ty, ag, _vecinas(ma, tx, ty, HIERBA)), sx, sy)
 		return true
-	if k == "surco":   # la tierra arada de los bancales: la tierra y, encima, sus surcos
+	if k == "surco" or k == "surcoV":   # la tierra arada de los bancales: la tierra y, encima, sus surcos (surcoV: recién cavada; i18n-no)
 		_arte_tile("dirt", tx, ty, sx, sy)
-		_img(_surco(tx, ty), sx, sy)
+		_img(_surco(tx, ty, k == "surcoV"), sx, sy)   # i18n-no
 		return true
 	var an = Atlas.sobre.get("tile:" + k)
 	if an:
@@ -926,17 +928,20 @@ static func playa_img(ag: Array, hi: Array, tx: int, ty: int, f: int) -> Image:
 # la tierra arada («surco» de tools/carreteras.py, lo pidió el usuario: «zona más de tierra»): sobre la tierra, cada 4 px un caballón
 # con su luz arriba y su sombra abajo, que no va del todo recto, y algún terrón
 const SURCO_C := ["#d29a62", "#a8703f", "#9e7650"]
+# la recién cavada o labrada (las herramientas y la motoazada de la huerta, campo.gd): una mancha de tierra húmeda y más oscura, de
+# borde irregular, con más terrones
+const SURCO_V := ["#b47c4c", "#6e4a2a", "#5a3c22", "#906238"]
 var _surco_c := {}
 
-func _surco(tx: int, ty: int) -> Image:
-	var k := "%d|%d" % [tx, ty]
+func _surco(tx: int, ty: int, v := false) -> Image:
+	var k := "%d|%d|%d" % [tx, ty, int(v)]
 	if not _surco_c.has(k):
 		if _surco_c.size() > 600:   # R7: tope
 			_surco_c.clear()
-		_surco_c[k] = surco_img(tx, ty)
+		_surco_c[k] = surco_img(tx, ty, v)
 	return _surco_c[k]
 
-static func surco_img(tx: int, ty: int) -> Image:
+static func surco_img(tx: int, ty: int, v := false) -> Image:
 	var im := Image.create(16, 16, false, Image.FORMAT_RGBA8)
 	for px in 16:
 		var X: int = tx * 16 + px
@@ -944,13 +949,65 @@ static func surco_img(tx: int, ty: int) -> Image:
 		for py in 16:
 			var r: int = (py + o) % 4
 			var h := hash_t(X, ty * 16 + py)
+			var d: float = pow((px - 7.5) / 7.6, 2) + pow((py - 8.0) / 7.0, 2)   # la mancha cavada, con el borde roto
+			var C: Array = SURCO_V if v and d < .92 + (h % 5) * .05 else SURCO_C
 			if r == 0:
-				im.set_pixel(px, py, css(SURCO_C[0]))
+				im.set_pixel(px, py, css(C[0]))
 			elif r == 3:
-				im.set_pixel(px, py, css(SURCO_C[1]))
-			elif h % 37 == 0:
-				im.set_pixel(px, py, css(SURCO_C[2]))   # un terrón
+				im.set_pixel(px, py, css(C[1]))
+			elif h % (11 if C == SURCO_V else 37) == 0:
+				im.set_pixel(px, py, css(C[2]))   # un terrón
+			elif C == SURCO_V:
+				im.set_pixel(px, py, css(C[3]))
 	return im
+
+# el goteo de la huerta (campo.gd, HUERTA_MEJ.goteo): la manguera negra por el suelo desde la bomba hasta el camino, por el borde del
+# camino abajo y un ramal al pie de cada fila de sitios, con un gotero en cada uno y, si queda agua y hay planta, la gota
+const MANG_C := ["#44444e", "#1e1e24", "#76b4f2"]
+
+func _manguera_huerta() -> void:
+	var H: Dictionary = J.HUERTA
+	var ox: float = -cam.x
+	var oy: float = -cam.y
+	var hl := func(x0: int, x1: int, y: int) -> void:
+		_rect(mini(x0, x1) + ox, y + oy, absi(x1 - x0) + 1, 1, css(MANG_C[0]))
+		_rect(mini(x0, x1) + ox, y + 1 + oy, absi(x1 - x0) + 1, 1, css(MANG_C[1]))
+	var vl := func(x: int, y0: int, y1: int) -> void:
+		_rect(x + ox, mini(y0, y1) + oy, 1, absi(y1 - y0) + 1, css(MANG_C[0]))
+		_rect(x + 1 + ox, mini(y0, y1) + oy, 1, absi(y1 - y0) + 1, css(MANG_C[1]))
+	var b: Array = J.HUERTA_MEJ.goteo.x[0]
+	var bx: int = int(b[0]) * 16 + 10
+	var cx: int = int(H.camino) * 16 + 1
+	var y0: int = (int(b[1]) + 1) * 16 + 12   # la principal, en la fila de debajo de la bomba
+	var filas := {}
+	var xa := 9999
+	var xb := 0
+	for q in H.bancales:
+		xa = mini(xa, int(q[0]) * 16 + 5)
+		xb = maxi(xb, int(q[2]) * 16 + 10)
+	for s in H.sitios:
+		filas[int(s[1])] = true
+	var yf: int = 0
+	for f in filas:
+		yf = maxi(yf, int(f) * 16 + 13)
+	vl.call(bx, (int(b[1]) + 1) * 16 - 2, y0)
+	hl.call(bx, cx, y0)
+	var xi: Array = J.HUERTA_MEJ.ibc.x
+	for j in mini(J.huerta_m("ibc"), xi.size()):   # los depósitos de 1000 L, de su válvula a la principal
+		var ix: int = int(xi[j][0]) * 16 + 8
+		vl.call(ix, (int(xi[j][1]) + 1) * 16 - 4, y0)
+		hl.call(cx, ix, y0)
+	vl.call(cx, y0, yf)
+	for f in filas:
+		hl.call(xa, xb, int(f) * 16 + 13)
+	var agua: bool = float(J.huerta_s().get("agua", 0)) > 0
+	for i in H.sitios.size():
+		var s: Array = H.sitios[i]
+		var gx: int = int(s[0]) * 16 + 11
+		var gy: int = int(s[1]) * 16 + 13
+		_rect(gx + ox, gy - 1 + oy, 2, 3, css(MANG_C[1]))   # el gotero
+		if agua and J.huerta_s().p[i] is Dictionary:
+			_rect(gx + ox, gy + 2 + oy, 1, 1, css(MANG_C[2]))   # la gota
 
 # los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
 const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13, "fotoMaite": -10, "extrN": -14, "extrG": -14, "filtroN": -12, "ctrlN": -12, "fotoK": -13, "ojoBuey": -13, "timon": -13, "red": -13, "diana": -13, "engranaje": -13, "neonH": -13, "copas": -16, "tuboS": -13, "botesW": -16, "neonG": -13}   # 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared; 1.34: lo de las paredes de los clubs, del bajo y de los grows

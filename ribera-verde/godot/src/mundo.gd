@@ -2606,6 +2606,12 @@ func campo_obj(_x: int, _y: int, _o) -> bool:   # MAESTRO [4], en campo.gd
 func montar_huerta(_k: String) -> void:   # la huerta de la tía, en campo.gd
 	pass
 
+func huerta_lista() -> bool:   # en campo.gd
+	return false
+
+func huerta_tienda() -> void:   # en campo.gd
+	pass
+
 # MAESTRO [6], en gestion.gd
 func staff_ok() -> bool:
 	return false

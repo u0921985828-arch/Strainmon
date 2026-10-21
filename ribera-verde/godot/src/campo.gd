@@ -197,6 +197,17 @@ const HUERTA := {"mapa": "huerta", "w": 30, "h": 12, "seto": [7, 1, 22, 10], "ca
 	"desbroce": 240, "riego": 30, "veg": [420, 805], "g": 250, "cap": 500, "veg_dias": 60,
 	"agua": [.2, .2, .3, .35, .45, .6, .7, .7, .5, .35, .25, .2], "plaga": 1.2, "helada": 25, "nieve": 50}
 var _town19 = null   # lo que había en town en la cancilla y la senda, para dejarlo como estaba sin CAL
+# las mejoras (lo pidió el usuario: «Opción a comprar mejoras como tanques de agua de 1m3 o tanques azules de 100L dependiendo, también
+# sistema de riego... Herramientas para trabajar la tierra o motoazada siguiente mejora... Habría que hacer los sprites»): en la
+# tienda online, ya desbrozada, y al día siguiente en la huerta (S.huerta.ped, llega_huerta; S.huerta.m, lo que hay). Los bidones de
+# 100 L y los depósitos de 1000 L (S.huerta.agua, los litros) se llenan con la manguera del garaje (caudal, L/min); el goteo con la
+# placa solar riega cada planta al bajar de umbral con los litros de su tamaño (litros: de la plántula a la grande) mientras quede
+# agua; las herramientas cavan un sitio vacío (herr.min) y la motoazada labra todos los vacíos (moto.min): la tierra trabajada
+# (S.huerta.t: 0, 1 cavada, 2 labrada) da g más de cosecha hasta que el sitio se vacía. Dibujos en huerta_mej.py; x, dónde van.
+const HUERTA_MEJ := {"bidon": {"p": 35, "l": 100, "max": 3, "x": [[9, 2], [10, 2], [11, 2]]}, "ibc": {"p": 95, "l": 1000, "max": 2, "x": [[17, 2], [19, 2]]},   # i18n-no
+	"goteo": {"p": 150, "x": [[12, 2]]}, "herr": {"p": 60, "g": .15, "min": 45, "x": [[8, 6]]}, "moto": {"p": 490, "g": .3, "min": 40, "x": [[21, 6]]},   # i18n-no
+	"caudal": 15, "umbral": 50, "litros": [3, 17]}
+const HUERTA_SPR := {"bidon": "bidonA", "goteo": "bombaS", "herr": "herrH", "moto": "motoA"}   # i18n-no
 
 func huerta_s() -> Dictionary:
 	if not (S.get("huerta") is Dictionary):
@@ -204,7 +215,26 @@ func huerta_s() -> Dictionary:
 	var h: Dictionary = S.huerta
 	while h.p.size() < HUERTA.sitios.size():
 		h.p.append(null)
+	if Datos.CAL:   # las mejoras
+		for k in ["m", "ped", "agua", "t"]:   # i18n-no
+			if not h.has(k):
+				h[k] = {} if k == "m" else ([] if k == "ped" else (0.0 if k == "agua" else []))
+		while h.t.size() < HUERTA.sitios.size():
+			h.t.append(0)
 	return h
+
+func huerta_m(k: String) -> int:   # cuántos hay en la huerta
+	return int(huerta_s().get("m", {}).get(k, 0))
+
+func huerta_ped(k: String) -> int:   # cuántos llegan mañana
+	return huerta_s().get("ped", []).filter(func(q): return q[0] == k).size()
+
+func huerta_cap() -> int:   # los litros de los depósitos
+	return huerta_m("bidon") * int(HUERTA_MEJ.bidon.l) + huerta_m("ibc") * int(HUERTA_MEJ.ibc.l)
+
+func huerta_t(i: int) -> int:   # la tierra del sitio i: 0 sin trabajar, 1 cavada, 2 labrada
+	var t: Array = huerta_s().get("t", [])
+	return int(t[i]) if i >= 0 and i < t.size() else 0
 
 func huerta_vista() -> bool:   # ¿la has encontrado?
 	return Datos.CAL and S != null and S.get("huerta") is Dictionary and int(S.huerta.get("v", 0)) > 0
@@ -277,7 +307,23 @@ func mapa_huerta() -> Dictionary:
 		for i in HUERTA.sitios.size():
 			var s: Array = HUERTA.sitios[i]
 			o[int(s[1])][int(s[0])] = sprite_huerta(huerta_s().p[i])
+		m.o = o
+		huerta_mejoras(m)
 	return m
+
+# las mejoras que hay, en su sitio (HUERTA_MEJ.x), el depósito de 1000 L con el agua por cuartos, y la tierra trabajada más oscura
+func huerta_mejoras(m: Dictionary) -> void:
+	if not Datos.CAL:
+		return
+	var cap := huerta_cap()
+	var q: int = clampi(roundi(4.0 * float(huerta_s().agua) / cap), 0, 4) if cap > 0 else 0
+	for k in ["bidon", "ibc", "goteo", "herr", "moto"]:   # i18n-no
+		var xs: Array = HUERTA_MEJ[k].x
+		for j in xs.size():
+			m.o[int(xs[j][1])][int(xs[j][0])] = (("ibcD-%d" % q) if k == "ibc" else HUERTA_SPR[k]) if j < huerta_m(k) else null   # i18n-no
+	for i in HUERTA.sitios.size():
+		var s: Array = HUERTA.sitios[i]
+		m.g[int(s[1])][int(s[0])] = "surcoV" if huerta_t(i) > 0 else "surco"   # i18n-no
 
 # hp<v>-<fase> (huerto.py, como las salvajes): v por el % índica, la fase por el progreso; seca, hs<v>-<fase> (pinta.gd la pinta parda)
 func sprite_huerta(p):
@@ -295,6 +341,7 @@ func huerta_objs() -> void:
 	for i in HUERTA.sitios.size():
 		var s: Array = HUERTA.sitios[i]
 		o[int(s[1])][int(s[0])] = sprite_huerta(huerta_s().p[i])
+	huerta_mejoras(MAPS[HUERTA.mapa])
 
 func huerta_veg(dia: int) -> bool:   # ¿días largos? (dentro de HUERTA.veg, mes × 100 + día)
 	var f := Datos.fecha(dia)
@@ -302,16 +349,18 @@ func huerta_veg(dia: int) -> bool:   # ¿días largos? (dentro de HUERTA.veg, me
 	return md >= int(HUERTA.veg[0]) and md <= int(HUERTA.veg[1])
 
 # los factores de una planta de la huerta, como Cultivo.factores de una plaza: sin foco ni maceta, el sol y la tierra
-func huerta_f(p) -> Dictionary:
+func huerta_f(p, i := -1) -> Dictionary:
 	var vd: float = float(p.get("vd", 0)) if p is Dictionary else 0.0
 	var t: float = float(Datos.tiempo(S.day, S.min).t)
-	return {"g": float(HUERTA.g) * clampf(vd / float(HUERTA.veg_dias), .25, 1.0), "cap": float(HUERTA.cap), "crec": Cultivo.f_clima({"t": t, "hr": 50.0}), "thc": 0.0,
+	var tg: int = huerta_t(i) if Datos.CAL else 0   # la tierra trabajada
+	var mas: float = 0.0 if tg == 0 else float(HUERTA_MEJ.herr.g if tg == 1 else HUERTA_MEJ.moto.g)
+	return {"g": float(HUERTA.g) * clampf(vd / float(HUERTA.veg_dias), .25, 1.0) * (1 + mas), "cap": float(HUERTA.cap), "crec": Cultivo.f_clima({"t": t, "hr": 50.0}), "thc": 0.0,
 		"agua": float(HUERTA.agua[int(Datos.fecha(S.day).m) - 1]), "plaga": float(HUERTA.plaga), "hr": 50.0, "moho": 1.0, "ciclo": "veg" if huerta_veg(S.day) else "flor"}   # i18n-no
 
 func huerta_hu(i: int) -> Dictionary:
 	var s: Array = HUERTA.sitios[i]
 	var p = huerta_s().p[i]
-	return {"l": huerta_s().p, "v": [int(s[0]) * 16 + 8, int(s[1]) * 16 - 8], "f": huerta_f(p)}
+	return {"l": huerta_s().p, "v": [int(s[0]) * 16 + 8, int(s[1]) * 16 - 8], "f": huerta_f(p, i)}
 
 func plants_advance(mn: int) -> void:
 	super(mn)
@@ -324,6 +373,7 @@ func huerta_avanza(mn: int) -> void:
 	var L: Array = huerta_s().p
 	var llueve: bool = Datos.tiempo(S.day, S.min).k in ["lluvia", "tormenta"]   # i18n-no
 	var cambia := false
+	var got: bool = Datos.CAL and huerta_m("goteo") > 0
 	for i in L.size():
 		var p = L[i]
 		if not (p is Dictionary) or p.get("dead"):
@@ -333,14 +383,124 @@ func huerta_avanza(mn: int) -> void:
 			p.water = 100.0
 		if p.prog >= .12 and p.prog < .65:
 			p.vd = float(p.get("vd", 0)) + mn / 1440.0
-		Cultivo.plant_step(S, p, mn / 60.0, huerta_f(p))
+		Cultivo.plant_step(S, p, mn / 60.0, huerta_f(p, i))
+		if got and not llueve:
+			huerta_gotea(p)
 		cambia = cambia or sprite_huerta(p) != a
+	var cap := huerta_cap()
+	if Datos.CAL and huerta_m("ibc") > 0 and MAPS.has(HUERTA.mapa):   # el depósito de 1000 L, por cuartos
+		var ix: Array = HUERTA_MEJ.ibc.x[0]
+		cambia = cambia or MAPS[HUERTA.mapa].o[int(ix[1])][int(ix[0])] != "ibcD-%d" % clampi(roundi(4.0 * float(huerta_s().agua) / cap), 0, 4)   # i18n-no
 	if cambia:
 		huerta_objs()
 
+# el goteo: si la tierra de la planta se ha secado (agua por debajo del umbral), los litros que le faltan, de los depósitos; si no
+# llegan, lo que quede
+func huerta_gotea(p: Dictionary) -> void:
+	var h := huerta_s()
+	if float(p.water) >= float(HUERTA_MEJ.umbral) or float(h.agua) <= 0:
+		return
+	var lp: float = float(HUERTA_MEJ.litros[0]) + float(HUERTA_MEJ.litros[1]) * clampf(float(p.prog), 0, 1)   # los litros de la planta llena
+	var pide: float = (100.0 - float(p.water)) / 100.0 * lp
+	var da: float = minf(pide, float(h.agua))
+	p.water = float(p.water) + da / lp * 100.0
+	h.agua = float(h.agua) - da
+
 func new_day() -> void:
 	super()
+	llega_huerta()
 	huerta_dia()
+
+# lo pedido para la huerta, al día siguiente
+func llega_huerta() -> void:
+	if not Datos.CAL or not (S.get("huerta") is Dictionary) or S.huerta.get("ped", []).is_empty():
+		return
+	var h := huerta_s()
+	var ll := []
+	var quedan := []
+	for q in h.ped:
+		if int(q[1]) <= S.day:
+			h.m[q[0]] = int(h.m.get(q[0], 0)) + 1
+			ll.append(huerta_mej_art(String(q[0])))
+		else:
+			quedan.append(q)
+	h.ped = quedan
+	if ll.is_empty():
+		return
+	if MAPS.has(HUERTA.mapa):
+		MAPS[HUERTA.mapa] = mapa_huerta()
+	var L := [T("Te dejan en la huerta lo que pediste: {l}.", {"l": _lista(ll)})]
+	queue("huerta", func():
+		sfx("get")
+		await say(L[0]), [["", L]])
+
+func huerta_mej_n(k: String) -> String:
+	return {"bidon": K("Bidón azul de 100 L"), "ibc": K("Depósito de 1000 L"), "goteo": K("Goteo con bomba solar"), "herr": K("Herramientas de huerta"), "moto": K("Motoazada")}[k]   # i18n-no
+
+func huerta_mej_art(k: String) -> String:
+	return {"bidon": K("un bidón azul de 100 L"), "ibc": K("un depósito de 1000 L"), "goteo": K("el goteo con la bomba solar"), "herr": K("la laya, la azada y el rastrillo"), "moto": K("la motoazada")}[k]   # i18n-no
+
+func huerta_mej_d(k: String) -> String:
+	if k == "bidon":   # i18n-no
+		return K("De polietileno, sobre dos bloques y con su grifo. Se llena con la manguera del garaje.")
+	if k == "ibc":   # i18n-no
+		return K("Un depósito de segunda mano, lavado, en su jaula de acero y su palé: una tonelada de agua para el verano.")
+	if k == "goteo":   # i18n-no
+		return K("Tubería con un gotero por planta, filtro, programador y bomba con placa solar: riega cada planta cuando la tierra se seca, mientras quede agua en los depósitos.")
+	var p: int = Datos.jsround(float(HUERTA_MEJ[k].g) * 100)
+	if k == "herr":   # i18n-no
+		return T("Laya, azada y rastrillo para cavar cada sitio antes de plantar: la tierra suelta da un {p} % más de cosecha.", {"p": p})
+	return T("De gasolina: labra todos los sitios vacíos de una vez y más hondo que a mano, un {p} % más de cosecha.", {"p": p})
+
+# la tienda online → La huerta: con tarjeta y al día siguiente
+func huerta_tienda() -> void:
+	var ks := ["bidon", "ibc", "goteo", "herr", "moto"]   # i18n-no
+	var i := 0
+	while true:
+		var items := []
+		for k in ks:
+			var M: Dictionary = HUERTA_MEJ[k]
+			var ya := huerta_m(k)
+			var pd := huerta_ped(k)
+			var mx: int = int(M.get("max", 1))
+			var falta := ""
+			if k == "goteo" and huerta_m("bidon") + huerta_m("ibc") + huerta_ped("bidon") + huerta_ped("ibc") == 0:   # i18n-no
+				falta = K("\nAntes hace falta un depósito.")
+			if k == "moto" and huerta_m("herr") + huerta_ped("herr") == 0:   # i18n-no
+				falta = K("\nAntes hacen falta las herramientas.")
+			var lb := huerta_mej_n(k) + (" · %d/%d" % [ya + pd, mx] if mx > 1 else (T(" · en la huerta") if ya else "")) + (T(" · pedido") if pd else "")
+			items.append({"label": lb, "right": Datos.eur(M.p), "disabled": ya + pd >= mx or falta != "", "desc": huerta_mej_d(k) + falta})
+		items.append({"label": K("Volver")})
+		i = await menu(items, {"cls": "full", "title": K("LA HUERTA"), "title2": T("Depósitos, riego y herramientas · en la cuenta {e}", {"e": Datos.eur(S.banco)}), "desc": true, "initial": i})
+		if i < 0 or i >= ks.size():
+			return
+		if items[i].disabled:
+			continue
+		var k: String = ks[i]
+		if not await tarjeta(HUERTA_MEJ[k].p, K("Tienda online") + " · " + huerta_mej_n(k)):
+			continue
+		huerta_s().ped.append([k, S.day + 1])
+		sfx("coin")
+		toast(T("Pedido: {n} · llega mañana", {"n": huerta_mej_n(k)}), 1400)
+
+# los sitios vacíos con la tierra por debajo de nv
+func huerta_vacios(nv: int) -> Array:
+	var r := []
+	for i in HUERTA.sitios.size():
+		if huerta_s().p[i] == null and huerta_t(i) < nv:
+			r.append(i)
+	return r
+
+# cavar (1) o labrar (2) los sitios vs en mn minutos
+func huerta_trabaja(vs: Array, nv: int, mn: int) -> void:
+	await fade(1)
+	advance_time(mn)
+	for i in vs:
+		huerta_s().t[i] = maxi(huerta_t(i), nv)
+	huerta_objs()
+	await fade(0)
+	sfx("get")
+	await say(K("Cavas a fondo, rompes los terrones y lo dejas rastrillado: la tierra, suelta y oscura.") if nv == 1 else K("La motoazada levanta la tierra a un palmo de hondo y la deja mullida."))
 
 # al amanecer: la helada y la nieve de ayer (la mínima), y la botritis de las que florecen con lluvia
 func huerta_dia() -> void:
@@ -411,9 +571,67 @@ func huerta_obj(x: int, y: int, o) -> bool:
 	for i in HUERTA.sitios.size():
 		var s: Array = HUERTA.sitios[i]
 		if huerta_lista() and int(s[0]) == x and int(s[1]) == y:
+			var antes = huerta_s().p[i]
+			if antes == null and (huerta_m("moto") and huerta_t(i) < 2 or huerta_m("herr") and huerta_t(i) < 1):
+				var ops := []
+				if huerta_m("moto") and huerta_t(i) < 2:
+					ops.append(K("Labrar con la motoazada"))
+				if huerta_m("herr") and huerta_t(i) < 1:
+					ops.append(K("Cavar la tierra"))
+				ops.append_array([K("Plantar"), K("Salir")])
+				var c: int = await ask(K("Un sitio vacío, con la tierra sin trabajar.") if huerta_t(i) == 0 else K("Un sitio vacío, con la tierra cavada a mano."), ops)
+				var op: String = ops[c] if c >= 0 else "Salir"   # i18n-no
+				if op == "Labrar con la motoazada":
+					await huerta_trabaja(huerta_vacios(2), 2, int(HUERTA_MEJ.moto.min))
+					return true
+				if op == "Cavar la tierra":
+					await huerta_trabaja([i], 1, int(HUERTA_MEJ.herr.min))
+					return true
+				if op != "Plantar":
+					return true
 			await pot_action(i, huerta_hu(i))
+			if Datos.CAL and antes != null and huerta_s().p[i] == null:   # cosechada o arrancada: la tierra, otra vez sin trabajar
+				huerta_s().t[i] = 0
 			huerta_objs()
 			return true
+	if huerta_lista() and (o == "bidonA" or String(o).begins_with("ibcD-")):   # i18n-no
+		var h := huerta_s()
+		var cap := huerta_cap()
+		var txt := T("Los depósitos de la huerta: {a} de {c} L.", {"a": int(h.agua), "c": cap}) + (K(" El goteo tira de aquí.") if huerta_m("goteo") else "")
+		var falta: float = cap - float(h.agua)
+		if falta < 1:
+			await say(txt + K(" Están llenos."))
+			return true
+		var mn: int = maxi(10, ceili(falta / float(HUERTA_MEJ.caudal)))
+		if await ask(txt + "\n" + T("Llenarlos con la manguera del garaje te lleva {m} min.", {"m": mn}), [K("Llenarlos"), K("Dejarlo")]) == 0:
+			await fade(1)
+			advance_time(mn)
+			h.agua = float(cap)
+			huerta_objs()
+			await fade(0)
+			sfx("sel")
+			await say(T("Depósitos llenos: {c} L.", {"c": cap}))
+		return true
+	if huerta_lista() and o == "bombaS":   # i18n-no
+		await say(T("La placa solar mueve la bomba del goteo: cada planta recibe agua cuando la tierra se seca, mientras quede en los depósitos ({a} de {c} L).", {"a": int(huerta_s().agua), "c": huerta_cap()}))
+		return true
+	if huerta_lista() and o == "herrH":   # i18n-no
+		var vs := huerta_vacios(1)
+		if vs.is_empty():
+			await say(K("La laya, la azada y el rastrillo. No queda ningún sitio vacío sin cavar."))
+			return true
+		var mn: int = int(HUERTA_MEJ.herr.min) * vs.size()
+		if await ask(T("La laya, la azada y el rastrillo. Cavar los {n} sitios vacíos te lleva {m} min.", {"n": vs.size(), "m": mn}) if vs.size() > 1 else T("La laya, la azada y el rastrillo. Cavar el sitio vacío te lleva {m} min.", {"m": mn}), [K("Cavar"), K("Dejarlo")]) == 0:
+			await huerta_trabaja(vs, 1, mn)
+		return true
+	if huerta_lista() and o == "motoA":   # i18n-no
+		var vs := huerta_vacios(2)
+		if vs.is_empty():
+			await say(K("La motoazada. No queda ningún sitio vacío por labrar."))
+			return true
+		if await ask(T("La motoazada. Labrar los {n} sitios vacíos te lleva {m} min.", {"n": vs.size(), "m": int(HUERTA_MEJ.moto.min)}) if vs.size() > 1 else T("La motoazada. Labrar el sitio vacío te lleva {m} min.", {"m": int(HUERTA_MEJ.moto.min)}), [K("Labrar"), K("Dejarlo")]) == 0:
+			await huerta_trabaja(vs, 2, int(HUERTA_MEJ.moto.min))
+		return true
 	if o == "bidonT":   # i18n-no
 		var vivas: Array = huerta_s().p.filter(func(p): return p is Dictionary and not p.get("dead"))
 		if not huerta_lista() or vivas.is_empty():
@@ -430,7 +648,7 @@ func huerta_obj(x: int, y: int, o) -> bool:
 			await say(K("Riegas toda la huerta. Agua al 100%."))
 		return true
 	if o == "crate":   # i18n-no
-		await say(K("Las herramientas de la tía: una azada, unas tijeras de podar y unos guantes de jardín gastados."))
+		await say(K("Las herramientas de la tía: una azada con el mango partido, unas tijeras de podar y unos guantes de jardín gastados. Las buenas, en la tienda online."))
 		return true
 	if o == "sacos":   # i18n-no
 		await say(K("Sacos de compost que la tía dejó hechos tierra. La huerta no necesita más."))
