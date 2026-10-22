@@ -108,50 +108,23 @@ def pasajero(L, x, y, pelo, ropa):
     L.r(x - 1, y + 5, 7, 4, ropa)
 
 
-# ---------- el autobús de la comarca: 12 m × 3,1 m → 168 × 44 (blanco con la franja verde, sin rótulos) ----------
+# ---------- el autobús de la comarca: de PixelLab, al estilo de los muebles (lo pidió el usuario: «el sprite del bus, más del
+# estilo del juego, muebles con PixelLab»). Blanco con la franja verde, sin rótulos; recortado y a 28 colores
+# (tools/sprites/pixellab-viaje/bus.png, 149 × 37). Aquí solo se sientan los pasajeros y el protagonista en las ventanas. ----------
+PIXELLAB = os.path.join(RAIZ, 'tools', 'sprites', 'pixellab-viaje')
+BUS_VENT = (5, 24, 42, 61, 79, 97)       # el primer píxel de cristal de cada ventana (de atrás adelante)
+
+
 def autobus():
-    W, H = 170, 46
-    L = Lienzo(W, H)
-    B, B_S, B_L = '#eef0ea', '#c4c8c0', '#ffffff'
-    V, V_S = '#2e8a4e', '#1e6236'
-    # la caja, con la trasera recta y el frontal algo inclinado arriba
-    L.poly([(1, 3), (163, 3), (166, 6), (168, 14), (168, 41), (1, 41)], B)
-    L.r(1, 3, 162, 1, B_L)
-    L.r(1, 33, 168, 8, B_S)                                       # el faldón, en sombra
-    L.r(1, 26, 168, 4, V); L.r(1, 29, 168, 1, V_S)                 # la franja verde
-    L.r(1, 4, 160, 2, '#d8dcd4')                                   # el techo: aire acondicionado
-    L.r(96, 0, 30, 3, '#c8ccc4'); L.hl(97, 124, 0, '#e8ece4')
-    # las ventanas: tramos con montantes y pasajeros (el protagonista, delante, junto al conductor)
-    L.r(6, 8, 128, 15, INT)
-    xs = list(range(6, 134, 21))
-    gente = [('#3a2a20', '#4a6aa0'), ('#9a9a9a', '#8a5a9a'), ('#1a1a1a', '#d8b040'), None, ('#7a4a2a', '#50a070'), ('#c8a060', '#3a3a4a')]
-    for i, xw in enumerate(xs):
-        L.r(xw, 8, 2, 15, '#3a3e48')                               # el montante
-        if i < len(gente) and gente[i]:
-            pasajero(L, xw + 8, 13, *gente[i])
-    persona_perfil(L, 124, 11)
-    L.r(6, 8, 128, 1, '#151820')
-    for xw in xs[:-1] + [134]:
-        L.r(xw + 2, 9, 3, 6, '#3a4250')                            # el reflejo del cristal, arriba a la izquierda de cada hoja
-    # la puerta de delante (dos hojas de cristal) y el parabrisas con el conductor
-    L.r(137, 8, 13, 31, '#3a3e48'); L.r(138, 9, 5, 29, VIDRIO_S); L.r(144, 9, 5, 29, VIDRIO_S); L.vl(143, 9, 37, '#3a3e48')
-    L.r(139, 10, 1, 8, REFLEJO); L.r(145, 10, 1, 8, REFLEJO)
-    L.poly([(152, 7), (163, 7), (166, 10), (167, 23), (152, 23)], VIDRIO)
-    L.r(157, 13, 5, 2, '#3a2a20'); L.r(157, 15, 5, 3, '#d8a47e'); L.r(156, 18, 7, 5, '#4a5a7a')   # el conductor
-    L.r(152, 7, 2, 16, '#3a3e48'); L.hl(154, 165, 8, REFLEJO)
-    L.r(152, 4, 12, 3, '#20201c')                                  # el letrero del destino, en ámbar
-    for xx in range(153, 163, 2):
-        L.p(xx, 5, '#f0a020')
-    # luces, retrovisor, parachoques
-    L.r(165, 34, 3, 3, FARO); L.r(1, 32, 2, 4, PILOTO); L.r(1, 36, 2, 2, '#f0a020')
-    L.r(168, 9, 1, 6, '#3a3e48'); L.r(168, 8, 2, 2, '#3a3e48')
-    L.r(1, 40, 168, 1, '#3a3e48')
-    # los pasos de rueda (las ruedas, en el motor, delante)
-    for cx in (30, 136):
-        L.d.ellipse([cx - 10, 31, cx + 10, 51], fill=(0, 0, 0, 0))
-        L.d.arc([cx - 10, 31, cx + 10, 51], 180, 360, fill=hexrgb('#3a3e48'))
-    L.contorno()
-    return L.im, {'ruedas': [[30, 41, 16], [136, 41, 16]], 'suelo': 49, 'faro': [168, 35]}
+    L = Lienzo(1, 1)
+    L.im = Image.open(os.path.join(PIXELLAB, 'bus.png')).convert('RGBA')
+    L.d = ImageDraw.Draw(L.im)
+    gente = [('#3a2a20', '#4a6aa0'), ('#9a9a9a', '#8a5a9a'), ('#1a1a1a', '#d8b040'), None, ('#7a4a2a', '#50a070')]
+    for xw, g in zip(BUS_VENT, gente):
+        if g:
+            pasajero(L, xw + 6, 11, *g)
+    persona_perfil(L, BUS_VENT[-1] + 7, 10)       # el protagonista, delante, junto a la puerta
+    return L.im, {'ruedas': [[26, 37, 14], [118, 37, 14]], 'suelo': 44, 'faro': [145, 32]}
 
 
 # ---------- los coches: de juguete como en la calle (cortos y redondos), a escala de perfil ----------
@@ -309,9 +282,11 @@ def main():
     for k in ('utilitario', 'berlina', 'deportivo'):
         im, m = coche(k); piezas[k] = im; meta[k] = m
     im, m = moto(); piezas['moto'] = im; meta['moto'] = m
-    for d in (10, 12, 16):
+    for d in (10, 12, 14, 16):
         for f in range(4):
             piezas['rueda-%d-%d' % (d, f)] = rueda(d, f)
+    for k in ('nube-0', 'nube-1', 'nube-2', 'nube-3', 'sol', 'luna'):     # el cielo, de PixelLab
+        piezas[k] = Image.open(os.path.join(PIXELLAB, k + '.png')).convert('RGBA')
     piezas['monte'] = monte(); piezas['medio'] = medio(); piezas['cerca'] = cerca(); piezas['carretera'] = carretera()
     # la hoja: por filas, de arriba abajo
     W = 200

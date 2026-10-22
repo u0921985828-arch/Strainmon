@@ -73,7 +73,6 @@ static func pinta(P, V: Dictionary, now: float) -> void:
 	var e := clampf(now - float(V.t0), 0.0, DUR)
 	var lz := luz(int(V.get("h", 720)))
 	var tin: Color = TINTE[lz]
-	_cielo(P, sw, lz)
 	var k := clave(String(V.veh))
 	var m: Dictionary = META[k]
 	var cuerpo: Image = R[k]
@@ -81,6 +80,7 @@ static func pinta(P, V: Dictionary, now: float) -> void:
 	var vel: float = VEL.get(k, 0.15)
 	var p := pos(e, sw, w, vel)
 	var corre := p.y
+	_cielo(P, sw, lz, corre)
 	_fondo(P, sw, sh, corre, tin)
 	# el vehículo: de noche, el haz de los faros delante
 	var suelo := Y_CARRETERA + CARRIL
@@ -111,26 +111,50 @@ static func pinta(P, V: Dictionary, now: float) -> void:
 	P._rect(20, sh - 6, bw, 3, Color(0, 0, 0, 0.5))
 	P._rect(20, sh - 6, int(bw * e / DUR), 3, Color("#8bd448"))
 
-static func _cielo(P, sw: int, lz: int) -> void:
-	# el cielo, en bandas
-	var c0 := Color(CIELO[lz][0])
-	var c1 := Color(CIELO[lz][1])
-	for i in 12:
-		P._rect(0, i * 10, sw, 10, c0.lerp(c1, i / 11.0))
-	P._rect(0, 120, sw, int(P.SH) - 120, c1)   # 1.57.2: hasta abajo, que entre el monte y la carretera no se vea lo de detrás
+# el cielo (lo pidió el usuario: «el fondo del cielo» al estilo de los muebles): el degradado en tonos tramados con Bayer 4 × 4,
+# cacheado por ancho y luz; las nubes, el sol y la luna de PixelLab (tools/sprites/pixellab-viaje); las nubes van a la deriva por
+# lo andado (corre), lentas
+const CIELO_TONOS := 6
+const BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
+const NUBES := [["nube-3", 10, 8, 0.05], ["nube-1", 150, 30, 0.08], ["nube-2", 300, 14, 0.06], ["nube-0", 420, 40, 0.1], ["nube-1", 560, 22, 0.07]]
+const NUBE_TINTE := [Color(1, 1, 1), Color(1.0, 0.78, 0.74), Color(0.36, 0.40, 0.58)]
+static var CIELO_IM := {}
+
+static func cielo_img(sw: int, lz: int) -> Image:
+	var key := "%d-%d" % [sw, lz]
+	if not CIELO_IM.has(key):
+		var c0 := Color(CIELO[lz][0])
+		var c1 := Color(CIELO[lz][1])
+		var tono := []
+		for i in CIELO_TONOS:
+			tono.append(c1 if i == CIELO_TONOS - 1 else c0.lerp(c1, i / float(CIELO_TONOS - 1)))
+		var im := Image.create(sw, 120, false, Image.FORMAT_RGBA8)
+		for y in 120:
+			var t := y / 119.0 * (CIELO_TONOS - 1)
+			for x in sw:
+				im.set_pixel(x, y, tono[mini(CIELO_TONOS - 1, int(t + BAYER[(y % 4) * 4 + x % 4] / 16.0))])
+		CIELO_IM[key] = im
+	return CIELO_IM[key]
+
+static func _cielo(P, sw: int, lz: int, corre := 0.0) -> void:
+	P._img(cielo_img(sw, lz), 0, 0)
+	P._rect(0, 120, sw, int(P.SH) - 120, Color(CIELO[lz][1]))   # 1.57.2: hasta abajo, que entre el monte y la carretera no se vea lo de detrás
 	if lz == 2:   # estrellas fijas y la luna
 		for i in 40:
 			var hs := (i * 2654435761 + 977) & 0xffffff
 			var sx := hs % sw
 			var sy := 4 + (hs >> 9) % 58
 			P._rect(sx, sy, 1, 1, Color("#e8ecff") if i % 3 else Color("#9aa4d0"))
-		P._rect(sw - 46, 14, 10, 10, Color("#f0ecd0"))
-		P._rect(sw - 47, 16, 12, 6, Color("#f0ecd0"))
-		P._rect(sw - 44, 13, 6, 12, Color("#f0ecd0"))
-		P._rect(sw - 42, 15, 3, 3, Color("#d8d2b0"))
+		P._img(R.luna, sw - 48, 10)
 	elif lz == 0:   # el sol, arriba a la derecha
-		P._rect(sw - 44, 12, 12, 12, Color("#fff4c0"))
-		P._rect(sw - 46, 15, 16, 6, Color("#fff4c0"))
+		P._img(R.sol, sw - 48, 8)
+	else:         # al atardecer, bajo
+		P._img(R.sol, sw - 64, 40, Color(1.0, 0.72, 0.5))
+	var vuelta := sw + 120
+	for n in NUBES:
+		var im: Image = R[n[0]]
+		var x := int(fposmod(float(n[1]) - corre * float(n[3]), float(vuelta))) - 60
+		P._img(im, x, int(n[2]), NUBE_TINTE[lz])
 
 static func _fondo(P, sw: int, sh: int, corre: float, tin: Color) -> void:
 	# las capas de fondo, repetidas
@@ -177,7 +201,7 @@ static func pinta_carga(P, e: float) -> void:
 	if Datos.CAL and Atlas.ok:   # 1.57.1: la calle con el arte del juego
 		pinta_calle(P, e)
 	else:
-		_cielo(P, sw, 0)
+		_cielo(P, sw, 0, e * 0.1)
 		_fondo(P, sw, sh, 0.0, Color(1, 1, 1))
 		_coches(P, e, Y_CARRETERA + CARRIL_LEJOS, Y_CARRETERA + CARRIL)
 	# la barra, con su marco
@@ -275,7 +299,7 @@ static func calle_y0(P) -> int:
 static func pinta_calle(P, e: float) -> void:
 	var sw: int = P.J.SW
 	var y0 := calle_y0(P)
-	_cielo(P, sw, 0)
+	_cielo(P, sw, 0, e * 0.1)
 	var im: Image = R.monte
 	var x := 0
 	while x < sw:

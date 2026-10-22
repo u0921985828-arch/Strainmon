@@ -98,6 +98,33 @@ func _corre() -> void:
 	for k in ["monte", "medio", "cerca", "carretera"]:
 		chk(EscViaje.R.has(k), "el fondo: %s" % k)
 	chk(EscViaje.clave("tractor") == "bus", "un vehículo sin dibujo, el autobús")
+	# el autobús y el cielo de PixelLab (lo pidió el usuario: «el sprite del bus, más del estilo del juego, muebles con PixelLab, como
+	# también el fondo del cielo»): cada rueda en su paso de rueda, el protagonista en una ventana; nubes, sol y luna; el cielo tramado
+	var bus: Image = EscViaje.R.bus
+	var by := bus.get_height() - 1
+	for r in EscViaje.META.bus.ruedas:
+		var cx := int(r[0])
+		var rd := int(r[2]) / 2
+		chk(bus.get_pixel(cx, by).is_equal_approx(Color("#2a2d34")) and bus.get_pixel(cx - rd - 1, by).a > 0.5 and bus.get_pixel(cx + rd + 1, by).a > 0.5, "bus: la rueda de %d en su paso (sombra dentro, carrocería a los lados)" % cx)
+	var gorra := false
+	for y in bus.get_height():
+		for x in bus.get_width():
+			gorra = gorra or bus.get_pixel(x, y).is_equal_approx(Color("#5aa861"))
+	chk(gorra, "bus: el protagonista, con la gorra verde, en la ventana")
+	for k in ["nube-0", "nube-1", "nube-2", "nube-3", "sol", "luna"]:
+		chk(EscViaje.R.has(k) and EscViaje.R[k].get_width() >= 16, "el cielo: %s" % k)
+	for lz in 3:
+		var ci: Image = EscViaje.cielo_img(J.SW, lz)
+		var tonos := {}
+		var mezcla := false
+		for y in ci.get_height():
+			var fila := {}
+			for x in 8:
+				fila[ci.get_pixel(x, y).to_html()] = 1
+				tonos[ci.get_pixel(x, y).to_html()] = 1
+			mezcla = mezcla or fila.size() == 2
+		chk(tonos.size() == EscViaje.CIELO_TONOS and mezcla, "el cielo %d: %d tonos tramados" % [lz, tonos.size()])
+		chk(ci.get_pixel(0, 0).is_equal_approx(Color(EscViaje.CIELO[lz][0])) and ci.get_pixel(0, 119).is_equal_approx(Color(EscViaje.CIELO[lz][1])), "el cielo %d: de arriba abajo" % lz)
 	# 2 · el movimiento y la luz
 	var sw: int = J.SW
 	for k in ["bus", "moto"]:

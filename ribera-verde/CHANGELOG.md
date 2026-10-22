@@ -2,6 +2,11 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El autobús y el cielo de PixelLab (lo pidió el usuario: «el sprite del bus, más del estilo del juego, muebles con PixelLab, como también el fondo del cielo»)
+- El autobús del viaje, la carga y el título, de PixelLab Pro (de la base de `viaje.py`, el candidato con la puerta de cristal y el conductor): recortado a 149 × 37 y 28 colores en `tools/sprites/pixellab-viaje/bus.png`, con los pasos de rueda en sombra; `autobus()` de `viaje.py` sienta a los pasajeros y al protagonista en las ventanas (`BUS_VENT`); ruedas de 14 (`rueda-14-*`) en (26, 37) y (118, 37), suelo 44.
+- El cielo: el degradado en 6 tonos tramados con Bayer 4 × 4 (`cielo_img`, cacheado por ancho y luz; `CIELO_TONOS`, `BAYER`), cuatro nubes, el sol y la luna de PixelLab (`nube-0..3`, `sol`, `luna` en `viaje.png`) en vez de los rectángulos; las nubes van a la deriva (`NUBES`, `corre` en `_cielo`) y se tiñen por la luz (`NUBE_TINTE`); al atardecer, el sol bajo y anaranjado. Lo usan el viaje, la carga y el título.
+- Prueba: `tests/viaje.gd` (122/0): cada rueda en su paso, el protagonista en la ventana, las piezas del cielo y los 6 tonos tramados de arriba abajo.
+
 ### 0.59.0 (código 79) y plugin de WordPress 1.5.8
 - El AAB de Play (con la marca `tienda`: la demo), el APK universal (`descargas/LandraceHunters.apk`, sin el bloqueo) y `descargas/landrace-hunters-1.5.8.zip` (sin el bloqueo), con el colocón en el combate y los combates más llevaderos. AAB 82 MB firmado; APK 88 MB (con `tools/apk-instalar.py`, firma v2/v3 con la upload key); zip 29 MB, probado en Chromium (aviso de edad y título). La marca `tienda` solo en el `project.binary` del AAB.
 
