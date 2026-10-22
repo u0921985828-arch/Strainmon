@@ -1,5 +1,8 @@
 # Strainmon — CLAUDE.md
 
+## Modo absoluto
+Si existe .modo-absoluto/ON, el modo absoluto está activo aunque nadie lo haya dicho en este contexto, también tras compactar: carga el skill modo-absoluto antes de responder y ejecuta `python3 .claude/skills/modo-absoluto/scripts/ma.py next`. Sin texto entre llamadas; el % solo lo saca ma.py.
+
 ## MODO ABSOLUTO (directiva de trabajo por defecto)
 
 Cuando el usuario escriba `[MODO:Absoluto]` (o pida "modo absoluto"):
