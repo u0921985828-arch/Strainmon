@@ -14,7 +14,7 @@ const DUR := 3000.0      # ms: entra, rueda y sale
 const ENTRA := 700.0
 const SALE := 2300.0
 const VEL := {"bus": 0.11, "moto": 0.16, "utilitario": 0.17, "berlina": 0.18, "deportivo": 0.26}   # px/ms del fondo cercano
-const CAPAS := [["monte", 64, 0.12], ["lejos", 52, 0.22], ["pueblo", 28, 0.4], ["cerca", 132, 1.0]]   # pieza, y, parallax (lejos y pueblo, por tipo: «lejos-rural»…)
+const CAPAS := [["monte", 64, 0.12], ["lejos", 48, 0.22], ["pueblo", 18, 0.4], ["cerca", 132, 1.0]]   # pieza, y, parallax (lejos y pueblo, por tipo: «lejos-rural»…)
 # el pueblo de detrás, por el sitio al que vas (lo pidió el usuario: «que no todos los pueblos sean iguales»); las casas de lejos, a la
 # mitad, más arriba y más despacio (de viaje.py); lo que no está, por el trayecto
 const PUEBLOS := ["rural", "costa", "industria", "barrio", "ciudad"]

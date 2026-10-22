@@ -123,22 +123,28 @@ func _corre() -> void:
 	for t in EscViaje.PUEBLOS:
 		var pc: Image = EscViaje.R.get("pueblo-" + t)
 		var pl: Image = EscViaje.R.get("lejos-" + t)
-		chk(pc != null and pc.get_width() == 704 and pc.get_height() == 120, "%s: el pueblo de junto a la carretera, con el arte del juego" % t)
-		chk(pl != null and pl.get_width() == 704 and pl.get_height() == 84, "%s: el de lejos" % t)
+		chk(pc != null and pc.get_width() == 704 and pc.get_height() == 130, "%s: el pueblo de junto a la carretera, con el arte del juego" % t)
+		chk(pl != null and pl.get_width() == 704 and pl.get_height() == 88, "%s: el de lejos" % t)
 		if pc == null or pl == null:
 			continue
-		var hc: int = alto_casas.call(pc, 108)
-		var hl: int = alto_casas.call(pl, 56)
+		var hc: int = alto_casas.call(pc, 118)
+		var hl: int = alto_casas.call(pl, 60)
 		chk(hc >= 80 and hl > 0 and hl <= hc * 0.6, "%s: lo de lejos, más pequeño (%d px frente a %d)" % [t, hl, hc])
 		chk(not vistos.any(func(o: Image): return o.get_data() == pc.get_data()), "%s: distinto de los demás" % t)
 		vistos.append(pc)
 		if t == "industria":   # la fundición entera (lo preguntó el usuario): cumbrera oscura y chimenea con boca por encima
-			var cumbre := pc.get_pixel(350, 6)
-			chk(pc.get_pixel(350, 5).a == 0 and cumbre.a > 0.9 and cumbre.r + cumbre.g + cumbre.b < 0.6, "la fundición, con la cumbrera del tejado")
-			chk(pc.get_pixel(405, 0).a > 0.9 and pc.get_pixel(405, 5).a > 0.9 and pc.get_pixel(395, 0).a == 0, "la fundición, con la chimenea rematada")
+			var cumbre := pc.get_pixel(350, 16)
+			chk(pc.get_pixel(350, 15).a == 0 and cumbre.a > 0.9 and cumbre.r + cumbre.g + cumbre.b < 0.6, "la fundición, con la cumbrera del tejado")
+			var alto := 0
+			for y in range(16):
+				if pc.get_pixel(405, y).a > 0.9:
+					alto = 16 - y
+					break
+			chk(alto >= 14, "la chimenea, %d px por encima del tejado" % alto)
+			chk(pc.get_pixel(395, 1).a > 0.9 and pc.get_pixel(395, 8).a == 0 and pc.get_pixel(397, 8).a > 0.9, "la chimenea, con su corona más ancha que el fuste y perfilada")
 	chk(EscViaje.CAPAS[1][0] == "lejos" and EscViaje.CAPAS[2][0] == "pueblo" and EscViaje.CAPAS[1][2] < EscViaje.CAPAS[2][2] and EscViaje.CAPAS[1][2] > EscViaje.CAPAS[0][2], "lejos, más despacio que el pueblo y más deprisa que el monte")
-	chk(EscViaje.CAPAS[1][1] + 56 < EscViaje.CAPAS[2][1] + 108 and EscViaje.CAPAS[1][1] + 84 >= EscViaje.CAPAS[3][1], "el pie de lo de lejos, más arriba; su prado, hasta el quitamiedos")
-	chk(EscViaje.CAPAS[2][1] + 108 >= EscViaje.CAPAS[3][1], "el pie de las casas, detrás del quitamiedos")
+	chk(EscViaje.CAPAS[1][1] + 60 < EscViaje.CAPAS[2][1] + 118 and EscViaje.CAPAS[1][1] + 88 >= EscViaje.CAPAS[3][1], "el pie de lo de lejos, más arriba; su prado, hasta el quitamiedos")
+	chk(EscViaje.CAPAS[2][1] + 118 >= EscViaje.CAPAS[3][1], "el pie de las casas, detrás del quitamiedos")
 	chk(J.D.PARADAS.keys().all(func(k): return EscViaje.PUEBLOS.has(EscViaje.pueblo({"k": k, "de": "", "a": ""})[0])), "cada parada con su pueblo")
 	chk(EscViaje.pueblo({"k": "puerto"})[0] == "costa" and EscViaje.pueblo({"k": "ibarbide"})[0] == "ciudad" and EscViaje.pueblo({"k": "valdehierro"})[0] == "industria" and EscViaje.pueblo({"k": "mendialde"})[0] == "rural", "el pueblo, por el destino")
 	# el texto no se tapa: cada píxel claro de las letras, rodeado de claro o del contorno, nunca del fondo

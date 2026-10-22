@@ -218,8 +218,8 @@ def monte():
 # los caseríos, el de la costa, el de las naves, el barrio y la ciudad), cada uno en dos capas: la de junto a la carretera, a su
 # tamaño, y la de lejos, a la mitad, más arriba y más despacio. Cada capa se repite cada PUEBLO_W px
 PUEBLO_W = 704
-CERCA_H, CERCA_BASE = 120, 108          # la capa de junto a la carretera: alto y la fila del suelo (el pie de las casas)
-LEJOS_H, LEJOS_BASE = 84, 56            # la de lejos
+CERCA_H, CERCA_BASE = 130, 118          # la capa de junto a la carretera: alto y la fila del suelo (el pie de las casas)
+LEJOS_H, LEJOS_BASE = 88, 60            # la de lejos
 A = 'prop-arbol-alto/tree'; A2 = 'prop-arbol-alto2/tree2'; MZ = 'prop-manzano/manzano'
 def e(k): return 'edificio-%s/base' % k
 # (marco del atlas, x: la izquierda de las casas, el centro de los árboles); los de lejos, en px de la mitad
@@ -255,33 +255,42 @@ def del_atlas():
     return lambda k: hoja.crop((j['frames'][k]['x'], j['frames'][k]['y'], j['frames'][k]['x'] + j['frames'][k]['w'], j['frames'][k]['y'] + j['frames'][k]['h']))
 
 
-REMATE = 12                              # filas que le faltan por arriba a la fábrica del atlas (el tejado sin canto y la chimenea sin boca)
+REMATE = 22                              # filas que le faltan por arriba a la fábrica del atlas (el tejado sin canto y la chimenea sin boca)
+CUMBRE = REMATE - 6                      # la fila de la cumbrera: la chapa sube 5 filas más que en el atlas
+NEGRO, LADRILLO_C = (42, 38, 36, 255), (122, 52, 38, 255)
+CORONA = ((200, 196, 188, 255), (150, 148, 144, 255))   # el hormigón de la corona, luz y sombra
 
 
 def remata(k, im):
     # la fábrica del atlas acaba en la fila 0 a mitad de tejado: le sigue la chapa hacia arriba (cada 9 filas se repite) con su
-    # cumbrera oscura y sube la chimenea (x 98–111) con su boca; el atlas no se toca
+    # cumbrera oscura y la chimenea (x 98–111) sube muy por encima, perfilada contra el cielo, con su corona de hormigón; el atlas
+    # no se toca
     if k != e('fabrica'):
         return im
     w, h = im.size
     out = Image.new('RGBA', (w, h + REMATE), (0, 0, 0, 0))
     out.alpha_composite(im, (0, REMATE))
     src, px = im.load(), out.load()
-    for y in (0, 1):                      # la tira negra de arriba de la chimenea, ladrillo como debajo
+    for y in (0, 1):                      # la tira negra con la que se cortaba arriba, ladrillo como debajo
         for x in range(99, 111):
-            px[x, y + REMATE] = src[x, y + 3]
-    cumbre = REMATE - 6
-    for y in range(cumbre + 1, REMATE):   # la chapa, por su periodo
+            px[x, y + REMATE] = src[x, y + 9]
+    for y in range(CUMBRE + 1, REMATE):   # la chapa, por su periodo
         for x in range(w):
             px[x, y] = src[x, (y - REMATE) % 9]
     for x in range(w):
-        px[x, cumbre] = (42, 38, 36, 255)
-    for y in range(2, REMATE):            # la chimenea sube por encima de la cumbrera
+        px[x, CUMBRE] = NEGRO
+    for y in range(4, REMATE):            # el fuste, con el ladrillo de las filas 9-17 (el mismo periodo que la chapa)
         for x in range(98, 112):
-            px[x, y] = src[x, 3 + (y % 6)]
-    for x in range(97, 113):
-        px[x, 0] = (42, 38, 36, 255)
-        px[x, 1] = (42, 38, 36, 255) if x in (97, 112) else (122, 52, 38, 255)
+            px[x, y] = src[x, 9 + (y - REMATE) % 9]
+    for y in range(4, CUMBRE):            # por encima del tejado, su contorno
+        px[97, y] = px[112, y] = NEGRO
+    for x in range(95, 115):              # la corona: más ancha que el fuste, hormigón con su canto, y la boca debajo
+        px[x, 0] = NEGRO
+        px[x, 1] = NEGRO if x in (95, 114) else CORONA[0]
+        px[x, 2] = NEGRO if x in (95, 114) else CORONA[1]
+        px[x, 3] = NEGRO
+    for x in range(98, 112):
+        px[x, 4] = LADRILLO_C
     return out
 
 
