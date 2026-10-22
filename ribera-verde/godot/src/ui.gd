@@ -38,6 +38,7 @@ var gancho_texto := Callable()   # (texto, nombre) · transcripción
 var gancho_toast := Callable()   # (html, ms)
 var gancho_pedir := Callable()    # (texto, inicial, máx, cancela) → texto o null · las pruebas escriben en la caja de texto
 var gancho_combate := Callable() # (tipo) · las pruebas cambian el combate por una función (window.battle en el HTML)
+var gancho_billar8 := Callable()  # (mesa) → {ang, f[, p]} o null (lo dejas) · las pruebas tiran en la bola 8 (1.58, billar8.gd)
 var gancho_billar := Callable()  # (texto) → de 0 a 1 · las pruebas cambian el tiro del billar (window.tiroBillar, 1.30)
 var gancho_almacen := Callable() # (caja | nevera) → el elegido o null · las pruebas eligen en la vista de la caja y la nevera (1.36, window.elegirAlmacen)
 var gancho_carro := Callable()   # () → el taco elegido o null · las pruebas eligen en la vista del carro de esquejes (1.40)

@@ -19,6 +19,7 @@ const Escena = preload("res://src/escena_extr.gd")
 const Croquis = preload("res://src/croquis.gd")
 const EscViaje = preload("res://src/escena_viaje.gd")
 const Hoja = preload("res://src/hoja.gd")
+const B8 = preload("res://src/billar8.gd")
 
 const SH := 180   # 1.12 (ui.gd); las escenas de 240 × 160 van abajo: OY
 const DIR4 := {"down": "south", "up": "north", "left": "west", "right": "east"}
@@ -532,6 +533,9 @@ func _luz(r: int, c: String, a: float) -> Image:
 func _encima() -> void:
 	if J.MESA_B != null:
 		for e in J.rects_mesa_billar(J.MESA_B):
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+	if J.MESA8 != null:   # 1.58: la bola 8 de verdad (billar8.gd)
+		for e in B8.rects(J.MESA8, J.SW, SH, J.M.reloj):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.TIRO != null:
 		_tiro()

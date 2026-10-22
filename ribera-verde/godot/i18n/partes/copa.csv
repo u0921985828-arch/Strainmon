@@ -211,3 +211,24 @@ DISPENSARIO,DISPENSARY
 "Cajas de tarros nuevos, todavía con el cartón.","Boxes of new jars, still in their cardboard."
 La puerta del almacén,The storeroom door
 La puerta del club,The club door
+"¿Una a la bola 8? Mesa abierta: la primera que metas tras el saque te da lisas o rayadas, y la negra al final. Quien la meta, gana.","Eight-ball? Open table: the first ball you pot after the break makes you solids or stripes, and the black goes last. Whoever pots it wins."
+"¿Una a la bola 8? Mesa abierta: la primera que metas tras el saque te da lisas o rayadas, y la negra al final. Quien la meta se lleva la apuesta.","Eight-ball? Open table: the first ball you pot after the break makes you solids or stripes, and the black goes last. Whoever pots it takes the bet."
+{nb} mete la negra.,{nb} pots the black.
+"La negra entra antes de tiempo, o con falta: pierdes.","The black drops too early, or on a foul: you lose."
+"A {nb} se le va la negra antes de tiempo, o con falta: pierde.","{nb} drops the black too early, or on a foul: {nb} loses."
+Se cuela la blanca.,The cue ball goes in.
+La blanca no toca ninguna bola.,The cue ball hits nothing.
+Toca primero una bola que no es suya.,It hits the wrong ball first.
+Falta: bola en mano para {nb}.,Foul: ball in hand for {nb}.
+Falta: bola en mano para ti.,Foul: ball in hand for you.
+Te quedas las lisas.,You're solids.
+Te quedas las rayadas.,You're stripes.
+Dentro. Sigues.,In. Go again.
+{nb} mete y sigue.,{nb} pots one and goes again.
+Nada dentro. Le toca a {nb}.,Nothing in. {nb}'s turn.
+{nb} falla. Te toca.,{nb} misses. Your turn.
+Bola en mano: las flechas la mueven y A la deja.,Ball in hand: the arrows move it and A places it.
+"Flechas: apuntar (arriba y abajo, fino). A apretado: la fuerza; al soltar, tiras. B: dejarlo.","Arrows: aim (up and down, fine). Hold A: power; let go to shoot. B: quit."
+¿Lo dejas? La partida es suya.,Quit? The game goes to them.
+Seguir,Keep playing
+Estudia la mesa…,Studying the table…

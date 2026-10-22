@@ -3409,6 +3409,8 @@ saf2854b4,"Te sale bien, con algo de pérdida. {e} de {l}: {r} g con un {t} % de
 sf0e0b107,Te sale regular: pierdes bastante. {e} de {l}: {r} g con un {t} % de THC.,It comes out so-so: you lose quite a bit. {e} of {l}: {r} g at {t} % THC.
 s52a7f1a2,Por hoy ya está bien. Mañana te doy la revancha.,That's enough for today. Rematch tomorrow.
 s2b83848a,Una partida,A game
+s824f2586,"¿Una a la bola 8? Mesa abierta: la primera que metas tras el saque te da lisas o rayadas, y la negra al final. Quien la meta, gana.","Eight-ball? Open table: the first ball you pot after the break makes you solids or stripes, and the black goes last. Whoever pots it wins."
+s831a40a7,"¿Una a la bola 8? Mesa abierta: la primera que metas tras el saque te da lisas o rayadas, y la negra al final. Quien la meta se lleva la apuesta.","Eight-ball? Open table: the first ball you pot after the break makes you solids or stripes, and the black goes last. Whoever pots it takes the bet."
 scc048bb6,"¿Una a la bola 8? {n} lisas para ti, {n} rayadas para mí y la negra al final: quien la meta, gana.","Game of 8-ball? {n} solids for you, {n} stripes for me and the black last: whoever sinks it wins."
 s04f14756,"¿Una a la bola 8? {n} lisas para ti, {n} rayadas para mí y la negra al final: quien la meta se lleva la apuesta.","Game of 8-ball? {n} solids for you, {n} stripes for me and the black last: whoever sinks it takes the bet."
 s4212b55b,Sin dinero encima no se juega.,"No cash on you, no game."
@@ -3445,6 +3447,25 @@ sd67d19ec,Se hace tarde y lo dejáis en tablas.,It's getting late and you call i
 se6e07865,"Ganas tú. {nb} te paga {e}: «La próxima, la revancha».","You win. {nb} pays you {e}: ""Next time, a rematch."""
 s113b3085,Gana {nb}. Le pagas {e}.,{nb} wins. You pay {e}.
 sa29835e5,Se hace tarde y lo dejáis en tablas. Nadie paga.,It's getting late and you call it a draw. Nobody pays.
+s35bd6d16,{nb} mete la negra.,{nb} pots the black.
+s0cbd2c53,"La negra entra antes de tiempo, o con falta: pierdes.","The black drops too early, or on a foul: you lose."
+sd58eac4a,"A {nb} se le va la negra antes de tiempo, o con falta: pierde.","{nb} drops the black too early, or on a foul: {nb} loses."
+s09280e95,Se cuela la blanca.,The cue ball goes in.
+s786f5dd0,La blanca no toca ninguna bola.,The cue ball hits nothing.
+s567e445a,Toca primero una bola que no es suya.,It hits the wrong ball first.
+se97556ad,Falta: bola en mano para {nb}.,Foul: ball in hand for {nb}.
+sc1c3d38c,Falta: bola en mano para ti.,Foul: ball in hand for you.
+s56601648,Te quedas las lisas.,You're solids.
+s1824f8fa,Te quedas las rayadas.,You're stripes.
+sa579670a,Dentro. Sigues.,In. Go again.
+sbff91ce9,{nb} mete y sigue.,{nb} pots one and goes again.
+sd4d97829,Nada dentro. Le toca a {nb}.,Nothing in. {nb}'s turn.
+s8e7e3fb0,{nb} falla. Te toca.,{nb} misses. Your turn.
+sdf8f9402,Bola en mano: las flechas la mueven y A la deja.,Ball in hand: the arrows move it and A places it.
+s3a5fefa3,"Flechas: apuntar (arriba y abajo, fino). A apretado: la fuerza; al soltar, tiras. B: dejarlo.","Arrows: aim (up and down, fine). Hold A: power; let go to shoot. B: quit."
+s6646ed1c,¿Lo dejas? La partida es suya.,Quit? The game goes to them.
+s94f58638,Seguir,Keep playing
+s41e79f12,Estudia la mesa…,Studying the table…
 s1641fb63,GENTE7,GENTE7
 s643e6825,índica,indica
 s78adc8eb,sativa,sativa

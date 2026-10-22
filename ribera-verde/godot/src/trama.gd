@@ -5,6 +5,7 @@ extends "res://src/granja.gd"
 const Croquis = preload("res://src/croquis.gd")
 
 const Hoja = preload("res://src/hoja.gd")
+const B8 = preload("res://src/billar8.gd")
 
 var cap_hasta := 0.0       # el rótulo del capítulo dura 2,8 s: el objetivo que se pida mientras tanto sale al acabar
 
@@ -1920,6 +1921,7 @@ func ficha_gente(w: Dictionary) -> String:
 var TIRO = null   # la barra mientras apuntas: {t0, f: "dir" o "fuerza", a}, en el reloj del juego (pinta.gd la dibuja)
 
 var MESA_B = null
+var MESA8 = null   # 1.58: la mesa de la bola 8 de verdad (billar8.gd), con CAL
 
 func disco_abierta() -> bool:
 	return S.min >= D.DISCO.abre or S.min < D.DISCO.cierra

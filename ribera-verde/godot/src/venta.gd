@@ -1310,7 +1310,12 @@ func talk_billar(k: String):
 		return
 	var ops: Array = [K("Una partida")] if Datos.PLAY else B.apuestas.map(func(e): return T("A {e}", {"e": Datos.eur(e)}))   # Google Play: sin apuestas
 	ops.append(K("Nada"))
-	var c: int = await ask(T("¿Una a la bola 8? {n} lisas para ti, {n} rayadas para mí y la negra al final: quien la meta, gana.", {"n": int(B.bolas)}) if Datos.PLAY else T("¿Una a la bola 8? {n} lisas para ti, {n} rayadas para mí y la negra al final: quien la meta se lleva la apuesta.", {"n": int(B.bolas)}), ops, N)
+	var pre: String
+	if Datos.CAL:
+		pre = I18n.K("¿Una a la bola 8? Mesa abierta: la primera que metas tras el saque te da lisas o rayadas, y la negra al final. Quien la meta, gana.") if Datos.PLAY else I18n.K("¿Una a la bola 8? Mesa abierta: la primera que metas tras el saque te da lisas o rayadas, y la negra al final. Quien la meta se lleva la apuesta.")
+	else:
+		pre = T("¿Una a la bola 8? {n} lisas para ti, {n} rayadas para mí y la negra al final: quien la meta, gana.", {"n": int(B.bolas)}) if Datos.PLAY else T("¿Una a la bola 8? {n} lisas para ti, {n} rayadas para mí y la negra al final: quien la meta se lleva la apuesta.", {"n": int(B.bolas)})
+	var c: int = await ask(pre, ops, N)
 	if c < 0 or c >= ops.size() - 1:
 		return
 	var e: int = 0 if Datos.PLAY else int(B.apuestas[c])
@@ -1319,103 +1324,106 @@ func talk_billar(k: String):
 		await say(K("Sin dinero encima no se juega."), N)
 		return
 	Db.n += 1
-	var V := {"yo": int(B.bolas), "el": int(B.bolas), "negra": 1}
-	MESA_B = V
-	var yo := true
-	var mano := false
-	var seguro := false
-	var deja := 1.0
 	var fin := ""
-	await say(K("Sacas tú. Las tuyas, las lisas."))
-	var t := 0
-	while t < int(B.turnos) and fin == "":
-		t += 1
-		if yo:
-			var extra := (" " + I18n.T("Bola en mano: la colocas donde quieras.")) if mano else ((" " + I18n.T("La blanca ha quedado bien.")) if deja > 1 else "")
-			var ta := {"y": V.yo, "nb": nb, "el": V.el}
-			var tt: String
-			if V.yo:
-				tt = I18n.T("Tu turno · te quedan {y}; a {nb}, {el}.", ta) if V.el else I18n.T("Tu turno · te quedan {y}; a {nb}, la negra.", ta)
-			else:
-				tt = I18n.T("Tu turno · te queda la negra; a {nb}, {el}.", ta) if V.el else I18n.T("Tu turno · te queda la negra; a {nb}, la negra.", ta)
-			var i: int = await ask(tt + extra, D.TIROS.map(func(x): return x.n))
-			var T: Dictionary = D.TIROS[0 if i < 0 else i]
-			if T.get("seguro"):
-				seguro = true
+	if Datos.CAL:   # 1.58: la bola 8 de verdad, en la mesa (billar8.gd)
+		fin = await billar8(k, nb, N)
+	else:
+		var V := {"yo": int(B.bolas), "el": int(B.bolas), "negra": 1}
+		MESA_B = V
+		var yo := true
+		var mano := false
+		var seguro := false
+		var deja := 1.0
+		await say(K("Sacas tú. Las tuyas, las lisas."))
+		var t := 0
+		while t < int(B.turnos) and fin == "":
+			t += 1
+			if yo:
+				var extra := (" " + I18n.T("Bola en mano: la colocas donde quieras.")) if mano else ((" " + I18n.T("La blanca ha quedado bien.")) if deja > 1 else "")
+				var ta := {"y": V.yo, "nb": nb, "el": V.el}
+				var tt: String
+				if V.yo:
+					tt = I18n.T("Tu turno · te quedan {y}; a {nb}, {el}.", ta) if V.el else I18n.T("Tu turno · te quedan {y}; a {nb}, la negra.", ta)
+				else:
+					tt = I18n.T("Tu turno · te queda la negra; a {nb}, {el}.", ta) if V.el else I18n.T("Tu turno · te queda la negra; a {nb}, la negra.", ta)
+				var i: int = await ask(tt + extra, D.TIROS.map(func(x): return x.n))
+				var T: Dictionary = D.TIROS[0 if i < 0 else i]
+				if T.get("seguro"):
+					seguro = true
+					deja = 1.0
+					mano = false
+					yo = false
+					await say(I18n.K("Escondes la blanca detrás de sus bolas. Le toca, y no lo tiene fácil."))
+					continue
+				var a: float = Datos.jsround(float(T.a) * deja * (float(B.manoX) if mano else 1.0) * 1000) / 1000.0
 				deja = 1.0
 				mano = false
+				var d1 := await tiro_billar(I18n.T("{t}: para la barra en el verde para apuntar.", {"t": T.n}), "dir", a)
+				var f1 := await tiro_billar(I18n.T("Ahora la fuerza: en el verde, dentro; pasada, se cuela la blanca."), "fuerza")
+				var r := resultado_tiro(d1, f1, a)
+				if r == "falta":
+					if not V.yo:
+						fin = "el"
+						await say(I18n.K("La negra entra... y la blanca detrás. Falta sobre la negra: pierdes."))
+						break
+					mano = true
+					yo = false
+					await say(I18n.T("Demasiado fuerte: la blanca se cuela. Falta: {nb} juega con bola en mano.", {"nb": nb}))
+					continue
+				if r == "dentro":
+					if not V.yo:
+						V.negra = 0
+						fin = "yo"
+						await say(I18n.K("¡La negra, dentro!"))
+						break
+					V.yo -= 1
+					deja = float(T.get("deja", 1))
+					await say((I18n.T("¡Dentro! Te quedan {n}. Sigues tú.", {"n": V.yo}) if V.yo > 1 else I18n.T("¡Dentro! Te queda {n}. Sigues tú.", {"n": V.yo})) if V.yo else I18n.K("¡Dentro! Ya solo te queda la negra. Sigues tú."))
+					continue
 				yo = false
-				await say(I18n.K("Escondes la blanca detrás de sus bolas. Le toca, y no lo tiene fácil."))
+				await say(I18n.T("No entra. Le toca a {nb}.", {"nb": nb}))
 				continue
-			var a: float = Datos.jsround(float(T.a) * deja * (float(B.manoX) if mano else 1.0) * 1000) / 1000.0
-			deja = 1.0
+			var p: float = float(B.hab[k]) + (float(B.mano) if mano else 0.0)
+			var m := 0
+			var falta := false
+			if seguro:
+				p *= float(B.seguro)
 			mano = false
-			var d1 := await tiro_billar(I18n.T("{t}: para la barra en el verde para apuntar.", {"t": T.n}), "dir", a)
-			var f1 := await tiro_billar(I18n.T("Ahora la fuerza: en el verde, dentro; pasada, se cuela la blanca."), "fuerza")
-			var r := resultado_tiro(d1, f1, a)
-			if r == "falta":
-				if not V.yo:
-					fin = "el"
-					await say(I18n.K("La negra entra... y la blanca detrás. Falta sobre la negra: pierdes."))
-					break
+			seguro = false
+			while true:
+				var rr := Cultivo.azar()
+				if rr < p:
+					if not V.el:
+						V.negra = 0
+						fin = "el"
+						break
+					V.el -= 1
+					m += 1
+					p = float(B.hab[k])
+					continue
+				if rr > float(B.faltaR):
+					falta = true
+				break
+			if fin != "":
+				await say((I18n.T("{nb} mete una y tira a la negra: dentro.", {"nb": nb}) if m == 1 else I18n.T("{nb} mete {m} y tira a la negra: dentro.", {"nb": nb, "m": m})) if m else I18n.T("{nb} tira a la negra: dentro.", {"nb": nb}))
+				break
+			if falta and not V.el:
+				fin = "yo"
+				await say(I18n.T("{nb} tira a la negra y se le cuela la blanca. Falta sobre la negra: pierde.", {"nb": nb}))
+				break
+			if falta:
 				mano = true
-				yo = false
-				await say(I18n.T("Demasiado fuerte: la blanca se cuela. Falta: {nb} juega con bola en mano.", {"nb": nb}))
-				continue
-			if r == "dentro":
-				if not V.yo:
-					V.negra = 0
-					fin = "yo"
-					await say(I18n.K("¡La negra, dentro!"))
-					break
-				V.yo -= 1
-				deja = float(T.get("deja", 1))
-				await say((I18n.T("¡Dentro! Te quedan {n}. Sigues tú.", {"n": V.yo}) if V.yo > 1 else I18n.T("¡Dentro! Te queda {n}. Sigues tú.", {"n": V.yo})) if V.yo else I18n.K("¡Dentro! Ya solo te queda la negra. Sigues tú."))
-				continue
-			yo = false
-			await say(I18n.T("No entra. Le toca a {nb}.", {"nb": nb}))
-			continue
-		var p: float = float(B.hab[k]) + (float(B.mano) if mano else 0.0)
-		var m := 0
-		var falta := false
-		if seguro:
-			p *= float(B.seguro)
-		mano = false
-		seguro = false
-		while true:
-			var rr := Cultivo.azar()
-			if rr < p:
-				if not V.el:
-					V.negra = 0
-					fin = "el"
-					break
-				V.el -= 1
-				m += 1
-				p = float(B.hab[k])
-				continue
-			if rr > float(B.faltaR):
-				falta = true
-			break
-		if fin != "":
-			await say((I18n.T("{nb} mete una y tira a la negra: dentro.", {"nb": nb}) if m == 1 else I18n.T("{nb} mete {m} y tira a la negra: dentro.", {"nb": nb, "m": m})) if m else I18n.T("{nb} tira a la negra: dentro.", {"nb": nb}))
-			break
-		if falta and not V.el:
-			fin = "yo"
-			await say(I18n.T("{nb} tira a la negra y se le cuela la blanca. Falta sobre la negra: pierde.", {"nb": nb}))
-			break
-		if falta:
-			mano = true
-		yo = true
-		var tx: String
-		var tm := {"nb": nb, "m": m}
-		if m == 1:
-			tx = I18n.T("{nb} mete una y se le cuela la blanca: bola en mano para ti.", tm) if falta else I18n.T("{nb} mete una y falla.", tm)
-		elif m:
-			tx = I18n.T("{nb} mete {m} y se le cuela la blanca: bola en mano para ti.", tm) if falta else I18n.T("{nb} mete {m} y falla.", tm)
-		else:
-			tx = I18n.T("{nb} cuela la blanca: bola en mano para ti.", tm) if falta else I18n.T("{nb} falla.", tm)
-		await say(tx)
-	MESA_B = null
+			yo = true
+			var tx: String
+			var tm := {"nb": nb, "m": m}
+			if m == 1:
+				tx = I18n.T("{nb} mete una y se le cuela la blanca: bola en mano para ti.", tm) if falta else I18n.T("{nb} mete una y falla.", tm)
+			elif m:
+				tx = I18n.T("{nb} mete {m} y se le cuela la blanca: bola en mano para ti.", tm) if falta else I18n.T("{nb} mete {m} y falla.", tm)
+			else:
+				tx = I18n.T("{nb} cuela la blanca: bola en mano para ti.", tm) if falta else I18n.T("{nb} falla.", tm)
+			await say(tx)
+		MESA_B = null
 	if fin == "yo":
 		S.money += e
 		confia(k, 1)
@@ -1433,6 +1441,210 @@ func talk_billar(k: String):
 		await say(I18n.T("Gana {nb}. Le pagas {e}.", {"nb": nb, "e": Datos.eur(e)}))
 	else:
 		await say(I18n.K("Se hace tarde y lo dejáis en tablas. Nadie paga."))
+
+# la bola 8 de verdad (1.58, lo pidió el usuario: «estilo 8 ball pool»; con CAL): la mesa desde arriba con las 15 bolas y la física
+# de billar8.gd. Sacas tú; mesa abierta hasta la primera que se mete tras el saque; falta, bola en mano para el otro; la negra al
+# final. El rival tira con la misma física y su pulso (BILLAR.hab). Da "yo", "el" o "" (tablas, al tope de tiros)
+func billar8(k: String, nb: String, N: String) -> String:
+	var B: Dictionary = D.BILLAR
+	var V := B8.nueva(nb)
+	MESA8 = V
+	var hab: float = float(B.hab[k])
+	var rapido: bool = gancho_billar8.is_valid() or oraculo
+	var q := 0
+	var fin := ""
+	while fin == "" and int(V.tiros) < 2 * int(B.turnos):
+		V.tiros = int(V.tiros) + 1
+		V.turno = q
+		var ob := B8.objetivos(V, q)
+		var s: Dictionary = (await _b8_tuyo(V, N)) if q == 0 else (await _b8_suyo(V, hab, N))
+		if s.is_empty():   # lo dejas: la pierdes
+			fin = "el"
+			break
+		var ev := B8.dispara(V, float(s.ang), float(s.f))
+		sfx("hit")
+		V.fase = "rueda"
+		if rapido:
+			B8.simula(V, ev)
+		else:
+			var t0 := M.reloj
+			var n := 0
+			while not B8.quieta(V) and n < B8.PASOS_MAX:
+				await M.wait(16)
+				var hasta := mini(B8.PASOS_MAX, int((M.reloj - t0) / 1000.0 / B8.DT))
+				while n < hasta and not B8.quieta(V):
+					B8.paso(V, ev)
+					n += 1
+			B8.simula(V, ev)
+		var met: Array = ev.met.filter(func(x): return x != 0)
+		if not met.is_empty():
+			sfx("coin" if q == 0 else "hit")
+		var r := B8.resuelve(V, ev, q, ob)
+		V.saque = false
+		var quien: String = nb if q == 1 else ""
+		var tx := ""
+		if r.fin != "":
+			fin = ("yo" if q == 0 else "el") if r.fin == "gana" else ("el" if q == 0 else "yo")
+			if r.fin == "gana":
+				tx = I18n.K("¡La negra, dentro!") if q == 0 else I18n.T("{nb} mete la negra.", {"nb": nb})
+			elif q == 0:
+				tx = I18n.K("La negra entra antes de tiempo, o con falta: pierdes.")
+			else:
+				tx = I18n.T("A {nb} se le va la negra antes de tiempo, o con falta: pierde.", {"nb": nb})
+		elif r.falta:
+			V.mano = true
+			var mo: String = r.motivo
+			if mo == "blanca":
+				tx = I18n.K("Se cuela la blanca.")
+			elif mo == "nada":
+				tx = I18n.K("La blanca no toca ninguna bola.")
+			else:
+				tx = I18n.K("Toca primero una bola que no es suya.")
+			tx += " " + (I18n.T("Falta: bola en mano para {nb}.", {"nb": nb}) if q == 0 else I18n.K("Falta: bola en mano para ti."))
+			q = 1 - q
+		else:
+			if r.grupo != "":
+				tx = (I18n.K("Te quedas las lisas.") if V.gr[0] == "lisas" else I18n.K("Te quedas las rayadas.")) + " "
+			if r.sigue:
+				tx += I18n.K("Dentro. Sigues.") if q == 0 else I18n.T("{nb} mete y sigue.", {"nb": nb})
+			else:
+				tx += I18n.T("Nada dentro. Le toca a {nb}.", {"nb": nb}) if q == 0 else I18n.T("{nb} falla. Te toca.", {"nb": nb})
+				q = 1 - q
+		V.ultimo = tx
+		if not rapido:
+			_dlg_fijo(tx, quien.to_upper() if quien != "" else "")
+			await M.wait(1300 if fin == "" else 1600)
+	MESA8 = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+	return fin
+
+# tu tiro: bola en mano (flechas y A), apuntar (izquierda y derecha, arriba y abajo afinan), la fuerza con A apretado (se suelta y
+# tira; un toque, nada) y B para dejarlo. Da {ang, f} o {} (lo dejas)
+func _b8_tuyo(V: Dictionary, N: String) -> Dictionary:
+	if gancho_billar8.is_valid():
+		var g = gancho_billar8.call(V)
+		if g == null:
+			return {}
+		if V.mano:
+			V.b[0].en = true
+			V.b[0].p = B8.sitio_libre(V, g.get("p", B8.coloca_ia(V, 0)), 0)
+			V.mano = false
+		return g
+	var pul: Array = []
+	var fn := func(b: String): pul.append(b)
+	push(fn)
+	if V.mano:
+		V.b[0].en = true
+		V.b[0].v = Vector2.ZERO
+		V.b[0].p = B8.sitio_libre(V, Vector2(B8.W * B8.RAYA, B8.H / 2), 0)
+		V.fase = "coloca"
+		_dlg_fijo(I18n.K("Bola en mano: las flechas la mueven y A la deja."), "")
+		var t := M.reloj
+		while true:
+			await M.wait(16)
+			var dt := (M.reloj - t) / 1000.0
+			t = M.reloj
+			var d := Vector2(float(held.right) - float(held.left), float(held.down) - float(held.up))
+			var xm: float = B8.W * B8.RAYA if V.saque else B8.W - B8.R
+			var p: Vector2 = V.b[0].p + d * 36.0 * dt
+			V.b[0].p = Vector2(clampf(p.x, B8.R, xm), clampf(p.y, B8.R, B8.H - B8.R))
+			V.vale = B8.libre(V, V.b[0].p, 0)
+			var a := pul.has("A")
+			pul.clear()
+			if a:
+				if V.vale:
+					sfx("hit")
+					break
+				sfx("bad")
+		V.erase("vale")
+		V.mano = false
+	# de primeras, apuntando a la bola buena más cerca
+	var ob := B8.objetivos(V, 0)
+	var mejor := INF
+	for n in ob:
+		var dd: float = V.b[0].p.distance_to(V.b[n].p)
+		if V.b[n].en and dd < mejor:
+			mejor = dd
+			V.ang = (V.b[n].p - V.b[0].p).angle()
+	V.f = 0.0
+	V.fase = "apunta"
+	var ayuda := I18n.K("Flechas: apuntar (arriba y abajo, fino). A apretado: la fuerza; al soltar, tiras. B: dejarlo.")
+	_dlg_fijo(ayuda, "")
+	var t := M.reloj
+	var giro := 0.0   # lo que llevas girando seguido: acelera
+	var c0 := 0.0
+	var res := {}
+	while true:
+		await M.wait(16)
+		var dt := (M.reloj - t) / 1000.0
+		t = M.reloj
+		var ps := pul.duplicate()
+		pul.clear()
+		if V.fase == "apunta":
+			var lr := float(held.right) - float(held.left)
+			var ud := float(held.down) - float(held.up)
+			if lr != 0:
+				giro += dt
+				V.ang = float(V.ang) + lr * dt * minf(2.2, 0.35 + giro * 2.0)
+			else:
+				giro = 0.0
+				V.ang = float(V.ang) + ud * dt * 0.08
+			if ps.has("A"):
+				V.fase = "carga"
+				c0 = M.reloj
+			elif ps.has("B"):
+				pop(fn)
+				var c: int = await ask(I18n.K("¿Lo dejas? La partida es suya."), [I18n.K("Seguir"), I18n.K("Dejarlo")], N)
+				push(fn)
+				pul.clear()
+				_dlg_fijo(ayuda, "")
+				t = M.reloj
+				if c == 1:
+					break
+		else:
+			var ct := (M.reloj - c0) / B8.CARGA_MS
+			V.f = 1.0 - absf(1.0 - fmod(ct, 2.0))
+			if ps.has("B"):
+				V.fase = "apunta"
+				V.f = 0.0
+			elif not held.A:
+				if M.reloj - c0 < 120:
+					V.fase = "apunta"
+					V.f = 0.0
+				else:
+					res = {"ang": float(V.ang), "f": maxf(.04, float(V.f))}
+					break
+	pop(fn)
+	return res
+
+# el tiro del rival: bola en mano donde le va bien, gira el taco hasta su ángulo y carga la fuerza
+func _b8_suyo(V: Dictionary, hab: float, N: String) -> Dictionary:
+	if V.mano:
+		V.b[0].en = true
+		V.b[0].v = Vector2.ZERO
+		V.b[0].p = B8.coloca_ia(V, 1)
+		V.mano = false
+	var s := B8.elige(V, 1, hab)
+	if gancho_billar8.is_valid() or oraculo:
+		return s
+	V.fase = "ia"
+	V.f = 0.0
+	_dlg_fijo(I18n.K("Estudia la mesa…"), N)
+	var a0 := float(V.ang)
+	var a1 := float(s.ang)
+	var t0 := M.reloj
+	while M.reloj - t0 < 700:
+		await M.wait(16)
+		V.ang = lerp_angle(a0, a1, clampf((M.reloj - t0) / 600.0, 0, 1))
+	V.ang = a1
+	t0 = M.reloj
+	var dur := float(s.f) * B8.CARGA_MS
+	while M.reloj - t0 < dur + 150:
+		await M.wait(16)
+		V.f = minf(float(s.f), (M.reloj - t0) / B8.CARGA_MS)
+	return s
 
 # la mesa del billar mientras dura la partida (rectsMesaBillar de 11j-locales): [x, y, w, h, color] en la pantalla
 func rects_mesa_billar(V: Dictionary) -> Array:

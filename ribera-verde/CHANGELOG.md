@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El billar a la bola 8 de verdad (lo pidió el usuario: «Hay que mejorar el minijuego de billar para que sea estilo 8 ball pool»)
+- Con `Datos.CAL`, la partida del billarista de cada club se juega en una mesa vista desde arriba (`src/billar8.gd`, `MESA8`, `billar8` en `venta.gd`): 15 bolas en triángulo y la blanca, choques entre bolas con impulso, bandas con rebote, roce del paño y seis troneras, a 240 pasos por segundo.
+- Apuntas con las flechas (izquierda y derecha giran y aceleran; arriba y abajo afinan) con la línea de tiro, la bola fantasma y hacia dónde salen la bola tocada y la blanca; la fuerza, con A apretado (sube y baja en la barra de la izquierda, y el taco se echa atrás); al soltar, tiras; B para dejarlo (la pierdes).
+- Reglas de la bola 8: sacas tú desde la cabecera; mesa abierta hasta la primera que metas tras el saque (lisas o rayadas); faltas (se cuela la blanca, no toca ninguna, toca primero una que no es tuya) con bola en mano para el otro; la negra al sacar vuelve al pie; la negra antes de tiempo o con falta pierde; con las tuyas dentro, gana. Las bolas metidas de cada uno, debajo de la mesa.
+- El rival tira con la misma física: busca tiros directos a tronera, los prueba en una copia de la mesa y tira con el pulso de `BILLAR.hab` (Ander, Izaskun, Txetxu, Olatz, Koldo); con bola en mano, se la deja detrás de la más fácil.
+- Las apuestas (o «Una partida» con `Datos.PLAY`), la partida al día, la confianza y lo que se paga, como antes; tablas a los `2 × BILLAR.turnos` tiros. Sin CAL, el billar de barras de la 1.35.
+- Prueba `tests/billar8.gd` (100 comprobaciones: el triángulo, el saque determinista, troneras, faltas, la negra, el rival, el dibujo, los mandos de verdad y la partida desde el billarista; con `--pintar`, las capturas).
+
 ### Repaso de coherencia con la partida del usuario (día 200, cap. 8) y el almacén del club por su puerta (lo pidió el usuario: «Deberíamos de crear una puerta para acceder al almacén del dispensario y que sea más visual, en cambio el dispensario es un menu como el de la caja de casa solo que son vitrinas»)
 - Con `Datos.CAL`, los muebles que no decían nada responden (`OBJ_MUDO` en `mundo.gd`, por «mapa:objeto»): plantas de decoración, carteles, mesas del bar, la barra de GAUA, el piso franco, el noray de La Punta, la nave, el pasillo y el bajo; los barcos del muelle dicen que se cargan desde su noray.
 - El encargado de KAIA (`club_muelle`) habla como los de los demás clubs; el póster del dormitorio ya no abre el PC gaming: deja cambiar el dibujo.
