@@ -2,6 +2,9 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.61.0 (código 81) y plugin de WordPress 1.6.1
+- El AAB de Play (con la demo), el APK universal (`descargas/LandraceHunters.apk`, sin el bloqueo) y `descargas/landrace-hunters-1.6.1.zip` (y el ligero de 28 KB), con el rival del billar de verdad y las bolas con sprite y apuestas grandes. AAB 82 MB firmado; APK 89 MB (con `tools/apk-instalar.py`, firma v2/v3 con la upload key, versión 81/0.61.0); zip 29 MB.
+
 ### El rival del billar, un jugador de verdad (lo pidió el usuario: «Tiene que ser un jugador realista de billar»)
 - Con `Datos.CAL`, el rival de la bola 8 (`src/billar8.gd`) mira cada bola suya con cada tronera y calcula la probabilidad de meterla con su pulso: el corte, lo que anda la blanca, lo que anda la tocada y lo ancha que le queda la boca desde donde está (`boca_desde`, `tiros`, con la función de error `erf`); apunta al centro de lo que entra y afina la bola fantasma con la física de la mesa (`afina`).
 - Juega la posición: de los tiros más fáciles prueba la fuerza justa, algo más y fuerte, y se queda con el que mejor le deja la siguiente y menos le deja al otro si falla (`prueba`, `deja`, `mejor_p`).
