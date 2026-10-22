@@ -2,6 +2,9 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Plugin de WordPress 1.6.0: el ligero (lo pidió el usuario: la subida de 30 MB daba «413 Request Entity Too Large» de nginx)
+- `descargas/landrace-hunters-1.6.0-ligero.zip` (28 KB): el plugin sin el motor web ni el `index.pck`. Con un botón («Descargar el juego», en el aviso del escritorio y en Ajustes → Landrace Hunters) el servidor baja `landrace-hunters-1.6.0.zip` de GitHub y copia sus piezas a `game/` (`fetch_game`, `game_ready`, `FULL_URL`, `PIEZAS`; con `ZipArchive` y por flujos); sin ellas, la dirección del juego dice que falta descargarlo. `tools/wordpress.js` saca los dos zips y borra la copia del proyecto (1,5 GB) al acabar. Probado con un WordPress simulado: la descarga deja `game/` igual que el zip completo.
+
 ### 0.60.0 (código 80) y plugin de WordPress 1.5.9
 - El AAB de Play (con la demo), el APK universal (`descargas/LandraceHunters.apk`, sin el bloqueo) y `descargas/landrace-hunters-1.5.9.zip`, con un dispensario en cada club, Bilbao como zonas nuevas, las vallas por piezas, la nave por salas y el viaje de PixelLab. AAB 82 MB firmado; APK 89 MB (con `tools/apk-instalar.py`, firma v2/v3 con la upload key, versión 80/0.60.0); zip 29 MB. La partida de copia de seguridad del día 200 (cap. 8) se importa, migra y guarda en la 0.60.0.
 

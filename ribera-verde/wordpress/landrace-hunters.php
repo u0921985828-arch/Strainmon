@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Landrace Hunters
  * Description: Hospeda el juego «Landrace Hunters» (Godot 4.3, versión web: la misma partida que la app de Android) dentro de WordPress: dirección propia a pantalla completa y atajo [landrace_hunters] para incrustarlo en cualquier página. Todo se sirve desde el propio plugin.
- * Version: 1.5.9
+ * Version: 1.6.0
  * Author: WOLFCADE
  * License: GPL-2.0-or-later
  * Text Domain: landrace-hunters
@@ -14,7 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Landrace_Hunters {
 
-	const VERSION   = '1.5.9';
+	const VERSION   = '1.6.0';
+	/** El plugin ligero (para servidores que no dejan subir más de unos MB) baja el resto del juego de aquí, en el propio servidor. */
+	const FULL_URL  = 'https://raw.githubusercontent.com/u0921985828-arch/Strainmon/claude/new-session-7quvtm/ribera-verde/descargas/landrace-hunters-%s.zip';
+	const PIEZAS    = array( 'index.js', 'index.wasm', 'index.pck', 'index.audio.worklet.js', 'index.audio.position.worklet.js' );
 	const OPTION    = 'landrace_hunters';
 	const QUERY_VAR = 'landrace_hunters';
 
@@ -41,6 +44,94 @@ final class Landrace_Hunters {
 		return plugins_url( 'game', __FILE__ );
 	}
 
+	/** ¿Están las piezas grandes del juego? (el plugin ligero no las trae: se descargan desde el panel). */
+	public static function game_ready() {
+		foreach ( self::PIEZAS as $f ) {
+			if ( ! is_readable( self::game_dir() . '/' . $f ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Descarga el zip entero de esta versión en el servidor y copia sus piezas a game/.
+	 * Así no hay que subir 30 MB por el navegador (nginx corta con «413 Request Entity Too Large»).
+	 */
+	public static function fetch_game() {
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			return new WP_Error( 'lh_zip', 'Este servidor no tiene ZipArchive de PHP. Sube el plugin completo por FTP o por el gestor de archivos.' );
+		}
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		if ( function_exists( 'set_time_limit' ) ) {
+			@set_time_limit( 900 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		}
+		$tmp = download_url( sprintf( self::FULL_URL, self::VERSION ), 900 );
+		if ( is_wp_error( $tmp ) ) {
+			return $tmp;
+		}
+		$zip = new ZipArchive();
+		if ( true !== $zip->open( $tmp ) ) {
+			@unlink( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return new WP_Error( 'lh_zip', 'El archivo descargado no es un zip.' );
+		}
+		$err = null;
+		foreach ( array_merge( self::PIEZAS, array( 'index.html' ) ) as $f ) {
+			$in  = $zip->getStream( 'landrace-hunters/game/' . $f );
+			$out = $in ? fopen( self::game_dir() . '/' . $f . '.part', 'wb' ) : false; // phpcs:ignore WordPress.WP.AlternativeFunctions
+			if ( ! $in || ! $out || false === stream_copy_to_stream( $in, $out ) ) {
+				$err = new WP_Error( 'lh_copia', 'No se ha podido copiar ' . $f . ' a la carpeta del plugin (¿permisos de escritura?).' );
+			}
+			if ( $in ) {
+				fclose( $in ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+			}
+			if ( $out ) {
+				fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+			}
+			if ( $err ) {
+				break;
+			}
+			rename( self::game_dir() . '/' . $f . '.part', self::game_dir() . '/' . $f );
+		}
+		$zip->close();
+		@unlink( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		if ( $err ) {
+			return $err;
+		}
+		return self::game_ready() ? true : new WP_Error( 'lh_faltan', 'Faltan piezas del juego tras la descarga.' );
+	}
+
+	/** El botón del panel y del aviso. */
+	public static function descargar() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Sin permiso.', 'landrace-hunters' ) );
+		}
+		check_admin_referer( 'lh_descargar' );
+		$r = self::fetch_game();
+		$q = true === $r ? array( 'lh' => 'ok' ) : array( 'lh' => 'error', 'lh_msg' => rawurlencode( $r->get_error_message() ) );
+		wp_safe_redirect( add_query_arg( $q, admin_url( 'options-general.php?page=landrace-hunters' ) ) );
+		exit;
+	}
+
+	private static function boton_descargar( $clase = 'button button-primary' ) {
+		?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
+			<input type="hidden" name="action" value="lh_descargar">
+			<?php wp_nonce_field( 'lh_descargar' ); ?>
+			<button type="submit" class="<?php echo esc_attr( $clase ); ?>" onclick="this.disabled=true;this.textContent='Descargando… (hasta un par de minutos)';this.form.submit()">Descargar el juego (unos 30 MB)</button>
+		</form>
+		<?php
+	}
+
+	public static function aviso() {
+		if ( self::game_ready() || ! current_user_can( 'manage_options' ) || ( isset( $_GET['page'] ) && 'landrace-hunters' === $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+		echo '<div class="notice notice-warning"><p><strong>Landrace Hunters:</strong> falta descargar el juego en el servidor (el plugin ligero no lo trae). ';
+		self::boton_descargar( 'button' );
+		echo '</p></div>';
+	}
+
 	public static function game_file() {
 		return self::game_dir() . '/index.html';
 	}
@@ -64,6 +155,8 @@ final class Landrace_Hunters {
 		add_shortcode( 'landrace_hunters', array( __CLASS__, 'shortcode' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
 		add_action( 'admin_init', array( __CLASS__, 'settings' ) );
+		add_action( 'admin_post_lh_descargar', array( __CLASS__, 'descargar' ) );
+		add_action( 'admin_notices', array( __CLASS__, 'aviso' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( __CLASS__, 'action_links' ) );
 	}
 
@@ -132,6 +225,10 @@ final class Landrace_Hunters {
 		}
 
 		$file = self::game_file();
+		if ( is_readable( $file ) && ! self::game_ready() ) {
+			status_header( 503 );
+			wp_die( esc_html__( 'Falta descargar el juego: en el escritorio de WordPress, Ajustes → Landrace Hunters → «Descargar el juego».', 'landrace-hunters' ) );
+		}
 		if ( ! is_readable( $file ) ) {
 			status_header( 500 );
 			wp_die( esc_html__( 'No encuentro el juego dentro del plugin.', 'landrace-hunters' ) );
@@ -334,6 +431,18 @@ final class Landrace_Hunters {
 		?>
 		<div class="wrap">
 			<h1>Landrace Hunters</h1>
+			<?php
+			$lh = isset( $_GET['lh'] ) ? sanitize_key( $_GET['lh'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+			if ( 'ok' === $lh ) :
+				?>
+				<div class="notice notice-success inline"><p>Juego descargado. Ya se puede jugar.</p></div>
+			<?php elseif ( 'error' === $lh ) : ?>
+				<div class="notice notice-error inline"><p>No se ha podido descargar: <?php echo esc_html( isset( $_GET['lh_msg'] ) ? rawurldecode( sanitize_text_field( wp_unslash( $_GET['lh_msg'] ) ) ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification ?></p></div>
+			<?php endif; ?>
+			<?php if ( ! self::game_ready() ) : ?>
+				<div class="notice notice-warning inline"><p>Es el plugin ligero: el juego (unos 30 MB) se descarga directamente en el servidor, sin subirlo por el navegador.</p>
+					<p><?php self::boton_descargar(); ?></p></div>
+			<?php endif; ?>
 			<p>El juego está dentro del plugin (<?php echo esc_html( size_format( $size ) ); ?>; el navegador lo descarga comprimido la primera vez y luego lo guarda). Se juega aquí:</p>
 			<p><a class="button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener">Jugar ahora</a>
 				&nbsp;<code><?php echo esc_html( $url ); ?></code></p>

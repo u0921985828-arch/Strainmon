@@ -114,5 +114,11 @@ if (!process.argv.includes('--sin-zip')) {
   fs.rmSync(ZIP, { force: true });
   execFileSync('zip', ['-q', '-r', '-9', ZIP, path.basename(OUT)], { cwd: path.dirname(OUT) });
   console.log(`${path.relative(ROOT, ZIP)}: ${(fs.statSync(ZIP).size / 1048576).toFixed(1)} MB (index.pck ${(tam('index.pck') / 1048576).toFixed(1)} MB)`);
+  // 1.6.0: el ligero, sin el motor ni el index.pck; el plugin los baja de GitHub en el servidor (Landrace_Hunters::fetch_game, el zip de arriba)
+  const LIG = path.join(ROOT, 'descargas', `landrace-hunters-${V}-ligero.zip`);
+  fs.rmSync(LIG, { force: true });
+  execFileSync('zip', ['-q', '-r', '-9', LIG, path.basename(OUT), ...MOTOR_F.concat('index.pck').flatMap((f) => ['-x', `${path.basename(OUT)}/game/${f}`])], { cwd: path.dirname(OUT) });
+  console.log(`${path.relative(ROOT, LIG)}: ${(fs.statSync(LIG).size / 1024).toFixed(0)} KB`);
 }
+fs.rmSync(PROY, { recursive: true, force: true });   // la copia del proyecto, 1,5 GB por exportación: sin borrarla, el disco se llena
 console.log('plugin en ' + OUT);
