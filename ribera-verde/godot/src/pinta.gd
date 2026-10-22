@@ -536,9 +536,10 @@ func _encima() -> void:
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.MESA8 != null:   # 1.58: la bola 8 de verdad (billar8.gd)
 		for e in B8.rects(J.MESA8, J.SW, SH, J.M.reloj):
-			if typeof(e[0]) == TYPE_STRING:   # ['@', imagen, x, y, recorte]: la mesa y el taco de PixelLab
+			if typeof(e[0]) == TYPE_STRING:   # ['@', imagen, x, y, recorte(, celda)]: la mesa, el taco y las bolas
 				var im: Image = e[1]
-				_img_clip(im, int(e[2]), int(e[3]), Rect2i(0, 0, im.get_width(), im.get_height()), e[4], Color.WHITE)
+				var src: Rect2i = e[5] if e.size() > 5 else Rect2i(0, 0, im.get_width(), im.get_height())
+				_img_clip(im, int(e[2]), int(e[3]), src, e[4], Color.WHITE)
 				continue
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.TIRO != null:

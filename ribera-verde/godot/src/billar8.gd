@@ -51,7 +51,7 @@ const RACK := [[1], [9, 2], [10, 8, 3], [11, 4, 12, 5], [6, 13, 14, 7, 15]]
 static func nueva(nb: String) -> Dictionary:
 	var b := []
 	for i in 16:
-		b.append({"n": i, "p": Vector2.ZERO, "v": Vector2.ZERO, "en": true})
+		b.append({"n": i, "p": Vector2.ZERO, "v": Vector2.ZERO, "en": true, "rod": 0.0, "dir": 0.0})
 	var fx := W * PIE
 	var sx := 2 * R * 0.866 + 0.08
 	var sy := 2 * R + 0.08
@@ -60,7 +60,7 @@ static func nueva(nb: String) -> Dictionary:
 			b[RACK[i][j]].p = Vector2(fx + i * sx, H / 2 + (j - i / 2.0) * sy)
 	b[0].p = Vector2(W * RAYA, H / 2)
 	return {"b": b, "gr": ["", ""], "turno": 0, "mano": true, "saque": true, "ang": 0.0, "f": 0.0, "fase": "coloca",
-		"tiros": 0, "nb": nb, "ultimo": "", "anim": 0.0}
+		"tiros": 0, "nb": nb, "ultimo": "", "anim": 0.0, "np": 0, "caen": []}
 
 static func en_mesa(V: Dictionary, n: int) -> bool:
 	return V.b[n].en
@@ -96,9 +96,12 @@ static func en_tronera(p: Vector2) -> bool:
 
 static func paso(V: Dictionary, ev: Dictionary) -> void:
 	var b: Array = V.b
+	V.np = int(V.get("np", 0)) + 1
 	for d in b:
 		if d.en and d.v != Vector2.ZERO:
 			d.p += d.v * DT
+			d.rod = float(d.get("rod", 0.0)) + d.v.length() * DT   # lo rodado (el dibujo gira con él)
+			d.dir = d.v.angle()
 	for d in b:
 		if not d.en:
 			continue
@@ -116,6 +119,8 @@ static func paso(V: Dictionary, ev: Dictionary) -> void:
 			if d.p.y < R and vy > 0: t = maxf(t, (R - d.p.y) / vy)
 			if d.p.y > H - R and vy > 0: t = maxf(t, (d.p.y - H + R) / vy)
 		if en_tronera(d.p - d.v * t):
+			if V.has("caen"):   # para dibujarla cayendo en su tronera
+				V.caen.append({"n": d.n, "p": d.p, "np": V.np})
 			d.en = false
 			d.v = Vector2.ZERO
 			ev.met.append(d.n)
@@ -190,6 +195,7 @@ static func copia(V: Dictionary) -> Dictionary:
 	for d in V.b:
 		C.b.append(d.duplicate())
 	C.gr = V.gr.duplicate()
+	C.caen = []
 	return C
 
 # ---------- las reglas ----------
@@ -471,6 +477,54 @@ static func carga() -> bool:
 	BANDA = int(j.banda)
 	return true
 
+# las bolas, a mano (tools/sprites/a-mano/bolas.py; lo pidió el usuario: «Las bolas también tienen que tener sprites, cuando se
+# mueven y demás»): una fila por bola, 8 direcciones × 8 fases del rodar y 3 de la caída en la tronera; celdas de 5 × 5
+static var BOLAS: Image = null
+static var BOLAS_J := {}
+const CAE_MS := 240.0
+
+static func carga_bolas() -> bool:
+	if BOLAS != null:
+		return true
+	var im := Image.new()
+	if im.load_png_from_buffer(FileAccess.get_file_as_bytes("res://arte/billar_bolas.png")) != OK:
+		return false
+	var j = JSON.parse_string(FileAccess.get_file_as_string("res://arte/billar_bolas.json"))
+	if typeof(j) != TYPE_DICTIONARY:
+		return false
+	BOLAS_J = j
+	BOLAS = im
+	return true
+
+# la celda de una bola: la dirección en la que rueda y la fase (una vuelta entera cada 2πR de camino)
+static func celda_bola(d: Dictionary) -> Rect2i:
+	var c := int(BOLAS_J.c)
+	var nd := int(BOLAS_J.dirs)
+	var nf := int(BOLAS_J.fases)
+	var di := posmod(roundi(float(d.get("dir", 0.0)) / (TAU / nd)), nd)
+	var fi := posmod(int(float(d.get("rod", 0.0)) / (TAU * R) * nf), nf)
+	return Rect2i((di * nf + fi) * c, int(d.n) * c, c, c)
+
+static func celda_caida(n: int, k: int) -> Rect2i:
+	var c := int(BOLAS_J.c)
+	return Rect2i((int(BOLAS_J.dirs) * int(BOLAS_J.fases) + k) * c, n * c, c, c)
+
+# la sombra en el paño, la silueta corrida 1 px abajo a la derecha
+static func _sombra(o: Array, cx: int, cy: int) -> void:
+	var c := "rgba(10,30,18,0.45)"
+	o.append([cx, cy - 1, 3, 1, c])
+	o.append([cx - 1, cy, 5, 3, c])
+	o.append([cx, cy + 3, 3, 1, c])
+
+static func _bola_d(o: Array, cx: int, cy: int, d: Dictionary, clip: Rect2i) -> void:
+	if carga_bolas():
+		o.append(["@", BOLAS, cx - 2, cy - 2, clip, celda_bola(d)])
+	else:
+		_bola(o, cx, cy, d.n)
+
+static func _bola_n(o: Array, cx: int, cy: int, n: int, clip: Rect2i) -> void:
+	_bola_d(o, cx, cy, {"n": n}, clip)
+
 static func origen(sw: int) -> Vector2i:
 	return Vector2i((sw - int(W)) >> 1, 14)
 
@@ -531,12 +585,29 @@ static func rects(V: Dictionary, sw: int, sh: int, now: float) -> Array:
 	o.append([x0 + int(W * PIE), y0 + int(H / 2), 1, 1, "rgba(255,255,255,0.3)"])   # el pie
 	var b: Array = V.b
 	for d in b:
+		if d.en:
+			_sombra(o, x0 + roundi(d.p.x), y0 + roundi(d.p.y))
+	# las que caen: hacia el centro de su tronera, cada vez más pequeñas y oscuras
+	var T := troneras()
+	for c in V.get("caen", []):
+		if not c.has("t") or not carga_bolas():
+			continue
+		var k := (now - float(c.t)) / CAE_MS
+		if k < 0 or k >= 1:
+			continue
+		var tp: Vector2 = T[0]
+		for t in T:
+			if t.distance_to(c.p) < tp.distance_to(c.p):
+				tp = t
+		var p: Vector2 = c.p.lerp(tp, minf(1.0, k * 2))
+		o.append(["@", BOLAS, x0 + roundi(p.x) - 2, y0 + roundi(p.y) - 2, clip, celda_caida(int(c.n), mini(2, int(k * 3)))])
+	for d in b:
 		if d.en and d.n != 0:
-			_bola(o, x0 + roundi(d.p.x), y0 + roundi(d.p.y), d.n)
+			_bola_d(o, x0 + roundi(d.p.x), y0 + roundi(d.p.y), d, clip)
 	var c0: Dictionary = b[0]
 	var fase: String = V.fase
 	if c0.en:
-		_bola(o, x0 + roundi(c0.p.x), y0 + roundi(c0.p.y), 0)
+		_bola_d(o, x0 + roundi(c0.p.x), y0 + roundi(c0.p.y), c0, clip)
 		if fase == "coloca" and int(now / 250) % 2 == 0:
 			_aro(o, x0 + roundi(c0.p.x), y0 + roundi(c0.p.y), "#f8f8f0" if V.get("vale", true) else "#e04040")
 		if fase == "apunta" or fase == "carga" or fase == "ia":
@@ -581,9 +652,9 @@ static func rects(V: Dictionary, sw: int, sh: int, now: float) -> Array:
 			o.append([xx - 3, yb - 3, 7 * 8 + 1, 7, "rgba(255,255,255,0.18)"])
 		for i in L.size():
 			if L[i].en:
-				_bola(o, xx + 3 + i * 7, yb, L[i].n)
+				_bola_n(o, xx + 3 + i * 7, yb, L[i].n, clip)
 			else:
 				_aro(o, xx + 3 + i * 7, yb, "rgba(255,255,255,0.25)")
 		if g != "" and quedan(V, g) == 0:
-			_bola(o, xx + 3 + 7 * 7, yb, 8)
+			_bola_n(o, xx + 3 + 7 * 7, yb, 8, clip)
 	return o.filter(func(x): return typeof(x[0]) == TYPE_STRING or (x[0] >= 0 and x[1] >= 0 and x[0] + x[2] <= sw and x[1] + x[3] <= sh))   # nada fuera de la pantalla (los sprites, con su recorte)

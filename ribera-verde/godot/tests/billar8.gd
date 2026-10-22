@@ -313,15 +313,57 @@ func _corre() -> void:
 		V.gr = ["lisas", "rayadas"]
 		var o: Array = B8.rects(V, 240, 180, 0)
 		var fuera := o.filter(func(x): return typeof(x[0]) != TYPE_STRING and (x[0] < 0 or x[1] < 0 or x[0] + x[2] > 240 or x[1] + x[3] > 180))
-		var spr := o.filter(func(x): return typeof(x[0]) == TYPE_STRING)
-		chk(o.size() > 60 and fuera.is_empty(), "%s: %d rectángulos, %d fuera" % [fase, o.size(), fuera.size()])
+		var spr := o.filter(func(x): return typeof(x[0]) == TYPE_STRING and x[1] != B8.BOLAS)
+		var bol := o.filter(func(x): return typeof(x[0]) == TYPE_STRING and x[1] == B8.BOLAS)
+		var som := o.filter(func(x): return typeof(x[0]) != TYPE_STRING and str(x[4]).begins_with("rgba(10,30,18"))
+		chk(o.size() > 40 and fuera.is_empty(), "%s: %d rectángulos, %d fuera" % [fase, o.size(), fuera.size()])
 		chk(spr.size() == (2 if fase in ["apunta", "carga", "ia"] else 1) and spr[0][1] == B8.ARTE.mesa, "%s: la mesa de PixelLab%s" % [fase, " y el taco" if spr.size() == 2 else ""])
+		# las 16 de la mesa y las 14 de debajo (7 + 7), de sprite; cada una con su sombra
+		chk(bol.size() == 30 and som.size() == 16 * 3, "%s: %d bolas de sprite (30) y %d trozos de sombra (48)" % [fase, bol.size(), som.size()])
 		if spr.size() == 2:   # la punta del taco, detrás de la blanca en la dirección contraria al tiro
 			var ti := posmod(roundi(.2 / TAU * B8.NT), B8.NT)
 			var pt: Array = B8.PUNTA["taco-%d" % ti]
 			var tip := Vector2(spr[1][2] + float(pt[0]), spr[1][3] + float(pt[1])) - Vector2(B8.origen(240))
 			var esperada: Vector2 = V.b[0].p - Vector2.from_angle(.2) * (B8.R + 3.0 + 12.0 * .6)
 			chk(tip.distance_to(esperada) < 2.0, "%s: la punta del taco en su sitio (%.1f px)" % [fase, tip.distance_to(esperada)])
+	# 6b · los sprites de las bolas: el atlas, rodar y caer
+	chk(B8.carga_bolas() and B8.BOLAS.get_size() == Vector2i(67 * 5, 16 * 5), "el atlas de las bolas: %s" % [B8.BOLAS.get_size() if B8.BOLAS else null])
+	var hay := 0
+	for n in 16:   # cada bola, de su color: el píxel del centro no es transparente y las lisas no son blancas
+		var px := B8.BOLAS.get_pixel(2, n * 5 + 2)
+		if px.a > .9 and (n == 0 or n >= 9 or (px.v < .25 if n == 8 else px.s > .3)):
+			hay += 1
+	chk(hay == 16, "las 16 bolas en el atlas, cada una de su color: %d" % hay)
+	V = B8.nueva("Ander")
+	var d0: Dictionary = V.b[0]
+	var cs := {}
+	for i in 8:   # una vuelta entera en 8 celdas distintas, y vuelve a la primera
+		d0.rod = i * TAU * B8.R / 8 + .01
+		cs[B8.celda_bola(d0)] = 1
+	d0.rod = TAU * B8.R + .01
+	chk(cs.size() == 8 and B8.celda_bola(d0) == B8.celda_bola({"n": 0, "rod": .01, "dir": 0.0}), "rueda: %d fases por vuelta y vuelve a la primera" % cs.size())
+	var ds := {}
+	for i in 8:
+		d0.dir = i * TAU / 8
+		ds[B8.celda_bola(d0).position.x / (8 * 5)] = 1
+	chk(ds.size() == 8, "rueda en 8 direcciones: %d" % ds.size())
+	var ev0 := B8.dispara(V, .3, .5)
+	B8.paso(V, ev0)
+	chk(float(V.b[0].rod) > 0 and absf(float(V.b[0].dir) - .3) < .01 and int(V.np) == 1, "al rodar, la blanca suma camino (%.2f) y dirección (%.2f)" % [V.b[0].rod, V.b[0].dir])
+	V = B8.nueva("Ander")
+	V.b[1].p = B8.troneras()[2] + Vector2(-6, 6)
+	V.b[1].v = Vector2(200, -200)
+	var ev1 := B8.ev_nuevo()
+	for i in 60:
+		B8.paso(V, ev1)
+	chk(1 in ev1.met and V.caen.size() == 1 and V.caen[0].n == 1, "la que cae se apunta para dibujarla: %s" % [V.caen])
+	V.caen[0].t = 1000.0
+	var cae: Array = []
+	for t in [1000.0, 1100.0, 1200.0, 1300.0]:
+		var ri: Array = B8.rects(V, 240, 180, t).filter(func(x): return typeof(x[0]) == TYPE_STRING and x[1] == B8.BOLAS and x[5].position.x >= 64 * 5)
+		cae.append(ri.size())
+	chk(cae == [1, 1, 1, 0], "la caída: 3 fotogramas y desaparece (%s)" % [cae])
+	chk(B8.copia(V).caen.is_empty(), "las copias del rival no dibujan caídas")
 	# 7 · los mandos de verdad: bola en mano con las flechas, apuntar y la fuerza con A apretado
 	auto = false
 	V = B8.nueva("X")
@@ -366,7 +408,7 @@ func _corre() -> void:
 	S.billar = {}
 	J.gancho_billar8 = func(W): return B8.elige(W, 0, 1.0)
 	var din := float(S.money)
-	QUIERO = ["A 20 €"]
+	QUIERO = ["Dinero", "A 20 €"]
 	LOG.clear()
 	chk(corre(func(): await J.talk_billar("puerto")), "partida con apuesta")
 	var dif := float(S.money) - din
@@ -376,9 +418,61 @@ func _corre() -> void:
 	# dejarla es perderla
 	J.gancho_billar8 = func(_W): return null
 	din = float(S.money)
-	QUIERO = ["A 10 €"]
+	QUIERO = ["Dinero", "A 10 €"]
 	chk(corre(func(): await J.talk_billar("puerto")), "la dejas")
 	chk(float(S.money) == din - 10, "la dejas: pagas")
+	# 8b · apuestas grandes hasta el tope del club, y su premio contra tus semillas (lo pidió el usuario)
+	S.billar = {}
+	S.money = 5000.0
+	MENUS.clear()
+	QUIERO = ["Dinero", "Nada"]
+	chk(corre(func(): await J.talk_billar("ibar")), "Txetxu: el dinero")
+	var m2: Array = MENUS[1] if MENUS.size() > 1 else []
+	chk(m2.has("A 1.000 €") and m2.has("A 500 €") and m2.has("A 10 €"), "en Ibarbide, hasta 1000 €: %s" % [m2])
+	MENUS.clear()
+	QUIERO = ["Dinero", "Nada"]
+	chk(corre(func(): await J.talk_billar("valde")), "Izaskun: el dinero")
+	m2 = MENUS[1] if MENUS.size() > 1 else []
+	chk(m2.has("A 250 €") and not m2.has("A 500 €"), "en Valdehierro, hasta 250 €: %s" % [m2])
+	var pr: Dictionary = J.billar_premio("puerto")
+	var BC: Dictionary = D.BILLAR.cal
+	chk(pr.hash() == J.billar_premio("puerto").hash() and (pr.k in BC.semillas.k if pr.t == "s" else BC.obj.any(func(o): return o[0] == pr.k)), "su premio, el mismo todo el día y de la lista: %s" % [pr])
+	var vari := {}
+	for dd in 30:
+		S.day = 100 + dd
+		vari[J.billar_premio("puerto").t] = 1
+	chk(vari.size() == 2, "unos días semillas y otros abono: %s" % [vari.keys()])
+	S.day = 100
+	pr = J.billar_premio("puerto")
+	S.seeds = {"ria": 7, "thai": 3}
+	MENUS.clear()
+	QUIERO = ["Su premio", "Pongo 5 semillas"]
+	J.gancho_billar8 = func(_W): return null   # la dejas: pierdes lo que pusiste
+	din = float(S.money)
+	chk(corre(func(): await J.talk_billar("puerto")), "su premio contra 5 semillas")
+	var m3: Array = MENUS[1] if MENUS.size() > 1 else []
+	chk(m3.size() == 3 and m3[0].begins_with("Pongo ") and m3[1].contains("Skunk"), "pones dinero o un lote con 5 o más (no las 3 de Thai): %s" % [m3])
+	chk(int(S.seeds.get("ria", 0)) == 2 and float(S.money) == din and log_tiene("Le das 5 semillas"), "pierdes: le das 5 semillas, el dinero no se toca (%s)" % [S.seeds])
+	S.seeds = {"ria": 5}
+	QUIERO = ["Su premio", "Pongo 5 semillas"]
+	chk(corre(func(): await J.talk_billar("puerto")), "las últimas 5")
+	chk(not S.seeds.has("ria"), "si eran las últimas, el lote desaparece: %s" % [S.seeds])
+	var antes: int = int(S.seeds.get(pr.k, 0)) if pr.t == "s" else int(S.items.get(pr.k, 0))
+	J.billar_cobra(pr)
+	var despues: int = int(S.seeds.get(pr.k, 0)) if pr.t == "s" else int(S.items.get(pr.k, 0))
+	chk(despues - antes == int(pr.n) and (pr.t != "s" or S.disc.get(pr.k)), "ganar su premio: %d más de %s" % [despues - antes, pr.k])
+	S.billar = {"puerto": {"d": S.day, "n": 0, "premio": true}}
+	MENUS.clear()
+	QUIERO = ["Nada"]
+	chk(corre(func(): await J.talk_billar("puerto")), "ganado el premio")
+	chk(MENUS.size() and not MENUS[0].any(func(l): return l.begins_with("Su premio")), "su premio, una vez al día: %s" % [MENUS[0] if MENUS.size() else []])
+	S.money = 50.0
+	S.billar = {}
+	QUIERO = ["Su premio", "Pongo "]
+	LOG.clear()
+	chk(corre(func(): await J.talk_billar("puerto")), "sin dinero")
+	chk(int(pr.v) <= 50 or log_tiene("Sin dinero encima"), "poner lo mismo en dinero sin llevarlo encima no vale")
+	S.money = 500.0
 	# 9 · sin CAL, el de barras de antes
 	Datos.CAL = false
 	J.gancho_billar8 = func(_W):
@@ -423,6 +517,14 @@ func _corre() -> void:
 		Vc.turno = 1
 		Vc.f = .4
 		fotos.append(["rival", Vc.duplicate(true), "Estudia la mesa…"])
+		var Vrd := B8.nueva("Ander")   # rodando, con su sombra, y una cayendo en la tronera de arriba a la derecha
+		Vrd.fase = "rueda"
+		for d in Vrd.b:
+			d.rod = float(d.n) * 1.3
+			d.dir = float(d.n) * .8
+		Vrd.b[3].en = false
+		Vrd.caen = [{"n": 3, "p": B8.troneras()[2] + Vector2(-3, 3), "np": 0, "t": M.reloj - 100.0}]
+		fotos.append(["rueda", Vrd, "¡Dentro! Sigues tú."])
 		for fo in fotos:
 			J.MESA8 = fo[1]
 			J._dlg_fijo(fo[2], "ANDER" if fo[0] == "rival" else "")

@@ -1315,10 +1315,18 @@ func talk_billar(k: String):
 		pre = I18n.K("¿Una a la bola 8? Mesa abierta: la primera que metas tras el saque te da lisas o rayadas, y la negra al final. Quien la meta, gana.") if Datos.PLAY else I18n.K("¿Una a la bola 8? Mesa abierta: la primera que metas tras el saque te da lisas o rayadas, y la negra al final. Quien la meta se lleva la apuesta.")
 	else:
 		pre = T("¿Una a la bola 8? {n} lisas para ti, {n} rayadas para mí y la negra al final: quien la meta, gana.", {"n": int(B.bolas)}) if Datos.PLAY else T("¿Una a la bola 8? {n} lisas para ti, {n} rayadas para mí y la negra al final: quien la meta se lleva la apuesta.", {"n": int(B.bolas)})
-	var c: int = await ask(pre, ops, N)
-	if c < 0 or c >= ops.size() - 1:
-		return
-	var e: int = 0 if Datos.PLAY else int(B.apuestas[c])
+	var e := 0
+	var apu := {}
+	if Datos.CAL and not Datos.PLAY:   # apuestas grandes, o su premio contra tu dinero o tus semillas
+		apu = await billar_apuesta(k, Db, pre, N)
+		if apu.is_empty():
+			return
+		e = int(apu.e)
+	else:
+		var c: int = await ask(pre, ops, N)
+		if c < 0 or c >= ops.size() - 1:
+			return
+		e = 0 if Datos.PLAY else int(B.apuestas[c])
 	if S.money < e:
 		sfx("bad")
 		await say(K("Sin dinero encima no se juega."), N)
@@ -1424,23 +1432,92 @@ func talk_billar(k: String):
 				tx = I18n.T("{nb} cuela la blanca: bola en mano para ti.", tm) if falta else I18n.T("{nb} falla.", tm)
 			await say(tx)
 		MESA_B = null
+	var pr: Dictionary = apu.get("pr", {})
+	var sem: String = apu.get("s", "")
 	if fin == "yo":
-		S.money += e
+		if pr.is_empty():
+			S.money += e
+		else:
+			billar_cobra(pr)
+			Db.premio = true
 		confia(k, 1)
 		sfx("coin")
 	elif fin == "el":
 		S.money -= e
+		if sem != "":
+			S.seeds[sem] = int(S.seeds[sem]) - int(B.cal.pone)
+			if int(S.seeds[sem]) <= 0:
+				S.seeds.erase(sem)
 		sfx("bad")
 	advance_time(int(B.min))
 	update_hud()
 	if Datos.PLAY:
 		await say(I18n.T("Ganas tú. {nb}: «La próxima, la revancha».", {"nb": nb}) if fin == "yo" else I18n.T("Gana {nb}.", {"nb": nb}) if fin == "el" else I18n.K("Se hace tarde y lo dejáis en tablas."))
+	elif fin == "yo" and not pr.is_empty():
+		await say(I18n.T("Ganas tú. {nb} te da {p}: «La próxima, la revancha».", {"nb": nb, "p": pr.txt}))
 	elif fin == "yo":
 		await say(I18n.T("Ganas tú. {nb} te paga {e}: «La próxima, la revancha».", {"nb": nb, "e": Datos.eur(e)}))
+	elif fin == "el" and sem != "":
+		await say(I18n.T("Gana {nb}. Le das {n} semillas de {v}.", {"nb": nb, "n": int(B.cal.pone), "v": strain(sem).n}))
 	elif fin == "el":
 		await say(I18n.T("Gana {nb}. Le pagas {e}.", {"nb": nb, "e": Datos.eur(e)}))
 	else:
 		await say(I18n.K("Se hace tarde y lo dejáis en tablas. Nadie paga."))
+
+# lo que pone el rival hoy (lo pidió el usuario: «apostar cantidades más grandes o incluso semillas u objetos para cultivar
+# especiales»): semillas de receta o una garrafa de abono, por el día y el club (BILLAR.cal); se gana una vez al día
+func billar_premio(k: String) -> Dictionary:
+	var BC: Dictionary = D.BILLAR.cal
+	var h := Datos.hash_str("billar%d%s" % [S.day, k])
+	if h % 3 != 0:
+		var pool: Array = BC.semillas.k
+		var sid: String = pool[(h / 3) % pool.size()]
+		var n := int(BC.semillas.n)
+		return {"t": "s", "k": sid, "n": n, "v": n * int(BC.semillas.v), "txt": T("{n} semillas de {v}", {"n": n, "v": strain(sid).n})}
+	var ob: Array = BC.obj[(h / 3) % BC.obj.size()]
+	return {"t": "o", "k": ob[0], "n": int(ob[1]), "v": int(ob[2]), "txt": K(str(ob[3]))}
+
+func billar_cobra(pr: Dictionary) -> void:
+	if pr.t == "s":
+		S.seeds[pr.k] = int(S.seeds.get(pr.k, 0)) + int(pr.n)
+		discover(pr.k)
+	else:
+		S.items[pr.k] = int(S.items.get(pr.k, 0)) + int(pr.n)
+
+# el dinero, hasta el tope de cada club; o su premio, contra lo mismo en dinero o 5 semillas de un lote tuyo. Da {e, pr, s} o {}
+func billar_apuesta(k: String, Db: Dictionary, pre: String, N: String) -> Dictionary:
+	var BC: Dictionary = D.BILLAR.cal
+	var pr := billar_premio(k)
+	var ops: Array = [K("Dinero")]
+	if not Db.get("premio", false):
+		ops.append(T("Su premio: {p}", {"p": pr.txt}))
+	ops.append(K("Nada"))
+	var c: int = await ask(pre, ops, N)
+	if c < 0 or c >= ops.size() - 1:
+		return {}
+	if c == 0:
+		var tope := int(BC.tope.get(k, 50))
+		var am: Array = BC.apuestas.filter(func(x): return int(x) <= tope)
+		var o2: Array = am.map(func(x): return T("A {e}", {"e": Datos.eur(int(x))}))
+		o2.append(K("Nada"))
+		var c2: int = await ask(T("¿Cuánto? Aquí se juega hasta {t}.", {"t": Datos.eur(tope)}), o2, N)
+		if c2 < 0 or c2 >= am.size():
+			return {}
+		return {"e": int(am[c2])}
+	var pone := int(BC.pone)
+	var o3: Array = [T("Pongo {e}", {"e": Datos.eur(int(pr.v))})]
+	var lotes: Array = []
+	for sid in S.seeds:
+		if int(S.seeds[sid]) >= pone:
+			lotes.append(sid)
+			o3.append(T("Pongo {n} semillas de {v}", {"n": pone, "v": strain(sid).n}))
+	o3.append(K("Nada"))
+	var c3: int = await ask(T("Pone {p}. ¿Y tú? Lo mismo en dinero o {n} semillas de las tuyas.", {"p": pr.txt, "n": pone}), o3, N)
+	if c3 < 0 or c3 >= o3.size() - 1:
+		return {}
+	if c3 == 0:
+		return {"e": int(pr.v), "pr": pr}
+	return {"e": 0, "pr": pr, "s": lotes[c3 - 1]}
 
 # la bola 8 de verdad (1.58, lo pidió el usuario: «estilo 8 ball pool»; con CAL): la mesa desde arriba con las 15 bolas y la física
 # de billar8.gd. Sacas tú; mesa abierta hasta la primera que se mete tras el saque; falta, bola en mano para el otro; la negra al
@@ -1475,7 +1552,13 @@ func billar8(k: String, nb: String, N: String) -> String:
 				while n < hasta and not B8.quieta(V):
 					B8.paso(V, ev)
 					n += 1
+				for c in V.caen:   # la hora a la que cae, para el dibujo de la caída
+					if not c.has("t"):
+						c.t = M.reloj
+			while V.caen.any(func(c): return c.has("t") and M.reloj - float(c.t) < B8.CAE_MS):
+				await M.wait(16)
 			B8.simula(V, ev)
+		V.caen = []
 		var met: Array = ev.met.filter(func(x): return x != 0)
 		if not met.is_empty():
 			sfx("coin" if q == 0 else "hit")

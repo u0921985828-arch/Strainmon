@@ -238,3 +238,11 @@ Bola en mano: las flechas la mueven y A la deja.,Ball in hand: the arrows move i
 ¿Lo dejas? La partida es suya.,Quit? The game goes to them.
 Seguir,Keep playing
 Estudia la mesa…,Studying the table…
+Su premio: {p},Their prize: {p}
+{n} semillas de {v},{n} {v} seeds
+¿Cuánto? Aquí se juega hasta {t}.,How much? Here the limit is {t}.
+Pongo {e},I put up {e}
+Pongo {n} semillas de {v},I put up {n} {v} seeds
+Pone {p}. ¿Y tú? Lo mismo en dinero o {n} semillas de las tuyas.,"They put up {p}. And you? The same in cash, or {n} of your seeds."
+"Ganas tú. {nb} te da {p}: «La próxima, la revancha».","You win. {nb} gives you {p}: “Next time, a rematch.”"
+Gana {nb}. Le das {n} semillas de {v}.,{nb} wins. You hand over {n} {v} seeds.
