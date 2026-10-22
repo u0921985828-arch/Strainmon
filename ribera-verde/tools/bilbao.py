@@ -34,9 +34,9 @@ LEY = {
 	"w": ("walk", "papelera"), "v": ("walk", "bolardo"), "C": ("walk", "contenedores"), "1": ("adoq", "papelera"),
 	"2": ("adoq", "bolardo"), "3": ("plaza", "papelera"), "4": ("hormigon", "papelera"), "5": ("muelleP", "papelera"),
 	"6": ("muelleP", "bench"), "7": ("muelleP", "lamp"), "8": ("hormigon", "contenedores"), "9": ("adoq", "contenedores"), "r": ("hormigon", "bench"),
-	 "G": ("hormigon", "grua0"),
+	 "G": ("hormigon", "grua0"), "E": ("hormigon", "escZ"), "V": ("hormigon", "ascensorZ"),
 }
-ANCHOS = {"metroB": "metroB2", "contenedores": "contenedores2"}   # lo de 2 casillas: la de la derecha, sólida y sin dibujo
+ANCHOS = {"metroB": "metroB2", "contenedores": "contenedores2", "escZ": "escZ2", "ascensorZ": "ascensorZ2"}   # lo de 2 casillas: la de la derecha, sólida y sin dibujo
 CAMBIA_HIERBA = {"grass": "walk", "flowers": "walk", "tallgrass": "walk"}
 
 
@@ -172,6 +172,13 @@ SALE = range(CALLE_Y, CALLE_Y + 6)
 
 
 # ------------------------------------------------------------------------------------------------------------------ Zorroza
+# El paso subterráneo (lo pidió el usuario: «O escaleras, que bajes unas escaleras y aparezcas en las del otro lado, sin cambiar el
+# mapa. Mejor que lo del ascensor. Me gusta más. Porque además en la estación de tren de Zorroza el ascensor no funciona»): sin
+# pasos a nivel; tres bocas de escalera de 2 casillas (escZ, que baja hacia la derecha, y escZ2) junto al camino del parque, en el
+# andén de la vía ancha, en el de la estrecha y en el paseo de la ría; se entra andando a la derecha desde la casilla de su
+# izquierda y se sale por la de otra boca (calle.gd, bajar_escalera). El ascensor de 2 casillas, al lado, averiado.
+ESC_Z = [{"x": 21, "y": 19, "n": "Al andén de la vía ancha"}, {"x": 21, "y": 22, "n": "Al andén de la vía estrecha"}, {"x": 21, "y": 24, "n": "A la ría"}]
+ASC_Z = (23, 19)
 def zorroza(DEC):
 	W, H = 40, 28
 	C = lienzo(W, H, "g")
@@ -200,10 +207,10 @@ def zorroza(DEC):
 	rect(C, 2, 15, 9, 18, "#")                                     # la estación, con su andén
 	blds.append({"id": "estacion", "x0": 2, "y0": 15, "w": 8, "h": 4, "doorX": None})
 	rect(C, 1, 19, W - 2, 19, "h")
-	paseo(C, 19, 1, W - 2, "h", "e", "r", "4")
-	rect(C, 1, 20, W - 2, 21, "=")                                 # la vía doble
-	for x in (18, 19):
-		C[20][x] = C[21][x] = "x"                                    # el paso a nivel, en el cruce
+	for x in (11, 17):                                             # el andén de arriba: bajo la estación, libre (el paso al
+		C[19][x] = "e"                                             # oeste); dos farolas junto al parque y, pasada la escalera y
+	paseo(C, 19, 26, W - 2, "h", "e", "r", "4")                   # su ascensor, el paseo con bancos
+	rect(C, 1, 20, W - 2, 21, "=")                                 # la vía doble, sin paso a nivel: se cruza por debajo (ESC_Z)
 	rect(C, 12, 15, W - 2, 18, "g")                                # el parque: césped, árboles en fila y el camino del paso
 	for x in range(13, W - 2, 6):
 		C[16][x] = "y"
@@ -211,12 +218,12 @@ def zorroza(DEC):
 	for x in (17, 20):
 		C[15][x] = C[18][x] = "v"
 	rect(C, 1, 22, W - 2, 22, "h")                                 # el andén de la vía estrecha (lo dijo el usuario: «Hay tren
-	paseo(C, 22, 1, W - 2, "h", "e", "r", "4")                     # renfe y feve»): la de ancho ibérico arriba, la de ancho
+	                                                               # renfe y feve»): la de ancho ibérico arriba, la de ancho
 	rect(C, 1, 23, W - 2, 23, "Ñ")                                 # métrico de una vía abajo, por la ría, y el bus en la calle
-	for x in (18, 19):
-		C[22][x] = "h"
-		C[23][x] = "ñ"
 	rect(C, 1, 24, W - 2, 24, "h")
+	for b in ESC_Z:                                                # las bocas del paso subterráneo, una por andén (el de abajo,
+		C[b["y"]][b["x"]] = "E"                                    # estrecho y sin nada que corte el paso) y la de la ría
+	C[ASC_Z[1]][ASC_Z[0]] = "V"                                    # y el ascensor, que no funciona
 	for x in range(1, W - 1):
 		C[25][x] = "_"                                              # la barandilla de la ría
 	rect(C, 1, 26, W - 2, 27, "~")
@@ -346,7 +353,7 @@ def casco(DEC):
 ZONAS_N = {"zorroza": "Zorroza", "lapunta": "La Punta", "abando": "Abando", "casco": "Casco Viejo"}
 MUSICA = {"zorroza": "town", "lapunta": "astilleros", "abando": "ensanche", "casco": "ibarbide"}
 CADENA = ["zorroza", "lapunta", "abando", "casco"]
-SOLIDO = ("water", "roof", "wall", "win", "iwT", "iwB", "void")
+SOLIDO = ("via", "water", "roof", "wall", "win", "iwT", "iwB", "void")
 
 
 def tablas(B):
@@ -394,6 +401,8 @@ def main():
 			x, y = map(int, c.split(","))
 			if m["o"][y][x]:
 				del DEC[c]
+		if k == "zorroza":
+			m["escaleras"] = ESC_Z
 		B["MAPS"][k] = m
 		B["DEC"][k] = DEC
 	tablas(B)

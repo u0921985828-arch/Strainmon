@@ -1614,7 +1614,8 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 	var gr = J.grupo_pj() if isP else Atlas.grupo_look(look)
 	if not gr:
 		return
-	var v = J.vehiculo() if isP else e.get("veh")   # 1.57: los coches de la demo del título, con su conductor; en la calle, con el patinete o la bici: detrás, él (subido) y delante (dibujarPJ)
+	var esc = J.ESC if isP and Datos.CAL else null   # por la escalera del paso subterráneo de Zorroza: a pie y cortado por abajo
+	var v = null if esc != null else J.vehiculo() if isP else e.get("veh")   # 1.57: los coches de la demo del título, con su conductor; en la calle, con el patinete o la bici: detrás, él (subido) y delante (dibujarPJ)
 	if v and not Atlas.anim_de("vehiculos", v + "-atras"):
 		v = null
 	var f = _monta_frame(e, gr, v, dur) if v else _pj_frame(e, gr, isP, dur)
@@ -1624,6 +1625,12 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 		f = J.ropa_c(f, gr)   # ropa y pelo (1.21)
 	var xp: int = Datos.jsround(e.px - cam.x) + 8
 	var yp: int = Datos.jsround(e.py - cam.y) + 15
+	if esc != null and int(esc.h) > 0:   # hundido h px en la escalera: lo de debajo de los peldaños no se ve (sin sombra)
+		var im: Image = f.c
+		var hv: int = int(f.cel.ancla[1]) + 1 - int(esc.h)
+		if hv > 0:
+			Atlas.dibuja(L, im, Rect2(Datos.jsround(xp - f.cel.ancla[0]), Datos.jsround(yp - f.cel.ancla[1]) + int(esc.h), im.get_width(), hv), Rect2(0, 0, im.get_width(), hv))
+		return
 	var sm := Color8(0, 0, 0, 56)
 	_rect(xp - 4, yp - 1, 8, 3, sm)
 	_rect(xp - 5, yp, 10, 1, sm)

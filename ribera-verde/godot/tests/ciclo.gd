@@ -550,7 +550,9 @@ func prologo() -> void:
 			var n: String = "night" if mu == "town" else mu + "_n"
 			temas_ok = temas_ok and J.sonido.grabadas.has(n) and n != mu
 			dia[mu] = n
-	check("música: %d mapas con su canción; %d zonas con la suya de día y de noche, distintas" % [J.MAPS.size(), dia.size()], temas_ok and dia.size() == J.D.ZONAS.size())
+	# las zonas de Bilbao (con CAL) llevan la canción del barrio al que se parecen (tools/bilbao.py): no cuentan como distintas
+	var bil: int = J.D.ZONAS.keys().filter(func(z): return J.D.get("BILBAO", {}).get("MAPS", {}).has(z)).size()
+	check("música: %d mapas con su canción; %d zonas con la suya de día y de noche, distintas" % [J.MAPS.size(), dia.size()], temas_ok and dia.size() == J.D.ZONAS.size() - bil)
 	var pa: Dictionary = J.D.PARADAS.mendialde
 	check("andando hasta la parada (%d,%d)" % [pa.a[0], pa.a[1]], await anda(Vector2i(int(pa.a[0]), int(pa.a[1]))))
 	await mira("left")

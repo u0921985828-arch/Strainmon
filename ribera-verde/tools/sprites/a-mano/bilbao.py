@@ -9,8 +9,8 @@
 #  · catedral: la fachada gótica con la aguja (6 × 9); teatro: el teatro de la ría (8 × 7); mercado: el mercado de la ribera
 #    (8 × 5) con sus vidrieras; grua: la grúa de pórtico del muelle (4 × 7), sobre el hormigón;
 #  · tiles-bilbao: la vía (horizontal y vertical), el paso a nivel, el adoquín del Casco Viejo y la losa del muelle;
-#  · props-bilbao: la barandilla verde de la ría, la papelera, el bolardo, el plátano en su alcorque (4 m), la boca del metro de cristal
-#    y los contenedores (2 casillas);
+#  · props-bilbao: la barandilla verde de la ría, la papelera, el bolardo, el plátano en su alcorque (4 m), la boca del metro de cristal,
+#    los contenedores, la boca de la escalera del paso subterráneo de Zorroza y su ascensor averiado (2 casillas);
 #  · suelo-bilbao: la tapa de registro, el imbornal y el paso de cebra, que el mapa pone a ritmo fijo (BILBAO.DEC; no al azar).
 # Sale a art/crudo/<grupo>/<sprite>/unica/NN.png; después, node tools/sprites/procesar.js <grupos> --atlas --atlas-dir godot/arte.
 import os
@@ -566,6 +566,62 @@ def contenedores():
     return lz
 
 
+# ------------------------------------------------------------------------------- el paso subterráneo de Zorroza (props-bilbao-ancho)
+# (lo pidió el usuario: «que bajes unas escaleras y aparezcas en las del otro lado, sin cambiar el mapa… en la estación de tren de
+# Zorroza el ascensor no funciona»): la boca de la escalera, de 2 casillas, vista desde arriba a medio fondo, que baja hacia la
+# derecha (cada peldaño más oscuro hasta la boca del túnel) con su murete y su barandilla; y el ascensor de cristal, averiado.
+def escalera():
+    """la boca de la escalera (2 m × 1 m): siete peldaños de hormigón bajando hacia el este (huella clara, tabica oscura), la
+    pared de dentro que se ve cada vez más alta según baja, el murete de arriba de frente con su pasamanos, el bordillo de abajo
+    y, al fondo, la boca oscura del paso"""
+    lz = Lienzo(48, 48)
+    y0, y1 = 33, 45                                                         # el hueco, dentro de la fila de la casilla (32 a 47)
+    for i in range(7):                                                      # siete peldaños de 4 px, cada uno más hondo y oscuro
+        x = 10 + i * 4
+        t = i / 6
+        c = tuple(int(a + (b - a) * t) for a, b in ((0xa8, 0x4a), (0xa4, 0x47), (0x9c, 0x42)))
+        hx = lambda v: '#%02x%02x%02x' % tuple(max(0, min(255, q)) for q in v)
+        pared = 1 + i * 2                                                   # la pared de dentro, por encima del peldaño
+        lz.r(x, y0, 4, y1 - y0 + 1, hx(c))
+        lz.vl(x, y0 + pared, y1, hx(tuple(q + 24 for q in c)))              # el canto de la huella
+        lz.vl(x + 3, y0 + pared, y1, hx(tuple(q - 30 for q in c)))          # la tabica, en sombra
+        lz.r(x, y0, 4, pared, hx(tuple(q - 46 for q in c)))                 # la pared de dentro, en sombra
+        lz.hl(x, x + 3, y0 + pared, hx(tuple(q - 60 for q in c)))
+    lz.r(38, y0, 2, y1 - y0 + 1, '#121214')                                 # la boca del túnel
+    lz.r(8, 28, 32, 5, '#b4b0a8'); lz.hl(8, 39, 28, '#d2cec6'); lz.hl(8, 39, 32, '#7a7670')   # el murete de arriba, de frente
+    for x in range(10, 40, 7):
+        lz.vl(x, 24, 27, '#5c6268')                                        # los postes del pasamanos
+    lz.hl(8, 39, 23, '#7c848a'); lz.hl(8, 39, 24, '#5c6268')
+    lz.hl(8, 39, 46, '#b4b0a8'); lz.hl(8, 39, 47, '#7a7670')                # el bordillo de abajo
+    lz.vl(8, 33, 45, '#c8c4bc'); lz.vl(9, 33, 45, '#8a8680')                 # el canto de la entrada, por donde se pisa
+    return lz
+
+
+def ascensor():
+    """el ascensor de la estación (2 m × 2,6 m), de cristal y acero, parado: la cabina abajo, las puertas cerradas con la cinta de
+    obra cruzada y la luz roja encendida (sin letras)"""
+    lz = Lienzo(48, 48)
+    AC, ACS, ACL, VI, VIL = '#9aa4ac', '#5a646c', '#c4ccd2', '#7cb0cc', '#b8dcec'
+    lz.r(9, 6, 30, 41, ACS)                                                 # la torre
+    lz.r(11, 8, 26, 22, VI)                                                 # el cristal, con los reflejos
+    for x in range(11, 37):
+        for y in range(8, 30):
+            if (x - y) % 9 in (0, 1):
+                lz.p(x, y, VIL)
+    lz.vl(24, 8, 29, AC); lz.hl(11, 36, 18, AC)
+    lz.r(9, 4, 30, 3, ACL); lz.hl(9, 38, 6, ACS)                            # la tapa
+    lz.r(13, 31, 22, 15, '#8a949c')                                         # las puertas, cerradas
+    lz.vl(24, 31, 45, ACS); lz.hl(13, 34, 31, ACL)
+    for i in range(22):                                                     # la cinta de obra, en aspa
+        for x, y in ((13 + i, 32 + i * 13 // 21), (34 - i, 32 + i * 13 // 21)):
+            c = '#e8c020' if (i // 3) % 2 else '#202024'
+            lz.p(x, y, c); lz.p(x, y + 1, c)
+    lz.caja(36, 33, 3, 6, ACS, '#2a2e32'); lz.p(37, 34, '#e83a30'); lz.p(37, 35, '#a02020')   # la botonera, con la luz roja
+    lz.hl(9, 38, 46, '#2a2e32')
+    lz.contorno('#1e1e22')
+    return lz
+
+
 SPRITES = {
     'torres': lambda: [guarda('edificio-' + k, torre(k)) for k in TORRES],
     'ensanches': lambda: [guarda('edificio-' + k, ensanche(k)) for k in ENSANCHES],
@@ -579,7 +635,8 @@ SPRITES = {
                                                                ('viaE', lambda: via(estrecha=True)), ('viaEX', lambda: via(False, True, True)), ('adoq', adoquin), ('muelleP', muelle))],
     'props': lambda: [sale(baranda(), 'props-bilbao', 'baranda'), sale(papelera(), 'props-bilbao', 'papelera'), sale(bolardo(), 'props-bilbao', 'bolardo'),
                       sale(platano(), 'props-bilbao-alto', 'platano'), sale(metro(), 'props-bilbao-ancho', 'metroB'),
-                      sale(contenedores(), 'props-bilbao-ancho', 'contenedores')],
+                      sale(contenedores(), 'props-bilbao-ancho', 'contenedores'), sale(escalera(), 'props-bilbao-ancho', 'escZ'),
+                      sale(ascensor(), 'props-bilbao-ancho', 'ascensorZ')],
     'suelo': lambda: [sale(f(), 'suelo-bilbao', k) for k, f in (('tapa', tapa), ('imbT', imbornal), ('imbB', lambda: imbornal(True)), ('cebra', cebra))],
 }
 

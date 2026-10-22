@@ -1,4 +1,7 @@
 clave,es,en
+sbe658eaa,escZ,
+s3a223bdb,"La escalera del paso subterráneo, por debajo de las vías.","The stairs to the underpass, under the tracks."
+s28beae68,Nada,Nothing
 se7166571,"Te despiertas en el banco de la parada, con la cabeza a punto de estallar. Han pasado {h} horas.","You wake up on the bench at the stop, with your head about to burst. {h} hours have gone by."
 s5cdf67e8,Te faltan {e} de la cartera.,{e} is missing from your wallet.
 sf85b7e0e,Y {g} g de lo que llevabas encima.,And {g} g of what you were carrying.
@@ -7,7 +10,6 @@ s93d6887b,MOVIL,
 sfbcd6556,Sentarte,Sit down
 s9b672b3b,Usar el ordenador,Use the computer
 se219dae0,Otra cosa,Something else
-s28beae68,Nada,Nothing
 s9a9aa3c7,Fumarte uno,Have a smoke
 sb4282de7,Pedir algo,Order something
 s7267cc9a,Hablar con {q},Talk to {q}
@@ -88,6 +90,8 @@ sa3954f99,Una mesa con una báscula y rollos de film transparente.,A table with 
 sa1a3a43c,Está tan desgastado que no se lee.,It's too worn to read.
 s9348fdc5,rotuloL,rotuloL
 s77bc1255,La fuente de la plaza. Lleva años sin agua potable.,The square's fountain. No drinking water for years.
+sd463f8b5,"La escalera del paso subterráneo, por debajo de las vías. Se baja andando hacia ella.","The stairs to the underpass, under the tracks. Walk into them to go down."
+s485fd2e9,"El ascensor de la estación. La luz roja, la cinta cruzada en las puertas: no funciona. Por la escalera.","The station lift. Red light, tape across the doors: out of order. Take the stairs."
 s2fe02f3f,"Botes de abono, sustrato de coco y medidores de pH.","Tubs of nutrients, coco substrate and watering testers."
 sec377e04,"Botes de abono, sustrato de coco y medidores de riego.",
 s57115523,"Sobres de semillas de bancos de todo el mundo, ordenados por tipo.","Seed packs from seed banks all over the world, sorted by type."
@@ -5964,10 +5968,16 @@ se4939ba2,wall_torreZ,
 s22e9ef52,wall_torreZ2,
 s5b1ae0e5,roofT_estacion,
 s71aa114a,roofB_estacion,
-s314053d3,viaX,
+s52463f0a,viaE,
 s3eec22fd,muelleP,
+s2c689175,escZ2,
+se71d3676,ascensorZ,
+sa3547732,ascensorZ2,
 s3f64fdc9,torreZ,
 sf852a0e4,torreZ2,
+sba884aad,Al andén de la vía ancha,To the broad-gauge platform
+s23b6a7bd,Al andén de la vía estrecha,To the narrow-gauge platform
+seb2a67b2,A la ría,To the estuary
 s6620dedf,La Punta,La Punta
 sc764056c,roofT_grua,
 s12ebe4ea,roofB_grua,

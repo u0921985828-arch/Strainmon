@@ -10,6 +10,12 @@ extends SceneTree
 const Datos = preload("res://src/datos.gd")
 const Atlas = preload("res://src/atlas.gd")
 const Pintor = preload("res://src/pinta.gd")
+const Juego = preload("res://src/juego.gd")
+
+# 4. las vallas encima de lo que acotan (lo pidió el usuario: «tiene que estar acotado encima de las baldosas donde termina la
+# acotación, no en las siguientes»): con CAL, las de los corrales y cercados, en su suelo; las sueltas, como estaban
+const CERCADOS := {"valdehierro": ["dirt", 53], "mendialde": ["tallgrass", 29], "errotabarri": ["tallgrass", 22], "astilleros": ["dirt", 36]}
+const SUELTAS := ["town", "carr-valle", "carr-molino", "carr-acantilado", "puerto"]
 
 var n := 0
 var fallos := []
@@ -43,6 +49,53 @@ func fila(im: Image, y: int) -> bool:
 		if im.get_pixel(x, y).a > 0:
 			return true
 	return false
+
+func vallas_de(m: Dictionary) -> Array:
+	var r := []
+	for y in m.o.size():
+		for x in m.o[y].size():
+			if m.o[y][x] == "fence":
+				r.append(Vector2i(x, y))
+	return r
+
+func dentro(D: Dictionary) -> void:
+	Juego.GUARDADO = "user://prueba-vallas.json"
+	Juego.AJUSTES = "user://prueba-vallas-ajustes.json"
+	var O = JSON.parse_string(FileAccess.get_file_as_string("res://tests/pantallas.json"))
+	var J = Juego.new()
+	root.add_child(J)
+	for x in O:
+		if x.k == "casa-extr":
+			J.S = Datos.enteros(x).S
+	J.oraculo = true
+	J.S.ch = 9
+	for k in CERCADOS:
+		J.enter_map(k, 1, 1)
+		var m: Dictionary = J.MAPS[k]
+		var con: Array = m.g.duplicate(true)
+		Datos.CAL = false   # el suelo sin las vallas encima (lo demás del mapa, montado con CAL)
+		J.vallas_dentro(k)
+		var sin: Array = m.g.duplicate(true)
+		Datos.CAL = true
+		J.vallas_dentro(k)
+		chk(m.g == con, "%s: al volver a ponerlas, igual" % k)
+		var vs := vallas_de(m)
+		var en := vs.filter(func(c): return m.g[c.y][c.x] == CERCADOS[k][0])
+		chk(vs.size() == CERCADOS[k][1] and en.size() == vs.size(), "%s: las %d vallas encima de %s (%d)" % [k, vs.size(), CERCADOS[k][0], en.size()])
+		var fuera := 0   # solo cambian las casillas de valla
+		for y in m.g.size():
+			for x in m.g[y].size():
+				if m.o[y][x] != "fence" and con[y][x] != sin[y][x]:
+					fuera += 1
+		chk(fuera == 0, "%s: fuera de las vallas, el suelo de siempre (%d cambiadas)" % [k, fuera])
+		var cambia := vs.filter(func(c): return sin[c.y][c.x] != CERCADOS[k][0]).size()
+		chk(k == "astilleros" or cambia > 0, "%s: había vallas fuera de lo acotado: %d" % [k, cambia])
+		J.enter_map(k, 1, 1)
+		chk(m.g == con, "%s: al volver a entrar, igual" % k)
+	for k in SUELTAS:
+		J.enter_map(k, 1, 1)
+		chk(not J._val0.has(k), "%s: las vallas sueltas, en su sitio de siempre" % k)
+	Datos.CAL = true
 
 func _corre() -> void:
 	Datos.CAL = true
@@ -112,6 +165,7 @@ func _corre() -> void:
 							im.convert(Image.FORMAT_RGBA8)
 							big.blend_rect(im, Rect2i(0, 0, 16, 16), Vector2i(x * 16, y * 16))
 			big.save_png(dir.path_join("vallas-%s.png" % k))
+	dentro(D)
 	print("vallas: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:
 		print("  FALLO: ", f)

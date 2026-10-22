@@ -1918,9 +1918,14 @@ func pick_item(it: Dictionary) -> void:
 func tile_solid(m: Dictionary, x: int, y: int) -> bool:
 	if x < 0 or y < 0 or x >= m.w or y >= m.h:
 		return true
-	if SOLID_G.search(m.g[y][x]) or m.o[y][x]:
+	if SOLID_G.search(m.g[y][x]) or m.o[y][x] or via_cerrada(m, x, y):
 		return true
 	return item_at(x, y) != null
+
+# con CAL, las vías del tren no se cruzan andando: por el paso subterráneo (lo pidió el usuario: «los pasos a nivel para pasar
+# encima de las vías tienen que estar… O escaleras»; calle.gd, bajar_escalera)
+func via_cerrada(m: Dictionary, x: int, y: int) -> bool:
+	return Datos.CAL and String(m.g[y][x]).begins_with("via")
 
 # la casilla donde deja el autobús en este mapa (1.10): ahí no se para nadie
 func llegada_bus(x: int, y: int) -> bool:
@@ -1999,6 +2004,69 @@ func montar_atrezo(k: String) -> void:
 const ARBOLES := ["tree", "tree2", "manzano", "monte", "monte2"]   # i18n-no
 const Pintor = preload("res://src/pinta.gd")
 var _arb0 := {}   # mapa → [[x, y, el que se quitó]]
+var _val0 := {}   # mapa → [[x, y, suelo de antes, suelo puesto]] (vallas_dentro)
+
+# Las vallas encima de lo que acotan (lo pidió el usuario: «tiene que estar acotado encima de las baldosas donde termina la
+# acotación, no en las siguientes»): con CAL, en cada tramo de valla de madera que cierra tierra o hierba alta (VALLA_CERCA), la
+# baldosa de debajo de cada valla pasa a ser la de dentro (la vecina de ese suelo, de lado antes que en diagonal; sin vecina, la
+# que más sale en el tramo). Un tramo cuenta si al menos VALLA_PARTE de sus vallas tocan ese suelo (una valla suelta junto a una
+# mata de hierba alta no). Sin CAL, el suelo de antes
+const VALLA_CERCA := ["dirt", "tallgrass"]   # i18n-no
+const VALLA_PARTE := 0.6
+
+func vallas_dentro(k: String) -> void:
+	if not MAPS.has(k):
+		return
+	var m: Dictionary = MAPS[k]
+	for q in _val0.get(k, []):
+		if m.g[q[1]][q[0]] == q[3]:
+			m.g[q[1]][q[0]] = q[2]
+	_val0.erase(k)
+	if not Datos.CAL:
+		return
+	var mo: Array = m.o
+	var es := func(x: int, y: int) -> bool: return y >= 0 and y < mo.size() and x >= 0 and x < mo[y].size() and mo[y][x] == "fence"
+	var visto := {}
+	var hecho := []
+	for y in mo.size():
+		for x in mo[y].size():
+			if not es.call(x, y) or visto.has(Vector2i(x, y)):
+				continue
+			var tramo := []   # [casilla, suelo de dentro o ""]
+			var pila := [Vector2i(x, y)]
+			visto[Vector2i(x, y)] = true
+			while pila.size():
+				var c: Vector2i = pila.pop_back()
+				var s := ""
+				for d in [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(1, 1), Vector2i(-1, 1), Vector2i(1, -1), Vector2i(-1, -1)]:
+					var v: Vector2i = c + d
+					if v.y < 0 or v.y >= mo.size() or v.x < 0 or v.x >= mo[v.y].size():
+						continue
+					if es.call(v.x, v.y):
+						if abs(d.x) + abs(d.y) == 1 and not visto.has(v):
+							visto[v] = true
+							pila.append(v)
+					elif s == "" and m.g[v.y][v.x] in VALLA_CERCA:
+						s = m.g[v.y][v.x]
+				tramo.append([c, s])
+			var cuenta := {}
+			for t in tramo:
+				if t[1] != "":
+					cuenta[t[1]] = cuenta.get(t[1], 0) + 1
+			var mas := ""
+			for s in cuenta:
+				if mas == "" or cuenta[s] > cuenta[mas]:
+					mas = s
+			if mas == "" or cuenta[mas] < VALLA_PARTE * tramo.size():
+				continue
+			for t in tramo:
+				var c: Vector2i = t[0]
+				var s: String = t[1] if t[1] != "" else mas
+				if m.g[c.y][c.x] != s:
+					hecho.append([c.x, c.y, m.g[c.y][c.x], s])
+					m.g[c.y][c.x] = s
+	if hecho.size():
+		_val0[k] = hecho
 var _arb_k := {}  # mapa → los edificios con los que se calculó
 
 func arboles_fuera(k: String) -> void:
@@ -2103,6 +2171,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	montar_garaje(name_)
 	montar_aparcamiento(name_)
 	arboles_fuera(name_)   # con CAL, ningún árbol encima de un edificio
+	vallas_dentro(name_)   # con CAL, la valla encima de lo que acota
 	P.x = x
 	P.y = y
 	P.px = x * 16.0

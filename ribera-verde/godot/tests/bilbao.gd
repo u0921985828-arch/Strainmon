@@ -20,7 +20,7 @@ const MAPAS := ["zorroza", "lapunta", "abando", "casco"]
 const CALLE_Y := 9
 # lo de cada sitio: edificios, suelos y objetos que tiene que tener
 const TIENE := {
-	"zorroza": {"b": ["torreZ", "torreZ2", "estacion"], "g": ["via", "viaX", "viaE", "viaEX", "roadT", "hormigon", "water"], "o": ["parada", "baranda", "lamp", "bench", "papelera", "bolardo", "contenedores"]},
+	"zorroza": {"b": ["torreZ", "torreZ2", "estacion"], "g": ["via", "viaE", "roadT", "hormigon", "water"], "o": ["parada", "baranda", "lamp", "bench", "papelera", "bolardo", "contenedores", "escZ", "ascensorZ"]},
 	"lapunta": {"b": ["ladrillo", "nave", "grua"], "g": ["hormigon", "muelleP", "roadT", "water"], "o": ["noray", "lamp", "bolardo", "contenedores"]},
 	"abando": {"b": ["ensB", "ensB2"], "g": ["plaza", "roadT", "walk"], "o": ["platano", "fountain", "lamp", "bolardo", "papelera"]},
 	"casco": {"b": ["teatro", "catedral", "mercado", "casco", "casco2", "casco3"], "g": ["adoq", "muelleP", "plaza", "water"], "o": ["baranda", "lamp", "bench", "papelera", "fountain"]},
@@ -192,7 +192,7 @@ func _corre() -> void:
 			for x in int(m.w):
 				if m.o[y][x] in ["papelera", "bench", "lamp", "bolardo"] and not (v.has("%d,%d" % [x + 1, y]) or v.has("%d,%d" % [x - 1, y]) or v.has("%d,%d" % [x, y + 1]) or v.has("%d,%d" % [x, y - 1])):
 					nl += 1
-		chk(nl == 0, "%s: %d piezas del mobiliario encerradas" % [k, nl])
+		chk(nl == 0, "%s: %d piezas del mobiliario encerradas" % [k, nl] + str(_encerradas(m, v)))
 		# 5. sin caos: lo del suelo encima de suelo libre; en la calle, todo a ritmo y los de enfrente a la misma x
 		for c in m.dec:
 			var p: Array = String(c).split(",")
@@ -243,3 +243,11 @@ func _corre() -> void:
 	for f in fallos:
 		print("  FALLO: ", f)
 	quit(1 if fallos.size() else 0)
+
+func _encerradas(m: Dictionary, v: Dictionary) -> Array:
+	var r := []
+	for y in int(m.h):
+		for x in int(m.w):
+			if m.o[y][x] in ["papelera", "bench", "lamp", "bolardo"] and not (v.has("%d,%d" % [x + 1, y]) or v.has("%d,%d" % [x - 1, y]) or v.has("%d,%d" % [x, y + 1]) or v.has("%d,%d" % [x, y - 1])):
+				r.append(Vector2i(x, y))
+	return r

@@ -12822,14 +12822,18 @@
    "id": "props-bilbao-ancho",
    "tipo": "objeto",
    "celda": "mueble_ancho",
-   "descripcion": "la boca del metro de cristal y acero y los contenedores (2 casillas)",
+   "descripcion": "la boca del metro de cristal y acero, los contenedores y, en Zorroza, la boca de la escalera del paso subterráneo y el ascensor averiado (2 casillas)",
    "cubre": [
     "obj:metroB",
-    "obj:contenedores"
+    "obj:contenedores",
+    "obj:escZ",
+    "obj:ascensorZ"
    ],
    "ajuste_por_sprite": {
     "metroB": "exacto",
-    "contenedores": "exacto"
+    "contenedores": "exacto",
+    "escZ": "exacto",
+    "ascensorZ": "exacto"
    }
   },
   {

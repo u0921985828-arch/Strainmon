@@ -3,6 +3,8 @@ extends "res://src/mundo.gd"
 
 # ---------- movimiento ----------
 func update_player(dt: float) -> void:
+	if ESC != null:   # bajando o subiendo la escalera del paso subterráneo: lo mueve bajar_escalera
+		return
 	if P.moving:
 		P.t += dt
 		var k := minf(1, P.t / P.dur)
@@ -56,6 +58,10 @@ func try_move(d: String) -> void:
 		return
 	var nx: int = P.x + dv[0]
 	var ny: int = P.y + dv[1]
+	if Datos.CAL and d == "right" and nx < m.w and m.o[ny][nx] == "escZ" and m.has("escaleras"):   # el paso subterráneo de Zorroza
+		P.chain = false
+		run(func(): await bajar_escalera(nx, ny))
+		return
 	if tile_solid(m, nx, ny) or ent_at(nx, ny) or coche_en(nx, ny) != "" or fuera_calzada(m, nx, ny):
 		if M.reloj - P.bumpT > 350:
 			sfx("bump")
@@ -72,6 +78,64 @@ func try_move(d: String) -> void:
 	P.pisT = M.reloj
 	P.dur = paso_ms()
 	P.parity ^= 1
+
+# El paso subterráneo de Zorroza (lo pidió el usuario: «O escaleras, que bajes unas escaleras y aparezcas en las del otro lado, sin
+# cambiar el mapa. Mejor que lo del ascensor. Me gusta más. Porque además en la estación de tren de Zorroza el ascensor no
+# funciona»), con CAL: andando a la derecha hacia una boca (escZ, m.escaleras de tools/bilbao.py), si hay más de una al otro lado
+# se elige a cuál; bajas andando hasta perderte por los peldaños (ESC.h, lo que te hunde; pinta.gd te corta por abajo), fundido a
+# negro y, en el mismo mapa, subes por la otra boca andando a la izquierda hasta la casilla de su entrada
+var ESC = null   # {"h": px hundido} mientras dura
+const ESC_HONDO := 24   # lo que se hunde en la boca hasta perderse (los 27 px del protagonista, menos el pelo)
+const ESC_FONDO := 1.6   # hasta dónde entra en la boca (casillas desde la entrada)
+
+func bajar_escalera(x: int, y: int) -> void:
+	var otras: Array = MAPS[S.map].escaleras.filter(func(b): return int(b.y) != y or int(b.x) != x)
+	if otras.is_empty():
+		return
+	var b: Dictionary = otras[0]
+	if otras.size() > 1:
+		var j := await ask(K("La escalera del paso subterráneo, por debajo de las vías."), otras.map(func(o): return I18n.v(o.n)) + [K("Nada")])
+		if j < 0 or j >= otras.size():
+			return
+		b = otras[j]
+	P.dir = "right"
+	await _escalon(x - 1, y, x - 1 + ESC_FONDO, 0, ESC_HONDO)
+	await fade(1)
+	P.dir = "left"
+	P.y = int(b.y)
+	await wait(240)
+	await fade(0)
+	await _escalon(int(b.x) - 1 + ESC_FONDO, int(b.y), int(b.x) - 1, ESC_HONDO, 0)
+	P.x = int(b.x) - 1
+	P.px = P.x * 16.0
+	P.py = P.y * 16.0
+	P.fx = P.x
+	P.fy = P.y
+	P.moving = false
+	ESC = null
+	S.x = P.x
+	S.y = P.y
+	S.dir = P.dir
+
+# un tramo de la escalera, de la x a0 a la a1 (en casillas) por la fila y, hundiéndose de h0 a h1 px, al paso de andar
+func _escalon(a0: float, y: int, a1: float, h0: int, h1: int) -> void:
+	var dur: float = paso_ms()
+	var total: float = dur * absf(a1 - a0) * 1.4   # por los peldaños, algo más despacio que andando
+	var t := 0.0
+	ESC = {"h": h0}
+	P.moving = true
+	P.py = y * 16.0
+	while true:
+		var k := minf(1.0, t / total)
+		P.px = lerpf(a0, a1, k) * 16.0
+		ESC.h = int(roundf(lerpf(h0, h1, k)))
+		P.t = fmod(t, dur)
+		P.parity = int(t / dur) & 1
+		P.x = int(roundf(P.px / 16.0))
+		if k >= 1.0:
+			break
+		await wait(16)
+		t += 16.0
 
 # el patinete o la bici (1.13, vehiculo() de 12c-salon): en la calle (ZONAS), el mejor que tengas; con CAL, también por las
 # carreteras, y en ellas, al volante (S.volante, eventos.gd), el coche o la moto
@@ -827,6 +891,10 @@ func object_action(x: int, y: int) -> void:
 					return
 		"fountain":
 			await say(K("La fuente de la plaza. Lleva años sin agua potable."))
+		"escZ", "escZ2":   # i18n-no; el paso subterráneo de Zorroza (bajar_escalera): se baja andando hacia la derecha
+			await say(K("La escalera del paso subterráneo, por debajo de las vías. Se baja andando hacia ella."))
+		"ascensorZ", "ascensorZ2":   # i18n-no
+			await say(K("El ascensor de la estación. La luz roja, la cinta cruzada en las puertas: no funciona. Por la escalera."))
 		"shelfW":
 			await say(K("Botes de abono, sustrato de coco y medidores de pH."))
 		"display":
@@ -1479,7 +1547,7 @@ func pisable(m: Dictionary, x: int, y: int) -> bool:
 	if x < 0 or y < 0 or x >= int(m.w) or y >= int(m.h):
 		return false
 	var k := "%d,%d" % [x, y]
-	return SOLID_G.search(m.g[y][x]) == null and m.g[y][x] != "mat" and not m.exits.has(k) and not m.doors.has(k)
+	return SOLID_G.search(m.g[y][x]) == null and m.g[y][x] != "mat" and not via_cerrada(m, x, y) and not m.exits.has(k) and not m.doors.has(k)
 
 func andable(m: Dictionary, O: Array, B := {}) -> Dictionary:
 	var v := {}
@@ -1500,10 +1568,20 @@ func andable(m: Dictionary, O: Array, B := {}) -> Dictionary:
 			if not v.has(kk) and pisable(m, nx, ny) and not O[ny][nx] and not B.has(kk):
 				v[kk] = true
 				q.append([nx, ny])
+	var bocas := []   # con CAL, las entradas de las escaleras del paso subterráneo: de una se sale por las otras (bajar_escalera)
+	if Datos.CAL:
+		for b in m.get("escaleras", []):
+			bocas.append(Vector2i(int(b.x) - 1, int(b.y)))
 	var i := 0
 	while i < q.size():
 		var c: Array = q[i]
 		i += 1
+		if Vector2i(c[0], c[1]) in bocas:
+			for b in bocas:
+				var kb := "%d,%d" % [b.x, b.y]
+				if not v.has(kb) and not B.has(kb):
+					v[kb] = true
+					q.append([b.x, b.y])
 		for d in DIRS_ORDEN:
 			var nx: int = c[0] + d[0]
 			var ny: int = c[1] + d[1]
