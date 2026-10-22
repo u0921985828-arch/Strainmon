@@ -112,8 +112,9 @@ func _corre() -> void:
 	MENUS.clear()
 	QUIERO = ["Nada"]
 	chk(corre(func(): await J.talk_kaia("Encargada")), "la encargada")
-	for t in ["El dispensario", "El almacén", "El diseño", "Ordenar el local"]:
+	for t in ["El dispensario", "El diseño", "Ordenar el local"]:
 		chk(vio(t), "el panel de KAIA ofrece «%s»: %s" % [t, MENUS])
+	chk(not vio("El almacén"), "el almacén de KAIA va por su puerta, no por el panel: %s" % [MENUS])
 	# 2 · llenar el dispensario
 	QUIERO = ["El dispensario", lote(), "%d g" % int(K.g[1]), "Nada"]
 	chk(corre(func(): await J.talk_kaia("Encargada")), "dejar género")

@@ -1706,7 +1706,7 @@ func npc_talk(d: Dictionary) -> void:
 			await say(pick([K("Don Baltasar está ocupado. Habla con él si traes el dinero."), K("Aquí dentro no se hacen preguntas.")]), K("TOÑO"))
 		"begona":   # 1.15: consejos, regalos y la jardinera
 			await talk_begona()
-		"club_puerto", "club_valde", "club_ibar", "club_ens", "club_rv":   # los clubs (1.15); la asociación (1.32)
+		"club_puerto", "club_valde", "club_ibar", "club_ens", "club_rv", "club_muelle":   # los clubs (1.15); la asociación (1.32); KAIA, la encargada (el repaso)
 			await talk_club(d.id.substr(5))
 		"delroy":
 			await talk_delroy()
@@ -1982,6 +1982,31 @@ var ATREZO_TXT := {   # F7: var, por K()
 		"sillaT": I18n.K("Las sillas de la espera, de plástico. Una revista de coches de hace dos años."),
 		"cafeM": I18n.K("La máquina de café de la espera: solo, cortado y chocolate. El de chocolate sale aguado.")},
 
+}
+
+# (el repaso de coherencia con la partida del usuario): lo que no respondía nada con A; «mapa:objeto» antes que «objeto»
+var OBJ_MUDO := {
+	"plantDeco": I18n.K("Una planta de interior en su maceta. Alguien se acuerda de regarla."),
+	"comisaria:plantDeco": I18n.K("Un ficus de plástico con dos dedos de polvo."),
+	"franco:plantDeco": I18n.K("Un potus medio seco. Gorka no la riega."),
+	"txaro:plantDeco": I18n.K("Un geranio de Txaro, con más flores que hojas."),
+	"shop:plantDeco": I18n.K("Un potus en una maceta de tela, de muestra."),
+	"growcity:plantDeco": I18n.K("Un potus en una maceta de tela, de muestra."),
+	"shop:poster": I18n.K("Un póster con el ciclo de la planta: de la semilla a la cosecha, semana a semana."),
+	"alto:banderaK": I18n.K("La banderola de AUTOS RIBERA, ondeando en la acera."),
+	"bar:btable": I18n.K("Una mesa alta con el servilletero y los palillos de los pintxos."),
+	"bar:barcounter": I18n.K("La barra de Josune: pintxos bajo la campana de cristal. Se pide a ella."),
+	"disco:barraD": I18n.K("La barra de GAUA. Se pide a la camarera."),
+	"franco:cuadro": I18n.K("Una lámina de un velero, de las que vienen con el piso."),
+	"franco:mesita": I18n.K("Una mesita con un cenicero lleno y el mando de la tele."),
+	"franco:fridge": I18n.K("La nevera de Gorka: cervezas, hielo y un limón."),
+	"franco:table": I18n.K("La mesa de Gorka: una libreta con números y un rollo de cinta de embalar."),
+	"lapunta:noray": I18n.K("Un noray de hierro fundido, gastado por las amarras."),
+	"nave:filtroN": I18n.K("El filtro de carbón activo: el olor de la nave se queda dentro."),
+	"nave:extrG": I18n.K("El extractor grande de la nave, con el tubo hasta el tejado."),
+	"pasillo:perchero": I18n.K("El perchero de la entrada: un chubasquero y la bufanda de la tía."),
+	"pasillo:cuadro": I18n.K("Una foto de la tía Maite de joven, en la ría."),
+	"setas:mesita": I18n.K("Una mesita con un termohigrómetro y un bote de lápices."),
 }
 
 var ASIENTO_FUERA := {"sofa": I18n.K("Un sofá."), "sillon": I18n.K("Un sillón."), "silla": I18n.K("Una silla.")}

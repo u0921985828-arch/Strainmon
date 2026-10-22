@@ -252,18 +252,22 @@ func _corre() -> void:
 	S.buds = {"ria": {"g": 50.0, "thc": 18.0}}
 	MENUS = []
 	var lv: String = String(J.venta_item(J.lotes_venta(1, 1)[0]).label)
-	QUIERO = ["El almacén", "Guardar", lv, "Nada", "Nada"]
+	QUIERO = ["Nada"]
 	chk(corre(func(): await J.talk_kaia("ENCARGADA")), "KAIA")
-	chk(MENUS.size() and MENUS[0].has("El dispensario") and MENUS[0].has("El almacén"), "el panel de KAIA: %s" % [MENUS])
+	# el almacén va por su puerta (repaso.gd): el panel ya no lo lleva
+	chk(MENUS.size() and MENUS[0].has("El dispensario") and not MENUS[0].has("El almacén"), "el panel de KAIA: %s" % [MENUS])
+	MENUS = []
+	QUIERO = ["Guardar", lv, "Nada", "Nada"]
+	chk(corre(func(): await J.almacen_club("muelle")), "el almacén de KAIA")
 	chk(J.alm_g("muelle") > 0 and J.alm_g("rv") == 0, "al almacén de KAIA: %s" % J.alm_g("muelle"))
 	var m0: float = S.money
 	J.almacen_dia("muelle")
 	chk(S.money > m0, "los socios de KAIA retiran: %s" % [S.money - m0])
 	J.aso().pres = true
 	MENUS = []
-	QUIERO = ["El dispensario", "El almacén", "Nada", "Nada"]
+	QUIERO = ["El dispensario", "Nada", "Nada"]
 	chk(corre(func(): await J.talk_delroy()), "Delroy")
-	chk(MENUS.size() >= 2 and MENUS[1] == MENUS[0].slice(0, 0) + ["El dispensario", "El almacén", "Nada"] or (MENUS.size() >= 2 and MENUS[1].has("El almacén")), "el mismo panel en la asociación: %s" % [MENUS])
+	chk(MENUS.size() >= 2 and MENUS[1] == ["El dispensario", "Nada"], "el mismo panel en la asociación: %s" % [MENUS])
 	# 10 · sin CAL: como antes
 	Datos.CAL = false
 	D = Datos.carga()

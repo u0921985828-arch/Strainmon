@@ -572,8 +572,36 @@ func tar_g(t: String) -> float:
 func tar_cap(t: String) -> float:
 	return cam_cap() if t == "cam" else navc_cap()
 
+# (lo pidió el usuario: «el dispensario es un menú como el de la caja de casa, solo que son vitrinas»): el dispensario que se ve,
+# H[key] (el lote de la asociación, de KAIA o de un club de Hiriburu)
+var DISP = null
+
+func disp_lote():
+	if DISP == null:
+		return null
+	var L = DISP.H.get(DISP.key)
+	return L if L is Dictionary and float(L.get("g", 0)) >= .1 else null
+
+# la vitrina antes del menú de siempre: A sigue (dejar un lote o gestionarlo), B cierra (false)
+func vista_disp(H: Dictionary, key: String) -> bool:
+	DISP = {"H": H, "key": key}
+	var e = await elegir_almacen("disp")
+	DISP = null
+	return e != null
+
 func items_almacen(t: String) -> Array:
 	var o := []
+	if t == "disp":   # el hueco de dejar y el lote, en tarros (los extractos, en botes)
+		o.append({"k": "+"})
+		var L = disp_lote()
+		if L != null:
+			var x: bool = L.get("x", false)
+			var tg := float(D.NEVERA.bote) if x else float(D.ALM.tarro)
+			var g := float(L.g)
+			var nt: int = maxi(1, ceili(g / tg - 1e-9))
+			for q in nt:
+				o.append({"k": String(L.k), "b": L, "r": 1 if x else 0, "q": q, "n": nt, "gj": g - tg * (nt - 1) if q == nt - 1 else tg})
+		return o
 	if t == "mal":
 		o.append({"k": "+"})
 		o.append({"k": "v"})   # envasar al vacío
@@ -623,7 +651,7 @@ func mueve_almacen(A: Dictionary, b: String) -> bool:
 		return false
 	var j := i
 	var F := int(D.ALM.fila)
-	if A.t in TARROS or A.t == "mal":   # 1.43.6: seis por balda (y el maletero, MAESTRO [3])
+	if A.t in TARROS or A.t == "mal" or A.t == "disp":   # 1.43.6: seis por balda (y el maletero, MAESTRO [3]; y la vitrina del dispensario)
 		var FC := int(D.CAMAROTE.est.tarros)
 		j = i + {"left": -1, "right": 1, "up": -FC, "down": FC}.get(b, 0)
 		j = maxi(0, mini(nn - 1, j))
@@ -668,6 +696,15 @@ func _pct_txt(p: float) -> String:
 func desc_almacen(A: Dictionary) -> String:
 	var its := items_almacen(A.t)
 	var it = its[A.i] if A.i < its.size() else null
+	if A.t == "disp":
+		var L = disp_lote()
+		if L == null:
+			return T("DEJAR UN LOTE en la vitrina: llevas {a} de cogollos y {b} de extractos. Los socios lo retiran cada mañana.\nA: elegir · B: cerrar.", {"a": g_txt(total_buds()), "b": g_txt(total_rosin())})
+		var nmb: String = extr_nombre(L.k, true) if L.get("x") else lot_nombre(L.k)
+		var tx := T("En la vitrina: {g} de {n}, a {p} € el gramo; llevas {t}.", {"g": g_txt(float(L.g)), "n": nmb, "p": _dos(float(L.pg)), "t": Datos.eur(int(L.get("tot", 0)))})
+		if it != null and it.k != "+" and int(it.n) > 1:
+			tx += " " + T("Este tarro, el {q}.º de {n}: {g} g.", {"q": int(it.q) + 1, "n": int(it.n), "g": int(it.gj)})
+		return tx + "\n" + K("A: gestionarlo · B: cerrar.")
 	if A.t == "navc":   # MAESTRO [8]: el curado de la nave, sin sobres
 		if it == null or it.k == "+":
 			return T("GUARDAR: llevas {a} de cogollos y en las estanterías de la nave caben {b} más ({t} tarros de 10 L).\nA: guardar · B: cerrar.", {"a": g_txt(total_buds()), "b": g_txt(maxf(0, navc_cap() - navc_g())), "t": int(navc_est() * int(D.CAMAROTE.est.tarros))})
@@ -731,7 +768,7 @@ func elegir_almacen(t: String, i0 := 0):
 		return r
 	var nn := items_almacen(t).size()
 	ALMACEN = {"t": t, "i": maxi(0, mini(nn - 1, i0))}
-	var N := K("CAJA FUERTE") if t == "caja" else K("CAMAROTE") if t == "cam" else K("CURADO DE LA NAVE") if t == "navc" else K("MALETERO") if t == "mal" else K("NEVERA")
+	var N := K("DISPENSARIO") if t == "disp" else K("CAJA FUERTE") if t == "caja" else K("CAMAROTE") if t == "cam" else K("CURADO DE LA NAVE") if t == "navc" else K("MALETERO") if t == "mal" else K("NEVERA")
 	_dlg_fijo(desc_almacen(ALMACEN), N)
 	var pr := Motor.Prom.new()
 	push(func(b: String):
@@ -827,6 +864,19 @@ func panel_almacen(o: Array, A: Dictionary, px: int, py: int) -> void:
 		_barra_alm(o, px, py, 0, "thc", it.b.thc / 30.0, "#e8d070")
 		_barra_alm(o, px, py, 1, "cu", mal_peso(MAL_K) / mc, "#d8b048")
 		return
+	if A.t == "disp":   # el lote en grande, su THC y su precio
+		if it.k == "+":
+			o.append(["@", "alm-mas-g", px + 12, py + 8])
+			_barra_alm(o, px, py, 0, "g", peso_encima() / cap_mochila(), "#e0a040")
+			return
+		if it.r:
+			_tarro(o, px + 18, py + 20, 12, 12, D.COLOR_EXTR[tipo_extr(it.k)], float(it.gj) / float(D.NEVERA.bote), false, "alm-bote", _dentro_lote(it.k, it.b, true), 2)
+		else:
+			_tarro(o, px + 12, py + 8, 18, 25, _color_lote(it.k), float(it.gj) / float(D.ALM.tarro), false, "alm-tarro-s" if it.k.contains("*") else "alm-tarro", _dentro_lote(it.k, it.b), 2)
+		if it.b.get("thc"):
+			_barra_alm(o, px, py, 0, "thc", float(it.b.thc) / (90.0 if it.r else 30.0), "#e8d070")
+		_barra_alm(o, px, py, 1, "eur", minf(1.0, float(it.b.pg) / 20.0), "#7cc07a")
+		return
 	var caja: bool = A.t == "caja"
 	var C: Dictionary = D.CAJA[int(S.caja.nivel)] if caja else {}
 	if it.k == "$":
@@ -911,6 +961,39 @@ func rects_almacen(A: Dictionary) -> Array:
 				if q == A.i:
 					_marco(o, x - 2, y - 2, 22, 29)
 		o.append_array([[x0 + 8, y0 + 89, 152, 5, "#2a2d34"], [x0 + 9, y0 + 90, Datos.jsround(150 * minf(1.0, mal_peso(MAL_K) / maxf(1.0, mal_kg(MAL_K)))), 3, "#d8b048"]])
+		panel_almacen(o, A, x0 + 172, y0)
+		return o
+	if A.t == "disp":   # la vitrina del dispensario (168 × 100): el cristal con su luz arriba y la balda, el zócalo de madera
+		var FM := int(D.CAMAROTE.est.tarros)
+		var x0: int = (SW - 232) >> 1
+		var y0 := 4
+		o.append_array([[x0, y0, 168, 100, "#1a1410"], [x0 + 2, y0 + 2, 164, 96, "#5a3a22"],
+			[x0 + 5, y0 + 5, 158, 68, "#8fb8c4"], [x0 + 6, y0 + 6, 156, 66, "#1d2a31"], [x0 + 6, y0 + 6, 156, 2, "#f4e6a8"], [x0 + 6, y0 + 8, 156, 1, "#6a6848"],
+			[x0 + 6, y0 + 39, 156, 2, "#9cc8d4"], [x0 + 6, y0 + 41, 156, 1, "#141d22"], [x0 + 5, y0 + 73, 158, 3, "#3a2616"],
+			[x0 + 5, y0 + 76, 158, 20, "#6a4428"], [x0 + 8, y0 + 79, 74, 14, "#5a3820"], [x0 + 86, y0 + 79, 74, 14, "#5a3820"], [x0 + 43, y0 + 85, 6, 2, "#c8a050"], [x0 + 119, y0 + 85, 6, 2, "#c8a050"]])
+		for q in 4:   # los reflejos del cristal
+			o.append_array([[x0 + 22 + q * 40, y0 + 10, 1, 26, "#2c3f48"], [x0 + 24 + q * 40, y0 + 10, 1, 14, "#2c3f48"]])
+		var fila0: int = 0 if A.i < FM else int(floor(float(A.i) / FM)) - 1
+		for f in 2:
+			var y: int = y0 + 13 + f * 33
+			for c in FM:
+				var q: int = (fila0 + f) * FM + c
+				if q >= it.size():
+					continue
+				var Jt: Dictionary = it[q]
+				var x: int = x0 + 10 + c * 25
+				if Jt.k == "+":
+					o.append(["@", "alm-mas", x, y])
+				elif Jt.r:
+					_tarro(o, x + 3, y + 12, 12, 12, D.COLOR_EXTR[tipo_extr(Jt.k)], float(Jt.gj) / float(D.NEVERA.bote), false, "alm-bote", _dentro_lote(Jt.k, Jt.b, true), 1, "#c4d6dc")
+				else:
+					_tarro(o, x, y, 18, 25, _color_lote(Jt.k), float(Jt.gj) / float(D.ALM.tarro), false, "alm-tarro-s" if Jt.k.contains("*") else "alm-tarro", _dentro_lote(Jt.k, Jt.b))
+				if q == A.i:
+					_marco(o, x - 2, y - 2, 22, 29)
+		if fila0 > 0:
+			o.append_array([[x0 + 158, y0 + 10, 2, 1, "#f8d040"], [x0 + 157, y0 + 11, 4, 1, "#f8d040"]])
+		if it.size() > (fila0 + 2) * FM:
+			o.append_array([[x0 + 157, y0 + 69, 4, 1, "#f8d040"], [x0 + 158, y0 + 70, 2, 1, "#f8d040"]])
 		panel_almacen(o, A, x0 + 172, y0)
 		return o
 	if A.t == "caja":

@@ -740,6 +740,9 @@ func object_action(x: int, y: int) -> void:
 		return
 	var pi_ = puerta_int(S.map, x, y)
 	if pi_ != null and o == pi_.o:   # 1.51: las puertas de dentro
+		if pi_.get("llave") == "rv" and not (S.get("aso") is Dictionary and S.aso.get("pres")):   # el almacén del dispensario: la llave, del presidente
+			await say(K("El almacén del club, con llave. La tiene el presidente."))
+			return
 		await cruzar_puerta(pi_)
 		return
 	if await obj_local(x, y, o):   # los locales (1.30)
@@ -867,6 +870,12 @@ func object_action(x: int, y: int) -> void:
 		txt = {"crate": K("Cajas precintadas con el sello de una conservera que cerró hace años."), "btable": K("Una mesa con una báscula y rollos de film transparente.")}.get(o, "")
 	if not txt and Datos.CAL and ATREZO_TXT.has(S.map):   # 1.51
 		txt = ATREZO_TXT[S.map].get(o, "")
+	if not txt and Datos.CAL and o is String:   # el repaso de coherencia: nada sin respuesta
+		txt = OBJ_MUDO.get(S.map + ":" + o, OBJ_MUDO.get(o, ""))
+		if not txt and S.map == "muelle" and D.has("MAR"):   # los barcos amarrados: se cargan desde su noray
+			for b in D.MAR.barcos:
+				if o == b.o or o == b.o + "2":
+					txt = T("{n}, amarrado al muelle. Se carga desde su noray.", {"n": mayus(I18n.v(String(b.n)))})
 	if txt:
 		await say(txt)
 		return
@@ -1823,11 +1832,20 @@ func montar_club(mapa: String) -> void:
 			for x in int(m.w):
 				if m.o[y][x] == "almC":
 					m.o[y][x] = null
-		if Datos.CAL and S != null and S.get("aso") is Dictionary and S.aso.get("pres"):
+		if Datos.CAL and S != null and S.get("aso") is Dictionary and S.aso.get("pres") and puertas_int(mapa).is_empty():
 			for q in [[9, 2], [12, 2], [13, 2], [11, 2]]:
 				if m.o[q[1]][q[0]] == null and m.o[q[1] + 1][q[0]] == null:
 					m.o[q[1]][q[0]] = "almC"   # i18n-no
 					break
+	if mapa.begins_with("club-") and puertas_int(mapa).size():   # (lo pidió el usuario): el almacén del dispensario, por su puerta (alm-<club>)
+		var m: Dictionary = MAPS[mapa]
+		for e in puertas_int(mapa):
+			var dx := int(e.x)
+			var dy := int(e.y) + 1
+			if m.o[dy][dx] != null and dx + 1 < int(m.w) and m.o[dy][dx + 1] == null:   # lo que hubiera delante, una casilla a la derecha
+				m.o[dy][dx + 1] = m.o[dy][dx]
+				m.o[dy][dx] = null
+		montar_puertas(mapa)
 
 # el marco de la pieza en el cursor: verde si cabe, rojo si no; y la casilla de su gente, en azul
 func rects_orden() -> Array:

@@ -2122,6 +2122,12 @@ func alijo_franco() -> void:
 func almacen_club(_id := "rv") -> void:
 	pass
 
+func alm_g(_id := "rv") -> float:
+	return 0.0
+
+func vista_disp(_H: Dictionary, _key: String) -> bool:
+	return true
+
 func aso() -> Dictionary:
 	return {}
 

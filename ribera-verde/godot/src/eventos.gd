@@ -1238,6 +1238,8 @@ func dispensario_kaia(N: String) -> void:
 # un dispensario tuyo (KAIA y los clubs de Hiriburu): H[key] = {k, g, pg, p0, thc, tot, x} o null; dia = lo que retiran los socios
 # al día al precio de la casa (los extractos, por VENTA_EXTR.dia), f = sobre el precio del club, gs = lo que se deja
 func disp_llena(N: String, H: Dictionary, key: String, dia: float, f: float, gs: Array, vacio: String) -> void:
+	if Datos.CAL and not await vista_disp(H, key):   # (lo pidió el usuario): el dispensario, como la caja, en sus vitrinas
+		return
 	if H.get(key) is Dictionary:
 		await disp_gestiona(N, H, key, dia, gs)
 		return

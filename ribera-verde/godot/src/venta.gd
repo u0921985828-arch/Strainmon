@@ -914,9 +914,17 @@ func obj_local(x: int, y: int, o) -> bool:
 	if S.map == "nave" and o in ["bedT", "bedB"]:   # i18n-no   # 1.45: el camastro de la nave
 		await bed_action(K("El camastro de la nave, detrás de las mesas: se oyen los extractores toda la noche."))
 		return true
-	if S.map == "club-rv" and o == "almC":   # 1.45: el almacén del club
-		await almacen_club()
+	if (S.map == "club-rv" or S.map.begins_with("alm-")) and o == "almC":   # 1.45: el almacén del club; y en su sala (alm-<club>)
+		await almacen_club("muelle" if S.map == "alm-muelle" else "rv")
 		return true
+	if S.map.begins_with("alm-"):
+		match o:
+			"btable":
+				await say(K("La mesa de pesar: la báscula de precisión, los tarros vacíos y las etiquetas del dispensario."))
+				return true
+			"crate":
+				await say(K("Cajas de tarros nuevos, todavía con el cartón."))
+				return true
 	if S.map == "shop" or S.map == "growcity":   # los dos grows (1.34): lo nuevo de cada uno
 		match o:
 			"pizarra":
@@ -1100,6 +1108,10 @@ func sprite_local(o: String) -> String:
 		return "deshidS-%d" % (1 if SL() != null and SL().get("fr", []).size() else 0)   # i18n-no
 	if o == "armS":
 		return "armS-%d-%d-%d" % [lleno_arm("g"), lleno_arm("mc"), lleno_arm("cc")]   # i18n-no
+	if o == "almC":   # el almacén del club, por lo lleno (almC-0..2)
+		var ida := "muelle" if S.map.ends_with("muelle") else "rv"
+		var ga: float = alm_g(ida)
+		return "almC-%d" % (0 if ga < 1 else 1 if ga < float(D.MERCADO.alm.g) / 2.0 else 2)   # i18n-no
 	if o == "mesaS":
 		return "mesaS-%d-%d" % [1 if S.get("setas") != null and S.setas.get("enc") else 0, 1 if S.get("setas") != null and S.setas.get("mol") else 0]   # i18n-no
 	if o == "carpaM":

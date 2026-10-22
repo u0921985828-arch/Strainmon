@@ -1035,6 +1035,8 @@ func presidencia_aso() -> void:
 # el dispensario: un lote a la vez; dice cuánto queda y lo que llevas
 func dispensario_aso() -> void:
 	var A := aso()
+	if Datos.CAL and not await vista_disp(A, "lote"):   # (lo pidió el usuario): en sus vitrinas
+		return
 	var N: String = D.DELROY.n
 	var O: Dictionary = D.ASO
 	var L = A.lote
@@ -1069,6 +1071,8 @@ func dispensario_aso() -> void:
 		return
 	usa_lote(l, ops[j])
 	A.lote = {"k": k, "g": ops[j], "pg": pg, "tot": 0}
+	if Datos.CAL:   # la vitrina enseña su THC
+		A.lote.thc = float(b.thc)
 	if x:   # 1.43.7: de una extracción retiran VENTA_EXTR.dia de lo de la flor
 		A.lote.x = true
 	sfx("sel")

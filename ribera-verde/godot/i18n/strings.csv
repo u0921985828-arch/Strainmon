@@ -47,6 +47,7 @@ s43dcd4ab,Cargas el vaporizador de {nom} y le das unas caladas.,You load the vap
 s0f025647, El tabaco rasca la garganta y tapa el sabor., The tobacco scratches your throat and hides the taste.
 s48ff5624, Solo hierba: sabe a la variedad y sube más., Just weed: it tastes of the strain and hits harder.
 sc36e1710, Fumar en la calle llama la atención., Smoking in the street draws attention.
+sf07774c9,"El almacén del club, con llave. La tiene el presidente.","The club's storeroom, locked. The president has the key."
 s0744c06a,Hueco junto a la cama: aquí cabe una carpa de 120×120.,Space by the bed: a 120×120 tent fits here.
 s6ece05fc, Kiko las tendrá más adelante., Kiko will have them later on.
 s49133d67, Kiko las vende., Kiko sells them.
@@ -87,6 +88,8 @@ s5320d80c,Archivadores con expedientes. Hay uno con tu calle.,Filing cabinets fu
 sec9dabb0,El mostrador de denuncias. No hay nadie detrás.,The complaints desk. Nobody behind it.
 s9a06c03d,Cajas precintadas con el sello de una conservera que cerró hace años.,Sealed boxes stamped by a cannery that shut years ago.
 sa3954f99,Una mesa con una báscula y rollos de film transparente.,A table with scales and rolls of cling film.
+seb04891d,MAR,SEA
+s9666ad7d,"{n}, amarrado al muelle. Se carga desde su noray.","{n}, moored at the dock. It's loaded from its bollard."
 sa1a3a43c,Está tan desgastado que no se lee.,It's too worn to read.
 s9348fdc5,rotuloL,rotuloL
 s77bc1255,La fuente de la plaza. Lleva años sin agua potable.,The square's fountain. No drinking water for years.
@@ -291,7 +294,6 @@ s6f42432f,"Mendialde, el pueblo del monte: el caserío donde empezó todo.","Men
 sf2982b0f,"Errotabarri, la aldea del molino viejo, al final de la pista.","Errotabarri, the old mill hamlet, at the end of the dirt track."
 s928a431f,HIRIBURU,HIRIBURU
 s23f6f0f3,COMARCAL,COUNTY ROAD
-seb04891d,MAR,SEA
 s230a7f6c, Estás aquí., You are here.
 sa474e3a5,"
 De su plaza salen todos los autobuses.","
@@ -928,6 +930,8 @@ s670b0027,Cambiar el tapizado,Change the upholstery
 s48312614,Tu sillón de lectura. La lámpara da una luz cálida.,Your reading armchair. The lamp gives off a warm light.
 s06fa01d4,Cambiar la lámina,Change the print
 s51f18243,En la pared del salón: {c}.,On the living room wall: {c}.
+s885bcda7,Cambiar el dibujo,Change the picture
+s89b87de7,"En la pared del dormitorio, tu póster: {c}.","On the bedroom wall, your poster: {c}."
 s44d371a2,Echar una cabezada (1 h),Take a nap (1 h)
 sfbcfbaac,Ver la tele,Watch TV
 s794df37a,Tu sofá. Todavía huele a nuevo.,Your sofa. It still smells new.
@@ -1990,6 +1994,35 @@ s888b7e04,sillaT,
 s65e57a6e,"Las sillas de la espera, de plástico. Una revista de coches de hace dos años.",Plastic waiting-room chairs. A two-year-old car magazine.
 sc7977fbb,cafeM,
 sc07adc76,"La máquina de café de la espera: solo, cortado y chocolate. El de chocolate sale aguado.","The waiting-room coffee machine: black, cortado and hot chocolate. The chocolate's watery."
+s872ff315,Una planta de interior en su maceta. Alguien se acuerda de regarla.,A houseplant in its pot. Someone remembers to water it.
+sac114f0b,comisaria:plantDeco,
+sf74e98fd,Un ficus de plástico con dos dedos de polvo.,A plastic ficus under an inch of dust.
+s837a2914,franco:plantDeco,
+sbf3dcdb3,Un potus medio seco. Gorka no la riega.,A half-dead pothos. Gorka never waters it.
+s8811e6bd,txaro:plantDeco,
+sf5b44c60,"Un geranio de Txaro, con más flores que hojas.","One of Txaro's geraniums, more flowers than leaves."
+s654dce48,shop:plantDeco,
+sf8fa6796,"Un potus en una maceta de tela, de muestra.","A pothos in a fabric pot, for display."
+sf29549d7,growcity:plantDeco,
+s1ad64e2f,"Un póster con el ciclo de la planta: de la semilla a la cosecha, semana a semana.","A poster of the plant's cycle: from seed to harvest, week by week."
+s036776d1,alto:banderaK,
+sc3352983,"La banderola de AUTOS RIBERA, ondeando en la acera.","The AUTOS RIBERA banner, flapping on the pavement."
+sd2d19754,Una mesa alta con el servilletero y los palillos de los pintxos.,A high table with the napkin holder and the pintxo sticks.
+s120ef599,La barra de Josune: pintxos bajo la campana de cristal. Se pide a ella.,Josune's bar: pintxos under the glass dome. You order from her.
+s7c2a09be,disco:barraD,
+sdb24dd56,La barra de GAUA. Se pide a la camarera.,GAUA's bar. You order from the bartender.
+sfdf0d107,"Una lámina de un velero, de las que vienen con el piso.","A print of a sailboat, the kind that comes with the flat."
+sb39e739a,Una mesita con un cenicero lleno y el mando de la tele.,A coffee table with a full ashtray and the TV remote.
+s2c2842b4,"La nevera de Gorka: cervezas, hielo y un limón.","Gorka's fridge: beers, ice and a lemon."
+sf3d0ba23,La mesa de Gorka: una libreta con números y un rollo de cinta de embalar.,Gorka's table: a notebook full of numbers and a roll of packing tape.
+sb4351ebb,"Un noray de hierro fundido, gastado por las amarras.","A cast-iron bollard, worn by the mooring lines."
+s8934630b,nave:filtroN,
+s79751709,El filtro de carbón activo: el olor de la nave se queda dentro.,The activated carbon filter: the warehouse smell stays inside.
+s28fc6949,nave:extrG,
+sa8440353,"El extractor grande de la nave, con el tubo hasta el tejado.","The warehouse's big extractor, ducted up to the roof."
+s992912d6,El perchero de la entrada: un chubasquero y la bufanda de la tía.,The coat rack by the door: a raincoat and your aunt's scarf.
+s120b3794,"Una foto de la tía Maite de joven, en la ría.",A photo of a young aunt Maite by the estuary.
+s0ced5f81,Una mesita con un termohigrómetro y un bote de lápices.,A small table with a thermo-hygrometer and a pot of pencils.
 sa4aa04d0,Un sofá.,A sofa.
 sb4fcf685,Un sillón.,An armchair.
 s7273a170,Una silla.,A chair.
@@ -2216,7 +2249,6 @@ sd5afeccd,"{n}, al {t} % de THC. ¿Cuánto te llevas?","{n}, at {t} % THC. How m
 s2e0cb995,Sin dinero no hay trato.,"No money, no deal."
 sb1971895,No te cabe en la bolsa.,It won't fit in your bag.
 scb171266,Comprado: {g} g de {n},Bought: {g} g of {n}
-sf07774c9,"El almacén del club, con llave. La tiene el presidente.","The club's storeroom, locked. The president has the key."
 saf78171b,Guardar,Store
 s2cd4de14,"EL ALMACÉN DEL CLUB · {a} de {b} ocupados. Lo de aquí lo retiran los socios del dispensario, {d} g al día; en total, {t}.","THE CLUB STOREROOM · {a} of {b} used. Members collect from here at the dispensary, {d} g a day; total so far, {t}."
 s90c352c6,No llevas nada encima.,You're not carrying anything.
@@ -2574,6 +2606,12 @@ saed18911,+{e} · {g} g de setas,+{e} · {g} g of mushrooms
 s291d3888,Para mis clientes de siempre. {e}.,For my regulars. {e}.
 s2d41042d,¿Dejas el bajo? Te devuelvo la fianza; lo que haya dentro se queda.,Leaving the basement? I'll return the deposit; whatever's inside stays.
 se155d2c6,"Como quieras. La puerta, cerrada al salir.",As you like. Shut the door on your way out.
+sc68cdddd,"DEJAR UN LOTE en la vitrina: llevas {a} de cogollos y {b} de extractos. Los socios lo retiran cada mañana.
+A: elegir · B: cerrar.","LEAVE A BATCH in the display case: you carry {a} of buds and {b} of extracts. Members collect it every morning.
+A: choose · B: close."
+s9030d097,"En la vitrina: {g} de {n}, a {p} € el gramo; llevas {t}.","In the display case: {g} of {n}, at {p} € a gram; {t} taken so far."
+s7bd2ddea,"Este tarro, el {q}.º de {n}: {g} g.","This jar, no. {q} of {n}: {g} g."
+s2f187fa6,A: gestionarlo · B: cerrar.,A: manage it · B: close.
 s662317eb,"GUARDAR: llevas {a} de cogollos y en las estanterías de la nave caben {b} más ({t} tarros de 10 L).
 A: guardar · B: cerrar.","STORE: you carry {a} of buds and the warehouse shelves hold {b} more ({t} 10 L jars).
 A: store · B: close."
@@ -2620,6 +2658,7 @@ A: take out · B: close."
 s5a2fa882,curado,cured
 s4aa91aa8,curándose,curing
 s2b4dc95b,sin curar,uncured
+sa6da908c,DISPENSARIO,DISPENSARY
 s060206be,CAJA FUERTE,SAFE
 s34ba2c7a,CAMAROTE,LOFT
 saa4d28c0,CURADO DE LA NAVE,WAREHOUSE CURING
@@ -3286,6 +3325,8 @@ s56002453,"Cajas de archivo: facturas de la luz, del agua y del sustrato.","Fili
 sdde6734d,cajaL,cajaL
 s4391b1a3,Lo de {n}.,{n} stuff.
 se97a94bd,"El camastro de la nave, detrás de las mesas: se oyen los extractores toda la noche.","The warehouse cot, behind the tables: the extractors hum all night."
+s142e75f2,"La mesa de pesar: la báscula de precisión, los tarros vacíos y las etiquetas del dispensario.","The weighing table: the precision scale, empty jars and the dispensary labels."
+s5fd3fde7,"Cajas de tarros nuevos, todavía con el cartón.","Boxes of new jars, still in their cardboard."
 sbbd26a9f,"En la pizarra de Kiko, a tiza: «{t}».","On Kiko's chalkboard: ""{t}""."
 s41f2b42f,"Sacos de 50 litros: fibra de coco, perlita y tierra abonada.","50-litre bags: coco coir, perlite and enriched soil."
 s1e8e4586,macetasP,macetasP
@@ -5727,6 +5768,8 @@ sc6435e15,La puerta del despacho,The office door
 s6d15acd5,La puerta del secadero,The drying room door
 s53868c27,La puerta de la nave,The warehouse door
 se214212e,La puerta de la habitación,The bedroom door
+sa9f08b09,La puerta del almacén,The storeroom door
+sc9735661,La puerta del club,The club door
 scdff8331,Habilitar el sótano,Fit out the basement
 s853c4fc0,"El sótano de debajo del piso, que la tía usaba de trastero: sacar los trastos, impermeabilizar, luz, un desagüe y tres estanterías de rejilla. Oscuro y húmedo: para setas. Las bandejas te las prepara Txomin (Kale Zaharra). Los obreros acaban en un día.","The basement under the flat, Auntie's junk room: clear the junk, waterproof, lights, a drain and three wire shelves. Dark and damp: for mushrooms. Txomin (Kale Zaharra) preps the trays. The builders finish in a day."
 s355e1a74,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos. Con una obra (MÓVIL → Tienda online) se podría usar.","The stairs go down to Auntie's basement: dark, damp and full of junk. With some work (PHONE → Online shop) it could be used."

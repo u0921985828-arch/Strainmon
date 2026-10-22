@@ -1064,6 +1064,12 @@ func mueble_action(k):
 		if oi == 0:
 			await cambiar_deco(k)
 		return
+	if k == "cartel" and Datos.CAL:   # el repaso: el póster del dormitorio no es el PC gaming
+		var o := [K("Cambiar el dibujo"), K("Nada")]
+		var oi: int = await ask(T("En la pared del dormitorio, tu póster: {c}.", {"c": I18n.v(String(D.DECO.cartel.v[deco_v("cartel")])).to_lower()}), o)
+		if oi == 0:
+			await cambiar_deco(k)
+		return
 	if k == "sofa":
 		var o := [K("Echar una cabezada (1 h)")]
 		if "tv" in muebles_ya():

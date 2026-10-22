@@ -2,6 +2,13 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Repaso de coherencia con la partida del usuario (día 200, cap. 8) y el almacén del club por su puerta (lo pidió el usuario: «Deberíamos de crear una puerta para acceder al almacén del dispensario y que sea más visual, en cambio el dispensario es un menu como el de la caja de casa solo que son vitrinas»)
+- Con `Datos.CAL`, los muebles que no decían nada responden (`OBJ_MUDO` en `mundo.gd`, por «mapa:objeto»): plantas de decoración, carteles, mesas del bar, la barra de GAUA, el piso franco, el noray de La Punta, la nave, el pasillo y el bajo; los barcos del muelle dicen que se cargan desde su noray.
+- El encargado de KAIA (`club_muelle`) habla como los de los demás clubs; el póster del dormitorio ya no abre el PC gaming: deja cambiar el dibujo.
+- La asociación y KAIA tienen una puerta en la pared del fondo (3, 1) al almacén del club (`alm-rv`, `alm-muelle`, 8 × 5 en `PUERTAS_INT` con `llave`): cerrada si no eres presidente; dentro, cuatro estanterías (`almC-0/1/2` por lo que hay), la mesa de pesar y cajas de tarros. «El almacén» sale del panel de Delroy cuando ya hay puerta.
+- El dispensario se ve como la caja de casa, pero en vitrina (`vista_disp`, tipo `disp` de la vista de almacén en `setas.gd`): cristal con su luz, balda y zócalo de madera, el lote en tarros de `ALM.tarro` (los extractos, en botes), el elegido en grande con su THC y su precio; A gestiona (el menú de siempre), B cierra. En la asociación, KAIA y los clubs de Hiriburu. El lote de la asociación guarda su THC.
+- Prueba nueva `tests/repaso.gd` (87/0; con `--pintar`, el club, el almacén y la vitrina).
+
 ### Plugin de WordPress 1.6.0: el ligero (lo pidió el usuario: la subida de 30 MB daba «413 Request Entity Too Large» de nginx)
 - `descargas/landrace-hunters-1.6.0-ligero.zip` (28 KB): el plugin sin el motor web ni el `index.pck`. Con un botón («Descargar el juego», en el aviso del escritorio y en Ajustes → Landrace Hunters) el servidor baja `landrace-hunters-1.6.0.zip` de GitHub y copia sus piezas a `game/` (`fetch_game`, `game_ready`, `FULL_URL`, `PIEZAS`; con `ZipArchive` y por flujos); sin ellas, la dirección del juego dice que falta descargarlo. `tools/wordpress.js` saca los dos zips y borra la copia del proyecto (1,5 GB) al acabar. Probado con un WordPress simulado: la descarga deja `game/` igual que el zip completo.
 

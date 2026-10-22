@@ -440,6 +440,8 @@ func panel_club(id: String, N: String) -> void:
 		var ops := [K("El dispensario"), K("El almacén"), K("Nada")]
 		if id == "muelle":   # KAIA, el tuyo: también el diseño y el orden del local
 			ops = [K("El dispensario"), K("El almacén"), K("El diseño"), K("Ordenar el local"), K("Nada")]
+		if puertas_int("club-" + id).size():   # (lo pidió el usuario): el almacén, por su puerta
+			ops.erase(K("El almacén"))
 		var c: int = await ask(K("¿Qué miramos, presidente?") if id == "rv" else K("¿Qué miramos, jefe?"), ops, N)
 		var op: String = ops[c] if c >= 0 and c < ops.size() else ""
 		if op == K("El dispensario"):

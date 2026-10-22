@@ -338,6 +338,9 @@ func _corre() -> void:
 		for x in int(mc.w):
 			if mc.o[y][x] == "almC":
 				pa = [x, y]
+	for pi_ in J.puertas_int("club-rv"):   # desde el repaso, el almacén va por su puerta (alm-rv)
+		if pa.is_empty() and String(pi_.to) == "alm-rv":
+			pa = [int(pi_.x), int(pi_.y)]
 	chk(pa.size() == 2, "el almacén en el club")
 	if pa.size() == 2:
 		chk(llega("club-rv", [6, 6], pa), "se llega al almacén")
