@@ -111,6 +111,9 @@ func _corre() -> void:
 		for x in bus.get_width():
 			gorra = gorra or bus.get_pixel(x, y).is_equal_approx(Color("#5aa861"))
 	chk(gorra, "bus: el protagonista, con la gorra verde, en la ventana")
+	var pu: Image = EscViaje.R.medio
+	chk(pu.get_width() == 704 and pu.get_height() == 108, "el pueblo de detrás, con las fachadas y los árboles del juego (%dx%d)" % [pu.get_width(), pu.get_height()])
+	chk(EscViaje.CAPAS[1][1] + 96 >= EscViaje.CAPAS[2][1], "el pie de las casas, detrás del quitamiedos")
 	for k in ["nube-0", "nube-1", "nube-2", "nube-3", "sol", "luna"]:
 		chk(EscViaje.R.has(k) and EscViaje.R[k].get_width() >= 16, "el cielo: %s" % k)
 	for lz in 3:

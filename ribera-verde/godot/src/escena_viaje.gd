@@ -14,7 +14,7 @@ const DUR := 3000.0      # ms: entra, rueda y sale
 const ENTRA := 700.0
 const SALE := 2300.0
 const VEL := {"bus": 0.11, "moto": 0.16, "utilitario": 0.17, "berlina": 0.18, "deportivo": 0.26}   # px/ms del fondo cercano
-const CAPAS := [["monte", 64, 0.12], ["medio", 92, 0.4], ["cerca", 132, 1.0]]   # pieza, y, parallax
+const CAPAS := [["monte", 64, 0.12], ["medio", 40, 0.4], ["cerca", 132, 1.0]]   # pieza, y, parallax (medio: el pueblo con el arte del juego, de viaje.py)
 const Y_CARRETERA := 142
 const CARRIL := 27        # el suelo de las ruedas, desde arriba de la carretera
 

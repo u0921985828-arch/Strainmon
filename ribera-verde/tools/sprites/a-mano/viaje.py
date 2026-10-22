@@ -110,9 +110,10 @@ def pasajero(L, x, y, pelo, ropa):
 
 # ---------- el autobús de la comarca: de PixelLab, al estilo de los muebles (lo pidió el usuario: «el sprite del bus, más del
 # estilo del juego, muebles con PixelLab»). Blanco con la franja verde, sin rótulos; recortado y a 28 colores
-# (tools/sprites/pixellab-viaje/bus.png, 149 × 37). Aquí solo se sientan los pasajeros y el protagonista en las ventanas. ----------
+# (tools/sprites/pixellab-viaje/bus.png, 148 × 41; el 2.º de los cuatro candidatos, el que eligió el usuario). Aquí solo se sientan los pasajeros y el protagonista en las ventanas. ----------
 PIXELLAB = os.path.join(RAIZ, 'tools', 'sprites', 'pixellab-viaje')
-BUS_VENT = (5, 24, 42, 61, 79, 97)       # el primer píxel de cristal de cada ventana (de atrás adelante)
+BUS_VENT = (7, 25, 43, 62, 80, 98)       # el primer píxel de cristal de cada ventana (de atrás adelante)
+BUS_Y = 12                                # la fila de arriba de las cabezas
 
 
 def autobus():
@@ -122,9 +123,9 @@ def autobus():
     gente = [('#3a2a20', '#4a6aa0'), ('#9a9a9a', '#8a5a9a'), ('#1a1a1a', '#d8b040'), None, ('#7a4a2a', '#50a070')]
     for xw, g in zip(BUS_VENT, gente):
         if g:
-            pasajero(L, xw + 6, 11, *g)
-    persona_perfil(L, BUS_VENT[-1] + 7, 10)       # el protagonista, delante, junto a la puerta
-    return L.im, {'ruedas': [[26, 37, 14], [118, 37, 14]], 'suelo': 44, 'faro': [145, 32]}
+            pasajero(L, xw + 5, BUS_Y + 1, *g)
+    persona_perfil(L, BUS_VENT[-1] + 5, BUS_Y)       # el protagonista, delante, junto a la puerta
+    return L.im, {'ruedas': [[26, 40, 14], [110, 40, 14]], 'suelo': 47, 'faro': [145, 32]}
 
 
 # ---------- los coches: de juguete como en la calle (cortos y redondos), a escala de perfil ----------
@@ -211,40 +212,34 @@ def monte():
     return L.im
 
 
+# el pueblo de detrás (lo pidió el usuario: «los pueblos que se ven al iniciar el juego, que se parezcan más al juego»): las
+# fachadas, los árboles y los setos del propio juego, sacados del atlas de Godot (godot/arte/atlas.png), sobre un prado; se repite
+# cada PUEBLO_W px
+PUEBLO_W, PUEBLO_H, PUEBLO_BASE = 704, 108, 96          # ancho, alto y la fila del suelo (el pie de las casas)
+PUEBLO = [('prop-arbol-alto/tree', 30), ('edificio-caserio/base', 54), ('prop-arbol-alto2/tree2', 206), ('edificio-borda/base', 236),
+          ('prop-manzano/manzano', 320), ('edificio-caserio3/base', 352), ('prop-arbol-alto/tree', 470), ('edificio-caserio2/base', 500),
+          ('prop-arbol-alto2/tree2', 650)]          # (marco del atlas, x: la izquierda de las casas, el centro de los árboles)
+
+
+def del_atlas():
+    hoja = Image.open(os.path.join(SALIDA, 'atlas.png')).convert('RGBA')
+    j = json.load(open(os.path.join(SALIDA, 'atlas.json')))
+    return lambda k: hoja.crop((j['frames'][k]['x'], j['frames'][k]['y'], j['frames'][k]['x'] + j['frames'][k]['w'], j['frames'][k]['y'] + j['frames'][k]['h']))
+
+
 def medio():
-    # prados, caseríos con tejado rojo y árboles redondos (los de mundo.py), y postes de la luz con su cable
-    L = Lienzo(192, 44)
-    L.r(0, 30, 192, 14, '#7cbc64'); L.r(0, 30, 192, 1, '#9cd47c')
-    for x in range(0, 192, 7):
-        L.p(x, 34 + (x * 13) % 7, '#6aa858')
-
-    def arbol(x, y, r, c=('#3f8a46', '#62aa56', '#2c6a36')):
-        L.r(x - 1, y, 3, 8, '#74502e')
-        L.d.ellipse([x - r, y - 2 * r + 2, x + r, y + 2], fill=hexrgb(c[0]))
-        L.d.ellipse([x - r + 2, y - 2 * r + 3, x + r - 3, y - r + 2], fill=hexrgb(c[1]))
-        L.d.chord([x - r, y - 2 * r + 2, x + r, y + 2], 20, 160, fill=hexrgb(c[2]))
-
-    def caserio(x, y, w):
-        L.r(x, y - 12, w, 13, '#f0e8d8'); L.r(x, y - 12, w, 1, '#ffffff')
-        L.poly([(x - 3, y - 12), (x + w // 2, y - 21), (x + w + 2, y - 12)], '#c4503e')
-        L.hl(x - 3, x + w + 2, y - 12, '#8e3428')
-        for i in range(2):
-            L.r(x + 3 + i * (w - 9), y - 9, 3, 4, '#5a3a22')
-        L.r(x + w // 2 - 2, y - 6, 4, 7, '#74502e')
-        L.r(x + w // 2 - 4, y - 14, 1, 1, '#ffffff')
-
-    caserio(20, 31, 22)
-    arbol(56, 28, 7)
-    arbol(68, 30, 5)
-    caserio(120, 31, 16)
-    arbol(98, 29, 6)
-    arbol(150, 28, 8)
-    arbol(171, 30, 5)
-    for x in (8, 104, 184):   # los postes y el cable
-        L.r(x, 6, 2, 25, '#74502e'); L.r(x - 3, 8, 8, 1, '#74502e')
-    for x in range(192):
-        y = 9 + int(4 * (1 - ((((x - 9) % 96) / 48 - 1) ** 2)))
-        L.p(x, y, '#3a3428')
+    marco = del_atlas()
+    L = Lienzo(PUEBLO_W, PUEBLO_H)
+    L.r(0, PUEBLO_BASE - 6, PUEBLO_W, PUEBLO_H - PUEBLO_BASE + 6, '#7cbc64'); L.r(0, PUEBLO_BASE - 6, PUEBLO_W, 1, '#9cd47c')
+    for x in range(0, PUEBLO_W, 7):
+        L.p(x, PUEBLO_BASE - 2 + (x * 13) % 9, '#6aa858')
+    seto = marco('prop-seto/seto/unica/00')
+    for x in range(0, PUEBLO_W, 16):          # el seto corrido delante del prado
+        L.im.alpha_composite(seto, (x, PUEBLO_H - 16))
+    for k, x in PUEBLO:
+        im = marco(k + '/unica/00')
+        x0 = x if k.startswith('edificio') else x - im.width // 2
+        L.im.alpha_composite(im, (x0, PUEBLO_BASE - im.height))
     return L.im
 
 
@@ -289,7 +284,7 @@ def main():
         piezas[k] = Image.open(os.path.join(PIXELLAB, k + '.png')).convert('RGBA')
     piezas['monte'] = monte(); piezas['medio'] = medio(); piezas['cerca'] = cerca(); piezas['carretera'] = carretera()
     # la hoja: por filas, de arriba abajo
-    W = 200
+    W = max(200, max(im.width for im in piezas.values()))
     x = y = fila = 0
     rects = {}
     for k, im in piezas.items():
