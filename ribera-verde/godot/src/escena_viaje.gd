@@ -416,8 +416,12 @@ static func _peatones(P, e: float, acera: int, yp: int) -> void:
 		else:
 			P._pinta(f, xp, yp)
 
+# el trayecto y los minutos, con el contorno oscuro por los ocho lados (lo pidió el usuario: «mientras no se tape el texto»): se lee
+# encima de cualquier fachada, también de las blancas
+const TEXTO_BORDE := Color("#1a1420")
 static func _texto(P, x: int, y: int, t: String, s: int) -> void:
 	for q in Croquis.letras(t):
-		P._rect(x + q.x * s + 1, y + q.y * s + 1, s, s, Color("#1a1420"))
+		for d in [Vector2i(-1, -1), Vector2i(0, -1), Vector2i(1, -1), Vector2i(-1, 0), Vector2i(1, 0), Vector2i(-1, 1), Vector2i(0, 1), Vector2i(1, 1)]:
+			P._rect(x + q.x * s + d.x, y + q.y * s + d.y, s, s, TEXTO_BORDE)
 	for q in Croquis.letras(t):
 		P._rect(x + q.x * s, y + q.y * s, s, s, Color("#f8f4e8"))

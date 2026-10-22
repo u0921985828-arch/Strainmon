@@ -137,6 +137,22 @@ func _corre() -> void:
 	chk(EscViaje.CAPAS[2][1] + 96 >= EscViaje.CAPAS[3][1], "el pie de las casas, detrás del quitamiedos")
 	chk(J.D.PARADAS.keys().all(func(k): return EscViaje.PUEBLOS.has(EscViaje.pueblo({"k": k, "de": "", "a": ""})[0])), "cada parada con su pueblo")
 	chk(EscViaje.pueblo({"k": "puerto"})[0] == "costa" and EscViaje.pueblo({"k": "ibarbide"})[0] == "ciudad" and EscViaje.pueblo({"k": "valdehierro"})[0] == "industria" and EscViaje.pueblo({"k": "mendialde"})[0] == "rural", "el pueblo, por el destino")
+	# el texto no se tapa: cada píxel claro de las letras, rodeado de claro o del contorno, nunca del fondo
+	var lienzo := Image.create(200, 30, false, Image.FORMAT_RGBA8)
+	var fp := FakeP.new()
+	fp.im = lienzo
+	EscViaje._texto(fp, 4, 4, "RIBERA VERDE - PUERTO VIEJO", 1)
+	var claro := Color("#f8f4e8")
+	var mal := 0
+	for y in range(1, 29):
+		for x in range(1, 199):
+			if lienzo.get_pixel(x, y).is_equal_approx(claro):
+				for dy in [-1, 0, 1]:
+					for dx in [-1, 0, 1]:
+						var c := lienzo.get_pixel(x + dx, y + dy)
+						if not (c.is_equal_approx(claro) or c.is_equal_approx(EscViaje.TEXTO_BORDE)):
+							mal += 1
+	chk(mal == 0, "el texto, con su contorno por los ocho lados (%d px al aire)" % mal)
 	var tipos := {}
 	for i in 30:
 		tipos[EscViaje.pueblo({"de": "a%d" % i, "a": "b"})[0]] = 1
@@ -314,3 +330,8 @@ func _corre() -> void:
 	for f in fallos:
 		print("  FALLO ", f)
 	quit(1 if fallos.size() else 0)
+
+class FakeP:
+	var im: Image
+	func _rect(x: int, y: int, w: int, h: int, c: Color) -> void:
+		im.fill_rect(Rect2i(x, y, w, h).intersection(Rect2i(0, 0, im.get_width(), im.get_height())), c)
