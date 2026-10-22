@@ -125,6 +125,8 @@ func _corre() -> void:
 		for p in D.PUERTAS_INT[mk]:
 			chk(J.MAPS.has(p.to), "%s → %s" % [mk, p.to])
 			var vuelta: Array = D.PUERTAS_INT.get(p.to, []).filter(func(q): return q.to == mk and int(q.tx) == int(p.x) and int(q.ty) == int(p.y) + 1)
+			# o una salida por abajo, como la trampilla del camarote (el secadero de la nave: el mismo mapa)
+			vuelta += J.MAPS[p.to].exits.values().filter(func(q): return q.to == mk and int(q.x) == int(p.x) and int(q.y) == int(p.y) + 1)
 			chk(vuelta.size() == 1, "%s (%d, %d): la puerta de vuelta desde %s" % [mk, p.x, p.y, p.to])
 	# 1 · la puerta del piso, el pasillo y la escalera cerrada sin la obra
 	entra("home", 3, 3)
@@ -307,9 +309,8 @@ func _corre() -> void:
 	mal = At.accesos(J, "nave-s")
 	chk(mal.is_empty(), "en el secadero se llega a todo: %s" % [mal])
 	await foto(dir, "secadero")
-	J.P.x = 1
-	J.P.y = 2
-	chk(corre(func(): await J.object_action(1, 1)) and S.map == "nave" and J.P.x == 14, "y vuelta")
+	chk(J.P.x == 4 and J.P.y == 4, "se entra por abajo, como al camarote: (%d, %d)" % [J.P.x, J.P.y])
+	chk(corre(func(): await J.warp(J.MAPS["nave-s"].exits["4,5"])) and S.map == "nave" and J.P.x == 14, "y vuelta")
 	# la habitación, por el despacho (lo pidió el usuario)
 	J.P.x = 12
 	J.P.y = 2

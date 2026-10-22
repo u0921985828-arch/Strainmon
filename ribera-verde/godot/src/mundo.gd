@@ -815,7 +815,7 @@ func montar_nave() -> void:
 
 # (lo pidió el usuario: «las estanterías de curado están en medio de la nave… que la otra puerta sea verdaderamente el secadero y la
 # zona de curado»): la sala de secado y curado (nave-s), detrás de la puerta de la nave que daba a la habitación; el secadero
-# (CURADO_NAVE.secadero) y las estanterías de tarros de 10 L (CURADO_NAVE.sitio), aquí y no en la zona de cultivo
+# (CURADO_NAVE.secadero) y las estanterías de tarros de 10 L (CURADO_NAVE.sitio), aquí y no en la zona de cultivo; el mapa, el del camarote
 func montar_secadero() -> void:
 	var m = MAPS.get(String(D.CURADO_NAVE.get("mapa", "nave-s")))
 	if m == null:

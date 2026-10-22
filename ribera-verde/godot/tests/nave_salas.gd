@@ -84,13 +84,27 @@ func _corre() -> void:
 	J.enter_map("nave", 9, 4, "up")
 	chk(cuenta("nave", "secadero") == 0 and cuenta("nave", "estanteC") == 0, "la nave con secadero %d estanterías %d" % [cuenta("nave", "secadero"), cuenta("nave", "estanteC")])
 	chk(J.MAPS["nave"].o[1][14] == "puertaM", "puerta del secadero en la nave: %s" % J.MAPS["nave"].o[1][14])
-	J.enter_map("nave-s", 1, 2, "up")
+	J.enter_map("nave-s", 4, 4, "up")
 	J.mode = "world"
 	var sc: Array = CU.secadero
 	chk(J.MAPS["nave-s"].o[int(sc[1])][int(sc[0])] == "secadero", "secadero en la sala")
 	chk(cuenta("nave-s", "estanteC") == int(CU.est), "estanterías de serie en la sala %d" % cuenta("nave-s", "estanteC"))
 	# como el camarote (lo pidió el usuario): 10 × 6, con el suelo y las paredes de la nave y una baldosa libre entre estanterías
 	var mS: Dictionary = J.MAPS["nave-s"]
+	var mC: Dictionary = J.MAPS["camarote"]
+	# el mismo mapa (lo pidió el usuario: «para lo mismo, utiliza el mismo mapa»): las estanterías donde las del camarote, el
+	# secadero donde el deshumidificador, la caja donde la caja y la entrada por abajo donde la trampilla
+	for i in 4:
+		chk(int(CU.sitio[i][0]) == 1 + i * 2 and int(CU.sitio[i][1]) == 2, "estantería %d en %s" % [i, CU.sitio[i]])
+	for y in int(mC.h):
+		for x in int(mC.w):
+			var oc = mC.o[y][x]
+			var on = mS.o[y][x]
+			if oc == "deshumC":
+				chk(on == "secadero", "secadero donde el deshumidificador: %s" % on)
+			elif oc != null and oc != "estanteC":
+				chk(on == oc, "%s en (%d, %d): %s" % [oc, x, y, on])
+	chk(mS.exits.has("4,5") and mS.exits["4,5"].to == "nave" and mS.g[5][4] == "mat", "la salida donde la trampilla")
 	chk(int(mS.w) == int(J.MAPS["camarote"].w) and int(mS.h) == int(J.MAPS["camarote"].h), "nave-s %dx%d" % [mS.w, mS.h])
 	chk(mS.g[0][4] == "iwT_nave" and mS.g[1][4] == "iwB_nave" and mS.g[3][4] == "floorN", "suelo y paredes de la nave: %s %s %s" % [mS.g[0][4], mS.g[1][4], mS.g[3][4]])
 	for i in CU.sitio.size() - 1:
@@ -110,7 +124,7 @@ func _corre() -> void:
 	chk(corre(func(): await J.obj_local(int(est[0]), int(est[1]), "estanteC")), "estantería bloqueada")
 	# la ampliación: el doble de estanterías, todas en la sala y accesibles
 	J.navc()["mj"] = 1
-	J.enter_map("nave-s", 1, 2, "up")
+	J.enter_map("nave-s", 4, 4, "up")
 	chk(cuenta("nave-s", "estanteC") == 2 * int(CU.est), "con la ampliación %d" % cuenta("nave-s", "estanteC"))
 	ac = At.accesos(J, "nave-s")
 	chk(ac.is_empty(), "accesos nave-s ampliada: %s" % [ac])
