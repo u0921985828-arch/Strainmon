@@ -2,6 +2,9 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.59.0 (código 79) y plugin de WordPress 1.5.8
+- El AAB de Play (con la marca `tienda`: la demo), el APK universal (`descargas/LandraceHunters.apk`, sin el bloqueo) y `descargas/landrace-hunters-1.5.8.zip` (sin el bloqueo), con el colocón en el combate y los combates más llevaderos.
+
 ### El APK y WordPress, como Play pero sin el bloqueo (lo pidió el usuario)
 - El bloqueo de la demo (el corte del capítulo 4 y la compra única) solo en el AAB de Google Play: `Retencion.DEMO` sale de la marca de exportación `tienda`. `tools/godot-aab.js` exporta dos veces: el AAB de Play con la marca y otro sin ella del que sale el APK universal. WordPress se exporta sin la marca. Los tres, con el mismo contenido (`Datos.PLAY`). Prueba `tests/retencion.gd` (47/0).
 
