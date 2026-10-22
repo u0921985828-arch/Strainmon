@@ -223,7 +223,7 @@ func coche_ya(k: String) -> bool:
 func desmayo() -> void:
 	var F: Dictionary = D.FISIO.desmayo
 	await fade(1)
-	var pa: String = S.map if D.PARADAS.has(S.map) else ("ibarbide" if S.map in ["ensanche", "callejon"] else "town")
+	var pa: String = S.map if D.PARADAS.has(S.map) else ("ibarbide" if S.map in ["ensanche", "callejon"] else "zorroza" if S.map in ["lapunta", "abando", "casco"] and D.PARADAS.has("zorroza") else "town")
 	var dm := snappedf(float(S.money) * float(F.dinero), 0.01)
 	S.money = snappedf(float(S.money) - dm, 0.01)
 	var g0 := total_buds() + total_rosin()
@@ -904,6 +904,8 @@ func spawn_clients() -> void:
 		if S.ch >= 3 and extr_algo():
 			for zx in [["town", 2], ["astilleros", 1], ["puerto", 1], ["valdehierro", 1]] + ([["ibarbide", 1], ["ensanche", 1]] if S.ch >= 4 else []):
 				zonas.append([zx[0], zx[1], ["ext"], "x"])
+		if Datos.CAL and D.has("BILBAO") and S.ch >= int(D.BILBAO.PARADA.cap):   # Bilbao: al final, para no mover las tiradas de antes
+			zonas.append_array([["zorroza", 2, ["est", "cur", "tur"]], ["lapunta", 2, ["est", "cur"]], ["abando", 3, ["pij", "pij", "tur", "cur"]], ["casco", 3, ["tur", "tur", "pij", "est"]]])
 		if metro_ya():   # MAESTRO [9]: Hiriburu, al final para no mover las tiradas de los demás
 			zonas.append(["metropoli", 6 + (2 if S.ch >= 8 else 0), ["pij", "pij", "tur", "cur", "est"]])
 		for zz in zonas:
@@ -927,7 +929,7 @@ func spawn_clients() -> void:
 				used["%d,%d" % [t[0], t[1]]] = true
 				var type: String = pick(zz[2])
 				var ct: Dictionary = D.CTYPES[type]
-				var id := "c%d_%s%s%d" % [S.day, pre, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e", "ibarbide": "i", "ensanche": "n", "callejon": "k", "metropoli": "h"}[map_], i]
+				var id := "c%d_%s%s%d" % [S.day, pre, {"town": "", "alto": "b", "astilleros": "s", "puerto": "p", "valdehierro": "v", "mendialde": "m", "errotabarri": "e", "ibarbide": "i", "ensanche": "n", "callejon": "k", "metropoli": "h", "zorroza": "z", "lapunta": "u", "abando": "a", "casco": "o"}[map_], i]
 				var want := ri(int(ct.g[0]), int(ct.g[1]))
 				var mt := 0
 				if type == "pij":

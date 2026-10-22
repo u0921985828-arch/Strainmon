@@ -42,8 +42,6 @@ func _ready() -> void:
 	super()
 	MAPS = D.MAPS.duplicate(true)
 	Datos.enteros(MAPS)
-	for k in D.get("BILBAO", {}).get("MAPS", {}):
-		MAPS[k]._bi = Datos.CAL
 	mapa_nave_r()
 
 # ---------- utilidades (00-nucleo) ----------

@@ -9,7 +9,9 @@
 #  · catedral: la fachada gótica con la aguja (6 × 9); teatro: el teatro de la ría (8 × 7); mercado: el mercado de la ribera
 #    (8 × 5) con sus vidrieras; grua: la grúa de pórtico del muelle (4 × 7), sobre el hormigón;
 #  · tiles-bilbao: la vía (horizontal y vertical), el paso a nivel, el adoquín del Casco Viejo y la losa del muelle;
-#  · props-bilbao: la barandilla verde de la ría, el plátano en su alcorque (4 m) y la boca del metro de cristal (2 casillas).
+#  · props-bilbao: la barandilla verde de la ría, la papelera, el bolardo, el plátano en su alcorque (4 m), la boca del metro de cristal
+#    y los contenedores (2 casillas);
+#  · suelo-bilbao: la tapa de registro, el imbornal y el paso de cebra, que el mapa pone a ritmo fijo (BILBAO.DEC; no al azar).
 # Sale a art/crudo/<grupo>/<sprite>/unica/NN.png; después, node tools/sprites/procesar.js <grupos> --atlas --atlas-dir godot/arte.
 import os
 import sys
@@ -369,10 +371,11 @@ TRAV, TRAVL = '#5a4232', '#7a5a42'                                          # tr
 RIEL, RIELL = '#6a6e74', '#c8ccd0'
 
 
-def via(vertical=False, paso=False):
+def via(vertical=False, paso=False, estrecha=False):
+    """la vía de ancho ibérico (los carriles a 7 px) o, estrecha, la de ancho métrico (a 5 px, traviesas más cortas)"""
     lz = Lienzo(64, 16)
     for v in range(4):
-        R = azar(1100 + v * 7 + (50 if vertical else 0)); x0 = v * 16
+        R = azar(1100 + (50 if vertical else 0)); x0 = v * 16          # las cuatro, iguales: nada al azar
         lz.r(x0, 0, 16, 16, BAL)
         for _ in range(40):
             lz.p(x0 + int(R() * 16), int(R() * 16), BALL if R() < .5 else BALS)
@@ -388,23 +391,22 @@ def via(vertical=False, paso=False):
                 if vertical:
                     lz.r(x0 + 1, i, 14, 2, TRAV); lz.hl(x0 + 1, x0 + 14, i, TRAVL)
                 else:
-                    lz.r(x0 + i, 1, 2, 14, TRAV); lz.vl(x0 + i, 1, 14, TRAVL)
-        for c in (4, 11):                                                   # carriles
+                    a, b = (3, 12) if estrecha else (1, 14)
+                    lz.r(x0 + i, a, 2, b - a + 1, TRAV); lz.vl(x0 + i, a, b, TRAVL)
+        for c in ((5, 10) if estrecha else (4, 11)):                                                   # carriles
             if vertical:
                 lz.vl(x0 + c, 0, 15, RIEL); lz.vl(x0 + c - 1, 0, 15, RIELL)
             else:
                 lz.hl(x0, x0 + 15, c, RIEL); lz.hl(x0, x0 + 15, c - 1, RIELL)
-        if v == 2 and not paso:
-            lz.p(x0 + 7, 7, '#c8b070'); lz.p(x0 + 8, 8, '#c8b070')          # una colilla / papel
     return lz
 
 
 def adoquin():
-    """adoquín de granito del Casco Viejo: 0 limpio, 1 con un charco, 2 con una tapa, 3 gastado"""
+    """adoquín de granito del Casco Viejo, las cuatro iguales (las tapas y los imbornales, en su sitio: suelo-bilbao)"""
     lz = Lienzo(64, 16)
     A, AL, AS = '#9a9488', '#b6b0a2', '#6e6a60'
     for v in range(4):
-        R = azar(1200 + v * 11); x0 = v * 16
+        R = azar(1200); x0 = v * 16
         lz.r(x0, 0, 16, 16, AS)
         for fy in range(0, 16, 4):
             off = 2 if (fy // 4) % 2 else 0
@@ -414,21 +416,15 @@ def adoquin():
                         lz.p(x0 + x, y, AL if y == fy else A)
         for _ in range(6):
             lz.p(x0 + int(R() * 16), int(R() * 16), AS)
-        if v == 1:
-            M.mancha(lz, x0 + 3, 6, 9, 4, '#6a8ea0', R); lz.hl(x0 + 6, x0 + 8, 7, '#a8d0e4')
-        elif v == 2:
-            lz.caja(x0 + 4, 4, 8, 8, '#5a5e66', MAR); lz.hl(x0 + 6, x0 + 9, 7, MAR); lz.hl(x0 + 6, x0 + 9, 9, MAR)
     return lz
 
 
 def muelle():
-    """losa de piedra del muelle de la ría: sillares grandes y alguna argolla"""
+    """losa de piedra del muelle de la ría: sillares grandes, las cuatro iguales"""
     lz = Lienzo(64, 16)
     for v in range(4):
         x0 = v * 16
-        M.sillar(lz, x0, 0, 16, 16, ('#a8a294', '#6e6a60', '#c4beb0'), bw=16, bh=8, sem=1300 + v)
-        if v == 3:
-            lz.caja(x0 + 6, 5, 5, 5, '#a8a294', MAR)
+        M.sillar(lz, x0, 0, 16, 16, ('#a8a294', '#6e6a60', '#c4beb0'), bw=16, bh=8, sem=1300)
     return lz
 
 
@@ -499,6 +495,77 @@ def metro():
     return lz
 
 
+# ------------------------------------------------------------------------------- lo del suelo, en su sitio (suelo-bilbao)
+# No van en las tiras (el juego elige la variante al azar): son calcomanías que el mapa pone donde tocan (BILBAO.DEC), encima de la
+# casilla, a ritmo fijo: la tapa del registro por el centro del carril, el imbornal junto al bordillo, el paso de cebra en los cruces.
+HIE, HIEL, HIES = '#4a4c52', '#6c7078', '#2c2e32'
+
+
+def tapa():
+    """la tapa de registro de fundición (60 cm): redonda, con su cuadrícula y el aro"""
+    lz = Lienzo(16, 16)
+    for y in range(16):
+        for x in range(16):
+            d = (x - 7.5) ** 2 + (y - 7.5) ** 2
+            if d < 4.6 ** 2:
+                lz.p(x, y, HIES if d > 3.8 ** 2 else HIEL if (x + y) % 3 == 0 else HIE)
+    lz.hl(5, 10, 7, HIES); lz.vl(7, 5, 10, HIES)
+    return lz
+
+
+def imbornal(abajo=False):
+    """el imbornal (la rejilla del desagüe) pegado al bordillo: arriba en la casilla de arriba de la calzada, abajo en la de abajo"""
+    lz = Lienzo(16, 16)
+    y0 = 12 if abajo else 0
+    lz.r(3, y0, 10, 4, HIES)
+    for x in range(4, 12, 2):
+        lz.vl(x, y0 + 1, y0 + 2, HIEL)
+    lz.hl(3, 12, y0 + (0 if abajo else 3), HIE)
+    return lz
+
+
+def cebra():
+    """el paso de cebra: bandas blancas paralelas al bordillo, una cada 5 px (tres por casilla), con un margen a cada lado"""
+    lz = Lienzo(16, 16)
+    for y in (1, 6, 11):
+        lz.r(1, y, 14, 3, '#e8e8e0'); lz.hl(1, 14, y + 2, '#c4c4bc')
+    return lz
+
+
+# ------------------------------------------------------------------------------- el mobiliario urbano (props-bilbao)
+def papelera():
+    """la papelera de la acera (1 m): cubo verde con su aro y el poste"""
+    lz = Lienzo(16, 16)
+    V, VL, VS = '#3c6e4e', '#5e9670', '#24463a'
+    lz.vl(7, 12, 15, '#3a3a3c'); lz.vl(8, 12, 15, '#5c5c60')
+    lz.r(4, 4, 8, 8, V); lz.vl(4, 4, 11, VS); lz.vl(10, 4, 11, VL)
+    lz.hl(4, 11, 4, VL); lz.hl(3, 12, 3, '#26262a'); lz.r(5, 5, 6, 1, '#1a1a1c')
+    lz.contorno('#1e2a24')
+    return lz
+
+
+def bolardo():
+    """el bolardo de fundición (80 cm) de las esquinas y los pasos"""
+    lz = Lienzo(16, 16)
+    lz.r(6, 6, 4, 9, '#3e4046'); lz.vl(6, 6, 14, '#26282c'); lz.vl(8, 6, 14, '#6c7078')
+    lz.r(5, 4, 6, 2, '#4e5058'); lz.hl(6, 9, 3, '#6c7078')
+    lz.hl(5, 10, 15, '#1e1e22')
+    lz.contorno('#1a1a1e')
+    return lz
+
+
+def contenedores():
+    """los contenedores de la acera (2 casillas): el de resto, gris, y el de envases, amarillo, con su tapa"""
+    lz = Lienzo(48, 48)
+    for x0, (c, cl, cs) in ((4, ('#5c6268', '#7c848a', '#3a3e44')), (22, ('#d8b43a', '#ecd06a', '#a08020'))):
+        lz.r(x0, 30, 16, 15, c); lz.vl(x0, 30, 44, cs); lz.vl(x0 + 15, 30, 44, cs)
+        lz.r(x0 - 1, 26, 18, 4, cl); lz.hl(x0 - 1, x0 + 16, 29, cs)
+        lz.r(x0 + 5, 33, 6, 2, cs)
+        lz.r(x0 + 1, 45, 3, 2, '#1e1e22'); lz.r(x0 + 12, 45, 3, 2, '#1e1e22')
+    lz.contorno('#1e1e22')
+    return lz
+
+
 SPRITES = {
     'torres': lambda: [guarda('edificio-' + k, torre(k)) for k in TORRES],
     'ensanches': lambda: [guarda('edificio-' + k, ensanche(k)) for k in ENSANCHES],
@@ -508,8 +575,12 @@ SPRITES = {
     'mercado': lambda: guarda('edificio-mercado', mercado()),
     'grua': lambda: guarda('edificio-grua', grua()),
     'tiles': lambda: [sale(f(), 'tiles-bilbao', k) for k, f in (('via', via), ('viaV', lambda: via(True)), ('viaX', lambda: via(False, True)),
-                                                               ('viaXV', lambda: via(True, True)), ('adoq', adoquin), ('muelleP', muelle))],
-    'props': lambda: [sale(baranda(), 'props-bilbao', 'baranda'), sale(platano(), 'props-bilbao-alto', 'platano'), sale(metro(), 'props-bilbao-ancho', 'metroB')],
+                                                               ('viaXV', lambda: via(True, True)),
+                                                               ('viaE', lambda: via(estrecha=True)), ('viaEX', lambda: via(False, True, True)), ('adoq', adoquin), ('muelleP', muelle))],
+    'props': lambda: [sale(baranda(), 'props-bilbao', 'baranda'), sale(papelera(), 'props-bilbao', 'papelera'), sale(bolardo(), 'props-bilbao', 'bolardo'),
+                      sale(platano(), 'props-bilbao-alto', 'platano'), sale(metro(), 'props-bilbao-ancho', 'metroB'),
+                      sale(contenedores(), 'props-bilbao-ancho', 'contenedores')],
+    'suelo': lambda: [sale(f(), 'suelo-bilbao', k) for k, f in (('tapa', tapa), ('imbT', imbornal), ('imbB', lambda: imbornal(True)), ('cebra', cebra))],
 }
 
 if __name__ == '__main__':

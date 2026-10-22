@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
-# Landrace Hunters — los mapas de Bilbao (lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao
-# centro y sus barrios, Zorroza no puede faltar, investiga las zonas como son»). Escribe en godot/datos/datos.json la clave BILBAO
-# (con Datos.CAL, Datos._aplica_auto la pone en lugar de los mapas de siempre; sin CAL, los de siempre: el oráculo no cambia):
-#   town        → Zorroza: el barrio al pie del monte, la calle de siempre, el parque, la plaza, la estación con la vía del tren
-#                 (las dos vías que cortan el barrio, con sus pasos a nivel) y la ría con su muelle y la barandilla verde;
-#   alto        → Zazpi Landa: las torres de pisos de la ladera y las campas;
-#   astilleros  → La Punta: el muelle de piedra con las grúas de pórtico, la ría y los pabellones;
-#   ibarbide    → el Casco Viejo: las casas estrechas en hilera, los cantones, el adoquín, la plaza porticada, la catedral, el
-#                 teatro, el mercado sobre la ría, la Ribera con su barandilla y el puente de piedra;
-#   ensanche    → Abando: la Gran Vía con plátanos en alcorque, las casas del Ensanche con miradores, la plaza ovalada con su
-#                 fuente y la boca del metro de cristal;
-#   callejon    → un cantón del Casco Viejo, de adoquín.
-# Los nombres del juego no cambian (Ribera Verde, Ibarbide…): solo la forma. Lo que se nombra desde fuera (puertas, salidas,
-# personas, objetos escondidos, carteles, paradas, clubs, locales, estancos, el concesionario, el garaje, la huerta, las carreteras)
-# se queda en su casilla: la herramienta lo comprueba y sale con 1 si algo se mueve o se tapa.
+# Landrace Hunters — Bilbao, zonas nuevas (lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao
+# centro y sus barrios, Zorroza no puede faltar», y después «Añade como zonas nuevas / No quiero caos», el caos: «el mobiliario
+# urbano, la distribución en el suelo de alcantarillas y demás»). Escribe en godot/datos/datos.json la clave BILBAO; con Datos.CAL,
+# Datos._aplica_auto mete los cuatro mapas, su parada, su zona, sus patrullas, sus clientes y su ronda (sin CAL, nada: los seis
+# mapas de siempre no cambian). Cuatro mapas en fila, de lado a lado por la calle:
+#   zorroza → la parada «Bilbao»: las torres de la ladera, la calle con su calzada, la estación, el parque, la vía doble y la ría;
+#   lapunta → La Punta: los pabellones de ladrillo, el hormigón, las grúas de pórtico y el muelle con sus norays;
+#   abando  → Abando: las casas del Ensanche con miradores, la Gran Vía con plátanos y la plaza elíptica con la fuente y el metro;
+#   casco   → el Casco Viejo: adoquín, casas estrechas, el teatro, la plaza, la catedral, el mercado y la Ribera.
+# Nada al azar: el mobiliario (farolas, bancos con su papelera, plátanos, bolardos en los pasos, contenedores) y lo del suelo (la tapa
+# de registro, los imbornales junto al bordillo, el paso de cebra) van por calles y a ritmo fijo (RITMO), los de enfrente a la misma
+# x; lo del suelo, en BILBAO.DEC (calcomanías que pinta pinta.gd encima de la casilla).
 #   python3 -I tools/bilbao.py
 import json
 import os
@@ -27,14 +24,19 @@ LEY = {
 	".": ("walk", None), ",": ("plaza", None), "h": ("hormigon", None), "k": ("adoq", None), "m": ("muelleP", None),
 	"_": ("muelleP", "baranda"), "g": ("grass", None), "f": ("flowers", None), "d": ("dirt", None), "~": ("water", None),
 	"D": ("dock", None), "c": ("dock", "crate"), "[": ("bridgeT", None), "]": ("bridgeB", None), "T": ("roadT", None),
-	"U": ("roadB", None), "=": ("via", None), "H": ("viaV", None), "x": ("viaX", None), "X": ("viaXV", None),
+	"U": ("roadB", None), "=": ("via", None), "H": ("viaV", None), "x": ("viaX", None), "X": ("viaXV", None), "Ñ": ("viaE", None), "ñ": ("viaEX", None),
 	"Y": ("walk", "tree2"), "y": ("grass", "tree"), "l": ("walk", "lamp"), "L": ("plaza", "lamp"), "b": ("walk", "bench"),
 	"n": ("plaza", "bench"), "*": ("grass", "bush"), "+": ("walk", "bush"), "S": ("walk", "sign"), "F": ("plaza", "fountain"),
 	"M": ("grass", "monte"), "W": ("grass", "monte2"), "s": ("grass", "seto"), "P": ("walk", "parada"), "$": ("walk", "cajero"),
 	"R": ("walk", "rotuloL"), "|": ("walk", "fence"), "Z": ("adoq", "tree2"), "j": ("adoq", "lamp"), "q": ("adoq", "bench"),
 	"Q": ("hormigon", "crate"), "e": ("hormigon", "lamp"), "o": ("muelleP", "noray"), "B": ("walk", "metroB"),
 	"t": ("hormigon", "tree2"), "&": ("hormigon", "fence"), "A": ("walk", "platano"), "a": ("plaza", "platano"),
+	"w": ("walk", "papelera"), "v": ("walk", "bolardo"), "C": ("walk", "contenedores"), "1": ("adoq", "papelera"),
+	"2": ("adoq", "bolardo"), "3": ("plaza", "papelera"), "4": ("hormigon", "papelera"), "5": ("muelleP", "papelera"),
+	"6": ("muelleP", "bench"), "7": ("muelleP", "lamp"), "8": ("hormigon", "contenedores"), "9": ("adoq", "contenedores"), "r": ("hormigon", "bench"),
+	 "G": ("hormigon", "grua0"),
 }
+ANCHOS = {"metroB": "metroB2", "contenedores": "contenedores2"}   # lo de 2 casillas: la de la derecha, sólida y sin dibujo
 CAMBIA_HIERBA = {"grass": "walk", "flowers": "walk", "tallgrass": "walk"}
 
 
@@ -70,8 +72,10 @@ def construye(k, M0, C, blds, G=None):
 			if ch in ("%", "#"):
 				continue
 			g[y][x], o[y][x] = LEY[ch]
-			if o[y][x] == "metroB" and x + 1 < w:
-				g[y][x + 1], o[y][x + 1] = "walk", "metroB2"
+	for y in range(h):                                                # lo de 2 casillas, después: la de la derecha no la pisa el «.»
+		for x in range(w - 1):
+			if o[y][x] in ANCHOS:
+				o[y][x + 1] = ANCHOS[o[y][x]]
 	nb = []
 	for b in blds:
 		b = dict(b)
@@ -96,330 +100,307 @@ def construye(k, M0, C, blds, G=None):
 	return m
 
 
-def calle_arriba(M0, C, filas, guarda=()):
-	"""en las filas dadas, la hierba de siempre pasa a acera (salvo las casillas de guarda y los bordes de monte)"""
-	for y in filas:
-		for x in range(int(M0["w"])):
-			if (x, y) in guarda:
-				continue
-			if M0["g"][y][x] in CAMBIA_HIERBA and not M0["o"][y][x]:
-				C[y][x] = "."
 
 
-EDIF = ("roof", "wall", "win", "door")
+# ------------------------------------------------------------------------------------------------------- el ritmo de la calle
+RITMO = {"farola": 8, "banco": 16, "imbornal": 8, "tapa": 16, "contenedor": 16}
 
 
-def pavimenta(M0, C, G, x0, y0, x1, y1, ch, de=None):
-	"""el suelo de un rectángulo pasa a ch; lo que lleva objeto lo conserva (con el suelo nuevo en G); los edificios, no se tocan.
-	de: solo las casillas con esos suelos"""
-	for y in range(y0, y1 + 1):
-		for x in range(x0, x1 + 1):
-			t = M0["g"][y][x]
-			if t.startswith(EDIF) or C[y][x] not in ("%",) or (de and t not in de):
-				continue
-			if M0["o"][y][x]:
-				if M0["o"][y][x] not in ("monte", "monte2", "seto"):
-					G[(x, y)] = LEY[ch][0]
-			else:
-				C[y][x] = ch
-
-
-def sin(M0, quita):
-	"""los edificios de siempre salvo los de quita ((id, x0, y0)), marcados para copiarlos tal cual"""
-	out = []
-	for b in M0["blds"]:
-		if (b["id"], int(b["x0"]), int(b["y0"])) in quita:
+def calle(C, DEC, y, x0, x1, arbol=False, cruces=(), suelo=".", sin_banco=(), sin_cont=()):
+	"""una calle de x0 a x1 desde la fila y: acera (y), bordillo con el mobiliario (y + 1), calzada (y + 2, y + 3), bordillo (y + 4)
+	y acera (y + 5). A ritmo: farola cada 8 en los dos bordillos a la misma x (+2); plátano en medio (+6) o, sin árboles, banco con
+	su papelera a la derecha cada 16 (+6, +7); contenedores cada 16 abajo (+12); imbornal en los dos cantos de la calzada cada 8
+	(+4), tapa en medio de la calzada cada 16 (+10); en cada cruce (x, x + 1), paso de cebra y bolardos a los lados."""
+	rect(C, x0, y, x1, y + 5, suelo)
+	rect(C, x0, y + 2, x1, y + 2, "T")
+	rect(C, x0, y + 3, x1, y + 3, "U")
+	libre = set()
+	for xc in cruces:
+		libre |= {xc - 1, xc, xc + 1, xc + 2}
+		for xx in (xc, xc + 1):
+			DEC["%d,%d" % (xx, y + 2)] = DEC["%d,%d" % (xx, y + 3)] = "cebra"
+		for yy in (y + 1, y + 4):
+			C[yy][xc - 1] = C[yy][xc + 2] = "v"
+	for x in range(x0, x1 + 1):
+		r = x - x0
+		if x not in libre:
+			if r % RITMO["farola"] == 2:
+				C[y + 1][x] = C[y + 4][x] = "l"
+			elif arbol and r % RITMO["farola"] == 6:
+				C[y + 1][x] = C[y + 4][x] = "A"
+			elif not arbol and r % RITMO["banco"] == 6 and x + 1 < x1 and x + 1 not in libre and x not in sin_banco:
+				C[y + 1][x], C[y + 1][x + 1] = "b", "w"
+			elif r % RITMO["contenedor"] == 12 and x + 1 not in libre and x + 1 < x1 and x not in sin_cont:
+				C[y + 4][x] = "C"
+		if any(x in (xc, xc + 1) for xc in cruces):                    # lo del suelo, a ritmo también junto al cruce (no en la cebra)
 			continue
-		b = dict(b)
-		b["orig"] = True
-		out.append(b)
-	return out
+		if r % RITMO["imbornal"] == 4:
+			DEC["%d,%d" % (x, y + 2)], DEC["%d,%d" % (x, y + 3)] = "imbT", "imbB"
+		elif r % RITMO["tapa"] == 10:
+			DEC["%d,%d" % (x, y + 3)] = "tapa"
+
+
+def paseo(C, y, x0, x1, ch, farola, banco, papelera, paso=8, desde=2):
+	"""un paseo de una fila: farola cada paso y, entre dos, banco con su papelera"""
+	for x in range(x0, x1 + 1):
+		r = (x - x0 - desde) % paso
+		if r == 0:
+			C[y][x] = farola
+		elif r == paso // 2 and x + 1 <= x1:
+			C[y][x], C[y][x + 1] = banco, papelera
+
+
+def borde(C, W, H, ch="M"):
+	for x in range(W):
+		C[0][x] = ch
+	for y in range(H):
+		C[y][0] = C[y][W - 1] = ch
+
+
+def vacio(k, W, H, nombre, musica):
+	return {"name": nombre, "w": W, "h": H, "g": [["grass"] * W for _ in range(H)], "o": [[None] * W for _ in range(H)],
+		"exits": {}, "doors": {}, "music": musica, "blds": [], "est": None}
+
+
+def lado(m, x, ys, to, tx, dir_):
+	for y in ys:
+		m["exits"]["%d,%d" % (x, y)] = {"to": to, "x": tx, "y": y, "dir": dir_, "lado": dir_}
+
+
+CALLE_Y = 9   # la calle de las cuatro zonas, en la misma fila: se pasa de una a otra por los lados (filas 9 a 14)
+SALE = range(CALLE_Y, CALLE_Y + 6)
 
 
 # ------------------------------------------------------------------------------------------------------------------ Zorroza
-def town(M0):
-	W, H = 40, 30
-	C = lienzo(W, H, "%")
-	# arriba, como estaba (el monte de Cobetas detrás, la calle con el piso, el grow, el bar y la casa de Txaro, la carretera):
-	# la hierba de detrás y entre las casas, acera; la cancilla de la huerta (9, 0-2), tal cual
-	calle_arriba(M0, C, range(2, 13), guarda={(9, 0), (9, 1), (9, 2)})
-	# abajo: el parque, la plaza, el paseo de la ría con la barandilla, la estación y la vía
-	rect(C, 0, 13, 0, 28, "s")
-	pon(C, 1, 13, [
-		"...S....Y...",   # 13 (4, 13) el cartel del parque
-		".yggggg.....",   # 14
-		".ggfggg.Y.l.",   # 15
-		".gggyg..+...",   # 16 (9, 16) el arbusto de la caja
-		".b...gg.Y...",   # 17
-		"..........b.",   # 18 (3, 18) Txaro
-		"Y....Y....Y.",   # 19
-		"............",   # 20
-	])
-	rect(C, 1, 21, 8, 24, "#")                       # la estación (8 × 4)
-	pon(C, 9, 21, ["....", "Y...", "....", ".+.."])  # (10, 24) el arbusto
-	# la plaza (13-26, 13-25), como estaba pero de losa entera y con los árboles en alcorque alrededor
-	rect(C, 13, 13, 26, 24, ",")
-	pon(C, 13, 13, [
-		"Y...S........Y",     # 13: (17, 13) el cartel de la plaza
-		".L...........L",     # 14
-		"..............",
-		"...n.......n..",     # 16
-		"..............",
-		"..............",
-		"..............",
-		"..............",
-		"..............",
-		"...n.......n..",     # 22
-		"..............",
-		".L...........L",     # 24
-	])
-	for y in range(13, 25):
-		for x in range(13, 27):
-			if C[y][x] == ".":
-				C[y][x] = ","
-	C[19][20] = "F"
-	rect(C, 13, 25, 26, 25, "h")
-	rect(C, 27, 13, 29, 24, ".")
-	pon(C, 27, 13, ["Y..", "...", "..Y", "...", "...", "..S", "...", "...", "..Y", "...", "...", "Y.."])   # (29, 18) el cartel del muelle
-	for y in list(range(13, 19)) + list(range(21, 25)):
-		C[y][30] = "_"
-	C[19][30] = C[20][30] = "."                       # al puente
-	rect(C, 1, 25, 30, 26, "h")                      # el andén
-	for x in range(3, 30, 6):
-		C[25][x] = "e"
-	C[26][2] = "+"                                    # (2, 26) el arbusto del acaparador, en su jardinera
-	pon(C, 27, 25, ["hhh"])
-	rect(C, 31, 26, 38, 26, "_")
-	rect(C, 1, 27, 38, 28, "=")                      # la vía doble
-	for x in (2, 14, 28):
-		C[27][x] = C[28][x] = "x"                     # pasos a nivel hacia las carreteras de abajo
-	rect(C, 0, 29, 38, 29, "s")
-	blds = [b for b in M0["blds"]]
-	for b in blds:
-		b["orig"] = True
-	blds.append({"id": "estacion", "x0": 1, "y0": 21, "w": 8, "h": 4, "doorX": None})
-	return C, blds, {}
-
-
-# ------------------------------------------------------------------------------------------------------------- Casco Viejo
-def ibarbide(M0):
-	W, H = 44, 30
-	C, G = lienzo(W, H, "%"), {}
-	# las Siete Calles, de adoquín (la de arriba y las de los lados de la plaza); la Plaza Nueva, de losa entera y sin jardín
-	pavimenta(M0, C, G, 1, 8, 42, 8, "k")
-	pavimenta(M0, C, G, 1, 9, 12, 10, "k")
-	pavimenta(M0, C, G, 31, 9, 42, 10, "k")
-	pavimenta(M0, C, G, 1, 18, 12, 19, "k")
-	pavimenta(M0, C, G, 31, 18, 42, 19, "k")
-	pavimenta(M0, C, G, 13, 9, 30, 19, ",")
-	for x, y in ((16, 18), (27, 18)):
-		C[y][x] = ","                                  # los arbustos de la plaza, fuera
-	rect(C, 37, 11, 37, 17, "k")                      # el cantón entre la catedral y las casas
-	# el teatro (8 × 7) donde las dos casas de arriba a la derecha; la catedral (6 × 9) en su plazuela, a la derecha de la plaza
-	rect(C, 34, 1, 41, 7, "#")
-	rect(C, 31, 9, 36, 17, "#")
-	# la Ribera: el paseo del muelle con su barandilla, la ría, el mercado y el puente de piedra hacia la carretera de abajo
-	rect(C, 1, 24, 42, 25, "m")
-	for x in range(3, 42, 6):
-		C[24][x] = "o" if x in (21, 27) else "l"
-	C[25][13] = C[25][33] = "b"
-	rect(C, 1, 26, 42, 26, "_")
-	rect(C, 6, 26, 10, 26, "m")                       # la bajada del aparcamiento
-	rect(C, 1, 27, 42, 29, "~")
-	rect(C, 20, 24, 27, 28, "#")                      # el mercado (8 × 5), sobre la ría
-	rect(C, 37, 26, 39, 29, "k")                      # el puente
-	for y in range(27, 30):
-		C[y][36] = C[y][40] = "_"
-	C[24][39] = "l"
-	blds = sin(M0, {("casco2", 34, 3), ("casco3", 37, 1), ("casco2", 31, 13), ("casco", 34, 12)})
-	blds += [{"id": "teatro", "x0": 34, "y0": 1, "w": 8, "h": 7, "doorX": None},
-		{"id": "catedral", "x0": 31, "y0": 9, "w": 6, "h": 9, "doorX": None},
-		{"id": "mercado", "x0": 20, "y0": 24, "w": 8, "h": 5, "doorX": None}]
-	return C, blds, G
-
-
-# ------------------------------------------------------------------------------------------------------------------ Abando
-def ensanche(M0):
-	W, H = 46, 22
-	C, G = lienzo(W, H, "%"), {}
-	# arriba, las casas del Ensanche con miradores donde los bloques sin puerta (el club y la discoteca, tal cual)
-	for x0, k in ((1, "ensB"), (19, "ensB2"), (28, "ensB")):
-		rect(C, x0, 1, x0 + 6, 8, "#")
-		rect(C, x0 + 7, 2, x0 + 7, 8, ".")
-	# la Gran Vía: la acera de abajo con plátanos en alcorque (en la de arriba taparían los miradores)
-	for x in range(4, 44, 4):
-		if M0["o"][12][x] is None:
-			C[12][x] = "A"
-	# abajo: la plaza elíptica (losa, cuatro jardines, la fuente y las bocas del metro) y dos casas a cada lado
-	rect(C, 15, 13, 30, 20, ",")
-	pon(C, 15, 13, [
-		"ggg..........ggg",
-		"g*...L....L...gg",
-		"g..............g",
-		"...............L",
-		"................",
-		"g..............g",
-		"gga.B.....n...ag",
-		"ggg..........ggg",
-	])
-	for y in range(13, 21):
-		for x in range(15, 31):
-			if C[y][x] == ".":
-				C[y][x] = ","
-	C[16][22] = "F"
-	C[19][26] = "B"
-	for x0 in (1, 8, 31, 38):
-		rect(C, x0, 13, x0 + 6, 20, "#")
-	rect(C, 1, 21, 44, 21, ".")
-	for x in (4, 11, 34, 41):
-		C[21][x] = "l"
-	blds = sin(M0, {("bloque", 1, 2), ("bloque", 19, 2), ("bloque2", 28, 2)})
-	blds += [{"id": "ensB", "x0": 1, "y0": 1, "w": 7, "h": 8, "doorX": None}, {"id": "ensB2", "x0": 19, "y0": 1, "w": 7, "h": 8, "doorX": None},
-		{"id": "ensB", "x0": 28, "y0": 1, "w": 7, "h": 8, "doorX": None}]
-	for i, x0 in enumerate((1, 8, 31, 38)):
-		blds.append({"id": "ensB2" if i % 2 else "ensB", "x0": x0, "y0": 13, "w": 7, "h": 8, "doorX": None})
-	return C, blds, G
-
-
-# ------------------------------------------------------------------------------------------------------------- Zazpi Landa
-def alto(M0):
-	W, H = 40, 30
-	C, G = lienzo(W, H, "%"), {}
-	# las torres de pisos de la ladera, a los lados de la fuente; la plaza que queda, de losa
-	rect(C, 3, 4, 8, 12, "#")
-	rect(C, 13, 4, 18, 12, "#")
-	pavimenta(M0, C, G, 9, 4, 12, 12, ",")
-	pavimenta(M0, C, G, 3, 13, 18, 17, ",")
-	# las campas de abajo, de hierba alta con el camino de tierra
-	pavimenta(M0, C, G, 1, 24, 38, 28, "d", de=("walk",))
-	blds = sin(M0, set())
-	blds += [{"id": "torreZ", "x0": 3, "y0": 4, "w": 6, "h": 9, "doorX": None}, {"id": "torreZ2", "x0": 13, "y0": 4, "w": 6, "h": 9, "doorX": None}]
-	return C, blds, G
+def zorroza(DEC):
+	W, H = 40, 28
+	C = lienzo(W, H, "g")
+	borde(C, W, H)
+	for y in range(1, 9):                                         # la ladera de Arbolantxa detrás de las torres
+		for x in range(1, W - 1):
+			C[y][x] = "g"
+	blds = []
+	for i, x0 in enumerate((2, 10, 24, 32)):                       # las torres de pisos, con un paso entre las dos de en medio
+		rect(C, x0, 0, x0 + 5, 8, "#")
+		blds.append({"id": "torreZ2" if i % 2 else "torreZ", "x0": x0, "y0": 0, "w": 6, "h": 9, "doorX": None})
+	for x0 in (8, 16, 22, 30, 38):
+		rect(C, x0, 1, min(x0 + 1, W - 2), 8, ".")
+	for x in (8, 22, 30):
+		C[2][x] = "l"
+	rect(C, 16, 1, 21, 8, ",")                                     # la plaza de entre las torres
+	C[4][18] = "F"
+	for x in (16, 21):
+		C[2][x] = C[7][x] = "L"
+	C[7][17], C[7][18] = "n", "3"
+	C[CALLE_Y][0] = C[CALLE_Y + 5][0] = "M"
+	calle(C, DEC, CALLE_Y, 1, W - 1, cruces=(18,))
+	for y in SALE:
+		C[y][W - 1] = C[y][W - 2] if C[y][W - 2] in ".TU" else "."
+	rect(C, 1, 15, W - 2, 22, "g")
+	rect(C, 2, 15, 9, 18, "#")                                     # la estación, con su andén
+	blds.append({"id": "estacion", "x0": 2, "y0": 15, "w": 8, "h": 4, "doorX": None})
+	rect(C, 1, 19, W - 2, 19, "h")
+	paseo(C, 19, 1, W - 2, "h", "e", "r", "4")
+	rect(C, 1, 20, W - 2, 21, "=")                                 # la vía doble
+	for x in (18, 19):
+		C[20][x] = C[21][x] = "x"                                    # el paso a nivel, en el cruce
+	rect(C, 12, 15, W - 2, 18, "g")                                # el parque: césped, árboles en fila y el camino del paso
+	for x in range(13, W - 2, 6):
+		C[16][x] = "y"
+	rect(C, 18, 15, 19, 18, ".")
+	for x in (17, 20):
+		C[15][x] = C[18][x] = "v"
+	rect(C, 1, 22, W - 2, 22, "h")                                 # el andén de la vía estrecha (lo dijo el usuario: «Hay tren
+	paseo(C, 22, 1, W - 2, "h", "e", "r", "4")                     # renfe y feve»): la de ancho ibérico arriba, la de ancho
+	rect(C, 1, 23, W - 2, 23, "Ñ")                                 # métrico de una vía abajo, por la ría, y el bus en la calle
+	for x in (18, 19):
+		C[22][x] = "h"
+		C[23][x] = "ñ"
+	rect(C, 1, 24, W - 2, 24, "h")
+	for x in range(1, W - 1):
+		C[25][x] = "_"                                              # la barandilla de la ría
+	rect(C, 1, 26, W - 2, 27, "~")
+	C[CALLE_Y + 4][12] = "P"                                       # la parada del autobús (Bilbao)
+	for x in (11, 13):
+		if C[CALLE_Y + 4][x] not in "lv":
+			C[CALLE_Y + 4][x] = "."
+	return C, blds
 
 
 # ---------------------------------------------------------------------------------------------------------------- La Punta
-def astilleros(M0):
-	W, H = 40, 30
-	C, G = lienzo(W, H, "%"), {}
-	pavimenta(M0, C, G, 1, 2, 38, 18, "h", de=("dirt",))
-	# el muelle de piedra con los norays y las grúas de pórtico en el canto
-	pavimenta(M0, C, G, 1, 19, 38, 22, "m")
-	for x in range(2, 39, 4):
-		if x not in (6, 7, 8, 26, 27, 28):
-			C[22][x] = "o"
-	for x in (9, 20, 31):
-		C[19][x] = "e"
-	rect(C, 28, 16, 31, 22, "#")
-	rect(C, 34, 16, 37, 22, "#")
-	blds = sin(M0, set())
-	blds += [{"id": "grua", "x0": 28, "y0": 16, "w": 4, "h": 7, "doorX": None}, {"id": "grua", "x0": 34, "y0": 16, "w": 4, "h": 7, "doorX": None}]
-	return C, blds, G
+def lapunta(DEC):
+	W, H = 40, 24
+	C = lienzo(W, H, "h")
+	borde(C, W, H, "M")
+	blds = []
+	for x0, k, w, h in ((2, "ladrillo", 7, 6), (11, "nave", 6, 6), (19, "ladrillo", 7, 6), (28, "nave", 6, 6)):
+		rect(C, x0, 9 - h, x0 + w - 1, 8, "#")
+		blds.append({"id": k, "x0": x0, "y0": 9 - h, "w": w, "h": h, "doorX": None})
+	rect(C, 1, 1, W - 2, 2, "M")
+	for y in range(3, 9):
+		for x in range(1, W - 1):
+			if C[y][x] == "h":
+				C[y][x] = "h"
+	calle(C, DEC, CALLE_Y, 0, W - 1, cruces=(9, 17), suelo="h")
+	for y in SALE:
+		C[y][0] = C[y][1] if C[y][1] in "hTU" else "h"
+		C[y][W - 1] = C[y][W - 2] if C[y][W - 2] in "hTU" else "h"
+	rect(C, 1, 15, W - 2, 17, "h")                                 # la explanada: los contenedores de obra, en fila
+	for x in range(3, W - 2, 8):
+		C[16][x] = "Q"
+	blds += [{"id": "grua", "x0": 12, "y0": 15, "w": 4, "h": 7, "doorX": None}, {"id": "grua", "x0": 28, "y0": 15, "w": 4, "h": 7, "doorX": None}]
+	rect(C, 12, 15, 15, 21, "#")
+	rect(C, 28, 15, 31, 21, "#")
+	rect(C, 1, 18, W - 2, 21, "m")                                 # el muelle de piedra, con los norays al canto cada 4
+	for x0 in (12, 28):
+		rect(C, x0, 15, x0 + 3, 21, "#")
+	for x in range(2, W - 1, 4):
+		if C[21][x] == "m":
+			C[21][x] = "o"
+	for x in range(4, W - 1, 8):
+		if C[18][x] == "m":
+			C[18][x] = "7"
+	rect(C, 1, 22, W - 2, 23, "~")
+	return C, blds
 
 
-# ---------------------------------------------------------------------------------------------------------------- el cantón
-def callejon(M0):
-	C, G = lienzo(23, 18, "%"), {}
-	pavimenta(M0, C, G, 1, 8, 21, 16, "k")
-	return C, sin(M0, set()), G
+# ------------------------------------------------------------------------------------------------------------------ Abando
+def abando(DEC):
+	W, H = 46, 26
+	C = lienzo(W, H, ".")
+	borde(C, W, H, "s")
+	blds = []
+	for i, x0 in enumerate((1, 8, 15, 24, 31, 38)):               # la manzana de arriba, seguida, con el paso de en medio
+		rect(C, x0, 0, x0 + 6, 7, "#")
+		blds.append({"id": "ensB2" if i % 2 else "ensB", "x0": x0, "y0": 0, "w": 7, "h": 8, "doorX": None})
+	rect(C, 22, 0, 23, 8, ".")
+	C[0][22] = C[0][23] = "s"
+	calle(C, DEC, CALLE_Y - 1 + 1, 0, W - 1, arbol=True, cruces=(22,))
+	for y in SALE:
+		C[y][0] = C[y][1] if C[y][1] in ".TU" else "."
+		C[y][W - 1] = C[y][W - 2] if C[y][W - 2] in ".TU" else "."
+	for i, x0 in enumerate((1, 8, 31, 38)):                       # las manzanas de abajo
+		rect(C, x0, 17, x0 + 6, 24, "#")
+		blds.append({"id": "ensB" if i % 2 else "ensB2", "x0": x0, "y0": 17, "w": 7, "h": 8, "doorX": None})
+	rect(C, 1, 15, W - 2, 16, ".")
+	rect(C, 15, 15, 30, 24, ",")                                   # la plaza elíptica: simétrica en las dos direcciones
+	pon(C, 15, 15, [
+		"gggg........gggg",
+		"gg..L......L..gg",
+		"g..............g",
+		"...n3......n3...",
+		"......,F,.......",
+		"................",
+		"...n3......n3...",
+		"g..............g",
+		"gg..L......L..gg",
+		"gggg........gggg",
+	])
+	for y in range(15, 25):
+		for x in range(15, 31):
+			if C[y][x] == ".":
+				C[y][x] = ","
+	rect(C, 1, 25, W - 2, 25, "s")
+	return C, blds
 
 
+# ------------------------------------------------------------------------------------------------------------- Casco Viejo
+def casco(DEC):
+	W, H = 44, 28
+	C = lienzo(W, H, "k")
+	borde(C, W, H, "M")
+	blds = []
+	casas = [("teatro", 2, 8, 7)] + [("casco3", x, 5, 7) for x in (12, 17)] + [("casco", x, 4, 6) for x in (24, 28)] + [("casco2", x, 3, 5) for x in (34, 37, 40)]
+	for k, x0, w, h in casas:
+		rect(C, x0, 8 - h, x0 + w - 1, 7, "#")
+		blds.append({"id": k, "x0": x0, "y0": 8 - h, "w": w, "h": h, "doorX": None})
+	for x in range(1, W - 1):
+		if C[1][x] != "#":
+			C[1][x] = "M"
+	for x0, x1 in ((10, 11), (22, 23), (32, 33)):                   # los cantones entre las casas
+		rect(C, x0, 2, x1, 7, "k")
+	rect(C, 10, 1, 11, 1, "k"); rect(C, 22, 1, 23, 1, "k"); rect(C, 32, 1, 33, 1, "k")
+	C[1][10] = C[1][11] = C[1][22] = C[1][23] = C[1][32] = C[1][33] = "M"
+	paseo(C, 8, 1, W - 2, "k", "j", "q", "1")                      # la calle de las Siete Calles: farolas y bancos en fila
+	for y in SALE:
+		C[y][0] = "k"
+	rect(C, 13, 10, 30, 15, ",")                                  # la plaza, porticada: farolas en las esquinas y la fuente
+	for x, y in ((13, 10), (30, 10), (13, 15), (30, 15)):
+		C[y][x] = "L"
+	C[12][21] = "F"
+	for x in (16, 26):
+		C[12][x], C[12][x + 1] = "n", "3"
+	casas2 = [("casco3", x, 5, 7) for x in (2, 7)] + [("mercado", 16, 8, 5)] + [("casco", x, 4, 6) for x in (25, 29)] + [("catedral", 36, 6, 9)]
+	for k, x0, w, h in casas2:
+		y0 = 23 - h
+		rect(C, x0, y0, x0 + w - 1, 22, "#")
+		blds.append({"id": k, "x0": x0, "y0": y0, "w": w, "h": h, "doorX": None})
+	rect(C, 1, 23, W - 2, 24, "m")                                # la Ribera: el paseo con su ritmo y la barandilla
+	paseo(C, 23, 1, W - 2, "m", "7", "6", "5")
+	for x in range(1, W - 1):
+		C[25][x] = "_"
+	rect(C, 1, 26, W - 2, 27, "~")
+	return C, blds
+
+
+ZONAS_N = {"zorroza": "Zorroza", "lapunta": "La Punta", "abando": "Abando", "casco": "Casco Viejo"}
+MUSICA = {"zorroza": "town", "lapunta": "astilleros", "abando": "ensanche", "casco": "ibarbide"}
+CADENA = ["zorroza", "lapunta", "abando", "casco"]
 SOLIDO = ("water", "roof", "wall", "win", "iwT", "iwB", "void")
-# lo que se nombra desde el código (no está en datos.json con su mapa): [mapa, x, y]
-ANCLAS_CODIGO = [
-	["town", 9, 0], ["town", 9, 1], ["town", 9, 2],                 # la cancilla y la senda de la huerta (HUERTA)
-	["town", 9, 8], ["town", 1, 8], ["town", 30, 8], ["town", 31, 8], # el cartel del garaje y el cajero (CAJERO_CAL)
-	["town", 8, 12], ["town", 7, 12], ["ibarbide", 9, 20], ["ibarbide", 10, 20],   # las paradas y sus llegadas
-	["town", 5, 9], ["town", 5, 10], ["town", 12, 9], ["town", 12, 10], ["town", 33, 10], ["town", 36, 11], ["town", 2, 11],   # DEMO
-]
 
 
-def anclas(D):
-	"""[mapa, x, y, de dónde] de todo lo que en datos.json nombra una casilla de estos mapas"""
-	import re
-	out = []
-	MAP = set(D["BILBAO_K"])
-
-	def anda(v, ruta):
-		if isinstance(v, dict):
-			mp = None
-			for kk in ("map", "mapa", "m", "to"):
-				if isinstance(v.get(kk), str) and v[kk] in MAP:
-					mp = v[kk]
-			if mp and isinstance(v.get("x"), (int, float)) and isinstance(v.get("y"), (int, float)):
-				out.append([mp, int(v["x"]), int(v["y"]), ruta])
-			for kk, w in v.items():
-				mm = re.match(r"^(\w+):(\d+),(\d+)$", str(kk))
-				if mm and mm.group(1) in MAP:
-					out.append([mm.group(1), int(mm.group(2)), int(mm.group(3)), ruta + "/" + kk])
-				if ruta == "" and kk in ("MAPS", "BILBAO"):
-					continue
-				anda(w, ruta + "/" + str(kk))
-		elif isinstance(v, list):
-			for i, w in enumerate(v):
-				anda(w, ruta + "[%d]" % i)
-	anda(D, "")
-	return out + [a + ["código"] for a in ANCLAS_CODIGO]
-
-
-def comprueba(D, B):
-	mal = []
-	solido = lambda t: t.startswith(SOLIDO)
-	for mp, x, y, de in anclas(D):
-		if mp not in B["MAPS"]:
-			continue
-		m0, m1 = D["MAPS"][mp], B["MAPS"][mp]
-		if m0["o"][y][x] and m1["o"][y][x] != m0["o"][y][x]:
-			mal.append("%s (%d, %d) %s: el objeto %s pasa a %s" % (mp, x, y, de, m0["o"][y][x], m1["o"][y][x]))
-		if not solido(m0["g"][y][x]) and solido(m1["g"][y][x]):
-			mal.append("%s (%d, %d) %s: %s pasa a %s" % (mp, x, y, de, m0["g"][y][x], m1["g"][y][x]))
-		if not m0["o"][y][x] and m1["o"][y][x] and de != "código":
-			mal.append("%s (%d, %d) %s: tapada por %s" % (mp, x, y, de, m1["o"][y][x]))
-	for mp, m1 in B["MAPS"].items():
-		m0 = D["MAPS"][mp]
-		for kk in list(m0["exits"]) + list(m0["doors"]):
-			x, y = map(int, kk.split(","))
-			if m1["g"][y][x] != m0["g"][y][x]:
-				mal.append("%s (%d, %d): la puerta o salida %s pasa a %s" % (mp, x, y, m0["g"][y][x], m1["g"][y][x]))
-		for q in D["CARRETERAS"]["puertas"].get(mp, []):   # el borde que abre la carretera y la casilla de dentro
-			x, y = int(q[0]), int(q[1])
-			dx = 1 if x == 0 else -1 if x == int(m1["w"]) - 1 else 0
-			dy = 1 if y == 0 else -1 if y == int(m1["h"]) - 1 else 0
-			if solido(m1["g"][y + dy][x + dx]) or m1["o"][y + dy][x + dx]:
-				mal.append("%s (%d, %d): la entrada de la carretera, tapada" % (mp, x + dx, y + dy))
-	return mal
-
-
-def tablas(D, B):
-	"""farolas, casillas de clientes y de ronda de los mapas nuevos: las de siempre que siguen libres y, si no queda ninguna, las aceras"""
+def tablas(B):
+	"""farolas, casillas de clientes (acera, plaza y adoquín libres, no en el bordillo del mobiliario) y de ronda (las aceras)"""
 	solido = lambda t: t.startswith(SOLIDO)
 	for mp, m in B["MAPS"].items():
-		libre = lambda x, y: not solido(m["g"][y][x]) and not m["o"][y][x] and m["g"][y][x] not in ("via", "viaV")
-		B["LAMPS"][mp] = [[x, y] for y in range(int(m["h"])) for x in range(int(m["w"])) if m["o"][y][x] == "lamp"]
-		for t in ("CLIENT_TILES", "RONDA"):
-			v = [c for c in D[t].get(mp, []) if libre(int(c[0]), int(c[1]))]
-			B[t][mp] = v or [[x, y] for y in range(int(m["h"])) for x in range(int(m["w"])) if m["g"][y][x] == "walk" and libre(x, y)]
+		W, H = int(m["w"]), int(m["h"])
+		libre = lambda x, y: 0 < x < W - 1 and 0 < y < H - 1 and not solido(m["g"][y][x]) and not m["o"][y][x] and m["g"][y][x] in ("walk", "plaza", "adoq", "hormigon", "muelleP")
+		vecino = lambda x, y: any(m["o"][y + dy][x + dx] for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+		bld = {(x, y) for b in m["blds"] for x in range(int(b["x0"]), int(b["x0"]) + int(b["w"])) for y in range(int(b["y0"]), int(b["y0"]) + int(b["h"]))}
+		va, cola = set(), [tuple(int(v) for v in c.split(",")) for c in m["exits"]]   # lo que se alcanza desde las salidas
+		while cola:
+			x, y = cola.pop()
+			for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+				q = (x + dx, y + dy)
+				if q not in va and 0 <= q[0] < W and 0 <= q[1] < H and q not in bld and not m["o"][q[1]][q[0]] and not solido(m["g"][q[1]][q[0]]):
+					va.add(q)
+					cola.append(q)
+		libre0 = libre
+		libre = lambda x, y: libre0(x, y) and (x, y) in va
+		B["LAMPS"][mp] = [[x, y] for y in range(H) for x in range(W) if m["o"][y][x] == "lamp"]
+		B["CLIENT_TILES"][mp] = [[x, y] for y in range(1, H - 1) for x in range(2, W - 2) if libre(x, y) and not vecino(x, y)]
+		B["RONDA"][mp] = [[x, y] for y in range(1, H - 1) for x in range(1, W - 1) if libre(x, y)]
 
 
 def main():
 	D = json.load(open(DATOS, encoding="utf-8"))
-	MAPS = D["MAPS"]
-	B = {"_": "Los mapas de Bilbao (con Datos.CAL; tools/bilbao.py): Zorroza, Zazpi Landa, La Punta, el Casco Viejo, Abando y un cantón. Datos._aplica_auto los pone en D.MAPS y en las tablas de cada mapa.", "MAPS": {}, "LAMPS": {}, "CLIENT_TILES": {}, "RONDA": {}}
-	for k, f in (("town", town), ("ibarbide", ibarbide), ("ensanche", ensanche), ("alto", alto), ("astilleros", astilleros), ("callejon", callejon)):
-		M0 = json.loads(json.dumps(MAPS[k]))
-		C, blds, G = f(M0)
-		B["MAPS"][k] = construye(k, M0, C, json.loads(json.dumps(blds)), G)
-	D["BILBAO_K"] = list(B["MAPS"])
-	mal = comprueba(D, B)
-	del D["BILBAO_K"]
-	tablas(D, B)
-	for t in mal:
-		print("  MAL:", t)
-	if mal:
-		return 1
+	B = {"_": "Bilbao, zonas nuevas (con Datos.CAL; tools/bilbao.py): Zorroza (la parada), La Punta, Abando y el Casco Viejo, en fila por la calle. Datos._aplica_auto los mete en D.MAPS y en sus tablas; DEC, lo del suelo de cada mapa (pinta.gd).",
+		"MAPS": {}, "DEC": {}, "LAMPS": {}, "CLIENT_TILES": {}, "RONDA": {},
+		"PARADA": {"n": "Bilbao", "x": 12, "y": CALLE_Y + 4, "a": [12, CALLE_Y + 5, "down"], "min": 30, "eur": 3, "cap": 2},
+		"ZONAS": {k: {"n": "Bilbao · " + n, "lad": 1.0, "precio": 1.25} for k, n in ZONAS_N.items()},
+		"PATRULLAS": {k: [1, 2] for k in ZONAS_N}, "KM": 14, "PRE": {"zorroza": "z", "lapunta": "u", "abando": "a", "casco": "o"}}
+	for k, f in (("zorroza", zorroza), ("lapunta", lapunta), ("abando", abando), ("casco", casco)):
+		DEC = {}
+		C, blds = f(DEC)
+		W, H = len(C[0]), len(C)
+		M0 = vacio(k, W, H, ZONAS_N[k], MUSICA[k])
+		m = construye(k, M0, C, blds)
+		i = CADENA.index(k)
+		if i > 0:
+			lado(m, 0, SALE, CADENA[i - 1], int(B["MAPS"][CADENA[i - 1]]["w"]) - 2, "left")
+		if i < len(CADENA) - 1:
+			lado(m, W - 1, SALE, CADENA[i + 1], 1, "right")
+		for c in list(DEC):
+			x, y = map(int, c.split(","))
+			if m["o"][y][x]:
+				del DEC[c]
+		B["MAPS"][k] = m
+		B["DEC"][k] = DEC
+	tablas(B)
 	D["BILBAO"] = B
 	s = json.dumps(D, ensure_ascii=False, separators=(",", ":"))
 	open(DATOS, "w", encoding="utf-8").write(s)
-	print("bilbao: %d mapas" % len(B["MAPS"]))
+	print("bilbao: %d mapas, %d cosas en el suelo" % (len(B["MAPS"]), sum(len(v) for v in B["DEC"].values())))
 
 
 if __name__ == "__main__":

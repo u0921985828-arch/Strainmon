@@ -136,6 +136,7 @@ const ZONA := {"town": "town", "alto": "town", "astilleros": "town", "home": "to
 	"disco-vip": "ibarbide", "est-rv": "town", "est-puerto": "puerto", "est-valde": "valdehierro", "est-mendi": "mendialde", "est-erro": "errotabarri", "est-ibar": "ibarbide",   # 1.47
 	"pasillo": "town", "sotano": "town", "cuarto-t": "valdehierro", "nave-d": "valdehierro", "nave-h": "valdehierro", "nave-s": "valdehierro", "muelle": "puerto", "franco": "puerto",   # 1.51
 	"metropoli": "metropoli", "vip-zen": "metropoli", "vip-ila": "metropoli",
+	"zorroza": "town", "lapunta": "town", "abando": "town", "casco": "town",   # Bilbao: sin chincheta propia, junto a Ribera Verde
 	"comarcal": "mendialde", "refugio": "mendialde", "carr-costa": "puerto", "carr-valle": "valdehierro", "carr-monte": "mendialde",   # las carreteras: el pueblo más cerca
 	"carr-general": "ibarbide", "carr-molino": "errotabarri", "carr-acantilado": "puerto", "carr-ribera": "errotabarri"}   # MAESTRO [9]: la ciudad no sale en el croquis (la chincheta, en Ibarbide)
 

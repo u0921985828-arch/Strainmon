@@ -272,6 +272,8 @@ func _mundo() -> void:
 				if k == "water":
 					_playa_agua(m, tx, ty, sx, sy)
 				_arte_orilla(m, k, tx, ty, sx, sy)
+				if m.has("dec"):   # Bilbao: lo del suelo (tapa, imbornal, cebra) a ritmo fijo, de tools/bilbao.py
+					_arte_dec(m.dec.get("%d,%d" % [tx, ty], ""), sx, sy)
 			var o = m.o[ty][tx]
 			if o and o != "carpa":
 				_arte_obj(o, tx, ty, tras if mt.has("%d,%d" % [tx, ty]) else list, sombras)
@@ -614,6 +616,13 @@ func _farola(a: float) -> Image:
 		cache.clear()
 	cache[key] = im
 	return im
+
+func _arte_dec(n: String, sx: int, sy: int) -> void:
+	if n == "":
+		return
+	var f = Atlas.frame_de("suelo-bilbao", n, "unica", 0, {"i": 0})
+	if f:
+		Atlas.dibuja(L, f.c, Rect2(sx, sy, 16, 16))
 
 func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 	if not Atlas.ok:
@@ -1029,6 +1038,13 @@ const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadr
 # los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto
 const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "mesaTb", "taburTb", "barrilTb", "plantDeco", "lab", "lab2", "pc", "display", "counter", "barcounter", "jukebox", "bench", "bedB", "vitrina", "mesita", "barraD", "mesaV", "estanteN", "secadero", "altavoz", "trim", "prensaM", "tamizM", "mallas", "lavadora", "staticM", "armS", "mesaS"]  # i18n-no
+const VALLAS := ["fence", "baranda"]
+
+# la pieza de una valla por las de su clase de al lado: N = 1, E = 2, S = 4, O = 8
+static func mascara_valla(mo: Array, o: String, tx: int, ty: int) -> int:
+	var es := func(x: int, y: int) -> bool: return y >= 0 and y < mo.size() and x >= 0 and x < mo[y].size() and mo[y][x] == o
+	return (1 if es.call(tx, ty - 1) else 0) | (2 if es.call(tx + 1, ty) else 0) | (4 if es.call(tx, ty + 1) else 0) | (8 if es.call(tx - 1, ty) else 0)
+
 func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var seca: bool = Datos.CAL and o.begins_with("hgs-")   # la planta muerta de la huerta (campo.gd): la de hg, parda
 	if seca:
@@ -1053,6 +1069,10 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 			fe = Atlas.frame_de(ge, "e-" + o, "unica", 0, {"i": 0, "esp": d.esp})
 		if fe != null:
 			f = fe
+	if Datos.CAL and o in VALLAS:   # lo pidió el usuario: las vallas conectan en x y en y (vallas.py: una pieza por sus vecinas N, E, S, O)
+		var fv = Atlas.frame_de("vallas", "%s-%d" % [o, mascara_valla(J.MAPS[J.S.map].o, o, tx, ty)], "unica", 0, {"i": 0})
+		if fv != null:
+			f = fv
 	if Datos.CAL and o == "mesita":   # 1.47 (lo pidió el usuario): las dos mesitas de los sofás, una mesa baja de frente a 3/4 como los sofás
 		var mo: Array = J.MAPS[J.S.map].o
 		var izq: bool = tx > 0 and mo[ty][tx - 1] == "mesita"

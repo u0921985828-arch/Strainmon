@@ -272,30 +272,14 @@ func huerta_vista() -> bool:   # ¿la has encontrado?
 func huerta_lista() -> bool:   # ¿desbrozada?
 	return huerta_vista() and int(S.huerta.get("l", 0)) > 0
 
-# con CAL, los mapas de Bilbao (tools/bilbao.py, Datos._aplica_auto); si CAL cambia con la partida en marcha (las pruebas), el mapa
-# vuelve a salir de D.MAPS en su sitio y lo que se montaba encima empieza de cero
+# con CAL, las zonas de Bilbao (tools/bilbao.py, Datos._aplica_auto): si CAL se encendió con la partida en marcha (las pruebas),
+# el mapa no está todavía en MAPS
 func mapas_bilbao(k: String) -> void:
-	if not D.get("BILBAO", {}).get("MAPS", {}).has(k) or not MAPS.has(k):
+	if not Datos.CAL or MAPS.has(k) or not D.get("BILBAO", {}).get("MAPS", {}).has(k):
 		return
 	Datos.carga()
-	var m: Dictionary = MAPS[k]
-	if m.get("_bi") == Datos.CAL:
-		return
-	m.clear()
-	m.merge(D.MAPS[k].duplicate(true))
-	Datos.enteros(m)
-	m._bi = Datos.CAL
-	_arb0.erase(k)
-	_arb_k.erase(k)
-	_aparc0.erase(k)
-	_neg0.erase(k)
-	if k == "alto":
-		_alto0 = null
-	if k == GARAJE:
-		_garaje0 = null
-	for c in CARR_ORIG.keys():
-		if String(c).begins_with(k + "|"):
-			CARR_ORIG.erase(c)
+	MAPS[k] = D.MAPS[k].duplicate(true)
+	Datos.enteros(MAPS[k])
 
 func montar_huerta(k: String) -> void:
 	if k == "town" and MAPS.has("town"):

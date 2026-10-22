@@ -19,7 +19,7 @@ const CAPAS := [["monte", 64, 0.12], ["lejos", 48, 0.22], ["pueblo", 18, 0.4], [
 # mitad, más arriba y más despacio (de viaje.py); lo que no está, por el trayecto
 const PUEBLOS := ["rural", "costa", "industria", "barrio", "ciudad"]
 const PUEBLO_DE := {"town": "barrio", "puerto": "costa", "muelle": "costa", "valdehierro": "industria", "mendialde": "rural",
-		"errotabarri": "rural", "ibarbide": "ciudad", "metropoli": "ciudad"}
+		"errotabarri": "rural", "ibarbide": "ciudad", "metropoli": "ciudad", "zorroza": "barrio"}
 const Y_CARRETERA := 142
 const CARRIL := 27        # el suelo de las ruedas, desde arriba de la carretera
 

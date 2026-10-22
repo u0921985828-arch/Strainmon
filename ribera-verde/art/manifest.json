@@ -12703,6 +12703,8 @@
     "tile:viaV",
     "tile:viaX",
     "tile:viaXV",
+    "tile:viaE",
+    "tile:viaEX",
     "tile:adoq",
     "tile:muelleP"
    ]
@@ -12721,12 +12723,67 @@
    "id": "props-bilbao",
    "tipo": "objeto",
    "celda": "objeto_1x1",
-   "descripcion": "la barandilla verde de la ría",
+   "descripcion": "la barandilla verde de la ría, la papelera y el bolardo",
    "cubre": [
-    "obj:baranda"
+    "obj:baranda",
+    "obj:papelera",
+    "obj:bolardo"
    ],
    "ajuste_por_sprite": {
-    "baranda": "exacto"
+    "baranda": "exacto",
+    "papelera": "exacto",
+    "bolardo": "exacto"
+   }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/vallas.py (los lados, del sprite aprobado)",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Las vallas tienen que ser tanto en dirección izquierda y derecha como alante a atrás». Solo con Datos.CAL (pinta.gd, _arte_obj).",
+   "id": "vallas",
+   "tipo": "objeto",
+   "celda": "objeto_1x1",
+   "descripcion": "la valla de madera y la barandilla de la ría en 16 piezas cada una, por sus vecinas (N, E, S, O)",
+   "cubre": [],
+   "ajuste_por_sprite": {
+    "fence-0": "exacto",
+    "fence-1": "exacto",
+    "fence-2": "exacto",
+    "fence-3": "exacto",
+    "fence-4": "exacto",
+    "fence-5": "exacto",
+    "fence-6": "exacto",
+    "fence-7": "exacto",
+    "fence-8": "exacto",
+    "fence-9": "exacto",
+    "fence-10": "exacto",
+    "fence-11": "exacto",
+    "fence-12": "exacto",
+    "fence-13": "exacto",
+    "fence-14": "exacto",
+    "fence-15": "exacto",
+    "baranda-0": "exacto",
+    "baranda-1": "exacto",
+    "baranda-2": "exacto",
+    "baranda-3": "exacto",
+    "baranda-4": "exacto",
+    "baranda-5": "exacto",
+    "baranda-6": "exacto",
+    "baranda-7": "exacto",
+    "baranda-8": "exacto",
+    "baranda-9": "exacto",
+    "baranda-10": "exacto",
+    "baranda-11": "exacto",
+    "baranda-12": "exacto",
+    "baranda-13": "exacto",
+    "baranda-14": "exacto",
+    "baranda-15": "exacto"
    }
   },
   {
@@ -12765,13 +12822,32 @@
    "id": "props-bilbao-ancho",
    "tipo": "objeto",
    "celda": "mueble_ancho",
-   "descripcion": "la boca del metro de cristal y acero (2 casillas)",
+   "descripcion": "la boca del metro de cristal y acero y los contenedores (2 casillas)",
    "cubre": [
-    "obj:metroB"
+    "obj:metroB",
+    "obj:contenedores"
    ],
    "ajuste_por_sprite": {
-    "metroB": "exacto"
+    "metroB": "exacto",
+    "contenedores": "exacto"
    }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
+   "id": "suelo-bilbao",
+   "tipo": "tiles",
+   "celda": "tile",
+   "descripcion": "lo del suelo de Bilbao en su sitio (BILBAO.DEC): la tapa de registro, el imbornal arriba y abajo y el paso de cebra",
+   "cubre": []
   }
  ],
  "familias": {

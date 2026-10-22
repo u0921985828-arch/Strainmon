@@ -103,6 +103,7 @@ sefa554f8,"Cajas de madera de los astilleros, podridas por la humedad.","Wooden 
 se8305f79,"Cajas de piezas de la fundición, oxidadas.","Crates of foundry parts, rusted."
 s0bbea870,Cajas de fruta vacías. La frutería de la esquina cerró en verano.,Empty fruit crates. The corner greengrocer shut in summer.
 sb0160b68,Cajas de pescado vacías del puerto.,Empty fish crates from the port.
+s0b6cac92,BILBAO,
 s58597f0a,minThc,
 sd626ce66,Busco {g} g de rosin o de hachís.,I'm after {g} g of rosin or hash.
 sbd8e3014,"Busco {g} g de algo potente, mínimo {thc}% de THC.","I'm after {g} g of something strong, at least {thc}% THC."
@@ -165,6 +166,7 @@ sd3dcfd09,Lo metes en el arcón y lo tapas con los sacos.,You put it in the ches
 s90031372,No llevas cogollos encima.,You have no buds on you.
 s4b05791e,El arcón está vacío.,The chest is empty.
 scb82bcdd,Lo sacas todo del arcón y lo guardas en la mochila.,You take everything out of the chest and put it in your backpack.
+s71bbe511,MAPS,
 s290dfee7,Te dejan en la huerta lo que pediste: {l}.,They leave what you ordered at the vegetable garden: {l}.
 s0830061a,Bidón azul de 100 L,Blue 100 L drum
 s633e594e,Depósito de 1000 L,1000 L tank
@@ -5952,6 +5954,46 @@ s55379088,"Cubre hasta 5 kW por encima de lo contratado, sin ruido: lo que pasa 
 s6bcc8de0,Placas solares,Solar panels
 s8784f2d5,"2,5 kW de placas con baterías: lo que pasa de la potencia contratada, hasta ahí, sale del tejado y no de la red. Sin gasto.","2.5 kW of panels with batteries: up to that, anything over the contracted power comes from the roof, not the grid. No running cost."
 s86aca0e1,"La red de carreteras que se andan (con Datos.CAL; tools/carreteras.py): rutas por mapa y, por pueblo, las salidas [x, y, carretera, llegada x, llegada y, lado] y las casillas del borde que se abren [x, y, la salida que la abre x, y].",
+s627348aa,"Bilbao, zonas nuevas (con Datos.CAL; tools/bilbao.py): Zorroza (la parada), La Punta, Abando y el Casco Viejo, en fila por la calle. Datos._aplica_auto los mete en D.MAPS y en sus tablas; DEC, lo del suelo de cada mapa (pinta.gd).",
+s0da1431f,Zorroza,Zorroza
+sf54a2421,roofT_torreZ,
+s5649e477,roofT_torreZ2,
+s4f9e1c8d,roofB_torreZ,
+s8993df8c,roofB_torreZ2,
+se4939ba2,wall_torreZ,
+s22e9ef52,wall_torreZ2,
+s5b1ae0e5,roofT_estacion,
+s71aa114a,roofB_estacion,
+s314053d3,viaX,
+s3eec22fd,muelleP,
+s3f64fdc9,torreZ,
+sf852a0e4,torreZ2,
+s6620dedf,La Punta,La Punta
+sc764056c,roofT_grua,
+s12ebe4ea,roofB_grua,
+s8b7bf861,Abando,Abando
+s8c6c4107,roofT_ensB,
+s843d47ef,roofT_ensB2,
+s59e3a081,roofB_ensB,
+s8033ee1b,roofB_ensB2,
+s359840af,wall_ensB,
+s5c899834,wall_ensB2,
+sf335348e,ensB,
+s1026251e,ensB2,
+s0a6eb4f3,Casco Viejo,Casco Viejo (Old Town)
+saaebf8f6,roofT_teatro,
+s103fc05a,roofB_teatro,
+s659dfacf,roofT_catedral,
+s4f2d0b60,roofB_catedral,
+sbe27b01e,roofT_mercado,
+s61fd8be5,roofB_mercado,
+s1ca8a32e,imbT,
+se87c167f,imbB,
+sfc386e22,Bilbao,Bilbao
+sf81cd2de,Bilbao · Zorroza,Bilbao · Zorroza
+s8ab69168,Bilbao · La Punta,Bilbao · La Punta
+s392e6e36,Bilbao · Abando,Bilbao · Abando
+sa4f23931,Bilbao · Casco Viejo,Bilbao · Old Town
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
