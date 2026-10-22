@@ -37,16 +37,19 @@ def pantalla(L, x, y, que):
     L.hl(x + 1, x + 10, y + 1 + (que * 3) % 7, PANT[1])                     # la línea de barrido
     L.p(x + 10, y + 1, '#e04040')                                            # el piloto de grabación
 
+MON_DY = 6   # el bastidor, 6 px más abajo: arriba, 2 px de pared libres; abajo, el grabador sobre el zócalo
+
 def monD():
     """la pared de monitores de seguridad (2 × 3 pantallas) sobre un soporte negro y el grabador debajo"""
     L = Lienzo(48, 48)
-    L.r(4, 12, 40, 24, '#202228'); L.hl(4, 43, 12, '#3a3e46')               # el bastidor de la pared
+    d = MON_DY   # (lo pidió el usuario: «la tele está encima de la pared»): todo dentro de la pared, nada por encima de su canto
+    L.r(4, 12 + d, 40, 24, '#202228'); L.hl(4, 43, 12 + d, '#3a3e46')       # el bastidor de la pared
     for j in range(2):
         for i in range(3):
-            pantalla(L, 5 + i * 13, 13 + j * 10, i + j * 3)
-    L.r(14, 34, 20, 4, '#2c2e34'); L.hl(14, 33, 34, '#4a4e56')              # el grabador
-    for i in range(4): L.p(16 + i * 2, 36, ('#58d080', '#58d080', '#e8b040', '#58d080')[i])
-    L.r(28, 36, 4, 1, '#16181c')
+            pantalla(L, 5 + i * 13, 13 + d + j * 10, i + j * 3)
+    L.r(14, 34 + d, 20, 4, '#2c2e34'); L.hl(14, 33, 34 + d, '#4a4e56')      # el grabador
+    for i in range(4): L.p(16 + i * 2, 36 + d, ('#58d080', '#58d080', '#e8b040', '#58d080')[i])
+    L.r(28, 36 + d, 4, 1, '#16181c')
     L.contorno(K)
     return L
 

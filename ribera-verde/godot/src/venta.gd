@@ -793,7 +793,7 @@ func obj_local(x: int, y: int, o) -> bool:
 		return true
 	if Datos.CAL and await obj_vip(o):   # MAESTRO [9]
 		return true
-	if Datos.CAL and S.map == "nave" and o == "estanteC":   # MAESTRO [8]: las estanterías de tarros de la nave
+	if Datos.CAL and S.map in ["nave", "nave-s"] and o == "estanteC":   # MAESTRO [8]: las estanterías de tarros de la nave
 		await navc_action()
 		return true
 	if Datos.CAL and S.map == "nave-d" and desp_ya() and o in ["monD", "monD2", "cajaD"]:   # i18n-no   # MAESTRO [8]: el despacho de lujo
@@ -855,6 +855,13 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = K("La mesilla: la radio, un despertador y una revista de coches.")
 			"cuadro":
 				txt = K("Un calendario de un taller de neumáticos, de hace años.")
+	if S.map == "nave-s":   # el secadero y el curado, en su sala
+		if S.get("nave") == null:
+			await say(K("La nave ya no es tuya."))
+			return true
+		if o == "secadero":   # i18n-no
+			await secadero_nave()
+			return true
 	if S.map == "nave-h" or S.map == "nave-d":   # 1.51: la habitación y el despacho de la nave
 		if S.get("nave") == null:
 			await say(K("La nave ya no es tuya."))

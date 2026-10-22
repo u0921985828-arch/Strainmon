@@ -302,14 +302,28 @@ func _corre() -> void:
 	J.P.y = 2
 	chk(corre(func(): await J.object_action(1, 1)) and S.map == "nave" and J.P.x == 12, "a la nave")
 	J.P.x = 14
-	chk(corre(func(): await J.object_action(14, 1)) and S.map == "nave-h", "a la habitación")
+	chk(corre(func(): await J.object_action(14, 1)) and S.map == "nave-s", "al secadero")
+	J.build_ents()
+	mal = At.accesos(J, "nave-s")
+	chk(mal.is_empty(), "en el secadero se llega a todo: %s" % [mal])
+	await foto(dir, "secadero")
+	J.P.x = 1
+	J.P.y = 2
+	chk(corre(func(): await J.object_action(1, 1)) and S.map == "nave" and J.P.x == 14, "y vuelta")
+	# la habitación, por el despacho (lo pidió el usuario)
+	J.P.x = 12
+	J.P.y = 2
+	chk(corre(func(): await J.object_action(12, 1)) and S.map == "nave-d", "al despacho otra vez")
+	J.P.x = 7
+	J.P.y = 2
+	chk(corre(func(): await J.object_action(7, 1)) and S.map == "nave-h", "del despacho a la habitación")
 	J.build_ents()
 	mal = At.accesos(J, "nave-h")
 	chk(mal.is_empty(), "en la habitación se llega a todo: %s" % [mal])
 	await foto(dir, "habitacion")
 	J.P.x = 1
 	J.P.y = 2
-	chk(corre(func(): await J.object_action(1, 1)) and S.map == "nave" and J.P.x == 14, "y vuelta")
+	chk(corre(func(): await J.object_action(1, 1)) and S.map == "nave-d" and J.P.x == 7, "de la habitación al despacho")
 	for k in ["pasillo", "sotano"]:
 		entra(k, 4, 2 if k == "pasillo" else 5)
 		mal = At.accesos(J, k)

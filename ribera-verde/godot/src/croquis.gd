@@ -134,7 +134,7 @@ const ZONA := {"town": "town", "alto": "town", "astilleros": "town", "home": "to
 	"errotabarri": "errotabarri", "ibarbide": "ibarbide", "ensanche": "ibarbide", "callejon": "ibarbide", "growcity": "ibarbide",
 	"club-ibar": "ibarbide", "club-ens": "ibarbide", "disco": "ibarbide", "setas": "ibarbide",
 	"disco-vip": "ibarbide", "est-rv": "town", "est-puerto": "puerto", "est-valde": "valdehierro", "est-mendi": "mendialde", "est-erro": "errotabarri", "est-ibar": "ibarbide",   # 1.47
-	"pasillo": "town", "sotano": "town", "cuarto-t": "valdehierro", "nave-d": "valdehierro", "nave-h": "valdehierro", "muelle": "puerto", "franco": "puerto",   # 1.51
+	"pasillo": "town", "sotano": "town", "cuarto-t": "valdehierro", "nave-d": "valdehierro", "nave-h": "valdehierro", "nave-s": "valdehierro", "muelle": "puerto", "franco": "puerto",   # 1.51
 	"metropoli": "metropoli", "vip-zen": "metropoli", "vip-ila": "metropoli",
 	"comarcal": "mendialde", "refugio": "mendialde", "carr-costa": "puerto", "carr-valle": "valdehierro", "carr-monte": "mendialde",   # las carreteras: el pueblo más cerca
 	"carr-general": "ibarbide", "carr-molino": "errotabarri", "carr-acantilado": "puerto", "carr-ribera": "errotabarri"}   # MAESTRO [9]: la ciudad no sale en el croquis (la chincheta, en Ibarbide)

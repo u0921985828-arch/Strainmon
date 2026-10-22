@@ -100,8 +100,8 @@ func _corre() -> void:
 		if J.handlers.size():
 			J.press("A"), 12)
 	M.intervalo(func(): J.update(1000 / 60.0), 1000 / 60.0)
-	var Mo: Array = J.MAPS.nave.o
-	# 1 · el curado de serie: CURADO_NAVE.est estanterías de tarros de 10 L en la nave
+	var Mo: Array = J.MAPS["nave-s"].o
+	# 1 · el curado de serie: CURADO_NAVE.est estanterías de tarros de 10 L en la sala del secadero (nave-s), no en la nave
 	var ns := 0
 	for q in CU.sitio:
 		if Mo[int(q[1])][int(q[0])] == "estanteC":
@@ -142,7 +142,7 @@ func _corre() -> void:
 	chk(int(J.navc().mj) == 1 and J.S.money == 100000 - int(CU.p), "ampliación %s %s" % [J.navc(), J.S.money])
 	chk(J.navc_est() == 2 * int(CU.est), "estanterías %d" % J.navc_est())
 	ns = 0
-	Mo = J.MAPS.nave.o
+	Mo = J.MAPS["nave-s"].o
 	for q in CU.sitio:
 		if Mo[int(q[1])][int(q[0])] == "estanteC":
 			ns += 1
@@ -156,6 +156,7 @@ func _corre() -> void:
 	J.S.buds = {}
 	var g0: float = J.navc_g()
 	ALMQ = [1]
+	J.enter_map("nave-s", int(est[0]), int(est[1]) + 1, "up")
 	chk(corre(func(): await J.obj_local(int(est[0]), int(est[1]), "estanteC")), "estantería bloqueada")
 	chk(J.total_buds() >= 1 and J.navc_g() < g0, "sacar de los tarros: fuera %s dentro %s" % [J.total_buds(), J.navc_g()])
 	# 3 · el despacho de lujo: sin la nave a tope no se ofrece
@@ -183,7 +184,7 @@ func _corre() -> void:
 		if not s0.ends_with("2"):
 			chk(J.Atlas.cubre("obj:" + s0) != null, "sin sprite obj:" + s0)
 	# se llega a la caja y a los monitores
-	chk(not J.tile_solid(md, 5, 2) and not J.tile_solid(md, 7, 3), "delante de los monitores y de la caja, libre")
+	chk(not J.tile_solid(md, 5, 2) and not J.tile_solid(md, 0, 3) and not J.tile_solid(md, 7, 2), "delante de los monitores, de la caja y de la puerta de la habitación, libre")
 	# 4 · los monitores: las cámaras de los locales (sin bloquear)
 	MENUS = []
 	chk(corre(func(): await J.obj_local(5, 1, "monD")), "monitores bloqueado")
@@ -206,14 +207,14 @@ func _corre() -> void:
 		J.set_process(false)
 		J.enter_map("nave-d", 3, 3, "up")
 		await pinta(dir, "lujo")
-		J.enter_map("nave", int(est[0]), int(est[1]) + 1, "up")
+		J.enter_map("nave-s", int(est[0]), int(est[1]) + 1, "up")
 		await pinta(dir, "estanterias")
 	# 7 · sin Datos.CAL: ni estanterías, ni despacho, ni filas
 	Datos.CAL = false
-	J.enter_map("nave", 9, 4, "up")
+	J.enter_map("nave-s", 2, 3, "up")
 	ns = 0
 	for q in CU.sitio:
-		if J.MAPS.nave.o[int(q[1])][int(q[0])] == "estanteC":
+		if J.MAPS["nave-s"].o[int(q[1])][int(q[0])] == "estanteC":
 			ns += 1
 	chk(ns == 0, "estanterías sin CAL %d" % ns)
 	J.enter_map("nave-d", 3, 3, "up")

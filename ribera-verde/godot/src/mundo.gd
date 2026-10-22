@@ -809,20 +809,29 @@ func montar_nave() -> void:
 	if S != null and S.get("nave") != null and Datos.CAL and n.o[6][17] == null and n.o[7][17] == null and puertas_int("nave").is_empty():
 		n.o[6][17] = "bedT"   # i18n-no
 		n.o[7][17] = "bedB"
-	# MAESTRO [8]: las estanterías de tarros de 10 L del curado de la nave (CURADO_NAVE), en los huecos libres de la pared
-	for q in D.get("CURADO_NAVE", {}).get("sitio", []):
-		if n.o[int(q[1])][int(q[0])] == "estanteC":   # i18n-no
-			n.o[int(q[1])][int(q[0])] = null
-	var ne := navc_est()
-	for q in D.get("CURADO_NAVE", {}).get("sitio", []):
+	montar_puertas("nave")   # 1.51: el despacho y la habitación, detrás de sus puertas
+	if Datos.CAL:
+		montar_secadero()   # el secadero y las estanterías del curado, en su sala
+
+# (lo pidió el usuario: «las estanterías de curado están en medio de la nave… que la otra puerta sea verdaderamente el secadero y la
+# zona de curado»): la sala de secado y curado (nave-s), detrás de la puerta de la nave que daba a la habitación; el secadero
+# (CURADO_NAVE.secadero) y las estanterías de tarros de 10 L (CURADO_NAVE.sitio), aquí y no en la zona de cultivo
+func montar_secadero() -> void:
+	var m = MAPS.get(String(D.CURADO_NAVE.get("mapa", "nave-s")))
+	if m == null:
+		return
+	for q in D.CURADO_NAVE.sitio:
+		if m.o[int(q[1])][int(q[0])] == "estanteC":   # i18n-no
+			m.o[int(q[1])][int(q[0])] = null
+	var sc: Array = D.CURADO_NAVE.secadero
+	m.o[int(sc[1])][int(sc[0])] = "secadero"   # i18n-no
+	var ne := navc_est() if S != null else 0
+	for q in D.CURADO_NAVE.sitio:
 		if ne <= 0:
 			break
-		if n.o[int(q[1]) - 1][int(q[0])] in ["extrN", "extrG", "ctrlN"]:   # i18n-no  delante del extractor o del controlador de la pared, no
-			continue
-		if n.o[int(q[1])][int(q[0])] == null:
-			n.o[int(q[1])][int(q[0])] = "estanteC"   # i18n-no
+		if m.o[int(q[1])][int(q[0])] == null:
+			m.o[int(q[1])][int(q[0])] = "estanteC"   # i18n-no
 			ne -= 1
-	montar_puertas("nave")   # 1.51: el despacho y la habitación, detrás de sus puertas
 
 # (lo pidió el usuario: «cuando lo vayas a alquilar, entres al local y por reformar»): la nave sin alquilar por dentro (nave-r),
 # la de siempre sin muebles y con los trastos del último inquilino; se entra con Arrieta (talk_nave), no por la persiana
@@ -1242,9 +1251,12 @@ func montar_puertas(mapa: String) -> void:
 		return
 	for e in puertas_int(mapa):
 		m.o[int(e.y)][int(e.x)] = e.o
-	if mapa == "nave" and puertas_int(mapa).size():   # el escritorio, al despacho
+	if mapa == "nave" and puertas_int(mapa).size():   # el escritorio, al despacho; el secadero, a su sala (nave-s)
 		for x in [12, 13]:
 			if m.o[2][x] in ["escritorio", "escritorio2"]:
+				m.o[2][x] = null
+		for x in m.w:
+			if m.o[2][x] == "secadero":   # i18n-no
 				m.o[2][x] = null
 
 # (lo pidió el usuario): el taller por zonas, con CAL; montar_locales lo vuelve a poner cada vez que rehace el local
@@ -2063,6 +2075,8 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_camarote()
 	if name_ == "nave-d":
 		montar_despacho()
+	if name_ == String(D.get("CURADO_NAVE", {}).get("mapa", "")):
+		montar_secadero()
 	if name_ == "setas":
 		montar_setas()
 	montar_locales(name_)   # 1.45: la puerta de los negocios y sus mejoras
