@@ -3480,6 +3480,10 @@ s3a5fefa3,"Flechas: apuntar (arriba y abajo, fino). A apretado: la fuerza; al so
 s6646ed1c,¿Lo dejas? La partida es suya.,Quit? The game goes to them.
 s94f58638,Seguir,Keep playing
 s41e79f12,Estudia la mesa…,Studying the table…
+s1d890966,"La {n}, al medio.","The {n}, middle pocket."
+s03d183ad,"La {n}, a la esquina.","The {n}, corner pocket."
+sd0f7e229,"Esta, a defender.",Playing safe.
+s5aa0a26d,"La {n}, por banda.","The {n}, off the rail."
 s1641fb63,GENTE7,GENTE7
 s643e6825,índica,indica
 s78adc8eb,sativa,sativa

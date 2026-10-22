@@ -1713,7 +1713,7 @@ func _b8_suyo(V: Dictionary, hab: float, N: String) -> Dictionary:
 	if V.mano:
 		V.b[0].en = true
 		V.b[0].v = Vector2.ZERO
-		V.b[0].p = B8.coloca_ia(V, 1)
+		V.b[0].p = B8.coloca_ia(V, 1, hab)
 		V.mano = false
 	if gancho_billar8.is_valid() or oraculo:
 		return B8.elige(V, 1, hab)
@@ -1722,6 +1722,14 @@ func _b8_suyo(V: Dictionary, hab: float, N: String) -> Dictionary:
 	_dlg_fijo(I18n.K("Estudia la mesa…"), N)
 	await M.wait(16)   # que se vea el aviso antes de que piense (elige simula los tiros y tarda)
 	var s := B8.elige(V, 1, hab)
+	var di := {"n": int(s.get("n", 0))}   # lo canta como lo canta uno que juega
+	match String(s.get("tipo", "")):
+		"ataque":
+			_dlg_fijo(I18n.T("La {n}, al medio.", di) if int(s.get("pk", 0)) in [1, 4] else I18n.T("La {n}, a la esquina.", di), N)
+		"defensa":
+			_dlg_fijo(I18n.T("Esta, a defender."), N)
+		"banda":
+			_dlg_fijo(I18n.T("La {n}, por banda.", di), N)
 	var a0 := float(V.ang)
 	var a1 := float(s.ang)
 	var t0 := M.reloj

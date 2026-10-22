@@ -155,6 +155,19 @@ static func paso(V: Dictionary, ev: Dictionary) -> void:
 				var l2 := dd.length_squared()
 				if l2 >= 4 * R * R or l2 == 0:
 					continue
+				# el instante del choque: se vuelve atrás lo que se han metido una en otra en este paso (tb), se choca con la normal
+				# del punto de contacto de verdad y se sigue; si no, el corte depende de cuánto se solapan en el paso (hasta 4°)
+				var vr: Vector2 = a.v - c.v
+				var tb := 0.0
+				var bq := dd.dot(vr)
+				var v2 := vr.length_squared()
+				if it == 0 and bq > 0 and v2 > 1e-9:
+					var disc := bq * bq - v2 * (l2 - 4 * R * R)
+					tb = clampf((-bq + sqrt(maxf(disc, 0))) / v2, 0, DT)
+					a.p -= a.v * tb
+					c.p -= c.v * tb
+					dd = c.p - a.p
+					l2 = dd.length_squared()
 				var l := sqrt(l2)
 				var nn := dd / l
 				var rel: float = (a.v - c.v).dot(nn)
@@ -163,6 +176,10 @@ static func paso(V: Dictionary, ev: Dictionary) -> void:
 					a.v -= nn * imp
 					c.v += nn * imp
 					hubo = true
+					if tb > 0:
+						a.p += a.v * tb
+						c.p += c.v * tb
+						l = 2 * R
 					if it == 0:
 						ev.toques += 1
 					if ev.primer < 0 and (i == 0 or j == 0):
@@ -311,11 +328,31 @@ static func rayo(V: Dictionary, ang: float) -> Dictionary:
 	return {"n": -1, "t": tb, "g": o + u * tb}
 
 # ---------- el rival ----------
+# Juega como una persona que sabe jugar (lo pidió el usuario: «Tiene que ser un jugador realista de billar»): mira cada bola suya
+# con cada tronera y calcula lo fácil que es (el corte, lo que anda la blanca, lo que anda la tocada y lo ancha que le queda la
+# boca desde donde está), apunta al centro de lo que entra, prueba la fuerza que deja la blanca para la siguiente y no lo que deja
+# al otro si falla; si no hay nada que meter con cabeza, juega a defender (toca una suya flojito y esconde la blanca), y si está
+# tapado sale por banda. Falla como falla una persona: el mismo pulso pesa más de lejos y en los cortes finos.
 
 static func gauss() -> float:
 	var a := maxf(1e-6, Cultivo.azar())
 	var b := Cultivo.azar()
 	return sqrt(-2 * log(a)) * cos(2 * PI * b)
+
+# la función de error (Abramowitz y Stegun 7.1.26): lo que da P de que entre con un error normal
+static func erf(x: float) -> float:
+	var s := signf(x)
+	x = absf(x)
+	var t := 1.0 / (1.0 + .3275911 * x)
+	var y := 1.0 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - .284496736) * t + .254829592) * t * exp(-x * x)
+	return s * y
+
+# el pulso: lo que se le va el taco (radianes) y la fuerza (de 0 a 1) según la habilidad (BILLAR.hab, de 0 a 1)
+static func pulso_ang(hab: float) -> float:
+	return clampf(.012 + (.5 - hab) * .06, .002, .04)
+
+static func pulso_f(hab: float) -> float:
+	return clampf(.035 + (.5 - hab) * .1, .01, .08)
 
 static func _seg_libre(V: Dictionary, a: Vector2, c: Vector2, sin: Array) -> bool:
 	var u := c - a
@@ -332,119 +369,254 @@ static func _seg_libre(V: Dictionary, a: Vector2, c: Vector2, sin: Array) -> boo
 			return false
 	return true
 
-# los tiros directos a cada tronera: [puntos, ángulo, fuerza, bola]
-static func candidatos(V: Dictionary, q: int, desde = null) -> Array:
+# dónde cruza la banda el centro de una bola que sale de p hacia u (la misma cuenta que paso() para ver si cae)
+static func _cruce(p: Vector2, u: Vector2) -> Vector2:
+	var t := 1e9
+	if u.x > 1e-6: t = minf(t, (W - R - p.x) / u.x)
+	elif u.x < -1e-6: t = minf(t, (R - p.x) / u.x)
+	if u.y > 1e-6: t = minf(t, (H - R - p.y) / u.y)
+	elif u.y < -1e-6: t = minf(t, (R - p.y) / u.y)
+	return p + u * t
+
+# lo que entra en la tronera pk desde bp: [ángulo del centro de la boca, media boca en radianes] o [] si no entra
+static func boca_desde(bp: Vector2, pk: int) -> Array:
+	var B: Vector2 = bocas()[pk]
+	var a0 := (B - bp).angle()
+	var T: Vector2 = troneras()[pk]
+	var tr := T_MEDIO if pk == 1 or pk == 4 else T_RONERA
+	var entra := func(a: float) -> bool:
+		return _cruce(bp, Vector2.from_angle(a)).distance_to(T) < tr
+	if not entra.call(a0):
+		return []
+	var lados := []
+	for sg in [-1.0, 1.0]:
+		var lo := 0.0
+		var hi := .6
+		for it in 10:
+			var m := (lo + hi) / 2
+			if entra.call(a0 + sg * m):
+				lo = m
+			else:
+				hi = m
+		lados.append(lo)
+	var c: float = a0 + (lados[1] - lados[0]) / 2
+	return [c, (lados[0] + lados[1]) / 2]
+
+# los tiros directos: {n, pk, ang, f (la justa para que llegue), p (probabilidad con su pulso), cs (coseno del corte), d1, d2}
+static func tiros(V: Dictionary, q: int, hab: float, desde = null) -> Array:
 	var c0: Vector2 = V.b[0].p if desde == null else desde
+	var sa := pulso_ang(hab)
 	var L := []
 	for n in objetivos(V, q):
 		var bp: Vector2 = V.b[n].p
-		for pk in bocas():
-			var dir: Vector2 = (pk - bp)
-			var d2 := dir.length()
-			if d2 < 1:
+		for pk in 6:
+			var bo := boca_desde(bp, pk)
+			if bo.is_empty():
 				continue
-			dir /= d2
+			var dir := Vector2.from_angle(bo[0])
+			var pkp: Vector2 = _cruce(bp, dir)
+			var d2 := bp.distance_to(pkp)
 			var g := bp - dir * 2 * R
 			var a := g - c0
 			var d1 := a.length()
-			if d1 < 1:
+			if d1 < .5:
 				continue
 			var cs := a.normalized().dot(dir)
-			if cs < .3:
+			if cs < .2:
 				continue
-			if not _seg_libre(V, c0, g, [0, n]) or not _seg_libre(V, bp, pk, [0, n]):
+			if not _seg_libre(V, c0, g, [0, n]) or not _seg_libre(V, bp, pkp, [0, n]):
 				continue
-			# la fuerza que pide el roce: la tocada llega a la tronera y la blanca, a la tocada (con algo de sobra, no más)
-			var vc := sqrt(2 * MU * (d2 + 12)) / cs
-			var f := clampf((sqrt(vc * vc + 2 * MU * d1) * 1.1 - VMIN) / VSUBE, .12, .85)
-			L.append([cs * cs * 100.0 / (1 + (d1 + d2) / 60.0), a.angle(), f, n])
-	L.sort_custom(func(x, y): return x[0] > y[0] or (x[0] == y[0] and x[3] < y[3]))
+			# lo que se va la tocada con el error del taco: el punto de contacto se corre d1·δ y la bola sale con ese giro / (2R·cos)
+			var sig := d1 * sa / (2 * R * cs) + .004
+			var p := erf(float(bo[1]) / (sig * sqrt(2.0)))
+			var vob := sqrt(2 * MU * (d2 + 10)) / (.975 * cs)
+			var f := (sqrt(vob * vob + 2 * MU * d1) - VMIN) / VSUBE
+			if f > 1:
+				continue
+			L.append({"n": n, "pk": pk, "ang": a.angle(), "f": clampf(f, .06, 1), "p": p, "cs": cs, "d1": d1, "d2": d2, "boca": bo[0]})
+	L.sort_custom(func(x, y): return x.p > y.p or (x.p == y.p and x.n < y.n))
 	return L
 
-# lo que vale un tiro para q tras simularlo
-static func valor(V: Dictionary, q: int, ang: float, f: float) -> float:
+# hacia dónde sale la bola n si la blanca sale con ang y f (solo hasta el choque; NAN si toca otra o ninguna)
+static func _sale(V: Dictionary, n: int, ang: float, f: float) -> float:
+	var C := copia(V)
+	var ev := dispara(C, ang, f)
+	for k in 240 * 3:
+		paso(C, ev)
+		if ev.primer >= 0 or quieta(C):
+			break
+	return C.b[n].v.angle() if ev.primer == n and C.b[n].v != Vector2.ZERO else NAN
+
+# la puntería de quien sabe jugar: corrige el ángulo de la bola fantasma hasta que la tocada sale hacia la boca (con la física de
+# la mesa, que choca por pasos y no en el punto exacto), por la secante
+static func afina(V: Dictionary, n: int, quiere: float, ang: float, f: float) -> float:
+	var a0 := ang
+	var e0 := angle_difference(quiere, _sale(V, n, a0, f))
+	if is_nan(e0) or absf(e0) < .002:
+		return a0
+	var a1 := a0 + (.004 if e0 > 0 else -.004)
+	for it in 4:
+		var e1 := angle_difference(quiere, _sale(V, n, a1, f))
+		if is_nan(e1):
+			return a0
+		if absf(e1) < .002 or absf(e1 - e0) < 1e-6:
+			return a1
+		var a2 := a1 - e1 * (a1 - a0) / (e1 - e0)
+		a0 = a1
+		e0 = e1
+		a1 = clampf(a2, ang - .08, ang + .08)
+	return a1
+
+# lo mejor que tiene q desde la mesa C (con la blanca dentro): la probabilidad del tiro más fácil
+static func mejor_p(C: Dictionary, q: int, hab: float) -> float:
+	if not C.b[0].en:
+		return .85   # bola en mano: casi siempre se mete
+	var L := tiros(C, q, hab)
+	return L[0].p if L.size() else 0.0
+
+# simula el tiro en una copia: {r (resuelve), C (la mesa después), ev}
+static func prueba(V: Dictionary, q: int, ang: float, f: float) -> Dictionary:
 	var C := copia(V)
 	var ob := objetivos(C, q)
 	var ev := dispara(C, ang, f)
 	simula(C, ev)
 	var r := resuelve(C, ev, q, ob)
+	return {"r": r, "C": C, "ev": ev}
+
+# lo que vale una mesa tras el tiro de q: lo que le queda a él y lo que le deja al otro
+static func deja(Pr: Dictionary, q: int, hab: float, pos: float, cuida: float) -> float:
+	var r: Dictionary = Pr.r
 	if r.fin == "gana":
-		return 1000.0
+		return 100.0
 	if r.fin == "pierde":
-		return -1000.0
+		return -100.0
 	if r.falta:
-		return -60.0
-	var v := 0.0
-	for n in ev.met:
-		if n != 0:
-			v += 25.0
+		return -1.5 - cuida
+	var C: Dictionary = Pr.C
 	if r.sigue:
-		v += 20.0 + candidatos(C, q).size() * 2.0
-	return v
+		return 1.0 + pos * mejor_p(C, q, hab)
+	return -cuida * mejor_p(C, 1 - q, hab)
 
-# el tiro del rival: {ang, f}; hab, de 0 a 1 (la de BILLAR.hab)
+# el tiro del rival: {ang, f, tipo ("saque" | "ataque" | "defensa" | "banda"), n, pk, prob}; hab, de 0 a 1 (la de BILLAR.hab)
 static func elige(V: Dictionary, q: int, hab: float) -> Dictionary:
-	if V.saque:
-		return {"ang": (V.b[1].p - V.b[0].p).angle() + gauss() * .01, "f": .95}
-	var L := candidatos(V, q)
-	var mejor := {"ang": 0.0, "f": .5, "v": -1e9}
-	var s := .012 + (.5 - hab) * .06
-	# lo que vale con su pulso: el tiro y los dos de al lado (un corte tan fino o una banda tan justa que con un poco de error
-	# ni la toca no le vale)
-	var pulso := func(ang: float, f: float) -> float:
-		var v: float = valor(V, q, ang, f)
-		if v > -60:
-			v = (v + valor(V, q, ang + s, f) + valor(V, q, ang - s, f)) / 3.0
-		return v
+	var sa := pulso_ang(hab)
+	var sf := pulso_f(hab)
+	if V.saque:   # a romper: de lleno a la de delante, con todo
+		return {"ang": (V.b[1].p - V.b[0].p).angle() + gauss() * sa * .5, "f": clampf(.9 + hab * .2 + gauss() * sf * .5, .7, 1), "tipo": "saque", "n": 1}
+	var pos := clampf((hab - .2) * 3, .15, 1)     # cuánto piensa en la siguiente
+	var cuida := clampf((hab - .2) * 2.5, .1, .9)  # cuánto mira lo que deja al otro
+	var mejor := {"v": -1e9}
+	# atacar: las más fáciles, cada una con tres fuerzas (la justa, con algo más y fuerte), por lo que deja
+	var L := tiros(V, q, hab)
 	for i in mini(4, L.size()):
-		var v: float = pulso.call(L[i][1], L[i][2])
-		if v > mejor.v:
-			mejor = {"ang": L[i][1], "f": L[i][2], "v": v}
-	if L.is_empty() or mejor.v < 0:   # sin tiro claro: una suya de lleno (al centro), con la fuerza que pide la distancia
-		var c0: Vector2 = V.b[0].p
-		var bp := []
-		for n in objetivos(V, q):
-			var bn: Vector2 = V.b[n].p
-			var a := (bn - c0).angle()
-			var r := rayo(V, a)
-			if r.n == n:
-				bp.append([float(r.t), a])
-		bp.sort_custom(func(x, y): return x[0] < y[0])
-		for i in mini(4, bp.size()):
-			var f := clampf((sqrt(2 * MU * (float(bp[i][0]) + 40)) - VMIN) / VSUBE, .15, 1)
-			var v: float = pulso.call(bp[i][1], f)
+		var c: Dictionary = L[i]
+		for k in [0.0, .15, .35]:
+			var f := clampf(float(c.f) + k, .06, 1)
+			var ang := afina(V, int(c.n), float(c.boca), float(c.ang), f)
+			var Pr := prueba(V, q, ang, f)
+			if not Pr.r.sigue and Pr.r.fin != "gana":
+				continue   # sin errores, no entra: la geometría engaña (otra bola, la blanca que cae)
+			var v: float = float(c.p) * deja(Pr, q, hab, pos, cuida) + (1 - float(c.p)) * (-cuida * mejor_p(Pr.C, 1 - q, hab) * .8)
+			if c.n == 8 and Pr.r.fin == "gana":
+				v = float(c.p) * 100.0 - (1 - float(c.p)) * 2
 			if v > mejor.v:
-				mejor = {"ang": bp[i][1], "f": f, "v": v}
-		if mejor.v < 0:   # tapado: a banda, los ángulos de una vuelta entera y, de los mejores, el que aguanta su pulso
-			var bs := []
-			for a in 24:
-				bs.append([valor(V, q, a * PI / 12, .6), a * PI / 12])
-			bs.sort_custom(func(x, y): return x[0] > y[0])
-			for i in 3:
-				var v: float = pulso.call(bs[i][1], .6)
-				if v > mejor.v:
-					mejor = {"ang": bs[i][1], "f": .6, "v": v}
-	return {"ang": float(mejor.ang) + gauss() * s, "f": clampf(float(mejor.f) + gauss() * .03, .1, 1)}
+				mejor = {"v": v, "ang": ang, "f": f, "tipo": "ataque", "n": c.n, "pk": c.pk, "prob": c.p}
+	# defender: si no hay un tiro claro (cuanto más sabe, antes lo ve), tocar una suya flojo y dejar la blanca escondida
+	var pm: float = float(mejor.get("prob", 0.0))
+	if not mejor.has("ang") or (pm < .1 + hab * .5 and hab > .25 and Cultivo.azar() < hab * 1.6):
+		var c0: Vector2 = V.b[0].p
+		var obs := []
+		for n in objetivos(V, q):
+			var r := rayo(V, (V.b[n].p - c0).angle())
+			if r.n == n:
+				obs.append([c0.distance_to(V.b[n].p), n])
+		obs.sort()
+		for o in obs.slice(0, 3):
+			var n: int = o[1]
+			var a0: float = (V.b[n].p - c0).angle()
+			var dd: float = o[0]
+			for off in [0.0, -.5, .5, -.85, .85]:   # de lleno, medio y fino a cada lado
+				var a: float = a0 + asin(clampf(off * 2 * R / maxf(dd, 2 * R), -1, 1))
+				var fl := clampf((sqrt(2 * MU * (dd + 12)) - VMIN) / VSUBE, .05, .8)   # lo justo para llegar y un poco
+				for f in [fl, fl + .08, fl + .18]:
+					var Pr := prueba(V, q, a, f)
+					if Pr.r.falta:
+						continue
+					var v: float = deja(Pr, q, hab, pos, 1.0) + (.25 if mejor_p(Pr.C, 1 - q, hab) == 0 else 0.0)
+					if v > mejor.v:
+						mejor = {"v": v, "ang": a, "f": f, "tipo": "defensa", "n": n}
+	# tapado (o nada mejor): por banda, con el ángulo que da la banda de verdad (devuelve E_BANDA de lo que entra)
+	if mejor.v <= -1.0 or not mejor.has("ang"):
+		for k in bandas(V, q):
+			var Pr := prueba(V, q, float(k.ang), float(k.f))
+			var v: float = deja(Pr, q, hab, pos, cuida) - .1
+			if Pr.r.falta and Pr.r.motivo != "blanca":
+				v = -3.0
+			if v > mejor.v:
+				mejor = {"v": v, "ang": k.ang, "f": k.f, "tipo": "banda", "n": k.n}
+	if not mejor.has("ang"):   # ni eso: a la más cercana de lleno, a ver
+		var obs := objetivos(V, q)
+		var n0: int = obs[0]
+		for n in obs:
+			if V.b[n].p.distance_to(V.b[0].p) < V.b[n0].p.distance_to(V.b[0].p):
+				n0 = n
+		mejor = {"ang": (V.b[n0].p - V.b[0].p).angle(), "f": .4, "tipo": "ataque", "n": n0}
+	var o := mejor.duplicate()
+	o.erase("v")
+	o.ang = float(mejor.ang) + gauss() * sa
+	o.f = clampf(float(mejor.f) * (1 + gauss() * sf), .04, 1)
+	return o
 
-# con bola en mano: detrás de la bola más fácil, en línea con su tronera
-static func coloca_ia(V: Dictionary, q: int) -> Vector2:
+# las bandas: a cada bola suya por cada banda, apuntando al sitio de la banda del que sale hacia ella (la banda devuelve E_BANDA de
+# lo que entra de frente, así que no es el espejo: x = (e·dy0·x1 + dy1·x0) / (e·dy0 + dy1)). [{ang, f, n}]
+static func bandas(V: Dictionary, q: int) -> Array:
+	var c0: Vector2 = V.b[0].p
+	var L := []
+	for n in objetivos(V, q):
+		var b: Vector2 = V.b[n].p
+		for lado in 4:
+			var hz := lado < 2               # arriba y abajo: banda horizontal
+			var lim: float = (R if lado % 2 == 0 else (H - R if hz else W - R))
+			var d0: float = absf((c0.y if hz else c0.x) - lim)
+			var d1: float = absf((b.y if hz else b.x) - lim)
+			if d0 < .5 or d1 < .5:
+				continue
+			var t := (E_BANDA * d0 * (b.x if hz else b.y) + d1 * (c0.x if hz else c0.y)) / (E_BANDA * d0 + d1)
+			var pb := Vector2(t, lim) if hz else Vector2(lim, t)
+			if en_tronera(pb) or not _seg_libre(V, c0, pb, [0]) or not _seg_libre(V, pb, b, [0, n]):
+				continue
+			var l := c0.distance_to(pb) + pb.distance_to(b) / E_BANDA
+			L.append({"ang": (pb - c0).angle(), "f": clampf((sqrt(2 * MU * (l + 40)) - VMIN) / VSUBE, .2, .9), "n": n, "l": l})
+	L.sort_custom(func(x, y): return x.l < y.l)
+	return L.slice(0, 6)
+
+# con bola en mano: donde le queda el tiro más fácil y, para la siguiente, un poco de ángulo (de lleno, la blanca se para)
+static func coloca_ia(V: Dictionary, q: int, hab := .5) -> Vector2:
+	if V.saque:   # a romper: en la raya de cabecera, un poco a un lado
+		return sitio_libre(V, Vector2(W * RAYA, H / 2 + 6), 0)
 	var mejor := Vector2(W * RAYA, H / 2)
 	var mv := -1e9
+	var C := copia(V)
 	for n in objetivos(V, q):
 		var bp: Vector2 = V.b[n].p
-		for pk in bocas():
-			var dir: Vector2 = (pk - bp).normalized()
-			for dd in [22.0, 34.0, 14.0]:
-				var p: Vector2 = bp - dir * (2 * R + dd)
-				if V.saque and p.x > W * RAYA:
-					continue
-				if not libre(V, p, 0) or not _seg_libre(V, p, bp, [0, n]) or not _seg_libre(V, bp, pk, [0, n]):
-					continue
-				var v: float = 100.0 - dd - bp.distance_to(pk) / 4.0
-				if v > mv:
-					mv = v
-					mejor = p
-				break
+		for pk in 6:
+			var bo := boca_desde(bp, pk)
+			if bo.is_empty():
+				continue
+			var dir := Vector2.from_angle(bo[0])
+			for dd in [12.0, 20.0, 30.0]:
+				for gi in [-.35, 0.0, .35]:
+					var p: Vector2 = bp - dir.rotated(gi) * (2 * R + dd)
+					if not libre(V, p, 0):
+						continue
+					C.b[0].p = p
+					var L := tiros(C, q, hab, p)
+					if L.is_empty():
+						continue
+					var v: float = float(L[0].p) - dd / 400.0 + (.05 if L.size() > 1 else 0.0) + (.03 if gi != 0.0 else 0.0)
+					if v > mv:
+						mv = v
+						mejor = p
 	return sitio_libre(V, mejor, 0)
 
 # ---------- el dibujo: [x, y, w, h, color] en la pantalla ----------

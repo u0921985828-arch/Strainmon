@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El rival del billar, un jugador de verdad (lo pidió el usuario: «Tiene que ser un jugador realista de billar»)
+- Con `Datos.CAL`, el rival de la bola 8 (`src/billar8.gd`) mira cada bola suya con cada tronera y calcula la probabilidad de meterla con su pulso: el corte, lo que anda la blanca, lo que anda la tocada y lo ancha que le queda la boca desde donde está (`boca_desde`, `tiros`, con la función de error `erf`); apunta al centro de lo que entra y afina la bola fantasma con la física de la mesa (`afina`).
+- Juega la posición: de los tiros más fáciles prueba la fuerza justa, algo más y fuerte, y se queda con el que mejor le deja la siguiente y menos le deja al otro si falla (`prueba`, `deja`, `mejor_p`).
+- Si no hay tiro claro, defiende: toca una suya flojo (lo justo para llegar) y esconde la blanca; cuanto más sabe, antes lo ve. Tapado, sale por banda con el ángulo que da la banda de verdad (`bandas`). Al sacar, de lleno a la del vértice con todo; con bola en mano, la pone donde le queda el tiro más fácil (`coloca_ia(V, q, hab)`).
+- Falla como una persona: el pulso (`pulso_ang`, `pulso_f`, según `BILLAR.hab`) pesa más de lejos y en los cortes finos; con más pulso, mete más y gana más. Canta el tiro: «La 3, a la esquina.», «Esta, a defender.», «La 11, por banda.».
+- La física, más fina: el choque entre bolas se resuelve en el instante exacto del contacto dentro del paso (antes el corte dependía de cuánto se solapaban en el paso, hasta 4°), para el rival y para ti.
+- Prueba `tests/billar8_ia.gd` (12 partidas de .55 contra .30 y la blanca tapada): antes el de .55 metía el 36 % y no defendía nunca; ahora mete el 61 %, gana 10 de 12, defiende, sale por banda (18 de 21 tocan la suya), saca metiendo y con bola en mano se deja tiros de p 0,82; ninguno se pasa de 400 ms por tiro.
+
 ### Las bolas con sprite y apuestas grandes (lo pidió el usuario: «Las bolas también tienen que tener sprites, cuando se mueven y demás / Molaría que se puedan apostar cantidades más grandes o incluso semillas o objetos para cultivar especiales»)
 
 - Las bolas, a mano (`tools/sprites/a-mano/bolas.py` → `godot/arte/billar_bolas.png` + `.json`): cada una pintada como una esfera con la luz de arriba a la izquierda, en 3 tonos por material, con la franja de las rayadas y el círculo del número. Ruedan en 8 direcciones × 8 fases (una vuelta cada 2πR de camino: `rod` y `dir` por bola en `paso`, `celda_bola`), llevan su sombra en el paño (`_sombra`) y, al entrar en la tronera, caen hacia su centro en 3 fotogramas cada vez más pequeños y oscuros (`V.caen`, `CAE_MS`, `celda_caida`). La fila de debajo, también con sprites. `pinta.gd` acepta la celda de origen como sexto campo de `["@", …]`.
