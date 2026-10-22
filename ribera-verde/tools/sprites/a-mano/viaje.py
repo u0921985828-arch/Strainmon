@@ -212,13 +212,41 @@ def monte():
     return L.im
 
 
-# el pueblo de detrás (lo pidió el usuario: «los pueblos que se ven al iniciar el juego, que se parezcan más al juego»): las
-# fachadas, los árboles y los setos del propio juego, sacados del atlas de Godot (godot/arte/atlas.png), sobre un prado; se repite
-# cada PUEBLO_W px
-PUEBLO_W, PUEBLO_H, PUEBLO_BASE = 704, 108, 96          # ancho, alto y la fila del suelo (el pie de las casas)
-PUEBLO = [('prop-arbol-alto/tree', 30), ('edificio-caserio/base', 54), ('prop-arbol-alto2/tree2', 206), ('edificio-borda/base', 236),
-          ('prop-manzano/manzano', 320), ('edificio-caserio3/base', 352), ('prop-arbol-alto/tree', 470), ('edificio-caserio2/base', 500),
-          ('prop-arbol-alto2/tree2', 650)]          # (marco del atlas, x: la izquierda de las casas, el centro de los árboles)
+# los pueblos de detrás (lo pidió el usuario: «los pueblos que se ven al iniciar el juego, que se parezcan más al juego», y luego «que no
+# todos los pueblos sean iguales y que, por lo alejadas que estén las casas de la carretera, se vean más o menos pequeñas»): las
+# fachadas, los árboles y los setos del propio juego, sacados del atlas de Godot (godot/arte/atlas.png). Un pueblo por tipo (el rural de
+# los caseríos, el de la costa, el de las naves, el barrio y la ciudad), cada uno en dos capas: la de junto a la carretera, a su
+# tamaño, y la de lejos, a la mitad, más arriba y más despacio. Cada capa se repite cada PUEBLO_W px
+PUEBLO_W = 704
+CERCA_H, CERCA_BASE = 108, 96           # la capa de junto a la carretera: alto y la fila del suelo (el pie de las casas)
+LEJOS_H, LEJOS_BASE = 80, 52            # la de lejos
+A = 'prop-arbol-alto/tree'; A2 = 'prop-arbol-alto2/tree2'; MZ = 'prop-manzano/manzano'
+def e(k): return 'edificio-%s/base' % k
+# (marco del atlas, x: la izquierda de las casas, el centro de los árboles); los de lejos, en px de la mitad
+PUEBLOS = {
+    'rural': {
+        'cerca': [(A, 30), (e('caserio'), 54), (MZ, 300), (e('borda'), 420), (A2, 520), (e('caserio3'), 560)],
+        'lejos': [(e('borda'), 10), (A2, 90), (e('caserio3'), 120), (e('caserio'), 260), (MZ, 340), (A, 380), (e('borda'), 420), (e('caserio2'), 520), (A2, 660)],
+        'prado': '#7cbc64'},
+    'costa': {
+        'cerca': [(e('marinera'), 20), (e('marinera2'), 84), (A2, 200), (e('marinera5'), 330), (e('marinera6'), 410), (MZ, 560), (e('marinera3'), 600)],
+        'lejos': [(e('marinera4'), 0), (e('marinera'), 64), (e('marinera2'), 128), (e('marinera6'), 192), (A, 270), (e('marinera3'), 310), (e('marinera5'), 374),
+                  (e('marinera'), 454), (e('marinera4'), 518), (A2, 610), (e('marinera6'), 640)],
+        'prado': '#8cc46c'},
+    'industria': {
+        'cerca': [(e('nave'), 16), (A, 200), (e('fabrica'), 300), (e('garaje'), 430), (A2, 560), (e('garaje'), 620)],
+        'lejos': [(e('fabrica'), 0), (e('nave'), 140), (A2, 262), (e('ladrillo'), 290), (e('fabrica'), 420), (A, 570), (e('nave'), 600)],
+        'prado': '#82b45e'},
+    'barrio': {
+        'cerca': [(e('home'), 10), (A, 160), (e('garaje'), 300), (e('gray'), 420), (MZ, 560), (A2, 650)],
+        'lejos': [(e('bloque'), 0), (e('ladrillo'), 132), (e('bloque2'), 250), (A, 392), (e('gray'), 420), (e('bloque'), 520), (A2, 670)],
+        'prado': '#7cbc64'},
+    'ciudad': {
+        'cerca': [(e('casco'), 0), (e('casco2'), 64), (A2, 190), (e('ladrillo'), 300), (A, 470), (e('casco3'), 540), (e('casco2'), 620)],
+        'lejos': [(e('bloque'), 0), (e('bloque2'), 128), (e('casco3'), 256), (e('bloque'), 336), (e('casco'), 464), (e('bloque2'), 528), (e('casco2'), 656)],
+        'prado': '#86b86a'},
+}
+NEBLINA = ('#a8c0cc', 0.22)              # lo de lejos, algo más claro, del color del monte del fondo
 
 
 def del_atlas():
@@ -227,20 +255,74 @@ def del_atlas():
     return lambda k: hoja.crop((j['frames'][k]['x'], j['frames'][k]['y'], j['frames'][k]['x'] + j['frames'][k]['w'], j['frames'][k]['y'] + j['frames'][k]['h']))
 
 
-def medio():
-    marco = del_atlas()
-    L = Lienzo(PUEBLO_W, PUEBLO_H)
-    L.r(0, PUEBLO_BASE - 6, PUEBLO_W, PUEBLO_H - PUEBLO_BASE + 6, '#7cbc64'); L.r(0, PUEBLO_BASE - 6, PUEBLO_W, 1, '#9cd47c')
+def mitad(im):
+    # a la mitad sin perder el estilo: cada 2 × 2 da el color de su paleta que más se repite (el contorno gana a los demás si está), y
+    # transparente solo si lo son 3 o 4 de los 4
+    w, h = im.width // 2, im.height // 2
+    src = im.load()
+    out = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    px = out.load()
+    for y in range(h):
+        for x in range(w):
+            cs = [src[2 * x + dx, 2 * y + dy] for dy in (0, 1) for dx in (0, 1)]
+            op = [c for c in cs if c[3] >= 128]
+            if len(op) < 2:
+                continue
+            osc = [c for c in op if sum(c[:3]) < 150]
+            if osc and len(osc) >= 2:
+                px[x, y] = osc[0][:3] + (255,); continue
+            cuenta = {}
+            for c in op:
+                cuenta[c[:3]] = cuenta.get(c[:3], 0) + 1
+            px[x, y] = max(cuenta, key=lambda c: (cuenta[c], -sum(c))) + (255,)
+    return out
+
+
+def neblina(im):
+    r0, g0, b0 = (int(NEBLINA[0][i:i + 2], 16) for i in (1, 3, 5))
+    t = NEBLINA[1]
+    px = im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            r, g, b, a = px[x, y]
+            if a:
+                px[x, y] = (round(r + (r0 - r) * t), round(g + (g0 - g) * t), round(b + (b0 - b) * t), a)
+    return im
+
+
+def prado(L, base, h, c):
+    claro = '#%02x%02x%02x' % tuple(min(255, int(c[i:i + 2], 16) + 32) for i in (1, 3, 5))
+    oscuro = '#%02x%02x%02x' % tuple(int(int(c[i:i + 2], 16) * 0.86) for i in (1, 3, 5))
+    L.r(0, base - 6, PUEBLO_W, h - base + 6, c); L.r(0, base - 6, PUEBLO_W, 1, claro)
     for x in range(0, PUEBLO_W, 7):
-        L.p(x, PUEBLO_BASE - 2 + (x * 13) % 9, '#6aa858')
+        L.p(x, base - 2 + (x * 13) % 9 if base - 2 + (x * 13) % 9 < h else h - 1, oscuro)
+
+
+def pueblo(tipo, marco):
+    P = PUEBLOS[tipo]
+    # junto a la carretera
+    L = Lienzo(PUEBLO_W, CERCA_H)
+    prado(L, CERCA_BASE, CERCA_H, P['prado'])
     seto = marco('prop-seto/seto/unica/00')
     for x in range(0, PUEBLO_W, 16):          # el seto corrido delante del prado
-        L.im.alpha_composite(seto, (x, PUEBLO_H - 16))
-    for k, x in PUEBLO:
+        L.im.alpha_composite(seto, (x, CERCA_H - 16))
+    for k, x in P['cerca']:
         im = marco(k + '/unica/00')
         x0 = x if k.startswith('edificio') else x - im.width // 2
-        L.im.alpha_composite(im, (x0, PUEBLO_BASE - im.height))
-    return L.im
+        L.im.alpha_composite(im, (x0, CERCA_BASE - im.height))
+    cerca_im = L.im
+    # lejos: las casas a la mitad, sobre su prado, con la neblina
+    L = Lienzo(PUEBLO_W, LEJOS_H)
+    for k, x in P['lejos']:
+        im = mitad(marco(k + '/unica/00'))
+        x0 = x if k.startswith('edificio') else x - im.width // 2
+        L.im.alpha_composite(im, (x0, LEJOS_BASE - im.height))
+    neblina(L.im)
+    fondo = Lienzo(PUEBLO_W, LEJOS_H)
+    prado(fondo, LEJOS_BASE, LEJOS_H, '#6ea870')
+    neblina(fondo.im)
+    fondo.im.alpha_composite(L.im)
+    return cerca_im, fondo.im
 
 
 def cerca():
@@ -282,7 +364,11 @@ def main():
             piezas['rueda-%d-%d' % (d, f)] = rueda(d, f)
     for k in ('nube-0', 'nube-1', 'nube-2', 'nube-3', 'sol', 'luna'):     # el cielo, de PixelLab
         piezas[k] = Image.open(os.path.join(PIXELLAB, k + '.png')).convert('RGBA')
-    piezas['monte'] = monte(); piezas['medio'] = medio(); piezas['cerca'] = cerca(); piezas['carretera'] = carretera()
+    piezas['monte'] = monte()
+    marco = del_atlas()
+    for t in PUEBLOS:
+        piezas['pueblo-' + t], piezas['lejos-' + t] = pueblo(t, marco)
+    piezas['cerca'] = cerca(); piezas['carretera'] = carretera()
     # la hoja: por filas, de arriba abajo
     W = max(200, max(im.width for im in piezas.values()))
     x = y = fila = 0

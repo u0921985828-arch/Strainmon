@@ -95,7 +95,7 @@ func _corre() -> void:
 					chk(EscViaje.R.has("rueda-%d-%d" % [int(r[2]), f]), "%s: rueda %d, fotograma %d" % [k, int(r[2]), f])
 			var w: int = EscViaje.R[k].get_width()
 			chk(int(m.suelo) >= EscViaje.R[k].get_height() - 2 and int(m.faro[0]) > w / 2, "%s: el suelo abajo y el faro delante" % k)
-	for k in ["monte", "medio", "cerca", "carretera"]:
+	for k in ["monte", "cerca", "carretera"]:
 		chk(EscViaje.R.has(k), "el fondo: %s" % k)
 	chk(EscViaje.clave("tractor") == "bus", "un vehículo sin dibujo, el autobús")
 	# el autobús y el cielo de PixelLab (lo pidió el usuario: «el sprite del bus, más del estilo del juego, muebles con PixelLab, como
@@ -111,9 +111,36 @@ func _corre() -> void:
 		for x in bus.get_width():
 			gorra = gorra or bus.get_pixel(x, y).is_equal_approx(Color("#5aa861"))
 	chk(gorra, "bus: el protagonista, con la gorra verde, en la ventana")
-	var pu: Image = EscViaje.R.medio
-	chk(pu.get_width() == 704 and pu.get_height() == 108, "el pueblo de detrás, con las fachadas y los árboles del juego (%dx%d)" % [pu.get_width(), pu.get_height()])
-	chk(EscViaje.CAPAS[1][1] + 96 >= EscViaje.CAPAS[2][1], "el pie de las casas, detrás del quitamiedos")
+	# los pueblos (lo pidió el usuario: «que no todos los pueblos sean iguales y que, por lo alejadas que estén las casas de la carretera,
+	# se vean más o menos pequeñas»): uno por tipo, en dos capas; las casas de lejos, a la mitad, más arriba y más despacio
+	var alto_casas := func(im: Image, base: int) -> int:   # lo más alto que sale del prado
+		for y in base - 7:
+			for x in im.get_width():
+				if im.get_pixel(x, y).a > 0.5 and not im.get_pixel(x, y).is_equal_approx(im.get_pixel(0, base - 1)):
+					return base - y
+		return 0
+	var vistos := []
+	for t in EscViaje.PUEBLOS:
+		var pc: Image = EscViaje.R.get("pueblo-" + t)
+		var pl: Image = EscViaje.R.get("lejos-" + t)
+		chk(pc != null and pc.get_width() == 704 and pc.get_height() == 108, "%s: el pueblo de junto a la carretera, con el arte del juego" % t)
+		chk(pl != null and pl.get_width() == 704 and pl.get_height() == 80, "%s: el de lejos" % t)
+		if pc == null or pl == null:
+			continue
+		var hc: int = alto_casas.call(pc, 96)
+		var hl: int = alto_casas.call(pl, 52)
+		chk(hc >= 80 and hl > 0 and hl <= hc * 0.6, "%s: lo de lejos, más pequeño (%d px frente a %d)" % [t, hl, hc])
+		chk(not vistos.any(func(o: Image): return o.get_data() == pc.get_data()), "%s: distinto de los demás" % t)
+		vistos.append(pc)
+	chk(EscViaje.CAPAS[1][0] == "lejos" and EscViaje.CAPAS[2][0] == "pueblo" and EscViaje.CAPAS[1][2] < EscViaje.CAPAS[2][2] and EscViaje.CAPAS[1][2] > EscViaje.CAPAS[0][2], "lejos, más despacio que el pueblo y más deprisa que el monte")
+	chk(EscViaje.CAPAS[1][1] + 52 < EscViaje.CAPAS[2][1] + 96 and EscViaje.CAPAS[1][1] + 80 >= EscViaje.CAPAS[3][1], "el pie de lo de lejos, más arriba; su prado, hasta el quitamiedos")
+	chk(EscViaje.CAPAS[2][1] + 96 >= EscViaje.CAPAS[3][1], "el pie de las casas, detrás del quitamiedos")
+	chk(J.D.PARADAS.keys().all(func(k): return EscViaje.PUEBLOS.has(EscViaje.pueblo({"k": k, "de": "", "a": ""})[0])), "cada parada con su pueblo")
+	chk(EscViaje.pueblo({"k": "puerto"})[0] == "costa" and EscViaje.pueblo({"k": "ibarbide"})[0] == "ciudad" and EscViaje.pueblo({"k": "valdehierro"})[0] == "industria" and EscViaje.pueblo({"k": "mendialde"})[0] == "rural", "el pueblo, por el destino")
+	var tipos := {}
+	for i in 30:
+		tipos[EscViaje.pueblo({"de": "a%d" % i, "a": "b"})[0]] = 1
+	chk(tipos.size() >= 4, "sin destino conocido, por el trayecto (%d tipos)" % tipos.size())
 	for k in ["nube-0", "nube-1", "nube-2", "nube-3", "sol", "luna"]:
 		chk(EscViaje.R.has(k) and EscViaje.R[k].get_width() >= 16, "el cielo: %s" % k)
 	for lz in 3:
@@ -149,7 +176,7 @@ func _corre() -> void:
 	# 4 · dura lo suyo y A lo pasa
 	auto.a = false
 	var vio := {"v": false}
-	M.timeout(func(): vio.v = J.VIAJE_V != null and J.VIAJE_V.veh == "bus" and J.VIAJE_V.a == "Puerto Viejo", 1000)
+	M.timeout(func(): vio.v = J.VIAJE_V != null and J.VIAJE_V.veh == "bus" and J.VIAJE_V.a == "Puerto Viejo" and J.VIAJE_V.k == "puerto", 1000)
 	t0 = M.reloj
 	chk(corre(func(): await J.anim_viaje("bus", "town", "puerto", 30)), "el viaje termina solo")
 	chk(vio.v, "a mitad, VIAJE_V con el autobús y el destino")
@@ -259,6 +286,12 @@ func _corre() -> void:
 						await RenderingServer.frame_post_draw
 					var im: Image = J.sv.get_texture().get_image()
 					im.save_png(dir.path_join("viaje-%s-%02d-%04d.png" % [veh, h, ms]))
+		for k in J.D.PARADAS:   # cada destino, su pueblo
+			J.VIAJE_V = {"veh": "bus", "k": k, "de": "Ribera Verde", "a": k, "min": 35, "h": 720, "t0": 0.0}
+			J.pintor.redibuja(1500)
+			for r in 3:
+				await RenderingServer.frame_post_draw
+			J.sv.get_texture().get_image().save_png(dir.path_join("pueblo-%s.png" % k))
 		J.VIAJE_V = null
 		for md in ["carga", "title"]:   # 1.57.1: la calle, en la carga y de fondo en el título
 			for ms in [800.0, 2600.0]:

@@ -1543,7 +1543,7 @@ func anim_viaje(veh: String, de: String, a: String, mins: int) -> void:
 	if gancho_viaje.is_valid():
 		gancho_viaje.call(veh, de, a)
 		return
-	VIAJE_V = {"veh": veh, "de": String(D.PARADAS[de].n) if D.PARADAS.has(de) else de, "a": String(D.PARADAS[a].n) if D.PARADAS.has(a) else a, "min": mins, "h": int(S.min), "t0": M.reloj}
+	VIAJE_V = {"veh": veh, "k": a, "de": String(D.PARADAS[de].n) if D.PARADAS.has(de) else de, "a": String(D.PARADAS[a].n) if D.PARADAS.has(a) else a, "min": mins, "h": int(S.min), "t0": M.reloj}
 	hud.hide()
 	await fade(0)
 	var pr := Motor.Prom.new()

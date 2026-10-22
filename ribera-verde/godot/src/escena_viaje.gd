@@ -14,7 +14,12 @@ const DUR := 3000.0      # ms: entra, rueda y sale
 const ENTRA := 700.0
 const SALE := 2300.0
 const VEL := {"bus": 0.11, "moto": 0.16, "utilitario": 0.17, "berlina": 0.18, "deportivo": 0.26}   # px/ms del fondo cercano
-const CAPAS := [["monte", 64, 0.12], ["medio", 40, 0.4], ["cerca", 132, 1.0]]   # pieza, y, parallax (medio: el pueblo con el arte del juego, de viaje.py)
+const CAPAS := [["monte", 64, 0.12], ["lejos", 56, 0.22], ["pueblo", 40, 0.4], ["cerca", 132, 1.0]]   # pieza, y, parallax (lejos y pueblo, por tipo: «lejos-rural»…)
+# el pueblo de detrás, por el sitio al que vas (lo pidió el usuario: «que no todos los pueblos sean iguales»); las casas de lejos, a la
+# mitad, más arriba y más despacio (de viaje.py); lo que no está, por el trayecto
+const PUEBLOS := ["rural", "costa", "industria", "barrio", "ciudad"]
+const PUEBLO_DE := {"town": "barrio", "puerto": "costa", "muelle": "costa", "valdehierro": "industria", "mendialde": "rural",
+		"errotabarri": "rural", "ibarbide": "ciudad", "metropoli": "ciudad"}
 const Y_CARRETERA := 142
 const CARRIL := 27        # el suelo de las ruedas, desde arriba de la carretera
 
@@ -80,8 +85,9 @@ static func pinta(P, V: Dictionary, now: float) -> void:
 	var vel: float = VEL.get(k, 0.15)
 	var p := pos(e, sw, w, vel)
 	var corre := p.y
+	var tp := pueblo(V)
 	_cielo(P, sw, lz, corre)
-	_fondo(P, sw, sh, corre, tin)
+	_fondo(P, sw, sh, corre + float(tp[1]), tin, String(tp[0]))
 	# el vehículo: de noche, el haz de los faros delante
 	var suelo := Y_CARRETERA + CARRIL
 	var bote := 1 if int(e / 90.0) % 4 == 0 and e > 60.0 else 0
@@ -156,10 +162,16 @@ static func _cielo(P, sw: int, lz: int, corre := 0.0) -> void:
 		var x := int(fposmod(float(n[1]) - corre * float(n[3]), float(vuelta))) - 60
 		P._img(im, x, int(n[2]), NUBE_TINTE[lz])
 
-static func _fondo(P, sw: int, sh: int, corre: float, tin: Color) -> void:
+# [tipo, desfase]: el tipo por el destino (o por el trayecto) y dónde empieza, por el trayecto
+static func pueblo(V: Dictionary) -> Array:
+	var h := absi(hash("%s>%s" % [V.get("de", ""), V.get("a", "")]))
+	var t: String = PUEBLO_DE.get(String(V.get("k", "")), PUEBLOS[h % PUEBLOS.size()])
+	return [t, float(h % 1760)]
+
+static func _fondo(P, sw: int, sh: int, corre: float, tin: Color, tipo := "rural") -> void:
 	# las capas de fondo, repetidas
 	for c in CAPAS:
-		var im: Image = R[c[0]]
+		var im: Image = R[c[0] + ("-" + tipo if c[0] in ["lejos", "pueblo"] else "")]
 		var cw := im.get_width()
 		var dx := -int(fposmod(corre * float(c[2]), cw))
 		var x := dx
