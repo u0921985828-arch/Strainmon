@@ -13,11 +13,12 @@ const W := 168.0          # el tapete, de banda a banda (2:1, como una mesa de 8
 const H := 84.0
 const R := 2.5            # el radio de la bola (5 px)
 const DT := 1.0 / 240.0   # el paso de la física
-const MU := 110.0         # el roce del paño (px/s²)
+const MU := 80.0          # el roce del paño (px/s²)
 const PARA := 3.0         # por debajo, quieta
-const E_BOLA := 0.94      # lo que devuelve un choque entre bolas
+const E_BOLA := 0.95      # lo que devuelve un choque entre bolas
 const E_BANDA := 0.75     # y una banda
 const VMIN := 40.0        # la fuerza: de VMIN a VMIN + VSUBE px/s
+const SAQUE := 2.4        # el saque, más fuerte que un tiro (taco de abrir y todo el brazo)
 const VSUBE := 380.0
 const T_RONERA := 5.6     # lo que traga una tronera de esquina (radio desde su centro)
 const T_MEDIO := 5.0      # y una del medio
@@ -25,6 +26,7 @@ const CARGA_MS := 1100.0  # lo que tarda la fuerza en llegar a tope con A apreta
 const RAYA := 0.25        # la cabecera (de la blanca al sacar)
 const PIE := 0.72         # el pie (el vértice del triángulo)
 const PASOS_MAX := 240 * 14
+const CHOQUES := 8         # vueltas de choques por paso
 
 # las troneras: las cuatro esquinas y las dos del medio, un poco fuera del tapete
 static func troneras() -> Array:
@@ -82,7 +84,7 @@ static func ev_nuevo() -> Dictionary:
 	return {"primer": -1, "met": [], "blanca": false, "toques": 0}
 
 static func dispara(V: Dictionary, ang: float, f: float) -> Dictionary:
-	V.b[0].v = Vector2.from_angle(ang) * (VMIN + VSUBE * clampf(f, 0, 1))
+	V.b[0].v = Vector2.from_angle(ang) * (VMIN + VSUBE * clampf(f, 0, 1)) * (SAQUE if V.get("saque", false) else 1.0)
 	return ev_nuevo()
 
 static func en_tronera(p: Vector2) -> bool:
@@ -100,7 +102,20 @@ static func paso(V: Dictionary, ev: Dictionary) -> void:
 	for d in b:
 		if not d.en:
 			continue
-		if en_tronera(d.p):
+		# la tronera se mira donde el centro cruza la línea de la banda, no donde ha llegado en este paso: así lo que cae no
+		# depende de la velocidad (antes, la rápida se metía más en la boca y caía; la lenta rebotaba)
+		var t := 0.0
+		var sale := 0.0
+		for e in [d.p.x - R, W - R - d.p.x, d.p.y - R, H - R - d.p.y]:
+			sale = maxf(sale, -e)
+		if sale > 0 and d.v != Vector2.ZERO:
+			var vx: float = absf(d.v.x)
+			var vy: float = absf(d.v.y)
+			if d.p.x < R and vx > 0: t = maxf(t, (R - d.p.x) / vx)
+			if d.p.x > W - R and vx > 0: t = maxf(t, (d.p.x - W + R) / vx)
+			if d.p.y < R and vy > 0: t = maxf(t, (R - d.p.y) / vy)
+			if d.p.y > H - R and vy > 0: t = maxf(t, (d.p.y - H + R) / vy)
+		if en_tronera(d.p - d.v * t):
 			d.en = false
 			d.v = Vector2.ZERO
 			ev.met.append(d.n)
@@ -119,31 +134,40 @@ static func paso(V: Dictionary, ev: Dictionary) -> void:
 		elif d.p.y > H - R:
 			d.p.y = H - R
 			d.v.y = -absf(d.v.y) * E_BANDA
-	for i in 16:
-		var a: Dictionary = b[i]
-		if not a.en:
-			continue
-		for j in range(i + 1, 16):
-			var c: Dictionary = b[j]
-			if not c.en or (a.v == Vector2.ZERO and c.v == Vector2.ZERO):
+	# los choques, en varias vueltas por paso: en el triángulo apretado un golpe tiene que pasar de bola en bola en el mismo
+	# instante (como en la realidad); con una sola vuelta se quedaba a medias y el saque no abría las bolas
+	for it in CHOQUES:
+		var hubo := false
+		for i in 16:
+			var a: Dictionary = b[i]
+			if not a.en:
 				continue
-			var dd: Vector2 = c.p - a.p
-			var l2 := dd.length_squared()
-			if l2 >= 4 * R * R or l2 == 0:
-				continue
-			var l := sqrt(l2)
-			var nn := dd / l
-			var rel: float = (a.v - c.v).dot(nn)
-			if rel > 0:
-				var imp := rel * (1 + E_BOLA) / 2
-				a.v -= nn * imp
-				c.v += nn * imp
-				ev.toques += 1
-				if ev.primer < 0 and (i == 0 or j == 0):
-					ev.primer = j if i == 0 else i
-			var sobra := (2 * R - l) / 2
-			a.p -= nn * sobra
-			c.p += nn * sobra
+			for j in range(i + 1, 16):
+				var c: Dictionary = b[j]
+				if not c.en or (a.v == Vector2.ZERO and c.v == Vector2.ZERO):
+					continue
+				var dd: Vector2 = c.p - a.p
+				var l2 := dd.length_squared()
+				if l2 >= 4 * R * R or l2 == 0:
+					continue
+				var l := sqrt(l2)
+				var nn := dd / l
+				var rel: float = (a.v - c.v).dot(nn)
+				if rel > 0:
+					var imp := rel * (1 + E_BOLA) / 2
+					a.v -= nn * imp
+					c.v += nn * imp
+					hubo = true
+					if it == 0:
+						ev.toques += 1
+					if ev.primer < 0 and (i == 0 or j == 0):
+						ev.primer = j if i == 0 else i
+				if it == 0:
+					var sobra := (2 * R - l) / 2
+					a.p -= nn * sobra
+					c.p += nn * sobra
+		if not hubo:
+			break
 	for d in b:
 		if d.en and d.v != Vector2.ZERO:
 			var s: float = d.v.length()
@@ -201,6 +225,8 @@ static func resuelve(V: Dictionary, ev: Dictionary, q: int, ob: Array) -> Dictio
 		negra = false
 	if negra:
 		r.fin = "gana" if (ob == [8] and not r.falta) else "pierde"
+		if r.fin == "pierde" and not r.falta:
+			r.motivo = "pronto"
 		return r
 	if V.gr[q] == "" and not saque and not r.falta:
 		for n in ev.met:
@@ -215,6 +241,14 @@ static func resuelve(V: Dictionary, ev: Dictionary, q: int, ob: Array) -> Dictio
 		if n != 0 and (saque or V.gr[q] == "" or de_grupo(n, V.gr[q])):
 			r.sigue = true
 	return r
+
+# al tope de tiros (se hace tarde): gana a quien le quedan menos bolas suyas en la mesa; con la mesa abierta o empatados, tablas
+static func al_tope(V: Dictionary) -> String:
+	if V.gr[0] == "":
+		return ""
+	var a := quedan(V, V.gr[0])
+	var b := quedan(V, V.gr[1])
+	return "yo" if a < b else "el" if b < a else ""
 
 # un sitio libre cerca de p (la negra que vuelve, la blanca en mano)
 static func libre(V: Dictionary, p: Vector2, sin := 0) -> bool:
@@ -314,7 +348,9 @@ static func candidatos(V: Dictionary, q: int, desde = null) -> Array:
 				continue
 			if not _seg_libre(V, c0, g, [0, n]) or not _seg_libre(V, bp, pk, [0, n]):
 				continue
-			var f := clampf(.18 + (d1 + d2 / maxf(cs, .3)) / 420.0, .2, .85)
+			# la fuerza que pide el roce: la tocada llega a la tronera y la blanca, a la tocada (con algo de sobra, no más)
+			var vc := sqrt(2 * MU * (d2 + 12)) / cs
+			var f := clampf((sqrt(vc * vc + 2 * MU * d1) * 1.1 - VMIN) / VSUBE, .12, .85)
 			L.append([cs * cs * 100.0 / (1 + (d1 + d2) / 60.0), a.angle(), f, n])
 	L.sort_custom(func(x, y): return x[0] > y[0] or (x[0] == y[0] and x[3] < y[3]))
 	return L
@@ -346,23 +382,42 @@ static func elige(V: Dictionary, q: int, hab: float) -> Dictionary:
 		return {"ang": (V.b[1].p - V.b[0].p).angle() + gauss() * .01, "f": .95}
 	var L := candidatos(V, q)
 	var mejor := {"ang": 0.0, "f": .5, "v": -1e9}
+	var s := .012 + (.5 - hab) * .06
+	# lo que vale con su pulso: el tiro y los dos de al lado (un corte tan fino o una banda tan justa que con un poco de error
+	# ni la toca no le vale)
+	var pulso := func(ang: float, f: float) -> float:
+		var v: float = valor(V, q, ang, f)
+		if v > -60:
+			v = (v + valor(V, q, ang + s, f) + valor(V, q, ang - s, f)) / 3.0
+		return v
 	for i in mini(4, L.size()):
-		var v: float = valor(V, q, L[i][1], L[i][2])
+		var v: float = pulso.call(L[i][1], L[i][2])
 		if v > mejor.v:
 			mejor = {"ang": L[i][1], "f": L[i][2], "v": v}
-	if L.is_empty() or mejor.v < 0:   # sin tiro claro: tocar una suya de lleno, sin más
-		var ob := objetivos(V, q)
+	if L.is_empty() or mejor.v < 0:   # sin tiro claro: una suya de lleno (al centro), con la fuerza que pide la distancia
+		var c0: Vector2 = V.b[0].p
 		var bp := []
-		for a in 72:
-			var r := rayo(V, a * PI / 36)
-			if r.n in ob:
-				bp.append([r.t, a * PI / 36])
+		for n in objetivos(V, q):
+			var bn: Vector2 = V.b[n].p
+			var a := (bn - c0).angle()
+			var r := rayo(V, a)
+			if r.n == n:
+				bp.append([float(r.t), a])
 		bp.sort_custom(func(x, y): return x[0] < y[0])
-		for i in mini(3, bp.size()):
-			var v: float = valor(V, q, bp[i][1], .35)
+		for i in mini(4, bp.size()):
+			var f := clampf((sqrt(2 * MU * (float(bp[i][0]) + 40)) - VMIN) / VSUBE, .15, 1)
+			var v: float = pulso.call(bp[i][1], f)
 			if v > mejor.v:
-				mejor = {"ang": bp[i][1], "f": .35, "v": v}
-	var s := .012 + (.5 - hab) * .06
+				mejor = {"ang": bp[i][1], "f": f, "v": v}
+		if mejor.v < 0:   # tapado: a banda, los ángulos de una vuelta entera y, de los mejores, el que aguanta su pulso
+			var bs := []
+			for a in 24:
+				bs.append([valor(V, q, a * PI / 12, .6), a * PI / 12])
+			bs.sort_custom(func(x, y): return x[0] > y[0])
+			for i in 3:
+				var v: float = pulso.call(bs[i][1], .6)
+				if v > mejor.v:
+					mejor = {"ang": bs[i][1], "f": .6, "v": v}
 	return {"ang": float(mejor.ang) + gauss() * s, "f": clampf(float(mejor.f) + gauss() * .03, .1, 1)}
 
 # con bola en mano: detrás de la bola más fácil, en línea con su tronera
@@ -391,6 +446,30 @@ static func coloca_ia(V: Dictionary, q: int) -> Vector2:
 const COL := ["#f8f8f0", "#e8c040", "#3a62c8", "#e04040", "#7a4aa8", "#f08a30", "#2e9a5a", "#8a3030", "#26262e"]
 const PANO := "#2f7a46"
 const PANO_O := "#286a3c"
+
+# la mesa y el taco de PixelLab (lo pidió el usuario: «Hazlo con sprites de PixelLab mejor»): arte/billar.png + billar.json de
+# tools/sprites/pixellab_billar.py (la mesa con 11 px de banda alrededor del tapete y el taco en NT ángulos con su punta)
+static var ARTE := {}
+static var PUNTA := {}
+static var NT := 0
+static var BANDA := 11
+
+static func carga() -> bool:
+	if ARTE.size():
+		return true
+	var im := Image.new()
+	if im.load_png_from_buffer(FileAccess.get_file_as_bytes("res://arte/billar.png")) != OK:
+		return false
+	var j = JSON.parse_string(FileAccess.get_file_as_string("res://arte/billar.json"))
+	if typeof(j) != TYPE_DICTIONARY:
+		return false
+	for k in j.r:
+		var q: Array = j.r[k]
+		ARTE[k] = im.get_region(Rect2i(int(q[0]), int(q[1]), int(q[2]), int(q[3])))
+	PUNTA = j.v
+	NT = int(j.nt)
+	BANDA = int(j.banda)
+	return true
 
 static func origen(sw: int) -> Vector2i:
 	return Vector2i((sw - int(W)) >> 1, 14)
@@ -424,27 +503,32 @@ static func rects(V: Dictionary, sw: int, sh: int, now: float) -> Array:
 	var x0 := O.x
 	var y0 := O.y
 	var o := [[0, 0, sw, sh, "rgba(8,10,14,0.72)"]]
-	o.append([x0 - 10, y0 - 10, int(W) + 20, int(H) + 20, "#26262e"])
-	o.append([x0 - 9, y0 - 9, int(W) + 18, int(H) + 18, "#74502e"])
-	o.append([x0 - 9, y0 - 9, int(W) + 18, 1, "#a46e40"])
-	o.append([x0 - 4, y0 - 4, int(W) + 8, int(H) + 8, "#1f5a34"])   # las bandas de goma
-	o.append([x0, y0, int(W), int(H), PANO])
-	o.append([x0, y0, int(W), 1, PANO_O])
-	o.append([x0, y0, 1, int(H), PANO_O])
-	for i in range(1, 8):   # los rombos de la madera
-		if i != 4:
-			o.append([x0 + int(W * i / 8.0), y0 - 7, 1, 1, "#dcac6c"])
-			o.append([x0 + int(W * i / 8.0), y0 + int(H) + 6, 1, 1, "#dcac6c"])
-	for i in range(1, 4):
-		o.append([x0 - 7, y0 + int(H * i / 4.0), 1, 1, "#dcac6c"])
-		o.append([x0 + int(W) + 6, y0 + int(H * i / 4.0), 1, 1, "#dcac6c"])
+	var clip := Rect2i(0, 0, sw, sh)
+	var arte := carga()
+	if arte:
+		o.append(["@", ARTE.mesa, x0 - BANDA, y0 - BANDA, clip])
+	else:
+		o.append([x0 - 10, y0 - 10, int(W) + 20, int(H) + 20, "#26262e"])
+		o.append([x0 - 9, y0 - 9, int(W) + 18, int(H) + 18, "#74502e"])
+		o.append([x0 - 9, y0 - 9, int(W) + 18, 1, "#a46e40"])
+		o.append([x0 - 4, y0 - 4, int(W) + 8, int(H) + 8, "#1f5a34"])   # las bandas de goma
+		o.append([x0, y0, int(W), int(H), PANO])
+		o.append([x0, y0, int(W), 1, PANO_O])
+		o.append([x0, y0, 1, int(H), PANO_O])
+		for i in range(1, 8):   # los rombos de la madera
+			if i != 4:
+				o.append([x0 + int(W * i / 8.0), y0 - 7, 1, 1, "#dcac6c"])
+				o.append([x0 + int(W * i / 8.0), y0 + int(H) + 6, 1, 1, "#dcac6c"])
+		for i in range(1, 4):
+			o.append([x0 - 7, y0 + int(H * i / 4.0), 1, 1, "#dcac6c"])
+			o.append([x0 + int(W) + 6, y0 + int(H * i / 4.0), 1, 1, "#dcac6c"])
+		for t in troneras():
+			var cx := x0 + roundi(t.x)
+			var cy := y0 + roundi(t.y)
+			o.append([cx - 3, cy - 4, 7, 9, "#121519"])
+			o.append([cx - 4, cy - 3, 9, 7, "#121519"])
 	o.append([x0 + int(W * RAYA), y0 + 1, 1, int(H) - 2, "rgba(255,255,255,0.12)"])   # la cabecera
 	o.append([x0 + int(W * PIE), y0 + int(H / 2), 1, 1, "rgba(255,255,255,0.3)"])   # el pie
-	for t in troneras():
-		var cx := x0 + roundi(t.x)
-		var cy := y0 + roundi(t.y)
-		o.append([cx - 3, cy - 4, 7, 9, "#121519"])
-		o.append([cx - 4, cy - 3, 9, 7, "#121519"])
 	var b: Array = V.b
 	for d in b:
 		if d.en and d.n != 0:
@@ -469,10 +553,15 @@ static func rects(V: Dictionary, sw: int, sh: int, now: float) -> Array:
 					_puntos(o, g, g + tg.normalized() * 10 * tg.length(), x0, y0, "rgba(200,220,255,0.55)", 3)
 			var tira := 3.0 + 12.0 * float(V.f)   # el taco, hacia atrás con la fuerza
 			var a: Vector2 = c0.p - u * (R + tira)
-			_puntos(o, a, a - u * 70, x0, y0, "#c48a52", 1)
-			_puntos(o, a, a - u * 4, x0, y0, "#e8e0d0", 1)
+			if arte and NT > 0:
+				var ti := posmod(roundi(float(V.ang) / TAU * NT), NT)
+				var pt: Array = PUNTA["taco-%d" % ti]
+				o.append(["@", ARTE["taco-%d" % ti], x0 + roundi(a.x - float(pt[0])), y0 + roundi(a.y - float(pt[1])), clip])
+			else:
+				_puntos(o, a, a - u * 70, x0, y0, "#c48a52", 1)
+				_puntos(o, a, a - u * 4, x0, y0, "#e8e0d0", 1)
 	# la fuerza, a la izquierda de la mesa
-	var bx := x0 - 22
+	var bx := x0 - BANDA - 9
 	var bh := int(H) + 8
 	if bx >= 2:
 		o.append([bx - 1, y0 - 5, 7, bh + 2, "#26262e"])
@@ -497,4 +586,4 @@ static func rects(V: Dictionary, sw: int, sh: int, now: float) -> Array:
 				_aro(o, xx + 3 + i * 7, yb, "rgba(255,255,255,0.25)")
 		if g != "" and quedan(V, g) == 0:
 			_bola(o, xx + 3 + 7 * 7, yb, 8)
-	return o.filter(func(x): return x[0] >= 0 and x[1] >= 0 and x[0] + x[2] <= sw and x[1] + x[3] <= sh)   # el taco, que no salga
+	return o.filter(func(x): return typeof(x[0]) == TYPE_STRING or (x[0] >= 0 and x[1] >= 0 and x[0] + x[2] <= sw and x[1] + x[3] <= sh))   # nada fuera de la pantalla (los sprites, con su recorte)

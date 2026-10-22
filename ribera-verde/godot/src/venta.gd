@@ -1444,7 +1444,7 @@ func talk_billar(k: String):
 
 # la bola 8 de verdad (1.58, lo pidió el usuario: «estilo 8 ball pool»; con CAL): la mesa desde arriba con las 15 bolas y la física
 # de billar8.gd. Sacas tú; mesa abierta hasta la primera que se mete tras el saque; falta, bola en mano para el otro; la negra al
-# final. El rival tira con la misma física y su pulso (BILLAR.hab). Da "yo", "el" o "" (tablas, al tope de tiros)
+# final. El rival tira con la misma física y su pulso (BILLAR.hab). Da "yo", "el" o "" (tablas: al tope de tiros, mesa abierta o empate)
 func billar8(k: String, nb: String, N: String) -> String:
 	var B: Dictionary = D.BILLAR
 	var V := B8.nueva(nb)
@@ -1488,18 +1488,19 @@ func billar8(k: String, nb: String, N: String) -> String:
 			if r.fin == "gana":
 				tx = I18n.K("¡La negra, dentro!") if q == 0 else I18n.T("{nb} mete la negra.", {"nb": nb})
 			elif q == 0:
-				tx = I18n.K("La negra entra antes de tiempo, o con falta: pierdes.")
+				tx = I18n.K("La negra entra antes de tiempo: pierdes.") if r.motivo == "pronto" else I18n.K("La negra entra con falta: pierdes.")
 			else:
-				tx = I18n.T("A {nb} se le va la negra antes de tiempo, o con falta: pierde.", {"nb": nb})
+				tx = I18n.T("A {nb} se le va la negra antes de tiempo: pierde.", {"nb": nb}) if r.motivo == "pronto" \
+					else I18n.T("{nb} mete la negra con falta: pierde.", {"nb": nb})
 		elif r.falta:
 			V.mano = true
 			var mo: String = r.motivo
 			if mo == "blanca":
-				tx = I18n.K("Se cuela la blanca.")
+				tx = I18n.K("Se te cuela la blanca.") if q == 0 else I18n.T("A {nb} se le cuela la blanca.", {"nb": nb})
 			elif mo == "nada":
-				tx = I18n.K("La blanca no toca ninguna bola.")
+				tx = I18n.K("Tu blanca no toca ninguna bola.") if q == 0 else I18n.T("La blanca de {nb} no toca ninguna bola.", {"nb": nb})
 			else:
-				tx = I18n.K("Toca primero una bola que no es suya.")
+				tx = I18n.K("Tocas primero una bola que no es tuya.") if q == 0 else I18n.T("{nb} toca primero una bola que no es suya.", {"nb": nb})
 			tx += " " + (I18n.T("Falta: bola en mano para {nb}.", {"nb": nb}) if q == 0 else I18n.K("Falta: bola en mano para ti."))
 			q = 1 - q
 		else:
@@ -1514,6 +1515,11 @@ func billar8(k: String, nb: String, N: String) -> String:
 		if not rapido:
 			_dlg_fijo(tx, quien.to_upper() if quien != "" else "")
 			await M.wait(1300 if fin == "" else 1600)
+	if fin == "" and int(V.tiros) >= 2 * int(B.turnos):   # se hace tarde: gana quien tiene menos bolas suyas en la mesa
+		fin = B8.al_tope(V)
+		if fin != "" and not rapido:
+			_dlg_fijo(I18n.K("Se hace tarde: gana quien tiene menos bolas suyas en la mesa."), "")
+			await M.wait(1600)
 	MESA8 = null
 	if not oraculo:
 		dlg.hide()
@@ -1626,12 +1632,13 @@ func _b8_suyo(V: Dictionary, hab: float, N: String) -> Dictionary:
 		V.b[0].v = Vector2.ZERO
 		V.b[0].p = B8.coloca_ia(V, 1)
 		V.mano = false
-	var s := B8.elige(V, 1, hab)
 	if gancho_billar8.is_valid() or oraculo:
-		return s
+		return B8.elige(V, 1, hab)
 	V.fase = "ia"
 	V.f = 0.0
 	_dlg_fijo(I18n.K("Estudia la mesa…"), N)
+	await M.wait(16)   # que se vea el aviso antes de que piense (elige simula los tiros y tarda)
+	var s := B8.elige(V, 1, hab)
 	var a0 := float(V.ang)
 	var a1 := float(s.ang)
 	var t0 := M.reloj

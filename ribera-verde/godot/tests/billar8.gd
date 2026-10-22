@@ -160,6 +160,35 @@ func _corre() -> void:
 			if V1.b[i].en and V1.b[j].en and V1.b[i].p.distance_to(V1.b[j].p) < 2 * B8.R - .2:
 				solapa = true
 	chk(not solapa, "sin bolas solapadas")
+	# el saque mete alguna de media (el golpe pasa por todo el triángulo y el saque va más fuerte que un tiro)
+	var mets := 0
+	var disp := 0.0
+	for k in 20:
+		var Vs := B8.nueva("X")
+		var es := B8.dispara(Vs, hacia(Vs.b[0].p, Vs.b[1].p) + (k - 10) * .006, 1.0)
+		B8.simula(Vs, es)
+		mets += es.met.filter(func(x): return x != 0).size()
+		var cen := Vector2.ZERO
+		var nn := 0
+		for d in Vs.b:
+			if d.en and d.n != 0:
+				cen += d.p
+				nn += 1
+		for d in Vs.b:
+			if d.en and d.n != 0:
+				disp += d.p.distance_to(cen / nn) / nn / 20.0
+	chk(mets >= 8 and mets <= 60, "el saque a tope mete %.2f de media" % (mets / 20.0))
+	chk(disp > 30, "y desparrama el triángulo (%.1f px del centro, 7,2 sin tocar)" % disp)
+	# la tronera no depende de la velocidad: lo mismo a 80, 150 y 300 px/s
+	for caso in [[Vector2(70, 30), Vector2(84, -1.5)], [Vector2(20, 22), Vector2(-.5, -.5)], [Vector2(60, 20), Vector2(84, -1.5)]]:
+		var res_v := []
+		for v in [80.0, 150.0, 300.0]:
+			var Vt := mesa({5: caso[0]})
+			Vt.b[5].v = (caso[1] - caso[0]).normalized() * v
+			var et := B8.ev_nuevo()
+			B8.simula(Vt, et)
+			res_v.append(5 in et.met)
+		chk(res_v[0] == res_v[1] and res_v[1] == res_v[2], "tronera igual a toda velocidad desde %s: %s" % [caso[0], res_v])
 	# una bola de frente a la tronera de la esquina entra; la blanca se queda
 	var pk: Vector2 = B8.bocas()[0]
 	var Vm := mesa({0: Vector2(40, 30), 3: Vector2(25, 18)})
@@ -194,7 +223,13 @@ func _corre() -> void:
 	Vn.gr = ["lisas", "rayadas"]
 	fant = Vn.b[8].p - ((pk - Vn.b[8].p).normalized()) * 2 * B8.R
 	r = tira(Vn, 0, hacia(Vn.b[0].p, fant), .45)
-	chk(r.fin == "pierde", "la negra antes de tiempo: pierdes (%s)" % r.fin)
+	chk(r.fin == "pierde" and r.motivo == "otra", "la negra tocada primero y dentro siendo lisas: falta y pierdes (%s, %s)" % [r.fin, r.motivo])
+	Vn = mesa({0: Vector2(40, 30), 2: Vector2(120, 60)})
+	Vn.gr = ["lisas", "rayadas"]
+	var ep := B8.ev_nuevo()
+	ep.primer = 2
+	ep.met = [8]
+	chk(B8.resuelve(Vn, ep, 0, [2]).motivo == "pronto", "la negra dentro sin falta pero antes de tiempo: «pronto»")
 	Vn = mesa({0: Vector2(40, 30), 8: Vector2(25, 18), 12: Vector2(120, 60)})
 	Vn.gr = ["lisas", "rayadas"]
 	chk(B8.objetivos(Vn, 0) == [8], "sin lisas, la negra")
@@ -203,17 +238,26 @@ func _corre() -> void:
 	Vn = mesa({0: Vector2(40, 30), 8: Vector2(25, 18), 12: Vector2(120, 60)})
 	Vn.gr = ["lisas", "rayadas"]
 	var ev := B8.ev_nuevo()
+	var rs := {}
 	ev.primer = 8
 	ev.met = [8]
 	ev.blanca = true
 	Vn.b[8].en = false
-	chk(B8.resuelve(Vn, ev, 0, [8]).fin == "pierde", "la negra y la blanca detrás: pierdes")
+	rs = B8.resuelve(Vn, ev, 0, [8])
+	chk(rs.fin == "pierde" and rs.motivo == "blanca", "la negra y la blanca detrás: pierdes, con falta")
+	# al tope de tiros: gana a quien le quedan menos; mesa abierta o empate, tablas
+	Vn = mesa({0: Vector2(40, 30), 1: Vector2(100, 42), 9: Vector2(130, 20), 10: Vector2(130, 60)})
+	chk(B8.al_tope(Vn) == "", "al tope con la mesa abierta: tablas")
+	Vn.gr = ["lisas", "rayadas"]
+	chk(B8.al_tope(Vn) == "yo", "al tope, te queda una y a él dos: ganas")
+	Vn.gr = ["rayadas", "lisas"]
+	chk(B8.al_tope(Vn) == "el", "y al revés, gana él")
 	Vn = mesa({0: Vector2(40, 30), 1: Vector2(100, 42), 9: Vector2(130, 20)}, true)
 	ev = B8.ev_nuevo()
 	ev.primer = 1
 	ev.met = [8]
 	Vn.b[8].en = false
-	var rs := B8.resuelve(Vn, ev, 0, B8.objetivos(Vn, 0))
+	rs = B8.resuelve(Vn, ev, 0, B8.objetivos(Vn, 0))
 	chk(rs.fin == "" and Vn.b[8].en and absf(Vn.b[8].p.x - B8.W * B8.PIE) < 8, "la negra al sacar vuelve al pie")
 	# en el saque no hay grupo aunque entre una
 	Vn = mesa({0: Vector2(40, 30), 1: Vector2(100, 42)}, true)
@@ -225,6 +269,7 @@ func _corre() -> void:
 	# 5 · el rival: con la misma física; el bueno gana más; las partidas acaban
 	var gana := {0: 0, 1: 0}
 	var tiros := 0
+	var nada := 0
 	var t0 := Time.get_ticks_msec()
 	for g in 12:
 		var W := B8.nueva("X")
@@ -241,6 +286,8 @@ func _corre() -> void:
 			var s := B8.elige(W, q, .55 if q == 0 else .3)
 			r = tira(W, q, s.ang, s.f)
 			W.saque = false
+			if r.falta and r.motivo == "nada":
+				nada += 1
 			if r.fin != "":
 				fin = q if r.fin == "gana" else 1 - q
 			elif r.falta:
@@ -253,6 +300,8 @@ func _corre() -> void:
 			gana[fin] += 1
 	chk(gana[0] + gana[1] >= 11, "las partidas acaban (%s)" % [gana])
 	chk(gana[0] > gana[1], "el de más pulso gana más (%s)" % [gana])
+	chk(nada <= 12, "tirar sin tocar ninguna bola, menos de una por partida (%d en 12)" % nada)
+	print("billar8: el rival tira sin tocar nada %d veces en 12 partidas; %.0f ms por tiro" % [nada, float(Time.get_ticks_msec() - t0) / maxf(1, tiros)])
 	var ms := float(Time.get_ticks_msec() - t0) / maxf(1, tiros)
 	chk(ms < 400, "lo que piensa el rival, por tiro: %.0f ms" % ms)
 	# 6 · el dibujo: dentro de la pantalla en cada fase
@@ -263,8 +312,16 @@ func _corre() -> void:
 		V.ang = .2
 		V.gr = ["lisas", "rayadas"]
 		var o: Array = B8.rects(V, 240, 180, 0)
-		var fuera := o.filter(func(x): return x[0] < 0 or x[1] < 0 or x[0] + x[2] > 240 or x[1] + x[3] > 180)
-		chk(o.size() > 100 and fuera.is_empty(), "%s: %d rectángulos, %d fuera" % [fase, o.size(), fuera.size()])
+		var fuera := o.filter(func(x): return typeof(x[0]) != TYPE_STRING and (x[0] < 0 or x[1] < 0 or x[0] + x[2] > 240 or x[1] + x[3] > 180))
+		var spr := o.filter(func(x): return typeof(x[0]) == TYPE_STRING)
+		chk(o.size() > 60 and fuera.is_empty(), "%s: %d rectángulos, %d fuera" % [fase, o.size(), fuera.size()])
+		chk(spr.size() == (2 if fase in ["apunta", "carga", "ia"] else 1) and spr[0][1] == B8.ARTE.mesa, "%s: la mesa de PixelLab%s" % [fase, " y el taco" if spr.size() == 2 else ""])
+		if spr.size() == 2:   # la punta del taco, detrás de la blanca en la dirección contraria al tiro
+			var ti := posmod(roundi(.2 / TAU * B8.NT), B8.NT)
+			var pt: Array = B8.PUNTA["taco-%d" % ti]
+			var tip := Vector2(spr[1][2] + float(pt[0]), spr[1][3] + float(pt[1])) - Vector2(B8.origen(240))
+			var esperada: Vector2 = V.b[0].p - Vector2.from_angle(.2) * (B8.R + 3.0 + 12.0 * .6)
+			chk(tip.distance_to(esperada) < 2.0, "%s: la punta del taco en su sitio (%.1f px)" % [fase, tip.distance_to(esperada)])
 	# 7 · los mandos de verdad: bola en mano con las flechas, apuntar y la fuerza con A apretado
 	auto = false
 	V = B8.nueva("X")

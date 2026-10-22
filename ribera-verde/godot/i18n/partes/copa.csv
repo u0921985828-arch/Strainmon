@@ -214,11 +214,17 @@ La puerta del club,The club door
 "¿Una a la bola 8? Mesa abierta: la primera que metas tras el saque te da lisas o rayadas, y la negra al final. Quien la meta, gana.","Eight-ball? Open table: the first ball you pot after the break makes you solids or stripes, and the black goes last. Whoever pots it wins."
 "¿Una a la bola 8? Mesa abierta: la primera que metas tras el saque te da lisas o rayadas, y la negra al final. Quien la meta se lleva la apuesta.","Eight-ball? Open table: the first ball you pot after the break makes you solids or stripes, and the black goes last. Whoever pots it takes the bet."
 {nb} mete la negra.,{nb} pots the black.
-"La negra entra antes de tiempo, o con falta: pierdes.","The black drops too early, or on a foul: you lose."
-"A {nb} se le va la negra antes de tiempo, o con falta: pierde.","{nb} drops the black too early, or on a foul: {nb} loses."
-Se cuela la blanca.,The cue ball goes in.
-La blanca no toca ninguna bola.,The cue ball hits nothing.
-Toca primero una bola que no es suya.,It hits the wrong ball first.
+La negra entra antes de tiempo: pierdes.,The black drops too early: you lose.
+La negra entra con falta: pierdes.,The black drops on a foul: you lose.
+A {nb} se le va la negra antes de tiempo: pierde.,{nb} drops the black too early: {nb} loses.
+{nb} mete la negra con falta: pierde.,{nb} pots the black on a foul: {nb} loses.
+Se te cuela la blanca.,You pot the cue ball.
+A {nb} se le cuela la blanca.,{nb} pots the cue ball.
+Tu blanca no toca ninguna bola.,Your cue ball hits nothing.
+La blanca de {nb} no toca ninguna bola.,"{nb}'s cue ball hits nothing."
+Tocas primero una bola que no es tuya.,You hit the wrong ball first.
+{nb} toca primero una bola que no es suya.,{nb} hits the wrong ball first.
+Se hace tarde: gana quien tiene menos bolas suyas en la mesa.,"It's getting late: whoever has fewer balls left on the table wins."
 Falta: bola en mano para {nb}.,Foul: ball in hand for {nb}.
 Falta: bola en mano para ti.,Foul: ball in hand for you.
 Te quedas las lisas.,You're solids.

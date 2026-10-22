@@ -3448,11 +3448,16 @@ se6e07865,"Ganas tú. {nb} te paga {e}: «La próxima, la revancha».","You win.
 s113b3085,Gana {nb}. Le pagas {e}.,{nb} wins. You pay {e}.
 sa29835e5,Se hace tarde y lo dejáis en tablas. Nadie paga.,It's getting late and you call it a draw. Nobody pays.
 s35bd6d16,{nb} mete la negra.,{nb} pots the black.
-s0cbd2c53,"La negra entra antes de tiempo, o con falta: pierdes.","The black drops too early, or on a foul: you lose."
-sd58eac4a,"A {nb} se le va la negra antes de tiempo, o con falta: pierde.","{nb} drops the black too early, or on a foul: {nb} loses."
-s09280e95,Se cuela la blanca.,The cue ball goes in.
-s786f5dd0,La blanca no toca ninguna bola.,The cue ball hits nothing.
-s567e445a,Toca primero una bola que no es suya.,It hits the wrong ball first.
+s1ffe1235,La negra entra antes de tiempo: pierdes.,The black drops too early: you lose.
+s5f3cb2f5,La negra entra con falta: pierdes.,The black drops on a foul: you lose.
+s72f320a9,A {nb} se le va la negra antes de tiempo: pierde.,{nb} drops the black too early: {nb} loses.
+sa02163bf,{nb} mete la negra con falta: pierde.,{nb} pots the black on a foul: {nb} loses.
+sb984f084,Se te cuela la blanca.,You pot the cue ball.
+sbf93bdb5,A {nb} se le cuela la blanca.,{nb} pots the cue ball.
+s6041266a,Tu blanca no toca ninguna bola.,Your cue ball hits nothing.
+s34092b50,La blanca de {nb} no toca ninguna bola.,{nb}'s cue ball hits nothing.
+s4da0b9b2,Tocas primero una bola que no es tuya.,You hit the wrong ball first.
+s617d915f,{nb} toca primero una bola que no es suya.,{nb} hits the wrong ball first.
 se97556ad,Falta: bola en mano para {nb}.,Foul: ball in hand for {nb}.
 sc1c3d38c,Falta: bola en mano para ti.,Foul: ball in hand for you.
 s56601648,Te quedas las lisas.,You're solids.
@@ -3461,6 +3466,7 @@ sa579670a,Dentro. Sigues.,In. Go again.
 sbff91ce9,{nb} mete y sigue.,{nb} pots one and goes again.
 sd4d97829,Nada dentro. Le toca a {nb}.,Nothing in. {nb}'s turn.
 s8e7e3fb0,{nb} falla. Te toca.,{nb} misses. Your turn.
+s29456c8a,Se hace tarde: gana quien tiene menos bolas suyas en la mesa.,It's getting late: whoever has fewer balls left on the table wins.
 sdf8f9402,Bola en mano: las flechas la mueven y A la deja.,Ball in hand: the arrows move it and A places it.
 s3a5fefa3,"Flechas: apuntar (arriba y abajo, fino). A apretado: la fuerza; al soltar, tiras. B: dejarlo.","Arrows: aim (up and down, fine). Hold A: power; let go to shoot. B: quit."
 s6646ed1c,¿Lo dejas? La partida es suya.,Quit? The game goes to them.
@@ -6180,6 +6186,11 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+s0cbd2c53,"La negra entra antes de tiempo, o con falta: pierdes.","The black drops too early, or on a foul: you lose."
+sd58eac4a,"A {nb} se le va la negra antes de tiempo, o con falta: pierde.","{nb} drops the black too early, or on a foul: {nb} loses."
+s09280e95,Se cuela la blanca.,The cue ball goes in.
+s786f5dd0,La blanca no toca ninguna bola.,The cue ball hits nothing.
+s567e445a,Toca primero una bola que no es suya.,It hits the wrong ball first.
 s63e6d4be,Dos estanterías más de tarros de 10 L contra la pared de la nave: el doble de tarros para curar lo que sale del secadero.,Two more shelves of 10 L jars against the warehouse wall: twice the jars to cure what comes out of the drying room.
 scd2e99f5,"Depósitos, riego y herramientas · en la cuenta {e}","Tanks, irrigation and tools · in your account {e}"
 s73d909ac,"Las herramientas de la tía: una azada, unas tijeras de podar y unos guantes de jardín gastados.","Your aunt's tools: a hoe, pruning shears and worn gardening gloves."
