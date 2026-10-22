@@ -125,11 +125,11 @@ func _corre() -> void:
 	chk(detras >= 50, "los de detrás, que se pintan antes que los edificios: %d" % detras)
 	chk(quitados > 0 and quitados <= 60, "los de delante que tapaban la fachada, quitados: %d" % quitados)
 	# los que siguen: el árbol de la esquina de Astilleros (delante de la nave de ladrillo) ya no está; la mata del borde del Ensanche,
-	# detrás del bloque, sí, y detrás
+	# detrás del bloque del club, sí, y detrás (con los mapas de Bilbao, la de (4, 1) queda bajo la casa del Ensanche: la de (11, 1))
 	J.enter_map("astilleros", 1, 1)
 	chk(J.MAPS.astilleros.o[10][2] == null, "Astilleros (2, 10): el árbol delante de la fachada, quitado (%s)" % J.MAPS.astilleros.o[10][2])
 	J.enter_map("ensanche", 1, 1)
-	chk(J.MAPS.ensanche.o[1][4] in ALTOS and J.MAPS.ensanche.get("tras", {}).has("4,1"), "Ensanche (4, 1): la mata de detrás del bloque, detrás")
+	chk(J.MAPS.ensanche.o[1][11] in ALTOS and J.MAPS.ensanche.get("tras", {}).has("11,1"), "Ensanche (11, 1): la mata de detrás del bloque, detrás")
 	# sin CAL: como estaban
 	Datos.CAL = false
 	for mid in ["astilleros", "ensanche", "ibarbide", "mendialde"]:

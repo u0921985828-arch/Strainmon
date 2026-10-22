@@ -42,6 +42,8 @@ func _ready() -> void:
 	super()
 	MAPS = D.MAPS.duplicate(true)
 	Datos.enteros(MAPS)
+	for k in D.get("BILBAO", {}).get("MAPS", {}):
+		MAPS[k]._bi = Datos.CAL
 	mapa_nave_r()
 
 # ---------- utilidades (00-nucleo) ----------
@@ -2060,6 +2062,7 @@ static func _pisa(a: Image, pa: Vector2i, b: Image, pb: Vector2i) -> bool:
 func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	SENT = null   # 1.49: al cambiar de sitio, de pie
 	S.map = name_
+	mapas_bilbao(name_)
 	montar_huerta(name_)   # con CAL, la huerta de la tía (campo.gd): la cancilla del pueblo y su mapa
 	if name_ == "home":
 		montar_casa()
@@ -2618,6 +2621,9 @@ func campo_obj(_x: int, _y: int, _o) -> bool:   # MAESTRO [4], en campo.gd
 	return false
 
 func montar_huerta(_k: String) -> void:   # la huerta de la tía, en campo.gd
+	pass
+
+func mapas_bilbao(_k: String) -> void:   # los mapas de Bilbao con CAL, en campo.gd
 	pass
 
 func huerta_lista() -> bool:   # en campo.gd

@@ -132,6 +132,24 @@ static func _aplica_auto() -> void:
 				t[0]["metropoli"] = t[1]
 			else:
 				t[0].erase("metropoli")
+	# Bilbao (lo pidió el usuario: «los mapas… los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede
+	# faltar»; tools/bilbao.py): con CAL, Zorroza, Zazpi Landa, La Punta, el Casco Viejo, Abando y el cantón en lugar de los mapas de
+	# siempre, con sus farolas, clientes y rondas; sin CAL, los de siempre (el oráculo no cambia)
+	var BI: Dictionary = D.get("BILBAO", {})
+	if not BI.is_empty():
+		if not D._base.has("BI_MAPS"):
+			D._base.BI_MAPS = {}
+			for k in BI.MAPS:
+				D._base.BI_MAPS[k] = {"MAPS": D.MAPS[k], "LAMPS": D.LAMPS.get(k), "CLIENT_TILES": D.CLIENT_TILES.get(k), "RONDA": D.RONDA.get(k)}
+		for k in BI.MAPS:
+			var b0: Dictionary = D._base.BI_MAPS[k]
+			D.MAPS[k] = BI.MAPS[k] if CAL else b0.MAPS
+			for t in ["LAMPS", "CLIENT_TILES", "RONDA"]:
+				var v = BI[t].get(k) if CAL else b0[t]
+				if v == null:
+					D[t].erase(k)
+				else:
+					D[t][k] = v
 	# El club KAIA del muelle, el tuyo (solo con CAL: las pruebas contra el HTML recorren D.CLUBS)
 	var K: Dictionary = D.get("KAIA", {})
 	if K.is_empty():
