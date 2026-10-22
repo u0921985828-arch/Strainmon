@@ -1,10 +1,10 @@
 === Landrace Hunters ===
-Version: 1.5.8
+Version: 1.5.9
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.5.8.zip → Activar.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.5.9.zip → Activar.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -13,6 +13,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
+1.5.9 — Landrace Hunters (Godot 0.60.0): un dispensario en cada club (la vitrina con su encargado; Club Zenit y Club Ilargi de Hiriburu, que llenas tú), Bilbao como zonas nuevas (Zorroza con sus trenes y el paso subterráneo, La Punta, Abando y el Casco Viejo), las vallas que conectan en las dos direcciones, la nave por salas con el secadero aparte y el viaje con el autobús y el cielo de PixelLab.
 1.5.8 — Landrace Hunters (Godot 0.59.0): el colocón también en el combate (índica aguantas más pero vas lento, sativa lo ves venir, borracho fallas), ladrones y rivales algo más fáciles y el juego entero, sin el corte de la demo (eso queda solo en Google Play).
 1.5.7 — Landrace Hunters (Godot 0.58.0): la huerta de la tía con los bancales de 7 × 4 y las plantas dentro, sus mejoras y la ampliación, setos y bancales de PixelLab, el ordenador sentado tecleando, los combates de PixelLab a su lado (el rival arriba a la izquierda, tú abajo a la derecha), los árboles fuera de los edificios y la red de carreteras.
 1.5.6 — Landrace Hunters (Godot 0.57.0): desde el ordenador (sin pantalla táctil), sin la cruceta ni A/B en pantalla: W A S D mueven (como las flechas), el clic izquierdo es A y el derecho es B (el derecho ya no abre el menú del navegador), M o Tab START y P el MÓVIL; en el móvil, los mandos de siempre; y todo lo de la 0.52 a la 0.57 (retratos, gestos en primera persona, la bodega del barco por tandas, las llaves por cerradura y las puertas dibujadas).

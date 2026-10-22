@@ -2,6 +2,9 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.60.0 (código 80) y plugin de WordPress 1.5.9
+- El AAB de Play (con la demo), el APK universal (`descargas/LandraceHunters.apk`, sin el bloqueo) y `descargas/landrace-hunters-1.5.9.zip`, con un dispensario en cada club, Bilbao como zonas nuevas, las vallas por piezas, la nave por salas y el viaje de PixelLab. AAB 82 MB firmado; APK 89 MB (con `tools/apk-instalar.py`, firma v2/v3 con la upload key, versión 80/0.60.0); zip 29 MB. La partida de copia de seguridad del día 200 (cap. 8) se importa, migra y guarda en la 0.60.0.
+
 ### Un dispensario en cada club (lo pidió el usuario: «El club … que hay en Hiribide … no tienen ni dispensario, esos son errores bastante grandes … eso pasa en varios clubs, molaría que fuese más coherente todo»)
 - Con `Datos.CAL`, la vitrina de todos los clubs (los cinco de la comarca, la asociación y KAIA) es el dispensario: A en ella habla con el encargado de detrás (antes, solo un texto).
 - La asociación siendo presidente: el encargado abre tu panel (el dispensario y el almacén) y ya no te compra a ti como a un cliente.
