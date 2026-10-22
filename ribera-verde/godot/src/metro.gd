@@ -398,6 +398,13 @@ func metro_dia() -> void:
 			queue("vip" + k, func(): await talk(K("SMS · AYUNTAMIENTO DE HIRIBURU"), [tx]))
 			continue
 		var e := vip_noche(k)
+		if V.get("disp") is Dictionary:   # lo que retiran los socios del dispensario, que llenas tú
+			var tot0: int = int(V.disp.tot)
+			var ed := disp_dia(V, "disp", float(MT.disp.dia))
+			e += ed
+			if V.disp == null:
+				var tx: String = T("Se acabó lo del dispensario de {n}: {e} en total.", {"n": R.n, "e": Datos.eur(tot0 + ed)})
+				queue("vipd" + k, func(): await talk(K("SMS · ") + String(MT.disp.n[k]), [tx]))
 		V.ay = e
 		V.tot = int(V.get("tot", 0)) + e
 		abono_banco(e, R.n)
@@ -437,6 +444,7 @@ func metro_npcs(mapa: String) -> Array:
 	for k in MT.vip:
 		if mapa == MT.vip[k].map:
 			o.append({"id": "m9_vip_" + k, "map": mapa, "x": 9, "y": 2, "look": MT.vip[k].look, "dir": "down", "wander": 0})
+			o.append({"id": "m9_disp_" + k, "map": mapa, "x": int(MT.disp.x), "y": int(MT.disp.y), "look": MT.disp.look[k], "dir": "down", "wander": 0})
 	for n in MT.npc:
 		if n.map == mapa:
 			var d: Dictionary = n.duplicate()
@@ -452,6 +460,8 @@ func talk_metro(id: String) -> void:
 		await talk_fac(id.substr(7))
 	elif id.begins_with("m9_vip_"):
 		await talk_vip9(id.substr(7))
+	elif id.begins_with("m9_disp_"):
+		await disp_vip(id.substr(8))
 	else:
 		var fr: Array = [K("«Aquí se viene a que te vean.»"), K("«¿Tú eres el dueño? Buena música.»"), K("«La próxima la pago yo.»")]
 		if id.begins_with("m9_t"):   # los que pasean por la calle
@@ -646,8 +656,23 @@ func obj_vip(o) -> bool:
 		return false
 	var t: Dictionary = D.METRO.txt
 	var k := String(o).trim_suffix("2")
+	if k == "vitrina":   # la vitrina es el dispensario (lo pidió el usuario: un club sin dispensario no es un club)
+		await disp_vip(S.map.substr(4))
+		return true
 	await say(String(t[k]) if t.has(k) else K("Todo de diseño, todo carísimo."))
 	return true
+
+# el dispensario de un club VIP tuyo: lo llenas tú, como el de KAIA; lo que retiran los socios va con la noche a la cuenta
+func disp_vip(k: String) -> void:
+	var MT: Dictionary = D.METRO
+	var Ds: Dictionary = MT.disp
+	var N: String = Ds.n[k]
+	var M_ := metro_d()
+	if not M_.vip.has(k):
+		await say(String(MT.txt.vitrina), N)
+		return
+	await disp_llena(N, M_.vip[k], "disp", float(Ds.dia), float(Ds.f), Ds.g,
+		T("Bienvenido a {n}. El dispensario lo llenas tú: déjame {g} g o más y los socios retiran {d} al día. Lo que dejen, con la noche, a tu cuenta.", {"n": MT.vip[k].n, "g": int(Ds.g[0]), "d": g_txt(float(Ds.dia))}))
 
 # la parada de la ciudad: no llega el autobús de la comarca; con tu vehículo, la autopista, y sin él (si te lo ha llevado la grúa),
 # el de línea a Ibarbide (METRO.bus, más el peaje)

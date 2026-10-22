@@ -93,14 +93,11 @@ MAPS = D['MAPS']
 MAPS['metropoli'] = OrderedDict([('name', 'Hiriburu'), ('w', W), ('h', H), ('g', g), ('o', o), ('exits', OrderedDict()),
     ('doors', doors), ('music', 'metropoli'), ('blds', blds), ('est', None)])
 
-# los dos clubs VIP por dentro: el plano del club del Ensanche, sin el dispensario (sin vitrina, tarros ni pizarra)
+# los dos clubs VIP por dentro: el plano del club del Ensanche, con su dispensario (vitrina, tarros, pizarra y normas; lo pidió el
+# usuario: un club cannábico sin dispensario no tiene sentido)
 for k, puerta in (('zen', (12, 9)), ('ila', (38, 9))):
     m = copy.deepcopy(MAPS['club-ens'])
     m['name'] = 'Club Zenit' if k == 'zen' else 'Club Ilargi'
-    for y, r in enumerate(m['o']):
-        for x, t in enumerate(r):
-            if t in ('tarros', 'vitrina', 'pizarra', 'cartelC'):
-                r[x] = 'neonH' if y == 1 and x in (1, 4) else None
     m['exits'] = OrderedDict((c, OrderedDict([('to', 'metropoli'), ('x', puerta[0]), ('y', puerta[1]), ('dir', 'down')])) for c in ('9,9', '10,9'))
     m['music'] = 'disco' if k == 'ila' else 'club'
     MAPS['vip-' + k] = m
@@ -156,7 +153,13 @@ D['METRO'] = OrderedDict([
         ('mesita', 'Una mesa baja de cristal con una cubitera.'), ('billar', 'Un billar de tapete negro. Nadie juega: se mira.'),
         ('jukebox', 'Una gramola de las de antes, conectada a los altavoces del techo.'), ('neonH', 'Un neón con el nombre del club.'),
         ('poster', 'Un cartel de la sesión del sábado.'), ('tacos', 'Los tacos del billar, en su soporte.'),
-        ('plantDeco', 'Una palmera de interior, regada por alguien que no eres tú.')])),
+        ('plantDeco', 'Una palmera de interior, regada por alguien que no eres tú.'),
+        ('vitrina', 'El dispensario del club: tarros con muestras, la báscula de precisión y la lista de lo que hay hoy.'),
+        ('tarros', 'Tarros de cristal con la etiqueta de cada variedad que ha pasado por el dispensario.'),
+        ('pizarra', 'En la pizarra, con tiza blanca: «Solo socios. Lo que se retira, se consume dentro».'),
+        ('cartelC', 'NORMAS DEL CLUB\nSolo socios mayores de edad, con el carné a la vista. Lo que se retira, se consume dentro.')])),
+    # el dispensario de cada club VIP: lo llenas tú, como el de KAIA; su encargado detrás de la vitrina
+    ('disp', OrderedDict([('dia', 30), ('f', 1.6), ('g', [25, 50, 100, 250]), ('x', 1), ('y', 2), ('look', OrderedDict([('zen', 'portera'), ('ila', 'portero')])), ('n', OrderedDict([('zen', 'NAIARA'), ('ila', 'ENEKO')]))])),
 ])
 
 D['PISOS9'] = OrderedDict([

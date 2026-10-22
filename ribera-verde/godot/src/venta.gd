@@ -948,6 +948,9 @@ func obj_local(x: int, y: int, o) -> bool:
 		if o == "vitrina" and k == "muelle" and mio:   # KAIA: la vitrina es tu dispensario
 			await dispensario_kaia(String(C.n))
 			return true
+		if o == "vitrina" and Datos.CAL:   # la vitrina es el dispensario (lo pidió el usuario): el tuyo de presidente, o el del encargado
+			await talk_club(k)
+			return true
 		match o:
 			"tarros":
 				txt = K("Tarros de cristal con la etiqueta de cada variedad que ha pasado por el club.")

@@ -1585,6 +1585,7 @@ s88fc49ae,"Allí hay clubs para gente con dinero, un concejal que sabe mirar a o
 s3c9f69c2,Multa · {n},Fine · {n}
 s2131d3bd,Inspección en {n}: precintado {d} días y {e} de multa.,Inspection at {n}: sealed for {d} days and a {e} fine.
 s0c1a885c,SMS · AYUNTAMIENTO DE HIRIBURU,SMS · HIRIBURU CITY COUNCIL
+se4de89a9,Se acabó lo del dispensario de {n}: {e} en total.,{n}'s dispensary ran out: {e} in total.
 sa864896e,{f} se mueven en {b}: has perdido {q} puntos de control. {j} te espera allí.,{f} are moving in {b}: you've lost {q} points of control. {j} is waiting for you there.
 s05f80854,UN CHAVAL DEL BARRIO,A KID FROM THE NEIGHBOURHOOD
 s23dabcd9,«Aquí se viene a que te vean.»,“You come here to be seen.”
@@ -1630,6 +1631,7 @@ se63decb4,No llevas {e} encima.,You don't have {e} on you.
 sf0b966a5,Se guardan el dinero y se apartan. Por esta vez.,They pocket the money and step aside. This time.
 s1a55e705,Te apartas. En {b} te queda un {c} %.,You back off. In {b} you keep {c} %.
 sfc860bc5,"Todo de diseño, todo carísimo.","All designer, all very expensive."
+s7385aacd,"Bienvenido a {n}. El dispensario lo llenas tú: déjame {g} g o más y los socios retiran {d} al día. Lo que dejen, con la noche, a tu cuenta.",Welcome to {n}. You stock the dispensary: leave me {g} g or more and members take {d} a day. What they pay goes to your account with the night's take.
 s56771650,Autobús de línea a Ibarbide ({e}),Coach to Ibarbide ({e})
 sc118df21,El billete cuesta {e}. No te llega.,The ticket costs {e}. You don't have enough.
 s94e2731b,Llamar,Call
@@ -5933,6 +5935,13 @@ saf3f3974,Un neón con el nombre del club.,A neon sign with the club's name.
 sec445062,Un cartel de la sesión del sábado.,A poster for Saturday's session.
 sdba22ac6,"Los tacos del billar, en su soporte.","The pool cues, in their rack."
 sb0c31625,"Una palmera de interior, regada por alguien que no eres tú.","An indoor palm, watered by someone who isn't you."
+s5d6576d2,"El dispensario del club: tarros con muestras, la báscula de precisión y la lista de lo que hay hoy.","The club's dispensary: sample jars, the precision scale and today's menu."
+s981d064a,Tarros de cristal con la etiqueta de cada variedad que ha pasado por el dispensario.,Glass jars labelled with every strain that has been through the dispensary.
+sd960a84d,"En la pizarra, con tiza blanca: «Solo socios. Lo que se retira, se consume dentro».","On the board, in white chalk: ""Members only. What you take, you consume inside."""
+s52d34890,"NORMAS DEL CLUB
+Solo socios mayores de edad, con el carné a la vista. Lo que se retira, se consume dentro.","CLUB RULES
+Adult members only, card on show. What you take, you consume inside."
+sff1105d6,NAIARA,NAIARA
 s37b59232,"MAESTRO [9]: un piso de venta por pueblo desde el primer envío por mar (S.mar.paso >= 1), con su lugarteniente (solo con Datos.CAL).","MAESTRO [9]: one selling flat per town from the first sea shipment (S.mar.paso >= 1), with its lieutenant (only with Datos.CAL)."
 s9fcf30bf,Pura,Pure
 s6c6bf121,Rebajada,Cut

@@ -578,6 +578,12 @@ func talk_club(k: String):
 	if D.CLUBS[k].get("tuyo"):   # 1.52: el club KAIA, el tuyo
 		await talk_kaia(N)
 		return
+	if k == "rv" and Datos.CAL and aso().pres:   # de presidente, el encargado lleva tu dispensario (no te compra a ti)
+		if staff_ok():
+			await panel_club("rv", N)
+		else:
+			await dispensario_aso()
+		return
 	if not S.clubs.get(k):
 		if not await carne_club(k):
 			return

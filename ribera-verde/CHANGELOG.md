@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Un dispensario en cada club (lo pidió el usuario: «El club … que hay en Hiribide … no tienen ni dispensario, esos son errores bastante grandes … eso pasa en varios clubs, molaría que fuese más coherente todo»)
+- Con `Datos.CAL`, la vitrina de todos los clubs (los cinco de la comarca, la asociación y KAIA) es el dispensario: A en ella habla con el encargado de detrás (antes, solo un texto).
+- La asociación siendo presidente: el encargado abre tu panel (el dispensario y el almacén) y ya no te compra a ti como a un cliente.
+- Club Zenit y Club Ilargi de Hiriburu, con su dispensario: vitrina, tarros, pizarra y cartel de normas, y su encargada (NAIARA y ENEKO, `METRO.disp`); siendo tuyos, lo llenas tú (25/50/100/250 g, al precio de club × 1,6) y los socios retiran 30 g al día, que van a la cuenta con la noche; SMS al acabarse.
+- El dispensario de KAIA y los de Hiriburu, con las mismas funciones (`disp_llena`, `disp_dia`, `disp_gestiona` en `eventos.gd`).
+- GAUA es la discoteca del Ensanche: sin dispensario, como un local de copas.
+- Prueba nueva `tests/clubs.gd` (81/0; con el código de antes, error en el dispensario VIP); textos en inglés en `partes/copa.csv`.
+
 ### Bilbao, zonas nuevas (lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar», y después «Añade como zonas nuevas / No quiero caos», «el mobiliario urbano, la distribución en el suelo de alcantarillas y demás» y «Fuck metro»)
 - Los seis mapas de siempre vuelven a ser los de antes; Bilbao entra con `Datos.CAL` como cuatro zonas nuevas en fila por la calle: **Zorroza** (la parada «Bilbao» del autobús, desde el cap. 2: torres, plaza con fuente, la estación, la vía doble con su paso a nivel, el parque y la ría), **La Punta** (naves, la explanada y el muelle con norays y dos grúas), **Abando** (las casas del Ensanche, la calle con plátanos y la plaza con fuente; sin boca de metro) y el **Casco Viejo** (teatro, plaza, mercado, catedral y la Ribera).
 - Sin caos: las casillas sin detalles al azar y el mobiliario a ritmo fijo (farolas enfrentadas cada 8, banco con su papelera cada 16, plátanos cada 8, contenedores cada 16 en la acera de abajo, bolardos a los lados de cada paso de cebra) y lo del suelo como calcomanías (`BILBAO.DEC` → `m.dec`, `_arte_dec` en `pinta.gd`): imbornales en los dos cantos de la calzada cada 8, tapas de alcantarilla cada 16 y la cebra.

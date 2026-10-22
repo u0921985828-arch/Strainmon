@@ -1200,21 +1200,17 @@ func obras_dia() -> void:
 	if obra_ya("casas") and int(S.day) >= int(M_.get("alq", 0)):
 		abono_banco(float(obra_k("casas").alq), K("Alquileres · muelle"))
 		M_.alq = int(S.day) + 7
-	var L = M_.get("kaia")
-	if L is Dictionary:
-		var g = min(L.g, kaia_dia() * (D.VENTA_EXTR.dia if L.get("x") else 1.0) * kaia_tiron(L))
-		var e := Datos.jsround(g * L.pg)
-		L.g -= g
-		L.tot += e
+	if M_.get("kaia") is Dictionary:
+		var tot0: int = int(M_.kaia.tot)
+		var e := disp_dia(M_, "kaia", kaia_dia())
 		if M_.get("lic"):
 			abono_banco(e, K("KAIA · dispensario"))
 		else:
 			S.money += e
 		S.sales += e
 		queue("historia", check_story)
-		if L.g < 1:
-			M_.kaia = null
-			var tot = L.tot
+		if M_.kaia == null:
+			var tot := tot0 + e
 			queue("kaia", func(): await talk(K("SMS · KAIA"), [T("Se acabó lo del dispensario: {e} en total.", {"e": Datos.eur(tot)})]))
 	if staff_ok():
 		almacen_dia("muelle")   # MAESTRO [6]: el almacén de KAIA
@@ -1237,15 +1233,18 @@ func dispensario_kaia(N: String) -> void:
 	if not (S.get("mar") is Dictionary):
 		return
 	var K: Dictionary = D.MAR.kaia
-	var M_: Dictionary = S.mar
-	var L = M_.get("kaia")
-	if L is Dictionary:
-		await gestiona_kaia(N)
+	await disp_llena(N, S.mar, "kaia", kaia_dia(), float(K.f), K.g, T("Bienvenido a KAIA. Aquí el dispensario lo llenas tú: déjame {g} g o más y los socios retiran {d} al día.", {"g": int(K.g[0]), "d": g_txt(kaia_dia())}))
+
+# un dispensario tuyo (KAIA y los clubs de Hiriburu): H[key] = {k, g, pg, p0, thc, tot, x} o null; dia = lo que retiran los socios
+# al día al precio de la casa (los extractos, por VENTA_EXTR.dia), f = sobre el precio del club, gs = lo que se deja
+func disp_llena(N: String, H: Dictionary, key: String, dia: float, f: float, gs: Array, vacio: String) -> void:
+	if H.get(key) is Dictionary:
+		await disp_gestiona(N, H, key, dia, gs)
 		return
 	var VX: Dictionary = D.VENTA_EXTR
-	var lots := lotes_venta(K.g[0], VX.club_g[0])
+	var lots := lotes_venta(gs[0], VX.club_g[0])
 	if lots.is_empty():
-		await say(T("Bienvenido a KAIA. Aquí el dispensario lo llenas tú: déjame {g} g o más y los socios retiran {d} al día.", {"g": int(K.g[0]), "d": g_txt(kaia_dia())}), N)
+		await say(vacio, N)
 		return
 	var it := lots.map(venta_item)
 	it.append({"label": T("Nada")})
@@ -1256,9 +1255,9 @@ func dispensario_kaia(N: String) -> void:
 	var x := es_extr(l)
 	var k: String = l[0]
 	var b: Dictionary = l[1]
-	var pg := Datos.jsround((precio_extr(k, b.thc, "club") if x else precio_club(b.thc)) * calidad(b, not x) * float(K.f) * 100) / 100.0
+	var pg := Datos.jsround((precio_extr(k, b.thc, "club") if x else precio_club(b.thc)) * calidad(b, not x) * f * 100) / 100.0
 	var ops := []
-	for g in (VX.club_g if x else K.g):
+	for g in (VX.club_g if x else gs):
 		if g <= floor(b.g):
 			ops.append(int(g))
 	var o := []
@@ -1269,11 +1268,24 @@ func dispensario_kaia(N: String) -> void:
 	if j < 0 or j >= ops.size():
 		return
 	usa_lote(l, ops[j])
-	M_.kaia = {"k": k, "g": ops[j], "pg": pg, "p0": pg, "thc": float(b.thc), "tot": 0}
+	H[key] = {"k": k, "g": ops[j], "pg": pg, "p0": pg, "thc": float(b.thc), "tot": 0}
 	if x:
-		M_.kaia.x = true
+		H[key].x = true
 	sfx("sel")
-	await say(T("Al dispensario. Cada mañana, {g} para los socios.", {"g": g_txt(kaia_dia() * (VX.dia if x else 1.0))}), N)
+	await say(T("Al dispensario. Cada mañana, {g} para los socios.", {"g": g_txt(dia * (VX.dia if x else 1.0))}), N)
+
+# lo que retiran los socios esta mañana de H[key]; lo vacía (null) cuando se acaba y devuelve los euros
+func disp_dia(H: Dictionary, key: String, dia: float) -> int:
+	var L = H.get(key)
+	if not (L is Dictionary):
+		return 0
+	var g = min(L.g, dia * (D.VENTA_EXTR.dia if L.get("x") else 1.0) * kaia_tiron(L))
+	var e := Datos.jsround(g * L.pg)
+	L.g -= g
+	L.tot += e
+	if L.g < 1:
+		H[key] = null
+	return e
 
 # lo que retiran los socios según el precio que pongas (lo pidió el usuario: «que actúes tú como encargado del dispensario»): al de la
 # casa (p0), lo de siempre; más caro, menos, y más barato, más (MAR.kaia.precio: el paso y los topes)
@@ -1284,13 +1296,15 @@ func kaia_tiron(L: Dictionary) -> float:
 
 # el dispensario de KAIA, tuyo: lo que hay, rellenarlo con más del mismo lote, el precio y retirar lo que queda
 func gestiona_kaia(N: String) -> void:
-	var M_: Dictionary = S.mar
+	await disp_gestiona(N, S.mar, "kaia", kaia_dia(), D.MAR.kaia.g)
+
+func disp_gestiona(N: String, M_: Dictionary, key: String, base: float, gs0: Array) -> void:
 	var KP: Dictionary = D.MAR.kaia.precio
-	while M_.get("kaia") is Dictionary:
-		var L: Dictionary = M_.kaia
+	while M_.get(key) is Dictionary:
+		var L: Dictionary = M_[key]
 		var x := true if L.get("x") else false
 		var nm_: String = extr_nombre(L.k, true) if x else lot_nombre(L.k)
-		var dia: float = kaia_dia() * (D.VENTA_EXTR.dia if x else 1.0) * kaia_tiron(L)
+		var dia: float = base * (D.VENTA_EXTR.dia if x else 1.0) * kaia_tiron(L)
 		var mas := lotes_venta(1, 1).filter(func(l): return l[0] == L.k and es_extr(l) == x)
 		var ops := [K("Rellenar"), K("Subir el precio"), K("Bajar el precio"), K("Retirar lo que queda"), K("Nada")]
 		var c: int = await ask(T("Tu dispensario, jefe: {g} de {n} a {p} € el gramo. Salen unos {d} al día. Llevamos {e}.", {"g": g_txt(L.g), "n": nm_, "p": _dos(L.pg), "d": g_txt(dia), "e": Datos.eur(L.tot)}), ops, N)
@@ -1301,7 +1315,7 @@ func gestiona_kaia(N: String) -> void:
 			var l: Array = mas[0]
 			var b: Dictionary = l[1]
 			var gs := []
-			for g in (D.VENTA_EXTR.club_g if x else D.MAR.kaia.g):
+			for g in (D.VENTA_EXTR.club_g if x else gs0):
 				if g <= floor(b.g):
 					gs.append(int(g))
 			if gs.is_empty():
@@ -1329,7 +1343,7 @@ func gestiona_kaia(N: String) -> void:
 				add_rosin(L.k, L.g, thc)
 			else:
 				add_buds(L.k, L.g, thc)
-			M_.kaia = null
+			M_[key] = null
 			sfx("get")
 			await say(K("Vaciado. El dispensario, a la espera de lo que traigas."), N)
 			return

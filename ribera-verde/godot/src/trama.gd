@@ -2296,6 +2296,9 @@ func talk_kaia(N: String) -> void:
 func dispensario_kaia(_N: String) -> void:
 	pass
 
+func dispensario_aso() -> void:   # nave.gd
+	pass
+
 func diseno_kaia(_N: String) -> void:
 	pass
 
