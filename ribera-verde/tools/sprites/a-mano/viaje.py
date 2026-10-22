@@ -218,8 +218,8 @@ def monte():
 # los caseríos, el de la costa, el de las naves, el barrio y la ciudad), cada uno en dos capas: la de junto a la carretera, a su
 # tamaño, y la de lejos, a la mitad, más arriba y más despacio. Cada capa se repite cada PUEBLO_W px
 PUEBLO_W = 704
-CERCA_H, CERCA_BASE = 108, 96           # la capa de junto a la carretera: alto y la fila del suelo (el pie de las casas)
-LEJOS_H, LEJOS_BASE = 80, 52            # la de lejos
+CERCA_H, CERCA_BASE = 120, 108          # la capa de junto a la carretera: alto y la fila del suelo (el pie de las casas)
+LEJOS_H, LEJOS_BASE = 84, 56            # la de lejos
 A = 'prop-arbol-alto/tree'; A2 = 'prop-arbol-alto2/tree2'; MZ = 'prop-manzano/manzano'
 def e(k): return 'edificio-%s/base' % k
 # (marco del atlas, x: la izquierda de las casas, el centro de los árboles); los de lejos, en px de la mitad
@@ -253,6 +253,36 @@ def del_atlas():
     hoja = Image.open(os.path.join(SALIDA, 'atlas.png')).convert('RGBA')
     j = json.load(open(os.path.join(SALIDA, 'atlas.json')))
     return lambda k: hoja.crop((j['frames'][k]['x'], j['frames'][k]['y'], j['frames'][k]['x'] + j['frames'][k]['w'], j['frames'][k]['y'] + j['frames'][k]['h']))
+
+
+REMATE = 12                              # filas que le faltan por arriba a la fábrica del atlas (el tejado sin canto y la chimenea sin boca)
+
+
+def remata(k, im):
+    # la fábrica del atlas acaba en la fila 0 a mitad de tejado: le sigue la chapa hacia arriba (cada 9 filas se repite) con su
+    # cumbrera oscura y sube la chimenea (x 98–111) con su boca; el atlas no se toca
+    if k != e('fabrica'):
+        return im
+    w, h = im.size
+    out = Image.new('RGBA', (w, h + REMATE), (0, 0, 0, 0))
+    out.alpha_composite(im, (0, REMATE))
+    src, px = im.load(), out.load()
+    for y in (0, 1):                      # la tira negra de arriba de la chimenea, ladrillo como debajo
+        for x in range(99, 111):
+            px[x, y + REMATE] = src[x, y + 3]
+    cumbre = REMATE - 6
+    for y in range(cumbre + 1, REMATE):   # la chapa, por su periodo
+        for x in range(w):
+            px[x, y] = src[x, (y - REMATE) % 9]
+    for x in range(w):
+        px[x, cumbre] = (42, 38, 36, 255)
+    for y in range(2, REMATE):            # la chimenea sube por encima de la cumbrera
+        for x in range(98, 112):
+            px[x, y] = src[x, 3 + (y % 6)]
+    for x in range(97, 113):
+        px[x, 0] = (42, 38, 36, 255)
+        px[x, 1] = (42, 38, 36, 255) if x in (97, 112) else (122, 52, 38, 255)
+    return out
 
 
 def mitad(im):
@@ -307,14 +337,14 @@ def pueblo(tipo, marco):
     for x in range(0, PUEBLO_W, 16):          # el seto corrido delante del prado
         L.im.alpha_composite(seto, (x, CERCA_H - 16))
     for k, x in P['cerca']:
-        im = marco(k + '/unica/00')
+        im = remata(k, marco(k + '/unica/00'))
         x0 = x if k.startswith('edificio') else x - im.width // 2
         L.im.alpha_composite(im, (x0, CERCA_BASE - im.height))
     cerca_im = L.im
     # lejos: las casas a la mitad, sobre su prado, con la neblina
     L = Lienzo(PUEBLO_W, LEJOS_H)
     for k, x in P['lejos']:
-        im = mitad(marco(k + '/unica/00'))
+        im = mitad(remata(k, marco(k + '/unica/00')))
         x0 = x if k.startswith('edificio') else x - im.width // 2
         L.im.alpha_composite(im, (x0, LEJOS_BASE - im.height))
     neblina(L.im)
