@@ -12255,6 +12255,72 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
+   "tipo": "objeto",
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/garaje_dentro.py",
+   "notas": "Lo pidió el usuario: «un garage por dentro, grande como el taller, pero que estén aparcados ahí los vehículos». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "id": "garaje-coche",
+   "celda": "vehiculo_expo",
+   "cubre": [
+    "obj:gS"
+   ],
+   "ajuste_por_sprite": {
+    "gS": "exacto"
+   },
+   "estilo_ref": "los vehículos de la exposición (conce-expo)",
+   "descripcion": "El deportivo rojo de la exposición en el suelo del garaje, sin la plataforma giratoria (4,6 m a 16 px/m).",
+   "montaje": "tal cual (garaje_dentro.py), 80 × 48 (ajuste exacto)"
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/garaje_dentro.py",
+   "notas": "Lo pidió el usuario: «un garage por dentro, grande como el taller, pero que estén aparcados ahí los vehículos». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "id": "garaje-alto",
+   "celda": "mueble_escala",
+   "cubre": [
+    "obj:garrafasG",
+    "obj:grifoG"
+   ],
+   "ajuste_por_sprite": {
+    "garrafasG": "exacto",
+    "grifoG": "exacto"
+   },
+   "estilo_ref": "el atrezo del taller (taller-alto)",
+   "descripcion": "El atrezo del garaje a 16 px/m: la estantería baja con dos garrafas de gasolina de 20 L y el grifo con el enrollador de la manguera."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/garaje_dentro.py",
+   "estilo_ref": "el suelo del taller (interior-taller)",
+   "notas": "Lo pidió el usuario: «si haces líneas de aparcamiento, que estén bien hechas». Solo con Datos.CAL.",
+   "id": "garaje-suelo",
+   "tipo": "tiles",
+   "celda": "tile",
+   "descripcion": "El hormigón del garaje con la línea amarilla de las plazas por el medio de la casilla.",
+   "cubre": [
+    "tile:floorGl"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
    "max_colores": 32,
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/huerto.py (la hoja de abanico de prim.py y la paleta de las plantas de la vista C)",
    "estilo_ref": "las plantas de la vista C (carpa-c-plantas-a) y el árbol y el seto de la calle",

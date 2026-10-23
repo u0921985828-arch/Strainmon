@@ -301,10 +301,13 @@ func tramo(a: String, b: String, k: String) -> Dictionary:
 	var V: Dictionary = D.CONCE.v[k]
 	var km: int = int(D.CONCE.km[a]) + int(D.CONCE.km[b])
 	var pj: int = int(D.METRO.peaje) if "metropoli" in [a, b] and D.has("METRO") else 0   # MAESTRO [9]: la autopista, con su peaje
-	return {"km": km, "min": maxi(5, roundi(viaje(a, b).min * float(V.t))), "eur": maxi(1, roundi(km * float(V.l) / 100.0 * float(D.CONCE.litro))) + pj}
+	return {"km": km, "min": maxi(5, roundi(viaje(a, b).min * float(V.t))), "eur": pago_gasolina(k, km) + pj}   # lo que no lleve el depósito
+
+func lugar_coche() -> String:   # el pueblo del vehículo: desde el garaje por dentro, Ribera Verde
+	return GARAJE if S.map == GARAJE_IN else S.map
 
 func conducir(k):
-	var aqui: String = S.map
+	var aqui: String = lugar_coche()
 	var ds := []
 	for x in D.PARADAS:
 		if x != aqui and (S.ch >= int(D.PARADAS[x].cap) or (x == "metropoli" and metro_ya())):   # MAESTRO [9]: la ciudad, por patrimonio
@@ -328,21 +331,24 @@ func conducir(k):
 	var t := tramo(aqui, x, k)
 	if not await gasolina(t.eur):
 		return
+	gasta_deposito(k, int(t.km))
 	var taller := kilometros(k, int(t.km))
 	sfx("door")
 	await fade(1)
 	await anim_viaje(k, aqui, x, int(t.min))
 	advance_time(t.min)
 	var a: Array = D.PARADAS[x].a
-	if Datos.CAL:   # MAESTRO [3]: se queda en el aparcamiento de la parada (en Ribera Verde, en el garaje, y sales por su puerta)
+	var xm: String = x
+	if Datos.CAL:   # MAESTRO [3]: se queda en el aparcamiento de la parada (en Ribera Verde, en su plaza del garaje, y bajas en él)
 		S.coches[k].en = x
 		S.coches[k].ap = S.day   # el día que lo aparcas (multa_aparcado)
 		if x == GARAJE:
-			a = [GARAJE_B.x0 + 1, GARAJE_B.y0 + GARAJE_B.h, "down"]
+			xm = GARAJE_IN
+			a = llegada_garaje(k)
 		else:
 			montar_aparcamiento(x)
 			a = llegada_parque(x, k)
-	enter_map(x, int(a[0]), int(a[1]), a[2])
+	enter_map(xm, int(a[0]), int(a[1]), a[2])
 	if S.clientsDay != S.day:
 		spawn_clients()
 	update_hud()
@@ -382,17 +388,18 @@ func carreteras_de(aqui: String) -> Array:
 
 func otro_lado(q: Array) -> String:   # el pueblo del otro extremo de la carretera de esa salida
 	var R: Dictionary = D.CARRETERAS.rutas[q[2]]
-	return String(R.b) if String(R.a) == S.map else String(R.a)
+	return String(R.b) if String(R.a) == lugar_coche() else String(R.a)
 
 func tramo_carretera(a: String, b: String, k: String) -> Dictionary:
 	var km: int = maxi(8, absi(int(D.CONCE.km[a]) - int(D.CONCE.km[b])))
-	return {"km": km, "eur": maxi(1, roundi(km * float(D.CONCE.v[k].l) / 100.0 * float(D.CONCE.litro)))}
+	return {"km": km, "eur": pago_gasolina(k, km)}
 
 func al_volante(k: String, q: Array) -> void:
-	var t := tramo_carretera(S.map, otro_lado(q), k)
+	var t := tramo_carretera(lugar_coche(), otro_lado(q), k)
 	if not await gasolina(t.eur):
 		return
-	S.volante = {"k": k, "de": S.map, "tl": kilometros(k, int(t.km))}
+	gasta_deposito(k, int(t.km))
+	S.volante = {"k": k, "de": lugar_coche(), "tl": kilometros(k, int(t.km))}
 	sfx("door")
 	await fade(1)
 	enter_map(String(q[2]), int(q[3]), int(q[4]), "right" if int(q[3]) <= 1 else "left")
@@ -411,13 +418,10 @@ func volante_llega(w: Dictionary):   # saliendo de la carretera al volante: apar
 		return null
 	S.coches[k].en = x
 	S.coches[k].ap = S.day   # el día que lo aparcas (multa_aparcado)
-	var a: Array
-	if x == GARAJE:
-		a = [GARAJE_B.x0 + 1, GARAJE_B.y0 + GARAJE_B.h, "down"]
-	else:
-		montar_aparcamiento(x)
-		a = llegada_parque(x, k)
-	return {"k": k, "a": a, "tl": String(v.get("tl", ""))}
+	if x == GARAJE:   # en casa, a su plaza del garaje por dentro
+		return {"k": k, "a": llegada_garaje(k), "tl": String(v.get("tl", "")), "to": GARAJE_IN}
+	montar_aparcamiento(x)
+	return {"k": k, "a": llegada_parque(x, k), "tl": String(v.get("tl", ""))}
 
 func volante_fin(vo: Dictionary) -> void:
 	await caida_moto(vo.k)
@@ -497,32 +501,46 @@ func accion_abono(k: String, op: String) -> void:
 	sfx("sel")
 	await say(T("Cargas el abono en el maletero: MEATZA ×{m} y ORTUA BIO ×{o} dosis.", q) + ((" " + K("No cabe todo: el resto se queda fuera.")) if int(S.items.get("fert", 0)) + int(S.items.get("ofert", 0)) > 0 else ""))
 
-# A en la puerta del garaje: salir con uno de los que hay dentro o abrirle el maletero
+# A en la puerta del garaje (lo pidió el usuario: «un garage por dentro… que estén aparcados ahí los vehículos»): se entra al garaje
+# por dentro (mapa_garaje, calle.gd), con cada vehículo en su plaza
 func garaje_menu():
-	var ks := aparcados(GARAJE)
-	if ks.is_empty():
+	sfx("door")
+	await fade(1)
+	enter_map(GARAJE_IN, int(GARAJE_SALE[0]), 8, "up")
+	update_hud()
+	await wait(80)
+	await fade(0)
+	if aparcados(GARAJE).is_empty():
 		await say(K("El garaje de la tía. Está vacío: aquí se guarda lo que compres en AUTOS RIBERA."))
+
+# A en un vehículo del garaje por dentro: salir con él, abrirle el maletero o llenarle el depósito con las garrafas (TANQUE)
+func garaje_coche(k: String) -> void:
+	var V: Dictionary = D.CONCE.v[k]
+	var dep: int = int(TANQUE.get(k, 40))
+	var falta: int = int(floor(dep - gas_de(k)))
+	var e: int = ceili(falta * float(D.CONCE.litro))
+	var ops := [T("Salir en {v}", {"v": String(V.art)}), K("Abrir el maletero"), T("Echar gasolina ({l} L · {e})", {"l": falta, "e": Datos.eur(e)}) if falta >= 1 else K("Echar gasolina (lleno)"), K("Nada")]
+	var j: int = await ask(T("{A}. Depósito: {g} de {d} L. Maletero: {m} de {c}.", {"A": mayus(V.art), "g": n(snappedf(gas_de(k), 0.1)), "d": dep, "m": g_txt(mal_peso(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), ops)
+	if j == 0:
+		await conducir(k)
+	elif j == 1:
+		await maletero(k)
+	elif j == 2:
+		await repostar(k)
+
+func repostar(k: String) -> void:
+	var dep: int = int(TANQUE.get(k, 40))
+	var falta: int = int(floor(dep - gas_de(k)))
+	if falta < 1:
+		await say(K("El depósito ya está lleno."))
 		return
-	var ops := []
-	for k in ks:
-		ops.append(T("Salir en {v}", {"v": String(D.CONCE.v[k].art)}))
-	for k in ks:
-		ops.append(T("Maletero {dv}", {"dv": de_art(String(D.CONCE.v[k].art))}))
-	var ab := []
-	for k in ks:
-		for o in ops_abono(k):
-			ops.append(o)
-			ab.append(k)
-	ops.append(K("Nada"))
-	var c: int = await ask(K("El garaje de la tía."), ops)
-	if c < 0 or c >= ops.size() - 1:
+	var e: int = ceili(falta * float(D.CONCE.litro))
+	if not await gasolina(e):
 		return
-	if c < ks.size():
-		await conducir(ks[c])
-	elif c < 2 * ks.size():
-		await maletero(ks[c - ks.size()])
-	else:
-		await accion_abono(ab[c - 2 * ks.size()], ops[c])
+	S.coches[k].gas = snappedf(gas_de(k) + falta, 0.1)
+	sfx("agua")
+	advance_time(5)
+	await say(T("Llenas el depósito {dv} con las garrafas: {l} L, {e}.", {"dv": de_art(String(D.CONCE.v[k].art)), "l": falta, "e": Datos.eur(e)}))
 
 func maletero(k: String) -> void:
 	MAL_K = k

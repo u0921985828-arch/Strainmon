@@ -63,6 +63,10 @@ func corre(f: Callable) -> bool:
 			return false
 	return true
 
+func _garaje_utilitario() -> void:   # A en la puerta del garaje (se entra) y A en el utilitario
+	await J.object_action(10, 8)
+	await J.object_action(1, 5)
+
 func haz(f: Callable, q: Array) -> String:
 	QUIERO = q
 	LOG = []
@@ -210,7 +214,7 @@ func _corre() -> void:
 	var tr: Dictionary = J.tramo("town", "puerto", "utilitario")
 	chk(tr.min == roundi(25 * .55) and tr.eur == roundi(18 * 5.4 / 100 * 1.6), "tramo: %s" % [tr])
 	Cultivo.fijo = .99   # sin control
-	t = haz(func(): await J.object_action(10, 8), ["Salir en el utilitario", "Puerto Viejo"])   # MAESTRO [3]: de Ribera Verde se sale del garaje
+	t = haz(_garaje_utilitario, ["Salir en el utilitario", "Puerto Viejo"])   # MAESTRO [3]: de Ribera Verde se sale del garaje
 	chk(J.S.map == "puerto" and int(J.S.money) == 100 - int(tr.eur), "en coche a Puerto Viejo, de noche, sin billete: %s %s" % [J.S.map, J.S.money])
 	chk(int(J.S.coches.utilitario.km) == 18 and not t.contains("TALLER"), "los km: %s" % [J.S.coches.utilitario])
 	# 4b · el taller por km: al pasar los 15.000, la revisión; a los 40.000, también los neumáticos
@@ -221,7 +225,7 @@ func _corre() -> void:
 	chk(int(J.S.coches.utilitario.km) == 15008 and int(J.S.banco) == 1000 - 220 and t.contains("revisión") and not t.contains("neumáticos"), "la revisión: %s %s %s" % [J.S.banco, J.S.coches.utilitario, t])
 	J.S.coches.utilitario.km = 39990
 	J.S.banco = 1000
-	t = haz(func(): await J.object_action(10, 8), ["Salir en el utilitario", "Puerto Viejo"])
+	t = haz(_garaje_utilitario, ["Salir en el utilitario", "Puerto Viejo"])
 	chk(int(J.S.banco) == 1000 - 300 and t.contains("neumáticos") and not t.contains("revisión"), "los neumáticos: %s %s" % [J.S.banco, t])
 	J.S.coches.utilitario.km = 18
 	# 5 · control de tráfico: con algo encima y registro, te lo quitan

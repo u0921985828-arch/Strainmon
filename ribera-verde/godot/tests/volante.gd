@@ -68,6 +68,13 @@ func al_garaje() -> void:   # delante de la puerta del garaje, mirando a ella
 	J.P.fx = 10
 	J.P.fy = 9
 
+func _garaje_a() -> void:   # A en la puerta del garaje (se entra) y A en el vehículo de QUIERO[0] («Salir en …»)
+	await J.object_action(10, 8)
+	for k in J.aparcados(J.GARAJE):
+		if QUIERO.size() and QUIERO[0] == "Salir en " + String(J.D.CONCE.v[k].art):
+			var pl: Array = J.GARAJE_PLAZA[k]
+			await J.object_action(int(pl[0]), int(pl[1]))
+
 func _corre() -> void:
 	Juego.GUARDADO = "user://prueba-volante.json"
 	Juego.AJUSTES = "user://prueba-volante-ajustes.json"
@@ -104,21 +111,21 @@ func _corre() -> void:
 	al_garaje()
 	QUIERO = ["Salir en el utilitario", "Nada"]
 	MENUS = []
-	corre(func(): await J.object_action(10, 8))
+	corre(_garaje_a)
 	var cm: Array = MENUS[-1] if MENUS.size() else []
 	var rutas_town := {}   # las carreteras de Ribera Verde (cada una, con una o dos casillas de salida)
 	for q in C.puertas.town:
 		rutas_town[q[2]] = int(C.rutas[q[2]].ch)
 	var abiertas: Array = rutas_town.keys().filter(func(id): return rutas_town[id] == 0)
 	chk(cm.filter(func(l): return String(l).begins_with("Por la carretera a ")).size() == abiertas.size() and abiertas.size() >= 1, "capítulo 0: solo las abiertas (%s)" % [cm])
-	chk(S.map == "town" and not S.has("volante"), "«Nada»: sigues en el pueblo")
+	chk(S.map == "garaje" and not S.has("volante"), "«Nada»: sigues en el garaje (%s)" % S.map)
 	# 2 · del garaje, al volante por la carretera de la costa: la gasolina y los km al salir, y en la carretera, el utilitario
 	S.ch = 9
 	al_garaje()
 	QUIERO = ["Salir en el utilitario", "Por la carretera a Puerto Viejo"]
 	MENUS = []
 	var c0: float = float(S.money) + float(S.banco)
-	chk(corre(func(): await J.object_action(10, 8)), "garaje → carretera de la costa")
+	chk(corre(_garaje_a), "garaje → carretera de la costa")
 	cm = MENUS[-1] if MENUS.size() else []
 	var por: Array = cm.filter(func(l): return String(l).begins_with("Por la carretera a "))
 	chk(por.size() == rutas_town.size() and rutas_town.size() == 5, "del garaje, las %d carreteras de Ribera Verde, una vez cada una (%s)" % [rutas_town.size(), por])
@@ -156,25 +163,25 @@ func _corre() -> void:
 	corre(func(): await J.parada_action())
 	chk(S.map == "carr-valle", "parada de Valdehierro → la carretera del valle (%s)" % S.map)
 	r = anda("carr-valle", int(J.MAPS["carr-valle"].w) - 1, 6, "right")
-	chk(r.begins_with("town|") and J.donde("utilitario") == J.GARAJE and J.P.x == int(J.GARAJE_B.x0) + 1 and J.P.y == int(J.GARAJE_B.y0) + int(J.GARAJE_B.h), "→ Ribera Verde: al garaje, y sales por su puerta (%s)" % r)
+	chk(r.begins_with("garaje|") and J.donde("utilitario") == J.GARAJE and [J.P.x, J.P.y] == J.llegada_garaje("utilitario").slice(0, 2), "→ Ribera Verde: al garaje por dentro, junto a su plaza (%s)" % r)
 	chk(J.aparcados("town").has("utilitario") and J.coche_en(J.P.x, J.P.y) == "", "en el garaje, no en la calle: %s" % [S.coches.utilitario])
 	# 5 · la moto y el superdeportivo, igual; y la vuelta por el mismo extremo, al garaje
 	for k in ["moto", "deportivo"]:
 		al_garaje()
 		var art: String = D.CONCE.v[k].art
 		QUIERO = ["Salir en " + art, "Por la carretera a Mendialde"]
-		corre(func(): await J.object_action(10, 8))
+		corre(_garaje_a)
 		chk(S.map == "carr-monte" and J.vehiculo() == k and absf(J.paso_ms() - float(D.VEHICULOS[k].paso[0])) < 0.01, "%s: en la carretera del monte, al volante (%s, %s)" % [k, S.map, J.vehiculo()])
 		r = anda("carr-monte", 0, 6, "left")
-		chk(r.begins_with("town|") and J.donde(k) == J.GARAJE and not S.has("volante"), "%s: de vuelta, al garaje (%s)" % [k, r])
+		chk(r.begins_with("garaje|") and J.donde(k) == J.GARAJE and not S.has("volante"), "%s: de vuelta, al garaje (%s)" % [k, r])
 	# 6 · sin dinero para la gasolina: no sales
 	S.money = 0
 	S.banco = 0
 	al_garaje()
 	QUIERO = ["Salir en la berlina", "Por la carretera a Ibarbide"]
 	LOG = []
-	corre(func(): await J.object_action(10, 8))
-	chk(S.map == "town" and not S.has("volante") and LOG.any(func(t): return String(t).begins_with("Para la gasolina")), "sin gasolina, en el garaje (%s)" % S.map)
+	corre(_garaje_a)
+	chk(S.map == "garaje" and not S.has("volante") and LOG.any(func(t): return String(t).begins_with("Para la gasolina")), "sin gasolina, en el garaje (%s)" % S.map)
 	S.money = 5000
 	# 7 · a pie, en bici o en patinete: por la carretera también, y por donde quieras
 	J.enter_map("carr-valle", 5, 6, "up")

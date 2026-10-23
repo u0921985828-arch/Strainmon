@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El garaje por dentro (lo pidió el usuario: «un garage por dentro, grande como el taller, que estén aparcados ahí los vehículos, A en cada vehículo para salir, abrir el maletero […] con forma de maletero de coche, o cargar gasolina del coche, no abono»)
+- Con `Datos.CAL`, la puerta seccional del garaje de la tía lleva dentro (`GARAJE_IN`, `mapa_garaje` en `calle.gd`): 14 × 10 (lo pidió el usuario: «si haces líneas de aparcamiento, que estén bien hechas, es muy grande»), con el pasillo de 2 m del portón en el medio y dos plazas de 6 × 3 m a cada lado, cerradas por su línea amarilla de atrás, la de entre las dos y la de delante, por el medio de la casilla a 0,5 m de las ruedas (`GARAJE_LINEA`, la casilla `floorGl` en `garaje_dentro.py`) y abiertas al pasillo, el sumidero en el pasillo, pocas manchas de aceite, el banco, el grifo con la manguera, las garrafas de gasolina, aceites, neumáticos, cajonera, extintor y bidón de serrín (textos en `ATREZO_TXT.garaje`); arte a mano en `tools/sprites/a-mano/garaje_dentro.py` (el deportivo sin la plataforma giratoria, garrafas y grifo).
+- Cada vehículo comprado, aparcado en su plaza (`GARAJE_PLAZA`: utilitario y berlina arriba, deportivo y moto abajo) y sólido; el que está fuera deja su plaza vacía. Sin vehículos, «Está vacío».
+- A en un vehículo (`garaje_coche`): «Salir en …» (sales con él por el portón, como antes), «Abrir el maletero», «Echar gasolina» y «Nada»; sin abono (se sigue cargando en los aparcamientos de los pueblos). Al volver a casa, entras al garaje junto a su plaza (`llegada_garaje`).
+- El depósito (`TANQUE`: moto 7 L, utilitario 45, berlina 60, deportivo 70; `S.coches[k].gas`): se llena con las garrafas al precio del litro (`repostar`), los viajes gastan de él (`gasta_deposito`) y solo se paga en el surtidor lo que falte (`pago_gasolina`); con el depósito vacío, como antes.
+- El maletero en vitrina, con forma de maletero (`rects_almacen`, tipo `mal`, en `setas.gd`): el vehículo visto por detrás con el portón abierto, amortiguadores, pilotos, junta, moqueta, umbral, parachoques y matrícula sin letras, del color de cada vehículo (`MAL_COLOR`); en la moto, el baúl con su piloto.
+- Prueba `tests/garaje.gd` (72 comprobaciones; con `--salida`, capturas del garaje y de los maleteros); `vehiculos.gd`, `volante.gd` y `concesionario.gd` entran por el garaje.
+
 ### 0.61.0 (código 81) y plugin de WordPress 1.6.1
 - El AAB de Play (con la demo), el APK universal (`descargas/LandraceHunters.apk`, sin el bloqueo) y `descargas/landrace-hunters-1.6.1.zip` (y el ligero de 28 KB), con el rival del billar de verdad y las bolas con sprite y apuestas grandes. AAB 82 MB firmado; APK 89 MB (con `tools/apk-instalar.py`, firma v2/v3 con la upload key, versión 81/0.61.0); zip 29 MB.
 

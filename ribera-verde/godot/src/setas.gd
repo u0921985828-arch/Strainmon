@@ -903,6 +903,9 @@ func panel_almacen(o: Array, A: Dictionary, px: int, py: int) -> void:
 	_barra_alm(o, px, py, 1, "cu", float(it.b.get("cu", 0)), "#58c070")
 	_barra_alm(o, px, py, 2, "g", it.b.g / cap, "#e0a040")
 
+# el color de cada vehículo por detrás (oscuro, medio, claro), como en la exposición
+const MAL_COLOR := {"moto": ["#121316", "#26282e", "#4a4e58"], "utilitario": ["#9aa0a8", "#dcdfe4", "#f4f6f8"], "berlina": ["#33373e", "#5a606a", "#848a94"], "deportivo": ["#6a1418", "#b8202a", "#e04048"]}   # i18n-no
+
 # la vista: la caja (168 × 100) o la nevera (152 × 120) y, a su derecha, la ventana del elegido (60 × 100), centradas juntas.
 # Rectángulos [x, y, w, h, color] y sprites ["@", nombre, x, y] (misc:alm-*, con el ancla arriba a la izquierda)
 func rects_almacen(A: Dictionary) -> Array:
@@ -936,31 +939,56 @@ func rects_almacen(A: Dictionary) -> Array:
 		o.append_array([[x0 + 8, y0 + 89, 140, 5, "#2a2d34"], [x0 + 9, y0 + 90, Datos.jsround(138 * minf(1.0, tar_g(A.t) / maxf(1.0, tar_cap(A.t)))), 3, "#d8b048"]])
 		panel_almacen(o, A, x0 + 172, y0)
 		return o
-	if A.t == "mal":   # MAESTRO [3]: el maletero por dentro: la moqueta, el burlete y los tarros, seis por fila
+	if A.t == "mal":   # MAESTRO [3]; (lo pidió el usuario: «con forma de maletero de coche») el vehículo por detrás con el portón abierto
+		# arriba y sus amortiguadores, los pilotos en los laterales, el burlete, la moqueta con los tarros, seis por fila, y el
+		# paragolpes con la matrícula sin letras; en la moto, el baúl negro con la tapa abierta. Del color de cada vehículo (MAL_COLOR)
 		var FM := int(D.CAMAROTE.est.tarros)
 		var x0: int = (SW - 232) >> 1
 		var y0 := 4
-		o.append_array([[x0, y0, 168, 100, "#1c1e24"], [x0 + 2, y0 + 2, 164, 96, "#3a3e48"], [x0 + 4, y0 + 4, 160, 82, "#2e3138"], [x0 + 2, y0 + 2, 164, 2, "#555a66"]])
-		for yy in range(y0 + 8, y0 + 84, 4):
-			o.append([x0 + 4, yy, 160, 1, "#34373f"])
+		var cc: Array = MAL_COLOR.get(MAL_K, MAL_COLOR.utilitario)
+		var moto: bool = MAL_K == "moto"
+		o.append_array([[x0, y0, 168, 100, "#16171c"],
+			[x0 + 12, y0, 144, 12, cc[0]], [x0 + 14, y0, 140, 10, cc[1]], [x0 + 20, y0 + 1, 128, 6, "#20262e" if not moto else cc[1]], [x0 + 14, y0 + 9, 140, 1, cc[2]],   # el portón abierto
+			[x0 + 2, y0 + 10, 14, 72, cc[0]], [x0 + 3, y0 + 11, 12, 70, cc[1]], [x0 + 3, y0 + 11, 2, 70, cc[2]],   # los laterales
+			[x0 + 152, y0 + 10, 14, 72, cc[0]], [x0 + 153, y0 + 11, 12, 70, cc[1]], [x0 + 163, y0 + 11, 2, 70, cc[0]],
+			[x0 + 15, y0 + 11, 138, 69, "#0e0f12"], [x0 + 16, y0 + 12, 136, 67, "#2c2e34"],   # el burlete y la moqueta
+			[x0 + 16, y0 + 74, 136, 5, "#24262b"], [x0 + 14, y0 + 79, 140, 3, "#9aa0a8"], [x0 + 14, y0 + 79, 140, 1, "#c8ccd2"]])   # el umbral de acero
+		for yy in range(y0 + 15, y0 + 74, 3):   # el tejido de la moqueta
+			o.append([x0 + 16, yy, 136, 1, "#303238"])
+		if not moto:
+			o.append_array([[x0 + 15, y0 + 10, 2, 1, "#8a8e96"], [x0 + 151, y0 + 10, 2, 1, "#8a8e96"]])
+			for q in 6:   # los amortiguadores del portón, en diagonal
+				o.append_array([[x0 + 17 + q, y0 + 12 + q * 3, 1, 3, "#8a8e96"], [x0 + 150 - q, y0 + 12 + q * 3, 1, 3, "#8a8e96"]])
+			for px_ in [x0 + 4, x0 + 154]:   # los pilotos
+				o.append_array([[px_, y0 + 36, 10, 18, "#5a0e10"], [px_ + 1, y0 + 37, 8, 7, "#d02a28"], [px_ + 1, y0 + 44, 8, 4, "#f0a020"], [px_ + 1, y0 + 48, 8, 5, "#e8e8e8"], [px_ + 2, y0 + 38, 3, 1, "#ff8a80"]])
+		o.append_array([[x0 + 2, y0 + 82, 164, 11, "#1e2024"], [x0 + 2, y0 + 82, 164, 1, "#3a3d44"], [x0 + 6, y0 + 90, 156, 1, "#2a2c32"]])   # el paragolpes
+		if moto:   # el piloto de la moto, en medio, debajo del baúl
+			o.append_array([[x0 + 70, y0 + 84, 28, 4, "#d02a28"], [x0 + 72, y0 + 84, 8, 1, "#ff8a80"]])
+		if not moto:   # la matrícula, sin letras
+			o.append_array([[x0 + 62, y0 + 84, 44, 7, "#101010"], [x0 + 63, y0 + 85, 42, 5, "#f0f0ea"], [x0 + 63, y0 + 85, 5, 5, "#2a4ab0"],
+				[x0 + 72, y0 + 87, 10, 1, "#9a9a9a"], [x0 + 86, y0 + 87, 14, 1, "#9a9a9a"]])
 		var fila0: int = 0 if A.i < FM else int(floor(float(A.i) / FM)) - 1
 		for f in 2:
-			var y: int = y0 + 8 + f * 38
+			var y: int = y0 + 16 + f * 30
 			for c in FM:
 				var q: int = (fila0 + f) * FM + c
 				if q >= it.size():
 					continue
 				var Jt: Dictionary = it[q]
-				var x: int = x0 + 10 + c * 25
+				var x: int = x0 + 18 + c * 23
 				if Jt.k == "+":
 					o.append(["@", "alm-mas", x, y])
 				elif Jt.k == "v":
 					o.append_array([[x + 1, y + 4, 16, 20, "#c8d0d8"], [x + 3, y + 6, 12, 16, "#9aa4ae"], [x + 1, y + 4, 16, 2, "#e8ecf0"], [x + 7, y + 10, 4, 4, "#58c070"]])
 				else:
-					_tarro(o, x, y, 18, 25, _color_lote(Jt.k), float(Jt.gj) / float(D.ALM.tarro), Jt.b.get("vac", false), "alm-tarro-s" if Jt.k.contains("*") else "alm-tarro", _dentro_lote(Jt.k, Jt.b))
+					_tarro(o, x, y, 18, 25, _color_lote(Jt.k), float(Jt.gj) / float(D.ALM.tarro), Jt.b.get("vac", false), "alm-tarro-s" if Jt.k.contains("*") else "alm-tarro", _dentro_lote(Jt.k, Jt.b), 1, "#2c2e34")
 				if q == A.i:
 					_marco(o, x - 2, y - 2, 22, 29)
-		o.append_array([[x0 + 8, y0 + 89, 152, 5, "#2a2d34"], [x0 + 9, y0 + 90, Datos.jsround(150 * minf(1.0, mal_peso(MAL_K) / maxf(1.0, mal_kg(MAL_K)))), 3, "#d8b048"]])
+		if fila0 > 0:
+			o.append_array([[x0 + 146, y0 + 14, 2, 1, "#f8d040"], [x0 + 145, y0 + 15, 4, 1, "#f8d040"]])
+		if it.size() > (fila0 + 2) * FM:
+			o.append_array([[x0 + 145, y0 + 71, 4, 1, "#f8d040"], [x0 + 146, y0 + 72, 2, 1, "#f8d040"]])
+		o.append_array([[x0 + 8, y0 + 94, 152, 5, "#2a2d34"], [x0 + 9, y0 + 95, Datos.jsround(150 * minf(1.0, mal_peso(MAL_K) / maxf(1.0, mal_kg(MAL_K)))), 3, "#d8b048"]])
 		panel_almacen(o, A, x0 + 172, y0)
 		return o
 	if A.t == "disp":   # la vitrina del dispensario (168 × 100): el cristal con su luz arriba y la balda, el zócalo de madera

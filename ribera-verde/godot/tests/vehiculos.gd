@@ -66,6 +66,10 @@ func corre(f: Callable) -> bool:
 
 const Atlas = preload("res://src/atlas.gd")
 
+func _garaje_utilitario() -> void:   # A en la puerta del garaje (se entra) y A en el utilitario
+	await J.object_action(10, 8)
+	await J.object_action(1, 5)
+
 func _corre() -> void:
 	Juego.GUARDADO = "user://prueba-vehiculos.json"
 	Juego.AJUSTES = "user://prueba-vehiculos-ajustes.json"
@@ -120,8 +124,12 @@ func _corre() -> void:
 	QUIERO = ["Salir en el utilitario", "Puerto Viejo"]
 	MENUS = []
 	var c0: float = float(S.money) + float(S.banco)
-	chk(corre(func(): await J.object_action(10, 8)), "garaje → Puerto Viejo en el utilitario")
-	chk(MENUS.size() and MENUS[0].has("Maletero de la moto") and MENUS[0].has("Salir en la moto"), "en el garaje, los dos: %s" % [MENUS])
+	chk(corre(func(): await J.object_action(10, 8)) and S.map == "garaje", "A en la puerta: dentro del garaje (%s)" % S.map)
+	var gm: Dictionary = J.MAPS.garaje
+	chk(gm.w == 14 and gm.h == 10 and gm.o[5][1] == "expoU" and gm.o[5][5] == "expoU2" and gm.o[8][8] == "expoMo" and gm.o[5][8] == null, "los dos, aparcados en su plaza: %s %s" % [gm.o[5].slice(0, 6), gm.o[8].slice(8, 10)])
+	chk(J.tile_solid(gm, 3, 5) or gm.o[5][3] != null, "el coche no se atraviesa")
+	chk(corre(func(): await J.object_action(3, 5)), "A en el utilitario → Puerto Viejo")
+	chk(MENUS.size() and MENUS[0].has("Salir en el utilitario") and MENUS[0].has("Abrir el maletero") and MENUS[0].any(func(l): return String(l).begins_with("Echar gasolina")) and not MENUS[0].any(func(l): return String(l).contains("abono")), "en el coche, salir, el maletero o la gasolina: %s" % [MENUS])
 	chk(S.map == "puerto" and J.donde("utilitario") == "puerto" and J.donde("moto") == J.GARAJE and float(S.money) + float(S.banco) < c0, "llegas y se queda allí: %s %s" % [S.map, J.donde("utilitario")])
 	chk(J.vehiculo() == null, "en Puerto Viejo, a pie")
 	chk(int(S.coches.utilitario.get("ap", -1)) == int(S.day), "aparcado hoy: %s" % S.coches.utilitario.get("ap"))
@@ -159,7 +167,8 @@ func _corre() -> void:
 	chk(J.P.y == pl[0].y + 1, "no se atraviesa")
 	QUIERO = ["Viajar", "Ribera Verde"]
 	chk(corre(func(): await J.coche_menu("utilitario")), "coche_menu → Ribera Verde")
-	chk(S.map == "town" and J.donde("utilitario") == J.GARAJE and J.P.x == 10 and J.P.y == 9, "de vuelta, al garaje, en su puerta: %d,%d" % [J.P.x, J.P.y])
+	chk(S.map == "garaje" and J.donde("utilitario") == J.GARAJE and [J.P.x, J.P.y] == J.llegada_garaje("utilitario").slice(0, 2), "de vuelta, al garaje por dentro, junto a su plaza: %s %d,%d" % [S.map, J.P.x, J.P.y])
+	J.enter_map("town", 10, 9, "up")
 	QUIERO = ["Puerto Viejo"]   # en Ribera Verde, la parada es solo del autobús
 	chk(corre(func(): await J.parada_action()), "en autobús")
 	chk(S.map == "puerto" and J.donde("utilitario") == J.GARAJE, "en autobús, el coche se queda en el garaje")
@@ -208,9 +217,9 @@ func _corre() -> void:
 		return null
 	J.enter_map("town", 10, 9, "up")
 	J.add_buds("ria", 20, 18.0)
-	QUIERO = ["Maletero del utilitario", "+"]
+	QUIERO = ["Abrir el maletero", "+"]
 	MENUS = []
-	chk(corre(func(): await J.object_action(10, 8)), "garaje → maletero")
+	chk(corre(_garaje_utilitario), "garaje → A en el utilitario → maletero")
 	chk(J.mal_g("utilitario") >= 1, "guardado desde el garaje: %.1f" % J.mal_g("utilitario"))
 	J.S.buds = {}
 	# y en Puerto Viejo, desde la parada (el coche, aparcado allí)
@@ -246,9 +255,10 @@ func _corre() -> void:
 	# 7c) el abono de floración al maletero y, en Valdehierro, a los tanques de la nave (cuenta en el peso del maletero)
 	S.items.fert = 20
 	S.items.ofert = 8
-	J.enter_map("town", 10, 9, "up")
+	S.coches.utilitario.en = "puerto"   # el abono, desde el aparcamiento (en el garaje, la gasolina: lo pidió el usuario)
+	J.enter_map("puerto", int(D.PARADAS.puerto.a[0]), int(D.PARADAS.puerto.a[1]), "down")
 	QUIERO = ["Cargar el abono del utilitario"]
-	chk(corre(func(): await J.object_action(10, 8)), "garaje → cargar el abono")
+	chk(corre(func(): await J.coche_menu("utilitario")), "aparcamiento → cargar el abono")
 	chk(int(J.mal_ab("utilitario").m) == 20 and int(J.mal_ab("utilitario").o) == 8 and int(S.items.fert) == 0 and int(S.items.ofert) == 0, "el abono, en el maletero: %s" % [J.mal_ab("utilitario")])
 	chk(absf(J.mal_peso("utilitario") - 28 * float(D.MALETERO.dosis)) < 0.01, "pesa: %.0f g" % J.mal_peso("utilitario"))
 	var nave0 = S.get("nave")

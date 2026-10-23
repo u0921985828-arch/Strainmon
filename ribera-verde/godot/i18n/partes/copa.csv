@@ -250,3 +250,18 @@ Gana {nb}. Le das {n} semillas de {v}.,{nb} wins. You hand over {n} {v} seeds.
 "La {n}, a la esquina.","The {n}, corner pocket."
 "Esta, a defender.","Playing safe."
 "La {n}, por banda.","The {n}, off the rail."
+Abrir el maletero,Open the boot
+Echar gasolina ({l} L · {e}),Fill up ({l} L · {e})
+Echar gasolina (lleno),Fill up (full)
+{A}. Depósito: {g} de {d} L. Maletero: {m} de {c}.,{A}. Tank: {g} of {d} L. Boot: {m} of {c}.
+El depósito ya está lleno.,The tank is already full.
+"Llenas el depósito {dv} con las garrafas: {l} L, {e}.","You fill up {dv} from the cans: {l} L, {e}."
+grifoG,grifoG
+garrafasG,garrafasG
+El grifo del garaje con el enrollador de la manguera verde: la que llega hasta la huerta.,The garage tap with the green hose reel: the one that reaches the vegetable plot.
+"Dos garrafas de gasolina de 20 litros, el embudo y un trapo. Con A en un coche, se le llena el depósito.","Two 20-litre petrol cans, the funnel and a rag. Press A on a vehicle to fill its tank."
+"El banco de la tía: un tornillo de mesa, latas de tornillos y una radio con la antena rota.","Your aunt's workbench: a vice, tins of screws and a radio with a broken aerial."
+"Garrafas de aceite de motor y de líquido de frenos, a medias.",Half-empty jugs of engine oil and brake fluid.
+"El extintor del garaje, colgado junto al portón.","The garage fire extinguisher, hanging by the door."
+Un bidón con serrín para las manchas de aceite.,A drum of sawdust for oil stains.
+Neumáticos viejos y bidones vacíos.,Old tyres and empty drums.

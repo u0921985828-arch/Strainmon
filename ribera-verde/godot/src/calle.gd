@@ -254,6 +254,9 @@ const GARAJE_CARTEL := [Vector2i(9, 8), Vector2i(1, 8)]
 var _garaje0 = null
 
 func montar_garaje(mapa: String) -> void:
+	if mapa == GARAJE_IN and Datos.CAL:
+		MAPS[GARAJE_IN] = mapa_garaje()
+		return
 	if mapa != GARAJE or not MAPS.has(mapa):
 		return
 	var m: Dictionary = MAPS[mapa]
@@ -277,6 +280,84 @@ func montar_garaje(mapa: String) -> void:
 	m.blds.clear()
 	m.blds.append_array(bs)
 	m.erase("_parque")
+
+# (lo pidió el usuario: «un garage por dentro, grande como el taller, pero que estén aparcados ahí los vehículos, A en cada vehículo
+# para salir, abrir el maletero… o cargar gasolina»; y luego: «si haces líneas de aparcamiento, que estén bien hechas, es muy
+# grande»): con CAL, la puerta del garaje entra al garaje por dentro (GARAJE_IN, 14 × 10 a 1 m por casilla): el pasillo de 2 m del
+# portón en el medio y dos plazas de 6 × 3 m a cada lado, cerradas por sus líneas amarillas (la de atrás, la de entre las dos y la
+# de delante; abiertas al pasillo), con cada vehículo que tengas en casa en la suya (GARAJE_PLAZA: x, y, sprite y largo en
+# casillas; el resto, con el «2» detrás, como en la exposición) y el atrezo contra la pared del fondo (garaje_dentro.py y el del
+# taller). Se rehace al entrar, con los que haya
+const GARAJE_IN := "garaje"   # i18n-no
+const GARAJE_W := 14
+const GARAJE_H := 10
+const GARAJE_PLAZA := {"utilitario": [1, 5, "expoU", 5], "berlina": [8, 5, "expoM", 5], "deportivo": [1, 8, "gS", 5], "moto": [8, 8, "expoMo", 2]}   # i18n-no
+const GARAJE_SALE := [6, 7]   # el pasillo y el portón, por dentro (las dos casillas de la fila de abajo)
+const GARAJE_LINEA := [3, 6, 9]   # las filas con la línea de las plazas por el medio (floorGl, a 0,5 m de las ruedas): detrás, entre las dos y delante
+const GARAJE_ATREZO := [[2, 1, "calT"], [13, 1, "grifoG"], [0, 2, "aceiteT"], [1, 2, "cajonT"], [3, 2, "bancoT"], [4, 2, "bancoT2"],   # i18n-no
+	[8, 2, "extinT"], [9, 2, "neumT"], [10, 2, "bidonT"], [12, 2, "garrafasG"]]   # i18n-no
+# el depósito de cada vehículo, en litros (S.coches[k].gas): se llena en el garaje con las garrafas, y el viaje gasta primero de él
+const TANQUE := {"moto": 7, "utilitario": 45, "berlina": 60, "deportivo": 70}   # i18n-no
+
+func mapa_garaje() -> Dictionary:
+	var W := GARAJE_W
+	var H := GARAJE_H
+	var g := []
+	var o := []
+	for y in H:
+		g.append([])
+		o.append([])
+		for x in W:
+			var t: String = "iwT_taller" if y == 0 else "iwB_taller" if y == 1 else "floorTc"   # i18n-no
+			if y > 2 and _hash_t(x, y) % 14 == 0:
+				t = "floorTc2"   # alguna mancha de aceite, pocas: es un garaje de casa   # i18n-no
+			if x in GARAJE_SALE:
+				if y == 7:
+					t = "floorTd"   # el sumidero del pasillo   # i18n-no
+			elif y in GARAJE_LINEA:
+				t = "floorGl"   # la línea de las plazas, que no cruza el pasillo   # i18n-no
+			g[y].append(t)
+			o[y].append(null)
+	for x in GARAJE_SALE:
+		g[H - 1][x] = "mat"   # i18n-no
+	for a in GARAJE_ATREZO:
+		o[int(a[1])][int(a[0])] = a[2]
+	for k in aparcados(GARAJE):
+		var pl: Array = GARAJE_PLAZA[k]
+		for j in int(pl[3]):
+			o[int(pl[1])][int(pl[0]) + j] = String(pl[2]) + ("2" if j else "")
+	var m := {"name": GARAJE_IN, "w": W, "h": H, "g": g, "o": o, "exits": {}, "doors": {}, "music": "club", "blds": [], "est": null}   # i18n-no
+	for x in GARAJE_SALE:
+		m.exits["%d,%d" % [x, H - 1]] = {"to": GARAJE, "x": GARAJE_B.x0 + 1, "y": GARAJE_B.y0 + GARAJE_B.h, "dir": "down"}   # i18n-no
+	return m
+
+func coche_garaje(x: int, y: int) -> String:   # el tuyo aparcado en (x, y) del garaje por dentro, o ""
+	if S.map != GARAJE_IN:
+		return ""
+	for k in aparcados(GARAJE):
+		var pl: Array = GARAJE_PLAZA[k]
+		if y == int(pl[1]) and x >= int(pl[0]) and x < int(pl[0]) + int(pl[3]):
+			return k
+	return ""
+
+func llegada_garaje(k: String) -> Array:   # al volver a casa: en el pasillo, al lado de la puerta del conductor
+	var pl: Array = GARAJE_PLAZA[k]
+	return [int(GARAJE_SALE[0]), int(pl[1]), "left"] if int(pl[0]) < int(GARAJE_SALE[0]) else [int(GARAJE_SALE[1]), int(pl[1]), "right"]   # i18n-no
+
+func gas_de(k: String) -> float:
+	return float(S.coches[k].get("gas", 0.0)) if S.get("coches") is Dictionary and S.coches.has(k) else 0.0
+
+# lo que se paga en la gasolinera por un viaje de km: los litros que no lleva el depósito (sin nada en él, como siempre)
+func pago_gasolina(k: String, km: int) -> int:
+	var l: float = km * float(D.CONCE.v[k].l) / 100.0
+	var q := gas_de(k)
+	if q <= 0:
+		return maxi(1, roundi(l * float(D.CONCE.litro)))
+	return 0 if q >= l else maxi(1, roundi((l - q) * float(D.CONCE.litro)))
+
+func gasta_deposito(k: String, km: int) -> void:
+	if gas_de(k) > 0:
+		S.coches[k].gas = snappedf(maxf(0.0, gas_de(k) - km * float(D.CONCE.v[k].l) / 100.0), 0.1)
 
 # Un vehículo del concesionario (S.coches: {k: {dia: cuándo llega, p: lo pagado, r: el próximo recibo del seguro o null}}), ya entregado
 func coche_ya(k: String) -> bool:
@@ -738,6 +819,9 @@ func object_action(x: int, y: int) -> void:
 	var o = m.o[y][x] if y >= 0 and y < m.h and x >= 0 and x < m.w else null
 	if await campo_obj(x, y, o):   # MAESTRO [4]: las salvajes de la comarcal y el refugio
 		return
+	if coche_garaje(x, y) != "":   # el garaje por dentro: salir, el maletero o la gasolina
+		await garaje_coche(coche_garaje(x, y))
+		return
 	var pi_ = puerta_int(S.map, x, y)
 	if pi_ != null and o == pi_.o:   # 1.51: las puertas de dentro
 		if pi_.get("llave") == "rv" and not (S.get("aso") is Dictionary and S.aso.get("pres")):   # el almacén del dispensario: la llave, del presidente
@@ -885,7 +969,7 @@ func object_action(x: int, y: int) -> void:
 			await say(I18n.v(D.SIGNS.get(st, K("Está tan desgastado que no se lee."))) + (("\n" + I18n.v(D.SETAS_SITIO.cartel)) if Datos.CAL and not Datos.PLAY and st == D.SETAS_SITIO.k else ""))   # 1.43.8
 		"parada":
 			await parada_action()
-		"garaje":   # MAESTRO [3]
+		"garaje":   # MAESTRO [3]; con CAL, se entra (el garaje por dentro, mapa_garaje)
 			await garaje_menu()
 		"cajero":   # 1.35 (granja.gd)
 			await cajero()

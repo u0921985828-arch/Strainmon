@@ -430,8 +430,12 @@ sdefbc86b,Cargas el abono en el maletero: MEATZA ×{m} y ORTUA BIO ×{o} dosis.,
 sdf439b17,No cabe todo: el resto se queda fuera.,Not everything fits: the rest stays out.
 s84a3d684,El garaje de la tía. Está vacío: aquí se guarda lo que compres en AUTOS RIBERA.,Your aunt's garage. It's empty: whatever you buy at AUTOS RIBERA is kept here.
 s6ac5d7a0,Salir en {v},Drive out in {v}
-sf9c3a4e4,Maletero {dv},Boot {dv}
-s07f3c4f1,El garaje de la tía.,Your aunt's garage.
+sa9013e30,Abrir el maletero,Open the boot
+s42851d7a,Echar gasolina ({l} L · {e}),Fill up ({l} L · {e})
+s17c66a14,Echar gasolina (lleno),Fill up (full)
+seae5b7bc,{A}. Depósito: {g} de {d} L. Maletero: {m} de {c}.,{A}. Tank: {g} of {d} L. Boot: {m} of {c}.
+s036a5df8,El depósito ya está lleno.,The tank is already full.
+s7d7c7e44,"Llenas el depósito {dv} con las garrafas: {l} L, {e}.","You fill up {dv} from the cans: {l} L, {e}."
 s30e044fa,No te cabe nada más encima.,You can't carry any more.
 s52465e63,Sacas {g} de {n}.,You take out {g} of {n}.
 sf454b922,Guardas {q} en el maletero.,You put {q} in the boot.
@@ -1039,6 +1043,7 @@ s76a5f712,"«Pásate por el growshop de Kiko, aquí al lado. Él te enseñará l
 s7ad6b53f,"«Le debo dinero a Baltasar, el del bar El Ancla. No es buena gente. Lo siento.»","«I owe money to Baltasar, from the El Ancla bar. He's not a good man. I'm sorry.»"
 s7d6733e6,En autobús,By bus
 s6712082e,En {v},By {v}
+sf9c3a4e4,Maletero {dv},Boot {dv}
 sad254088,"PARADA DE {p}
 ¿Cómo vas?","{p} STOP
 How are you going?"
@@ -1972,23 +1977,37 @@ s15a719e3,estanteN,estanteN
 sb2fb6688,Una estantería con latas oxidadas y cuerdas.,A shelf with rusty tins and rope.
 se281c41c,barrilT,
 s57eb5667,Un bidón azul. Huele a gasoil.,A blue drum. Smells of diesel.
+s278881ae,grifoG,grifoG
+sae8158ac,El grifo del garaje con el enrollador de la manguera verde: la que llega hasta la huerta.,The garage tap with the green hose reel: the one that reaches the vegetable plot.
+se0f79c1d,garrafasG,garrafasG
+s5bfb92d7,"Dos garrafas de gasolina de 20 litros, el embudo y un trapo. Con A en un coche, se le llena el depósito.","Two 20-litre petrol cans, the funnel and a rag. Press A on a vehicle to fill its tank."
+se48c97a0,calT,
+s2e5456a3,"El calendario de la tía, todavía en la hoja del mes en que se fue.",
+s4fa746c3,bancoT,bancoT
+s22eebcdd,"El banco de la tía: un tornillo de mesa, latas de tornillos y una radio con la antena rota.","Your aunt's workbench: a vice, tins of screws and a radio with a broken aerial."
+s18f78a41,bancoT2,bancoT2
+s0e456fec,aceiteT,aceiteT
+s84a1b7b8,"Garrafas de aceite de motor y de líquido de frenos, a medias.",Half-empty jugs of engine oil and brake fluid.
+s24916b2b,Una pila de ruedas viejas. Nadie sabe de qué coche son.,
+s1b98ca14,cajonT,
+s2e944970,"El armario de herramientas: llaves, vasos y un gato pequeño.",
+s147a80e4,extinT,
+s74e8c69d,"El extintor del garaje, colgado junto al portón.","The garage fire extinguisher, hanging by the door."
+s006b2543,bidonT,
+s9c1575e6,Un bidón con serrín para las manchas de aceite.,A drum of sawdust for oil stains.
 s20e95a20,mangT,
 s01174abe,"El enrollador de la manguera del aire, colgado encima del elevador: se estira hasta el coche y vuelve solo.",The air hose reel above the lift: it stretches to the car and winds itself back.
-se48c97a0,calT,
 sa46b2c68,"Un calendario de pared con un coche de rally de los noventa, sin marca. Los días de las citas, en rojo.",A wall calendar with an unbranded nineties rally car. Booking days in red.
 s562af2e0,lavabT,
 s5d114e31,"El lavabo de acero con el jabón de taller, el de la piedra pómez, y un rollo de papel azul.",The steel sink with pumice workshop soap and a roll of blue paper.
 s6634862c,rackT,
 s3fc7c7c3,"La estantería de las ruedas nuevas, de pie y con su etiqueta de medida.","The rack of new tyres, standing up with their size labels."
-s147a80e4,extinT,
 s4be71108,"El extintor de polvo de 6 kg, con la revisión al día y su placa encima.","The 6 kg powder extinguisher, inspection up to date, sign above."
-s006b2543,bidonT,
 sd7f95de5,"Un bidón de 200 litros de aceite usado, esperando al gestor de residuos.","A 200-litre drum of used oil, waiting for the waste collector."
 sb331ee2f,gatoT,
 sadc4b633,El gato de carretilla de 3 toneladas: se mete debajo del coche y se bombea con la palanca.,The 3-tonne trolley jack: slide it under the car and pump the handle.
 s6edc51e7,gruaT,
 s8bf19e15,"La grúa de motores, plegada: con la pluma y la cadena se saca un motor entero.","The engine crane, folded: boom and chain lift out a whole engine."
-s1b98ca14,cajonT,
 sad754c24,"El armario de herramientas grande: siete cajones de llaves, carracas y vasos, y encima la caja de las brocas.","The big tool chest: seven drawers of spanners, ratchets and sockets, the drill bits on top."
 s888b7e04,sillaT,
 s65e57a6e,"Las sillas de la espera, de plástico. Una revista de coches de hace dos años.",Plastic waiting-room chairs. A two-year-old car magazine.
@@ -3295,7 +3314,7 @@ s4374da3b,"La puerta del bajo de Txomin, con un candado. La llave te la da él, 
 sd3654415,"Cerrado. En el cristal, el cartel de SE TRASPASA.",Closed. A BUSINESS FOR SALE sign hangs in the window.
 sa8adefc7,{n} abre de 23:00 a 6:00.,{n} opens from 23:00 to 6:00.
 s42cd9c20,"¿Qué? Con una limpieza y las mesas, queda como nueva.",
-s210335de,Neumáticos viejos y bidones vacíos.,
+s210335de,Neumáticos viejos y bidones vacíos.,Old tyres and empty drums.
 s56a40d26,Sacos rotos de algo que ya no se sabe qué era.,
 sf2a6cfcb,"Cajas con polvo del último inquilino. Si la alquilas, Arrieta las saca.",
 sd33dfb7f,cajaD,cajaD
@@ -4229,12 +4248,9 @@ sc10c1be9,floorTa,floorTa
 s83d0b406,carroT,carroT
 s9868d9d5,recambT,recambT
 secf4f08f,recambT2,recambT2
-s4fa746c3,bancoT,bancoT
-s18f78a41,bancoT2,bancoT2
 s78c3a9bd,compT,compT
 see6a8b02,cajasT,cajasT
 sffbd7f05,elevT2,elevT2
-s0e456fec,aceiteT,aceiteT
 s580ce7c7,fosoT2,fosoT2
 sc3b650c0,prodL,prodL
 sd61e5465,aspiraL,aspiraL
@@ -6198,6 +6214,7 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+s07f3c4f1,El garaje de la tía.,Your aunt's garage.
 s0cbd2c53,"La negra entra antes de tiempo, o con falta: pierdes.","The black drops too early, or on a foul: you lose."
 sd58eac4a,"A {nb} se le va la negra antes de tiempo, o con falta: pierde.","{nb} drops the black too early, or on a foul: {nb} loses."
 s09280e95,Se cuela la blanca.,The cue ball goes in.

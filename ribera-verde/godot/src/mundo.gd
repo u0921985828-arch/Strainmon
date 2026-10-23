@@ -1970,6 +1970,15 @@ var ATREZO_TXT := {   # F7: var, por K()
 		"cuadro": I18n.K("Una lámina de la ría, torcida. Nadie la endereza.")},
 	"almacen": {"sacos": I18n.K("Sacos de sal gorda de la conservera."), "red": I18n.K("Una red de pesca vieja, colgada de un clavo."), "estanteN": I18n.K("Una estantería con latas oxidadas y cuerdas."),
 		"barrilT": I18n.K("Un bidón azul. Huele a gasoil.")},
+	"garaje": {"grifoG": I18n.K("El grifo del garaje con el enrollador de la manguera verde: la que llega hasta la huerta."),
+		"garrafasG": I18n.K("Dos garrafas de gasolina de 20 litros, el embudo y un trapo. Con A en un coche, se le llena el depósito."),
+		"calT": I18n.K("El calendario de la tía, todavía en la hoja del mes en que se fue."),
+		"bancoT": I18n.K("El banco de la tía: un tornillo de mesa, latas de tornillos y una radio con la antena rota."), "bancoT2": I18n.K("El banco de la tía: un tornillo de mesa, latas de tornillos y una radio con la antena rota."),
+		"aceiteT": I18n.K("Garrafas de aceite de motor y de líquido de frenos, a medias."),
+		"neumT": I18n.K("Una pila de ruedas viejas. Nadie sabe de qué coche son."),
+		"cajonT": I18n.K("El armario de herramientas: llaves, vasos y un gato pequeño."),
+		"extinT": I18n.K("El extintor del garaje, colgado junto al portón."),
+		"bidonT": I18n.K("Un bidón con serrín para las manchas de aceite.")},
 	"loc-valde": {"mangT": I18n.K("El enrollador de la manguera del aire, colgado encima del elevador: se estira hasta el coche y vuelve solo."),
 		"calT": I18n.K("Un calendario de pared con un coche de rally de los noventa, sin marca. Los días de las citas, en rojo."),
 		"lavabT": I18n.K("El lavabo de acero con el jabón de taller, el de la piedra pómez, y un rollo de papel azul."),
@@ -2155,6 +2164,8 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	S.map = name_
 	mapas_bilbao(name_)
 	montar_huerta(name_)   # con CAL, la huerta de la tía (campo.gd): la cancilla del pueblo y su mapa
+	if name_ == "garaje":   # con CAL, el garaje por dentro (calle.gd), con los vehículos que haya en casa   # i18n-no
+		montar_garaje(name_)
 	if name_ == "home":
 		montar_casa()
 	if name_ == "nave":
@@ -2233,7 +2244,7 @@ func warp(w: Dictionary) -> void:
 	await fade(1)
 	var vo = volante_llega(w)   # con CAL, al volante por una carretera: aparcado en el pueblo al que llegas (eventos.gd)
 	if vo:
-		enter_map(w.to, int(vo.a[0]), int(vo.a[1]), vo.a[2])
+		enter_map(String(vo.get("to", w.to)), int(vo.a[0]), int(vo.a[1]), vo.a[2])
 	else:
 		enter_map(w.to, w.x, w.y, w.dir)
 	update_hud()
@@ -2503,6 +2514,9 @@ func coche_menu(_k: String):   # MAESTRO [3], en eventos.gd
 	pass
 
 func garaje_menu():   # MAESTRO [3], en eventos.gd
+	pass
+
+func garaje_coche(_k: String) -> void:   # el garaje por dentro, en eventos.gd
 	pass
 
 func maletero(_k: String) -> void:   # MAESTRO [3], en eventos.gd
