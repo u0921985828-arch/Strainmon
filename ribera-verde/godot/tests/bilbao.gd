@@ -52,6 +52,9 @@ func hay(m: Dictionary, capa: String, que: String) -> bool:
 # el mapa entero a PNG, por trozos de pantalla
 func plano(dir: String, k: String) -> void:
 	var m: Dictionary = J.MAPS[k]
+	J.montar_aparcamiento(k)   # el aparcamiento con dos coches (tests/aparc_bilbao.gd)
+	J.S.coches = {"utilitario": {"dia": 0, "p": 20000, "r": 999, "iv": 999, "en": k}, "berlina": {"dia": 0, "p": 40000, "r": 999, "iv": 999, "en": k}}
+	J.S.map = k
 	J.mode = "world"
 	J.ents = []
 	var mw: int = int(m.w) * 16

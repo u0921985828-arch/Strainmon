@@ -182,8 +182,23 @@ func aparcados(mapa: String) -> Array:   # los tuyos que están en mapa, por ord
 
 # el aparcamiento de cada pueblo, dibujado junto a la parada (3 × 4 casillas: cuatro plazas de 2 × 1 a la izquierda y el pasillo a la
 # derecha; aparcamiento.py), en suelo libre que no corta el paso a nada (lo comprueba tests/vehiculos.gd)
-const APARC := {"puerto": [17, 10], "valdehierro": [17, 11], "mendialde": [25, 19], "errotabarri": [13, 13], "ibarbide": [7, 23], "metropoli": [1, 24]}   # i18n-no
+# Bilbao (lo pidió el usuario: «En los nuevos mapas no hay parking, hay que estudiar el espacio jugable que no sea agobiante»): uno en
+# cada zona, en el hueco que deja tools/bilbao.py (BILBAO.APARC, lo mismo; lo comprueba tests/aparc_bilbao.gd)
+const APARC := {"puerto": [17, 10], "valdehierro": [17, 11], "mendialde": [25, 19], "errotabarri": [13, 13], "ibarbide": [7, 23], "metropoli": [1, 24],
+	"zorroza": [13, 15], "lapunta": [22, 15], "abando": [6, 15], "casco": [4, 10]}   # i18n-no
 var _aparc0 := {}
+# las otras tres zonas de Bilbao, sin parada (se llega en autobús a Zorroza): con tu vehículo se va a cualquiera de las cuatro y se
+# aparca en la suya; para la gasolina, los km y el tiempo cuentan como Zorroza (parada_de) y entre dos de Bilbao, BILBAO_KM
+const BILBAO_Z := ["lapunta", "abando", "casco"]   # i18n-no
+const BILBAO_KM := 2
+
+func parada_de(x: String) -> String:
+	return "zorroza" if x in BILBAO_Z else x   # i18n-no
+
+func nombre_lugar(x: String) -> String:   # «Bilbao · La Punta» en Bilbao (D.ZONAS), si no el de la parada
+	if Datos.CAL and (x == "zorroza" or x in BILBAO_Z) and D.ZONAS.has(x):   # i18n-no
+		return String(D.ZONAS[x].n)
+	return String(D.PARADAS[x].n) if D.PARADAS.has(x) else x
 
 func montar_aparcamiento(mapa: String) -> void:
 	if not APARC.has(mapa) or not MAPS.has(mapa):
@@ -243,9 +258,9 @@ func coche_en(x: int, y: int) -> String:   # el tuyo aparcado en (x, y) de este 
 
 func llegada_parque(mapa: String, k: String) -> Array:   # dónde te deja el coche: en el pasillo, al lado de su plaza
 	var i: int = aparcados(mapa).find(k)
-	if not APARC.has(mapa) or i < 0 or i > 3:
+	if not APARC.has(mapa):
 		return D.PARADAS[mapa].a
-	return [APARC[mapa][0] + 2, APARC[mapa][1] + i, "down"]   # i18n-no
+	return [APARC[mapa][0] + 2, APARC[mapa][1] + clampi(i, 0, 3), "down"]   # i18n-no
 
 # el garaje de la tía, dibujado junto al piso (lo pidió el usuario: «dibujado en el mapa junto al piso»): 2 × 3 casillas a la
 # derecha del portal, con la puerta en la fila de la acera; el cartel del piso, que estaba ahí, pasa al otro lado del portal

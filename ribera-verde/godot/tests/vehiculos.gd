@@ -144,13 +144,13 @@ func _corre() -> void:
 		J.montar_aparcamiento(mp)
 		var mm: Dictionary = J.MAPS[mp]
 		var q: Array = J.APARC[mp]
-		var a: Array = D.PARADAS[mp].a
+		var a: Array = D.PARADAS[mp].a if D.PARADAS.has(mp) else [int(q[0]) + 2, int(q[1])]   # Bilbao: sin parada, desde el pasillo (tests/aparc_bilbao.gd)
 		var libre := true
 		for y in range(q[1], q[1] + 4):
 			for x in range(q[0], q[0] + 3):
 				libre = libre and not J.tile_solid(mm, x, y) and J.pisable(mm, x, y)
 		chk(libre and mm.blds.any(func(b): return b.id == "aparcamiento"), "aparcamiento en %s, libre" % mp)
-		chk(absi(int(q[0]) + 1 - int(a[0])) + absi(int(q[1]) + 2 - int(a[1])) <= 12, "en %s, junto a la parada" % mp)
+		chk(not D.PARADAS.has(mp) or absi(int(q[0]) + 1 - int(a[0])) + absi(int(q[1]) + 2 - int(a[1])) <= 12, "en %s, junto a la parada" % mp)
 		var tapa := {}
 		for y in range(q[1], q[1] + 4):
 			tapa[Vector2i(q[0], y)] = 1

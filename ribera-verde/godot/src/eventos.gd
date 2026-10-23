@@ -289,7 +289,7 @@ func multa_aparcado(k: String) -> void:
 	if int(S.day) - int(c.ap) <= int(M.dias) or Datos.hash_str("multa|%d|%s" % [int(S.day), k]) % 1000 >= float(M.p) * 1000:
 		return
 	var V: Dictionary = D.CONCE.v[k]
-	var pu: String = D.PARADAS[donde(k)].n
+	var pu: String = nombre_lugar(donde(k))
 	var f := pagar_recibo(float(M.e), T("Multa · {p}", {"p": pu}))
 	var tx: String = T("Multa del Ayuntamiento de {p}: {a} lleva más de {d} días en el aparcamiento de la parada. {e}, cobrados de lo que tienes.", {"p": pu, "a": V.art, "d": int(M.dias), "e": Datos.eur(M.e)})
 	if f > 0:
@@ -299,6 +299,10 @@ func multa_aparcado(k: String) -> void:
 # de parada en parada con tu vehículo (CONCE.km de cada una; CONCE.v[k].t del tiempo del autobús, sin esperas)
 func tramo(a: String, b: String, k: String) -> Dictionary:
 	var V: Dictionary = D.CONCE.v[k]
+	a = parada_de(a)   # una zona de Bilbao cuenta como Zorroza
+	b = parada_de(b)
+	if a == b:   # de una zona de Bilbao a otra, por la calle
+		return {"km": BILBAO_KM, "min": 5, "eur": pago_gasolina(k, BILBAO_KM)}
 	var km: int = int(D.CONCE.km[a]) + int(D.CONCE.km[b])
 	var pj: int = int(D.METRO.peaje) if "metropoli" in [a, b] and D.has("METRO") else 0   # MAESTRO [9]: la autopista, con su peaje
 	return {"km": km, "min": maxi(5, roundi(viaje(a, b).min * float(V.t))), "eur": pago_gasolina(k, km) + pj}   # lo que no lleve el depósito
@@ -312,10 +316,16 @@ func conducir(k):
 	for x in D.PARADAS:
 		if x != aqui and (S.ch >= int(D.PARADAS[x].cap) or (x == "metropoli" and metro_ya())):   # MAESTRO [9]: la ciudad, por patrimonio
 			ds.append(x)
+	if Datos.CAL and D.PARADAS.has("zorroza") and ("zorroza" in ds or parada_de(aqui) == "zorroza"):   # Bilbao: cada zona, con su aparcamiento
+		var i0: int = ds.find("zorroza") + 1 if "zorroza" in ds else 0   # detrás de Zorroza, en el orden de la calle
+		for z in BILBAO_Z:
+			if z != aqui and MAPS.has(z):
+				ds.insert(i0, z)
+				i0 += 1
 	var it := []
 	for x in ds:
 		var t := tramo(aqui, x, k)
-		it.append({"label": D.PARADAS[x].n, "right": T("{m} min · {e}", {"m": t.min, "e": Datos.eur(t.eur)})})
+		it.append({"label": nombre_lugar(x), "right": T("{m} min · {e}", {"m": t.min, "e": Datos.eur(t.eur)})})
 	var rs := carreteras_de(aqui)
 	for q in rs:
 		var t := tramo_carretera(aqui, otro_lado(q), k)
@@ -337,7 +347,7 @@ func conducir(k):
 	await fade(1)
 	await anim_viaje(k, aqui, x, int(t.min))
 	advance_time(t.min)
-	var a: Array = D.PARADAS[x].a
+	var a: Array = D.PARADAS[parada_de(x)].a
 	var xm: String = x
 	if Datos.CAL:   # MAESTRO [3]: se queda en el aparcamiento de la parada (en Ribera Verde, en su plaza del garaje, y bajas en él)
 		S.coches[k].en = x

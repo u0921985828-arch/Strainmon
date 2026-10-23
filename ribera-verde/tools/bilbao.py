@@ -167,6 +167,16 @@ def lado(m, x, ys, to, tx, dir_):
 		m["exits"]["%d,%d" % (x, y)] = {"to": to, "x": tx, "y": y, "dir": dir_, "lado": dir_}
 
 
+# El aparcamiento de cada zona (lo pidió el usuario: «En los nuevos mapas no hay parking, hay que estudiar el espacio jugable que no
+# sea agobiante»): un hueco de 3 × 4 casillas (aparcamiento.py, APARC en calle.gd: cuatro plazas y el pasillo a la derecha) junto a la
+# acera de abajo de la calle, sin nada dentro y con dos casillas libres como poco a cada lado (que no estreche el paso)
+APARC = {"zorroza": (13, 15), "lapunta": (22, 15), "abando": (6, 15), "casco": (4, 10)}
+
+def hueco_aparc(C, k, suelo):
+	x0, y0 = APARC[k]
+	rect(C, x0, y0, x0 + 2, y0 + 3, suelo)
+
+
 CALLE_Y = 9   # la calle de las cuatro zonas, en la misma fila: se pasa de una a otra por los lados (filas 9 a 14)
 SALE = range(CALLE_Y, CALLE_Y + 6)
 
@@ -213,7 +223,8 @@ def zorroza(DEC):
 	rect(C, 1, 20, W - 2, 21, "=")                                 # la vía doble, sin paso a nivel: se cruza por debajo (ESC_Z)
 	rect(C, 12, 15, W - 2, 18, "g")                                # el parque: césped, árboles en fila y el camino del paso
 	for x in range(13, W - 2, 6):
-		C[16][x] = "y"
+		if x != 13:                                                # el primero, quitado: ahí va el aparcamiento, junto a la parada
+			C[16][x] = "y"
 	rect(C, 18, 15, 19, 18, ".")
 	for x in (17, 20):
 		C[15][x] = C[18][x] = "v"
@@ -227,6 +238,7 @@ def zorroza(DEC):
 	for x in range(1, W - 1):
 		C[25][x] = "_"                                              # la barandilla de la ría
 	rect(C, 1, 26, W - 2, 27, "~")
+	hueco_aparc(C, "zorroza", "g")
 	C[CALLE_Y + 4][12] = "P"                                       # la parada del autobús (Bilbao)
 	for x in (11, 13):
 		if C[CALLE_Y + 4][x] not in "lv":
@@ -268,12 +280,13 @@ def lapunta(DEC):
 		if C[18][x] == "m":
 			C[18][x] = "7"
 	rect(C, 1, 22, W - 2, 23, "~")
+	hueco_aparc(C, "lapunta", "h")
 	return C, blds
 
 
 # ------------------------------------------------------------------------------------------------------------------ Abando
 def abando(DEC):
-	W, H = 46, 26
+	W, H = 46, 30                                                  # 4 filas más que al principio: la acera ancha del aparcamiento
 	C = lienzo(W, H, ".")
 	borde(C, W, H, "s")
 	blds = []
@@ -286,12 +299,14 @@ def abando(DEC):
 	for y in SALE:
 		C[y][0] = C[y][1] if C[y][1] in ".TU" else "."
 		C[y][W - 1] = C[y][W - 2] if C[y][W - 2] in ".TU" else "."
+	Y = 19                                                         # la plaza y las manzanas de abajo, bajo la acera ancha
 	for i, x0 in enumerate((1, 8, 31, 38)):                       # las manzanas de abajo
-		rect(C, x0, 17, x0 + 6, 24, "#")
-		blds.append({"id": "ensB" if i % 2 else "ensB2", "x0": x0, "y0": 17, "w": 7, "h": 8, "doorX": None})
-	rect(C, 1, 15, W - 2, 16, ".")
-	rect(C, 15, 15, 30, 24, ",")                                   # la plaza elíptica: simétrica en las dos direcciones
-	pon(C, 15, 15, [
+		rect(C, x0, Y + 2, x0 + 6, Y + 9, "#")
+		blds.append({"id": "ensB" if i % 2 else "ensB2", "x0": x0, "y0": Y + 2, "w": 7, "h": 8, "doorX": None})
+	rect(C, 1, 15, W - 2, Y + 1, ".")
+	paseo(C, 18, 1, W - 2, ".", "l", "b", "w", paso=16, desde=2)   # la acera ancha, con sus farolas y bancos a ritmo
+	rect(C, 15, Y, 30, Y + 9, ",")                                 # la plaza elíptica: simétrica en las dos direcciones
+	pon(C, 15, Y, [
 		"gggg........gggg",
 		"gg..L......L..gg",
 		"g..............g",
@@ -303,11 +318,12 @@ def abando(DEC):
 		"gg..L......L..gg",
 		"gggg........gggg",
 	])
-	for y in range(15, 25):
+	for y in range(Y, Y + 10):
 		for x in range(15, 31):
 			if C[y][x] == ".":
 				C[y][x] = ","
-	rect(C, 1, 25, W - 2, 25, "s")
+	rect(C, 1, H - 1, W - 2, H - 1, "s")
+	hueco_aparc(C, "abando", ".")
 	return C, blds
 
 
@@ -347,6 +363,7 @@ def casco(DEC):
 	for x in range(1, W - 1):
 		C[25][x] = "_"
 	rect(C, 1, 26, W - 2, 27, "~")
+	hueco_aparc(C, "casco", "k")
 	return C, blds
 
 
@@ -385,7 +402,7 @@ def main():
 		"MAPS": {}, "DEC": {}, "LAMPS": {}, "CLIENT_TILES": {}, "RONDA": {},
 		"PARADA": {"n": "Bilbao", "x": 12, "y": CALLE_Y + 4, "a": [12, CALLE_Y + 5, "down"], "min": 30, "eur": 3, "cap": 2},
 		"ZONAS": {k: {"n": "Bilbao · " + n, "lad": 1.0, "precio": 1.25} for k, n in ZONAS_N.items()},
-		"PATRULLAS": {k: [1, 2] for k in ZONAS_N}, "KM": 14, "PRE": {"zorroza": "z", "lapunta": "u", "abando": "a", "casco": "o"}}
+		"PATRULLAS": {k: [1, 2] for k in ZONAS_N}, "KM": 14, "APARC": {k: list(v) for k, v in APARC.items()}, "PRE": {"zorroza": "z", "lapunta": "u", "abando": "a", "casco": "o"}}
 	for k, f in (("zorroza", zorroza), ("lapunta", lapunta), ("abando", abando), ("casco", casco)):
 		DEC = {}
 		C, blds = f(DEC)
