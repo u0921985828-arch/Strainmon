@@ -86,6 +86,21 @@ def m_tallgrass(L):
 
 def m_dirt(L):
     L.r(0, 0, 64, 64, '#c48a52')
+    # lo pidió el usuario («me parece muy plano… lo haría más imperfecto»): manchas de tierra más húmeda y más seca, de borde
+    # irregular (elipses con mordiscos por el azar) y que casan de un mosaico al siguiente (x e y módulo 64)
+    R = azar(4810)
+    for (cx, cy, rx, ry, c) in ((12, 18, 9, 5, '#bc8450'), (44, 10, 7, 4, '#cc9660'), (38, 44, 11, 6, '#bc8450'),
+                                (8, 52, 6, 4, '#cc9660'), (56, 30, 5, 3, '#b47c48'), (24, 34, 4, 3, '#cc9660')):
+        for y in range(cy - ry, cy + ry + 1):
+            for x in range(cx - rx, cx + rx + 1):
+                d = ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2
+                if d <= 1 and (d < 0.6 or R() < 0.55):
+                    L.p(x % 64, y % 64, c)
+    for (x0, y0, pasos) in ((30, 22, ((1, 0), (1, 1), (1, 0), (1, 1), (1, 0))), (2, 40, ((1, 1), (1, 0), (1, 0), (1, -1)))):
+        x, y = x0, y0
+        for (dx, dy) in pasos:   # dos grietas finas, con el labio de abajo claro
+            L.p(x % 64, y % 64, '#a0744c'); L.p(x % 64, (y + 1) % 64, '#dca476')
+            x += dx; y += dy
     R = azar(4804)
     for _ in range(26):
         x, y = int(R() * 63), int(R() * 63)

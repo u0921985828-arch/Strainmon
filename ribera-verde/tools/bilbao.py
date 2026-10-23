@@ -456,18 +456,283 @@ def casco(DEC):
 			continue
 		edif(C, blds, "casco2", x0, 20, 3, 5)
 		edif(C, blds, "cascoB2" if i % 2 else "cascoB", x0, 26, 3, 4)
-	edif(C, blds, "mercadoR", 17, 33, 14, 5)                       # la Ribera: el mercado en la orilla
-	rect(C, 5, 33, 16, 34, "m")
+	edif(C, blds, "mercadoR", 17, 32, 14, 4)                       # la Ribera: el mercado en la orilla, con su muelle delante (se entra
+	rect(C, 5, 33, 16, 34, "m")                                    # por abajo: la puerta, en la fila de abajo del edificio)
 	paseo(C, 34, 5, 16, "m", "7", "6", "5")
 	rect(C, 31, 33, 38, 34, "m")
 	paseo(C, 34, 31, 38, "m", "7", "6", "5")
+	C[35][31] = "m"
+	rect(C, 17, 36, 31, 36, "m")
+	C[36][16] = "_"
+	rect(C, 16, 37, 32, 37, "_")
+	C[36][32] = "_"
 	edif(C, blds, "sanAnton", 39, 33, 6, 6)                        # la iglesia y su puente de piedra
 	rect(C, 45, 33, 48, 34, "m")
 	for y in range(35, H):
 		C[y][45], C[y][46], C[y][47], C[y][48] = "_", "p", "p", "_"
 	C[H - 1][46] = C[H - 1][47] = "|"
+	rect(C, 39, H - 1, 45, H - 1, "m")                             # el muelle de la iglesia, de su puerta al puente
 	hueco_aparc(C, "casco", "k")
 	return C, blds
+
+# ------------------------------------------------------------------------------------------------------------ por dentro
+# (lo pidió el usuario: «en los que has hecho de Bilbao, hay edificios que no se puede acceder… molaría poder acceder al teatro… la
+# iglesia también… piensa en qué edificios podrían tener juego en la historia»): el teatro, las iglesias y el mercado se entran por su
+# puerta (doors con gate, venta.gd entra_local → ciudad.gd); dentro, mapas propios (BILBAO.IN), con el arte a mano de
+# tools/sprites/a-mano/interiores_bilbao.py. PUERTAS: edificio → [mapa, gate, x de la puerta (2 casillas), llegada dentro]
+# Después de la revisión (que no quede Bilbao sin entrar): las estaciones, donde se coge el tren (estacion:<k>); la iglesia del
+# puente y la de Indautxu; el segundo teatro, el del Ensanche (teatro:camposE); la Diputación, con la ventanilla de Hacienda
+# (hacienda); y en La Punta, el molino de mareas (molino) y el almacén del muelle, con su jornal (almacen). Una clave «id@x0»
+# elige uno de varios edificios iguales. Las torres, los bloques y los pisos, sin entrar: son casas de otros.
+PUERTAS = {
+	"casco": {"teatro": ["teatro-in", "teatro", 9], "catedral": ["catedral-in", "iglesia:catedral", 28], "mercadoR": ["mercado-in", "mercado", 23],
+		"sanNicolas": ["sannicolas-in", "iglesia:sanNicolas", 18], "sanAnton": ["sananton-in", "iglesia:sanAnton", 41]},
+	"zorroza": {"iglesiaZ": ["iglesiaz-in", "iglesia:iglesiaZ", 23], "estacion": ["zorrozae-in", "estacion:estacion", 8]},
+	"abando": {"milagrosa": ["milagrosa-in", "iglesia:milagrosa", 5], "camposE": ["campose-in", "teatro:camposE", 33],
+		"abandoE": ["abandoe-in", "estacion:abandoE", 49], "concordia": ["concordia-in", "estacion:concordia", 55],
+		"diputacion": ["hacienda-in", "hacienda", 33]},
+	"lapunta": {"molino": ["molino-in", "molino", 14], "nave@32": ["almacen-in", "almacen", 34]},
+}
+IN_N = {"teatro-in": "Teatro", "catedral-in": "La catedral", "mercado-in": "Mercado de la Ribera", "sannicolas-in": "San Nicolás",
+	"iglesiaz-in": "La parroquia", "sananton-in": "San Antón", "milagrosa-in": "La parroquia de Indautxu", "campose-in": "Teatro del Ensanche",
+	"zorrozae-in": "Estación de Zorroza", "abandoe-in": "Estación de Abando", "concordia-in": "Estación de la Concordia",
+	"hacienda-in": "Diputación", "molino-in": "Molino de mareas", "almacen-in": "Almacén del muelle"}
+
+
+IN_ANCHO = ("decoT", "palcoT", "taquillaT", "panelE", "ruedaM", "retabloI", "retabloB", "cruzZ", "altarI", "confesI", "barraMe", "puestoFr", "puestoPe", "puestoCa",
+	"puestoQu", "puestoVe", "puestoPa", "puestoFl", "puestoEs")
+
+
+def interior(nombre, W, H, suelo, pared, musica):
+	g = [[suelo] * W for _ in range(H)]
+	for x in range(W):
+		g[0][x], g[1][x] = "iwT_" + pared, "iwB_" + pared
+	return {"name": nombre, "w": W, "h": H, "g": g, "o": [[None] * W for _ in range(H)], "exits": {}, "doors": {}, "music": musica,
+		"blds": [], "est": None}
+
+
+def salida(m, xs, to, tx, ty):
+	for i, x in enumerate(xs):
+		m["g"][m["h"] - 1][x] = "mat"
+		m["exits"]["%d,%d" % (x, m["h"] - 1)] = {"to": to, "x": tx + i, "y": ty, "dir": "down"}
+
+
+def teatro_in(nombre="Teatro", to="casco", tx=9, ty=27):
+	"""el teatro por dentro (20 × 15): arriba, el escenario de tablas entre las dos columnas del proscenio, con el telón recogido a
+	los lados, el decorado al fondo y los palcos en la pared; la boca del escenario con las candilejas y dos escalones; el patio de
+	butacas en tres filas con los pasillos (las butacas, de espaldas: te sientas mirando al escenario); abajo, el vestíbulo con la
+	taquilla y los carteles"""
+	W, H = 20, 15
+	m = interior(nombre, W, H, "floorTeat", "teat", "club")
+	g, o = m["g"], m["o"]
+	for y in range(2, 5):
+		for x in range(4, 16):
+			g[y][x] = "tablado"
+		for x in (2, 3, 16, 17):
+			g[y][x] = "iwB_teatP"                                     # el proscenio: las columnas pintadas, sólidas
+	for x in range(4, 16):
+		g[5][x] = "iwB_teatF"                                         # la boca del escenario, con las candilejas
+	g[5][4] = g[5][15] = "escalonT"                                   # los dos escalones de subida
+	o[2][4], o[2][15] = "telonI", "telonD"                            # el telón recogido, a los lados
+	for x in (6, 8, 10, 12):
+		o[1][x] = "decoT"                                             # el decorado del fondo (de 2 casillas)
+	o[1][0], o[1][18] = "palcoT", "palcoT"                            # los palcos de la pared
+	for y, a, b in ((7, 4, 15), (9, 3, 16), (11, 2, 17)):          # el patio en abanico: cada fila, una butaca más por cada lado
+		for x in list(range(a, 9)) + list(range(11, b + 1)):
+			o[y][x] = "butaca"
+	o[11][2] = None                                                   # y la esquina de la última, rota: sin la del rincón
+	o[13][16] = "taquillaT"                                           # la taquilla (de 2 casillas) y la taquillera, a su derecha
+	o[13][1] = "cartelT"
+	o[13][3] = "cartelT2"
+	o[12][19] = "plantaT"
+	salida(m, (9, 10), to, tx, ty)
+	return m
+
+
+def iglesia_in(k, nombre, W, H, to, tx, ty, retablo="retabloI"):
+	"""una iglesia por dentro: el presbiterio arriba (el retablo en la pared, el altar con sus dos velas y el sacerdote), dos
+	escalones, la nave con los bancos a los dos lados del pasillo de la alfombra, las columnas, el confesionario, el lampadario de
+	las velas, el cepillo y las pilas del agua junto a la puerta"""
+	m = interior(nombre, W, H, "floorIg", "ig", "casa_ama")
+	g, o = m["g"], m["o"]
+	cx = W // 2 - 1                                                   # el pasillo del centro: cx, cx + 1
+	for y in range(2, 4):
+		for x in range(2, W - 2):
+			g[y][x] = "presbI"
+	o[1][cx] = retablo                                                # el retablo (de 2 casillas), en la pared
+	o[3][cx] = "altarI"                                               # el altar (de 2 casillas)
+	o[2][2], o[2][W - 3] = "cirioI", "cirioI"
+	for x in range(2, W - 2):
+		g[4][x] = "escalonI"
+	for y in range(5, H - 1):
+		g[y][cx] = g[y][cx + 1] = "alfombraI"
+	for y in range(6, H - 3, 2):
+		for x in list(range(2, cx - 1)) + list(range(cx + 3, W - 2)):
+			o[y][x] = "bancoI"
+	o[6][2] = None                                                    # el primer banco de la izquierda, quitado para las velas del santo
+	o[list(range(6, H - 3, 2))[-1]][W - 3] = None                                 # y uno del fondo, junto al confesionario
+	for y in range(6, H - 3, 4):
+		o[y][0] = o[y][W - 1] = "columnaI"
+	o[H - 3][W - 3] = "confesI"                                       # el confesionario (de 2 casillas), a la derecha
+	o[H - 3][1] = "velasI"                                            # el lampadario
+	o[H - 2][2] = "cepilloI"
+	o[H - 2][cx - 1], o[H - 2][cx + 2] = "pilaI", "pilaI"
+	salida(m, (cx, cx + 1), to, tx, ty)
+	return m
+
+
+def mercado_in():
+	"""el mercado por dentro (22 × 12): el terrazo, la pared de azulejo con los ventanales, dos calles de puestos (de 2 casillas): la
+	fruta, el pescado en hielo, la carne, los quesos, las verduras y el pan; abajo, la barra de pintxos con sus taburetes"""
+	W, H = 22, 12
+	m = interior("Mercado de la Ribera", W, H, "floorMe", "me", "bar")
+	o = m["o"]
+	for x, y, p in ((2, 3, "puestoFr"), (6, 4, "puestoPe"), (10, 3, "puestoCa"), (14, 4, "puestoQu"), (18, 3, "puestoVe"),
+			(2, 8, "puestoPa"), (6, 7, "puestoFl"), (15, 8, "puestoEs")):   # los puestos, a tresbolillo: nada en fila de regla
+		o[y][x] = p
+	o[7][9], o[7][11] = "barraMe", "barraMe"                         # la barra de pintxos (dos de 2 casillas)
+	for x in (9, 10, 11, 12):
+		o[8][x] = "taburMe"
+	o[10][1], o[10][20] = "cajasMe", "cajasMe"
+	salida(m, (10, 11), "casco", 23, 36)
+	return m
+
+
+def estacion_in(nombre, W, to, tx, ty):
+	"""una estación por dentro (W × 11): el vestíbulo de terrazo con los ventanales; la taquilla (de 2 casillas) con su taquillero,
+	la máquina de billetes, el panel de salidas en la pared, los bancos de la espera en dos filas, la papelera y, al fondo, el paso
+	a los andenes (cerrado: se sube al tren desde la taquilla)"""
+	H = 11
+	m = interior(nombre, W, H, "floorMe", "me", "ensanche")
+	o = m["o"]
+	o[4][2] = "taquillaT"                                             # la taquilla, y el taquillero detrás (gente_in)
+	o[3][W - 4] = "maquinaE"
+	o[1][W // 2 - 1] = "panelE"                                       # el panel de salidas (de 2 casillas), en la pared
+	for y, xs in ((6, range(W // 2 - 3, W // 2 - 1)), (6, range(W // 2 + 1, W // 2 + 3)), (8, range(W // 2 - 4, W // 2 - 1))):
+		for x in xs:
+			o[y][x] = "bench"
+	o[H - 2][W - 2] = "papelera"
+	o[H - 2][1] = "plantaT"
+	cx = W // 2 - 1
+	salida(m, (cx, cx + 1), to, tx, ty)
+	return m
+
+
+def hacienda_in():
+	"""la Diputación por dentro (16 × 10): el palacio, con la piedra y el damasco; dos ventanillas (de 2 casillas) de Hacienda con la
+	funcionaria detrás de la de la izquierda, las columnas, los bancos de la espera y las plantas"""
+	W, H = 16, 10
+	m = interior("Diputación", W, H, "floorIg", "teat", "casa_ama")
+	o = m["o"]
+	o[3][3], o[3][10] = "taquillaT", "taquillaT"
+	for x in (1, 14):
+		o[3][x] = "columnaI"
+		o[6][x] = "columnaI"
+	for x in (5, 6, 9, 10):
+		o[6][x] = "bench"
+	o[8][1], o[8][14] = "plantaT", "plantaT"
+	salida(m, (7, 8), "abando", 33, 26)
+	return m
+
+
+def molino_in():
+	"""el molino de mareas por dentro (14 × 9): la piedra, las losas, la rueda (de 2 casillas) que mueve la marea por el canal de
+	abajo, los sacos de grano apilados, el banco del molinero y la papelera"""
+	W, H = 14, 9
+	m = interior("Molino de mareas", W, H, "floorIg", "bajo", "astilleros")
+	o = m["o"]
+	o[3][5] = "ruedaM"
+	for x, y in ((1, 3), (1, 4), (2, 3), (11, 3), (12, 3), (12, 4)):
+		o[y][x] = "sacos"
+	o[6][2], o[6][3] = "bench", "bench"
+	o[7][12] = "cajasMe"
+	salida(m, (6, 7), "lapunta", 14, 14)
+	return m
+
+
+def almacen_in():
+	"""el almacén del muelle por dentro (16 × 10): el hormigón de la nave, las cajas y los sacos de la carga en hileras con su
+	pasillo, el banco de los estibadores y el capataz junto a la puerta"""
+	W, H = 16, 10
+	m = interior("Almacén del muelle", W, H, "floorN", "nave", "astilleros")
+	o = m["o"]
+	for x in (2, 3, 5, 10, 12, 13):
+		o[3][x] = "cajasMe"
+	for x in (2, 4, 11, 13):
+		o[5][x] = "sacos"
+	o[8][1], o[8][2] = "bench", "bench"
+	o[8][14] = "papelera"
+	salida(m, (7, 8), "lapunta", 34, 14)
+	return m
+
+
+def interiores(B):
+	"""BILBAO.IN: los mapas de dentro; y en los de fuera, la puerta de cada edificio (doorX, ancha y la casilla door_), con su gate"""
+	IN = {"teatro-in": teatro_in(), "mercado-in": mercado_in(),
+		"catedral-in": iglesia_in("catedral", "La catedral", 16, 16, "casco", 28, 26),
+		"sannicolas-in": iglesia_in("sanNicolas", "San Nicolás", 14, 14, "casco", 18, 7, "retabloB"),
+		"iglesiaz-in": iglesia_in("iglesiaZ", "La parroquia", 14, 13, "zorroza", 23, 28, "cruzZ"),
+		"sananton-in": iglesia_in("sanAnton", "San Antón", 12, 12, "casco", 41, 39, "retabloB"),
+		"milagrosa-in": iglesia_in("milagrosa", "La parroquia de Indautxu", 14, 15, "abando", 5, 35),
+		"campose-in": teatro_in("Teatro del Ensanche", "abando", 33, 35),
+		"zorrozae-in": estacion_in("Estación de Zorroza", 16, "zorroza", 8, 14),
+		"abandoe-in": estacion_in("Estación de Abando", 22, "abando", 49, 27),
+		"concordia-in": estacion_in("Estación de la Concordia", 14, "abando", 55, 26),
+		"hacienda-in": hacienda_in(), "molino-in": molino_in(), "almacen-in": almacen_in()}
+	for m in IN.values():                                              # lo de 2 casillas: la de la derecha, k + "2" (sólida, sin dibujo)
+		for row in m["o"]:
+			for x in range(len(row) - 1):
+				if row[x] in IN_ANCHO:
+					row[x + 1] = row[x] + "2"
+	for k, P in PUERTAS.items():
+		m = B["MAPS"][k]
+		for b in m["blds"]:
+			kb = b["id"] if b["id"] in P else "%s@%d" % (b["id"], b["x0"])
+			if kb not in P:
+				continue
+			to, gate, dx = P[kb]
+			dy = int(b["y0"]) + int(b["h"]) - 1
+			b["doorX"], b["ancha"] = dx, 1
+			for i in (0, 1):
+				assert m["g"][dy + 1][dx + i] not in ("water",) and not m["o"][dy + 1][dx + i], "%s: delante de %s (%d, %d)" % (k, b["id"], dx + i, dy + 1)
+				m["g"][dy][dx + i] = "door_" + b["id"]
+				ex = IN[to]["exits"]
+				llega = [c for c in ex][0]
+				m["doors"]["%d,%d" % (dx + i, dy)] = {"to": to, "x": int(llega.split(",")[0]) + i, "y": IN[to]["h"] - 2, "dir": "up", "gate": gate}
+	B["IN"] = IN
+	B["NPC"] = gente_in(IN)
+
+
+def gente_in(IN):
+	"""BILBAO.NPC: la gente de dentro (ciudad.gd, ciudad_npcs), cada uno con su horario en minutos [desde, hasta): la taquillera
+	detrás de la taquilla, la actriz que ensaya de día, los dos de la función, el cura junto al altar de cada iglesia y una
+	feligresa en la catedral, los del mercado detrás de su puesto y el camarero detrás de la barra (el muñeco, del sexo del
+	oficio: GENERO.mujeres)"""
+	def p(i, mp, x, y, look, d, h, dr="down"):
+		assert not IN[mp]["o"][y][x], "%s: %s encima de %s" % (mp, i, IN[mp]["o"][y][x])
+		return {"id": "bi_" + i, "map": mp, "x": x, "y": y, "look": look, "dir": dr, "wander": 0, "desde": d, "hasta": h}
+	L = [p("taquillera", "teatro-in", 16, 12, "cliente4", 600, 1290), p("ainhoa", "teatro-in", 9, 3, "cliente6", 600, 1200),
+		p("actor1", "teatro-in", 7, 3, "oldman", 1260, 1380), p("actor2", "teatro-in", 12, 3, "cliente2", 1260, 1380),
+		p("feligresa", "catedral-in", 11, 9, "granny", 480, 1200, "up")]
+	L += [p("taquillera_c", "campose-in", 16, 12, "cliente6", 600, 1290), p("actor1_c", "campose-in", 7, 3, "cliente2", 1260, 1380),
+		p("actor2_c", "campose-in", 12, 3, "turista", 1260, 1380)]
+	for mp in ("zorrozae-in", "abandoe-in", "concordia-in"):                # el taquillero, detrás de la taquilla, y el vigilante
+		L += [p("taquillero_" + mp[:-3], mp, 2, 3, "obrero", 360, 1380), p("vigilante_" + mp[:-3], mp, IN[mp]["w"] - 2, 6, "judge", 360, 1380, "left")]
+	L += [p("funcionaria", "hacienda-in", 3, 2, "cliente4", 510, 840), p("molinero", "molino-in", 8, 6, "oldman", 540, 1140, "left"),
+		p("capataz", "almacen-in", 13, 8, "obrero", 420, 900, "left")]
+	for mp in ("catedral-in", "sannicolas-in", "iglesiaz-in", "sananton-in", "milagrosa-in"):
+		cx = IN[mp]["w"] // 2 - 1
+		L.append(p("cura_" + mp[:-3], mp, cx + 2, 3, "judge", 480, 1200))
+	o = IN["mercado-in"]["o"]
+	look = {"puestoFr": "cliente4", "puestoPe": "sailor", "puestoCa": "obrero", "puestoQu": "granny", "puestoVe": "cliente2",
+		"puestoPa": "cliente6", "puestoFl": "turista", "puestoEs": "oldman"}
+	for y in range(len(o)):
+		for x in range(len(o[y])):
+			if o[y][x] in look:
+				L.append(p("me_" + o[y][x][6:].lower(), "mercado-in", x, y - 1, look[o[y][x]], 480, 900))
+	L.append(p("camarero", "mercado-in", 10, 6, "socio", 480, 900))
+	return L
+
 
 ZONAS_N = {"zorroza": "Zorroza", "lapunta": "La Punta", "abando": "Abando", "casco": "Casco Viejo"}
 MUSICA = {"zorroza": "town", "lapunta": "astilleros", "abando": "ensanche", "casco": "ibarbide"}
@@ -525,6 +790,7 @@ def main():
 		B["MAPS"][k] = m
 		B["DEC"][k] = DEC
 	tablas(B)
+	interiores(B)
 	D["BILBAO"] = B
 	s = json.dumps(D, ensure_ascii=False, separators=(",", ":"))
 	open(DATOS, "w", encoding="utf-8").write(s)

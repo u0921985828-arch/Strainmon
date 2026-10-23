@@ -154,7 +154,7 @@ func _corre() -> void:
 	MENUS = []
 	chk(corre(func(): await J.parada_action()), "parada de Puerto Viejo → al volante")
 	chk(S.map == "carr-acantilado" and J.vehiculo() == "utilitario", "en la pista de los acantilados (%s)" % S.map)
-	r = anda("carr-acantilado", 0, 6, "left")
+	r = anda("carr-acantilado", int(J.MAPS["carr-acantilado"].w) - 1, 6, "right")
 	chk(r.begins_with("valdehierro|") and J.donde("utilitario") == "valdehierro", "→ Valdehierro, aparcado allí (%s)" % r)
 	chk(int(S.coches.utilitario.km) == int(D.CONCE.km.puerto) + 8, "de pueblo a pueblo sin pasar por Ribera Verde, 8 km: %s" % S.coches.utilitario.km)
 	J.enter_map("valdehierro", int(D.PARADAS.valdehierro.a[0]), int(D.PARADAS.valdehierro.a[1]), "down")

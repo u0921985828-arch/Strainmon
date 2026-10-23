@@ -275,7 +275,7 @@ func huerta_lista() -> bool:   # ¿desbrozada?
 # con CAL, las zonas de Bilbao (tools/bilbao.py, Datos._aplica_auto): si CAL se encendió con la partida en marcha (las pruebas),
 # el mapa no está todavía en MAPS
 func mapas_bilbao(k: String) -> void:
-	if not Datos.CAL or MAPS.has(k) or not D.get("BILBAO", {}).get("MAPS", {}).has(k):
+	if not Datos.CAL or MAPS.has(k) or not (D.get("BILBAO", {}).get("MAPS", {}).has(k) or D.get("BILBAO", {}).get("IN", {}).has(k)):
 		return
 	Datos.carga()
 	MAPS[k] = D.MAPS[k].duplicate(true)

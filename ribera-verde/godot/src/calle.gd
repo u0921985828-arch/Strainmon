@@ -467,6 +467,9 @@ func on_step_end() -> void:
 	if (S.map == "disco" or S.map == "disco-vip") and not disco_abierta():
 		run(func(): await echar_disco())
 		return
+	if Datos.CAL and ciudad_cerrada():   # Bilbao por dentro (ciudad.gd): a la hora de cerrar, a la calle
+		run(func(): await echar_ciudad())
+		return
 	if not D.ZONAS.has(S.map):
 		return
 	if borr() >= float(D.FISIO.tope):   # MAESTRO [2]: en la calle con la borrachera a tope, al suelo
@@ -652,6 +655,8 @@ func bebidas_aqui() -> String:
 		return "club"
 	if S.map in ["disco", "disco-vip", "disco-g"]:
 		return "disco"
+	if S.map == "mercado-in":
+		return "mercado"
 	return ""
 
 # quien está a tu lado: junto al asiento o junto a la casilla donde estás (ni la policía de patrulla)
@@ -692,6 +697,8 @@ func menu_sentado() -> void:
 	var ops := []   # [texto, clave]
 	if sent_mesa():
 		ops.append([K("Usar el ordenador"), "pc"])
+	if S.map in ["teatro-in", "campose-in"]:   # Bilbao por dentro (ciudad.gd)   # i18n-no
+		ops.append([K("Ver la función"), "funcion"])
 	ops.append([K("Fumarte uno"), "fumar"])
 	var bb := bebidas_aqui()
 	if bb != "":
@@ -715,6 +722,8 @@ func menu_sentado() -> void:
 			await fumar_sentado()
 		"beber":
 			await beber_sentado(bb)
+		"funcion":
+			await funcion_teatro()
 		"movil":
 			await movil_menu()
 		"rato":
@@ -748,6 +757,9 @@ func beber_sentado(bb: String) -> void:
 	await say(T("{b}. Te lo tomas sentado, sin prisa.", {"b": b[0]}) + ("" if float(b[3]) <= 0 or bt <= float(D.FISIO.inercia[0]) else (T(" Ya vas tocado: te cuesta andar recto.") if bt <= float(D.FISIO.vision) else T(" Lo ves todo triple. Si sales así a la calle, acabas en el suelo."))))
 
 func rato_sentado() -> void:
+	if S.map in ["catedral-in", "sannicolas-in", "iglesiaz-in", "ermita-in", "sananton-in", "milagrosa-in"]:   # i18n-no
+		await rato_iglesia()
+		return
 	advance_time(30)
 	var t := T("Pasas media hora mirando a la gente.")
 	if D.ZONAS.has(S.map) and float(S.heat) > 0 and not is_night():
@@ -849,6 +861,8 @@ func object_action(x: int, y: int) -> void:
 	var m: Dictionary = MAPS[S.map]
 	var o = m.o[y][x] if y >= 0 and y < m.h and x >= 0 and x < m.w else null
 	if await campo_obj(x, y, o):   # MAESTRO [4]: las salvajes de la comarcal y el refugio
+		return
+	if Datos.CAL and await hito_obj(x, y):   # los sitios de los pueblos (ciudad.gd): el lavadero, el frontón, el faro…
 		return
 	if coche_garaje(x, y) != "":   # el garaje por dentro: salir, el maletero o la gasolina
 		await garaje_coche(coche_garaje(x, y))

@@ -718,6 +718,9 @@ func entra_local(d: Dictionary):
 	elif t == "vip":   # MAESTRO [9]: los clubs VIP de la ciudad (metro.gd)
 		if not await vip_puerta(gk[1]):
 			return
+	elif t in ["teatro", "iglesia", "mercado", "estacion", "hacienda", "molino", "almacen"]:   # Bilbao por dentro (ciudad.gd)
+		if not await entra_ciudad(t):
+			return
 	elif t == "disco":
 		if S.ch < int(D.DISCO.ch) or not disco_abierta():
 			atras_puerta()
@@ -774,6 +777,8 @@ func gate_cerrado(g: String) -> bool:
 			return gk.size() > 1 and D.CLUBS.has(gk[1]) and S.ch < int(D.CLUBS[gk[1]].ch)
 		"disco":
 			return S.ch < int(D.DISCO.ch) or not disco_abierta()
+		"teatro", "iglesia", "mercado", "estacion", "hacienda", "molino", "almacen":   # i18n-no
+			return not ciudad_abierta(gk[0])
 	return false
 
 func atras_puerta() -> void:
@@ -792,6 +797,8 @@ func obj_local(x: int, y: int, o) -> bool:
 	var txt := ""
 	if S.map == "nave-r":   # la nave sin alquilar: los trastos del último
 		await say(K("Neumáticos viejos y bidones vacíos.") if o in ["neumT", "bidonT", "barrilT"] else (K("Sacos rotos de algo que ya no se sabe qué era.") if o == "sacos" else K("Cajas con polvo del último inquilino. Si la alquilas, Arrieta las saca.")))   # i18n-no
+		return true
+	if Datos.CAL and await obj_ciudad(o):   # Bilbao por dentro (ciudad.gd)
 		return true
 	if Datos.CAL and await obj_vip(o):   # MAESTRO [9]
 		return true

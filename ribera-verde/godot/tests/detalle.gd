@@ -116,6 +116,29 @@ func _corre() -> void:
 	var hg: Image = Atlas.frame_de("exterior-mosaico", "mo-grass", "unica", 0, {"i": 0}).c
 	var hv: Image = Atlas.frame_de(Atlas.cubre("tile:grass"), "grass", "unica", 0, {"i": 0}).c
 	chk(hg.get_pixel(5, 5).is_equal_approx(hv.get_pixel(8, 8)) or hg.get_pixel(0, 0).is_equal_approx(Color8(0x84, 0xcc, 0x6c)), "la hierba, del mismo verde (las orillas casan)")
+	# 1b · el atrezo de la tierra (lo pidió el usuario: «me parece muy plano. Lo haría más imperfecto»): ocho detalles de 16 × 16,
+	# todos distintos, con píxeles enteros (alfa 0 o 1), y el mosaico de tierra con manchas: más tonos que el de antes (4)
+	var ft = Atlas.frame_de(Atlas.cubre("misc:tierra"), "tierra", "unica", 0, {"i": 0})
+	chk(ft != null and ft.c.get_width() == 16 * Pt.TIERRA_N and ft.c.get_height() == 16, "la tira del atrezo de la tierra")
+	if ft != null:
+		var vistas := {}
+		for i in Pt.TIERRA_N:
+			var c: Image = ft.c.get_region(Rect2i(i * 16, 0, 16, 16))
+			var llenos := 0
+			var semi := 0
+			for y in 16:
+				for x in 16:
+					var al: float = c.get_pixel(x, y).a
+					llenos += int(al > 0.99)
+					semi += int(al > 0.01 and al < 0.99)
+			chk(llenos >= 8 and semi == 0 and not vistas.has(c.get_data()), "atrezo de la tierra %d: %d píxeles, %d a medias" % [i, llenos, semi])
+			vistas[c.get_data()] = true
+	var md: Image = Atlas.frame_de("exterior-mosaico", "mo-dirt", "unica", 0, {"i": 0}).c
+	var tonos := {}
+	for y in 16:
+		for x in 256:
+			tonos[md.get_pixel(x, y).to_html()] = true
+	chk(tonos.size() > 4, "la tierra con manchas y grietas: %d tonos" % tonos.size())
 	# 2 · los muebles con lo que traen: por mapa y por tramo
 	var casos := [["counter", "shop"], ["counter", "growcity"], ["counter", "comisaria"], ["barcounter", "bar"], ["barraD", "disco"], ["display", "shop"], ["crate", "puerto"], ["crate", "astilleros"], ["crate", "valdehierro"], ["shelfW", "shop"], ["shelfW", "comisaria"], ["sacos", "shop"], ["bottles", "bar"], ["seto", "ensanche"]]
 	var vistos := {}

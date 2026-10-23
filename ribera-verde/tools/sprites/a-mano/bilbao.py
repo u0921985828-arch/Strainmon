@@ -341,16 +341,18 @@ def mercado():
     return lz
 
 
-def grua():
-    """grúa de pórtico del muelle (4 × 7) sobre el hormigón: las patas, la cabina amarilla y la pluma hacia arriba"""
+def grua(fondo=True):
+    """grúa de pórtico del muelle (4 × 7) sobre el hormigón: las patas, la cabina amarilla y la pluma hacia arriba; sin fondo, sola
+    (la de los astilleros, pueblos.py)"""
     W, H = 64, 112
     lz = Lienzo(W, H)
     R = azar(1001)
-    lz.r(0, 0, W, H, '#8e8a84')                                             # el muelle, debajo
-    for _ in range(500):
-        lz.p(int(R() * W), int(R() * H), '#a6a29a' if R() < .5 else '#76726c')
-    for y in range(0, H, 16):
-        lz.hl(0, W - 1, y, '#6a665e')
+    if fondo:
+        lz.r(0, 0, W, H, '#8e8a84')                                         # el muelle, debajo
+        for _ in range(500):
+            lz.p(int(R() * W), int(R() * H), '#a6a29a' if R() < .5 else '#76726c')
+        for y in range(0, H, 16):
+            lz.hl(0, W - 1, y, '#6a665e')
     AM, AMS, AML = '#d8a830', '#a07a20', '#f0c850'
     lz.r(12, 100, 40, 4, '#5a5e66'); lz.hl(10, 54, 104, MAR)                # carriles
     for x in (14, 44):                                                      # patas en A
@@ -640,40 +642,39 @@ def catedral4():
 
 
 def mercadoR():
-    """el mercado de la Ribera, a lo largo de la orilla (14 × 5): la cubierta plana con los tres cuerpos más altos, hormigón
-    claro con las vidrieras de colores en vertical y las puertas de cristal con su marquesina"""
-    W, H = 224, 80
+    """el mercado de la Ribera, a lo largo de la orilla (14 × 4): la cubierta plana con los tres cuerpos más altos, hormigón
+    claro con las vidrieras de colores en vertical y las puertas de cristal con su marquesina en el centro (doorX 23: x 96–127)"""
+    W, H = 224, 64
     lz = Lienzo(W, H)
     H0, H1, H2, H3 = '#e8e0cc', '#cfc6ae', '#f4efe2', '#7a705a'
-    azotea(lz, W, 1541, alto=18)
-    for c0 in (8, 88, 168):                                                 # los tres cuerpos altos: los dos torreones y el centro
-        w = 48
-        lz.r(c0, 0, w, 20, H0); lz.hl(c0, c0 + w - 1, 19, H3); lz.r(c0, 0, w, 3, H2)
+    azotea(lz, W, 1541, alto=14)
+    for c0, w, al in ((6, 44, 15), (86, 52, 17), (170, 46, 14)):            # los tres cuerpos altos, cada uno a su altura
+        lz.r(c0, 0, w, al, H0); lz.hl(c0, c0 + w - 1, al - 1, H3); lz.r(c0, 0, w, 2, H2)
         for x in range(c0 + 4, c0 + w - 4, 6):
-            lz.r(x, 5, 3, 12, '#4a72b4')
-    lz.r(0, 20, W, 60, H0)
-    lz.hl(0, W - 1, 20, H3)
+            lz.r(x, 4, 3, al - 7, '#4a72b4')
+    lz.r(0, 16, W, 48, H0)
+    lz.hl(0, W - 1, 16, H3)
     for x in range(0, W, 16):                                               # pilares y vidrieras
-        lz.r(x, 20, 4, 56, H2); lz.vl(x + 3, 20, 75, H1)
-        if 92 <= x <= 124:
+        lz.r(x, 16, 4, 46, H2); lz.vl(x + 3, 16, 61, H1)
+        if 88 <= x <= 128:
             continue
-        for y in range(24, 54):
+        for y in range(20, 44):
             for xx in range(x + 5, x + 15):
                 c = ('#4a72b4', '#e0b84a', '#c04848', '#5ab868')[((xx // 3) + (y // 5)) % 4]
                 lz.p(xx, y, c if (xx + y) % 5 else CR)
-        lz.hl(x + 5, x + 14, 54, H3)
-    lz.r(92, 22, 40, 6, '#3a5a4a')                                          # la franja verde, sin letras
+        lz.hl(x + 5, x + 14, 44, H3)
+    lz.r(92, 18, 40, 5, '#3a5a4a')                                          # la franja verde, sin letras
     for x in range(96, 130, 4):
-        lz.r(x, 24, 2, 2, H0)
-    lz.r(88, 30, 48, 2, H3)                                                 # marquesina
-    lz.r(92, 34, 40, 46, ALU)
-    for x in (94, 114):
-        lz.caja(x, 36, 18, 44, CR, MAR); lz.p(x + 2, 38, CRL); lz.p(x + 3, 38, CRL); lz.vl(x + 9, 37, 79, MAR)
-    for x0 in (2, 46, 140, 184):                                            # puestos a la vista por abajo
-        lz.r(x0, 58, 38, 18, '#5a5e66')
-        for x in range(x0 + 2, x0 + 36, 6):
-            lz.r(x, 64, 4, 3, ('#e04848', '#f0d070', '#5ab868', '#e08a3a')[(x // 6) % 4])
-    lz.r(0, 77, W, 3, '#5a5e66')
+        lz.r(x, 20, 2, 2, H0)
+    lz.r(88, 25, 48, 2, H3)                                                 # marquesina
+    lz.r(92, 28, 40, 36, ALU)
+    for x in (96, 112):                                                     # las dos hojas, encima de las dos casillas de la puerta
+        lz.caja(x, 30, 16, 34, CR, MAR); lz.p(x + 2, 32, CRL); lz.p(x + 3, 32, CRL); lz.vl(x + 8, 31, 63, MAR)
+    for x0 in (4, 46, 142, 184):                                            # puestos a la vista por abajo
+        lz.r(x0, 48, 36, 13, '#5a5e66')
+        for x in range(x0 + 2, x0 + 34, 6):
+            lz.r(x, 52, 4, 3, ('#e04848', '#f0d070', '#5ab868', '#e08a3a')[(x // 6) % 4])
+    lz.r(0, 61, 92, 3, '#5a5e66'); lz.r(132, 61, W - 132, 3, '#5a5e66')
     return lz
 
 

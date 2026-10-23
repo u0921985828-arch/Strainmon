@@ -102,6 +102,22 @@ func _corre() -> void:
 	Atlas.carga()
 	var D: Dictionary = Datos.carga()
 	var dir := arg("--pintar")
+	# 0. el seto de la calle, con el de PixelLab de la huerta (lo pidió el usuario: «el seto… hicimos otro ya»): cada seto de los
+	# mapas sale con su pieza, el tramo alterno y el remate redondo en las puntas
+	var vs := 0
+	for k in D.MAPS:
+		var mo: Array = D.MAPS[k].o
+		for y in mo.size():
+			for x in mo[y].size():
+				if mo[y][x] != "seto":
+					continue
+				vs += 1
+				var p: String = Pintor.seto_pieza(mo, x, y)
+				var w: bool = x > 0 and mo[y][x - 1] == "seto"
+				var e: bool = x + 1 < mo[y].size() and mo[y][x + 1] == "seto"
+				var bien: bool = (p == "setoHi") == (e and not w) and (p == "setoHd") == (w and not e)
+				chk(bien and Atlas.frame_de("seto-huerta", p, "unica", 0, {"i": 0}) != null, "%s (%d, %d): el seto con %s" % [k, x, y, p])
+	chk(vs > 200, "setos en los mapas: %d" % vs)
 	# 1. las 32 piezas, de 16 × 16, cada una tocando el borde de cada lado que conecta
 	for o in Pintor.VALLAS:
 		for m in 16:

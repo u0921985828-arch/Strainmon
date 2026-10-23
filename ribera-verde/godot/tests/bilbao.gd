@@ -382,7 +382,7 @@ func forma(k: String, m: Dictionary, v: Dictionary) -> void:
 			var vb: Dictionary = J.andable(m, m.o, B)
 			chk(v.has("30,6") and not vb.has("30,6"), "casco: la plaza porticada, cerrada salvo por su paso")
 			var me: Dictionary = bld(m, "mercadoR")
-			chk(me and agua(m, int(me.x0) - 1, int(me.y0) + int(me.h) - 1), "casco: el mercado, en la orilla")
+			chk(me and agua(m, int(me.x0), int(me.y0) + int(me.h) + 2) and v.has("%d,%d" % [int(me.doorX), int(me.y0) + int(me.h)]), "casco: el mercado, en la orilla, con su muelle delante de la puerta")
 			chk(range(36, H - 1).all(func(y): return String(m.g[y][46]) == "puenteV" and agua(m, 49, y)), "casco: el puente, sobre la ría")
 			var ar := 0
 			for y in range(1, 13):

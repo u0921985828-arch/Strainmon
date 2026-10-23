@@ -147,12 +147,29 @@ static func _aplica_auto() -> void:
 				D.MAPS.erase(k)
 				for t in ["LAMPS", "CLIENT_TILES", "RONDA", "ZONAS", "PATRULLAS"]:   # i18n-no
 					D[t].erase(k)
+		for k in BI.get("IN", {}):   # los de dentro: el teatro, las iglesias y el mercado (ciudad.gd)
+			if CAL:
+				D.MAPS[k] = BI.IN[k]
+			else:
+				D.MAPS.erase(k)
 		if CAL:
 			D.PARADAS["zorroza"] = BI.PARADA
 			D.CONCE.km["zorroza"] = BI.KM
 		else:
 			D.PARADAS.erase("zorroza")
 			D.CONCE.km.erase("zorroza")
+	# Los pueblos con su sitio propio (tools/pueblos.py): con CAL, sus clientes y su ronda sin lo que tapan los hitos
+	var PU: Dictionary = D.get("PUEBLOS", {})
+	if not PU.is_empty():
+		if not D._base.has("PCT"):
+			D._base.PCT = {}
+			for t in ["CLIENT_TILES", "RONDA"]:   # i18n-no
+				D._base.PCT[t] = {}
+				for k in PU.MAPS:
+					D._base.PCT[t][k] = D[t].get(k, [])
+		for t in ["CLIENT_TILES", "RONDA"]:   # i18n-no
+			for k in PU.MAPS:
+				D[t][k] = PU[t][k] if CAL else D._base.PCT[t][k]
 	# El club KAIA del muelle, el tuyo (solo con CAL: las pruebas contra el HTML recorren D.CLUBS)
 	var K: Dictionary = D.get("KAIA", {})
 	if K.is_empty():

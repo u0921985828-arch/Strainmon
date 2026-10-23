@@ -23,9 +23,13 @@ RUTAS = [
 	["monte", "Carretera del monte", ("town", [(14, 29)], "down"), ("mendialde", [(0, 17), (0, 18)], "left"), "monte"],
 	["general", "La general", ("town", [(39, 10), (39, 11)], "right"), ("ibarbide", [(0, 21), (0, 22)], "left"), "general"],
 	["molino", "Carretera del molino", ("town", [(28, 29)], "down"), ("errotabarri", [(15, 0)], "up"), "molino"],
-	["acantilado", "Pista de los acantilados", ("valdehierro", [(0, 9), (0, 10)], "left"), ("puerto", [(0, 10), (0, 11)], "left"), "acantilado"],
-	["ribera", "Carretera de la ribera", ("ibarbide", [(38, 29)], "down"), ("errotabarri", [(35, 11), (35, 12)], "right"), "ribera"],
+	["acantilado", "Pista de los acantilados", ("puerto", [(39, 8)], "right"), ("valdehierro", [(0, 9), (0, 10)], "left"), "acantilado"],
+	["ribera", "Carretera de la ribera", ("errotabarri", [(35, 11), (35, 12)], "right"), ("ibarbide", [(38, 29)], "down"), "ribera"],
 ]
+# por su lado (lo pidió el usuario: «si yo voy del camino de izquierda a derecha, no puedo aparecer a la derecha del pueblo»): el
+# pueblo de la izquierda sale por su derecha (o por arriba o abajo) y el de la derecha, por su izquierda (o por arriba o abajo)
+for _r in RUTAS:
+	assert _r[2][2] != "left" and _r[3][2] != "right", "carretera %s: el pueblo sale por el lado de la otra punta" % _r[0]
 # casillas de más que se abren hacia dentro (la salida del norte de Errotabarri pasa por la fila 1; la de Puerto Viejo, por (38, 13),
 # que antes del muelle es monte)
 ABRE_MAS = {"errotabarri": [((15, 1), (15, 0))], "puerto": [((38, 13), (39, 13))]}   # (casilla, la salida que la abre)

@@ -641,6 +641,8 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 		return _arte_tile(md.g[ty][tx] if ty < md.g.size() and tx < md.g[ty].size() else "floorD", tx, ty, sx, sy)  # i18n-no
 	if k.begins_with("cv"):
 		return _curva(k, tx, ty, sx, sy)
+	if k.begins_with("hito_"):   # los sitios de los pueblos (tools/pueblos.py): debajo, su suelo; encima, el edificio
+		return _arte_tile(k.substr(5), tx, ty, sx, sy)
 	if k == "arena":   # la playa: debajo, el agua si la toca; encima, la arena con su orilla (_playa)
 		var ma: Dictionary = J.MAPS[J.S.map]
 		var ag := _vecinas(ma, tx, ty, ["water"])
@@ -673,6 +675,8 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 				_canto_hierba(tx, ty, sx, sy)
 				if k == "grass":
 					_detalle(tx, ty, sx, sy)
+			elif k == "dirt":   # i18n-no
+				_detalle_tierra(tx, ty, sx, sy)
 			return true
 	var f = Atlas.frame_de(Atlas.cubre("tile:" + k), k, "unica", 0, {"i": 0})
 	if f == null:
@@ -684,6 +688,8 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 	Atlas.dibuja(L, f.c, Rect2(sx, sy, 16, 16))
 	if k == "grass":
 		_detalle(tx, ty, sx, sy)
+	elif Datos.CAL and k == "pista":   # i18n-no
+		_detalle_tierra(tx, ty, sx, sy)
 	return true
 
 # Los firmes en mosaico (exterior-mosaico) y el canto de la hierba donde toca acera, calzada u hormigón: dos píxeles más oscuros,
@@ -819,6 +825,20 @@ func _detalle(tx: int, ty: int, sx: int, sy: int) -> void:
 	if f == null:
 		return
 	Atlas.dibuja(L, f.c, Rect2(sx + (h / 7) % 9, sy + (h / 11) % 9, 8, 8), Rect2((h / 3) % 5 * 8, 0, 8, 8))
+
+# el atrezo de la tierra (lo pidió el usuario: «le daría más atrezo a los suelos de la tierra… me parece muy plano. Lo haría más
+# imperfecto»), con CAL: en una de cada TIERRA_CADA casillas de tierra o de pista, por su hash, uno de los ocho detalles de
+# tierra.py (piedra, huellas, matojo seco, charco, grieta, ramita, piedrecitas, terrón)
+const TIERRA_CADA := 3
+const TIERRA_N := 8
+func _detalle_tierra(tx: int, ty: int, sx: int, sy: int) -> void:
+	var h := hash_t(tx * 3 + 1, ty * 5 + 2)
+	if h % TIERRA_CADA:
+		return
+	var f = Atlas.frame_de(Atlas.cubre("misc:tierra"), "tierra", "unica", 0, {"i": 0})   # i18n-no
+	if f == null:
+		return
+	Atlas.dibuja(L, f.c, Rect2(sx, sy, 16, 16), Rect2((h / 7) % TIERRA_N * 16, 0, 16, 16))
 
 const DESF := {"tree": [6, 3], "tree2": [6, 3], "manzano": [5, 3], "monte": [4, 2], "monte2": [4, 2]}
 static func desfase(o: String, x: int, y: int) -> Dictionary:
@@ -1050,6 +1070,17 @@ const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "mesaTb", "t
 const VALLAS := ["fence", "baranda"]
 
 # la pieza de una valla por las de su clase de al lado: N = 1, E = 2, S = 4, O = 8
+# la pieza del seto de PixelLab (pixellab_setos.py) para el seto de la calle: los setos de los mapas van en tramos de lado a lado; el
+# tramo, alterno (setoH, setoH2) y con su remate redondo en cada punta (setoHi a la izquierda, setoHd a la derecha); suelto, el tramo
+static func seto_pieza(mo: Array, tx: int, ty: int) -> String:
+	var w: bool = tx > 0 and mo[ty][tx - 1] == "seto"   # i18n-no
+	var e: bool = tx + 1 < mo[ty].size() and mo[ty][tx + 1] == "seto"   # i18n-no
+	if w and not e:
+		return "setoHd"   # i18n-no
+	if e and not w:
+		return "setoHi"   # i18n-no
+	return "setoH2" if tx % 2 else "setoH"   # i18n-no
+
 static func mascara_valla(mo: Array, o: String, tx: int, ty: int) -> int:
 	var es := func(x: int, y: int) -> bool: return y >= 0 and y < mo.size() and x >= 0 and x < mo[y].size() and mo[y][x] == o
 	return (1 if es.call(tx, ty - 1) else 0) | (2 if es.call(tx + 1, ty) else 0) | (4 if es.call(tx, ty + 1) else 0) | (8 if es.call(tx - 1, ty) else 0)
@@ -1082,6 +1113,10 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		var fv = Atlas.frame_de("vallas", "%s-%d" % [o, mascara_valla(J.MAPS[J.S.map].o, o, tx, ty)], "unica", 0, {"i": 0})
 		if fv != null:
 			f = fv
+	if Datos.CAL and o == "seto":   # lo pidió el usuario («el seto… hicimos otro ya»): el de PixelLab de la huerta (seto-huerta), por tramos
+		var fs = Atlas.frame_de("seto-huerta", seto_pieza(J.MAPS[J.S.map].o, tx, ty), "unica", 0, {"i": 0})
+		if fs != null:
+			f = fs
 	if Datos.CAL and o == "mesita":   # 1.47 (lo pidió el usuario): las dos mesitas de los sofás, una mesa baja de frente a 3/4 como los sofás
 		var mo: Array = J.MAPS[J.S.map].o
 		var izq: bool = tx > 0 and mo[ty][tx - 1] == "mesita"

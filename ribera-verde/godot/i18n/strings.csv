@@ -10,6 +10,7 @@ s93d6887b,MOVIL,
 sfbcd6556,Sentarte,Sit down
 s9b672b3b,Usar el ordenador,Use the computer
 se219dae0,Otra cosa,Something else
+sa3d03df5,Ver la función,See the show
 s9a9aa3c7,Fumarte uno,Have a smoke
 sb4282de7,Pedir algo,Order something
 s7267cc9a,Hablar con {q},Talk to {q}
@@ -175,6 +176,7 @@ s90031372,No llevas cogollos encima.,You have no buds on you.
 s4b05791e,El arcón está vacío.,The chest is empty.
 scb82bcdd,Lo sacas todo del arcón y lo guardas en la mochila.,You take everything out of the chest and put it in your backpack.
 s71bbe511,MAPS,
+sf1068a24,IN,
 s290dfee7,Te dejan en la huerta lo que pediste: {l}.,They leave what you ordered at the vegetable garden: {l}.
 s0830061a,Bidón azul de 100 L,Blue 100 L drum
 s633e594e,Depósito de 1000 L,1000 L tank
@@ -247,6 +249,190 @@ s435af587,"Las herramientas de la tía: una azada con el mango partido, unas tij
 s4bf5ce22,Sacos de compost que la tía dejó hechos tierra. La huerta no necesita más.,"Bags of compost your aunt left, now turned to soil. The garden needs nothing more."
 s03920724,Un cubo con una pala de mano dentro.,A bucket with a hand trowel inside.
 s3269e3a7,Un manzano viejo que sigue dando manzanas pequeñas y ácidas.,"An old apple tree that still gives small, sour apples."
+scba946a8,La ría no duerme,The Estuary Never Sleeps
+sff6a0d46,Dos hermanas se reparten la casa de su madre en Deusto y no se ponen de acuerdo ni en el reloj de la cocina.,Two sisters split their mother's house in Deusto and can't even agree on the kitchen clock.
+s8bd93ba9,Marea baja,Low Tide
+scfb2480e,Un pescador jubilado espera en el muelle a un barco que nunca vuelve. El público sale en silencio.,A retired fisherman waits on the quay for a boat that never comes back. The audience leaves in silence.
+sd85affbb,El último tranvía,The Last Tram
+s6381fc9a,Una comedia de enredos en un tranvía parado a medianoche. Se ríe hasta el acomodador.,A comedy of errors on a tram stuck at midnight. Even the usher laughs.
+s5d62e02c,Hierro,Iron
+scd44880f,"Tres generaciones de una familia de la fundición, en una sola cena. Aplauden de pie.",Three generations of a foundry family at a single dinner. Standing ovation.
+s9f09911a,La verbena,The Street Party
+s6cdf80f4,"Un musical de barrio: fiestas, una orquesta desafinada y un amor de verano. Sales tarareando.","A neighbourhood musical: festivities, an out-of-tune band and a summer love. You leave humming."
+s123e283a,Niebla en el Arenal,Fog on the Arenal
+sd01b9e54,Un misterio con un cadáver que no aparece. Hasta el final no sabes quién miente.,A mystery with a body that never turns up. You don't know who's lying until the end.
+sa20fe67a,Una bolsa de cerezas,A bag of cherries
+s97c175de,Unas anchoas en vinagre,Some anchovies in vinegar
+s48194667,Un bocadillo de lomo,A pork loin sandwich
+sedbd223a,Una cuña de queso,A wedge of cheese
+s71800f94,Unos tomates con sal,Some tomatoes with salt
+s555f4873,Una barra recién hecha,A freshly baked loaf
+s67b835b0,Un ramo de margaritas,A bunch of daisies
+sa33fce8f,Un cucurucho de frutos secos,A paper cone of nuts
+sb06aef74,FRUTERA,FRUIT SELLER
+s078d80d6,PESCADERO,FISHMONGER
+sa1c49b8a,CARNICERO,BUTCHER
+sf221d2b7,QUESERA,CHEESE SELLER
+s9f31dbfd,VERDULERO,GREENGROCER
+s69c88616,PANADERA,BAKER
+se24c4114,FLORISTA,FLORIST
+s3415cd79,ESPECIERO,SPICE SELLER
+se382f399,"«Vamos, que cerramos.» Te acompañan a la puerta.","“Come on, we're closing.” They walk you to the door."
+s9550ad3e,Cerrado. En la puerta: de {a} a {b}.,Closed. On the door: {a} to {b}.
+sd02b34a6,NPC,
+s1b9a99cc,«Tú. Las manos donde las vea.» Te mira la mochila de arriba abajo y te deja ir.,“You. Hands where I can see them.” He looks your backpack up and down and lets you go.
+s1b63afbb,«Sin correr por el vestíbulo.»,“No running in the hall.”
+sa345dd96,"«El ascensor de Zorroza, ni lo intentes: lleva dos años roto.»","“The Zorroza lift, don't even try: it's been broken for two years.”"
+s64a6e252,VIGILANTE,SECURITY GUARD
+sec224507,«Shhh. Estamos en escena.»,"""Shhh. We're on stage."""
+sb3219449,ACTOR,ACTOR
+s538867ab,"«Antes venía mucha gente. Ahora, los turistas y yo.»","""Lots of people used to come. Now it's the tourists and me."""
+seccb95c9,FELIGRESA,PARISHIONER
+s268b4977,"«La ermita la cuido yo, que el cura sube una vez al mes. Tu tía subía en romería todos los años, con sus cuadernos.»","""I look after the chapel; the priest only comes up once a month. Your aunt came up on pilgrimage every year, with her notebooks."""
+s385f4fc7,SERORA,CARETAKER
+s83547788,"«Cierro a las ocho. Si te sientas, no hagas ruido.»","""I lock up at eight. If you sit down, keep quiet."""
+s1547cf1f,"«La campana no la toques, que baja todo el pueblo.»","""Don't touch the bell, or the whole village will come up."""
+se96c64da,TAQUILLERA,BOX OFFICE
+s2ccbbfd8,entM,
+s8e9c3dea,«Ya tienes la tuya. Siéntate donde quieras; empieza a las nueve.»,"""You've already got yours. Sit wherever you like; it starts at nine."""
+s4fe8726c,"«La taquilla abre a las seis. Esta semana, {o}, a las nueve.»","""The box office opens at six. This week, {o}, at nine."""
+s06b43dc5,"«{o}, esta noche a las nueve. {e} la entrada.»","""{o}, tonight at nine. {e} a ticket."""
+s8e28e8bd,Comprar,Buy
+sf22e0cbd,No,No
+se3bba54c,"«Solo efectivo, cariño.»","""Cash only, love."""
+s82ba3be8,"«Platea, sin numerar. Que la disfrutes.»","""Stalls, unnumbered. Enjoy it."""
+s39ab1698,Sin entrada no hay función. La taquilla vende de seis a nueve.,"No ticket, no show. The box office sells from six to nine."
+s00ececa7,"La función ya va por la mitad. Hoy, ya no.",The show's already halfway through. Not today.
+s5049aebc,Todavía no hay función. Empieza a las nueve.,No show yet. It starts at nine.
+s964dc592,vipN,
+s2f3a517b,"A la salida, en el vestíbulo, {n} comenta la obra contigo. Habláis de todo un poco y te pide el número: «Me han dicho que tienes de lo bueno».","On the way out, in the foyer, {n} talks the play over with you. You chat about this and that and she asks for your number: ""I hear you have the good stuff."""
+s535d93e8,AINHOA,AINHOA
+sf89afa91,"«Perdona, estoy ensayando. ¿Vienes a ver la de esta semana? Ven, que la del final la hago yo.»","""Sorry, I'm rehearsing. Coming to see this week's? Do, I do the last scene."""
+s37ce1374,"«Oye, tú. Dicen en el bar de enfrente que tienes algo para después de la función…»","""Hey, you. They say in the bar across the street you've got something for after the show…"""
+sa9222430,Darle tu número,Give your number
+sf27706ea,Hacerte el tonto,Play dumb
+s1da515de,"«Te llamo cuando acabe la temporada. Discreción, ¿eh?» Apuntas su número.","""I'll call you when the season ends. Discreetly, eh?"" You note down the number."
+sfafd0a30,"«Repaso el texto. Si me equivoco, me lo dices.»","""I'm going over my lines. Tell me if I slip."""
+s79d88193,«El escenario es más pequeño de lo que parece desde ahí.»,"""The stage is smaller than it looks from there."""
+s9795eb26,SACERDOTE,PRIEST
+sef4e9be0,"«Tú eres el sobrino de Maite, ¿verdad? Venía los jueves a encender una vela. Se la echa de menos.»","""You're Maite's nephew, aren't you? She came on Thursdays to light a candle. She's missed."""
+s2bdbfe74,«La casa está abierta. Siéntate el rato que quieras.»,"""The house is open. Sit as long as you like."""
+s469a4a80,"«Si algo te pesa, el confesionario está ahí.»","""If something weighs on you, the confessional is right there."""
+s0e9c8def,velasI,
+s59df7324,"El lampadario, con velas encendidas. Una vela, un euro.","The candle stand, with lit candles. One candle, one euro."
+safe32572,Encender una,Light one
+s2250927b,No llevas ni un euro suelto.,You don't have a single loose euro.
+s8b10e74d,"Enciendes una por la tía Maite. Te acuerdas de sus cuadernos, de su letra pequeña, de cómo olía la casa.","You light one for aunt Maite. You remember her notebooks, her small handwriting, how the house smelled."
+s2b16fed9,Enciendes una vela. La llama tiembla un rato y se queda quieta.,You light a candle. The flame flickers a while and settles.
+sa090f72d,cepilloI,
+s166ee3fd,El cepillo. Hoy ya has echado.,The offering box. You've already given today.
+s4565dba4,El cepillo de las limosnas. ¿Echas {e}?,The alms box. Put in {e}?
+sfb8ba8a7,Echar,Drop in
+sec201d2d,No llevas tanto suelto.,You don't have that much cash on you.
+s9e0e03d5,Echas los billetes. En el barrio se sabe quién ayuda a la parroquia: se habla menos de ti.,You drop the notes in. The neighbourhood knows who helps the parish: people talk less about you.
+s8b66153c,La cortina está echada. Hace nada que viniste.,The curtain is drawn. You were here only just now.
+s03dd23f6,"El confesionario, con la cortina corrida.","The confessional, curtain drawn."
+s7cf5507d,Confesarte,Go to confession
+s08e05f5e,"Hablas sin dar nombres. Al otro lado, una voz cansada: «Ve con cuidado, hijo». Sales más ligero, y con menos ganas de que te vean.","You talk without naming names. On the other side, a tired voice: ""Be careful, son."" You come out lighter, and less keen to be seen."
+s4bf53ecd,pilaI,
+sf7b68d89,"La pila del agua bendita, de piedra gastada.","The holy water font, of worn stone."
+s33db055f,"El altar, con su mantel blanco y dos candeleros.","The altar, with its white cloth and two candlesticks."
+sf0ab36d5,"El retablo, dorado y oscuro. Hace falta un rato para ver todo lo que tiene.","The altarpiece, gilded and dark. It takes a while to see everything in it."
+sc0d5df8f,cirioI,
+saf2dc6d2,Un cirio alto. La cera le cae a chorretones.,A tall candle. The wax runs down in streams.
+sf05f8e85,columnaI,
+s8656a624,"Una columna de piedra, fría al tacto.","A stone column, cold to the touch."
+s98551456,Media hora en silencio. Solo se oye la piedra.,Half an hour of silence. Only the stone can be heard.
+sb5516c3e, Aquí no te busca nadie., Nobody looks for you here.
+sa8776b77,El lavadero viejo del pueblo. El agua baja fría del monte.,The village's old wash house. The water comes down cold from the hills.
+s5fc23258,Lavarte la cara,Wash your face
+sc68797c1,El agua helada te despeja de golpe.,The icy water wakes you right up.
+sbaec3e99,Domingo: la banda toca pasodobles en el kiosko. Los mayores bailan y los críos corren alrededor.,Sunday: the band plays pasodobles at the bandstand. The old folks dance and the kids run around.
+s68b77ca9,El kiosko de la música. Los domingos a mediodía toca la banda.,The bandstand. The band plays on Sundays at noon.
+s02b130ae,"En la escalinata del kiosko, los jubilados de siempre. Entre semana no hay banda, pero se enteran de todo:","On the bandstand steps, the usual pensioners. No band on weekdays, but they hear about everything:"
+scb90bdc9,«Ni un municipal en toda la mañana. Tranquilo está el barrio.»,“Not one local cop all morning. The neighbourhood's quiet.”
+sbe3e826d,"«Hay una patrulla dando vueltas de más. Ojo, que miran mucho.»","“There's a patrol going round more than usual. Careful, they're looking hard.”"
+sb48b1bfd,"«Andan preguntando por uno que vende hierba. Que no seas tú, chaval.»","“They're asking about someone who sells weed. Better not be you, lad.”"
+s4f81e494,"«Dicen que un juez ha firmado papeles. Si tienes algo en casa, muévelo.»","“They say a judge has signed papers. If you've got something at home, move it.”"
+s2cd2dafe,"La pared del frontón, con las marcas de mil pelotazos.","The pelota wall, marked by a thousand balls."
+s962bb815,Pelotear un rato,Knock a ball about
+s0a4ddce0,Media hora a pala contra la pared. Sudas lo que no está escrito y la cabeza se te aclara.,Half an hour with a paddle against the wall. You sweat buckets and your head clears.
+s0ccd4389,"La ermita del monte, de piedra y con su campana. La puerta está abajo; el pórtico mira al valle.","The hillside chapel, stone with its bell. The door is below; the porch looks over the valley."
+s6643876b,Sentarte en el pórtico,Sit in the porch
+s913e396b,La ermita del monte. Ya has estado hoy en el pórtico.,The hillside chapel. You've already sat in the porch today.
+sa9541689,Veinte minutos con el valle a los pies y el viento en la cara. Se te asienta todo.,Twenty minutes with the valley at your feet and the wind on your face. Everything settles.
+sd8f24818,El faro. Ya has estado hoy mirando el mar.,The lighthouse. You've already been looking at the sea today.
+sf9eb481d,Te sientas al pie del faro a ver las olas romper contra el espigón. Aquí no te busca nadie.,You sit at the foot of the lighthouse watching the waves break on the breakwater. Nobody looks for you here.
+s42a3d95e,La chimenea de la fundición vieja. Al pie ya no queda nada que valga.,The old foundry chimney. Nothing worth taking left at its foot.
+sa618231e,"La chimenea de la fundición vieja. Lleva treinta años sin echar humo; al pie, chatarra y cable viejo.","The old foundry chimney. No smoke for thirty years; at its foot, scrap and old cable."
+s2e57b983,Rebuscar,Rummage
+s0f8dc4a6,"Media hora entre ladrillos rotos. Sacas un rollo de cobre y Bixente, en la chatarrería, te da {e}.","Half an hour among broken bricks. You pull out a coil of copper and Bixente, at the scrapyard, gives you {e}."
+s6edc51e7,gruaT,
+s1141013d,"La grúa vieja, con el saco colgando del gancho. Ya has entrenado hoy.","The old crane, the bag hanging from its hook. You've already trained today."
+scfecfe59,"Una grúa de astillero, oxidada. Del gancho cuelga un saco de arena que alguien usa para entrenar.",A rusty shipyard crane. A sandbag someone uses for training hangs from the hook.
+s73d47915,Darle al saco,Hit the bag
+sfd983fde,"Tres cuartos de hora de golpes y esquivas contra el saco. Te duelen los nudillos; la próxima pelea, se notará.",Forty-five minutes of punches and dodges against the bag. Your knuckles hurt; you'll feel it in the next fight.
+s640d0c1b,"La torre del reloj. Ya es tarde: la esfera, iluminada, sobre la plaza vacía.",The clock tower. It's late now: the lit dial over the empty square.
+s3bcb6652,Hasta las {h},Until {h}
+sbc4a252c,La torre del reloj marca las {h}. En su banco corrido se espera bien.,The clock tower says {h}. Its long bench is a good place to wait.
+sf8f1a27c,Las {h}. Las campanas de la torre dan la hora sobre tu cabeza.,{h}. The tower bells strike the hour above your head.
+s25bb55de,El quiosco de prensa. El periódico de hoy ya lo tienes.,The newsstand. You already have today's paper.
+s64fdeccd,"El quiosco de prensa. El periódico, {e}.","The newsstand. The paper, {e}."
+sbb9fe894,No llevas suelto.,You've no change on you.
+sa4b55995,"El tiempo de mañana: {t}, de {a} a {b} °C.","Tomorrow's weather: {t}, from {a} to {b} °C."
+s336b4bcc,"El tiempo de mañana: {t}, de {a} a {b}°.","Tomorrow's weather: {t}, from {a} to {b}°."
+s429062df,"En sucesos, nada de la comarca.","In the crime pages, nothing from the county."
+sb122bdf6,"En sucesos, la policía refuerza las patrullas del barrio.","In the crime pages, police are stepping up neighbourhood patrols."
+s53230f2a,"En sucesos, «la policía investiga una red de venta de marihuana en la comarca».","In the crime pages, “police investigate a marijuana dealing ring in the county”."
+s0c242370,"En sucesos, «un juzgado autoriza registros por tráfico de marihuana».","In the crime pages, “a court authorises searches over marijuana trafficking”."
+s9bca507d,"El colmenar. Las abejas ya te tienen fichado: hoy, mejor no.",The beehives. The bees have your number now: not today.
+sb78a7484,El colmenar de Errotabarri. El zumbido se oye desde el camino.,The Errotabarri beehives. You can hear the buzz from the path.
+s4a682676,Coger un poco de miel,Take a little honey
+sa3a10c9f,Metes la mano y te pica una en el dedo. Sales corriendo con la mano hinchada y sin miel.,You reach in and one stings your finger. You run off with a swollen hand and no honey.
+s6999737b,"Un trozo de panal chorreando. Lo chupas allí mismo: dulce y espeso, te devuelve el cuerpo.","A dripping piece of honeycomb. You suck it right there: sweet and thick, it brings you back to life."
+sc85d9b22,"«¿Qué te pongo? {q}, {e}.»","""What can I get you? {q}, {e}."""
+s0a2f2ae8,"«Sin dinero no hay género, majo.»","""No money, no goods, pal."""
+sdefab395,Te lo envuelve en papel de estraza. Huele a campo.,Wrapped in brown paper. It smells of the countryside.
+sfb3c400e,"{q}. Te lo comes allí mismo, de pie. Se te asienta el cuerpo.","{q}. You eat it right there, standing. It settles you."
+sba654637,"El panel de salidas: trenes a la comarca cada media hora, de seis de la mañana a once de la noche.","The departures board: trains to the county every half hour, from six in the morning to eleven at night."
+s20550815,Una columna de mármol. El palacio entero huele a cera y a papel.,A marble column. The whole palace smells of wax and paper.
+see53314c,"La marea sube: el agua entra en el estanque y la compuerta está abierta. La muela, quieta.","The tide is rising: water flows into the pond and the sluice is open. The millstone, still."
+s011b218c,"La marea baja: el agua sale por el canal y la muela gira despacio, rascando la piedra.","The tide is going out: water runs down the channel and the millstone turns slowly, grinding stone."
+s9a3ad8e5,cajasMe,
+s7afad1fc,"Cajas de herramientas del molinero, con su candado.","The miller's toolboxes, padlocked."
+sa869b933,"Cajas de la carga, flejadas. Huelen a pescado y a gasoil.",Strapped cargo crates. They smell of fish and diesel.
+sb9a97970,"Sacos de café verde, esperando al camión.","Sacks of green coffee, waiting for the lorry."
+s8c87a495,El cartel de la semana: «{t}». Función a las nueve.,"This week's poster: ""{t}"". Show at nine."
+s32dca89c,"El telón de terciopelo, recogido con su cordón dorado.","The velvet curtain, tied back with its golden cord."
+s283f1da9,"El decorado de la obra: una casa pintada en tela, con su ventana y todo.","The set: a house painted on canvas, window and all."
+s4492d7b6,"Un palco, con sus cortinas. Se sube por otra escalera que está cerrada.","A box, with its curtains. Reached by another staircase, which is locked."
+s3281113e,plantaT,
+sc9bfa05f,"Una planta de interior, mustia. Le haría falta un buen abono.",A wilted houseplant. It could do with a good feed.
+s9889d409,"Cajas de fruta vacías, apiladas para el camión.","Empty fruit crates, stacked for the lorry."
+s573f51a6,{e} · {m} min,{e} · {m} min
+sdbbdd47d,¿A dónde vas en tren?,Where are you going by train?
+s544c97a5,El billete hasta {d} cuesta {e}. No te llega.,The ticket to {d} costs {e}. You can't afford it.
+sb3829eeb,Bajas del tren en {d} y sales a la parada.,You get off the train in {d} and walk out to the stop.
+s1fab1c20,FUNCIONARIA,CLERK
+s106fdc09,«Una declaración por semana. Vuelva usted la que viene.»,“One declaration a week. Come back next week.”
+sfe85e51d,"«Para regularizar, traiga el efectivo. Desde cien euros.»","“To regularise, bring the cash. From one hundred euros.”"
+sdf7beb79,"«Declaración de efectivo: hasta {e} a la semana. Hacienda se queda el {p} % y el resto va a su cuenta, limpio.»","“Cash declaration: up to {e} a week. The tax office keeps {p} % and the rest goes to your account, clean.”"
+sa5a23e20,Hacienda foral: regularización,Regional tax office: regularisation
+sc8c55ff1,"Media hora de impresos y sellos. En la cuenta entran {n}, con su papel.","Half an hour of forms and stamps. {n} goes into your account, with paperwork."
+s2bf4fe18,MOLINERO,MILLER
+s31c39dd5,"«Este molino lo movía la ría: entra la marea, se cierra la compuerta y, al bajar, el agua mueve la muela. Tu tía traía aquí el maíz del caserío, cuando todavía molíamos.»","“The estuary drove this mill: the tide comes in, the sluice shuts and, as it ebbs, the water turns the stone. Your aunt brought the farm's maize here, back when we still milled.”"
+sd8117c6e,"«Si estás cansado, en los sacos se duerme bien. Yo lo hacía de chaval.»","“If you're tired, the sacks are good for a nap. I did it as a kid.”"
+s37602438,"«Mira la rueda: con la marea baja, gira sola.»","“Look at the wheel: when the tide goes out, it turns by itself.”"
+scc41fd06,Sacos de grano viejo. Ya te has echado hoy.,Sacks of old grain. You've already had a lie-down today.
+s5453614b,"Sacos de grano viejo, blandos como un colchón.","Sacks of old grain, soft as a mattress."
+s039c6c4e,Echar una cabezada,Take a nap
+s16233070,Hora y media con el ruido del agua por debajo. Te levantas con harina en la ropa y la cabeza despejada.,An hour and a half with the sound of water below. You get up with flour on your clothes and a clear head.
+s3e59d902,CAPATAZ,FOREMAN
+sa591c6a7,"«Por hoy ya has cobrado. Mañana, a las siete.»","“You've been paid for today. Tomorrow, at seven.”"
+s95931b51,"«El camión ya ha salido. Mañana, a las siete, y no preguntes qué llevan las cajas.»","“The lorry's already left. Tomorrow, at seven, and don't ask what's in the crates.”"
+s5c629270,"«¿Vienes a descargar? Tres horas, {e} en mano.»","“Here to unload? Three hours, {e} cash in hand.”"
+s448dfe81,Descargar,Unload
+s91a68ae4,Tres horas de cajas y sacos. El capataz te da {e} y no pregunta nada.,Three hours of crates and sacks. The foreman gives you {e} and asks nothing.
 s73721917,"CannaDex: {n}, completa. {b}","CannaDex: {n}, complete. {b}"
 s5e486c5d,Para siempre: un {v} % más de cogollo en todas tus cosechas.,Forever: {v} % more bud in all your harvests.
 s79c637ca,Para siempre: un {v} % más de THC en todas tus cosechas.,Forever: {v} % more THC in all your harvests.
@@ -325,6 +511,8 @@ s9c2c1caf,RECIPES,
 s808a2361,BANCO,BANK
 s9affa116,SHOP,SHOP
 scfd02651,METRO,METRO
+sbff7cf22,PUEBLOS,
+s24af7e89,PCT,
 s3c69629d,KAIA,
 se0facbd4,día {n},day {n}
 s8bb5e92a,{d} de {m} de {y},"{m} {d}, {y}"
@@ -378,7 +566,6 @@ s7898712d,{A} ya es tuyo.,{A} is already yours.
 s82bd15ce,{A} está en camino: te aviso por SMS.,{A} is on its way: I'll text you.
 sdf471b0c,"{n}: {tot} en total. {efe} en efectivo, que más no deja la ley, y {tr} por transferencia; el seguro, {sm} al año, domiciliado. ¿Lo firmas?","{n}: {tot} in total. {efe} in cash, the legal limit, and {tr} by transfer; insurance, {sm} a year, direct debit. Sign?"
 sbf35277c,Firmar,Sign
-sf22e0cbd,No,No
 sc9e2ce25,"Con la transferencia y el primer año del seguro hacen falta {e} en tu cuenta, y hay {b}. Lo dejamos reservado si quieres.","With the transfer and the first year of insurance you need {e} in your account, and there's {b}. We can hold it for you."
 sa9f2a306,Seguro · {n},Insurance · {n}
 s6b77e103, Lo traen bajo pedido de fábrica., It's made to order at the factory.
@@ -508,7 +695,6 @@ s1808ea8a,"{b} está en el mar, camino de {r}. Vuelve el {d}.","{b} is at sea, h
 s6a4e9f9a,{d} días de viaje con {b}.,{d} days at sea with {b}.
 s5809a6c0,¿A dónde?,Where to?
 sa9e0077b,Zarpar ({kg}),Set sail ({kg})
-s448dfe81,Descargar,Unload
 s4161fb99,"Lo de la bodega, otra vez encima (lo que te quepa).","What's in the hold, back on you (whatever fits)."
 sc6d4c6a2,Dejarlo cargado,Leave it loaded
 se60ec26e,La carga · {a} de {b},Cargo · {a} of {b}
@@ -627,7 +813,6 @@ sb43e96fc,Ozonizador · {e},Ozonator · {e}
 s7131855b,Mover el ozonizador,Move the ozonator
 s7a773f6e,EL OLOR,THE SMELL
 s4ede69f9,Arrieta cambia el carbón de los filtros. Huele a nuevo.,Arrieta changes the carbon in the filters. It smells new.
-s8e28e8bd,Comprar,Buy
 s42d1d553,¿Dónde va el ozonizador?,Where does the ozonator go?
 s25e21daf,"En el conducto, después del filtro","In the duct, after the filter"
 s5c9259be,"En la sala, con las plantas","In the room, with the plants"
@@ -1054,8 +1239,6 @@ The first bus comes at 7:00 and the last at 21:00."
 s9bf060fd,Esperar al de las 7:00,Wait for the 7:00
 sdd956aa7,"Las siete. Llega el primer autobús, medio vacío.","Seven o'clock. The first bus pulls in, half empty."
 s4eb9f251,billete de ama,Ama's ticket
-s573f51a6,{e} · {m} min,{e} · {m} min
-s544c97a5,El billete hasta {d} cuesta {e}. No te llega.,The ticket to {d} costs {e}. You can't afford it.
 s2cab497b,"Ribera Verde. El piso de la tía es el del tejado rojo, al otro lado de la calle.","Ribera Verde. Your aunt's flat is the one with the red roof, across the street."
 s69725f09,La mesa de la tía. ¿Qué haces?,Your aunt's table. What do you do?
 sd12ba1e1,Cruzar semillas,Cross seeds
@@ -1858,7 +2041,7 @@ s70231a6f,"{n} no volverá por {s} en {d} días. Mientras, sus clientes te pagan
 s5a62c8e2,{n}: «Vale. Pero no te quiero ver tanto por aquí.»,"{n}: ""Fine. But I don't want to see you around here so much."""
 se1194822,{n} se guarda el dinero. «Así me gusta. Hasta la próxima.»,"{n} pockets the money. ""That's how I like it. Until next time."""
 scf5ddead,Te apartas. {n} se queda mirándote.,You back off. {n} keeps staring at you.
-sda8bda0a,^(water|roof|wall|win|iwT|iwB|void),
+sb07558db,^(water|roof|wall|win|iwT|iwB|void|hito_),
 s7a0737f6,bumpT,
 s656930f7,pisT,
 sa0d2acbe,SMS: ,SMS: 
@@ -2007,7 +2190,6 @@ s4be71108,"El extintor de polvo de 6 kg, con la revisión al día y su placa enc
 sd7f95de5,"Un bidón de 200 litros de aceite usado, esperando al gestor de residuos.","A 200-litre drum of used oil, waiting for the waste collector."
 sb331ee2f,gatoT,
 sadc4b633,El gato de carretilla de 3 toneladas: se mete debajo del coche y se bombea con la palanca.,The 3-tonne trolley jack: slide it under the car and pump the handle.
-s6edc51e7,gruaT,
 s8bf19e15,"La grúa de motores, plegada: con la pluma y la cadena se saca un motor entero.","The engine crane, folded: boom and chain lift out a whole engine."
 sad754c24,"El armario de herramientas grande: siete cajones de llaves, carracas y vasos, y encima la caja de las brocas.","The big tool chest: seven drawers of spanners, ratchets and sockets, the drill bits on top."
 s888b7e04,sillaT,
@@ -2055,6 +2237,8 @@ s0c353fda,sillaG,sillaG
 s1ceb806c,sillaTs,sillaTs
 s7fedecb5,sillaTn,sillaTn
 sd3eea720,taburTb,taburTb
+s2ca12a1a,bancoI,
+sd68a9b9b,taburMe,
 sada002a1,Un sofá del club.,A club sofa.
 s54b166e2,El sofá del reservado.,The VIP sofa.
 s9aa5e4c0,Un banco.,A bench.
@@ -2066,6 +2250,9 @@ s87c4314e,Tu silla gaming.,Your gaming chair.
 sa743d170,Una silla de la taberna.,A tavern chair.
 s0de73383,Un taburete de la barra.,A bar stool.
 sb51e7254,Las sillas de la espera.,The waiting-room chairs.
+sd39ccb7a,"Una butaca de terciopelo, algo gastada.","A velvet seat, a bit worn."
+s02a48b20,Un banco de la iglesia.,A church pew.
+sc607ca9e,Un taburete de la barra de pintxos.,A stool at the pintxo bar.
 sfa4ea5ed,Un café,A coffee
 s384a9bac,Una caña,A small beer
 s8c674938,Un refresco,A soft drink
@@ -2073,6 +2260,9 @@ s309f6d4f,Un vino,A wine
 s4458db20,Un zumo,A juice
 s91764eff,Una cerveza,A beer
 sde961a40,Una copa,A drink
+s7b763463,Un pintxo de tortilla,A tortilla pintxo
+sd8ee393b,Un txakoli,A txakoli
+s0a4ae664,Un caldo caliente,A hot broth
 saff5a022,Liarte un porro,Roll a joint
 s98b79e83,Una pipa,A pipe
 se5b25907,Un bong,A bong
@@ -2299,6 +2489,9 @@ s9eaa4605,encVeto,
 s37303b08,cristalV,cristalV
 s02f739be,roadT,roadT
 sf6238cef,roadB,roadB
+s119ba1e8,roadL,
+seb949c8b,roadR,
+s0b417595,roadX,
 sfbee81ee,rotoT,rotoT
 s0f3a34bf,rotoB,rotoB
 seb54ecd7,cartelC,cartelC
@@ -5988,7 +6181,6 @@ s445c2e51,ZIGA,ZIGA
 s5c90684f,SUGAR,SUGAR
 sfc20e498,ZAKU,ZAKU
 s66cf52de,Un mosto,A grape juice
-sd8ee393b,Un txakoli,A txakoli
 sa1feeba9,Una sidra,A cider
 s605a01f4,Un cortado,A cortado
 s8ccaecae,Una infusión,A herbal tea
@@ -6067,8 +6259,13 @@ s6bcc8de0,Placas solares,Solar panels
 s8784f2d5,"2,5 kW de placas con baterías: lo que pasa de la potencia contratada, hasta ahí, sale del tejado y no de la red. Sin gasto.","2.5 kW of panels with batteries: up to that, anything over the contracted power comes from the roof, not the grid. No running cost."
 s86aca0e1,"La red de carreteras que se andan (con Datos.CAL; tools/carreteras.py): rutas por mapa y, por pueblo, las salidas [x, y, carretera, llegada x, llegada y, lado] y las casillas del borde que se abren [x, y, la salida que la abre x, y].",
 s627348aa,"Bilbao, zonas nuevas (con Datos.CAL; tools/bilbao.py): Zorroza (la parada), La Punta, Abando y el Casco Viejo, en fila por la calle. Datos._aplica_auto los mete en D.MAPS y en sus tablas; DEC, lo del suelo de cada mapa (pinta.gd).",
-s0da1431f,Zorroza,Zorroza
+s6620dedf,La Punta,La Punta
 s3eec22fd,muelleP,
+sc764056c,roofT_grua,
+sc46106a7,roofT_molino,
+s12ebe4ea,roofB_grua,
+s7eb53e0b,roofB_molino,
+s0da1431f,Zorroza,Zorroza
 s5987a3d6,roofT_bloqueZ,
 s753c4e4f,roofT_bloqueZ2,
 s5b1ae0e5,roofT_estacion,
@@ -6078,61 +6275,66 @@ s71aa114a,roofB_estacion,
 s2d27a8f3,wall_bloqueZ,
 s3e4c3a03,wall_bloqueZ2,
 sf54a2421,roofT_torreZ,
-sb7eaf544,roofT_milagrosa,
+s6a0fe5e5,roofT_iglesiaZ,
 s5649e477,roofT_torreZ2,
 s4f9e1c8d,roofB_torreZ,
-sf1a9fbcc,roofB_milagrosa,
+s40bf144a,roofB_iglesiaZ,
 s8993df8c,roofB_torreZ2,
 se4939ba2,wall_torreZ,
+s217f91a9,wall_iglesiaZ,
 s22e9ef52,wall_torreZ2,
+s61065ff9,door_iglesiaZ,
 s3a94b8eb,roofT_apeadero,
 s10244944,roofB_apeadero,
 s52463f0a,viaE,
 s2c689175,escZ2,
 se71d3676,ascensorZ,
 sa3547732,ascensorZ2,
+sffb8c831,iglesia:iglesiaZ,
 sf79ce745,bloqueZ,
 s1c9497f5,bloqueZ2,
 s3f64fdc9,torreZ,
+s03a73c5f,iglesiaZ,
 sf852a0e4,torreZ2,
 se26a8c69,Al paseo de la ría,To the riverside walk
 sba884aad,Al andén de la vía ancha,To the broad-gauge platform
 s5c372de3,A la ladera,To the hillside
 s23b6a7bd,Al andén de la vía estrecha,To the narrow-gauge platform
-s6620dedf,La Punta,La Punta
-sc764056c,roofT_grua,
-sc46106a7,roofT_molino,
-s12ebe4ea,roofB_grua,
-s7eb53e0b,roofB_molino,
 s8b7bf861,Abando,Abando
-s8c6c4107,roofT_ensB,
 sa2058449,roofT_chavarri,
 s843d47ef,roofT_ensB2,
 saaa61112,roofT_torreBBVA,
-s59e3a081,roofB_ensB,
 s88b575e6,roofB_chavarri,
 s8033ee1b,roofB_ensB2,
 sece51f9a,roofB_torreBBVA,
-s359840af,wall_ensB,
 s5c899834,wall_ensB2,
 sd5876cdd,wall_torreBBVA,
 s2a78522a,roofT_diputacion,
-s0133113d,roofT_camposE,
 s8f2c0dab,roofT_abandoE,
 sef18c988,roofT_concordia,
 sc95d1a36,roofB_diputacion,
-sdee92ac6,roofB_camposE,
 s50f63650,roofB_abandoE,
 sa95bc700,roofB_concordia,
-s75931a18,wall_camposE,
 sfb8c068e,wall_abandoE,
 sa3f411c5,roofT_carlton,
 s7c2e2a3e,roofB_carlton,
-sf335348e,ensB,
+s5d493064,door_abandoE,
+sb7eaf544,roofT_milagrosa,
+sf1a9fbcc,roofB_milagrosa,
+s0133113d,roofT_camposE,
+s8c6c4107,roofT_ensB,
+sdee92ac6,roofB_camposE,
+s59e3a081,roofB_ensB,
+s75931a18,wall_camposE,
+s359840af,wall_ensB,
+sd3562cf2,door_camposE,
+s9b87f377,teatro:camposE,
+sf06a5ee9,estacion:abandoE,
 s1026251e,ensB2,
 s817be359,torreBBVA,
 saf2855ae,camposE,
 s21374938,abandoE,
+sf335348e,ensB,
 s0a6eb4f3,Casco Viejo,Casco Viejo (Old Town)
 se397c633,roofT_sanNicolas,
 s1b72a457,roofT_plazaN,
@@ -6145,6 +6347,7 @@ s0f73f818,roofT_plazaR,
 s4fa8fdd7,roofB_plazaL,
 sb5a7c0b4,roofB_plazaR,
 se30b6d17,roofT_kiosko,
+s2e54caf5,door_sanNicolas,
 se4a57af8,wall_plazaL,
 s1eaa479b,wall_plazaR,
 s59df55bb,roofB_kiosko,
@@ -6162,12 +6365,16 @@ s4ba91879,roofB_cascoB2,
 s09abc91e,wall_cascoB,
 se0d328a7,wall_cascoB2,
 sadd6c586,roofT_mercadoR,
-s9497b3a9,roofT_sanAnton,
 s87663429,roofB_mercadoR,
-sbe274206,roofB_sanAnton,
+s9497b3a9,roofT_sanAnton,
 se6a6b1ca,wall_mercadoR,
+sbe274206,roofB_sanAnton,
+sa6df7f9a,door_mercadoR,
 sdfe7c7e5,wall_sanAnton,
 s69ba4085,puenteV,
+s9f9e09b5,door_sanAnton,
+s431c0fea,iglesia:sanNicolas,
+s01209e7d,iglesia:sanAnton,
 s02b283d9,sanNicolas,
 sd15c7dbf,plazaN,
 s3f521c93,plazaL,
@@ -6184,6 +6391,80 @@ sf81cd2de,Bilbao · Zorroza,Bilbao · Zorroza
 s8ab69168,Bilbao · La Punta,Bilbao · La Punta
 s392e6e36,Bilbao · Abando,Bilbao · Abando
 sa4f23931,Bilbao · Casco Viejo,Bilbao · Old Town
+s67692428,Teatro,Theatre
+s2fda4964,iwT_teat,
+sfa55a8e2,iwB_teat,
+s688715a5,floorTeat,
+sf7976885,iwB_teatP,
+saf988f6b,escalonT,
+s0343ddd4,iwB_teatF,
+sabb02dd8,palcoT,
+s927654c6,palcoT2,
+s629ab65d,decoT,
+s0f6d09f2,decoT2,
+sb6a66df2,telonI,
+sc817114f,telonD,
+s68876910,cartelT,
+s070a2900,cartelT2,
+sf208c177,taquillaT,
+sd4465253,taquillaT2,
+s022fd0a0,Mercado de la Ribera,Ribera Market
+s1bcfb2ab,iwT_me,
+s6ebdbae8,iwB_me,
+s5d6176e8,floorMe,
+s2e97f6c6,puestoFr,
+s68fc4e7e,puestoFr2,
+sd75e435d,puestoCa,
+s0fd8cd07,puestoCa2,
+se7866150,puestoVe,
+s71596998,puestoVe2,
+sb1dcc6d6,puestoPe,
+s75d4152a,puestoPe2,
+sb570e7f3,puestoQu,
+s3ed46d4c,puestoQu2,
+sd498cba5,puestoFl,
+sbcbd71a1,puestoFl2,
+s31d3807d,barraMe,
+s3450600c,barraMe2,
+sb6b102cf,puestoPa,
+s11b8d02e,puestoPa2,
+s72bd9593,puestoEs,
+s73a1c166,puestoEs2,
+s62162b35,La catedral,The cathedral
+s91ad1683,iwT_ig,
+se4df1ec0,iwB_ig,
+sd703d2c0,floorIg,
+s3b763ee4,presbI,
+scc9ee3b2,escalonI,
+sef8f6375,alfombraI,
+s5bbfb87c,retabloI,
+s433d3ca2,retabloI2,
+s91e9938c,altarI,
+sfe4a9895,altarI2,
+sa3d18fb0,confesI,
+sd117dc0e,confesI2,
+sc7873806,San Nicolás,San Nicolás
+scc6d61f4,retabloB,
+sa0c9e569,retabloB2,
+s551574f0,La parroquia,The parish church
+sd5d211ba,cruzZ,
+s31b4368e,cruzZ2,
+s003df5dc,San Antón,San Antón
+sd71e2fea,La parroquia de Indautxu,Indautxu parish church
+s879b921e,Teatro del Ensanche,Ensanche Theatre
+s9cb74fc8,Estación de Zorroza,Zorroza station
+s44a9ead0,panelE,
+s9c42c533,panelE2,
+s8c762dd3,maquinaE,
+sf91bb82f,Estación de Abando,Abando station
+s29457868,Estación de la Concordia,Concordia station
+s81cfacf4,Diputación,Provincial council
+sc3a4772c,Molino de mareas,Tide mill
+sf1b761d0,ruedaM,
+s9cf7dbb8,ruedaM2,
+sc9c8a16d,Almacén del muelle,Dock warehouse
+s29d4620f,La ermita,The chapel
+s6e9d8105,"Los pueblos de siempre con su sitio propio y trazados naturales (con Datos.CAL; tools/pueblos.py): cambia = [x, y, suelo, objeto, suelo de antes, objeto de antes]; mundo.gd (pueblos_mapa) los pone y los quita al entrar; los hitos (bld con «hito»), en ciudad.gd (hito_obj).",
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -6287,6 +6568,9 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+s91d5cd57,"La ermita del monte, de piedra y con su campana. La puerta está abajo.","The hill chapel, stone, with its bell. The door is at the bottom."
+sa3ad6bc8,La chimenea de la fundición vieja. Lleva treinta años sin echar humo.,The old foundry chimney. It hasn't smoked in thirty years.
+sc7b68786,"Una grúa de astillero, oxidada, con el gancho colgando sobre nada.","A rusty shipyard crane, its hook hanging over nothing."
 seb2a67b2,A la ría,To the estuary
 s07f3c4f1,El garaje de la tía.,Your aunt's garage.
 s0cbd2c53,"La negra entra antes de tiempo, o con falta: pierdes.","The black drops too early, or on a foul: you lose."

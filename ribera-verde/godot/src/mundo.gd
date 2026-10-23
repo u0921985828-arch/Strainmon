@@ -9,11 +9,13 @@ const DV := {"up": [0, -1], "down": [0, 1], "left": [-1, 0], "right": [1, 0]}
 
 const OPP := {"up": "down", "down": "up", "left": "right", "right": "left"}
 
-const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2", "barraN", "barraN2", "mostrN", "mostrN2", "mostrE", "mostrE2", "barraTb", "barraTb2"]   # i18n-no · 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
+const COUNTERS := ["counter", "barcounter", "btable", "vitrina", "barraD", "cabina", "cabina2", "mesaK", "mesaK2", "barraN", "barraN2", "mostrN", "mostrN2", "mostrE", "mostrE2", "barraTb", "barraTb2",   # i18n-no
+	"taquillaT", "taquillaT2", "barraMe", "barraMe2", "puestoFr", "puestoFr2", "puestoPe", "puestoPe2", "puestoCa", "puestoCa2", "puestoQu", "puestoQu2",   # i18n-no
+	"puestoVe", "puestoVe2", "puestoPa", "puestoPa2", "puestoFl", "puestoFl2", "puestoEs", "puestoEs2"]   # i18n-no · 1.30: la vitrina del dispensario, la barra y la cabina del DJ; 1.43: la mesa del concesionario
 
 const SILLAS := ["silla", "sillaG", "sillaG2"]   # i18n-no · 1.27.1: delante de un ordenador; con A, el ordenador de encima (delante)
 
-var SOLID_G := RegEx.create_from_string("^(water|roof|wall|win|iwT|iwB|void)")
+var SOLID_G := RegEx.create_from_string("^(water|roof|wall|win|iwT|iwB|void|hito_)")   # hito_<suelo>: los sitios de los pueblos (tools/pueblos.py)
 
 var lock := 0
 
@@ -1444,8 +1446,8 @@ func fisio_pasa(mn: int) -> void:   # granja: con cada rato que pasa
 					S.erase("efe")
 
 func beber_alc(p: float) -> void:
-	if Datos.CAL and p > 0:
-		S.borr = minf(float(D.FISIO.tope), borr() + p)
+	if Datos.CAL and p != 0:   # negativo: comer (el mercado de la Ribera, ciudad.gd)
+		S.borr = clampf(borr() + p, 0.0, float(D.FISIO.tope))
 
 # lo que sube fumar o catar: los mg de THC (g × % × 10) por FISIO.colo; el perfil, la media de lo fumado por lo que sube cada vez
 var humo_ms := -1e9
@@ -1662,6 +1664,9 @@ func npc_talk(d: Dictionary) -> void:
 	if d.id == "setero":   # 1.51
 		await talk_setero()
 		return
+	if d.id.begins_with("bi_"):   # Bilbao por dentro (ciudad.gd)
+		await talk_ciudad(d.id)
+		return
 	if d.id.begins_with("m9_"):   # MAESTRO [9]: la ciudad (metro.gd)
 		await talk_metro(d.id)
 		return
@@ -1808,6 +1813,8 @@ func build_ents() -> void:
 		var Gk: Dictionary = D.MAR.gorka
 		ents.append(old["gorka"] if old.has("gorka") else mk_ent({"id": "gorka", "map": "franco", "x": int(Gk.x), "y": int(Gk.y), "look": Gk.look, "dir": "down", "wander": 0}))
 	for dd in metro_npcs(S.map):   # MAESTRO [9]: el concejal, las bandas y los encargados de los clubs VIP
+		ents.append(old[dd.id] if old.has(dd.id) else mk_ent(dd))
+	for dd in ciudad_npcs(S.map):   # Bilbao por dentro (ciudad.gd): la gente del teatro, las iglesias y el mercado, por su horario
 		ents.append(old[dd.id] if old.has(dd.id) else mk_ent(dd))
 	for c in S.clients:
 		if c.get("map", "town") == S.map:
@@ -2186,6 +2193,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_setas()
 	montar_locales(name_)   # 1.45: la puerta de los negocios y sus mejoras
 	montar_estancos(name_)   # 1.47: el estanco de cada pueblo
+	pueblos_mapa(name_)   # después de los montajes que parten de una copia del mapa (montar_locales, montar_alto)
 	if name_ in ["disco", "disco-vip", "ensanche"]:
 		montar_disco()
 	if Datos.CAL and VITRINA_GROW.has(name_):   # 1.47: la vitrina de las pipas y demás en los dos grows
@@ -2258,11 +2266,13 @@ var paso_sobra := 0.0
 # sentarse (1.47, solo con CAL): en los asientos, mirando al sur (se ven de frente) o al norte (de espaldas); sentado, fumarte
 # uno de lo que lleves (medio gramo), pedir algo, hablar con el de al lado, el móvil, quedarte un rato o levantarte; no se guarda
 const ASIENTOS := {"sofaF": "sur", "sofaV": "sur", "bench": "sur", "sofaB": "norte", "sofa": "norte", "sillon": "norte", "silla": "norte", "sillaG": "norte", "stool": "norte",
-	"sillaTs": "sur", "sillaTn": "norte", "taburTb": "norte", "sillaT": "sur"}   # 1.57.2: las sillas y los taburetes de la taberna y la espera del taller, muebles de verdad
+	"sillaTs": "sur", "sillaTn": "norte", "taburTb": "norte", "sillaT": "sur",
+	"butaca": "norte", "bancoI": "norte", "taburMe": "norte"}   # Bilbao por dentro: las butacas del teatro, los bancos de la iglesia y los taburetes del mercado   # 1.57.2: las sillas y los taburetes de la taberna y la espera del taller, muebles de verdad
 
 var ASIENTO_TXT := {"sofaF": I18n.K("Un sofá del club."), "sofaB": I18n.K("Un sofá del club."), "sofaV": I18n.K("El sofá del reservado."), "bench": I18n.K("Un banco."), "stool": I18n.K("Un taburete."),
 	"sofa": I18n.K("Tu sofá."), "sillon": I18n.K("Tu sillón de lectura."), "silla": I18n.K("La silla del ordenador de la tía."), "sillaG": I18n.K("Tu silla gaming."),
-	"sillaTs": I18n.K("Una silla de la taberna."), "sillaTn": I18n.K("Una silla de la taberna."), "taburTb": I18n.K("Un taburete de la barra."), "sillaT": I18n.K("Las sillas de la espera.")}
+	"sillaTs": I18n.K("Una silla de la taberna."), "sillaTn": I18n.K("Una silla de la taberna."), "taburTb": I18n.K("Un taburete de la barra."), "sillaT": I18n.K("Las sillas de la espera."),
+	"butaca": I18n.K("Una butaca de terciopelo, algo gastada."), "bancoI": I18n.K("Un banco de la iglesia."), "taburMe": I18n.K("Un taburete de la barra de pintxos.")}
 
 # (lo pidió el usuario: «la altura correcta en todos los muebles donde se puede sentar»): por asiento, [dx, cadera]: dx,
 # lo que se corre a la derecha para quedar en medio del dibujo (la silla gaming, de 2 casillas, va centrada entre las dos), y
@@ -2270,9 +2280,10 @@ var ASIENTO_TXT := {"sofaF": I18n.K("Un sofá del club."), "sofaB": I18n.K("Un s
 # de pie, en la 9. De espaldas, la cabeza asoma por encima del respaldo (en la silla gaming, alto, la cadera por encima
 # del cojín para que se vea la cabeza; lo de debajo lo tapa el respaldo). El taburete, con SENT_TABURETE en pinta.gd
 const SENT_GEO := {"silla": [0, 1], "sillaG": [8, 2], "sillon": [0, 7], "sofa": [0, 8], "sofaB": [0, 9], "sofaF": [2, 7], "sofaV": [2, 7], "bench": [0, 9], "stool": [0, 4],
-	"sillaTs": [0, 8], "sillaTn": [0, 5], "taburTb": [0, 4], "sillaT": [-6, 8]}
+	"sillaTs": [0, 8], "sillaTn": [0, 5], "taburTb": [0, 4], "sillaT": [-6, 8],
+	"butaca": [0, 7], "bancoI": [0, 8], "taburMe": [0, 4]}
 
-const TABURETES := ["stool", "taburTb"]   # 1.57.2: con las piernas de SENT_TABURETE (pinta.gd)   # i18n-no
+const TABURETES := ["stool", "taburTb", "taburMe"]   # 1.57.2: con las piernas de SENT_TABURETE (pinta.gd)   # i18n-no
 
 const SENT_PORRO := 0.5
 
@@ -2283,6 +2294,7 @@ var BEBIDAS := {
 	"bar": [[I18n.K("Un café"), 1.5, 10, 0], [I18n.K("Una caña"), 2.5, 15, 10], [I18n.K("Un refresco"), 2.2, 15, 0], [I18n.K("Un vino"), 2.0, 15, 12]],
 	"club": [[I18n.K("Un café"), 1.2, 10, 0], [I18n.K("Un refresco"), 1.8, 15, 0], [I18n.K("Un zumo"), 2.0, 15, 0], [I18n.K("Una cerveza"), 2.2, 15, 12]],
 	"disco": [[I18n.K("Un refresco"), 5.0, 15, 0], [I18n.K("Una cerveza"), 6.0, 15, 12], [I18n.K("Una copa"), 9.0, 20, 25]],
+	"mercado": [[I18n.K("Un pintxo de tortilla"), 2.5, 10, -8], [I18n.K("Un café"), 1.5, 10, 0], [I18n.K("Un txakoli"), 2.2, 15, 10], [I18n.K("Un caldo caliente"), 2.0, 15, -12]],   # lo de comer baja la borrachera
 
 }
 
@@ -2729,6 +2741,35 @@ func campo_obj(_x: int, _y: int, _o) -> bool:   # MAESTRO [4], en campo.gd
 func montar_huerta(_k: String) -> void:   # la huerta de la tía, en campo.gd
 	pass
 
+# Los pueblos con su sitio propio (lo pidió el usuario: «que no sea todo el mismo esquema de pueblo», «más imperfecto… pero que
+# los píxeles sean perfectos»; tools/pueblos.py → PUEBLOS): con CAL, las casillas de `cambia` ([x, y, suelo, objeto, suelo de
+# antes, objeto de antes]), los edificios de hito y las puertas; sin CAL, lo de antes. Cada vez que se entra, después de los
+# montajes que parten de una copia del mapa: así la copia es la de siempre y lo de los pueblos se vuelve a poner encima.
+func pueblos_mapa(k: String) -> void:
+	var PM: Dictionary = D.get("PUEBLOS", {}).get("MAPS", {})
+	if not PM.has(k) or not MAPS.has(k):
+		return
+	var m: Dictionary = MAPS[k]
+	var on := Datos.CAL
+	for c in PM[k].cambia:
+		m.g[int(c[1])][int(c[0])] = c[2] if on else c[4]
+		m.o[int(c[1])][int(c[0])] = c[3] if on else c[5]
+	m.blds = m.blds.filter(func(b): return not b.has("hito"))
+	for d in PM[k].doors:
+		m.doors.erase(d)
+	if on:
+		for b in PM[k].blds:
+			var nb: Dictionary = b.duplicate(true)
+			Datos.enteros(nb)
+			m.blds.append(nb)
+		for d in PM[k].doors:
+			var nd: Dictionary = PM[k].doors[d].duplicate(true)
+			Datos.enteros(nd)
+			m.doors[d] = nd
+
+func hito_obj(_x: int, _y: int) -> bool:   # ciudad.gd
+	return false
+
 func mapas_bilbao(_k: String) -> void:   # los mapas de Bilbao con CAL, en campo.gd
 	pass
 
@@ -2977,3 +3018,31 @@ func fam_bono_txt(_F: Dictionary) -> String:
 
 func cup_trofeos() -> Array:
 	return []
+
+# Bilbao por dentro (ciudad.gd)
+func entra_ciudad(_t: String) -> bool:
+	return true
+
+func ciudad_abierta(_t: String) -> bool:
+	return true
+
+func obj_ciudad(_o) -> bool:
+	return false
+
+func ciudad_cerrada() -> bool:
+	return false
+
+func echar_ciudad() -> void:
+	pass
+
+func talk_ciudad(_id: String) -> void:
+	pass
+
+func ciudad_npcs(_mapa: String) -> Array:
+	return []
+
+func funcion_teatro() -> void:
+	pass
+
+func rato_iglesia() -> void:
+	pass
