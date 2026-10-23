@@ -86,20 +86,21 @@ def tabique():
     return L
 
 def almC(n):
-    """el almacén del club: estantería de acero de 2 m con las cajas de cartón y los tarros por lo lleno (0, 1 o 2)"""
-    L = Lienzo(32, 32); x0, x1 = 6, 25
+    """el almacén del club: estantería de acero de 2 m de alto y 0,9 m de ancho (una casilla, lo pidió el usuario: «son muy anchas
+    para la baldosa»), con las cajas de cartón y los tarros por lo lleno (0, 1 o 2); en fila, los contornos se tocan como en un almacén"""
+    L = Lienzo(32, 32); x0, x1 = 9, 22
     for x in (x0, x1): L.vl(x, 2, 30, AC[1])
     for y in (9, 17, 25): L.hl(x0, x1, y, AC[2]); L.hl(x0 + 1, x1 - 1, y + 1, AC[0])
     L.hl(x0, x1, 2, AC[3])
     if n >= 1:
-        for x in range(x0 + 2, x1 - 3, 5):                                            # los tarros de arriba
+        for x in (x0 + 2, x0 + 7):                                                     # los tarros de arriba
             L.r(x, 5, 3, 4, '#cfe2e6'); L.r(x, 7, 3, 2, '#5a8a3a'); L.hl(x, x + 2, 4, '#2a2a30')
-        L.r(x0 + 2, 20, 7, 5, '#c8a070'); L.hl(x0 + 2, x0 + 8, 20, '#e0bc8a'); L.vl(x0 + 5, 20, 24, '#a07a50')
+        L.r(x0 + 2, 20, 5, 5, '#c8a070'); L.hl(x0 + 2, x0 + 6, 20, '#e0bc8a'); L.vl(x0 + 4, 20, 24, '#a07a50')
     if n >= 2:
-        for x in range(x0 + 2, x1 - 2, 4):                                            # los botes de las extracciones
-            L.r(x, 14, 3, 3, '#2a2a30'); L.hl(x, x + 2, 14, '#d89a18')
-        L.r(x0 + 11, 20, 7, 5, '#c8a070'); L.hl(x0 + 11, x0 + 17, 20, '#e0bc8a')
-        L.r(x0 + 3, 28, 12, 2, '#c8a070')
+        for x in (x0 + 2, x0 + 6, x0 + 10):                                            # los botes de las extracciones
+            L.r(x, 14, 2, 3, '#2a2a30'); L.hl(x, x + 1, 14, '#d89a18')
+        L.r(x0 + 7, 20, 5, 5, '#c8a070'); L.hl(x0 + 7, x0 + 11, 20, '#e0bc8a')
+        L.r(x0 + 2, 28, 10, 2, '#c8a070')
     L.contorno(K); sombra(L, x0, x1, 31)
     return L
 

@@ -2,6 +2,9 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Las estanterías del almacén del club, una por baldosa (lo preguntó el usuario: «o las estanterías del almacén son muy anchas para con la baldosa, o se necesita una baldosa de espacio entre cada estantería»)
+- `almC` (`negocios.py`) medía 20 px (1,25 m) en casillas de 16 px y las cuatro de `alm-rv` y `alm-muelle` se montaban; ahora 14 px (0,9 m, el ancho de una estantería de acero de almacén), una por casilla con su hueco, sin baldosa libre entre ellas. `repaso.gd` 87/0, `negocios.gd` 340/0.
+
 ### El garaje por dentro (lo pidió el usuario: «un garage por dentro, grande como el taller, que estén aparcados ahí los vehículos, A en cada vehículo para salir, abrir el maletero […] con forma de maletero de coche, o cargar gasolina del coche, no abono»)
 - Con `Datos.CAL`, la puerta seccional del garaje de la tía lleva dentro (`GARAJE_IN`, `mapa_garaje` en `calle.gd`): 14 × 10 (lo pidió el usuario: «si haces líneas de aparcamiento, que estén bien hechas, es muy grande»), con el pasillo de 2 m del portón en el medio y dos plazas de 6 × 3 m a cada lado, cerradas por su línea amarilla de atrás, la de entre las dos y la de delante, por el medio de la casilla a 0,5 m de las ruedas (`GARAJE_LINEA`, la casilla `floorGl` en `garaje_dentro.py`) y abiertas al pasillo, el sumidero en el pasillo, pocas manchas de aceite, el banco, el grifo con la manguera, las garrafas de gasolina, aceites, neumáticos, cajonera, extintor y bidón de serrín (textos en `ATREZO_TXT.garaje`); arte a mano en `tools/sprites/a-mano/garaje_dentro.py` (el deportivo sin la plataforma giratoria, garrafas y grifo).
 - Cada vehículo comprado, aparcado en su plaza (`GARAJE_PLAZA`: utilitario y berlina arriba, deportivo y moto abajo) y sólido; el que está fuera deja su plaza vacía. Sin vehículos, «Está vacío».
