@@ -14,7 +14,7 @@ const Juego = preload("res://src/juego.gd")
 
 # 4. las vallas encima de lo que acotan (lo pidió el usuario: «tiene que estar acotado encima de las baldosas donde termina la
 # acotación, no en las siguientes»): con CAL, las de los corrales y cercados, en su suelo; las sueltas, como estaban
-const CERCADOS := {"valdehierro": ["dirt", 53], "mendialde": ["tallgrass", 29], "errotabarri": ["tallgrass", 22], "astilleros": ["dirt", 36]}
+const CERCADOS := {"valdehierro": ["dirt", 48], "mendialde": ["tallgrass", 29], "errotabarri": ["tallgrass", 22], "astilleros": ["dirt", 36]}   # Valdehierro, sin las 5 que abre el aparcamiento (APARC_OBRA)
 const SUELTAS := ["town", "carr-valle", "carr-molino", "carr-acantilado", "puerto"]
 
 var n := 0

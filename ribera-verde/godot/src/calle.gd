@@ -89,7 +89,12 @@ const ESC_HONDO := 24   # lo que se hunde en la boca hasta perderse (los 27 px d
 const ESC_FONDO := 1.6   # hasta dónde entra en la boca (casillas desde la entrada)
 
 func bajar_escalera(x: int, y: int) -> void:
-	var otras: Array = MAPS[S.map].escaleras.filter(func(b): return int(b.y) != y or int(b.x) != x)
+	var es: Array = MAPS[S.map].escaleras
+	var g := ""   # cada paso subterráneo, su grupo (g): se sale por una boca del mismo
+	for b in es:
+		if int(b.y) == y and int(b.x) == x:
+			g = String(b.get("g", ""))
+	var otras: Array = es.filter(func(b): return (int(b.y) != y or int(b.x) != x) and String(b.get("g", "")) == g)
 	if otras.is_empty():
 		return
 	var b: Dictionary = otras[0]
@@ -184,9 +189,14 @@ func aparcados(mapa: String) -> Array:   # los tuyos que están en mapa, por ord
 # derecha; aparcamiento.py), en suelo libre que no corta el paso a nada (lo comprueba tests/vehiculos.gd)
 # Bilbao (lo pidió el usuario: «En los nuevos mapas no hay parking, hay que estudiar el espacio jugable que no sea agobiante»): uno en
 # cada zona, en el hueco que deja tools/bilbao.py (BILBAO.APARC, lo mismo; lo comprueba tests/aparc_bilbao.gd)
-const APARC := {"puerto": [17, 10], "valdehierro": [17, 11], "mendialde": [25, 19], "errotabarri": [13, 13], "ibarbide": [7, 23], "metropoli": [1, 24],
-	"zorroza": [13, 15], "lapunta": [22, 15], "abando": [6, 15], "casco": [4, 10]}   # i18n-no
+# Los de los pueblos, igual (lo pidió el usuario: «tanto en los mapas nuevos como en los viejos»): una casilla libre alrededor, ninguna
+# fachada a dos y con las cuatro plazas llenas se llega a todo (tests/aparc_bilbao.gd); en Valdehierro, en el solar de al lado de la
+# parada, con la valla abierta y sin las tres cajas de dentro, y en Errotabarri, en el prado sin un manzano (APARC_OBRA)
+const APARC := {"puerto": [23, 10], "valdehierro": [22, 13], "mendialde": [20, 13], "errotabarri": [13, 15], "ibarbide": [4, 23], "metropoli": [7, 23],
+	"zorroza": [13, 21], "lapunta": [20, 21], "abando": [54, 3], "casco": [6, 29]}   # i18n-no
+const APARC_OBRA := {"valdehierro": [[21, 12], [22, 12], [23, 12], [24, 12], [25, 12], [23, 14], [24, 14], [23, 15]], "errotabarri": [[12, 18]]}   # i18n-no
 var _aparc0 := {}
+var _aparc_o := {}
 # las otras tres zonas de Bilbao, sin parada (se llega en autobús a Zorroza): con tu vehículo se va a cualquiera de las cuatro y se
 # aparca en la suya; para la gasolina, los km y el tiempo cuentan como Zorroza (parada_de) y entre dos de Bilbao, BILBAO_KM
 const BILBAO_Z := ["lapunta", "abando", "casco"]   # i18n-no
@@ -214,6 +224,12 @@ func montar_aparcamiento(mapa: String) -> void:
 	for y in 4:
 		for x in 3:
 			m.g[y0 + y][x0 + x] = "road" if Datos.CAL else _aparc0[mapa][y][x]   # i18n-no
+	if APARC_OBRA.has(mapa):   # lo que se quita para que quepa con aire (sin CAL, vuelve)
+		if not _aparc_o.has(mapa):
+			_aparc_o[mapa] = APARC_OBRA[mapa].map(func(c): return m.o[c[1]][c[0]])
+		for i in APARC_OBRA[mapa].size():
+			var c: Array = APARC_OBRA[mapa][i]
+			m.o[c[1]][c[0]] = null if Datos.CAL else _aparc_o[mapa][i]
 	var bs: Array = m.blds.filter(func(q): return q.id != "aparcamiento")   # i18n-no
 	if Datos.CAL:
 		bs.append({"id": "aparcamiento", "x0": x0, "y0": y0, "w": 3, "h": 4})   # i18n-no
@@ -999,6 +1015,8 @@ func object_action(x: int, y: int) -> void:
 					return
 		"fountain":
 			await say(K("La fuente de la plaza. Lleva años sin agua potable."))
+		"estatua":   # i18n-no
+			await say(K("Una estatua de bronce en su pedestal, verde de tanta lluvia. Nadie se acuerda ya de la placa."))
 		"escZ", "escZ2":   # i18n-no; el paso subterráneo de Zorroza (bajar_escalera): se baja andando hacia la derecha
 			await say(K("La escalera del paso subterráneo, por debajo de las vías. Se baja andando hacia ella."))
 		"ascensorZ", "ascensorZ2":   # i18n-no
@@ -1679,13 +1697,20 @@ func andable(m: Dictionary, O: Array, B := {}) -> Dictionary:
 	var bocas := []   # con CAL, las entradas de las escaleras del paso subterráneo: de una se sale por las otras (bajar_escalera)
 	if Datos.CAL:
 		for b in m.get("escaleras", []):
-			bocas.append(Vector2i(int(b.x) - 1, int(b.y)))
+			bocas.append([Vector2i(int(b.x) - 1, int(b.y)), String(b.get("g", ""))])
 	var i := 0
 	while i < q.size():
 		var c: Array = q[i]
 		i += 1
-		if Vector2i(c[0], c[1]) in bocas:
-			for b in bocas:
+		var gc = null
+		for b in bocas:
+			if b[0] == Vector2i(c[0], c[1]):
+				gc = b[1]
+		if gc != null:
+			for bb in bocas:
+				if bb[1] != gc:
+					continue
+				var b: Vector2i = bb[0]
 				var kb := "%d,%d" % [b.x, b.y]
 				if not v.has(kb) and not B.has(kb):
 					v[kb] = true

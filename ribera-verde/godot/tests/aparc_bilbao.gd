@@ -1,4 +1,4 @@
-# Landrace Hunters (Godot) — Bilbao con aparcamiento (lo pidió el usuario: «En los nuevos mapas no hay parking, hay que estudiar el espacio jugable que no sea
+# Landrace Hunters (Godot) — Bilbao y los pueblos con aparcamiento (lo pidió el usuario: «En los nuevos mapas no hay parking, hay que estudiar el espacio jugable que no sea
 # agobiante»): en cada zona nueva (Zorroza, La Punta, Abando, Casco Viejo), un aparcamiento de 3 × 4 (APARC, el mismo que BILBAO.APARC de tools/bilbao.py)
 # en un hueco sin nada, con dos casillas libres alrededor y sin cortar el paso con las cuatro plazas llenas; en coche se va a cada zona y se aparca allí.
 #   $GODOT --headless --path godot --script res://tests/aparc_bilbao.gd   → «aparc_bilbao: N comprobaciones, 0 fallos»
@@ -8,6 +8,7 @@ const Datos = preload("res://src/datos.gd")
 const Juego = preload("res://src/juego.gd")
 
 const MAPAS := ["zorroza", "lapunta", "abando", "casco"]
+const PUEBLOS := ["puerto", "valdehierro", "mendialde", "errotabarri", "ibarbide", "metropoli"]
 var J
 var M
 var MENUS := []
@@ -92,15 +93,21 @@ func _corre() -> void:
 	S.min = 12 * 60
 	S.money = 20000
 	S.flags.conce = true
-	# 1. el aparcamiento de cada zona, el de tools/bilbao.py, en un hueco sin nada y con aire alrededor
+	# 1. el aparcamiento de cada zona (el de tools/bilbao.py) y de cada pueblo (lo pidió el usuario: «tanto en los mapas nuevos como en
+	# los viejos»), en un hueco sin nada y con aire alrededor
 	var BA: Dictionary = D.get("BILBAO", {}).get("APARC", {})
 	for k in MAPAS:
 		chk(J.APARC.has(k) and BA.has(k) and int(J.APARC[k][0]) == int(BA[k][0]) and int(J.APARC[k][1]) == int(BA[k][1]), "%s: APARC = BILBAO.APARC (%s, %s)" % [k, J.APARC.get(k), BA.get(k)])
+	chk(PUEBLOS.all(func(k): return J.APARC.has(k)), "los pueblos de la parada, con el suyo")
+	for k in MAPAS + PUEBLOS:
 		if not J.APARC.has(k):
 			continue
+		if k in PUEBLOS:
+			J.enter_map(k, int(D.PARADAS[k].a[0]), int(D.PARADAS[k].a[1]), "down")
 		var m: Dictionary = J.MAPS[k]
 		var x0: int = int(J.APARC[k][0])
 		var y0: int = int(J.APARC[k][1])
+		J.montar_aparcamiento(k)
 		var vacio := true
 		for y in range(y0, y0 + 4):
 			for x in range(x0, x0 + 3):
@@ -122,7 +129,6 @@ func _corre() -> void:
 					casa.append(Vector2i(x, y))
 		chk(aire.is_empty(), "%s: una casilla libre alrededor (estorban %s)" % [k, aire])
 		chk(casa.is_empty(), "%s: ninguna fachada a dos casillas (%s)" % [k, casa])
-		J.montar_aparcamiento(k)
 		chk(m.blds.any(func(b): return b.id == "aparcamiento" and int(b.x0) == x0 and int(b.y0) == y0) and String(m.g[y0][x0]).begins_with("road"), "%s: dibujado" % k)
 		var p0 := Vector2i(x0 + 2, y0)
 		var tapa := {}
@@ -131,10 +137,13 @@ func _corre() -> void:
 			tapa[Vector2i(x0 + 1, y)] = 1
 		var antes := _llega(m, p0, {})
 		var ahora := _llega(m, p0, tapa)
-		chk(antes.size() > 200 and antes.keys().all(func(c): return tapa.has(c) or ahora.has(c)), "%s: con las cuatro plazas llenas se llega a todo (%d)" % [k, antes.size()])
+		if k in PUEBLOS:
+			var pa: Array = D.PARADAS[k].a
+			chk(absi(x0 + 1 - int(pa[0])) + absi(y0 + 2 - int(pa[1])) <= 12 and ahora.has(Vector2i(int(pa[0]), int(pa[1]))), "%s: junto a la parada" % k)
+		chk(antes.size() > 100 and antes.keys().all(func(c): return tapa.has(c) or ahora.has(c)), "%s: con las cuatro plazas llenas se llega a todo (%d)" % [k, antes.size()])
 	# 2. en coche: desde Zorroza, a cada zona; se aparca en la suya y te deja en el pasillo
 	S.coches = {"utilitario": {"dia": 0, "p": 20000, "r": S.day + 365, "iv": S.day + 365, "en": "zorroza", "ap": S.day}}
-	J.enter_map("zorroza", 4, 10, "down")
+	J.enter_map("zorroza", 12, 19, "down")
 	J.mode = "world"
 	for z in ["lapunta", "abando", "casco", "zorroza"]:
 		var de: String = J.donde("utilitario")

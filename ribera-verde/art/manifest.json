@@ -1292,6 +1292,126 @@
    ],
    "ajuste": "pies",
    "nota": "fachadas de Bilbao (bilbao.py), con Datos.CAL"
+  },
+  "edificio_6x7": {
+   "w": 96,
+   "h": 112,
+   "ancla": [
+    48,
+    111
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 6 × 7 casillas (Bilbao)"
+  },
+  "edificio_3x2": {
+   "w": 48,
+   "h": 32,
+   "ancla": [
+    24,
+    31
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 3 × 2 casillas (Bilbao)"
+  },
+  "edificio_16x4": {
+   "w": 256,
+   "h": 64,
+   "ancla": [
+    128,
+    63
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 16 × 4 casillas (Bilbao)"
+  },
+  "edificio_7x4": {
+   "w": 112,
+   "h": 64,
+   "ancla": [
+    56,
+    63
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 7 × 4 casillas (Bilbao)"
+  },
+  "edificio_2x6": {
+   "w": 32,
+   "h": 96,
+   "ancla": [
+    16,
+    95
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 2 × 6 casillas (Bilbao)"
+  },
+  "edificio_14x5": {
+   "w": 224,
+   "h": 80,
+   "ancla": [
+    112,
+    79
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 14 × 5 casillas (Bilbao)"
+  },
+  "edificio_7x5": {
+   "w": 112,
+   "h": 80,
+   "ancla": [
+    56,
+    79
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 7 × 5 casillas (Bilbao)"
+  },
+  "edificio_7x7": {
+   "w": 112,
+   "h": 112,
+   "ancla": [
+    56,
+    111
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 7 × 7 casillas (Bilbao)"
+  },
+  "edificio_6x14": {
+   "w": 96,
+   "h": 224,
+   "ancla": [
+    48,
+    223
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 6 × 14 casillas (Bilbao)"
+  },
+  "edificio_6x8": {
+   "w": 96,
+   "h": 128,
+   "ancla": [
+    48,
+    127
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 6 × 8 casillas (Bilbao)"
+  },
+  "edificio_4x3": {
+   "w": 64,
+   "h": 48,
+   "ancla": [
+    32,
+    47
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 4 × 3 casillas (Bilbao)"
+  },
+  "edificio_8x9": {
+   "w": 128,
+   "h": 144,
+   "ancla": [
+    64,
+    143
+   ],
+   "ajuste": "pies",
+   "nota": "edificio de 8 × 9 casillas (Bilbao)"
   }
  },
  "fases": [
@@ -12671,11 +12791,11 @@
    "max_colores": 32,
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
-   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-catedral",
    "tipo": "edificio",
-   "celda": "edificio_6x9",
-   "descripcion": "fachada gótica con aguja",
+   "celda": "edificio_4x6",
+   "descripcion": "la catedral gótica de las Siete Calles, torre y aguja",
    "cubre": [
     "tile:roofT_catedral",
     "tile:roofB_catedral",
@@ -12772,7 +12892,8 @@
     "tile:viaE",
     "tile:viaEX",
     "tile:adoq",
-    "tile:muelleP"
+    "tile:muelleP",
+    "tile:puenteV"
    ]
   },
   {
@@ -12868,10 +12989,12 @@
    "celda": "objeto_muy_alto",
    "descripcion": "el plátano de sombra de la Gran Vía en su alcorque (4 m)",
    "cubre": [
-    "obj:platano"
+    "obj:platano",
+    "obj:estatua"
    ],
    "ajuste_por_sprite": {
-    "platano": "exacto"
+    "platano": "exacto",
+    "estatua": "exacto"
    }
   },
   {
@@ -12918,6 +13041,490 @@
    "celda": "tile",
    "descripcion": "lo del suelo de Bilbao en su sitio (BILBAO.DEC): la tapa de registro, el imbornal arriba y abajo y el paso de cebra",
    "cubre": []
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-sanNicolas",
+   "tipo": "edificio",
+   "celda": "edificio_6x7",
+   "descripcion": "la iglesia barroca del Arenal",
+   "cubre": [
+    "tile:roofT_sanNicolas",
+    "tile:roofB_sanNicolas",
+    "tile:wall_sanNicolas",
+    "tile:win_sanNicolas"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-kiosko",
+   "tipo": "edificio",
+   "celda": "edificio_3x2",
+   "descripcion": "el templete de la música del Arenal",
+   "cubre": [
+    "tile:roofT_kiosko",
+    "tile:roofB_kiosko",
+    "tile:wall_kiosko",
+    "tile:win_kiosko"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-plazaN",
+   "tipo": "edificio",
+   "celda": "edificio_16x4",
+   "descripcion": "la plaza porticada, lado de arriba",
+   "cubre": [
+    "tile:roofT_plazaN",
+    "tile:roofB_plazaN",
+    "tile:wall_plazaN",
+    "tile:win_plazaN"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-plazaS",
+   "tipo": "edificio",
+   "celda": "edificio_7x4",
+   "descripcion": "la plaza porticada, lado de abajo",
+   "cubre": [
+    "tile:roofT_plazaS",
+    "tile:roofB_plazaS",
+    "tile:wall_plazaS",
+    "tile:win_plazaS"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-plazaL",
+   "tipo": "edificio",
+   "celda": "edificio_2x6",
+   "descripcion": "la plaza porticada, ala izquierda",
+   "cubre": [
+    "tile:roofT_plazaL",
+    "tile:roofB_plazaL",
+    "tile:wall_plazaL",
+    "tile:win_plazaL"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-plazaR",
+   "tipo": "edificio",
+   "celda": "edificio_2x6",
+   "descripcion": "la plaza porticada, ala derecha",
+   "cubre": [
+    "tile:roofT_plazaR",
+    "tile:roofB_plazaR",
+    "tile:wall_plazaR",
+    "tile:win_plazaR"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-cascoB",
+   "tipo": "edificio",
+   "celda": "edificio_3x4",
+   "descripcion": "casa estrecha de las Siete Calles con balcones",
+   "cubre": [
+    "tile:roofT_cascoB",
+    "tile:roofB_cascoB",
+    "tile:wall_cascoB",
+    "tile:win_cascoB"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-cascoB2",
+   "tipo": "edificio",
+   "celda": "edificio_3x4",
+   "descripcion": "casa estrecha de las Siete Calles, otro color",
+   "cubre": [
+    "tile:roofT_cascoB2",
+    "tile:roofB_cascoB2",
+    "tile:wall_cascoB2",
+    "tile:win_cascoB2"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-mercadoR",
+   "tipo": "edificio",
+   "celda": "edificio_14x5",
+   "descripcion": "el mercado de la Ribera a la orilla",
+   "cubre": [
+    "tile:roofT_mercadoR",
+    "tile:roofB_mercadoR",
+    "tile:wall_mercadoR",
+    "tile:win_mercadoR"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-sanAnton",
+   "tipo": "edificio",
+   "celda": "edificio_6x6",
+   "descripcion": "la iglesia gótica junto al puente viejo",
+   "cubre": [
+    "tile:roofT_sanAnton",
+    "tile:roofB_sanAnton",
+    "tile:wall_sanAnton",
+    "tile:win_sanAnton"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-chavarri",
+   "tipo": "edificio",
+   "celda": "edificio_7x5",
+   "descripcion": "el palacete con torreones de la plaza elíptica",
+   "cubre": [
+    "tile:roofT_chavarri",
+    "tile:roofB_chavarri",
+    "tile:wall_chavarri",
+    "tile:win_chavarri"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-carlton",
+   "tipo": "edificio",
+   "celda": "edificio_7x7",
+   "descripcion": "el hotel de la plaza elíptica con cúpula",
+   "cubre": [
+    "tile:roofT_carlton",
+    "tile:roofB_carlton",
+    "tile:wall_carlton",
+    "tile:win_carlton"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-diputacion",
+   "tipo": "edificio",
+   "celda": "edificio_8x6",
+   "descripcion": "el palacio de la Gran Vía",
+   "cubre": [
+    "tile:roofT_diputacion",
+    "tile:roofB_diputacion",
+    "tile:wall_diputacion",
+    "tile:win_diputacion"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-camposE",
+   "tipo": "edificio",
+   "celda": "edificio_7x7",
+   "descripcion": "el teatro modernista del Ensanche",
+   "cubre": [
+    "tile:roofT_camposE",
+    "tile:roofB_camposE",
+    "tile:wall_camposE",
+    "tile:win_camposE"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-torreBBVA",
+   "tipo": "edificio",
+   "celda": "edificio_6x14",
+   "descripcion": "la torre de oficinas de la plaza",
+   "cubre": [
+    "tile:roofT_torreBBVA",
+    "tile:roofB_torreBBVA",
+    "tile:wall_torreBBVA",
+    "tile:win_torreBBVA"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-abandoE",
+   "tipo": "edificio",
+   "celda": "edificio_8x7",
+   "descripcion": "la estación del Ensanche con la vidriera",
+   "cubre": [
+    "tile:roofT_abandoE",
+    "tile:roofB_abandoE",
+    "tile:wall_abandoE",
+    "tile:win_abandoE"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-concordia",
+   "tipo": "edificio",
+   "celda": "edificio_4x6",
+   "descripcion": "la estación de fachada modernista junto a la ría",
+   "cubre": [
+    "tile:roofT_concordia",
+    "tile:roofB_concordia",
+    "tile:wall_concordia",
+    "tile:win_concordia"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-milagrosa",
+   "tipo": "edificio",
+   "celda": "edificio_6x8",
+   "descripcion": "la iglesia de ladrillo de Zorroza",
+   "cubre": [
+    "tile:roofT_milagrosa",
+    "tile:roofB_milagrosa",
+    "tile:wall_milagrosa",
+    "tile:win_milagrosa"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-apeadero",
+   "tipo": "edificio",
+   "celda": "edificio_4x3",
+   "descripcion": "el apeadero de la vía estrecha",
+   "cubre": [
+    "tile:roofT_apeadero",
+    "tile:roofB_apeadero",
+    "tile:wall_apeadero",
+    "tile:win_apeadero"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-molino",
+   "tipo": "edificio",
+   "celda": "edificio_8x9",
+   "descripcion": "el molino de mareas de La Punta",
+   "cubre": [
+    "tile:roofT_molino",
+    "tile:roofB_molino",
+    "tile:wall_molino",
+    "tile:win_molino"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
+   "id": "edificio-bloqueZ",
+   "tipo": "edificio",
+   "celda": "edificio_6x5",
+   "descripcion": "bloque bajo de revoque de la avenida de Zorroza",
+   "cubre": [
+    "tile:roofT_bloqueZ",
+    "tile:roofB_bloqueZ",
+    "tile:wall_bloqueZ",
+    "tile:win_bloqueZ"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
+   "id": "edificio-bloqueZ2",
+   "tipo": "edificio",
+   "celda": "edificio_6x5",
+   "descripcion": "bloque bajo de ladrillo de la avenida de Zorroza",
+   "cubre": [
+    "tile:roofT_bloqueZ2",
+    "tile:roofB_bloqueZ2",
+    "tile:wall_bloqueZ2",
+    "tile:win_bloqueZ2"
+   ]
   }
  ],
  "familias": {

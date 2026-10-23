@@ -1,9 +1,9 @@
 # Landrace Hunters (Godot) — el paso subterráneo de Zorroza (lo pidió el usuario: «los pasos a nivel para pasar encima de las vías
 # tienen que estar… O escaleras, que bajes unas escaleras y aparezcas en las del otro lado, sin cambiar el mapa. Mejor que lo del
 # ascensor. Me gusta más. Porque además en la estación de tren de Zorroza el ascensor no funciona»), con Datos.CAL: las vías no se
-# cruzan andando; tres bocas de escalera (andén de la vía ancha, andén de la vía estrecha, la ría); andando a la derecha hacia una,
-# eliges a qué lado sales, bajas hundiéndote por los peldaños, fundido y, en el mismo mapa, subes por la otra boca hasta su entrada;
-# el ascensor, averiado. Sin CAL, las vías se pisan como antes.
+# cruzan andando; dos pasos de dos bocas (la vía ancha, entre el paseo de la ría y su andén; la estrecha, entre la ladera y el suyo);
+# andando a la derecha hacia una, bajas hundiéndote por los peldaños, fundido y, en el mismo mapa, subes por la otra boca de su
+# paso hasta su entrada; el ascensor, averiado. Sin CAL, las vías se pisan como antes.
 #   $GODOT --headless --path godot --script res://tests/escaleras.gd   → «escaleras: N comprobaciones, 0 fallos»
 #   (con xvfb y opengl3, `-- --pintar <dir>`: esc-<n>.png, la bajada y la subida fotograma a fotograma)
 extends SceneTree
@@ -89,21 +89,25 @@ func _corre() -> void:
 	M.intervalo(func(): J.update(1000 / 60.0), 1000 / 60.0)
 	J.enter_map("zorroza", 12, 14, "down")
 	var m: Dictionary = J.MAPS.zorroza
-	# 1 · el mapa: sin pasos a nivel; las tres bocas de 2 casillas con su entrada libre; las vías, cerradas al paso
+	# 1 · el mapa: sin pasos a nivel; cuatro bocas de 2 casillas, dos por paso (la vía ancha: el paseo de la ría y su andén; la
+	# estrecha: la ladera y su andén), con su entrada y la casilla de detrás libres; las vías, cerradas al paso
 	var g := {}
 	for fila in m.g:
 		for t in fila:
 			g[t] = true
 	chk(not g.has("viaX") and not g.has("viaEX") and g.has("via") and g.has("viaE"), "sin pasos a nivel, con las dos vías")
 	var bocas: Array = m.get("escaleras", [])
-	chk(bocas.size() == 3, "tres bocas: %s" % [bocas])
+	chk(bocas.size() == 4, "cuatro bocas: %s" % [bocas])
+	var grupos := {}
 	for b in bocas:
 		var x := int(b.x)
 		var y := int(b.y)
+		grupos[String(b.get("g", ""))] = int(grupos.get(String(b.get("g", "")), 0)) + 1
 		chk(m.o[y][x] == "escZ" and m.o[y][x + 1] == "escZ2", "la boca (%d, %d), de 2 casillas" % [x, y])
-		chk(not J.tile_solid(m, x - 1, y), "la entrada de (%d, %d), libre" % [x, y])
+		chk(not J.tile_solid(m, x - 1, y) and not J.tile_solid(m, x + 2, y), "la entrada y la salida de (%d, %d), libres" % [x, y])
 		chk(String(b.n) != "", "la boca (%d, %d) dice a dónde va" % [x, y])
-	chk(J.tile_solid(m, 18, 20) and J.tile_solid(m, 18, 23), "las vías no se pisan")
+	chk(grupos.get("ancha", 0) == 2 and grupos.get("estrecha", 0) == 2, "dos pasos de dos bocas: %s" % [grupos])
+	chk(J.tile_solid(m, 18, 6) and J.tile_solid(m, 18, 7) and J.tile_solid(m, 18, 32), "las vías no se pisan")
 	var asc := []
 	for y in int(m.h):
 		for x in int(m.w):
@@ -111,22 +115,23 @@ func _corre() -> void:
 				asc.append(Vector2i(x, y))
 	chk(asc.size() == 1 and m.o[asc[0].y][asc[0].x + 1] == "ascensorZ2", "el ascensor, de 2 casillas: %s" % [asc])
 	# 2 · andando hacia las vías, no se cruza
-	chk(empuja(18, 19, "down") and J.P.y == 19, "contra la vía, quieto (%d, %d)" % [J.P.x, J.P.y])
-	# 3 · por la escalera: del andén de arriba al de la vía estrecha, eligiendo; en el mismo mapa, en su entrada, mirando a la izquierda
+	chk(empuja(18, 5, "down") and J.P.y == 5, "contra la vía ancha, quieto (%d, %d)" % [J.P.x, J.P.y])
+	chk(empuja(18, 8, "up") and J.P.y == 8, "contra la vía ancha desde la ría, quieto (%d, %d)" % [J.P.x, J.P.y])
+	chk(empuja(18, 31, "down") and J.P.y == 31, "contra la vía estrecha, quieto (%d, %d)" % [J.P.x, J.P.y])
+	# 3 · por la escalera de la vía ancha: del paseo de la ría a su andén, sin preguntar (solo hay otra boca); en el mismo mapa, en
+	# su entrada, mirando a la izquierda
 	var b0: Dictionary = bocas[0]
-	QUIERO = ["Al andén de la vía estrecha"]
 	MENUS = []
 	chk(empuja(int(b0.x) - 1, int(b0.y)), "la bajada acaba")
-	chk(MENUS.size() == 1 and MENUS[0].size() == 3, "a qué lado: las otras dos y «Nada» (%s)" % [MENUS])
-	chk(J.S.map == "zorroza" and J.P.x == int(bocas[1].x) - 1 and J.P.y == int(bocas[1].y) and J.P.dir == "left", "sale por la boca del andén de la vía estrecha (%d, %d, %s)" % [J.P.x, J.P.y, J.P.dir])
+	chk(MENUS.is_empty(), "sin menú: una sola salida (%s)" % [MENUS])
+	chk(J.S.map == "zorroza" and J.P.x == int(bocas[1].x) - 1 and J.P.y == int(bocas[1].y) and J.P.dir == "left", "sale por la boca del andén de la vía ancha (%d, %d, %s)" % [J.P.x, J.P.y, J.P.dir])
 	chk(J.S.x == J.P.x and J.S.y == J.P.y and J.P.px == J.P.x * 16.0 and J.P.py == J.P.y * 16.0 and not J.P.moving and J.ESC == null, "de pie y quieto al acabar")
 	var mx: int = HONDO.max() if HONDO.size() else 0
 	chk(mx == J.ESC_HONDO and HONDO[0] <= 2 and HONDO[-1] <= 2, "baja hundiéndose hasta %d px y sube (%d → %d → %d)" % [J.ESC_HONDO, HONDO[0] if HONDO.size() else -1, mx, HONDO[-1] if HONDO.size() else -1])
-	# 4 · de vuelta y a la ría; «Nada», sin moverse
-	QUIERO = ["A la ría"]
-	chk(empuja(int(bocas[1].x) - 1, int(bocas[1].y)) and J.P.y == int(bocas[2].y), "del andén de abajo, a la ría (%d)" % J.P.y)
-	QUIERO = ["Nada"]
-	chk(empuja(int(bocas[2].x) - 1, int(bocas[2].y)) and J.P.x == int(bocas[2].x) - 1 and J.P.y == int(bocas[2].y) and HONDO.is_empty(), "«Nada»: se queda arriba")
+	# 4 · de vuelta a la ría; y la vía estrecha, de la ladera a su andén y al revés: nunca se sale por el otro paso
+	chk(empuja(int(bocas[1].x) - 1, int(bocas[1].y)) and J.P.y == int(bocas[0].y), "del andén, a la ría (%d)" % J.P.y)
+	chk(empuja(int(bocas[2].x) - 1, int(bocas[2].y)) and J.P.y == int(bocas[3].y), "de la ladera, al andén de la vía estrecha (%d)" % J.P.y)
+	chk(empuja(int(bocas[3].x) - 1, int(bocas[3].y)) and J.P.y == int(bocas[2].y), "del andén de la vía estrecha, a la ladera (%d)" % J.P.y)
 	# 5 · el ascensor no funciona; la escalera dice por dónde se baja
 	LOG = []
 	var st := {"f": false}
@@ -143,7 +148,7 @@ func _corre() -> void:
 		await pinta(dir, bocas)
 	# 7 · sin CAL, las vías se pisan y no hay escalera
 	Datos.CAL = false
-	chk(not J.tile_solid(m, 18, 20), "sin CAL, la vía se pisa")
+	chk(not J.tile_solid(m, 18, 6), "sin CAL, la vía se pisa")
 	Datos.CAL = true
 	_fin()
 
@@ -153,7 +158,6 @@ func pinta(dir: String, bocas: Array) -> void:
 	var b: Dictionary = bocas[0]
 	J.enter_map("zorroza", int(b.x) - 1, int(b.y), "right")
 	J.mode = "world"
-	QUIERO = ["Al andén de la vía estrecha"]
 	var k := 0
 	var t0 := Time.get_ticks_msec()
 	await foto(dir, k)

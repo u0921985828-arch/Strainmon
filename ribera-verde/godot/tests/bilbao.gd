@@ -17,17 +17,17 @@ var n := 0
 var fallos := []
 
 const MAPAS := ["zorroza", "lapunta", "abando", "casco"]
-const CALLE_Y := 9
+const CALLE_Y := 14
 # lo de cada sitio: edificios, suelos y objetos que tiene que tener
 const TIENE := {
-	"zorroza": {"b": ["torreZ", "torreZ2", "estacion"], "g": ["via", "viaE", "roadT", "hormigon", "water"], "o": ["parada", "baranda", "lamp", "bench", "papelera", "bolardo", "contenedores", "escZ", "ascensorZ"]},
-	"lapunta": {"b": ["ladrillo", "nave", "grua"], "g": ["hormigon", "muelleP", "roadT", "water"], "o": ["noray", "lamp", "bolardo", "contenedores"]},
-	"abando": {"b": ["ensB", "ensB2"], "g": ["plaza", "roadT", "walk"], "o": ["platano", "fountain", "lamp", "bolardo", "papelera"]},
-	"casco": {"b": ["teatro", "catedral", "mercado", "casco", "casco2", "casco3"], "g": ["adoq", "muelleP", "plaza", "water"], "o": ["baranda", "lamp", "bench", "papelera", "fountain"]},
+	"zorroza": {"b": ["torreZ", "torreZ2", "estacion", "milagrosa", "apeadero", "bloqueZ", "bloqueZ2"], "g": ["via", "viaE", "roadT", "hormigon", "water", "muelleP"], "o": ["parada", "baranda", "lamp", "bench", "papelera", "bolardo", "contenedores", "escZ", "ascensorZ", "fountain"]},
+	"lapunta": {"b": ["ladrillo", "nave", "grua", "molino"], "g": ["hormigon", "muelleP", "roadT", "water"], "o": ["noray", "lamp", "bolardo", "contenedores", "crate"]},
+	"abando": {"b": ["ensB", "ensB2", "chavarri", "carlton", "diputacion", "camposE", "torreBBVA", "abandoE", "concordia"], "g": ["plaza", "roadT", "walk", "water"], "o": ["platano", "fountain", "estatua", "lamp", "bolardo", "papelera"]},
+	"casco": {"b": ["teatro", "catedral", "mercadoR", "sanNicolas", "plazaN", "plazaS", "plazaL", "plazaR", "sanAnton", "kiosko", "casco", "casco2", "casco3", "cascoB"], "g": ["adoq", "muelleP", "plaza", "water", "puenteV"], "o": ["baranda", "lamp", "bench", "papelera", "fountain", "bolardo"]},
 }
 const SEMBRADO := ["papelera", "bench", "lamp", "bolardo", "platano", "contenedores", "contenedores2", "metroB", "metroB2"]
 # lo que no hace falta alcanzar (el borde, la barandilla, los árboles y el mobiliario de la calle)
-const DECORADO := ["monte", "monte2", "seto", "tree", "tree2", "platano", "fence", "baranda", "lamp", "noray", "bench", "papelera", "bolardo", "contenedores", "fountain", "crate", "metroB"]
+const DECORADO := ["monte", "monte2", "seto", "tree", "tree2", "platano", "fence", "baranda", "lamp", "noray", "bench", "papelera", "bolardo", "contenedores", "fountain", "crate", "metroB", "estatua"]
 
 func _initialize() -> void:
 	Datos.PLAY = false
@@ -228,6 +228,8 @@ func _corre() -> void:
 					chk(m.o[y][x - 1] == "bench" or m.o[y][x + 1] == "bench", "%s (%d, %d): papelera suelta" % [k, x, y])
 				if m.o[y][x] == "contenedores":
 					chk(m.o[y][x + 1] == "contenedores2", "%s (%d, %d): el contenedor, entero" % [k, x, y])
+		# 6. la forma del sitio de verdad (lo pidió el usuario: «la estructura del mapa que se parezca al lugar»)
+		forma(k, m, v)
 		# la plaza simétrica: lo de la izquierda, también a la derecha
 		if dir != "":
 			await plano(dir, k)
@@ -246,6 +248,88 @@ func _corre() -> void:
 	for f in fallos:
 		print("  FALLO: ", f)
 	quit(1 if fallos.size() else 0)
+
+func bld(m: Dictionary, id: String) -> Dictionary:
+	for b in m.blds:
+		if String(b.id) == id:
+			return b
+	return {}
+
+func agua(m: Dictionary, x: int, y: int) -> bool:
+	return String(m.g[y][x]).begins_with("water")
+
+func libre(m: Dictionary, x: int, y: int) -> bool:
+	var g := String(m.g[y][x])
+	return not (g.begins_with("roof") or g.begins_with("wall") or g.begins_with("water") or g.begins_with("via")) and m.o[y][x] == null
+
+func forma(k: String, m: Dictionary, v: Dictionary) -> void:
+	var W := int(m.w)
+	var H := int(m.h)
+	match k:
+		"zorroza":   # la ría al norte; la vía ancha entre el paseo y el andén; la estrecha al pie de la ladera; la iglesia en su plaza
+			chk(range(W).all(func(x): return agua(m, x, 0) and agua(m, x, 2)), "zorroza: la ría, arriba")
+			chk(range(H).all(func(y): return agua(m, 0, y) or y in [6, 7, 32]), "zorroza: el Kadagua, al oeste (salvo los puentes del tren)")
+			chk(range(W).all(func(x): return String(m.g[6][x]) == "via" and String(m.g[7][x]) == "via"), "zorroza: la vía ancha, doble y de lado a lado")
+			chk(range(W).all(func(x): return String(m.g[32][x]) == "viaE"), "zorroza: la vía estrecha, abajo")
+			var es: Dictionary = bld(m, "estacion")
+			chk(es and int(es.y0) == 10, "zorroza: la estación, pegada al andén")
+			chk(range(4, W - 1).all(func(x): return String(m.g[8][x]) == "hormigon" or m.o[8][x] != null), "zorroza: el andén, entre la vía y la estación")
+			chk(m.o[24][29] == "fountain" and bld(m, "milagrosa"), "zorroza: la iglesia en su plaza con la fuente")
+			chk(m.o[CALLE_Y + 4][12] == "parada", "zorroza: la parada en la avenida")
+		"lapunta":   # la orilla en diagonal: la punta arriba a la izquierda, donde el Kadagua entra en la ría
+			var prim := []
+			for y in range(4, 14):
+				var x0 := 0
+				while x0 < W and agua(m, x0, y):
+					x0 += 1
+				prim.append(x0)
+			var baja := true
+			for i in range(1, prim.size()):
+				baja = baja and prim[i] < prim[i - 1]
+			chk(baja, "lapunta: la orilla, en diagonal %s" % [prim])
+			var mo: Dictionary = bld(m, "molino")
+			chk(mo and int(mo.x0) < 15 and int(mo.y0) <= 6, "lapunta: el molino, en la punta")
+			chk(range(21, H).all(func(y): return agua(m, 0, y)), "lapunta: el Kadagua, al oeste")
+			var nor := 0
+			for x in W:
+				nor += 1 if m.o[4][x] == "noray" else 0
+			chk(nor >= 6, "lapunta: los norays del muelle (%d)" % nor)
+		"abando":   # la plaza elíptica, la Gran Vía de la plaza a la ría, la torre más alta y la ría al este
+			chk(range(H).all(func(y): return agua(m, W - 1, y) or (y >= CALLE_Y - 1 and y <= CALLE_Y + 6)), "abando: la ría, al este (salvo el puente)")
+			chk(m.o[16][13] == "fountain" and m.o[16][49] == "estatua", "abando: la fuente en la plaza elíptica y la estatua en la redonda")
+			var pl := 0
+			for y in H:
+				for x in range(0, 27):
+					pl += 1 if String(m.g[y][x]) == "plaza" else 0
+			chk(pl >= 120, "abando: la plaza elíptica, grande (%d)" % pl)
+			var al := {}
+			for b in m.blds:
+				al[String(b.id)] = int(b.h)
+			chk(al.get("torreBBVA", 0) > 0 and al.values().all(func(h): return h <= al.torreBBVA), "abando: la torre, la más alta")
+			chk(range(13, W - 1).all(func(x): return libre(m, x, CALLE_Y) or m.o[CALLE_Y][x] != null), "abando: la Gran Vía, de la plaza a la ría")
+			chk(range(59, W).all(func(x): return not agua(m, x, CALLE_Y)), "abando: el puente, que sigue en el Casco")
+		"casco":   # la ría al oeste y al sur; el Arenal; las Siete Calles; la plaza porticada cerrada; el mercado en la orilla
+			chk(range(0, 13).all(func(y): return agua(m, 0, y) and agua(m, 3, y)), "casco: la ría, al oeste")
+			chk(range(0, 17).all(func(x): return agua(m, x, 38)), "casco: la ría, al sur")
+			var siete := 0   # en la fila 22, los tramos libres entre manzanas, y cada uno libre de la calle a la Ribera
+			var x := 14
+			while x < W - 1:
+				if libre(m, x, 22) and not libre(m, x - 1, 22) or (x == 14 and libre(m, x, 22)):
+					var col := x
+					if range(20, 31).all(func(y): return libre(m, col, y) or m.o[y][col] != null):
+						siete += 1
+				x += 1
+			chk(siete >= 7, "casco: las Siete Calles, en paralelo (%d)" % siete)
+			var B := {"30,10": true, "31,10": true}
+			var vb: Dictionary = J.andable(m, m.o, B)
+			chk(v.has("30,6") and not vb.has("30,6"), "casco: la plaza porticada, cerrada salvo por su paso")
+			var me: Dictionary = bld(m, "mercadoR")
+			chk(me and agua(m, int(me.x0) - 1, int(me.y0) + int(me.h) - 1), "casco: el mercado, en la orilla")
+			chk(range(36, H - 1).all(func(y): return String(m.g[y][46]) == "puenteV" and agua(m, 49, y)), "casco: el puente, sobre la ría")
+			var ar := 0
+			for y in range(1, 13):
+				ar += 1 if m.o[y][9] == null and not agua(m, 9, y) else 0
+			chk(bld(m, "kiosko") and bld(m, "teatro") and int(bld(m, "teatro").y0) > int(bld(m, "kiosko").y0), "casco: el Arenal con el kiosko, y el teatro enfrente")
 
 func _encerradas(m: Dictionary, v: Dictionary) -> Array:
 	var r := []
