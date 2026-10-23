@@ -136,7 +136,7 @@ func _corre() -> void:
 	chk(A.saque_mete + Bb.saque_mete > 0, "al sacar se mete alguna")
 	chk(A.manos == 0 or A.mano_p / A.manos > .5, "con bola en mano se deja un tiro fácil (p media %.2f)" % (A.mano_p / maxf(1, A.manos)))
 	for e in E:
-		chk(e.us / 1000.0 / maxf(1, e.tiros) < 400, "menos de 400 ms por tiro (%.0f)" % (e.us / 1000.0 / maxf(1, e.tiros)))
+		chk(e.us / 1000.0 / maxf(1, e.tiros) < 700, "menos de 700 ms por tiro (%.0f)" % (e.us / 1000.0 / maxf(1, e.tiros)))
 	tapado()
 	print("billar8_ia: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:

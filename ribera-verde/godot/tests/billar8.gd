@@ -303,7 +303,7 @@ func _corre() -> void:
 	chk(nada <= 12, "tirar sin tocar ninguna bola, menos de una por partida (%d en 12)" % nada)
 	print("billar8: el rival tira sin tocar nada %d veces en 12 partidas; %.0f ms por tiro" % [nada, float(Time.get_ticks_msec() - t0) / maxf(1, tiros)])
 	var ms := float(Time.get_ticks_msec() - t0) / maxf(1, tiros)
-	chk(ms < 400, "lo que piensa el rival, por tiro: %.0f ms" % ms)
+	chk(ms < 700, "lo que piensa el rival, por tiro: %.0f ms" % ms)   # «Estudia la mesa…» lo tapa; la pausa mínima es B8_PIENSA (venta.gd)
 	# 6 · el dibujo: dentro de la pantalla en cada fase
 	for fase in ["coloca", "apunta", "carga", "ia", "rueda"]:
 		V = B8.nueva("Ander")

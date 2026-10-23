@@ -1,6 +1,8 @@
 # F8 (de trama.gd): la plantilla, la compra de la nave, los locales por dentro y el club con el socio y el billar.
 extends "res://src/movil.gd"
 
+const B8_PIENSA := 600   # ms que se ve «Estudia la mesa…» como poco: fluida, no un flash
+
 func gerente():
 	for w in S.plantilla:
 		if w.get("rol") == "gerente":
@@ -1721,7 +1723,10 @@ func _b8_suyo(V: Dictionary, hab: float, N: String) -> Dictionary:
 	V.f = 0.0
 	_dlg_fijo(I18n.K("Estudia la mesa…"), N)
 	await M.wait(16)   # que se vea el aviso antes de que piense (elige simula los tiros y tarda)
+	var t_pi := Time.get_ticks_msec()
 	var s := B8.elige(V, 1, hab)
+	var pensado := 16 + Time.get_ticks_msec() - t_pi
+	if pensado < B8_PIENSA: await M.wait(B8_PIENSA - pensado)   # en un móvil rápido, que no sea un flash
 	var di := {"n": int(s.get("n", 0))}   # lo canta como lo canta uno que juega
 	match String(s.get("tipo", "")):
 		"ataque":
