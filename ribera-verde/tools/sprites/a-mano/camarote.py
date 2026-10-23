@@ -82,16 +82,16 @@ def tarro10(L, x, y, lleno, c):
 def estanteC():
     """la estantería metálica de 180 cm (4 baldas, 3 con tarros de 10 L y la de abajo con las cajas de los sobres)"""
     L = Lienzo(32, 32); M0, M1, M2 = '#3a4048', '#7e8a94', '#b4bec6'
-    x0, x1 = 6, 25
+    x0, x1 = 9, 22                                                           # 90 cm: una casilla con el contorno
     for y in (2, 11, 20, 28): L.hl(x0, x1, y, M2); L.hl(x0, x1, y + 1, M1)
     for x in (x0, x1): L.vl(x, 1, 31, M0)
     VERDES = ('#5a8a3a', '#6e9a40', '#4e7a36')
     for i, y in enumerate((3, 12)):
-        for j, x in enumerate((8, 15, 20 if i else 21)):
-            if x + 5 <= x1: tarro10(L, x if x < 20 else 19, y, (6, 4, 5, 3, 6, 2)[i * 3 + j], VERDES[(i + j) % 3])
-    L.r(8, 23, 7, 5, '#c8b48a'); L.hl(8, 14, 23, '#e0d0a8'); L.r(10, 25, 3, 1, '#4e7ab0')   # la caja de los sobres al 62 %
-    L.r(16, 24, 7, 4, '#c8b48a'); L.hl(16, 22, 24, '#e0d0a8'); L.r(18, 25, 3, 1, '#4e7ab0')
-    L.r(9, 21, 4, 1, '#f0ecd8')                                              # un sobre suelto
+        for j, x in enumerate((10, 16)):
+            tarro10(L, x, y, (6, 4, 5, 3)[i * 2 + j], VERDES[(i + j) % 3])
+    L.r(10, 23, 6, 5, '#c8b48a'); L.hl(10, 15, 23, '#e0d0a8'); L.r(11, 25, 3, 1, '#4e7ab0')   # la caja de los sobres al 62 %
+    L.r(16, 24, 6, 4, '#c8b48a'); L.hl(16, 21, 24, '#e0d0a8'); L.r(18, 25, 2, 1, '#4e7ab0')
+    L.r(11, 21, 4, 1, '#f0ecd8')                                             # un sobre suelto
     L.contorno(K)
     return L
 

@@ -264,13 +264,13 @@ def fichasL():
     return L
 
 def prodL():
-    """los bidones de 25 L del champú, la cera y el desengrasante, en su palé"""
+    """los bidones de 25 L del champú, la cera y el desengrasante, en su medio palé (una casilla con el contorno)"""
     L = Lienzo(32, 32)
-    L.r(6, 27, 20, 3, MA[1]); L.hl(6, 25, 27, MA[3])
-    for i, (x, y) in enumerate(((7, 17), (13, 17), (19, 17), (10, 8), (16, 8))):
+    L.r(9, 27, 14, 3, MA[1]); L.hl(9, 22, 27, MA[3])
+    for i, (x, y) in enumerate(((10, 17), (14, 17), (18, 17), (12, 8), (16, 8))):
         c = ('#2a6ac0', '#e0e0d8', '#2a8a4a', '#e0b030', '#c04040')[i]
-        L.r(x, y, 6, 10 if y == 17 else 9, c); L.vl(x, y, y + 8, '#ffffff60'); L.r(x + 1, y - 1, 2, 1, '#2a2a30')
-    L.contorno(K); sombra(L, 6, 25, 31)
+        L.r(x, y, 4, 10 if y == 17 else 9, c); L.vl(x, y, y + 8, '#ffffff60'); L.r(x + 1, y - 1, 2, 1, '#2a2a30')
+    L.contorno(K); sombra(L, 9, 22, 31)
     return L
 
 # ---------- la taberna (Puerto Viejo) ----------
@@ -316,8 +316,8 @@ def prensaQ():
     return L
 
 def curaQ():
-    """la estantería de madera de la cámara de curación con las ruedas de queso"""
-    L = Lienzo(32, 32); x0, x1 = 6, 25
+    """la estantería de madera de la cámara de curación con las ruedas de queso (90 cm, una casilla con el contorno)"""
+    L = Lienzo(32, 32); x0, x1 = 9, 22
     for x in (x0, x1): L.vl(x, 2, 30, MA[1])
     for y in (9, 17, 25): L.hl(x0, x1, y, MA[2]); L.hl(x0 + 1, x1 - 1, y + 1, MA[0])
     for y in (5, 13, 21):

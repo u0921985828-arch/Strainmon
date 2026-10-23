@@ -431,9 +431,10 @@ def cordon(fin=False):
 
 # ---------------------------------------------------------------------------------------------------------- objetos altos (32 × 32)
 def estanteN():
-    """la estantería metálica de los abonos (100 × 180 cm): azules de MEATZA, verdes de ORTUA BIO, los sacos de sustrato abajo"""
+    """la estantería metálica de los abonos (90 × 180 cm, una casilla con el contorno: lo pidió el usuario, todas las estanterías
+    como las del almacén del club): azules de MEATZA, verdes de ORTUA BIO, los sacos de sustrato abajo"""
     L = Lienzo(32, 32); M0, M1, M2 = '#4a525a', '#8c98a2', '#bcc6ce'
-    x0, x1 = 8, 23
+    x0, x1 = 9, 22
     for y in (3, 11, 19, 27): L.hl(x0, x1, y, M2); L.hl(x0, x1, y + 1, M1)
     for x in (x0, x1): L.vl(x, 2, 31, M0)
     for i, x in enumerate(range(x0 + 2, x1 - 1, 4)):                # garrafas de 1 L
@@ -442,7 +443,7 @@ def estanteN():
         c = '#3a6ab8' if i % 2 else '#3f8a46'
         L.r(x, 14, 3, 5, c); L.p(x + 1, 13, '#2a2a34'); L.p(x, 15, '#e8e8e0')
     L.r(x0 + 1, 21, 6, 6, '#8a6a42'); L.hl(x0 + 1, x0 + 6, 21, '#a8865a'); L.r(x0 + 2, 23, 3, 2, '#3f8a46')   # los sacos
-    L.r(x0 + 8, 22, 6, 5, '#8a6a42'); L.hl(x0 + 8, x0 + 13, 22, '#a8865a'); L.r(x0 + 9, 24, 3, 2, '#e0b040')
+    L.r(x0 + 7, 22, 6, 5, '#8a6a42'); L.hl(x0 + 7, x0 + 12, 22, '#a8865a'); L.r(x0 + 8, 24, 3, 2, '#e0b040')
     L.contorno(K)
     return L
 
@@ -1103,10 +1104,11 @@ def copas():
     return L
 
 def libreria():
-    """la librería de la asociación (90 × 180 cm): libros, carpetas de las actas, una caja de semillas y una planta encima"""
+    """la librería de la asociación (90 × 180 cm, una casilla con el contorno): libros, carpetas de las actas, una caja de semillas y
+    una planta encima"""
     L = Lienzo(32, 32); W0, W1, W2 = '#3a2414', '#5a3a24', '#7a5232'; R = azar(134)
-    x0, x1 = 8, 23
-    L.r(x0, 4, 16, 28, W1); L.vl(x0, 4, 31, W2); L.vl(x1, 4, 31, W0)
+    x0, x1 = 9, 22
+    L.r(x0, 4, x1 - x0 + 1, 28, W1); L.vl(x0, 4, 31, W2); L.vl(x1, 4, 31, W0)
     LIB = ['#8a3a3a', '#3a5a8a', '#c8a040', '#3a7a4a', '#e8e4d8', '#6a4a8a']
     for y in (11, 18, 25):
         L.hl(x0 + 1, x1 - 1, y, W2); L.hl(x0 + 1, x1 - 1, y + 1, W0)
@@ -1115,7 +1117,7 @@ def libreria():
             w = 1 + (R() < .3); h = 4 + int(R() * 2)
             if R() < .12: x += 1; continue
             L.r(x, y - h, w, h, LIB[int(R() * len(LIB))]); x += w
-    L.r(x0 + 1, 26, 14, 5, W0); L.hl(x0 + 1, x1 - 1, 28, W2)                        # el cajón de abajo
+    L.r(x0 + 1, 26, x1 - x0 - 1, 5, W0); L.hl(x0 + 1, x1 - 1, 28, W2)                        # el cajón de abajo
     L.r(14, 0, 4, 4, '#a85a3a'); L.p(15, 0, '#3f8a46')                               # la maceta de encima
     for (x, y) in ((13, -1), (16, -2), (18, -1), (15, -3)): L.p(x, y + 3, '#5aa04a')
     L.contorno(K)
@@ -1154,9 +1156,10 @@ def iwB_bajo():
 RJ0, RJ1, RJ2 = '#5a5e66', '#8a8e96', '#b8bcc4'
 BALDA_Y = (24, 12)              # la cara de arriba de cada balda: la de abajo (j = 0) y la de arriba (j = 1)
 def baldaS():
-    """la estantería de rejilla (100 × 180 cm): cuatro patas, tres baldas de rejilla; las bandejas van encima (bandejaS)"""
+    """la estantería de rejilla (90 × 180 cm, una casilla con el contorno): cuatro patas, tres baldas de rejilla; las bandejas van
+    encima (bandejaS)"""
     L = Lienzo(32, 32)
-    x0, x1 = 8, 23
+    x0, x1 = 9, 22
     for x in (x0, x1): L.vl(x, 2, 31, RJ0)
     for x in (x0 + 1, x1 - 1): L.vl(x, 4, 30, RJ1)                # las patas de detrás
     for y in BALDA_Y + (30,):

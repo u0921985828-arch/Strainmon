@@ -36,22 +36,22 @@ def bombones(L, x, y):
 
 def armS(b, m, c):
     """el armario de almacén de acero con tres baldas (b: los botes, m: las microdosis, c: los bombones; 0 vacío, 1 a medias,
-    2 lleno) y las puertas abiertas a los lados"""
-    L = Lienzo(32, 32); x0, x1, y0 = 8, 23, 3
+    2 lleno) y las puertas abiertas, plegadas a los lados: con ellas, una casilla con el contorno (lo pidió el usuario, todas las
+    estanterías como las del almacén del club)"""
+    L = Lienzo(32, 32); x0, x1, y0 = 10, 21, 3
     L.r(x0, y0, x1 - x0 + 1, 29, AC[1]); L.r(x0 + 1, y0 + 1, x1 - x0 - 1, 27, '#2e3036')       # el cuerpo y su fondo
     L.hl(x0, x1, y0, AC[3]); L.vl(x0, y0, 31, AC[2]); L.vl(x1, y0, 31, AC[0])
-    L.vl(x0 - 2, y0 + 1, 30, AC[2]); L.vl(x0 - 1, y0 + 1, 30, AC[1])                          # las puertas abiertas
-    L.vl(x1 + 1, y0 + 1, 30, AC[1]); L.vl(x1 + 2, y0 + 1, 30, AC[0])
-    L.p(x0 - 2, 17, '#2a2a30'); L.p(x1 + 2, 17, '#2a2a30')                                   # los tiradores
+    L.vl(x0 - 1, y0 + 1, 30, AC[2]); L.vl(x1 + 1, y0 + 1, 30, AC[0])                          # las puertas abiertas, de canto
+    L.p(x0 - 1, 17, '#2a2a30'); L.p(x1 + 1, 17, '#2a2a30')                                   # los tiradores
     for y in (11, 19, 27):                                                                    # las baldas
         L.hl(x0 + 1, x1 - 1, y, AC[2]); L.hl(x0 + 1, x1 - 1, y + 1, AC[0])
-    for k in range((0, 2, 3)[b]):
+    for k in range((0, 1, 2)[b]):
         bote(L, x0 + 1 + k * 5, 5)
-    for k in range((0, 2, 4)[m]):
-        cajita(L, x0 + 1 + k * 4, 15)
+    for k in range((0, 2, 3)[m]):
+        cajita(L, x0 + 1 + k * 3 + (k > 0), 15)
     for k in range((0, 1, 2)[c]):
-        bombones(L, x0 + 2 + k * 7, 24)
-        if c == 2: bombones(L, x0 + 2 + k * 7, 21)
+        bombones(L, x0 + 1 + k * 5, 24)
+        if c == 2: bombones(L, x0 + 1 + k * 5, 21)
     L.hl(x0, x1, 31, AC[0])
     L.contorno(K)
     return L

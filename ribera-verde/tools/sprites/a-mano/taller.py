@@ -129,12 +129,12 @@ def rackT():
     """la estantería de ruedas nuevas (1 m × 1,8 m, 16 × 29 px): tres baldas de tubo con cuatro ruedas de 63 cm (10 px) de pie,
     de canto (20 cm, 3 px), como las del coche del elevador"""
     L = Lienzo(32, 48)
-    x0, x1 = 7, 24
+    x0, x1 = 9, 22                                                                             # una casilla con el contorno
     L.vl(x0, 18, 46, AC[1]); L.vl(x1, 18, 46, AC[0])
     for y in (19, 32, 46):
         L.hl(x0, x1, y, AC[2])
     for y in (31, 45):
-        for x in (9, 13, 17, 21):
+        for x in (10, 13, 16, 19):
             L.r(x, y - 9, 3, 9, NG[1]); L.vl(x, y - 8, y - 2, NG[2]); L.p(x, y - 9, NG[0]); L.p(x + 2, y - 9, NG[0])
             for j in range(y - 7, y - 1, 2): L.p(x + 1, j, NG[0])                              # el dibujo de la banda
             L.p(x + 1, y - 5, '#f4f4ee')                                                       # la etiqueta de medida

@@ -40,6 +40,9 @@ PIEZAS = {
     'doblaN': ('doblaN', 19, 2, 'la mesa de doblar de 1,2 m con la ropa', 0),
     'mesaP': ('mesaP', 20, 2, 'la mesa de acero de 1,25 m con la masa', 0),
 }
+# las estanterías de una casilla, a 16 px de ancho con el contorno (lo pidió el usuario: todas como las del almacén del club, una por
+# baldosa sin montarse): se estrechan sin tocar el alto, como un carro de bandejas de 60 cm
+ESTRECHA = {'rackP': 16}
 # en el grupo detalle-alto, por mapa (_detalle_obj): la bancada de tres asientos de la lavandería en lugar del banco
 DETALLE = {
     'd-bench-loc-ibar': ('bench', 13, 'la bancada metálica de tres asientos, 80 cm'),
@@ -82,6 +85,8 @@ def lee(f):
 if __name__ == '__main__':
     for n, (f, h, c, _, sube) in PIEZAS.items():
         im = binaria(escala(lee(f), h))
+        if n in ESTRECHA and im.width > ESTRECHA[n]:
+            im = binaria(im.resize((ESTRECHA[n], h), Image.NEAREST))
         if n == 'cestaL':
             pa = binaria(escala(lee(PAPELERA[0]), PAPELERA[1]))
             junta = Image.new('RGBA', (im.width + 1 + pa.width, h))

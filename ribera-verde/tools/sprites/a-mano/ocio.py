@@ -115,8 +115,8 @@ CAJ = (('#f4f4ee', '#c83a2c'), ('#f4f4ee', '#3a6ac8'), ('#d8b048', '#8a6a18'), (
        ('#c83a2c', '#f4f4ee'), ('#5a4a8a', '#f4f4ee'), ('#f4f4ee', '#e08a2a'))
 def estanteE():
     """la estantería de las cajetillas detrás del mostrador (2 m × 2,2 m): madera, cinco baldas y las cajetillas de colores lisos"""
-    L = Lienzo(48, 48); x0, x1 = 8, 39; R = azar(4773)
-    L.r(x0, 11, 32, 36, W0); L.r(x0, 11, 32, 3, W2); L.hl(x0, x1, 11, W3)                          # el copete
+    L = Lienzo(48, 48); x0, x1 = 9, 38; R = azar(4773)                                              # dos casillas con el contorno
+    L.r(x0, 11, x1 - x0 + 1, 36, W0); L.r(x0, 11, x1 - x0 + 1, 3, W2); L.hl(x0, x1, 11, W3)                          # el copete
     L.vl(x0, 14, 46, W2); L.vl(x1, 14, 46, W1); L.vl(23, 14, 46, W1); L.vl(24, 14, 46, W2)
     for i, y in enumerate((20, 26, 32, 38, 44)):
         L.hl(x0 + 1, x1 - 1, y, W3)                                                                 # la balda
@@ -276,8 +276,8 @@ def escaleraDB():
 # ---------------------------------------------------------------------------------------------------------- de una casilla, altos
 def humidor():
     """el humidificador de puros (60 cm × 1,6 m): madera con la puerta de cristal y las cajas de puros dentro"""
-    L = Lienzo(32, 48); x0, x1 = 8, 23
-    L.r(x0, 21, 16, 26, W1); L.r(x0, 21, 16, 2, W3); L.hl(x0, x1, 46, W0)
+    L = Lienzo(32, 48); x0, x1 = 9, 22                                                                 # una casilla con el contorno
+    L.r(x0, 21, x1 - x0 + 1, 26, W1); L.r(x0, 21, x1 - x0 + 1, 2, W3); L.hl(x0, x1, 46, W0)
     L.r(x0 + 2, 24, 12, 18, '#5a3a24'); L.hl(x0 + 2, x1 - 2, 24, '#8a5a34')
     for y in (29, 35, 41): L.hl(x0 + 2, x1 - 2, y, W3)
     for y in (26, 32, 38):
