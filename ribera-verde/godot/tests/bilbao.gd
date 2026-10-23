@@ -1,7 +1,7 @@
 # Ribera Verde (Godot) — Bilbao, zonas nuevas (lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a
 # Bilbao centro y sus barrios, Zorroza no puede faltar», y después «Añade como zonas nuevas / No quiero caos», el caos: «el
 # mobiliario urbano, la distribución en el suelo de alcantarillas y demás»; tools/bilbao.py → BILBAO en datos.json, con CAL):
-# Zorroza (la parada «Bilbao»), La Punta, Abando y el Casco Viejo, en fila por la calle; todo alcanzable; el mobiliario y lo del
+# La Punta, Zorroza (la parada «Bilbao»), Abando y el Casco Viejo, en fila por la calle de oeste a este; todo alcanzable; el mobiliario y lo del
 # suelo a ritmo fijo; y sin CAL, nada de Bilbao y los seis mapas de siempre como en datos.json.
 #   $GODOT --headless --path godot --script res://tests/bilbao.gd   → «bilbao: N comprobaciones, 0 fallos»
 #   con -- --sin-arranque --pintar <dir> (y xvfb, --rendering-driver opengl3) deja también bilbao-<mapa>.png, el mapa entero
@@ -16,13 +16,13 @@ var J
 var n := 0
 var fallos := []
 
-const MAPAS := ["zorroza", "lapunta", "abando", "casco"]
+const MAPAS := ["lapunta", "zorroza", "abando", "casco"]   # de oeste a este
 const CALLE_Y := 14
 # lo de cada sitio: edificios, suelos y objetos que tiene que tener
 const TIENE := {
-	"zorroza": {"b": ["torreZ", "torreZ2", "estacion", "milagrosa", "apeadero", "bloqueZ", "bloqueZ2"], "g": ["via", "viaE", "roadT", "hormigon", "water", "muelleP"], "o": ["parada", "baranda", "lamp", "bench", "papelera", "bolardo", "contenedores", "escZ", "ascensorZ", "fountain"]},
+	"zorroza": {"b": ["torreZ", "torreZ2", "estacion", "iglesiaZ", "apeadero", "bloqueZ", "bloqueZ2"], "g": ["via", "viaE", "roadT", "hormigon", "water", "muelleP"], "o": ["parada", "baranda", "lamp", "bench", "papelera", "bolardo", "contenedores", "escZ", "ascensorZ", "fountain"]},
 	"lapunta": {"b": ["ladrillo", "nave", "grua", "molino"], "g": ["hormigon", "muelleP", "roadT", "water"], "o": ["noray", "lamp", "bolardo", "contenedores", "crate"]},
-	"abando": {"b": ["ensB", "ensB2", "chavarri", "carlton", "diputacion", "camposE", "torreBBVA", "abandoE", "concordia"], "g": ["plaza", "roadT", "walk", "water"], "o": ["platano", "fountain", "estatua", "lamp", "bolardo", "papelera"]},
+	"abando": {"b": ["ensB", "ensB2", "chavarri", "carlton", "diputacion", "camposE", "torreBBVA", "abandoE", "concordia", "milagrosa"], "g": ["plaza", "roadT", "roadL", "roadR", "roadX", "walk", "water"], "o": ["platano", "fountain", "estatua", "lamp", "bolardo", "papelera"]},
 	"casco": {"b": ["teatro", "catedral", "mercadoR", "sanNicolas", "plazaN", "plazaS", "plazaL", "plazaR", "sanAnton", "kiosko", "casco", "casco2", "casco3", "cascoB"], "g": ["adoq", "muelleP", "plaza", "water", "puenteV"], "o": ["baranda", "lamp", "bench", "papelera", "fountain", "bolardo"]},
 }
 const SEMBRADO := ["papelera", "bench", "lamp", "bolardo", "platano", "contenedores", "contenedores2", "metroB", "metroB2"]
@@ -233,6 +233,14 @@ func _corre() -> void:
 		# la plaza simétrica: lo de la izquierda, también a la derecha
 		if dir != "":
 			await plano(dir, k)
+	# la costura de dos zonas seguidas: junto a la calle, agua en las dos o en ninguna (el mismo río, o ninguno)
+	var fila := ["lapunta", "zorroza", "abando", "casco"]
+	for i in range(1, fila.size()):
+		var a: Dictionary = D.MAPS[fila[i - 1]]
+		var b: Dictionary = D.MAPS[fila[i]]
+		for y in [CALLE_Y - 1, CALLE_Y + 6]:
+			chk(agua(a, int(a.w) - 1, y) == agua(b, 0, y), "%s | %s (fila %d): la costura casa" % [fila[i - 1], fila[i], y])
+		chk(a.exits.has("%d,%d" % [int(a.w) - 1, CALLE_Y + 2]) and a.exits["%d,%d" % [int(a.w) - 1, CALLE_Y + 2]].to == fila[i], "%s → %s, por la derecha" % [fila[i - 1], fila[i]])
 	# 6. sin CAL: nada de Bilbao (ni mapas, ni parada, ni zonas)
 	Datos.CAL = false
 	Datos.carga()
@@ -268,13 +276,13 @@ func forma(k: String, m: Dictionary, v: Dictionary) -> void:
 	match k:
 		"zorroza":   # la ría al norte; la vía ancha entre el paseo y el andén; la estrecha al pie de la ladera; la iglesia en su plaza
 			chk(range(W).all(func(x): return agua(m, x, 0) and agua(m, x, 2)), "zorroza: la ría, arriba")
-			chk(range(H).all(func(y): return agua(m, 0, y) or y in [6, 7, 32]), "zorroza: el Kadagua, al oeste (salvo los puentes del tren)")
+			chk(range(3, H).all(func(y): return not agua(m, 0, y) and not agua(m, 1, y)), "zorroza: sin el Kadagua (es de La Punta, al oeste): tierra firme de lado a lado")
 			chk(range(W).all(func(x): return String(m.g[6][x]) == "via" and String(m.g[7][x]) == "via"), "zorroza: la vía ancha, doble y de lado a lado")
 			chk(range(W).all(func(x): return String(m.g[32][x]) == "viaE"), "zorroza: la vía estrecha, abajo")
 			var es: Dictionary = bld(m, "estacion")
 			chk(es and int(es.y0) == 10, "zorroza: la estación, pegada al andén")
 			chk(range(4, W - 1).all(func(x): return String(m.g[8][x]) == "hormigon" or m.o[8][x] != null), "zorroza: el andén, entre la vía y la estación")
-			chk(m.o[24][29] == "fountain" and bld(m, "milagrosa"), "zorroza: la iglesia en su plaza con la fuente")
+			chk(m.o[24][29] == "fountain" and bld(m, "iglesiaZ"), "zorroza: la parroquia en su plaza con la fuente")
 			chk(m.o[CALLE_Y + 4][12] == "parada", "zorroza: la parada en la avenida")
 		"lapunta":   # la orilla en diagonal: la punta arriba a la izquierda, donde el Kadagua entra en la ría
 			var prim := []
@@ -289,7 +297,8 @@ func forma(k: String, m: Dictionary, v: Dictionary) -> void:
 			chk(baja, "lapunta: la orilla, en diagonal %s" % [prim])
 			var mo: Dictionary = bld(m, "molino")
 			chk(mo and int(mo.x0) < 15 and int(mo.y0) <= 6, "lapunta: el molino, en la punta")
-			chk(range(21, H).all(func(y): return agua(m, 0, y)), "lapunta: el Kadagua, al oeste")
+			chk(range(H).all(func(y): return agua(m, 0, y)), "lapunta: el Kadagua, al oeste de arriba abajo (la punta: no se sigue)")
+			chk(not m.exits.keys().any(func(c): return int(String(c).split(",")[0]) == 0), "lapunta: sin salida al oeste")
 			var nor := 0
 			for x in W:
 				nor += 1 if m.o[4][x] == "noray" else 0
@@ -308,6 +317,43 @@ func forma(k: String, m: Dictionary, v: Dictionary) -> void:
 			chk(al.get("torreBBVA", 0) > 0 and al.values().all(func(h): return h <= al.torreBBVA), "abando: la torre, la más alta")
 			chk(range(13, W - 1).all(func(x): return libre(m, x, CALLE_Y) or m.o[CALLE_Y][x] != null), "abando: la Gran Vía, de la plaza a la ría")
 			chk(range(59, W).all(func(x): return not agua(m, x, CALLE_Y)), "abando: el puente, que sigue en el Casco")
+			# la retícula del Ensanche: calles de norte a sur que cruzan la Gran Vía de lado a lado del mapa, con manzanas entre ellas
+			var calles := []
+			for x in range(1, W - 1):
+				var fuera := range(H).filter(func(y): return y < CALLE_Y - 2 or y > CALLE_Y + 7)   # la glorieta, aparte
+				if fuera.all(func(y): return String(m.g[y][x]) in ["roadL", "roadX"]) and fuera.all(func(y): return String(m.g[y][x + 1]) in ["roadR", "roadX"]):
+					calles.append(x)
+			chk(calles.size() >= 3, "abando: calles de norte a sur que cruzan la Gran Vía %s" % [calles])
+			var vg := 0   # la Gran Vía, cortada por las calles: en cada cruce, el asfalto sin bordillo
+			for x in calles:
+				vg += 1 if String(m.g[CALLE_Y + 2][x]) == "roadX" and String(m.g[CALLE_Y + 3][x + 1]) == "roadX" or String(m.g[CALLE_Y - 2][x]) == "roadX" else 0
+			chk(vg == calles.size(), "abando: los cruces con la Gran Vía")
+			var mz := 0   # manzanas: edificios entre dos calles, al norte y al sur
+			for i in range(1, calles.size()):
+				for b in m.blds:
+					mz += 1 if int(b.x0) > int(calles[i - 1]) + 2 and int(b.x0) + int(b.w) <= int(calles[i]) - 1 else 0
+			chk(mz >= 3, "abando: manzanas entre las calles (%d)" % mz)
+			# las dos plazas, glorietas: el asfalto del cruce alrededor de la isleta, con la fuente y la estatua dentro
+			for c in [[13, 16, "fountain"], [49, 16, "estatua"]]:
+				var cx: int = c[0]
+				var cy: int = c[1]
+				var anillo := true
+				var x0 := cx
+				while x0 > 0 and String(m.g[cy][x0]) != "roadX":
+					x0 -= 1
+				var x1 := cx
+				while x1 < W - 1 and String(m.g[cy][x1]) != "roadX":
+					x1 += 1
+				var y0 := cy
+				while y0 > 0 and String(m.g[y0][cx]) != "roadX":
+					y0 -= 1
+				var y1 := cy
+				while y1 < H - 1 and String(m.g[y1][cx]) != "roadX":
+					y1 += 1
+				for y in range(y0 + 1, y1):
+					for x in range(x0 + 1, x1):
+						anillo = anillo and not String(m.g[y][x]).begins_with("road")
+				chk(m.o[cy][cx] == c[2] and anillo and x1 - x0 >= 3 and y1 - y0 >= 3 and String(m.g[y0][x0]) == "roadX" and String(m.g[y1][x1]) == "roadX", "abando: la %s en su isleta, con la glorieta alrededor (%d..%d, %d..%d)" % [c[2], x0, x1, y0, y1])
 		"casco":   # la ría al oeste y al sur; el Arenal; las Siete Calles; la plaza porticada cerrada; el mercado en la orilla
 			chk(range(0, 13).all(func(y): return agua(m, 0, y) and agua(m, 3, y)), "casco: la ría, al oeste")
 			chk(range(0, 17).all(func(x): return agua(m, x, 38)), "casco: la ría, al sur")
@@ -320,6 +366,18 @@ func forma(k: String, m: Dictionary, v: Dictionary) -> void:
 						siete += 1
 				x += 1
 			chk(siete >= 7, "casco: las Siete Calles, en paralelo (%d)" % siete)
+			# entre las calles, manzanas de fachada seguida: de la fila 20 a la 29, todo casas salvo un solo cantón
+			var mzs := 0
+			var sueltas := 0
+			for b in m.blds:
+				if String(b.id) == "casco2":
+					mzs += 1
+					var cx := int(b.x0)
+					var hueco := 0
+					for y in range(20, 30):
+						hueco += 0 if String(m.g[y][cx]).begins_with("roof") or String(m.g[y][cx]).begins_with("wall") else 1
+					sueltas += 0 if hueco == 1 else 1
+			chk(mzs >= 5 and sueltas == 0, "casco: las manzanas de las Siete Calles, seguidas y con un solo cantón (%d, %d sueltas)" % [mzs, sueltas])
 			var B := {"30,10": true, "31,10": true}
 			var vb: Dictionary = J.andable(m, m.o, B)
 			chk(v.has("30,6") and not vb.has("30,6"), "casco: la plaza porticada, cerrada salvo por su paso")

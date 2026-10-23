@@ -127,7 +127,7 @@ D['METRO'] = OrderedDict([
     ('_', 'MAESTRO [9]: la ciudad de la autopista (solo con Datos.CAL). Se abre con el patrimonio (umbral) y se va con tu vehículo.'),
     ('umbral', 500000), ('km', 140), ('peaje', 18), ('bus', 24),
     ('parada', OrderedDict([('n', 'Hiriburu'), ('x', 2), ('y', 23), ('a', [4, 24, 'down']), ('min', 60), ('eur', 0), ('cap', 99)])),
-    ('zona', OrderedDict([('n', 'Hiriburu'), ('lad', 1.4), ('precio', 1.5)])), ('pat', [2, 3]), ('ct', ct), ('ronda', ct[::2]), ('aparc', [1, 24]),
+    ('zona', OrderedDict([('n', 'Hiriburu'), ('lad', 1.4), ('precio', 1.5)])), ('pat', [2, 3]), ('ct', ct), ('ronda', ct[::2]), ('aparc', [7, 23]),
     ('barrios', OrderedDict([
         ('erdi', OrderedDict([('n', 'Erdialdea'), ('r', [0, 0, 23, 13]), ('f', 'gris')])),
         ('goi', OrderedDict([('n', 'Goialde'), ('r', [23, 0, 46, 13]), ('f', 'gris')])),

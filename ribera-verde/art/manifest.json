@@ -13430,12 +13430,34 @@
    "id": "edificio-milagrosa",
    "tipo": "edificio",
    "celda": "edificio_6x8",
-   "descripcion": "la iglesia de ladrillo de Zorroza",
+   "descripcion": "la iglesia neogótica de ladrillo con su aguja, en Indautxu (Abando)",
    "cubre": [
     "tile:roofT_milagrosa",
     "tile:roofB_milagrosa",
     "tile:wall_milagrosa",
     "tile:win_milagrosa"
+   ]
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
+   "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
+   "id": "edificio-iglesiaZ",
+   "tipo": "edificio",
+   "celda": "edificio_6x8",
+   "descripcion": "la parroquia de Zorroza, genérica: nave de hormigón y ladrillo con vidriera y campanario exento",
+   "cubre": [
+    "tile:roofT_iglesiaZ",
+    "tile:roofB_iglesiaZ",
+    "tile:wall_iglesiaZ",
+    "tile:win_iglesiaZ"
    ]
   },
   {

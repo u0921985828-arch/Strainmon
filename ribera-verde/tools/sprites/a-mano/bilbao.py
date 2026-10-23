@@ -257,7 +257,7 @@ def catedral():
 
 
 def teatro():
-    """el teatro de la ría (8 × 7): cúpulas de pizarra en las esquinas, balaustrada, frontón con el escudo propio, tres arcos
+    """el teatro de la ría (8 × 7): cúpulas de pizarra en las esquinas, balaustrada, frontón con su óculo liso (sin escudo), tres arcos
     grandes con columnas, los ventanales del piso noble y la escalinata"""
     W, H = 128, 112
     lz = Lienzo(W, H)
@@ -272,7 +272,7 @@ def teatro():
     for y in range(4, 26):                                                  # frontón
         hw = min(30, (y - 4) * 2)
         lz.hl(64 - hw, 63 + hw, y, P2)
-    lz.caja(58, 12, 12, 10, '#4a72b4', P3); lz.r(62, 14, 4, 6, '#e0b040')  # escudo propio
+    lz.caja(58, 12, 12, 10, P1, P3); lz.r(61, 14, 6, 6, CR); lz.hl(61, 66, 14, CRL)   # el óculo, de piedra y cristal: sin escudo
     lz.r(0, 26, W, 5, P2)                                                   # balaustrada
     for x in range(2, W, 4):
         lz.vl(x, 27, 30, P3)
@@ -784,8 +784,8 @@ def diputacion():
     for x in range(6, W - 4, 20):                                           # figuras y pináculos de la crestería
         lz.r(x, 14, 4, 10, P2); lz.r(x + 1, 11, 2, 3, P1)
     frontis(lz, 64, 4, 24, 18, P2, P3)
-    lz.r(58, 10, 12, 10, '#7a7268')                                         # el grupo de figuras, sin escudo
-    lz.r(60, 8, 3, 4, P1); lz.r(65, 8, 3, 4, P1)
+    lz.r(58, 10, 12, 10, P1); lz.hl(58, 69, 10, P2); lz.hl(58, 69, 19, P3)   # el remate, moldura lisa de piedra: ni escudo ni blasón
+    lz.r(60, 8, 3, 3, P2); lz.r(65, 8, 3, 3, P2)
     lz.r(0, 24, W, 72, P0)
     lz.r(0, 24, W, 3, P2); lz.hl(0, W - 1, 27, P3)
     for y in (30, 50):                                                      # dos pisos de ventanales con su frontón
@@ -976,6 +976,35 @@ def milagrosa():
     return lz
 
 
+def iglesiaZ():
+    """la parroquia del barrio de Zorroza (6 × 8), genérica: la nave de hormigón y ladrillo de los años sesenta con el tejado a dos
+    aguas bajo, la vidriera alta de la fachada en franjas, la puerta bajo la marquesina y el campanario exento de hormigón a la
+    derecha, prismático, con el hueco de la campana arriba y una cruz sencilla"""
+    W, H = 96, 128
+    lz = Lienzo(W, H)
+    HO, HOO, HOL = '#c8c2b4', '#9a9488', '#e0dace'
+    lz.r(0, 0, 64, 40, '#e8d6b0')                                           # detrás, la plaza
+    M.tejas(lz, 0, 40, 64, 14, PIZ, alto=3, paso=6, sem=1621)               # el tejado bajo
+    for y in range(40, 54):                                                 # el hastial, poco inclinado
+        hw = 18 + (y - 40)
+        lz.hl(32 - hw, 31 + hw, y, HO)
+    M.ladrillos(lz, 0, 54, 64, H - 54, LAD, sem=1623)
+    lz.r(0, 54, 64, 3, HOL); lz.r(0, 54, 4, H - 54, HO); lz.r(60, 54, 4, H - 54, HO)
+    for i, x in enumerate(range(14, 50, 6)):                                # la vidriera en franjas verticales
+        lz.r(x, 60, 4, 34, CR if i % 2 else '#8ab0c8'); lz.hl(x, x + 3, 60, CRL)
+    lz.r(12, 58, 40, 2, HOO); lz.r(12, 94, 40, 2, HOO)
+    lz.r(16, 100, 32, 3, HOO); lz.r(20, 103, 24, H - 106, '#4a3020')        # la marquesina y la puerta
+    lz.vl(32, 103, H - 4, '#2a1c14')
+    for x in range(72, 90):                                                 # el campanario exento, prismático
+        lz.vl(x, 8, H - 3, HOL if x < 75 else HO if x < 86 else HOO)
+    lz.r(74, 18, 14, 14, '#3a3a42'); lz.r(79, 22, 4, 6, '#b08a3a')          # el hueco de la campana
+    lz.r(72, 8, 18, 3, HOO); lz.vl(81, 0, 8, HOO); lz.hl(78, 84, 3, HOO)    # el remate con la cruz sencilla
+    for y in range(40, H - 8, 12):
+        lz.hl(72, 89, y, HOO)
+    lz.r(0, H - 3, W, 3, LAD[3])
+    return lz
+
+
 def apeadero():
     """el apeadero de la vía estrecha (4 × 3): la caseta con la marquesina de chapa, la ventanilla y el banco"""
     W, H = 64, 48
@@ -1054,7 +1083,7 @@ ICONOS = {'sanNicolas': sanNicolas, 'kiosko': kiosko, 'plazaN': lambda: plaza_fr
           'plazaS': lambda: plaza_frente(112, 64, 1533), 'plazaL': plaza_ala, 'plazaR': plaza_ala,
           'cascoB': lambda: cascoB('cascoB'), 'cascoB2': lambda: cascoB('cascoB2'), 'catedral': catedral4, 'mercadoR': mercadoR,
           'sanAnton': sanAnton, 'chavarri': chavarri, 'carlton': carlton, 'diputacion': diputacion, 'camposE': camposE,
-          'torreBBVA': torreBBVA, 'abandoE': abandoE, 'concordia': concordia, 'milagrosa': milagrosa, 'apeadero': apeadero,
+          'torreBBVA': torreBBVA, 'abandoE': abandoE, 'concordia': concordia, 'milagrosa': milagrosa, 'iglesiaZ': iglesiaZ, 'apeadero': apeadero,
           'molino': molino}
 
 

@@ -688,8 +688,8 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 
 # Los firmes en mosaico (exterior-mosaico) y el canto de la hierba donde toca acera, calzada u hormigón: dos píxeles más oscuros,
 # como un borde, en vez del corte seco de casilla a casilla
-const MOSAICO_TILE := {"grass": 1, "flowers": 1, "tallgrass": 1, "dirt": 1, "walk": 1, "plaza": 1, "roadT": 1, "roadB": 1}
-const DURO := {"walk": 1, "roadT": 1, "roadB": 1, "hormigon": 1, "rotoT": 1, "rotoB": 1}
+const MOSAICO_TILE := {"grass": 1, "flowers": 1, "tallgrass": 1, "dirt": 1, "walk": 1, "plaza": 1, "roadT": 1, "roadB": 1, "roadL": 1, "roadR": 1, "roadX": 1}   # roadL/R/X: las calles de norte a sur y los cruces del Ensanche de Bilbao
+const DURO := {"walk": 1, "roadT": 1, "roadB": 1, "roadL": 1, "roadR": 1, "roadX": 1, "hormigon": 1, "rotoT": 1, "rotoB": 1}
 func _canto_hierba(tx: int, ty: int, sx: int, sy: int) -> void:
 	var m: Dictionary = J.MAPS[J.S.map]
 	var c1 := Color8(0x5a, 0xa0, 0x4e)

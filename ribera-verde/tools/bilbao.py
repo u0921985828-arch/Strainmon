@@ -35,6 +35,7 @@ LEY = {
 	"2": ("adoq", "bolardo"), "3": ("plaza", "papelera"), "4": ("hormigon", "papelera"), "5": ("muelleP", "papelera"),
 	"6": ("muelleP", "bench"), "7": ("muelleP", "lamp"), "8": ("hormigon", "contenedores"), "9": ("adoq", "contenedores"), "r": ("hormigon", "bench"),
 	 "G": ("hormigon", "grua0"), "E": ("hormigon", "escZ"), "V": ("hormigon", "ascensorZ"), "i": ("plaza", "estatua"), "p": ("puenteV", None),
+	"{": ("roadL", None), "}": ("roadR", None), "^": ("roadX", None),
 }
 ANCHOS = {"metroB": "metroB2", "contenedores": "contenedores2", "escZ": "escZ2", "ascensorZ": "ascensorZ2"}   # lo de 2 casillas: la de la derecha, sólida y sin dibujo
 CAMBIA_HIERBA = {"grass": "walk", "flowers": "walk", "tallgrass": "walk"}
@@ -202,7 +203,7 @@ def elipse(x, y, cx, cy, rx, ry):
 
 
 # ------------------------------------------------------------------------------------------------------------------ Zorroza
-# Una franja llana entre la ría (arriba) y la ladera (abajo), con el Kadagua por el oeste. De norte a sur: la ría con su paseo, la vía
+# Una franja llana entre la ría (arriba) y la ladera (abajo), al este de La Punta (el Kadagua, en La Punta). De norte a sur: la ría con su paseo, la vía
 # de ancho ibérico con el andén y la estación junto a la avenida, la avenida (la calle, con la parada «Bilbao»), la manzana del medio
 # (las torres y la plaza de la iglesia con su torre) y la vía estrecha con su apeadero, al pie de la ladera. Sin pasos a nivel: cada vía
 # se cruza por su paso subterráneo (lo pidió el usuario: «O escaleras, que bajes unas escaleras y aparezcas en las del otro lado, sin
@@ -217,27 +218,24 @@ def zorroza(DEC):
 	C = lienzo(W, H, ".")
 	borde(C, W, H)
 	blds = []
-	rect(C, 0, 0, W - 1, 2, "~")                                   # la ría
-	rect(C, 0, 0, 2, H - 1, "~")                                   # el Kadagua, por el oeste
-	for y in range(3, H):
-		C[y][3] = "_"
-	rect(C, 3, 3, W - 2, 3, "_")                                   # la barandilla de la ría
-	rect(C, 4, 4, W - 2, 4, "m")                                   # el paseo de la ría, con sus farolas y bancos
+	rect(C, 0, 0, W - 1, 2, "~")                                   # la ría, que sigue en La Punta
+	rect(C, 1, 3, W - 2, 3, "_")                                   # la barandilla de la ría
+	rect(C, 1, 4, W - 2, 4, "m")                                   # el paseo de la ría, con sus farolas y bancos
 	paseo(C, 4, 4, W - 2, "m", "7", "6", "5")
-	rect(C, 4, 5, W - 2, 5, "m")                                   # la otra mitad del paseo, libre (de la vía la separa la catenaria)
-	rect(C, 0, 6, W - 1, 7, "=")                                   # la vía ancha, doble, que cruza el Kadagua por su puente
-	rect(C, 4, 8, W - 2, 9, "h")                                   # el andén
+	rect(C, 1, 5, W - 2, 5, "m")                                   # la otra mitad del paseo, libre (de la vía la separa la catenaria)
+	rect(C, 0, 6, W - 1, 7, "=")                                   # la vía ancha, doble, de lado a lado
+	rect(C, 1, 8, W - 2, 9, "h")                                   # el andén
 	edif(C, blds, "estacion", 5, 10, 8, 4)                         # la estación, entre el andén y la avenida
 	rect(C, 13, 10, 14, 13, "h")
 	edif(C, blds, "bloqueZ", 15, 9, 6, 5)
 	for x in (22, 31):                                             # la placita de delante del paso
 		C[11][x] = "Y"
 	edif(C, blds, "bloqueZ2", 34, 9, 6, 5)
-	calle(C, DEC, CALLE_Y, 4, W - 1, cruces=(22,))                 # la avenida
-	lados(C, W, False, True)
+	calle(C, DEC, CALLE_Y, 0, W - 1, cruces=(22,))                 # la avenida, de La Punta a Abando
+	lados(C, W, True, True)
 	C[CALLE_Y + 4][12] = "P"                                       # la parada del autobús (Bilbao)
 	edif(C, blds, "torreZ", 5, 20, 6, 9)                           # la manzana del medio: torres de pisos y la plaza de la iglesia
-	edif(C, blds, "milagrosa", 21, 20, 6, 8)
+	edif(C, blds, "iglesiaZ", 21, 20, 6, 8)                        # la parroquia del barrio, con su campanario exento
 	rect(C, 18, 20, 20, 29, ",")
 	rect(C, 27, 20, 30, 29, ",")
 	rect(C, 21, 28, 26, 29, ",")
@@ -249,11 +247,11 @@ def zorroza(DEC):
 	edif(C, blds, "torreZ2", 32, 20, 6, 9)
 	edif(C, blds, "torreZ", 39, 20, 6, 9)
 	edif(C, blds, "apeadero", 13, 28, 4, 3)                        # el apeadero de la vía estrecha
-	rect(C, 4, 31, W - 2, 31, "h")                                 # su andén, la vía de ancho métrico y el camino de la ladera
+	rect(C, 1, 31, W - 2, 31, "h")                                 # su andén, la vía de ancho métrico y el camino de la ladera
 	paseo(C, 31, 4, W - 2, "h", "e", "r", "4", desde=6)
 	rect(C, 0, 32, W - 1, 32, "Ñ")
-	rect(C, 4, 33, W - 2, 33, "h")
-	for x in range(4, W - 1):
+	rect(C, 1, 33, W - 2, 33, "h")
+	for x in range(1, W - 1):
 		C[34][x] = "W" if x % 3 else "M"
 		C[35][x] = "M"
 	for b in ESC_Z:
@@ -261,7 +259,7 @@ def zorroza(DEC):
 		C[b["y"]][b["x"] - 1] = C[b["y"]][b["x"] - 1] if C[b["y"]][b["x"] - 1] in "hm" else "m"   # la entrada, libre
 		C[b["y"]][b["x"] + 2] = C[b["y"]][b["x"] + 2] if C[b["y"]][b["x"] + 2] in "hm" else "m"
 	for y in (4, 31):                                              # y el banco o la papelera que se quedan sin su pareja, fuera
-		for x in range(4, W - 1):
+		for x in range(1, W - 1):
 			if C[y][x] in "6r" and C[y][x - 1] not in "54" and C[y][x + 1] not in "54" or C[y][x] in "54" and C[y][x - 1] not in "6r" and C[y][x + 1] not in "6r":
 				C[y][x] = "m" if y == 4 else "h"
 	C[ASC_Z[1]][ASC_Z[0]] = "V"
@@ -280,11 +278,11 @@ def lapunta(DEC):
 	blds = []
 	rect(C, 0, 0, W - 1, 3, "~")
 	for y in range(4, CALLE_Y):                                    # la orilla en diagonal: la punta
-		lim = CALLE_Y - 1 - y
+		lim = CALLE_Y - y
 		for x in range(lim):
 			C[y][x] = "~"
 		C[y][lim] = "m"
-	rect(C, 9, 4, W - 2, 4, "m")                                   # el muelle de piedra, con sus norays al canto
+	rect(C, 10, 4, W - 2, 4, "m")                                  # el muelle de piedra, con sus norays al canto
 	rect(C, 20, 5, W - 2, 7, "m")
 	for x in range(12, W - 1, 4):
 		C[4][x] = "o"
@@ -297,9 +295,10 @@ def lapunta(DEC):
 	edif(C, blds, "nave", 32, 8, 6, 6)
 	edif(C, blds, "ladrillo", 38, 8, 7, 6)
 	calle(C, DEC, CALLE_Y, 0, W - 1, cruces=(17, 33), suelo="h")
-	lados(C, W, True, True, "h")
+	lados(C, W, False, True, "h")
+	rect(C, 0, CALLE_Y, 1, CALLE_Y + 5, "~")                      # por el oeste, el Kadagua también junto a la calle: es la punta, no se sigue
+	rect(C, 2, CALLE_Y, 2, CALLE_Y + 5, "_")
 	rect(C, 0, 20, 1, H - 1, "~")                                  # el Kadagua, al oeste de la calle
-	rect(C, 0, 20, 2, 20, "_")
 	for y in range(20, H):
 		C[y][2] = "_"
 	edif(C, blds, "ladrillo", 4, 20, 7, 6)
@@ -317,10 +316,25 @@ def lapunta(DEC):
 
 
 # ------------------------------------------------------------------------------------------------------------------ Abando
-# La Gran Vía (la calle, con sus plátanos) de oeste a este: la plaza elíptica (eje mayor de norte a sur, con la fuente en medio)
-# con el palacio de ladrillo al norte y el hotel de la esquina curva al sureste; los jardines con su estatua; la Diputación y el
-# teatro del arco en el lado sur; la plaza redonda con su estatua, la torre oscura al norte y la estación al sur; la estación de la
-# orilla y el puente sobre la ría, que sigue en el Casco Viejo. Las manzanas del Ensanche, con miradores, alrededor.
+# El Ensanche (lo pidió el usuario: «la estructura del mapa que se parezca al lugar»): la retícula de manzanas cerradas entre calles que
+# se cruzan. La Gran Vía (la calle, con sus plátanos) de oeste a este y tres calles de norte a sur que la cortan (V_ABANDO: acera,
+# calzada de dos carriles y acera); en la primera, la plaza elíptica, una glorieta (el asfalto del cruce alrededor de la isleta del
+# jardín con la fuente) donde se cruzan la Gran Vía y la calle; con el palacio de ladrillo al norte, el hotel de la esquina curva al
+# sureste y la iglesia neogótica de ladrillo de Indautxu al suroeste. Después, los jardines con su estatua, la Diputación y el teatro
+# del arco; la calle que baja a la estación; la plaza redonda, otra glorieta con la estatua en su isleta, la torre oscura al norte y la
+# estación al sur; y la calle que sigue hasta el puente sobre la ría, que llega al Casco Viejo. Las manzanas, con miradores.
+V_ABANDO = (12, 26, 41)                                            # la acera de la izquierda de cada calle de norte a sur
+MOYUA = (9, 18, 12, 21)                                            # la glorieta de la plaza elíptica (x0, x1, y0, y1)
+CIRCULAR = (45, 54, CALLE_Y, CALLE_Y + 5)                          # la de la plaza redonda
+
+
+def glorieta(C, x0, x1, y0, y1, isla):
+	"""el anillo de asfalto (2 de ancho) alrededor de la isleta; isla(x, y) da lo de dentro"""
+	for y in range(y0, y1 + 1):
+		for x in range(x0, x1 + 1):
+			C[y][x] = "^" if x < x0 + 2 or x > x1 - 2 or y < y0 + 2 or y > y1 - 2 else isla(x, y)
+
+
 def abando(DEC):
 	W, H = 62, 36
 	C = lienzo(W, H, ".")
@@ -329,50 +343,56 @@ def abando(DEC):
 	rect(C, 59, 0, W - 1, H - 1, "~")                              # la ría, al este
 	for y in range(H):
 		C[y][58] = "_"
-	edif(C, blds, "ensB", 1, 0, 7, 8)                              # el norte de la Gran Vía
-	edif(C, blds, "chavarri", 10, 0, 7, 5)
-	edif(C, blds, "ensB2", 18, 0, 7, 8)
-	rect(C, 27, 1, 36, 13, ",")                                    # los jardines, con la estatua
-	for x0, y0 in ((28, 2), (33, 2), (28, 8), (33, 8)):
+	edif(C, blds, "chavarri", 3, 0, 7, 5)                          # el norte de la Gran Vía: el palacio en la plaza elíptica
+	edif(C, blds, "ensB2", 17, 0, 7, 8)
+	rect(C, 30, 1, 40, 13, ",")                                    # los jardines, con la estatua
+	for x0, y0 in ((31, 2), (37, 2), (31, 8), (37, 8)):
 		rect(C, x0, y0, x0 + 2, y0 + 3, "g")
 		C[y0 + 1][x0 + 1] = "y"
-	C[6][31] = "i"
-	for x in (27, 36):
+	C[6][35] = "i"
+	for x in (30, 40):
 		C[6][x] = "L"
-	C[12][29], C[12][30] = "n", "3"
-	C[12][33], C[12][34] = "n", "3"
-	edif(C, blds, "ensB", 37, 0, 7, 8)
+	C[12][34], C[12][35] = "n", "3"
 	edif(C, blds, "torreBBVA", 46, 0, 6, 14)
-	for x in (44, 45, 52, 53):                                     # la plaza redonda, a los lados de la torre
+	for x in (45, 52, 53):                                         # la plaza redonda, a los lados de la torre
 		for y in range(8, CALLE_Y):
 			C[y][x] = ","
 	for y in (10, 12):                                             # el paseo de la ría
 		C[y][57] = "Y"
-	edif(C, blds, "diputacion", 29, 20, 8, 6)                      # el sur
-	edif(C, blds, "camposE", 38, 20, 7, 7)
+	edif(C, blds, "diputacion", 30, 20, 8, 6)                      # el sur
+	edif(C, blds, "camposE", 31, 28, 7, 7)
 	edif(C, blds, "abandoE", 46, 20, 8, 7)
 	edif(C, blds, "concordia", 54, 20, 4, 6)
-	edif(C, blds, "carlton", 21, 24, 7, 7)
-	edif(C, blds, "ensB2", 1, 28, 7, 8)
-	edif(C, blds, "ensB", 30, 28, 7, 8)
-	edif(C, blds, "ensB2", 38, 28, 7, 8)
+	edif(C, blds, "carlton", 17, 23, 7, 7)
+	edif(C, blds, "milagrosa", 3, 27, 6, 8)
 	edif(C, blds, "ensB", 46, 28, 7, 8)
-	for y in range(1, H - 1):                                      # la plaza elíptica, cortada por la Gran Vía
-		for x in range(1, 27):
-			if CALLE_Y <= y < CALLE_Y + 6 or C[y][x] != "." or elipse(x, y, 13, 16.5, 10, 12) > 1:
+	for y in range(1, H - 1):                                      # la plaza elíptica, alrededor de su glorieta
+		for x in range(1, 26):
+			if CALLE_Y <= y < CALLE_Y + 6 or C[y][x] != "." or elipse(x, y, 13.5, 16.5, 10.5, 12.5) > 1:
 				continue
-			d = elipse(x, y, 13, 16.5, 6.5, 8.5)
-			C[y][x] = "," if d > 1.3 or x == 13 else "f" if d > 1 else "g"
-	for x, y in ((6, 9), (20, 9), (6, 24), (20, 24)):
+			C[y][x] = ","
+	for x, y in ((6, 9), (21, 9), (6, 23), (24, 23)):
 		C[y][x] = "L"
-	for y in (6, 27):
-		C[y][9], C[y][10], C[y][16], C[y][17] = "n", "3", "n", "3"
-	calle(C, DEC, CALLE_Y, 0, W - 1, arbol=True, cruces=(22, 40))  # la Gran Vía
+	C[9][9], C[9][10], C[9][17], C[9][18] = "n", "3", "n", "3"
+	C[25][9], C[25][10], C[26][24], C[26][25] = "n", "3", "n", "3"
+	calle(C, DEC, CALLE_Y, 0, W - 1, arbol=True, cruces=(22, 35))  # la Gran Vía
 	lados(C, W, True, True)
-	C[16][13], C[17][13] = "F", ","                                # la fuente, en medio de la plaza elíptica
-	C[16][49], C[17][49] = "i", ","                                # y la estatua, en medio de la plaza redonda
+	for xa in V_ABANDO:                                            # las calles de norte a sur, de lado a lado del mapa
+		for y in range(H):
+			en = CALLE_Y <= y < CALLE_Y + 6
+			C[y][xa + 1], C[y][xa + 2] = ("^", "^") if CALLE_Y + 2 <= y <= CALLE_Y + 3 else ("{", "}")
+			if not en:
+				C[y][xa] = C[y][xa + 3] = "," if C[y][xa] == "," else "."
+	x0, x1, y0, y1 = MOYUA                                         # la glorieta de la plaza elíptica: la isleta, jardín con la fuente
+	glorieta(C, x0, x1, y0, y1, lambda x, y: "F" if (x, y) == (13, 16) else "L" if (x, y) in ((11, 14), (16, 19)) else "f" if x in (11, 16) or y in (14, 19) else "g")
+	x0, x1, y0, y1 = CIRCULAR                                      # la de la plaza redonda: la isleta de losas con la estatua
+	glorieta(C, x0, x1, y0, y1, lambda x, y: "i" if (x, y) == (49, 16) else ",")
 	rect(C, 59, CALLE_Y - 1, W - 1, CALLE_Y - 1, "_")              # el puente
 	rect(C, 59, CALLE_Y + 6, W - 1, CALLE_Y + 6, "_")
+	for y in range(H):                                             # lo de 2 casillas que se queda partido por las calles, fuera
+		for x in range(W - 1):
+			if C[y][x] in "C" and C[y][x + 1] not in ".,":
+				C[y][x] = "."
 	hueco_aparc(C, "abando", ".")
 	return C, blds
 
@@ -425,8 +445,9 @@ def casco(DEC):
 	edif(C, blds, "casco3", 44, 7, 5, 7)
 	edif(C, blds, "teatro", 6, 20, 8, 7)                           # el teatro, de cara al puente
 	rect(C, 5, 20, 5, 34, "m")
-	for i, x in enumerate(SIETE[:-1]):                             # las Siete Calles, en paralelo hasta la Ribera, con las manzanas de
-		x0 = x + 2 + (1 if x > 25 else 0)                          # casas estrechas entre ellas y la calle que las cruza (filas 25-26)
+	for i, x in enumerate(SIETE[:-1]):                             # las Siete Calles, en paralelo hasta la calle de la Ribera (filas 30-32),
+		x0 = x + 2 + (1 if x > 25 else 0)                          # con las manzanas de casas estrechas de fachada seguida entre ellas
+		                                                           # y un solo cantón estrecho que las cruza (fila 25)
 		if x == 25:                                                # entre la tercera y la cuarta, la catedral y su plaza
 			edif(C, blds, "catedral", 27, 20, 4, 6)
 			rect(C, 27, 26, 30, 30, ",")
@@ -434,7 +455,7 @@ def casco(DEC):
 			C[26][27] = C[26][30] = "L"
 			continue
 		edif(C, blds, "casco2", x0, 20, 3, 5)
-		edif(C, blds, "cascoB2" if i % 2 else "cascoB", x0, 27, 3, 4)
+		edif(C, blds, "cascoB2" if i % 2 else "cascoB", x0, 26, 3, 4)
 	edif(C, blds, "mercadoR", 17, 33, 14, 5)                       # la Ribera: el mercado en la orilla
 	rect(C, 5, 33, 16, 34, "m")
 	paseo(C, 34, 5, 16, "m", "7", "6", "5")
@@ -450,7 +471,7 @@ def casco(DEC):
 
 ZONAS_N = {"zorroza": "Zorroza", "lapunta": "La Punta", "abando": "Abando", "casco": "Casco Viejo"}
 MUSICA = {"zorroza": "town", "lapunta": "astilleros", "abando": "ensanche", "casco": "ibarbide"}
-CADENA = ["zorroza", "lapunta", "abando", "casco"]
+CADENA = ["lapunta", "zorroza", "abando", "casco"]   # de oeste a este: La Punta, en la boca del Kadagua, al oeste de Zorroza
 SOLIDO = ("via", "water", "roof", "wall", "win", "iwT", "iwB", "void")
 
 
@@ -484,7 +505,7 @@ def main():
 		"PARADA": {"n": "Bilbao", "x": 12, "y": CALLE_Y + 4, "a": [12, CALLE_Y + 5, "down"], "min": 30, "eur": 3, "cap": 2},
 		"ZONAS": {k: {"n": "Bilbao · " + n, "lad": 1.0, "precio": 1.25} for k, n in ZONAS_N.items()},
 		"PATRULLAS": {k: [1, 2] for k in ZONAS_N}, "KM": 14, "APARC": {k: list(v) for k, v in APARC.items()}, "PRE": {"zorroza": "z", "lapunta": "u", "abando": "a", "casco": "o"}}
-	for k, f in (("zorroza", zorroza), ("lapunta", lapunta), ("abando", abando), ("casco", casco)):
+	for k, f in (("lapunta", lapunta), ("zorroza", zorroza), ("abando", abando), ("casco", casco)):
 		DEC = {}
 		C, blds = f(DEC)
 		W, H = len(C[0]), len(C)
@@ -495,9 +516,9 @@ def main():
 			lado(m, 0, SALE, CADENA[i - 1], int(B["MAPS"][CADENA[i - 1]]["w"]) - 2, "left")
 		if i < len(CADENA) - 1:
 			lado(m, W - 1, SALE, CADENA[i + 1], 1, "right")
-		for c in list(DEC):
+		for c in list(DEC):                                            # lo del suelo, solo en la calzada de la calle y sin nada encima
 			x, y = map(int, c.split(","))
-			if m["o"][y][x]:
+			if m["o"][y][x] or m["g"][y][x] not in ("roadT", "roadB"):
 				del DEC[c]
 		if k == "zorroza":
 			m["escaleras"] = ESC_Z

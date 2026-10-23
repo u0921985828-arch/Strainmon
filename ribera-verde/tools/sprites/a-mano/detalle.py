@@ -144,6 +144,20 @@ for n, f in (('mo-grass', m_grass), ('mo-flowers', m_flowers), ('mo-tallgrass', 
              ('mo-walk', m_walk), ('mo-plaza', m_plaza), ('mo-roadT', m_roadT), ('mo-roadB', m_roadB)):
     sale(n, mosaico(f), 'exterior-mosaico')
 
+def traspuesto(f):
+    """el mismo firme girado a lo vertical (x ↔ y): la calle de norte a sur, con el bordillo a un lado y la raya en el otro"""
+    def d(L):
+        M = Lienzo(64, 64); f(M)
+        for y in range(64):
+            for x in range(64):
+                L.px[x, y] = M.px[y, x]
+    return d
+
+# Las calles transversales del Ensanche de Bilbao (lo pidió el usuario: «la estructura del mapa que se parezca al lugar»): mo-roadL y
+# mo-roadR, la calzada de norte a sur (el bordillo a la izquierda o a la derecha), y mo-roadX, el asfalto del cruce, sin bordillo ni raya
+for n, f in (('mo-roadL', traspuesto(m_roadT)), ('mo-roadR', traspuesto(m_roadB)), ('mo-roadX', asfalto)):
+    sale(n, mosaico(f), 'exterior-mosaico')
+
 # ---------------------------------------------------------------------------------------------------------- objetos 1 × 1
 def d_seto():
     """el seto de 1 m: matas redondas (círculos de 5 px cada 8, que casan de una casilla a otra) con el borde oscuro, la luz arriba
