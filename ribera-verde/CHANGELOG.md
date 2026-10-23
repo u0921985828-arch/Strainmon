@@ -49,8 +49,9 @@
 - El maletero en vitrina, con forma de maletero (`rects_almacen`, tipo `mal`, en `setas.gd`): el vehículo visto por detrás con el portón abierto, amortiguadores, pilotos, junta, moqueta, umbral, parachoques y matrícula sin letras, del color de cada vehículo (`MAL_COLOR`); en la moto, el baúl con su piloto.
 - Prueba `tests/garaje.gd` (72 comprobaciones; con `--salida`, capturas del garaje y de los maleteros); `vehiculos.gd`, `volante.gd` y `concesionario.gd` entran por el garaje.
 
-### 0.63.0 (código 83)
+### 0.63.0 (código 83) y plugin de WordPress 1.6.3
 - El AAB de Play (con la demo) y el APK universal (`descargas/LandraceHunters.apk`, sin el bloqueo) con Bilbao por dentro, los pueblos con su sitio, las salidas por su lado, el seto nuevo y la tierra con atrezo; la senda de tierra bajo el portal de casa, fija en `tools/pueblos.py` (`FIJOS`). AAB 82 MB firmado; APK 89 MB (con `tools/apk-instalar.py`, firma v2/v3 con la upload key, versión 83/0.63.0).
+- `descargas/landrace-hunters-1.6.3.zip` (29 MB) y el ligero de 28 KB con la 0.63.0.
 
 ### 0.62.0 (código 82) y plugin de WordPress 1.6.2
 - El AAB de Play (con la demo) y el APK universal (`descargas/LandraceHunters.apk`, sin el bloqueo) con el garaje por dentro. AAB 82 MB firmado; APK 89 MB (con `tools/apk-instalar.py`, firma v2/v3 con la upload key, versión 82/0.62.0).
