@@ -1,11 +1,11 @@
 === Landrace Hunters ===
-Version: 1.6.1
+Version: 1.6.2
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.6.1.zip → Activar.
-Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.6.1-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.6.2.zip → Activar.
+Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.6.2-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -14,6 +14,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
+1.6.2 — Landrace Hunters (Godot 0.62.0): el garaje de la tía por dentro, con los vehículos aparcados en sus plazas, el maletero y el depósito de gasolina, y el turno del rival del billar con una pausa mínima.
 1.6.1 — Landrace Hunters (Godot 0.61.0): el rival del billar a la bola 8, un jugador de verdad (elige bola y tronera por dificultad, juega la posición, defiende, sale por banda y canta el tiro) y los choques de las bolas en el instante del contacto.
 1.6.0 — El plugin ligero: sin el motor ni los datos del juego, que se descargan en el propio servidor con un botón (para los servidores que cortan las subidas grandes con «413 Request Entity Too Large»).
 1.5.9 — Landrace Hunters (Godot 0.60.0): un dispensario en cada club (la vitrina con su encargado; Club Zenit y Club Ilargi de Hiriburu, que llenas tú), Bilbao como zonas nuevas (Zorroza con sus trenes y el paso subterráneo, La Punta, Abando y el Casco Viejo), las vallas que conectan en las dos direcciones, la nave por salas con el secadero aparte y el viaje con el autobús y el cielo de PixelLab.
