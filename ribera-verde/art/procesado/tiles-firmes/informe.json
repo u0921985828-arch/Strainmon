@@ -1,0 +1,19 @@
+{
+  "grupo": "tiles-firmes",
+  "celda": [
+    64,
+    16
+  ],
+  "tope_colores": 15,
+  "secuencias": 4,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 70.7,
+  "distancia_media": 0,
+  "colores_finales": 12,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

@@ -1,0 +1,35 @@
+{
+  "grupo": "paloma",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 1,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 15.46,
+  "colores_finales": 15,
+  "fundidos": [
+    "#8a90a0→#7e8694",
+    "#3a3a44→#3a3a40",
+    "#202024→#1a1a1a",
+    "#a6ba92→#a2a9b6",
+    "#2c2c30→#2a2a34",
+    "#d8f0ff→#e8eaf0",
+    "#684828→#483e36",
+    "#e8eaf0→#c8ccd6",
+    "#acb3c0→#a2a9b6",
+    "#1a1a1a→#2a2a2a",
+    "#4c5560→#4a4a52",
+    "#483e36→#3a3a3a",
+    "#b8a070→#7e8694",
+    "#2a2a2a→#2a2a34"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "idle/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

@@ -1,0 +1,640 @@
+es,en
+¡ALARMA!,ALARM!
+SOSPECHA,SUSPICION
+CALOR,HEAT
+Caza genéticas. Salda la deuda. Que no te pillen.,Hunt genetics. Pay off the debt. Don't get caught.
+día ,day 
+El encargado,The manager
+La encargada,The manager
+pH− ,corrector 
+corrector ,corrector 
+ 250 ml, 250 ml
+primavera,spring
+verano,summer
+invierno,winter
+ORDEN,WARRANT
+Norzen Lights × Haize,Norzen Lights × Haize
+Durvan Poizon,Durvan Poizon
+Norzen Lights × Big Bod,Norzen Lights × Big Bod
+Durvan Poizon Auto,Durvan Poizon Auto
+Durvan Poizon × Ruderalis,Durvan Poizon × Ruderalis
+"La Durvan Poizon con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Durvan Poizon with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
+"La lavadora de extracción (1.36): una pequeña de carga superior, con la cuba de plástico; bate sola el agua con hielo y la flor congelada con las bolsas de malla dentro y desagua por la manguera. Más Ais-o-lator y más limpio que a mano. Se monta junto a la nevera del piso.",The extraction washer (1.36): a small top-loader with a plastic drum; churns ice water and frozen flower with the mesh bags inside and drains through the hose. More Ais-o-lator and cleaner than by hand. Goes next to the flat's fridge.
+"Durvan Poizon con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Durvan Poizon with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
+Ais-o-lator,Ais-o-lator
+Ais-o-lator en la lavadora,Ais-o-lator in the washer
+"¡Feliz cumpleaños, {N}! Te he guardado tres regalos en el armario. Elige uno.","Happy birthday, {N}! I've kept three presents for you in the cupboard. Pick one."
+LEGENDARIO · 1 semilla ★ de {s},LEGENDARY · 1 ★ seed of {s}
+Sale fenotipo estrella seguro: más cogollo y más THC.,A sure star phenotype: more bud and more THC.
+ÉPICO · {n} focos {f},EPIC · {n} {f} lights
+Para las carpas: cámbialos desde la carpa.,For the tents: swap them from the tent.
+RARO · {n} consumibles,RARE · {n} supplies
+"{a} abonos de crecimiento, {b} de floración y {c} botes de pH−","{a} grow nutrients, {b} bloom nutrients and {c} bottles of pH−"
+"{a} abonos de crecimiento, {b} de floración y {c} botes de corrector","{a} grow nutrients, {b} bloom nutrients and {c} bottles of corrector"
+CUMPLEAÑOS,BIRTHDAY
+Regalo de cumpleaños en la mochila,Birthday present in your backpack
+CHICO,MAN
+Carga un 15 % más en la mochila.,Carries 15% more in the backpack.
+CHICA,WOMAN
+Las patrullas te ven desde menos lejos y regateas mejor.,Patrols spot you from less far away and you haggle better.
+¿QUIÉN ERES?,WHO ARE YOU?
+TU CUMPLEAÑOS: EL MES,YOUR BIRTHDAY: MONTH
+TU CUMPLEAÑOS: EL DÍA,YOUR BIRTHDAY: DAY
+Recoger del depósito,Collect from the pound
+La grúa se lo llevó por mal aparcado. Pagas la tasa y te lo dejan en la puerta.,The tow truck took it for bad parking. Pay the fee and they leave it at the door.
+"La grúa municipal se ha llevado {a}: estaba mal aparcad{o}. En el depósito, {e} de tasa (en el concesionario).","The council tow truck took {a}: it was badly parked. At the pound, a {e} fee (at the dealership)."
+Depósito municipal,Council pound
+La tasa del depósito son {e} y no te llega.,The pound fee is {e} and you can't cover it.
+"{A}, recogid{o} del depósito. Lo tienes en la puerta.","{A}, collected from the pound. It's at the door."
+"{A}, aparcad{o} aquí. Maletero: {g} de {c}.","{A}, parked here. Boot: {g} of {c}."
+Conducir,Drive
+Maletero,Boot
+Maletero: {g} de {c}.,Boot: {g} of {c}.
+Aparcar aquí,Park here
+No hay sitio para bajarte por ese lado.,No room to get out on that side.
+"Aquí no se puede aparcar: si no lo mueves, mañana se lo lleva la grúa.","No parking here: if you don't move it, the tow truck takes it tomorrow."
+En el maletero no cabe más.,The boot is full.
+Guardas {q} en el maletero.,You put {q} in the boot.
+Sin envasadora al vacío: se pide en la tienda online.,No vacuum sealer: order one from the online shop.
+Envasas al vacío {n} lotes del maletero.,You vacuum-seal {n} batches in the boot.
+Ya está todo envasado.,Everything is already sealed.
+Un bache: se ha caído {g} del baúl de la moto.,A pothole: {g} fell out of the scooter's top box.
+{r} y {g} del maletero,{r} and {g} from the boot
+{g} del maletero,{g} from the boot
+Envasadora al vacío,Vacuum sealer
+Para envasar lo del maletero en bolsas selladas: en un registro de tráfico se nota menos.,To seal what's in the boot in bags: it shows less in a traffic search.
+"La envasadora, en casa: se usa desde el maletero.",The sealer is at home: use it from the boot.
+"GUARDAR: llevas {a} de cogollos y en el maletero caben {b} más.
+A: guardar · B: cerrar.","STORE: you carry {a} of buds and the boot holds {b} more.
+A: store · B: close."
+"ENVASAR AL VACÍO: lo del maletero, en bolsas selladas; en un registro de tráfico se nota menos.{e}
+A: envasar · B: cerrar.","VACUUM SEAL: what's in the boot, in sealed bags; it shows less in a traffic search.{e}
+A: seal · B: close."
+Hace falta la envasadora de la tienda online.,You need the sealer from the online shop.
+"{n}: {g} · {t} % THC{v}.
+A: sacarlo · B: cerrar.","{n}: {g} · {t} % THC{v}.
+A: take out · B: close."
+al vacío,vacuum-sealed
+MALETERO,BOOT
+"Solo cambia cómo te ves: lo demás, igual.",It only changes how you look: everything else is the same.
+"{A}, en el aparcamiento. Maletero: {g} de {c}.","{A}, in the car park. Boot: {g} of {c}."
+Viajar,Travel
+El garaje de la tía. Está vacío: aquí se guarda lo que compres en AUTOS RIBERA.,Your aunt's garage. It's empty: whatever you buy at AUTOS RIBERA is kept here.
+Salir en {v},Drive out in {v}
+Maletero {dv},Boot {dv}
+El garaje de la tía.,Your aunt's garage.
+Curada en el maletero {dv}: {l},Cured in the boot {dv}: {l}
+Cargar el abono {dv},Load the fertiliser into {dv}
+Rellenar los tanques de la nave,Refill the warehouse tanks
+"Descargas el abono en la nave: MEATZA ×{m} y ORTUA BIO ×{o}. Los tanques, llenos: MEATZA ×{tm} · ORTUA BIO ×{to}.",You unload the fertiliser at the warehouse: MEATZA ×{m} and ORTUA BIO ×{o}. The tanks now hold MEATZA ×{tm} · ORTUA BIO ×{to}.
+Cargas el abono en el maletero: MEATZA ×{m} y ORTUA BIO ×{o} dosis.,You load the fertiliser into the boot: MEATZA ×{m} and ORTUA BIO ×{o} doses.
+Esa la está vendiendo todo el mundo por aquí. Ya no se paga como antes.,Everyone around here is selling that one. It doesn't fetch what it used to.
+Genes: potencia {a} · producción {b} · floración {c} · resistencia {d} (de 31).,Genes: potency {a} · yield {b} · flowering {c} · resistance {d} (out of 31).
+cogollos morados,purple buds
+cogollos albinos,albino buds
+cogollos dorados,golden buds
+"¡Una planta rara, de {c}! Va a su lote y se paga {x} veces más.","A rare plant, with {c}! It goes to its own batch and sells for {x} times as much."
+"Sus semillas no salen así: solo sus esquejes son esta misma planta. Si no le sacaste ninguno, se ha perdido.","Its seeds won't come out like this: only its clones are this same plant. If you didn't take any, it's gone."
+"Sale verde: recién cortada se paga poco, y no está seca del todo hasta los {d} días.","It's green: freshly cut it sells cheap, and it isn't fully dry until {d} days."
+"Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura y vale más cada semana en el tarro.","With curing jars (Kiko sells them), it cures in the safe and is worth more every week in the jar."
+ (rara), (rare)
+Potencia,Potency
+Producción,Yield
+Floración,Flowering
+Resistencia,Resistance
+Multa · {p},Fine · {p}
+"Multa del Ayuntamiento de {p}: {a} lleva más de {d} días en el aparcamiento de la parada. {e}, cobrados de lo que tienes.","Fine from {p} town hall: {a} has been in the car park by the stop for more than {d} days. {e}, taken from what you have."
+Te quedan a deber {f}.,You still owe {f}.
+"Te despiertas en el banco de la parada, con la cabeza a punto de estallar. Han pasado {h} horas.","You wake up on the bench at the stop, with your head about to burst. {h} hours have gone by."
+Te faltan {e} de la cartera.,{e} is missing from your wallet.
+Y {g} g de lo que llevabas encima.,And {g} g of what you were carrying.
+ Ya vas tocado: te cuesta andar recto., You're tipsy now: it's hard to walk straight.
+" Lo ves todo triple. Si sales así a la calle, acabas en el suelo."," You're seeing everything in triple. If you go out like this, you'll end up on the ground."
+ALCOHOL,ALCOHOL
+COLOCÓN,HIGH
+ÍNDICA,INDICA
+CAMPO,CAMPO
+BOTRITIS,BOTRYTIS
+SHOP,SHOP
+CONTROL,CONTROL
+Un camastro con una manta de lana. Aquí no te busca nadie.,A cot with a wool blanket. Nobody looks for you here.
+Una mesa de castaño con un candil. Alguien dejó un mapa de la comarca con los claros marcados en lápiz.,A chestnut table with an oil lamp. Someone left a map of the county with the clearings marked in pencil.
+"Por la ventana, la carretera comarcal y el monte.","Through the window, the county road and the hills."
+"Una {s} salvaje, madura y con semillas en los cogollos.","A wild {s}, ripe and with seeds in the buds."
+Recoger semillas,Collect seeds
+"Sacas {n} semillas puras de {s}. Van con las demás, para plantar o cruzar.","You get {n} pure {s} seeds. They go with the others, to plant or cross."
+Una {s} salvaje en pleno crecimiento.,A wild {s} in full growth.
+Cortas una punta de la {s} y la envuelves en papel húmedo. Plántala antes del {d}.,You cut a tip off the {s} and wrap it in damp paper. Plant it before {d}.
+Un arcón de madera bajo unos sacos. Dentro: {g}.,A wooden chest under some sacks. Inside: {g}.
+Esconder lo que llevo,Hide what I carry
+Sacarlo todo,Take everything out
+Lo metes en el arcón y lo tapas con los sacos.,You put it in the chest and cover it with the sacks.
+El arcón está vacío.,The chest is empty.
+Lo sacas todo del arcón y lo guardas en la mochila.,You take everything out of the chest and put it in your backpack.
+Huir,Flee
+Sobornar ({e}),Bribe ({e})
+Entregar la carga,Hand over the load
+Dejar que registren,Let them search
+"«Abra {a}, por favor.» Llevas {g} encima y en el maletero.","“Open {a}, please.” You carry {g} on you and in the trunk."
+Pisas a fondo y te pierdes por la comarcal. Te han visto la matrícula: calor +{c}.,You floor it and vanish down the county road. They saw your plate: heat +{c}.
+Multa · huida,Fine · fleeing
+Te cierran el paso en la rotonda. Te requisan {r} y te multan con {e} por darte a la fuga.,They block you at the roundabout. They seize {r} and fine you {e} for fleeing.
+Se guarda el sobre sin mirarte. «Circule. Y no le he visto.»,He pockets the envelope without looking at you. “Move along. I never saw you.”
+«¿Me está intentando sobornar?» Se queda el sobre como prueba.,“Are you trying to bribe me?” He keeps the envelope as evidence.
+"Le das la carga sin rechistar: {r}. «Por esta vez, sin multa. Circule.»",You hand over the load without a fuss: {r}. “No fine this time. Move along.”
+Tratar hongos,Treat mould
+Preventivo,Preventive
+ · BOTRITIS, · BOTRYTIS
+Quitas los cogollos con moho gris y aplicas el FUNGICIDA. Botritis parada.,You remove the buds with grey mould and apply the FUNGICIDE. Botrytis stopped.
+No tienes FUNGICIDA. Lo venden en el growshop.,You have no FUNGICIDE. The growshop sells it.
+Aplicas el PREVENTIVO: la botritis no la coge en {n} días.,You apply the PREVENTIVE: no botrytis for {n} days.
+Botritis en {l}: moho gris en los cogollos. Trátala con FUNGICIDA; el PREVENTIVO y el sellado de la carpa la evitan.,Botrytis in {l}: grey mould in the buds. Treat it with FUNGICIDE; the PREVENTIVE and sealing the tent prevent it.
+Sigue la botritis en {l}: pierde salud cada día y cosecharás menos.,Botrytis persists in {l}: it loses health every day and you will harvest less.
+Carretera comarcal,County road
+Caserío abandonado,Abandoned farmhouse
+Fungicida de cobre 250 ml,Copper fungicide 250 ml
+3 tratamientos. Cada uno para la botritis de una planta en flor.,3 treatments. Each one for the botrytis of one flowering plant.
+Preventivo de cola de caballo 500 ml,Horsetail preventive 500 ml
+4 aplicaciones. Cada una protege una planta de la botritis una semana.,4 applications. Each one protects a plant from botrytis for a week.
+Kit de sellado de carpa,Tent sealing kit
+"Juntas y cinta para las cremalleras y los pasos de tubo: la lluvia de fuera no sube la humedad de la carpa y la botritis prende un 75 % menos.
+Uno por carpa.","Seals and tape for the zips and duct ports: rain outside no longer raises the tent's humidity and botrytis takes hold 75 % less.
+One per tent."
+Kit de sellado,Sealing kit
+Sellado,Sealed
+Juntas y cinta en cremalleras y pasos de tubo: la lluvia de fuera no entra y la botritis prende un 75 % menos.,Seals and tape on zips and duct ports: rain outside stays out and botrytis takes hold 75 % less.
+STAFF,STAFF
+El piso,The flat
+Sin trabajo,Unemployed
+"Jefe, ojo con {n}: ayer le vi hablando con uno de paisano detrás de {l}. Yo no le contaría nada.","Boss, watch out for {n}: yesterday I saw them talking to a plain-clothes cop behind {l}. I wouldn't tell them anything."
+Sin extracción no hay filtro: el olor sale a la calle.,"No extraction, no filter: the smell gets out to the street."
+Carbón activo al {p} %.,Activated carbon at {p} %.
+Saturado: huele como sin filtro. Cámbialo.,Saturated: it smells as if there were no filter. Change it.
+"Con el ozonizador en el conducto, en la calle no huele nada.","With the ozonator in the duct, the street smells of nothing."
+"El ozonizador está en la sala: no huele nada, pero quema los terpenos de las flores.","The ozonator is in the room: nothing smells, but it burns the terpenes of the flowers."
+En la calle se nota un {p} % del olor.,On the street you notice {p} % of the smell.
+Cambiar el carbón · {e},Change the carbon · {e}
+Ozonizador · {e},Ozonator · {e}
+Mover el ozonizador,Move the ozonator
+EL OLOR,THE SMELL
+Arrieta cambia el carbón de los filtros. Huele a nuevo.,Arrieta changes the carbon in the filters. It smells new.
+¿Dónde va el ozonizador?,Where does the ozonator go?
+"En el conducto, después del filtro","In the duct, after the filter"
+"En la sala, con las plantas","In the room, with the plants"
+En el conducto: el ozono no toca las flores.,In the duct: the ozone doesn't touch the flowers.
+En la sala: el ozono quema los terpenos y lo que se cuelgue se venderá peor.,In the room: the ozone burns the terpenes and whatever is hung will sell worse.
+SEGURIDAD,SECURITY
+Han entrado de noche en la nave y se han llevado {g} del secadero.,Someone broke into the warehouse at night and took {g} from the drying room.
+Han entrado de noche en {n} y se han llevado {e} de la caja.,Someone broke into {n} at night and took {e} from the till.
+Las cámaras lo grabaron todo: la policía ha recuperado la mitad.,The cameras recorded everything: the police have recovered half.
+SMS · ALARMA,SMS · ALARM
+SMS · VECINO,SMS · NEIGHBOUR
+No tienes ningún local que proteger.,You don't have any premises to protect.
+{n} de {t},{n} of {t}
+Riesgo de robo: {p} % al día.,Burglary risk: {p} % a day.
+puesta,installed
+robo {p} %,burglary {p} %
+{n}: ya está puesta.,{n}: already installed.
+"{n} para {l}: {e}, con tarjeta. {d}","{n} for {l}: {e}, by card. {d}"
+{n}: puesta,{n}: installed
+sin cámaras,no cameras
+Ponle cámaras desde SEGURIDAD.,Put cameras in from SECURITY.
+{n} trabajando · {g} en el secadero · {o},{n} working · {g} in the drying room · {o}
+"Ayer vendió {a}. En la caja, {c}. El local {l}.","Yesterday it sold {a}. In the till, {c}. The premises are {l}."
+{n} sale a hablar por teléfono cada poco.,{n} keeps going out to talk on the phone.
+en directo,live
+Los monitores están apagados: no tienes locales con cámaras.,The monitors are off: you have no premises with cameras.
+MONITORES,MONITORS
+1 persona,1 person
+Nadie.,Nobody.
+PLANTILLA POR LOCAL,STAFF BY PREMISES
+Sueldo {s}.,Wage {s}.
+El capataz dice que habla con la policía.,The foreman says they talk to the police.
+En {l} no trabaja nadie.,Nobody works at {l}.
+rol · sueldo · lealtad · eficiencia,role · wage · loyalty · efficiency
+De contable,As accountant
+Sueldo: {s},Wage: {s}
+{d} ¿De qué local?,{d} Which premises?
+"{n}: «Desde mañana llevo la caja de {l}. Lo que entre, limpio a la cuenta, menos lo mío».","{n}: “From tomorrow I'll run the till at {l}. Whatever comes in goes clean to the account, minus my cut.”"
+{s} · {e} al día,{s} · {e} a day
+"El sueldo de {n}. Con el bajo, su lealtad se resiente; con el alto, sube poco a poco.","{n}'s wage. On low, their loyalty suffers; on high, it rises little by little."
+El almacén,The storeroom
+"¿Qué miramos, presidente?","What shall we look at, president?"
+"¿Qué miramos, jefe?","What shall we look at, boss?"
+Seguridad,Security
+El olor,The smell
+carbón {p} %,carbon {p} %
+Pulsa A.,Press A.
+"Puertas blindadas, alarmas, perros y cámaras para la nave y los locales. Pulsa A.","Armoured doors, alarms, dogs and cameras for the warehouse and the premises. Press A."
+Monitores,Monitors
+Lo que ven las cámaras de cada local. Pulsa A.,What the cameras at each premises see. Press A.
+Labia {a} · cuidado {b} · lealtad {c}/10 · eficiencia {e} %,Patter {a} · care {b} · loyalty {c}/10 · efficiency {e} %
+contable · {l},accountant · {l}
+contable,accountant
+Lleva la caja de {l}: cada mañana mete el efectivo que cabe y se queda el {p} %.,Runs the till at {l}: every morning they put in the cash that fits and keep {p} %.
+La policía ha entrado en la nave de Valdehierro y se lleva las plantas y {g}. {q} vio el furgón en las cámaras y salió por detrás con los demás.,The police have raided the Valdehierro warehouse and are taking the plants and {g}. {q} saw the van on the cameras and slipped out the back with the others.
+La policía ha entrado en la nave de Valdehierro y se lleva las plantas. {q} vio el furgón en las cámaras y salió por detrás con los demás.,The police have raided the Valdehierro warehouse and are taking the plants. {q} saw the van on the cameras and slipped out the back with the others.
+Bajo,Low
+Normal,Normal
+Alto,High
+Lleva la caja de un local: cada mañana mete en ella el efectivo que cabe y se queda su comisión.,Runs the till at one of the premises: every morning they put in the cash that fits and keep their commission.
+Puerta blindada,Armoured door
+Cerradura de seguridad y bisagras ocultas: entrar cuesta mucho más.,Security lock and hidden hinges: breaking in is much harder.
+Alarma con central,Alarm with monitoring
+Sensores en puertas y ventanas y aviso a la central: casi nadie se queda a mirar.,Sensors on doors and windows and a call to the monitoring centre: hardly anyone sticks around.
+Perro guardián,Guard dog
+Un pastor que duerme en el local: ladra a todo lo que se mueve.,A shepherd dog that sleeps at the premises: it barks at anything that moves.
+Cámaras,Cameras
+"Cámaras con grabación, en los monitores del despacho de la nave: lo robado se recupera a medias y, si entra la policía, tu gente sale por detrás.","Recording cameras, on the monitors in the warehouse office: what's stolen is half recovered and, if the police come in, your people slip out the back."
+Carbón activo de recambio,Replacement activated carbon
+Ozonizador,Ozonator
+"Un generador de ozono para el conducto de extracción: con el carbón en buen estado, en la calle no huele nada.","An ozone generator for the extraction duct: with the carbon in good shape, the street smells of nothing."
+Fiado · {g} g,On credit · {g} g
+Deudas,Debts
+Lo que te deben los que les fiaste. Pulsa A.,What the people you gave credit to owe you. Press A.
+ESTANCO_MAS,ESTANCO_MAS
+ Marca: {m}., Brand: {m}.
+"«Para defenderte, ¿eh? Yo no te he visto.»","“For self-defence, eh? I never saw you.”"
+GENTE7,GENTE7
+índica,indica
+sativa,sativa
+híbrida,hybrid
+Le va la {e} con aroma {a}.,They like {e} with a {a} aroma.
+"Oye… lo de lo que te debo, que no me olvido. Dame un poco más.","Listen… about what I owe you, I haven't forgotten. Give me a bit longer."
+"Por fiarme el otro día, te cuento una cosa:","For giving me credit the other day, I'll tell you something:"
+¿Qué tal? La {s} de la otra vez estaba de diez.,How's it going? That {s} from last time was top notch.
+"Busco {g} g de una {e} con aroma {a}, de más del {t} % de THC. Si das con ella, te lo pago bien.","I'm after {g} g of a {e} with a {a} aroma, over {t} % THC. If you find it, I'll pay well."
+«Justo lo que buscaba.» Te da también {x}.,“Just what I was looking for.” They also give you {x}.
+{n} hojas de papel,{n} rolling papers
+un mechero,a lighter
+un bocata,a sandwich
+un spray de pimienta,a pepper spray
+"Me pillas sin un duro. ¿Me lo fías hasta el {d}? Te lo pago, palabra.","I'm totally broke. Can you give me credit until {d}? I'll pay you, I promise."
+Fiárselo,Give them credit
+Que pague ya,Pay up now
+«Eres de los buenos. No te fallo.»,“You're one of the good ones. I won't let you down.”
+"Rebusca en todos los bolsillos y al final te lo paga, a regañadientes.","They search every pocket and in the end they pay, grudgingly."
+Te he dejado {e} en el buzón. Gracias por fiarme; te debo una.,I've left {e} in your letterbox. Thanks for the credit; I owe you one.
+"No llego, de verdad. Dame unos días.","I can't make it, honestly. Give me a few days."
+Ya no hace falta. Otra vez será.,No need any more. Another time.
+{e} · no paga,{e} · not paying
+{e} · el {d},{e} · due {d}
+{a}. Le fiaste el {d}.,{a}. You gave them credit on {d}.
+Nadie te debe nada.,Nobody owes you anything.
+DEUDAS,DEBTS
+{n} te debe {e}. Vence el {d}.,{n} owes you {e}. Due {d}.
+Ya has hablado hoy con {n}. Déjale respirar.,You've already talked to {n} today. Give them some space.
+{n} no te ha pagado los {e}. ¿Qué haces?,{n} hasn't paid you the {e}. What do you do?
+Perdonarle,Forgive them
+Exigirle {e},Demand {e}
+Amenazarle,Threaten them
+«Te debo la vida. En el barrio se va a saber que eres legal.»,“I owe you my life. The whole neighbourhood will know you're legit.”
+Para cobrar hay que quedar en la calle.,"To collect, you have to meet on the street."
+{n} se pone chulo: «¿Intereses? Te vas a enterar».,{n} gets cocky: “Interest? You'll see.”
+Al final suelta los {e}.,In the end they hand over the {e}.
+"Te paga los {e}, intereses incluidos, mirando al suelo.","They pay you the {e}, interest included, staring at the floor."
+"«No tengo nada, te lo juro.» Hoy no le sacas ni un euro.","“I've got nothing, I swear.” You won't get a single euro out of them today."
+"Se asusta y te paga los {e}. En el barrio se habla de ti, y no para bien.","They get scared and pay you the {e}. People in the neighbourhood are talking about you, and not kindly."
+Se esconde: no te coge el teléfono. Y alguien ha oído la amenaza.,They hide: they won't pick up the phone. And someone heard the threat.
+"Por cierto: {q} en {p} necesita {g} g de una {ef}. Si se los llevas antes del {d}, te paga {e}. ¿Te animas?","By the way: {q} in {p} needs {g} g of a {ef}. If you get it to them before {d}, they'll pay {e}. Up for it?"
+Me animo,I'm in
+Paso,Pass
+{q} de {n},{q} of {n}
+"«Te paso su número. Cuando estés en {p}, llámale.»","“I'll give you their number. When you're in {p}, call them.”"
+Encargo: {g} g de una {ef} antes del {d}. Paga {e}.,Job: {g} g of a {ef} before {d}. Pays {e}.
+"«Estoy en {p}. Llámame cuando estés por aquí, en la calle.»","“I'm in {p}. Call me when you're around here, on the street.”"
+«¿No traes una {ef}? Entonces nada.»,“You haven't brought a {ef}? Then forget it.”
+¿Qué le llevas?,What do you bring them?
+"Viene en diez minutos, mira el material y te paga {e}. «Ya me dijeron que eras de fiar.»","They come in ten minutes, check the stuff and pay you {e}. “They told me you could be trusted.”"
+COMBATE7,COMBATE7
+" Con el bate, se nota."," With the bat, it shows."
+" Con la cadena, se nota."," With the chain, it shows."
+{b} se queda aturdido.,{b} is stunned.
+{b} sangra.,{b} is bleeding.
+{b} sigue sangrando: −{d}.,{b} keeps bleeding: −{d}.
+El corte te sigue sangrando: −{d}.,The cut keeps bleeding: −{d}.
+{b} no se tiene en pie: no te ataca.,{b} can't stand up straight: no attack.
+{b} saca una navaja y te alcanza en el brazo. Sangras.,{b} pulls a knife and catches you on the arm. You're bleeding.
+Papel y filtros,Papers and filters
+Tabaco,Tobacco
+Mecheros,Lighters
+Autoflorecientes,Autoflowering
+Índicas,Indicas
+Sativas,Sativas
+Híbridas,Hybrids
+LED,LED
+Sodio,Sodium
+Carpas,Tents
+Macetas,Pots
+Carros,Trolleys
+Tratamientos,Treatments
+Ventilación,Ventilation
+Climatización,Climate control
+Bolsas,Bags
+Abono mineral,Mineral nutrients
+Abono orgánico,Organic nutrients
+Medición,Measuring
+Prensas y tamices,Presses and sieves
+Máquinas,Machines
+Curado,Curing
+Análisis,Analysis
+Pipas y bongs,Pipes and bongs
+Comida,Food
+Defensa,Self-defence
+Varios,Miscellaneous
+CATALOGO,CATALOGO
+Ver solo esta sección.,Show only this section.
+Ver solo este tipo.,Show only this type.
+Ver solo esta marca.,Show only this brand.
+Todas las secciones,All sections
+Volver atrás.,Go back.
+"Egun on. Tú eres la familia de Maite, ¿no? Aquí se sabe todo.","Egun on. You're Maite's family, aren't you? Everybody knows everything here."
+"Buenas. Mal tiempo se nos viene, dicen los viejos.","Afternoon. Bad weather's coming, the old folk say."
+"Aupa. Que no te vea nadie del pueblo, que luego hablan.","Aupa. Don't let anyone from the village see you, they'll talk."
+"Bueno, pues trato. Y que no se entere el cura.","Right then, deal. And don't let the priest find out."
+"Hecho. Lo que se habla aquí, aquí se queda.",Done. What's said here stays here.
+Ondo. Ya te diré qué tal.,Ondo. I'll tell you how it was.
+"Uy, a ese precio ni mi cuñado.","Ooh, not even my brother-in-law would pay that."
+Eso es mucho dinero para el monte.,That's a lot of money for up in the hills.
+"No, no. Con eso compro pienso para un mes.","No, no. With that I buy feed for a month."
+Dicen que en el caserío de arriba alguien planta entre el maíz.,They say someone at the farmhouse up the hill grows it among the maize.
+El martes subió una patrulla hasta la ermita. Mira tú.,On Tuesday a patrol went all the way up to the chapel. Fancy that.
+"Este año las lluvias vienen tarde: lo que tengas fuera, que se dé prisa.",The rain is late this year: whatever you've got outside had better hurry.
+"¿Qué pasa, máquina? ¿Hay algo o qué?","What's up, champ? Got anything or what?"
+"Ey. Rápido, que me están esperando.","Hey. Quick, they're waiting for me."
+"Buenas. Tú eres el que mueve, ¿no? Me han hablado bien.","Alright. You're the one who moves stuff, right? I've heard good things."
+Hecho. Palabra de barrio.,Done. Neighbourhood's honour.
+Guay. Esto queda entre tú y yo.,Sweet. This stays between you and me.
+De lujo. Te debo una.,Brilliant. I owe you one.
+¿Me ves cara de banco? Ni de coña.,Do I look like a bank? No way.
+A ese precio que te lo compre tu madre.,"At that price, get your mum to buy it."
+"Paso, tío. Eso es un robo.","I'll pass, mate. That's daylight robbery."
+Han cambiado el turno de la patrulla: de noche pasan menos por la plaza.,The patrol changed shifts: at night they come through the square less.
+Al de la moto roja le pillaron con lo que llevaba. Por bocas.,The guy with the red motorbike got caught with what he had on him. Ratted out.
+Dicen que en los astilleros alguien vende cortado. Ojo.,They say someone at the shipyards sells cut stuff. Careful.
+Buenas tardes. Me han dicho que tu producto es… distinto.,Good afternoon. I'm told your product is… different.
+"Hola. Seamos breves: busco calidad, no conversación.","Hello. Let's keep it brief: I'm after quality, not conversation."
+Encantado. Un amigo del club te recomienda.,Delighted. A friend from the club recommends you.
+Perfecto. Un placer hacer negocios.,Perfect. A pleasure doing business.
+"Excelente. Te recomendaré, con discreción.","Excellent. I'll recommend you, discreetly."
+"De acuerdo. Si repite la calidad, repito yo.","Very well. If the quality holds, so will I."
+"No, gracias. No pago por estética.","No, thank you. I don't pay for looks."
+Para ese precio prefiero a mi proveedor de siempre.,At that price I'd rather stick to my usual supplier.
+Me temo que no hablamos de lo mismo.,I'm afraid we're not talking about the same thing.
+En el Ensanche hay un concejal que se deja ver mucho en los reservados.,In the Ensanche there's a councillor who's often seen in the private rooms.
+La RRPP de GAUA cambia de proveedor cada mes. Hay hueco.,GAUA's promoter changes supplier every month. There's an opening.
+Han abierto un local nuevo en el Casco. Mucho dinero detrás.,A new bar has opened in the Casco. Lots of money behind it.
+chaval de la plaza,lad from the square
+mi primo,my cousin
+una amiga,a friend
+mi cuñado,my brother-in-law
+una compañera del curro,a workmate
+mi vecino,my neighbour
+Le sueltas un directo a la cara.,You land a straight to the face.
+Le cazas con un gancho al hígado.,You catch them with a hook to the liver.
+Le das un crochet que le gira la cara.,You throw a cross that turns their head.
+Le hundes el puño en el estómago.,You sink your fist into their stomach.
+Le das una patada en la rodilla.,You kick them in the knee.
+Le metes una patada baja que le dobla.,You land a low kick that doubles them over.
+Le das una patada en las costillas.,You kick them in the ribs.
+{b} te suelta un derechazo.,{b} throws a right hook at you.
+{b} te agarra del cuello y te empuja.,{b} grabs you by the neck and shoves you.
+{b} te da un rodillazo.,{b} knees you.
+{b} te tira contra un contenedor.,{b} throws you against a bin.
+{b} te mete un codazo.,{b} elbows you.
+Bate de madera,Wooden bat
+Pesa y se nota. Suma 3 a cada golpe y a veces deja al otro aturdido.,It's heavy and it shows. Adds 3 to every hit and sometimes leaves the other one stunned.
+Cadena de bici,Bike chain
+Suma 2 a cada golpe y a veces le abre una herida que sangra.,Adds 2 to every hit and sometimes opens a bleeding wound.
+Semillas,Seeds
+Carpas y macetas,Tents and pots
+Clima y aire,Climate and air
+Riego y abono,Watering and nutrients
+Plagas y hongos,Pests and mould
+Extracción y curado,Extraction and curing
+Para fumar,For smoking
+HAZIA,HAZIA
+ARGIA,ARGIA
+EGUZKI,EGUZKI
+OLATU,OLATU
+LURRA,LURRA
+UREZ,UREZ
+NEURRI,NEURRI
+BABESA,BABESA
+ESTUTU,ESTUTU
+KUPEL,KUPEL
+KEA,KEA
+ZIGA,ZIGA
+SUGAR,SUGAR
+ZAKU,ZAKU
+Un mosto,A grape juice
+Un txakoli,A txakoli
+Una sidra,A cider
+Un cortado,A cortado
+Una infusión,A herbal tea
+Un agua,A water
+Un chupito,A shot
+Papel de arroz (50 hojas),Rice papers (50 sheets)
+"Fino y lento. ZIGA, de arroz.","Thin and slow-burning. ZIGA, rice paper."
+Boquillas de cartón (50),Cardboard tips (50)
+"Para el porro: de cartón, se enrollan a mano.","For the joint: cardboard, rolled by hand."
+Mechero de gasolina,Petrol lighter
+"De metal, recargable. Dura toda la vida.","Metal, refillable. Lasts a lifetime."
+SMS: ,SMS: 
+Curada en la nave: {l},Cured at the warehouse: {l}
+CURADO_NAVE,CURADO_NAVE
+{t} tarros,{t} jars
+Despacho de lujo,Luxury office
+hecho,done
+Arrieta cuelga dos estanterías más de tarros: ya caben {g} g curando en la nave.,Arrieta hangs two more shelves of jars: {g} g can now cure at the warehouse.
+"Arrieta y los suyos dejan el despacho de lujo: tarima, sofá, la pared de monitores con las cámaras de tus locales y una caja fuerte de las grandes.","Arrieta and his crew finish the luxury office: wooden floor, a sofa, the wall of monitors with the cameras of your premises and a big safe."
+La caja del despacho: {m} y {g} g (caben {cm} y {cg} g).,The office safe: {m} and {g} g (it holds {cm} and {cg} g).
+No hay nada que guardar o la caja está llena.,There's nothing to store or the safe is full.
+No hay dinero en la caja.,There's no money in the safe.
+Guardas {g} g en la caja del despacho.,You put {g} g in the office safe.
+No hay cogollos en la caja.,There are no buds in the safe.
+"GUARDAR: llevas {a} de cogollos y en las estanterías de la nave caben {b} más ({t} tarros de 10 L).
+A: guardar · B: cerrar.","STORE: you carry {a} of buds and the warehouse shelves hold {b} more ({t} 10 L jars).
+A: store · B: close."
+CURADO DE LA NAVE,WAREHOUSE CURING
+Las estanterías de la nave están llenas.,The warehouse shelves are full.
+Las estanterías de la nave están llenas: en las mejoras del escritorio se amplía el curado.,The warehouse shelves are full: you can expand the curing in the desk upgrades.
+¿Qué guardas en las estanterías de la nave?,What do you put on the warehouse shelves?
+Guardas {q} en los tarros de la nave.,You put {q} in the warehouse jars.
+Vacías la caja del despacho: {l}.,You empty the office safe: {l}.
+cajaD,cajaD
+Ampliar el curado,Expand the curing
+Dos estanterías más de tarros de 10 L en el secadero de la nave: el doble de tarros para curar lo que sale del secadero.,Two more shelves of 10 L jars in the warehouse drying room: twice the jars to cure what comes out of the drying room.
+"Tarima de roble, paredes de obra, una librería, un sofá de terciopelo, la pared de monitores con las cámaras de tus locales y una caja fuerte empotrada de alta capacidad. Solo con la nave a tope (extracción y riego).","Oak floor, brick walls, a bookcase, a velvet sofa, the wall of monitors with the cameras of your premises and a high-capacity built-in safe. Only with the warehouse maxed out (extraction and watering)."
+monD,monD
+monD2,monD2
+"Una librería de roble: libros de botánica de la tía, un herbario y una botella de reserva.","An oak bookcase: your aunt's botany books, a herbarium and a bottle of reserve wine."
+El sofá de terciopelo verde. Desde aquí se ven todos los monitores.,The green velvet sofa. You can see every monitor from here.
+Una kentia en una maceta de barro. La riega Arrieta.,A kentia palm in a clay pot. Arrieta waters it.
+"El plano de la nave, enmarcado en roble.","The warehouse floor plan, framed in oak."
+METRO,METRO
+PISOS9,PISOS9
+sin piso,no flat
+sin lugarteniente · {s},no lieutenant · {s}
+Un piso por pueblo: tu lugarteniente vende cada mañana lo que dejes en su almacén.,One flat per town: your lieutenant sells every morning whatever you leave in the storeroom.
+PISOS,FLATS
+Alquiler: {a} al mes. Comprarlo: {p}.,Rent: {a} a month. Buy it: {p}.
+nadie,nobody
+"Lugarteniente: {l} · {p}, {x} · ayer {v} · calor {c}.","Lieutenant: {l} · {p}, {x} · yesterday {v} · heat {c}."
+Un piso discreto en {n}: {a} al mes o {p} en propiedad.,"A quiet flat in {n}: {a} a month, or {p} to own it."
+Comprarlo,Buy it
+"El primer mes va en efectivo, por delante. No te llega.","The first month is paid in cash, up front. You don't have enough."
+Compra · piso de {n},Purchase · flat in {n}
+Para comprarlo hacen falta {p} en la cuenta.,To buy it you need {p} in the account.
+El piso de {n} es tuyo. Pon a alguien de tu plantilla al frente y déjale género.,The flat in {n} is yours. Put someone from your staff in charge and leave them some product.
+Lugarteniente,Lieutenant
+Pureza,Purity
+Precio,Price
+Dejar género,Leave product
+El piso de {n}. {d},The flat in {n}. {d}
+"El género y la caja, en persona.","The product and the till, in person."
+"Ayer salieron {v}; quedan {s}. Calor {c}. Tuyo, sin alquiler.","Yesterday {v} went out; {s} left. Heat {c}. Yours, no rent."
+"Ayer salieron {v}; quedan {s}. Calor {c}. El alquiler, el {d}.",Yesterday {v} went out; {s} left. Heat {c}. Rent due on {d}.
+"¿Cómo lo vende? Rebajado rinde más gramos, pero se nota y da más calor.","How do they sell it? Cut, it yields more grams, but people notice and it brings more heat."
+"¿A qué precio? Barato vende más; caro, menos.","At what price? Cheap sells more; expensive, less."
+La caja está vacía.,The till is empty.
+Te llevas {e}.,You take {e}.
+Para vaciarlo tienes que estar en el pueblo.,To empty it you have to be in the town.
+¿Dejas el piso? Lo que haya en el almacén y en la caja te lo llevas tú.,"Give up the flat? Whatever is in the storeroom and the till, you take with you."
+No tienes a nadie libre en la plantilla. Pídele gente a Patxi desde el móvil.,You have nobody free on your staff. Ask Patxi for people from your phone.
+labia {l} · lealtad {e},patter {l} · loyalty {e}
+Nadie,Nobody
+¿Quién lleva el piso?,Who runs the flat?
+{n} lleva el piso de {p}.,{n} runs the flat in {p}.
+Al almacén · {a} de {b},To the storeroom · {a} of {b}
+El almacén está lleno.,The storeroom is full.
+CASERO,LANDLORD
+el piso de {n},the flat in {n}
+SMS · CASERO,SMS · LANDLORD
+Sin alquiler no hay piso en {n}. Lo que había dentro cubre lo que debes.,"No rent, no flat in {n}. What was inside covers what you owe."
+Han entrado en el piso de {n}. Me llevan detenido. Se han quedado {kg} y {e} de la caja.,They've raided the flat in {n}. They're taking me in. They kept {kg} and {e} from the till.
+"Tu nombre ya suena en Hiriburu. Con un patrimonio así, la ciudad se abre: la autopista sale de la parada, con tu vehículo ({p} de peaje).","Your name is getting around in Hiriburu. With assets like yours, the city opens up: the motorway leaves from the stop, in your own vehicle ({p} toll)."
+"Allí hay clubs para gente con dinero, un concejal que sabe mirar a otro lado y dos bandas que no te esperan con flores.","There are clubs for people with money, a councillor who knows how to look the other way and two gangs that won't greet you with flowers."
+Multa · {n},Fine · {n}
+Inspección en {n}: precintado {d} días y {e} de multa.,Inspection at {n}: sealed for {d} days and a {e} fine.
+SMS · AYUNTAMIENTO DE HIRIBURU,SMS · HIRIBURU CITY COUNCIL
+{f} se mueven en {b}: has perdido {q} puntos de control. {j} te espera allí.,{f} are moving in {b}: you've lost {q} points of control. {j} is waiting for you there.
+UN CHAVAL DEL BARRIO,A KID FROM THE NEIGHBOURHOOD
+«Aquí se viene a que te vean.»,“You come here to be seen.”
+«¿Tú eres el dueño? Buena música.»,“Are you the owner? Good music.”
+«La próxima la pago yo.»,“Next round's on me.”
+Cerrado. Una cámara te mira desde lo alto.,Closed. A camera watches you from up high.
+Precinto del Ayuntamiento en la puerta: cerrado hasta el {d}.,Council seal on the door: closed until {d}.
+"{n}: SE TRASPASA. Local de copas con licencia hasta las 6, {p}. ¿Lo compras?","{n}: FOR SALE. Bar licensed until 6 a.m., {p}. Buy it?"
+Hacen falta {p} en la cuenta.,You need {p} in the account.
+"{n} es tuyo. {e} lo lleva por ti: lo que deje cada noche, a tu cuenta.","{n} is yours. {e} runs it for you: whatever it makes each night, into your account."
+«Esto ya no es tuyo. Fuera.»,“This isn't yours any more. Out.”
+"Anoche, {e}. En {b} mandas un {c} %.","Last night, {e}. In {b} you control {c} %."
+"Con el concejal, tranquilos.","With the councillor, we're safe."
+"Sin el concejal, cualquier inspección nos cierra.","Without the councillor, any inspection shuts us down."
+"Desde que es tuyo, {t}. {s}","Since it's been yours, {t}. {s}"
+"«Usted y yo no nos conocemos. Hasta el {d}, ninguna inspección pasa por sus locales.»","“You and I have never met. Until {d}, no inspection comes near your premises.”"
+"«Las licencias de ocio nocturno pasan por mi mesa. Por {e} al mes, las inspecciones se pierden por el camino.»","“Nightlife licences go across my desk. For {e} a month, the inspections get lost on the way.”"
+Darle el sobre ({e}),Hand him the envelope ({e})
+«Eso va en efectivo. Vuelva cuando lo traiga.»,“That's in cash. Come back when you bring it.”
+"Se guarda el sobre sin mirarlo. «Hasta el {d}, sin sustos.»","He pockets the envelope without looking. “Until {d}, no surprises.”"
+«Ya no tengo nada que hablar contigo. La ciudad es tuya… por ahora.»,“I've got nothing more to say to you. The city's yours… for now.”
+Plantarles cara en {b} ({c} %),Stand up to them in {b} ({c} %)
+Pactar ({e}),Make a deal ({e})
+«{f} mandan aquí. ¿Qué quieres?»,“{f} run things here. What do you want?”
+"«Sin el dinero delante, no hay pacto.»","“No money on the table, no deal.”"
+«Trato.» En {b} te dejan sitio: {c} % de control.,“Deal.” In {b} they make room for you: {c} % control.
+{f} se retiran de media {b}: {c} % de control.,{f} pull out of half of {b}: {c} % control.
+{b} es tuyo.,{b} is yours.
+Os separáis sin más. Nadie gana nada.,You go your separate ways. Nobody wins anything.
+Te sacan de {b} a empujones: {c} % de control.,They shove you out of {b}: {c} % control.
+{j} y los suyos te cortan el paso: «{b} no es tuya.»,{j} and his crew block your way: “{b} isn't yours.”
+Plantarles cara,Stand up to them
+Pagarles ({e}),Pay them ({e})
+Se guardan el dinero y se apartan. Por esta vez.,They pocket the money and step aside. This time.
+Te apartas. En {b} te queda un {c} %.,You back off. In {b} you keep {c} %.
+"Todo de diseño, todo carísimo.","All designer, all very expensive."
+Autobús de línea a Ibarbide ({e}),Coach to Ibarbide ({e})
+El billete cuesta {e}. No te llega.,The ticket costs {e}. You don't have enough.
+Pisos,Flats
+Tus pisos de venta y sus lugartenientes.,Your selling flats and their lieutenants.
+piso · {l},flat · {l}
+Lleva tu piso de {l}: vende lo del almacén cada mañana y se queda el {p} %.,Runs your flat in {l}: sells from the storeroom every morning and keeps {p} %.
+Hiriburu,Hiriburu
+Club Zenit,Club Zenit
+Club Ilargi,Club Ilargi
+"HIRIBURU · UDALA
+El Ayuntamiento. Se atiende en la puerta.","HIRIBURU · UDALA
+The Town Hall. Enquiries at the door."
+"APARCAMIENTO
+Entrada y salida de la autopista.","CAR PARK
+Motorway entrance and exit."
+MAESTRO [9]: la ciudad de la autopista (solo con Datos.CAL). Se abre con el patrimonio (umbral) y se va con tu vehículo.,MAESTRO [9]: the motorway city (only with Datos.CAL). It opens with your assets (threshold) and you go in your own vehicle.
+Erdialdea,Erdialdea
+Goialde,Goialde
+Ibaiondo,Ibaiondo
+Geltokia,Geltokia
+Los del Puente,The Bridge Crew
+TXEMA,TXEMA
+La Peña Gris,The Grey Gang
+MIKEL,MIKEL
+Reservados,Private booths
+Tres reservados con su camarero: un 25 % más cada noche.,Three private booths with their own waiter: 25 % more every night.
+Seguridad en la puerta,Door security
+Dos porteros con licencia: la mitad de riesgo de que lo cierren.,Two licensed bouncers: half the risk of being shut down.
+ZUBIRI,ZUBIRI
+Sofá de cuero blanco. Aquí no se sienta cualquiera.,A white leather sofa. Not just anyone sits here.
+"Sofá de cuero blanco, de espaldas a la pista.","A white leather sofa, with its back to the dance floor."
+Una mesa baja de cristal con una cubitera.,A low glass table with an ice bucket.
+Un billar de tapete negro. Nadie juega: se mira.,A black-felt pool table. Nobody plays: people watch.
+"Una gramola de las de antes, conectada a los altavoces del techo.","An old-style jukebox, wired to the ceiling speakers."
+Un neón con el nombre del club.,A neon sign with the club's name.
+Un cartel de la sesión del sábado.,A poster for Saturday's session.
+"Los tacos del billar, en su soporte.","The pool cues, in their rack."
+"Una palmera de interior, regada por alguien que no eres tú.","An indoor palm, watered by someone who isn't you."
+"MAESTRO [9]: un piso de venta por pueblo desde el primer envío por mar (S.mar.paso >= 1), con su lugarteniente (solo con Datos.CAL).","MAESTRO [9]: one selling flat per town from the first sea shipment (S.mar.paso >= 1), with its lieutenant (only with Datos.CAL)."
+Pura,Pure
+Rebajada,Cut
+Muy rebajada,Heavily cut
+Barata,Cheap
+Cara,Expensive
+"Me dicen que ya sacas género por mar. Con ese volumen, monta pisos de venta por los pueblos, con alguien de tu plantilla al frente: MÓVIL → PISOS.","Word is you're already shipping product by sea. With that volume, set up selling flats around the towns, with someone from your staff in charge: PHONE → FLATS."
+Los pisos,The flats
+No te cabe todo encima: quedan {s} en el almacén. Vacía la mochila y vuelve a por ello.,You can't carry it all: {s} left in the storeroom. Empty your backpack and come back for it.
+"«Con prisa, perdona.»","“In a hurry, sorry.”"
+«Esta ciudad no duerme.»,“This city never sleeps.”
+«¿Buscas algo? Yo no he visto nada.»,“Looking for something? I haven't seen a thing.”
+«El alquiler aquí te come vivo.»,“The rent here eats you alive.”
+No llevas {e} encima.,You don't have {e} on you.
+"¿Jugar el tutorial (el primer cultivo, paso a paso) o saltarlo y empezar con la primera cosecha hecha?","Play the tutorial (your first grow, step by step) or skip it and start with the first harvest done?"
+Jugarlo,Play it
+Saltarlo,Skip it
+"Tutorial saltado: el primer cultivo ya está hecho. La cosecha, en la mochila.","Tutorial skipped: your first grow is done. The harvest is in your backpack."
+RASTRO,RASTRO
+rastroP,rastroP
+"
+Si ya no te sirve, Bixente te lo compra en la chatarrería de Valdehierro.","
+If you don't need it anymore, Bixente buys it at the Valdehierro scrapyard."
+"No te sobra nada que me interese. Cuando cambies un foco o una maceta, la vieja me la traes.","You've got nothing spare I'm after. When you swap a lamp or a pot, bring me the old one."
+"Tienes {n} de sobra en la mochila.
+Te la pago a {e}, la mitad de lo que vale nueva.","You have {n} spare in your backpack.
+I'll pay {e}, half what it costs new."
+"Lo que me vendas, vendido está: no se devuelve.","Whatever you sell me, stays sold: no take-backs."
+VENDERLE A BIXENTE,SELL TO BIXENTE
+"Esto es el rastro de la comarca: lo que a uno le sobra, a otro le hace falta. ¿Compras o vendes?",This is the county flea market: one man's spare is another man's need. Buying or selling?
+Le gusta la de olor {a}.,Likes it with a {a} smell.
+"Busco {g} g de algo fuerte, del {t} % de THC para arriba. Si me lo traes, te lo pago bien.","I'm after {g} g of something strong, {t} % THC or more. Bring it and I'll pay well."
+"Por cierto: {q} en {p} necesita {g} g de algo del {t} % para arriba. Si se los llevas antes del {d}, te paga {e}. ¿Te animas?",By the way: {q} in {p} needs {g} g of something {t} % or stronger. Get it there before {d} and they'll pay {e}. You in?
+Encargo: {g} g del {t} % para arriba antes del {d}. Paga {e}.,"Order: {g} g, {t} % or stronger, before {d}. Pays {e}."
+«¿No traes {g} g del {t} % para arriba? Entonces nada.»,“No {g} g of {t} % or stronger? Then no deal.”
+Un pastor de Mendialde busca 5 g de algo fuerte (18 % de THC o más) para dormir en la borda.,A Mendialde shepherd wants 5 g of something strong (18 % THC or more) to sleep in his hut.
+"5 gramos de algo fuerte, de lo que tumba.","5 grams of something strong, the kind that knocks you out."
+¿Seguro que le vendes {x} por {e}? Lo vendido no se recupera.,Sure you want to sell him {x} for {e}? Once sold, it's gone.
+
+Carretera de la costa,Coast road
+Carretera del valle,Valley road
+Carretera del monte,Mountain road
+La general,The main road
+Carretera del molino,Mill road
+Pista de los acantilados,Cliff track
+Carretera de la ribera,Riverside road

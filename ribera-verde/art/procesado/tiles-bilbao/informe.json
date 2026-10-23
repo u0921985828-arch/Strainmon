@@ -1,0 +1,19 @@
+{
+  "grupo": "tiles-bilbao",
+  "celda": [
+    64,
+    16
+  ],
+  "tope_colores": 32,
+  "secuencias": 9,
+  "fotogramas": 9,
+  "semitransparentes": 0,
+  "en_paleta_antes": 6.3,
+  "distancia_media": 0,
+  "colores_finales": 7,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

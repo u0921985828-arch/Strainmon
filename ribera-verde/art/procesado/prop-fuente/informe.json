@@ -1,0 +1,48 @@
+{
+  "grupo": "prop-fuente",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 2,
+  "fotogramas": 7,
+  "semitransparentes": 0,
+  "en_paleta_antes": 1.9,
+  "distancia_media": 19.18,
+  "colores_finales": 15,
+  "fundidos": [
+    "agua: #36466e→#4a515c",
+    "agua: #535b6b→#4a515c",
+    "agua: #e8eef4→#f8f8f0",
+    "agua: #e8d6b0→#f6e8c8",
+    "agua: #d8c070→#dcac6c",
+    "fountain: #e0aa84→#e6bc80",
+    "fountain: #a0e8c0→#c6cdda",
+    "fountain: #1a1a22→#2e2e3a",
+    "fountain: #91a87e→#8a92a2",
+    "fountain: #5a5048→#4a4a5a",
+    "fountain: #4a4a5a→#4a515c",
+    "fountain: #e8eef4→#f8f8f8",
+    "fountain: #f8f8f8→#f8f8f0",
+    "fountain: #e8c890→#e6bc80",
+    "fountain: #4a515c→#36466e",
+    "fountain: #8f6741→#7a5a3a",
+    "fountain: #7a8494→#8a92a2",
+    "fountain: #646c7c→#484888",
+    "fountain: #36466e→#484888",
+    "fountain: #c6cdda→#a8b0c0",
+    "fountain: #c49464→#c4a46c",
+    "fountain: #a8b0c0→#8a92a2",
+    "fountain: #8a92a2→#c4a46c",
+    "fountain: #e8d6b0→#f6e8c8",
+    "fountain: #2e2e3a→#3c3434",
+    "fountain: #6c4632→#74502e",
+    "fountain: #4a3220→#5a3a24"
+  ],
+  "huerfanos_quitados": 2,
+  "deriva_pies": {
+    "agua/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

@@ -1,0 +1,20 @@
+{
+  "grupo": "interior-shop",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 33.3,
+  "distancia_media": 19.05,
+  "colores_finales": 4,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #93aa80≈#91a87e"
+  ]
+}

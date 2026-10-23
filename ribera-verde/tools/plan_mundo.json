@@ -1,0 +1,3 @@
+{"base": "mundo", "antepasados": ["ui"], "base_tramos": [[2957, 3140]],
+ "modulos": [["calle", 1752]],
+ "desc": {"calle": "F8 (de mundo.gd): el movimiento, las acciones del atlas, los clientes y la venta, las patrullas y ordenar."}}

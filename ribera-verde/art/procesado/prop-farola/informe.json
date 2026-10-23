@@ -1,0 +1,18 @@
+{
+  "grupo": "prop-farola",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 16.37,
+  "colores_finales": 12,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

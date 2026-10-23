@@ -1,0 +1,19 @@
+{
+  "grupo": "iconos-fumar",
+  "celda": [
+    16,
+    16
+  ],
+  "tope_colores": 32,
+  "secuencias": 8,
+  "fotogramas": 8,
+  "semitransparentes": 0,
+  "en_paleta_antes": 44.6,
+  "distancia_media": 0,
+  "colores_finales": 8,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

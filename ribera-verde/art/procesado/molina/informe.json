@@ -1,0 +1,23 @@
+{
+  "grupo": "molina",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 6,
+  "fotogramas": 18,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 24.62,
+  "colores_finales": 13,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "fumar/south": 0,
+    "idle/south": 0
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #26262e≈#2a2a30"
+  ]
+}

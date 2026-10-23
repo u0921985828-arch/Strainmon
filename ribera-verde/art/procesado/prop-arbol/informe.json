@@ -1,0 +1,22 @@
+{
+  "grupo": "prop-arbol",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 77.69,
+  "colores_finales": 15,
+  "fundidos": [
+    "tree: #b0e48c→#9bd35a",
+    "tree: #9a7040→#8a7c30",
+    "tree: #8a7c30→#7e5630"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

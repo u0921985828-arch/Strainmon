@@ -1,0 +1,26 @@
+{
+  "grupo": "cuarto-cultivo",
+  "celda": [
+    240,
+    160
+  ],
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 21.4,
+  "colores_finales": 15,
+  "fundidos": [
+    "cuarto-cultivo: #747c8c→#9a9aa4",
+    "cuarto-cultivo: #c0c0c8→#bcb4a2",
+    "cuarto-cultivo: #eeeadc→#e0e0e0",
+    "cuarto-cultivo: #ccba96→#bcb4a2",
+    "cuarto-cultivo: #e0e0e0→#f4f4f4",
+    "cuarto-cultivo: #9a9aa4→#a0a4ac",
+    "cuarto-cultivo: #5a5a66→#5a5048"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

@@ -1,0 +1,19 @@
+{
+  "grupo": "tierra-detalles",
+  "celda": [
+    128,
+    16
+  ],
+  "tope_colores": 15,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 19.6,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [],
+  "huerfanos_quitados": 2,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

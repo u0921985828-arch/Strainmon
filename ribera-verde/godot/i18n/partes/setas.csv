@@ -1,0 +1,230 @@
+es,en
+Nada,Nothing
+"Panes de micelio, cada uno de su cepa. Con uno, te preparo una bandeja de esa cepa; juntando dos en la mesa, sale otra si está en el cuaderno.","Mycelium blocks, each its own strain. With one I'll set you a tray of that strain; join two at the table and you get another, if it's in the notebook."
+Sin {e} no hay pan.,"No {e}, no block."
+Un pan de {n}: {d},A {n} block: {d}
+No tienes panes de micelio. Txomin los vende en la puerta.,You have no mycelium blocks. Txomin sells them at the door.
+Juntar micelios: el primer pan.,Join mycelia: the first block.
+Hace falta un pan de otra cepa para juntarlo con el de {n}.,You need a block of another strain to join with the {n}.
+Juntar {n} con…,Join {n} with…
+"{a} y {b} no se juntan: un {fa} y una {fb} se repelen, las hifas no se tocan. No gastas nada.","{a} and {b} won't join: a {fa} and a {fb} repel, the hyphae don't touch. Nothing used."
+No prende: {a} con {b} no está en el cuaderno. No gastas nada.,It won't take: {a} with {b} isn't in the notebook. Nothing used.
+"Juntas los dos micelios en un pan nuevo y, al rato, prende: {n} panes de {c}. ¡Nueva en tu cuaderno! {d}","You join both mycelia into a new block and, after a while, it takes: {n} {c} blocks. New in your notebook! {d}"
+"Juntas los dos micelios en un pan nuevo y, al rato, prende: {n} panes de {c}.","You join both mycelia into a new block and, after a while, it takes: {n} {c} blocks."
+Lo que no se junta,What won't join
+El cuaderno de las cepas: {a} de {b}.,The strain notebook: {a} of {b}.
+un {a} con una {b},a {a} with a {b}
+{a} con {b},{a} with {b}
+No se juntan: {t}; se repelen. Y lo que no está en el cuaderno no prende.,These won't join: {t}; they repel. And what's not in the notebook won't take.
+ni,or
+La vende Txomin ({e} el pan).,Txomin sells it ({e} a block).
+Sale de juntar {a} con {b}.,Comes from joining {a} with {b}.
+{n} · {f} · {g}.ª generación. {d} {de} Rinde ×{r} y se paga ×{p}.,{n} · {f} · gen {g}. {d} {de} Yields ×{r} and pays ×{p}.
+Aún no la has tenido.,You haven't had it yet.
+SMS · TXOMIN,SMS · TXOMIN
+TXOMIN,TXOMIN
+el bajo,the basement
+"No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí.",You didn't pay for the basement. I'm changing the lock; what's inside and the deposit are mine.
+La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas y {g} de setas.,The police raided the Kale Zaharra basement. They took the trays and {g} of mushrooms.
+La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas.,The police raided the Kale Zaharra basement. They took the trays.
+Se te han echado a perder {n} bandejas. Las del sótano: tíralas.,{n} trays have gone bad. The cellar ones: bin them.
+Una bandeja se te ha secado. La del sótano: tírala.,A tray has dried out. The cellar one: bin it.
+Una bandeja se te ha contaminado. La del sótano: tírala.,A tray got contaminated. The cellar one: bin it.
+Se te han echado a perder {n} bandejas. Tíralas.,{n} trays have gone bad. Bin them.
+Una bandeja se te ha secado. Tírala.,A tray has dried out. Bin it.
+Una bandeja se te ha contaminado. Tírala.,A tray got contaminated. Bin it.
+SMS · {n},SMS · {n}
+Bandejas pulverizadas. He recogido {g} g y están secándose.,Trays misted. I picked {g} g and they're drying.
+Sin bajo no hay faena. Me vuelvo con mi tío.,"No basement, no work. I'm going back to my uncle."
+Todo en orden: {a} bandejas vivas de {b}. Cada mañana las pulverizo y recojo lo que esté listo.,All good: {a} live trays of {b}. Every morning I mist them and pick what's ready.
+Seguir así,Keep it up
+Despedirlo,Fire him
+¿Seguro? Txomin no se lo va a tomar bien.,Sure? Txomin won't take it well.
+No,No
+Vale. Ahí te quedas con las bandejas.,Fine. The trays are all yours.
+"Lo que tú digas, jefe.","Whatever you say, boss."
+"¿Setas? Eso era antes, chaval. Ahora solo paseo.","Mushrooms? That was ages ago, kid. These days I just take walks."
+¿Para el sótano de tu casa o para mi bajo?,For your cellar at home or for my basement?
+Para el sótano,For the cellar
+El bajo,The basement
+"El bajo de mi casa: oscuro, húmedo y nadie pregunta. {f} de fianza y {r} cada {d} días, en efectivo; el primero, ahora. Las bandejas te las preparo yo.","My house's basement: dark, damp and nobody asks. {f} deposit and {r} every {d} days, cash; the first one now. I'll set up the trays for you."
+Caben {n}.,It holds {n}.
+Alquilarlo,Rent it
+Sin {e} no hay llave.,"No {e}, no key."
+la llave del bajo,the basement key
+Compra las bandejas y tenlas húmedas. Lo demás lo hace el tiempo.,Buy the trays and keep them damp. Time does the rest.
+Pulverizas las bandejas: humedad al {h} %.,You mist the trays: humidity at {h} %.
+Pulverizas las bandejas.,You mist the trays.
+sin bandejas,no trays
+Comprar bandeja ({e}),Buy tray ({e})
+Panes de micelio,Mycelium blocks
+Pulverizar,Mist
+Recoger,Pick
+Tirar las malas,Bin the bad ones
+Venderle {g},Sell him {g}
+Microdosis: {n} caja,Microdoses: {n} box
+Microdosis: {n} cajas,Microdoses: {n} boxes
+Comestibles: {n} caja,Edibles: {n} box
+Comestibles: {n} cajas,Edibles: {n} boxes
+Deshidratador ({e}),Dehydrator ({e})
+Encapsuladora ({e}),Capsule filler ({e})
+Moldes ({e}),Moulds ({e})
+Contratar a {n} ({e}),Hire {n} ({e})
+Dejar el bajo,Leave the basement
+humedad {h} %,humidity {h} %
+El sótano: {e}{h}.,The cellar: {e}{h}.
+El bajo: {e}{h}.,The basement: {e}{h}.
+"Las bandejas las prepara Txomin, en la puerta.","Txomin sets up the trays, at the door."
+Sin dinero no hay bandeja.,"No money, no tray."
+"¿De qué cepa? La Txuria la pongo yo; si no, uno de tus panes.","Which strain? I'll put in Txuria; otherwise, one of your blocks."
+Txuria (la de Txomin),Txuria (Txomin's)
+Lista para colonizar. En {a} días la habrá cogido el micelio; {b} más y a recoger.,Ready to colonise. In {a} days the mycelium will have taken it; {b} more and it's picking time.
+"{d} Cada {n} días, {e} más en el recibo del bajo.","{d} Every {n} days, {e} more on the basement bill."
+Contratarlo,Hire him
+Mañana empieza. Es de fiar: lo he criado yo.,He starts tomorrow. He's trustworthy: I raised him.
+"Recoges {g} g de setas{x} y las tiendes en {s}: en {d}, al armario.","You pick {g} g of mushrooms{x} and lay them on {s}: in {d}, into the cupboard."
+el deshidratador,the dehydrator
+la malla del secadero,the drying mesh
+un día,one day
+{n} días,{n} days
+Recoges las setas y las dejas secando en el bajo: {g} g.,You pick the mushrooms and leave them drying in the basement: {g} g.
+Tiras {n} bandejas.,You bin {n} trays.
+Tiras la bandeja.,You bin the tray.
++{e} · {n} caja de microdosis,+{e} · {n} box of microdoses
++{e} · {n} cajas de microdosis,+{e} · {n} boxes of microdoses
++{e} · {n} caja de comestibles,+{e} · {n} box of edibles
++{e} · {n} cajas de comestibles,+{e} · {n} boxes of edibles
+Esto se mueve solo. {e}.,This stuff sells itself. {e}.
+Sin {e} no hay trato.,"No {e}, no deal."
+"Te lo bajo yo y lo enchufo junto al secadero: lo que recojas, seco en un día.","I'll bring it down and plug it in by the drying rack: whatever you pick, dry in a day."
+"La encapsuladora, en la mesa de trabajo. Con setas secas del armario, cajas de microdosis.","The capsule filler, on the workbench. With dried mushrooms from the cupboard, boxes of microdoses."
+"Los moldes y el chocolate, en la mesa de trabajo. Con setas secas del armario, cajas de comestibles.","The moulds and chocolate, on the workbench. With dried mushrooms from the cupboard, boxes of edibles."
++{e} · {g} g de setas,+{e} · {g} g of mushrooms
+Para mis clientes de siempre. {e}.,For my regulars. {e}.
+¿Dejas el bajo? Te devuelvo la fianza; lo que haya dentro se queda.,Leaving the basement? I'll return the deposit; whatever's inside stays.
+Dejarlo,Leave it
+"Como quieras. La puerta, cerrada al salir.",As you like. Shut the door on your way out.
+"Sobres de humedad: {n} (uno por tarro, {d} días).","Humidity packs: {n} (one per jar, {d} days)."
+Sin sobres de humedad: lo curado no se afina.,No humidity packs: cured stuff won't refine.
+"GUARDAR: llevas {a} de cogollos y en el camarote caben {b} más ({t} tarros de 10 L). {s}
+A: guardar · B: cerrar.","STORE: you carry {a} of buds and the loft holds {b} more ({t} 10 L jars). {s}
+A: store · B: close."
+"en {n} tarros (este, el {q}.º: {g} g)","in {n} jars (this, no. {q}: {g} g)"
+"{n}: {g}{tj} · {t} % THC{c}{af}.
+A: sacarlo · B: cerrar.","{n}: {g}{tj} · {t} % THC{c}{af}.
+A: take out · B: close."
+afinada al 62 %%,refined at 62 %
+afinándose ({p} %),refining ({p} %)
+"GUARDAR: llevas {a} de cogollos y en la caja caben {b} más.{c}
+A: guardar · B: cerrar.","STORE: you carry {a} of buds and the safe holds {b} more.{c}
+A: store · B: close."
+Con los tarros se curan en {d} días.,With the jars they cure in {d} days.
+"Dinero: {a} de {b} ({c}). Tarros: {d} de {e} ({f}).
+A: guardar o sacar · B: cerrar.","Cash: {a} of {b} ({c}). Jars: {d} of {e} ({f}).
+A: store or take · B: close."
+"{n}: {g}{tj} · {t} % THC{c}.
+A: sacarlo · B: cerrar.","{n}: {g}{tj} · {t} % THC{c}.
+A: take out · B: close."
+"GUARDAR: llevas {a} g de extractos y en la nevera caben {b} g más.{c}
+A: guardar · B: cerrar.","STORE: you carry {a} g of extracts and the fridge holds {b} g more.{c}
+A: store · B: close."
+"En los tarros, en frío, se curan en {d} días.","In the jars, kept cold, they cure in {d} days."
+"Con tarros, se curarían en frío.","With jars, they would cure in the cold."
+"{n}: {g} g · {t} % THC · {c}. Nevera: {r} g de {m} ({p}).
+A: sacarlo · B: cerrar.","{n}: {g} g · {t} % THC · {c}. Fridge: {r} g of {m} ({p}).
+A: take out · B: close."
+curado,cured
+curándose,curing
+sin curar,uncured
+CAJA FUERTE,SAFE
+CAMAROTE,LOFT
+NEVERA,FRIDGE
+No llevas cogollos encima.,You have no buds on you.
+No llevas extractos encima.,You have no extracts on you.
+En la caja no caben más cogollos.,No more buds fit in the safe.
+En la nevera ya no cabe más.,Nothing else fits in the fridge.
+¿Qué guardas en la caja?,What goes in the safe?
+¿Qué guardas en la nevera?,What goes in the fridge?
+Todos los cogollos,All the buds
+Todos los extractos,All the extracts
+Un lote,One batch
+Un extracto,One extract
+Guardas {q} en {s}.,You store {q} in {s}.
+la caja,the safe
+la nevera,the fridge
+No cabe todo: el resto se queda fuera.,Not everything fits: the rest stays out.
+¿Qué guardas?,Store what?
+{n}: ¿cuánto?,{n}: how much?
+En el camarote no caben más tarros: pide otra estantería en la tienda online.,No more jars fit in the loft: order another shelf from the online shop.
+El camarote está lleno.,The loft is full.
+¿Qué guardas en el camarote?,What goes in the loft?
+Guardas {q} en los tarros del camarote.,You store {q} in the loft jars.
+Aquí van las estanterías de los tarros de 10 L. Se piden en la tienda online.,The 10 L jar shelves go here. Order them from the online shop.
+No te cabe nada más encima.,You can't carry any more.
+Sacas {g} de {n}.,You take out {g} of {n}.
+Sacas {g} g de {n}.,You take out {g} g of {n}.
+La mesa de manicurar. ¿Qué haces?,The trimming table. What now?
+Manicurar un lote,Trim a batch
+"La mesa de manicurar: tijeras de punta fina, guantes y una bandeja con rejilla. {x}","The trimming table: fine-tip scissors, gloves and a screened tray. {x}"
+Lo que llevas ya está manicurado.,What you carry is already trimmed.
+Trae cogollos para pelarlos.,Bring buds to trim them.
+Manicurar: ¿qué lote?,Trim: which batch?
+"Con las tijeras, cogollo a cogollo: fuera las hojitas con poca resina, que quede limpio y redondo.","Scissors, bud by bud: off with the low-resin leaves, nice, clean and round."
+MANICURA,TRIMMING
+{n} min,{n} min
+{n}: {g} manicurados en {d}. Se venden un {p} % más caros.,{n}: {g} trimmed in {d}. They sell for {p} % more.
+{n}. ¿Qué haces?,{n}. What now?
+"{n} · {m}
+Flechas: mover · A: dejar aquí · B: como estaba","{n} · {m}
+Arrows: move · A: place here · B: undo"
+Aquí cabe.,It fits here.
+Terminar,Done
+"Esqueje de {n}: pinchado el {a}, aguanta hasta el {b} (hoy es el último).
+A: nombrarlo o tirarlo · B: cerrar.","{n} clone: plugged in on {a}, lasts until {b} (today is the last day).
+A: name or bin it · B: close."
+"Esqueje de {n}: pinchado el {a}, aguanta hasta el {b}.
+A: nombrarlo o tirarlo · B: cerrar.","{n} clone: plugged in on {a}, lasts until {b}.
+A: name or bin it · B: close."
+"Taco vacío · {a} de {b} ocupados. {p}
+{x} · B: cerrar.","Empty plug · {a} of {b} in use. {p}
+{x} · B: close."
+En el propagador llevas {n}.,You have {n} in the propagator.
+El propagador está vacío.,The propagator is empty.
+A: pinchar,A: plug in
+A: ver,A: view
+CARRO DE ESQUEJES,CLONE CART
+"Hueco libre en la balda · {a} de {b} bandejas. Las prepara Txomin, en la puerta.
+B: cerrar.","Free spot on the shelf · {a} of {b} trays. Txomin sets them up, at the door.
+B: close."
+el micelio cubre el {p} % del sustrato,mycelium covers {p} % of the substrate
+las setas crecen: {p} %,mushrooms growing: {p} %
+lista para recoger,ready to pick
+contaminada: hay que tirarla,contaminated: bin it
+seca: hay que tirarla,dried out: bin it
+día {a} de {b},day {a} of {b}
+"Bandeja {n}{c} · {q}{d} · humedad {h} %.
+A: pulverizar, recoger o tirar · B: cerrar.","Tray {n}{c} · {q}{d} · humidity {h} %.
+A: mist, pick or bin · B: close."
+EL SÓTANO,THE CELLAR
+EL BAJO,THE BASEMENT
+En ese hueco no hay bandeja. Las prepara Txomin: se las compras en la puerta.,No tray in that spot. Txomin sets them up: buy them from him at the door.
+"La malla del secadero, sin usar: ahora secas en el deshidratador.","The drying mesh, unused: now you dry in the dehydrator."
+El deshidratador está vacío. Lo que recojas se seca aquí y pasa al armario.,The dehydrator is empty. What you pick dries here and goes to the cupboard.
+La malla del secadero está vacía. Lo que recojas se seca aquí y pasa al armario.,The drying mesh is empty. What you pick dries here and goes to the cupboard.
+"En el deshidratador, {g} de setas secándose; las primeras pasan al armario el {d}.","In the dehydrator, {g} of mushrooms drying; the first go to the cupboard on {d}."
+"En la malla del secadero, {g} de setas secándose; las primeras pasan al armario el {d}.","On the drying mesh, {g} of mushrooms drying; the first go to the cupboard on {d}."
+Microdosis ({n} g),Microdoses ({n} g)
+Comestibles ({n} g + {e}),Edibles ({n} g + {e})
+Juntar micelios,Join mycelia
+El cuaderno,The notebook
+"La mesa de trabajo, con la báscula. Para las microdosis falta la encapsuladora y para los comestibles, los moldes: te los consigue Txomin, en la puerta.","The workbench, with the scales. Microdoses need the capsule filler and edibles need the moulds: Txomin gets them for you, at the door."
+"La mesa de trabajo. En el armario, {g} de setas secas.","The workbench. In the cupboard, {g} of dried mushrooms."
+Hacen falta {n} g de setas secas del armario.,You need {n} g of dried mushrooms from the cupboard.
+Sin {e} no hay chocolate.,"No {e}, no chocolate."
+"Llenas las cápsulas con la encapsuladora y cierras la cajita: una caja de microdosis, al armario.","You fill the capsules with the filler and close the little box: one box of microdoses, into the cupboard."
+"Fundes el chocolate, llenas los moldes y, cuando enfría, los encajas: una caja de comestibles, al armario.","You melt the chocolate, fill the moulds and, once cool, box them: one box of edibles, into the cupboard."
+"Setas secas: {g}{c} · microdosis: {m} · comestibles: {k}.{s}
+B: cerrar.","Dried mushrooms: {g}{c} · microdoses: {m} · edibles: {k}.{s}
+B: close."
+"Secándose, {g}.","Drying, {g}."
+EL ARMARIO,THE CUPBOARD

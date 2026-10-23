@@ -1,0 +1,19 @@
+{
+  "grupo": "edificio-colmenas",
+  "celda": [
+    48,
+    32
+  ],
+  "tope_colores": 32,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 9,
+  "distancia_media": 0,
+  "colores_finales": 16,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}
