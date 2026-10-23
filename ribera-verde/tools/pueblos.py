@@ -35,7 +35,8 @@ SOLIDO = ("water", "roof", "wall", "win", "iwT", "iwB", "void", "hito_", "via")
 # sitios fijos del código (calle.gd, campo.gd, mundo.gd) y de las pruebas (enter_map de tests/*.gd): ni el suelo ni lo de encima
 FIJOS = {
 	"town": [(16, 17), (16, 16), (10, 9), (7, 12), (5, 9), (10, 10), (9, 2), (3, 10), (9, 3), (8, 8), (7, 14), (8, 14), (31, 9), (30, 9),
-		(31, 8), (30, 8), (21, 22), (14, 10), (12, 10), (10, 12), (9, 1), (9, 0), (2, 28), (14, 28), (2, 29), (14, 29), (20, 19)],
+		(31, 8), (30, 8), (21, 22), (14, 10), (12, 10), (10, 12), (9, 1), (9, 0), (2, 28), (14, 28), (2, 29), (14, 29), (20, 19)]
+		+ [(5, y) for y in range(10, 19)],   # la recta de la persecución de tests/ciclo.gd, del portal hacia abajo
 	"valdehierro": [(17, 8), (23, 7), (15, 11), (23, 8), (12, 8), (12, 7)] + [(x, y) for x in range(21, 26) for y in range(12, 18)],
 	"puerto": [(20, 9), (17, 9), (10, 10)] + [(x, y) for x in range(22, 27) for y in range(9, 15)],
 	"mendialde": [(20, 19), (21, 19), (20, 20)] + [(x, y) for x in range(19, 24) for y in range(12, 18)],
