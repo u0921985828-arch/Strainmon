@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El cuaderno azul de la tía Maite (lo pidió el usuario: «el juego ya me aburre… igual le falta historia, falta contexto»; con `Datos.CAL`)
+- Un hilo de historia por encima de la deuda (`src/hilo.gd`, entre `ciudad` y `retencion`; `S.hilo`): Kiko (SMS al amanecer desde el capítulo 3), Delroy y la noche de la Copa del 98, los tres trozos del cuaderno con Miren, la serora de la ermita y la abuela Txaro (en cualquier orden), la lata del manzano de la huerta y una elección: contarlo en la asociación, ir a por Baltasar o guardártelo. Texto completo en `docs/GUION.md`.
+- Pararte con la gente (la cena de Miren, la vela de la serora, el café de Txaro) cambia el SMS del final.
+- OBJETIVO → LA TÍA MAITE con los pasos; las escenas entran por `hilo_talk` al principio de `npc_talk` (si no toca, lo de siempre), `hilo_dia` al amanecer y `hilo_entra` en `enter_map`. Inglés en `godot/i18n/partes/hilo.csv`.
+- Prueba `tests/hilo.gd`.
+
 ### Bilbao por dentro y los pueblos con su sitio (lo pidió el usuario: «hay edificios que no se puede acceder… molaría poder acceder al teatro… y a la iglesia también… piensa en qué edificios podrían tener juego en la historia» y «toca también los otros… que no sea todo el mismo esquema de pueblo… más natural, que no sea tan cuadrado. Pero que los píxeles sean perfectos»)
 - Con `Datos.CAL`, se entra al teatro, la catedral, San Nicolás, la parroquia de Zorroza y el mercado de la Ribera (`BILBAO.IN`, `BILBAO.NPC` de `tools/bilbao.py`; interiores a mano en `tools/sprites/a-mano/interiores_bilbao.py`; `src/ciudad.gd`, entre `copa` y `retencion`), cada uno con su horario en la puerta (`HORARIO`, `entra_ciudad`).
 - El teatro: taquilla de 18:00 a 21:00 (`TAQUILLA`, 18 €), una obra inventada por semana (`OBRAS`), la función de 21:00 a 23:00 en la butaca y el entreacto, donde Ainhoa te pide el número (un VIP en la agenda); el actor que ensaya y el cartel, el telón, el decorado y el palco con su texto.

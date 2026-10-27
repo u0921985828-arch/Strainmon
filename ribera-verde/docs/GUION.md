@@ -351,6 +351,19 @@ Eres de Mendialde, un pueblo de caseríos de la comarca. La tía Maite ha muerto
 
 **La última página** (al final del diario): «Si lees esto, Miren te ha encontrado. El segundo premio del 98 lo sacamos entre las dos, aunque el diploma lo colgué yo. Lo de Baltasar no fue por el piso: le pedí el dinero cuando a Miren le querían quitar el caserío, y no se lo conté a nadie. No le debas nada a quien no sabe perder. Y cuida las semillas: son lo único que no se puede comprar. M.»
 
+## El cuaderno azul (con `Datos.CAL`, `src/hilo.gd`)
+
+Un hilo propio por encima de la deuda: lo que pasó en la Copa de 1998. OBJETIVO → LA TÍA MAITE dice el paso que toca (`HILO_PASOS`).
+
+1. **Kiko** (SMS al amanecer desde el capítulo 3, o hablando con él): la tía tenía un cuaderno azul con su planta madre, la Haze del 98, que nunca metió en la CannaDex. Esa noche estuvo con Delroy.
+2. **Delroy** (la asociación): Baltasar también se presentó; Toño llevaba los tarros al jurado y el de la tía apareció con moho. Ganó Baltasar. La tía partió el cuaderno en tres.
+3. **Los tres trozos**, en el orden que quieras: **Miren** (después de la última página; quedarte a cenar o no), **la serora** de la ermita de Mendialde (encender una vela por la hermana de la tía y dejar 50 € en el cepillo, o solo coger el sobre) y **la abuela Txaro**, en su casa (tomarte el café o no). Juntos: «Toño cambió mi tarro… Las semillas, en la lata de galletas, debajo del manzano de la huerta».
+4. **La huerta** de detrás del garaje: la lata, 5 semillas de Super Silver Haze y la nota («haz con esto lo que yo no me atreví. O no hagas nada: también vale»). Ahí se elige:
+   - *Contarlo en la asociación* → Delroy lo cuelga junto a la foto de la tía: 3 semillas de Lamb's Bread, +5 de reputación y confianza con Delroy.
+   - *Ir a por Baltasar* → «Toño hizo lo que le dijeron»: 3.000 € en efectivo para que no vuelvas a nombrarla (+5 de calor).
+   - *Guardártelo* → se cierra ahí.
+5. **El final**: SMS de Kiko según lo elegido y según si te paraste con la gente (la cena, la vela, el café: dos o más).
+
 ## La caja fuerte
 
 *Ordenador → «Notas de la tía»:*

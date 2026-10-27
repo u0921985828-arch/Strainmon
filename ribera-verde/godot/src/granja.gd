@@ -167,6 +167,7 @@ func new_day() -> void:
 	vida_dia()   # MAESTRO [7]: los fiados que vencen y los encargos que caducan
 	conce_dia()   # 1.43
 	vencer_encargo_club()
+	hilo_dia()   # con CAL, el cuaderno azul de la tía (hilo.gd)
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 		queue("penalty", penalty_event)
 	elif S.due > 0 and (S.deadline - S.day == 3 or S.deadline == S.day):   # 1.11: a 3 días y el último

@@ -1307,6 +1307,8 @@ func objetivo_menu():
 		if iti and itin_sig() != null:
 			ini = 1
 		var plazo := T("Plazo: {e} antes de que acabe el {f}. Llevas {l}.\n", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day), "l": Datos.eur(S.money + caja_e())}) if S.due > 0 else ""
+		if hilo_visible():   # el cuaderno azul de la tía (hilo.gd)
+			it.append({"label": K("LA TÍA MAITE"), "right": hilo_derecha(), "desc": K("Lo que dejó escrito tu tía y la gente que la conoció. Pulsa A para verlo.")})
 		if Datos.CAL:   # 1.51
 			var rv := recados_ver()
 			it.append({"label": K("RECADOS"), "right": "%d/%d" % [rv.filter(func(sc): return sec_estado(sc.id) == 2).size(), rv.size()], "desc": K("Lo que te piden por la comarca, según el capítulo. Pulsa A para verlos.")})
@@ -1318,6 +1320,9 @@ func objetivo_menu():
 		var i: int = await menu(it, {"cls": "full", "title": K("OBJETIVO"), "title2": T("cap. {n}", {"n": S.ch}),"desc": true, "initial": ini})
 		if iti and i == 1:
 			await itinerario_menu()
+			continue
+		if i >= 0 and it[i].label == K("LA TÍA MAITE"):
+			await hilo_menu()
 			continue
 		if i >= 0 and it[i].label == "DIARIOS":
 			await diario_menu()

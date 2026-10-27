@@ -1655,6 +1655,8 @@ func npc_cond(d: Dictionary) -> bool:
 	return true
 
 func npc_talk(d: Dictionary) -> void:
+	if await hilo_talk(String(d.id)):   # con CAL, el cuaderno azul de la tía (hilo.gd)
+		return
 	if d.id.begins_with("sec_") or d.id.begins_with("secb_"):   # 1.51: los recados
 		await talk_sec(d.id)
 		return
@@ -2216,6 +2218,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	montar_aparcamiento(name_)
 	arboles_fuera(name_)   # con CAL, ningún árbol encima de un edificio
 	vallas_dentro(name_)   # con CAL, la valla encima de lo que acota
+	hilo_entra(name_)   # con CAL, la lata de la tía en la huerta (hilo.gd)
 	P.x = x
 	P.y = y
 	P.px = x * 16.0
@@ -3046,3 +3049,22 @@ func funcion_teatro() -> void:
 
 func rato_iglesia() -> void:
 	pass
+
+# el cuaderno azul de la tía (hilo.gd)
+func hilo_talk(_id: String) -> bool:
+	return false
+
+func hilo_dia() -> void:
+	pass
+
+func hilo_entra(_mapa: String) -> void:
+	pass
+
+func hilo_visible() -> bool:
+	return false
+
+func hilo_menu() -> void:
+	pass
+
+func hilo_derecha() -> String:
+	return ""
