@@ -1054,8 +1054,9 @@ scad16f8a,"Cortas una punta de la {s}{e} y la pones a enraizar.
 Plántala antes del {d}: es la misma planta.","You cut a tip off the {s}{e} and set it to root.
 Plant it before {d}: it's the same plant."
 s520771d4,O pínchala en el carro: allí aguanta {n} días.,Or stick it in the cart: it lasts {n} days there.
-s20676bad,Plaza vacía con una maceta de {m}.,Empty spot with a {m} pot.
 sc0300166,Cambiar maceta,Change pot
+s7551beb4,Completar la carpa,Fill the tent
+s20676bad,Plaza vacía con una maceta de {m}.,Empty spot with a {m} pot.
 s70ab0f1d,La {s} se ha secado del todo.,The {s} has dried out completely.
 se9b9b1e8,Retiras la planta muerta.,You remove the dead plant.
 s71bb313a,"{s}{e} lista para cosechar.
@@ -1082,6 +1083,10 @@ sb1a4540a,No tienes FUNGICIDA. Lo venden en el growshop.,You have no FUNGICIDE. 
 s25ccf54d,Aplicas el PREVENTIVO: la botritis no la coge en {n} días.,You apply the PREVENTIVE: no botrytis for {n} days.
 se427de54,¿Seguro que quieres arrancarla?,Sure you want to uproot it?
 s94ab7537,Arrancas la planta.,You uproot the plant.
+s349faa79,{n} macetas de {m},{n} pots of {m}
+sb195441c,COMPLETAR CON MACETAS,FILL WITH POTS
+s9495d8f4,Las plazas vacías · tierra {a} de {b} L,The empty spots · soil {a} of {b} L
+s9758615d,Pones {n} macetas de {m}: tierra {a} de {b} L. Las viejas van a la mochila.,You put in {n} pots of {m}: soil {a} of {b} L. The old ones go to your backpack.
 se130c299,tierra {a} de {b} L,soil {a} of {b} L
 s9eea625f,No cabe más tierra en la carpa ({tl}).,No more soil fits in the tent ({tl}).
 s2595ab39,No tienes otra maceta que quepa aquí.,You have no other pot that fits here.
@@ -1154,6 +1159,7 @@ s50abd315,Cambiar foco,Change light
 sacf62bc1,Poner {x},Install {x}
 s53a8f137,Rellenar depósito,Refill tank
 sceaadbc6,Rellenar garrafas,Refill jugs
+s6b9d6eb9,Completar con macetas,Fill with pots
 s92dd5f4a, · goteo {a} de {b} L, · drip {a} of {b} L
 sbb7a63c2, · garrafas {a} de {b} L, · jugs {a} of {b} L
 s228e2460,"{c} · {p} plantas · {f}
@@ -1813,6 +1819,7 @@ safbefe26,"Antes, espera a que llegue la carpa que tienes pedida.",
 s4d9e530d,Comprarla,Buy it
 s5ca3c99d,Carpas de segunda mano (KAIA),Second-hand tents (KAIA)
 sa6dbc08a,"Pedido: la primera {c} llega mañana, con sus LED, el extractor y el goteo; caben {m}.","Ordered: the first {c} arrives tomorrow, with its LEDs, the extractor and the drip; {m} fit."
+sfd4c407c,"Las {n} macetas que pusiste tú, a la mochila.",The {n} pots you put in go to your backpack.
 sf47682b4,"La sala entera como la nave: {l}. En total, {e}, con la tarjeta; la obra dura {d} días. Después, las mesas las lleva alguien de tu plantilla.","The whole room like the warehouse: {l}. {e} in total, by card; the works take {d} days. Afterwards, someone from your crew runs the tables."
 s110640e9,Las carpas se desmontan y se venden de segunda mano por {e}.,The tents are taken down and sold second-hand for {e}.
 sc303f5e0,Hacer la obra,Do the works
@@ -1822,8 +1829,29 @@ s100c7a74,"Sin la licencia de cultivo, las carpas se quedan vacías.","Without t
 s1d69b400,Plaza {n},Spot {n}
 s752e7823,{st} {p}% · Agua {w}% · Salud {h}%,{st} {p}% · Water {w}% · Health {h}%
 s538df21c,vacía,empty
-sbaef3c8b,Una maceta de tela con su gotero.,A fabric pot with its dripper.
+s8ff47b86,Una maceta de tela de {l} L con su gotero.,A {l} L fabric pot with its dripper.
+saa6f0092,Esquema de la carpa,Tent layout
+s53495bb1,"Con las macetas que tienes, puedes ponerle {q}.","With the pots you have, you can give it {q}."
+s6c351022,"Cuántas macetas lleva y de qué tamaño: con otro esquema, más plantas más pequeñas o menos y más grandes.","How many pots it holds and what size: with another layout, more smaller plants or fewer bigger ones."
 se404e6e7,LA CARPA {n},TENT {n}
+s6e5f516a,{n} de {l} L,{n} of {l} L
+sdb75e055,{n} macetas de {l} L,{n} pots of {l} L
+s47c3d2de,puesto,in place
+sd4507e06,tienes {t},you have {t}
+s158db214,las tienes,you have them
+s85fa8bb3,{tl} L de tierra · unos {g} por planta y {c} la carpa por cosecha · {r},{tl} L of soil · about {g} per plant and {c} the tent per harvest · {r}
+s353d5e7a,crecen un {c} % más deprisa,they grow {c} % faster
+sd81d40f6,crecen a su ritmo,they grow at their own pace
+s36a65276,ESQUEMA DE LA CARPA {n},LAYOUT OF TENT {n}
+s363e8370,Ahora: {n} macetas de {l} L,Now: {n} pots of {l} L
+s49146641,La carpa ya lleva ese esquema.,The tent already has that layout.
+s7216f7af,"Antes, cosecha o arranca lo que tengas en esta carpa: las macetas se cambian con la carpa vacía.","First, harvest or pull what you have in this tent: pots are changed with the tent empty."
+sfbddb53b,"Quitas las {a} macetas de {la} L y pones {n} de {l} L, con sus goteros: {tl} L de tierra. Las que sobren, a la mochila.","You take out the {a} pots of {la} L and put in {n} of {l} L, with their drippers: {tl} L of soil. The spare ones go to your backpack."
+s01e0bbc7,Tienes {t}: las {f} que faltan se piden por {e} con la tarjeta y te las suben ahora.,You have {t}: the {f} missing ones are ordered for {e} by card and brought up now.
+s1bc7a687,Ponerlas,Put them in
+s6245d91a,Pedirlas y ponerlas,Order and put them in
+s3968dbb5,Macetas de la sala de cultivo (KAIA),Pots for the grow room (KAIA)
+scb460765,"La carpa {c}, con {n} macetas de {l} L y sus goteros.","Tent {c}, with {n} pots of {l} L and their drippers."
 s39d6b660,Me,
 s5742a7d0,Arrancar y plantar,Uproot and plant
 sbfb12456,Llevarte lo seco · {g},Take the dried buds · {g}
@@ -6572,6 +6600,11 @@ sf138d32b,Maceta de tela 35 L,Fabric pot 35 L
 s38a42a64,"35 L · hasta 290 g por planta · cosecha +8% · riego ×1 · menos plagas
 Para la carpa de 150 × 100 y las de KAIA. Se cambia en una plaza vacía de la carpa.","35 L · up to 290 g per plant · harvest +8% · watering ×1 · fewer pests
 For the 150 × 100 tent and the KAIA ones. Swapped in an empty spot of the tent."
+s16b3bb7b,Tela 50 L,Fabric 50 L
+sd2984e1c,Maceta de tela 50 L,Fabric pot 50 L
+s7c8781f2,"50 L · hasta 410 g por planta · cosecha +10% · riego ×0,95 · menos plagas
+Para las carpas de KAIA: en el esquema de cada carpa.","50 L · up to 410 g per plant · harvest +10% · watering ×0.95 · fewer pests
+For the KAIA tents: in each tent's layout."
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -6603,6 +6636,7 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+sbaef3c8b,Una maceta de tela con su gotero.,A fabric pot with its dripper.
 sd5b6a75f,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip and the climate. All automatic: long days while they grow and shorter ones once it's time to flower."
 s1f41b1f3,Comprar un kit de carpa · {e},Buy a tent kit · {e}
 s6f594fca,Comprar un kit,Buy a tent kit

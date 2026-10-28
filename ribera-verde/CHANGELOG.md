@@ -2,6 +2,13 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Siguiente (sin APK todavía) · los esquemas de macetas de las carpas (lo pidió el usuario: «Posibilidad de poner x de cierto tamaño, elegir por patrones igual, cuando ya tienes ciertas macetas para completar todo el esquema de la carpa te ofrece poner X cantidad dependiendo de cada maceta»; con `Datos.CAL`)
+
+- En KAIA, cada carpa con su esquema: A en la carpa → «Esquema de la carpa» elige cuántas macetas lleva y de qué tamaño (`KC_PATRON` de `tools/patrones.py`, en rejilla y sin pasar de 100 L por m²: la de 200 × 200, 16 de 25 L, 9 de 35 L o 4 de 50 L; la de 400 × 200, 32, 18 u 8; la de 400 × 400, 64, 36 o 16). Con las macetas que tienes se ponen sin pagar y la carpa te dice qué esquemas puedes completar ya; si faltan, se piden las que faltan por la cuenta. Solo con la carpa vacía; las que quitas, a la mochila. La luz de la carpa se reparte entre todas (los mismos gramos por carpa, por la maceta) y cuantas más, antes cierran el hueco (× (n / plazas del kit)^0,1: 16, un 15 % más deprisa). El dibujo de la carpa, a escala. Al pasar al nivel siguiente o reformar, las macetas que pusiste tú vuelven a la mochila (`S.kc.pat`, `kc_pat`, `kc_off`, `kc_ci`, `kc_esquema`, `kc_pon_pat`, `kc_devuelve_macetas`, `kc_dibujo`; las plazas de las carpas van seguidas en `S.kc.p`; sin esquema, el del kit, como antes).
+- La maceta de tela de 50 L (`MACETA50`, 410 g por planta, cosecha +10 %, 8 €, cap. 4, detrás de la de 35 L en la tienda): solo para los esquemas de KAIA (ninguna carpa de casa la admite).
+- En casa, completar la carpa: con macetas de un tamaño para todas las plazas vacías que no lo llevan, y sin pasar de la tierra de la carpa, la carpa (y una plaza vacía) ofrece «Completar con macetas» (`completa_macetas`, `completar_macetas` en `granja.gd`); las viejas, a la mochila.
+- Prueba `tests/patrones.gd`.
+
 ### 0.65.4 (código 89) · nombres reales, más tierra, la maceta de 35 L y el seto (lo pidió el usuario); APK en `descargas/LandraceHunters.apk` (89 MB)
 
 - Con `Datos.PLAY` vuelven los nombres reales de las variedades y las extracciones («volviésemos a usar los nombres originales de cepas y de extracciones»); solo el kit Ice-o-lator sale como «Ice Hash» («Ais-o-lator… es demasiado cateto»). `NOMBRES` en `tools/play.py` (las parodias de antes en `PARODIA`, sin usar), `datos/play.json`, i18n sin parodias; prueba `tests/play.gd`.

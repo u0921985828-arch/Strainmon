@@ -412,9 +412,14 @@ func pot_action(i: int, hu = null) -> void:
 	var p = L[i]
 	if p == null:
 		if not hu and macetas_libres(i, false).size():
-			var c: int = await ask(T("Plaza vacía con una maceta de {m}.", {"m": D.MACETAS[S.macetas[i]].n}), [K("Plantar"), K("Cambiar maceta"), K("Salir")])
+			var cm := completa_macetas(huecos()[i].c) if Datos.CAL else []
+			var co := [K("Plantar"), K("Cambiar maceta")] + ([K("Completar la carpa")] if cm.size() > 0 else []) + [K("Salir")]
+			var c: int = await ask(T("Plaza vacía con una maceta de {m}.", {"m": D.MACETAS[S.macetas[i]].n}), co)
 			if c == 1:
 				await cambiar_maceta(i)
+				return
+			if cm.size() and c == 2:
+				await completar_macetas(huecos()[i].c, cm)
 				return
 			if c != 0:
 				return
@@ -534,6 +539,45 @@ func macetas_libres(i: int, tierra := true) -> Array:
 		if S.items.get("m_" + k, 0) > 0 and D.MACETAS[k].l <= C.lmax and k != S.macetas[i] and (not tierra or D.MACETAS[k].l <= sobra):
 			o.append(k)
 	return o
+
+# completar la carpa ci con macetas de un tamaño (con CAL; lo pidió el usuario: «cuando ya tienes ciertas macetas para completar todo
+# el esquema de la carpa te ofrece poner X cantidad dependiendo de cada maceta»): por cada maceta que quepa (lmax) y de la que tengas
+# para todas las plazas vacías que no la llevan, sin pasar de la tierra de la carpa: [[maceta, [plazas]]…]
+func completa_macetas(ci: int) -> Array:
+	var C: Dictionary = D.CARPAS[S.carpas[ci].t]
+	var hu := huecos()
+	var o := []
+	for k in D.MACETAS:
+		if int(D.MACETAS[k].l) > int(C.lmax):
+			continue
+		var cambia := []
+		var l := litros_carpa(ci)
+		for i in hu.size():
+			if hu[i].c == ci and S.pots[i] == null and S.macetas[i] != k:
+				cambia.append(i)
+				l += int(D.MACETAS[k].l) - int(D.MACETAS.get(S.macetas[i], D.MACETAS.plastico7).l)
+		if cambia.size() and int(S.items.get("m_" + k, 0)) >= cambia.size() and l <= litros_max(ci):
+			o.append([k, cambia])
+	return o
+
+func completar_macetas(ci: int, cm: Array) -> void:
+	var it := []
+	for q in cm:
+		it.append({"label": T("{n} macetas de {m}", {"n": q[1].size(), "m": D.MACETAS[q[0]].n}), "right": "×" + n(S.items["m_" + q[0]]), "ic": icono("maceta"), "desc": desc_maceta(q[0])})
+	var j: int = await menu(it, {"cls": "full", "title": K("COMPLETAR CON MACETAS"), "title2": T("Las plazas vacías · tierra {a} de {b} L", {"a": litros_carpa(ci), "b": litros_max(ci)}), "desc": true})
+	if j < 0 or j >= cm.size():
+		return
+	var k: String = cm[j][0]
+	var hu := huecos()
+	var gc: Dictionary = S.carpas[ci]
+	for i in cm[j][1]:
+		S.items["m_" + k] -= 1
+		S.items["m_" + S.macetas[i]] = S.items.get("m_" + S.macetas[i], 0) + 1
+		S.macetas[i] = k
+		if gc.get("gar") != null and hu[i].j < gc.gar.size():   # su garrafa, llena para la maceta nueva
+			gc.gar[hu[i].j] = null
+	sfx("sel")
+	await say(T("Pones {n} macetas de {m}: tierra {a} de {b} L. Las viejas van a la mochila.", {"n": cm[j][1].size(), "m": D.MACETAS[k].n, "a": litros_carpa(ci), "b": litros_max(ci)}) + pista_rastro())
 
 func cambiar_maceta(i: int) -> void:
 	var l := macetas_libres(i)
@@ -758,6 +802,9 @@ func carpa_action(ci: int) -> void:
 		opts.append(T("Poner {x}", {"x": I18n.v(String(D.EXTRAS[k].c)).to_lower()}))
 	if ll:
 		opts.append(K("Rellenar depósito") if c.get("goteo") else K("Rellenar garrafas"))
+	var cm := completa_macetas(ci) if Datos.CAL else []
+	if cm.size():
+		opts.append(K("Completar con macetas"))
 	opts.append(K("Salir"))
 	var gt: String = T(" · goteo {a} de {b} L", {"a": Datos.miles(floor(dep)), "b": Datos.miles(gl)}) if c.get("goteo") else (T(" · garrafas {a} de {b} L", {"a": int(floor(ga[0])), "b": int(ga[1])}) if gar else "")
 	var k: int = await ask(T("{c} · {p} plantas · {f}\n{w} W/m² · luz {e} al día con plantas{gt}", {"c": C.n, "p": n(C.plazas), "f": F.n, "w": Datos.jsround(F.w / (C.cm[0] * C.cm[2] / 1e4)), "e": Datos.eur(luz_carpa(ci)), "gt": gt}), opts)
@@ -768,6 +815,9 @@ func carpa_action(ci: int) -> void:
 		c.dep = gl
 		sfx("sel")
 		await say(T("Llenas el depósito del goteo: {l} L.", {"l": Datos.miles(gl)}))
+		return
+	if opts[k] == "Completar con macetas":
+		await completar_macetas(ci, cm)
 		return
 	if opts[k] == "Rellenar garrafas":
 		c.gar = []

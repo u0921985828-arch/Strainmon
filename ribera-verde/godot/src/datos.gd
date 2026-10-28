@@ -150,6 +150,18 @@ static func _aplica_auto() -> void:
 			for k in M35.lmax:
 				D.CARPAS[k].lmax = D._base.lmax[k]
 			D.KAIA_CULT.maceta = D._base.kaia
+	# la de 50 L, solo para los esquemas de las carpas de KAIA (KC_PATRON, tools/patrones.py): en la tienda, detrás de la de 35 L
+	var M50: Dictionary = D.get("MACETA50", {})   # i18n-no
+	if not M50.is_empty():
+		if CAL:
+			D.MACETAS[M50.k] = M50.m
+			D.MACETA_CM[M50.k] = M50.cm
+			if not D.SHOP.has(M50.shop):
+				D.SHOP.insert(D._base.SHOP.size() + (1 if D.SHOP.has(M35.get("shop")) else 0), M50.shop)
+		else:
+			D.MACETAS.erase(M50.k)
+			D.MACETA_CM.erase(M50.k)
+			D.SHOP.erase(M50.shop)
 	# MAESTRO [9]: Hiriburu, la ciudad de la autopista (solo con CAL: su parada, sus km, su zona, sus patrullas y sus clientes)
 	var MT: Dictionary = D.get("METRO", {})
 	if not MT.is_empty():
