@@ -100,12 +100,13 @@ Lo que ya hay se respeta: Toño cambió el tarro, Baltasar lo pagó y la elecci�
 
 Todo con `Datos.CAL`, como siempre; las partidas de antes se migran.
 
-## 8. Lo que decides tú
+## 8. Decisiones (las tomé yo, con tu criterio: «elige como lo haría yo»)
 
-1. ¿El final por la genética (el banco de semillas) en vez de facturar? La rama del tráfico se quedaría como opción.
-2. ¿Los Actos II a IV así, con la lucha por las semillas en vez de por el mercado?
-3. ¿El Acto II oscuro (alguien entró en el piso cuando murió la tía) o más ligero?
-4. ¿Empiezo por la tanda 1?
+1. **El final, por la genética: sí.** El banco de semillas de la tía es la meta final y sustituye a facturar. El tráfico (pisos, franco, mar) se queda como rama opcional, no como final.
+2. **Actos II a IV, por las semillas: sí.** La lucha es por las landraces, no por el mercado. Es lo que distingue al juego de Schedule I, que ya descartaste por ser de venta.
+3. **Acto II, entre medias.** Es un misterio serio (alguien entró en el piso cuando murió la tía), sin morbo ni muertes a la vista. Lleva humor de barrio en la gente, como el resto del guion.
+4. **Se empieza por la tanda 1**, el banco de semillas como meta. Sin él, el resto de las tandas no tiene a dónde llevar al jugador.
+5. **El cuaderno azul (commit 6c1d011) se queda** como Acto I: ya cuenta lo de la tía y lleva a la lata de semillas, que es la puerta del banco.
 
 ## Fuentes
 - [Schedule I · debate en Steam sobre el final (1)](https://steamcommunity.com/app/3164500/discussions/1/599651410936605741)
