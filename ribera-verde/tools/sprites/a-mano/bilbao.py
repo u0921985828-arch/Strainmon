@@ -1094,8 +1094,9 @@ TRAV, TRAVL = '#5a4232', '#7a5a42'                                          # tr
 RIEL, RIELL = '#6a6e74', '#c8ccd0'
 
 
-def via(vertical=False, paso=False, estrecha=False):
-    """la vía de ancho ibérico (los carriles a 7 px) o, estrecha, la de ancho métrico (a 5 px, traviesas más cortas)"""
+def via(vertical=False, paso=False, estrecha=False, fin=None):
+    """la vía de ancho ibérico (los carriles a 7 px) o, estrecha, la de ancho métrico (a 5 px, traviesas más cortas); con `fin`
+    ('o' a la izquierda, 'n' arriba, 's' abajo), la topera del final de la línea en ese lado (el apeadero de cabecera)"""
     lz = Lienzo(64, 16)
     for v in range(4):
         R = azar(1100 + (50 if vertical else 0)); x0 = v * 16          # las cuatro, iguales: nada al azar
@@ -1112,7 +1113,8 @@ def via(vertical=False, paso=False, estrecha=False):
         else:
             for i in range(1, 16, 4):                                       # traviesas
                 if vertical:
-                    lz.r(x0 + 1, i, 14, 2, TRAV); lz.hl(x0 + 1, x0 + 14, i, TRAVL)
+                    a, b = (3, 12) if estrecha else (1, 14)
+                    lz.r(x0 + a, i, b - a + 1, 2, TRAV); lz.hl(x0 + a, x0 + b, i, TRAVL)
                 else:
                     a, b = (3, 12) if estrecha else (1, 14)
                     lz.r(x0 + i, a, 2, b - a + 1, TRAV); lz.vl(x0 + i, a, b, TRAVL)
@@ -1121,7 +1123,37 @@ def via(vertical=False, paso=False, estrecha=False):
                 lz.vl(x0 + c, 0, 15, RIEL); lz.vl(x0 + c - 1, 0, 15, RIELL)
             else:
                 lz.hl(x0, x0 + 15, c, RIEL); lz.hl(x0, x0 + 15, c - 1, RIELL)
+        if fin:
+            topera(lz, x0, fin)
     return lz
+
+
+def topera(lz, x0, fin):
+    """la topera: los carriles cortados y la viga a franjas rojas y blancas sobre dos pies, a 2 px del canto"""
+    for t in range(4):                                                      # hasta la viga, balasto sin carriles
+        for u in range(16):
+            if fin == 'o':
+                lz.p(x0 + t, u, BAL)
+            else:
+                lz.p(x0 + u, t if fin == 'n' else 15 - t, BAL)
+    for u in range(2, 14):                                                  # la viga, a franjas de 2
+        c = '#d83a30' if (u // 2) % 2 else '#f0ece4'
+        for t in (4, 5):
+            if fin == 'o':
+                lz.p(x0 + t, u, c)
+            else:
+                lz.p(x0 + u, t if fin == 'n' else 15 - t, c)
+    for u in (2, 13):                                                       # los pies, oscuros, hacia fuera
+        for t in (2, 3, 4, 5):
+            if fin == 'o':
+                lz.p(x0 + t, u, '#2a2a30')
+            else:
+                lz.p(x0 + u, t if fin == 'n' else 15 - t, '#2a2a30')
+    for u in range(2, 14):                                                  # el canto de la viga
+        if fin == 'o':
+            lz.p(x0 + 6, u, '#2a2a30')
+        else:
+            lz.p(x0 + u, 6 if fin == 'n' else 9, '#2a2a30')
 
 
 def adoquin():
@@ -1356,7 +1388,9 @@ SPRITES = {
     'grua': lambda: guarda('edificio-grua', grua()),
     'tiles': lambda: [sale(f(), 'tiles-bilbao', k) for k, f in (('via', via), ('viaV', lambda: via(True)), ('viaX', lambda: via(False, True)),
                                                                ('viaXV', lambda: via(True, True)),
-                                                               ('viaE', lambda: via(estrecha=True)), ('viaEX', lambda: via(False, True, True)), ('adoq', adoquin), ('muelleP', muelle))],
+                                                               ('viaE', lambda: via(estrecha=True)), ('viaEX', lambda: via(False, True, True)),
+                                                               ('viaEV', lambda: via(True, estrecha=True)), ('viaEF', lambda: via(estrecha=True, fin='o')),
+                                                               ('viaEFN', lambda: via(True, estrecha=True, fin='n')), ('viaEFS', lambda: via(True, estrecha=True, fin='s')), ('adoq', adoquin), ('muelleP', muelle))],
     'props': lambda: [sale(baranda(), 'props-bilbao', 'baranda'), sale(papelera(), 'props-bilbao', 'papelera'), sale(bolardo(), 'props-bilbao', 'bolardo'),
                       sale(platano(), 'props-bilbao-alto', 'platano'), sale(metro(), 'props-bilbao-ancho', 'metroB'),
                       sale(contenedores(), 'props-bilbao-ancho', 'contenedores'), sale(escalera(), 'props-bilbao-ancho', 'escZ'),

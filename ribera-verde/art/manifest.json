@@ -12958,6 +12958,10 @@
     "tile:viaXV",
     "tile:viaE",
     "tile:viaEX",
+    "tile:viaEV",
+    "tile:viaEF",
+    "tile:viaEFN",
+    "tile:viaEFS",
     "tile:adoq",
     "tile:muelleP",
     "tile:puenteV"

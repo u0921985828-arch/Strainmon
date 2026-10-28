@@ -73,6 +73,50 @@ func hace(q: Array, f: Callable) -> String:
 	return " ".join(LOG)
 
 # lo que se alcanza andando desde donde se llega: puertas y salidas de los otros mapas, la parada y las propias salidas
+# la vía del apeadero (lo pidió el usuario: «el apeadero deberá de estar cerca de unas vías»): pegada a la caseta, vía estrecha,
+# sin pisar nada que se ande; cada extremo, en el canto del mapa (va a alguna parte) o en su topera
+func vias_apeadero(k: String) -> void:
+	var m: Dictionary = J.MAPS[k]
+	var W := int(m.w)
+	var H := int(m.h)
+	var b: Dictionary = {}
+	for q in D.PUEBLOS.MAPS[k].blds:
+		if q.get("hito", "") == "apeadero":
+			b = q
+	var es_via := func(x: int, y: int) -> bool:
+		return x >= 0 and y >= 0 and x < W and y < H and String(m.g[y][x]).begins_with("viaE")
+	var ini := Vector2i(-1, -1)
+	for y in range(int(b.y0) - 1, int(b.y0) + int(b.h) + 1):
+		for x in range(int(b.x0) - 1, int(b.x0) + int(b.w) + 1):
+			if es_via.call(x, y):
+				ini = Vector2i(x, y)
+	chk(ini.x >= 0, "%s: el apeadero sin vía al lado" % k)
+	if ini.x < 0:
+		return
+	var vistos := {ini: true}
+	var cola := [ini]
+	var ok_fin := true
+	var al_canto := false
+	var anda := alcance(k)
+	while not cola.is_empty():
+		var c: Vector2i = cola.pop_back()
+		chk(not anda.has("%d,%d" % [c.x, c.y]) and m.o[c.y][c.x] == null, "%s: la vía en (%d, %d) se pisa o lleva algo encima" % [k, c.x, c.y])
+		var vec := 0
+		for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var q: Vector2i = c + d
+			if es_via.call(q.x, q.y):
+				vec += 1
+				if not vistos.has(q):
+					vistos[q] = true
+					cola.append(q)
+		# el canto por el que sigue: el de su dirección (la vertical, arriba o abajo; la de lado, a los lados)
+		var canto: bool = (c.y == 0 or c.y == H - 1) if String(m.g[c.y][c.x]) in ["viaEV", "viaEFN", "viaEFS"] else (c.x == 0 or c.x == W - 1)
+		if vec < 2:
+			al_canto = al_canto or canto
+			if not canto and not String(m.g[c.y][c.x]).begins_with("viaEF"):
+				ok_fin = false
+	chk(al_canto and ok_fin and vistos.size() >= 6, "%s: la vía no sale del mapa o acaba sin topera (%d casillas)" % [k, vistos.size()])
+
 func alcance(k: String) -> Dictionary:
 	var m: Dictionary = J.MAPS[k]
 	var q := []
@@ -256,6 +300,7 @@ func _corre() -> void:
 		J.enter_map(k, int(a[0]), int(a[1]), "up")
 		chk(alcance(k).has("%d,%d" % [int(a[0]), int(a[1])]), "%s: al apeadero no se llega andando" % k)
 		chk(J.hito_de(int(a[0]), int(a[1]) - 1) == "apeadero", "%s: el apeadero no está delante" % k)
+		vias_apeadero(k)
 	J.S.min = 1400
 	J.enter_map("town", int(J.apeadero_de("town")[0]), int(J.apeadero_de("town")[1]), "up")
 	t = hace(["Coger"], func(): await J.object_action(int(J.apeadero_de("town")[0]), int(J.apeadero_de("town")[1]) - 1))
