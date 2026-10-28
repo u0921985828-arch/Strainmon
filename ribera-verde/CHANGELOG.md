@@ -2,6 +2,10 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.65.1 (código 86) · la mesa con plantas, translúcida en una sola capa (lo pendiente de la 0.65.0; con `Datos.CAL`)
+
+- Detrás de una mesa con plantas (la nave, KAIA), la mesa, las plantas y los focos se pintan juntos en una capa (`capa_unica`, `_con_alfa_capa` en `pinta.gd`: `_img` y `_rect` mezclan en `_capt` en vez de pintar) y esa capa sale a `TAPA_ALFA`: ya no se ve la mesa a través de las plantas. Prueba `tests/translucido.gd` (12/0).
+
 ### 0.65.0 (código 85) · KAIA por niveles, las madres por dentro, la sala fría, la manicura a la vista, el billar con efecto y lo que tapa, translúcido (tanda nueva, lo pidió el usuario; con `Datos.CAL`)
 
 - **KAIA por niveles** (lo pidió el usuario: «4 de 2×2, luego 2 de 4×2, luego una de 4×4 y después la reforma de la sala a mesas»): `KAIA_CULT.niv` en `tools/kaia_cult.py` — cuatro carpas de 200 × 200 (2 LED de 720 W, 4 plazas; kit 2.700 €), dos de 400 × 200 (4 LED, 8 plazas; 5.140 €) y una de 400 × 400 (8 LED, 16 plazas; 10.200 €), cada una una pieza de ORDENAR de su tamaño en casillas (`kc<nivel><i>`). En el cuadro, «Comprar una carpa» y «Pasar a la …» (`kc_sube`: con las plazas vacías, las de antes de segunda mano al 40 % y la primera del nivel nuevo al día siguiente); en el último nivel, «Reformar la sala». Las carpas, a mano en `kaia_carpa.py` (`carpa_kc`: frente, techo por metros, un LED por columna, extractor y filtro). Las partidas de antes pasan al nivel 1 (o al 0 con la obra) con sus plantas.

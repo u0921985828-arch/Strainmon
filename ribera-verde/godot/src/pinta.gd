@@ -159,12 +159,21 @@ static func css(s: String) -> Color:
 	return c
 
 func _img(im: Image, x: float, y: float, mod := Color.WHITE) -> void:
+	if _capt != null and mod == Color.WHITE:
+		var o: Image = im if im.get_format() == Image.FORMAT_RGBA8 else _rgba(im)
+		_capt.blend_rect(o, Rect2i(0, 0, o.get_width(), o.get_height()), Vector2i(roundi(x), roundi(y)) - _capt_o)
+		return
 	if alfa < 1.0:
 		mod.a *= alfa
 	Atlas.dibuja(L, im, Rect2(x, y, im.get_width(), im.get_height()), null, mod)
 
 func _rect(x: float, y: float, w: float, h: float, c: Color) -> void:
 	if w > 0 and h > 0:
+		if _capt != null:
+			var q := Image.create(roundi(w), roundi(h), false, Image.FORMAT_RGBA8)
+			q.fill(c)
+			_capt.blend_rect(q, Rect2i(0, 0, q.get_width(), q.get_height()), Vector2i(roundi(x), roundi(y)) - _capt_o)
+			return
 		if alfa < 1.0:
 			c.a *= alfa
 		L.draw_rect(Rect2(x, y, w, h), c)
@@ -201,6 +210,35 @@ func tapa_encima(x: int, y: int, w: int, pie: float) -> bool:
 		return false
 	var b := caja_pj().intersection(Rect2i(x, y - TAPA_ALTO, w, TAPA_ALTO))
 	return b.size.x * b.size.y >= TAPA_PX * 4
+
+# una mesa con plantas y focos que tapa: todo en una sola capa (_capt, desde _capt_o) y esa capa a TAPA_ALFA, sin que la mesa se vea
+# a través de las plantas (lo pendiente de la 0.65.0); x, y, w, h: la caja de pantalla en la que cabe
+var _capt: Image = null
+var _capt_o := Vector2i.ZERO
+var _capt_t: ImageTexture = null
+func _rgba(im: Image) -> Image:
+	var o: Image = im.duplicate()
+	o.convert(Image.FORMAT_RGBA8)
+	return o
+
+func capa_unica(x: int, y: int, w: int, h: int, f: Callable) -> Image:
+	_capt = Image.create(maxi(w, 1), maxi(h, 1), false, Image.FORMAT_RGBA8)
+	_capt_o = Vector2i(x, y)
+	f.call()
+	var im := _capt
+	_capt = null
+	return im
+
+func _con_alfa_capa(tapa: bool, x: int, y: int, w: int, h: int, f: Callable) -> void:
+	if not tapa:
+		f.call()
+		return
+	var im := capa_unica(x, y, w, h, f)
+	if _capt_t == null or Vector2i(_capt_t.get_size()) != im.get_size():
+		_capt_t = ImageTexture.create_from_image(im)
+	else:
+		_capt_t.update(im)
+	L.draw_texture(_capt_t, Vector2(x, y), Color(1, 1, 1, TAPA_ALFA))
 
 func _con_alfa(tapa: bool, f: Callable) -> void:
 	if tapa:
@@ -1227,7 +1265,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		list.append([pie, func():
 			var mx: int = Datos.jsround(xp - f.cel.ancla[0])
 			var my: int = Datos.jsround(yp - f.cel.ancla[1])
-			_con_alfa(tapa_pj(f.c, mx, my, pie) or (pl != null and tapa_encima(mx, my, f.c.get_width(), pie)), _pinta_mesa.bind(f, xp, yp, pl, md, fm, ex))])   # corrido hacia abajo, no pasa delante de quien está en su fila
+			_con_alfa_capa(tapa_pj(f.c, mx, my, pie) or (pl != null and tapa_encima(mx, my, f.c.get_width(), pie)), mx - 32, 0, f.c.get_width() + 64, my + f.c.get_height(), _pinta_mesa.bind(f, xp, yp, pl, md, fm, ex))])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
 		_pinta_mesa(f, xp, yp, pl, md, fm, ex)
 

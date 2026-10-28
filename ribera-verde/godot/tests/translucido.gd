@@ -95,6 +95,21 @@ func _corre() -> void:
 		Pn._con_alfa(true, func(): vistos.append(Pn.alfa))
 		Pn._con_alfa(false, func(): vistos.append(Pn.alfa))
 		chk(vistos == [Pn.TAPA_ALFA, 1.0] and Pn.alfa == 1.0, "a TAPA_ALFA y vuelta a 1 (%s)" % [vistos])
+		# la mesa y sus plantas, en una sola capa: lo de encima tapa del todo a lo de debajo y la capa entera va a TAPA_ALFA
+		var ra := Image.create(8, 8, false, Image.FORMAT_RGBA8)
+		ra.fill(Color.RED)
+		var ve := Image.create(4, 4, false, Image.FORMAT_RGBA8)
+		ve.fill(Color.GREEN)
+		var capa: Image = Pn.capa_unica(10, 20, 16, 16, func():
+			Pn._img(ra, 10, 20)
+			Pn._img(ve, 12, 22)
+			Pn._rect(20, 30, 2, 2, Color.BLUE))
+		chk(capa.get_pixel(3, 3) == Color.GREEN and capa.get_pixel(0, 0) == Color.RED and capa.get_pixel(10, 10) == Color.BLUE and capa.get_pixel(15, 0).a == 0.0 and Pn._capt == null,
+			"capa única: lo de encima opaco sobre la mesa, sin mezclarse (%s %s %s)" % [capa.get_pixel(3, 3), capa.get_pixel(0, 0), capa.get_pixel(10, 10)])
+		var hoja: Image = Image.create(4, 4, false, Image.FORMAT_LA8)
+		hoja.fill(Color(1, 1, 1, 1))
+		var capa2: Image = Pn.capa_unica(0, 0, 8, 8, func(): Pn._img(hoja, -2, -2))
+		chk(capa2.get_pixel(1, 1) == Color.WHITE and capa2.get_pixel(2, 2).a == 0.0, "otro formato y fuera de la caja: recortado")
 		if fotos != "":
 			J.oraculo = false
 			J.enter_map(hallado.m, c.x, c.y - 1, "up")
