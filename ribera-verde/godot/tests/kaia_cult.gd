@@ -307,6 +307,33 @@ func _corre() -> void:
 	var gm := float(J.kc_me(0).g)
 	QUIERO = ["Llevarte lo seco"]
 	chk(corre(func(): await J.object_action(4, 3)) and float(J.kc_me(0).g) < gm, "te lo llevas")
+	# 12b · con las plantas crecidas, la copa no sube hasta el foco: pierde filas enteras y deja FOCO_AIRE px (la nave, con techo, igual)
+	var At = load("res://src/atlas.gd")
+	var Ar = load("res://src/arte.gd")
+	var tope_ok := 0
+	for q in D.KAIA_CULT.f2.mesas:
+		var md = J.mesa_de("mesaKC", int(q[0]), int(q[1]))
+		var ym: int = int(q[1]) * 16 + 15
+		var tope: int = int(md.get("techo", 0)) + int(D.FOCO_POLEA) + 12 + int(D.FOCO_AIRE) + 1
+		for fm in [2, 3, 4]:
+			for po in ["i", "h", "s"]:
+				var f = At.frame_de(At.cubre("obj:mesaN"), "plantasN-%d-%s" % [fm, po], "unica", 0, {"i": 0})
+				if f == null:
+					continue
+				var o = J.pintor.copa_bajo_foco(f, ym, md)
+				var top: int = ym - 47 + Ar.fila_arriba(o.c)
+				var top0: int = ym - 47 + Ar.fila_arriba(f.c)
+				chk(top >= tope and (top0 < tope or o.c == f.c) and o.c.get_size() == f.c.get_size(), "KAIA (%d, %d) %d-%s: la punta en %d, el foco hasta %d" % [q[0], q[1], fm, po, top, tope])
+				chk(o.c.get_pixel(24, 46) == f.c.get_pixel(24, 46) and o.c.get_pixel(24, 47) == f.c.get_pixel(24, 47), "la base del tallo se queda")
+				if top0 < tope:
+					tope_ok += 1
+	chk(tope_ok > 0, "la sativa en flor tocaba el foco antes")
+	var mdn = {"foco": "led", "techo": 0}
+	var fs = At.frame_de(At.cubre("obj:mesaN"), "plantasN-4-s", "unica", 0, {"i": 0})
+	chk(J.pintor.copa_bajo_foco(fs, 4 * 16 + 15, mdn) == fs, "en la nave caben enteras")
+	Datos.CAL = false
+	chk(J.pintor.copa_bajo_foco(fs, 3 * 16 + 15, mdn) == fs, "sin CAL, como antes")
+	Datos.CAL = true
 	# 13 · la sala de antes (tres carpas de 4 plazas de regalo) pasa a tres kits montados con sus plantas
 	J.S.kc = {"p": [null, null, null, null, null, {"sid": "txoko", "prog": .3, "water": 50.0, "health": 100.0}]}
 	chk(J.kc().kits.size() == 3 and J.kc().p[10] is Dictionary and J.kc().p.size() == 36, "la de antes, pasada")

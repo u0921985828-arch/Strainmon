@@ -19,11 +19,12 @@
 - **KAIA, fase 2: como la nave.** «Reformar la sala · 45.000 €» (obra, seis mesas de 240 × 120 con su LED doble, riego centralizado y extracción), con las carpas vacías: se venden de segunda mano al 40 %, la obra dura 5 días y deja las mesas, el tanque y el programador del riego (`KAIA_CULT.f2`). Rinde más que las cuatro carpas (8.640 W frente a 5.760 W).
 - **Alguien que la lleve.** Desde el móvil, «A la sala de KAIA» pone a un trabajador de la plantilla con el rol `kaia` (45 € al día por `PLANTILLA.sueldo`): cada mañana las mesas avanzan, se cortan enteras, se secan y lo seco va al almacén de KAIA hasta su tope (lo que sobra, en la mesa: «Llevarte lo seco»). Sin nadie, no avanzan. Su muñeco, en la sala.
 - **Las mesas, pintadas como las de la nave** (`mesa_de` en `nave.gd` y `kaiacult.gd`, que usan `_arte_obj` y `_focos_mesa`); los focos de la segunda fila cuelgan de su techo (`t0` en `_poleas_nave`), sin cruzar las de delante.
+- **La copa no toca el foco.** En la sala de KAIA (poco techo), con las plantas muy crecidas el foco ya no puede subir más: la copa pierde filas enteras, como en la vista C (`copa_bajo_foco` en `pinta.gd`, con `Arte.aplasta`), y la punta queda a `FOCO_AIRE` px del foco en su altura más baja. En la nave caben enteras.
 - **Partidas de antes:** el `S.kc` de las tres carpas pasa a tres kits con sus plantas en sus plazas.
 - **Sin mover nada al cargar.** Lo que una partida ya tenía puesto no se recoloca por la regla `solapa` (`cabe_pieza(…, sol)`, solo para lo que mueves tú); la carpa grande del piso se queda donde estaba.
 - **Sin romper lo de antes.** Lo que se aparta en los mapas de antes del calendario va solo con `Datos.CAL` (`SOLAPE_CAL` en `mundo.gd`: el expositor de GROW IBARBIDE y las cajas del almacén; `defc` y `def_p` en `calle.gd`: las máquinas de las extracciones del piso, con una casilla libre entre cada dos y la de la puerta libre), así que las pruebas contra el HTML no cambian. Todo lo apartado deja el paso: la mesilla del cuartucho junto a su mesa (no delante del cuadro), el escritorio de la comisaría en la sala, el extintor del taller fuera del calendario de la pared y la caja de la taberna al final de la barra.
 - **La sala de KAIA en la plantilla.** Quien la lleva sale en MÓVIL → PLANTILLA en «La sala de KAIA», no «Sin trabajo» (`local_staff`); y la obra no se hace con un kit pagado que aún no ha llegado.
-- Pruebas `tests/kaia_cult.gd` (81), `tests/kaia_orden.gd` (al día, con las carpas de 240 × 240), `tests/solapes.gd` (con la carpa grande de una partida de antes) y `tests/orden_sala.gd`. Inglés en `godot/i18n/partes/copa.csv`.
+- Pruebas `tests/kaia_cult.gd` (192), `tests/kaia_orden.gd` (al día, con las carpas de 240 × 240), `tests/solapes.gd` (con la carpa grande de una partida de antes) y `tests/orden_sala.gd`. Inglés en `godot/i18n/partes/copa.csv`.
 
 ### La sala de cultivo de KAIA (lo pidió el usuario: «incluso molaría tener un cultivo finalmente en la nueva asociación de KAIA» y, de las carpas, «tiene que tener lógica con el suelo que hay al rededor y las zonas donde las colocas»; con `Datos.CAL`)
 
@@ -101,6 +102,9 @@
 - El depósito (`TANQUE`: moto 7 L, utilitario 45, berlina 60, deportivo 70; `S.coches[k].gas`): se llena con las garrafas al precio del litro (`repostar`), los viajes gastan de él (`gasta_deposito`) y solo se paga en el surtidor lo que falte (`pago_gasolina`); con el depósito vacío, como antes.
 - El maletero en vitrina, con forma de maletero (`rects_almacen`, tipo `mal`, en `setas.gd`): el vehículo visto por detrás con el portón abierto, amortiguadores, pilotos, junta, moqueta, umbral, parachoques y matrícula sin letras, del color de cada vehículo (`MAL_COLOR`); en la moto, el baúl con su piloto.
 - Prueba `tests/garaje.gd` (72 comprobaciones; con `--salida`, capturas del garaje y de los maleteros); `vehiculos.gd`, `volante.gd` y `concesionario.gd` entran por el garaje.
+
+### 0.64.0 (código 84)
+- El AAB de Play (con la demo) y el APK universal (`descargas/LandraceHunters.apk`, sin el bloqueo) con nada encima de nada, la sala de KAIA por fases y la copa que no toca el foco.
 
 ### 0.63.0 (código 83) y plugin de WordPress 1.6.3
 - El AAB de Play (con la demo) y el APK universal (`descargas/LandraceHunters.apk`, sin el bloqueo) con Bilbao por dentro, los pueblos con su sitio, las salidas por su lado, el seto nuevo y la tierra con atrezo; la senda de tierra bajo el portal de casa, fija en `tools/pueblos.py` (`FIJOS`). AAB 82 MB firmado; APK 89 MB (con `tools/apk-instalar.py`, firma v2/v3 con la upload key, versión 83/0.63.0).

@@ -1211,12 +1211,26 @@ func _detalle_obj(o: String, tx: int):
 
 func _pinta_mesa(f, xp: float, yp: float, pl, md = null, fm := 0, ex := []) -> void:
 	_pinta(f, xp, yp)
+	pl = copa_bajo_foco(pl, int(yp + cam.y), md)
 	if pl != null:
 		_pinta(pl, xp, yp)
 	if md != null and md.foco != null:
 		_focos_mesa(String(md.foco), xp + cam.x, yp + cam.y, fm, pl.c if pl != null else null, int(md.get("techo", 0)))   # 1.33: y sus focos, colgados encima
 	for fb in ex:   # 1.34: las bandejas del bajo
 		_pinta(fb, xp, yp)
+
+# sin sitio para colgar el foco encima de la copa (la sala de KAIA, con poco techo), las plantas pierden filas enteras, como en la
+# vista C (Arte.aplasta): la punta queda a FOCO_AIRE px del foco a su altura más baja; ym, el ancla de la mesa en el mapa
+func copa_bajo_foco(pl, ym: int, md):
+	if not Datos.CAL or pl == null or md == null or md.foco == null:
+		return pl
+	var tope: int = int(md.get("techo", 0)) + int(J.D.FOCO_POLEA) + 12 + int(J.D.FOCO_AIRE) + 1
+	var top: int = ym - 47 + Arte.fila_arriba(pl.c)
+	if top >= tope:
+		return pl
+	var o: Dictionary = pl.duplicate()
+	o.c = Arte.aplasta(pl.c, Arte.alto(pl.c) - (tope - top))
+	return o
 
 # los focos de la mesa i de la nave (1.33, focosMesa de 11j-locales; xp, yp: el ancla de la mesa en el mapa; pl: la imagen de sus
 # plantas): dos, colgados de sus poleas a FOCO_AIRE px por encima de la punta más alta (la primera fila con algo de las plantas) o,
