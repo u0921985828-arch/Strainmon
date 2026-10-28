@@ -10,7 +10,6 @@ sa4ccc656,"Cuelga la placa de la tía: el banco de semillas, abierto.","Hangs yo
 s1d3bc143,EL CUARTO DE ATRÁS,THE BACK ROOM
 s4317d5e2,"Huele a cerrado y a papel viejo. Todo está tapado con sábanas, menos un fichero de madera.","It smells stuffy, of old paper. Everything is under dust sheets except a wooden card cabinet."
 s53749c37,"En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa, África, sierra, Asia... y uno solo: «Haze 98».","On each little drawer, a label in your aunt's hand: Kush, coast, Africa, sierra, Asia... and one on its own: «Haze 98»."
-s37ab959c,"En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa, África, sierra, Asia... y uno solo: «Haize 98».","On each little drawer, a label in your aunt's hand: Kush, coast, Africa, sierra, Asia... and one on its own: «Haize 98»."
 sd45e1f6e,"Era su banco de semillas. Lo empezó para que las variedades del barrio no se perdieran, y lo dejó a medias.","It was her seed bank. She started it so the neighbourhood's strains wouldn't be lost, and left it half done."
 s16ed904c,"Si llenas los cajones, el cuarto vuelve a la vida. Entrega las colecciones en el fichero (dos semillas de cada variedad).",Fill the drawers and the room comes back to life. Hand in the collections at the cabinet (two seeds of each strain).
 sdc9d0bc0,puertaLabP,puertaLabP
@@ -27,11 +26,9 @@ s1bbd5284,"La placa de la tía, de madera y latón, con una hoja grabada. Debajo
 s49cccb08,HECHA,DONE
 sf77a797e,Volver,Back
 sb12a357d,"Cada colección, dos semillas de cada variedad (la Haze del 98, cinco, y fijada en F4).","Each collection: two seeds of each strain (the Haze of '98: five, fixed at F4)."
-se58e5638,"Cada colección, dos semillas de cada variedad (la Haize del 98, cinco, y fijada en F4).","Each collection: two seeds of each strain (the Haize of '98: five, fixed at F4)."
 s91b155cb,EL BANCO DE LA TÍA,YOUR AUNT'S BANK
 s942f9b07,Esa ya está en su cajón.,That one is already in its drawer.
 s6db9cfb3,"La Haze del 98 va en el último cajón: antes, las otras cinco colecciones.","The Haze of '98 goes in the last drawer: first, the other five collections."
-s2b0fe858,"La Haize del 98 va en el último cajón: antes, las otras cinco colecciones.","The Haize of '98 goes in the last drawer: first, the other five collections."
 sdabdcde3,"Te faltan semillas para esa colección. Mira la lista: cada variedad, en su cajón.","You're missing seeds for that collection. Check the list: each strain, in its drawer."
 sf9e8dbf0,¿Entregar «{n}»? Las semillas se quedan en el banco.,Hand in «{n}»? The seeds stay in the bank.
 s4ffa4842,Entregar,Hand over
@@ -40,7 +37,6 @@ s0aa75975,"«{c}», en su cajón. {z}: destapado.
 {p}",
 s74de5797,EL BANCO DE SEMILLAS,THE SEED BANK
 s12a0c8a7,"El último cajón, el de la Haze del 98. Cierras el fichero y el cuarto está entero.","The last drawer, the Haze of '98. You close the cabinet and the room is whole."
-s10bf245c,"El último cajón, el de la Haize del 98. Cierras el fichero y el cuarto está entero.","The last drawer, the Haize of '98. You close the cabinet and the room is whole."
 sb5a634e5,"Delroy cuelga la placa de la tía en la pared. Kiko ha traído a medio barrio, Miren ha bajado del monte y la abuela Txaro se ha sentado en primera fila.","Delroy hangs your aunt's plaque on the wall. Kiko has brought half the neighbourhood, Miren has come down from the hills and grandma Txaro has sat in the front row."
 sd0c0b1ac,"Nadie dice nada un rato. Luego Delroy abre la puerta del cuarto a los socios: desde hoy, el banco es del barrio.","Nobody says anything for a while. Then Delroy opens the room to the members: from today, the bank belongs to the neighbourhood."
 s6eb49921,DELROY,DELROY
@@ -1394,10 +1390,8 @@ s05fbc5aa,Nueva variedad: {s}.,New strain: {s}.
 s483ebe0d,"THC {t}% · ~{g} g/m² · {d} días.
 Obtienes 2 semillas F1: la línea aún no es estable.","THC {t}% · ~{g} g/m² · {d} days.
 You get 2 F1 seeds: the line isn't stable yet."
-s941becb7,Te tiemblan las manos: es JACK HERER.,Your hands are shaking: it's JAK HERRER.
-s7445a88c,Te tiemblan las manos: es JAK HERRER.,
-s611bc98c,¿Jack Herer? ¿De semilla propia? Llevo veinte años detrás de ella.,Jak Herrer? From your own seed? I've been after it for twenty years.
-sf8e6f3a0,¿Jak Herrer? ¿De semilla propia? Llevo veinte años detrás de ella.,
+s941becb7,Te tiemblan las manos: es JACK HERER.,Your hands are shaking: it's JACK HERER.
+s611bc98c,¿Jack Herer? ¿De semilla propia? Llevo veinte años detrás de ella.,Jack Herer? From your own seed? I've been after it for twenty years.
 sd646f76d,Tu tía estaría orgullosa. Estabilízala y guárdala bien: eso vale más que el piso.,Your aunt would be proud. Stabilise it and keep it safe: that's worth more than the flat.
 s362697a3,Obtienes 2 semillas de {s}.,You get 2 seeds of {s}.
 scf1e9078,Temporizador,Timer
@@ -1509,7 +1503,6 @@ se7f47ca0,KIKO,KIKO
 s7f690da0,"Cierra la puerta, anda.","Close the door, will you."
 s6724b063,"Tu tía tenía dos cuadernos. El diario, que ya tienes, y uno azul que no enseñaba a nadie.","Your aunt had two notebooks. The diary, which you already have, and a blue one she never showed anyone."
 s0983089c,En el azul apuntaba su planta madre: la Haze con la que se presentó a la Copa del 98. Nunca la metió en la CannaDex.,In the blue one she wrote down her mother plant: the Haze she entered in the '98 Cup. She never put it in the CannaDex.
-s329c7e5a,En el azul apuntaba su planta madre: la Haize con la que se presentó a la Copa del 98. Nunca la metió en la CannaDex.,In the blue one she wrote down her mother plant: the Haize she entered in the '98 Cup. She never put it in the CannaDex.
 s1e7039e7,Aquella noche pasó algo. Volvió con el segundo premio y no quiso volver a hablar de esa planta. Ni conmigo.,Something happened that night. She came back with second prize and never wanted to talk about that plant again. Not even with me.
 s4ab2d9d6,"El que estuvo con ella toda la noche fue Delroy, el de la asociación del barrio alto. Pregúntale a él.","The one who was with her all night was Delroy, from the association in the upper quarter. Ask him."
 s59574a1c,una pista: «LA NOCHE DEL 98»,"a lead: ""THE NIGHT OF '98"""
@@ -1526,7 +1519,6 @@ se8c4b03b,un trozo del cuaderno azul ({n}/3),a piece of the blue notebook ({n}/3
 s8c26608a,EL CUADERNO AZUL,THE BLUE NOTEBOOK
 s809ab462,"Juntas los tres trozos. La letra apretada de la tía, con manchas de tierra.","You put the three pieces together. Your aunt's cramped handwriting, with smudges of soil."
 s9c1b9659,"«Haze del 98, fenotipo del limón. Madre: la que trajo Miren de su viaje. La mejor que he tenido.»","""Haze of '98, the lemon pheno. Mother: the one Miren brought back from her trip. The best I've ever had."""
-s959fcfa9,"«Haize del 98, fenotipo del limón. Madre: la que trajo Miren de su viaje. La mejor que he tenido.»","""Haize of '98, the lemon pheno. Mother: the one Miren brought back from her trip. The best I've ever had."""
 s9b530489,"«Toño cambió mi tarro. Lo vi meterse en el bar de Baltasar con él debajo del brazo. No tengo pruebas, solo esto.»","""Toño swapped my jar. I saw him go into Baltasar's bar with it under his arm. I have no proof, only this."""
 s6bfbc9ff,"«Las semillas buenas, en la lata de galletas, debajo del manzano de la huerta. Que no las encuentre él.»","""The good seeds are in the biscuit tin, under the apple tree in the garden. Don't let him find them."""
 s0f8a1fcf,"Si el cuaderno dice lo que creo, ve a la huerta. Y no se lo cuentes a nadie del bar.","If the notebook says what I think, go to the garden. And don't tell anyone from the bar."
@@ -1534,7 +1526,6 @@ se130e6b8,SMS · DELROY,SMS · DELROY
 sf30f515b,MIREN,MIREN
 s8f1f2a2c,Delroy me ha llamado. Sabía que vendrías.,Delroy called me. I knew you'd come.
 sd2a0cc3b,"La madre de esa Haze la traje yo de un viaje, en un bote de carretes de fotos. Tu tía la hizo suya.","I brought the mother of that Haze back from a trip, in a film canister. Your aunt made it her own."
-s6fdf621a,"La madre de esa Haize la traje yo de un viaje, en un bote de carretes de fotos. Tu tía la hizo suya.","I brought the mother of that Haize back from a trip, in a film canister. Your aunt made it her own."
 s98a52fbe,"Me dio su trozo del cuaderno la última vez que subió. Me dijo: «Si viene alguien con mis ojos, dáselo».","She gave me her piece of the notebook the last time she came up. She said: ""If someone with my eyes comes, give it to them""."
 s14a733d7,¿Te quedas a cenar con Miren?,Will you stay for dinner with Miren?
 s045f8b16,Quedarte a cenar,Stay for dinner
@@ -1561,13 +1552,10 @@ s2200f990,"Al fondo, junto al manzano, la tierra se hunde un poco. Escarbas con 
 s61da9a49,"Una lata de galletas oxidada. Dentro, envueltas en papel de periódico del 98, semillas y una nota.","A rusty biscuit tin. Inside, wrapped in newspaper from '98, seeds and a note."
 s18d0cb62,"«Si las tienes tú, {N}, haz con esto lo que yo no me atreví. O no hagas nada: también vale. M.»","""If you have these, {N}, do with this what I didn't dare to. Or do nothing: that's fine too. M."""
 s4884a4c3,"{n} semillas de {s}, la Haze del 98 de la tía","{n} seeds of {s}, your aunt's Haze of '98"
-se0a4fb4d,"{n} semillas de {s}, la Haize del 98 de la tía","{n} seeds of {s}, your aunt's Haize of '98"
 sb46ecb92,"Debajo de las semillas, una llave pequeña atada con un cordel y otra nota:","Under the seeds, a small key tied with string and another note:"
 se7fd0af8,«La del cuarto de atrás de la asociación. Ahí empecé el banco de semillas del barrio y no lo terminé.»,"«For the back room of the association. That's where I started the neighbourhood seed bank, and never finished it.»"
 sdc36ab06,"«Las de la lata son de una polinización al aire: si quieres la Haze de verdad, fíjala otra vez, generación a generación.»","«The ones in the tin are open-pollinated: if you want the real Haze, fix it again, generation by generation.»"
-s6d18a593,"«Las de la lata son de una polinización al aire: si quieres la Haize de verdad, fíjala otra vez, generación a generación.»","«The ones in the tin are open-pollinated: if you want the real Haize, fix it again, generation by generation.»"
 s5a3f1b13,"«Si ya tienes la Haze fijada, guárdala bien: el banco la necesita.»","“If you already have the Haze fixed, keep it safe: the bank needs it.”"
-s6c712850,"«Si ya tienes la Haize fijada, guárdala bien: el banco la necesita.»","“If you already have the Haize fixed, keep it safe: the bank needs it.”"
 s283397e4,la llave del cuarto de atrás de la asociación,the key to the association's back room
 s8809daf9,¿Qué haces con lo que dice el cuaderno?,What do you do with what the notebook says?
 s450f5e74,Contarlo en la asociación,Tell it at the association
@@ -1784,8 +1772,8 @@ s30d0d8df,"Tutorial saltado: el primer cultivo ya está hecho. La cosecha, en la
 sa99d31ba,"Soy Kiko, el del growshop de la calle de tu tía Maite, en Ribera Verde. ¿Cómo te llamabas?","I'm Kiko, from the growshop on your aunt Maite's street, in Ribera Verde. What was your name?"
 s57a5399c,"«{N}: el piso y el armario de cultivo son tuyos. Le debo dinero a Baltasar, el del bar El Ancla. Lo siento.»","""{N}: the flat and the grow cabinet are yours. I owe money to Baltasar, from the El Ancla bar. I'm sorry."""
 s1809cf3b,«Kiko te ayudará. Empieza plantando: A delante del armario.»,"""Kiko will help you. Start by planting: A in front of the cabinet."""
-s6da88bdd,"Te he dejado en el armario 3 semillas de SKUNK #1, abono y pH−. Julen, mi hijo, está en el piso: te explica cada paso.","I've left 3 SKONK #1 seeds, nutrients and corrector in the cabinet. Julen, my son, is at the flat: he'll explain each step."
-sed8c7456,"Te he dejado en el armario 3 semillas de SKONK #1, abono y corrector. Julen, mi hijo, está en el piso: te explica cada paso.",
+s6da88bdd,"Te he dejado en el armario 3 semillas de SKUNK #1, abono y pH−. Julen, mi hijo, está en el piso: te explica cada paso.","I've left 3 SKUNK #1 seeds, nutrients and corrector in the cabinet. Julen, my son, is at the flat: he'll explain each step."
+s7981896b,"Te he dejado en el armario 3 semillas de SKUNK #1, abono y corrector. Julen, mi hijo, está en el piso: te explica cada paso.",
 sadac835f,ALCOHOL,ALCOHOL
 s030a70fc,COLOCÓN,HIGH
 s88550f6d,SATIVA,SATIVA
@@ -1992,14 +1980,14 @@ s240d9493,"De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la me
 s1ad382d4,Tamices de seda,Silk screens
 s73025733,"Dry sift: de la flor, el kief con algo más del doble de THC. Se usa en la mesa del piso.",Dry sift: kief from the flower with just over double the THC. Used at the flat table.
 s767bcfa8,Kit Ice-o-lator,Ice water kit
-s044085df,Kit Ais-o-lator,
+s2954f6a4,Kit Ice Hash,
 sb390a67a,Agua con hielo y bolsas de malla: la resina más limpia. Se usa en la mesa del piso.,Ice water and mesh bags: the cleanest resin. Used at the flat table.
 sfabfa85b,Mallas 00,00 mesh
 s2bcc1a8a,en el piso,in the flat
 sed6caa2f,"La malla «doble cero» de la tía: dry sift de lo más fino, solo las cabezas. Se usa en los tamices del piso.","Auntie's «double zero» mesh: the finest dry sift, heads only. Used with the flat's screens."
 s5e7c66ae,Lavadora de extracción,Extraction washer
 s541ec757,Ice-o-lator en grande: bate sola con las bolsas de malla. Está montada junto a la nevera.,"An ice water kit, but big: it churns the mesh bags by itself. Set up by the fridge."
-s2977fa39,Ais-o-lator en grande: bate sola con las bolsas de malla. Está montada junto a la nevera.,
+s0d3f15da,Ice Hash en grande: bate sola con las bolsas de malla. Está montada junto a la nevera.,
 s5f95b5cf,Máquina de static,Static machine
 sfa70e666,La placa cargada levanta las cabezas de resina de la flor fría: la resina más pura.,The charged plate lifts the resin heads off cold flower: the purest resin.
 s73cedc16,{n} g encima · {c} g en la caja,{n} g on you · {c} g in the safe
@@ -3314,11 +3302,9 @@ s1353cb98,Instalado: {x},Installed: {x}
 s77047a98,"{N}, pasa. Te pareces a tu tía.","{N}, come in. You look like your aunt."
 seea9790c,"Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia.",Maite and I grew together since the shipyards shut. She had the touch; I had patience.
 s4aff7f08,"Para empezar, toma esto.","To start you off, take this."
-s6be2cf23,3 semillas de SKUNK #1,3 SKONK #1 seeds
-sc9afeede,3 semillas de SKONK #1,
+s6be2cf23,3 semillas de SKUNK #1,3 SKUNK #1 seeds
 s17dc094d,2 dosis de MEATZA FLORACIÓN,2 doses of MEATZA BLOOM
-sb66fc381,"La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.","Skonk #1 can take almost anything: bad watering, pests, cold. Best one to learn on."
-s457f569b,"La Skonk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.",
+sb66fc381,"La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.","Skunk #1 can take almost anything: bad watering, pests, cold. Best one to learn on."
 scb92c3e6,Planta en las macetas del armario de tu tía y riega cuando baje el agua.,Plant in the pots in your aunt's cupboard and water when the level drops.
 sccfbb001,"El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.","Nutrients mean more bud. If you see spider mites, insecticide: I've got it here."
 sc3e8f78a,"Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.","Harvest when she's ready. They're feminized: hardly ever seed, but if one turns up, keep it."
@@ -3335,8 +3321,7 @@ sc633da3e,"Algunos cruces dan variedades conocidas. Otros, híbridos que solo te
 s00d3fa02,Apúntalo todo en la GENOTECA. Las mejores genéticas salen de cruzar cruces.,Log it all in the GENEBANK. The best genetics come from crossing crosses.
 s1c4f3e3f,"Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.","Start with the known ones: make two recipes at the table and harvest one plant of each. Patxi, in the square, knows a few."
 sada702b9,¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.,No seeds and no money? Here. Pay me back later.
-s7ccaabe3,2 semillas de SKUNK #1,2 SKONK #1 seeds
-sde878a1e,2 semillas de SKONK #1,
+s7ccaabe3,2 semillas de SKUNK #1,2 SKUNK #1 seeds
 s1bcef420,¿Qué necesitas?,What do you need?
 sc117c69c,Un consejo,A tip
 s1e21dcb2,JOSUNE,JOSUNE
@@ -3434,8 +3419,7 @@ s4473f784,Se va a trabajar a un pesquero de fuera. Le vendrá bien.,He's going t
 s374ddefe,Tú y yo seguimos como siempre.,You and I carry on as always.
 s80cab274,Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir.,Your aunt came up every autumn with a tub of buds and stayed the night.
 s2c861347,Del caserío no me echó nadie gracias a ella. Eso no se olvida.,"Nobody threw me off the farm, thanks to her. You don't forget that."
-scff054f8,"Cuando la Haze te salga sola, acuérdate de nosotras.","When your Haize comes out right, think of us."
-s0d3b03ae,"Cuando la Haize te salga sola, acuérdate de nosotras.",
+scff054f8,"Cuando la Haze te salga sola, acuérdate de nosotras.","When your Haze comes out right, think of us."
 s8db91a28,¿Tú eres el de Maite? Tienes sus ojos.,You're Maite's? You've got her eyes.
 sedf22829,"Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años.","I'm Miren. Your aunt and I grew together on this farm, thirty years ago."
 s35a481be,Su diario tiene una página arrancada. Me la dio la última vez que subió.,Her diary has a page torn out. She gave it to me the last time she came up.
@@ -3445,12 +3429,10 @@ s98487ff6,¿Le das {g} g de {s}?,Give her {g} g of {s}?
 see468ae5,Dárselos,Give them
 sc2eb6d35,Cuando quieras.,Whenever you like.
 s9ed4e62e,Huele igual que entonces.,Smells just like back then.
-s53c99ab2,"Toma. La página que falta, y unas semillas de su Haze.","Here. The missing page, and some seeds of her Haize."
-s6db3738a,"Toma. La página que falta, y unas semillas de su Haize.",
+s53c99ab2,"Toma. La página que falta, y unas semillas de su Haze.","Here. The missing page, and some seeds of her Haze."
 s49d12089,la última página del diario y {n} semillas de {s},the last page of the diary and {n} {s} seeds
 sb2f2077f,"Léela en casa, con calma.","Read it at home, take your time."
-s5027cc08,Y esto también era de las dos. La de Laos: la guardábamos para la Amnesia.,And this was ours too. The Laos one: we kept it for the Amnesya.
-s4c016f78,Y esto también era de las dos. La de Laos: la guardábamos para la Amnesya.,
+s5027cc08,Y esto también era de las dos. La de Laos: la guardábamos para la Amnesia.,And this was ours too. The Laos one: we kept it for the Amnesia.
 s5371e2db,{n} semillas de {s},{n} {s} seeds
 s9c4f006a,ANDONI,ANDONI
 sbcde4bf9,"El molino muele los domingos. Si te interesan las semillas viejas, vuelve más adelante.","The mill grinds on Sundays. If old seeds interest you, come back later on."
@@ -3465,7 +3447,6 @@ s9d1642c1,Circule.,Move along.
 s084cd62e,Todo tranquilo por aquí. Que siga así.,All quiet here. Let's keep it that way.
 se98abde9,De noche hay robos en el parque. Tenga cuidado.,There are muggings in the park at night. Be careful.
 sc4648eee,"¿Vienes a la Copa? Mi AMNESIA HAZE dio un 26,8 % de THC en el laboratorio.",Coming to the Cup? My TORMENTA tested at 26.8 % THC in the lab.
-s69fc2f8b,"¿Vienes a la Copa? Mi AMNESYA HAIZE dio un 26,8 % de THC en el laboratorio.",
 sec4fdc2e,Nadie en Ribera ha pasado del 26. No vas a ser tú el primero.,Nobody in Ribera has beaten 26. You won't be the first.
 s96687944,¿Has dormido bien últimamente?,Sleeping well lately?
 sc899e77a,"Mi tío dice que ya no le debes nada. A mí, sí.",My uncle says you owe him nothing now. You owe me.
@@ -3491,10 +3472,8 @@ s97f6d576,"Si me necesitas, estoy en la comisaría del barrio alto.","If you nee
 sfa98f26c,"Esto es la COPA DE RIBERA, la de la asociación cannábica del barrio.","This is the RIBERA CUP, run by the barrio's cannabis association."
 sa69c8cd4,"Para competir, trae 20 g de una sola variedad. Se analizan en laboratorio.","To enter, bring 20 g of a single strain. It gets lab tested."
 s54efdc64,"Marca a batir: DARKO, con AMNESIA HAZE, 26,8 % de THC.","Mark to beat: DARKO, with TORMENTA, 26.8 % THC."
-sb4a6864a,"Marca a batir: DARKO, con AMNESYA HAIZE, 26,8 % de THC.",
 s4a87a002,Vuelve cuando tengas 20 g de algo.,Come back when you have 20 g of something.
 s40511dc8,"Resultado del laboratorio. AMNESIA HAZE de Darko: 26,8 % de THC.",Lab result. Darko's TORMENTA: 26.8 % THC.
-sbfcf8158,"Resultado del laboratorio. AMNESYA HAIZE de Darko: 26,8 % de THC.",
 s6b1860f1,{s} de {N}: {p} % de THC.,{N}'s {s}: {p} % THC.
 sa0a75344,Nueva marca. {N} gana la COPA DE RIBERA.,New record. {N} wins the RIBERA CUP.
 s675c6f3b,{e} y el trofeo de la Copa,{e} and the Cup trophy
@@ -3683,9 +3662,7 @@ s36972141,Has saldado los {e} de tu tía Maite en {n} días.,You paid off aunt M
 sd0f39d61,Variedades: {n} · Ventas totales: {e},Strains: {n} · Total sales: {e}
 see4493e8,"Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.
 ¿Completarás la GENOTECA? ¿Conseguirás la JACK HERER?","Now your empire begins: the more you bill, the more Iñaki loads on the boat.
-Will you complete the GENEBANK? Will you get the JAK HERRER?"
-s0e1ad7d3,"Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.
-¿Completarás la GENOTECA? ¿Conseguirás la JAK HERRER?",
+Will you complete the GENEBANK? Will you get the JACK HERER?"
 s1d54cb36,Pulsa A,Press A
 s5e5c6c6b,"Bajo una lámpara las plantas beben mucho. Riégalas a diario, majo.","Under a lamp plants drink a lot. Water them daily, love."
 s347f5935,"Si se te ponen amarillas las hojas de abajo, les falta agua o abono.","If the lower leaves turn yellow, they need water or feed."
@@ -3921,7 +3898,7 @@ s6d8ef762,Compartes {l} en el sofá. {n}: «Esto es otra liga. Se lo cuento a lo
 s6fe2b8f5,"Compartes {l} en el sofá. {n}: «Suave, de los de charlar. Gracias.»","You share {l} on the sofa. {n}: ""Smooth, good for chatting. Thanks."""
 s62f4ed41,BILLAR,POOL
 sd6096bb2,"{n}: necesitas 1 g de kief, del tamiz o del Ice-o-lator, como mínimo.","{n}: you need at least 1 g of kief, from the sieve or the ice bags."
-sf01bde89,"{n}: necesitas 1 g de kief, del tamiz o del Ais-o-lator, como mínimo.",
+sa7b15e92,"{n}: necesitas 1 g de kief, del tamiz o del Ice Hash, como mínimo.",
 sdda56c1e,{n}: necesitas 5 g de cogollos como mínimo.,{n}: you need at least 5 g of buds.
 s31272d2b,MOONROCK: necesitas rosin para bañar el cogollo y kief para rebozarlo.,MOONROCK: you need rosin to coat the bud and kief to roll it in.
 s6e6a6ae4,{n}: ¿de qué?,{n}: from what?
@@ -4081,54 +4058,36 @@ se7b29b61,Ver solo esta marca.,Show only this brand.
 s3f8f7ec9,Todas las secciones,All sections
 s5635e3e3,Volver atrás.,Go back.
 s71ca27b4,Skunk #1,Skunk #1
-sd3870649,Skonk #1,Skonk #1
 sc546d362,Afghani × Colombian Gold × Acapulco Gold,Afghani × Colombian Gold × Acapulco Gold
 s83855702,"Fijada a finales de los setenta con tres landraces: robusta, estable y fácil. Es la base de media genética moderna.","Fixed in the late seventies from three landraces: sturdy, stable and easy. The base of half of modern genetics."
 s4b6a5695,Lemon Haze,Lemon Haze
-sa6f284fe,Limon Haize,Limon Haize
 s752260b3,Lemon Skunk × Silver Haze · ≈ origen incierto,Lemon Skunk × Silver Haze · ≈ uncertain origin
-s6fefa5d6,Limon Skonk × Silber Haize · ≈ origen incierto,Limon Skonk × Silber Haize · ≈ uncertain origin
 s880d913d,Sativa cítrica de floración lenta. Su linaje exacto no está publicado.,Slow-flowering citrus sativa. Its exact lineage was never published.
 s6ef87c70,Super Skunk,Super Skunk
-s5f01e4b7,Supra Skonk,Supra Skonk
 s498513b1,Skunk #1 × Afghani,Skunk #1 × Afghani
-s6cf85595,Skonk #1 × Afghani,Skonk #1 × Afghani
 s8a6a6b48,"La Skunk #1 vuelta a cruzar con Afghani: más índica, más rápida y más olorosa.","Skunk #1 backcrossed to Afghani: more indica, faster and smellier."
-sf049bf76,"La Skonk #1 vuelta a cruzar con Afghani: más índica, más rápida y más olorosa.","Skonk #1 backcrossed to Afghani: more indica, faster and smellier."
 sfbefa670,Blueberry,Blueberry
-s887bfdb0,Bluberri,Bluberri
 s7cabd656,Purple Thai × Highland Thai × Afghani,Purple Thai × Highland Thai × Afghani
-sa291be5c,Purpel Thai × Highland Thai × Afghani,Purpel Thai × Highland Thai × Afghani
 sf8342080,Índica afrutada de los setenta; con frío de noche azulea.,Fruity seventies indica; cold nights turn it blue.
 s81aa9083,Big Bud,Big Bud
-s31876a58,Big Bod,Big Bod
 s0ae9c55c,base Afghani · ≈ origen incierto,Afghani base · ≈ uncertain origin
 s0dd20889,Famosa por el tamaño de sus cogollos. Sus padres exactos no se conocen.,Famous for its huge buds. Its exact parents are unknown.
 s2c35aaef,Purple Afghani,Purple Afghani
 s70e3b4d7,"Landrace · Afganistán, selección morada","Landrace · Afghanistan, purple selection"
 s0108d537,Índica delicada de montaña que se vuelve morada al final.,Delicate mountain indica that turns purple at the end.
 s186982c1,Lemon Skunk,Lemon Skunk
-s13e444e9,Limon Skonk,Limon Skonk
 s9aafcb8d,Selección cítrica de Skunk #1,Citrus selection of Skunk #1
-s38e2ea70,Selección cítrica de Skonk #1,Citrus selection of Skonk #1
 s7080079a,"Dos plantas de Skunk #1 con olor a limón, cruzadas entre sí hasta fijarlo.","Two lemon-scented Skunk #1 plants, inbred until the trait was fixed."
-s7cef6f27,"Dos plantas de Skonk #1 con olor a limón, cruzadas entre sí hasta fijarlo.","Two lemon-scented Skonk #1 plants, inbred until the trait was fixed."
 s79a19109,Kali Mist,Kali Mist
-s7556d5a1,Kalli Mixt,Kalli Mixt
 s142c7dd7,sativa asiática · ≈ origen incierto (padres sin publicar),Asian sativa · ≈ uncertain origin (parents unpublished)
 sd27ce8b7,Sativa de floración larga y efecto claro. Nunca se publicaron sus padres.,Long-flowering sativa with a clear high. Its parents were never published.
 sea6254f5,Cheese,Cheese
-sc1a50463,Cheez,Cheez
 s86cc9dc7,Fenotipo de Skunk #1 (Reino Unido),Skunk #1 pheno (UK)
-s311f96dc,Fenotipo de Skonk #1 (Reino Unido),Skonk #1 pheno (UK)
 s269160eb,"Una planta de Skunk #1 con olor a queso curado, guardada por esquejes durante años.","A Skunk #1 plant that smelled of aged cheese, kept alive as clones for years."
-s96880058,"Una planta de Skonk #1 con olor a queso curado, guardada por esquejes durante años.","A Skonk #1 plant that smelled of aged cheese, kept alive as clones for years."
 s607ddd15,California Orange,California Orange
-s8484bfc0,Kalifornia Orantx,Kalifornia Orantx
 s6aef5bcf,Híbrido de California de los setenta,Seventies California hybrid
 sa40c8556,"Planta de aroma a naranja, conservada en California desde los setenta.","Orange-scented plant, kept in California since the seventies."
 s0d0bef79,Chemdawg,Chemdawg
-seadb0a21,Chemdog,Chemdog
 s1ff3ef0e,Híbrido de los noventa · ≈ origen incierto,Nineties hybrid · ≈ uncertain origin
 s89805576,"Olor químico, a gasóleo. Salió de unas semillas sin papeles a principios de los noventa.","Chemical, diesel smell. Came from some unlabeled seeds in the early nineties."
 sf2380787,Afghani,Afghani
@@ -4148,11 +4107,9 @@ s1fcfc342,Sativa colombiana de pistilos rojizos. Floración larga y efecto eufó
 saa9d118f,Colombian Gold,Colombian Gold
 s5de83013,"Landrace · sierra de Santa Marta, Colombia","Landrace · Sierra de Santa Marta, Colombia"
 s9b4ecf4b,La sativa dorada de la costa colombiana. Una de las tres madres de la Skunk #1.,The golden sativa of the Colombian coast. One of Skunk #1's three parents.
-s58e00ccb,La sativa dorada de la costa colombiana. Una de las tres madres de la Skonk #1.,The golden sativa of the Colombian coast. One of Skonk #1's three parents.
 s6b675e6b,Thai,Thai
 s332cb1f7,Landrace · selvas del norte de Tailandia,Landrace · jungles of northern Thailand
 s17aa476f,"Sativa esbelta, de floración larguísima y aroma especiado. Es madre de la Haze y de la Northern Lights.","Slender sativa, very long flowering, spicy aroma. Parent of Haze and Northern Lights."
-s786e269a,"Sativa esbelta, de floración larguísima y aroma especiado. Es madre de la Haize y de la Norzen Lights.","Slender sativa, very long flowering, spicy aroma. Parent of Haize and Norzen Lights."
 s6665e854,Chocolate Thai,Chocolate Thai
 s7d977e9f,Landrace · Tailandia,Landrace · Thailand
 s68c121ff,Sativa tailandesa de cogollo oscuro y aroma a cacao. Llegaba a Occidente atada en palitos.,Thai sativa with dark buds and a cocoa aroma. Reached the West tied to sticks.
@@ -4190,42 +4147,30 @@ s7441a33b,Panama Red,Panama Red
 s7d3f799f,Landrace · istmo de Panamá,Landrace · Isthmus of Panama
 s1af36271,"La sativa legendaria de los setenta, veteada de rojo. Muy cerebral y de floración lenta.","The legendary seventies sativa, streaked with red. Very heady, slow flowering."
 sdef90a72,Haze,Haze
-s823580f7,Haize,Haize
 s620455ec,Colombia × México × Tailandia (quizá India del Sur) · ≈ origen incierto,Colombia × Mexico × Thailand (maybe South India) · ≈ uncertain origin
 s5627aa75,"Se fijó en California en los años setenta con sativas de Colombia, México y Tailandia. Se cruza Punto Rojo o Michoacán con Thai.","Fixed in California in the seventies from Colombian, Mexican and Thai sativas. Cross Punto Rojo or Michoacán with Thai."
 s5074e606,Northern Lights,Northern Lights
-sc7068f00,Norzen Lights,Norzen Lights
 s2620c593,"Afghani, con algo de Thai · ≈ origen incierto","Afghani, with some Thai · ≈ uncertain origin"
 sb2925add,"Índica compacta y muy resinosa, fijada en los ochenta. En la mesa: Afghani × Thai.","Compact, very resinous indica, fixed in the eighties. At the table: Afghani × Thai."
 see914edc,Purple Thai,Purple Thai
-s5c065ac7,Purpel Thai,Purpel Thai
 s79383002,Chocolate Thai × Highland Oaxacan Gold,Chocolate Thai × Highland Oaxacan Gold
 s6ab7af36,Sativa morada de los setenta. Es la abuela de la Blueberry.,Purple seventies sativa. Grandmother of Blueberry.
-s3637385a,Sativa morada de los setenta. Es la abuela de la Bluberri.,Purple seventies sativa. Grandmother of Bluberri.
 sedd9bf99,Trainwreck,Trainwreck
-s9cda42e6,Trenwreck,Trenwreck
 s86204f3d,Mexicana × Thai × Afghani · ≈ origen incierto,Mexican × Thai × Afghani · ≈ uncertain origin
 s158bb71d,"Una de las primeras grandes de California. En la mesa: Michoacán, Thai y Afghani.","One of California's first greats. At the table: Michoacán, Thai and Afghani."
 sdca6da93,AK-47,AK-47
-s9e0a22e2,AX-47,AX-47
 sf74799f2,Colombiana × mexicana × thai × afgana (1992),Colombian × Mexican × Thai × Afghan (1992)
 s5a5e23e1,Cuatro landraces en una: rápida para ser tan sativa y muy fácil de cultivar.,Four landraces in one: fast for such a sativa and very easy to grow.
 seb6010ef,Laughing Buddha,Laughing Buddha
-s25ad1cc8,Laffing Budha,Laffing Budha
 s03825304,Thai × Jamaicana,Thai × Jamaican
 s709d0c42,Sativa alegre de Thai y Lamb's Bread. Aroma dulce y especiado.,"Happy sativa from Thai and Lamb's Bread. Sweet, spicy aroma."
 sfb53b15f,Cannalope Haze,Cannalope Haze
-s22026a6b,Kanalope Haize,Kanalope Haize
 s105f779b,Haze × Michoacán,Haze × Michoacán
-saab06f57,Haize × Michoacán,Haize × Michoacán
 s4ef9fb18,"Una Haze más rápida, con aroma a melón.",A faster Haze with a melon aroma.
-s4da7c424,"Una Haize más rápida, con aroma a melón.",A faster Haize with a melon aroma.
 saebbbc64,Master Kush,Master Kush
-s8f74201d,Maister Kush,Maister Kush
 s3a6ac305,dos landraces del Hindu Kush · ≈ origen incierto,two Hindu Kush landraces · ≈ uncertain origin
 s82b5031e,"Dos índicas de la cordillera juntas: compacta, resinosa y de floración corta. En la mesa: Hindu Kush × Chitral Kush.","Two mountain indicas together: compact, resinous, short flowering. At the table: Hindu Kush × Chitral Kush."
 sfde67973,Purple Kush,Purple Kush
-s4f716d68,Purpel Kush,Purpel Kush
 s7f71b8fd,Hindu Kush × Purple Afghani · ≈ origen incierto,Hindu Kush × Purple Afghani · ≈ uncertain origin
 s79e85fbf,"Índica pura morada, de efecto pesado.",Pure purple indica with a heavy stone.
 s49d6938b,Congo × Panama,Congo × Panama
@@ -4238,98 +4183,53 @@ sb49c42db,Malawi × PCK,Malawi × PCK
 s44ab05a5,Malawi Gold × Chitral Kush (PCK),Malawi Gold × Chitral Kush (PCK)
 s10fdd161,La Malawi domada con la índica de Chitral: florece antes y produce más.,Malawi tamed with Chitral indica: flowers sooner and yields more.
 sc39e3544,Critical Mass,Critical Mass
-s4a78fd9c,Kritikal Mass,Kritikal Mass
 s10810434,Afghani × Skunk #1,Afghani × Skunk #1
-sb2cc25c9,Afghani × Skonk #1,Afghani × Skonk #1
 s36893e07,La madre es la Afghani: cogollos tan gordos que hay que sujetarlos.,Afghani is the mother: buds so fat they need staking.
 s18c93299,Shiva Skunk,Shiva Skunk
-s08daf4b8,Xiva Skonk,Xiva Skonk
 s41043d8f,Skunk #1 × Northern Lights,Skunk #1 × Northern Lights
-s4a0bcbc7,Skonk #1 × Norzen Lights,Skonk #1 × Norzen Lights
 s3406868d,"Northern Lights con Skunk #1: robusta, rápida y muy productiva.","Northern Lights with Skunk #1: sturdy, fast and very productive."
-scf3e0e9a,"Norzen Lights con Skonk #1: robusta, rápida y muy productiva.","Norzen Lights with Skonk #1: sturdy, fast and very productive."
 s3505da67,NL5 × Haze,NL5 × Haze
-sa9409644,NZ5 × Haize,NZ5 × Haize
 s5101fe0e,Northern Lights × Haze,Northern Lights × Haze
-s1c2360f7,Norzen Lights × Haize,Norzen Lights × Haize
 s7449f3e9,La madre es la Northern Lights: la Haze con más cogollo y algo más rápida.,Northern Lights is the mother: Haze with more bud and a bit faster.
-see77b86b,La madre es la Norzen Lights: la Haize con más cogollo y algo más rápida.,Norzen Lights is the mother: Haize with more bud and a bit faster.
 sf8fc84d4,Neville's Haze,Neville's Haze
-s1454d61e,Nevil's Haize,Nevil's Haize
 s240d04a5,Haze × (NL5 × Haze),Haze × (NL5 × Haze)
-s00eb6f6c,Haize × (NZ5 × Haize),Haize × (NZ5 × Haize)
 s08accdae,Tres cuartos de Haze: de las sativas más potentes y lentas que hay.,"Three-quarters Haze: one of the strongest, slowest sativas there is."
-s6a82bebf,Tres cuartos de Haize: de las sativas más potentes y lentas que hay.,"Three-quarters Haize: one of the strongest, slowest sativas there is."
 sd659fa36,Silver Haze,Silver Haze
-s02a0b6f3,Silber Haize,Silber Haize
 s700f4974,Haze × Northern Lights · ≈ origen incierto,Haze × Northern Lights · ≈ uncertain origin
-s383220dd,Haize × Norzen Lights · ≈ origen incierto,Haize × Norzen Lights · ≈ uncertain origin
 s08da73f8,La madre es la Haze: conserva el efecto y acorta la floración.,"Haze is the mother: keeps the high, shortens flowering."
-s2af5e91a,La madre es la Haize: conserva el efecto y acorta la floración.,"Haize is the mother: keeps the high, shortens flowering."
 sca781981,Chocolope,Chocolope
-s9231857f,Txokolope,Txokolope
 sf820b67a,Chocolate Thai × Cannalope Haze,Chocolate Thai × Cannalope Haze
-s21716d4e,Chocolate Thai × Kanalope Haize,Chocolate Thai × Kanalope Haize
 s96cd95c1,Sativa con aroma a cacao y café.,Sativa with a cocoa and coffee aroma.
 sa701fef2,Pineapple Express,Pineapple Express
-sfc4ab2c6,Pinapel Express,Pinapel Express
 s0b78422b,Trainwreck × Hawaiian · ≈ origen incierto,Trainwreck × Hawaiian · ≈ uncertain origin
-s498af42a,Trenwreck × Hawaiian · ≈ origen incierto,Trenwreck × Hawaiian · ≈ uncertain origin
 s93875415,Trainwreck con una sativa de Hawái: aroma a piña.,Trainwreck with a Hawaiian sativa: pineapple aroma.
-s982dfd86,Trenwreck con una sativa de Hawái: aroma a piña.,Trenwreck with a Hawaiian sativa: pineapple aroma.
 s9d09ad13,Tangie,Tangie
-sd4b0ccc6,Tangi,Tangi
 se1650ed4,California Orange × Skunk #1,California Orange × Skunk #1
-s040c3598,Kalifornia Orantx × Skonk #1,Kalifornia Orantx × Skonk #1
 sa9507bb0,La California Orange con Skunk #1: huele a mandarina.,California Orange with Skunk #1: smells of tangerine.
-s11b865fb,La Kalifornia Orantx con Skonk #1: huele a mandarina.,Kalifornia Orantx with Skonk #1: smells of tangerine.
 s53acaf37,Amnesia Haze,Amnesia Haze
-sf8b55166,Amnesya Haize,Amnesya Haize
 sac7075c6,Haze + jamaicana + afgana o hawaiana + Laos · ≈ origen incierto,Haze + Jamaican + Afghan or Hawaiian + Laos · ≈ uncertain origin
-sb67d6f50,Haize + jamaicana + afgana o hawaiana + Laos · ≈ origen incierto,Haize + Jamaican + Afghan or Hawaiian + Laos · ≈ uncertain origin
 s717e9717,"Haze con Lamb's Bread, Luang Prabang y una índica (Afghani o Hawaiian). Muy potente.","Haze with Lamb's Bread, Luang Prabang and an indica (Afghani or Hawaiian). Very strong."
-s59fdc169,"Haize con Lamb's Bread, Luang Prabang y una índica (Afghani o Hawaiian). Muy potente.","Haize with Lamb's Bread, Luang Prabang and an indica (Afghani or Hawaiian). Very strong."
 s64fcf7fc,Jack Herer,Jack Herer
-se12dc46e,Jak Herrer,Jak Herrer
 sa8610ee8,Haze × (NL5 × Shiva Skunk) · LEGENDARIA,Haze × (NL5 × Shiva Skunk) · LEGENDARY
-s9184ffca,Haize × (NZ5 × Xiva Skonk) · LEGENDARIA,Haize × (NZ5 × Xiva Skonk) · LEGENDARY
 s641de57f,"Haze, Northern Lights y Shiva Skunk en una sola línea. Premiada como pocas en los noventa.","Haze, Northern Lights and Shiva Skunk in one line. Few won as many awards in the nineties."
-s33608a0c,"Haize, Norzen Lights y Xiva Skonk en una sola línea. Premiada como pocas en los noventa.","Haize, Norzen Lights and Xiva Skonk in one line. Few won as many awards in the nineties."
 s04385aba,Super Silver Haze,Super Silver Haze
-s23cc91ba,Supra Silber Haize,Supra Silber Haize
 se21384b3,Skunk #1 × Northern Lights × Haze,Skunk #1 × Northern Lights × Haze
-saeaba4a7,Skonk #1 × Norzen Lights × Haize,Skonk #1 × Norzen Lights × Haize
 seb325f30,"Haze, Northern Lights y Skunk #1 en una sola línea. Una de las sativas más premiadas de los noventa.","Haze, Northern Lights and Skunk #1 in one line. One of the nineties' most awarded sativas."
-s5f17d950,"Haize, Norzen Lights y Skonk #1 en una sola línea. Una de las sativas más premiadas de los noventa.","Haize, Norzen Lights and Skonk #1 in one line. One of the nineties' most awarded sativas."
 s94bcec8d,Blue Dream,Blue Dream
-s1c9d3141,Blu Drim,Blu Drim
 s0f635b67,Blueberry × Haze,Blueberry × Haze
-sc9833fd5,Bluberri × Haize,Bluberri × Haize
 s4f4ec4fd,La Blueberry con una Haze: dulce y equilibrada.,Blueberry with a Haze: sweet and balanced.
-s5ce9ffd7,La Bluberri con una Haize: dulce y equilibrada.,Bluberri with an Haize: sweet and balanced.
 s985a11b3,Blue Cheese,Blue Cheese
-s2f52831f,Blu Cheez,Blu Cheez
 sc1bb0219,Blueberry × Cheese,Blueberry × Cheese
-s8a13bb41,Bluberri × Cheez,Bluberri × Cheez
 s60307ed1,La Cheese con el dulzor de la Blueberry.,Cheese with Blueberry's sweetness.
-sa1b4b466,La Cheez con el dulzor de la Bluberri.,Cheez with Bluberri's sweetness.
 s37e14230,Sour Diesel,Sour Diesel
-s833eb982,Saur Disel,Saur Disel
 sff0fee7c,Chemdawg × Super Skunk · ≈ origen incierto,Chemdawg × Super Skunk · ≈ uncertain origin
-s5f6740f2,Chemdog × Supra Skonk · ≈ origen incierto,Chemdog × Supra Skonk · ≈ uncertain origin
 s7a4151bd,Olor a gasóleo agrio y efecto rápido. Una de las más buscadas.,Sharp fuel smell and a fast high. One of the most wanted.
 s39fe10df,Kali 47,Kali 47
-s6214bb7f,Kalli 47,Kalli 47
 s25ee3034,Kali Mist × AK-47,Kali Mist × AK-47
-s43f2e08a,Kalli Mixt × AX-47,Kalli Mixt × AX-47
 s2193eb9b,La Kali Mist con la AK-47: sativa más rápida y productiva.,"Kali Mist with AK-47: a faster, more productive sativa."
-sd4deeddd,La Kalli Mixt con la AX-47: sativa más rápida y productiva.,"Kalli Mixt with AX-47: a faster, more productive sativa."
 s47fc647b,Critical Kali Mist,Critical Kali Mist
-sf19b9bf7,Kritikal Kalli Mixt,Kritikal Kalli Mixt
 s52beb0ee,Critical Mass × Kali Mist,Critical Mass × Kali Mist
-s30d24dd1,Kritikal Mass × Kalli Mixt,Kritikal Mass × Kalli Mixt
 s723a42e2,La producción de la Critical Mass con el efecto de la Kali Mist.,Critical Mass yield with the Kali Mist high.
-s4985dbc3,La producción de la Kritikal Mass con el efecto de la Kalli Mixt.,Kritikal Mass yield with the Kalli Mixt high.
 sfe511f54,Kerala,Kerala
 s71bcf6fe,"Landrace · sierras de Kerala, India del Sur","Landrace · Kerala hills, South India"
 s599f5504,"Sativa de la India del Sur: tronco recio, hasta tres metros y ramas laterales como las de un helecho. Flores pequeñas, curvadas y muy resinosas, de aroma especiado.","South Indian sativa: thick trunk, up to three meters, fern-like side branches. Small, curled, very resinous flowers with a spicy aroma."
@@ -4340,37 +4240,23 @@ s56e77257,Manga Rosa,Manga Rosa
 sab4df210,Landrace · nordeste de Brasil,Landrace · northeast Brazil
 s768508d2,"Sativa brasileña de cogollo largo y pistilos rosados, con aroma a fruta tropical.","Brazilian sativa with long buds and pink pistils, tropical fruit aroma."
 sb32bd70a,Durban Poison,Durban Poison
-s92bfcd17,Durvan Poizon,Durvan Poizon
 s34acbb89,"Landrace · puerto de Durban, Sudáfrica","Landrace · port of Durban, South Africa"
 secd7680d,"Sativa sudafricana, rápida para su tipo y muy resinosa. Aroma dulce, a anís, y efecto claro.","South African sativa, fast for its kind and very resinous. Sweet aniseed aroma, clear high."
 s510da877,White Widow,White Widow
-s13c38b2a,Whyte Widou,Whyte Widou
 sfb1f69f5,sativa de Brasil × planta resinosa del sur de la India · ≈ origen incierto,Brazilian sativa × resinous South Indian plant · ≈ uncertain origin
 s8f574110,"Se cubre de tricomas hasta verse blanca. Arrasó a mediados de los noventa. Su padre fue una índica resinosa del sur de la India sin documentar, por eso sale más índica que las sativas de la mesa: Manga Rosa × Kerala.","Frosts over with trichomes until it looks white. Swept the mid-nineties. Its father was an undocumented resinous South Indian indica, so it comes out more indica than the sativas at the table: Manga Rosa × Kerala."
 s5b0f1ac5,Purple Haze,Purple Haze
-s5d620e30,Purpel Haize,Purpel Haize
 sef7e6ec4,Purple Thai × Haze · ≈ origen incierto,Purple Thai × Haze · ≈ uncertain origin
-sd2c7bb07,Purpel Thai × Haize · ≈ origen incierto,Purpel Thai × Haize · ≈ uncertain origin
 sc1de6425,Una Haze morada: el efecto eléctrico de la Haze con el color de la Purple Thai.,A purple Haze: the electric Haze high with Purple Thai's color.
-s7ebfba90,Una Haize morada: el efecto eléctrico de la Haize con el color de la Purpel Thai.,A purple Haize: the electric Haize high with Purpel Thai's color.
 sd7dd5128,White Russian,White Russian
-sb190867e,Whyte Rusian,Whyte Rusian
 secf95e64,White Widow × AK-47,White Widow × AK-47
-s84032a30,Whyte Widou × AX-47,Whyte Widou × AX-47
 s62e1f911,La White Widow con la AK-47: todavía más resina y floración corta. Premiada a mediados de los noventa.,White Widow with AK-47: even more resin and short flowering. Awarded in the mid-nineties.
-sd63bc6b2,La Whyte Widou con la AX-47: todavía más resina y floración corta. Premiada a mediados de los noventa.,Whyte Widou with AX-47: even more resin and short flowering. Awarded in the mid-nineties.
 s56c76f82,Blue Widow,Blue Widow
-s691c4a14,Blu Widou,Blu Widou
 sa6672101,Blueberry × White Widow,Blueberry × White Widow
-s8fe6c3b5,Bluberri × Whyte Widou,Bluberri × Whyte Widou
 s03b69b23,La White Widow con el dulzor y el azul de la Blueberry.,White Widow with Blueberry's sweetness and blue.
-sa22028b7,La Whyte Widou con el dulzor y el azul de la Bluberri.,Whyte Widou with Bluberri's sweetness and blue.
 s274f27b3,Super Lemon Haze,Super Lemon Haze
-s7e2178ca,Supra Limon Haize,Supra Limon Haize
 s001aa61c,Lemon Skunk × Super Silver Haze,Lemon Skunk × Super Silver Haze
-s6a990961,Limon Skonk × Supra Silber Haize,Limon Skonk × Supra Silber Haize
 sdf53d288,Limón y escarcha: la Super Silver Haze con la Lemon Skunk. Campeona dos años seguidos a finales de los 2000.,Lemon and frost: Super Silver Haze with Lemon Skunk. Champion two years running in the late 2000s.
-sc0720572,Limón y escarcha: la Supra Silber Haize con la Limon Skonk. Campeona dos años seguidos a finales de los 2000.,Lemon and frost: Supra Silber Haize with Limon Skonk. Champion two years running in the late 2000s.
 s59d7c884,Swazi Gold,Swazi Gold
 sbbf072b0,Landrace · montes de Esuatini (Suazilandia),Landrace · hills of Eswatini (Swaziland)
 s784ad156,"Sativa del sur de África, de cogollo dorado y aroma cítrico. Se cultiva al aire libre en los montes desde hace generaciones.",Southern African sativa with golden buds and a citrus aroma. Grown outdoors in the hills for generations.
@@ -4390,179 +4276,94 @@ s88ac40ac,Ethiopian Highland,Ethiopian Highland
 sc4c1b78c,Landrace · tierras altas de Etiopía,Landrace · Ethiopian highlands
 se648e4fd,Sativa africana de altura: florece antes que las de la costa y huele a fruta y especias.,"Highland African sativa: flowers before the coastal ones, smells of fruit and spice."
 sceb26f71,Chronic,Chronic
-s181c81e2,Kronik,Kronik
 s30f9c23b,Skunk #1 × Northern Lights × AK-47,Skunk #1 × Northern Lights × AK-47
-sb29406b2,Skonk #1 × Norzen Lights × AX-47,Skonk #1 × Norzen Lights × AX-47
 s7fb4ab34,Índica de mucha producción: la Skunk #1 y la Northern Lights con la AK-47. Cogollos grandes sin perder potencia.,High-yield indica: Skunk #1 and Northern Lights with AK-47. Big buds without losing potency.
-s2fa9510b,Índica de mucha producción: la Skonk #1 y la Norzen Lights con la AX-47. Cogollos grandes sin perder potencia.,High-yield indica: Skonk #1 and Norzen Lights with AX-47. Big buds without losing potency.
 s23fe7a26,White Rhino,White Rhino
-s6d4814f3,Whyte Rino,Whyte Rino
 s95d0c0f0,White Widow × índica norteamericana · ≈ origen incierto,White Widow × North American indica · ≈ uncertain origin
-s319519e5,Whyte Widou × índica norteamericana · ≈ origen incierto,Whyte Widou × North American indica · ≈ uncertain origin
 s95d11cac,"La White Widow con una índica de Norteamérica sin documentar: más baja, más pesada y de cogollo más denso. En la mesa, con Afghani.","White Widow with an undocumented North American indica: shorter, heavier, denser buds. At the table, with Afghani."
-sb80f025e,"La Whyte Widou con una índica de Norteamérica sin documentar: más baja, más pesada y de cogollo más denso. En la mesa, con Afghani.","Whyte Widou with an undocumented North American indica: shorter, heavier, denser buds. At the table, with Afghani."
 sf1979b6a,White Shark,White Shark
-sedfc3c6b,Whyte Xark,Whyte Xark
 sfa621115,Super Skunk × brasileña × India del Sur,Super Skunk × Brazilian × South Indian
-s90914d29,Supra Skonk × brasileña × India del Sur,Supra Skonk × Brazilian × South Indian
 s654dc6da,"La Super Skunk con las dos madres de la White Widow: blanca de resina, rápida y aromática.","Super Skunk with both parents of White Widow: white with resin, fast and aromatic."
-s71dbf138,"La Supra Skonk con las dos madres de la Whyte Widou: blanca de resina, rápida y aromática.","Supra Skonk with both parents of Whyte Widou: white with resin, fast and aromatic."
 se45e539c,Hawaiian Snow,Hawaiian Snow
-sb7777de6,Hawayan Snou,Hawayan Snou
 sb83c430d,Hawaiian Haze × Neville's Haze × Haze,Hawaiian Haze × Neville's Haze × Haze
-s27fc3bfa,Hawaiian Haize × Nevil's Haize × Haize,Hawaiian Haize × Nevil's Haize × Haize
 s700efca5,"Tres Haze y una sativa de Hawái: altísima, lenta y de efecto muy claro.","Three Hazes and a Hawaiian sativa: very tall, slow, very clear high."
-sa2643bcc,"Tres Haize y una sativa de Hawái: altísima, lenta y de efecto muy claro.","Three Haizes and a Hawaiian sativa: very tall, slow, very clear high."
 s595e5793,Jack Flash,Jack Flash
-s97c4a721,Jak Flash,Jak Flash
 s9b9ddcdc,Jack Herer × Super Skunk × Haze,Jack Herer × Super Skunk × Haze
-sb76aa3b7,Jak Herrer × Supra Skonk × Haize,Jak Herrer × Supra Skonk × Haize
 seca5bba8,La Jack Herer con más Haze y la Super Skunk: algo más rápida y productiva.,Jack Herer with more Haze and Super Skunk: a bit faster and more productive.
-se5bd4d43,La Jak Herrer con más Haize y la Supra Skonk: algo más rápida y productiva.,Jak Herrer with more Haize and Supra Skonk: a bit faster and more productive.
 sb7d04431,Jack 47,Jack 47
-s6caeb64e,Jak 47,Jak 47
 s124186ef,Jack Herer × AK-47,Jack Herer × AK-47
-sfc05cd22,Jak Herrer × AX-47,Jak Herrer × AX-47
 s600b6376,La Jack Herer con la AK-47: más fácil de cultivar y de floración más corta.,"Jack Herer with AK-47: easier to grow, shorter flowering."
-scff8f778,La Jak Herrer con la AX-47: más fácil de cultivar y de floración más corta.,"Jak Herrer with AX-47: easier to grow, shorter flowering."
 s1d00706f,Sour Tangie,Sour Tangie
-s70c8a0c1,Saur Tangi,Saur Tangi
 s5187cb75,Sour Diesel × Tangie,Sour Diesel × Tangie
-s4ee2fdba,Saur Disel × Tangi,Saur Disel × Tangi
 s850166a6,El gasóleo agrio de la Sour Diesel con la mandarina de la Tangie.,Sour Diesel's sour fuel with Tangie's tangerine.
-sd2c1a80e,El gasóleo agrio de la Saur Disel con la mandarina de la Tangi.,Saur Disel's sour fuel with Tangi's tangerine.
 sf302c2ee,Ice,Ice
-s68026bf6,Ize,Ize
 s68a3a9c6,Afghani × Northern Lights × Shiva Skunk,Afghani × Northern Lights × Shiva Skunk
-s7bf81d2c,Afghani × Norzen Lights × Xiva Skonk,Afghani × Norzen Lights × Xiva Skonk
 sc3e17590,Índica tan cargada de resina que parece helada: de las preferidas para las extracciones. Rápida y fácil.,Indica so loaded with resin it looks frozen: a favorite for extractions. Fast and easy.
 s232619c1,NL × Big Bud,NL × Big Bud
-s702eab06,NZ × Big Bod,NZ × Big Bod
 s1ff75faf,Northern Lights × Big Bud,Northern Lights × Big Bud
-s918d1636,Norzen Lights × Big Bod,Norzen Lights × Big Bod
 s720e5e65,La Northern Lights con el tamaño de la Big Bud: de las que más producen.,Northern Lights with Big Bud's size: one of the top yielders.
-s3bbae97d,La Norzen Lights con el tamaño de la Big Bod: de las que más producen.,Norzen Lights with Big Bod's size: one of the top yielders.
 s07e787fa,Critical Jack,Critical Jack
-sbe1123e2,Kritikal Jak,Kritikal Jak
 s9da87a3a,Critical × Jack Herer · ≈ origen incierto,Critical × Jack Herer · ≈ uncertain origin
-s564a6976,Kritikal × Jak Herrer · ≈ origen incierto,Kritikal × Jak Herrer · ≈ uncertain origin
 s2549866d,"La producción de una Critical con el efecto de la Jack Herer. Qué Critical se usó no está claro; en la mesa, la Critical Mass.","A Critical's yield with Jack Herer's high. Which Critical is unclear; at the table, Critical Mass."
-sbe0a890f,"La producción de una Kritikal con el efecto de la Jak Herrer. Qué Kritikal se usó no está claro; en la mesa, la Kritikal Mass.","A Kritikal's yield with Jak Herrer's high. Which Kritikal is unclear; at the table, Kritikal Mass."
 s707d41ae,Critical 47,Critical 47
-s26ed2286,Kritikal 47,Kritikal 47
 s19fb468d,Critical × AK-47 · ≈ origen incierto,Critical × AK-47 · ≈ uncertain origin
-s442de0e1,Kritikal × AX-47 · ≈ origen incierto,Kritikal × AX-47 · ≈ uncertain origin
 sf0fb9752,"Una Critical con la AK-47: corta, productiva y fácil. En la mesa, con la Critical Mass.","A Critical with AK-47: short, productive and easy. At the table, with Critical Mass."
-s023cd5e8,"Una Kritikal con la AX-47: corta, productiva y fácil. En la mesa, con la Kritikal Mass.","A Kritikal with AX-47: short, productive and easy. At the table, with Kritikal Mass."
 se076f421,Critical Cheese,Critical Cheese
-s5d2a4bc3,Kritikal Cheez,Kritikal Cheez
 s09894222,Critical × Cheese · ≈ origen incierto,Critical × Cheese · ≈ uncertain origin
-s6e6bbc51,Kritikal × Cheez · ≈ origen incierto,Kritikal × Cheez · ≈ uncertain origin
 s92d644ea,"Una Critical con el olor a queso de la Cheese. En la mesa, con la Critical Mass.","A Critical with Cheese's cheesy smell. At the table, with Critical Mass."
-s127e403f,"Una Kritikal con el olor a queso de la Cheez. En la mesa, con la Kritikal Mass.","A Kritikal with Cheez's cheesy smell. At the table, with Kritikal Mass."
 se98bce59,Northern Light Blue,Northern Light Blue
-se9b8a09e,Norzen Light Blu,Norzen Light Blu
 sc9058ca2,Northern Lights × Blueberry,Northern Lights × Blueberry
-s22d1bb93,Norzen Lights × Bluberri,Norzen Lights × Bluberri
 s557dcb48,La Northern Lights con el dulzor y el azul de la Blueberry.,Northern Lights with Blueberry's sweetness and blue.
-s6c2f7d19,La Norzen Lights con el dulzor y el azul de la Bluberri.,Norzen Lights with Bluberri's sweetness and blue.
 s45abf550,Ruderalis,Ruderalis
 s7341d233,"Landrace · Rusia y Asia central, silvestre","Landrace · Russia and Central Asia, wild"
 s41e362d1,"La del frío: pequeña, dura y casi sin THC. Florece por la edad y no por las horas de luz; de ella sacan todas las autoflorecientes.","The cold one: small, tough and almost no THC. Flowers by age, not light hours; every autoflower comes from it."
 s7538fb5d,Northern Lights Auto,Northern Lights Auto
-sd5231697,Norzen Lights Auto,Norzen Lights Auto
 s7741df82,Northern Lights × Ruderalis,Northern Lights × Ruderalis
-se7662e64,Norzen Lights × Ruderalis,Norzen Lights × Ruderalis
 s9526cfa2,"La Northern Lights con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Northern Lights with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-s0bef88c2,"La Norzen Lights con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Norzen Lights with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s887a7fb2,White Widow Auto,White Widow Auto
-sa300e2d5,Whyte Widou Auto,Whyte Widou Auto
 sa3dc1925,White Widow × Ruderalis,White Widow × Ruderalis
-seb4597c9,Whyte Widou × Ruderalis,Whyte Widou × Ruderalis
 s3d849856,"La White Widow con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","White Widow with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-sd51844ee,"La Whyte Widou con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Whyte Widou with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 sa7d24a97,Amnesia Haze Auto,Amnesia Haze Auto
-s9a1c30a5,Amnesya Haize Auto,Amnesya Haize Auto
 s5ecfd4b4,Amnesia Haze × Ruderalis,Amnesia Haze × Ruderalis
-sa36c0c22,Amnesya Haize × Ruderalis,Amnesya Haize × Ruderalis
 sde77e850,"La Amnesia Haze con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Amnesia Haze with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-sd353f6e0,"La Amnesya Haize con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Amnesya Haize with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s240b843c,Blueberry Auto,Blueberry Auto
-s2f1ade5d,Bluberri Auto,Bluberri Auto
 sf6bd4c1d,Blueberry × Ruderalis,Blueberry × Ruderalis
-sd203baee,Bluberri × Ruderalis,Bluberri × Ruderalis
 s97dcf923,"La Blueberry con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Blueberry with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-s6bd8f848,"La Bluberri con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Bluberri with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 scf18223d,AK-47 Auto,AK-47 Auto
-s5a555c89,AX-47 Auto,AX-47 Auto
 sc42a2c2c,AK-47 × Ruderalis,AK-47 × Ruderalis
-s80e1eed5,AX-47 × Ruderalis,AX-47 × Ruderalis
 s0e88bda6,"La AK-47 con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","AK-47 with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-s01376f9a,"La AX-47 con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","AX-47 with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 scb153a94,Jack Herer Auto,Jack Herer Auto
-s48f22aa2,Jak Herrer Auto,Jak Herrer Auto
 s6c07b73c,Jack Herer × Ruderalis,Jack Herer × Ruderalis
-sb57c9070,Jak Herrer × Ruderalis,Jak Herrer × Ruderalis
 sfbdc0714,"La Jack Herer con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Jack Herer with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-s767f8fca,"La Jak Herrer con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Jak Herrer with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s9291efb3,Skunk #1 Auto,Skunk #1 Auto
-sdec873fc,Skonk #1 Auto,Skonk #1 Auto
 sd66d0be5,Skunk #1 × Ruderalis,Skunk #1 × Ruderalis
-sb83a2b9b,Skonk #1 × Ruderalis,Skonk #1 × Ruderalis
 sb0b21765,"La Skunk #1 con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Skunk #1 with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-sa6c78375,"La Skonk #1 con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Skonk #1 with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s5d5ed79b,Big Bud Auto,Big Bud Auto
-s9ef0141b,Big Bod Auto,Big Bod Auto
 sec894a58,Big Bud × Ruderalis,Big Bud × Ruderalis
-scfe4a801,Big Bod × Ruderalis,Big Bod × Ruderalis
 s47ceae02,"La Big Bud con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Big Bud with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-sd9ef46b7,"La Big Bod con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Big Bod with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s78bd166b,Super Skunk Auto,Super Skunk Auto
-s2734a406,Supra Skonk Auto,Supra Skonk Auto
 se0790375,Super Skunk × Ruderalis,Super Skunk × Ruderalis
-s9f81f59c,Supra Skonk × Ruderalis,Supra Skonk × Ruderalis
 sc5a02d2b,"La Super Skunk con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Super Skunk with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-sb55ca75e,"La Supra Skonk con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Supra Skonk with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 scb56ce31,Cheese Auto,Cheese Auto
-sbc8d6e8f,Cheez Auto,Cheez Auto
 s975738dc,Cheese × Ruderalis,Cheese × Ruderalis
-s208bff14,Cheez × Ruderalis,Cheez × Ruderalis
 s8584e704,"La Cheese con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Cheese with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-sb0afbb92,"La Cheez con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Cheez with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 sec994f08,Blue Dream Auto,Blue Dream Auto
-sde971502,Blu Drim Auto,Blu Drim Auto
 sb0ebceb9,Blue Dream × Ruderalis,Blue Dream × Ruderalis
-s4765ee1e,Blu Drim × Ruderalis,Blu Drim × Ruderalis
 sed9592a5,"La Blue Dream con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Blue Dream with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-sd4dc0cc0,"La Blu Drim con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Blu Drim with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s4834bf52,Sour Diesel Auto,Sour Diesel Auto
-s75286c31,Saur Disel Auto,Saur Disel Auto
 s30562008,Sour Diesel × Ruderalis,Sour Diesel × Ruderalis
-sd9bc205f,Saur Disel × Ruderalis,Saur Disel × Ruderalis
 s393da038,"La Sour Diesel con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Sour Diesel with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-s95c8cdaa,"La Saur Disel con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Saur Disel with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s50fc039e,Super Silver Haze Auto,Super Silver Haze Auto
-s99b803f0,Supra Silber Haize Auto,Supra Silber Haize Auto
 s57a1173e,Super Silver Haze × Ruderalis,Super Silver Haze × Ruderalis
-se20c6767,Supra Silber Haize × Ruderalis,Supra Silber Haize × Ruderalis
 sdce17d1b,"La Super Silver Haze con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Super Silver Haze with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-s2721bb80,"La Supra Silber Haize con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Supra Silber Haize with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s4417cb2a,Purple Kush Auto,Purple Kush Auto
-sa2f3cf3e,Purpel Kush Auto,Purpel Kush Auto
 s130cc48c,Purple Kush × Ruderalis,Purple Kush × Ruderalis
-s35f3b4a5,Purpel Kush × Ruderalis,Purpel Kush × Ruderalis
 saa3059b2,"La Purple Kush con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Purple Kush with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-s7f6b7891,"La Purpel Kush con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Purpel Kush with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 seaec403a,Durban Poison Auto,Durban Poison Auto
-s3bbda13d,Durvan Poizon Auto,Durvan Poizon Auto
 s55e48382,Durban Poison × Ruderalis,Durban Poison × Ruderalis
-s89b1aa83,Durvan Poizon × Ruderalis,Durvan Poizon × Ruderalis
 s8b694061,"La Durban Poison con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Durban Poison with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
-s00dd5818,"La Durvan Poizon con sangre ruderalis: florece por la edad, sin cambiar la luz, y se cosecha antes. Rinde menos y no se clona.","Durvan Poizon with ruderalis blood: flowers by age, no light change, harvests sooner. Lower yield, no clones."
 s0cb3b909,Lowryder,Lowryder
-sb3621ebf,Lowraider,Lowraider
 s6ad9b989,Northern Lights × ruderalis mexicana · ≈ origen incierto,Northern Lights × Mexican ruderalis · ≈ uncertain origin
-s4fe7aef9,Norzen Lights × ruderalis mexicana · ≈ origen incierto,Norzen Lights × Mexican ruderalis · ≈ uncertain origin
 s1b74f534,"La primera autofloreciente que se vendió, a principios de los 2000: pequeña, de balcón, en dos meses. Abrió la puerta a todas las demás.","The first autoflower ever sold, early 2000s: small, balcony-sized, done in two months. Opened the door for the rest."
 s1fb29352,Línea estable,Stable line
 s3b6a0bc7,fijada a lo largo de generaciones: casi todas las plantas salen iguales,fixed over generations: nearly every plant comes out the same
@@ -5029,26 +4830,16 @@ sbf7a47b7,"APARCAMIENTO
 Entrada y salida de la autopista.","CAR PARK
 Motorway entrance and exit."
 saced0e96,Semillas Skunk #1,Skunk #1 seeds
-s0ea02f6b,Semillas Skonk #1,Skonk #1 seeds
 sae6a55fe,Semillas Lemon Haze,Lemon Haze seeds
-s7c773c2d,Semillas Limon Haize,Limon Haize seeds
 sb47dc4a3,Semillas Super Skunk,Super Skunk seeds
-s85845c64,Semillas Supra Skonk,Supra Skonk seeds
 s2e52c0bd,Semillas Blueberry,Blueberry seeds
-s555cd492,Semillas Bluberri,Bluberri seeds
 sabff7bec,Semillas Big Bud,Big Bud seeds
-s1bd28137,Semillas Big Bod,Big Bod seeds
 sc2ec3a12,Semillas Lemon Skunk,Lemon Skunk seeds
-sc961fc3a,Semillas Limon Skonk,Limon Skonk seeds
 sd0a2af0e,Semillas Cheese,Cheese seeds
-sb40f3102,Semillas Cheez,Cheez seeds
 s12347243,Semillas Purple Afghani,Purple Afghani seeds
 sac1cf7c4,Semillas Kali Mist,Kali Mist seeds
-s9056d6ca,Semillas Kalli Mixt,Kalli Mixt seeds
 s8ef906ae,Semillas California Orange,California Orange seeds
-s6a00647b,Semillas Kalifornia Orantx,Kalifornia Orantx seeds
 sd02cc65b,Semillas Chemdawg,Chemdawg seeds
-sc08ee14e,Semillas Chemdog,Chemdog seeds
 sf65f69ee,Abono floración MEATZA 1 L,Bloom nutrients MEATZA 1 L
 saeacaddc,"4 dosis. Mineral. Una dosis por planta: +25 % de cosecha, +0,3 de THC y florece un 10 % más deprisa, con el pH corregido (sin pH−, ×0,5).","4 doses. Mineral. One dose per plant: +25 % yield, +0,3 THC and flowers 10 % faster, with pH corrected (no pH−, ×0,5)."
 sa6f41e8c,"4 dosis. Mineral. Una dosis por planta: +25 % de cosecha, +0,3 de THC y florece un 10 % más deprisa, con el riego corregido (sin corrector, ×0,5).","4 doses. Mineral. One dose per plant: +25 % yield, +0,3 THC and flowers 10 % faster, with water corrected (no corrector, ×0,5)."
@@ -5243,7 +5034,7 @@ s5ee46f87,"Prensa manual de calor (1.10): de 5 g de cogollo, 1 g de rosin con el
 sae9f169a,"Tres tamices, de grueso a fino (1.35): dry sift en la mesa del piso, y su kief para el hachís prensado y el moonrock.","Three sieves, coarse to fine (1.35): dry sift at the flat's table, and its kief for pressed hash and moonrock."
 sf46dd620,"Cubo y bolsas de malla para agua con hielo (1.35): la resina más limpia, en la mesa del piso. Su kief sirve para el prensado y el moonrock.","Bucket and mesh bags for ice water (1.35): the cleanest resin, at the flat's table. Its kief works for pressed hash and moonrock."
 s06d17bf0,"La lavadora de extracción (1.36): una pequeña de carga superior, con la cuba de plástico; bate sola el agua con hielo y la flor congelada con las bolsas de malla dentro y desagua por la manguera. Más Ice-o-lator y más limpio que a mano. Se monta junto a la nevera del piso.",The extraction washer (1.36): a small top-loader with a plastic drum; churns ice water and frozen flower with the mesh bags inside and drains through the hose. More Ice-o-lator and cleaner than by hand. Goes next to the flat's fridge.
-s04e7d431,"La lavadora de extracción (1.36): una pequeña de carga superior, con la cuba de plástico; bate sola el agua con hielo y la flor congelada con las bolsas de malla dentro y desagua por la manguera. Más Ais-o-lator y más limpio que a mano. Se monta junto a la nevera del piso.",The extraction washer (1.36): a small top-loader with a plastic drum; churns ice water and frozen flower with the mesh bags inside and drains through the hose. More Ais-o-lator and cleaner than by hand. Goes next to the flat's fridge.
+sde3367c3,"La lavadora de extracción (1.36): una pequeña de carga superior, con la cuba de plástico; bate sola el agua con hielo y la flor congelada con las bolsas de malla dentro y desagua por la manguera. Más Ice Hash y más limpio que a mano. Se monta junto a la nevera del piso.",The extraction washer (1.36): a small top-loader with a plastic drum; churns ice water and frozen flower with the mesh bags inside and drains through the hose. More Ice Hash and cleaner than by hand. Goes next to the flat's fridge.
 sb233e708,"Separador electrostático de mesa (1.36): la placa cargada levanta las cabezas de resina de la flor fría, sin agua ni disolventes. La resina más pura, hasta un 85 % de THC, en la mesa del piso. Una inversión fuerte.","Tabletop electrostatic separator (1.36): the charged plate lifts resin heads off cold flower, no water or solvents. The purest resin, up to 85 % THC, at the flat's table. A big investment."
 s5bf666fd,"Tarros de cristal herméticos (1.29) para la caja fuerte y la nevera: los cogollos que guardas en la caja se curan en 2 días: suben un 1 % de THC y se venden un 15 % más caros. Sin curar no pierden nada. Los extractos, en sus tarros pequeños, se curan en frío en la nevera.","Airtight glass jars (1.29) for the safe and the fridge: buds stored in the safe cure in 2 days: +1 % THC and they sell 15 % higher. Uncured, they lose nothing. Extracts cure cold in the fridge in their small jars."
 s35de1612,TRANQUILO,CALM
@@ -5279,7 +5070,6 @@ s42300714,"La carpa de 150 en lugar de la de 100 (140 €) y, en el capítulo 5,
 sea6fbb36,Seis plantas por carpa. Esto ya es un negocio.,Six plants per tent. Now this is a business.
 s9437c27c,Una genética potente,A strong strain
 s9ce0fc5e,"Darko presenta una Amnesia Haze del 26,8 %. Para pasarla, una de receta del 26 % o más (Amnesia Haze, Jack Herer y Sour Diesel). La más a mano, la Sour Diesel: Chemdawg (12 €) × Super Skunk (10 €) en la mesa.","Darko enters an Amnesia Haze at 26,8 %. To beat it, a recipe strain of 26 % or more (Amnesia Haze, Jack Herer and Sour Diesel). The easiest, Sour Diesel: Chemdawg (12 €) × Super Skunk (10 €) at the table."
-s15665664,"Darko presenta una Amnesya Haize del 26,8 %. Para pasarla, una de receta del 26 % o más (Amnesya Haize, Jak Herrer y Saur Disel). La más a mano, la Saur Disel: Chemdog (12 €) × Supra Skonk (10 €) en la mesa.","Darko enters a Amnesya Haize at 26,8 %. To beat it, a recipe strain of 26 % or more (Amnesya Haize, Jak Herrer and Saur Disel). The easiest, Saur Disel: Chemdog (12 €) × Supra Skonk (10 €) at the table."
 s40ac318c,"Con esa ya puedes plantarle cara a Darko. Ahora, a sacarle todo el THC.",With that one you can face Darko. Now squeeze out all the THC.
 s489cffe5,Floración a tope,Full bloom
 sf61075cd,"El THC sube con la luz y el abono: el LED de 720 W (950 €, en la carpa de 120 o la de 150), +1,4, y MEATZA FLORACIÓN con pH− y el medidor de pH y EC (35 €), +0,3 si lo aprovecha entero (ORTUA BIO, +0,4).","THC rises with light and nutrients: the 720 W LED (950 €, in the 120 or 150 tent), +1,4, and MEATZA BLOOM with pH− and the pH and EC meter (35 €), +0,3 if fully used (ORTUA BIO, +0,4)."
@@ -5344,7 +5134,6 @@ s47be1fff,"Huele a limón y a pino. Ata las colas, que pesan y se tronchan.","Sm
 sdcf8a46e,"Cuatro sangres y florece en ocho semanas. Si solo tienes sitio para una, esta.","Four bloodlines and flowers in eight weeks. If you've only room for one, this is it."
 s8d038623,Tailandesa con jamaicana. La que le daba la risa a Txaro los domingos.,Thai with Jamaican. The one that gave Txaro the giggles on Sundays.
 saafe744c,Haze con mexicana: huele a melón maduro. Pide sitio a lo alto.,Haze with Mexican: smells of ripe melon. Needs headroom.
-s9f8a34b1,Haize con mexicana: huele a melón maduro. Pide sitio a lo alto.,Haize with Mexican: smells of ripe melon. Needs headroom.
 s2380341e,Las dos montañas juntas. Resina de la de verdad; la que tamizábamos en seco.,The two mountains together. Proper resin; the one we dry-sifted.
 s5f66e6e6,Hindu Kush con la púrpura: morada hasta el tallo. La del aceite de Txaro.,Hindu Kush with the purple: purple down to the stem. Txaro's oil strain.
 s9f07b197,"Dos ecuatoriales: eléctrica y lenta. En el armario, ni lo intentes.","Two equatorials: electric and slow. In the wardrobe, don't even try."
@@ -5352,92 +5141,58 @@ s59e02686,Africana y panameña. Muy alta y muy clara de efecto; ponle tutor.,Afr
 s40fcdcc8,"Malawi con la de Chitral. La rara del cuaderno: si te sale, guárdale semillas.","Malawi with the Chitral one. The rare one in the notebook: if you get it, save seeds."
 s466e2b27,Sabe a arándanos de verdad. Tres generaciones me costó que oliera así.,Tastes of real blueberries. Took me three generations to make it smell like that.
 sf3fecc3b,"Skunk con Northern Lights: corta, gorda y obediente. La de mi primer año.","Skunk with Northern Lights: short, fat and obedient. My first year's strain."
-sf7936c30,"Skonk con Norzen Lights: corta, gorda y obediente. La de mi primer año.","Skonk with Norzen Lights: short, fat and obedient. My first year's strain."
 s2847611b,Haze con NL5 × Haze: la sativa más alta que he tenido. Doce semanas largas de flor.,Haze with NL5 × Haze: the tallest sativa I ever had. Twelve long weeks of flower.
-s87223b79,Haize con NZ5 × Haize: la sativa más alta que he tenido. Doce semanas largas de flor.,Haize with NZ5 × Haize: the tallest sativa I ever had. Twelve long weeks of flower.
 sb96b881c,"Chocolate y melón. No la cuelgues a secar con otra, que se le pega el olor.","Chocolate and melon. Don't hang it to dry with another, the smell rubs off."
 s8d317fda,Sabe a piña. Kiko decía que era la de los veranos.,Tastes of pineapple. Kiko called it the summer one.
 s299afd1d,Pela una mandarina: así huele la carpa cuando florece.,Peel a tangerine: that's how the tent smells in flower.
 s406d8b22,"Tres landraces y una Haze. Si la sacas, ya sabes cruzar.","Three landraces and a Haze. If you pull it off, you know how to cross."
-sbc917534,"Tres landraces y una Haize. Si la sacas, ya sabes cruzar.","Three landraces and an Haize. If you pull it off, you know how to cross."
 sf1809ba1,"La que nunca terminé. Haze, Northern Lights y Shiva: el cuaderno acaba aquí. Termínala tú.","The one I never finished. Haze, Northern Lights and Shiva: the notebook ends here. You finish it."
-sbd4d4c0b,"La que nunca terminé. Haize, Norzen Lights y Shiva: el cuaderno acaba aquí. Termínala tú.","The one I never finished. Haize, Norzen Lights and Shiva: the notebook ends here. You finish it."
 sb9ece711,"Plateada de tricomas. Skunk, Northern Lights y Haze en un solo cogollo.","Silver with trichomes. Skunk, Northern Lights and Haze in a single bud."
-s3e5e1627,"Plateada de tricomas. Skonk, Norzen Lights y Haize en un solo cogollo.","Silver with trichomes. Skonk, Norzen Lights and Haize in a single bud."
 sa6114fe1,Blueberry con Haze: dulce y despierta. La que más me pedían en el muelle.,Blueberry with Haze: sweet and uplifting. The most asked-for at the docks.
-s1b7cf386,Bluberri con Haize: dulce y despierta. La que más me pedían en el muelle.,Bluberri with Haize: sweet and uplifting. The most asked-for at the docks.
 s1a544e49,Blueberry con queso. Huele fuerte: extractor y filtro antes de plantarla.,Blueberry with cheese. Strong smell: extractor and filter before you plant it.
-se21fa3b0,Bluberri con queso. Huele fuerte: extractor y filtro antes de plantarla.,Bluberri with cheese. Strong smell: extractor and filter before you plant it.
 sb5d544db,Huele a limón recién cortado. Cosecha con los tricomas lechosos.,Smells of fresh-cut lemon. Harvest when the trichomes go milky.
 s09bcf9b5,Huele a gasoil. Ni el mejor filtro la tapa del todo.,Smells of diesel. Not even the best filter fully hides it.
 sd98cbf6e,"Una sativa que florece a tiempo. Un milagro, en esta ría.","A sativa that finishes on time. A miracle, on this ría."
 s3af51d32,Produce como ninguna: la de pagar las facturas.,Yields like no other: the one that pays the bills.
 s810fce36,Skunk #1 de madre y Afghani de padre. Al revés sale otra: la madre manda.,Skunk #1 mother and Afghani father. The other way round you get another: the mother rules.
-s967efef6,Skonk #1 de madre y Afghani de padre. Al revés sale otra: la madre manda.,Skonk #1 mother and Afghani father. The other way round you get another: the mother rules.
 sc4a7d1af,Afghani de madre y Skunk #1 de padre. Cogollos tan densos que hay que vigilar el moho.,Afghani mother and Skunk #1 father. Buds so dense you have to watch for mould.
-sa1eef3b9,Afghani de madre y Skonk #1 de padre. Cogollos tan densos que hay que vigilar el moho.,Afghani mother and Skonk #1 father. Buds so dense you have to watch for mould.
 sc92006da,Northern Lights de madre y Haze de padre: la más fácil de las Haze.,Northern Lights mother and Haze father: the easiest of the Hazes.
-se3c831bc,Norzen Lights de madre y Haize de padre: la más fácil de las Haize.,Norzen Lights mother and Haize father: the easiest of the Haizes.
 s463c6800,Haze de madre y Northern Lights de padre. Al revés no sale igual.,Haze mother and Northern Lights father. The other way round it's not the same.
-s5c156a72,Haize de madre y Norzen Lights de padre. Al revés no sale igual.,Haize mother and Norzen Lights father. The other way round it's not the same.
 sb848499c,Brasileña con la del sur de la India: se cubre de escarcha blanca. La que todos pedían en el 95.,Brazilian with the South Indian: covers itself in white frost. The one everyone wanted in '95.
 s167958a5,Purple Thai con Haze: morada y eléctrica. Ponía música en la carpa cuando florecía.,Purple Thai with Haze: purple and electric. I played music in the tent while it flowered.
-s1b6ecc33,Purpel Thai con Haize: morada y eléctrica. Ponía música en la carpa cuando florecía.,Purpel Thai with Haize: purple and electric. I played music in the tent while it flowered.
 s5021893a,White Widow con AK-47: aún más blanca. Kiko la llamaba «la del invierno».,White Widow with AK-47: even whiter. Kiko called it «the winter one».
-scbe04fb9,Whyte Widou con AX-47: aún más blanca. Kiko la llamaba «la del invierno».,Whyte Widou with AX-47: even whiter. Kiko called it «the winter one».
 sd3198056,Blueberry con White Widow: dulce y escarchada. Con noches frías le sale el azul.,Blueberry with White Widow: sweet and frosty. Cold nights bring out the blue.
-s1e5c0e36,Bluberri con Whyte Widou: dulce y escarchada. Con noches frías le sale el azul.,Bluberri with Whyte Widou: sweet and frosty. Cold nights bring out the blue.
 s063290f9,"Lemon Skunk con Super Silver Haze: limón y escarcha. Larga de flor, pero merece la pena.","Lemon Skunk with Super Silver Haze: lemon and frost. Long flower, but worth it."
-s090869f1,"Limon Skonk con Supra Silber Haize: limón y escarcha. Larga de flor, pero merece la pena.","Limon Skonk with Supra Silber Haize: lemon and frost. Long flower, but worth it."
 s5242e0bc,"Cogollos como puños. Kiko la tiene en la tienda: ponle malla, que las ramas se doblan.","Buds like fists. Kiko stocks it: net it, the branches bend."
 s38c1d066,La afgana morada de la tienda. Con la Hindu Kush sale la Purple Kush.,The purple Afghan from the shop. With Hindu Kush you get Purple Kush.
-sb2168e9e,La afgana morada de la tienda. Con la Hindu Kush sale la Purpel Kush.,The purple Afghan from the shop. With Hindu Kush you get Purpel Kush.
 s630063e7,"Skunk que huele a limón. Con Silver Haze, la Lemon Haze; con Super Silver Haze, la Super Lemon Haze.","Skunk that smells of lemon. With Silver Haze, Lemon Haze; with Super Silver Haze, Super Lemon Haze."
-sa55f4b00,"Skonk que huele a limón. Con Silber Haize, la Limon Haize; con Supra Silber Haize, la Supra Limon Haize.","Skonk that smells of lemon. With Silber Haize, Limon Haize; with Supra Silber Haize, Supra Limon Haize."
 sc87c8bb1,"Una sativa de la tienda que florece a tiempo. Con AK-47, la Kali 47; con Critical Mass, la Critical Kali Mist.","A shop sativa that finishes on time. With AK-47, Kali 47; with Critical Mass, Critical Kali Mist."
-sd4b54cbd,"Una sativa de la tienda que florece a tiempo. Con AX-47, la Kalli 47; con Kritikal Mass, la Kritikal Kalli Mixt.","A shop sativa that finishes on time. With AX-47, Kalli 47; with Kritikal Mass, Kritikal Kalli Mixt."
 sd70ff541,"Huele a queso curado y no hay filtro que lo tape. Con Blueberry, la Blue Cheese.","Smells of aged cheese and no filter hides it. With Blueberry, Blue Cheese."
-scb941513,"Huele a queso curado y no hay filtro que lo tape. Con Bluberri, la Blu Cheez.","Smells of aged cheese and no filter hides it. With Bluberri, Blu Cheez."
 s27477eb7,Naranja de California. Con Skunk #1 sale la Tangie.,California orange. With Skunk #1 you get Tangie.
-s2189ef86,Naranja de California. Con Skonk #1 sale la Tangi.,California orange. With Skonk #1 you get Tangi.
 s972d8e1c,"Huele a gasoil del bueno. Con Super Skunk, la Sour Diesel.","Smells of good diesel. With Super Skunk, Sour Diesel."
-s9d8e4f81,"Huele a gasoil del bueno. Con Supra Skonk, la Saur Disel.","Smells of good diesel. With Supra Skonk, Saur Disel."
 s23cc7728,"La afgana de Kiko: medio cuaderno sale de ella. Corta, ancha y llena de resina.","Kiko's Afghan: half the notebook comes from her. Short, wide and full of resin."
 s857a66fb,"La de Txaro: baja y ancha como un abeto. Con la de Chitral, la Master Kush.","Txaro's: short and wide like a fir. With the Chitral one, Master Kush."
-s1c2da0a8,"La de Txaro: baja y ancha como un abeto. Con la de Chitral, la Maister Kush.","Txaro's: short and wide like a fir. With the Chitral one, Maister Kush."
 sd4f552af,"La dorada de Guerrero. La escondí en el parque del barrio, en un bote de carrete, entre los arbustos.","Guerrero's golden one. I hid it in the neighbourhood park, in a film canister, in the bushes."
 s7c77f308,Africana de flor eterna: Iñaki la trajo en un barco. Con Panama Red o con Chitral Kush.,Never-ending African flower: Iñaki brought it on a boat. With Panama Red or with Chitral Kush.
 s260ed421,"Mexicana de altura. Con Thai y Punto Rojo, la Haze; con Thai y Afghani, la Trainwreck.","High-altitude Mexican. With Thai and Punto Rojo, Haze; with Thai and Afghani, Trainwreck."
-s19ea7c55,"Mexicana de altura. Con Thai y Punto Rojo, la Haize; con Thai y Afghani, la Trenwreck.","High-altitude Mexican. With Thai and Punto Rojo, Haize; with Thai and Afghani, Trenwreck."
 sea0d9c75,"Colombiana de punta roja. Con Thai, la Haze: la madre de todas las largas.","Red-tipped Colombian. With Thai, Haze: mother of all the long ones."
-sb2b52fd7,"Colombiana de punta roja. Con Thai, la Haize: la madre de todas las largas.","Red-tipped Colombian. With Thai, Haize: mother of all the long ones."
 s76fc380f,"Colombiana dorada. Con Afghani y Acapulco Gold, la Skunk #1.","Golden Colombian. With Afghani and Acapulco Gold, Skunk #1."
-sb552fb8f,"Colombiana dorada. Con Afghani y Acapulco Gold, la Skonk #1.","Golden Colombian. With Afghani and Acapulco Gold, Skonk #1."
 s2c5705e0,"Tailandesa fina, de flor larga. Entra en la Haze, la Northern Lights y la AK-47.","Fine Thai, long flowering. Goes into Haze, Northern Lights and AK-47."
-s86bcbf73,"Tailandesa fina, de flor larga. Entra en la Haize, la Norzen Lights y la AX-47.","Fine Thai, long flowering. Goes into Haize, Norzen Lights and AX-47."
 s626df980,"Huele a cacao. Guardé unas en la nevera, en un bote de cristal: el frío las conserva.","Smells of cocoa. I kept some in the fridge, in a glass jar: the cold keeps them."
 s794468ce,"La tailandesa de montaña. Con Purple Thai y Afghani, la Blueberry.",The mountain Thai. With Purple Thai and Afghani: Blueberry.
-sd4a6c512,"La tailandesa de montaña. Con Purpel Thai y Afghani, la Bluberri.",The mountain Thai. With Purpel Thai and Afghani: Bluberri.
 s93c3d626,"La de Laos se la dejé a Miren, en Errotabarri. La guardábamos para la Amnesia.","I left the Laos one with Miren, in Errotabarri. We were saving it for Amnesia."
-s8fe57556,"La de Laos se la dejé a Miren, en Errotabarri. La guardábamos para la Amnesya.","I left the Laos one with Miren, in Errotabarri. We were saving it for Amnesya."
 sba46a28a,"Kush del valle de Chitral, densa y oscura. Txaro guarda unas; con Hindu Kush, la Master Kush.","Kush from the Chitral valley, dense and dark. Txaro keeps some; with Hindu Kush, Master Kush."
-s3b10ddc6,"Kush del valle de Chitral, densa y oscura. Txaro guarda unas; con Hindu Kush, la Maister Kush.","Kush from the Chitral valley, dense and dark. Txaro keeps some; with Hindu Kush, Maister Kush."
 sfea230f7,Del Himalaya: resina de templo. No entra en ninguna receta; para cruzar a tu aire.,From the Himalaya: temple resin. In no recipe; cross it your own way.
 s8249dacc,"Del Congo: eléctrica y lenta. Con Panama Red, la Congo × Panama.",From the Congo: electric and slow. With Panama Red: Congo × Panama.
 sbc830e01,"La jamaicana. Dejé unas en Puerto Viejo, en un arbusto al fondo del callejón del este. Con Thai, la Laughing Buddha.","The Jamaican. I left some in Puerto Viejo, in a bush at the end of the east alley. With Thai: Laughing Buddha."
-sc744559d,"La jamaicana. Dejé unas en Puerto Viejo, en un arbusto al fondo del callejón del este. Con Thai, la Laffing Budha.","The Jamaican. I left some in Puerto Viejo, in a bush at the end of the east alley. With Thai: Laffing Budha."
 s1948d3c2,"Huele a piña. Unas, en un seto del Ensanche, en Ibarbide. Con Trainwreck, la Pineapple Express.","Smells of pineapple. Some are in a hedge in the Ensanche, in Ibarbide. With Trainwreck: Pineapple Express."
-s3bee6f75,"Huele a piña. Unas, en un seto del Ensanche, en Ibarbide. Con Trenwreck, la Pinapel Express.","Smells of pineapple. Some are in a hedge in the Ensanche, in Ibarbide. With Trenwreck: Pinapel Express."
 sfea7fe43,"La del Rif, para tamizar. No entra en ninguna receta: cruza tú.","The Rif one, for sifting. In no recipe: cross it yourself."
 s345072e4,"La vieja de Ketama, la de antes de los híbridos. Para tamizar en seco.","The old Ketama one, from before the hybrids. For dry sift."
 s6e46c390,"Mexicana de la sierra. Las guardé bajo llave, en la caja de detrás del diploma. Con Chocolate Thai, la Purple Thai.","Mexican from the sierra. I locked them up, in the safe behind the diploma. With Chocolate Thai: Purple Thai."
-se4919d68,"Mexicana de la sierra. Las guardé bajo llave, en la caja de detrás del diploma. Con Chocolate Thai, la Purpel Thai.","Mexican from the sierra. I locked them up, in the safe behind the diploma. With Chocolate Thai: Purpel Thai."
 sfbeab76f,"Roja de Panamá, de flor larguísima. Con Congolese o con Malawi Gold.","Panama red, very long flowering. With Congolese or with Malawi Gold."
 s7be73051,"Del sur de la India. Escondí unas en un arbusto junto a una borda, al este de Mendialde. Con Manga Rosa, la White Widow.","From southern India. I hid some in a bush by a borda, east of Mendialde. With Manga Rosa: White Widow."
-s6e7fd33b,"Del sur de la India. Escondí unas en un arbusto junto a una borda, al este de Mendialde. Con Manga Rosa, la Whyte Widou.","From southern India. I hid some in a bush by a borda, east of Mendialde. With Manga Rosa: Whyte Widou."
 s42fbe7bb,Del valle de la Bekaa: el hachís rubio. Ninguna receta; prueba tú.,From the Bekaa valley: the blond hash. No recipe; try it yourself.
 s0b60f98f,"Brasileña, de cogollo rosado. Dejé unas en Errotabarri, en un arbusto. Con Kerala, la White Widow.","Brazilian, pinkish buds. I left some in Errotabarri, in a bush. With Kerala: White Widow."
-s1ef81ae5,"Brasileña, de cogollo rosado. Dejé unas en Errotabarri, en un arbusto. Con Kerala, la Whyte Widou.","Brazilian, pinkish buds. I left some in Errotabarri, in a bush. With Kerala: Whyte Widou."
 s362c45ce,"Sudafricana, de las sativas más rápidas. Ninguna receta: para tus cruces.","South African, one of the fastest sativas. No recipe: for your crosses."
 se3ab4891,De los montes de Esuatini: dorada y cítrica. Ninguna receta; para tus cruces.,From the Eswatini hills: golden and citrusy. No recipe; for your crosses.
 s3f1e8543,"De la isla de la Reunión: altísima y de flor eterna. Ninguna receta: si la cruzas, ten paciencia.","From Réunion island: very tall, endless flowering. No recipe: if you cross it, be patient."
@@ -5446,61 +5201,35 @@ s246da6f1,"De los valles de Cachemira: baja, oscura y no le asusta el frío. Nin
 s777787e2,"Vietnamita de cogollo casi negro, con olor a especia. Ninguna receta: para tus cruces.","Vietnamese with almost black buds, smells of spice. No recipe: for your crosses."
 sf9e3a270,De las tierras altas de Etiopía: florece antes que las de la costa. Ninguna receta; cruza tú.,From the Ethiopian highlands: flowers before the coastal ones. No recipe; cross it yourself.
 s07294b65,"Skunk, Northern Lights y AK-47: tres de las fáciles en una. La de llenar tarros.","Skunk, Northern Lights and AK-47: three easy ones in one. The jar filler."
-s7375ee21,"Skonk, Norzen Lights y AX-47: tres de las fáciles en una. La de llenar tarros.","Skonk, Norzen Lights and AX-47: three easy ones in one. The jar filler."
 s7521a8d4,White Widow con una índica: más baja y más pesada. Para el armario pequeño.,White Widow with an indica: shorter and heavier. For the small cupboard.
-sacb49f06,Whyte Widou con una índica: más baja y más pesada. Para el armario pequeño.,Whyte Widou with an indica: shorter and heavier. For the small cupboard.
 se4b37cda,Super Skunk con las dos de la White Widow. Huele fuerte: filtro antes de plantarla.,Super Skunk with both White Widow parents. Stinks: filter before planting.
-se3cfc7c6,Supra Skonk con las dos de la Whyte Widou. Huele fuerte: filtro antes de plantarla.,Supra Skonk with both Whyte Widou parents. Stinks: filter before planting.
 s399619cf,"Tres Haze y la de Hawái: no me cabía en ninguna carpa. Si la sacas, a 12/12 pronto.","Three Hazes and the Hawaiian: never fit in any tent. If you get it, flip to 12/12 early."
-sf8cb8ba3,"Tres Haize y la de Hawái: no me cabía en ninguna carpa. Si la sacas, a 12/12 pronto.","Three Haizes and the Hawaiian: never fit in any tent. If you get it, flip to 12/12 early."
 s6072432a,La Jack Herer con más Haze y Super Skunk. Termina la Jack primero.,Jack Herer with more Haze and Super Skunk. Finish the Jack first.
-s547d0e85,La Jak Herrer con más Haize y Supra Skonk. Termina la Jak primero.,Jak Herrer with more Haize and Supra Skonk. Finish the Jak first.
 s765694ac,"Si terminas la Jack, con la AK-47: la Jack para los que tienen prisa.","If you finish the Jack, with AK-47: the Jack for people in a hurry."
-s2ba88ca8,"Si terminas la Jak, con la AX-47: la Jak para los que tienen prisa.","If you finish the Jak, with AX-47: the Jak for people in a hurry."
 s9690b225,"Gasoil y mandarina. Suena raro, pero funciona.","Fuel and tangerine. Sounds weird, but it works."
 s666307bb,Tanta resina que parece helada. La de las extracciones.,So much resin it looks frozen. The one for extracts.
 s91b4ddc7,"Northern Lights con Big Bud: los tarros llenos. Ponle malla, que las ramas no aguantan.","Northern Lights with Big Bud: full jars. Net it, the branches can't hold."
-sa7a8c8fb,"Norzen Lights con Big Bod: los tarros llenos. Ponle malla, que las ramas no aguantan.","Norzen Lights with Big Bod: full jars. Net it, the branches can't hold."
 s637eccc4,"Si terminas la Jack, con la Critical Mass: la producción con el efecto. Hay quien dice que su Critical era otra.","If you finish the Jack, with Critical Mass: yield with the high. Some say its Critical was another one."
-sd02d684a,"Si terminas la Jak, con la Kritikal Mass: la producción con el efecto. Hay quien dice que su Kritikal era otra.","If you finish the Jak, with Kritikal Mass: yield with the high. Some say its Kritikal was another one."
 s73a447d1,Critical Mass con AK-47: corta y generosa. La de los balcones.,Critical Mass with AK-47: short and generous. The balcony one.
-s6557a58d,Kritikal Mass con AX-47: corta y generosa. La de los balcones.,Kritikal Mass with AX-47: short and generous. The balcony one.
 scd4ef44b,Critical Mass con Cheese. Huele a queso hasta en la escalera.,Critical Mass with Cheese. You smell cheese even on the stairs.
-sf6c8a092,Kritikal Mass con Cheez. Huele a queso hasta en la escalera.,Kritikal Mass with Cheez. You smell cheese even on the stairs.
 s5741d972,"Northern Lights con Blueberry: dulce, corta y obediente.","Northern Lights with Blueberry: sweet, short and obedient."
-s8c6898bb,"Norzen Lights con Bluberri: dulce, corta y obediente.","Norzen Lights with Bluberri: sweet, short and obedient."
 s8bedb153,"Me la trajo un marinero de Arkángel. No coloca, pero florece sola: crúzala con lo que quieras y tendrás autos.","A sailor brought it from Arkhangelsk. Doesn't get you high, but flowers by itself: cross it with anything and you get autos."
 s25a24ca8,"La primera auto que vi. Cabe en un balcón y en dos meses está. Poca cosa, pero la gracia es esa.","The first auto I saw. Fits on a balcony, done in two months. Not much, but that's the point."
 sbbdc2999,"Northern Lights con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Northern Lights with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-s3470a0cf,"Norzen Lights con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Norzen Lights with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 sf9e8e2e1,"White Widow con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","White Widow with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-s9fb8a7a9,"Whyte Widou con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Whyte Widou with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 s8a652b7c,"Amnesia Haze con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Amnesia Haze with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-sdb90d787,"Amnesya Haize con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Amnesya Haize with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 s4b3d6248,"Blueberry con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Blueberry with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-sed1f05ad,"Bluberri con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Bluberri with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 sd2e02821,"AK-47 con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","AK-47 with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-sf4e67b51,"AX-47 con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","AX-47 with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 s4d732e2b,"Jack Herer con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Jack Herer with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-s54082cdd,"Jak Herrer con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Jak Herrer with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 s55c4d7fe,"Skunk #1 con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Skunk #1 with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-s3d63a6d3,"Skonk #1 con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Skonk #1 with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 scfd571e9,"Big Bud con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Big Bud with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-sd2dfefae,"Big Bod con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Big Bod with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 s1c3942f5,"Super Skunk con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Super Skunk with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-sdc24159f,"Supra Skonk con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Supra Skonk with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 sdbffb396,"Cheese con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Cheese with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-s07874fe7,"Cheez con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Cheez with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 s4867b667,"Blue Dream con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Blue Dream with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-s81157ad7,"Blu Drim con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Blu Drim with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 s92eb9e04,"Sour Diesel con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Sour Diesel with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-s458632af,"Saur Disel con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Saur Disel with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 sf6f9d92e,"Super Silver Haze con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Super Silver Haze with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-s64687fcf,"Supra Silber Haize con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Supra Silber Haize with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 sb2e44fc5,"Purple Kush con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Purple Kush with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-s6ead5986,"Purpel Kush con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Purpel Kush with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 sde49ec6d,"Durban Poison con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Durban Poison with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
-s75b01717,"Durvan Poizon con ruderalis. Florece sola, a su edad: déjala a 18/6 y no la cambies. No la clones, que el esqueje florece con la edad de la madre.","Durvan Poizon with ruderalis. Flowers on its own, by age: keep it at 18/6, don't switch it. Don't clone it: the clone flowers at the mother's age."
 sb79c78fd,te las da Kiko al conocerlo,Kiko gives them to you when you meet him
 s453a0624,te las da Kiko con la mesa de genética,Kiko gives them to you with the breeding table
 s051ad7ac,"Txaro, la vecina, por 5 g de cogollo","Txaro, the neighbor, for 5 g of bud"
@@ -5584,44 +5313,25 @@ s5c05720d,Proveedor del barrio,Neighborhood supplier
 s94453008,Distribuidor de la ría,Estuary distributor
 sdeb876d5,Mayorista del norte,Northern wholesaler
 s056d5551,"Afghani, Colombian Gold y Acapulco Gold: de esas tres salió la Skunk #1. Cruza dos y luego la tercera.","Afghani, Colombian Gold and Acapulco Gold: those three made Skunk #1. Cross two, then the third."
-s61668ced,"Afghani, Colombian Gold y Acapulco Gold: de esas tres salió la Skonk #1. Cruza dos y luego la tercera.","Afghani, Colombian Gold and Acapulco Gold: those three made Skonk #1. Cross two, then the third."
 s1b0dfcb1,Punto Rojo o Michoacán con Thai: la Haze. Afghani con Thai: la Northern Lights.,Punto Rojo or Michoacán with Thai: Haze. Afghani with Thai: Northern Lights.
-s25cb0d71,Punto Rojo o Michoacán con Thai: la Haize. Afghani con Thai: la Norzen Lights.,Punto Rojo or Michoacán with Thai: Haize. Afghani with Thai: Norzen Lights.
 sbdd0c70c,"Afghani × Skunk #1 es la Critical Mass. Al revés, Skunk #1 × Afghani, la Super Skunk: la madre manda.","Afghani × Skunk #1 is Critical Mass. Reversed, Skunk #1 × Afghani, Super Skunk: the mother rules."
-sb3eadee7,"Afghani × Skonk #1 es la Kritikal Mass. Al revés, Skonk #1 × Afghani, la Supra Skonk: la madre manda.","Afghani × Skonk #1 is Kritikal Mass. Reversed, Skonk #1 × Afghani, Supra Skonk: the mother rules."
 s9940957a,"Northern Lights × Haze da la NL5 × Haze; Haze × Northern Lights, la Silver Haze.","Northern Lights × Haze gives NL5 × Haze; Haze × Northern Lights, Silver Haze."
-sa3fd056d,"Norzen Lights × Haize da la NZ5 × Haize; Haize × Norzen Lights, la Silber Haize.","Norzen Lights × Haize gives NZ5 × Haize; Haize × Norzen Lights, Silber Haize."
 sac9eebd7,Skunk #1 con Northern Lights: la Shiva Skunk.,Skunk #1 with Northern Lights: Shiva Skunk.
-s24257664,Skonk #1 con Norzen Lights: la Xiva Skonk.,Skonk #1 with Norzen Lights: Xiva Skonk.
 s50a16358,"Chocolate Thai con Highland Oaxacan Gold: la Purple Thai. Con Highland Thai y Afghani, la Blueberry.","Chocolate Thai with Highland Oaxacan Gold: Purple Thai. With Highland Thai and Afghani, Blueberry."
-sc58a19c9,"Chocolate Thai con Highland Oaxacan Gold: la Purpel Thai. Con Highland Thai y Afghani, la Bluberri.","Chocolate Thai with Highland Oaxacan Gold: Purpel Thai. With Highland Thai and Afghani, Bluberri."
 sd1167d1c,"Michoacán, Afghani y Thai: la Trainwreck. Con una Colombian Gold antes de la Thai sale la AK-47.","Michoacán, Afghani and Thai: Trainwreck. With a Colombian Gold before the Thai you get AK-47."
-s4b4fd8c5,"Michoacán, Afghani y Thai: la Trenwreck. Con una Colombian Gold antes de la Thai sale la AX-47.","Michoacán, Afghani and Thai: Trenwreck. With a Colombian Gold before the Thai you get AX-47."
 s707c3cde,Thai con Lamb's Bread: la Laughing Buddha. Haze con Michoacán: la Cannalope Haze.,Thai with Lamb's Bread: Laughing Buddha. Haze with Michoacán: Cannalope Haze.
-s08978565,Thai con Lamb's Bread: la Laffing Budha. Haize con Michoacán: la Kanalope Haize.,Thai with Lamb's Bread: Laffing Budha. Haize with Michoacán: Kanalope Haize.
 s7ffb2e01,"Hindu Kush con Chitral Kush: la Master Kush. Con Purple Afghani, la Purple Kush.","Hindu Kush with Chitral Kush: Master Kush. With Purple Afghani, Purple Kush."
-s32ce513b,"Hindu Kush con Chitral Kush: la Maister Kush. Con Purple Afghani, la Purpel Kush.","Hindu Kush with Chitral Kush: Maister Kush. With Purple Afghani, Purpel Kush."
 sbdf10cd9,Malawi o Congolese con Panama Red; Malawi con Chitral Kush: las sativas africanas.,Malawi or Congolese with Panama Red; Malawi with Chitral Kush: the African sativas.
 s38410367,"Una Haze con la NL5 × Haze da la Neville's Haze, casi pura Haze.","A Haze with NL5 × Haze gives Neville's Haze, almost pure Haze."
-sa5e4a238,"Una Haize con la NZ5 × Haize da la Nevil's Haize, casi pura Haize.","An Haize with NZ5 × Haize gives Nevil's Haize, almost pure Haize."
 sb4bb45da,Trainwreck con Hawaiian: la Pineapple Express. California Orange con Skunk #1: la Tangie.,Trainwreck with Hawaiian: Pineapple Express. California Orange with Skunk #1: Tangie.
-sed454638,Trenwreck con Hawaiian: la Pinapel Express. Kalifornia Orantx con Skonk #1: la Tangi.,Trenwreck with Hawaiian: Pinapel Express. Kalifornia Orantx with Skonk #1: Tangi.
 sc316e017,"Haze, Lamb's Bread, Luang Prabang y una Afghani o una Hawaiian: así se hizo la Amnesia Haze de Darko.","Haze, Lamb's Bread, Luang Prabang and an Afghani or a Hawaiian: that's how Darko's Amnesia Haze was made."
-s51d3e6aa,"Haize, Lamb's Bread, Luang Prabang y una Afghani o una Hawaiian: así se hizo la Amnesya Haize de Darko.","Haize, Lamb's Bread, Luang Prabang and an Afghani or a Hawaiian: that's how Darko's Amnesya Haize was made."
 s4700d1ca,"Blueberry con Haze, Blue Dream; con Cheese, Blue Cheese.","Blueberry with Haze, Blue Dream; with Cheese, Blue Cheese."
-sf17a1a37,"Bluberri con Haize, Blu Drim; con Cheez, Blu Cheez.","Bluberri with Haize, Blu Drim; with Cheez, Blu Cheez."
 se1a72625,"Skunk #1, Northern Lights y Haze: la Super Silver Haze. La Lemon Haze sale de Lemon Skunk con Silver Haze.","Skunk #1, Northern Lights and Haze: Super Silver Haze. Lemon Haze comes from Lemon Skunk with Silver Haze."
-s434a89f7,"Skonk #1, Norzen Lights y Haize: la Supra Silber Haize. La Limon Haize sale de Limon Skonk con Silber Haize.","Skonk #1, Norzen Lights and Haize: Supra Silber Haize. Limon Haize comes from Limon Skonk with Silber Haize."
 s9cff92f9,"Kali Mist con Critical Mass: la Critical Kali Mist. Con AK-47, la Kali 47.","Kali Mist with Critical Mass: Critical Kali Mist. With AK-47, Kali 47."
-s92f5dea9,"Kalli Mixt con Kritikal Mass: la Kritikal Kalli Mixt. Con AX-47, la Kalli 47.","Kalli Mixt with Kritikal Mass: Kritikal Kalli Mixt. With AX-47, Kalli 47."
 s4e8a608c,La Sour Diesel sale de Chemdawg con Super Skunk. Hace falta paciencia.,Sour Diesel comes from Chemdawg with Super Skunk. Takes patience.
-s4d4c4e02,La Saur Disel sale de Chemdog con Supra Skonk. Hace falta paciencia.,Saur Disel comes from Chemdog with Supra Skonk. Takes patience.
 s4f560de7,"Manga Rosa con Kerala, la brasileña con la del sur de la India: la White Widow. Con AK-47, la White Russian; con Blueberry, la Blue Widow.","Manga Rosa with Kerala, the Brazilian with the south Indian: White Widow. With AK-47, White Russian; with Blueberry, Blue Widow."
-s6ffb0d19,"Manga Rosa con Kerala, la brasileña con la del sur de la India: la Whyte Widou. Con AX-47, la Whyte Rusian; con Bluberri, la Blu Widou.","Manga Rosa with Kerala, the Brazilian with the south Indian: Whyte Widou. With AX-47, Whyte Rusian; with Bluberri, Blu Widou."
 s6c19d94d,"Purple Thai con Haze: la Purple Haze. Lemon Skunk con Super Silver Haze: la Super Lemon Haze. Y Punto Rojo, Michoacán, Thai y Kerala también dan la Haze.","Purple Thai with Haze: Purple Haze. Lemon Skunk with Super Silver Haze: Super Lemon Haze. And Punto Rojo, Michoacán, Thai and Kerala also give Haze."
-s6fe3bcad,"Purpel Thai con Haize: la Purpel Haize. Limon Skonk con Supra Silber Haize: la Supra Limon Haize. Y Punto Rojo, Michoacán, Thai y Kerala también dan la Haize.","Purpel Thai with Haize: Purpel Haize. Limon Skonk with Supra Silber Haize: Supra Limon Haize. And Punto Rojo, Michoacán, Thai and Kerala also give Haize."
 s4bbc21e1,Haze × (Northern Lights × Shiva Skunk)... de ahí sale la Jack Herer. Yo nunca lo he conseguido.,Haze × (Northern Lights × Shiva Skunk)... that gives Jack Herer. I never managed it.
-s74d44804,Haize × (Norzen Lights × Xiva Skonk)... de ahí sale la Jak Herrer. Yo nunca lo he conseguido.,Haize × (Norzen Lights × Xiva Skonk)... that gives Jak Herrer. I never managed it.
 scc1f8c86,"Te la monto esta tarde en el piso, al fondo, al lado del armario. Viene con un CFL; si quieres más luz, aquí tienes focos.","I'll set it up in your flat this afternoon, at the back, by the wardrobe. Comes with a CFL; want more light, I've got lamps."
 s2f4e51cc,Me llevo la de 100 y te monto la de 150 en su sitio. Las plantas ni se enteran.,I'll take the 100 and put the 150 in its place. The plants won't notice.
 sefa5918c,Te guardo el armario de tu tía en el trastero y te monto uno de 80 en su sitio. Las plantas ni se enteran.,I'll store your aunt's cabinet in the storeroom and put an 80 in its place. The plants won't notice.
@@ -5767,7 +5477,6 @@ sdfaae9df,Diez recetas,Ten recipes
 sdcee4e64,Cosecha diez variedades de receta.,Harvest ten recipe strains.
 sf422157b,La meta de la tía,Aunt's goal
 s7a5a2177,Cosecha la Jack Herer.,Harvest Jack Herer.
-s64de022c,Cosecha la Jak Herrer.,Harvest Jak Herrer.
 s8553f4ad,Media Genoteca,Half Genebank
 s6d0bd055,Ten 44 de las 87 variedades en la Genoteca.,Have 44 of the 87 strains in the Genebank.
 s1d510557,Genoteca completa,Full Genebank
@@ -5896,7 +5605,7 @@ saa6dd3ee,220 micras: fuera el polvo verde y los trozos.,220 microns: out with t
 sb5cff4aa,"160: sacude en el verde, sin frotar.","160: shake in the green, don't rub."
 s062cd336,120 y 73: aquí se quedan las cabezas de resina.,120 and 73: this is where the resin heads stay.
 s9ed71da3,Ice-o-lator,Ice-o-lator
-secec57d4,Ais-o-lator,Ais-o-lator
+s2098f3a0,Ice Hash,Ice Hash
 se75b47cc,"El cubo de 20 L con las bolsas de malla: hielo y agua a partes iguales, por debajo de 4 °C, y la flor congelada.","The 20 L bucket with the mesh bags: equal parts ice and water, below 4 °C, and frozen flower."
 s0b7d76d3,"El cubo de 20 L con las bolsas de malla: hielo y agua a partes iguales, por debajo de 4°, y la flor congelada.",
 se8ff4ef9,"El agua con hielo, entre 1 y 3 °C: para la barra en el verde.","Ice water, between 1 and 3 °C: stop the bar in the green."
@@ -5923,7 +5632,7 @@ sd4f409a0,Bañar el cogollo.,Dip the bud.
 s5e7ad018,Rebozarlo en el kief.,Roll it in the kief.
 s9efb330d,Secarlo sin que se pegue.,Dry it without it sticking.
 s09837119,Ice-o-lator en la lavadora,Ice-o-lator in the washer
-s2f91c422,Ais-o-lator en la lavadora,Ais-o-lator in the washer
+sdbe9e04f,Ice Hash en la lavadora,Ice Hash in the washer
 s39d82860,"La lavadora de extracción, de carga superior y cuba de plástico: hielo y agua a partes iguales y la flor congelada, a baja velocidad.","The extraction washer, top-loading with a plastic drum: equal parts ice and water and frozen flower, on low speed."
 s023a4470,Cargarla: el agua con hielo por debajo de 4 °C.,Load it: ice water below 4 °C.
 s7af40ba1,Cargarla: el agua con hielo por debajo de 4°.,
@@ -6595,7 +6304,6 @@ s147a5307,Las de América,The American ones
 s476af330,Las de África,The African ones
 s7b79aa54,Las del olor fuerte,The strong-smelling ones
 s851bca9f,Las Haze,The Hazes
-s5cd5fcf2,Las Haize,The Haizes
 s05ae9f25,Las del norte,The northern ones
 s5a678bf5,Las blancas,The white ones
 s401a5c59,La leyenda,The legend
@@ -6826,7 +6534,6 @@ s349dfad0,Las de la costa,The coastal ones
 s13a4396e,Las de África y el Mediterráneo,The African and Mediterranean ones
 sacdf9e82,Las de la sierra americana,The American highland ones
 s91d89e58,"La Haze del 98, fijada","The Haze of '98, fixed"
-s02591e7f,"La Haize del 98, fijada","The Haize of '98, fixed"
 s391ece68,La cámara fría,The cold room
 s0cc6d052,El archivo de la tía,Your aunt's archive
 s6e63843c,El laboratorio,The lab
@@ -6890,79 +6597,7 @@ s44a594a6,"Un CFL da poco. Un LED, el triple.","A CFL gives little. An LED, trip
 s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
-s73c53390,Kritikal,
-s7a6e0dc6,Norzen Lights #5,
-s93a20825,NZ5,
-s372340e0,Skonk,
-s24ca3332,Jak,
-s737f3652,Amnesya,
-s87ebcd68,Widou,
-sd670c130,Kalli,
-s5daa43e4,Saur,
-s2746d585,Disel,
-s7a65bad9,SKONK #1,
-s6b00b3f3,LIMON HAIZE,
-s92f3d3ba,SUPRA SKONK,
-sb73e03aa,BLUBERRI,
-s59004400,BIG BOD,
-sde1673e4,LIMON SKONK,
-s50674b74,KALLI MIXT,
-sf730e9d7,CHEEZ,
-s3847bcb4,KALIFORNIA ORANTX,
-s1a23cda7,CHEMDOG,
-s9a25faba,NORZEN LIGHTS,
-s366ac7c2,PURPEL THAI,
-s5ae9deaa,TRENWRECK,
-s76f27fea,LAFFING BUDHA,
-sc22342bc,KANALOPE HAIZE,
-s638432cf,MAISTER KUSH,
-s251df06d,PURPEL KUSH,
-sbeb934b6,KRITIKAL MASS,
-s8a75c065,XIVA SKONK,
-s9fd57bf0,NZ5 × HAIZE,
-sbe7dd76a,NEVIL'S HAIZE,
-s49ce0e29,SILBER HAIZE,
-s54021933,TXOKOLOPE,
-s21a99331,PINAPEL EXPRESS,
-se2252172,TANGI,
-sabea3244,AMNESYA HAIZE,
-s6dfee62b,JAK HERRER,
-s19a92d8b,AIS-O-LATOR,
-scf9cb8ad,DURVAN POIZON,
-s149f26a1,SUPRA SILBER HAIZE,
-s422b4f61,BLU DRIM,
-s2f0c3561,BLU CHEEZ,
-s01918d5f,SAUR DISEL,
-scbf607ef,KALLI 47,
-s5e9e22de,KRITIKAL KALLI MIXT,
-sde31bc27,WHYTE WIDOU,
-s160cb6ea,PURPEL HAIZE,
-sf482283c,WHYTE RUSIAN,
-s6942fc6a,BLU WIDOU,
-s52333909,SUPRA LIMON HAIZE,
-sef484352,KRONIK,
-s48798a26,WHYTE RINO,
-sc8cda2be,WHYTE XARK,
-s5b876f34,HAWAYAN SNOU,
-s979a115f,JAK FLASH,
-s0d5d3674,JAK 47,
-sf267941c,SAUR TANGI,
-sc6e86f9c,IZE,
-s18a9855e,NZ × BIG BOD,
-sab6d58d4,KRITIKAL JAK,
-sbbd57d33,KRITIKAL 47,
-sbd0b6314,KRITIKAL CHEEZ,
-sdf868c90,NORZEN LIGHT BLU,
-s755182f3,LOWRAIDER,
-s4c80cd8a,KRITIKAL,
-s42888a9c,NORZEN LIGHTS #5,
-s01b6ad54,SKONK,
-s8a203758,JAK,
-s8387f1d4,AMNESYA,
-sb17e20dc,WIDOU,
-se0e52c84,KALLI,
-scb0d016e,SAUR,
-s11d33831,DISEL,
+s7e2e8d80,ICE HASH,
 sd5b6a75f,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip and the climate. All automatic: long days while they grow and shorter ones once it's time to flower."
 s1f41b1f3,Comprar un kit de carpa · {e},Buy a tent kit · {e}
 s6f594fca,Comprar un kit,Buy a tent kit
@@ -6997,7 +6632,6 @@ s63e6d4be,Dos estanterías más de tarros de 10 L contra la pared de la nave: el
 scd2e99f5,"Depósitos, riego y herramientas · en la cuenta {e}","Tanks, irrigation and tools · in your account {e}"
 s73d909ac,"Las herramientas de la tía: una azada, unas tijeras de podar y unos guantes de jardín gastados.","Your aunt's tools: a hoe, pruning shears and worn gardening gloves."
 sf8721a43,Las Skunk,The Skunks
-se9c33ce5,Las Skonk,The Skonks
 sed8b6d1e,"Tu club, jefe. En el dispensario quedan {g} de {n}, a {p} € el gramo. Llevamos {e}.","Your club, boss. The dispensary has {g} of {n} left, at {p} € a gram. We've taken {e}."
 sa99a7bb0,"Tienes {n} de sobra en la mochila.
 Te la pago a {e} y la pongo a la venta.","You have {n} spare in your backpack.

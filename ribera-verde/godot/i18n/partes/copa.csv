@@ -44,7 +44,6 @@ Las de América,The American ones
 Las de África,The African ones
 Las del olor fuerte,The strong-smelling ones
 Las Haze,The Hazes
-Las Haize,The Haizes
 Las del norte,The northern ones
 Las blancas,The white ones
 La leyenda,The legend
@@ -473,13 +472,11 @@ Abre el mostrador de los socios: cada {d} días te dejan un sobre con semillas d
 EL CUARTO DE ATRÁS,THE BACK ROOM
 "Huele a cerrado y a papel viejo. Todo está tapado con sábanas, menos un fichero de madera.","It smells stuffy, of old paper. Everything is under dust sheets except a wooden card cabinet."
 "En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa, África, sierra, Asia... y uno solo: «Haze 98».","On each little drawer, a label in your aunt's hand: Kush, coast, Africa, sierra, Asia... and one on its own: «Haze 98»."
-"En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa, África, sierra, Asia... y uno solo: «Haize 98».","On each little drawer, a label in your aunt's hand: Kush, coast, Africa, sierra, Asia... and one on its own: «Haize 98»."
 "Era su banco de semillas. Lo empezó para que las variedades del barrio no se perdieran, y lo dejó a medias.","It was her seed bank. She started it so the neighbourhood's strains wouldn't be lost, and left it half done."
 "Si llenas los cajones, el cuarto vuelve a la vida. Entrega las colecciones en el fichero (dos semillas de cada variedad).",Fill the drawers and the room comes back to life. Hand in the collections at the cabinet (two seeds of each strain).
 Un mueble tapado con una sábana llena de polvo. Se destapa al entregar su colección en el fichero.,Something under a dusty sheet. It is uncovered when you hand in its collection at the cabinet.
 "La placa de la tía, de madera y latón, con una hoja grabada. Debajo, alguien ha dejado un ramo de flores del monte.","Your aunt's plaque, wood and brass, with a leaf engraved on it. Below, someone has left a bunch of wild flowers."
 "Cada colección, dos semillas de cada variedad (la Haze del 98, cinco, y fijada en F4).","Each collection: two seeds of each strain (the Haze of '98: five, fixed at F4)."
-"Cada colección, dos semillas de cada variedad (la Haize del 98, cinco, y fijada en F4).","Each collection: two seeds of each strain (the Haize of '98: five, fixed at F4)."
 EL BANCO DE LA TÍA,YOUR AUNT'S BANK
 Esa ya está en su cajón.,That one is already in its drawer.
 "Te faltan semillas para esa colección. Mira la lista: cada variedad, en su cajón.","You're missing seeds for that collection. Check the list: each strain, in its drawer."
@@ -488,7 +485,6 @@ Esa ya está en su cajón.,That one is already in its drawer.
 {p},{p}
 EL BANCO DE SEMILLAS,THE SEED BANK
 "El último cajón, el de la Haze del 98. Cierras el fichero y el cuarto está entero.","The last drawer, the Haze of '98. You close the cabinet and the room is whole."
-"El último cajón, el de la Haize del 98. Cierras el fichero y el cuarto está entero.","The last drawer, the Haize of '98. You close the cabinet and the room is whole."
 "Delroy cuelga la placa de la tía en la pared. Kiko ha traído a medio barrio, Miren ha bajado del monte y la abuela Txaro se ha sentado en primera fila.","Delroy hangs your aunt's plaque on the wall. Kiko has brought half the neighbourhood, Miren has come down from the hills and grandma Txaro has sat in the front row."
 "Nadie dice nada un rato. Luego Delroy abre la puerta del cuarto a los socios: desde hoy, el banco es del barrio.","Nobody says anything for a while. Then Delroy opens the room to the members: from today, the bank belongs to the neighbourhood."
 Treinta años diciendo que esto había que terminarlo. Lo has hecho tú.,Thirty years saying this had to be finished. You did it.
@@ -522,7 +518,6 @@ Una puerta cerrada con llave. Delroy dice que era el cuarto de tu tía y que nad
 "Debajo de las semillas, una llave pequeña atada con un cordel y otra nota:","Under the seeds, a small key tied with string and another note:"
 «La del cuarto de atrás de la asociación. Ahí empecé el banco de semillas del barrio y no lo terminé.»,"«For the back room of the association. That's where I started the neighbourhood seed bank, and never finished it.»"
 "«Las de la lata son de una polinización al aire: si quieres la Haze de verdad, fíjala otra vez, generación a generación.»","«The ones in the tin are open-pollinated: if you want the real Haze, fix it again, generation by generation.»"
-"«Las de la lata son de una polinización al aire: si quieres la Haize de verdad, fíjala otra vez, generación a generación.»","«The ones in the tin are open-pollinated: if you want the real Haize, fix it again, generation by generation.»"
 la llave del cuarto de atrás de la asociación,the key to the association's back room
 Las colecciones de semillas del cuarto de atrás de la asociación. Pulsa A para verlas.,The seed collections in the association's back room. Press A to see them.
 La puerta del cuarto de atrás,The back room door
@@ -531,7 +526,6 @@ Las de la costa,The coastal ones
 Las de África y el Mediterráneo,The African and Mediterranean ones
 Las de la sierra americana,The American highland ones
 "La Haze del 98, fijada","The Haze of '98, fixed"
-"La Haize del 98, fijada","The Haize of '98, fixed"
 La cámara fría,The cold room
 El archivo de la tía,Your aunt's archive
 El laboratorio,The lab
@@ -539,10 +533,8 @@ El mostrador de los socios,The members' counter
 La sala de catas,The tasting room
 La placa de la tía,Your aunt's plaque
 "La Haze del 98 va en el último cajón: antes, las otras cinco colecciones.","The Haze of '98 goes in the last drawer: first, the other five collections."
-"La Haize del 98 va en el último cajón: antes, las otras cinco colecciones.","The Haize of '98 goes in the last drawer: first, the other five collections."
 "Cada generación es una cosecha: cultiva la línea y vuelve con lo cosechado.","Each generation is a harvest: grow the line and come back with what you harvested."
 "«Si ya tienes la Haze fijada, guárdala bien: el banco la necesita.»","“If you already have the Haze fixed, keep it safe: the bank needs it.”"
-"«Si ya tienes la Haize fijada, guárdala bien: el banco la necesita.»","“If you already have the Haize fixed, keep it safe: the bank needs it.”"
 "Abre el laboratorio, la puerta de al lado de la placa: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea, con las normas de un laboratorio de verdad.","Opens the lab, the door next to the plaque: stabilise with one seed instead of two, once a day and once per harvest of each line, under the rules of a real lab."
 "La puerta del laboratorio, precintada con cinta. Se abre al entregar «{c}» en el fichero.","The lab door, sealed with tape. It opens when you hand in «{c}» at the card index."
 Así no se trabaja en un laboratorio: nadie toca nada colocado ni bebido. Vuelve cuando se te pase.,That's no way to work in a lab: nobody touches anything high or drunk. Come back when it wears off.

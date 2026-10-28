@@ -31,9 +31,9 @@ Instalado: {x},Installed: {x}
 "{N}, pasa. Te pareces a tu tía.","{N}, come in. You look like your aunt."
 "Maite y yo cultivamos juntos desde que cerraron los astilleros. Ella tenía mano; yo, paciencia.",Maite and I grew together since the shipyards shut. She had the touch; I had patience.
 "Para empezar, toma esto.","To start you off, take this."
-3 semillas de SKUNK #1,3 SKONK #1 seeds
+3 semillas de SKUNK #1,3 SKUNK #1 seeds
 2 dosis de MEATZA FLORACIÓN,2 doses of MEATZA BLOOM
-"La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.","Skonk #1 can take almost anything: bad watering, pests, cold. Best one to learn on."
+"La Skunk #1 aguanta casi todo: errores de riego, plagas, frío. Es la mejor para aprender.","Skunk #1 can take almost anything: bad watering, pests, cold. Best one to learn on."
 Planta en las macetas del armario de tu tía y riega cuando baje el agua.,Plant in the pots in your aunt's cupboard and water when the level drops.
 "El abono da más cogollo. Si ves araña roja, insecticida: lo tengo aquí.","Nutrients mean more bud. If you see spider mites, insecticide: I've got it here."
 "Cuando esté lista, cosecha. Son feminizadas: casi nunca dan semilla, pero si sale alguna, guárdala.","Harvest when she's ready. They're feminized: hardly ever seed, but if one turns up, keep it."
@@ -50,7 +50,7 @@ En la mesa polinizas una variedad con otra: gastas una semilla de cada y obtiene
 Apúntalo todo en la GENOTECA. Las mejores genéticas salen de cruzar cruces.,Log it all in the GENEBANK. The best genetics come from crossing crosses.
 "Empieza por las conocidas: saca dos de receta en la mesa y cosecha una planta de cada. Patxi, el de la plaza, se sabe unas cuantas.","Start with the known ones: make two recipes at the table and harvest one plant of each. Patxi, in the square, knows a few."
 ¿Sin semillas y sin dinero? Toma. Ya me lo pagarás.,No seeds and no money? Here. Pay me back later.
-2 semillas de SKUNK #1,2 SKONK #1 seeds
+2 semillas de SKUNK #1,2 SKUNK #1 seeds
 ¿Qué necesitas?,What do you need?
 Comprar,Buy
 Un consejo,A tip
@@ -154,7 +154,7 @@ Tú y yo seguimos como siempre.,You and I carry on as always.
 MIREN,MIREN
 Tu tía subía cada otoño con un táper de cogollos y se quedaba a dormir.,Your aunt came up every autumn with a tub of buds and stayed the night.
 Del caserío no me echó nadie gracias a ella. Eso no se olvida.,"Nobody threw me off the farm, thanks to her. You don't forget that."
-"Cuando la Haze te salga sola, acuérdate de nosotras.","When your Haize comes out right, think of us."
+"Cuando la Haze te salga sola, acuérdate de nosotras.","When your Haze comes out right, think of us."
 ¿Tú eres el de Maite? Tienes sus ojos.,You're Maite's? You've got her eyes.
 "Me llamo Miren. Tu tía y yo cultivábamos juntas en este caserío, hace treinta años.","I'm Miren. Your aunt and I grew together on this farm, thirty years ago."
 Su diario tiene una página arrancada. Me la dio la última vez que subió.,Her diary has a page torn out. She gave it to me the last time she came up.
@@ -165,10 +165,10 @@ Dárselos,Give them
 Todavía no,Not yet
 Cuando quieras.,Whenever you like.
 Huele igual que entonces.,Smells just like back then.
-"Toma. La página que falta, y unas semillas de su Haze.","Here. The missing page, and some seeds of her Haize."
+"Toma. La página que falta, y unas semillas de su Haze.","Here. The missing page, and some seeds of her Haze."
 la última página del diario y {n} semillas de {s},the last page of the diary and {n} {s} seeds
 "Léela en casa, con calma.","Read it at home, take your time."
-Y esto también era de las dos. La de Laos: la guardábamos para la Amnesia.,And this was ours too. The Laos one: we kept it for the Amnesya.
+Y esto también era de las dos. La de Laos: la guardábamos para la Amnesia.,And this was ours too. The Laos one: we kept it for the Amnesia.
 {n} semillas de {s},{n} {s} seeds
 ANDONI,ANDONI
 "El molino muele los domingos. Si te interesan las semillas viejas, vuelve más adelante.","The mill grinds on Sundays. If old seeds interest you, come back later on."
@@ -404,7 +404,7 @@ Has saldado los {e} de tu tía Maite en {n} días.,You paid off aunt Maite's {e}
 Variedades: {n} · Ventas totales: {e},Strains: {n} · Total sales: {e}
 "Ahora empieza tu imperio: cuanto más factures, más carga Iñaki en el barco.
 ¿Completarás la GENOTECA? ¿Conseguirás la JACK HERER?","Now your empire begins: the more you bill, the more Iñaki loads on the boat.
-Will you complete the GENEBANK? Will you get the JAK HERRER?"
+Will you complete the GENEBANK? Will you get the JACK HERER?"
 Pulsa A,Press A
 "Bajo una lámpara las plantas beben mucho. Riégalas a diario, majo.","Under a lamp plants drink a lot. Water them daily, love."
 "Si se te ponen amarillas las hojas de abajo, les falta agua o abono.","If the lower leaves turn yellow, they need water or feed."

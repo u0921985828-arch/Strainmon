@@ -509,8 +509,12 @@ func pot_action(i: int, hu = null) -> void:
 
 # tierra (1.10): como mucho LITROS_M2 litros por m² de suelo en cada carpa, sumando todas sus macetas
 func litros_max(ci: int) -> int:
-	var cm: Array = D.CARPAS[S.carpas[ci].t].cm
-	return Datos.jsround(cm[0] * cm[2] / 1e4 * D.LITROS_M2)
+	var C: Dictionary = D.CARPAS[S.carpas[ci].t]
+	var cm: Array = C.cm
+	var l := Datos.jsround(cm[0] * cm[2] / 1e4 * D.LITROS_M2)
+	if Datos.CAL:   # lo pidió el usuario: que quepan todas las plazas con su maceta más grande (las 6 de 25 L en la de 120)
+		l = maxi(l, int(C.plazas) * int(C.lmax))
+	return l
 
 func litros_carpa(ci: int) -> int:
 	var a := 0

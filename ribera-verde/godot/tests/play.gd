@@ -82,29 +82,19 @@ func _corre() -> void:
 	chk(malos.is_empty(), "datos con cifras reales (%d): %s" % [malos.size(), malos.slice(0, 6)])
 	chk(T.size() > 3000, "textos recorridos: %d" % T.size())
 	# 2 · las variedades: los híbridos con nombre propio, las landraces igual, y ningún nombre viejo en los textos
-	var L: Array = D.LANDRACES
-	var guarda := ["congopan", "malapan", "malapck", "ruderalis"]
-	var marca := ["durban", "durbanauto"]   # landrace, pero también nombre comercial: con parodia
+	# los nombres reales (lo pidió el usuario: «volver a usar los nombres originales»): ninguna variedad cambia de nombre
 	var mal_n := []
 	for k in D.STRAINS:
-		var a: String = O.STRAINS[k].n
-		var b: String = D.STRAINS[k].n
-		if (k in L or k in guarda) and not k in marca:
-			if a != b:
-				mal_n.append("%s cambia: %s → %s" % [k, a, b])
-		elif a == b:
-			mal_n.append("%s sin nombre nuevo: %s" % [k, a])
-	chk(mal_n.is_empty(), "nombres: %s" % [mal_n])
-	var viejos := []
-	for v in P.nombres:
-		if v.length() >= 5:
-			viejos.append(v)
-	var con_viejo := []
-	var rx := RegEx.create_from_string("(?<![A-Za-zÀ-ÿ0-9])(%s)(?![A-Za-zÀ-ÿ0-9\\-])" % "|".join(viejos.map(func(x): return Datos._esc(x))))
+		if String(O.STRAINS[k].n) != String(D.STRAINS[k].n):
+			mal_n.append("%s cambia: %s → %s" % [k, O.STRAINS[k].n, D.STRAINS[k].n])
+	chk(mal_n.is_empty(), "nombres reales: %s" % [mal_n])
+	chk(P.nombres.keys() == ["Ice-o-lator", "ICE-O-LATOR"], "solo cambia la marca Ice-o-lator: %s" % [P.nombres.keys()])
+	var paro := []
+	var rp := RegEx.create_from_string("Skonk|Jak Herrer|Norzen|Haize|Ais-o-lator|Kritikal|Whyte|Purpel")
 	for t in T:
-		if rx.search(t[1]):
-			con_viejo.append("%s: %s" % [t[0], t[1].substr(0, 80)])
-	chk(con_viejo.is_empty(), "nombres viejos en los textos (%d): %s" % [con_viejo.size(), con_viejo.slice(0, 6)])
+		if rp.search(t[1]):
+			paro.append("%s: %s" % [t[0], t[1].substr(0, 80)])
+	chk(paro.is_empty(), "sin las parodias de antes (%d): %s" % [paro.size(), paro.slice(0, 6)])
 	# 3 · el código: cada texto entre comillas de src/*.gd, después de Datos.tp (lo que hacen diálogos, menús y avisos)
 	var lit := RegEx.create_from_string("\"((?:[^\"\\\\]|\\\\.)*)\"")
 	var malos_c := []
@@ -124,20 +114,12 @@ func _corre() -> void:
 					malos_c.append("%s:%d %s" % [f, i, s.substr(0, 70)])
 	chk(malos_c.is_empty(), "textos del código con cifras reales (%d): %s" % [malos_c.size(), malos_c.slice(0, 8)])
 	chk(not MAL.search(Datos.tp("Echa pH− con el medidor de pH y EC: el pH al 6,2 y 20 °C, malla de 73 µm")), "Datos.tp")
-	# 4 · las extracciones y el foro, sin cifras; la Ice-o-lator (marca) sale Ais-o-lator, no Ize-o-lator
+	# 4 · las extracciones y el foro, sin cifras; la Ice-o-lator (marca de unas bolsas) sale con su nombre genérico, Ice Hash
 	chk(not String(D.EXTR.rosin.d).contains("80") and not String(D.EXTR.ice.d).contains("4"), "extracciones: %s / %s" % [D.EXTR.rosin.d, D.EXTR.ice.d])
-	chk(String(D.EXTR.ice.n) == "Ais-o-lator" and Datos.tp("el kit Ice-o-lator") == "el kit Ais-o-lator", "Ice-o-lator → Ais-o-lator: %s" % D.EXTR.ice.n)
-	chk(Datos.tp("una Ice muy blanca") == "una Ize muy blanca", "Ice → Ize: %s" % Datos.tp("una Ice muy blanca"))
-	chk(Datos.tp("es JACK HERER.") == "es JAK HERRER.", "JACK HERER → JAK HERRER: %s" % Datos.tp("es JACK HERER."))
-	# 4b · en inglés tampoco sale un nombre real (la fila de PLAY sin inglés caía en la del nombre real: «Northern Lights × Haze»)
+	chk(String(D.EXTR.ice.n) == "Ice Hash" and Datos.tp("el kit Ice-o-lator") == "el kit Ice Hash", "Ice-o-lator → Ice Hash: %s" % D.EXTR.ice.n)
+	chk(Datos.tp("una Ice muy blanca") == "una Ice muy blanca" and Datos.tp("es JACK HERER.") == "es JACK HERER.", "los nombres reales, tal cual")
+	# 4b · en inglés tampoco sale la parodia ni la marca
 	var I18n = preload("res://src/i18n.gd")
-	var reales := []
-	for k in P.nombres:
-		if not k in ["Ice", "Cheese", "Haze", "Critical", "Tangie"] and k != String(k).to_upper():
-			reales.append(k)
-	reales.sort_custom(func(x, y): return x.length() > y.length())
-	var alt := "|".join(reales.map(func(x): return "\\Q" + x + "\\E"))
-	var rxr := RegEx.create_from_string("(?<![A-Za-zÀ-ÿ0-9])(" + alt + ")(?![A-Za-zÀ-ÿ0-9\\-])")
 	I18n.LANG = "en"
 	var fug := []
 	var fc := FileAccess.open("res://i18n/strings.csv", FileAccess.READ)
@@ -145,11 +127,11 @@ func _corre() -> void:
 	while not fc.eof_reached():
 		var r := fc.get_csv_line()
 		if r.size() >= 2 and r[1] != "":
-			var m := rxr.search(I18n.v(r[1]))
+			var m := rp.search(I18n.v(r[1]))
 			if m:
-				fug.append("%s → %s" % [r[1].left(40), m.get_string(1)])
+				fug.append("%s → %s" % [r[1].left(40), m.get_string()])
 	I18n.LANG = ""
-	chk(fug.is_empty(), "en inglés, nombres reales (%d): %s" % [fug.size(), fug.slice(0, 6)])
+	chk(fug.is_empty(), "en inglés, sin parodias (%d): %s" % [fug.size(), fug.slice(0, 6)])
 	# 5 · ida y vuelta: sin PLAY, como antes (en su sitio: las mismas listas)
 	var foro: Array = D.FORO
 	Datos.PLAY = false
@@ -165,7 +147,7 @@ func _corre() -> void:
 	chk(iguales, "sin PLAY, los datos de antes")
 	Datos.PLAY = true
 	Datos.carga()
-	chk(D.STRAINS.ria.n == "Skonk #1" and not String(D.FORO[0]).contains("pH"), "otra vez con PLAY: %s" % D.STRAINS.ria.n)
+	chk(D.STRAINS.ria.n == "Skunk #1" and not String(D.FORO[0]).contains("pH"), "otra vez con PLAY: %s" % D.STRAINS.ria.n)
 	# 6 · el juego: sin Txomin, sin SMS, sin mapa ni cartel del bajo, la puerta cerrada, sin sótano en la tienda; billar sin apuestas
 	var Oe = JSON.parse_string(FileAccess.get_file_as_string("res://tests/pantallas.json"))
 	var e: Dictionary = {}

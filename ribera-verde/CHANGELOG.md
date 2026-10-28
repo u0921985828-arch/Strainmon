@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Nombres reales y 150 L en la carpa de 120 (lo pidió el usuario)
+
+- Con `Datos.PLAY` vuelven los nombres reales de las variedades y las extracciones («volviésemos a usar los nombres originales de cepas y de extracciones»); solo el kit Ice-o-lator sale como «Ice Hash» («Ais-o-lator… es demasiado cateto»). `NOMBRES` en `tools/play.py` (las parodias de antes en `PARODIA`, sin usar), `datos/play.json`, i18n sin parodias; prueba `tests/play.gd`.
+- Con `Datos.CAL`, cada carpa admite al menos sus plazas × su maceta más grande de tierra (`litros_max` en `granja.gd`): la de 120 × 120, 150 L, para las seis de 25 L (antes 144); prueba `tests/tierra.gd`.
+- El seto de la fila de abajo ya no sale en un cuadro translúcido bajo los pies (lo vio el usuario en el móvil): asoma 1 o 2 px sobre su casilla y rozaba los pies; lo que solo roza las últimas `TAPA_PIES` filas del cuerpo no tapa (`tapa_pj` en `pinta.gd`); prueba `tests/translucido.gd`.
+
 ### 0.65.3 (código 88) · el reloj más lento (lo pidió el usuario: «el tiempo en el juego debería pasar más lento»; con `Datos.CAL`)
 
 - Un día del juego dura 12 minutos de verdad (antes, 4): el minuto del juego pasa de 167 ms a 500 ms (`ms_por_min` en `juego.gd`). OPCIONES → RELOJ lo cambia en bucle: 12, 24 o 4 minutos el día (`RELOJ_DIA`, `aj.reloj`, se guarda en los ajustes). Sin CAL, el ritmo del HTML (`D.MS_PER_MIN`). Prueba `tests/reloj.gd` (11/0).

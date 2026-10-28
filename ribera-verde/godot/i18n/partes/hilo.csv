@@ -14,7 +14,6 @@ Ya sabes lo que pasó en la Copa del 98. Lo que hagas con eso es cosa tuya.,Now 
 "Cierra la puerta, anda.","Close the door, will you."
 "Tu tía tenía dos cuadernos. El diario, que ya tienes, y uno azul que no enseñaba a nadie.","Your aunt had two notebooks. The diary, which you already have, and a blue one she never showed anyone."
 En el azul apuntaba su planta madre: la Haze con la que se presentó a la Copa del 98. Nunca la metió en la CannaDex.,In the blue one she wrote down her mother plant: the Haze she entered in the '98 Cup. She never put it in the CannaDex.
-En el azul apuntaba su planta madre: la Haize con la que se presentó a la Copa del 98. Nunca la metió en la CannaDex.,In the blue one she wrote down her mother plant: the Haize she entered in the '98 Cup. She never put it in the CannaDex.
 Aquella noche pasó algo. Volvió con el segundo premio y no quiso volver a hablar de esa planta. Ni conmigo.,Something happened that night. She came back with second prize and never wanted to talk about that plant again. Not even with me.
 "El que estuvo con ella toda la noche fue Delroy, el de la asociación del barrio alto. Pregúntale a él.","The one who was with her all night was Delroy, from the association in the upper quarter. Ask him."
 una pista: «LA NOCHE DEL 98»,"a lead: ""THE NIGHT OF '98"""
@@ -31,13 +30,11 @@ un trozo del cuaderno azul ({n}/3),a piece of the blue notebook ({n}/3)
 EL CUADERNO AZUL,THE BLUE NOTEBOOK
 "Juntas los tres trozos. La letra apretada de la tía, con manchas de tierra.","You put the three pieces together. Your aunt's cramped handwriting, with smudges of soil."
 "«Haze del 98, fenotipo del limón. Madre: la que trajo Miren de su viaje. La mejor que he tenido.»","""Haze of '98, the lemon pheno. Mother: the one Miren brought back from her trip. The best I've ever had."""
-"«Haize del 98, fenotipo del limón. Madre: la que trajo Miren de su viaje. La mejor que he tenido.»","""Haize of '98, the lemon pheno. Mother: the one Miren brought back from her trip. The best I've ever had."""
 "«Toño cambió mi tarro. Lo vi meterse en el bar de Baltasar con él debajo del brazo. No tengo pruebas, solo esto.»","""Toño swapped my jar. I saw him go into Baltasar's bar with it under his arm. I have no proof, only this."""
 "«Las semillas buenas, en la lata de galletas, debajo del manzano de la huerta. Que no las encuentre él.»","""The good seeds are in the biscuit tin, under the apple tree in the garden. Don't let him find them."""
 "Si el cuaderno dice lo que creo, ve a la huerta. Y no se lo cuentes a nadie del bar.","If the notebook says what I think, go to the garden. And don't tell anyone from the bar."
 Delroy me ha llamado. Sabía que vendrías.,Delroy called me. I knew you'd come.
 "La madre de esa Haze la traje yo de un viaje, en un bote de carretes de fotos. Tu tía la hizo suya.","I brought the mother of that Haze back from a trip, in a film canister. Your aunt made it her own."
-"La madre de esa Haize la traje yo de un viaje, en un bote de carretes de fotos. Tu tía la hizo suya.","I brought the mother of that Haize back from a trip, in a film canister. Your aunt made it her own."
 "Me dio su trozo del cuaderno la última vez que subió. Me dijo: «Si viene alguien con mis ojos, dáselo».","She gave me her piece of the notebook the last time she came up. She said: ""If someone with my eyes comes, give it to them""."
 ¿Te quedas a cenar con Miren?,Will you stay for dinner with Miren?
 Quedarte a cenar,Stay for dinner
@@ -62,7 +59,6 @@ Coger el papel y marcharte,Take the paper and leave
 "Una lata de galletas oxidada. Dentro, envueltas en papel de periódico del 98, semillas y una nota.","A rusty biscuit tin. Inside, wrapped in newspaper from '98, seeds and a note."
 "«Si las tienes tú, {N}, haz con esto lo que yo no me atreví. O no hagas nada: también vale. M.»","""If you have these, {N}, do with this what I didn't dare to. Or do nothing: that's fine too. M."""
 "{n} semillas de {s}, la Haze del 98 de la tía","{n} seeds of {s}, your aunt's Haze of '98"
-"{n} semillas de {s}, la Haize del 98 de la tía","{n} seeds of {s}, your aunt's Haize of '98"
 ¿Qué haces con lo que dice el cuaderno?,What do you do with what the notebook says?
 Contarlo en la asociación,Tell it at the association
 Ir a por Baltasar,Go after Baltasar

@@ -80,6 +80,19 @@ func _corre() -> void:
 		J.SENT = {"x": c.x, "y": c.y - 1, "d": "sur"}
 		chk(not Pn.tapa_pj(c.c, c.px, c.py, c.y * 16), "sentado: entero")
 		J.SENT = null
+		# el seto de la fila de abajo (lo vio el usuario: un cuadro translúcido bajo los pies): asoma 1-2 px sobre su casilla y solo
+		# roza los pies, no tapa; con el cuerpo detrás del árbol, sí
+		var fs = Atlas.frame_de("seto-huerta", "setoH", "unica", 0, {"i": 0})
+		chk(fs != null, "el seto de PixelLab")
+		if fs:
+			for d in [0, 4, 8]:
+				P.px = 10 * 16 + d
+				P.py = 9 * 16
+				var sx: int = Datos.jsround(10 * 16 + 8 - fs.cel.ancla[0])
+				var sy: int = Datos.jsround(10 * 16 + 15 - fs.cel.ancla[1])
+				chk(not Pn.tapa_pj(fs.c, sx, sy, 10 * 16), "el seto de debajo no tapa (dx %d)" % d)
+		P.px = c.x * 16
+		P.py = (c.y - 1) * 16
 		# una mesa con plantas: lo de encima (hasta TAPA_ALTO px) también tapa, aunque la mesa sola no llegue
 		var P2 = J.P
 		P2.px = 5 * 16

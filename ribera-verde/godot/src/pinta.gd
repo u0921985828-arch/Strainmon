@@ -184,6 +184,8 @@ func _rect(x: float, y: float, w: float, h: float, c: Color) -> void:
 # abajo que el suyo) y le pisa el cuerpo con más de TAPA_PX píxeles opacos se pinta a TAPA_ALFA, para verlo detrás
 const TAPA_ALFA := 0.45
 const TAPA_PX := 12
+const TAPA_PIES := 4   # lo vio el usuario: el seto de la fila de abajo, que asoma 1 o 2 px sobre su casilla, rozaba los pies y salía en un
+						# cuadro translúcido; lo que solo roza las últimas filas (los pies, las ruedas) no tapa
 var alfa := 1.0
 
 func caja_pj() -> Rect2i:   # el cuerpo del protagonista en la pantalla (sus pies en px + 8, py + 15, como en _pj)
@@ -193,7 +195,9 @@ func caja_pj() -> Rect2i:   # el cuerpo del protagonista en la pantalla (sus pie
 func tapa_pj(im: Image, x: int, y: int, pie: float) -> bool:
 	if not Datos.CAL or J.SENT != null or pie <= float(J.P.py) or J.mode != "world":
 		return false
-	var b := caja_pj().intersection(Rect2i(x, y, im.get_width(), im.get_height()))
+	var cj := caja_pj()
+	cj.size.y -= TAPA_PIES
+	var b := cj.intersection(Rect2i(x, y, im.get_width(), im.get_height()))
 	if b.size.x <= 0 or b.size.y <= 0:
 		return false
 	var nn := 0

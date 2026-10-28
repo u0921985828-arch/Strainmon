@@ -10,7 +10,7 @@ import json, re, os
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D = json.load(open(os.path.join(RAIZ, 'godot/datos/datos.json'), encoding='utf-8'))
 
-NOMBRES = {   # parodias de los nombres reales: una letra cambiada o el orden (lo pidió el usuario, 1.58)
+PARODIA = {   # las parodias de la 1.58 (una letra cambiada o el orden); ya no se usan: el usuario quiso los nombres reales
     'Skunk #1': 'Skonk #1', 'Lemon Haze': 'Limon Haize', 'Super Skunk': 'Supra Skonk', 'Blueberry': 'Bluberri', 'Big Bud': 'Big Bod',
     'Lemon Skunk': 'Limon Skonk', 'Kali Mist': 'Kalli Mixt', 'Cheese': 'Cheez', 'California Orange': 'Kalifornia Orantx',
     'Chemdawg': 'Chemdog', 'Haze': 'Haize', 'Northern Lights': 'Norzen Lights', 'Purple Thai': 'Purpel Thai',
@@ -82,7 +82,11 @@ SET = {
     'SOTANO.txt.cerrado': 'La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.',
 }
 
-# y en mayúsculas (los rótulos y avisos: «JACK HERER», «SKUNK #1»)
+# los nombres reales de las variedades y las extracciones (lo pidió el usuario: «volver a usar los nombres originales»;
+# las parodias le parecían «demasiado cateto»); solo cambia Ice-o-lator, la marca de unas bolsas, por el nombre genérico
+NOMBRES = {'Ice-o-lator': 'Ice Hash'}
+
+# y en mayúsculas (los rótulos y avisos)
 NOMBRES.update({k.upper(): v.upper() for k, v in list(NOMBRES.items()) if k.upper() != k})
 
 LETRA = 'A-Za-zÀ-ÿ0-9'
