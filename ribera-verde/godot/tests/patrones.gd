@@ -1,9 +1,10 @@
 # Ribera Verde (Godot) — los esquemas de macetas de las carpas (con CAL; lo pidió el usuario: «Posibilidad de poner x de cierto tamaño,
 # elegir por patrones igual, cuando ya tienes ciertas macetas para completar todo el esquema de la carpa te ofrece poner X cantidad
 # dependiendo de cada maceta»): la maceta de 50 L (MACETA50) y KC_PATRON; en KAIA, cada carpa con su esquema (kc_pat, kc_esquema):
-# con las macetas que tienes o pidiendo las que faltan, con la carpa vacía, las plazas de las demás en su sitio, la luz repartida, más
-# deprisa cuantas más, el dibujo a escala y, al vender las carpas, las tuyas a la mochila; en casa, completar las plazas vacías con
-# las macetas que tienes (completa_macetas) sin pasar de la tierra; sin CAL, nada.
+# con las macetas que tienes o pidiendo las que faltan, con la carpa vacía, las plazas de las demás en su sitio, la luz repartida al
+# mismo ritmo, el dibujo a escala y, al vender las carpas, las tuyas a la mochila (las del kit, no); la de 50 L, solo con la licencia;
+# en casa, completar las plazas vacías con las macetas que tienes (completa_macetas) sin pasar de la tierra, también desde una plaza
+# que ya lleva esa maceta; sin CAL, nada.
 #   $GODOT --headless --path godot --script res://tests/patrones.gd   → «patrones: N comprobaciones, 0 fallos»
 extends SceneTree
 
@@ -121,13 +122,18 @@ func _corre() -> void:
 	# 2 · KAIA: dos carpas de 200 × 200 con el kit de serie (4 de 35 L)
 	if not (J.S.get("mar") is Dictionary):
 		J.S.mar = {}
+	var t50: Dictionary = D.SHOP.filter(func(s): return s.get("maceta") == "tela50")[0]
+	J.S.mar.erase("lic")
+	chk(not J.shop_cond(t50), "la de 50 L, sin la licencia de KAIA, no se vende")
 	J.S.mar.lic = int(J.S.day)
+	chk(J.shop_cond(t50), "con la licencia, sí")
 	J.S.kc = {"niv": 0, "kits": [0, 0], "p": []}
 	J.S.banco = 1000
 	for k in ["tela25", "tela35", "tela50"]:
 		J.S.items["m_" + k] = 0
 	J.kc()
 	chk(J.kc().p.size() == 16 and J.kc_n(0) == 4 and J.kc_pat(0).m == "tela35" and J.kc_off(1) == 4, "de serie, como antes: 4 plazas por carpa (%d)" % J.kc().p.size())
+	chk(J.kc_tengo(0, "tela35") == 0 and J.kc_puedes(0) == "", "las 4 del kit no cuentan como tuyas")
 	chk(mundo(C, 1, 2) and J.MAPS[C].o[4][4] == "carpaKS0", "dentro, la carpa 1")
 	J.S.seeds = {"txoko": 5}
 	QUIERO = ["Plaza 1", J.strain("txoko").n]
@@ -148,7 +154,7 @@ func _corre() -> void:
 	QUIERO = ["Esquema de la carpa", "16 macetas de 25 L", "Pedirlas y ponerlas"]
 	LOG = []
 	chk(corre(func(): await J.object_action(4, 4)) and J.kc_pat(0).m == "tela25" and J.kc_n(0) == 16, "16 de 25 L (%s · %s)" % [J.kc_pat(0), LOG.slice(-2)])
-	chk(pr > 0 and is_equal_approx(float(J.S.banco), 1000.0 - 16 * pr) and it_m("tela25") == 0 and it_m("tela35") == 4, "pagadas por la cuenta (%d €) y las de 35 L, a la mochila (%d)" % [int(1000 - J.S.banco), it_m("tela35")])
+	chk(pr > 0 and is_equal_approx(float(J.S.banco), 1000.0 - 16 * pr) and it_m("tela25") == 0 and it_m("tela35") == 0, "pagadas por la cuenta (%d €) y las 4 del kit, no a la mochila (%d)" % [int(1000 - J.S.banco), it_m("tela35")])
 	chk(J.kc().p.size() == 28 and J.kc_off(1) == 16 and J.kc().p[16] is Dictionary and J.kc().p[16].sid == "ria" and J.kc_plantadas(1) == 1 and J.kc_ci(16) == 1 and J.kc_ci(15) == 0, "la planta de la carpa 2, en su plaza (%d plazas)" % J.kc().p.size())
 	MENUS = []
 	QUIERO = ["Plaza 16", J.strain("txoko").n]
@@ -159,11 +165,11 @@ func _corre() -> void:
 	chk(J.kc_dibujo(0) == 4 and J.sprite_local("carpaKS0") == "kcs-4", "llena, las cuatro del dibujo")
 	for j in 15:
 		J.kc().p[j] = null
-	# 4 · la luz, repartida; más plantas, antes cierran
+	# 4 · la luz, repartida, al mismo ritmo
 	var f16: Dictionary = J.kc_f(0)
 	var f4: Dictionary = J.kc_f(1)
 	chk(is_equal_approx(float(f16.g) * 16 / (float(f4.g) * 4), float(D.MACETAS.tela25.rend) / float(D.MACETAS.tela35.rend)), "los mismos gramos por carpa, por la maceta: %.1f g × 16 y %.1f g × 4" % [float(f16.g), float(f4.g)])
-	chk(is_equal_approx(float(f16.crec) / float(f4.crec), pow(4.0, J.KC_DENSO) * float(D.MACETAS.tela25.crec) / float(D.MACETAS.tela35.crec)) and float(f16.crec) > float(f4.crec), "16 crecen más deprisa (×%.3f)" % (float(f16.crec) / float(f4.crec)))
+	chk(is_equal_approx(float(f16.crec) / float(f4.crec), float(D.MACETAS.tela25.crec) / float(D.MACETAS.tela35.crec)), "al mismo ritmo: el esquema no acelera (×%.3f)" % (float(f16.crec) / float(f4.crec)))
 	chk(is_equal_approx(float(J.kc_hu(15).f.crec), float(f16.crec)) and is_equal_approx(float(J.kc_hu(16).f.crec), float(f4.crec)), "cada plaza, con su carpa")
 	var p15: Dictionary = J.kc().p[15]
 	var p16: Dictionary = J.kc().p[16]
@@ -178,10 +184,10 @@ func _corre() -> void:
 	MENUS = []
 	QUIERO = ["Salir"]
 	corre(func(): await J.kc_carpa(1))
-	chk(J.kc_puedes(1) == "9 de 35 L", "la carpa 2: con 9 + 4 de 35 L, puedes 9 de 35 L («%s»)" % J.kc_puedes(1))
+	chk(J.kc_puedes(1) == "9 de 35 L", "la carpa 2: con 9 de 35 L en la mochila, puedes 9 de 35 L («%s»)" % J.kc_puedes(1))
 	var b0: float = float(J.S.banco)
 	QUIERO = ["Esquema de la carpa", "9 macetas de 35 L", "Ponerlas"]
-	chk(corre(func(): await J.kc_carpa(1)) and J.kc_n(1) == 9 and J.kc_pat(1).m == "tela35" and is_equal_approx(float(J.S.banco), b0) and it_m("tela35") == 4, "9 de 35 L con las tuyas, sin pagar (quedan %d)" % it_m("tela35"))
+	chk(corre(func(): await J.kc_carpa(1)) and J.kc_n(1) == 9 and J.kc_pat(1).m == "tela35" and is_equal_approx(float(J.S.banco), b0) and it_m("tela35") == 0, "9 de 35 L con las tuyas, sin pagar; las del kit, no (quedan %d)" % it_m("tela35"))
 	chk(J.kc().p.size() == 16 + 9 + 4 + 4 and J.kc_off(2) == 25 and J.kc().p[15] is Dictionary, "las plazas: 16 + 9 + 4 + 4")
 	QUIERO = ["Esquema de la carpa", "9 macetas de 35 L"]
 	LOG = []
@@ -196,7 +202,7 @@ func _corre() -> void:
 	QUIERO = ["Pasar a la", "Comprarla"]
 	LOG = []
 	chk(corre(func(): await J.object_action(2, 1)) and int(J.kc().niv) == 1 and J.kc().get("pat", []).is_empty() and J.kc().p.size() == 16, "a las de 4 × 2, de serie (%d plazas)" % J.kc().p.size())
-	chk(it_m("tela25") == 16 and it_m("tela35") == 13 and dicho("16 + 9") == false and dicho("25 macetas"), "las 16 de 25 L y las 9 de 35 L, a la mochila (%d, %d · %s)" % [it_m("tela25"), it_m("tela35"), LOG.slice(-1)])
+	chk(it_m("tela25") == 16 and it_m("tela35") == 9 and dicho("16 + 9") == false and dicho("25 macetas"), "las 16 de 25 L y las 9 de 35 L, a la mochila (%d, %d · %s)" % [it_m("tela25"), it_m("tela35"), LOG.slice(-1)])
 	chk(J.kc_patrones().map(func(q): return q[1]) == [32, 18, 8], "en la de 4 × 2: 32, 18 y 8")
 	# 7 · una partida de antes, sin esquemas: las plazas como siempre
 	J.S.kc = {"niv": 0, "kits": [0, 0, 0], "p": [null, null, null, null, null, planta.duplicate(true)]}
@@ -229,6 +235,17 @@ func _corre() -> void:
 	J.S.items.m_tela11 = 1
 	cm = J.completa_macetas(0)
 	chk(cm.size() == 1 and cm[0][0] == "plastico7", "con lo que queda, solo volver a las de 7 L (1 de 11 L no llega): %s" % [cm])
+	# 8b · desde una plaza vacía que ya lleva la maceta con la que se completa, también se ofrece
+	J.S.pots = [null, null, null, null, null, null]
+	J.S.macetas = ["plastico7", "tela25", "plastico7", "plastico7", "plastico7", "plastico7"]
+	for k in J.S.items.keys():
+		if String(k).begins_with("m_"):
+			J.S.items[k] = 0
+	J.S.items.m_tela25 = 5
+	chk(J.macetas_libres(1, false).is_empty() and J.completa_macetas(0).size() == 1, "la plaza 2 ya en 25 L y nada más que cambiarle")
+	QUIERO = ["Completar la carpa", "5 macetas de"]
+	LOG = []
+	chk(corre(func(): await J.pot_action(1)) and J.S.macetas.all(func(k): return k == "tela25") and it_m("tela25") == 0, "desde esa plaza, completar la carpa (%s)" % [J.S.macetas])
 	# 9 · sin CAL, en casa no se ofrece
 	J.S.macetas = ["plastico7", "plastico7", "plastico7", "plastico7", "plastico7", "plastico7"]
 	J.S.pots[0] = null

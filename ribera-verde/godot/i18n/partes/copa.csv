@@ -763,14 +763,15 @@ Esquema de la carpa,Tent layout
 puesto,in place
 tienes {t},you have {t}
 las tienes,you have them
-{tl} L de tierra · unos {g} por planta y {c} la carpa por cosecha · {r},{tl} L of soil · about {g} per plant and {c} the tent per harvest · {r}
-crecen un {c} % más deprisa,they grow {c} % faster
-crecen a su ritmo,they grow at their own pace
+{tl} L de tierra · unos {g} por planta y {c} la carpa por cosecha,{tl} L of soil · about {g} per plant and {c} the tent per harvest
 ESQUEMA DE LA CARPA {n},LAYOUT OF TENT {n}
 Ahora: {n} macetas de {l} L,Now: {n} pots of {l} L
 La carpa ya lleva ese esquema.,The tent already has that layout.
 "Antes, cosecha o arranca lo que tengas en esta carpa: las macetas se cambian con la carpa vacía.","First, harvest or pull what you have in this tent: pots are changed with the tent empty."
 "Quitas las {a} macetas de {la} L y pones {n} de {l} L, con sus goteros: {tl} L de tierra. Las que sobren, a la mochila.","You take out the {a} pots of {la} L and put in {n} of {l} L, with their drippers: {tl} L of soil. The spare ones go to your backpack."
+"Retiras las {a} macetas de {la} L del kit y pones {n} de {l} L, con sus goteros: {tl} L de tierra.","You remove the kit's {a} pots of {la} L and put in {n} of {l} L, with their drippers: {tl} L of soil."
+{n} × {l} L,{n} × {l} L
+Para los esquemas de las carpas de KAIA.,For the layouts of the KAIA tents.
 Tienes {t}: las {f} que faltan se piden por {e} con la tarjeta y te las suben ahora.,You have {t}: the {f} missing ones are ordered for {e} by card and brought up now.
 Ponerlas,Put them in
 Pedirlas y ponerlas,Order and put them in

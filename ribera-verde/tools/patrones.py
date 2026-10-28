@@ -1,7 +1,8 @@
 # Landrace Hunters — los esquemas de macetas de las carpas de KAIA (lo pidió el usuario: «Posibilidad de poner x de cierto tamaño,
 # elegir por patrones igual, cuando ya tienes ciertas macetas para completar todo el esquema de la carpa te ofrece poner X cantidad
 # dependiendo de cada maceta»; solo con Datos.CAL). Escribe en godot/datos/datos.json:
-#  · MACETA50: la maceta de tela de 50 L (como MACETA35, sin carpa de casa que la admita: solo en los esquemas de KAIA);
+#  · MACETA50: la maceta de tela de 50 L (como MACETA35, sin carpa de casa que la admita: solo en los esquemas de KAIA, y en la
+#    tienda solo con la licencia, «kaia»);
 #  · KC_PATRON: por nivel de KAIA_CULT.niv, cuántas macetas de cada tamaño llenan la carpa, en rejilla y sin pasar de LITROS_M2
 #    litros por m² de suelo (la de 200 × 200: 16 de 25 L, 9 de 35 L o 4 de 50 L; las otras, a escala).
 #   python3 -I tools/patrones.py
@@ -14,7 +15,7 @@ MACETA50 = {
 	"k": "tela50",
 	"m": {"n": "Tela 50 L", "l": 50, "rend": 1.1, "cap": 410, "crec": 1, "agua": 0.95, "plaga": 0.8},
 	"cm": [46, 34, "#4a4038", "#625848", 1],
-	"shop": {"lbl": "Maceta de tela 50 L", "p": 8, "ch": 4, "cal": 1, "desc": "50 L · hasta 410 g por planta · cosecha +10% · riego ×0,95 · menos plagas\nPara las carpas de KAIA: en el esquema de cada carpa.", "maceta": "tela50"},
+	"shop": {"lbl": "Maceta de tela 50 L", "p": 8, "ch": 4, "cal": 1, "kaia": 1, "desc": "50 L · hasta 410 g por planta · cosecha +10% · riego ×0,95 · menos plagas\nPara las carpas de KAIA: en el esquema de cada carpa.", "maceta": "tela50"},
 	"lmax": {},
 }
 

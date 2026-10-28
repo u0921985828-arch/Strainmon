@@ -500,7 +500,7 @@ func mochila() -> void:
 			{"label": K("Bocata"), "right": "×" + n(S.items.bocata), "ic": icono("bocadillo"), "desc": K("Pulsa A para comerlo: +15 de vida."), "k": "bocata"}])
 		for k in D.MACETAS:
 			if S.items.get("m_" + k, 0) > 0:
-				rows.append({"label": T("Maceta {n}", {"n": D.MACETAS[k].n}), "right": "×" + n(S.items["m_" + k]), "ic": icono("maceta"), "desc": desc_maceta(k) + "\n" + T("Se cambia en una plaza vacía de la carpa.")})
+				rows.append({"label": T("Maceta {n}", {"n": D.MACETAS[k].n}), "right": "×" + n(S.items["m_" + k]), "ic": icono("maceta"), "desc": desc_maceta(k) + "\n" + (T("Se cambia en una plaza vacía de la carpa.") if D.CARPAS.values().any(func(c): return int(c.get("lmax", 0)) >= int(D.MACETAS[k].l)) else K("Para los esquemas de las carpas de KAIA."))})
 		for k in D.FOCOS:
 			if S.items.get("f_" + k, 0) > 0:
 				rows.append({"label": T("Foco {n}", {"n": D.FOCOS[k].n}), "right": "×" + n(S.items["f_" + k]), "ic": icono(Atlas.ico_foco(k)), "desc": desc_foco(k) + "\n" + T("Se cuelga desde la vista de carpa: ▲ hasta el foco y A.")})

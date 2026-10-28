@@ -1839,13 +1839,12 @@ sdb75e055,{n} macetas de {l} L,{n} pots of {l} L
 s47c3d2de,puesto,in place
 sd4507e06,tienes {t},you have {t}
 s158db214,las tienes,you have them
-s85fa8bb3,{tl} L de tierra · unos {g} por planta y {c} la carpa por cosecha · {r},{tl} L of soil · about {g} per plant and {c} the tent per harvest · {r}
-s353d5e7a,crecen un {c} % más deprisa,they grow {c} % faster
-sd81d40f6,crecen a su ritmo,they grow at their own pace
+s021229b5,{tl} L de tierra · unos {g} por planta y {c} la carpa por cosecha,{tl} L of soil · about {g} per plant and {c} the tent per harvest
 s36a65276,ESQUEMA DE LA CARPA {n},LAYOUT OF TENT {n}
 s363e8370,Ahora: {n} macetas de {l} L,Now: {n} pots of {l} L
 s49146641,La carpa ya lleva ese esquema.,The tent already has that layout.
 s7216f7af,"Antes, cosecha o arranca lo que tengas en esta carpa: las macetas se cambian con la carpa vacía.","First, harvest or pull what you have in this tent: pots are changed with the tent empty."
+s8df3294e,"Retiras las {a} macetas de {la} L del kit y pones {n} de {l} L, con sus goteros: {tl} L de tierra.","You remove the kit's {a} pots of {la} L and put in {n} of {l} L, with their drippers: {tl} L of soil."
 sfbddb53b,"Quitas las {a} macetas de {la} L y pones {n} de {l} L, con sus goteros: {tl} L de tierra. Las que sobren, a la mochila.","You take out the {a} pots of {la} L and put in {n} of {l} L, with their drippers: {tl} L of soil. The spare ones go to your backpack."
 s01e0bbc7,Tienes {t}: las {f} que faltan se piden por {e} con la tarjeta y te las suben ahora.,You have {t}: the {f} missing ones are ordered for {e} by card and brought up now.
 s1bc7a687,Ponerlas,Put them in
@@ -1969,6 +1968,7 @@ sf950fe9e,Bocata,Sandwich
 s8efd7dbb,Pulsa A para comerlo: +15 de vida.,Press A to eat it: +15 health.
 s5d81c796,Maceta {n},Pot {n}
 se553ada2,Se cambia en una plaza vacía de la carpa.,Swap it in an empty spot in the tent.
+s5e79c7a6,Para los esquemas de las carpas de KAIA.,For the layouts of the KAIA tents.
 s4f70d640,Foco {n},Light {n}
 s771cd2ba,Se cuelga desde la vista de carpa: ▲ hasta el foco y A.,Hang it from the tent view: ▲ up to the light and A.
 sa8244634,Se ponen desde la vista de carpa: ▲ hasta el foco y A.,Fit them from the tent view: ▲ up to the light and A.
@@ -6636,6 +6636,9 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+s85fa8bb3,{tl} L de tierra · unos {g} por planta y {c} la carpa por cosecha · {r},{tl} L of soil · about {g} per plant and {c} the tent per harvest · {r}
+s353d5e7a,crecen un {c} % más deprisa,they grow {c} % faster
+sd81d40f6,crecen a su ritmo,they grow at their own pace
 sbaef3c8b,Una maceta de tela con su gotero.,A fabric pot with its dripper.
 sd5b6a75f,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip and the climate. All automatic: long days while they grow and shorter ones once it's time to flower."
 s1f41b1f3,Comprar un kit de carpa · {e},Buy a tent kit · {e}
@@ -6758,3 +6761,4 @@ s137508f0,Defensa,Self-defence
 s836ff227,"«{c}», en su cajón. {z}: destapado.","«{c}», in its drawer. {z}: uncovered."
 sa66e2ad4,{p},{p}
 sfa36793c,Antes, espera a que llegue la carpa que tienes pedida.
+s3d36940f,{n} × {l} L,{n} × {l} L

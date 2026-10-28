@@ -19,14 +19,14 @@
 # El esquema de cada carpa (lo pidió el usuario: «Posibilidad de poner x de cierto tamaño, elegir por patrones igual, cuando ya tienes
 # ciertas macetas para completar todo el esquema de la carpa te ofrece poner X cantidad dependiendo de cada maceta»): {m: maceta,
 # n: plazas}; sin él, el del kit (N.plazas macetas de KAIA_CULT.maceta). KC_PATRON[N.k] dice cuántas de cada maceta llenan la carpa
-# (tools/patrones.py); la luz de la carpa se reparte entre las n y, cuantas más, antes cierran el hueco (KC_DENSO).
+# (tools/patrones.py); la luz de la carpa se reparte entre las n, al mismo ritmo: más plantas pequeñas (más fenotipos donde
+# elegir) o menos y más grandes (las de 50 L rinden más por cosecha).
 # Datos de tools/kaia_cult.py (KAIA_CULT, MAPS["cult-muelle"]). Cadena: … → hilo → bancotia → kaiacult → salafria → retencion → juego.
 extends "res://src/bancotia.gd"
 
 var _kc0 = null   # los muebles de la sala tal como vienen de datos.json, para montar las mesas encima
 
 const KC_KIT_VIEJO := 3180   # lo que costaba el kit de 240 × 240 de antes de los niveles
-const KC_DENSO := 0.1   # el crecimiento por la densidad del esquema: × (n / N.plazas) ^ KC_DENSO (16 en la de 200 × 200, un 15 % más deprisa)
 
 func kc() -> Dictionary:
 	if not (S.get("kc") is Dictionary):
@@ -74,7 +74,7 @@ func kc_pat(ci: int) -> Dictionary:   # el esquema de la carpa ci: {m: maceta, n
 	var l: Array = S.kc.get("pat", []) if S.get("kc") is Dictionary else []
 	if ci >= 0 and ci < l.size() and l[ci] is Dictionary:
 		return l[ci]
-	return {"m": D.KAIA_CULT.maceta, "n": int(kc_N().plazas)}
+	return {"m": D.KAIA_CULT.maceta, "n": int(kc_N().plazas), "kit": true}   # las del kit: no son tuyas, no van a la mochila
 
 func kc_n(ci: int) -> int:
 	return int(kc_pat(ci).n)
@@ -141,7 +141,7 @@ func kc_f(ci := 0, P = null) -> Dictionary:
 	var np := float(P.n)
 	var w: float = float(F.w) * float(N.nf)
 	var dens := minf(1, w / (float(cm[0]) * float(cm[1]) / 1e4 * float(D.W_M2)))
-	return {"g": w * float(F.gpw) / np * float(M.rend) * float(N.get("efi", 1.0)), "cap": float(M.cap), "crec": float(F.crec) * (.85 + .15 * dens) * float(M.crec) * Cultivo.f_clima(KC.clima) * pow(np / float(N.plazas), KC_DENSO),
+	return {"g": w * float(F.gpw) / np * float(M.rend) * float(N.get("efi", 1.0)), "cap": float(M.cap), "crec": float(F.crec) * (.85 + .15 * dens) * float(M.crec) * Cultivo.f_clima(KC.clima),
 		"thc": float(F.thc) * dens, "agua": float(F.agua) * float(M.agua), "plaga": float(M.plaga), "dens": dens, "hr": float(KC.clima.hr), "moho": 1.0, "ciclo": "auto"}   # i18n-no
 
 func kc_pos(ci: int) -> Array:
@@ -412,7 +412,7 @@ func kc_carpa(ci: int) -> void:
 # las macetas de un tamaño que tienes para la carpa ci: las de la mochila y, si son del mismo, las que ya lleva
 func kc_tengo(ci: int, k: String) -> int:
 	var P := kc_pat(ci)
-	return int(S.items.get("m_" + k, 0)) + (int(P.n) if P.m == k else 0)
+	return int(S.items.get("m_" + k, 0)) + (int(P.n) if P.m == k and not P.get("kit") else 0)
 
 # los esquemas que ya puedes completar con tus macetas, en texto («9 de 35 L o 16 de 25 L»), o ""
 func kc_puedes(ci: int) -> String:
@@ -439,11 +439,10 @@ func kc_esquema(ci: int) -> void:
 		var M: Dictionary = D.MACETAS[q[0]]
 		var f := kc_f(ci, {"m": q[0], "n": q[1]})
 		var gp: float = minf(float(f.g), float(f.cap))
-		var cr := roundi((pow(float(q[1]) / float(N.plazas), KC_DENSO) - 1) * 100)
 		var ya: bool = q[0] == P.m and q[1] == int(P.n)
 		var t := kc_tengo(ci, q[0])
 		it.append({"label": T("{n} macetas de {l} L", {"n": q[1], "l": int(M.l)}), "right": K("puesto") if ya else (T("tienes {t}", {"t": t}) if t < q[1] else K("las tienes")), "ic": icono("maceta"),
-			"desc": T("{tl} L de tierra · unos {g} por planta y {c} la carpa por cosecha · {r}", {"tl": q[1] * int(M.l), "g": g_txt(gp), "c": g_txt(gp * q[1]), "r": T("crecen un {c} % más deprisa", {"c": cr}) if cr > 0 else K("crecen a su ritmo")})})
+			"desc": T("{tl} L de tierra · unos {g} por planta y {c} la carpa por cosecha", {"tl": q[1] * int(M.l), "g": g_txt(gp), "c": g_txt(gp * q[1])})})
 	it.append({"label": K("Salir"), "desc": ""})
 	var j: int = await menu(it, {"cls": "full", "title": T("ESQUEMA DE LA CARPA {n}", {"n": ci + 1}), "title2": T("Ahora: {n} macetas de {l} L", {"n": int(P.n), "l": int(D.MACETAS.get(P.m, {"l": 0}).l)}), "desc": true})
 	if j < 0 or j >= l.size():
@@ -460,14 +459,15 @@ func kc_esquema(ci: int) -> void:
 	var t := kc_tengo(ci, k)
 	var falta := maxi(0, nn - t)
 	var e := falta * kc_precio_maceta(k)
-	var txt := T("Quitas las {a} macetas de {la} L y pones {n} de {l} L, con sus goteros: {tl} L de tierra. Las que sobren, a la mochila.", {"a": int(P.n), "la": int(D.MACETAS.get(P.m, {"l": 0}).l), "n": nn, "l": lk, "tl": nn * lk})
+	var txt := T("Retiras las {a} macetas de {la} L del kit y pones {n} de {l} L, con sus goteros: {tl} L de tierra.", {"a": int(P.n), "la": int(D.MACETAS.get(P.m, {"l": 0}).l), "n": nn, "l": lk, "tl": nn * lk}) if P.get("kit") else T("Quitas las {a} macetas de {la} L y pones {n} de {l} L, con sus goteros: {tl} L de tierra. Las que sobren, a la mochila.", {"a": int(P.n), "la": int(D.MACETAS.get(P.m, {"l": 0}).l), "n": nn, "l": lk, "tl": nn * lk})
 	if falta > 0:
 		txt += " " + T("Tienes {t}: las {f} que faltan se piden por {e} con la tarjeta y te las suben ahora.", {"t": t, "f": falta, "e": Datos.eur(e)})
 	if await ask(txt, [K("Ponerlas") if falta == 0 else K("Pedirlas y ponerlas"), K("Ahora no")]) != 0:
 		return
 	if falta > 0 and not await tarjeta(e, K("Macetas de la sala de cultivo (KAIA)")):
 		return
-	S.items["m_" + String(P.m)] = int(S.items.get("m_" + String(P.m), 0)) + int(P.n)
+	if not P.get("kit"):
+		S.items["m_" + String(P.m)] = int(S.items.get("m_" + String(P.m), 0)) + int(P.n)
 	S.items["m_" + k] = int(S.items.get("m_" + k, 0)) + falta - nn
 	kc_pon_pat(ci, {"m": k, "n": nn})
 	sfx("get")

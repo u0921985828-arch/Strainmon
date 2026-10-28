@@ -13,6 +13,8 @@ var endcard_on := false
 
 # ---------- tienda ----------
 func shop_cond(it: Dictionary) -> bool:
+	if it.get("kaia"):   # la maceta de 50 L: solo para los esquemas de las carpas de KAIA, con su licencia
+		return S.get("mar") is Dictionary and S.mar.get("lic") != null
 	if it.get("uno"):   # 1.47: el grinder, la pipa, el bong y el vaporizador, uno
 		return not S.items.get(it.item)
 	if it.get("item") == "prensa":   # la prensa de rosin (1.10), una

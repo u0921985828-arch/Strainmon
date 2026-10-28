@@ -411,17 +411,23 @@ func pot_action(i: int, hu = null) -> void:
 	var L: Array = hu.l if hu else S.pots
 	var p = L[i]
 	if p == null:
-		if not hu and macetas_libres(i, false).size():
-			var cm := completa_macetas(huecos()[i].c) if Datos.CAL else []
-			var co := [K("Plantar"), K("Cambiar maceta")] + ([K("Completar la carpa")] if cm.size() > 0 else []) + [K("Salir")]
+		var ml: bool = not hu and macetas_libres(i, false).size() > 0
+		var cm := completa_macetas(huecos()[i].c) if Datos.CAL and not hu else []
+		if ml or cm.size():   # «Completar la carpa» también desde una plaza que ya lleva esa maceta
+			var ops := ["plantar"] + (["cambiar"] if ml else []) + (["completar"] if cm.size() else []) + ["salir"]   # i18n-no
+			var nom := {"plantar": K("Plantar"), "cambiar": K("Cambiar maceta"), "completar": K("Completar la carpa"), "salir": K("Salir")}
+			var co := []
+			for o in ops:
+				co.append(nom[o])
 			var c: int = await ask(T("Plaza vacía con una maceta de {m}.", {"m": D.MACETAS[S.macetas[i]].n}), co)
-			if c == 1:
+			var op: String = ops[c] if c >= 0 and c < ops.size() else "salir"
+			if op == "cambiar":
 				await cambiar_maceta(i)
 				return
-			if cm.size() and c == 2:
+			if op == "completar":
 				await completar_macetas(huecos()[i].c, cm)
 				return
-			if c != 0:
+			if op != "plantar":
 				return
 		await plantar(i, hu)
 		return
