@@ -2,10 +2,11 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### Nombres reales y 150 L en la carpa de 120 (lo pidió el usuario)
+### 0.65.4 (código 89) · nombres reales, más tierra, la maceta de 35 L y el seto (lo pidió el usuario); APK en `descargas/LandraceHunters.apk` (89 MB)
 
 - Con `Datos.PLAY` vuelven los nombres reales de las variedades y las extracciones («volviésemos a usar los nombres originales de cepas y de extracciones»); solo el kit Ice-o-lator sale como «Ice Hash» («Ais-o-lator… es demasiado cateto»). `NOMBRES` en `tools/play.py` (las parodias de antes en `PARODIA`, sin usar), `datos/play.json`, i18n sin parodias; prueba `tests/play.gd`.
 - Con `Datos.CAL`, cada carpa admite al menos sus plazas × su maceta más grande de tierra (`litros_max` en `granja.gd`): la de 120 × 120, 150 L, para las seis de 25 L (antes 144); prueba `tests/tierra.gd`.
+- La maceta de tela de 35 L (lo pidió el usuario: «en la siguiente carpa más grande, deberían de entrar macetas algo más grandes… la cantidad de tierra pues eso lo mismo»; con `Datos.CAL`): `MACETA35` en `datos.json` (290 g por planta, cosecha +8 %, 6 €, cap. 4, al final de la tienda), que `_aplica_auto` pone en `MACETAS`, `MACETA_CM` y `SHOP`; cabe en la carpa de 150 × 100 (`lmax` 35: 6 × 35 = 210 L de tierra) y la llevan las carpas de KAIA (`KAIA_CULT.maceta`); en la de 120, no. Su dibujo en la vista C, de tela verde oliva (`maceta-c-tela35-28` en `equipo_c.py`, pegada en `godot/arte/carpa.png` con `tools/maceta35.py`); prueba `tests/tierra.gd` (29/0).
 - El seto de la fila de abajo ya no sale en un cuadro translúcido bajo los pies (lo vio el usuario en el móvil): asoma 1 o 2 px sobre su casilla y rozaba los pies; lo que solo roza las últimas `TAPA_PIES` filas del cuerpo no tapa (`tapa_pj` en `pinta.gd`); prueba `tests/translucido.gd`.
 
 ### 0.65.3 (código 88) · el reloj más lento (lo pidió el usuario: «el tiempo en el juego debería pasar más lento»; con `Datos.CAL`)

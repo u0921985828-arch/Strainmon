@@ -124,6 +124,32 @@ static func _aplica_auto() -> void:
 			D.EXTRAS["sello"] = D.BOTRITIS.extra
 		else:
 			D.EXTRAS.erase("sello")
+	# la maceta de tela de 35 L (lo pidió el usuario: «en la siguiente carpa más grande, deberían de entrar macetas algo más grandes»):
+	# con CAL, en la tienda (al final), en la carpa de 150 × 100 (lmax 35: 6 × 35 = 210 L de tierra) y en las carpas de KAIA
+	var M35: Dictionary = D.get("MACETA35", {})   # i18n-no
+	if not M35.is_empty():
+		if not D._base.has("SHOP"):
+			D._base.SHOP = D.SHOP.duplicate()
+		if not D._base.has("lmax"):
+			D._base.lmax = {}
+			for k in M35.lmax:
+				D._base.lmax[k] = D.CARPAS[k].lmax
+			D._base.kaia = D.KAIA_CULT.maceta
+		if CAL:
+			D.MACETAS[M35.k] = M35.m
+			D.MACETA_CM[M35.k] = M35.cm
+			if not D.SHOP.has(M35.shop):   # detrás de la tienda de siempre y antes de lo de la botritis (que va al final)
+				D.SHOP.insert(D._base.SHOP.size(), M35.shop)
+			for k in M35.lmax:
+				D.CARPAS[k].lmax = M35.lmax[k]
+			D.KAIA_CULT.maceta = M35.k
+		else:
+			D.MACETAS.erase(M35.k)
+			D.MACETA_CM.erase(M35.k)
+			D.SHOP.erase(M35.shop)
+			for k in M35.lmax:
+				D.CARPAS[k].lmax = D._base.lmax[k]
+			D.KAIA_CULT.maceta = D._base.kaia
 	# MAESTRO [9]: Hiriburu, la ciudad de la autopista (solo con CAL: su parada, sus km, su zona, sus patrullas y sus clientes)
 	var MT: Dictionary = D.get("METRO", {})
 	if not MT.is_empty():

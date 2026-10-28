@@ -121,9 +121,12 @@ def estira(im, w, h, cols, filas):
     L = Lienzo(32, 32); L.im = o; L.px = o.load(); return L
 
 GRIS, BEIS = ('#2e3036', '#45474e', '#5e6068', '#787a82'), ('#5a4e38', '#7a6c50', '#988a6c', '#b0a280')
+VERDE = ('#28332c', '#3e4e44', '#566a5c', '#6e8474')   # la de 35 L, tela verde oliva
 sale('carpa-c-macetas-b', 'maceta-c-tela11-26', tela(26, 29, GRIS, 1))
 sale('carpa-c-macetas-b', 'maceta-c-tela11-20', tela(20, 22, GRIS, 2))
 sale('carpa-c-macetas-b', 'maceta-c-tela25-27', tela(27, 26, BEIS, 3))
+# la de 35 L (Ø 40 × 30 cm, Godot con CAL): la carpa de 150 × 100 y las de KAIA; la pega en godot/arte/carpa.png tools/maceta35.py
+sale('carpa-c-macetas-b', 'maceta-c-tela35-28', tela(28, 30, VERDE, 4))
 m7 = Image.open(P('art', 'procesado', 'carpa-c-macetas', 'maceta-c-22', 'unica', '00.png')).convert('RGBA').crop((5, 5, 27, 32))   # 22 × 27
 sale('carpa-c-macetas-b', 'maceta-c-plastico18-26', estira(m7, 26, 31, [7, 14, 16, 5], [14, 18, 22, 16]))
 sale('carpa-c-macetas-b', 'maceta-c-plastico18-23', estira(m7, 23, 29, [14], [14, 18]))

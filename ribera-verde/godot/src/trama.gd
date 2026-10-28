@@ -183,7 +183,7 @@ func entregar(it: Dictionary, N: String) -> void:
 	if it.get("item"):
 		S.items[it.item] = int(S.items.get(it.item, 0)) + int(it.get("n", 1))
 	if it.get("maceta"):
-		S.items["m_" + it.maceta] += 1
+		S.items["m_" + it.maceta] = S.items.get("m_" + it.maceta, 0) + 1
 	if it.get("bolsa"):
 		S.items.bolsa = int(it.bolsa)
 	if it.get("aparato"):

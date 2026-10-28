@@ -278,7 +278,7 @@ func recibir_envio():
 		if it.get("item"):
 			S.items[it.item] += int(it.get("n", 1))
 		if it.get("maceta"):
-			S.items["m_" + it.maceta] += 1
+			S.items["m_" + it.maceta] = S.items.get("m_" + it.maceta, 0) + 1
 		if it.get("foco"):
 			S.items["f_" + it.foco] += 1
 		if it.get("extra"):
