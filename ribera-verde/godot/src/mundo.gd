@@ -3077,6 +3077,19 @@ func bt_entra(_mapa: String) -> void:
 func bt_obj(_x: int, _y: int, _o) -> bool:
 	return false
 
+func linea_lab(_nx: int, _ny: int) -> bool:
+	return false
+
+func aviso_linea() -> void:
+	pass
+
+func bt_zona(_z: String) -> bool:
+	return false
+
+# la sala de cultivo de KAIA (kaiacult.gd)
+func kc_cerrada() -> bool:
+	return false
+
 func bt_abierto() -> bool:
 	return false
 

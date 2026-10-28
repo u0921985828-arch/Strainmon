@@ -2,7 +2,7 @@ clave,es,en
 s6cba58f0,BANCO_TIA,
 sb0633d67, (sin fijar), (not fixed)
 sefbd28ea,Abre la cámara fría: una semilla de lo que hayas guardado cada {d} días.,Opens the cold room: one seed of whatever you have stored every {d} days.
-sd9dc17c5,"Abre el laboratorio: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea.","Opens the lab: stabilise with one seed instead of two, once a day and once per harvest of each line."
+s041595c6,"Abre el laboratorio, la puerta de al lado de la placa: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea, con las normas de un laboratorio de verdad.","Opens the lab, the door next to the plaque: stabilise with one seed instead of two, once a day and once per harvest of each line, under the rules of a real lab."
 s03db6a4c,"Abre la sala de catas: un lote analizado al día, sin analizador.","Opens the tasting room: one batch analysed a day, no analyser needed."
 see1a4f01,"Abre el archivo de la tía: cada día, una receta de sus cuadernos.","Opens your aunt's archive: every day, a recipe from her notebooks."
 sf7d10cb0,Abre el mostrador de los socios: cada {d} días te dejan un sobre con semillas de una landrace.,Opens the members' counter: every {d} days they leave you an envelope of landrace seeds.
@@ -13,11 +13,12 @@ s53749c37,"En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa,
 s37ab959c,"En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa, África, sierra, Asia... y uno solo: «Haize 98».","On each little drawer, a label in your aunt's hand: Kush, coast, Africa, sierra, Asia... and one on its own: «Haize 98»."
 sd45e1f6e,"Era su banco de semillas. Lo empezó para que las variedades del barrio no se perdieran, y lo dejó a medias.","It was her seed bank. She started it so the neighbourhood's strains wouldn't be lost, and left it half done."
 s16ed904c,"Si llenas los cajones, el cuarto vuelve a la vida. Entrega las colecciones en el fichero (dos semillas de cada variedad).",Fill the drawers and the room comes back to life. Hand in the collections at the cabinet (two seeds of each strain).
+sdc9d0bc0,puertaLabP,puertaLabP
+se1d8be4b,"La puerta del laboratorio, precintada con cinta. Se abre al entregar «{c}» en el fichero.","The lab door, sealed with tape. It opens when you hand in «{c}» at the card index."
 s1abe8030,btFichero,
 s22304b6a,btTapado,
 s75385b10,Un mueble tapado con una sábana llena de polvo. Se destapa al entregar su colección en el fichero.,Something under a dusty sheet. It is uncovered when you hand in its collection at the cabinet.
 s65b06edb,btCamara,
-s6757cacd,btLab,
 s49fef205,btCata,
 sdb7e7086,btArchivo,
 se4804f9c,btMostrador,
@@ -73,6 +74,63 @@ sf78d6ceb,2 semillas de {s},2 {s} seeds
 s0547d76d,Sigue el cuaderno azul de la tía: OBJETIVO → LA TÍA MAITE.,Follow your aunt's blue notebook: GOAL → AUNT MAITE.
 s4950c80c,"El banco de semillas de la tía, abierto. Cultiva, cruza y que no se pierda ninguna variedad.","Your aunt's seed bank, open. Grow, cross and don't let a single strain get lost."
 s677da29a,"Restaura el banco de semillas de la tía, en el cuarto de atrás de la asociación: {a}/{b} colecciones. La más cerca: «{n}».","Restore your aunt's seed bank, in the back room of the association: {a}/{b} collections. The closest: «{n}»."
+sf771f34e,LAB,LAB
+s84149bbe,Así no se trabaja en un laboratorio: nadie toca nada colocado ni bebido. Vuelve cuando se te pase.,That's no way to work in a lab: nobody touches anything high or drunk. Come back when it wears off.
+s5d18959b,"Sin las manos lavadas y la bata, las gafas y los guantes, aquí no se toca nada. Está todo en la antesala.","Without washed hands and the coat, goggles and gloves, nothing gets touched here. It's all in the anteroom."
+s0c494bbd,"El puesto, sin recoger: primero, lo usado al contenedor amarillo y la cabina limpia con alcohol.","The bench hasn't been cleared: first, the used stuff into the yellow bin and the cabinet wiped with alcohol."
+sfe7ca738,"El instrumental, sin esterilizar: las pinzas, el bisturí y las placas pasan antes por el autoclave, cada día.","The instruments aren't sterilised: tweezers, scalpel and dishes go through the autoclave first, every day."
+s91544de0,"La línea amarilla no se pasa sin lavarte las manos y ponerte la bata, las gafas y los guantes. El lavamanos y la percha, en la antesala.","You don't cross the yellow line without washing your hands and putting on the coat, goggles and gloves. The sink and the rack are in the anteroom."
+sf392a4e6,"Las manos, ya. Ahora la bata, las gafas y los guantes, en la percha: sin el EPI no se pasa la línea amarilla.","Hands done. Now the coat, goggles and gloves, on the rack: without the PPE you don't cross the yellow line."
+scf639848,"Antes de salir, en la antesala: los guantes al cubo, la bata a su percha con las gafas y las manos, otra vez al lavabo. El EPI no sale del laboratorio.","Before leaving, in the anteroom: gloves in the bin, coat on its rack with the goggles and hands back to the sink. The PPE doesn't leave the lab."
+s8955facc,"Azulejo blanco, el suelo sin juntas y una línea amarilla que parte la sala en dos. Huele a alcohol y a lejía.","White tiles, a seamless floor and a yellow line splitting the room in two. It smells of alcohol and bleach."
+s7e6e03bf,"Antes de la línea, la antesala: el lavamanos de pedal, la percha con las batas, las gafas y los guantes, y un cartel con las normas.","Before the line, the anteroom: the pedal sink, the rack with coats, goggles and gloves, and a sign with the rules."
+s86cda5d0,"Debajo del cartel, con la letra de la tía: «Aquí se trabaja como en un laboratorio de verdad, o no se trabaja».","Under the sign, in your aunt's handwriting: «Here we work like in a real lab, or we don't work»."
+s4ff5f585,LAS NORMAS DEL LABORATORIO,THE LAB RULES
+se173f361,"1. Antes de pasar la línea amarilla: las manos lavadas, la bata abrochada, las gafas y los guantes.","1. Before crossing the yellow line: hands washed, coat buttoned, goggles and gloves."
+sa64571da,"2. Aquí dentro no se come, no se bebe y no se fuma. Y en la nevera de las muestras, nada de comida.","2. No eating, drinking or smoking in here. And no food in the sample fridge."
+sa6a427fe,3. Nadie trabaja colocado ni bebido.,3. Nobody works high or drunk.
+s49ebcab3,"4. El instrumental se esteriliza en el autoclave antes de usarlo, cada día.","4. Instruments are sterilised in the autoclave before use, every day."
+s377e84f6,"5. Todo lo que toca las muestras va al contenedor amarillo, y el puesto se deja limpio. Cada placa y cada sobre, con su etiqueta: qué es, de quién y la fecha.","5. Everything that touches the samples goes in the yellow bin, and the bench is left clean. Every dish and every envelope labelled: what it is, whose and the date."
+s8056834a,"6. Antes de necesitarlos, se sabe dónde están la ducha, el lavaojos, el extintor y el botiquín.","6. Before you need them, you know where the shower, eyewash, extinguisher and first-aid kit are."
+s35406e4c,7. El EPI no sale del laboratorio: se deja en la antesala y las manos se lavan otra vez al salir.,7. PPE doesn't leave the lab: it stays in the anteroom and hands are washed again on the way out.
+s85faad33,"Firmado, con una hoja dibujada: M.","Signed, with a leaf drawn: M."
+s46d55a73,labNormas,labNormas
+s8ed68b55,labPila,labPila
+s58dcfcdd,"Con los guantes puestos, no: las manos se lavan antes de ponértelos y después de quitártelos.",Not with gloves on: hands are washed before putting them on and after taking them off.
+sbdc268d4,"Ya te has lavado las manos. Ahora, la percha.","You've already washed your hands. Now, the rack."
+s735e25e0,"Te lavas las manos con jabón, entre los dedos y hasta las muñecas, y te las secas con papel. El grifo, con el pedal.","You wash your hands with soap, between the fingers and up to the wrists, and dry them with paper. The tap, with the pedal."
+s1d5cc632,labPercha,labPercha
+sa6ab373d,"Ya llevas la bata abrochada, las gafas y los guantes.","You've already got the coat buttoned, the goggles and the gloves."
+sd5fcba88,"Antes de los guantes, las manos: el lavamanos está al lado.",Hands before gloves: the sink is right next to it.
+sa4d8b26b,"Te pones la bata y te la abrochas, las gafas y los guantes de nitrilo por encima de los puños. Ya puedes pasar la línea amarilla.","You put the coat on and button it, the goggles, and the nitrile gloves over the cuffs. Now you can cross the yellow line."
+s3cfd3390,labFlujo,labFlujo
+s7cd314c2,labAutoclave,labAutoclave
+seaf30246,"El instrumental de hoy ya está esterilizado, en sus botes con la cinta que cambia de color.","Today's instruments are already sterilised, in their jars with the colour-change tape."
+sf11df0a4,"El autoclave: el instrumental, a presión y con vapor, para que no lleve nada de fuera a las semillas. ¿Esterilizarlo ahora? Es media hora.","The autoclave: instruments under steam and pressure, so nothing from outside reaches the seeds. Sterilise them now? It takes half an hour."
+s31c91cf9,Esterilizar,Sterilise
+se453599c,"El instrumental, esterilizado: la cinta de los botes ha cambiado de color. Ya se puede trabajar en la cabina.",Instruments sterilised: the tape on the jars has changed colour. You can work at the cabinet now.
+s67f713d4,labResiduos,labResiduos
+s2240aea4,"Las placas, las puntas y lo que ha tocado las muestras, al contenedor amarillo. La cabina, limpia con alcohol. El puesto, listo.","Dishes, tips and whatever touched the samples into the yellow bin. The cabinet wiped with alcohol. The bench, ready."
+s0138122e,"El contenedor amarillo, para lo que toca las muestras, y el rojo, para lo que corta. Se los lleva un gestor autorizado: nada de eso va a la basura de casa.","The yellow bin is for what touches the samples, the red one for sharps. A licensed waste company collects them: none of it goes in the household rubbish."
+se643b528,labMicro,labMicro
+sc845a9c3,"Al microscopio, una semilla de cada línea: la cubierta, las vetas, si está madura. Lo que no se ve a simple vista se apunta en el cuaderno, con la fecha.","Under the microscope, one seed from each line: the shell, the stripes, whether it's ripe. What the naked eye misses goes in the notebook, with the date."
+s93cf2ab4,labBalanza,labBalanza
+s9462ae68,"La balanza de precisión, con su urna para que el aire no la mueva. Cada lote de semillas se pesa y se apunta: las vanas no llegan al peso.","The precision balance, with its draft shield so the air doesn't move it. Each seed batch is weighed and logged: the empty ones fall short."
+s02a49aa8,labEstufa,labEstufa
+sc6c5609f,"La estufa de germinación: las semillas, en placas a oscuras y a temperatura fija. Cada placa, con su etiqueta.","The germination incubator: seeds in dishes, in the dark at a fixed temperature. Every dish labelled."
+s1f42b4e7,labNevera,labNevera
+s829c42e5,"La nevera de las muestras: tubos y sobres, todos etiquetados. Ni comida ni bebida: es una de las normas.","The sample fridge: tubes and envelopes, all labelled. No food or drink: it's one of the rules."
+sa609e8a2,labDucha,labDucha
+scea33eab,"La ducha de emergencia: si te cae algo encima, se tira del triángulo y uno se queda debajo hasta quitárselo todo. Se prueba cada semana.","The emergency shower: if something spills on you, pull the triangle and stay under it until it's all off. It's tested every week."
+s5a4fade0,labLavaojos,labLavaojos
+s5e9d7cf4,"El lavaojos: si salpica algo a los ojos, se empuja la palanca y se lavan abiertos, sin frotar, un buen rato. Luego, al médico.","The eyewash: if something splashes your eyes, push the lever and rinse them open, without rubbing, for a good while. Then, to the doctor."
+s13fd5c95,labExtintor,labExtintor
+scff847cf,"El extintor de dióxido de carbono, el de los aparatos eléctricos, con la revisión al día en su etiqueta.","The carbon dioxide extinguisher, the one for electrical equipment, with its inspection up to date on the label."
+sf0a221fb,labBotiquin,labBotiquin
+s6c94ffce,"El botiquín: gasas, vendas, tiritas, suero y guantes. Al lado, con la letra de la tía, el teléfono de urgencias.","The first-aid kit: gauze, bandages, plasters, saline and gloves. Next to it, in your aunt's handwriting, the emergency number."
+s0cfb4005,labTaburete,labTaburete
+s1caa4bf7,"Un taburete de laboratorio, regulable y con ruedas.","A lab stool, adjustable and on castors."
+s72d67d11,"En el laboratorio no se come, no se bebe y no se fuma. Es la segunda norma del cartel.","No eating, drinking or smoking in the lab. It's the second rule on the sign."
 sbe658eaa,escZ,
 s3a223bdb,"La escalera del paso subterráneo, por debajo de las vías.","The stairs to the underpass, under the tracks."
 se7166571,"Te despiertas en el banco de la parada, con la cabeza a punto de estallar. Han pasado {h} horas.","You wake up on the bench at the stop, with your head about to burst. {h} hours have gone by."
@@ -1733,6 +1791,19 @@ s4929112a, · {g} g rosin, · {g} g rosin
 s52e4628c,EFECTIVO,CASH
 s26e3f421,FLORES,BUDS
 s99a32bef,ROSIN,ROSIN
+s23317412,KAIA_CULT,KAIA_CULT
+s066ae4c4,"La sala de cultivo de KAIA, cerrada. Hasta tener la licencia de cultivo, aquí dentro no se planta nada.","KAIA's grow room, locked. Until you have the cultivation licence, nothing gets planted in here."
+s3a4f2254,"El cuadro de la sala: el temporizador de los LED, la bomba del goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip pump and the climate. All automatic: long hours of light while they grow and fewer as soon as it's time to flower."
+saaa33220,Ordenar la sala,Arrange the room
+sefcb688d,"El depósito del goteo, con el abono ya mezclado. La bomba lo lleva a cada maceta cuando la tierra se seca.","The drip tank, with the nutrients already mixed in. The pump takes it to each pot when the soil dries out."
+se0c09aef,"La bomba y el programador del riego por goteo: un gotero por maceta, a la tierra y no a las hojas.","The drip irrigation pump and timer: one dripper per pot, onto the soil and not the leaves."
+sbc6dc006,"La extracción, con sus filtros de carbón: el aire de la sala sale limpio y sin olor, como pide la licencia.","The extraction, with its carbon filters: the room's air leaves clean and odourless, as the licence requires."
+s100c7a74,"Sin la licencia de cultivo, las carpas se quedan vacías.","Without the cultivation licence, the tents stay empty."
+s1d69b400,Plaza {n},Spot {n}
+s752e7823,{st} {p}% · Agua {w}% · Salud {h}%,{st} {p}% · Water {w}% · Health {h}%
+s538df21c,vacía,empty
+sbaef3c8b,Una maceta de tela con su gotero.,A fabric pot with its dripper.
+se404e6e7,LA CARPA {n},TENT {n}
 s4e58915c,CANNADEX,CANNADEX
 s570950d9,GENOTECA,GENEBANK
 s2511e675,MOCHILA,BAG
@@ -2447,7 +2518,6 @@ sd5734ed9,^(bedT|pc|gpc|.*2)$,
 s5742a7d0,Arrancar y plantar,Uproot and plant
 s57660f91,Abono,Nutrients
 s132c9f36,Focos,Lights
-s538df21c,vacía,empty
 se7b42179,"Mesa {i} · {que} · {foco}
 {cuida}","Table {i} · {que} · {foco}
 {cuida}"
@@ -4763,6 +4833,18 @@ sf544e072,Pista de los acantilados,Cliff track
 sf31f4075,Carretera de la ribera,Riverside road
 sb7900600,btTapado2,
 s3c163021,btFichero2,
+s550ff518,iwT_lab,iwT_lab
+sbaaf973a,iwB_lab,iwB_lab
+sba9c4bf6,floorLab,floorLab
+sf90c2954,floorLabL,floorLabL
+seae6d07a,labFlujo2,labFlujo2
+s2f865542,labMicro2,labMicro2
+sd64a06b2,labBalanza2,labBalanza2
+s70f641bf,carpaK0,carpaK0
+s07f17129,carpaK1,carpaK1
+s9ef82093,carpaK2,carpaK2
+s68b6a0a2,tanqueN,tanqueN
+s516bd93e,riegoN,riegoN
 s30a02292,ESTUDIANTE,STUDENT
 sf07acb89,Hola. Me ha dicho un amigo que tienes.,Hi. A friend said you've got some.
 s42927016,"Aupa, ¿tienes algo? Voy justo de dinero.","Hey, got anything? I'm a bit short on cash."
@@ -5721,8 +5803,6 @@ s207d87cf,Mide el riego y dosifica el abono sola en cada riego.,Measures the wat
 s2fe99616,apañada,makeshift
 sf62fb426,en marcha,up and running
 s23c85b4e,de concurso,award-grade
-s68b6a0a2,tanqueN,tanqueN
-s516bd93e,riegoN,riegoN
 s115d1f40,¡Esta canción es la mejor!,This song is the best!
 sabf5235f,"No pares, que viene el estribillo.","Don't stop, the chorus is coming."
 se2d96a12,Vengo cada sábado. El DJ es amigo mío.,I come every Saturday. The DJ's a mate.
@@ -5847,12 +5927,17 @@ sd03524ba,El tanque del riego,The irrigation tank
 s5965fef2,ORDENAR KAIA,ARRANGE KAIA
 sb61b234e,Los sofás de la izquierda,
 sd467cb00,Los sofás de la derecha,
+s4abfe96e,ORDENAR LA SALA DE CULTIVO,ARRANGE THE GROW ROOM
+sc9f664d2,La carpa 1,Tent 1
+s50ff3568,La carpa 2,Tent 2
+s27f805fe,La carpa 3,Tent 3
 sca19c6c2,Ahí no cabe.,It won't fit there.
 sc20453b7,Ahí ya hay algo.,Something's already there.
 s13045d4c,Ese hueco es para la carpa.,That spot is for the tent.
 s6ec04784,Ahí estás tú.,You're standing there.
 s28deb4b2,Así no se podría pasar.,Nobody could get past.
 s4c2ac553,La manguera no llegaría a todas las mesas.,The hose wouldn't reach every table.
+sd0b04296,"Las carpas, en la zona de cultivo: sobre el suelo con desagüe, no en el pasillo.","Tents go in the grow area: on the floor with the drain, not in the corridor."
 s85e53511,Xabier,Xabier
 sd32b800f,Rosario,Rosario
 s98d0677a,Eneko,Eneko
@@ -6192,6 +6277,10 @@ se214212e,La puerta de la habitación,The bedroom door
 sa9f08b09,La puerta del almacén,The storeroom door
 sb60b0cf4,La puerta del cuarto de atrás,The back room door
 sc9735661,La puerta del club,The club door
+sc89fe1ec,La puerta de la sala de cultivo,The grow room door
+s446c7f58,puertaLab,puertaLab
+s03e0a1f7,La puerta del laboratorio,The lab door
+sf3113d61,La puerta del banco,The bank door
 scdff8331,Habilitar el sótano,Fit out the basement
 s853c4fc0,"El sótano de debajo del piso, que la tía usaba de trastero: sacar los trastos, impermeabilizar, luz, un desagüe y tres estanterías de rejilla. Oscuro y húmedo: para setas. Las bandejas te las prepara Txomin (Kale Zaharra). Los obreros acaban en un día.","The basement under the flat, Auntie's junk room: clear the junk, waterproof, lights, a drain and three wire shelves. Dark and damp: for mushrooms. Txomin (Kale Zaharra) preps the trays. The builders finish in a day."
 s355e1a74,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos. Con una obra (MÓVIL → Tienda online) se podría usar.","The stairs go down to Auntie's basement: dark, damp and full of junk. With some work (PHONE → Online shop) it could be used."
@@ -6759,6 +6848,7 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+sd9dc17c5,"Abre el laboratorio: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea.","Opens the lab: stabilise with one seed instead of two, once a day and once per harvest of each line."
 s849eb6f1,"Abre el laboratorio: estabilizar con una semilla en vez de dos, una vez al día.","Opens the lab: stabilise with one seed instead of two, once a day."
 scba6d27f,"El apeadero del tren de la comarca: la caseta, la marquesina y la vía detrás. Pasa uno cada media hora.","The local railway halt: the hut, the shelter and the track behind. A train comes every half hour."
 sb3829eeb,Bajas del tren en {d} y sales a la parada.,You get off the train in {d} and walk out to the stop.

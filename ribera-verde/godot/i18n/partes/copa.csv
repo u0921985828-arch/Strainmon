@@ -543,3 +543,94 @@ La placa de la tía,Your aunt's plaque
 "Cada generación es una cosecha: cultiva la línea y vuelve con lo cosechado.","Each generation is a harvest: grow the line and come back with what you harvested."
 "«Si ya tienes la Haze fijada, guárdala bien: el banco la necesita.»","“If you already have the Haze fixed, keep it safe: the bank needs it.”"
 "«Si ya tienes la Haize fijada, guárdala bien: el banco la necesita.»","“If you already have the Haize fixed, keep it safe: the bank needs it.”"
+"Abre el laboratorio, la puerta de al lado de la placa: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea, con las normas de un laboratorio de verdad.","Opens the lab, the door next to the plaque: stabilise with one seed instead of two, once a day and once per harvest of each line, under the rules of a real lab."
+"La puerta del laboratorio, precintada con cinta. Se abre al entregar «{c}» en el fichero.","The lab door, sealed with tape. It opens when you hand in «{c}» at the card index."
+Así no se trabaja en un laboratorio: nadie toca nada colocado ni bebido. Vuelve cuando se te pase.,That's no way to work in a lab: nobody touches anything high or drunk. Come back when it wears off.
+"Sin las manos lavadas y la bata, las gafas y los guantes, aquí no se toca nada. Está todo en la antesala.","Without washed hands and the coat, goggles and gloves, nothing gets touched here. It's all in the anteroom."
+"El puesto, sin recoger: primero, lo usado al contenedor amarillo y la cabina limpia con alcohol.","The bench hasn't been cleared: first, the used stuff into the yellow bin and the cabinet wiped with alcohol."
+"El instrumental, sin esterilizar: las pinzas, el bisturí y las placas pasan antes por el autoclave, cada día.","The instruments aren't sterilised: tweezers, scalpel and dishes go through the autoclave first, every day."
+"La línea amarilla no se pasa sin lavarte las manos y ponerte la bata, las gafas y los guantes. El lavamanos y la percha, en la antesala.","You don't cross the yellow line without washing your hands and putting on the coat, goggles and gloves. The sink and the rack are in the anteroom."
+"Las manos, ya. Ahora la bata, las gafas y los guantes, en la percha: sin el EPI no se pasa la línea amarilla.","Hands done. Now the coat, goggles and gloves, on the rack: without the PPE you don't cross the yellow line."
+"Antes de salir, en la antesala: los guantes al cubo, la bata a su percha con las gafas y las manos, otra vez al lavabo. El EPI no sale del laboratorio.","Before leaving, in the anteroom: gloves in the bin, coat on its rack with the goggles and hands back to the sink. The PPE doesn't leave the lab."
+"Azulejo blanco, el suelo sin juntas y una línea amarilla que parte la sala en dos. Huele a alcohol y a lejía.","White tiles, a seamless floor and a yellow line splitting the room in two. It smells of alcohol and bleach."
+"Antes de la línea, la antesala: el lavamanos de pedal, la percha con las batas, las gafas y los guantes, y un cartel con las normas.","Before the line, the anteroom: the pedal sink, the rack with coats, goggles and gloves, and a sign with the rules."
+"Debajo del cartel, con la letra de la tía: «Aquí se trabaja como en un laboratorio de verdad, o no se trabaja».","Under the sign, in your aunt's handwriting: «Here we work like in a real lab, or we don't work»."
+LAS NORMAS DEL LABORATORIO,THE LAB RULES
+"1. Antes de pasar la línea amarilla: las manos lavadas, la bata abrochada, las gafas y los guantes.","1. Before crossing the yellow line: hands washed, coat buttoned, goggles and gloves."
+"2. Aquí dentro no se come, no se bebe y no se fuma. Y en la nevera de las muestras, nada de comida.","2. No eating, drinking or smoking in here. And no food in the sample fridge."
+3. Nadie trabaja colocado ni bebido.,3. Nobody works high or drunk.
+"4. El instrumental se esteriliza en el autoclave antes de usarlo, cada día.","4. Instruments are sterilised in the autoclave before use, every day."
+"5. Todo lo que toca las muestras va al contenedor amarillo, y el puesto se deja limpio. Cada placa y cada sobre, con su etiqueta: qué es, de quién y la fecha.","5. Everything that touches the samples goes in the yellow bin, and the bench is left clean. Every dish and every envelope labelled: what it is, whose and the date."
+"6. Antes de necesitarlos, se sabe dónde están la ducha, el lavaojos, el extintor y el botiquín.","6. Before you need them, you know where the shower, eyewash, extinguisher and first-aid kit are."
+7. El EPI no sale del laboratorio: se deja en la antesala y las manos se lavan otra vez al salir.,7. PPE doesn't leave the lab: it stays in the anteroom and hands are washed again on the way out.
+"Firmado, con una hoja dibujada: M.","Signed, with a leaf drawn: M."
+"Con los guantes puestos, no: las manos se lavan antes de ponértelos y después de quitártelos.",Not with gloves on: hands are washed before putting them on and after taking them off.
+"Ya te has lavado las manos. Ahora, la percha.","You've already washed your hands. Now, the rack."
+"Te lavas las manos con jabón, entre los dedos y hasta las muñecas, y te las secas con papel. El grifo, con el pedal.","You wash your hands with soap, between the fingers and up to the wrists, and dry them with paper. The tap, with the pedal."
+"Ya llevas la bata abrochada, las gafas y los guantes.","You've already got the coat buttoned, the goggles and the gloves."
+"Antes de los guantes, las manos: el lavamanos está al lado.",Hands before gloves: the sink is right next to it.
+"Te pones la bata y te la abrochas, las gafas y los guantes de nitrilo por encima de los puños. Ya puedes pasar la línea amarilla.","You put the coat on and button it, the goggles, and the nitrile gloves over the cuffs. Now you can cross the yellow line."
+"El instrumental de hoy ya está esterilizado, en sus botes con la cinta que cambia de color.","Today's instruments are already sterilised, in their jars with the colour-change tape."
+"El autoclave: el instrumental, a presión y con vapor, para que no lleve nada de fuera a las semillas. ¿Esterilizarlo ahora? Es media hora.","The autoclave: instruments under steam and pressure, so nothing from outside reaches the seeds. Sterilise them now? It takes half an hour."
+Esterilizar,Sterilise
+"El instrumental, esterilizado: la cinta de los botes ha cambiado de color. Ya se puede trabajar en la cabina.",Instruments sterilised: the tape on the jars has changed colour. You can work at the cabinet now.
+"Las placas, las puntas y lo que ha tocado las muestras, al contenedor amarillo. La cabina, limpia con alcohol. El puesto, listo.","Dishes, tips and whatever touched the samples into the yellow bin. The cabinet wiped with alcohol. The bench, ready."
+"El contenedor amarillo, para lo que toca las muestras, y el rojo, para lo que corta. Se los lleva un gestor autorizado: nada de eso va a la basura de casa.","The yellow bin is for what touches the samples, the red one for sharps. A licensed waste company collects them: none of it goes in the household rubbish."
+"Al microscopio, una semilla de cada línea: la cubierta, las vetas, si está madura. Lo que no se ve a simple vista se apunta en el cuaderno, con la fecha.","Under the microscope, one seed from each line: the shell, the stripes, whether it's ripe. What the naked eye misses goes in the notebook, with the date."
+"La balanza de precisión, con su urna para que el aire no la mueva. Cada lote de semillas se pesa y se apunta: las vanas no llegan al peso.","The precision balance, with its draft shield so the air doesn't move it. Each seed batch is weighed and logged: the empty ones fall short."
+"La estufa de germinación: las semillas, en placas a oscuras y a temperatura fija. Cada placa, con su etiqueta.","The germination incubator: seeds in dishes, in the dark at a fixed temperature. Every dish labelled."
+"La nevera de las muestras: tubos y sobres, todos etiquetados. Ni comida ni bebida: es una de las normas.","The sample fridge: tubes and envelopes, all labelled. No food or drink: it's one of the rules."
+"La ducha de emergencia: si te cae algo encima, se tira del triángulo y uno se queda debajo hasta quitárselo todo. Se prueba cada semana.","The emergency shower: if something spills on you, pull the triangle and stay under it until it's all off. It's tested every week."
+"El lavaojos: si salpica algo a los ojos, se empuja la palanca y se lavan abiertos, sin frotar, un buen rato. Luego, al médico.","The eyewash: if something splashes your eyes, push the lever and rinse them open, without rubbing, for a good while. Then, to the doctor."
+"El extintor de dióxido de carbono, el de los aparatos eléctricos, con la revisión al día en su etiqueta.","The carbon dioxide extinguisher, the one for electrical equipment, with its inspection up to date on the label."
+"El botiquín: gasas, vendas, tiritas, suero y guantes. Al lado, con la letra de la tía, el teléfono de urgencias.","The first-aid kit: gauze, bandages, plasters, saline and gloves. Next to it, in your aunt's handwriting, the emergency number."
+"Un taburete de laboratorio, regulable y con ruedas.","A lab stool, adjustable and on castors."
+"En el laboratorio no se come, no se bebe y no se fuma. Es la segunda norma del cartel.","No eating, drinking or smoking in the lab. It's the second rule on the sign."
+La puerta del laboratorio,The lab door
+La puerta del banco,The bank door
+puertaLabP,puertaLabP
+LAB,LAB
+labNormas,labNormas
+labPila,labPila
+labPercha,labPercha
+labFlujo,labFlujo
+labAutoclave,labAutoclave
+labResiduos,labResiduos
+labMicro,labMicro
+labBalanza,labBalanza
+labEstufa,labEstufa
+labNevera,labNevera
+labDucha,labDucha
+labLavaojos,labLavaojos
+labExtintor,labExtintor
+labBotiquin,labBotiquin
+labTaburete,labTaburete
+iwT_lab,iwT_lab
+iwB_lab,iwB_lab
+floorLab,floorLab
+floorLabL,floorLabL
+labFlujo2,labFlujo2
+labMicro2,labMicro2
+labBalanza2,labBalanza2
+puertaLab,puertaLab
+"La sala de cultivo de KAIA, cerrada. Hasta tener la licencia de cultivo, aquí dentro no se planta nada.","KAIA's grow room, locked. Until you have the cultivation licence, nothing gets planted in here."
+"El cuadro de la sala: el temporizador de los LED, la bomba del goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip pump and the climate. All automatic: long hours of light while they grow and fewer as soon as it's time to flower."
+Ordenar la sala,Arrange the room
+"El depósito del goteo, con el abono ya mezclado. La bomba lo lleva a cada maceta cuando la tierra se seca.","The drip tank, with the nutrients already mixed in. The pump takes it to each pot when the soil dries out."
+"La bomba y el programador del riego por goteo: un gotero por maceta, a la tierra y no a las hojas.","The drip irrigation pump and timer: one dripper per pot, onto the soil and not the leaves."
+"La extracción, con sus filtros de carbón: el aire de la sala sale limpio y sin olor, como pide la licencia.","The extraction, with its carbon filters: the room's air leaves clean and odourless, as the licence requires."
+"Sin la licencia de cultivo, las carpas se quedan vacías.","Without the cultivation licence, the tents stay empty."
+Plaza {n},Spot {n}
+{st} {p}% · Agua {w}% · Salud {h}%,{st} {p}% · Water {w}% · Health {h}%
+Una maceta de tela con su gotero.,A fabric pot with its dripper.
+LA CARPA {n},TENT {n}
+ORDENAR LA SALA DE CULTIVO,ARRANGE THE GROW ROOM
+La carpa 1,Tent 1
+La carpa 2,Tent 2
+La carpa 3,Tent 3
+"Las carpas, en la zona de cultivo: sobre el suelo con desagüe, no en el pasillo.","Tents go in the grow area: on the floor with the drain, not in the corridor."
+La puerta de la sala de cultivo,The grow room door
+KAIA_CULT,KAIA_CULT
+carpaK0,carpaK0
+carpaK1,carpaK1
+carpaK2,carpaK2

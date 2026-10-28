@@ -174,14 +174,14 @@ func _corre() -> void:
 	chk(corre(func(): await J.object_action(9, 1)) and J.S.map == MP and J.P.x == 1 and J.P.y == 2 and dicho("banco de semillas"), "dentro, con la presentación (%s %d,%d)" % [J.S.map, J.P.x, J.P.y])
 	var m: Dictionary = J.MAPS[MP]
 	chk(m.o[3][6] == "btFichero" and m.o[3][7] == "btFichero2", "el fichero")
-	chk(B.zonas.keys().all(func(z): return z == "placa" or m.o[int(B.zonas[z].y)][int(B.zonas[z].x)] == "btTapado"), "todo tapado")
+	chk(B.zonas.keys().all(func(z): return z == "placa" or m.o[int(B.zonas[z].y)][int(B.zonas[z].x)] == ("puertaLabP" if B.zonas[z].get("puerta") else "btTapado")), "todo tapado, y el laboratorio precintado")
 	chk(m.o[1][6] == null, "sin la placa")
 	var v := alcance_d(MP)
 	for z in B.zonas:
 		if z == "placa":
 			continue
 		var Z: Dictionary = B.zonas[z]
-		chk(delante(v, int(Z.x), int(Z.y)) and delante(v, int(Z.x) + 1, int(Z.y)), "%s: se llega" % z)
+		chk(delante(v, int(Z.x), int(Z.y)) and (Z.get("puerta") or delante(v, int(Z.x) + 1, int(Z.y))), "%s: se llega" % z)
 	chk(delante(v, 6, 3), "el fichero: se llega")
 	# 5 · entregar: sin semillas, no; con ellas, se destapa
 	LOG = []
@@ -211,27 +211,13 @@ func _corre() -> void:
 			J.S.seeds[sid] = int(J.S.seeds.get(sid, 0)) + int(J.bt_col(id).get("k", B.k))
 		QUIERO = [String(J.bt_col(id).n), "Entregar", "Volver"]
 		return corre(func(): await J.object_action(6, 3)) and J.bt_hecha(id)
-	chk(da.call("costa") and m.o[5][2] == "btLab", "la costa: el laboratorio")
+	LOG = []
+	chk(corre(func(): await J.object_action(8, 1)) and J.S.map == MP and dicho("precintada"), "el laboratorio, precintado hasta su colección")
+	chk(da.call("costa") and m.o[1][8] == "puertaLab", "la costa: la puerta del laboratorio")
 	LOG = []
 	QUIERO = ["La Haze", "Volver"]
 	chk(corre(func(): await J.object_action(6, 3)) and dicho("último cajón"), "la Haze del 98, la última")
-	J.S.gen.txoko = 1
-	J.S.seeds.txoko = 1
-	LOG = []
-	QUIERO = [J.strain("txoko").n, "Estabilizar"]
-	chk(corre(func(): await J.object_action(2, 5)) and Cultivo.gen_de(J.S, "txoko") == 1 and dicho("Cada generación"), "sin cosechar la línea, no")
-	J.cult_apunta("txoko")
-	QUIERO = [J.strain("txoko").n, "Cancelar"]
-	chk(corre(func(): await J.object_action(2, 5)) and Cultivo.gen_de(J.S, "txoko") == 1 and not J.bt().has("lab"), "cancelar no gasta el día")
-	QUIERO = [J.strain("txoko").n, "Estabilizar"]
-	chk(corre(func(): await J.object_action(2, 5)) and Cultivo.gen_de(J.S, "txoko") == 2 and int(J.S.seeds.get("txoko", 0)) == 1, "estabilizada con una: F%d, %d semillas" % [Cultivo.gen_de(J.S, "txoko"), int(J.S.seeds.get("txoko", 0))])
-	LOG = []
-	QUIERO = [J.strain("txoko").n, "Estabilizar"]
-	chk(corre(func(): await J.object_action(3, 5)) and Cultivo.gen_de(J.S, "txoko") == 2 and dicho("mañana"), "una vez al día")
-	J.S.day = int(J.S.day) + 1
-	LOG = []
-	QUIERO = [J.strain("txoko").n, "Estabilizar"]
-	chk(corre(func(): await J.object_action(2, 5)) and Cultivo.gen_de(J.S, "txoko") == 2 and dicho("Cada generación"), "al día siguiente, sin otra cosecha, no")
+	await laboratorio()
 	# 8 · la sala de catas: un análisis al día
 	chk(da.call("africa") and m.o[5][8] == "btCata", "África: la sala de catas")
 	J.S.buds = {"ria": {"g": 30.0, "thc": 14.0, "dia": int(J.S.day)}}
@@ -290,6 +276,115 @@ func _corre() -> void:
 	quit(1 if fallos.size() else 0)
 
 # lo andable del cuarto desde la puerta
+# 7 · el laboratorio (lo pidió el usuario: «debe parecer un laboratorio de verdad… las normas que tienes que tener en un laboratorio
+# real»): la sala aparte, su equipo, la línea amarilla con el EPI, las manos antes que los guantes, nada de catar, sereno, el
+# autoclave de cada día, lo usado al contenedor, estabilizar con una y el EPI que no sale
+func anda(d: String) -> bool:
+	J.P.moving = false
+	J.try_move(d)
+	var ok := corre(func(): pass)
+	J.P.moving = false   # el paso, ya dado (la prueba no anda el fotograma)
+	return ok
+
+func laboratorio() -> void:
+	var MP: String = J.D.BANCO_TIA.mapa
+	var L: String = J.D.LAB.mapa
+	LOG = []
+	chk(corre(func(): await J.object_action(8, 1)) and J.S.map == L and J.P.x == 1 and J.P.y == 2 and dicho("línea amarilla"), "dentro del laboratorio, con su presentación (%s)" % J.S.map)
+	var lm: Dictionary = J.MAPS[L]
+	var hay := {}
+	for r in lm.o:
+		for o in r:
+			if o:
+				hay[String(o).trim_suffix("2")] = true
+	for k in ["labNormas", "labPercha", "labPila", "labDucha", "labLavaojos", "labExtintor", "labBotiquin", "labFlujo", "labAutoclave", "labEstufa", "labNevera", "labMicro", "labBalanza", "labResiduos"]:
+		chk(hay.has(k), "en el laboratorio: %s" % k)
+	chk(lm.g[2][int(J.D.LAB.linea)] == "floorLabL" and lm.g[7][int(J.D.LAB.linea)] == "floorLabL", "la línea amarilla, de pared a pared")
+	var v := alcance_d(L)
+	for y in lm.h:
+		for x in lm.w:
+			if lm.o[y][x] and not String(lm.o[y][x]).ends_with("2"):
+				chk(delante(v, x, y), "se llega a %s (%d, %d)" % [lm.o[y][x], x, y])
+	# la línea amarilla, sin nada
+	J.P.x = 4
+	J.P.y = 3
+	LOG = []
+	chk(anda("right") and J.P.x == 4 and dicho("sin lavarte las manos"), "sin lavarte ni el EPI, no se pasa la línea")
+	LOG = []
+	chk(corre(func(): await J.object_action(2, 2)) and not J.lab().get("e") and dicho("Antes de los guantes"), "los guantes, después de las manos")
+	chk(corre(func(): await J.object_action(3, 2)) and J.lab().get("m") == true, "las manos, lavadas")
+	LOG = []
+	chk(anda("right") and J.P.x == 4 and dicho("Ahora la bata"), "con las manos, pero sin el EPI, tampoco")
+	chk(corre(func(): await J.object_action(2, 2)) and J.lab().get("e") == true, "la bata, las gafas y los guantes")
+	LOG = []
+	chk(corre(func(): await J.object_action(3, 2)) and dicho("Con los guantes puestos"), "con los guantes no se lavan las manos")
+	chk(anda("right") and J.P.x == 5, "con el EPI, se pasa la línea")
+	# nada de catar dentro, y sereno
+	J.S.buds = {"ria": {"g": 30.0, "thc": 14.0, "dia": int(J.S.day)}}
+	LOG = []
+	chk(corre(func(): await J.catar("ria", .5)) and is_equal_approx(float(J.S.buds.ria.g), 30.0) and dicho("no se fuma"), "en el laboratorio no se cata")
+	J.S.colo = 60.0
+	LOG = []
+	QUIERO = ["Esterilizar"]
+	chk(corre(func(): await J.object_action(9, 2)) and not J.lab().has("at") and dicho("colocado"), "colocado, no se trabaja")
+	J.S.colo = 0.0
+	# el autoclave, antes de la cabina
+	J.S.gen.txoko = 1
+	J.S.seeds.txoko = 1
+	LOG = []
+	QUIERO = [J.strain("txoko").n, "Estabilizar"]
+	chk(corre(func(): await J.object_action(6, 2)) and Cultivo.gen_de(J.S, "txoko") == 1 and dicho("sin esterilizar"), "sin el autoclave, la cabina no")
+	var mn0 := int(J.S.day) * 1440 + int(J.S.min)
+	QUIERO = ["Esterilizar"]
+	chk(corre(func(): await J.object_action(9, 2)) and int(J.lab().get("at", -1)) == int(J.S.day) and int(J.S.day) * 1440 + int(J.S.min) - mn0 == int(J.D.LAB.esteril), "el autoclave: esterilizado, media hora")
+	LOG = []
+	QUIERO = [J.strain("txoko").n, "Estabilizar"]
+	chk(corre(func(): await J.object_action(6, 2)) and Cultivo.gen_de(J.S, "txoko") == 1 and dicho("Cada generación"), "sin cosechar la línea, no")
+	J.cult_apunta("txoko")
+	QUIERO = [J.strain("txoko").n, "Cancelar"]
+	chk(corre(func(): await J.object_action(7, 2)) and Cultivo.gen_de(J.S, "txoko") == 1 and not J.bt().has("lab"), "cancelar no gasta el día")
+	QUIERO = [J.strain("txoko").n, "Estabilizar"]
+	LOG = []
+	var ok_e := corre(func(): await J.object_action(6, 2))
+	chk(ok_e and Cultivo.gen_de(J.S, "txoko") == 2 and int(J.S.seeds.get("txoko", 0)) == 1 and J.lab().get("r") == true, "estabilizada con una: F%d, %d semillas, lo usado sin tirar" % [Cultivo.gen_de(J.S, "txoko"), int(J.S.seeds.get("txoko", 0))])
+	LOG = []
+	QUIERO = [J.strain("txoko").n, "Estabilizar"]
+	chk(corre(func(): await J.object_action(6, 2)) and Cultivo.gen_de(J.S, "txoko") == 2 and dicho("mañana"), "una vez al día")
+	J.S.day = int(J.S.day) + 1
+	J.cult_apunta("txoko")
+	LOG = []
+	QUIERO = [J.strain("txoko").n, "Estabilizar"]
+	chk(corre(func(): await J.object_action(6, 2)) and Cultivo.gen_de(J.S, "txoko") == 2 and dicho("sin recoger"), "lo de ayer, sin tirar: no")
+	chk(corre(func(): await J.object_action(11, 6)) and not J.lab().get("r"), "lo usado, al contenedor amarillo")
+	LOG = []
+	QUIERO = [J.strain("txoko").n, "Estabilizar"]
+	chk(corre(func(): await J.object_action(6, 2)) and Cultivo.gen_de(J.S, "txoko") == 2 and dicho("sin esterilizar"), "otro día, otra vez el autoclave")
+	QUIERO = ["Esterilizar"]
+	corre(func(): await J.object_action(9, 2))
+	QUIERO = [J.strain("txoko").n, "Estabilizar"]
+	chk(corre(func(): await J.object_action(6, 2)) and Cultivo.gen_de(J.S, "txoko") == 3, "con todo en regla, la F3 (F%d)" % Cultivo.gen_de(J.S, "txoko"))
+	J.S.day = int(J.S.day) + 1
+	LOG = []
+	QUIERO = [J.strain("txoko").n, "Estabilizar"]
+	corre(func(): await J.object_action(11, 6))
+	QUIERO = ["Esterilizar"]
+	corre(func(): await J.object_action(9, 2))
+	QUIERO = [J.strain("txoko").n, "Estabilizar"]
+	chk(corre(func(): await J.object_action(6, 2)) and Cultivo.gen_de(J.S, "txoko") == 3 and dicho("Cada generación"), "al día siguiente, sin otra cosecha, no")
+	LOG = []
+	chk(corre(func(): await J.object_action(0, 1)) and dicho("LAS NORMAS") or dicho("1. Antes de pasar"), "el cartel de las normas")
+	# el EPI no sale del laboratorio
+	J.P.x = 1
+	J.P.y = 2
+	LOG = []
+	chk(corre(func(): await J.object_action(1, 1)) and J.S.map == MP and J.P.x == 8 and J.P.y == 2 and not J.lab().get("e") and dicho("El EPI no sale"), "al salir, el EPI se queda en la antesala (%s)" % J.S.map)
+	J.lab().m = true
+	chk(corre(func(): await J.object_action(8, 1)) and J.S.map == L and not J.lab().get("m") and not J.lab().get("e"), "al volver a entrar, otra vez las manos y el EPI")
+	J.P.x = 1
+	J.P.y = 2
+	corre(func(): await J.object_action(1, 1))
+	chk(J.S.map == MP, "de vuelta en el cuarto")
+
 func alcance_d(mapa: String) -> Dictionary:
 	var m: Dictionary = J.MAPS[mapa]
 	var q := [[1, 2]]

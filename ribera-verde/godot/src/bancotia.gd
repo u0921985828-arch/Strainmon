@@ -72,7 +72,7 @@ func bt_premio(z: String) -> String:
 		"camara":
 			return T("Abre la cámara fría: una semilla de lo que hayas guardado cada {d} días.", {"d": int(B.saca)})
 		"lab":
-			return K("Abre el laboratorio: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea.")
+			return K("Abre el laboratorio, la puerta de al lado de la placa: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea, con las normas de un laboratorio de verdad.")
 		"cata":
 			return K("Abre la sala de catas: un lote analizado al día, sin analizador.")
 		"archivo":
@@ -98,7 +98,9 @@ func bt_entra(mapa: String) -> void:
 		var z: Dictionary = D.BANCO_TIA.zonas[k]
 		var x := int(z.x)
 		var y := int(z.y)
-		if k == "placa":
+		if z.get("puerta"):   # el laboratorio, una sala aparte: la puerta precintada hasta que se restaura
+			m.o[y][x] = z.o if bt_zona(k) else "puertaLabP"   # i18n-no
+		elif k == "placa":
 			m.o[y][x] = z.o if bt_zona(k) else null
 			m.o[y][x + 1] = (z.o + "2") if bt_zona(k) else null
 		else:
@@ -115,10 +117,17 @@ func bt_intro() -> void:
 		T("Si llenas los cajones, el cuarto vuelve a la vida. Entrega las colecciones en el fichero (dos semillas de cada variedad).")])
 
 # A en un mueble del cuarto (calle.gd, object_action)
-func bt_obj(_x: int, _y: int, o) -> bool:
-	if not Datos.CAL or not D.has("BANCO_TIA") or S.map != String(D.BANCO_TIA.mapa) or not (o is String):
+func bt_obj(x: int, y: int, o) -> bool:
+	if not Datos.CAL or not D.has("BANCO_TIA") or not (o is String):
+		return false
+	if en_lab():
+		return await lab_obj(x, y, o)
+	if S.map != String(D.BANCO_TIA.mapa):
 		return false
 	var b: String = o.trim_suffix("2")
+	if b == "puertaLabP":
+		await say(T("La puerta del laboratorio, precintada con cinta. Se abre al entregar «{c}» en el fichero.", {"c": I18n.v(String(bt_col_z("lab").get("n", "")))}))
+		return true
 	if b == "btFichero":
 		await bt_menu(false)
 		return true
@@ -128,8 +137,6 @@ func bt_obj(_x: int, _y: int, o) -> bool:
 	match b:
 		"btCamara":
 			await bt_camara()
-		"btLab":
-			await bt_lab()
 		"btCata":
 			await bt_cata()
 		"btArchivo":
@@ -226,6 +233,10 @@ func bt_lab() -> void:
 	if bt_espera("lab", 1) > 0:
 		await say(K("El laboratorio, por hoy, ya está. Vuelve mañana."))
 		return
+	var no := lab_norma(true)
+	if no != "":
+		await say(no)
+		return
 	var l: Array = S.seeds.keys().filter(func(sid): return int(S.seeds[sid]) >= 1 and Cultivo.gen_de(S, sid) < int(D.GEN_ESTABLE))
 	if l.is_empty():
 		await say(K("En el laboratorio se fija una línea con una sola semilla. Ahora no tienes ninguna sin fijar."))
@@ -242,6 +253,7 @@ func bt_lab() -> void:
 	var cn := bt_cos(l[i])
 	if await estabilizar(l[i], 1):
 		bt().lab = int(S.day)
+		lab().r = true   # lo usado, al contenedor amarillo
 		if not bt().has("lc"):
 			bt().lc = {}
 		bt().lc[l[i]] = cn
@@ -338,3 +350,163 @@ func bt_objetivo() -> String:
 
 func bt_derecha() -> String:
 	return "%d/%d" % [bt_n(), D.BANCO_TIA.col.size()]
+
+# ---------- el laboratorio (lo pidió el usuario: «El laboratorio debe parecer un laboratorio de verdad, no los materiales de labo y
+# ya, las normas que tienes que tener en un laboratorio real»): lab-rv (LAB, de tools/banco_tia.py), por la puerta de al lado de la
+# placa. La antesala, hasta la línea amarilla (LAB.linea): el lavamanos, la percha con la bata, las gafas y los guantes, el cartel de
+# las normas y el botiquín; la zona de trabajo, detrás. Las normas, de verdad: no se pasa la línea sin las manos lavadas y el EPI
+# puesto (linea_lab, desde try_move), las manos antes que los guantes, nada de comer, beber ni fumar (catar), nadie trabaja colocado
+# ni borracho, el instrumental esterilizado en el autoclave ese día, lo usado al contenedor amarillo antes de volver a empezar y el
+# EPI se deja en la antesala al salir (cruzar_puerta). S.bt.ld = {m: manos, e: EPI, at: el día del autoclave, r: lo usado sin tirar,
+# v: el día que lo viste}
+func lab() -> Dictionary:
+	if not (bt().get("ld") is Dictionary):
+		bt().ld = {}
+	return bt().ld
+
+func en_lab() -> bool:
+	return Datos.CAL and S != null and D.has("LAB") and S.map == String(D.LAB.mapa)
+
+func bt_col_z(z: String) -> Dictionary:
+	for c in D.BANCO_TIA.col:
+		if c.z == z:
+			return c
+	return {}
+
+func lab_sereno() -> bool:
+	return colo() < float(D.FISIO.efecto) and borr() < float(D.FISIO.efecto)
+
+# '' si se puede trabajar; si no, por qué (con el puesto: el autoclave de hoy y lo de ayer tirado)
+func lab_norma(puesto := false) -> String:
+	if not lab_sereno():
+		return K("Así no se trabaja en un laboratorio: nadie toca nada colocado ni bebido. Vuelve cuando se te pase.")
+	if not lab().get("m") or not lab().get("e"):
+		return K("Sin las manos lavadas y la bata, las gafas y los guantes, aquí no se toca nada. Está todo en la antesala.")
+	if puesto and lab().get("r"):
+		return K("El puesto, sin recoger: primero, lo usado al contenedor amarillo y la cabina limpia con alcohol.")
+	if puesto and int(lab().get("at", -1)) != int(S.day):
+		return K("El instrumental, sin esterilizar: las pinzas, el bisturí y las placas pasan antes por el autoclave, cada día.")
+	return ""
+
+# la línea amarilla: de la antesala a la zona de trabajo, solo con las manos lavadas y el EPI
+func linea_lab(nx: int, _ny: int) -> bool:
+	if not en_lab():
+		return false
+	var li := int(D.LAB.linea)
+	return int(P.x) <= li and nx > li and not (lab().get("m") and lab().get("e"))
+
+func aviso_linea() -> void:
+	if not lab().get("m"):
+		await say(K("La línea amarilla no se pasa sin lavarte las manos y ponerte la bata, las gafas y los guantes. El lavamanos y la percha, en la antesala."))
+	else:
+		await say(K("Las manos, ya. Ahora la bata, las gafas y los guantes, en la percha: sin el EPI no se pasa la línea amarilla."))
+
+func cruzar_puerta(e: Dictionary) -> void:
+	if Datos.CAL and D.has("LAB"):
+		if String(e.get("to", "")) == String(D.LAB.mapa):   # se entra con las manos sin lavar y sin nada puesto
+			lab().m = false
+			lab().e = false
+		elif en_lab() and lab().get("e"):
+			lab().e = false
+			lab().m = false
+			await say(K("Antes de salir, en la antesala: los guantes al cubo, la bata a su percha con las gafas y las manos, otra vez al lavabo. El EPI no sale del laboratorio."))
+	await super(e)
+	if en_lab() and not lab().has("v"):
+		lab().v = int(S.day)
+		await lab_intro()
+
+func lab_intro() -> void:
+	await talk(K("EL LABORATORIO"), [K("Azulejo blanco, el suelo sin juntas y una línea amarilla que parte la sala en dos. Huele a alcohol y a lejía."),
+		K("Antes de la línea, la antesala: el lavamanos de pedal, la percha con las batas, las gafas y los guantes, y un cartel con las normas."),
+		K("Debajo del cartel, con la letra de la tía: «Aquí se trabaja como en un laboratorio de verdad, o no se trabaja».")])
+
+func lab_normas() -> void:
+	await talk(K("LAS NORMAS DEL LABORATORIO"), [K("1. Antes de pasar la línea amarilla: las manos lavadas, la bata abrochada, las gafas y los guantes."),
+		K("2. Aquí dentro no se come, no se bebe y no se fuma. Y en la nevera de las muestras, nada de comida."),
+		K("3. Nadie trabaja colocado ni bebido."),
+		K("4. El instrumental se esteriliza en el autoclave antes de usarlo, cada día."),
+		K("5. Todo lo que toca las muestras va al contenedor amarillo, y el puesto se deja limpio. Cada placa y cada sobre, con su etiqueta: qué es, de quién y la fecha."),
+		K("6. Antes de necesitarlos, se sabe dónde están la ducha, el lavaojos, el extintor y el botiquín."),
+		K("7. El EPI no sale del laboratorio: se deja en la antesala y las manos se lavan otra vez al salir."),
+		K("Firmado, con una hoja dibujada: M.")])
+
+func lab_obj(_x: int, _y: int, o) -> bool:
+	var b: String = String(o).trim_suffix("2")
+	match b:
+		"labNormas":
+			await lab_normas()
+		"labPila":
+			if lab().get("e"):
+				await say(K("Con los guantes puestos, no: las manos se lavan antes de ponértelos y después de quitártelos."))
+			elif lab().get("m"):
+				await say(K("Ya te has lavado las manos. Ahora, la percha."))
+			else:
+				lab().m = true
+				sfx("agua")   # i18n-no
+				await say(K("Te lavas las manos con jabón, entre los dedos y hasta las muñecas, y te las secas con papel. El grifo, con el pedal."))
+		"labPercha":
+			if lab().get("e"):
+				await say(K("Ya llevas la bata abrochada, las gafas y los guantes."))
+			elif not lab().get("m"):
+				await say(K("Antes de los guantes, las manos: el lavamanos está al lado."))
+			else:
+				lab().e = true
+				sfx("get")   # i18n-no
+				await say(K("Te pones la bata y te la abrochas, las gafas y los guantes de nitrilo por encima de los puños. Ya puedes pasar la línea amarilla."))
+		"labFlujo":
+			await bt_lab()
+		"labAutoclave":
+			var no := lab_norma()
+			if no != "":
+				await say(no)
+			elif int(lab().get("at", -1)) == int(S.day):
+				await say(K("El instrumental de hoy ya está esterilizado, en sus botes con la cinta que cambia de color."))
+			elif await ask(K("El autoclave: el instrumental, a presión y con vapor, para que no lleve nada de fuera a las semillas. ¿Esterilizarlo ahora? Es media hora."), [K("Esterilizar"), K("Nada")]) == 0:
+				advance_time(int(D.LAB.esteril))
+				lab().at = int(S.day)
+				sfx("get")   # i18n-no
+				update_hud()
+				await say(K("El instrumental, esterilizado: la cinta de los botes ha cambiado de color. Ya se puede trabajar en la cabina."))
+		"labResiduos":
+			if lab().get("r") and lab_norma() == "":
+				lab().r = false
+				sfx("get")   # i18n-no
+				await say(K("Las placas, las puntas y lo que ha tocado las muestras, al contenedor amarillo. La cabina, limpia con alcohol. El puesto, listo."))
+			else:
+				await say(K("El contenedor amarillo, para lo que toca las muestras, y el rojo, para lo que corta. Se los lleva un gestor autorizado: nada de eso va a la basura de casa."))
+		"labMicro":
+			var no := lab_norma()
+			await say(no if no != "" else K("Al microscopio, una semilla de cada línea: la cubierta, las vetas, si está madura. Lo que no se ve a simple vista se apunta en el cuaderno, con la fecha."))
+		"labBalanza":
+			var no := lab_norma()
+			await say(no if no != "" else K("La balanza de precisión, con su urna para que el aire no la mueva. Cada lote de semillas se pesa y se apunta: las vanas no llegan al peso."))
+		"labEstufa":
+			await say(K("La estufa de germinación: las semillas, en placas a oscuras y a temperatura fija. Cada placa, con su etiqueta."))
+		"labNevera":
+			await say(K("La nevera de las muestras: tubos y sobres, todos etiquetados. Ni comida ni bebida: es una de las normas."))
+		"labDucha":
+			await say(K("La ducha de emergencia: si te cae algo encima, se tira del triángulo y uno se queda debajo hasta quitárselo todo. Se prueba cada semana."))
+		"labLavaojos":
+			await say(K("El lavaojos: si salpica algo a los ojos, se empuja la palanca y se lavan abiertos, sin frotar, un buen rato. Luego, al médico."))
+		"labExtintor":
+			await say(K("El extintor de dióxido de carbono, el de los aparatos eléctricos, con la revisión al día en su etiqueta."))
+		"labBotiquin":
+			await say(K("El botiquín: gasas, vendas, tiritas, suero y guantes. Al lado, con la letra de la tía, el teléfono de urgencias."))
+		"labTaburete":
+			await say(K("Un taburete de laboratorio, regulable y con ruedas."))
+		_:
+			return false
+	return true
+
+# las normas: en el laboratorio no se come, no se bebe y no se fuma
+func catar(k: String, g := -1.0) -> void:
+	if en_lab():
+		await say(K("En el laboratorio no se come, no se bebe y no se fuma. Es la segunda norma del cartel."))
+		return
+	await super(k, g)
+
+func catar_extr(k: String, g: float) -> void:
+	if en_lab():
+		await say(K("En el laboratorio no se come, no se bebe y no se fuma. Es la segunda norma del cartel."))
+		return
+	await super(k, g)

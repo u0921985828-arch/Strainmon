@@ -91,7 +91,7 @@ func prueba_mapa(mapa: String) -> Array:
 						hechos.append(T[v[1]])
 				for l in v[2]:
 					if str(l).begins_with("Ordenar "):
-						var bueno: bool = ("casa" in l and mapa == "home") or ("nave" in l and mapa == "nave") or ("local" in l and J.D.ORDEN_P.has(mapa))
+						var bueno: bool = ("casa" in l and mapa == "home") or ("nave" in l and mapa == "nave") or ("local" in l and J.D.ORDEN_P.has(mapa)) or ("sala" in l and mapa == "cult-muelle")
 						chk(bueno, "%s: el mueble %s ofrece «%s»" % [mapa, o, l])
 	return hechos
 

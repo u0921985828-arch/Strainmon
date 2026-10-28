@@ -62,6 +62,10 @@ func try_move(d: String) -> void:
 		P.chain = false
 		run(func(): await bajar_escalera(nx, ny))
 		return
+	if Datos.CAL and linea_lab(nx, ny):   # el laboratorio de la tía: la línea amarilla, solo con el EPI (bancotia.gd)
+		P.chain = false
+		run(func(): await aviso_linea())
+		return
 	if tile_solid(m, nx, ny) or ent_at(nx, ny) or coche_en(nx, ny) != "" or fuera_calzada(m, nx, ny):
 		if M.reloj - P.bumpT > 350:
 			sfx("bump")
@@ -876,6 +880,10 @@ func object_action(x: int, y: int) -> void:
 			return
 		if pi_.get("llave") == "banco" and not bt_abierto():   # el banco de semillas de la tía: la llave, en la lata del manzano
 			await say(K("Una puerta cerrada con llave. Delroy dice que era el cuarto de tu tía y que nadie sabe dónde está la llave."))
+			return
+		if pi_.get("llave") == "lab" and not bt_zona("lab"):   # el laboratorio, precintado hasta entregar su colección
+			return
+		if pi_.get("llave") == "kc" and await kc_cerrada():   # la sala de cultivo de KAIA, con la licencia (kaiacult.gd)
 			return
 		await cruzar_puerta(pi_)
 		return
@@ -1769,6 +1777,10 @@ func cabe_pieza(mapa: String, k: String, x: int, y: int, O = null, jug := true) 
 	for c in F + G:
 		if c[0] < 0 or c[1] < 0 or c[0] >= int(m.w) or c[1] >= int(m.h):
 			return "fuera"
+	if P_.has("zona"):   # (lo pidió el usuario: «tiene que tener lógica con el suelo»): solo encima del suelo de su zona (KAIA_CULT)
+		for c in F:
+			if not (String(m.g[c[1]][c[0]]) in P_.zona):
+				return "zona"
 	var fila := func(cy: int, dy: int) -> bool:
 		if dy < 0:
 			return cy == 1
