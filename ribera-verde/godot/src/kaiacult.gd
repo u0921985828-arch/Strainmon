@@ -1,16 +1,34 @@
 # La sala de cultivo de KAIA (lo pidió el usuario: «incluso molaría tener un cultivo finalmente en la nueva asociación de KAIA» y,
 # de las carpas, «tiene que tener lógica con el suelo que hay al rededor y las zonas donde las colocas»; solo con Datos.CAL): por la
-# puerta (15, 1) del club, cerrada hasta tener la licencia (S.mar.lic). Tres carpas de 120 × 120 con su LED, cuatro plazas cada una,
-# con el riego por goteo y el clima de la sala, que van solos (kc_avanza desde plants_advance); A en una carpa, sus plazas, y en cada
-# una lo de siempre (pot_action con hu, como la huerta de campo.gd). Las carpas se ordenan desde el cuadro de la pared (ctrlN), solo
-# encima de la zona de cultivo (la regla zona de cabe_pieza). Datos de tools/kaia_cult.py (KAIA_CULT, MAPS["cult-muelle"]).
-# S.kc = {p: [plantas o null, carpa × plazas]}.
-# Cadena: … → hilo → bancotia → kaiacult → retencion → juego.
+# puerta (15, 1) del club, cerrada hasta tener la licencia (S.mar.lic). Por fases (lo pidió el usuario: «como en casa, cultivo con
+# carpas, pero más grandes de primeras, con una inversión realista, después como en la nave en esa misma habitación, ya con
+# posibilidad de poner a alguien a trabajar ahí y la inversión será más grande»):
+#  · fase 1: kits de carpa de 240 × 240 (KAIA_CULT.kit: la carpa, dos LED de 720 W, el extractor con su filtro y el goteo) que se
+#    pagan con la cuenta desde el cuadro (ctrlN) y llegan al día siguiente, hasta KAIA_CULT.max; nueve plazas por carpa, con el riego
+#    y el clima solos (kc_avanza desde plants_advance); A en una carpa, sus plazas, y en cada una lo de siempre (pot_action con hu,
+#    como la huerta de campo.gd). Las carpas se ordenan desde el cuadro, solo encima de la zona de cultivo (la regla zona de
+#    cabe_pieza) y sin montarse encima de nada (pieza_solapa).
+#  · fase 2: la obra de la sala entera (KAIA_CULT.f2), con las plazas vacías: las carpas se venden de segunda mano y, a los días de la
+#    obra, la sala lleva las mesas de la nave con su LED doble, el riego centralizado y alguien de la plantilla de cultivo (rol kaia);
+#    cada mañana las lleva como un navero (kc_dia, desde nave_dia), lo cortado se seca y va al almacén de KAIA; lo que no cabe, en su
+#    mesa, para llevártelo.
+# S.kc = {kits: [día de llegada de cada kit], p: [plantas o null, carpa × plazas], f2: null o el día en que acaba la obra, m: [mesas]}.
+# Datos de tools/kaia_cult.py (KAIA_CULT, MAPS["cult-muelle"]). Cadena: … → hilo → bancotia → kaiacult → retencion → juego.
 extends "res://src/bancotia.gd"
+
+var _kc0 = null   # los muebles de la sala tal como vienen de datos.json, para montar las mesas encima
 
 func kc() -> Dictionary:
 	if not (S.get("kc") is Dictionary):
-		S.kc = {"p": []}
+		S.kc = {"kits": [], "p": []}
+	if not S.kc.has("kits"):   # la de antes, con tres carpas de 4 plazas de regalo: cada una, un kit montado, con sus plantas
+		var viejas: Array = S.kc.get("p", [])
+		S.kc = {"kits": [0, 0, 0], "p": []}
+		for i in viejas.size():
+			if viejas[i] is Dictionary:
+				while S.kc.p.size() <= (i / 4) * int(D.KAIA_CULT.plazas) + i % 4:
+					S.kc.p.append(null)
+				S.kc.p[(i / 4) * int(D.KAIA_CULT.plazas) + i % 4] = viejas[i]
 	var n: int = D.KAIA_CULT.carpas.size() * int(D.KAIA_CULT.plazas)
 	while S.kc.p.size() < n:
 		S.kc.p.append(null)
@@ -22,6 +40,20 @@ func kc_hay() -> bool:
 func kc_lic() -> bool:
 	return kc_hay() and S.get("mar") is Dictionary and S.mar.get("lic") != null
 
+# los kits ya montados (los que han llegado)
+func kc_kits() -> int:
+	var n := 0
+	for d in kc().kits:
+		if int(d) <= int(S.day):
+			n += 1
+	return n
+
+func kc_f2() -> bool:   # la sala reformada, con las mesas
+	return kc_hay() and S.get("kc") is Dictionary and S.kc.get("f2") != null and int(S.kc.f2) <= int(S.day)
+
+func kc_obra() -> bool:   # la obra en marcha
+	return kc_hay() and S.get("kc") is Dictionary and S.kc.get("f2") != null and int(S.kc.f2) > int(S.day)
+
 # la puerta de la sala, desde KAIA (calle.gd object_action): sin la licencia, cerrada
 func kc_cerrada() -> bool:
 	if kc_lic():
@@ -29,14 +61,15 @@ func kc_cerrada() -> bool:
 	await say(K("La sala de cultivo de KAIA, cerrada. Hasta tener la licencia de cultivo, aquí dentro no se planta nada."))
 	return true
 
-# los factores de una plaza, como Cultivo.factores con la carpa, el foco y la maceta de la sala, y su clima controlado
+# los factores de una plaza, como Cultivo.factores con la carpa grande, sus dos LED y la maceta de la sala, y su clima controlado
 func kc_f() -> Dictionary:
 	var KC: Dictionary = D.KAIA_CULT
-	var C: Dictionary = D.CARPAS[KC.carpa]
+	var cm: Array = KC.carpa.cm
 	var F: Dictionary = D.FOCOS[KC.foco]
 	var M: Dictionary = D.MACETAS[KC.maceta]
-	var dens := minf(1, float(F.w) / (float(C.cm[0]) * float(C.cm[2]) / 1e4 * float(D.W_M2)))
-	return {"g": float(F.w) * float(F.gpw) / float(KC.plazas) * float(M.rend), "cap": float(M.cap), "crec": float(F.crec) * (.85 + .15 * dens) * float(M.crec) * Cultivo.f_clima(KC.clima),
+	var w: float = float(F.w) * float(KC.nf)
+	var dens := minf(1, w / (float(cm[0]) * float(cm[2]) / 1e4 * float(D.W_M2)))
+	return {"g": w * float(F.gpw) / float(KC.plazas) * float(M.rend), "cap": float(M.cap), "crec": float(F.crec) * (.85 + .15 * dens) * float(M.crec) * Cultivo.f_clima(KC.clima),
 		"thc": float(F.thc) * dens, "agua": float(F.agua) * float(M.agua), "plaga": float(M.plaga), "dens": dens, "hr": float(KC.clima.hr), "moho": 1.0, "ciclo": "auto"}   # i18n-no
 
 func kc_pos(ci: int) -> Array:
@@ -44,12 +77,14 @@ func kc_pos(ci: int) -> Array:
 
 func kc_hu(i: int) -> Dictionary:
 	var p := kc_pos(i / int(D.KAIA_CULT.plazas))
-	return {"l": kc().p, "v": [(int(p[0]) + 1) * 16, int(p[1]) * 16], "f": kc_f()}
+	return {"l": kc().p, "v": [int(p[0]) * 16 + 24, (int(p[1]) + 1) * 16], "f": kc_f()}
 
-func kc_carpa_en(x: int, y: int) -> int:   # la carpa con la casilla (x, y), o -1
-	for ci in D.KAIA_CULT.carpas.size():
+func kc_carpa_en(x: int, y: int) -> int:   # la carpa (3 × 2 casillas) con la casilla (x, y), o -1
+	if kc_f2() or kc_obra():
+		return -1
+	for ci in kc_kits():
 		var p := kc_pos(ci)
-		if y == int(p[1]) and (x == int(p[0]) or x == int(p[0]) + 1):
+		if y >= int(p[1]) and y <= int(p[1]) + 1 and x >= int(p[0]) and x <= int(p[0]) + 2:
 			return ci
 	return -1
 
@@ -61,23 +96,54 @@ func kc_plantadas(ci: int) -> int:
 			n += 1
 	return n
 
-# cada carpa con las plantas que tiene (carpaM-<n>, la de las madres de la nave)
+func kc_vacias() -> bool:
+	for p in kc().p:
+		if p is Dictionary:
+			return false
+	return true
+
+# cada carpa montada sale en ORDENAR solo si su kit ha llegado y no hay obra
+func pieza_ya(P_: Dictionary) -> bool:
+	if str(P_.get("si", "")) == "kc":
+		return kc_hay() and not kc_f2() and not kc_obra() and int(str(P_.k).substr(2)) < kc_kits()
+	return super(P_)
+
+# cada carpa con las plantas que tiene (carpaKG-<n>, de kaia_carpa.py)
 func sprite_local(o: String) -> String:
-	if kc_hay() and o.begins_with("carpaK"):   # i18n-no
-		return "carpaM-%d" % kc_plantadas(int(o.substr(6)))   # i18n-no
+	if kc_hay() and o.begins_with("carpaKG"):   # i18n-no
+		return "carpaKG-%d" % kc_plantadas(int(o.substr(7)))   # i18n-no
 	return super(o)
 
 func bt_entra(mapa: String) -> void:
 	super(mapa)
 	if kc_hay() and mapa == D.KAIA_CULT.mapa:
 		kc()
-		aplica_orden(mapa)
+		kc_monta()
+
+# la sala: las carpas que hayan llegado (aplica_orden) o, reformada, las mesas, el tanque y la bomba
+func kc_monta() -> void:
+	var mapa: String = D.KAIA_CULT.mapa
+	var m: Dictionary = MAPS[mapa]
+	if _kc0 == null:
+		_kc0 = m.o.duplicate(true)
+	m.o = _kc0.duplicate(true)   # siempre desde la sala vacía: lo de antes no se queda debajo
+	m.erase("opos")
+	aplica_orden(mapa)
+	if not kc_f2():
+		return
+	var F2: Dictionary = D.KAIA_CULT.f2
+	for e in F2.o:
+		m.o[int(e[1])][int(e[0])] = e[2]
+	for q in F2.mesas:
+		m.o[int(q[1])][int(q[0])] = "mesaKC"   # i18n-no
+		m.o[int(q[1])][int(q[0]) + 1] = "mesaKC2"   # i18n-no
 
 # después de mover una carpa con ORDENAR (setas.gd mover_pieza), la sala con cada una donde se dejó
 func rehace_orden(mapa: String) -> void:
-	super(mapa)
 	if kc_hay() and mapa == D.KAIA_CULT.mapa:
-		aplica_orden(mapa)
+		kc_monta()
+		return
+	super(mapa)
 
 func bt_obj(x: int, y: int, o) -> bool:
 	if kc_hay() and S.map == D.KAIA_CULT.mapa:
@@ -89,22 +155,101 @@ func kc_obj(x: int, y: int, o) -> bool:
 	if ci >= 0:
 		await kc_carpa(ci)
 		return true
+	var mi := kc_mesa_idx(x, y)
+	if mi >= 0:
+		await kc_mesa(mi)
+		return true
 	match o:
 		"ctrlN":   # i18n-no
-			var c: int = await ask(K("El cuadro de la sala: el temporizador de los LED, la bomba del goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer."), [K("Ordenar la sala"), K("Salir")])
-			if c == 0:
-				await ordenar(S.map)
+			await kc_cuadro()
 			return true
 		"tanqueN":   # i18n-no
-			await say(K("El depósito del goteo, con el abono ya mezclado. La bomba lo lleva a cada maceta cuando la tierra se seca."))
+			await say(K("El tanque del riego centralizado, con el abono ya mezclado: las bombas lo llevan a cada mesa."))
 			return true
 		"riegoN":   # i18n-no
-			await say(K("La bomba y el programador del riego por goteo: un gotero por maceta, a la tierra y no a las hojas."))
-			return true
-		"extrN", "filtroN":   # i18n-no
-			await say(K("La extracción, con sus filtros de carbón: el aire de la sala sale limpio y sin olor, como pide la licencia."))
+			await say(K("El programador del riego de las mesas: los turnos de cada una, el pH y la EC, en automático."))
 			return true
 	return false
+
+# el cuadro de la pared: el temporizador, el clima y lo que se compra para la sala
+func kc_cuadro() -> void:
+	var KC: Dictionary = D.KAIA_CULT
+	while true:
+		var ops := []
+		var txt := ""
+		if kc_obra():
+			await say(T("La sala, en obras: desagües, el cuadro trifásico y el clima industrial. Las mesas estarán montadas el {f}.", {"f": Datos.fd(int(S.kc.f2), S.day)}))
+			return
+		if kc_f2():
+			var w = kc_cultiva()
+			txt = T("El cuadro de la sala: seis mesas con su LED doble, el riego centralizado y el clima. {q}", {"q": T("Las lleva {n}.", {"n": w.n}) if w != null else K("Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.")})
+			ops.append(K("Salir"))
+		else:
+			var nk: int = kc().kits.size()
+			txt = K("El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.")
+			if nk < int(KC.max):
+				ops.append(T("Comprar un kit de carpa · {e}", {"e": Datos.eur(KC.kit.p)}))
+			if kc_kits() >= 1:
+				ops.append(K("Ordenar la sala"))
+			ops.append(T("Reformar la sala · {e}", {"e": Datos.eur(KC.f2.p)}))
+			ops.append(K("Salir"))
+		var c: int = await ask(txt, ops)
+		var op: String = ops[c] if c >= 0 and c < ops.size() else ""
+		if op.begins_with(K("Comprar un kit")):
+			await kc_compra_kit()
+		elif op == K("Ordenar la sala"):
+			await ordenar(S.map)
+			return
+		elif op.begins_with(K("Reformar la sala")):
+			await kc_reforma()
+		else:
+			return
+
+func kc_compra_kit() -> void:
+	var KC: Dictionary = D.KAIA_CULT
+	var l := []
+	for x in KC.kit.l:
+		l.append(T("{n}: {e}", {"n": I18n.v(x[0]), "e": Datos.eur(x[1])}))
+	if await ask(T("El kit de la carpa grande, a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y lo montan aquí.", {"l": "; ".join(PackedStringArray(l)), "e": Datos.eur(KC.kit.p)}), [K("Comprarlo"), K("Ahora no")]) != 0:
+		return
+	if not await tarjeta(float(KC.kit.p), K("Kit de carpa (KAIA)")):
+		return
+	kc().kits.append(int(S.day) + 1)
+	sfx("get")
+	await say(T("Pedido: la carpa {n} llega mañana, con sus dos LED, el extractor y el goteo. Nueve plazas más.", {"n": kc().kits.size()}))
+
+func kc_reforma() -> void:
+	var KC: Dictionary = D.KAIA_CULT
+	var F2: Dictionary = KC.f2
+	var l := []
+	for x in F2.l:
+		l.append(T("{n}: {e}", {"n": I18n.v(x[0]), "e": Datos.eur(x[1])}))
+	var vende := roundi(float(KC.kit.p) * float(F2.venta) * kc().kits.size())
+	var t := T("La sala entera como la nave: {l}. En total, {e}, con la tarjeta; la obra dura {d} días. Después, las mesas las lleva alguien de tu plantilla.", {"l": "; ".join(PackedStringArray(l)), "e": Datos.eur(F2.p), "d": int(F2.dias)})
+	if kc().kits.size():
+		t += " " + T("Las carpas se desmontan y se venden de segunda mano por {e}.", {"e": Datos.eur(vende)})
+	if not kc_vacias():
+		await say(t + " " + K("Antes, cosecha o arranca lo que tengas en las carpas."))
+		return
+	if kc().kits.any(func(d): return int(d) > int(S.day)):   # un kit pagado y en camino: primero que llegue
+		await say(t + " " + K("Antes, espera a que llegue la carpa que tienes pedida."))
+		return
+	if await ask(t, [K("Hacer la obra"), K("Ahora no")]) != 0:
+		return
+	if not await tarjeta(float(F2.p), K("Obra de la sala de cultivo (KAIA)")):
+		return
+	if vende > 0:
+		abono_banco(vende, K("Carpas de segunda mano (KAIA)"))
+	kc().kits = []
+	kc().f2 = int(S.day) + int(F2.dias)
+	kc().m = []
+	for q in F2.mesas:
+		kc().m.append(null)
+	if S.get("coloca") is Dictionary:
+		S.coloca.erase(KC.mapa)
+	kc_monta()
+	sfx("get")
+	await say(T("Empieza la obra. El {f}, la sala con sus mesas.", {"f": Datos.fd(int(S.kc.f2), S.day)}))
 
 # las plazas de una carpa: cada una, con su planta o vacía; A, lo de siempre (pot_action)
 func kc_carpa(ci: int) -> void:
@@ -133,9 +278,183 @@ func plants_advance(mn: int) -> void:
 func kc_avanza(mn: int) -> void:
 	if not kc_hay() or not (S.get("kc") is Dictionary):
 		return
+	kc()
 	var f := kc_f()
 	for p in S.kc.p:
 		if not (p is Dictionary) or p.get("dead"):
 			continue
 		Cultivo.plant_step(S, p, mn / 60.0, f)
 		p.water = 100.0
+
+# ---------- fase 2: las mesas ----------
+func kc_mesa_idx(x: int, y: int) -> int:
+	if not kc_f2():
+		return -1
+	var Ms: Array = D.KAIA_CULT.f2.mesas
+	for i in Ms.size():
+		if int(Ms[i][1]) == y and (int(Ms[i][0]) == x or int(Ms[i][0]) + 1 == x):
+			return i
+	return -1
+
+func kc_me(i: int):
+	var m: Array = kc().get("m", [])
+	return m[i] if i >= 0 and i < m.size() and m[i] is Dictionary else null
+
+func kc_fase(i: int) -> int:
+	var Me = kc_me(i)
+	if Me == null:
+		return 0
+	var p := float(Me.p)
+	return 1 if p < .35 else (2 if p < .65 else (3 if p < .85 else 4))
+
+# las mesas en el mapa, como las de la nave (pinta.gd): la mesa, sus plantas y su foco
+func mesa_de(o: String, x: int, y: int):
+	if o == "mesaKC" and kc_hay():   # i18n-no
+		var i := kc_mesa_idx(x, y)
+		var y0: int = int(D.KAIA_CULT.f2.mesas[0][1])
+		return {"Me": kc_me(i), "fm": kc_fase(i), "foco": String(D.KAIA_CULT.f2.foco), "techo": (y - y0) * 16}   # la segunda fila, su techo más abajo
+	return super(o, x, y)
+
+func kc_cultiva():   # quien lleva las mesas
+	for w in S.plantilla:
+		if w.get("rol") == "kaia":
+			return w
+	return null
+
+func kc_mesa(i: int) -> void:
+	var Me = kc_me(i)
+	var w = kc_cultiva()
+	var ops: Array = [K("Arrancar y plantar") if Me else K("Plantar")]
+	if Me and float(Me.g) >= 1:
+		ops.push_front(T("Llevarte lo seco · {g}", {"g": g_txt(Me.g)}))
+	ops.append(K("Nada"))
+	var que: String = (mesa_txt(Me) + " · " + I18n.v(D.FASE_MESA[kc_fase(i)]) + " · " + cosecha_txt(Me)) if Me else K("vacía")
+	var oi: int = await ask(T("Mesa {i} · {que} · {foco}\n{cuida}", {"i": i + 1, "que": que, "foco": D.FOCO_NAVE[D.KAIA_CULT.f2.foco].n, "cuida": T("La lleva {n}.", {"n": w.n}) if w else K("Nadie la lleva: pon a alguien de tu plantilla en la sala.")}), ops)
+	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+	if op.begins_with(K("Llevarte lo seco")):
+		var q: int = mini(int(floor(Me.g)), int(floor(libre_mochila())))
+		if q < 1:
+			await say(K("No te cabe nada más en la mochila."))
+			return
+		add_buds(Me.k, q, Me.t, null, 0, Me.get("cd", S.day))
+		Me.g = Datos.jsround((Me.g - q) * 10) / 10.0
+		sfx("get")
+		update_hud()
+		await say(T("Te llevas {g} de la mesa {i}.", {"g": g_txt(q), "i": i + 1}))
+	elif op == K("Plantar") or op == K("Arrancar y plantar"):
+		if Me and Me.get("h") != null:
+			await say(K("Lo de esta mesa aún se está secando: espera a que esté seco."))
+			return
+		if Me and float(Me.g) >= 1:
+			await say(K("Antes, llévate lo seco de esta mesa."))
+			return
+		var p = await elegir_planta(K("¿QUÉ PLANTAS EN LA MESA?"), false)
+		if p == null:
+			return
+		var sid: String = p.sid
+		kc().m[i] = {"k": sid + ("*" if Cultivo.clase_feno(p.f) == "estrella" else ""), "f": p.f, "thc": thc_nave(sid, p.f), "y": p.f.y, "dia": S.day, "g": 0, "t": 0, "abo": 1, "p": float(D.NAVE.clon), "dn": 0, "am": 0, "ao": 0, "n": 0}
+		sfx("sel")
+		await say(T("Mesa {i}: {nom}{et}. La mesa entera de clones: enraízan, crecen a 18/6 y florecen a 12/12. Se cosecha entera en unos {d} días y vuelve a empezar.", {"i": i + 1, "nom": strain(sid).n, "et": etiq(p.f), "d": dias_mesa(kc().m[i])}))
+
+# cada mañana (desde nave_dia): lo que se seca pasa al almacén de KAIA y quien lleva la sala hace avanzar cada mesa y la corta entera
+func nave_dia() -> void:
+	super()
+	kc_dia()
+
+func kc_dia() -> void:
+	if not kc_f2():
+		return
+	var al := alm_club("muelle")
+	for Me in kc().m:
+		if not (Me is Dictionary) or Me.get("h") == null or S.day - int(Me.h.d) < int(D.NAVE.seca):
+			continue
+		var g: float = float(Me.h.g)
+		var cabe: float = maxf(0, float(D.MERCADO.alm.g) - alm_g("muelle"))
+		var q: int = mini(int(floor(g)), int(floor(cabe)))
+		if q >= 1:
+			add_buds(Me.k, q, Me.h.t, al.buds, 0, int(Me.h.d))
+		var resto: float = g - q
+		if resto >= .05:
+			Me.t = Datos.jsround((Me.t * Me.g + Me.h.t * resto) / (Me.g + resto) * 10) / 10.0 if Me.g + resto > 0 else Me.h.t
+			Me.g = Datos.jsround((Me.g + resto) * 10) / 10.0
+			Me.cd = int(Me.h.d)
+		Me.erase("h")
+	var w = kc_cultiva()
+	if w == null:
+		return
+	for i in kc().m.size():
+		var Me = kc().m[i]
+		if not (Me is Dictionary):
+			continue
+		Me.dn = int(Me.get("dn", 0)) + 1
+		Me.am = int(Me.get("am", 0)) + 1   # el abono va en el riego centralizado, cada día
+		var p: float = float(Me.p) + 1.0 / float(strain(lot_sid(Me.k)).d)
+		if p < 1:
+			Me.p = Datos.jsround(p * 1000) / 1000.0
+			continue
+		var c := kc_cosecha(Me, w)
+		Me.h = {"g": c.g, "t": c.t, "d": S.day}
+		Me.p = float(D.NAVE.clon)
+		Me.n = int(Me.get("n", 0)) + 1
+		Me.dn = 0
+		Me.am = 0
+		Me.ao = 0
+
+# la cosecha de una mesa de la sala: la de la nave (cosecha_mesa) con el LED doble, el riego centralizado y el abono de cada día
+func kc_cosecha(Me: Dictionary, w: Dictionary) -> Dictionary:
+	var F: Dictionary = D.FOCO_NAVE[D.KAIA_CULT.f2.foco]
+	var dn := maxf(1, float(Me.get("dn", 1)))
+	var am := float(Me.get("am", 0)) / dn
+	var g: float = float(F.w) * float(F.gpw) * float(strain(lot_sid(Me.k)).y) / float(D.Y_MEDIA) * float(Me.y) * nave_g(w) / float(D.NAVE.g) \
+		* (1 + float(D.ABONO.rend) * am) * (1 + Cultivo.fam(S, "g"))
+	var thc: float = Me.thc * (1 + Cultivo.fam(S, "thc")) + float(F.thc) + float(D.ABONO.thc) * am
+	cult_apunta(lot_sid(Me.k))
+	return {"g": Datos.jsround(g * 10) / 10.0, "t": Datos.jsround(thc * 10) / 10.0}
+
+# ---------- quien lleva la sala (rol kaia, en la plantilla) ----------
+func ops_staff(w: Dictionary) -> Array:
+	var o := super(w)
+	if kc_f2() and w.get("rol") != "kaia" and kc_cultiva() == null:
+		o.push_front(K("A la sala de KAIA"))
+	return o
+
+func staff_op(w: Dictionary, op: String) -> bool:
+	if op == K("A la sala de KAIA"):
+		libre(w)
+		w.rol = "kaia"
+		sfx("sel")
+		await say(T("{n}: «Mañana empiezo en la sala de cultivo de KAIA: las seis mesas, el riego y los cortes. {e} al día».", {"n": w.n, "e": Datos.eur(D.PLANTILLA.sueldo.kaia)}))
+		return true
+	return await super(w, op)
+
+func rol_txt(w: Dictionary) -> String:
+	if w.get("rol") == "kaia":
+		return T("sala de KAIA")
+	return super(w)
+
+func rol_desc(w: Dictionary) -> String:
+	if w.get("rol") == "kaia":
+		return T("Lleva las mesas de la sala de cultivo de KAIA por {e} al día: con su cuidado, la cosecha da un {p} %.", {"e": Datos.eur(D.PLANTILLA.sueldo.kaia), "p": int(Datos.jsround(100.0 * nave_g(w) / float(D.NAVE.g)))})
+	return super(w)
+
+# quien lleva la sala, de pie entre las mesas
+func ciudad_npcs(mapa: String) -> Array:
+	var l := super(mapa)
+	if kc_f2() and mapa == D.KAIA_CULT.mapa:
+		var w = kc_cultiva()
+		if w != null:
+			var q: Array = D.KAIA_CULT.f2.npc
+			l.append({"id": "kcw", "map": mapa, "x": int(q[0]), "y": int(q[1]), "lookObj": look_genero(D.LOOKS.navero1, String(w.n), 0, D.GENERO.naveH, D.GENERO.naveM), "dir": "up", "wander": 0, "nombre": w.n})
+	return l
+
+func hilo_talk(id: String) -> bool:
+	if id == "kcw" and kc_hay():
+		var w = kc_cultiva()
+		if w != null:
+			var vivas := 0
+			for Me in kc().m:
+				if Me is Dictionary:
+					vivas += 1
+			await say(T("«Las {n} mesas que tienen plantas van bien: riego, poda y el corte cuando toca. Lo seco, al almacén del club».", {"n": vivas}) if vivas else K("«Las mesas, vacías. Planta en ellas y me encargo del resto»."), w.n.to_upper())
+			return true
+	return await super(id)

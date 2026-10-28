@@ -136,7 +136,12 @@ func _corre() -> void:
 	# 2 · el escritorio del despacho ya no ofrece ordenar la nave
 	J.S.map = "nave-d"
 	chk(not J._filas_escritorio().any(func(r): return r.label == "Ordenar la nave"), "el escritorio del despacho, sin «Ordenar la nave»")
-	# 3 · cada mapa ordenable y sus salas de al lado: A en cada mueble
+	# 3 · cada mapa ordenable y sus salas de al lado: A en cada mueble (en la sala de KAIA, con un kit de carpa ya llegado: sin carpa no hay nada que ordenar)
+	if not (J.S.get("mar") is Dictionary):
+		J.S.mar = {}
+	J.S.mar.lic = 1
+	J.kc()
+	J.S.kc.kits = [0]
 	var mapas := []
 	for mk in D.ORDEN_P:
 		if not mapas.has(mk):

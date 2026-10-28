@@ -35,6 +35,7 @@ var c1 := Node2D.new()
 var now := 0.0
 var modo := ""
 var cam := Vector2i.ZERO
+var mide = null   # tests/solapes.gd: con un Array, _arte_obj apunta lo que pintaría ({o, x, y, c, px, py}) y no pinta
 var g := {}                  # geometría de la carpa abierta (vista B)
 var ambiente_on := true      # las pruebas de pantalla lo apagan (el HTML tira de Math.random)
 var L: CanvasItem            # la capa en la que se pinta
@@ -1094,9 +1095,10 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		return
 	var an = Atlas.sobre.get("obj:" + o)
 	var d := desfase(o, tx, ty)
-	var fm: int = J.fase_mesa(J.mesa_idx(tx, ty)) if o == "mesaN" else 0
-	var pl = _plantas_mesa(gr, J.mesa_idx(tx, ty), fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima
-	var sp: String = ("mesaN-%d" % mini(fm, 1)) if o == "mesaN" else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)  # i18n-no
+	var md = J.mesa_de(o, tx, ty) if o == "mesaN" or o == "mesaKC" else null   # la mesa de la nave o de KAIA: {Me, fm, foco}  # i18n-no
+	var fm: int = int(md.fm) if md != null else 0
+	var pl = _plantas_mesa(gr, md.Me, fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima
+	var sp: String = ("mesaN-%d" % mini(fm, 1)) if md != null else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)  # i18n-no
 	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
 	var ge = Atlas.cubre("obj:e-" + o) if Datos.CAL and not an else null   # 1.47: a escala con el protagonista (escala.py), solo con CAL
 	var fd = _detalle_obj(o, tx) if Datos.CAL and not an else null   # 1.48: con lo que trae encima (detalle.py)
@@ -1167,10 +1169,13 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 			var fb = Atlas.frame_de(gr, b, "unica", 0, {"i": 0})
 			if fb != null:
 				ex.append(fb)
+	if mide != null:
+		mide.append({"o": o, "x": tx, "y": ty, "c": f.c, "px": Datos.jsround(xp - f.cel.ancla[0]), "py": Datos.jsround(yp - f.cel.ancla[1])})
+		return
 	if f.cel.h > 16:
-		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl, J.mesa_idx(tx, ty) if o == "mesaN" else -1, fm, ex)])   # corrido hacia abajo, no pasa delante de quien está en su fila
+		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl, md, fm, ex)])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
-		_pinta_mesa(f, xp, yp, pl, J.mesa_idx(tx, ty) if o == "mesaN" else -1, fm, ex)
+		_pinta_mesa(f, xp, yp, pl, md, fm, ex)
 
 # la planta seca: los mismos píxeles en cuatro pardos por su luz (el contorno, el más oscuro)
 const SECA := [Color8(48, 32, 20), Color8(102, 72, 40), Color8(146, 110, 64), Color8(184, 152, 100)]
@@ -1204,39 +1209,40 @@ func _detalle_obj(o: String, tx: int):
 	_det_c[key] = r
 	return r
 
-func _pinta_mesa(f, xp: float, yp: float, pl, i := -1, fm := 0, ex := []) -> void:
+func _pinta_mesa(f, xp: float, yp: float, pl, md = null, fm := 0, ex := []) -> void:
 	_pinta(f, xp, yp)
 	if pl != null:
 		_pinta(pl, xp, yp)
-	if i >= 0:
-		_focos_mesa(i, xp + cam.x, yp + cam.y, fm, pl.c if pl != null else null)   # 1.33: y sus focos, colgados encima
+	if md != null and md.foco != null:
+		_focos_mesa(String(md.foco), xp + cam.x, yp + cam.y, fm, pl.c if pl != null else null, int(md.get("techo", 0)))   # 1.33: y sus focos, colgados encima
 	for fb in ex:   # 1.34: las bandejas del bajo
 		_pinta(fb, xp, yp)
 
 # los focos de la mesa i de la nave (1.33, focosMesa de 11j-locales; xp, yp: el ancla de la mesa en el mapa; pl: la imagen de sus
 # plantas): dos, colgados de sus poleas a FOCO_AIRE px por encima de la punta más alta (la primera fila con algo de las plantas) o,
-# sin plantas, a la altura de un esqueje; la cuerda del techo se desvanece hacia arriba en FOCO_DEG pasos
-func _focos_mesa(i: int, xp: float, yp: float, fm: int, pl) -> void:
+# sin plantas, a la altura de un esqueje; la cuerda del techo se desvanece hacia arriba en FOCO_DEG pasos; t0: dónde empieza el techo
+# en el mapa (las mesas de una segunda fila, más abajo: su cuerda no cruza las de delante de la pared)
+func _focos_mesa(foco: String, xp: float, yp: float, fm: int, pl, t0 := 0) -> void:
 	var D = J.D
 	var g = Atlas.cubre("obj:focoN")  # i18n-no
-	var f = Atlas.frame_de(g, "focoN-%s-%d" % [J.S.nave.f[i] if J.S.get("nave") != null else "led", 1 if fm else 0], "unica", 0, {"i": 0}) if g else null  # i18n-no
+	var f = Atlas.frame_de(g, "focoN-%s-%d" % [foco, 1 if fm else 0], "unica", 0, {"i": 0}) if g else null  # i18n-no
 	if f == null:
 		return
 	var top: float = (yp - 47 + Arte.fila_arriba(pl)) if pl != null else (yp - 47 + 25 - int(D.FOCO_ALTO))
-	var yb: float = maxf(int(D.FOCO_POLEA) + 12, top - int(D.FOCO_AIRE) - 1)
+	var yb: float = maxf(t0 + int(D.FOCO_POLEA) + 12, top - int(D.FOCO_AIRE) - 1)
 	for dx in D.FOCO_DX:
-		for e in _poleas_nave(int(xp) + int(dx), int(yb)):
+		for e in _poleas_nave(int(xp) + int(dx), int(yb), t0):
 			_rect(e[0] - cam.x, e[1] - cam.y, e[2], e[3], e[4])
 		_pinta(f, xp + 8 + int(dx) - cam.x, yb - cam.y)
 
 # poleasNave: dos cuerdas del techo (con su degradado) a dos poleas a FOCO_POLEA px, y de cada polea, el tramo que baja al asa del
 # foco y el del tirador
-func _poleas_nave(x0: int, yb: int) -> Array:
+func _poleas_nave(x0: int, yb: int, t0 := 0) -> Array:
 	var D = J.D
 	var K: Color = Arte.VC_CUERDA
 	var M: Color = Arte.VC_POLEA[0]
 	var H: Color = Arte.VC_POLEA[1]
-	var y0 := int(D.FOCO_POLEA)
+	var y0 := t0 + int(D.FOCO_POLEA)
 	var dg := float(D.FOCO_DEG)
 	var asa: int = yb - 15 + int(D.FOCO_ASA)
 	var o := []
@@ -1244,8 +1250,8 @@ func _poleas_nave(x0: int, yb: int) -> Array:
 		var X: int = ls[0]
 		var cx: int = X + 2 * ls[1]
 		var T: int = X + 4 * ls[1]
-		for y in y0:
-			o.append([cx, y, 1, 1, Color8(28, 29, 34, Datos.jsround(ceil(float(y + 1) / y0 * dg) / dg * 255))])
+		for y in range(t0, y0):
+			o.append([cx, y, 1, 1, Color8(28, 29, 34, Datos.jsround(ceil(float(y - t0 + 1) / (y0 - t0) * dg) / dg * 255))])
 		o.append_array([[X, y0 + 3, 1, asa - (y0 + 3), K], [T, y0 + 3, 1, 8, K], [T - 1, y0 + 11, 3, 3, K], [T, y0 + 12, 1, 1, M],
 			[cx - 1, y0 + 1, 3, 5, K], [cx - 2, y0 + 2, 5, 3, K], [cx - 1, y0 + 2, 3, 3, M], [cx, y0 + 3, 1, 1, K], [cx - 1, y0 + 2, 1, 1, H]])
 	return o.filter(func(e): return e[3] > 0)
@@ -1259,9 +1265,8 @@ func _manguera_nave() -> void:
 # las plantas de la mesa i de la nave en la fase fm (1.31, plantasMesa de 01b-arte): las de su porte (porte_planta, por el % índica de
 # su fenotipo) con el tono de hoja y el color de cogollo de la variedad, como en la vista C (hoja_planta, vc_tonos y la rampa de
 # carpa-c-plantas-a); el fotograma, con su imagen ya cambiada
-func _plantas_mesa(gr, i: int, fm: int):
+func _plantas_mesa(gr, Me, fm: int):
 	var S_: Dictionary = J.S
-	var Me = S_.nave.m[i] if S_.get("nave") != null else null
 	if not Me:
 		return null
 	var p := {"sid": J.lot_sid(Me.k), "f": Me.get("f")}

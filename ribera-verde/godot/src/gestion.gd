@@ -53,6 +53,8 @@ func local_staff(w: Dictionary) -> String:
 		return String(w.get("loc", ""))
 	if w.get("rol") == "lugar":   # MAESTRO [9]: los lugartenientes de los pisos de venta
 		return "pisos"
+	if w.get("rol") == "kaia":   # quien lleva la sala de cultivo de KAIA (kaiacult.gd)
+		return "kaia"
 	return String(D.STAFF.roles.get(w.get("rol"), ""))
 
 func nombre_local(k: String) -> String:
@@ -65,6 +67,8 @@ func nombre_local(k: String) -> String:
 			return K("La nave")
 		"pisos":
 			return K("Los pisos")
+		"kaia":
+			return K("La sala de KAIA")
 		"":
 			return K("Sin trabajo")
 	return String(D.LOCALES[k].n) if D.LOCALES.has(k) else k
@@ -351,6 +355,8 @@ func plantilla_locales() -> void:
 			ks.append("nave")
 		if S.plantilla.any(func(w): return w.get("rol") == "lugar"):
 			ks.append("pisos")
+		if S.plantilla.any(func(w): return w.get("rol") == "kaia"):
+			ks.append("kaia")
 		for k in S.loc:
 			ks.append(k)
 		ks.append("")

@@ -57,6 +57,14 @@ func fase_mesa(i: int) -> int:
 	var p := float(Me.p)   # 1.41: por el ciclo, como las plantas del piso (plant_stage)
 	return 1 if p < .35 else (2 if p < .65 else (3 if p < .85 else 4))
 
+# lo que pinta.gd necesita de una mesa del mapa: {Me, fm (la fase), foco} o null si o no es una mesa (la de la nave; kaiacult.gd, las de KAIA)
+func mesa_de(o: String, x: int, y: int):
+	if o != "mesaN":   # i18n-no
+		return null
+	var i := mesa_idx(x, y)
+	var N = S.get("nave")
+	return {"Me": N.m[i] if N != null and i >= 0 and i < N.m.size() else null, "fm": fase_mesa(i), "foco": (N.f[i] if N != null else "led") if i >= 0 else null}   # i18n-no
+
 func thc_nave(sid: String, f) -> float:
 	return Datos.jsround(strain(sid).thc * (f.t if f else 1.0) * D.NAVE.thc * 10) / 10.0
 

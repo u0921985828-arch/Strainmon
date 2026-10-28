@@ -211,14 +211,16 @@ func _corre() -> void:
 	chk(corre(func(): J.interact()) and int(S.items.get("papel", 0)) == 50 and int(S.items.get("mechero", 0)) == 1 and S.money == m0 - 2, "el estanco: librillo y mechero (%s, %s €)" % [S.items.get("papel"), m0 - S.money])
 	# 4 · el grow: las pipas y demás, en la vitrina y en el mostrador; una de cada
 	J.enter_map("shop", 4, 6, "up")
-	chk(J.MAPS.shop.o[6][7] == "vitrinaP" and J.MAPS.shop.o[6][8] == "vitrinaP2", "la vitrina en el grow de Kiko")
+	var vg: Array = J.VITRINA_GROW.shop
+	chk(J.MAPS.shop.o[vg[1]][vg[0]] == "vitrinaP" and J.MAPS.shop.o[vg[1]][vg[0] + 1] == "vitrinaP2", "la vitrina en el grow de Kiko")
 	S.items.erase("bong")
 	MENUS = []
 	QUIERO = ["Bong"]
 	chk(corre(func(): await J.shop()) and int(S.items.get("bong", 0)) == 1, "el bong, en el grow")
 	chk(MENUS.size() >= 2 and MENUS[0].has("Bong de cristal") and not MENUS[0].has("Grinder de aluminio") and not MENUS[1].has("Bong de cristal"), "una de cada %s" % [MENUS.slice(0, 2)])
 	J.enter_map("growcity", 5, 7, "up")
-	chk(J.MAPS.growcity.o[5][9] == "vitrinaP", "la vitrina en GROW IBARBIDE")
+	vg = J.VITRINA_GROW.growcity
+	chk(J.MAPS.growcity.o[vg[1]][vg[0]] == "vitrinaP", "la vitrina en GROW IBARBIDE")
 	# 5 · las mesitas de los clubs, de frente a 3/4 y de dos casillas
 	for s in ["w-mesita", "w-mesita-kalea", "w-mesita-itsaso", "w-mesita-fundicion", "w-mesita-ensanche"]:
 		var f = Atlas.frame_de("ocio-ancho", s, "unica", 0, {"i": 0})

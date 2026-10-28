@@ -634,3 +634,52 @@ KAIA_CULT,KAIA_CULT
 carpaK0,carpaK0
 carpaK1,carpaK1
 carpaK2,carpaK2
+"Ahí quedaría montado encima de otra cosa.","It would end up on top of something else."
+"El tanque del riego centralizado, con el abono ya mezclado: las bombas lo llevan a cada mesa.","The central irrigation tank, with the nutrients already mixed in: the pumps carry it to every table."
+"El programador del riego de las mesas: los turnos de cada una, el pH y la EC, en automático.","The tables' irrigation controller: each one's cycles, the pH and the EC, all automatic."
+"El programador del riego de las mesas: los turnos de cada una, la acidez y la EC, en automático.","The tables' irrigation controller: each one's cycles, the acidity and the EC, all automatic."
+"La sala, en obras: desagües, el cuadro trifásico y el clima industrial. Las mesas estarán montadas el {f}.","The room is under works: drains, the three-phase panel and industrial climate control. The tables will be set up on {f}."
+"El cuadro de la sala: seis mesas con su LED doble, el riego centralizado y el clima. {q}","The room's control panel: six tables with their double LED, central irrigation and climate. {q}"
+Las lleva {n}.,{n} runs them.
+Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.,Nobody runs them: put someone from your crew in the room from your phone.
+"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip and the climate. All automatic: long days while they grow and shorter ones once it's time to flower."
+Comprar un kit de carpa · {e},Buy a tent kit · {e}
+Reformar la sala · {e},Refit the room · {e}
+Comprar un kit,Buy a tent kit
+Reformar la sala,Refit the room
+"El kit de la carpa grande, a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y lo montan aquí.","The big tent kit, at shop prices: {l}. {e} in total, by card; it arrives tomorrow and they set it up here."
+Kit de carpa (KAIA),Tent kit (KAIA)
+"Pedido: la carpa {n} llega mañana, con sus dos LED, el extractor y el goteo. Nueve plazas más.","Ordered: tent {n} arrives tomorrow, with its two LEDs, the extractor and the drip. Nine more spots."
+"La sala entera como la nave: {l}. En total, {e}, con la tarjeta; la obra dura {d} días. Después, las mesas las lleva alguien de tu plantilla.","The whole room like the warehouse: {l}. {e} in total, by card; the works take {d} days. Afterwards, someone from your crew runs the tables."
+Las carpas se desmontan y se venden de segunda mano por {e}.,The tents are taken down and sold second-hand for {e}.
+"Antes, cosecha o arranca lo que tengas en las carpas.","First, harvest or pull up whatever you have in the tents."
+Hacer la obra,Do the works
+Obra de la sala de cultivo (KAIA),Grow room works (KAIA)
+Carpas de segunda mano (KAIA),Second-hand tents (KAIA)
+"Empieza la obra. El {f}, la sala con sus mesas.","The works begin. On {f}, the room with its tables."
+Llevarte lo seco · {g},Take the dried buds · {g}
+Llevarte lo seco,Take the dried buds
+Nadie la lleva: pon a alguien de tu plantilla en la sala.,Nobody runs it: put someone from your crew in the room.
+Te llevas {g} de la mesa {i}.,You take {g} from table {i}.
+Lo de esta mesa aún se está secando: espera a que esté seco.,What came off this table is still drying: wait until it's dry.
+"Antes, llévate lo seco de esta mesa.","First, take the dried buds from this table."
+"Mesa {i}: {nom}{et}. La mesa entera de clones: enraízan, crecen a 18/6 y florecen a 12/12. Se cosecha entera en unos {d} días y vuelve a empezar.","Table {i}: {nom}{et}. A whole table of clones: they root, grow at 18/6 and flower at 12/12. It's harvested in one go in about {d} days and starts again."
+A la sala de KAIA,To the KAIA room
+"{n}: «Mañana empiezo en la sala de cultivo de KAIA: las seis mesas, el riego y los cortes. {e} al día».","{n}: ""I start in KAIA's grow room tomorrow: the six tables, the watering and the harvests. {e} a day."""
+sala de KAIA,KAIA room
+"Lleva las mesas de la sala de cultivo de KAIA por {e} al día: con su cuidado, la cosecha da un {p} %.","Runs the tables in KAIA's grow room for {e} a day: with their care, the harvest yields {p} %."
+"«Las {n} mesas que tienen plantas van bien: riego, poda y el corte cuando toca. Lo seco, al almacén del club».","""The {n} tables with plants are doing well: watering, pruning and the cut when it's due. The dried buds go to the club's storeroom."""
+"«Las mesas, vacías. Planta en ellas y me encargo del resto».","""The tables are empty. Plant them and I'll take care of the rest."""
+Carpa 240×240,Tent 240×240
+Carpa de 240 × 240 × 200 cm,240 × 240 × 200 cm tent
+Dos LED de 720 W,Two 720 W LEDs
+Extracción con filtros de carbón,Extraction with carbon filters
+Extractor de 250 mm con filtro de carbón,250 mm extractor with carbon filter
+Goteo de 9 salidas con su depósito,9-outlet drip with its reservoir
+La carpa 4,Tent 4
+"Obra: desagües, cuadro trifásico y clima industrial","Works: drains, three-phase panel and industrial climate"
+Riego centralizado con su tanque,Central irrigation with its tank
+Seis mesas de 240 × 120 con su LED doble,Six 240 × 120 tables with their double LED
+La lleva {n}.,{n} runs it.
+La sala de KAIA,The KAIA grow room
+Antes, espera a que llegue la carpa que tienes pedida.,"First, wait for the tent you ordered to arrive."

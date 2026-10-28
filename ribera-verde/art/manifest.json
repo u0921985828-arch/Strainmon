@@ -1462,6 +1462,16 @@
    ],
    "ajuste": "exacto",
    "nota": "atrezo de la tierra en 16 × 16 (tierra.py): ocho detalles en tira"
+  },
+  "carpa_grande": {
+   "w": 64,
+   "h": 64,
+   "ancla": [
+    16,
+    63
+   ],
+   "ajuste": "exacto",
+   "nota": "muebles de 3 × 2 casillas a escala real (16 px/m): la base en el centro de la casilla de abajo a la izquierda (16, 63) y el mueble centrado en x 32; las demás casillas (carpaG2) no se pintan"
   }
  },
  "fases": [
@@ -10645,7 +10655,8 @@
     "obj:carpaDemo",
     "obj:rotuloK",
     "obj:mesaK",
-    "obj:clonN"
+    "obj:clonN",
+    "obj:mesaKC"
    ],
    "celda": "mueble_ancho",
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
@@ -14047,6 +14058,28 @@
     "labMicro": "exacto",
     "labBalanza": "exacto"
    }
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "max_colores": 32,
+   "id": "kaia-carpa",
+   "celda": "carpa_grande",
+   "cubre": [
+    "obj:carpaKG0",
+    "obj:carpaKG1",
+    "obj:carpaKG2",
+    "obj:carpaKG3"
+   ],
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/kaia_carpa.py",
+   "estilo_ref": "la carpa de las madres de la nave (carpaM de locales.py)",
+   "notas": "Lo pidió el usuario: «como en casa, cultivo con carpas, pero más grandes de primeras». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "descripcion": "La carpa de 240 × 240 × 200 cm de la sala de cultivo de KAIA, plateada y abierta de frente, con dos LED de 720 W, el extractor y el filtro encima y el tubo al techo, y de 0 a 9 plantas (carpaKG-<n>)."
   }
  ],
  "familias": {

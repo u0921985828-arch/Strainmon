@@ -89,14 +89,14 @@ def labNormas():
     """el cartel de las normas (60 × 50 cm, 12 × 10 px a 1,4 m): tres señales azules de obligación (la bata, las gafas y los
     guantes) y tres rojas de prohibición (la comida, la bebida y el tabaco)"""
     L = Lienzo(32, 48)
-    x0, y0 = 9, 17
-    L.r(x0, y0, 15, 13, '#f8f8f4'); L.hl(x0, x0 + 14, y0, BL[2])
-    obligacion(L, x0 + 3, y0 + 3, ((0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)))            # la bata
-    obligacion(L, x0 + 7, y0 + 3, ((-1, 0), (1, 0), (0, 0)))                             # las gafas
-    obligacion(L, x0 + 11, y0 + 3, ((0, -1), (-1, 0), (0, 0), (0, 1)))                   # el guante
-    prohibido(L, x0 + 3, y0 + 9, '#c8a060')                                              # comer
-    prohibido(L, x0 + 7, y0 + 9, '#4a92e0')                                              # beber
-    prohibido(L, x0 + 11, y0 + 9, '#a8acb4')                                             # fumar
+    x0, y0 = 10, 17                                                                       # con el contorno, dentro de su casilla
+    L.r(x0, y0, 13, 13, '#f8f8f4'); L.hl(x0, x0 + 12, y0, BL[2])
+    obligacion(L, x0 + 2, y0 + 3, ((0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)))            # la bata
+    obligacion(L, x0 + 6, y0 + 3, ((-1, 0), (1, 0), (0, 0)))                             # las gafas
+    obligacion(L, x0 + 10, y0 + 3, ((0, -1), (-1, 0), (0, 0), (0, 1)))                   # el guante
+    prohibido(L, x0 + 2, y0 + 9, '#c8a060')                                              # comer
+    prohibido(L, x0 + 6, y0 + 9, '#4a92e0')                                              # beber
+    prohibido(L, x0 + 10, y0 + 9, '#a8acb4')                                             # fumar
     L.contorno(K)
     return L
 
@@ -135,13 +135,13 @@ def labPercha():
     """la percha de la antesala: el tablero con cuatro ganchos, dos batas blancas colgadas, las gafas de seguridad colgando de su
     goma y, al lado, el dispensador de guantes de nitrilo azules; abajo, el cubo de las fundas usadas"""
     L = Lienzo(32, 48)
-    L.r(8, 14, 16, 2, AC[1]); L.hl(8, 23, 14, AC[3])                                      # el tablero
-    for x in (10, 14, 18, 22): L.p(x, 16, AC[0])
+    L.r(9, 14, 14, 2, AC[1]); L.hl(9, 22, 14, AC[3])                                      # el tablero (con el contorno, en su casilla)
+    for x in (10, 14, 18, 21): L.p(x, 16, AC[0])
     for bx in (9, 14):                                                                    # las batas
         L.r(bx, 17, 5, 17, BL[3]); L.vl(bx, 17, 33, BL[2]); L.vl(bx + 4, 18, 33, BL[1]); L.vl(bx + 2, 19, 33, BL[1])
         L.hl(bx + 1, bx + 3, 17, BL[1]); L.p(bx + 1, 24, BL[1]); L.p(bx + 3, 27, BL[1])   # el cuello y los bolsillos
     L.hl(19, 21, 19, '#3a3a44'); L.r(19, 20, 4, 2, VI[2]); L.p(21, 20, VI[0])             # las gafas
-    L.r(19, 24, 5, 5, AZ[1]); L.hl(19, 23, 24, AZ[2]); L.hl(20, 22, 25, '#1a2a58'); L.p(21, 26, '#7aa6f0')   # los guantes
+    L.r(19, 24, 4, 5, AZ[1]); L.hl(19, 22, 24, AZ[2]); L.hl(20, 22, 25, '#1a2a58'); L.p(21, 26, '#7aa6f0')   # los guantes
     L.r(18, 39, 5, 7, AC[1]); L.hl(18, 22, 39, AC[3]); L.vl(22, 39, 45, AC[0])            # el cubo
     L.contorno(K); suelo(L, 18, 22, K)
     return L
@@ -234,22 +234,23 @@ def labResiduos():
 
 def puerta(precinto):
     """la puerta del laboratorio: el marco gris, la hoja blanca de acero lacado con el ventanuco estrecho de cristal, la manilla de
-    palanca, la placa de empuje, las tres señales azules de EPI y, cerrada, la cinta de precinto en aspa"""
+    palanca, la placa de empuje, las tres señales azules de EPI y, cerrada, la cinta de precinto en aspa. Con el contorno, dentro de
+    su casilla (x 8..23), como las de sotano.py: que no se monte encima de lo de al lado"""
     L = Lienzo(32, 48); t = 21
-    L.r(7, t, 18, 48 - t, AC[0]); L.hl(7, 24, t, AC[1])                                    # el marco
-    L.r(9, t + 2, 14, 46 - t, BL[3]); L.vl(9, t + 2, 47, '#ffffff'); L.vl(22, t + 2, 47, BL[1])
+    L.r(9, t, 14, 48 - t, AC[0]); L.hl(9, 22, t, AC[1])                                    # el marco
+    L.r(10, t + 2, 12, 46 - t, BL[3]); L.vl(10, t + 2, 47, '#ffffff'); L.vl(21, t + 2, 47, BL[1])
     L.r(15, t + 4, 3, 9, VI[1]); L.vl(15, t + 4, t + 12, VI[2]); L.hl(15, 17, t + 4, AC[2])   # el ventanuco
     for i, d in enumerate((((0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)), ((-1, 0), (1, 0), (0, 0)), ((0, -1), (-1, 0), (0, 0), (0, 1)))):
         cy = t + 5 + i * 4
-        L.r(10, cy - 1, 3, 3, AZ[1])
-        for dx, dy in d: L.p(11 + dx, cy + dy, '#f4f4ee')
-    L.r(19, t + 15, 3, 1, AC[1]); L.p(21, t + 16, AC[1]); L.p(19, t + 16, AC[2])          # la manilla
-    L.r(10, t + 18, 4, 6, BL[1])                                                          # la placa de empuje
-    L.hl(9, 22, 47, AC[0])
+        L.r(11, cy - 1, 3, 3, AZ[1])
+        for dx, dy in d: L.p(12 + dx, cy + dy, '#f4f4ee')
+    L.r(18, t + 15, 3, 1, AC[1]); L.p(20, t + 16, AC[1]); L.p(18, t + 16, AC[2])          # la manilla
+    L.r(11, t + 18, 4, 6, BL[1])                                                          # la placa de empuje
+    L.hl(10, 21, 47, AC[0])
     if precinto:
-        for i in range(14):
+        for i in range(12):
             y1 = t + 4 + i
-            for x, y in ((9 + i, y1), (22 - i, y1)):
+            for x, y in ((10 + i, y1), (21 - i, y1)):
                 L.p(x, y, AM[1] if (i // 2) % 2 == 0 else RN[0])
     L.contorno(K)
     return L

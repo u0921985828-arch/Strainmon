@@ -935,6 +935,7 @@ sc08e634a,El piso,The flat
 sd928546f,La calle,The Street
 scaff5908,La nave,The warehouse
 scf6a408b,Los pisos,The flats
+sba6699fd,La sala de KAIA,The KAIA grow room
 saa447a67,Sin trabajo,Unemployed
 s89729d10,"Jefe, ojo con {n}: ayer le vi hablando con uno de paisano detrás de {l}. Yo no le contaría nada.","Boss, watch out for {n}: yesterday I saw them talking to a plain-clothes cop behind {l}. I wouldn't tell them anything."
 s5f9d243c,Sin extracción no hay filtro: el olor sale a la calle.,"No extraction, no filter: the smell gets out to the street."
@@ -1793,17 +1794,60 @@ s26e3f421,FLORES,BUDS
 s99a32bef,ROSIN,ROSIN
 s23317412,KAIA_CULT,KAIA_CULT
 s066ae4c4,"La sala de cultivo de KAIA, cerrada. Hasta tener la licencia de cultivo, aquí dentro no se planta nada.","KAIA's grow room, locked. Until you have the cultivation licence, nothing gets planted in here."
-s3a4f2254,"El cuadro de la sala: el temporizador de los LED, la bomba del goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip pump and the climate. All automatic: long hours of light while they grow and fewer as soon as it's time to flower."
+s62ad04d6,"El tanque del riego centralizado, con el abono ya mezclado: las bombas lo llevan a cada mesa.","The central irrigation tank, with the nutrients already mixed in: the pumps carry it to every table."
+sa9e94427,"El programador del riego de las mesas: los turnos de cada una, el pH y la EC, en automático.","The tables' irrigation controller: each one's cycles, the pH and the EC, all automatic."
+s04708b3d,"El programador del riego de las mesas: los turnos de cada una, la acidez y la EC, en automático.","The tables' irrigation controller: each one's cycles, the acidity and the EC, all automatic."
+s135969dd,"La sala, en obras: desagües, el cuadro trifásico y el clima industrial. Las mesas estarán montadas el {f}.","The room is under works: drains, the three-phase panel and industrial climate control. The tables will be set up on {f}."
+sd2bdf196,"El cuadro de la sala: seis mesas con su LED doble, el riego centralizado y el clima. {q}","The room's control panel: six tables with their double LED, central irrigation and climate. {q}"
+s60bc25ab,Las lleva {n}.,{n} runs them.
+s5f6947bc,Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.,Nobody runs them: put someone from your crew in the room from your phone.
+sd5b6a75f,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip and the climate. All automatic: long days while they grow and shorter ones once it's time to flower."
+s1f41b1f3,Comprar un kit de carpa · {e},Buy a tent kit · {e}
 saaa33220,Ordenar la sala,Arrange the room
-sefcb688d,"El depósito del goteo, con el abono ya mezclado. La bomba lo lleva a cada maceta cuando la tierra se seca.","The drip tank, with the nutrients already mixed in. The pump takes it to each pot when the soil dries out."
-se0c09aef,"La bomba y el programador del riego por goteo: un gotero por maceta, a la tierra y no a las hojas.","The drip irrigation pump and timer: one dripper per pot, onto the soil and not the leaves."
-sbc6dc006,"La extracción, con sus filtros de carbón: el aire de la sala sale limpio y sin olor, como pide la licencia.","The extraction, with its carbon filters: the room's air leaves clean and odourless, as the licence requires."
+s055ef0d6,Reformar la sala · {e},Refit the room · {e}
+s6f594fca,Comprar un kit,Buy a tent kit
+s484dbabb,Reformar la sala,Refit the room
+s763310f9,"El kit de la carpa grande, a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y lo montan aquí.","The big tent kit, at shop prices: {l}. {e} in total, by card; it arrives tomorrow and they set it up here."
+saa267e0a,Comprarlo,Buy it
+sdf58fdde,Ahora no,Not now
+s7d640fd3,Kit de carpa (KAIA),Tent kit (KAIA)
+s7d81ec91,"Pedido: la carpa {n} llega mañana, con sus dos LED, el extractor y el goteo. Nueve plazas más.","Ordered: tent {n} arrives tomorrow, with its two LEDs, the extractor and the drip. Nine more spots."
+sf47682b4,"La sala entera como la nave: {l}. En total, {e}, con la tarjeta; la obra dura {d} días. Después, las mesas las lleva alguien de tu plantilla.","The whole room like the warehouse: {l}. {e} in total, by card; the works take {d} days. Afterwards, someone from your crew runs the tables."
+s110640e9,Las carpas se desmontan y se venden de segunda mano por {e}.,The tents are taken down and sold second-hand for {e}.
+s82ef3618,"Antes, cosecha o arranca lo que tengas en las carpas.","First, harvest or pull up whatever you have in the tents."
+safbefe26,"Antes, espera a que llegue la carpa que tienes pedida.",
+sc303f5e0,Hacer la obra,Do the works
+s0b8f532d,Obra de la sala de cultivo (KAIA),Grow room works (KAIA)
+s5ca3c99d,Carpas de segunda mano (KAIA),Second-hand tents (KAIA)
+s22e7890e,"Empieza la obra. El {f}, la sala con sus mesas.","The works begin. On {f}, the room with its tables."
 s100c7a74,"Sin la licencia de cultivo, las carpas se quedan vacías.","Without the cultivation licence, the tents stay empty."
 s1d69b400,Plaza {n},Spot {n}
 s752e7823,{st} {p}% · Agua {w}% · Salud {h}%,{st} {p}% · Water {w}% · Health {h}%
 s538df21c,vacía,empty
 sbaef3c8b,Una maceta de tela con su gotero.,A fabric pot with its dripper.
 se404e6e7,LA CARPA {n},TENT {n}
+s39d6b660,Me,
+s5742a7d0,Arrancar y plantar,Uproot and plant
+sbfb12456,Llevarte lo seco · {g},Take the dried buds · {g}
+se7b42179,"Mesa {i} · {que} · {foco}
+{cuida}","Table {i} · {que} · {foco}
+{cuida}"
+sc14e24da,La lleva {n}.,{n} runs it.
+s7598f7e7,Nadie la lleva: pon a alguien de tu plantilla en la sala.,Nobody runs it: put someone from your crew in the room.
+sa5e47e79,Llevarte lo seco,Take the dried buds
+sae3696fb,No te cabe nada más en la mochila.,Your backpack can't fit any more.
+s01228fda,Te llevas {g} de la mesa {i}.,You take {g} from table {i}.
+s2154f22e,Lo de esta mesa aún se está secando: espera a que esté seco.,What came off this table is still drying: wait until it's dry.
+s0e6f70cf,"Antes, llévate lo seco de esta mesa.","First, take the dried buds from this table."
+sb960ede7,¿QUÉ PLANTAS EN LA MESA?,WHAT GOES ON THE TABLE?
+sb8cca834,"Mesa {i}: {nom}{et}. La mesa entera de clones: enraízan, crecen a 18/6 y florecen a 12/12. Se cosecha entera en unos {d} días y vuelve a empezar.","Table {i}: {nom}{et}. A whole table of clones: they root, grow at 18/6 and flower at 12/12. It's harvested in one go in about {d} days and starts again."
+se14080f3,A la sala de KAIA,To the KAIA room
+sb49f8383,"{n}: «Mañana empiezo en la sala de cultivo de KAIA: las seis mesas, el riego y los cortes. {e} al día».","{n}: ""I start in KAIA's grow room tomorrow: the six tables, the watering and the harvests. {e} a day."""
+s3bc2ab46,sala de KAIA,KAIA room
+s3b43529a,"Lleva las mesas de la sala de cultivo de KAIA por {e} al día: con su cuidado, la cosecha da un {p} %.","Runs the tables in KAIA's grow room for {e} a day: with their care, the harvest yields {p} %."
+s5ef79f60,lookObj,
+se56a8ca1,"«Las {n} mesas que tienen plantas van bien: riego, poda y el corte cuando toca. Lo seco, al almacén del club».","""The {n} tables with plants are doing well: watering, pruning and the cut when it's due. The dried buds go to the club's storeroom."""
+sc63b883b,"«Las mesas, vacías. Planta en ellas y me encargo del resto».","""The tables are empty. Plant them and I'll take care of the rest."""
 s4e58915c,CANNADEX,CANNADEX
 s570950d9,GENOTECA,GENEBANK
 s2511e675,MOCHILA,BAG
@@ -1991,7 +2035,6 @@ sbf3ec475,Alquiler: {a} al mes. Comprarlo: {p}.,Rent: {a} a month. Buy it: {p}.
 sa5838892,nadie,nobody
 s3c61c9ea,"Lugarteniente: {l} · {p}, {x} · ayer {v} · calor {c}.","Lieutenant: {l} · {p}, {x} · yesterday {v} · heat {c}."
 s7752de1e,Un piso discreto en {n}: {a} al mes o {p} en propiedad.,"A quiet flat in {n}: {a} a month, or {p} to own it."
-saa267e0a,Comprarlo,Buy it
 s276aeb3f,"El primer mes va en efectivo, por delante. No te llega.","The first month is paid in cash, up front. You don't have enough."
 s755d7e70,Compra · piso de {n},Purchase · flat in {n}
 s6fecee0b,Para comprarlo hacen falta {p} en la cuenta.,To buy it you need {p} in the account.
@@ -2197,7 +2240,6 @@ se2e5e2d2,¿Qué le das?,What do you give them?
 s9ab54675,"Ay, gracias. Para dormir, como hacía tu tía.","Oh, thanks. For sleeping, like your aunt did."
 s644fbd5e,"Te riego, relleno las garrafas y el depósito y, si tienes insecticida, trato las plagas. {e} al día, cada mañana. ¿Hecho?","I'll water, refill the jugs and the tank and, if you've got insecticide, treat the pests. {e} a day, every morning. Deal?"
 s98e10bbb,Hecho,Deal
-sdf58fdde,Ahora no,Not now
 s7d1305ff,Mañana empiezo. Ya sé dónde dejaba la llave tu tía.,I start tomorrow. I know where your aunt left the key.
 s86a5ef94,{c}. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son {q}. ¿Te haces socio?,{c}. Nothing's sold inside: your stuff comes in the back door. Membership is {q}. Want to join?
 s60ede028,"{c}, asociación de consumidores. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son {q}. ¿Te haces socio?","{c}, a consumers' association. Nothing's sold inside: your stuff comes in the back door. Membership is {q}. Want to join?"
@@ -2337,7 +2379,6 @@ s4a6d1d63,NEGOCIO,
 sa84d49a7,ESTANCO,TOBACCONIST
 s2f027ac5,floorTc,
 s02b713bc,neumT,neumT
-s5ef79f60,lookObj,
 secbada89,demoG,
 sebd71e90,demoC,
 s58094308,«Circule.»,«Move along.»
@@ -2515,12 +2556,8 @@ s98b79e83,Una pipa,A pipe
 se5b25907,Un bong,A bong
 s3e472d26,El vaporizador,The vaporizer
 sd5734ed9,^(bedT|pc|gpc|.*2)$,
-s5742a7d0,Arrancar y plantar,Uproot and plant
 s57660f91,Abono,Nutrients
 s132c9f36,Focos,Lights
-se7b42179,"Mesa {i} · {que} · {foco}
-{cuida}","Table {i} · {que} · {foco}
-{cuida}"
 s97c813d5,La cuida {n}.,{n} looks after it.
 s62c01999,Nadie la cuida: pon a alguien de tu plantilla en la nave.,Nobody tends it: put someone from your crew in the warehouse.
 s2070b918,Lo de esta mesa aún se está secando en el secadero: espera a descolgarlo.,This table's crop is still drying: wait to take it down.
@@ -2538,7 +2575,6 @@ sa342a851,{n} clones,{n} clones
 sbe1e0de5,Los clones enraizados del carro de bandejas: una mesa entera.,The rooted clones from the tray cart: a whole table.
 s1021039e,Esqueje {nom}{et},Cutting {nom}{et}
 saa86ae2c,Clon enraizado: sale con su fenotipo.,Rooted clone: keeps its phenotype.
-sb960ede7,¿QUÉ PLANTAS EN LA MESA?,WHAT GOES ON THE TABLE?
 s2ddc86ec,"Mesa {i}: {nom}{et}. De la madre salen los clones para toda la mesa: enraízan, crecen a 18/6 y florecen a 12/12. Se cosecha entera en unos {d} días y vuelve a empezar.","Table {i}: {nom}{et}. The mother gives clones for the whole table: they root, grow at 18/6 and bloom at 12/12. The whole table is harvested in about {d} days and it starts again."
 s765b7a00,Madre {j} · {nom},Mother {j} · {nom}
 s8951c04c,{n} esq.,{n} cut.
@@ -2610,7 +2646,6 @@ sd67f0ac4,La estantería de los abonos: MEATZA FLORACIÓN ×{m} · ORTUA BIO FLO
 se3fd7c74,En el secadero cuelgan {g} secándose: mañana se pueden descolgar.,{g} hanging in the drying room: you can take it down tomorrow.
 s91340eee,El secadero está vacío. Cada mesa se cosecha entera al final de su ciclo y se seca aquí un día.,The drying room is empty. Each table is harvested whole at the end of its cycle and dries here for a day.
 sbbb0a3a3,El secadero está vacío. Cada mesa se cosecha entera al final de su ciclo y se seca aquí {n} días.,The drying room is empty. Each table is harvested whole at the end of its cycle and dries here for {n} days.
-sae3696fb,No te cabe nada más en la mochila.,Your backpack can't fit any more.
 s0d7e3397,Descuelgas {g} del secadero.,You take {g} down from the drying room.
 s36747054,Quedan {g}: no te caben.,{g} left: they don't fit.
 s062a7344,"Siguen colgados {g}, secándose.","{g} still hanging, drying."
@@ -2751,7 +2786,6 @@ s2c2a3a96,neonH,neonH
 scdc589d4,tuboS,tuboS
 sb4c03f0c,botesW,botesW
 sbc952707,neonG,neonG
-s104da3a8,mesaN,mesaN
 se00620e0,baldaS,baldaS
 sf2e78f6a,doorX,
 sa802c4ea,humoHecho,
@@ -4648,6 +4682,7 @@ se2309e4f,iwB_club,iwB_club
 se1bfb7be,floorC,floorC
 s3b52007a,fotoMaite2,fotoMaite2
 sc8a28715,carpaM2,carpaM2
+s104da3a8,mesaN,mesaN
 sc2c8d874,mesaN2,mesaN2
 s75e837fe,iwT_disco,iwT_disco
 s71e69e0a,iwB_disco,iwB_disco
@@ -4694,13 +4729,13 @@ s886c5c04,boxL2,boxL2
 s473a07d0,iwT_tab,iwT_tab
 sa89a65f2,iwB_tab,iwB_tab
 s58054a53,floorTb,floorTb
-s655d3272,barrilTb,barrilTb
 s68066ccd,botTb,botTb
 sff68066c,botTb2,botTb2
 sb6cabb9a,cafeTb,cafeTb
 s198e735b,mesaTb,mesaTb
 s34b7bcc6,barraTb,barraTb
 s68e66e34,barraTb2,barraTb2
+s655d3272,barrilTb,barrilTb
 s73ae2d94,curaQ,curaQ
 s6f888ee4,cubaQ,cubaQ
 sbddd10e2,cubaQ2,cubaQ2
@@ -4840,11 +4875,6 @@ sf90c2954,floorLabL,floorLabL
 seae6d07a,labFlujo2,labFlujo2
 s2f865542,labMicro2,labMicro2
 sd64a06b2,labBalanza2,labBalanza2
-s70f641bf,carpaK0,carpaK0
-s07f17129,carpaK1,carpaK1
-s9ef82093,carpaK2,carpaK2
-s68b6a0a2,tanqueN,tanqueN
-s516bd93e,riegoN,riegoN
 s30a02292,ESTUDIANTE,STUDENT
 sf07acb89,Hola. Me ha dicho un amigo que tienes.,Hi. A friend said you've got some.
 s42927016,"Aupa, ¿tienes algo? Voy justo de dinero.","Hey, got anything? I'm a bit short on cash."
@@ -5803,6 +5833,8 @@ s207d87cf,Mide el riego y dosifica el abono sola en cada riego.,Measures the wat
 s2fe99616,apañada,makeshift
 sf62fb426,en marcha,up and running
 s23c85b4e,de concurso,award-grade
+s68b6a0a2,tanqueN,tanqueN
+s516bd93e,riegoN,riegoN
 s115d1f40,¡Esta canción es la mejor!,This song is the best!
 sabf5235f,"No pares, que viene el estribillo.","Don't stop, the chorus is coming."
 se2d96a12,Vengo cada sábado. El DJ es amigo mío.,I come every Saturday. The DJ's a mate.
@@ -5929,8 +5961,14 @@ sb61b234e,Los sofás de la izquierda,
 sd467cb00,Los sofás de la derecha,
 s4abfe96e,ORDENAR LA SALA DE CULTIVO,ARRANGE THE GROW ROOM
 sc9f664d2,La carpa 1,Tent 1
+s324d6f9f,carpaG2,
+scf0b684c,carpaKG0,
 s50ff3568,La carpa 2,Tent 2
+sb80c58da,carpaKG1,
 s27f805fe,La carpa 3,Tent 3
+s21050960,carpaKG2,
+sb99c905d,La carpa 4,Tent 4
+s560239f6,carpaKG3,
 sca19c6c2,Ahí no cabe.,It won't fit there.
 sc20453b7,Ahí ya hay algo.,Something's already there.
 s13045d4c,Ese hueco es para la carpa.,That spot is for the tent.
@@ -5938,6 +5976,7 @@ s6ec04784,Ahí estás tú.,You're standing there.
 s28deb4b2,Así no se podría pasar.,Nobody could get past.
 s4c2ac553,La manguera no llegaría a todas las mesas.,The hose wouldn't reach every table.
 sd0b04296,"Las carpas, en la zona de cultivo: sobre el suelo con desagüe, no en el pasillo.","Tents go in the grow area: on the floor with the drain, not in the corridor."
+s4594dbb4,Ahí quedaría montado encima de otra cosa.,It would end up on top of something else.
 s85e53511,Xabier,Xabier
 sd32b800f,Rosario,Rosario
 s98d0677a,Eneko,Eneko
@@ -6745,6 +6784,15 @@ s6e63843c,El laboratorio,The lab
 s0aa5f652,El mostrador de los socios,The members' counter
 s300cbea9,La sala de catas,The tasting room
 s31870a6f,La placa de la tía,Your aunt's plaque
+s1e01631c,Carpa 240×240,Tent 240×240
+sa0208618,Carpa de 240 × 240 × 200 cm,240 × 240 × 200 cm tent
+s25a45974,Dos LED de 720 W,Two 720 W LEDs
+s0334d841,Extractor de 250 mm con filtro de carbón,250 mm extractor with carbon filter
+s70f69132,Goteo de 9 salidas con su depósito,9-outlet drip with its reservoir
+s1c226ee4,"Obra: desagües, cuadro trifásico y clima industrial","Works: drains, three-phase panel and industrial climate"
+s97f04eca,Seis mesas de 240 × 120 con su LED doble,Six 240 × 120 tables with their double LED
+s1a47c179,Riego centralizado con su tanque,Central irrigation with its tank
+sc2d98008,Extracción con filtros de carbón,Extraction with carbon filters
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -6848,6 +6896,13 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+s3a4f2254,"El cuadro de la sala: el temporizador de los LED, la bomba del goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip pump and the climate. All automatic: long hours of light while they grow and fewer as soon as it's time to flower."
+sefcb688d,"El depósito del goteo, con el abono ya mezclado. La bomba lo lleva a cada maceta cuando la tierra se seca.","The drip tank, with the nutrients already mixed in. The pump takes it to each pot when the soil dries out."
+se0c09aef,"La bomba y el programador del riego por goteo: un gotero por maceta, a la tierra y no a las hojas.","The drip irrigation pump and timer: one dripper per pot, onto the soil and not the leaves."
+sbc6dc006,"La extracción, con sus filtros de carbón: el aire de la sala sale limpio y sin olor, como pide la licencia.","The extraction, with its carbon filters: the room's air leaves clean and odourless, as the licence requires."
+s70f641bf,carpaK0,carpaK0
+s07f17129,carpaK1,carpaK1
+s9ef82093,carpaK2,carpaK2
 sd9dc17c5,"Abre el laboratorio: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea.","Opens the lab: stabilise with one seed instead of two, once a day and once per harvest of each line."
 s849eb6f1,"Abre el laboratorio: estabilizar con una semilla en vez de dos, una vez al día.","Opens the lab: stabilise with one seed instead of two, once a day."
 scba6d27f,"El apeadero del tren de la comarca: la caseta, la marquesina y la vía detrás. Pasa uno cada media hora.","The local railway halt: the hut, the shelter and the track behind. A train comes every half hour."
@@ -6953,3 +7008,4 @@ s960219e1,Comida,Food
 s137508f0,Defensa,Self-defence
 s836ff227,"«{c}», en su cajón. {z}: destapado.","«{c}», in its drawer. {z}: uncovered."
 sa66e2ad4,{p},{p}
+sfa36793c,Antes, espera a que llegue la carpa que tienes pedida.

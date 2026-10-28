@@ -543,7 +543,7 @@ def teatro_in(nombre="Teatro", to="casco", tx=9, ty=27):
 	o[11][2] = None                                                   # y la esquina de la última, rota: sin la del rincón
 	o[13][16] = "taquillaT"                                           # la taquilla (de 2 casillas) y la taquillera, a su derecha
 	o[13][1] = "cartelT"
-	o[13][3] = "cartelT2"
+	o[13][2] = "cartelT2"                                             # bajo la esquina sin butaca: alto, no tapa la fila de delante
 	o[12][19] = "plantaT"
 	salida(m, (9, 10), to, tx, ty)
 	return m
@@ -573,8 +573,14 @@ def iglesia_in(k, nombre, W, H, to, tx, ty, retablo="retabloI"):
 	o[list(range(6, H - 3, 2))[-1]][W - 3] = None                                 # y uno del fondo, junto al confesionario
 	for y in range(6, H - 3, 4):
 		o[y][0] = o[y][W - 1] = "columnaI"
-	o[H - 3][W - 3] = "confesI"                                       # el confesionario (de 2 casillas), a la derecha
-	o[H - 3][1] = "velasI"                                            # el lampadario
+	o[H - 2][W - 3] = "confesI"                                       # el confesionario (de 2 casillas), a la derecha, contra la pared del fondo
+	for y in range(H - 4, H - 2):                                     # y, delante de él, ni banco ni columna: es alto y los taparía
+		for x in (W - 4, W - 3, W - 2, W - 1):
+			if o[y][x] in ("bancoI", "columnaI"):
+				o[y][x] = None
+	o[6][2] = "velasI"                                                # el lampadario de las velas del santo, en el sitio del primer banco
+	# (lo pidió el usuario: «que ningún objeto de pared o suelo se superponga sobre otro»): ni el lampadario ni el confesionario,
+	# que son altos, delante de un banco o de una columna (tests/solapes.gd)
 	o[H - 2][2] = "cepilloI"
 	o[H - 2][cx - 1], o[H - 2][cx + 2] = "pilaI", "pilaI"
 	salida(m, (cx, cx + 1), to, tx, ty)

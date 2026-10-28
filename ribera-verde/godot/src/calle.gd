@@ -1656,8 +1656,12 @@ func pos_pieza(mapa: String, k: String) -> Array:
 	var c = S.get("coloca") if S != null else null
 	if c is Dictionary and c.get(mapa) is Dictionary and c[mapa].has(k):
 		return [int(c[mapa][k][0]), int(c[mapa][k][1])]
-	var d: Array = pieza_de(mapa, k).def
+	var d: Array = def_p(pieza_de(mapa, k))
 	return [int(d[0]), int(d[1])]
+
+# el sitio de serie de una pieza; con Datos.CAL, el suyo si lo trae (defc: las máquinas del piso, sin montarse unas en otras)
+func def_p(P_: Dictionary) -> Array:
+	return P_.defc if Datos.CAL and P_.has("defc") else P_.def
 
 func celdas_p(P_: Dictionary, x: int, y: int) -> Array:
 	var l := []
@@ -1766,7 +1770,7 @@ func sin_pieza(mapa: String, k: String) -> Array:
 	return O
 
 # '' si la pieza k cabe en (x, y); si no, el motivo (D.ORDEN_MOTIVO)
-func cabe_pieza(mapa: String, k: String, x: int, y: int, O = null, jug := true) -> String:
+func cabe_pieza(mapa: String, k: String, x: int, y: int, O = null, jug := true, sol := true) -> String:
 	if O == null:
 		O = sin_pieza(mapa, k)
 	var m: Dictionary = MAPS[mapa]
@@ -1866,12 +1870,103 @@ func cabe_pieza(mapa: String, k: String, x: int, y: int, O = null, jug := true) 
 					break
 			if not lado:
 				return "paso"
+	if Datos.CAL and sol and pieza_solapa(mapa, k, F, O2, x, y):   # (lo pidió el usuario: «No quiero que ningún objeto de pared o suelo se superponga sobre otro»)
+		return "solapa"
 	if mapa == "nave" and S.get("nave") != null and int(S.nave.get("rg", 0)) >= 1:
 		var pos := {k: [x, y]}
 		for i in D.MESAS_X.size():
 			if ruta_riego(i, O2, pos) == null:
 				return "riego"
 	return ""
+
+# lo que pintaría el pintor en el mapa con los objetos O (pinta.gd mide: el sprite de verdad y su sitio en píxeles, sin cámara), en la
+# ventana v = [x0, y0, x1, y1] de casillas si la hay; en el piso, también las carpas (_carpa_mapa), con las de pos {k: [x, y]} movidas
+const SOLAPE_LIBRE := ["tree", "tree2", "manzano", "monte", "monte2"]   # los árboles y el monte de fuera: sus copas se cruzan
+const SOLAPE_MESA := ["table", "mesita", "mesaTb"]   # una mesa con su asiento pegado (la silla metida debajo, el sofá detrás)   # i18n-no
+func cajas_obj(mapa: String, O: Array, pos := {}, v = null) -> Array:
+	var Pn = get("pintor")   # el de juego.gd
+	if Pn == null:
+		return []
+	var cam0 = Pn.cam
+	Pn.cam = Vector2i.ZERO
+	Pn.mide = []
+	for ty in O.size():
+		for tx in O[ty].size():
+			var o = O[ty][tx]
+			if o and o != "carpa" and (v == null or (tx >= v[0] and tx <= v[2] and ty >= v[1] and ty <= v[3])):
+				Pn._arte_obj(o, tx, ty, [], [])
+	var r: Array = Pn.mide
+	Pn.mide = null
+	Pn.cam = cam0
+	var m: Dictionary = MAPS[mapa]
+	if mapa == "home" and S.get("carpas") is Array:
+		for ci in S.carpas.size():
+			var c = S.carpas[ci]
+			var kc := "carpa%d" % ci
+			var p = pos.get(kc, m.get("opos", {}).get(kc))
+			var f = Atlas.foto_misc("carpa-" + String(c.t) + "-mapa") if c and p != null else null
+			if f:
+				var x0 := int(p[0])
+				var x1: int = x0 + int(D.CARPAS[c.t].w) - 1
+				r.append({"o": "carpa-" + String(c.t), "k": kc, "x": x0, "y": int(p[1]), "c": f.c, "px": (x0 + x1 + 1) * 8 - int(f.cel.ancla[0]), "py": int(p[1]) * 16 + 15 - int(f.cel.ancla[1])})
+	return r
+
+# a y b van juntos a propósito: los árboles, las piezas seguidas de un mismo mueble en una fila y un asiento pegado a su mesa
+func junta_ok(a: Dictionary, b: Dictionary) -> bool:
+	if a.o in SOLAPE_LIBRE or b.o in SOLAPE_LIBRE:
+		return true
+	if a.o == b.o and a.y == b.y and absi(a.x - b.x) <= 2:
+		return true
+	for q in [[a, b], [b, a]]:
+		if q[0].o in SOLAPE_MESA and ASIENTOS.has(q[1].o) and q[1].x == q[0].x and absi(q[1].y - q[0].y) == 1:
+			return true
+	return false
+
+# los píxeles opacos de a encima de los de b
+func solape_px(a: Dictionary, b: Dictionary) -> int:
+	var ia: Image = a.c
+	var ib: Image = b.c
+	var x0: int = maxi(a.px, b.px)
+	var y0: int = maxi(a.py, b.py)
+	var x1: int = mini(a.px + ia.get_width(), b.px + ib.get_width())
+	var y1: int = mini(a.py + ia.get_height(), b.py + ib.get_height())
+	var n := 0
+	for y in range(y0, y1):
+		for x in range(x0, x1):
+			if ia.get_pixel(x - a.px, y - a.py).a > 0 and ib.get_pixel(x - b.px, y - b.py).a > 0:
+				n += 1
+	return n
+
+# los solapes de una lista de cajas, ["o1 x,y / o2 x,y: px"]; con mias, solo los de esas con las demás
+func solapes_de(C: Array, mias = null) -> Array:
+	var r := []
+	for i in C.size():
+		for j in range(i + 1, C.size()):
+			var a: Dictionary = C[i]
+			var b: Dictionary = C[j]
+			if mias != null and mias.call(a) == mias.call(b):
+				continue
+			if a.px >= b.px + b.c.get_width() or b.px >= a.px + a.c.get_width() or a.py >= b.py + b.c.get_height() or b.py >= a.py + a.c.get_height():
+				continue
+			if junta_ok(a, b):
+				continue
+			var n := solape_px(a, b)
+			if n > 0:
+				r.append("%s %d,%d / %s %d,%d: %d px" % [a.o, a.x, a.y, b.o, b.x, b.y, n])   # i18n-no
+	return r
+
+# la pieza k en (x, y), con las casillas F, se pintaría encima de otra cosa
+func pieza_solapa(mapa: String, k: String, F: Array, O2: Array, x: int, y: int) -> bool:
+	var x0 := x
+	var x1 := x
+	for c in F:
+		x0 = mini(x0, int(c[0]))
+		x1 = maxi(x1, int(c[0]))
+	var C := cajas_obj(mapa, O2, {k: [x, y]}, [x0 - 4, y - 5, x1 + 4, y + 5])
+	var mias := {}
+	for c in F:
+		mias["%d,%d" % [int(c[0]), int(c[1])]] = true
+	return not solapes_de(C, func(a): return a.get("k", "") == k or (not a.has("k") and mias.has("%d,%d" % [a.x, a.y]))).is_empty()
 
 # quita las piezas del mapa (las de serie del plano la primera vez: las que están enteras en su sitio de serie)
 func quita_orden(mapa: String) -> void:
@@ -1883,13 +1978,13 @@ func quita_orden(mapa: String) -> void:
 				continue
 			var ok := true
 			for o in P_.o:
-				var yy: int = int(P_.def[1]) + int(o[1])
-				var xx: int = int(P_.def[0]) + int(o[0])
+				var yy: int = int(def_p(P_)[1]) + int(o[1])
+				var xx: int = int(def_p(P_)[0]) + int(o[0])
 				if not (yy >= 0 and yy < int(m.h) and xx >= 0 and xx < int(m.w) and m.o[yy][xx] == (o[2] if o.size() > 2 else null)):
 					ok = false
 					break
 			if ok:
-				m.opos[P_.k] = [int(P_.def[0]), int(P_.def[1])]
+				m.opos[P_.k] = [int(def_p(P_)[0]), int(def_p(P_)[1])]
 	for k in m.opos:
 		var P_ := pieza_de(mapa, k)
 		if P_.get("suelo"):
@@ -1909,7 +2004,7 @@ func aplica_orden(mapa: String) -> void:
 	quita_orden(mapa)
 	for P_ in piezas_ya(mapa):
 		var p := pos_pieza(mapa, P_.k)
-		if cabe_pieza(mapa, P_.k, p[0], p[1], copia_o(m), false) != "":
+		if cabe_pieza(mapa, P_.k, p[0], p[1], copia_o(m), false, false) != "":   # lo que ya estaba puesto no se mueve por un solape (las partidas de antes)
 			var cs := []
 			if P_.has("alt"):
 				cs.append([int(P_.alt[0]), int(P_.alt[1])])

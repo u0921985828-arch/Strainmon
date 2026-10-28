@@ -1165,7 +1165,11 @@ func montar_disco() -> void:
 			MAPS.ensanche.doors[k].x = int(C.puerta[k][0])
 			MAPS.ensanche.doors[k].y = int(C.puerta[k][1])
 
-const VITRINA_GROW := {"shop": [7, 6], "growcity": [9, 5]}
+const VITRINA_GROW := {"shop": [6, 6], "growcity": [8, 6]}   # sin montarse en el expositor ni en las macetas de al lado (tests/solapes.gd)
+
+# (lo pidió el usuario: «No quiero que ningún objeto de pared o suelo se superponga sobre otro»): en los mapas de antes del calendario, con
+# Datos.CAL, lo que iba montado, a una casilla libre de al lado [x, y, x2, y2, objeto] (el resto, en datos.json por tools/solapes.py)
+const SOLAPE_CAL := {"growcity": [[0, 5, 0, 6, "display"]], "almacen": [[0, 3, 0, 4, "crate"], [9, 3, 9, 4, "crate"]]}   # i18n-no
 
 const CAJERO_CAL := {"town": [[31, 8], [30, 8]]}   # 1.47 (lo pidió el usuario): el cajero que tapaba la farola, una casilla a la izquierda
 
@@ -1953,13 +1957,14 @@ func ent_at(x: int, y: int):
 const ATREZO := {
 	"txaro": [[3, 2, "tv"], [4, 2, "tv2"], [6, 1, "cuadro"], [8, 2, "libreria"], [3, 4, "sillon"], [4, 4, "sillon2"], [5, 5, "silla"], [8, 6, "mesita"], [5, 1, "cartel"]],
 	"casa-ama": [[4, 1, "cuadro"], [3, 2, "libreria"], [7, 2, "sillon"], [8, 2, "sillon2"], [5, 5, "silla"], [8, 6, "mesita"]],
-	"comisaria": [[6, 2, "escritorio"], [7, 2, "escritorio2"], [3, 1, "cuadro"]],
+	"comisaria": [[4, 6, "escritorio"], [5, 6, "escritorio2"], [3, 1, "cuadro"]],   # detrás del mostrador no: lo taparía (tests/solapes.gd)
 	"almacen": [[3, 2, "sacos"], [2, 1, "red"], [7, 2, "estanteN"], [8, 4, "barrilT"]],   # i18n-no
 	# (lo pidió el usuario: «está muy vacío… el atrezo deja que desear o por lo menos cómo está usado»): el taller, cada cosa en
 	# su zona: la manguera del aire sobre el elevador, el bidón y la grúa junto a los puestos, el lavabo entre el banco y el compresor,
 	# las ruedas nuevas en su estantería, el extintor junto a la puerta del cuartucho, entre las cajas y la recogedora y la espera con su máquina de café
-	"loc-valde": [[3, 1, "mangT"], [17, 1, "calT"], [11, 2, "lavabT"], [15, 2, "rackT"], [19, 3, "extinT"], [0, 6, "bidonT"],   # i18n-no
-		[6, 6, "gatoT"], [6, 7, "gruaT"], [19, 6, "cajonT"], [19, 7, "bidonT"], [14, 9, "sillaT"], [16, 9, "cafeM"]],   # i18n-no
+	"loc-valde": [[3, 1, "mangT"], [17, 1, "calT"], [11, 2, "lavabT"], [15, 2, "rackT"], [17, 3, "extinT"], [0, 6, "bidonT"],   # i18n-no
+		[5, 6, "gatoT"], [6, 7, "gruaT"], [19, 6, "cajonT"], [19, 8, "bidonT"], [14, 9, "sillaT"], [16, 9, "cafeM"]],   # i18n-no
+	# (lo pidió el usuario: «que ningún objeto de pared o suelo se superponga sobre otro»): el extintor, el gato y el bidón, sin montarse
 
 }
 
@@ -2202,6 +2207,12 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		var vg: Array = VITRINA_GROW[name_]
 		MAPS[name_].o[vg[1]][vg[0]] = "vitrinaP"   # i18n-no
 		MAPS[name_].o[vg[1]][vg[0] + 1] = "vitrinaP2"   # i18n-no
+	if Datos.CAL and SOLAPE_CAL.has(name_):
+		for q in SOLAPE_CAL[name_]:
+			var mo: Array = MAPS[name_].o
+			if mo[q[1]][q[0]] == q[4] and mo[q[3]][q[2]] == null:
+				mo[q[1]][q[0]] = null
+				mo[q[3]][q[2]] = q[4]
 	if Datos.CAL and CAJERO_CAL.has(name_):
 		var cj: Array = CAJERO_CAL[name_]
 		if MAPS[name_].o[cj[0][1]][cj[0][0]] == "cajero":

@@ -54,29 +54,31 @@ def escS():
     return L
 
 # 1.52 (lo pidió el usuario: «el alto de la pared no puede ser igual que el de la puerta»): la pared de dentro tiene 32 px (2 casillas);
-# la puerta, 27 px de marco (2,03 m frente a los 2,5 m del techo, a escala de la pared), con la pared a la vista encima del dintel
+# la puerta, 27 px de marco (2,03 m frente a los 2,5 m del techo, a escala de la pared), con la pared a la vista encima del dintel.
+# Con el contorno, dentro de su casilla (x 8..23; lo pidió el usuario: «que ningún objeto de pared o suelo se superponga sobre otro»):
+# el marco de 14 px y la hoja de 12 px (0,75 m, la de una puerta de paso)
 TOP = 5
 def puertaI():
     """la puerta de madera de dentro del piso: el marco, cuatro cuarterones, el pomo de latón y la sombra del umbral"""
     L = Lienzo(32, 32); t = TOP
-    L.r(7, t, 18, 32 - t, MAD[3])                                             # el marco
-    L.r(8, t + 1, 16, 31 - t, MAD[0]); L.vl(8, t + 1, 31, MAD[2]); L.hl(8, 23, t + 1, MAD[2]); L.vl(23, t + 2, 31, MAD[1])
-    for (x, y, h) in ((10, t + 3, 8), (17, t + 3, 8), (10, t + 14, 10), (17, t + 14, 10)):  # los cuarterones
-        L.r(x, y, 5, h, MAD[1]); L.hl(x, x + 4, y, MAD[3]); L.vl(x, y, y + h - 1, MAD[3]); L.vl(x + 4, y + 1, y + h - 1, MAD[2])
-    L.p(21, t + 13, '#e8c860'); L.p(21, t + 14, '#a88a30'); L.p(22, t + 13, '#f8e8a0')   # el pomo
-    L.hl(8, 23, 31, '#5a3c22')                                                 # el umbral
+    L.r(9, t, 14, 32 - t, MAD[3])                                             # el marco
+    L.r(10, t + 1, 12, 31 - t, MAD[0]); L.vl(10, t + 1, 31, MAD[2]); L.hl(10, 21, t + 1, MAD[2]); L.vl(21, t + 2, 31, MAD[1])
+    for (x, y, h) in ((11, t + 3, 8), (16, t + 3, 8), (11, t + 14, 10), (16, t + 14, 10)):  # los cuarterones
+        L.r(x, y, 4, h, MAD[1]); L.hl(x, x + 3, y, MAD[3]); L.vl(x, y, y + h - 1, MAD[3]); L.vl(x + 3, y + 1, y + h - 1, MAD[2])
+    L.p(19, t + 13, '#e8c860'); L.p(19, t + 14, '#a88a30'); L.p(20, t + 13, '#f8e8a0')   # el pomo
+    L.hl(10, 21, 31, '#5a3c22')                                                # el umbral
     L.contorno(K)
     return L
 
 def puertaM():
     """la puerta metálica de los locales: gris, con la barra antipánico, la rejilla de abajo y el cartel en blanco"""
     L = Lienzo(32, 32); G0, G1, G2, G3 = '#4a5058', '#7a828c', '#a4acb6', '#c8d0d8'; t = TOP
-    L.r(7, t, 18, 32 - t, '#3a3e44')
-    L.r(8, t + 1, 16, 31 - t, G1); L.vl(8, t + 1, 31, G2); L.hl(8, 23, t + 1, G3); L.vl(23, t + 2, 31, G0)
+    L.r(9, t, 14, 32 - t, '#3a3e44')
+    L.r(10, t + 1, 12, 31 - t, G1); L.vl(10, t + 1, 31, G2); L.hl(10, 21, t + 1, G3); L.vl(21, t + 2, 31, G0)
     L.r(12, t + 4, 8, 4, '#e8e8e0'); L.hl(13, 18, t + 5, '#9aa2aa'); L.hl(13, 16, t + 6, '#9aa2aa')   # el cartel
-    L.r(9, t + 13, 14, 2, G3); L.hl(9, 22, t + 15, G0); L.p(9, t + 12, G0); L.p(22, t + 12, G0)   # la barra
-    for y in range(24, 30, 2): L.hl(11, 20, y, G0)                                         # la rejilla
-    L.hl(8, 23, 31, '#2e3238')
+    L.r(11, t + 13, 10, 2, G3); L.hl(11, 20, t + 15, G0); L.p(11, t + 12, G0); L.p(20, t + 12, G0)   # la barra
+    for y in range(24, 30, 2): L.hl(12, 19, y, G0)                                         # la rejilla
+    L.hl(10, 21, 31, '#2e3238')
     L.contorno(K)
     return L
 
