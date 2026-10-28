@@ -410,13 +410,14 @@ s3281113e,plantaT,
 sc9bfa05f,"Una planta de interior, mustia. Le haría falta un buen abono.",A wilted houseplant. It could do with a good feed.
 s9889d409,"Cajas de fruta vacías, apiladas para el camión.","Empty fruit crates, stacked for the lorry."
 sbff7cf22,PUEBLOS,
+s52463f0a,viaE,
 s573f51a6,{e} · {m} min,{e} · {m} min
 sdbbdd47d,¿A dónde vas en tren?,Where are you going by train?
 s544c97a5,El billete hasta {d} cuesta {e}. No te llega.,The ticket to {d} costs {e}. You can't afford it.
 saddb3560,Bajas del tren en la estación de Zorroza.,You get off the train at Zorroza station.
 sf7445da7,Bajas del tren en el apeadero de {d}.,You get off the train at the {d} halt.
 s5315c345,"El apeadero, cerrado. En el cartel: el primer tren sale a las seis de la mañana y el último a las once de la noche.",The halt is closed. The sign says the first train leaves at six in the morning and the last at eleven at night.
-scba6d27f,"El apeadero del tren de la comarca: la caseta, la marquesina y la vía detrás. Pasa uno cada media hora.","The local railway halt: the hut, the shelter and the track behind. A train comes every half hour."
+s072e5987,"El apeadero del tren de la comarca: la caseta, la marquesina y el andén junto a la vía. Pasa uno cada media hora.","The local railway halt: the hut, the shelter and the platform by the track. A train comes every half hour."
 s5a26563b,Coger el tren,Take the train
 s1fab1c20,FUNCIONARIA,CLERK
 s106fdc09,«Una declaración por semana. Vuelva usted la que viene.»,“One declaration a week. Come back next week.”
@@ -6379,7 +6380,6 @@ s22e9ef52,wall_torreZ2,
 s61065ff9,door_iglesiaZ,
 s3a94b8eb,roofT_apeadero,
 s10244944,roofB_apeadero,
-s52463f0a,viaE,
 s2c689175,escZ2,
 se71d3676,ascensorZ,
 sa3547732,ascensorZ2,
@@ -6558,6 +6558,13 @@ s9cf7dbb8,ruedaM2,
 sc9c8a16d,Almacén del muelle,Dock warehouse
 s29d4620f,La ermita,The chapel
 s6e9d8105,"Los pueblos de siempre con su sitio propio y trazados naturales (con Datos.CAL; tools/pueblos.py): cambia = [x, y, suelo, objeto, suelo de antes, objeto de antes]; mundo.gd (pueblos_mapa) los pone y los quita al entrar; los hitos (bld con «hito»), en ciudad.gd (hito_obj).",
+s3a17011a,viaEFN,
+sb08db46d,viaEV,
+sb32dc7c7,andenO,
+sc42af751,andenN,
+s59116dc3,viaEFS,
+sad3aa409,viaEF,
+s53f82ed9,andenE,
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -6661,6 +6668,7 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+scba6d27f,"El apeadero del tren de la comarca: la caseta, la marquesina y la vía detrás. Pasa uno cada media hora.","The local railway halt: the hut, the shelter and the track behind. A train comes every half hour."
 sb3829eeb,Bajas del tren en {d} y sales a la parada.,You get off the train in {d} and walk out to the stop.
 s91d5cd57,"La ermita del monte, de piedra y con su campana. La puerta está abajo.","The hill chapel, stone, with its bell. The door is at the bottom."
 sa3ad6bc8,La chimenea de la fundición vieja. Lleva treinta años sin echar humo.,The old foundry chimney. It hasn't smoked in thirty years.

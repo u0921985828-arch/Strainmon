@@ -178,11 +178,20 @@ class Mapa:
 				if self.o[y][x] in ("monte", "monte2", "tree", "tree2"):
 					self.o[y][x] = None
 
-	def apeadero(self, x0, y0, sobre):
+	def apeadero(self, x0, y0, sobre, anden):
 		"""el apeadero del tren de la comarca (4 × 3; lo pidió el usuario: «si te permite ir a demás pueblos, debería de haber
-		estación de tren en los demás pueblos»): la caseta con la marquesina; la vía, detrás; se llega y se sale por delante"""
+		estación de tren en los demás pueblos»): la caseta con la marquesina, y entre ella y la vía, el andén (lo pidió el usuario:
+		«lo suyo sería que las vías sean accesibles desde el apeadero»): `anden` = (x0, y0, x1, y1, lado de la vía, llegada)"""
 		self.despeja(x0, y0, 4, 3)
 		self.hito("apeadero", x0, y0, 4, 3, sobre)
+		ax0, ay0, ax1, ay1, lado, llega = anden
+		for y in range(ay0, ay1 + 1):
+			for x in range(ax0, ax1 + 1):
+				assert (x, y) not in self.prot and self.g[y][x] in BLANDO + ("walk",) and self.o[y][x] in QUITABLE + ("monte", "monte2", "crate"), \
+					"%s: el andén pisa %s/%s en (%d, %d)" % (self.k, self.g[y][x], self.o[y][x], x, y)
+				self.g[y][x] = "anden" + lado
+				self.o[y][x] = None
+		self.blds[-1]["anden"] = list(llega)
 
 	def via(self, x0, y0, x1, y1, fin=None):
 		"""la vía estrecha del tren de la comarca, recta de (x0, y0) a (x1, y1) (lo pidió el usuario: «el apeadero deberá de estar
@@ -248,7 +257,7 @@ def town(M):
 	M.obj(17, 23, "bench")
 	M.quita(2, 24, "tree")                                      # su copa taparía el apeadero
 	M.via(0, 13, 0, 29, (0, 13))                                # la vía, por el canto de poniente: sale al sur junto a la carretera y acaba aquí
-	M.apeadero(1, 20, "grass")                                  # al pie de la vía, en el parque, antes de la senda de tierra
+	M.apeadero(2, 20, "grass", (1, 19, 1, 23, "O", (1, 21)))    # al pie de la vía, con su andén, en el parque, antes de la senda
 
 
 def alto(M):
@@ -293,7 +302,7 @@ def mendialde(M):
 	M.hito("ermita", 24, 7, 4, 4, "grass", (25, "ermita-in", "iglesia:ermita", (5, 9)))
 	M.senda([(25.6, 11.2), (25.4, 11.6)], 2, "plaza", ("grass",))   # el atrio, delante de la puerta
 	M.via(0, 1, 47, 1)                                          # la vía, de paso por la ladera, de canto a canto
-	M.apeadero(11, 2, "grass")                                  # debajo, entre las casas, al pie del monte
+	M.apeadero(11, 3, "grass", (9, 2, 14, 2, "N", (12, 2)))     # debajo del andén, entre las casas, al pie del monte
 
 
 def puerto(M):
@@ -312,7 +321,7 @@ def puerto(M):
 	M.via(0, 0, 0, 13, (0, 13))
 	for x, y in ((0, 14), (1, 14), (0, 15)):                    # el monte que lo taparía
 		M.quita(x, y, M.o[y][x])                                 # la vía baja del monte por detrás de las casas de poniente y acaba aquí
-	M.apeadero(1, 11, "plaza")                                  # al final del paseo, al oeste, junto a la vía
+	M.apeadero(2, 11, "plaza", (1, 9, 1, 13, "O", (1, 12)))     # al final del paseo, al oeste, con su andén junto a la vía
 
 
 def valdehierro(M):
@@ -324,9 +333,8 @@ def valdehierro(M):
 			M.g[21][x] = "via"
 	M.rect(30, 17, 33, 19, "dirt", ("tallgrass",))
 	M.mancha(31.6, 18.2, 2.3, 1.5, "tallgrass", "val-alta", 0.3, ("dirt",))
-	M.quita(31, 20, "crate")                                    # el paso al rincón de la vía muerta, por debajo del apeadero
-	M.via(30, 16, 39, 16, (30, 16))                             # la vía entra por levante, por la valla del desguace, y acaba aquí
-	M.apeadero(31, 17, "dirt")                                  # debajo, junto a la vía muerta del desguace
+	M.via(31, 15, 39, 15, (31, 15))                             # la vía entra por levante, por la valla del desguace, y acaba aquí
+	M.apeadero(31, 17, "dirt", (30, 16, 37, 16, "N", (32, 16)))   # debajo del andén, junto a la vía muerta del desguace
 
 
 def errotabarri(M):
@@ -340,7 +348,7 @@ def errotabarri(M):
 	M.quita(34, 7, "monte2")                                    # lo que taparía el apeadero
 	M.quita(30, 9, "tree")
 	M.via(26, 3, 35, 3, (26, 3))                                # la vía entra por levante, al pie del monte, y acaba aquí
-	M.apeadero(30, 4, "grass")                                  # debajo, arriba a la derecha
+	M.apeadero(30, 5, "grass", (29, 4, 34, 4, "N", (31, 4)))    # debajo del andén, arriba a la derecha
 
 
 def ibarbide(M):
@@ -356,7 +364,7 @@ def ibarbide(M):
 	M.quita(40, 28, "tree")                                     # su copa taparía el apeadero
 	M.quita(41, 25, "bush")                                     # la mata donde va el apeadero
 	M.via(43, 24, 43, 29, (43, 24))                             # la vía sale al sur por el canto de levante, pegada al parque, y acaba aquí
-	M.apeadero(39, 25, "grass")                                 # en el parque de abajo, al final de la senda, junto a la vía
+	M.apeadero(38, 25, "grass", (42, 24, 42, 28, "E", (42, 26)))   # en el parque de abajo, al final de la senda, con su andén
 
 
 def ensanche(M):

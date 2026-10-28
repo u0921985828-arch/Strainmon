@@ -1128,6 +1128,27 @@ def via(vertical=False, paso=False, estrecha=False, fin=None):
     return lz
 
 
+def anden(lado):
+    """el andén del apeadero: losas de hormigón, el bordillo claro del lado de la vía ('n', 'o' o 'e') y la raya amarilla de seguridad"""
+    lz = Lienzo(64, 16)
+    for v in range(4):
+        R = azar(1150); x0 = v * 16                                           # las cuatro, iguales
+        lz.r(x0, 0, 16, 16, '#b4b0a6')
+        for _ in range(10):
+            lz.p(x0 + int(R() * 16), int(R() * 16), '#c4c0b6' if R() < .5 else '#a29e94')
+        for t in range(16):                                                 # las juntas de las losas, cada 8
+            lz.p(x0 + 7, t, '#9a968c'); lz.p(x0 + t, 7, '#9a968c'); lz.p(x0 + t, 15, '#9a968c'); lz.p(x0 + 15, t, '#9a968c')
+        for t in range(16):
+            for u, c in ((0, '#e4e0d4'), (1, '#e4e0d4'), (2, '#8a8680'), (4, '#e8c020')):
+                if lado == 'n':
+                    lz.p(x0 + t, u, c)
+                elif lado == 'o':
+                    lz.p(x0 + u, t, c)
+                else:
+                    lz.p(x0 + 15 - u, t, c)
+    return lz
+
+
 def topera(lz, x0, fin):
     """la topera: los carriles cortados y la viga a franjas rojas y blancas sobre dos pies, a 2 px del canto"""
     for t in range(4):                                                      # hasta la viga, balasto sin carriles
@@ -1390,7 +1411,8 @@ SPRITES = {
                                                                ('viaXV', lambda: via(True, True)),
                                                                ('viaE', lambda: via(estrecha=True)), ('viaEX', lambda: via(False, True, True)),
                                                                ('viaEV', lambda: via(True, estrecha=True)), ('viaEF', lambda: via(estrecha=True, fin='o')),
-                                                               ('viaEFN', lambda: via(True, estrecha=True, fin='n')), ('viaEFS', lambda: via(True, estrecha=True, fin='s')), ('adoq', adoquin), ('muelleP', muelle))],
+                                                               ('viaEFN', lambda: via(True, estrecha=True, fin='n')), ('viaEFS', lambda: via(True, estrecha=True, fin='s')),
+                                                               ('andenN', lambda: anden('n')), ('andenO', lambda: anden('o')), ('andenE', lambda: anden('e')), ('adoq', adoquin), ('muelleP', muelle))],
     'props': lambda: [sale(baranda(), 'props-bilbao', 'baranda'), sale(papelera(), 'props-bilbao', 'papelera'), sale(bolardo(), 'props-bilbao', 'bolardo'),
                       sale(platano(), 'props-bilbao-alto', 'platano'), sale(metro(), 'props-bilbao-ancho', 'metroB'),
                       sale(contenedores(), 'props-bilbao-ancho', 'contenedores'), sale(escalera(), 'props-bilbao-ancho', 'escZ'),

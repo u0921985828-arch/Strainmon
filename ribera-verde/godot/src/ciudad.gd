@@ -300,6 +300,8 @@ func hito_de(x: int, y: int) -> String:
 
 func hito_obj(x: int, y: int) -> bool:
 	var h := hito_de(x, y)
+	if h == "" and en_anden(x, y):
+		h = "apeadero"
 	if h == "":
 		return false
 	var C := ciu()
@@ -538,8 +540,19 @@ const TREN_BILBAO := [8, 14]   # delante de la puerta de la estación de Zorroza
 func apeadero_de(k: String) -> Array:
 	for b in D.get("PUEBLOS", {}).get("MAPS", {}).get(k, {}).get("blds", []):
 		if str(b.get("hito", "")) == "apeadero":
+			if b.has("anden"):   # el andén, entre la caseta y la vía: ahí se baja y desde ahí se sube
+				return [int(b.anden[0]), int(b.anden[1])]
 			return [int(b.x0) + 1, int(b.y0) + int(b.h)]
 	return []
+
+# A en la vía desde el andén del apeadero: el tren se coge ahí (la vía no se pisa)
+func en_anden(x: int, y: int) -> bool:
+	var m: Dictionary = MAPS.get(S.map, {})
+	if m.is_empty() or y < 0 or y >= int(m.h) or x < 0 or x >= int(m.w) or not String(m.g[y][x]).begins_with("viaE"):
+		return false
+	var px := int(P.x)
+	var py := int(P.y)
+	return py >= 0 and py < int(m.h) and px >= 0 and px < int(m.w) and String(m.g[py][px]).begins_with("anden")
 
 # de dónde sale el tren: la estación de Bilbao (cualquiera de las de dentro) o el pueblo del apeadero
 func tren_origen() -> String:
@@ -591,7 +604,7 @@ func apeadero() -> void:
 	if int(S.min) < int(h[0]) or int(S.min) >= int(h[1]):
 		await say(K("El apeadero, cerrado. En el cartel: el primer tren sale a las seis de la mañana y el último a las once de la noche."))
 		return
-	if await ask(K("El apeadero del tren de la comarca: la caseta, la marquesina y la vía detrás. Pasa uno cada media hora."), [K("Coger el tren"), K("Nada")]) == 0:
+	if await ask(K("El apeadero del tren de la comarca: la caseta, la marquesina y el andén junto a la vía. Pasa uno cada media hora."), [K("Coger el tren"), K("Nada")]) == 0:
 		await tren()
 
 # ---------- la Diputación: la ventanilla de Hacienda ----------

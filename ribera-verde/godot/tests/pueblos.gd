@@ -72,8 +72,20 @@ func hace(q: Array, f: Callable) -> String:
 	chk(corre(f), "bloqueo con %s" % [q])
 	return " ".join(LOG)
 
-# lo que se alcanza andando desde donde se llega: puertas y salidas de los otros mapas, la parada y las propias salidas
-# la vía del apeadero (lo pidió el usuario: «el apeadero deberá de estar cerca de unas vías»): pegada a la caseta, vía estrecha,
+# la casilla de al lado del andén con la vía o con la caseta (-1, -1 si no hay)
+func junto(k: String, a: Array, que: String) -> Vector2i:
+	var m: Dictionary = J.MAPS[k]
+	for d in [Vector2i(0, -1), Vector2i(-1, 0), Vector2i(1, 0), Vector2i(0, 1)]:
+		var q: Vector2i = Vector2i(int(a[0]), int(a[1])) + d
+		if q.x < 0 or q.y < 0 or q.x >= int(m.w) or q.y >= int(m.h):
+			continue
+		if que == "via" and String(m.g[q.y][q.x]).begins_with("viaE"):
+			return q
+		if que == "caseta" and J.hito_de(q.x, q.y) == "apeadero":
+			return q
+	return Vector2i(-1, -1)
+
+# la vía del apeadero (lo pidió el usuario: «el apeadero deberá de estar cerca de unas vías»): al otro lado del andén, vía estrecha,
 # sin pisar nada que se ande; cada extremo, en el canto del mapa (va a alguna parte) o en su topera
 func vias_apeadero(k: String) -> void:
 	var m: Dictionary = J.MAPS[k]
@@ -86,8 +98,8 @@ func vias_apeadero(k: String) -> void:
 	var es_via := func(x: int, y: int) -> bool:
 		return x >= 0 and y >= 0 and x < W and y < H and String(m.g[y][x]).begins_with("viaE")
 	var ini := Vector2i(-1, -1)
-	for y in range(int(b.y0) - 1, int(b.y0) + int(b.h) + 1):
-		for x in range(int(b.x0) - 1, int(b.x0) + int(b.w) + 1):
+	for y in range(int(b.y0) - 2, int(b.y0) + int(b.h) + 2):   # caseta, andén y vía
+		for x in range(int(b.x0) - 2, int(b.x0) + int(b.w) + 2):
 			if es_via.call(x, y):
 				ini = Vector2i(x, y)
 	chk(ini.x >= 0, "%s: el apeadero sin vía al lado" % k)
@@ -117,6 +129,7 @@ func vias_apeadero(k: String) -> void:
 				ok_fin = false
 	chk(al_canto and ok_fin and vistos.size() >= 6, "%s: la vía no sale del mapa o acaba sin topera (%d casillas)" % [k, vistos.size()])
 
+# lo que se alcanza andando desde donde se llega: puertas y salidas de los otros mapas, la parada y las propias salidas
 func alcance(k: String) -> Dictionary:
 	var m: Dictionary = J.MAPS[k]
 	var q := []
@@ -290,7 +303,9 @@ func _corre() -> void:
 	J.S.borr = 20.0
 	hace(["Sentarte"], func(): await J.object_action(24, 10))
 	chk(J.borr() < 20.0, "el pórtico de la ermita: %s" % J.borr())
-	# 3b · los apeaderos: en cada pueblo de la parada, delante se llega andando; el tren va de apeadero en apeadero y a Bilbao
+	# 3b · los apeaderos: en cada pueblo de la parada, el andén entre la caseta y la vía (lo pidió el usuario: «lo suyo sería que
+	# las vías sean accesibles desde el apeadero»): ahí se baja, se llega andando y, con A en la vía, se coge el tren; la ventanilla
+	# de la caseta también; el tren va de apeadero en apeadero y a Bilbao
 	J.S.ch = 8
 	for k in APEADEROS:
 		var a: Array = J.apeadero_de(k)
@@ -298,29 +313,36 @@ func _corre() -> void:
 		if a.size() != 2:
 			continue
 		J.enter_map(k, int(a[0]), int(a[1]), "up")
-		chk(alcance(k).has("%d,%d" % [int(a[0]), int(a[1])]), "%s: al apeadero no se llega andando" % k)
-		chk(J.hito_de(int(a[0]), int(a[1]) - 1) == "apeadero", "%s: el apeadero no está delante" % k)
+		chk(String(J.MAPS[k].g[int(a[1])][int(a[0])]).begins_with("anden"), "%s: no se llega al andén" % k)
+		chk(alcance(k).has("%d,%d" % [int(a[0]), int(a[1])]), "%s: al andén no se llega andando" % k)
+		chk(junto(k, a, "via") != Vector2i(-1, -1) and junto(k, a, "caseta") != Vector2i(-1, -1), "%s: el andén, sin la vía o la caseta al lado" % k)
 		vias_apeadero(k)
 	J.S.min = 1400
-	J.enter_map("town", int(J.apeadero_de("town")[0]), int(J.apeadero_de("town")[1]), "up")
-	t = hace(["Coger"], func(): await J.object_action(int(J.apeadero_de("town")[0]), int(J.apeadero_de("town")[1]) - 1))
+	var at: Array = J.apeadero_de("town")
+	J.enter_map("town", int(at[0]), int(at[1]), "up")
+	var ct := junto("town", at, "caseta")
+	t = hace(["Coger"], func(): await J.object_action(ct.x, ct.y))
 	chk(J.S.map == "town" and "cerrado" in t, "el apeadero de noche: %s %s" % [J.S.map, t])
 	J.S.min = 600
-	for par in [["town", "puerto"], ["puerto", "errotabarri"], ["errotabarri", "zorroza"]]:
+	for par in [["town", "puerto"], ["puerto", "errotabarri"], ["errotabarri", "zorroza"], ["ibarbide", "mendialde"]]:
 		var de: String = par[0]
 		var a2: String = par[1]
 		var ap: Array = J.apeadero_de(de)
 		J.enter_map(de, int(ap[0]), int(ap[1]), "up")
 		J.S.money = 100.0
 		var v: Dictionary = J.tren_viaje(a2, de)
-		t = hace(["Coger", String(D.PARADAS[a2].n)], func(): await J.object_action(int(ap[0]), int(ap[1]) - 1))
+		var vq := junto(de, ap, "caseta" if de == "town" else "via")   # por la ventanilla o desde el andén
+		t = hace(["Coger", String(D.PARADAS[a2].n)], func(): await J.object_action(vq.x, vq.y))
 		var lleg: Array = J.TREN_BILBAO if a2 == "zorroza" else J.apeadero_de(a2)
 		chk(J.S.map == a2 and int(J.P.x) == int(lleg[0]) and int(J.P.y) == int(lleg[1]) and is_equal_approx(float(J.S.money), 100.0 - float(v.eur)),
 			"el tren de %s a %s: %s (%s, %s) %s" % [de, a2, J.S.map, J.P.x, J.P.y, J.S.money])
 		chk(not ("parada" in t), "el tren de %s a %s: «%s»" % [de, a2, t])
+	# desde fuera del andén, la vía no da el tren
+	J.enter_map("valdehierro", 31, 14, "down")
+	chk(not J.en_anden(31, 15), "la vía, desde fuera del andén")
 	# lejos de un hito, nada
-	J.enter_map("town", 5, 20, "up")
-	chk(not J.hito_de(5, 19), "fuera de un hito")
+	J.enter_map("town", 8, 20, "up")
+	chk(not J.hito_de(8, 19), "fuera de un hito")
 	# 4 · la ermita: la puerta, la serora, las velas y el banco
 	J.enter_map("mendialde", 25, 11, "up")
 	var d: Dictionary = J.MAPS.mendialde.doors.get("25,10", {})
