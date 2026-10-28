@@ -2057,6 +2057,7 @@ const BAJO_H := 108
 # SETAS_PRO.lote g secos hace una caja de microdosis (mc) o de comestibles (cc); Txomin lo compra en la puerta. Nada de método ni de
 # dosis: cajas y lotes. La redada (setas_dia) se lo lleva todo.
 var ARM_V = null   # {}: el armario abierto
+var MADRES_V = null   # {i}: el sitio elegido en el armario de las madres por dentro (nave.gd vista_madres, con CAL)
 
 # ---------- el calendario y el mapa de la comarca (1.42, lo pidió el usuario; croquis.gd) ----------
 var CAL_V = null    # {y, m}: el mes que se ve
@@ -2165,6 +2166,9 @@ func bandejas_nave() -> void:
 
 func carpa_madres() -> void:
 	pass
+
+func rects_madres(_V: Dictionary) -> Array:
+	return []
 
 func comprar_mercado(id: String, N: String, pool: Array) -> void:
 	pass

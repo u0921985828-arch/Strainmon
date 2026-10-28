@@ -2,7 +2,8 @@
 # finalmente en la nueva asociación de KAIA», «tiene que tener lógica con el suelo que hay al rededor y las zonas donde las colocas» y
 # «como en casa, cultivo con carpas, pero más grandes de primeras, con una inversión realista, después como en la nave en esa misma
 # habitación, ya con posibilidad de poner a alguien a trabajar ahí y la inversión será más grande»): la puerta de KAIA, cerrada sin la
-# licencia; dentro, el pasillo y la zona de cultivo; los kits de carpa de 240 × 240 por la cuenta, que llegan al día siguiente; las
+# licencia; dentro, el pasillo y la zona de cultivo; las carpas por niveles (4 de 2 × 2, 2 de 4 × 2 y 1 de 4 × 4) por la cuenta, que
+# llegan al día siguiente, y el paso de un nivel al siguiente con las de antes de segunda mano; las
 # carpas solo en la zona y sin montarse encima de nada; plantar, crecer con el goteo y cosechar; la obra de la sala con las mesas y
 # quien las lleva, que cortan, secan y llenan el almacén de KAIA; nada encima de nada; sin CAL, nada.
 #   $GODOT --headless --path godot --script res://tests/kaia_cult.gd   → «kaia_cult: N comprobaciones, 0 fallos»
@@ -126,16 +127,24 @@ func _corre() -> void:
 	J.S.erase("kc")
 	# 1 · los datos: la sala, su puerta en KAIA, sus carpas y la obra
 	var PZ: Array = D.ORDEN_P[C].piezas
-	chk(D.MAPS.has(C) and int(D.MAPS[C].w) == 16 and int(D.MAPS[C].h) == 10 and PZ.size() == 4 and PZ.all(func(q): return q.zona == ["floorG"] and q.si == "kc" and q.o.size() == 6), "la sala de 16 × 10, con cuatro carpas de 3 × 2 que van en la zona")
+	chk(D.MAPS.has(C) and int(D.MAPS[C].w) == 16 and int(D.MAPS[C].h) == 10 and PZ.size() == 7 and PZ.all(func(q): return q.zona == ["floorG"] and q.si == "kc"), "la sala de 16 × 10, con las siete carpas de los tres niveles, que van en la zona")
+	var NV: Array = KC.niv
+	chk(NV.size() == 3 and NV.map(func(q): return [int(q.max), int(q.tam[0]), int(q.tam[1])]) == [[4, 2, 2], [2, 4, 2], [1, 4, 4]] and PZ.all(func(q): return q.o.size() == int(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].tam[0]) * int(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].tam[1])), "los niveles: 4 de 2 × 2, 2 de 4 × 2 y 1 de 4 × 4, cada pieza de su tamaño")
 	chk(D.PUERTAS_INT["club-muelle"].any(func(q): return q.to == C and int(q.x) == 15 and int(q.y) == 1 and q.llave == "kc"), "la puerta, en la pared de KAIA")
 	chk(D.MAPS["club-muelle"].o[2][14] == "jukebox" and D.MAPS["club-muelle"].o[2][15] == null and D.ORDEN_P["club-muelle"].pie.any(func(c): return int(c[0]) == 15 and int(c[1]) == 2), "la gramola, a un lado; delante de la puerta, libre")
 	var cm: Dictionary = D.MAPS[C]
 	chk(range(2, cm.h).all(func(y): return cm.g[y][0] == "floorC_itsaso" and cm.g[y][2] == "floorC_itsaso" and cm.g[y][3] == "floorG" and cm.g[y][15] == "floorG"), "el pasillo con el suelo del club y la zona de cultivo con el del grow")
-	var kp := 0
-	for q in KC.kit.l:
-		kp += int(q[1])
-	chk(kp == int(KC.kit.p) and kp >= 2500 and kp <= 5000 and int(KC.plazas) == 9 and int(KC.nf) == 2 and D.FOCOS[KC.foco].w == 720, "el kit, a precio de tienda: %d €, nueve plazas y dos LED de 720 W" % kp)
-	chk(int(KC.f2.p) > int(KC.max) * kp and KC.f2.mesas.size() == 6 and int(D.PLANTILLA.sueldo.kaia) > 0, "la obra, más inversión que las cuatro carpas: %d €" % int(KC.f2.p))
+	var kps := []
+	for N in NV:
+		var kq := 0
+		for q in N.kit.l:
+			kq += int(q[1])
+		kps.append(kq)
+		var wl: float = float(D.FOCOS[KC.foco].w) * float(N.nf)
+		chk(kq == int(N.kit.p) and D.FOCOS[KC.foco].w == 720 and wl / (float(N.cm[0]) * float(N.cm[1]) / 1e4) >= 300 and wl / (float(N.cm[0]) * float(N.cm[1]) / 1e4) <= float(D.W_M2), "%s: el kit a precio de tienda (%d €), %d LED de 720 W (%d W/m²)" % [N.n, kq, int(N.nf), int(wl / (float(N.cm[0]) * float(N.cm[1]) / 1e4))])
+	var kp: int = kps[0]
+	chk(kps[0] < kps[1] and kps[1] < kps[2] and int(NV[0].plazas) * 4 == int(NV[1].plazas) * 2 and int(NV[1].plazas) * 2 == int(NV[2].plazas), "cada nivel, más inversión por carpa y las mismas plazas en total: %s" % [kps])
+	chk(int(KC.f2.p) > kps[2] and KC.f2.mesas.size() == 6 and int(D.PLANTILLA.sueldo.kaia) > 0, "la obra, más inversión que la carpa grande: %d €" % int(KC.f2.p))
 	chk(cm.o[1][2] == "ctrlN" and D.ORDEN_RESERVA[C].any(func(c): return int(c[0]) == 2 and int(c[1]) == 2), "el cuadro en la pared del pasillo, con su casilla de delante reservada")
 	# 2 · sin la licencia, cerrada
 	chk(mundo("club-muelle", 15, 2) and J.MAPS["club-muelle"].o[1][15] == "puertaI", "en KAIA, la puerta")
@@ -149,17 +158,23 @@ func _corre() -> void:
 	# 4 · el cuadro: un kit, por la cuenta, llega mañana
 	J.S.banco = 0
 	LOG = []
-	QUIERO = ["Comprar un kit", "Comprarlo"]
+	QUIERO = ["Comprar una carpa", "Comprarlo"]
 	chk(corre(func(): await J.object_action(2, 1)) and J.kc().kits.is_empty() and dicho("tarjeta no pasa"), "sin dinero en la cuenta, no")
 	J.S.banco = 100000
-	QUIERO = ["Comprar un kit", "Comprarlo"]
+	QUIERO = ["Comprar una carpa", "Comprarlo"]
 	chk(corre(func(): await J.object_action(2, 1)) and J.kc().kits.size() == 1 and is_equal_approx(float(J.S.banco), 100000.0 - kp), "comprado, por la cuenta (%d €)" % int(J.S.banco))
-	chk(mundo(C, 1, 2) and m.o[3][3] == null, "hoy no está")
+	chk(mundo(C, 1, 2) and m.o[4][4] == null, "hoy no está")
 	J.S.day += 1
-	chk(mundo(C, 1, 2) and m.o[3][3] == "carpaKG0" and m.o[2][3] == "carpaG2" and m.o[2][5] == "carpaG2" and m.o[3][5] == "carpaG2", "mañana, montada en su sitio, 3 × 2")
-	chk(J.sprite_local("carpaKG0") == "carpaKG-0", "la carpa, vacía (%s)" % J.sprite_local("carpaKG0"))
+	chk(mundo(C, 1, 2) and m.o[4][4] == "carpaKS0" and m.o[3][4] == "carpaG2" and m.o[3][5] == "carpaG2" and m.o[4][5] == "carpaG2" and m.o[4][6] == null, "mañana, montada en su sitio, 2 × 2")
+	chk(J.sprite_local("carpaKS0") == "kcs-0", "la carpa, vacía (%s)" % J.sprite_local("carpaKS0"))
+	chk(not MENUS.is_empty(), "el cuadro, con menú")
+	TIT = []
+	QUIERO = []
+	MENUS = []
+	corre(func(): await J.object_action(2, 1))
+	chk(MENUS.size() and not MENUS.back().any(func(l): return str(l).begins_with("Reformar")) and MENUS.back().any(func(l): return str(l).begins_with("Pasar a la Carpa 400×200")), "en el primer nivel, pasar al siguiente, no la reforma: %s" % [MENUS.back() if MENUS.size() else []])
 	for i in 3:
-		QUIERO = ["Comprar un kit", "Comprarlo"]
+		QUIERO = ["Comprar una carpa", "Comprarlo"]
 		corre(func(): await J.object_action(2, 1))
 	LOG = []
 	TIT = []
@@ -167,7 +182,7 @@ func _corre() -> void:
 	corre(func(): await J.object_action(2, 1))
 	chk(J.kc().kits.size() == 4 and not MENUS.back().any(func(l): return str(l).begins_with("Comprar")), "cuatro como mucho")
 	J.S.day += 1
-	chk(mundo(C, 1, 2) and m.o[3][7] == "carpaKG1" and m.o[3][11] == "carpaKG2" and m.o[7][3] == "carpaKG3", "las cuatro, en su sitio")
+	chk(mundo(C, 1, 2) and m.o[4][8] == "carpaKS1" and m.o[4][12] == "carpaKS2" and m.o[8][4] == "carpaKS3", "las cuatro, en su sitio")
 	var v := alcance_d(C, 1, 2)
 	for y in m.h:
 		for x in m.w:
@@ -177,9 +192,9 @@ func _corre() -> void:
 	var sl: Array = J.solapes_de(J.cajas_obj(C, m.o))
 	chk(sl.is_empty(), "las cuatro carpas, sin solapes: %s" % [sl.slice(0, 3)])
 	# 6 · la regla de la zona y la del solape
-	chk(J.cabe_pieza(C, "kc0", 0, 4) == "zona" and J.cabe_pieza(C, "kc0", 1, 4) == "zona", "en el pasillo, no: «%s»" % J.cabe_pieza(C, "kc0", 1, 4))
-	chk(J.cabe_pieza(C, "kc0", 7, 6) == "", "en la zona libre, sí: «%s»" % J.cabe_pieza(C, "kc0", 7, 6))
-	chk(J.cabe_pieza(C, "kc0", 7, 4) == "solapa", "delante de otra carpa, con el tubo encima de ella, no: «%s»" % J.cabe_pieza(C, "kc0", 7, 4))
+	chk(J.cabe_pieza(C, "kcs0", 0, 4) == "zona" and J.cabe_pieza(C, "kcs0", 1, 4) == "zona", "en el pasillo, no: «%s»" % J.cabe_pieza(C, "kcs0", 1, 4))
+	chk(J.cabe_pieza(C, "kcs0", 10, 6) == "", "en la zona libre, sí: «%s»" % J.cabe_pieza(C, "kcs0", 10, 6))
+	chk(J.cabe_pieza(C, "kcs0", 8, 5) == "solapa", "delante de otra carpa, con el tubo encima de ella, no: «%s»" % J.cabe_pieza(C, "kcs0", 8, 5))
 	chk(str(D.ORDEN_MOTIVO.zona).contains("zona de cultivo") and str(D.ORDEN_MOTIVO.solapa).contains("encima"), "los motivos, dichos")
 	chk(J.cabe_pieza("home", "carpa0", 8, 2) != "zona", "las carpas de casa, sin la regla")
 	mundo("club-muelle", 14, 3)
@@ -193,21 +208,21 @@ func _corre() -> void:
 	TIT = []
 	QUIERO = ["Ordenar la sala"]
 	chk(corre(func(): await J.object_action(2, 1)) and TIT.has(D.ORDEN_P[C].n), "el cuadro ordena la sala (%s)" % [TIT])
-	J.S.coloca = {C: {"kc0": [0, 4]}}
+	J.S.coloca = {C: {"kcs0": [0, 4]}}
 	J.aplica_orden(C)
-	chk(int(J.pos_pieza(C, "kc0")[0]) >= 3, "una carpa guardada en el pasillo vuelve a la zona (%s)" % [J.pos_pieza(C, "kc0")])
+	chk(int(J.pos_pieza(C, "kcs0")[0]) >= 3, "una carpa guardada en el pasillo vuelve a la zona (%s)" % [J.pos_pieza(C, "kcs0")])
 	J.S.coloca = {}
 	J.MAPS[C].erase("opos")
-	chk(mundo(C, 1, 2) and int(J.pos_pieza(C, "kc0")[0]) == 3 and int(J.pos_pieza(C, "kc0")[1]) == 2, "de serie, otra vez (%s)" % [J.pos_pieza(C, "kc0")])
+	chk(mundo(C, 1, 2) and int(J.pos_pieza(C, "kcs0")[0]) == 4 and int(J.pos_pieza(C, "kcs0")[1]) == 3, "de serie, otra vez (%s)" % [J.pos_pieza(C, "kcs0")])
 	# 7 · plantar en las plazas de una carpa, por cualquiera de sus casillas
 	J.S.seeds = {"txoko": 3}
 	QUIERO = ["Plaza 1", J.strain("txoko").n]
 	MENUS = []
 	LOG = []
-	chk(corre(func(): await J.object_action(3, 3)) and J.kc().p[0] is Dictionary and J.kc().p[0].sid == "txoko" and int(J.S.seeds.get("txoko", 0)) == 2, "plantada en la plaza 1 (%s · %s · %s)" % [MENUS.slice(-3), J.kc().p.slice(0, 2), LOG.slice(-3)])
-	chk(J.sprite_local("carpaKG0") == "carpaKG-1" and J.sprite_local("carpaKG1") == "carpaKG-0", "la carpa 1, con una planta")
-	QUIERO = ["Plaza 9", J.strain("txoko").n]
-	chk(corre(func(): await J.object_action(5, 2)) and J.kc().p[8] is Dictionary and J.kc_plantadas(0) == 2, "por la otra punta, la misma carpa, plaza 9")
+	chk(corre(func(): await J.object_action(4, 4)) and J.kc().p[0] is Dictionary and J.kc().p[0].sid == "txoko" and int(J.S.seeds.get("txoko", 0)) == 2, "plantada en la plaza 1 (%s · %s · %s)" % [MENUS.slice(-3), J.kc().p.slice(0, 2), LOG.slice(-3)])
+	chk(J.sprite_local("carpaKS0") == "kcs-1" and J.sprite_local("carpaKS1") == "kcs-0", "la carpa 1, con una planta")
+	QUIERO = ["Plaza 4", J.strain("txoko").n]
+	chk(corre(func(): await J.object_action(5, 3)) and J.kc().p[3] is Dictionary and J.kc_plantadas(0) == 2, "por la otra punta, la misma carpa, plaza 4")
 	# 8 · crecen solas, con el goteo, también fuera de la sala
 	chk(mundo("club-muelle", 15, 2), "fuera")
 	if not (J.kc().p[0] is Dictionary):
@@ -233,16 +248,57 @@ func _corre() -> void:
 		g0 += float(J.S.buds[k].g)
 	QUIERO = ["Plaza 1", "Cosechar"]
 	LOG = []
-	chk(corre(func(): await J.object_action(4, 3)) and J.kc().p[0] == null and dicho("Cosechas"), "cosechada")
+	chk(corre(func(): await J.object_action(4, 4)) and J.kc().p[0] == null and dicho("Cosechas"), "cosechada")
 	var g1 := 0.0
 	for k in J.S.buds:
 		g1 += float(J.S.buds[k].g)
 	chk(g1 - g0 >= 60, "con sus dos LED, una buena planta: %d g" % int(g1 - g0))
-	# 10 · la obra: con plantas, no; vacía, se paga, se venden las carpas y a los días, las mesas
+	# 9b · los niveles: con plantas o con una carpa en camino, no; vacías, las de antes de segunda mano y la primera del nuevo, mañana
+	LOG = []
+	QUIERO = ["Pasar a la", "Comprarla"]
+	chk(corre(func(): await J.object_action(2, 1)) and int(J.kc().get("niv", 0)) == 0 and dicho("Antes, cosecha"), "con plantas en las carpas, aún no se pasa")
+	J.kc().p[3] = null
+	J.kc().kits.append(int(J.S.day) + 1)
+	LOG = []
+	QUIERO = ["Pasar a la", "Comprarla"]
+	chk(corre(func(): await J.object_action(2, 1)) and int(J.kc().get("niv", 0)) == 0 and dicho("espera a que llegue"), "con una carpa en camino, tampoco")
+	J.kc().kits.pop_back()
+	var bn: float = float(J.S.banco)
+	QUIERO = ["Pasar a la", "Comprarla"]
+	chk(corre(func(): await J.object_action(2, 1)) and int(J.kc().niv) == 1 and J.kc().kits == [int(J.S.day) + 1] and J.kc().p.size() == 16, "a las de 4 × 2: una pedida, 16 plazas (%s)" % [J.kc().kits])
+	chk(is_equal_approx(float(J.S.banco), bn - kps[1] + roundi(kps[0] * float(KC.f2.venta) * 4)), "por la cuenta, menos las cuatro de antes de segunda mano (%d €)" % int(bn - J.S.banco))
+	chk(mundo(C, 1, 2) and not m.o.any(func(r): return r.any(func(c): return c != null and str(c).begins_with("carpa"))), "hoy, sin carpas")
+	J.S.day += 1
+	chk(mundo(C, 1, 2) and m.o[4][4] == "carpaKM0" and m.o[3][7] == "carpaG2" and m.o[4][8] == null and J.sprite_local("carpaKM0") == "kcm-0", "mañana, la de 4 × 2 en su sitio")
+	QUIERO = ["Comprar una carpa", "Comprarlo"]
+	corre(func(): await J.object_action(2, 1))
+	J.S.day += 1
+	chk(mundo(C, 1, 2) and m.o[4][10] == "carpaKM1" and J.solapes_de(J.cajas_obj(C, m.o)).is_empty(), "las dos de 4 × 2, sin solapes")
+	QUIERO = ["Plaza 8", J.strain("txoko").n]
+	J.S.seeds = {"txoko": 3}
+	chk(corre(func(): await J.object_action(13, 3)) and J.kc().p[15] is Dictionary and J.kc_plantadas(1) == 1, "la segunda, por su otra punta, plaza 8")
+	J.kc().p[15] = null
+	QUIERO = ["Pasar a la", "Comprarla"]
+	corre(func(): await J.object_action(2, 1))
+	J.S.day += 1
+	chk(int(J.kc().niv) == 2 and mundo(C, 1, 2) and m.o[6][7] == "carpaKL0" and m.o[3][10] == "carpaG2" and J.solapes_de(J.cajas_obj(C, m.o)).is_empty(), "la de 4 × 4, sola y en su sitio")
+	MENUS = []
+	QUIERO = []
+	corre(func(): await J.object_action(2, 1))
+	chk(MENUS.size() and not MENUS.back().any(func(l): return str(l).begins_with("Comprar") or str(l).begins_with("Pasar")) and MENUS.back().any(func(l): return str(l).begins_with("Reformar")), "con la de 4 × 4, ya solo la reforma: %s" % [MENUS.back() if MENUS.size() else []])
+	v = alcance_d(C, 1, 2)
+	for y in m.h:
+		for x in m.w:
+			if m.o[y][x] and m.o[y][x] != "carpaG2":
+				chk(delante(v, x, y), "se llega a %s (%d, %d)" % [m.o[y][x], x, y])
+	# 10 · la obra: con plantas, no; vacía, se paga, se vende la carpa y a los días, las mesas
+	J.S.seeds = {"txoko": 3}
+	QUIERO = ["Plaza 16", J.strain("txoko").n]
+	chk(corre(func(): await J.object_action(10, 3)) and J.kc().p[15] is Dictionary, "en la de 4 × 4, la plaza 16")
 	LOG = []
 	QUIERO = ["Reformar la sala"]
 	chk(corre(func(): await J.object_action(2, 1)) and J.kc().get("f2") == null and dicho("Antes, cosecha"), "con plantas en las carpas, aún no")
-	J.kc().p[8] = null
+	J.kc().p[15] = null
 	var b0: float = float(J.S.banco)
 	QUIERO = ["Reformar la sala", "Hacer la obra"]
 	J.kc().kits.append(int(J.S.day) + 1)   # una carpa pagada que aún no ha llegado: primero que llegue, no se vende al 40 % sin montarla
@@ -250,7 +306,7 @@ func _corre() -> void:
 	J.kc().kits.pop_back()
 	QUIERO = ["Reformar la sala", "Hacer la obra"]
 	chk(corre(func(): await J.object_action(2, 1)) and J.kc().get("f2") != null and J.kc().kits.is_empty(), "la obra, en marcha")
-	chk(is_equal_approx(float(J.S.banco), b0 - int(KC.f2.p) + roundi(kp * float(KC.f2.venta) * 4)), "por la cuenta, menos lo de las carpas de segunda mano (%d €)" % int(b0 - J.S.banco))
+	chk(is_equal_approx(float(J.S.banco), b0 - int(KC.f2.p) + roundi(kps[2] * float(KC.f2.venta))), "por la cuenta, menos lo de la carpa de segunda mano (%d €)" % int(b0 - J.S.banco))
 	chk(mundo(C, 1, 2) and not m.o.any(func(r): return r.any(func(c): return c != null and (str(c).begins_with("carpa") or str(c).begins_with("mesa")))), "en obras: ni carpas ni mesas")
 	LOG = []
 	chk(corre(func(): await J.object_action(2, 1)) and dicho("en obras"), "el cuadro lo dice")
@@ -264,7 +320,7 @@ func _corre() -> void:
 		for x in m.w:
 			if m.o[y][x] and m.o[y][x] != "mesaKC2":
 				chk(delante(v, x, y), "se llega a %s (%d, %d)" % [m.o[y][x], x, y])
-	chk(J.pos_pieza(C, "kc0") == [3, 2] and J.piezas_ya(C).is_empty(), "sin carpas que ordenar")
+	chk(J.pos_pieza(C, "kcs0") == [4, 3] and J.piezas_ya(C).is_empty(), "sin carpas que ordenar")
 	# 11 · las mesas: plantar y, sin nadie, no avanzan
 	QUIERO = ["Plantar", J.strain("txoko").n]
 	chk(corre(func(): await J.object_action(4, 3)) and J.kc_me(0) is Dictionary and J.kc_me(0).k.begins_with("txoko"), "plantada la mesa 1")
@@ -334,12 +390,33 @@ func _corre() -> void:
 	Datos.CAL = false
 	chk(J.pintor.copa_bajo_foco(fs, 3 * 16 + 15, mdn) == fs, "sin CAL, como antes")
 	Datos.CAL = true
-	# 13 · la sala de antes (tres carpas de 4 plazas de regalo) pasa a tres kits montados con sus plantas
+	# 13 · las salas de antes: la de las tres carpas de regalo y la de los kits de 240 × 240, al nivel de las de 4 × 2 con sus plantas
 	J.S.kc = {"p": [null, null, null, null, null, {"sid": "txoko", "prog": .3, "water": 50.0, "health": 100.0}]}
-	chk(J.kc().kits.size() == 3 and J.kc().p[10] is Dictionary and J.kc().p.size() == 36, "la de antes, pasada")
+	chk(int(J.kc().niv) == 1 and J.kc().kits.size() == 2 and J.kc().p[0] is Dictionary and J.kc().p.size() == 16, "la primera, pasada")
+	var vj := []
+	for i in 36:
+		vj.append({"sid": "txoko", "prog": .3, "water": 50.0, "health": 100.0} if i == 30 else null)
+	for i in 17:   # 18 plantas: caben 16
+		vj[i] = {"sid": "txoko", "prog": .3, "water": 50.0, "health": 100.0}
+	J.S.kc = {"kits": [0, 0, 0, int(J.S.day) + 1], "p": vj}
+	var bco: float = J.S.banco
+	var smv: int = int(J.S.seeds.get("txoko", 0))
+	J.queued.clear()
+	chk(int(J.kc().niv) == 1 and J.kc().kits == [0, 0] and J.kc().p[0] is Dictionary and J.kc().p.size() == 16 and J.kc_plantadas(0) == 8 and J.kc_plantadas(1) == 8, "la de los kits, pasada (%d + %d)" % [J.kc_plantadas(0), J.kc_plantadas(1)])
+	chk(is_equal_approx(J.S.banco - bco, 2 * J.KC_KIT_VIEJO) and int(J.S.seeds.get("txoko", 0)) - smv == 2 and J.queued.has("kcmig"), "lo que no cabe, devuelto: %s € y %d semillas" % [J.S.banco - bco, int(J.S.seeds.get("txoko", 0)) - smv])
+	J.queued.clear()
+	J.pending.clear()
+	# cada nivel rinde más por plaza que el de antes
+	var gs := []
+	for nv in 3:
+		J.S.kc = {"niv": nv, "kits": [], "p": []}
+		gs.append(float(J.kc_f().g) * int(J.kc_N().plazas) * int(J.kc_N().max))
+	chk(gs[0] < gs[1] and gs[1] < gs[2], "lleno, cada nivel rinde más: %s" % [gs])
+	J.S.kc = {"kits": [], "p": [], "f2": 3, "m": []}
+	chk(int(J.kc().niv) == 0 and J.kc().get("f2") == 3, "la reformada, igual")
 	# 14 · sin CAL, nada
 	Datos.CAL = false
-	chk(J.puertas_int("club-muelle").is_empty() and J.sprite_local("carpaKG0") == "carpaKG0" and not J.kc_hay(), "sin CAL, ni la puerta ni la sala")
+	chk(J.puertas_int("club-muelle").is_empty() and J.sprite_local("carpaKS0") == "carpaKS0" and not J.kc_hay(), "sin CAL, ni la puerta ni la sala")
 	Datos.CAL = true
 	print("kaia_cult: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:

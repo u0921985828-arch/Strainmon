@@ -27,6 +27,7 @@ const RAYA := 0.25        # la cabecera (de la blanca al sacar)
 const PIE := 0.72         # el pie (el vértice del triángulo)
 const PASOS_MAX := 240 * 14
 const CHOQUES := 8         # vueltas de choques por paso
+const EFECTO := 0.55       # lo que vuelve (retroceso) o sigue (seguir) la blanca, de lo que llevaba, en un golpe lleno
 
 # las troneras: las cuatro esquinas y las dos del medio, un poco fuera del tapete
 static func troneras() -> Array:
@@ -83,8 +84,11 @@ static func quieta(V: Dictionary) -> bool:
 static func ev_nuevo() -> Dictionary:
 	return {"primer": -1, "met": [], "blanca": false, "toques": 0}
 
-static func dispara(V: Dictionary, ang: float, f: float) -> Dictionary:
+# efe: el efecto de la blanca, de −1 (retroceso: le das abajo y vuelve) a 1 (seguir: arriba y sigue tras la bola); 0, al centro
+static func dispara(V: Dictionary, ang: float, f: float, efe := 0.0) -> Dictionary:
 	V.b[0].v = Vector2.from_angle(ang) * (VMIN + VSUBE * clampf(f, 0, 1)) * (SAQUE if V.get("saque", false) else 1.0)
+	V.b[0].efe = clampf(efe, -1, 1)
+	V.b[0].efd = Vector2.from_angle(ang)
 	return ev_nuevo()
 
 static func en_tronera(p: Vector2) -> bool:
@@ -127,6 +131,8 @@ static func paso(V: Dictionary, ev: Dictionary) -> void:
 			if d.n == 0:
 				ev.blanca = true
 			continue
+		if d.n == 0 and float(d.get("efe", 0.0)) != 0.0 and (d.p.x < R or d.p.x > W - R or d.p.y < R or d.p.y > H - R):
+			d.efe = 0.0   # en la banda antes que en una bola, el efecto se va
 		if d.p.x < R:
 			d.p.x = R
 			d.v.x = absf(d.v.x) * E_BANDA
@@ -173,8 +179,12 @@ static func paso(V: Dictionary, ev: Dictionary) -> void:
 				var rel: float = (a.v - c.v).dot(nn)
 				if rel > 0:
 					var imp := rel * (1 + E_BOLA) / 2
+					var s0: float = a.v.length()
 					a.v -= nn * imp
 					c.v += nn * imp
+					if i == 0 and float(a.get("efe", 0.0)) != 0.0:   # el efecto, en el primer choque de la blanca: cuanto más llena, más
+						a.v += a.efd * s0 * EFECTO * float(a.efe) * maxf(0.0, nn.dot(a.efd))
+						a.efe = 0.0
 					hubo = true
 					if tb > 0:
 						a.p += a.v * tb
@@ -195,6 +205,8 @@ static func paso(V: Dictionary, ev: Dictionary) -> void:
 			var s: float = d.v.length()
 			var s2 := s - MU * DT
 			d.v = d.v * (s2 / s) if s2 > PARA else Vector2.ZERO
+			if d.v == Vector2.ZERO and d.n == 0:
+				d.efe = 0.0
 
 # hasta que se paran todas (las pruebas y el rival)
 static func simula(V: Dictionary, ev: Dictionary) -> Dictionary:
@@ -498,7 +510,8 @@ static func deja(Pr: Dictionary, q: int, hab: float, pos: float, cuida: float) -
 	return -cuida * mejor_p(C, 1 - q, hab)
 
 # el tiro del rival: {ang, f, tipo ("saque" | "ataque" | "defensa" | "banda"), n, pk, prob}; hab, de 0 a 1 (la de BILLAR.hab)
-static func elige(V: Dictionary, q: int, hab: float) -> Dictionary:
+# lim: la hora (Time.get_ticks_msec) a la que deja de mirar más tiros y se queda con el mejor visto; 0, sin límite (las pruebas)
+static func elige(V: Dictionary, q: int, hab: float, lim := 0) -> Dictionary:
 	var sa := pulso_ang(hab)
 	var sf := pulso_f(hab)
 	if V.saque:   # a romper: de lleno a la de delante, con todo
@@ -511,6 +524,8 @@ static func elige(V: Dictionary, q: int, hab: float) -> Dictionary:
 	for i in mini(4, L.size()):
 		var c: Dictionary = L[i]
 		for k in [0.0, .15, .35]:
+			if lim > 0 and mejor.has("ang") and Time.get_ticks_msec() > lim:
+				break
 			var f := clampf(float(c.f) + k, .06, 1)
 			var ang := afina(V, int(c.n), float(c.boca), float(c.ang), f)
 			var Pr := prueba(V, q, ang, f)
@@ -539,6 +554,8 @@ static func elige(V: Dictionary, q: int, hab: float) -> Dictionary:
 				var a: float = a0 + asin(clampf(off * 2 * R / maxf(dd, 2 * R), -1, 1))
 				var fl := clampf((sqrt(2 * MU * (dd + 12)) - VMIN) / VSUBE, .05, .8)   # lo justo para llegar y un poco
 				for f in [fl, fl + .08, fl + .18]:
+					if lim > 0 and mejor.has("ang") and Time.get_ticks_msec() > lim:
+						break
 					var Pr := prueba(V, q, a, f)
 					if Pr.r.falta:
 						continue
@@ -548,6 +565,8 @@ static func elige(V: Dictionary, q: int, hab: float) -> Dictionary:
 	# tapado (o nada mejor): por banda, con el ángulo que da la banda de verdad (devuelve E_BANDA de lo que entra)
 	if mejor.v <= -1.0 or not mejor.has("ang"):
 		for k in bandas(V, q):
+			if lim > 0 and mejor.has("ang") and mejor.v > -3.0 and Time.get_ticks_msec() > lim:
+				break
 			var Pr := prueba(V, q, float(k.ang), float(k.f))
 			var v: float = deja(Pr, q, hab, pos, cuida) - .1
 			if Pr.r.falta and Pr.r.motivo != "blanca":
@@ -811,6 +830,17 @@ static func rects(V: Dictionary, sw: int, sh: int, now: float) -> Array:
 		o.append([bx, y0 - 4, 5, bh, "#3a3446"])
 		var fh := roundi(float(V.f) * bh)
 		o.append([bx, y0 - 4 + bh - fh, 5, fh, "#58d080" if V.f < .8 else "#e0b84a" if V.f < .95 else "#e04040"])
+		if V.has("efe"):   # con CAL (venta.gd _b8_tuyo): las marcas de un cuarto, la del último tiro y el efecto de la blanca
+			for k in [1, 2, 3]:
+				o.append([bx - 2, y0 - 4 + bh - roundi(bh * k / 4.0), 2, 1, "#a0a0a8" if k != 2 else "#f8f8f0"])
+			if V.has("fza"):
+				o.append([bx, y0 - 4 + bh - roundi(float(V.fza) * bh), 5, 1, "#f8f8f0"])
+			var ey := y0 + bh + 2   # la blanca de frente, con el punto donde le da el taco
+			o.append([bx - 1, ey, 7, 7, "#26262e"])
+			o.append([bx, ey + 1, 5, 5, "#f8f8f0"])
+			o.append([bx + 1, ey, 3, 7, "#f8f8f0"])
+			o.append([bx + 1, ey + 1, 3, 5, "#f8f8f0"])
+			o.append([bx + 2, ey + 3 - roundi(float(V.efe) * 2), 1, 1, "#e04040"])
 	# lo que le queda a cada uno, debajo
 	var yb := y0 + int(H) + 16
 	for q in 2:

@@ -159,11 +159,54 @@ static func css(s: String) -> Color:
 	return c
 
 func _img(im: Image, x: float, y: float, mod := Color.WHITE) -> void:
+	if alfa < 1.0:
+		mod.a *= alfa
 	Atlas.dibuja(L, im, Rect2(x, y, im.get_width(), im.get_height()), null, mod)
 
 func _rect(x: float, y: float, w: float, h: float, c: Color) -> void:
 	if w > 0 and h > 0:
+		if alfa < 1.0:
+			c.a *= alfa
 		L.draw_rect(Rect2(x, y, w, h), c)
+
+# translúcido si tapa al protagonista (lo pidió el usuario: «como en los Sims»; con CAL): lo que se pinta después de él (su pie, más
+# abajo que el suyo) y le pisa el cuerpo con más de TAPA_PX píxeles opacos se pinta a TAPA_ALFA, para verlo detrás
+const TAPA_ALFA := 0.45
+const TAPA_PX := 12
+var alfa := 1.0
+
+func caja_pj() -> Rect2i:   # el cuerpo del protagonista en la pantalla (sus pies en px + 8, py + 15, como en _pj)
+	var P: Dictionary = J.P
+	return Rect2i(Datos.jsround(P.px - cam.x) + 2, Datos.jsround(P.py - cam.y) - 11, 12, 26)
+
+func tapa_pj(im: Image, x: int, y: int, pie: float) -> bool:
+	if not Datos.CAL or J.SENT != null or pie <= float(J.P.py) or J.mode != "world":
+		return false
+	var b := caja_pj().intersection(Rect2i(x, y, im.get_width(), im.get_height()))
+	if b.size.x <= 0 or b.size.y <= 0:
+		return false
+	var nn := 0
+	for yy in range(b.position.y, b.end.y):
+		for xx in range(b.position.x, b.end.x):
+			if im.get_pixel(xx - x, yy - y).a > .5:
+				nn += 1
+				if nn >= TAPA_PX:
+					return true
+	return false
+
+# lo de encima de una mesa (las plantas y los focos, hasta TAPA_ALTO px sobre ella), que no está en su sprite: por su caja
+const TAPA_ALTO := 48
+func tapa_encima(x: int, y: int, w: int, pie: float) -> bool:
+	if not Datos.CAL or J.SENT != null or pie <= float(J.P.py) or J.mode != "world":
+		return false
+	var b := caja_pj().intersection(Rect2i(x, y - TAPA_ALTO, w, TAPA_ALTO))
+	return b.size.x * b.size.y >= TAPA_PX * 4
+
+func _con_alfa(tapa: bool, f: Callable) -> void:
+	if tapa:
+		alfa = TAPA_ALFA
+	f.call()
+	alfa = 1.0
 
 func _pinta(f, xP: float, yP: float) -> void:
 	_img(f.c, Datos.jsround(xP - f.cel.ancla[0]), Datos.jsround(yP - f.cel.ancla[1]))
@@ -555,6 +598,13 @@ func _encima() -> void:
 	if J.SETAS_V != null:   # 1.43.9: las baldas del bajo de las setas, a la vista
 		for e in J.rects_bajo(J.SETAS_V):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+	if J.MADRES_V != null:   # el armario de las madres de la nave, por dentro (nave.gd rects_madres, con CAL)
+		for e in J.rects_madres(J.MADRES_V):
+			if typeof(e[0]) == TYPE_STRING:   # ['@', imagen, x, y, recorte]
+				var im: Image = e[1]
+				_img_clip(im, int(e[2]), int(e[3]), Rect2i(0, 0, im.get_width(), im.get_height()), e[4], Color.WHITE)
+				continue
+			_rect(e[0], e[1], e[2], e[3], e[4] if e[4] is Color else css(e[4]))
 	if J.ARM_V != null:   # 1.44: el armario del bajo, por dentro
 		for e in J.rects_armario():
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
@@ -1173,7 +1223,11 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		mide.append({"o": o, "x": tx, "y": ty, "c": f.c, "px": Datos.jsround(xp - f.cel.ancla[0]), "py": Datos.jsround(yp - f.cel.ancla[1])})
 		return
 	if f.cel.h > 16:
-		list.append([ty * 16 + mini(0, d.dy), _pinta_mesa.bind(f, xp, yp, pl, md, fm, ex)])   # corrido hacia abajo, no pasa delante de quien está en su fila
+		var pie: int = ty * 16 + mini(0, d.dy)
+		list.append([pie, func():
+			var mx: int = Datos.jsround(xp - f.cel.ancla[0])
+			var my: int = Datos.jsround(yp - f.cel.ancla[1])
+			_con_alfa(tapa_pj(f.c, mx, my, pie) or (pl != null and tapa_encima(mx, my, f.c.get_width(), pie)), _pinta_mesa.bind(f, xp, yp, pl, md, fm, ex))])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
 		_pinta_mesa(f, xp, yp, pl, md, fm, ex)
 
@@ -1453,7 +1507,7 @@ func _carpa_mapa(t: Dictionary) -> void:
 		_rect(e[0], e[1], e[2], e[3], e[4])
 	var f = Atlas.foto_misc("carpa-" + t.t + "-mapa")
 	if f:
-		_pinta(f, xc, yb)
+		_con_alfa(tapa_pj(f.c, Datos.jsround(xc - f.cel.ancla[0]), Datos.jsround(yb - f.cel.ancla[1]), t.y * 16), _pinta.bind(f, xc, yb))
 	else:
 		var c := Procedural.carpa_mapa(t.t)
 		_img(c, xc - (c.get_width() >> 1), yb - c.get_height() + 1)

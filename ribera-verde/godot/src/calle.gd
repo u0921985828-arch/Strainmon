@@ -885,6 +885,8 @@ func object_action(x: int, y: int) -> void:
 			return
 		if pi_.get("llave") == "kc" and await kc_cerrada():   # la sala de cultivo de KAIA, con la licencia (kaiacult.gd)
 			return
+		if pi_.get("llave") == "fria" and await fria_cerrada():   # la sala fría del sótano, con la obra (salafria.gd)
+			return
 		await cruzar_puerta(pi_)
 		return
 	if await obj_local(x, y, o):   # los locales (1.30)

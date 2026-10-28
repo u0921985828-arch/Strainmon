@@ -1,14 +1,14 @@
 {
   "grupo": "kaia-carpa",
   "celda": [
-    64,
-    64
+    80,
+    80
   ],
   "tope_colores": 32,
-  "secuencias": 10,
-  "fotogramas": 10,
+  "secuencias": 31,
+  "fotogramas": 31,
   "semitransparentes": 0,
-  "en_paleta_antes": 19.6,
+  "en_paleta_antes": 14.4,
   "distancia_media": 0,
   "colores_finales": 27,
   "fundidos": [],

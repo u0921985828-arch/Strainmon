@@ -1279,12 +1279,25 @@ func manicura_action():
 	var b: Dictionary = lots[i][1]
 	var m: int = mini(int(D.MANICURA.max), maxi(15, Datos.jsround(b.g * (1 - float(b.get("mc", 0))) * D.MANICURA.min)))
 	await say(K("Con las tijeras, cogollo a cogollo: fuera las hojitas con poca resina, que quede limpio y redondo."), K("MANICURA"))
-	gesto_sid = lot_sid(k)
-	await gesto("manicurar")   # 1.54
-	b.mc = 1
+	var mc := 1.0
+	if Datos.CAL and D.MANICURA.has("pasos"):   # a la vista: tres pasos con su barra y la escena encima (escena_extr.gd, «mani»)
+		var ok := 0
+		var Pa: Array = D.MANICURA.pasos
+		for ip in Pa.size():
+			var d: float = await tiro_billar(I18n.v(String(Pa[ip][0])), "dir", float(Pa[ip][1]), float(D.MANICURA.per), K("MANICURA"), {"esc": "mani", "paso": ip, "n": Pa.size()})
+			if absf(d - float(D.BILLAR.centro)) <= float(Pa[ip][1]):
+				ok += 1
+		mc = maxf(float(b.get("mc", 0)), float(D.MANICURA.base) + (1 - float(D.MANICURA.base)) * ok / Pa.size())
+	else:
+		gesto_sid = lot_sid(k)
+		await gesto("manicurar")   # 1.54
+	b.mc = mc
 	advance_time(m)
 	sfx("get")
 	var dur: String = (("%d h" % int(m / 60)) + ((" " + T("{n} min", {"n": m % 60})) if m % 60 else "")) if m >= 60 else T("{n} min", {"n": m})
+	if mc < 1:
+		await say(T("{n}: {g} repasados en {d}, pero quedan hojitas: se venden un {p} % más caros. Se pueden repasar.", {"n": lot_nombre(k), "g": g_txt(b.g), "d": dur, "p": Datos.jsround(D.MANICURA.precio * mc * 100)}))
+		return
 	await say(T("{n}: {g} manicurados en {d}. Se venden un {p} % más caros.", {"n": lot_nombre(k), "g": g_txt(b.g), "d": dur, "p": Datos.jsround(D.MANICURA.precio * 100)}))
 
 # un mueble por máquina (1.36), montado en el piso cuando la tienes (montar_casa)

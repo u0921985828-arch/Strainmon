@@ -3,8 +3,10 @@
 # puerta (15, 1) del club, cerrada hasta tener la licencia (S.mar.lic). Por fases (lo pidió el usuario: «como en casa, cultivo con
 # carpas, pero más grandes de primeras, con una inversión realista, después como en la nave en esa misma habitación, ya con
 # posibilidad de poner a alguien a trabajar ahí y la inversión será más grande»):
-#  · fase 1: kits de carpa de 240 × 240 (KAIA_CULT.kit: la carpa, dos LED de 720 W, el extractor con su filtro y el goteo) que se
-#    pagan con la cuenta desde el cuadro (ctrlN) y llegan al día siguiente, hasta KAIA_CULT.max; nueve plazas por carpa, con el riego
+#  · fase 1: las carpas por niveles (lo pidió el usuario: «4 de 2×2, luego 2 de 4×2, luego una de 4×4 y después la reforma»;
+#    KAIA_CULT.niv, cada nivel con su kit: la carpa, sus LED de 720 W, el extractor con su filtro y el goteo) que se pagan con la
+#    cuenta desde el cuadro (ctrlN) y llegan al día siguiente, hasta N.max; al pasar al siguiente (kc_sube), las de antes se venden de
+#    segunda mano y llega la primera del nuevo; N.plazas por carpa, con el riego
 #    y el clima solos (kc_avanza desde plants_advance); A en una carpa, sus plazas, y en cada una lo de siempre (pot_action con hu,
 #    como la huerta de campo.gd). Las carpas se ordenan desde el cuadro, solo encima de la zona de cultivo (la regla zona de
 #    cabe_pieza) y sin montarse encima de nada (pieza_solapa).
@@ -12,27 +14,56 @@
 #    obra, la sala lleva las mesas de la nave con su LED doble, el riego centralizado y alguien de la plantilla de cultivo (rol kaia);
 #    cada mañana las lleva como un navero (kc_dia, desde nave_dia), lo cortado se seca y va al almacén de KAIA; lo que no cabe, en su
 #    mesa, para llevártelo.
-# S.kc = {kits: [día de llegada de cada kit], p: [plantas o null, carpa × plazas], f2: null o el día en que acaba la obra, m: [mesas]}.
-# Datos de tools/kaia_cult.py (KAIA_CULT, MAPS["cult-muelle"]). Cadena: … → hilo → bancotia → kaiacult → retencion → juego.
+# S.kc = {niv: el nivel de las carpas, kits: [día de llegada de cada kit], p: [plantas o null, carpa × plazas], f2: null o el día en que
+# acaba la obra, m: [mesas]}.
+# Datos de tools/kaia_cult.py (KAIA_CULT, MAPS["cult-muelle"]). Cadena: … → hilo → bancotia → kaiacult → salafria → retencion → juego.
 extends "res://src/bancotia.gd"
 
 var _kc0 = null   # los muebles de la sala tal como vienen de datos.json, para montar las mesas encima
 
+const KC_KIT_VIEJO := 3180   # lo que costaba el kit de 240 × 240 de antes de los niveles
+
 func kc() -> Dictionary:
 	if not (S.get("kc") is Dictionary):
-		S.kc = {"kits": [], "p": []}
-	if not S.kc.has("kits"):   # la de antes, con tres carpas de 4 plazas de regalo: cada una, un kit montado, con sus plantas
+		S.kc = {"niv": 0, "kits": [], "p": []}
+	if not S.kc.has("kits"):   # la primera, con tres carpas de 4 plazas de regalo: cada una, un kit montado de 9 plazas, con sus plantas
 		var viejas: Array = S.kc.get("p", [])
 		S.kc = {"kits": [0, 0, 0], "p": []}
 		for i in viejas.size():
 			if viejas[i] is Dictionary:
-				while S.kc.p.size() <= (i / 4) * int(D.KAIA_CULT.plazas) + i % 4:
+				while S.kc.p.size() <= (i / 4) * 9 + i % 4:
 					S.kc.p.append(null)
-				S.kc.p[(i / 4) * int(D.KAIA_CULT.plazas) + i % 4] = viejas[i]
-	var n: int = D.KAIA_CULT.carpas.size() * int(D.KAIA_CULT.plazas)
+				S.kc.p[(i / 4) * 9 + i % 4] = viejas[i]
+	if not S.kc.has("niv"):   # la de los kits de 240 × 240: en el nivel de las de 4 × 2, con dos como mucho y sus plantas en las primeras plazas
+		var N1: Dictionary = D.KAIA_CULT.niv[1]
+		var pl: Array = S.kc.p.filter(func(q): return q is Dictionary)
+		S.kc.niv = 0 if S.kc.get("f2") != null else 1
+		var kv: Array = S.kc.kits
+		S.kc.kits = kv.slice(0, int(N1.max)) if S.kc.get("f2") == null else []
+		var cabe: int = int(N1.plazas) * S.kc.kits.size()
+		S.kc.p = pl.slice(0, cabe)
+		# lo que no cabe, devuelto: los kits de más (también el que venía de camino) a lo que costaron, y de cada planta, su semilla
+		var dev: int = (kv.size() - S.kc.kits.size()) * KC_KIT_VIEJO
+		var sem := 0
+		for q in pl.slice(cabe):
+			var sid := str(q.get("sid", ""))
+			if sid != "":
+				S.seeds[sid] = int(S.seeds.get(sid, 0)) + 1
+				sem += 1
+		if dev > 0:
+			abono_banco(float(dev), K("Kits de carpa devueltos (KAIA)"))
+		if dev > 0 or sem > 0:
+			var L := [T("La sala de cultivo de KAIA pasa a las carpas nuevas. Lo que no cabe se devuelve: {e} a la cuenta por los kits de más y {n} semillas por las plantas que no caben.", {"e": Datos.eur(dev), "n": sem})]
+			queue("kcmig", func(): await say(L[0]), [["", L]])
+		if S.get("coloca") is Dictionary:
+			S.coloca.erase(D.KAIA_CULT.mapa)
+	var n: int = int(kc_N().plazas) * int(kc_N().max)
 	while S.kc.p.size() < n:
 		S.kc.p.append(null)
 	return S.kc
+
+func kc_N() -> Dictionary:   # el nivel de las carpas
+	return D.KAIA_CULT.niv[clampi(int(S.kc.get("niv", 0)), 0, D.KAIA_CULT.niv.size() - 1)]
 
 func kc_hay() -> bool:
 	return Datos.CAL and S != null and D.has("KAIA_CULT")
@@ -64,33 +95,36 @@ func kc_cerrada() -> bool:
 # los factores de una plaza, como Cultivo.factores con la carpa grande, sus dos LED y la maceta de la sala, y su clima controlado
 func kc_f() -> Dictionary:
 	var KC: Dictionary = D.KAIA_CULT
-	var cm: Array = KC.carpa.cm
+	var N: Dictionary = kc_N()
+	var cm: Array = N.cm
 	var F: Dictionary = D.FOCOS[KC.foco]
 	var M: Dictionary = D.MACETAS[KC.maceta]
-	var w: float = float(F.w) * float(KC.nf)
-	var dens := minf(1, w / (float(cm[0]) * float(cm[2]) / 1e4 * float(D.W_M2)))
-	return {"g": w * float(F.gpw) / float(KC.plazas) * float(M.rend), "cap": float(M.cap), "crec": float(F.crec) * (.85 + .15 * dens) * float(M.crec) * Cultivo.f_clima(KC.clima),
+	var w: float = float(F.w) * float(N.nf)
+	var dens := minf(1, w / (float(cm[0]) * float(cm[1]) / 1e4 * float(D.W_M2)))
+	return {"g": w * float(F.gpw) / float(N.plazas) * float(M.rend) * float(N.get("efi", 1.0)), "cap": float(M.cap), "crec": float(F.crec) * (.85 + .15 * dens) * float(M.crec) * Cultivo.f_clima(KC.clima),
 		"thc": float(F.thc) * dens, "agua": float(F.agua) * float(M.agua), "plaga": float(M.plaga), "dens": dens, "hr": float(KC.clima.hr), "moho": 1.0, "ciclo": "auto"}   # i18n-no
 
 func kc_pos(ci: int) -> Array:
-	return pos_pieza(D.KAIA_CULT.mapa, "kc%d" % ci)
+	return pos_pieza(D.KAIA_CULT.mapa, "kc%s%d" % [kc_N().k, ci])
 
 func kc_hu(i: int) -> Dictionary:
-	var p := kc_pos(i / int(D.KAIA_CULT.plazas))
-	return {"l": kc().p, "v": [int(p[0]) * 16 + 24, (int(p[1]) + 1) * 16], "f": kc_f()}
+	var t: Array = kc_N().tam
+	var p := kc_pos(i / int(kc_N().plazas))
+	return {"l": kc().p, "v": [int(p[0]) * 16 + int(t[0]) * 8, (int(p[1]) + int(t[1]) - 1) * 16], "f": kc_f()}
 
-func kc_carpa_en(x: int, y: int) -> int:   # la carpa (3 × 2 casillas) con la casilla (x, y), o -1
+func kc_carpa_en(x: int, y: int) -> int:   # la carpa (N.tam casillas) con la casilla (x, y), o -1
 	if kc_f2() or kc_obra():
 		return -1
+	var t: Array = kc_N().tam
 	for ci in kc_kits():
 		var p := kc_pos(ci)
-		if y >= int(p[1]) and y <= int(p[1]) + 1 and x >= int(p[0]) and x <= int(p[0]) + 2:
+		if y >= int(p[1]) and y < int(p[1]) + int(t[1]) and x >= int(p[0]) and x < int(p[0]) + int(t[0]):
 			return ci
 	return -1
 
 func kc_plantadas(ci: int) -> int:
 	var n := 0
-	var np: int = int(D.KAIA_CULT.plazas)
+	var np: int = int(kc_N().plazas)
 	for j in np:
 		if kc().p[ci * np + j] is Dictionary:
 			n += 1
@@ -105,13 +139,15 @@ func kc_vacias() -> bool:
 # cada carpa montada sale en ORDENAR solo si su kit ha llegado y no hay obra
 func pieza_ya(P_: Dictionary) -> bool:
 	if str(P_.get("si", "")) == "kc":
-		return kc_hay() and not kc_f2() and not kc_obra() and int(str(P_.k).substr(2)) < kc_kits()
+		return kc_hay() and not kc_f2() and not kc_obra() and str(P_.k).substr(2, 1) == str(kc_N().k) and int(str(P_.k).substr(3)) < kc_kits()
 	return super(P_)
 
-# cada carpa con las plantas que tiene (carpaKG-<n>, de kaia_carpa.py)
+# cada carpa con las plantas que tiene (kcs-<n>, kcm-<n>, kcl-<n>, de kaia_carpa.py)
 func sprite_local(o: String) -> String:
-	if kc_hay() and o.begins_with("carpaKG"):   # i18n-no
-		return "carpaKG-%d" % kc_plantadas(int(o.substr(7)))   # i18n-no
+	if kc_hay():
+		for N in D.KAIA_CULT.niv:
+			if o.begins_with(N.obj):
+				return "%s-%d" % [N.spr, kc_plantadas(int(o.substr(String(N.obj).length()))) if N.k == kc_N().k else 0]   # i18n-no
 	return super(o)
 
 func bt_entra(mapa: String) -> void:
@@ -185,18 +221,25 @@ func kc_cuadro() -> void:
 			txt = T("El cuadro de la sala: seis mesas con su LED doble, el riego centralizado y el clima. {q}", {"q": T("Las lleva {n}.", {"n": w.n}) if w != null else K("Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.")})
 			ops.append(K("Salir"))
 		else:
+			var N: Dictionary = kc_N()
 			var nk: int = kc().kits.size()
-			txt = K("El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.")
-			if nk < int(KC.max):
-				ops.append(T("Comprar un kit de carpa · {e}", {"e": Datos.eur(KC.kit.p)}))
+			txt = T("El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas de {n}: {k} de {m}.", {"n": I18n.v(N.n), "k": nk, "m": int(N.max)})
+			if nk < int(N.max):
+				ops.append(T("Comprar una carpa · {e}", {"e": Datos.eur(N.kit.p)}))
 			if kc_kits() >= 1:
 				ops.append(K("Ordenar la sala"))
-			ops.append(T("Reformar la sala · {e}", {"e": Datos.eur(KC.f2.p)}))
+			var sig = kc_sig()
+			if sig != null:
+				ops.append(T("Pasar a la {n} · {e}", {"n": I18n.v(sig.n), "e": Datos.eur(sig.kit.p)}))
+			else:
+				ops.append(T("Reformar la sala · {e}", {"e": Datos.eur(KC.f2.p)}))
 			ops.append(K("Salir"))
 		var c: int = await ask(txt, ops)
 		var op: String = ops[c] if c >= 0 and c < ops.size() else ""
-		if op.begins_with(K("Comprar un kit")):
+		if op.begins_with(K("Comprar una carpa")):
 			await kc_compra_kit()
+		elif op.begins_with(K("Pasar a la")):
+			await kc_sube()
 		elif op == K("Ordenar la sala"):
 			await ordenar(S.map)
 			return
@@ -205,18 +248,57 @@ func kc_cuadro() -> void:
 		else:
 			return
 
-func kc_compra_kit() -> void:
-	var KC: Dictionary = D.KAIA_CULT
+func kc_kit_txt(N: Dictionary) -> String:
 	var l := []
-	for x in KC.kit.l:
+	for x in N.kit.l:
 		l.append(T("{n}: {e}", {"n": I18n.v(x[0]), "e": Datos.eur(x[1])}))
-	if await ask(T("El kit de la carpa grande, a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y lo montan aquí.", {"l": "; ".join(PackedStringArray(l)), "e": Datos.eur(KC.kit.p)}), [K("Comprarlo"), K("Ahora no")]) != 0:
+	return "; ".join(PackedStringArray(l))
+
+func kc_compra_kit() -> void:
+	var N: Dictionary = kc_N()
+	if await ask(T("El kit de la {c}, a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y lo montan aquí.", {"c": I18n.v(N.n), "l": kc_kit_txt(N), "e": Datos.eur(N.kit.p)}), [K("Comprarlo"), K("Ahora no")]) != 0:
 		return
-	if not await tarjeta(float(KC.kit.p), K("Kit de carpa (KAIA)")):
+	if not await tarjeta(float(N.kit.p), K("Kit de carpa (KAIA)")):
 		return
 	kc().kits.append(int(S.day) + 1)
 	sfx("get")
-	await say(T("Pedido: la carpa {n} llega mañana, con sus dos LED, el extractor y el goteo. Nueve plazas más.", {"n": kc().kits.size()}))
+	await say(T("Pedido: la carpa {n} llega mañana, con sus LED, el extractor y el goteo. {p} plazas más.", {"n": kc().kits.size(), "p": int(N.plazas)}))
+
+func kc_sig():   # el nivel siguiente, o null en el último (después, la reforma)
+	var i: int = int(kc().get("niv", 0)) + 1
+	return D.KAIA_CULT.niv[i] if i < D.KAIA_CULT.niv.size() else null
+
+# pasar al nivel siguiente: las carpas de ahora, de segunda mano; la primera del nuevo, pagada y mañana aquí
+func kc_sube() -> void:
+	var N: Dictionary = kc_N()
+	var N2 = kc_sig()
+	if N2 == null:
+		return
+	var vende := roundi(float(N.kit.p) * float(D.KAIA_CULT.f2.venta) * kc().kits.size())
+	var t := T("La {c}, con su kit a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y caben más.", {"c": I18n.v(N2.n), "l": kc_kit_txt(N2), "e": Datos.eur(N2.kit.p)})
+	if kc().kits.size():
+		t += " " + T("Las carpas de ahora se desmontan y se venden de segunda mano por {e}.", {"e": Datos.eur(vende)})
+	if not kc_vacias():
+		await say(t + " " + K("Antes, cosecha o arranca lo que tengas en las carpas."))
+		return
+	if kc().kits.any(func(d): return int(d) > int(S.day)):
+		await say(t + " " + K("Antes, espera a que llegue la carpa que tienes pedida."))
+		return
+	if await ask(t, [K("Comprarla"), K("Ahora no")]) != 0:
+		return
+	if not await tarjeta(float(N2.kit.p), K("Kit de carpa (KAIA)")):
+		return
+	if vende > 0:
+		abono_banco(vende, K("Carpas de segunda mano (KAIA)"))
+	kc().niv = int(kc().get("niv", 0)) + 1
+	kc().kits = [int(S.day) + 1]
+	kc().p = []
+	kc()
+	if S.get("coloca") is Dictionary:
+		S.coloca.erase(D.KAIA_CULT.mapa)
+	kc_monta()
+	sfx("get")
+	await say(T("Pedido: la primera {c} llega mañana, con sus LED, el extractor y el goteo; caben {m}.", {"c": I18n.v(N2.n), "m": int(N2.max)}))
 
 func kc_reforma() -> void:
 	var KC: Dictionary = D.KAIA_CULT
@@ -224,7 +306,7 @@ func kc_reforma() -> void:
 	var l := []
 	for x in F2.l:
 		l.append(T("{n}: {e}", {"n": I18n.v(x[0]), "e": Datos.eur(x[1])}))
-	var vende := roundi(float(KC.kit.p) * float(F2.venta) * kc().kits.size())
+	var vende := roundi(float(kc_N().kit.p) * float(F2.venta) * kc().kits.size())
 	var t := T("La sala entera como la nave: {l}. En total, {e}, con la tarjeta; la obra dura {d} días. Después, las mesas las lleva alguien de tu plantilla.", {"l": "; ".join(PackedStringArray(l)), "e": Datos.eur(F2.p), "d": int(F2.dias)})
 	if kc().kits.size():
 		t += " " + T("Las carpas se desmontan y se venden de segunda mano por {e}.", {"e": Datos.eur(vende)})
@@ -256,7 +338,7 @@ func kc_carpa(ci: int) -> void:
 	if not kc_lic():
 		await say(K("Sin la licencia de cultivo, las carpas se quedan vacías."))
 		return
-	var np: int = int(D.KAIA_CULT.plazas)
+	var np: int = int(kc_N().plazas)
 	var it := []
 	for j in np:
 		var p = kc().p[ci * np + j]

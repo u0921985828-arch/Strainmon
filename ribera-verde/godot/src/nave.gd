@@ -173,6 +173,9 @@ func madre_txt(M: Dictionary) -> String:
 	return strain(lot_sid(M.k)).n + etiq(M.get("f"))
 
 func carpa_madres() -> void:
+	if Datos.CAL:
+		await vista_madres()
+		return
 	var N: Dictionary = S.nave
 	var i := 0
 	while true:
@@ -191,42 +194,209 @@ func carpa_madres() -> void:
 		if i < 0 or i == rows.size() - 1:
 			return
 		if i >= N.ma.size():
-			var p = await elegir_planta(K("¿QUÉ MADRE METES?"), false)
-			if p == null:
-				continue
-			if Datos.CAL and strain(p.sid).get("auto"):   # 1.52
-				await say(T("La {nom} es autofloreciente: florece por la edad y no se queda de madre. Sus esquejes florecerían enanos.", {"nom": strain(p.sid).n}))
-				continue
-			N.ma.append({"k": p.sid + ("*" if Cultivo.clase_feno(p.f) == "estrella" else ""), "f": p.f, "v": 100, "e": 0})
-			sfx("sel")
-			await say(T("La {nom}{et}, a la carpa de las madres: a 18/6, siempre en crecimiento.", {"nom": strain(p.sid).n, "et": etiq(p.f)}) + " " + (T("{n} se encarga.", {"n": c.n}) if c != null else K("Sin nadie que la cuide, se va apagando: pon a alguien de tu plantilla en las madres.")))
+			await madre_meter()
 			continue
-		var M: Dictionary = N.ma[i]
-		var ops := []
-		var rec := ""
-		if M.e:
-			rec = T("Recoger {n} esquejes", {"n": int(M.e)}) if M.e > 1 else T("Recoger {n} esqueje", {"n": int(M.e)})
-			ops.append(rec)
-		ops.append_array([K("Quitarla"), K("Nada")])
-		var oi: int = await ask(T("Madre {j}: {m} · vigor {v} %.", {"j": i + 1, "m": madre_txt(M), "v": int(M.v)}) + ("" if M.e else (" " + (T("{n} le saca esquejes cada mañana.", {"n": c.n}) if c != null else K("Nadie le saca esquejes.")))), ops)
-		var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
-		if rec != "" and op == rec:
-			var q: int = mini(int(M.e), int(D.MADRES.propagador) - S.esquejes.size())
-			if q < 1:
-				await say(T("El propagador está lleno: {n} esquejes. Planta alguno antes.", {"n": int(D.MADRES.propagador)}))
-				continue
-			for j in q:
-				S.esquejes.append({"sid": lot_sid(M.k), "f": M.f, "dia": S.day})
-			M.e = int(M.e) - q
-			sfx("get")
-			var fq := Datos.fd(int(S.day) + int(D.ESQUEJE_DIAS) + 1, S.day)
-			await say(T("{q} esquejes de la {m}, al propagador. Plántalos antes del {f}.", {"q": q, "m": madre_txt(M), "f": fq}) if q > 1 else T("Un esqueje de la {m}, al propagador. Plántalos antes del {f}.", {"m": madre_txt(M), "f": fq}))
-			continue
-		if op == "Quitarla":
-			if await ask(T("¿Quitas la madre de {m}? Se tira.", {"m": madre_txt(M)}), [K("Quitarla"), K("No")]) != 0:
-				continue
-			N.ma.remove_at(i)
+		await madre_ops(i)
+
+# meter una madre en la carpa, con una semilla o un esqueje
+func madre_meter() -> void:
+	var N: Dictionary = S.nave
+	var c = cuida_madres()
+	var p = await elegir_planta(K("¿QUÉ MADRE METES?"), false)
+	if p == null:
+		return
+	if Datos.CAL and strain(p.sid).get("auto"):   # 1.52
+		await say(T("La {nom} es autofloreciente: florece por la edad y no se queda de madre. Sus esquejes florecerían enanos.", {"nom": strain(p.sid).n}))
+		return
+	N.ma.append({"k": p.sid + ("*" if Cultivo.clase_feno(p.f) == "estrella" else ""), "f": p.f, "v": 100, "e": 0})
+	sfx("sel")
+	await say(T("La {nom}{et}, a la carpa de las madres: a 18/6, siempre en crecimiento.", {"nom": strain(p.sid).n, "et": etiq(p.f)}) + " " + (T("{n} se encarga.", {"n": c.n}) if c != null else K("Sin nadie que la cuide, se va apagando: pon a alguien de tu plantilla en las madres.")))
+
+# los esquejes van al propagador (S.esquejes, con su tope); devuelve los que caben de q
+func _al_propagador(M: Dictionary, q: int) -> int:
+	q = mini(q, int(D.MADRES.propagador) - S.esquejes.size())
+	for j in maxi(0, q):
+		S.esquejes.append({"sid": lot_sid(M.k), "f": M.f, "dia": S.day})
+	return q
+
+# lo de una madre: recoger los esquejes que le ha sacado quien las cuida, cortárselos tú (con CAL, una vez al día) o quitarla
+func madre_ops(i: int) -> void:
+	var N: Dictionary = S.nave
+	var c = cuida_madres()
+	var M: Dictionary = N.ma[i]
+	var ops := []
+	var rec := ""
+	if M.e:
+		rec = T("Recoger {n} esquejes", {"n": int(M.e)}) if M.e > 1 else T("Recoger {n} esqueje", {"n": int(M.e)})
+		ops.append(rec)
+	var cor := Datos.CAL and int(M.get("cd", -1)) != int(S.day) and int(M.v) >= int(D.MADRES.get("corte_v", 40))
+	if cor:
+		ops.append(K("Cortarle esquejes"))
+	ops.append_array([K("Quitarla"), K("Nada")])
+	var oi: int = await ask(T("Madre {j}: {m} · vigor {v} %.", {"j": i + 1, "m": madre_txt(M), "v": int(M.v)}) + ("" if M.e else (" " + (T("{n} le saca esquejes cada mañana.", {"n": c.n}) if c != null else K("Nadie le saca esquejes.")))), ops)
+	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
+	if rec != "" and op == rec:
+		var q := _al_propagador(M, int(M.e))
+		if q < 1:
+			await say(T("El propagador está lleno: {n} esquejes. Planta alguno antes.", {"n": int(D.MADRES.propagador)}))
+			return
+		M.e = int(M.e) - q
+		sfx("get")
+		var fq := Datos.fd(int(S.day) + int(D.ESQUEJE_DIAS) + 1, S.day)
+		await say(T("{q} esquejes de la {m}, al propagador. Plántalos antes del {f}.", {"q": q, "m": madre_txt(M), "f": fq}) if q > 1 else T("Un esqueje de la {m}, al propagador. Plántalos antes del {f}.", {"m": madre_txt(M), "f": fq}))
+		return
+	if op == K("Cortarle esquejes"):   # con CAL: tú, con las tijeras, las puntas de las ramas de abajo (le cuesta algo de vigor)
+		if S.esquejes.size() >= int(D.MADRES.propagador):
+			await say(T("El propagador está lleno: {n} esquejes. Planta alguno antes.", {"n": int(D.MADRES.propagador)}))
+			return
+		gesto_sid = str(M.k)
+		await gesto("esqueje")
+		var q := _al_propagador(M, int(D.MADRES.get("corte", 2)))
+		M.cd = int(S.day)
+		M.v = maxi(0, int(M.v) - int(D.MADRES.get("corte_p", 5)))
+		sfx("get")
+		var fq := Datos.fd(int(S.day) + int(D.ESQUEJE_DIAS) + 1, S.day)
+		await say(T("Le cortas {q} esquejes a la {m}, al propagador. Plántalos antes del {f}. Mañana, más.", {"q": q, "m": madre_txt(M), "f": fq}) if q > 1 else T("Le cortas un esqueje a la {m}, al propagador. Plántalo antes del {f}. Mañana, más.", {"m": madre_txt(M), "f": fq}))
+		return
+	if op == K("Quitarla"):
+		if await ask(T("¿Quitas la madre de {m}? Se tira.", {"m": madre_txt(M)}), [K("Quitarla"), K("No")]) != 0:
+			return
+		N.ma.remove_at(i)
+		sfx("sel")
+
+# ---------- el armario de las madres por dentro (lo pidió el usuario: «vista por dentro, como la carpa de casa»; con CAL) ----------
+# La carpa plateada de la vista C (carpa-c-pared) con sus dos LED a 18/6 y el temporizador en la pared, las madres en sus macetas de
+# tela con el tono de hoja de su variedad, su vigor y los esquejes listos, y los huecos libres. Flechas eligen; A, la madre
+# (madre_ops: recoger, cortarle esquejes, quitarla) o el hueco (madre_meter); B cierra. MADRES_V = {i: el sitio elegido}
+func vista_madres() -> void:
+	var i := 0
+	while S.get("nave") != null:
+		var r = await elegir_madres(i)
+		if r == null:
+			return
+		i = int(r)
+		if i < S.nave.ma.size():
+			await madre_ops(i)
+		elif S.nave.ma.size() < int(D.MADRES.max):
+			await madre_meter()
+			i = mini(i, maxi(0, S.nave.ma.size() - 1))
+
+func luz_madres() -> bool:   # el LED, a 18/6 desde las 6 de la mañana (como el temporizador de casa), con alguna madre dentro
+	return S.get("nave") != null and not S.nave.ma.is_empty() and posmod(int(S.min) - 6 * 60, 24 * 60) < 18 * 60
+
+func desc_madres(V: Dictionary) -> String:
+	var N: Dictionary = S.nave
+	var c = cuida_madres()
+	var cu: String = T("Las cuida {n}.", {"n": c.n}) if c != null else K("Nadie las cuida.")
+	var lz: String = K("LED encendido, a 18/6.") if luz_madres() else (K("LED apagado: sus 6 horas de noche.") if not N.ma.is_empty() else K("LED apagado: no hay madres."))
+	if V.i >= N.ma.size():
+		return T("Hueco libre · {a} de {b} madres. {l} {c}\nA: meter una madre · B: cerrar.", {"a": N.ma.size(), "b": int(D.MADRES.max), "l": lz, "c": cu})
+	var M: Dictionary = N.ma[V.i]
+	return T("Madre {j} · {m} · vigor {v} % · {e} esquejes listos. {l}\nA: cortar o recoger esquejes · B: cerrar.", {"j": V.i + 1, "m": madre_txt(M), "v": int(M.v), "e": int(M.e), "l": lz})
+
+func elegir_madres(i0 := 0):
+	if gancho_madres.is_valid():
+		return gancho_madres.call(i0)
+	var nmax: int = int(D.MADRES.max)
+	MADRES_V = {"i": clampi(i0, 0, nmax - 1)}
+	_dlg_fijo(desc_madres(MADRES_V), K("LAS MADRES"))
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "B":
+			pop()
+			pr.res(null)
+			return
+		if b == "A":
+			pop()
+			pr.res(MADRES_V.i)
+			return
+		var n2: int = int(MADRES_V.i) + (-1 if b == "left" else (1 if b == "right" else 0))
+		if n2 != int(MADRES_V.i) and n2 >= 0 and n2 < nmax:
+			MADRES_V.i = n2
 			sfx("sel")
+			_dlg_fijo(desc_madres(MADRES_V), K("LAS MADRES")))
+	var e = await Motor.espera(pr)
+	MADRES_V = null
+	if not oraculo:
+		dlg.hide()
+		dlg_nm.hide()
+	return e
+
+const ArteM = preload("res://src/arte.gd")
+const VistaM = preload("res://src/vista.gd")
+const MAD_PARED := 58   # la carpa de la vista C, de la fila 58 abajo (MAD_H px: lo que cabe encima del diálogo)
+const MAD_H := 102
+var _mad_cache := {}
+
+func _madre_img(M: Dictionary):   # la planta en crecimiento de la vista C, con el tono de hoja de su variedad
+	var p := {"sid": lot_sid(M.k), "f": M.get("f")}
+	var po := Datos.porte_planta(S, p)
+	var n := "planta-c-%s2-38" % po
+	if not ArteM.hay(n):
+		return null
+	var hj := Datos.hoja_planta(S, p)
+	var k := n + "|" + hj
+	if not _mad_cache.has(k):
+		if _mad_cache.size() > 64:
+			_mad_cache.clear()
+		_mad_cache[k] = ArteM.recolor(ArteM.foto(n), Datos.vc_tonos(hj))
+	return _mad_cache[k]
+
+# los sitios de las madres: el centro x de cada una y la base de su maceta
+func sitios_madres() -> Array:
+	var x0: int = (SW - 240) >> 1
+	var o := []
+	var nmax: int = int(D.MADRES.max)
+	for k in nmax:
+		o.append([x0 + 120 + int(round((k - (nmax - 1) / 2.0) * 44)), MAD_H - 6])
+	return o
+
+func rects_madres(V: Dictionary) -> Array:
+	var o := []
+	var x0: int = (SW - 240) >> 1
+	var clip := Rect2i(x0, 0, 240, MAD_H)
+	var N: Dictionary = S.nave if S.get("nave") != null else {"ma": []}
+	var on := luz_madres()
+	o.append([0, 0, SW, SH, "#0e0e12"])
+	if ArteM.hay("carpa-c-pared"):
+		o.append(["@", ArteM.foto("carpa-c-pared"), x0, -MAD_PARED, clip])
+	# los dos LED colgados del techo con sus cuerdas y su luz
+	var fl := "foco-c-led200-30"
+	for fx in [x0 + 76, x0 + 164]:
+		if ArteM.hay(fl):
+			var fi: Image = ArteM.foto(fl)
+			o.append([fx - 22, 0, 1, 9, ArteM.VC_CUERDA])
+			o.append([fx + 21, 0, 1, 9, ArteM.VC_CUERDA])
+			o.append(["@", fi, fx - (fi.get_width() >> 1), 8, clip])
+		if on:
+			o.append([fx - 30, 24, 60, MAD_H - 30, "rgba(255,244,210,0.07)"])
+	# el temporizador, a 18/6, en la pared de la izquierda
+	o.append_array(VistaM.temporizador(x0 + 12, 20, "veg", on))
+	var st := sitios_madres()
+	for k in st.size():
+		var cx: int = st[k][0]
+		var yb: int = st[k][1]
+		if k < N.ma.size():
+			var M: Dictionary = N.ma[k]
+			var im = _madre_img(M)
+			var mc := "maceta-c-tela11-26"
+			var mi: Image = ArteM.foto(mc) if ArteM.hay(mc) else null
+			var top: int = yb - (ArteM.alto(mi) if mi != null else 12)
+			if im != null:
+				var dv: int = 0 if int(M.v) >= 50 else (2 if int(M.v) >= 20 else 4)   # sin vigor, más baja
+				o.append(["@", im, cx - (im.get_width() >> 1), top + 5 - im.get_height() + dv, clip])
+			if mi != null:
+				o.append(["@", mi, cx - (mi.get_width() >> 1), yb - mi.get_height(), clip])
+			for e in int(M.e):   # los esquejes listos, en un vaso al pie de la maceta
+				o.append([cx + 10 + (e % 2) * 3, yb - 4 - (e >> 1) * 3, 2, 2, "#6ac04a"])
+			o.append_array([[cx - 16, yb + 2, 32, 3, "#16161c"], [cx - 16, yb + 2, Datos.jsround(32 * clampf(float(M.v) / 100.0, 0, 1)), 3, "#58c060" if int(M.v) >= 50 else "#e0a040"]])
+		else:   # el hueco: el sitio de la maceta, marcado en el suelo
+			o.append_array([[cx - 8, yb - 1, 16, 1, "#8a8e96"], [cx - 8, yb - 12, 1, 11, "#8a8e96"], [cx + 7, yb - 12, 1, 11, "#8a8e96"]])
+	if not on:   # la noche del temporizador: la carpa a oscuras
+		o.append([x0, 0, 240, MAD_H, "rgba(4,4,10,0.72)"])
+	var cx: int = st[clampi(int(V.i), 0, st.size() - 1)][0]   # el sitio elegido
+	o.append_array([[cx - 20, 22, 40, 1, "#f8d040"], [cx - 20, MAD_H - 1, 40, 1, "#f8d040"], [cx - 20, 22, 1, MAD_H - 22, "#f8d040"], [cx + 19, 22, 1, MAD_H - 22, "#f8d040"]])
+	return o
 
 func talk_madres():
 	var w = cuida_madres()

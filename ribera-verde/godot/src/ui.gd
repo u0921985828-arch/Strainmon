@@ -42,6 +42,7 @@ var gancho_billar8 := Callable()  # (mesa) → {ang, f[, p]} o null (lo dejas) �
 var gancho_billar := Callable()  # (texto) → de 0 a 1 · las pruebas cambian el tiro del billar (window.tiroBillar, 1.30)
 var gancho_almacen := Callable() # (caja | nevera) → el elegido o null · las pruebas eligen en la vista de la caja y la nevera (1.36, window.elegirAlmacen)
 var gancho_carro := Callable()   # () → el taco elegido o null · las pruebas eligen en la vista del carro de esquejes (1.40)
+var gancho_madres := Callable()  # (i) → el sitio elegido o null · las pruebas eligen en el armario de las madres por dentro
 var gancho_bajo := Callable()    # (i) → la bandeja elegida o null · las pruebas eligen en las baldas del bajo de las setas (1.43.9)
 
 var handlers: Array = []

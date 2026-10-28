@@ -249,6 +249,9 @@
   "JULEN",
   "MINERAL_ORG",
   "DESC_PROD",
-  "SOTANO"
+  "SOTANO",
+  "FAMILIAS",
+  "BANCO_TIA",
+  "FRIA"
  ]
 }

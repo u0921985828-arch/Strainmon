@@ -65,10 +65,66 @@ def carpa(n):
         if L.lleno(x, 62) and not L.lleno(x, 63): L.p(x, 63, K)
     return L
 
+# Por niveles (lo pidió el usuario: «4 de 2×2, luego 2 de 4×2, luego una de 4×4»): la carpa de w × d m a 16 px/m, de frente con 2 m de
+# alto (32 px) y el techo a 4 px por metro de fondo, plateada y abierta, con un LED de barras por columna de plantas, el extractor y el
+# filtro encima y un tramo de tubo que va a la pared; de 0 a todas sus plantas en rejilla (kcs-<n>, kcm-<n>, kcl-<n>). Celda carpa_kc de 80 × 80
+# con la base en el centro de la casilla de abajo a la izquierda (8, 79): el mueble ocupa sus w casillas desde x 0.
+TUBO = 6
+NIVELES = {'kcs': (2, 2, 2, 2), 'kcm': (4, 2, 4, 2), 'kcl': (4, 4, 4, 4)}   # ancho, fondo (m), columnas y filas de plantas
+
+def carpa_kc(w, d, cols, filas, n):
+    L = Lienzo(80, 80)
+    x0, x1, yb = 1, w * 16 - 2, 78
+    y0 = yb - 31                                                    # el frente, 2 m
+    yt = y0 - d * 4                                                 # el techo, por el fondo
+    cx = (x0 + x1) // 2
+    # encima del techo: el filtro de carbón, el extractor y el tubo que sube al techo de la sala
+    fx = cx - 12 if w > 2 else cx - 10
+    L.caja(fx, yt - 7, 10, 7, '#4a4e56', '#2a2e34'); L.hl(fx + 1, fx + 8, yt - 6, '#6a6e76')
+    for x in range(fx + 2, fx + 9, 2): L.vl(x, yt - 5, yt - 2, '#3a3e44')
+    L.r(fx + 10, yt - 5, 2, 3, AL1)
+    L.caja(fx + 12, yt - 7, 8, 7, '#2e3238', '#1e2226'); L.hl(fx + 13, fx + 18, yt - 6, '#4a5058'); L.p(fx + 15, yt - 4, '#c8a040')
+    for y in range(yt - 7 - TUBO, yt - 7):                          # el tubo, que sube un tramo y se va hacia la pared (no tapa lo de detrás)
+        L.hl(fx + 13, fx + 17, y, AL1); L.p(fx + 13, y, AL0); L.p(fx + 17, y, AL0)
+        if y % 3 == 0: L.hl(fx + 14, fx + 16, y, AL2)
+    L.hl(fx + 12, fx + 18, yt - 8 - TUBO, AL0); L.hl(fx + 13, fx + 17, yt - 9 - TUBO, AL2)   # la boca, de canto
+    # el techo, plateado, con sus costuras
+    L.r(x0, yt, x1 - x0 + 1, y0 - yt, P2); L.hl(x0, x1, y0 - 1, P1)
+    for x in range(x0 + 4, x1, 8): L.vl(x, yt + 1, y0 - 2, P1)
+    # el frente, abierto
+    L.r(x0, y0, x1 - x0 + 1, yb - y0 + 1, P1)
+    L.r(x0 + 2, y0 + 5, x1 - x0 - 3, yb - y0 - 5, '#1e1a22')
+    L.r(x0 + 2, y0 + 3, x1 - x0 - 3, 2, P0)
+    for x in range(x0 + 2, x1 - 1, 3): L.p(x, y0 + 3, P2)
+    L.vl(x0, yt, yb, P0); L.vl(x1, yt, yb, P0)
+    paso = (x1 - x0 - 3) / cols
+    cxs = [int(x0 + 2 + paso * (c + .5)) for c in range(cols)]
+    for c in cxs:                                                   # un LED de barras por columna, encendido
+        L.vl(c - 3, y0 + 1, y0 + 5, '#3a3a40'); L.vl(c + 3, y0 + 1, y0 + 5, '#3a3a40')
+        L.r(c - 5, y0 + 6, 11, 2, '#f4f4ee'); L.hl(c - 5, c + 5, y0 + 8, '#fff2b0')
+    for y in range(y0 + 9, yb):
+        ww = 5 + (y - y0 - 9) // 2
+        for c in cxs:
+            L.hl(max(x0 + 2, c - ww), min(x1 - 2, c + ww), y, '#2e2a34')
+    sitio = []                                                      # de delante atrás: la de delante, la primera que se llena
+    for f in range(filas - 1, -1, -1):
+        b = yb - 1 - (filas - 1 - f) * (12 // filas + 1)
+        dx = int(paso / 4) * (1 if (filas - 1 - f) % 2 else -1) if filas > 1 else 0   # a tresbolillo, dentro de la carpa
+        for c in range(cols):
+            sitio.append((cxs[c] + dx, b, 0 if f == filas - 1 else 3))
+    for cx_, b, i in sorted(sitio[:n], key=lambda q: q[1]):        # se pintan de atrás adelante
+        planta(L, cx_, b, i)
+    L.hl(x0 + 2, x1 - 2, yb, '#3a3a40')
+    L.contorno(K)
+    for x in range(80):
+        if L.lleno(x, 78) and not L.lleno(x, 79): L.p(x, 79, K)
+    return L
+
 if __name__ == '__main__':
-    for n in range(10):
-        d = P('art', 'crudo', 'kaia-carpa', f'carpaKG-{n}', 'unica')
-        os.makedirs(d, exist_ok=True)
-        for v in glob.glob(os.path.join(d, '*.png')): os.remove(v)
-        L = carpa(n); L.im.save(os.path.join(d, '00.png'))
-        print('kaia-carpa', f'carpaKG-{n}', L.im.getbbox(), len(L.colores()), 'colores')
+    for spr, (w, d, cols, filas) in NIVELES.items():
+        for n in range(cols * filas + 1):
+            dd = P('art', 'crudo', 'kaia-carpa', f'{spr}-{n}', 'unica')
+            os.makedirs(dd, exist_ok=True)
+            for v in glob.glob(os.path.join(dd, '*.png')): os.remove(v)
+            L = carpa_kc(w, d, cols, filas, n); L.im.save(os.path.join(dd, '00.png'))
+            print('kaia-carpa', f'{spr}-{n}', L.im.getbbox(), len(L.colores()), 'colores')

@@ -1792,6 +1792,8 @@ s4929112a, · {g} g rosin, · {g} g rosin
 s52e4628c,EFECTIVO,CASH
 s26e3f421,FLORES,BUDS
 s99a32bef,ROSIN,ROSIN
+s4c0acb47,Kits de carpa devueltos (KAIA),Tent kits refunded (KAIA)
+sa4f130fc,La sala de cultivo de KAIA pasa a las carpas nuevas. Lo que no cabe se devuelve: {e} a la cuenta por los kits de más y {n} semillas por las plantas que no caben.,KAIA's grow room moves to the new tents. What doesn't fit is refunded: {e} to your account for the extra kits and {n} seeds for the plants that don't fit.
 s23317412,KAIA_CULT,KAIA_CULT
 s066ae4c4,"La sala de cultivo de KAIA, cerrada. Hasta tener la licencia de cultivo, aquí dentro no se planta nada.","KAIA's grow room, locked. Until you have the cultivation licence, nothing gets planted in here."
 s62ad04d6,"El tanque del riego centralizado, con el abono ya mezclado: las bombas lo llevan a cada mesa.","The central irrigation tank, with the nutrients already mixed in: the pumps carry it to every table."
@@ -1801,24 +1803,30 @@ s135969dd,"La sala, en obras: desagües, el cuadro trifásico y el clima industr
 sd2bdf196,"El cuadro de la sala: seis mesas con su LED doble, el riego centralizado y el clima. {q}","The room's control panel: six tables with their double LED, central irrigation and climate. {q}"
 s60bc25ab,Las lleva {n}.,{n} runs them.
 s5f6947bc,Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.,Nobody runs them: put someone from your crew in the room from your phone.
-sd5b6a75f,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip and the climate. All automatic: long days while they grow and shorter ones once it's time to flower."
-s1f41b1f3,Comprar un kit de carpa · {e},Buy a tent kit · {e}
+scc1c24d3,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas de {n}: {k} de {m}.","The room panel: the LED timer, the drip and the climate. All automatic: long hours of light while they grow and fewer as soon as it is time to flower. {n} tents: {k} of {m}."
+se84388d0,Comprar una carpa · {e},Buy a tent · {e}
 saaa33220,Ordenar la sala,Arrange the room
+s05d84f3f,Pasar a la {n} · {e},Move up to the {n} · {e}
 s055ef0d6,Reformar la sala · {e},Refit the room · {e}
-s6f594fca,Comprar un kit,Buy a tent kit
+see44df19,Comprar una carpa,Buy a tent
+sd1998ad6,Pasar a la,Move up to the
 s484dbabb,Reformar la sala,Refit the room
-s763310f9,"El kit de la carpa grande, a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y lo montan aquí.","The big tent kit, at shop prices: {l}. {e} in total, by card; it arrives tomorrow and they set it up here."
+s90e92b4b,"El kit de la {c}, a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y lo montan aquí.","The {c} kit, at shop price: {l}. {e} in total, by card; it arrives tomorrow and they set it up here."
 saa267e0a,Comprarlo,Buy it
 sdf58fdde,Ahora no,Not now
 s7d640fd3,Kit de carpa (KAIA),Tent kit (KAIA)
-s7d81ec91,"Pedido: la carpa {n} llega mañana, con sus dos LED, el extractor y el goteo. Nueve plazas más.","Ordered: tent {n} arrives tomorrow, with its two LEDs, the extractor and the drip. Nine more spots."
-sf47682b4,"La sala entera como la nave: {l}. En total, {e}, con la tarjeta; la obra dura {d} días. Después, las mesas las lleva alguien de tu plantilla.","The whole room like the warehouse: {l}. {e} in total, by card; the works take {d} days. Afterwards, someone from your crew runs the tables."
-s110640e9,Las carpas se desmontan y se venden de segunda mano por {e}.,The tents are taken down and sold second-hand for {e}.
+s25477d4f,"Pedido: la carpa {n} llega mañana, con sus LED, el extractor y el goteo. {p} plazas más.","Ordered: tent {n} arrives tomorrow, with its LEDs, the extractor and the drip. {p} more spots."
+s639d941f,"La {c}, con su kit a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y caben más.","The {c}, with its kit at shop price: {l}. {e} in total, by card; it arrives tomorrow and holds more."
+sae202cea,Las carpas de ahora se desmontan y se venden de segunda mano por {e}.,The current tents are taken down and sold second-hand for {e}.
 s82ef3618,"Antes, cosecha o arranca lo que tengas en las carpas.","First, harvest or pull up whatever you have in the tents."
 safbefe26,"Antes, espera a que llegue la carpa que tienes pedida.",
+s4d9e530d,Comprarla,Buy it
+s5ca3c99d,Carpas de segunda mano (KAIA),Second-hand tents (KAIA)
+sa6dbc08a,"Pedido: la primera {c} llega mañana, con sus LED, el extractor y el goteo; caben {m}.","Ordered: the first {c} arrives tomorrow, with its LEDs, the extractor and the drip; {m} fit."
+sf47682b4,"La sala entera como la nave: {l}. En total, {e}, con la tarjeta; la obra dura {d} días. Después, las mesas las lleva alguien de tu plantilla.","The whole room like the warehouse: {l}. {e} in total, by card; the works take {d} days. Afterwards, someone from your crew runs the tables."
+s110640e9,Las carpas se desmontan y se venden de segunda mano por {e}.,The tents are taken down and sold second-hand for {e}.
 sc303f5e0,Hacer la obra,Do the works
 s0b8f532d,Obra de la sala de cultivo (KAIA),Grow room works (KAIA)
-s5ca3c99d,Carpas de segunda mano (KAIA),Second-hand tents (KAIA)
 s22e7890e,"Empieza la obra. El {f}, la sala con sus mesas.","The works begin. On {f}, the room with its tables."
 s100c7a74,"Sin la licencia de cultivo, las carpas se quedan vacías.","Without the cultivation licence, the tents stay empty."
 s1d69b400,Plaza {n},Spot {n}
@@ -2592,6 +2600,7 @@ s3a05438e,{n} se encarga.,{n} takes care of it.
 sd589b982,"Sin nadie que la cuide, se va apagando: pon a alguien de tu plantilla en las madres.","With nobody tending it, it fades: put someone from your crew on the mothers."
 s0ab20584,Recoger {n} esquejes,Take {n} cuttings
 sbdc1d3db,Recoger {n} esqueje,Take {n} cutting
+sf59d04da,Cortarle esquejes,Take cuttings from her
 s4645921d,Quitarla,Remove it
 s87ea97ed,Madre {j}: {m} · vigor {v} %.,Mother {j}: {m} · vigour {v} %.
 s5a0beafd,{n} le saca esquejes cada mañana.,{n} takes cuttings every morning.
@@ -2599,7 +2608,20 @@ s3e02e3fa,Nadie le saca esquejes.,Nobody takes cuttings.
 sed2d89a7,El propagador está lleno: {n} esquejes. Planta alguno antes.,The propagator is full: {n} cuttings. Plant some first.
 sf87e2ca4,"{q} esquejes de la {m}, al propagador. Plántalos antes del {f}.",{q} cuttings of {m} into the propagator. Plant them before {f}.
 s7d7625b1,"Un esqueje de la {m}, al propagador. Plántalos antes del {f}.",One cutting of {m} into the propagator. Plant it before {f}.
+s2b4d9ada,"Le cortas {q} esquejes a la {m}, al propagador. Plántalos antes del {f}. Mañana, más.","You take {q} cuttings from the {m}, into the propagator. Plant them before {f}. More tomorrow."
+s90806ff2,"Le cortas un esqueje a la {m}, al propagador. Plántalo antes del {f}. Mañana, más.","You take a cutting from the {m}, into the propagator. Plant it before {f}. More tomorrow."
 s0ae5ac8e,¿Quitas la madre de {m}? Se tira.,Remove the {m} mother? It gets binned.
+s363a12a4,Las cuida {n}.,{n} looks after them.
+s48cbd1a5,Nadie las cuida.,Nobody looks after them.
+s77db1fbc,"LED encendido, a 18/6.","LED on, at 18/6."
+s8be6da60,LED apagado: sus 6 horas de noche.,LED off: their 6 hours of night.
+s94e74263,LED apagado: no hay madres.,LED off: there are no mothers.
+s78b87411,"Hueco libre · {a} de {b} madres. {l} {c}
+A: meter una madre · B: cerrar.","Free spot · {a} of {b} mothers. {l} {c}
+A: add a mother · B: close."
+s40dd929e,"Madre {j} · {m} · vigor {v} % · {e} esquejes listos. {l}
+A: cortar o recoger esquejes · B: cerrar.","Mother {j} · {m} · vigour {v} % · {e} cuttings ready. {l}
+A: take or collect cuttings · B: close."
 s0aeb0c02,"La carpa está vacía. Tráeme una madre, una semilla o un esqueje de lo que quieras guardar, y te la cuido.","The tent's empty. Bring me a mother, a seed or a cutting of whatever you want to keep, and I'll look after it."
 sc0281781,"{n} madres, a 18/6 y bien regadas. Cada mañana les saco dos esquejes; los tienes en la carpa.","{n} mothers, at 18/6 and well watered. Every morning I take two cuttings; they're in the tent."
 s53739c8c,"{n} madres, a 18/6 y bien regadas. Cada mañana les saco un esqueje; los tienes en la carpa.","{n} mothers, at 18/6 and well watered. Every morning I take a cutting; they're in the tent."
@@ -2987,6 +3009,18 @@ s2ee6cac3,¡Gracias! Ya tienes el juego completo.,Thanks! You now have the full 
 sbaa4da2f,"La compra está pendiente. Cuando se confirme, sigue desde START · JUEGO COMPLETO.","The purchase is pending. Once confirmed, carry on from START · FULL GAME."
 sad7ca9d6,Compra cancelada.,Purchase cancelled.
 sd5542ba8,No se ha podido hacer la compra. Inténtalo más tarde.,The purchase couldn't go through. Try again later.
+sd063a769,FRIA,
+sa55ad4e6,"La sala de al lado del sótano, a {t} °C: {l}. Las máquinas de extracción bajan allí y rinden más en frío.","The room next to the basement, at {t} °C: {l}. The extraction machines go down there and yield more in the cold."
+s0562b6e7,"La sala de al lado del sótano, a {t}°: {l}. Las máquinas de extracción bajan allí y rinden más en frío.","The room next to the basement, at {t}°: {l}. The extraction machines go down there and yield more in the cold."
+s97c9db5b,"Con la obra, también se habilita el sótano: sin trastos, con luz y desagüe.","The works also fit out the basement: cleared out, with light and a drain."
+s67390657,"Los obreros acaban la sala fría del sótano: paneles aislantes, el equipo de frío a 4 °C y la mesa de acero. Las máquinas de extracción ya están abajo, en su sitio.","The builders finish the basement cold room: insulated panels, the cooling unit at 4 °C and the steel table. The extraction machines are already downstairs, in place."
+s21b3eeec,"Los obreros acaban la sala fría del sótano: paneles aislantes, el equipo de frío a 4° y la mesa de acero. Las máquinas de extracción ya están abajo, en su sitio.","The builders finish the basement cold room: insulated panels, the cooling unit at 4° and the steel table. The extraction machines are already downstairs, in place."
+s0c3c3096,El cuarto de al lado del sótano: frío y vacío. Con una obra (MÓVIL → Tienda online) sería la sala fría de las extracciones.,The room next to the basement: cold and empty. With some works (PHONE → Online shop) it would be the cold room for extractions.
+sd5676676,"La sala fría, a medio hacer: mañana acaban los obreros.","The cold room, half done: the builders finish tomorrow."
+s14c62e67,"El evaporador del equipo de frío: {t} °C, sin escarcha. En frío los tricomas se quiebran y se sueltan mejor: el hielo, el tamiz, la lavadora y la static rinden más, y la prensa saca un rosin más limpio.","The cooling unit evaporator: {t} °C, no frost. In the cold the trichomes snap and come off better: the ice, the sieve, the washer and the static yield more, and the press gives a cleaner rosin."
+s291d27dd,"El evaporador del equipo de frío: {t}°, sin escarcha. En frío los tricomas se quiebran y se sueltan mejor: el hielo, el tamiz, la lavadora y la static rinden más, y la prensa saca un rosin más limpio.","The cooling unit evaporator: {t}°, no frost. In the cold the trichomes snap and come off better: the ice, the sieve, the washer and the static yield more, and the press gives a cleaner rosin."
+s07ce41c7,La mesa de acero inoxidable: aquí se enfría el material antes de cada extracción y se recoge lo que sale.,The stainless steel table: the material is chilled here before each extraction and what comes out is collected.
+s59ea83d1,"Estanterías de rejilla y trastos del sótano. La sala fría, por la puerta de la pared.",Wire shelves and basement clutter. The cold room is through the door in the wall.
 sf4222ba2,"Panes de micelio, cada uno de su cepa. Con uno, te preparo una bandeja de esa cepa; juntando dos en la mesa, sale otra si está en el cuaderno.","Mycelium blocks, each its own strain. With one I'll set you a tray of that strain; join two at the table and you get another, if it's in the notebook."
 s4e0363f7,Sin {e} no hay pan.,"No {e}, no block."
 s3d84c814,Un pan de {n}: {d},A {n} block: {d}
@@ -3187,6 +3221,7 @@ s4881f43d,Manicurar: ¿qué lote?,Trim: which batch?
 sc7da6117,"Con las tijeras, cogollo a cogollo: fuera las hojitas con poca resina, que quede limpio y redondo.","Scissors, bud by bud: off with the low-resin leaves, nice, clean and round."
 s3ff772e4,MANICURA,TRIMMING
 sbeb77a07,{n} min,{n} min
+sd4bb34c5,"{n}: {g} repasados en {d}, pero quedan hojitas: se venden un {p} % más caros. Se pueden repasar.","{n}: {g} touched up in {d}, but some small leaves are left: they sell for {p} % more. They can be touched up again."
 sdbc2b125,{n}: {g} manicurados en {d}. Se venden un {p} % más caros.,{n}: {g} trimmed in {d}. They sell for {p} % more.
 sa3f1dc88,{n}. ¿Qué haces?,{n}. What now?
 s8ea496bf,"{n} · {m}
@@ -3754,7 +3789,6 @@ s7cd159a3,la llave de la nave,the warehouse key
 s1d9bf67c,"Dentro hay {n} mesas de cultivo, una por persona. Pon a tu gente desde el móvil y planta tú lo que quieras.","Inside there are {n} grow tables, one per person. Assign your crew from the phone and plant whatever you like."
 sf1e231ba,Dejar la nave,Give up the warehouse
 s5e88d812,La nave es tuya.,The warehouse is yours.
-s4d9e530d,Comprarla,Buy it
 se6bd18cd,Opción a compra: llevas {a} de {b}.,Option to buy: {a} of {b} paid.
 s63dad79a,Opción a compra,Option to buy
 s9c653541,"La nave: {a} de {b} mesas plantadas · {c} de {d} trabajando. Lo demás, dentro.","The warehouse: {a} of {b} tables planted · {c} of {d} working. The rest, inside."
@@ -3964,9 +3998,12 @@ sd4d97829,Nada dentro. Le toca a {nb}.,Nothing in. {nb}'s turn.
 s8e7e3fb0,{nb} falla. Te toca.,{nb} misses. Your turn.
 s29456c8a,Se hace tarde: gana quien tiene menos bolas suyas en la mesa.,It's getting late: whoever has fewer balls left on the table wins.
 sdf8f9402,Bola en mano: las flechas la mueven y A la deja.,Ball in hand: the arrows move it and A places it.
-s3a5fefa3,"Flechas: apuntar (arriba y abajo, fino). A apretado: la fuerza; al soltar, tiras. B: dejarlo.","Arrows: aim (up and down, fine). Hold A: power; let go to shoot. B: quit."
+s9d444034,"Flechas: apuntar (arriba y abajo, un toque, muy fino). A apretado: la fuerza; al soltar, tiras. Un toque de A: el efecto. B: dejarlo.","Arrows: aim (up and down, one tap, very fine). Hold A: the power; release to shoot. Tap A: the spin. B: give up."
 s6646ed1c,¿Lo dejas? La partida es suya.,Quit? The game goes to them.
 s94f58638,Seguir,Keep playing
+s6bdeac07,Efecto: al centro.,Spin: centre.
+s81550695,Efecto: retroceso (abajo): la blanca vuelve.,Spin: draw (low): the cue ball comes back.
+s4d416aa4,Efecto: seguir (arriba): la blanca sigue a la bola.,Spin: follow (high): the cue ball follows the ball.
 s41e79f12,Estudia la mesa…,Studying the table…
 s1d890966,"La {n}, al medio.","The {n}, middle pocket."
 s03d183ad,"La {n}, a la esquina.","The {n}, corner pocket."
@@ -4875,6 +4912,8 @@ sf90c2954,floorLabL,floorLabL
 seae6d07a,labFlujo2,labFlujo2
 s2f865542,labMicro2,labMicro2
 sd64a06b2,labBalanza2,labBalanza2
+s2bba7e85,frioF,
+s1e962b9a,mesaF,
 s30a02292,ESTUDIANTE,STUDENT
 sf07acb89,Hola. Me ha dicho un amigo que tienes.,Hi. A friend said you've got some.
 s42927016,"Aupa, ¿tienes algo? Voy justo de dinero.","Hey, got anything? I'm a bit short on cash."
@@ -5908,6 +5947,9 @@ s08f80aef,Panadería Errota,Errota Bakery
 s4ad30925,la panadería,the bakery
 s68649926,Lavandería Garbi,Garbi Laundrette
 s2d299f86,la lavandería,the laundrette
+s5254809f,"Fuera las hojas grandes, por el rabito.","Off with the big leaves, at the stem."
+s409a7d3a,"Las hojitas de azúcar, a ras, con la punta fina.","The sugar leaves, flush, with the fine tip."
+s570890ad,Redondear el cogollo sin tocar los cálices.,Round off the bud without touching the calyxes.
 s5daceeb6,Arcón congelador,Chest freezer
 sa7b6d476,"Un arcón de 300 L para los extractos, al lado de la nevera: caben 5 kg más. Llega mañana y te lo dejan enchufado.","A 300 L chest for extracts, next to the fridge: fits 5 kg more. Arrives tomorrow, plugged in for you."
 s68696118,"La 00, la más fina: solo las cabezas más limpias.","The 00, the finest: only the cleanest heads."
@@ -5962,13 +6004,16 @@ sd467cb00,Los sofás de la derecha,
 s4abfe96e,ORDENAR LA SALA DE CULTIVO,ARRANGE THE GROW ROOM
 sc9f664d2,La carpa 1,Tent 1
 s324d6f9f,carpaG2,
-scf0b684c,carpaKG0,
+se1a5bf19,carpaKS0,
 s50ff3568,La carpa 2,Tent 2
-sb80c58da,carpaKG1,
+s96a28f8f,carpaKS1,
 s27f805fe,La carpa 3,Tent 3
-s21050960,carpaKG2,
+s0fabde35,carpaKS2,
 sb99c905d,La carpa 4,Tent 4
-s560239f6,carpaKG3,
+s78aceea3,carpaKS3,
+s35e480c6,carpaKM0,
+s42e3b050,carpaKM1,
+s2cffb187,carpaKL0,
 sca19c6c2,Ahí no cabe.,It won't fit there.
 sc20453b7,Ahí ya hay algo.,Something's already there.
 s13045d4c,Ese hueco es para la carpa.,That spot is for the tent.
@@ -6320,6 +6365,8 @@ sc89fe1ec,La puerta de la sala de cultivo,The grow room door
 s446c7f58,puertaLab,puertaLab
 s03e0a1f7,La puerta del laboratorio,The lab door
 sf3113d61,La puerta del banco,The bank door
+sd0cce7a7,La puerta de la sala fría,The cold room door
+s606c13a2,La puerta del sótano,The basement door
 scdff8331,Habilitar el sótano,Fit out the basement
 s853c4fc0,"El sótano de debajo del piso, que la tía usaba de trastero: sacar los trastos, impermeabilizar, luz, un desagüe y tres estanterías de rejilla. Oscuro y húmedo: para setas. Las bandejas te las prepara Txomin (Kale Zaharra). Los obreros acaban en un día.","The basement under the flat, Auntie's junk room: clear the junk, waterproof, lights, a drain and three wire shelves. Dark and damp: for mushrooms. Txomin (Kale Zaharra) preps the trays. The builders finish in a day."
 s355e1a74,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos. Con una obra (MÓVIL → Tienda online) se podría usar.","The stairs go down to Auntie's basement: dark, damp and full of junk. With some work (PHONE → Online shop) it could be used."
@@ -6784,15 +6831,33 @@ s6e63843c,El laboratorio,The lab
 s0aa5f652,El mostrador de los socios,The members' counter
 s300cbea9,La sala de catas,The tasting room
 s31870a6f,La placa de la tía,Your aunt's plaque
-s1e01631c,Carpa 240×240,Tent 240×240
-sa0208618,Carpa de 240 × 240 × 200 cm,240 × 240 × 200 cm tent
+s8e22820b,Carpa 200×200,200×200 tent
+sa44d715d,carpaKS,
+s4a4eb085,Carpa de 200 × 200 × 200 cm,200 × 200 × 200 cm tent
 s25a45974,Dos LED de 720 W,Two 720 W LEDs
+s0cf9a845,Extractor de 200 mm con filtro de carbón,200 mm extractor with carbon filter
+se8568cc7,Goteo de 4 salidas con su depósito,4-outlet drip with its tank
+s484d8b8c,Carpa 400×200,400×200 tent
+s5e424c3e,carpaKM,
+sce6d2d50,Carpa de 400 × 200 × 200 cm,400 × 200 × 200 cm tent
+s21abddcc,Cuatro LED de 720 W,Four 720 W LEDs
 s0334d841,Extractor de 250 mm con filtro de carbón,250 mm extractor with carbon filter
-s70f69132,Goteo de 9 salidas con su depósito,9-outlet drip with its reservoir
+s97eb37a5,Goteo de 8 salidas con su depósito,8-outlet drip with its tank
+s4cc0f73e,Carpa 400×400,400×400 tent
+s29457ca8,carpaKL,
+s6e88f28d,Carpa de 400 × 400 × 200 cm,400 × 400 × 200 cm tent
+sa6b494ee,Ocho LED de 720 W,Eight 720 W LEDs
+sf9786037,Extractor de 315 mm con dos filtros de carbón,315 mm extractor with two carbon filters
+sa73fdb47,Goteo de 16 salidas con su depósito,16-outlet drip with its tank
 s1c226ee4,"Obra: desagües, cuadro trifásico y clima industrial","Works: drains, three-phase panel and industrial climate"
 s97f04eca,Seis mesas de 240 × 120 con su LED doble,Six 240 × 120 tables with their double LED
 s1a47c179,Riego centralizado con su tanque,Central irrigation with its tank
 sc2d98008,Extracción con filtros de carbón,Extraction with carbon filters
+sed28d3b4,Paneles de poliuretano de 80 mm y puerta frigorífica,80 mm polyurethane panels and a cold-room door
+s284c4628,"Equipo de frío de 1,5 kW para 4 °C",1.5 kW cooling unit for 4 °C
+s4d95cc43,"Equipo de frío de 1,5 kW para 4°",1.5 kW cooling unit for 4°
+s827e4877,Mesa de acero inoxidable y luz estanca,Stainless steel table and sealed light
+sc4c419e7,La sala fría del sótano,The basement cold room
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -6896,6 +6961,15 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+sd5b6a75f,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip and the climate. All automatic: long days while they grow and shorter ones once it's time to flower."
+s1f41b1f3,Comprar un kit de carpa · {e},Buy a tent kit · {e}
+s6f594fca,Comprar un kit,Buy a tent kit
+s763310f9,"El kit de la carpa grande, a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y lo montan aquí.","The big tent kit, at shop prices: {l}. {e} in total, by card; it arrives tomorrow and they set it up here."
+s7d81ec91,"Pedido: la carpa {n} llega mañana, con sus dos LED, el extractor y el goteo. Nueve plazas más.","Ordered: tent {n} arrives tomorrow, with its two LEDs, the extractor and the drip. Nine more spots."
+s3a5fefa3,"Flechas: apuntar (arriba y abajo, fino). A apretado: la fuerza; al soltar, tiras. B: dejarlo.","Arrows: aim (up and down, fine). Hold A: power; let go to shoot. B: quit."
+s1e01631c,Carpa 240×240,Tent 240×240
+sa0208618,Carpa de 240 × 240 × 200 cm,240 × 240 × 200 cm tent
+s70f69132,Goteo de 9 salidas con su depósito,9-outlet drip with its reservoir
 s3a4f2254,"El cuadro de la sala: el temporizador de los LED, la bomba del goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip pump and the climate. All automatic: long hours of light while they grow and fewer as soon as it's time to flower."
 sefcb688d,"El depósito del goteo, con el abono ya mezclado. La bomba lo lleva a cada maceta cuando la tierra se seca.","The drip tank, with the nutrients already mixed in. The pump takes it to each pot when the soil dries out."
 se0c09aef,"La bomba y el programador del riego por goteo: un gotero por maceta, a la tierra y no a las hojas.","The drip irrigation pump and timer: one dripper per pot, onto the soil and not the leaves."

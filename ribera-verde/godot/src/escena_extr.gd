@@ -60,6 +60,7 @@ static func pinta(pintor, T: Dictionary, now: float, x0: int, y0: int) -> void:
 		"hash": hachis(i, t, p)
 		"moon": moon(i, t, p)
 		"stat": stat(i, t, p)
+		"mani": mani(i, t, p)
 		_: r(0, 0, W, H, Color("#2b2f3a"))
 	for k in n:   # los pasos: hechos, el de ahora y los que quedan
 		P._rect(X + W - 6 * n + 6 * k, Y + H + 3, 4, 3, Color("#58d080") if k == i else Color("#a0a0a8") if k < i else Color("#4a4a54"))
@@ -795,3 +796,84 @@ static func stat(i: int, t: float, p: float) -> void:
 		borde(cx, 40, 4, 12, Color("#e8ecf2"))
 		r(cx, 40, 4, 2, Color("#4a70c0"))
 		monton(cx - 3, 52, 6 + f * 8, 2 + int(f * 2), Color.WHITE, KIEF_C)
+
+# ── La manicura (setas.gd manicura_action, con CAL): el cogollo grande sobre la bandeja de rejilla, la mano con guante de nitrilo que lo
+# sujeta por el tallo y las tijeras de punta fina que abren y cierran; primero las hojas grandes por el rabito, luego las hojitas de
+# azúcar a ras y al final el cogollo, que gira, redondo y limpio. Lo cortado cae a la bandeja ──
+static var GUANTE := Color("#3a5ad0")
+static var GUANTE_C := Color("#6a8af0")
+static var GUANTE_O := Color("#24388a")
+static var ACERO := Color("#c8ccd4")
+static var ACERO_O := Color("#80868f")
+static var MANGO := Color("#3aa060")
+
+static func hoja(x0: float, y0: float, a: float, largo: float, ancho: float, c: Color) -> void:   # una hoja dentada, del rabito a la punta
+	var nn := int(largo)
+	for k in nn:
+		var f := float(k) / nn
+		var w := ancho * sin(PI * minf(f * 1.15, 1.0)) * (1.0 if k % 3 else .6)   # los dientes
+		var cx := x0 + cos(a) * k
+		var cy := y0 + sin(a) * k
+		var nx := -sin(a)
+		var ny := cos(a)
+		linea(cx - nx * w, cy - ny * w, cx + nx * w, cy + ny * w, c)
+	linea(x0, y0, x0 + cos(a) * largo * .9, y0 + sin(a) * largo * .9, VERDE_O)   # el nervio
+
+static func tijeras(x: float, y: float, abre: float) -> void:   # las de punta fina, de lado: las hojas hacia el cogollo y los mangos verdes a la derecha
+	var a := .08 + .28 * abre
+	for d in [-1, 1]:
+		linea(x, y, x + 20 * cos(d * a), y + 20 * sin(d * a) + 4, K, 2)
+		linea(x, y, x + 19 * cos(d * a), y + 19 * sin(d * a) + 4, MANGO)
+	for d in [-1, 1]:
+		linea(x, y, x - 13 * cos(d * a * .7), y - 13 * sin(d * a * .7), ACERO_O, 2)
+		linea(x, y, x - 12 * cos(d * a * .7), y - 12 * sin(d * a * .7), ACERO)
+	disco(x, y, 1.5, K)
+
+static func guante(x: float, y: float) -> void:   # la mano izquierda con el guante, con el tallo entre los dedos
+	elipse(x, y, 10, 7, K)
+	elipse(x, y, 9, 6, GUANTE)
+	for k in 3:
+		r(x + 4 + k * 0, y - 8 + k * 4, 10, 4, K)
+		r(x + 5, y - 7 + k * 4, 8, 2, GUANTE_C if k == 0 else GUANTE)
+	r(x - 9, y + 4, 18, 1, GUANTE_O)
+	r(x - 22, y + 2, 14, 8, GUANTE_O)   # la muñeca, hacia el canto
+
+static func bandeja(y: int, cortes: int, t: float) -> void:   # la bandeja con rejilla y lo que ha caído
+	borde(20, y, 120, 8, Color("#d8dce0"))
+	for k in 24:
+		r(22 + k * 5, y + 1, 1, 6, Color("#9aa0a8"))
+	for k in cortes:
+		var xx := 28 + h(k * 7) * 100
+		r(xx, y + 2 + h(k) * 3, 3 + h(k + 5) * 3, 1, VERDE_O if k % 2 else VERDE)
+
+static func mani(i: int, t: float, p: float) -> void:
+	mesa(62)
+	var cx := 80.0
+	var cy := 34.0
+	var abre := absf(sin(t * 7))
+	bandeja(54, 6 + i * 8 + int(fr(t / 4) * 4), t)
+	r(cx - 1, cy + 12, 3, 12, K)   # el tallo, hasta los dedos
+	r(cx, cy + 12, 1, 11, VERDE_O)
+	if i == 0:   # las hojas grandes salen del cogollo; una se va, cortada por el rabito, y cae
+		var cae := fr(t / 1.6)
+		for k in 4:
+			var a: float = [-2.6, -.5, 2.7, .4][k]
+			if k == int(t / 1.6) % 4:
+				hoja(cx + cos(a) * 8 + cae * 6, cy + sin(a) * 6 + cae * 18, a + cae * 1.5, 18, 4, VERDE_C)
+			else:
+				hoja(cx + cos(a) * 8, cy + sin(a) * 6, a, 18, 4, VERDE)
+	cogollo(cx, cy, 3.6 if i < 2 else 3.4, t * 1.5 if i == 2 else 0.0)
+	if i <= 1:   # las hojitas de azúcar, con la resina por encima
+		for k in 7:
+			var a := k * .9 + .3
+			var l := 5.0 + h(k) * 3 - (fr(t / 2.2 + h(k)) * 4 if i == 1 else 0.0)
+			if l > 1:
+				hoja(cx + cos(a) * 9, cy + sin(a) * 8, a, l, 1.5, VERDE_O)
+				px(cx + cos(a) * (9 + l * .5), cy + sin(a) * (8 + l * .5), KIEF_C)
+	if i == 2:   # la resina brillando, sin tocar los cálices
+		for k in 5:
+			px(cx - 8 + h(k + int(t * 3)) * 16, cy - 8 + h(k + 9) * 14, KIEF_C)
+	guante(cx - 8, cy + 26)
+	var tx := cx + 22 + 3 * sin(t * 2.3)
+	var ty := cy - 4 + (6 * sin(t * 1.7) if i else -6.0)
+	tijeras(tx, ty, abre)

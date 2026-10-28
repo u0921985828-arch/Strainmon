@@ -1472,6 +1472,16 @@
    ],
    "ajuste": "exacto",
    "nota": "muebles de 3 × 2 casillas a escala real (16 px/m): la base en el centro de la casilla de abajo a la izquierda (16, 63) y el mueble centrado en x 32; las demás casillas (carpaG2) no se pintan"
+  },
+  "carpa_kc": {
+   "w": 80,
+   "h": 80,
+   "ancla": [
+    8,
+    79
+   ],
+   "ajuste": "exacto",
+   "nota": "las carpas de KAIA por niveles a 16 px/m: la base en el centro de la casilla de abajo a la izquierda (8, 79) y el mueble en sus w casillas desde x 0; las demás casillas (carpaG2) no se pintan"
   }
  },
  "fases": [
@@ -14069,17 +14079,40 @@
    "tipo": "objeto",
    "max_colores": 32,
    "id": "kaia-carpa",
-   "celda": "carpa_grande",
+   "celda": "carpa_kc",
    "cubre": [
-    "obj:carpaKG0",
-    "obj:carpaKG1",
-    "obj:carpaKG2",
-    "obj:carpaKG3"
+    "obj:carpaKS0",
+    "obj:carpaKS1",
+    "obj:carpaKS2",
+    "obj:carpaKS3",
+    "obj:carpaKM0",
+    "obj:carpaKM1",
+    "obj:carpaKL0"
    ],
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/kaia_carpa.py",
    "estilo_ref": "la carpa de las madres de la nave (carpaM de locales.py)",
    "notas": "Lo pidió el usuario: «como en casa, cultivo con carpas, pero más grandes de primeras». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
-   "descripcion": "La carpa de 240 × 240 × 200 cm de la sala de cultivo de KAIA, plateada y abierta de frente, con dos LED de 720 W, el extractor y el filtro encima y el tubo al techo, y de 0 a 9 plantas (carpaKG-<n>)."
+   "descripcion": "Las carpas de la sala de cultivo de KAIA por niveles (2 × 2, 4 × 2 y 4 × 4 m), plateadas y abiertas de frente, con un LED de barras por columna, el extractor y el filtro encima y el tubo al techo, y sus plantas (kcs-<n>, kcm-<n>, kcl-<n>)."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "max_colores": 32,
+   "id": "sala-fria",
+   "celda": "objeto_1x1",
+   "cubre": [
+    "obj:frioF",
+    "obj:mesaF"
+   ],
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/sala_fria.py",
+   "estilo_ref": "el controlador de riego (ctrlN de locales.py)",
+   "notas": "Lo pidió el usuario: una habitación fría para las extracciones, en el sótano del piso. De frente; solo con Datos.CAL.",
+   "descripcion": "El evaporador del equipo de frío de la sala fría del sótano (frioF) y la mesa de acero inoxidable (mesaF)."
   }
  ],
  "familias": {

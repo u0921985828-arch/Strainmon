@@ -965,7 +965,7 @@ func montar_casa() -> void:
 	var ya := muebles_ya()
 	var su := deco_v("suelo")
 	var pa := deco_v("pared")
-	var key := ",".join(ks) + "|" + ",".join(ya) + "|" + ",".join([su, pa, deco_v("alfombra")]) + "|" + ",".join(D.MUEBLE_EXTR.keys().filter(func(k): return mueble_ya(D.MUEBLE_EXTR[k]))) + "|" + JSON.stringify(S.get("coloca", {}).get("home", {}) if S.get("coloca") is Dictionary else {}) + ("|cam" if cam_ya() else "")
+	var key := ",".join(ks) + "|" + ",".join(ya) + "|" + ",".join([su, pa, deco_v("alfombra")]) + "|" + ",".join(D.MUEBLE_EXTR.keys().filter(func(k): return mueble_ya(D.MUEBLE_EXTR[k]))) + "|" + JSON.stringify(S.get("coloca", {}).get("home", {}) if S.get("coloca") is Dictionary else {}) + ("|cam" if cam_ya() else "") + ("|fria" if fria_ya() else "")
 	if h.get("carpasK") == key:
 		return
 	h.carpasK = key
@@ -3100,6 +3100,22 @@ func bt_zona(_z: String) -> bool:
 # la sala de cultivo de KAIA (kaiacult.gd)
 func kc_cerrada() -> bool:
 	return false
+
+# la sala fría del sótano (salafria.gd)
+func fria_cerrada() -> bool:
+	return false
+
+func fria_ya() -> bool:
+	return false
+
+func fria_venta() -> bool:
+	return false
+
+func fria_item() -> Dictionary:
+	return {}
+
+func fria_tienda() -> void:
+	pass
 
 func bt_abierto() -> bool:
 	return false

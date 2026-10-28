@@ -140,8 +140,8 @@ func _corre() -> void:
 	if not (J.S.get("mar") is Dictionary):
 		J.S.mar = {}
 	J.S.mar.lic = 1
+	J.S.kc = {"niv": 0, "kits": [0], "p": []}
 	J.kc()
-	J.S.kc.kits = [0]
 	var mapas := []
 	for mk in D.ORDEN_P:
 		if not mapas.has(mk):

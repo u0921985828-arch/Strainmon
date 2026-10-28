@@ -155,7 +155,7 @@ func lienzo_quieto() -> bool:
 		return false
 	if not (menu_box.visible or lector.visible or import_box.visible):
 		return false
-	for v in [ACCESO_V, VIAJE_V, TIRO, MESA_B, MESA8, ORDEN, ALMACEN, CARRO_V, SETAS_V, ARM_V, CAL_V, MAPA_V, FICHA_V, MOVIL_V]:
+	for v in [ACCESO_V, VIAJE_V, TIRO, MESA_B, MESA8, ORDEN, ALMACEN, CARRO_V, SETAS_V, MADRES_V, ARM_V, CAL_V, MAPA_V, FICHA_V, MOVIL_V]:
 		if v != null:
 			return false
 	return wipe_t0 < 0 and not P.moving

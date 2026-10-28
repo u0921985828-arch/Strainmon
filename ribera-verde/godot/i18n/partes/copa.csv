@@ -683,3 +683,68 @@ Seis mesas de 240 × 120 con su LED doble,Six 240 × 120 tables with their doubl
 La lleva {n}.,{n} runs it.
 La sala de KAIA,The KAIA grow room
 Antes, espera a que llegue la carpa que tienes pedida.,"First, wait for the tent you ordered to arrive."
+"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas de {n}: {k} de {m}.","The room panel: the LED timer, the drip and the climate. All automatic: long hours of light while they grow and fewer as soon as it is time to flower. {n} tents: {k} of {m}."
+Comprar una carpa · {e},Buy a tent · {e}
+Pasar a la {n} · {e},Move up to the {n} · {e}
+Comprar una carpa,Buy a tent
+Pasar a la,Move up to the
+"El kit de la {c}, a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y lo montan aquí.","The {c} kit, at shop price: {l}. {e} in total, by card; it arrives tomorrow and they set it up here."
+"Pedido: la carpa {n} llega mañana, con sus LED, el extractor y el goteo. {p} plazas más.","Ordered: tent {n} arrives tomorrow, with its LEDs, the extractor and the drip. {p} more spots."
+"La {c}, con su kit a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y caben más.","The {c}, with its kit at shop price: {l}. {e} in total, by card; it arrives tomorrow and holds more."
+Las carpas de ahora se desmontan y se venden de segunda mano por {e}.,The current tents are taken down and sold second-hand for {e}.
+"Pedido: la primera {c} llega mañana, con sus LED, el extractor y el goteo; caben {m}.","Ordered: the first {c} arrives tomorrow, with its LEDs, the extractor and the drip; {m} fit."
+Cortarle esquejes,Take cuttings from her
+"Le cortas {q} esquejes a la {m}, al propagador. Plántalos antes del {f}. Mañana, más.","You take {q} cuttings from the {m}, into the propagator. Plant them before {f}. More tomorrow."
+"Le cortas un esqueje a la {m}, al propagador. Plántalo antes del {f}. Mañana, más.","You take a cutting from the {m}, into the propagator. Plant it before {f}. More tomorrow."
+Las cuida {n}.,{n} looks after them.
+Nadie las cuida.,Nobody looks after them.
+"LED encendido, a 18/6.","LED on, at 18/6."
+LED apagado: sus 6 horas de noche.,LED off: their 6 hours of night.
+LED apagado: no hay madres.,LED off: there are no mothers.
+"Hueco libre · {a} de {b} madres. {l} {c}
+A: meter una madre · B: cerrar.","Free spot · {a} of {b} mothers. {l} {c}
+A: add a mother · B: close."
+"Madre {j} · {m} · vigor {v} % · {e} esquejes listos. {l}
+A: cortar o recoger esquejes · B: cerrar.","Mother {j} · {m} · vigour {v} % · {e} cuttings ready. {l}
+A: take or collect cuttings · B: close."
+"La sala de al lado del sótano, a {t} °C: {l}. Las máquinas de extracción bajan allí y rinden más en frío.","The room next to the basement, at {t} °C: {l}. The extraction machines go down there and yield more in the cold."
+"La sala de al lado del sótano, a {t}°: {l}. Las máquinas de extracción bajan allí y rinden más en frío.","The room next to the basement, at {t}°: {l}. The extraction machines go down there and yield more in the cold."
+"Con la obra, también se habilita el sótano: sin trastos, con luz y desagüe.","The works also fit out the basement: cleared out, with light and a drain."
+"Los obreros acaban la sala fría del sótano: paneles aislantes, el equipo de frío a 4 °C y la mesa de acero. Las máquinas de extracción ya están abajo, en su sitio.","The builders finish the basement cold room: insulated panels, the cooling unit at 4 °C and the steel table. The extraction machines are already downstairs, in place."
+"Los obreros acaban la sala fría del sótano: paneles aislantes, el equipo de frío a 4° y la mesa de acero. Las máquinas de extracción ya están abajo, en su sitio.","The builders finish the basement cold room: insulated panels, the cooling unit at 4° and the steel table. The extraction machines are already downstairs, in place."
+El cuarto de al lado del sótano: frío y vacío. Con una obra (MÓVIL → Tienda online) sería la sala fría de las extracciones.,The room next to the basement: cold and empty. With some works (PHONE → Online shop) it would be the cold room for extractions.
+"La sala fría, a medio hacer: mañana acaban los obreros.","The cold room, half done: the builders finish tomorrow."
+"El evaporador del equipo de frío: {t} °C, sin escarcha. En frío los tricomas se quiebran y se sueltan mejor: el hielo, el tamiz, la lavadora y la static rinden más, y la prensa saca un rosin más limpio.","The cooling unit evaporator: {t} °C, no frost. In the cold the trichomes snap and come off better: the ice, the sieve, the washer and the static yield more, and the press gives a cleaner rosin."
+"El evaporador del equipo de frío: {t}°, sin escarcha. En frío los tricomas se quiebran y se sueltan mejor: el hielo, el tamiz, la lavadora y la static rinden más, y la prensa saca un rosin más limpio.","The cooling unit evaporator: {t}°, no frost. In the cold the trichomes snap and come off better: the ice, the sieve, the washer and the static yield more, and the press gives a cleaner rosin."
+La mesa de acero inoxidable: aquí se enfría el material antes de cada extracción y se recoge lo que sale.,The stainless steel table: the material is chilled here before each extraction and what comes out is collected.
+"Estanterías de rejilla y trastos del sótano. La sala fría, por la puerta de la pared.",Wire shelves and basement clutter. The cold room is through the door in the wall.
+"{n}: {g} repasados en {d}, pero quedan hojitas: se venden un {p} % más caros. Se pueden repasar.","{n}: {g} touched up in {d}, but some small leaves are left: they sell for {p} % more. They can be touched up again."
+"Flechas: apuntar (arriba y abajo, un toque, muy fino). A apretado: la fuerza; al soltar, tiras. Un toque de A: el efecto. B: dejarlo.","Arrows: aim (up and down, one tap, very fine). Hold A: the power; release to shoot. Tap A: the spin. B: give up."
+Efecto: al centro.,Spin: centre.
+Efecto: retroceso (abajo): la blanca vuelve.,Spin: draw (low): the cue ball comes back.
+Efecto: seguir (arriba): la blanca sigue a la bola.,Spin: follow (high): the cue ball follows the ball.
+"Fuera las hojas grandes, por el rabito.","Off with the big leaves, at the stem."
+"Las hojitas de azúcar, a ras, con la punta fina.","The sugar leaves, flush, with the fine tip."
+Redondear el cogollo sin tocar los cálices.,Round off the bud without touching the calyxes.
+La puerta de la sala fría,The cold room door
+La puerta del sótano,The basement door
+Carpa 200×200,200×200 tent
+Carpa de 200 × 200 × 200 cm,200 × 200 × 200 cm tent
+Extractor de 200 mm con filtro de carbón,200 mm extractor with carbon filter
+Goteo de 4 salidas con su depósito,4-outlet drip with its tank
+Carpa 400×200,400×200 tent
+Carpa de 400 × 200 × 200 cm,400 × 200 × 200 cm tent
+Cuatro LED de 720 W,Four 720 W LEDs
+Goteo de 8 salidas con su depósito,8-outlet drip with its tank
+Carpa 400×400,400×400 tent
+Carpa de 400 × 400 × 200 cm,400 × 400 × 200 cm tent
+Ocho LED de 720 W,Eight 720 W LEDs
+Extractor de 315 mm con dos filtros de carbón,315 mm extractor with two carbon filters
+Goteo de 16 salidas con su depósito,16-outlet drip with its tank
+Paneles de poliuretano de 80 mm y puerta frigorífica,80 mm polyurethane panels and a cold-room door
+"Equipo de frío de 1,5 kW para 4 °C",1.5 kW cooling unit for 4 °C
+"Equipo de frío de 1,5 kW para 4°",1.5 kW cooling unit for 4°
+Mesa de acero inoxidable y luz estanca,Stainless steel table and sealed light
+La sala fría del sótano,The basement cold room
+Kits de carpa devueltos (KAIA),Tent kits refunded (KAIA)
+La sala de cultivo de KAIA pasa a las carpas nuevas. Lo que no cabe se devuelve: {e} a la cuenta por los kits de más y {n} semillas por las plantas que no caben.,KAIA's grow room moves to the new tents. What doesn't fit is refunded: {e} to your account for the extra kits and {n} seeds for the plants that don't fit.

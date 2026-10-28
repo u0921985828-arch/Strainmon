@@ -1,7 +1,14 @@
 # F8 (de trama.gd): la plantilla, la compra de la nave, los locales por dentro y el club con el socio y el billar.
 extends "res://src/movil.gd"
 
-const B8_PIENSA := 600   # ms que se ve «Estudia la mesa…» como poco: fluida, no un flash
+const B8_PIENSA_MAX := 700   # ms como mucho mirando tiros (en un móvil lento, se queda con lo mejor que haya visto)
+const B8_PIENSA_R := 320   # con el rival rápido (lo pidió el usuario), lo que se ve «Estudia la mesa…» como poco
+const B8_GIRA := 320.0     # lo que tarda en girar el taco hasta su tiro
+const B8_CARGA_R := 0.6    # y en cargar la fuerza, de lo que tardas tú
+const B8_AJ := 0.04        # lo que sube o baja su pulso por partida
+const B8_AJ_MAX := 0.12
+const B8_PASO := 0.0035   # un toque de arriba o abajo al apuntar: 0,2°
+const B8_EFECTOS := [0.0, -1.0, 1.0]   # al centro, retroceso, seguir (el toque de A)
 
 func gerente():
 	for w in S.plantilla:
@@ -1535,7 +1542,7 @@ func billar8(k: String, nb: String, N: String) -> String:
 	var B: Dictionary = D.BILLAR
 	var V := B8.nueva(nb)
 	MESA8 = V
-	var hab: float = float(B.hab[k])
+	var hab: float = float(B.hab[k]) + b8_ajuste(k)   # equilibrado: se ajusta a cómo te va con él
 	var rapido: bool = gancho_billar8.is_valid() or oraculo
 	var q := 0
 	var fin := ""
@@ -1547,7 +1554,7 @@ func billar8(k: String, nb: String, N: String) -> String:
 		if s.is_empty():   # lo dejas: la pierdes
 			fin = "el"
 			break
-		var ev := B8.dispara(V, float(s.ang), float(s.f))
+		var ev := B8.dispara(V, float(s.ang), float(s.f), float(s.get("efe", 0.0)))
 		sfx("hit")
 		V.fase = "rueda"
 		if rapido:
@@ -1606,17 +1613,32 @@ func billar8(k: String, nb: String, N: String) -> String:
 		V.ultimo = tx
 		if not rapido:
 			_dlg_fijo(tx, quien.to_upper() if quien != "" else "")
-			await M.wait(1300 if fin == "" else 1600)
+			await M.wait(900 if fin == "" else 1400)
 	if fin == "" and int(V.tiros) >= 2 * int(B.turnos):   # se hace tarde: gana quien tiene menos bolas suyas en la mesa
 		fin = B8.al_tope(V)
 		if fin != "" and not rapido:
 			_dlg_fijo(I18n.K("Se hace tarde: gana quien tiene menos bolas suyas en la mesa."), "")
 			await M.wait(1600)
 	MESA8 = null
+	b8_apunta(k, fin)
 	if not oraculo:
 		dlg.hide()
 		dlg_nm.hide()
 	return fin
+
+# el rival equilibrado (con CAL): cada partida que le ganas, juega un poco mejor la siguiente; cada una que pierdes, un poco peor,
+# hasta B8_AJ_MAX arriba o abajo de su pulso (BILLAR.hab), por club (S.b8aj)
+func b8_ajuste(k: String) -> float:
+	if not Datos.CAL or not (S.get("b8aj") is Dictionary):
+		return 0.0
+	return float(S.b8aj.get(k, 0.0))
+
+func b8_apunta(k: String, fin: String) -> void:
+	if not Datos.CAL or fin == "":
+		return
+	if not (S.get("b8aj") is Dictionary):
+		S.b8aj = {}
+	S.b8aj[k] = clampf(float(S.b8aj.get(k, 0.0)) + (B8_AJ if fin == "yo" else -B8_AJ), -B8_AJ_MAX, B8_AJ_MAX)
 
 # tu tiro: bola en mano (flechas y A), apuntar (izquierda y derecha, arriba y abajo afinan), la fuerza con A apretado (se suelta y
 # tira; un toque, nada) y B para dejarlo. Da {ang, f} o {} (lo dejas)
@@ -1668,10 +1690,12 @@ func _b8_tuyo(V: Dictionary, N: String) -> Dictionary:
 			V.ang = (V.b[n].p - V.b[0].p).angle()
 	V.f = 0.0
 	V.fase = "apunta"
-	var ayuda := I18n.K("Flechas: apuntar (arriba y abajo, fino). A apretado: la fuerza; al soltar, tiras. B: dejarlo.")
+	V.efe = float(V.get("efe", 0.0))
+	var ayuda := I18n.K("Flechas: apuntar (arriba y abajo, un toque, muy fino). A apretado: la fuerza; al soltar, tiras. Un toque de A: el efecto. B: dejarlo.")
 	_dlg_fijo(ayuda, "")
 	var t := M.reloj
 	var giro := 0.0   # lo que llevas girando seguido: acelera
+	var fino := 0.0   # lo que llevas con arriba o abajo apretado
 	var c0 := 0.0
 	var res := {}
 	while true:
@@ -1685,10 +1709,21 @@ func _b8_tuyo(V: Dictionary, N: String) -> Dictionary:
 			var ud := float(held.down) - float(held.up)
 			if lr != 0:
 				giro += dt
-				V.ang = float(V.ang) + lr * dt * minf(2.2, 0.35 + giro * 2.0)
+				V.ang = float(V.ang) + lr * dt * ((0.2 if giro < .2 else minf(2.2, 0.35 + (giro - .2) * 2.0)) if Datos.CAL else minf(2.2, 0.35 + giro * 2.0))
 			else:
 				giro = 0.0
-				V.ang = float(V.ang) + ud * dt * 0.08
+				if Datos.CAL:   # un toque, un paso de 0,2°; apretado, despacio y luego algo más
+					var tq := float(ps.has("down")) - float(ps.has("up"))
+					if tq != 0:
+						V.ang = float(V.ang) + tq * B8_PASO
+					if ud != 0:
+						fino += dt
+						if fino > .3:
+							V.ang = float(V.ang) + ud * dt * (0.05 if fino < 1.2 else 0.12)
+					else:
+						fino = 0.0
+				else:
+					V.ang = float(V.ang) + ud * dt * 0.08
 			if ps.has("A"):
 				V.fase = "carga"
 				c0 = M.reloj
@@ -1711,8 +1746,13 @@ func _b8_tuyo(V: Dictionary, N: String) -> Dictionary:
 				if M.reloj - c0 < 120:
 					V.fase = "apunta"
 					V.f = 0.0
+					if Datos.CAL:   # el toque de A: el efecto, de uno en uno (al centro, retroceso, seguir)
+						V.efe = B8_EFECTOS[(B8_EFECTOS.find(float(V.efe)) + 1) % B8_EFECTOS.size()]
+						sfx("sel")
+						_dlg_fijo(I18n.K("Efecto: al centro.") if V.efe == 0.0 else I18n.K("Efecto: retroceso (abajo): la blanca vuelve.") if V.efe < 0 else I18n.K("Efecto: seguir (arriba): la blanca sigue a la bola."), "")
 				else:
-					res = {"ang": float(V.ang), "f": maxf(.04, float(V.f))}
+					res = {"ang": float(V.ang), "f": maxf(.04, float(V.f)), "efe": float(V.efe) if Datos.CAL else 0.0}
+					V.fza = float(res.f)   # la marca del último tiro, en la barra
 					break
 	pop(fn)
 	return res
@@ -1731,9 +1771,17 @@ func _b8_suyo(V: Dictionary, hab: float, N: String) -> Dictionary:
 	_dlg_fijo(I18n.K("Estudia la mesa…"), N)
 	await M.wait(16)   # que se vea el aviso antes de que piense (elige simula los tiros y tarda)
 	var t_pi := Time.get_ticks_msec()
-	var s := B8.elige(V, 1, hab)
+	# piensa en otro hilo, sobre una copia, para que la mesa siga viva; y con tope (B8_PIENSA_MAX), como uno que no se eterniza
+	var Vc: Dictionary = V.duplicate(true)
+	var res := {}
+	var lim: int = t_pi + B8_PIENSA_MAX
+	var tid := WorkerThreadPool.add_task(func(): res.s = B8.elige(Vc, 1, hab, lim))
+	while not WorkerThreadPool.is_task_completed(tid):
+		await M.wait(16)
+	WorkerThreadPool.wait_for_task_completion(tid)
+	var s: Dictionary = res.s
 	var pensado := 16 + Time.get_ticks_msec() - t_pi
-	if pensado < B8_PIENSA: await M.wait(B8_PIENSA - pensado)   # en un móvil rápido, que no sea un flash
+	if pensado < B8_PIENSA_R: await M.wait(B8_PIENSA_R - pensado)   # en un móvil rápido, que no sea un flash
 	var di := {"n": int(s.get("n", 0))}   # lo canta como lo canta uno que juega
 	match String(s.get("tipo", "")):
 		"ataque":
@@ -1745,15 +1793,15 @@ func _b8_suyo(V: Dictionary, hab: float, N: String) -> Dictionary:
 	var a0 := float(V.ang)
 	var a1 := float(s.ang)
 	var t0 := M.reloj
-	while M.reloj - t0 < 700:
+	while M.reloj - t0 < B8_GIRA + 60:   # gira el taco y tira, sin hacerse esperar
 		await M.wait(16)
-		V.ang = lerp_angle(a0, a1, clampf((M.reloj - t0) / 600.0, 0, 1))
+		V.ang = lerp_angle(a0, a1, clampf((M.reloj - t0) / B8_GIRA, 0, 1))
 	V.ang = a1
 	t0 = M.reloj
-	var dur := float(s.f) * B8.CARGA_MS
-	while M.reloj - t0 < dur + 150:
+	var dur := float(s.f) * B8.CARGA_MS * B8_CARGA_R
+	while M.reloj - t0 < dur + 100:
 		await M.wait(16)
-		V.f = minf(float(s.f), (M.reloj - t0) / B8.CARGA_MS)
+		V.f = minf(float(s.f), (M.reloj - t0) / (B8.CARGA_MS * B8_CARGA_R))
 	return s
 
 # la mesa del billar mientras dura la partida (rectsMesaBillar de 11j-locales): [x, y, w, h, color] en la pantalla
