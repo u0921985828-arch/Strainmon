@@ -2,9 +2,10 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### 0.65.1 (código 86) · la mesa con plantas, translúcida en una sola capa (lo pendiente de la 0.65.0; con `Datos.CAL`)
+### 0.65.1 (código 86) y plugin de WordPress 1.6.4 · la mesa con plantas, translúcida en una sola capa (lo pendiente de la 0.65.0; con `Datos.CAL`)
 
 - Detrás de una mesa con plantas (la nave, KAIA), la mesa, las plantas y los focos se pintan juntos en una capa (`capa_unica`, `_con_alfa_capa` en `pinta.gd`: `_img` y `_rect` mezclan en `_capt` en vez de pintar) y esa capa sale a `TAPA_ALFA`: ya no se ve la mesa a través de las plantas. Prueba `tests/translucido.gd` (12/0).
+- `descargas/landrace-hunters-1.6.4.zip` (29 MB) y el ligero de 28 KB con la 0.65.1.
 
 ### 0.65.0 (código 85) · KAIA por niveles, las madres por dentro, la sala fría, la manicura a la vista, el billar con efecto y lo que tapa, translúcido (tanda nueva, lo pidió el usuario; con `Datos.CAL`)
 

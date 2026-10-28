@@ -1,11 +1,11 @@
 === Landrace Hunters ===
-Version: 1.6.3
+Version: 1.6.4
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.6.3.zip → Activar.
-Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.6.3-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.6.4.zip → Activar.
+Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.6.4-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -14,6 +14,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
+1.6.4 — Landrace Hunters (Godot 0.65.1): KAIA por niveles, las madres por dentro, la sala fría del sótano, la manicura a la vista, el billar con efecto y un rival que piensa rápido, y lo que tapa al protagonista, translúcido (la mesa con sus plantas, en una sola capa).
 1.6.3 — Landrace Hunters (Godot 0.63.0): Bilbao por dentro (el teatro, las iglesias, el mercado, las estaciones y la Diputación), los pueblos con su sitio y su forma, las salidas por su lado, el seto nuevo y la tierra con atrezo.
 1.6.2 — Landrace Hunters (Godot 0.62.0): el garaje de la tía por dentro, con los vehículos aparcados en sus plazas, el maletero y el depósito de gasolina, y el turno del rival del billar con una pausa mínima.
 1.6.1 — Landrace Hunters (Godot 0.61.0): el rival del billar a la bola 8, un jugador de verdad (elige bola y tronera por dificultad, juega la posición, defiende, sale por banda y canta el tiro) y los choques de las bolas en el instante del contacto.
