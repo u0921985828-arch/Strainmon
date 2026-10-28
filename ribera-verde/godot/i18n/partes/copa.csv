@@ -463,3 +463,83 @@ Diputación,Provincial council
 Molino de mareas,Tide mill
 Almacén del muelle,Dock warehouse
 La ermita,The chapel
+ (sin fijar), (not fixed)
+Abre la cámara fría: una semilla de lo que hayas guardado cada {d} días.,Opens the cold room: one seed of whatever you have stored every {d} days.
+"Abre el laboratorio: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea.","Opens the lab: stabilise with one seed instead of two, once a day and once per harvest of each line."
+"Abre la sala de catas: un lote analizado al día, sin analizador.","Opens the tasting room: one batch analysed a day, no analyser needed."
+"Abre el archivo de la tía: cada día, una receta de sus cuadernos.","Opens your aunt's archive: every day, a recipe from her notebooks."
+Abre el mostrador de los socios: cada {d} días te dejan un sobre con semillas de una landrace.,Opens the members' counter: every {d} days they leave you an envelope of landrace seeds.
+"Cuelga la placa de la tía: el banco de semillas, abierto.","Hangs your aunt's plaque: the seed bank, open."
+EL CUARTO DE ATRÁS,THE BACK ROOM
+"Huele a cerrado y a papel viejo. Todo está tapado con sábanas, menos un fichero de madera.","It smells stuffy, of old paper. Everything is under dust sheets except a wooden card cabinet."
+"En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa, África, sierra, Asia... y uno solo: «Haze 98».","On each little drawer, a label in your aunt's hand: Kush, coast, Africa, sierra, Asia... and one on its own: «Haze 98»."
+"En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa, África, sierra, Asia... y uno solo: «Haize 98».","On each little drawer, a label in your aunt's hand: Kush, coast, Africa, sierra, Asia... and one on its own: «Haize 98»."
+"Era su banco de semillas. Lo empezó para que las variedades del barrio no se perdieran, y lo dejó a medias.","It was her seed bank. She started it so the neighbourhood's strains wouldn't be lost, and left it half done."
+"Si llenas los cajones, el cuarto vuelve a la vida. Entrega las colecciones en el fichero (dos semillas de cada variedad).",Fill the drawers and the room comes back to life. Hand in the collections at the cabinet (two seeds of each strain).
+Un mueble tapado con una sábana llena de polvo. Se destapa al entregar su colección en el fichero.,Something under a dusty sheet. It is uncovered when you hand in its collection at the cabinet.
+"La placa de la tía, de madera y latón, con una hoja grabada. Debajo, alguien ha dejado un ramo de flores del monte.","Your aunt's plaque, wood and brass, with a leaf engraved on it. Below, someone has left a bunch of wild flowers."
+"Cada colección, dos semillas de cada variedad (la Haze del 98, cinco, y fijada en F4).","Each collection: two seeds of each strain (the Haze of '98: five, fixed at F4)."
+"Cada colección, dos semillas de cada variedad (la Haize del 98, cinco, y fijada en F4).","Each collection: two seeds of each strain (the Haize of '98: five, fixed at F4)."
+EL BANCO DE LA TÍA,YOUR AUNT'S BANK
+Esa ya está en su cajón.,That one is already in its drawer.
+"Te faltan semillas para esa colección. Mira la lista: cada variedad, en su cajón.","You're missing seeds for that collection. Check the list: each strain, in its drawer."
+¿Entregar «{n}»? Las semillas se quedan en el banco.,Hand in «{n}»? The seeds stay in the bank.
+"«{c}», en su cajón. {z}: destapado.","«{c}», in its drawer. {z}: uncovered."
+{p},{p}
+EL BANCO DE SEMILLAS,THE SEED BANK
+"El último cajón, el de la Haze del 98. Cierras el fichero y el cuarto está entero.","The last drawer, the Haze of '98. You close the cabinet and the room is whole."
+"El último cajón, el de la Haize del 98. Cierras el fichero y el cuarto está entero.","The last drawer, the Haize of '98. You close the cabinet and the room is whole."
+"Delroy cuelga la placa de la tía en la pared. Kiko ha traído a medio barrio, Miren ha bajado del monte y la abuela Txaro se ha sentado en primera fila.","Delroy hangs your aunt's plaque on the wall. Kiko has brought half the neighbourhood, Miren has come down from the hills and grandma Txaro has sat in the front row."
+"Nadie dice nada un rato. Luego Delroy abre la puerta del cuarto a los socios: desde hoy, el banco es del barrio.","Nobody says anything for a while. Then Delroy opens the room to the members: from today, the bank belongs to the neighbourhood."
+Treinta años diciendo que esto había que terminarlo. Lo has hecho tú.,Thirty years saying this had to be finished. You did it.
+Ahora cualquiera del barrio puede pedir una semilla y devolver dos. Como quería ella.,Now anyone in the neighbourhood can borrow a seed and give back two. Just as she wanted.
+"{r} de reputación y {p} de prestigio: el banco de semillas de la tía, abierto","{r} reputation and {p} prestige: your aunt's seed bank, open"
+Me han contado lo del banco. Tu tía estaría orgullosa. Yo lo estoy.,I heard about the bank. Your aunt would be proud. I am.
+"Lo demás ya es cosa tuya: cultivar, cruzar y que no se pierda nada.","The rest is up to you: grow, cross and don't let anything get lost."
+"La cámara fría solo suelta un sobre cada {d} días. El próximo, el {f}.","The cold room only gives out one envelope every {d} days. The next one, on {f}."
+"Una semilla de esa variedad, del banco.","One seed of that strain, from the bank."
+LA CÁMARA FRÍA,THE COLD ROOM
+"1 semilla de {s}, de la cámara fría","1 {s} seed, from the cold room"
+"El laboratorio, por hoy, ya está. Vuelve mañana.",The lab is done for today. Come back tomorrow.
+En el laboratorio se fija una línea con una sola semilla. Ahora no tienes ninguna sin fijar.,In the lab a line is fixed with a single seed. Right now you have none that isn't fixed.
+{n} semillas,{n} seeds
+EL LABORATORIO,THE LAB
+"La sala de catas, por hoy, ya está. Vuelve mañana.",The tasting room is done for today. Come back tomorrow.
+En la sala de catas se analiza un lote al día. No llevas ninguno sin analizar.,The tasting room analyses one batch a day. You have none that hasn't been analysed.
+THC {t} %,THC {t} %
+LA SALA DE CATAS,THE TASTING ROOM
+"Ya has leído lo de hoy en los cuadernos de la tía. Mañana, más.",You've read today's bit of your aunt's notebooks. More tomorrow.
+Ya conoces todo lo que la tía apuntó en sus cuadernos.,You already know everything your aunt wrote in her notebooks.
+"En un cuaderno del archivo, con la letra de la tía: «{a}: de ahí sale la {r}».","In a notebook in the archive, in your aunt's hand: «{a}: that gives you {r}»."
+"El mostrador está vacío. Los socios dejan un sobre cada {d} días: el próximo, el {f}.","The counter is empty. The members leave an envelope every {d} days: the next one, on {f}."
+"En el mostrador, un sobre de papel con una nota: «Para el banco de Maite. Eran de mi padre».","On the counter, a paper envelope with a note: «For Maite's bank. They were my father's»."
+2 semillas de {s},2 {s} seeds
+Sigue el cuaderno azul de la tía: OBJETIVO → LA TÍA MAITE.,Follow your aunt's blue notebook: GOAL → AUNT MAITE.
+"El banco de semillas de la tía, abierto. Cultiva, cruza y que no se pierda ninguna variedad.","Your aunt's seed bank, open. Grow, cross and don't let a single strain get lost."
+"Restaura el banco de semillas de la tía, en el cuarto de atrás de la asociación: {a}/{b} colecciones. La más cerca: «{n}».","Restore your aunt's seed bank, in the back room of the association: {a}/{b} collections. The closest: «{n}»."
+Una puerta cerrada con llave. Delroy dice que era el cuarto de tu tía y que nadie sabe dónde está la llave.,A locked door. Delroy says it was your aunt's room and nobody knows where the key is.
+¿Estabilizar {s} (F{g})? Gastas 1 semilla y guardas 1.,Stabilise {s} (F{g})? You use 1 seed and keep 1.
+"Debajo de las semillas, una llave pequeña atada con un cordel y otra nota:","Under the seeds, a small key tied with string and another note:"
+«La del cuarto de atrás de la asociación. Ahí empecé el banco de semillas del barrio y no lo terminé.»,"«For the back room of the association. That's where I started the neighbourhood seed bank, and never finished it.»"
+"«Las de la lata son de una polinización al aire: si quieres la Haze de verdad, fíjala otra vez, generación a generación.»","«The ones in the tin are open-pollinated: if you want the real Haze, fix it again, generation by generation.»"
+"«Las de la lata son de una polinización al aire: si quieres la Haize de verdad, fíjala otra vez, generación a generación.»","«The ones in the tin are open-pollinated: if you want the real Haize, fix it again, generation by generation.»"
+la llave del cuarto de atrás de la asociación,the key to the association's back room
+Las colecciones de semillas del cuarto de atrás de la asociación. Pulsa A para verlas.,The seed collections in the association's back room. Press A to see them.
+La puerta del cuarto de atrás,The back room door
+Las del Kush y el Himalaya,The Kush and Himalaya ones
+Las de la costa,The coastal ones
+Las de África y el Mediterráneo,The African and Mediterranean ones
+Las de la sierra americana,The American highland ones
+"La Haze del 98, fijada","The Haze of '98, fixed"
+"La Haize del 98, fijada","The Haize of '98, fixed"
+La cámara fría,The cold room
+El archivo de la tía,Your aunt's archive
+El laboratorio,The lab
+El mostrador de los socios,The members' counter
+La sala de catas,The tasting room
+La placa de la tía,Your aunt's plaque
+"La Haze del 98 va en el último cajón: antes, las otras cinco colecciones.","The Haze of '98 goes in the last drawer: first, the other five collections."
+"La Haize del 98 va en el último cajón: antes, las otras cinco colecciones.","The Haize of '98 goes in the last drawer: first, the other five collections."
+"Cada generación es una cosecha: cultiva la línea y vuelve con lo cosechado.","Each generation is a harvest: grow the line and come back with what you harvested."
+"«Si ya tienes la Haze fijada, guárdala bien: el banco la necesita.»","“If you already have the Haze fixed, keep it safe: the bank needs it.”"
+"«Si ya tienes la Haize fijada, guárdala bien: el banco la necesita.»","“If you already have the Haize fixed, keep it safe: the bank needs it.”"

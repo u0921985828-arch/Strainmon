@@ -862,6 +862,8 @@ func object_action(x: int, y: int) -> void:
 	var o = m.o[y][x] if y >= 0 and y < m.h and x >= 0 and x < m.w else null
 	if await campo_obj(x, y, o):   # MAESTRO [4]: las salvajes de la comarcal y el refugio
 		return
+	if Datos.CAL and await bt_obj(x, y, o):   # el banco de semillas de la tía (bancotia.gd)
+		return
 	if Datos.CAL and await hito_obj(x, y):   # los sitios de los pueblos (ciudad.gd): el lavadero, el frontón, el faro…
 		return
 	if coche_garaje(x, y) != "":   # el garaje por dentro: salir, el maletero o la gasolina
@@ -871,6 +873,9 @@ func object_action(x: int, y: int) -> void:
 	if pi_ != null and o == pi_.o:   # 1.51: las puertas de dentro
 		if pi_.get("llave") == "rv" and not (S.get("aso") is Dictionary and S.aso.get("pres")):   # el almacén del dispensario: la llave, del presidente
 			await say(K("El almacén del club, con llave. La tiene el presidente."))
+			return
+		if pi_.get("llave") == "banco" and not bt_abierto():   # el banco de semillas de la tía: la llave, en la lata del manzano
+			await say(K("Una puerta cerrada con llave. Delroy dice que era el cuarto de tu tía y que nadie sabe dónde está la llave."))
 			return
 		await cruzar_puerta(pi_)
 		return

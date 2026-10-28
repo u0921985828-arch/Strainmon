@@ -1,7 +1,80 @@
 clave,es,en
+s6cba58f0,BANCO_TIA,
+sb0633d67, (sin fijar), (not fixed)
+sefbd28ea,Abre la cámara fría: una semilla de lo que hayas guardado cada {d} días.,Opens the cold room: one seed of whatever you have stored every {d} days.
+sd9dc17c5,"Abre el laboratorio: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea.","Opens the lab: stabilise with one seed instead of two, once a day and once per harvest of each line."
+s03db6a4c,"Abre la sala de catas: un lote analizado al día, sin analizador.","Opens the tasting room: one batch analysed a day, no analyser needed."
+see1a4f01,"Abre el archivo de la tía: cada día, una receta de sus cuadernos.","Opens your aunt's archive: every day, a recipe from her notebooks."
+sf7d10cb0,Abre el mostrador de los socios: cada {d} días te dejan un sobre con semillas de una landrace.,Opens the members' counter: every {d} days they leave you an envelope of landrace seeds.
+sa4ccc656,"Cuelga la placa de la tía: el banco de semillas, abierto.","Hangs your aunt's plaque: the seed bank, open."
+s1d3bc143,EL CUARTO DE ATRÁS,THE BACK ROOM
+s4317d5e2,"Huele a cerrado y a papel viejo. Todo está tapado con sábanas, menos un fichero de madera.","It smells stuffy, of old paper. Everything is under dust sheets except a wooden card cabinet."
+s53749c37,"En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa, África, sierra, Asia... y uno solo: «Haze 98».","On each little drawer, a label in your aunt's hand: Kush, coast, Africa, sierra, Asia... and one on its own: «Haze 98»."
+s37ab959c,"En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa, África, sierra, Asia... y uno solo: «Haize 98».","On each little drawer, a label in your aunt's hand: Kush, coast, Africa, sierra, Asia... and one on its own: «Haize 98»."
+sd45e1f6e,"Era su banco de semillas. Lo empezó para que las variedades del barrio no se perdieran, y lo dejó a medias.","It was her seed bank. She started it so the neighbourhood's strains wouldn't be lost, and left it half done."
+s16ed904c,"Si llenas los cajones, el cuarto vuelve a la vida. Entrega las colecciones en el fichero (dos semillas de cada variedad).",Fill the drawers and the room comes back to life. Hand in the collections at the cabinet (two seeds of each strain).
+s1abe8030,btFichero,
+s22304b6a,btTapado,
+s75385b10,Un mueble tapado con una sábana llena de polvo. Se destapa al entregar su colección en el fichero.,Something under a dusty sheet. It is uncovered when you hand in its collection at the cabinet.
+s65b06edb,btCamara,
+s6757cacd,btLab,
+s49fef205,btCata,
+sdb7e7086,btArchivo,
+se4804f9c,btMostrador,
+s656582a8,btPlaca,
+s1bbd5284,"La placa de la tía, de madera y latón, con una hoja grabada. Debajo, alguien ha dejado un ramo de flores del monte.","Your aunt's plaque, wood and brass, with a leaf engraved on it. Below, someone has left a bunch of wild flowers."
+s49cccb08,HECHA,DONE
+sf77a797e,Volver,Back
+sb12a357d,"Cada colección, dos semillas de cada variedad (la Haze del 98, cinco, y fijada en F4).","Each collection: two seeds of each strain (the Haze of '98: five, fixed at F4)."
+se58e5638,"Cada colección, dos semillas de cada variedad (la Haize del 98, cinco, y fijada en F4).","Each collection: two seeds of each strain (the Haize of '98: five, fixed at F4)."
+s91b155cb,EL BANCO DE LA TÍA,YOUR AUNT'S BANK
+s942f9b07,Esa ya está en su cajón.,That one is already in its drawer.
+s6db9cfb3,"La Haze del 98 va en el último cajón: antes, las otras cinco colecciones.","The Haze of '98 goes in the last drawer: first, the other five collections."
+s2b0fe858,"La Haize del 98 va en el último cajón: antes, las otras cinco colecciones.","The Haize of '98 goes in the last drawer: first, the other five collections."
+sdabdcde3,"Te faltan semillas para esa colección. Mira la lista: cada variedad, en su cajón.","You're missing seeds for that collection. Check the list: each strain, in its drawer."
+sf9e8dbf0,¿Entregar «{n}»? Las semillas se quedan en el banco.,Hand in «{n}»? The seeds stay in the bank.
+s4ffa4842,Entregar,Hand over
+s93150e70,Todavía no,Not yet
+s0aa75975,"«{c}», en su cajón. {z}: destapado.
+{p}",
+s74de5797,EL BANCO DE SEMILLAS,THE SEED BANK
+s12a0c8a7,"El último cajón, el de la Haze del 98. Cierras el fichero y el cuarto está entero.","The last drawer, the Haze of '98. You close the cabinet and the room is whole."
+s10bf245c,"El último cajón, el de la Haize del 98. Cierras el fichero y el cuarto está entero.","The last drawer, the Haize of '98. You close the cabinet and the room is whole."
+sb5a634e5,"Delroy cuelga la placa de la tía en la pared. Kiko ha traído a medio barrio, Miren ha bajado del monte y la abuela Txaro se ha sentado en primera fila.","Delroy hangs your aunt's plaque on the wall. Kiko has brought half the neighbourhood, Miren has come down from the hills and grandma Txaro has sat in the front row."
+sd0c0b1ac,"Nadie dice nada un rato. Luego Delroy abre la puerta del cuarto a los socios: desde hoy, el banco es del barrio.","Nobody says anything for a while. Then Delroy opens the room to the members: from today, the bank belongs to the neighbourhood."
+s6eb49921,DELROY,DELROY
+s5c80d25b,Treinta años diciendo que esto había que terminarlo. Lo has hecho tú.,Thirty years saying this had to be finished. You did it.
+sbbd2aba9,Ahora cualquiera del barrio puede pedir una semilla y devolver dos. Como quería ella.,Now anyone in the neighbourhood can borrow a seed and give back two. Just as she wanted.
+sbabcba21,"{r} de reputación y {p} de prestigio: el banco de semillas de la tía, abierto","{r} reputation and {p} prestige: your aunt's seed bank, open"
+s8534dc44,Me han contado lo del banco. Tu tía estaría orgullosa. Yo lo estoy.,I heard about the bank. Your aunt would be proud. I am.
+sfee4aeea,"Lo demás ya es cosa tuya: cultivar, cruzar y que no se pierda nada.","The rest is up to you: grow, cross and don't let anything get lost."
+s080ab8eb,SMS · KIKO,SMS · KIKO
+s75d94822,"La cámara fría solo suelta un sobre cada {d} días. El próximo, el {f}.","The cold room only gives out one envelope every {d} days. The next one, on {f}."
+s2e5069d5,"Una semilla de esa variedad, del banco.","One seed of that strain, from the bank."
+s28beae68,Nada,Nothing
+sb0476a3d,LA CÁMARA FRÍA,THE COLD ROOM
+sf166b2da,"1 semilla de {s}, de la cámara fría","1 {s} seed, from the cold room"
+sd4c5d263,"El laboratorio, por hoy, ya está. Vuelve mañana.",The lab is done for today. Come back tomorrow.
+se3a3dbbc,En el laboratorio se fija una línea con una sola semilla. Ahora no tienes ninguna sin fijar.,In the lab a line is fixed with a single seed. Right now you have none that isn't fixed.
+sb8f50fdc,Cada generación es una cosecha: cultiva la línea y vuelve con lo cosechado.,Each generation is a harvest: grow the line and come back with what you harvested.
+sf3272e36,{n} semillas,{n} seeds
+s501e5d21,EL LABORATORIO,THE LAB
+saefafc62,"La sala de catas, por hoy, ya está. Vuelve mañana.",The tasting room is done for today. Come back tomorrow.
+sa2cb5067,En la sala de catas se analiza un lote al día. No llevas ninguno sin analizar.,The tasting room analyses one batch a day. You have none that hasn't been analysed.
+sa9765aad,THC {t} %,THC {t} %
+s1bd80547,LA SALA DE CATAS,THE TASTING ROOM
+s4b6ba5c2,"Analizado: {l} · THC {t} % · CBD {c} % · terpeno principal, {p}. Lo que va con análisis se vende mejor.","Tested: {l} · THC {t} % · CBD {c} % · main terpene, {p}. Tested stuff sells better."
+s643c29ab,"Ya has leído lo de hoy en los cuadernos de la tía. Mañana, más.",You've read today's bit of your aunt's notebooks. More tomorrow.
+saea53bd0,Ya conoces todo lo que la tía apuntó en sus cuadernos.,You already know everything your aunt wrote in her notebooks.
+sfff8a4e8,"En un cuaderno del archivo, con la letra de la tía: «{a}: de ahí sale la {r}».","In a notebook in the archive, in your aunt's hand: «{a}: that gives you {r}»."
+sf39423b7,"El mostrador está vacío. Los socios dejan un sobre cada {d} días: el próximo, el {f}.","The counter is empty. The members leave an envelope every {d} days: the next one, on {f}."
+s473eac64,"En el mostrador, un sobre de papel con una nota: «Para el banco de Maite. Eran de mi padre».","On the counter, a paper envelope with a note: «For Maite's bank. They were my father's»."
+sf78d6ceb,2 semillas de {s},2 {s} seeds
+s0547d76d,Sigue el cuaderno azul de la tía: OBJETIVO → LA TÍA MAITE.,Follow your aunt's blue notebook: GOAL → AUNT MAITE.
+s4950c80c,"El banco de semillas de la tía, abierto. Cultiva, cruza y que no se pierda ninguna variedad.","Your aunt's seed bank, open. Grow, cross and don't let a single strain get lost."
+s677da29a,"Restaura el banco de semillas de la tía, en el cuarto de atrás de la asociación: {a}/{b} colecciones. La más cerca: «{n}».","Restore your aunt's seed bank, in the back room of the association: {a}/{b} collections. The closest: «{n}»."
 sbe658eaa,escZ,
 s3a223bdb,"La escalera del paso subterráneo, por debajo de las vías.","The stairs to the underpass, under the tracks."
-s28beae68,Nada,Nothing
 se7166571,"Te despiertas en el banco de la parada, con la cabeza a punto de estallar. Han pasado {h} horas.","You wake up on the bench at the stop, with your head about to burst. {h} hours have gone by."
 s5cdf67e8,Te faltan {e} de la cartera.,{e} is missing from your wallet.
 sf85b7e0e,Y {g} g de lo que llevabas encima.,And {g} g of what you were carrying.
@@ -49,6 +122,7 @@ s0f025647, El tabaco rasca la garganta y tapa el sabor., The tobacco scratches y
 s48ff5624, Solo hierba: sabe a la variedad y sube más., Just weed: it tastes of the strain and hits harder.
 sc36e1710, Fumar en la calle llama la atención., Smoking in the street draws attention.
 sf07774c9,"El almacén del club, con llave. La tiene el presidente.","The club's storeroom, locked. The president has the key."
+sc489ad23,Una puerta cerrada con llave. Delroy dice que era el cuarto de tu tía y que nadie sabe dónde está la llave.,A locked door. Delroy says it was your aunt's room and nobody knows where the key is.
 s0744c06a,Hueco junto a la cama: aquí cabe una carpa de 120×120.,Space by the bed: a 120×120 tent fits here.
 s6ece05fc, Kiko las tendrá más adelante., Kiko will have them later on.
 s49133d67, Kiko las vende., Kiko sells them.
@@ -204,7 +278,6 @@ Antes hacen falta las herramientas.","
 You need the tools first."
 s4233ba58, · en la huerta, · at the garden
 s5c461127, · pedido, · ordered
-sf77a797e,Volver,Back
 sfb236c6f,LA HUERTA,THE GARDEN
 s99ea8f2c,"Depósitos, riego, herramientas y obra · en la cuenta {e}","Tanks, irrigation, tools and works · in your account {e}"
 s6092151d,Tienda online,Online shop
@@ -461,7 +534,6 @@ sd1076acc,Bienvenido a la CANNACUP de la asociación.,Welcome to the association
 s386ce97c,"Este trimestre buscamos {p}. Cuenta el THC y, encima, el perfil.","This quarter we want {p}. THC counts, and the profile on top."
 sfc9603fe,"Trae {g} g de un solo lote curado del todo, en tarro.","Bring {g} g of a single fully cured batch, in a jar."
 s950c1baf,Sin un tarro curado del todo no puedes competir. Cúralo y vuelve hoy mismo si te da tiempo.,Without a fully cured jar you can't compete. Cure it and come back today if you have time.
-s93150e70,Todavía no,Not yet
 s4fc6f726,¿Qué presentas?,What are you entering?
 s5f978161,Tú,You
 s6920efc3,El jurado ha catado y analizado.,The jury has tasted and tested.
@@ -887,7 +959,6 @@ s36a87693,Se han secado {n} esquejes sin plantar,{n} unplanted cuttings have dri
 s3289f066,Se ha secado un esqueje sin plantar,An unplanted cutting has dried out
 sf6273387,Se han secado {n} esquejes en las bandejas,{n} cuttings have dried out in the trays
 s29d563da,Se ha secado un esqueje en las bandejas,A cutting has dried out in the trays
-s080ab8eb,SMS · KIKO,SMS · KIKO
 sd818275a,"¡Feliz cumpleaños, {N}! Te he guardado tres regalos en el armario. Elige uno.","Happy birthday, {N}! I've kept three presents for you in the cupboard. Pick one."
 s82121a10,LEGENDARIO · 1 semilla ★ de {s},LEGENDARY · 1 ★ seed of {s}
 s6c4aed93,Sale fenotipo estrella seguro: más cogollo y más THC.,A sure star phenotype: more bud and more THC.
@@ -1068,6 +1139,7 @@ s3ff11748,"Sale verde: recién cortada se paga poco, y no está seca del todo ha
 s57a56002,"Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura y vale más cada semana en el tarro.","With curing jars (Kiko sells them), it cures in the safe and is worth more every week in the jar."
 s893d0923,"Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en {d} días: algo más de THC y se vende más cara. Sin curar no pierde nada.","It comes out uncured. With some curing jars (Kiko sells them), it cures in the safe in {d} days: a bit more THC and it sells for more. Uncured, it loses nothing."
 sdd1e1958,¿Estabilizar {s} (F{g})? Gastas 2 semillas y guardas 1.,Stabilise {s} (F{g})? You use 2 seeds and keep 1.
+s34d514e6,¿Estabilizar {s} (F{g})? Gastas 1 semilla y guardas 1.,Stabilise {s} (F{g})? You use 1 seed and keep 1.
 sd25d8ecd,Estabilizar,Stabilise
 sa9447a70,"{s} ya es una línea estable: todas sus plantas salen iguales.
 Guardas 1 semilla.","{s} is now a stable line: all its plants come out the same.
@@ -1382,7 +1454,6 @@ s329c7e5a,En el azul apuntaba su planta madre: la Haize con la que se presentó 
 s1e7039e7,Aquella noche pasó algo. Volvió con el segundo premio y no quiso volver a hablar de esa planta. Ni conmigo.,Something happened that night. She came back with second prize and never wanted to talk about that plant again. Not even with me.
 s4ab2d9d6,"El que estuvo con ella toda la noche fue Delroy, el de la asociación del barrio alto. Pregúntale a él.","The one who was with her all night was Delroy, from the association in the upper quarter. Ask him."
 s59574a1c,una pista: «LA NOCHE DEL 98»,"a lead: ""THE NIGHT OF '98"""
-s6eb49921,DELROY,DELROY
 sdc882018,El cuaderno azul... Kiko no ha tardado en contártelo.,The blue notebook... Kiko didn't take long to tell you.
 s3baf150e,La Copa del 98 se jugaba en la plaza. Tu tía llevaba un tarro que olía a limón desde la otra punta.,The '98 Cup was held in the square. Your aunt had a jar you could smell lemon from across the square.
 sa5187698,"Baltasar se presentaba también. Y Toño, el chaval que hoy le guarda la puerta, era el que llevaba los tarros a la mesa del jurado.","Baltasar entered too. And Toño, the kid who guards his door today, was the one carrying the jars to the judges' table."
@@ -1432,6 +1503,13 @@ s61da9a49,"Una lata de galletas oxidada. Dentro, envueltas en papel de periódic
 s18d0cb62,"«Si las tienes tú, {N}, haz con esto lo que yo no me atreví. O no hagas nada: también vale. M.»","""If you have these, {N}, do with this what I didn't dare to. Or do nothing: that's fine too. M."""
 s4884a4c3,"{n} semillas de {s}, la Haze del 98 de la tía","{n} seeds of {s}, your aunt's Haze of '98"
 se0a4fb4d,"{n} semillas de {s}, la Haize del 98 de la tía","{n} seeds of {s}, your aunt's Haize of '98"
+sb46ecb92,"Debajo de las semillas, una llave pequeña atada con un cordel y otra nota:","Under the seeds, a small key tied with string and another note:"
+se7fd0af8,«La del cuarto de atrás de la asociación. Ahí empecé el banco de semillas del barrio y no lo terminé.»,"«For the back room of the association. That's where I started the neighbourhood seed bank, and never finished it.»"
+sdc36ab06,"«Las de la lata son de una polinización al aire: si quieres la Haze de verdad, fíjala otra vez, generación a generación.»","«The ones in the tin are open-pollinated: if you want the real Haze, fix it again, generation by generation.»"
+s6d18a593,"«Las de la lata son de una polinización al aire: si quieres la Haize de verdad, fíjala otra vez, generación a generación.»","«The ones in the tin are open-pollinated: if you want the real Haize, fix it again, generation by generation.»"
+s5a3f1b13,"«Si ya tienes la Haze fijada, guárdala bien: el banco la necesita.»","“If you already have the Haze fixed, keep it safe: the bank needs it.”"
+s6c712850,"«Si ya tienes la Haize fijada, guárdala bien: el banco la necesita.»","“If you already have the Haize fixed, keep it safe: the bank needs it.”"
+s283397e4,la llave del cuarto de atrás de la asociación,the key to the association's back room
 s8809daf9,¿Qué haces con lo que dice el cuaderno?,What do you do with what the notebook says?
 s450f5e74,Contarlo en la asociación,Tell it at the association
 s3246aea0,Ir a por Baltasar,Go after Baltasar
@@ -2061,7 +2139,6 @@ s26b1cc26,Vender al club,Sell to the club
 s2e2aa303,Entregar las semillas,Hand over the seeds
 s9dbeacc4,Encargo de semillas,Seed order
 sdebf1307,¿Qué te trae?,What brings you here?
-s4ffa4842,Entregar,Hand over
 s446d4be6,Encargo,
 s6be3137a,"Aquí no compramos a cualquiera. Antes te tienes que ganar mi confianza y la de {p}, el {t}.","We don't buy from just anyone. First you have to earn my trust and that of {p}, the {t}."
 s42e54577,"Aquí no compramos a cualquiera. Antes te tienes que ganar mi confianza y la de {p}, la {t}.","We don't buy from just anyone. First you have to earn my trust and that of {p}, the {t}."
@@ -2122,7 +2199,6 @@ saf70ed76,"¿Cuánto catas? (de una vez, {g} g como mucho)",How much do you samp
 s36ed2063,Catas {g} g de {x}: {n}.,You sample {g} g of {x}: {n}.
 sb476be53,Catar…,Sample…
 s043af18d,{x}: {g} g · {t} % · catado,{x}: {g} g · {t} % · sampled
-s4b6ba5c2,"Analizado: {l} · THC {t} % · CBD {c} % · terpeno principal, {p}. Lo que va con análisis se vende mejor.","Tested: {l} · THC {t} % · CBD {c} % · main terpene, {p}. Tested stuff sells better."
 se5d562ba,Catar {g} g,Sample {g} g
 s195373e8,Analizar,Test
 seff0f12e,{l}: {g} g · {t} %{c} · catado · analizado,{l}: {g} g · {t} %{c} · sampled · tested
@@ -3343,11 +3419,11 @@ s0e284386,Llevas {e} entre el bolsillo y la caja: te faltan {f}.,You have {e} be
 sd9adfb2b,Llevas {e} entre el bolsillo y la caja: ya lo tienes. Saca lo que falte de la caja y Ve al bar El Ancla.,You have {e} between pocket and safe: you've got it. Take what's missing from the safe and Go to El Ancla bar.
 s26476db0,Llevas {e} entre el bolsillo y la caja: ya lo tienes. Ve al bar El Ancla.,You have {e} between pocket and safe: you've got it. Go to El Ancla bar.
 sf73d9262,CAPÍTULO {n},CHAPTER {n}
-s49cccb08,HECHA,DONE
 s8461e3b9,"Plazo: {e} antes de que acabe el {f}. Llevas {l}.
 ","Due: {e} before {f} ends. You have {l}.
 "
 sc2557f57,Lo que dejó escrito tu tía y la gente que la conoció. Pulsa A para verlo.,What your aunt left written and the people who knew her. Press A to see it.
+s4065a5b1,Las colecciones de semillas del cuarto de atrás de la asociación. Pulsa A para verlas.,The seed collections in the association's back room. Press A to see them.
 sb858d766,RECADOS,ERRANDS
 sdbcfa5b1,"Lo que te piden por la comarca, según el capítulo. Pulsa A para verlos.","What people ask of you around the district, by chapter. Press A to see them."
 sfb2086ab,DIARIOS,DAILIES
@@ -4685,6 +4761,8 @@ sc8f2fe8e,cvP-u-22,
 sd1e9cfcf,cvP-u-32,
 sf544e072,Pista de los acantilados,Cliff track
 sf31f4075,Carretera de la ribera,Riverside road
+sb7900600,btTapado2,
+s3c163021,btFichero2,
 s30a02292,ESTUDIANTE,STUDENT
 sf07acb89,Hola. Me ha dicho un amigo que tienes.,Hi. A friend said you've got some.
 s42927016,"Aupa, ¿tienes algo? Voy justo de dinero.","Hey, got anything? I'm a bit short on cash."
@@ -6112,6 +6190,7 @@ s6d15acd5,La puerta del secadero,The drying room door
 s53868c27,La puerta de la nave,The warehouse door
 se214212e,La puerta de la habitación,The bedroom door
 sa9f08b09,La puerta del almacén,The storeroom door
+sb60b0cf4,La puerta del cuarto de atrás,The back room door
 sc9735661,La puerta del club,The club door
 scdff8331,Habilitar el sótano,Fit out the basement
 s853c4fc0,"El sótano de debajo del piso, que la tía usaba de trastero: sacar los trastos, impermeabilizar, luz, un desagüe y tres estanterías de rejilla. Oscuro y húmedo: para setas. Las bandejas te las prepara Txomin (Kale Zaharra). Los obreros acaban en un día.","The basement under the flat, Auntie's junk room: clear the junk, waterproof, lights, a drain and three wire shelves. Dark and damp: for mushrooms. Txomin (Kale Zaharra) preps the trays. The builders finish in a day."
@@ -6565,6 +6644,18 @@ sc42af751,andenN,
 s59116dc3,viaEFS,
 sad3aa409,viaEF,
 s53f82ed9,andenE,
+s4952412f,Las del Kush y el Himalaya,The Kush and Himalaya ones
+s349dfad0,Las de la costa,The coastal ones
+s13a4396e,Las de África y el Mediterráneo,The African and Mediterranean ones
+sacdf9e82,Las de la sierra americana,The American highland ones
+s91d89e58,"La Haze del 98, fijada","The Haze of '98, fixed"
+s02591e7f,"La Haize del 98, fijada","The Haize of '98, fixed"
+s391ece68,La cámara fría,The cold room
+s0cc6d052,El archivo de la tía,Your aunt's archive
+s6e63843c,El laboratorio,The lab
+s0aa5f652,El mostrador de los socios,The members' counter
+s300cbea9,La sala de catas,The tasting room
+s31870a6f,La placa de la tía,Your aunt's plaque
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -6668,6 +6759,7 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+s849eb6f1,"Abre el laboratorio: estabilizar con una semilla en vez de dos, una vez al día.","Opens the lab: stabilise with one seed instead of two, once a day."
 scba6d27f,"El apeadero del tren de la comarca: la caseta, la marquesina y la vía detrás. Pasa uno cada media hora.","The local railway halt: the hut, the shelter and the track behind. A train comes every half hour."
 sb3829eeb,Bajas del tren en {d} y sales a la parada.,You get off the train in {d} and walk out to the stop.
 s91d5cd57,"La ermita del monte, de piedra y con su campana. La puerta está abajo.","The hill chapel, stone, with its bell. The door is at the bottom."
@@ -6769,3 +6861,5 @@ sf45cf29a,Análisis,Analysis
 s1c48efeb,Pipas y bongs,Pipes and bongs
 s960219e1,Comida,Food
 s137508f0,Defensa,Self-defence
+s836ff227,"«{c}», en su cajón. {z}: destapado.","«{c}», in its drawer. {z}: uncovered."
+sa66e2ad4,{p},{p}

@@ -871,12 +871,12 @@ func harvest(i: int, hu = null) -> void:
 	await check_story()
 
 # estabilizar: la línea cruzada consigo misma sube una generación (F1 → F2 → F3 → estable)
-func estabilizar(k: String) -> void:
+func estabilizar(k: String, coste := 2) -> bool:   # coste 1: en el laboratorio del banco de la tía (bancotia.gd)
 	var s = strain(k)
 	var g := Cultivo.gen_de(S, k)
-	if await ask(T("¿Estabilizar {s} (F{g})? Gastas 2 semillas y guardas 1.", {"s": s.n, "g": g}), [K("Estabilizar"), K("Cancelar")]) != 0:
-		return
-	S.seeds[k] -= 2
+	if await ask(T("¿Estabilizar {s} (F{g})? Gastas 2 semillas y guardas 1.", {"s": s.n, "g": g}) if coste == 2 else T("¿Estabilizar {s} (F{g})? Gastas 1 semilla y guardas 1.", {"s": s.n, "g": g}), [K("Estabilizar"), K("Cancelar")]) != 0:
+		return false
+	S.seeds[k] -= coste
 	if not S.seeds[k]:
 		S.seeds.erase(k)
 	gesto_sid = k
@@ -895,6 +895,7 @@ func estabilizar(k: String) -> void:
 		S.gen[k] = g + 1
 		add_seeds(k, 1)
 		await say(T("Guardas 1 semilla F{f} de {s}: cultívala para tener más.\nFalta una generación para fijarla.", {"f": g + 1, "s": s.n}) if GE - g - 1 == 1 else T("Guardas 1 semilla F{f} de {s}: cultívala para tener más.\nFaltan {n} generaciones para fijarla.", {"f": g + 1, "s": s.n, "n": GE - g - 1}))
+	return true
 
 # ---------- cama ----------
 # la cama del piso y, desde la 1.10, la de casa de ama (txt): allí no hay robo de Darko ni aviso de plagas (las plantas están en el piso).

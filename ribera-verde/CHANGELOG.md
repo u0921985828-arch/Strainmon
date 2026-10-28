@@ -2,6 +2,15 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El banco de semillas de la tía, la meta del juego (ESTUDIO, tanda 1; lo pidió el usuario: «también quiero que metas mano a las mejoras que hablamos»; con `Datos.CAL`)
+
+- **La meta ya no es facturar.** Con la lata abierta, OBJETIVO dice «Restaura el banco de semillas de la tía…: n/6 colecciones» y la más cercana (`bt_objetivo`, antes que el imperio); OBJETIVO → EL BANCO DE LA TÍA abre la lista. El tráfico (pisos, franco, mar) queda como rama aparte.
+- **El cuaderno azul es el Acto I.** La lata del manzano trae, además de la Haze del 98 (ahora en F1, de una polinización al aire: hay que fijarla), la llave del cuarto de atrás de la asociación y dos notas de la tía (`hilo_lata`).
+- **El cuarto de atrás** (`banco-rv`, 12 × 8, por la puerta (9, 1) de la asociación, cerrada hasta tener la llave; `tools/banco_tia.py` → `BANCO_TIA`, `MAPS["banco-rv"]`, `PUERTAS_INT`). Todo tapado con sábanas menos el fichero.
+- **Seis colecciones** en el fichero, dos semillas de cada variedad: Kush e Himalaya, la costa, África y el Mediterráneo, la sierra americana, Asia (31 landraces de verdad) y la Haze del 98, cinco y fijada en F4. Cada una destapa su mueble: la cámara fría (una semilla de lo guardado cada 7 días), el laboratorio (estabilizar con una semilla, una vez al día y una vez por cosecha de cada línea: cada generación, una cosecha; `estabilizar(k, coste)` dice si se hizo, `cult_apunta` cuenta las cosechas), la sala de catas (un lote analizado al día), el archivo (una receta de los cuadernos al día) y el mostrador de los socios (2 semillas de una landrace sin descubrir cada 7 días, nunca de las que escondió la tía); la Haze va en el último cajón y cuelga la placa, que se toca desde delante del fichero: escena con Delroy, Kiko, Miren y Txaro, reputación y prestigio (`bt_fin`).
+- **Arte a mano** (`tools/sprites/a-mano/banco_tia.py`, grupo `banco-tia`): el fichero con la lata y el cuaderno, la cámara, el archivo, el laboratorio, el mostrador, la mesa de catas, lo tapado y la placa.
+- **Código:** `src/bancotia.gd` (entre `hilo` y `retencion`; `S.bt`), `bt_entra` en `enter_map`, `bt_obj` en `object_action`. Inglés en `godot/i18n/partes/copa.csv`. Prueba `tests/banco_tia.gd`.
+
 ### El tren de la comarca llega a su apeadero (lo pidió el usuario: «si te permite ir a demás pueblos, debería de haber estación de tren en los demás pueblos, no puede ser que subas al tren y aparezcas en la parada del bus»; con `Datos.CAL`)
 
 - **Un apeadero en cada pueblo de la parada.** Ribera Verde, Puerto Viejo, Valdehierro, Mendialde, Errotabarri e Ibarbide tienen su apeadero: la caseta de la vía estrecha de Zorroza (`edificio-apeadero`), puesta como hito con `M.apeadero` en `tools/pueblos.py`. Se quitan el monte y los árboles que lo tapaban.

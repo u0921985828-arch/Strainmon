@@ -167,8 +167,18 @@ func hilo_lata() -> void:
 	await talk(K("LA HUERTA"), [K("Al fondo, junto al manzano, la tierra se hunde un poco. Escarbas con las manos."),
 		K("Una lata de galletas oxidada. Dentro, envueltas en papel de periódico del 98, semillas y una nota."),
 		K("«Si las tienes tú, {N}, haz con esto lo que yo no me atreví. O no hagas nada: también vale. M.»")])
+	var nueva: bool = not S.disc.get(sid) and not S.get("gen", {}).has(sid)
 	add_seeds(sid, int(HILO.n))
 	await got(T("{n} semillas de {s}, la Haze del 98 de la tía", {"n": int(HILO.n), "s": String(strain(sid).n).to_upper()}))
+	if D.has("BANCO_TIA"):   # ESTUDIO tanda 1: la lata es la puerta del banco de semillas (bancotia.gd)
+		if nueva:   # de una polinización al aire del 98: hay que volver a fijarla
+			if not (S.get("gen") is Dictionary):
+				S.gen = {}
+			S.gen[sid] = 1
+		await talk(K("LA HUERTA"), [K("Debajo de las semillas, una llave pequeña atada con un cordel y otra nota:"),
+			K("«La del cuarto de atrás de la asociación. Ahí empecé el banco de semillas del barrio y no lo terminé.»"),
+			K("«Las de la lata son de una polinización al aire: si quieres la Haze de verdad, fíjala otra vez, generación a generación.»") if nueva else K("«Si ya tienes la Haze fijada, guárdala bien: el banco la necesita.»")])
+		await got(K("la llave del cuarto de atrás de la asociación"))
 	var el := -1
 	while el < 0:   # sin elegir no se cierra: la lata ya está abierta
 		el = await ask(K("¿Qué haces con lo que dice el cuaderno?"), [K("Contarlo en la asociación"), K("Ir a por Baltasar"), K("Guardártelo")])

@@ -13913,6 +13913,42 @@
    "celda": "edificio_4x7",
    "descripcion": "la grúa de pórtico de los astilleros, sin el muelle debajo",
    "cubre": []
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "max_colores": 32,
+   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/banco_tia.py",
+   "notas": "ESTUDIO tanda 1 (lo pidió el usuario: «mete mano a las mejoras que hablamos»): el banco de semillas de la tía. De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
+   "id": "banco-tia",
+   "celda": "mueble_ancho",
+   "cubre": [
+    "obj:btFichero",
+    "obj:btCamara",
+    "obj:btArchivo",
+    "obj:btLab",
+    "obj:btMostrador",
+    "obj:btCata",
+    "obj:btTapado",
+    "obj:btPlaca"
+   ],
+   "ajuste_por_sprite": {
+    "btFichero": "exacto",
+    "btCamara": "exacto",
+    "btArchivo": "exacto",
+    "btLab": "exacto",
+    "btMostrador": "exacto",
+    "btCata": "exacto",
+    "btTapado": "exacto",
+    "btPlaca": "exacto"
+   },
+   "estilo_ref": "los muebles anchos de los locales (locales-ancho)",
+   "descripcion": "El cuarto del banco de semillas a 16 px/m: el fichero de la tía, la cámara fría, el archivo, el laboratorio, el mostrador de los socios, la mesa de catas, lo tapado con la sábana y la placa de la pared."
   }
  ],
  "familias": {

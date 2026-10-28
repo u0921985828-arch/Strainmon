@@ -134,7 +134,7 @@ const ZONA := {"town": "town", "alto": "town", "astilleros": "town", "home": "to
 	"errotabarri": "errotabarri", "ibarbide": "ibarbide", "ensanche": "ibarbide", "callejon": "ibarbide", "growcity": "ibarbide",
 	"club-ibar": "ibarbide", "club-ens": "ibarbide", "disco": "ibarbide", "setas": "ibarbide",
 	"disco-vip": "ibarbide", "est-rv": "town", "est-puerto": "puerto", "est-valde": "valdehierro", "est-mendi": "mendialde", "est-erro": "errotabarri", "est-ibar": "ibarbide",   # 1.47
-	"pasillo": "town", "sotano": "town", "cuarto-t": "valdehierro", "nave-d": "valdehierro", "nave-h": "valdehierro", "nave-s": "valdehierro", "muelle": "puerto", "franco": "puerto", "alm-rv": "alto", "alm-muelle": "puerto",   # 1.51; el almacén del dispensario
+	"pasillo": "town", "sotano": "town", "cuarto-t": "valdehierro", "nave-d": "valdehierro", "nave-h": "valdehierro", "nave-s": "valdehierro", "muelle": "puerto", "franco": "puerto", "alm-rv": "alto", "banco-rv": "alto", "alm-muelle": "puerto",   # 1.51; el almacén del dispensario
 	"metropoli": "metropoli", "vip-zen": "metropoli", "vip-ila": "metropoli",
 	"zorroza": "town", "lapunta": "town", "abando": "town", "casco": "town",   # Bilbao: sin chincheta propia, junto a Ribera Verde
 	"comarcal": "mendialde", "refugio": "mendialde", "carr-costa": "puerto", "carr-valle": "valdehierro", "carr-monte": "mendialde",   # las carreteras: el pueblo más cerca

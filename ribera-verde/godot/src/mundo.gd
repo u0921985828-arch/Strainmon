@@ -2219,6 +2219,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	arboles_fuera(name_)   # con CAL, ningún árbol encima de un edificio
 	vallas_dentro(name_)   # con CAL, la valla encima de lo que acota
 	hilo_entra(name_)   # con CAL, la lata de la tía en la huerta (hilo.gd)
+	bt_entra(name_)   # con CAL, el banco de semillas de la tía (bancotia.gd)
 	P.x = x
 	P.y = y
 	P.px = x * 16.0
@@ -3067,4 +3068,23 @@ func hilo_menu() -> void:
 	pass
 
 func hilo_derecha() -> String:
+	return ""
+
+# el banco de semillas de la tía (bancotia.gd)
+func bt_entra(_mapa: String) -> void:
+	pass
+
+func bt_obj(_x: int, _y: int, _o) -> bool:
+	return false
+
+func bt_abierto() -> bool:
+	return false
+
+func bt_objetivo() -> String:
+	return ""
+
+func bt_menu(_ver := true) -> void:
+	pass
+
+func bt_derecha() -> String:
 	return ""

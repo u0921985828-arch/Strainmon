@@ -1040,6 +1040,8 @@ func objective_text() -> String:
 			return T("Paga los últimos {e} a Don Baltasar antes de que acabe el {f}.", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day)}) + llevas()
 	if S.get("encargo"):
 		return T("Encargo de Don Baltasar: lleva {g} al almacén de los astilleros, de noche, antes de que acabe el {f}.", {"g": _kg(int(S.encargo.g)), "f": Datos.fd(S.encargo.hasta, S.day)})
+	if bt_objetivo() != "":   # ESTUDIO tanda 1, con CAL: la meta, el banco de semillas de la tía (bancotia.gd); el imperio, aparte
+		return bt_objetivo()
 	var nv := imperio_nivel()
 	var I: Array = D.IMPERIO
 	var nd := 0
@@ -1309,6 +1311,8 @@ func objetivo_menu():
 		var plazo := T("Plazo: {e} antes de que acabe el {f}. Llevas {l}.\n", {"e": Datos.eur(S.due), "f": Datos.fd(S.deadline, S.day), "l": Datos.eur(S.money + caja_e())}) if S.due > 0 else ""
 		if hilo_visible():   # el cuaderno azul de la tía (hilo.gd)
 			it.append({"label": K("LA TÍA MAITE"), "right": hilo_derecha(), "desc": K("Lo que dejó escrito tu tía y la gente que la conoció. Pulsa A para verlo.")})
+		if bt_abierto():   # el banco de semillas de la tía (bancotia.gd)
+			it.append({"label": K("EL BANCO DE LA TÍA"), "right": bt_derecha(), "desc": K("Las colecciones de semillas del cuarto de atrás de la asociación. Pulsa A para verlas.")})
 		if Datos.CAL:   # 1.51
 			var rv := recados_ver()
 			it.append({"label": K("RECADOS"), "right": "%d/%d" % [rv.filter(func(sc): return sec_estado(sc.id) == 2).size(), rv.size()], "desc": K("Lo que te piden por la comarca, según el capítulo. Pulsa A para verlos.")})
@@ -1323,6 +1327,9 @@ func objetivo_menu():
 			continue
 		if i >= 0 and it[i].label == K("LA TÍA MAITE"):
 			await hilo_menu()
+			continue
+		if i >= 0 and it[i].label == K("EL BANCO DE LA TÍA"):
+			await bt_menu()
 			continue
 		if i >= 0 and it[i].label == "DIARIOS":
 			await diario_menu()

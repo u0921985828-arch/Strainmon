@@ -1062,7 +1062,7 @@ static func tubos_huerta(H: Dictionary, HM: Dictionary, n_ibc: int) -> Dictionar
 const MANG_MARGEN := 10   # px de bancal a cada lado del ramal: dentro de la tierra que se ve (la hierba de la orilla tapa 6)
 
 # los de la pared, subidos a su altura (1.10, ALZA de 01b-arte.js: px)
-const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13, "fotoMaite": -10, "extrN": -14, "extrG": -14, "filtroN": -12, "ctrlN": -12, "fotoK": -13, "ojoBuey": -13, "timon": -13, "red": -13, "diana": -13, "engranaje": -13, "neonH": -13, "copas": -16, "tuboS": -13, "botesW": -16, "neonG": -13}   # 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared; 1.34: lo de las paredes de los clubs, del bajo y de los grows
+const ALZA := {"iwin": -13, "poster": -13, "shelfW": -16, "bottles": -13, "cuadro": -13, "cartel": -13, "tarros": -16, "pizarra": -13, "cartelC": -13, "tacos": -13, "neon": -13, "fotoMaite": -10, "extrN": -14, "extrG": -14, "filtroN": -12, "ctrlN": -12, "fotoK": -13, "ojoBuey": -13, "timon": -13, "red": -13, "diana": -13, "engranaje": -13, "neonH": -13, "copas": -16, "tuboS": -13, "botesW": -16, "neonG": -13, "btPlaca": -10}   # 1.30: los de los locales; 1.32: la foto de la tía (1.33: de 2 casillas, a -10); 1.33: el equipo de la nave en la pared; 1.34: lo de las paredes de los clubs, del bajo y de los grows
 
 # los muebles que dejan sombra en el suelo (1.10 P5, SOMBRA_OBJ de 01b-arte.js): 1 px a cada lado del dibujo en sus 2 últimas filas
 # y la fila de debajo, sin pisar el objeto de la casilla de al lado ni el de debajo; se pintan con todo el suelo ya puesto

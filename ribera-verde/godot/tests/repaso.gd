@@ -182,7 +182,7 @@ func _corre() -> void:
 	S.aso = J.aso()
 	S.aso.pres = false
 	entra("club-rv")
-	var pu: Array = J.puertas_int("club-rv")
+	var pu: Array = J.puertas_int("club-rv").filter(func(q): return String(q.get("to", "")) != "banco-rv")   # la del cuarto de atrás, en tests/banco_tia.gd
 	chk(pu.size() == 1 and J.MAPS["club-rv"].o[1][int(pu[0].x)] == "puertaI", "club-rv: sin la puerta del almacén")
 	chk(J.MAPS["club-rv"].o[2][int(pu[0].x)] == null, "club-rv: algo delante de la puerta")
 	var t4 := await a_en("club-rv", int(pu[0].x), 1)
