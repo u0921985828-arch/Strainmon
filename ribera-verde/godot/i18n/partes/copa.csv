@@ -424,7 +424,11 @@ Una columna de mármol. El palacio entero huele a cera y a papel.,A marble colum
 "Cajas de la carga, flejadas. Huelen a pescado y a gasoil.",Strapped cargo crates. They smell of fish and diesel.
 "Sacos de café verde, esperando al camión.","Sacks of green coffee, waiting for the lorry."
 ¿A dónde vas en tren?,Where are you going by train?
-Bajas del tren en {d} y sales a la parada.,You get off the train in {d} and walk out to the stop.
+Bajas del tren en la estación de Zorroza.,You get off the train at Zorroza station.
+Bajas del tren en el apeadero de {d}.,You get off the train at the {d} halt.
+"El apeadero, cerrado. En el cartel: el primer tren sale a las seis de la mañana y el último a las once de la noche.","The halt is closed. The sign says the first train leaves at six in the morning and the last at eleven at night."
+"El apeadero del tren de la comarca: la caseta, la marquesina y la vía detrás. Pasa uno cada media hora.","The local railway halt: the hut, the shelter and the track behind. A train comes every half hour."
+Coger el tren,Take the train
 FUNCIONARIA,CLERK
 «Una declaración por semana. Vuelva usted la que viene.»,“One declaration a week. Come back next week.”
 "«Para regularizar, traiga el efectivo. Desde cien euros.»","“To regularise, bring the cash. From one hundred euros.”"

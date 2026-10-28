@@ -2,6 +2,13 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El tren de la comarca llega a su apeadero (lo pidió el usuario: «si te permite ir a demás pueblos, debería de haber estación de tren en los demás pueblos, no puede ser que subas al tren y aparezcas en la parada del bus»; con `Datos.CAL`)
+
+- **Un apeadero en cada pueblo de la parada.** Ribera Verde, Puerto Viejo, Valdehierro, Mendialde, Errotabarri e Ibarbide tienen su apeadero: la caseta de la vía estrecha de Zorroza (`edificio-apeadero`), puesta como hito con `M.apeadero` en `tools/pueblos.py`. Se quitan el monte y los árboles que lo tapaban.
+- **El tren va de estación en estación.** Llega delante del apeadero y ya no a la parada del autobús (`apeadero_de`). Desde un apeadero se va a los otros pueblos o a Bilbao, donde se llega a la puerta de la estación de Zorroza (`TREN_BILBAO`).
+- **El precio y el horario.** El billete sale por el tramo entre el origen y el destino (`tren_viaje(k, de)`). El apeadero sigue el horario de las estaciones: cerrado de 23:00 a 6:00.
+- **Pruebas:** `tests/pueblos.gd` (§ 3b: delante de cada apeadero se llega andando, cierra de noche y el tren llega al apeadero) y `tests/interiores_bilbao.gd` (de Zorroza, al apeadero de Puerto Viejo).
+
 ### El cuaderno azul de la tía Maite (lo pidió el usuario: «el juego ya me aburre… igual le falta historia, falta contexto»; con `Datos.CAL`)
 - Un hilo de historia por encima de la deuda (`src/hilo.gd`, entre `ciudad` y `retencion`; `S.hilo`): Kiko (SMS al amanecer desde el capítulo 3), Delroy y la noche de la Copa del 98, los tres trozos del cuaderno con Miren, la serora de la ermita y la abuela Txaro (en cualquier orden), la lata del manzano de la huerta y una elección: contarlo en la asociación, ir a por Baltasar o guardártelo. Texto completo en `docs/GUION.md`.
 - Pararte con la gente (la cena de Miren, la vela de la serora, el café de Txaro) cambia el SMS del final.

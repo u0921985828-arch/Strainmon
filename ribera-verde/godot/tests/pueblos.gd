@@ -22,8 +22,11 @@ var ATLAS := ""
 var fallos := []
 
 # el hito de cada mapa (los de tools/pueblos.py)
-const HITOS := {"town": ["lavadero"], "alto": ["kiosko"], "astilleros": ["gruaT"], "mendialde": ["fronton", "ermita"], "puerto": ["faro"],
-	"valdehierro": ["chimenea"], "errotabarri": ["colmenas"], "ibarbide": ["reloj"], "ensanche": ["prensa"]}
+const HITOS := {"town": ["lavadero", "apeadero"], "alto": ["kiosko"], "astilleros": ["gruaT"], "mendialde": ["fronton", "ermita", "apeadero"],
+	"puerto": ["faro", "apeadero"], "valdehierro": ["chimenea", "apeadero"], "errotabarri": ["colmenas", "apeadero"], "ibarbide": ["reloj", "apeadero"],
+	"ensanche": ["prensa"]}
+# los pueblos de la parada, con su apeadero (lo pidió el usuario: «no puede ser que subas al tren y aparezcas en la parada del bus»)
+const APEADEROS := ["town", "puerto", "valdehierro", "mendialde", "errotabarri", "ibarbide"]
 
 func _initialize() -> void:
 	Datos.PLAY = false
@@ -210,7 +213,7 @@ func _corre() -> void:
 	var todos := []
 	for k in PU:
 		for b in PU[k].blds:
-			chk(not (b.hito in todos), "hito repetido: %s" % b.hito)
+			chk(b.hito == "apeadero" or not (b.hito in todos), "hito repetido: %s" % b.hito)
 			todos.append(b.hito)
 	J.S.day = dom + 2
 	J.S.min = 600
@@ -243,6 +246,33 @@ func _corre() -> void:
 	J.S.borr = 20.0
 	hace(["Sentarte"], func(): await J.object_action(24, 10))
 	chk(J.borr() < 20.0, "el pórtico de la ermita: %s" % J.borr())
+	# 3b · los apeaderos: en cada pueblo de la parada, delante se llega andando; el tren va de apeadero en apeadero y a Bilbao
+	J.S.ch = 8
+	for k in APEADEROS:
+		var a: Array = J.apeadero_de(k)
+		chk(a.size() == 2, "%s: sin apeadero" % k)
+		if a.size() != 2:
+			continue
+		J.enter_map(k, int(a[0]), int(a[1]), "up")
+		chk(alcance(k).has("%d,%d" % [int(a[0]), int(a[1])]), "%s: al apeadero no se llega andando" % k)
+		chk(J.hito_de(int(a[0]), int(a[1]) - 1) == "apeadero", "%s: el apeadero no está delante" % k)
+	J.S.min = 1400
+	J.enter_map("town", int(J.apeadero_de("town")[0]), int(J.apeadero_de("town")[1]), "up")
+	t = hace(["Coger"], func(): await J.object_action(int(J.apeadero_de("town")[0]), int(J.apeadero_de("town")[1]) - 1))
+	chk(J.S.map == "town" and "cerrado" in t, "el apeadero de noche: %s %s" % [J.S.map, t])
+	J.S.min = 600
+	for par in [["town", "puerto"], ["puerto", "errotabarri"], ["errotabarri", "zorroza"]]:
+		var de: String = par[0]
+		var a2: String = par[1]
+		var ap: Array = J.apeadero_de(de)
+		J.enter_map(de, int(ap[0]), int(ap[1]), "up")
+		J.S.money = 100.0
+		var v: Dictionary = J.tren_viaje(a2, de)
+		t = hace(["Coger", String(D.PARADAS[a2].n)], func(): await J.object_action(int(ap[0]), int(ap[1]) - 1))
+		var lleg: Array = J.TREN_BILBAO if a2 == "zorroza" else J.apeadero_de(a2)
+		chk(J.S.map == a2 and int(J.P.x) == int(lleg[0]) and int(J.P.y) == int(lleg[1]) and is_equal_approx(float(J.S.money), 100.0 - float(v.eur)),
+			"el tren de %s a %s: %s (%s, %s) %s" % [de, a2, J.S.map, J.P.x, J.P.y, J.S.money])
+		chk(not ("parada" in t), "el tren de %s a %s: «%s»" % [de, a2, t])
 	# lejos de un hito, nada
 	J.enter_map("town", 5, 20, "up")
 	chk(not J.hito_de(5, 19), "fuera de un hito")

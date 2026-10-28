@@ -225,6 +225,7 @@ func _corre() -> void:
 	chk(float(pv.eur) < float(J.viaje("zorroza", "puerto").eur) and int(pv.min) < int(J.viaje("zorroza", "puerto").min), "el tren: %s" % [pv])
 	hace([String(D.PARADAS.puerto.n)], func(): await J.talk_ciudad("bi_taquillero_zorrozae"))
 	chk(J.S.map == "puerto" and is_equal_approx(float(J.S.money), m0 - float(pv.eur)), "el tren a Puerto Viejo: %s %s" % [J.S.map, J.S.money])
+	chk(int(J.P.x) == int(J.apeadero_de("puerto")[0]) and int(J.P.y) == int(J.apeadero_de("puerto")[1]), "el tren llega al apeadero, no a la parada: (%s, %s)" % [J.P.x, J.P.y])
 	# 8 · Hacienda: declarar efectivo, una vez a la semana
 	J.S.min = 600
 	J.enter_map("hacienda-in", 7, 8, "up")

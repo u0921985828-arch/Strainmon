@@ -304,6 +304,8 @@ func hito_obj(x: int, y: int) -> bool:
 		return false
 	var C := ciu()
 	match h:
+		"apeadero":
+			await apeadero()
 		"lavadero":
 			if await ask(K("El lavadero viejo del pueblo. El agua baja fría del monte."), [K("Lavarte la cara"), K("Nada")]) == 0:
 				beber_alc(-8)
@@ -527,25 +529,42 @@ func obj_ciudad(o) -> bool:
 	return false
 
 # ---------- las estaciones: el tren ----------
-func tren_viaje(k: String) -> Dictionary:
-	var v := viaje("zorroza", k)
-	return {"min": maxi(10, int(float(v.min) * TREN.min)), "eur": snappedf(float(v.eur) * TREN.eur, 0.05)}
+# (lo pidió el usuario: «si te permite ir a demás pueblos, debería de haber estación de tren en los demás pueblos, no puede ser que
+# subas al tren y aparezcas en la parada del bus»): cada pueblo de la parada tiene su apeadero (hito «apeadero» de tools/pueblos.py);
+# el tren va de estación en estación: de Bilbao a los apeaderos, de un apeadero a otro y de vuelta a la estación de Zorroza
+const TREN_BILBAO := [8, 14]   # delante de la puerta de la estación de Zorroza
+
+# la casilla de delante del apeadero de un pueblo (o [] si no tiene)
+func apeadero_de(k: String) -> Array:
+	for b in D.get("PUEBLOS", {}).get("MAPS", {}).get(k, {}).get("blds", []):
+		if str(b.get("hito", "")) == "apeadero":
+			return [int(b.x0) + 1, int(b.y0) + int(b.h)]
+	return []
+
+# de dónde sale el tren: la estación de Bilbao (cualquiera de las de dentro) o el pueblo del apeadero
+func tren_origen() -> String:
+	return "zorroza" if S.map in ESTACIONES else String(S.map)
+
+func tren_viaje(k: String, de := "zorroza") -> Dictionary:
+	var v := viaje(de, k)
+	return {"min": maxi(10, int(float(v.min) * TREN.min)), "eur": snappedf(maxf(1.0, float(v.eur) * TREN.eur), 0.05)}
 
 func tren() -> void:
+	var de := tren_origen()
 	var ds := []
 	for k in D.PARADAS:
-		if k != "zorroza" and S.ch >= int(D.PARADAS[k].cap):
+		if k != de and S.ch >= int(D.PARADAS[k].cap) and (k == "zorroza" or apeadero_de(k).size() > 0):
 			ds.append(k)
 	var it := []
 	for k in ds:
-		var v := tren_viaje(k)
+		var v := tren_viaje(k, de)
 		it.append({"label": D.PARADAS[k].n, "right": T("{e} · {m} min", {"e": Datos.eur(v.eur), "m": int(v.min)})})
 	it.append({"label": K("Nada")})
 	var i: int = await menu(it, {"cls": "right", "title": K("¿A dónde vas en tren?")})
 	if i < 0 or i >= ds.size():
 		return
 	var k: String = ds[i]
-	var v := tren_viaje(k)
+	var v := tren_viaje(k, de)
 	if float(S.money) < float(v.eur):
 		sfx("bad")
 		await say(T("El billete hasta {d} cuesta {e}. No te llega.", {"d": D.PARADAS[k].n, "e": Datos.eur(v.eur)}))
@@ -554,14 +573,26 @@ func tren() -> void:
 	sfx("door")
 	await fade(1)
 	advance_time(int(v.min))
-	var a: Array = D.PARADAS[k].a
-	enter_map(k, int(a[0]), int(a[1]), a[2])
+	var a: Array = apeadero_de(k)
+	if k == "zorroza":
+		enter_map(k, int(TREN_BILBAO[0]), int(TREN_BILBAO[1]), "down")
+	else:
+		enter_map(k, int(a[0]), int(a[1]), "down")
 	if S.clientsDay != S.day:
 		spawn_clients()
 	update_hud()
 	await wait(80)
 	await fade(0)
-	await say(T("Bajas del tren en {d} y sales a la parada.", {"d": D.PARADAS[k].n}))
+	await say(T("Bajas del tren en la estación de Zorroza.") if k == "zorroza" else T("Bajas del tren en el apeadero de {d}.", {"d": D.PARADAS[k].n}))
+
+# el apeadero de un pueblo: la ventanilla, con el horario de las estaciones
+func apeadero() -> void:
+	var h: Array = HORARIO.estacion
+	if int(S.min) < int(h[0]) or int(S.min) >= int(h[1]):
+		await say(K("El apeadero, cerrado. En el cartel: el primer tren sale a las seis de la mañana y el último a las once de la noche."))
+		return
+	if await ask(K("El apeadero del tren de la comarca: la caseta, la marquesina y la vía detrás. Pasa uno cada media hora."), [K("Coger el tren"), K("Nada")]) == 0:
+		await tren()
 
 # ---------- la Diputación: la ventanilla de Hacienda ----------
 func hacienda() -> void:

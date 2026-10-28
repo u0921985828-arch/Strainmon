@@ -409,10 +409,15 @@ s4492d7b6,"Un palco, con sus cortinas. Se sube por otra escalera que está cerra
 s3281113e,plantaT,
 sc9bfa05f,"Una planta de interior, mustia. Le haría falta un buen abono.",A wilted houseplant. It could do with a good feed.
 s9889d409,"Cajas de fruta vacías, apiladas para el camión.","Empty fruit crates, stacked for the lorry."
+sbff7cf22,PUEBLOS,
 s573f51a6,{e} · {m} min,{e} · {m} min
 sdbbdd47d,¿A dónde vas en tren?,Where are you going by train?
 s544c97a5,El billete hasta {d} cuesta {e}. No te llega.,The ticket to {d} costs {e}. You can't afford it.
-sb3829eeb,Bajas del tren en {d} y sales a la parada.,You get off the train in {d} and walk out to the stop.
+saddb3560,Bajas del tren en la estación de Zorroza.,You get off the train at Zorroza station.
+sf7445da7,Bajas del tren en el apeadero de {d}.,You get off the train at the {d} halt.
+s5315c345,"El apeadero, cerrado. En el cartel: el primer tren sale a las seis de la mañana y el último a las once de la noche.",The halt is closed. The sign says the first train leaves at six in the morning and the last at eleven at night.
+scba6d27f,"El apeadero del tren de la comarca: la caseta, la marquesina y la vía detrás. Pasa uno cada media hora.","The local railway halt: the hut, the shelter and the track behind. A train comes every half hour."
+s5a26563b,Coger el tren,Take the train
 s1fab1c20,FUNCIONARIA,CLERK
 s106fdc09,«Una declaración por semana. Vuelva usted la que viene.»,“One declaration a week. Come back next week.”
 sfe85e51d,"«Para regularizar, traiga el efectivo. Desde cien euros.»","“To regularise, bring the cash. From one hundred euros.”"
@@ -511,7 +516,6 @@ s9c2c1caf,RECIPES,
 s808a2361,BANCO,BANK
 s9affa116,SHOP,SHOP
 scfd02651,METRO,METRO
-sbff7cf22,PUEBLOS,
 s24af7e89,PCT,
 s3c69629d,KAIA,
 se0facbd4,día {n},day {n}
@@ -6657,6 +6661,7 @@ sb17e20dc,WIDOU,
 se0e52c84,KALLI,
 scb0d016e,SAUR,
 s11d33831,DISEL,
+sb3829eeb,Bajas del tren en {d} y sales a la parada.,You get off the train in {d} and walk out to the stop.
 s91d5cd57,"La ermita del monte, de piedra y con su campana. La puerta está abajo.","The hill chapel, stone, with its bell. The door is at the bottom."
 sa3ad6bc8,La chimenea de la fundición vieja. Lleva treinta años sin echar humo.,The old foundry chimney. It hasn't smoked in thirty years.
 sc7b68786,"Una grúa de astillero, oxidada, con el gancho colgando sobre nada.","A rusty shipyard crane, its hook hanging over nothing."

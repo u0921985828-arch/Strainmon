@@ -17,6 +17,9 @@ natural: plazas en mancha, sendas en curva, la hierba alta y las flores en corro
   ibarbide             la plaza con la estatua y el parque de abajo con su senda
   ensanche             el quiosco en la plaza y las sendas del parque
 
+Y en los seis pueblos de la parada, el apeadero del tren de la comarca (hito «apeadero»): el tren de Bilbao llega ahí, no a la
+parada del autobús.
+
 Sale `PUEBLOS = {MAPS: {k: {cambia: [[x, y, g, o, g0, o0]…], blds, doors}}, CLIENT_TILES, RONDA}` y la ermita en BILBAO.IN y su
 gente en BILBAO.NPC (por eso va después de tools/bilbao.py). Comprueba que todo lo que se alcanzaba se sigue alcanzando, que nada
 de lo protegido (puertas, personas, objetos de la historia, sitios fijos del código y de las pruebas) cambia y que los hitos no
@@ -168,6 +171,19 @@ class Mapa:
 			for x in range(x0, x1 + 1):
 				self.suelo(x, y, g, sobre)
 
+	def despeja(self, x0, y0, w, h):
+		"""quita el monte y los árboles de un rectángulo (para el apeadero, al borde del pueblo)"""
+		for y in range(y0, y0 + h):
+			for x in range(x0, x0 + w):
+				if self.o[y][x] in ("monte", "monte2", "tree", "tree2"):
+					self.o[y][x] = None
+
+	def apeadero(self, x0, y0, sobre):
+		"""el apeadero del tren de la comarca (4 × 3; lo pidió el usuario: «si te permite ir a demás pueblos, debería de haber
+		estación de tren en los demás pueblos»): la caseta con la marquesina; la vía, detrás; se llega y se sale por delante"""
+		self.despeja(x0, y0, 4, 3)
+		self.hito("apeadero", x0, y0, 4, 3, sobre)
+
 	def hito(self, hid, x0, y0, w, h, sobre, puerta=None, agua=False, junto=False):
 		"""un edificio de hito: casillas hito_<suelo> (sólidas, con el suelo debajo) y su bld; con `puerta` = (x, to, gate, llega),
 		las dos casillas de la puerta (door_<id>) y la entrada"""
@@ -212,6 +228,9 @@ def town(M):
 	M.mancha(2.2, 22.4, 1.9, 1.7, "tallgrass", "town-alta2", 0.3, ("grass",))
 	M.obj(24, 20, "bench")
 	M.obj(17, 23, "bench")
+	M.quita(17, 28, "tree")                                     # los dos árboles cuya copa taparía el apeadero
+	M.quita(20, 28, "tree")
+	M.apeadero(18, 24, "grass")                                 # al fondo del parque; la vía pasa detrás del seto
 
 
 def alto(M):
@@ -255,6 +274,7 @@ def mendialde(M):
 	M.quita(25, 10, "manzano")
 	M.hito("ermita", 24, 7, 4, 4, "grass", (25, "ermita-in", "iglesia:ermita", (5, 9)))
 	M.senda([(25.6, 11.2), (25.4, 11.6)], 2, "plaza", ("grass",))   # el atrio, delante de la puerta
+	M.apeadero(11, 2, "grass")                                  # arriba, entre las casas, al pie del monte
 
 
 def puerto(M):
@@ -269,6 +289,8 @@ def puerto(M):
 	for x, y in ((6, 21), (32, 19)):                      # los norays, en la punta de los pantalanes
 		if M.g[y][x] == "dock" and not M.o[y][x]:
 			M.o[y][x] = "noray"
+	M.quita(4, 14, "tree")                                      # su copa taparía el apeadero
+	M.apeadero(5, 10, "plaza")                                  # en el paseo, al oeste
 
 
 def valdehierro(M):
@@ -280,6 +302,7 @@ def valdehierro(M):
 			M.g[21][x] = "via"
 	M.rect(30, 17, 33, 19, "dirt", ("tallgrass",))
 	M.mancha(31.6, 18.2, 2.3, 1.5, "tallgrass", "val-alta", 0.3, ("dirt",))
+	M.apeadero(31, 17, "dirt")                                  # junto a la vía del desguace
 
 
 def errotabarri(M):
@@ -290,6 +313,9 @@ def errotabarri(M):
 	for x, y in ((9, 21), (31, 21), (4, 21)):
 		M.obj(x, y, "manzano")
 	M.hito("colmenas", 13, 4, 3, 2, "grass")                      # el colmenar, arriba, junto al río
+	M.quita(34, 7, "monte2")                                    # lo que taparía el apeadero
+	M.quita(30, 9, "tree")
+	M.apeadero(30, 4, "grass")                                  # arriba a la derecha, al pie del monte
 
 
 def ibarbide(M):
@@ -302,6 +328,8 @@ def ibarbide(M):
 		M.obj(x, y, "platano", ("plaza",))
 	M.rect(1, 24, 42, 27, "grass", ("dirt",))
 	M.senda([(8.6, 23.6), (10.4, 25.4), (16, 26.1), (22, 25.4), (29, 26.3), (35.6, 25.1), (38.4, 23.6)], 2, "dirt", ("grass", "flowers"))
+	M.quita(40, 28, "tree")                                     # su copa taparía el apeadero
+	M.apeadero(37, 24, "grass")                                 # en el parque de abajo, al final de la senda
 
 
 def ensanche(M):
