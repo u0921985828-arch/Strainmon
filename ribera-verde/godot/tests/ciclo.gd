@@ -339,6 +339,7 @@ func _corre() -> void:
 	Cultivo.pm = int(arg("--azar", "4242"))   # el azar del Park-Miller: la prueba sale siempre igual
 	J = load("res://juego.tscn").instantiate()
 	root.add_child(J)
+	J.aj.reloj = 0   # OPCIONES → RELOJ: el de antes (4 min el día), con el que el azar de esta partida sale como siempre
 	await espera(10)
 	await titulo_e_intro()
 	await prologo()
