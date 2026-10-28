@@ -2,6 +2,10 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.65.2 (código 87) y plugin de WordPress 1.6.5 · sin franjas blancas en lo translúcido (lo vio el usuario en el móvil)
+
+- La capa de la 0.65.1 dejaba en el móvil franjas blancas a lo alto de la pantalla detrás de árboles y farolas: una sola textura para todas las capas del fotograma, que se rehacía al cambiar de tamaño y se liberaba con la orden de pintarla aún pendiente (rectángulo blanco). Ahora la capa es solo para las mesas con plantas, focos o bandejas, recortada a lo que tiene (`get_used_rect`), con una textura por capa y fotograma (`_capt_tex`) y las cambiadas vivas hasta el siguiente (`_capt_viejo`); lo que va solo (árbol, farola), con su alfa de siempre. Prueba `tests/translucido.gd` (14/0).
+
 ### 0.65.1 (código 86) y plugin de WordPress 1.6.4 · la mesa con plantas, translúcida en una sola capa (lo pendiente de la 0.65.0; con `Datos.CAL`)
 
 - Detrás de una mesa con plantas (la nave, KAIA), la mesa, las plantas y los focos se pintan juntos en una capa (`capa_unica`, `_con_alfa_capa` en `pinta.gd`: `_img` y `_rect` mezclan en `_capt` en vez de pintar) y esa capa sale a `TAPA_ALFA`: ya no se ve la mesa a través de las plantas. Prueba `tests/translucido.gd` (12/0).

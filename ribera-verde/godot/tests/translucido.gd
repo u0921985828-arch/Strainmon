@@ -110,6 +110,17 @@ func _corre() -> void:
 		hoja.fill(Color(1, 1, 1, 1))
 		var capa2: Image = Pn.capa_unica(0, 0, 8, 8, func(): Pn._img(hoja, -2, -2))
 		chk(capa2.get_pixel(1, 1) == Color.WHITE and capa2.get_pixel(2, 2).a == 0.0, "otro formato y fuera de la caja: recortado")
+		# una textura por capa y fotograma, y la que se cambia de tamaño sigue viva hasta el siguiente (si no, rectángulo blanco)
+		Pn._capt_n = 0
+		var t1: ImageTexture = Pn._capt_tex(ra)
+		var t2: ImageTexture = Pn._capt_tex(ve)
+		Pn._capt_n = 0
+		Pn._capt_viejo.clear()
+		Pn._capt_tex(ra)
+		var t3: ImageTexture = Pn._capt_tex(ra)
+		chk(t1 != t2 and t3 != t2 and t2 in Pn._capt_viejo and Vector2i(t3.get_size()) == Vector2i(8, 8), "capas del fotograma: sin reutilizar ni liberar a destiempo")
+		# lo que va solo (árbol, farola), sin capa: su alfa de siempre
+		chk(Pn._con_alfa_capa.get_argument_count() == 6, "capa solo para la mesa")
 		if fotos != "":
 			J.oraculo = false
 			J.enter_map(hallado.m, c.x, c.y - 1, "up")

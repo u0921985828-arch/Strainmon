@@ -56,6 +56,8 @@ func _init() -> void:
 func redibuja(t: float) -> void:
 	if J == null:
 		return
+	_capt_n = 0
+	_capt_viejo.clear()
 	var m: String = J.mode
 	if m == "world" and J.S:
 		modo = "world"
@@ -215,7 +217,10 @@ func tapa_encima(x: int, y: int, w: int, pie: float) -> bool:
 # a través de las plantas (lo pendiente de la 0.65.0); x, y, w, h: la caja de pantalla en la que cabe
 var _capt: Image = null
 var _capt_o := Vector2i.ZERO
-var _capt_t: ImageTexture = null
+var _capt_t := []   # una textura por capa en cada fotograma (si se reutilizara, todas las del fotograma saldrían con la última)
+var _capt_n := 0
+var _capt_viejo := []   # las que se cambian de tamaño, vivas hasta el fotograma siguiente: una textura liberada con la orden de pintarla
+						# aún en la lista sale como un rectángulo blanco (las franjas blancas del móvil, 0.65.1)
 func _rgba(im: Image) -> Image:
 	var o: Image = im.duplicate()
 	o.convert(Image.FORMAT_RGBA8)
@@ -234,11 +239,25 @@ func _con_alfa_capa(tapa: bool, x: int, y: int, w: int, h: int, f: Callable) -> 
 		f.call()
 		return
 	var im := capa_unica(x, y, w, h, f)
-	if _capt_t == null or Vector2i(_capt_t.get_size()) != im.get_size():
-		_capt_t = ImageTexture.create_from_image(im)
+	var u := im.get_used_rect()
+	if u.size.x <= 0 or u.size.y <= 0:
+		return
+	L.draw_texture(_capt_tex(im.get_region(u)), Vector2(x + u.position.x, y + u.position.y), Color(1, 1, 1, TAPA_ALFA))
+
+func _capt_tex(im: Image) -> ImageTexture:
+	var tx: ImageTexture
+	if _capt_n < _capt_t.size() and Vector2i(_capt_t[_capt_n].get_size()) == im.get_size():
+		tx = _capt_t[_capt_n]
+		tx.update(im)
 	else:
-		_capt_t.update(im)
-	L.draw_texture(_capt_t, Vector2(x, y), Color(1, 1, 1, TAPA_ALFA))
+		tx = ImageTexture.create_from_image(im)
+		if _capt_n < _capt_t.size():
+			_capt_viejo.append(_capt_t[_capt_n])
+			_capt_t[_capt_n] = tx
+		else:
+			_capt_t.append(tx)
+	_capt_n += 1
+	return tx
 
 func _con_alfa(tapa: bool, f: Callable) -> void:
 	if tapa:
@@ -1265,7 +1284,11 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		list.append([pie, func():
 			var mx: int = Datos.jsround(xp - f.cel.ancla[0])
 			var my: int = Datos.jsround(yp - f.cel.ancla[1])
-			_con_alfa_capa(tapa_pj(f.c, mx, my, pie) or (pl != null and tapa_encima(mx, my, f.c.get_width(), pie)), mx - 32, 0, f.c.get_width() + 64, my + f.c.get_height(), _pinta_mesa.bind(f, xp, yp, pl, md, fm, ex))])   # corrido hacia abajo, no pasa delante de quien está en su fila
+			var tapa: bool = tapa_pj(f.c, mx, my, pie) or (pl != null and tapa_encima(mx, my, f.c.get_width(), pie))
+			if pl == null and (md == null or md.foco == null) and ex.is_empty():   # lo que va solo (un árbol, una farola): sin capa
+				_con_alfa(tapa, _pinta_mesa.bind(f, xp, yp, pl, md, fm, ex))
+				return
+			_con_alfa_capa(tapa, mx - 32, 0, f.c.get_width() + 64, my + f.c.get_height(), _pinta_mesa.bind(f, xp, yp, pl, md, fm, ex))])   # corrido hacia abajo, no pasa delante de quien está en su fila
 	else:
 		_pinta_mesa(f, xp, yp, pl, md, fm, ex)
 
