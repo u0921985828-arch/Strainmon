@@ -1082,7 +1082,7 @@ func set_sound(on: bool, guarda := true) -> void:
 # de 25 en 25 %), la velocidad del texto y SONIDO; en un archivo aparte de la partida, que no los borra ----------
 static var AJUSTES := "user://ajustes.json"   # las pruebas usan otro
 var TEXTO_VEL := [I18n.K("NORMAL"), I18n.K("RÁPIDO"), I18n.K("AL MOMENTO")]   # F7: var, por K()
-var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true, "vibra": true, "ahorro": false, "tam": 1, "zurdo": false, "dalt": false, "calma": false, "avisos": false, "errores": false, "completo": false, "idioma": 0}
+var aj := {"aviso": false, "musica": 4, "efectos": 4, "texto": 0, "sonido": true, "vibra": true, "ahorro": false, "tam": 1, "zurdo": false, "dalt": false, "calma": false, "avisos": false, "errores": false, "completo": false, "idioma": 0, "reloj": 1}
 # U5 (fase 5, con Datos.PLAY): TAMAÑO DE TEXTO S/M/L, nunca por debajo de TXT_MIN sp
 const TAM_TXT := [0.85, 1.0, 1.25]
 const TAM_NOM := ["S", "M", "L"]

@@ -613,6 +613,14 @@ func copia_seguridad(desde_titulo: bool) -> void:
 
 # OPCIONES (en el título y en el menú START): A cambia cada fila; se guardan al momento
 var IDIOMA_NOM := [I18n.K("SISTEMA"), I18n.K("ESPAÑOL"), I18n.K("ENGLISH")]
+# OPCIONES → RELOJ (lo pidió el usuario: «el tiempo debería pasar más lento»): lo que dura un día del juego, en minutos de verdad;
+# de serie, 12 (antes, 4: el ritmo del HTML, el de las pruebas sin CAL)
+const RELOJ_DIA := [4, 12, 24]
+
+func ms_por_min() -> float:
+	if not Datos.CAL:
+		return D.MS_PER_MIN
+	return RELOJ_DIA[clampi(int(aj.get("reloj", 1)), 0, 2)] * 60000.0 / 1440.0
 
 func opciones(desde_titulo := false) -> void:
 	var i := 0
@@ -628,6 +636,7 @@ func opciones(desde_titulo := false) -> void:
 		if Datos.CAL:
 			it.insert(4, {"label": K("VIBRACIÓN"), "right": K("SÍ") if aj.vibra else K("NO")})   # 1.57
 			it.insert(5, {"label": K("AHORRO"), "right": K("30 FPS") if aj.ahorro else K("NO")})   # R3
+			it.insert(6, {"label": K("RELOJ"), "right": T("1 DÍA = {m} MIN", {"m": RELOJ_DIA[clampi(int(aj.get("reloj", 1)), 0, 2)]})})
 			it.append({"label": K("COPIA DE SEGURIDAD")})
 		if Datos.PLAY:   # U5: accesibilidad
 			var c := it.size() - (1 if Datos.CAL else 0)
@@ -672,6 +681,8 @@ func opciones(desde_titulo := false) -> void:
 				vibra()
 			"AHORRO":
 				aj.ahorro = not aj.ahorro
+			"RELOJ":
+				aj.reloj = (clampi(int(aj.get("reloj", 1)), 0, 2) + 1) % 3
 			"TAMAÑO DE TEXTO":
 				aj.tam = (int(aj.get("tam", 1)) + 1) % 3
 			"ZURDO":
@@ -1005,8 +1016,9 @@ func update(dt: float) -> void:
 			update_patrullas(dt)
 		if is_free():
 			time_acc += dt
-			while time_acc >= D.MS_PER_MIN:
-				time_acc -= D.MS_PER_MIN
+			var mpm := ms_por_min()
+			while time_acc >= mpm:
+				time_acc -= mpm
 				tick_minute()
 			if pending.size() and not P.moving:
 				run(pending.pop_front())

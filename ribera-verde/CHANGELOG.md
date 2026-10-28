@@ -2,6 +2,10 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El reloj más lento (lo pidió el usuario: «el tiempo en el juego debería pasar más lento»; con `Datos.CAL`)
+
+- Un día del juego dura 12 minutos de verdad (antes, 4): el minuto del juego pasa de 167 ms a 500 ms (`ms_por_min` en `juego.gd`). OPCIONES → RELOJ lo cambia en bucle: 12, 24 o 4 minutos el día (`RELOJ_DIA`, `aj.reloj`, se guarda en los ajustes). Sin CAL, el ritmo del HTML (`D.MS_PER_MIN`). Prueba `tests/reloj.gd` (11/0).
+
 ### 0.65.2 (código 87) y plugin de WordPress 1.6.5 · sin franjas blancas en lo translúcido (lo vio el usuario en el móvil)
 
 - La capa de la 0.65.1 dejaba en el móvil franjas blancas a lo alto de la pantalla detrás de árboles y farolas: una sola textura para todas las capas del fotograma, que se rehacía al cambiar de tamaño y se liberaba con la orden de pintarla aún pendiente (rectángulo blanco). Ahora la capa es solo para las mesas con plantas, focos o bandejas, recortada a lo que tiene (`get_used_rect`), con una textura por capa y fotograma (`_capt_tex`) y las cambiadas vivas hasta el siguiente (`_capt_viejo`); lo que va solo (árbol, farola), con su alfa de siempre. Prueba `tests/translucido.gd` (14/0).
