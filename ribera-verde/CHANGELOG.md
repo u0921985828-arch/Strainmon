@@ -2,7 +2,7 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### KAIA por niveles, las madres por dentro, la sala fría, la manicura a la vista, el billar con efecto y lo que tapa, translúcido (tanda nueva, lo pidió el usuario; con `Datos.CAL`)
+### 0.65.0 (código 85) · KAIA por niveles, las madres por dentro, la sala fría, la manicura a la vista, el billar con efecto y lo que tapa, translúcido (tanda nueva, lo pidió el usuario; con `Datos.CAL`)
 
 - **KAIA por niveles** (lo pidió el usuario: «4 de 2×2, luego 2 de 4×2, luego una de 4×4 y después la reforma de la sala a mesas»): `KAIA_CULT.niv` en `tools/kaia_cult.py` — cuatro carpas de 200 × 200 (2 LED de 720 W, 4 plazas; kit 2.700 €), dos de 400 × 200 (4 LED, 8 plazas; 5.140 €) y una de 400 × 400 (8 LED, 16 plazas; 10.200 €), cada una una pieza de ORDENAR de su tamaño en casillas (`kc<nivel><i>`). En el cuadro, «Comprar una carpa» y «Pasar a la …» (`kc_sube`: con las plazas vacías, las de antes de segunda mano al 40 % y la primera del nivel nuevo al día siguiente); en el último nivel, «Reformar la sala». Las carpas, a mano en `kaia_carpa.py` (`carpa_kc`: frente, techo por metros, un LED por columna, extractor y filtro). Las partidas de antes pasan al nivel 1 (o al 0 con la obra) con sus plantas.
 - **Las madres por dentro** (`vista_madres` en `nave.gd`): la carpa de la vista C con dos LED a 18/6 y su temporizador, cada madre con el tono de su hoja, su barra de vigor y sus esquejes; flechas, A (cortarle esquejes tú una vez al día con vigor ≥ 40, recoger los listos o meter una en el hueco), B cierra. Prueba `tests/madres_vista.gd`.
