@@ -2,7 +2,7 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### El reloj más lento (lo pidió el usuario: «el tiempo en el juego debería pasar más lento»; con `Datos.CAL`)
+### 0.65.3 (código 88) · el reloj más lento (lo pidió el usuario: «el tiempo en el juego debería pasar más lento»; con `Datos.CAL`)
 
 - Un día del juego dura 12 minutos de verdad (antes, 4): el minuto del juego pasa de 167 ms a 500 ms (`ms_por_min` en `juego.gd`). OPCIONES → RELOJ lo cambia en bucle: 12, 24 o 4 minutos el día (`RELOJ_DIA`, `aj.reloj`, se guarda en los ajustes). Sin CAL, el ritmo del HTML (`D.MS_PER_MIN`). Prueba `tests/reloj.gd` (11/0).
 
