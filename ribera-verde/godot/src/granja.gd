@@ -1893,8 +1893,7 @@ func vc_ficha() -> void:
 		L.append(T("{n} · {c}", {"n": D.CICLOS[k].n, "c": D.CICLOS[k].c}))
 		L.append(T("Luz {e} al día", {"e": Datos.eur(luz_carpa(VC.ci))}) if plantas_vivas(VC.ci) else T("Apagado"))
 	elif VC.sel < 0:
-		L.append(I18n.v(String(D.FOCOS[c.foco].n)))
-		L.append(T("Luz {e} al día", {"e": Datos.eur(luz_carpa(VC.ci))}) if plantas_vivas(VC.ci) else T("Apagado"))
+		L.append_array(vc_foco(c))
 		for k in D.EXTRAS:
 			if c.get(k):
 				L.append(I18n.v(String(D.EXTRAS[k].c)))
@@ -1919,6 +1918,9 @@ func vc_ficha() -> void:
 	for l in L:
 		vc_texto += l.substr(1) if l.begins_with("!") else l
 	vc_info_pon([t, L])
+
+func vc_foco(c: Dictionary) -> Array:   # la ficha del foco: cuál y lo que gasta (en KAIA, kaiacult.gd: los de la carpa)
+	return [I18n.v(String(D.FOCOS[c.foco].n)), T("Luz {e} al día", {"e": Datos.eur(luz_carpa(VC.ci))}) if plantas_vivas(VC.ci) else T("Apagado")]
 
 func vc_mover(b: String) -> void:
 	var pl: Array = vc_geo(VC.ci).pl

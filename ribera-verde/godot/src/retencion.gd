@@ -132,7 +132,9 @@ func al_pausar() -> void:
 		if s > 0:
 			plat().aviso(s, T("Landrace Hunters"), T("Tienes plantas listas para cosechar."))
 	if mode == "world" or mode == "carpa":
+		var kf := kc_guarda_fuera()   # con una carpa de KAIA abierta, lo de casa en su sitio, como en save
 		plat().nube_guarda(JSON.stringify(S, "", false, true))
+		kc_guarda_dentro(kf)
 
 func al_volver() -> void:
 	if not Datos.PLAY:

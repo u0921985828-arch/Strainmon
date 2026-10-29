@@ -285,7 +285,9 @@ func _corre() -> void:
 	ef0 = float(S.money)
 	QUIERO = ["Echar gasolina"]
 	MENUS = []
+	LOG = []
 	chk(corre(func(): await J.coche_menu("utilitario")), "aparcamiento → echar gasolina")
+	chk(LOG.any(func(t): return String(t).contains("gasolinera")) and not LOG.any(func(t): return String(t).contains("garrafas")), "en el aparcamiento, a la gasolinera (sin garrafas): %s" % [LOG.slice(-1)])
 	chk(absf(J.gas_de("utilitario") - float(J.TANQUE.get("utilitario", 40))) < 0.11 and float(S.money) < ef0, "depósito lleno desde el aparcamiento: %.1f L, %.0f → %.0f €" % [J.gas_de("utilitario"), ef0, S.money])
 	MENUS = []
 	QUIERO = ["Nada"]

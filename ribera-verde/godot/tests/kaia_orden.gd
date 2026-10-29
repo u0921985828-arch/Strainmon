@@ -56,28 +56,28 @@ func _corre() -> void:
 	J.enter_map("cult-muelle", 1, 4, "down")
 	J.mode = "world"
 	var C := "cult-muelle"
-	# la carpa 4 (4, 7): dos a la izquierda pisa el pasillo; una a la derecha, otra vez en la zona
+	# la carpa 3 (8, 7): seis a la izquierda pisa el pasillo; una a la derecha, otra vez en la zona
 	var vistos := []
 	var fin := {"r": null}
 	var co := func():
-		fin.r = await J.mover_pieza(C, "kcs3")
+		fin.r = await J.mover_pieza(C, "kcs2")
 	co.call()
 	M.paso()
-	for b in ["left", "left"]:
+	for b in ["left", "left", "left", "left", "left", "left"]:
 		J.press(b)
 		vistos.append(J.ORDEN.no if J.ORDEN != null else "?")
 	J.press("A")   # en el pasillo: no se deja
 	M.paso()
-	chk(J.ORDEN != null and vistos[0] == "" and vistos[1] == "zona", "con la carpa en el pasillo, A no la deja (%s)" % [vistos])
+	chk(J.ORDEN != null and vistos.slice(0, 5).all(func(v): return v == "") and vistos[5] == "zona", "con la carpa en el pasillo, A no la deja (%s)" % [vistos])
 	J.press("right")
 	vistos.append(J.ORDEN.no if J.ORDEN != null else "?")
-	chk(vistos[2] == "", "en la x 3 cabe (%s)" % [vistos])
+	chk(vistos[6] == "", "en la x 3 cabe (%s)" % [vistos])
 	J.press("A")
 	for q in 30:
 		M.paso()
-	var p: Array = J.pos_pieza(C, "kcs3")
+	var p: Array = J.pos_pieza(C, "kcs2")
 	chk(fin.r == true and int(p[0]) == 3 and int(p[1]) == 7, "dejada en la zona (%s %s)" % [fin.r, p])
-	chk(J.MAPS[C].o[8][3] == "carpaKS3" and J.MAPS[C].o[7][3] == "carpaG2" and J.MAPS[C].o[8][5] == null, "en la sala, ya en su sitio nuevo")
+	chk(J.MAPS[C].o[8][3] == "carpaKS2" and J.MAPS[C].o[7][3] == "carpaG2" and J.MAPS[C].o[8][8] == null and J.MAPS[C].o[8][11] == "carpaKS3", "en la sala, ya en su sitio nuevo")
 	# guardar y cargar
 	J.S.kc.p[15] = {"sid": "txoko", "prog": .3, "water": 100, "health": 100, "fert": false, "pest": false}
 	var txt := JSON.stringify(J.S)
@@ -85,8 +85,8 @@ func _corre() -> void:
 	J.MAPS[C] = J.D.MAPS[C].duplicate(true)
 	Datos.enteros(J.MAPS[C])
 	J.enter_map(C, 1, 4, "down")
-	p = J.pos_pieza(C, "kcs3")
-	chk(int(p[0]) == 3 and int(p[1]) == 7 and J.MAPS[C].o[8][3] == "carpaKS3" and J.kc().p[15] is Dictionary, "tras guardar y cargar, igual")
+	p = J.pos_pieza(C, "kcs2")
+	chk(int(p[0]) == 3 and int(p[1]) == 7 and J.MAPS[C].o[8][3] == "carpaKS2" and J.kc().p[15] is Dictionary, "tras guardar y cargar, igual")
 	print("kaia_orden: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:
 		print("  FALLO: " + f)

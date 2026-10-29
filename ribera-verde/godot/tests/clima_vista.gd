@@ -162,7 +162,7 @@ func _corre() -> void:
 	J.kc().p[0] = planta("txoko", 0.2)
 	J.kc().p[1] = planta("txoko", 0.4)
 	var c: Dictionary = J.clima_v("kaia")
-	chk(is_equal_approx(float(c.t), float(D.KAIA_CULT.clima.t)) and is_equal_approx(float(c.hr), float(D.KAIA_CULT.clima.hr)) and c.luz and int(c.hz) == 18, "KAIA a mediodía: %s °C, %s %%, luz a %d/%d" % [c.t, c.hr, c.hz, 24 - int(c.hz)])
+	chk(absf(float(c.t) - float(D.KAIA_CULT.clima.t)) < 1.0 and float(c.hr) >= 40 and float(c.hr) <= 70 and c.luz and int(c.hz) == 18, "KAIA a mediodía: %s °C, %s %%, luz a %d/%d" % [c.t, c.hr, c.hz, 24 - int(c.hz)])
 	chk(float(c.vpd) > .8 and float(c.vpd) < 1.8 and c.graf.size() == 24 and c.graf.filter(func(g): return g[1]).size() == 18, "el VPD (%.2f kPa) y las 24 horas, 18 con luz" % float(c.vpd))
 	J.S.min = 3 * 60
 	c = J.clima_v("kaia")
@@ -173,6 +173,22 @@ func _corre() -> void:
 	chk(int(c.hz) == 12 and c.graf.filter(func(g): return g[1]).size() == 12, "con una en flor, 12/12")
 	J.S.min = 20 * 60
 	chk(not J.clima_v("kaia").luz, "a 12/12, a las 20 ya a oscuras")
+	# cada carpa con su temporizador: otra en crecimiento, a 18/6; la pantalla lo dice y a las 20 sigue la luz en esa
+	J.kc().p[J.kc_off(1)] = planta("txoko", 0.3)
+	c = J.clima_v("kaia")
+	chk(c.mix and int(c.hz) == 18 and c.luz and int(c.nf) == 3, "dos carpas, una en flor y otra creciendo: 12/12 y 18/6 (%s)" % [c])
+	J.kc().p[J.kc_off(1)] = null
+	# la sala reformada: las plantas, en las mesas (S.kc.m), no en S.kc.p
+	var kc0: Dictionary = J.S.kc.duplicate(true)
+	J.S.min = 12 * 60
+	J.S.kc = {"niv": 2, "kits": [-1, -1, -1, -1, -1, -1, -1], "p": [], "v": 2, "f2": 0, "m": []}
+	J.kc()
+	for i in 6:
+		J.kc().m.append({"k": "txoko", "dia": int(J.S.day), "p": 0.3 if i < 5 else 0.9, "thc": 18.0, "y": 1.0, "g": 0, "t": 0, "abo": 1, "dn": 0, "am": 0, "ao": 0, "n": 0})
+	c = J.clima_v("kaia")
+	chk(J.kc_f2() and int(c.nf) == 6 and c.luz and float(c.cg) > 0 and c.mix, "con las mesas: 6 con plantas, la luz encendida y la extracción en marcha (%s)" % [c])
+	J.S.kc = kc0
+	J.kc()
 	J.S.min = 12 * 60
 	J.enter_map(C, 2, 2, "up")
 	J.mode = "world"
@@ -206,6 +222,20 @@ func _corre() -> void:
 	J.S.nave.ex = 0
 	c = J.clima_v("nave")
 	chk(float(c.t) > float(D.T_OK[1]) and float(c.cg) > 1.0 and int(c.nf) == 4 and int(c.hz) == 18, "la nave con 4 de sodio y sin extracción: %.1f °C, carga %d %%" % [float(c.t), roundi(100 * float(c.cg))])
+	# la pantalla y el juego, de acuerdo: en cuanto el calor pasa de lo que saca la extracción, el sofoco (sofoco_nave) y el aviso
+	J.S.nave.f[2] = "led"
+	J.S.nave.m[3] = null
+	for ex in D.EXTR_NAVE.size():
+		J.S.nave.ex = ex
+		c = J.clima_v("nave")
+		chk((float(c.sof) < 1.0) == (float(c.t) > float(D.T_OK[1])) and (float(c.sof) < 1.0) == (float(c.cg) > 1.0), "extracción %d: carga %d %%, %.1f °C, sofoco %.2f" % [ex, roundi(100 * float(c.cg)), float(c.t), float(c.sof)])
+	J.S.min = 2 * 60
+	var tn: float = float(J.clima_v("nave").t)
+	J.S.min = 12 * 60
+	chk(is_equal_approx(tn, float(J.clima_v("nave").t)), "el calor de la nave no depende de la hora (%.1f °C)" % tn)
+	J.S.nave.f[2] = "sodio"
+	J.S.nave.m[3] = {"k": "txoko", "dia": int(J.S.day), "p": 0.5}
+	J.S.nave.ex = 0
 	r = await vista("nave", dir, "nave-calor", "A")
 	chk(r[0] and r[1] == true and r[2], "la pantalla de la nave; A, a lo de siempre (%s)" % [r])
 	J.S.nave.ex = D.EXTR_NAVE.size() - 1

@@ -415,6 +415,8 @@ func _mundo() -> void:
 				_rect(lx + 8, ly + 7, 2, 1, css("#c04040"))
 	if S.map == "nave":
 		list.append([2 * 16 - 1, _manguera_nave])   # 1.33: la manguera del riego, detrás de lo de la fila 2
+	if Datos.CAL and J.D.has("KAIA_CULT") and S.map == String(J.D.KAIA_CULT.f2.sala):   # las tuberías de drenaje de KAIA, detrás de las mesas
+		list.append([2 * 16 - 1, _tubos_dren])
 	if Atlas.ok and ambiente_on:
 		for e in J.ents:
 			_ambiente(e)
@@ -661,6 +663,13 @@ func _encima() -> void:
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.CLIMA_V != null:   # el controlador de clima de KAIA y de la nave, a la vista (kaiacult.gd vista_clima)
 		Escena.clima(self, J.clima_v(J.CLIMA_V.s), now, (J.SW - Escena.W) >> 1, 6)
+	if J.MESA_KV != null:   # cada mesa de la carpa de sala de KAIA, a la vista (kaiacult.gd rects_mesak, con CAL)
+		for e in J.rects_mesak(J.MESA_KV):
+			if typeof(e[0]) == TYPE_STRING:   # ['@', imagen, x, y, recorte]
+				var im: Image = e[1]
+				_img_clip(im, int(e[2]), int(e[3]), Rect2i(0, 0, im.get_width(), im.get_height()), e[4], Color.WHITE)
+				continue
+			_rect(e[0], e[1], e[2], e[3], e[4] if e[4] is Color else css(e[4]))
 	if J.MADRES_V != null:   # el armario de las madres de la nave, por dentro (nave.gd rects_madres, con CAL)
 		for e in J.rects_madres(J.MADRES_V):
 			if typeof(e[0]) == TYPE_STRING:   # ['@', imagen, x, y, recorte]
@@ -755,6 +764,12 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 		return _arte_tile(md.g[ty][tx] if ty < md.g.size() and tx < md.g[ty].size() else "floorD", tx, ty, sx, sy)  # i18n-no
 	if k.begins_with("cv"):
 		return _curva(k, tx, ty, sx, sy)
+	if k == "iwT_kcs" or k == "iwB_kcs":   # la pared de la carpa de sala de KAIA, por dentro: la tela de PixelLab (o-pared, 16 × 32), la de arriba y la de abajo  # i18n-no
+		var pw: Image = Escena.pl("t-pared") if Datos.CAL else null
+		if pw == null:
+			return false
+		_img(pw.get_region(Rect2i((tx % maxi(1, pw.get_width() / 16)) * 16, 0 if k == "iwT_kcs" else 16, 16, 16)), sx, sy)  # i18n-no
+		return true
 	if k.begins_with("hito_"):   # los sitios de los pueblos (tools/pueblos.py): debajo, su suelo; encima, el edificio
 		return _arte_tile(k.substr(5), tx, ty, sx, sy)
 	if k == "arena":   # la playa: debajo, el agua si la toca; encima, la arena con su orilla (_playa)
@@ -1199,22 +1214,34 @@ static func mascara_valla(mo: Array, o: String, tx: int, ty: int) -> int:
 	var es := func(x: int, y: int) -> bool: return y >= 0 and y < mo.size() and x >= 0 and x < mo[y].size() and mo[y][x] == o
 	return (1 if es.call(tx, ty - 1) else 0) | (2 if es.call(tx + 1, ty) else 0) | (4 if es.call(tx, ty + 1) else 0) | (8 if es.call(tx - 1, ty) else 0)
 
+# los objetos de KAIA hechos con PixelLab (lo pidió el usuario: «hazlo con Pixel Lab», «EN ISOMETRICO NO»): o-<objeto> de
+# kaia_pl.png, de frente a 3/4; el pie en la fila de abajo y, a lo ancho, la casilla de la izquierda (OBJ_PL_ANCLA: x del ancla)
+const OBJ_PL_ANCLA := {"mesaKP": 8, "drenKS": 24, "carpaKX": 8}
+static func obj_pl(o: String):
+	if not Datos.CAL or not OBJ_PL_ANCLA.has(o):
+		return null
+	var im: Image = Escena.pl("o-" + o)
+	if im == null:
+		return null
+	return {"c": im, "cel": {"ancla": [int(OBJ_PL_ANCLA[o]), im.get_height() - 1], "h": im.get_height(), "w": im.get_width()}}
+
 func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var seca: bool = Datos.CAL and o.begins_with("hgs-")   # la planta muerta de la huerta (campo.gd): la de hg, parda
 	if seca:
 		o = "hg-" + o.substr(4)
+	var fpl = obj_pl(o)   # lo de KAIA de PixelLab (kaia_pl.png), de frente
 	var gr = Atlas.cubre("obj:" + o)
-	if not gr:
+	if not gr and fpl == null:
 		return
-	var an = Atlas.sobre.get("obj:" + o)
+	var an = null if fpl != null else Atlas.sobre.get("obj:" + o)
 	var d := desfase(o, tx, ty)
-	var md = J.mesa_de(o, tx, ty) if o == "mesaN" or o == "mesaKC" else null   # la mesa de la nave o de KAIA: {Me, fm, foco}  # i18n-no
+	var md = J.mesa_de(o, tx, ty) if o == "mesaN" or o == "mesaKP" else null   # la mesa de la nave o de KAIA: {Me, fm, foco}  # i18n-no
 	var fm: int = int(md.fm) if md != null else 0
-	var pl = _plantas_mesa(gr, md.Me, fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima
-	var sp: String = ("mesaN-%d" % mini(fm, 1)) if md != null else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)  # i18n-no
-	var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
-	var ge = Atlas.cubre("obj:e-" + o) if Datos.CAL and not an else null   # 1.47: a escala con el protagonista (escala.py), solo con CAL
-	var fd = _detalle_obj(o, tx) if Datos.CAL and not an else null   # 1.48: con lo que trae encima (detalle.py)
+	var pl = _plantas_mesa(gr if gr else Atlas.cubre("obj:mesaN"), md.Me, fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima  # i18n-no
+	var sp: String = ("mesaKP" if o == "mesaKP" else "mesaN-%d" % mini(fm, 1)) if md != null else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)  # i18n-no
+	var f = fpl if fpl != null else Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
+	var ge = Atlas.cubre("obj:e-" + o) if Datos.CAL and not an and fpl == null else null   # 1.47: a escala con el protagonista (escala.py), solo con CAL
+	var fd = _detalle_obj(o, tx) if Datos.CAL and not an and fpl == null else null   # 1.48: con lo que trae encima (detalle.py)
 	if fd != null:
 		f = fd
 		ge = null
@@ -1393,6 +1420,10 @@ func _poleas_nave(x0: int, yb: int, t0 := 0) -> Array:
 
 # el riego de la nave (1.35, mangueraNave): el grifo, la tubería por el pie de la pared y, en cada mesa, su llave o su electroválvula
 # y la bajada; 1.37: guiada del tanque a cada mesa, donde estén (manguera_nave, mundo.gd)
+func _tubos_dren() -> void:
+	for e in J.tubos_dren():
+		_rect(float(e[0]) - cam.x, float(e[1]) - cam.y, e[2], e[3], css(e[4]))
+
 func _manguera_nave() -> void:
 	for e in J.manguera_nave():
 		_rect(float(e[0]) - cam.x, float(e[1]) - cam.y, e[2], e[3], css(e[4]))
@@ -1967,7 +1998,8 @@ func _pj_frame(e: Dictionary, gr, isP: bool, dur: float):
 			return f
 		e.act = null
 	if e.moving:
-		var s = "run" if isP and dur < 200 and Atlas.anim_de(gr, "run") else ("walk" if Atlas.anim_de(gr, "walk") else null)
+		# en el laboratorio no se corre (sus normas): andando, con el EPI de PixelLab (epi_pl)
+		var s = "run" if isP and dur < 200 and Atlas.anim_de(gr, "run") and not J.epi_puesto() else ("walk" if Atlas.anim_de(gr, "walk") else null)
 		if s:
 			var par: int = e.parity if isP else (int(e.x) + int(e.y)) & 1
 			return Atlas.frame_de(gr, s, dir, 0, {"ph": (par + minf(1, e.t / dur)) / 2})

@@ -27,19 +27,21 @@ VUELTA = [1, 1]      # la de la sala
 # Por niveles (lo pidió el usuario: «4 de 2×2, luego 2 de 4×2, luego una de 4×4 y después la reforma de la sala a mesas, con riego
 # automático por tanque»): cada nivel, su carpa con sus LED de 720 W (uno por cada 2,25 m², la huella de uno; lado 150 cm), su
 # extractor con filtro, su goteo y un kit por carpa a precio de tienda; al pasar al siguiente, las del nivel de antes se venden de
-# segunda mano (f2.venta) y llega la primera del nuevo. Cuanto más grande, menos pared por planta y mejor reparte el aire y la luz:
+# segunda mano (f2.venta) y llega la primera del nuevo. Después (lo pidió el usuario: «los anteriores serían ir completando con las
+# diferentes medidas la sala, con espacio para pasar entre ellas»), las de cada nivel se quedan: cuatro de 2 × 2, dos de 4 × 2 y una de
+# 4 × 4 conviven en la zona de cultivo con un pasillo de 1 m (el esquema que aprobó: «Sí, así»), y el último nivel es la carpa de sala. Cuanto más grande, menos pared por planta y mejor reparte el aire y la luz:
 # rinde más por plaza (efi: 0,9; 1; 1,12), y así cada nivel compensa lo que cuesta. Cada carpa, una pieza de ORDENAR de su tamaño en casillas (1 casilla = 1 m).
 NIV = [
 	{"k": "s", "n": "Carpa 200×200", "cm": [200, 200, 200], "nf": 2, "plazas": 4, "efi": 0.9, "max": 4, "tam": [2, 2], "obj": "carpaKS", "spr": "kcs",
-		"def": [[4, 3], [8, 3], [12, 3], [4, 7]],
+		"def": [[13, 2], [13, 6], [8, 7], [11, 7]],
 		"kit": {"l": [["Carpa de 200 × 200 × 200 cm", 340], ["Dos LED de 720 W", 1900], ["Extractor de 200 mm con filtro de carbón", 320],
 			["Goteo de 4 salidas con su depósito", 140]]}},
 	{"k": "m", "n": "Carpa 400×200", "cm": [400, 200, 200], "nf": 4, "plazas": 8, "efi": 1.0, "max": 2, "tam": [4, 2], "obj": "carpaKM", "spr": "kcm",
-		"def": [[4, 3], [10, 3]],
+		"def": [[3, 2], [8, 2]],
 		"kit": {"l": [["Carpa de 400 × 200 × 200 cm", 620], ["Cuatro LED de 720 W", 3800], ["Extractor de 250 mm con filtro de carbón", 480],
 			["Goteo de 8 salidas con su depósito", 240]]}},
 	{"k": "l", "n": "Carpa 400×400", "cm": [400, 400, 200], "nf": 8, "plazas": 16, "efi": 1.12, "max": 1, "tam": [4, 4], "obj": "carpaKL", "spr": "kcl",
-		"def": [[7, 3]],
+		"def": [[3, 5]],
 		"kit": {"l": [["Carpa de 400 × 400 × 200 cm", 980], ["Ocho LED de 720 W", 7600], ["Extractor de 315 mm con dos filtros de carbón", 1200],
 			["Goteo de 16 salidas con su depósito", 420]]}},
 ]
@@ -51,11 +53,18 @@ KAIA_CULT = {
 	"clima": {"t": 25.0, "hr": 55.0},   # con la licencia, la sala con su clima controlado
 	"ctrl": [2, 1], "zona": [ZONA],
 	"o": [[2, 1, "ctrlN"]],
-	"f2": {"l": [["Obra: desagües, cuadro trifásico y clima industrial", 30000], ["Seis mesas de 240 × 120 con su LED doble", 10800],
-		["Riego centralizado con su tanque", 2800], ["Extracción con filtros de carbón", 1400]],
+	# el último nivel (lo pidió el usuario: «que la sala sea previamente una carpa a la que entras, con mayores dimensiones desde
+	# fuera… que la carpa ocupe finalmente todo el suelo preparado para la carpa»): la carpa de sala de 13 × 7 m sobre toda la zona de
+	# cultivo menos el paso de delante, con su puerta; dentro, ocho mesas de flujo y reflujo de 240 × 120 en dos filas de cuatro con
+	# pasillos de 1 m, cada una con su LED doble y su tubería de drenaje al depósito de recogida, el tanque del riego y el cuadro
+	"f2": {"l": [["Carpa de sala de 1.300 × 700 × 250 cm, con su puerta", 6400], ["Obra: desagües, cuadro trifásico y clima industrial", 18000],
+		["Ocho mesas de flujo y reflujo de 240 × 120 con su LED doble", 14400], ["Riego centralizado con su tanque", 2800],
+		["Drenaje: tuberías y depósito de recogida", 1900], ["Extracción con filtros de carbón", 1500]],
 		"dias": 5, "venta": 0.4, "foco": "led", "sueldo": 45,
-		"mesas": [[4, 3], [8, 3], [12, 3], [4, 7], [8, 7], [12, 7]],
-		"o": [[15, 3, "tanqueN"], [15, 8, "riegoN"]], "npc": [7, 5]},
+		"carpa": {"obj": "carpaKX", "def": [3, 2], "tam": [13, 7], "puerta": [9, 8]},
+		"sala": "cult-sala", "W": 13, "H": 9, "sale": [6, 8], "entra": [6, 7],
+		"mesas": [[1, 3], [4, 3], [7, 3], [10, 3], [1, 6], [4, 6], [7, 6], [10, 6]],
+		"o": [[1, 1, "ctrlN"], [11, 1, "riegoN"], [0, 8, "tanqueN"], [12, 8, "drenKS"]], "npc": [6, 5]},
 }
 KAIA_CULT["f2"]["p"] = sum(x[1] for x in KAIA_CULT["f2"]["l"])
 
@@ -66,6 +75,19 @@ def pieza(N, i, d):   # la carpa de w × h: el dibujo en la casilla de abajo a l
 	return {"k": "kc%s%d" % (N["k"], i), "n": "La carpa %d" % (i + 1), "o": o, "def": d, "zona": [ZONA], "si": "kc"}
 
 PIEZAS = [pieza(N, i, d) for N in NIV for i, d in enumerate(N["def"])]
+
+def sala():   # la carpa de sala por dentro: la tela plateada, el suelo de la zona de cultivo, las mesas y su equipo
+	F = KAIA_CULT["f2"]
+	W2, H2 = F["W"], F["H"]
+	g = [["iwT_kcs"] * W2, ["iwB_kcs"] * W2] + [[ZONA] * W2 for _ in range(H2 - 2)]
+	o = [[None] * W2 for _ in range(H2)]
+	for x, y, k in F["o"]:
+		o[y][x] = k
+	for x, y in F["mesas"]:
+		o[y][x], o[y][x + 1] = "mesaKP", "mesaKP2"
+	sx, sy = F["sale"]
+	return {"name": F["sala"], "w": W2, "h": H2, "g": g, "o": o, "doors": {}, "music": "club", "blds": [], "est": "itsaso",
+		"exits": {"%d,%d" % (sx, sy): {"to": MAPA, "x": F["carpa"]["puerta"][0], "y": F["carpa"]["puerta"][1] + 1, "dir": "down"}}}
 
 def mapa():
 	g = [["iwT_club_itsaso"] * W, ["iwB_club_itsaso"] * W] + [["floorC_itsaso"] * PASILLO + [ZONA] * (W - PASILLO) for _ in range(H - 2)]
@@ -80,6 +102,7 @@ def main():
 	D["KAIA_CULT"] = KAIA_CULT
 	D["PLANTILLA"]["sueldo"]["kaia"] = KAIA_CULT["f2"]["sueldo"]   # quien lleva las mesas de la sala de cultivo de KAIA
 	D["MAPS"][MAPA] = mapa()
+	D["MAPS"][KAIA_CULT["f2"]["sala"]] = sala()
 	D["ORDEN_P"][MAPA] = {"n": "ORDENAR LA SALA DE CULTIVO", "filas": [2, H - 1], "pie": [[VUELTA[0], VUELTA[1] + 1]], "piezas": PIEZAS}
 	D["ORDEN_MOTIVO"]["zona"] = "Las carpas, en la zona de cultivo: sobre el suelo con desagüe, no en el pasillo."
 	D["ORDEN_MOTIVO"]["solapa"] = "Ahí quedaría montado encima de otra cosa."   # calle.gd pieza_solapa (lo pidió el usuario: que nada se superponga)
@@ -107,8 +130,17 @@ def main():
 		for i, (x, y) in enumerate(N["def"]):   # las de un nivel, sin pisarse entre ellas
 			for x2, y2 in N["def"][i + 1:]:
 				assert x + w <= x2 or x2 + w <= x or y + h <= y2 or y2 + h <= y, N["k"]
-	for x, y in KAIA_CULT["f2"]["mesas"]:
-		assert x >= PASILLO and x + 1 < W and y >= 2 and y < H, "cada mesa, en la zona de cultivo"
+	for i, N in enumerate(NIV):   # las de todos los niveles, juntas, sin pisarse y con su pasillo
+		for N2 in NIV[i + 1:]:
+			for x, y in N["def"]:
+				for x2, y2 in N2["def"]:
+					w, h = N["tam"]; w2, h2 = N2["tam"]
+					assert x + w <= x2 or x2 + w2 <= x or y + h <= y2 or y2 + h2 <= y, (N["k"], N2["k"])
+	C = KAIA_CULT["f2"]["carpa"]
+	assert C["def"][0] == PASILLO and C["def"][0] + C["tam"][0] == W and C["def"][1] + C["tam"][1] == H - 1, "la carpa de sala, en toda la zona menos el paso"
+	F = KAIA_CULT["f2"]
+	for x, y in F["mesas"]:
+		assert 0 <= x and x + 1 < F["W"] and 2 <= y < F["H"] - 1, "cada mesa, dentro de la carpa"
 	with open(DJ, "w", encoding="utf-8") as fh:
 		json.dump(D, fh, ensure_ascii=False, separators=(",", ":"))
 	print("kaia_cult: %s, %d mesas (obra %d €), mapa %s %d × %d" % (", ".join("%d × %s (%d plazas, kit %d €)" % (N["max"], N["n"], N["plazas"], N["kit"]["p"]) for N in NIV), len(KAIA_CULT["f2"]["mesas"]), KAIA_CULT["f2"]["p"], MAPA, W, H))

@@ -106,6 +106,7 @@ func escenas(dir: String) -> void:
 		b.save_png(dir.path_join("mani-%d-b.png" % i))
 		chk(a.get_data() != base.get_data(), "paso %d: se pinta" % i)
 		chk(a.get_data() != b.get_data(), "paso %d: se mueve" % i)
+		chk(load("res://src/escena_extr.gd").pl("mani-%d" % i) != null, "paso %d: su escena de PixelLab" % i)
 	print("manicura: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:
 		print("  FALLO: " + f)

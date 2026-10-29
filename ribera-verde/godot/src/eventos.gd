@@ -474,7 +474,7 @@ func coche_menu(k: String):
 	elif j == 1:
 		await maletero(k)
 	elif j == 2:
-		await repostar(k)
+		await repostar(k, false)
 	elif op != "" and op != K("Nada"):
 		await accion_abono(k, op)
 
@@ -540,9 +540,11 @@ func garaje_coche(k: String) -> void:
 	elif j == 1:
 		await maletero(k)
 	elif j == 2:
-		await repostar(k)
+		await repostar(k, true)
 
-func repostar(k: String) -> void:
+# en el garaje, con las garrafas de la tía; en el aparcamiento de un pueblo no hay garrafas: con el coche a la gasolinera de la
+# salida y vuelta (un cuarto de hora)
+func repostar(k: String, garaje := true) -> void:
 	var dep: int = int(TANQUE.get(k, 40))
 	var falta: int = int(floor(dep - gas_de(k)))
 	if falta < 1:
@@ -553,8 +555,11 @@ func repostar(k: String) -> void:
 		return
 	S.coches[k].gas = snappedf(gas_de(k) + falta, 0.1)
 	sfx("agua")
-	advance_time(5)
-	await say(T("Llenas el depósito {dv} con las garrafas: {l} L, {e}.", {"dv": de_art(String(D.CONCE.v[k].art)), "l": falta, "e": Datos.eur(e)}))
+	advance_time(5 if garaje else 15)
+	if garaje:
+		await say(T("Llenas el depósito {dv} con las garrafas: {l} L, {e}.", {"dv": de_art(String(D.CONCE.v[k].art)), "l": falta, "e": Datos.eur(e)}))
+	else:
+		await say(T("Vas con {v} a la gasolinera de la salida y llenas el depósito: {l} L, {e}. Vuelta al aparcamiento.", {"v": String(D.CONCE.v[k].art), "l": falta, "e": Datos.eur(e)}))
 
 func maletero(k: String) -> void:
 	MAL_K = k

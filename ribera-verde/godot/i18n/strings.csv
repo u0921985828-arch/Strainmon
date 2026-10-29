@@ -955,6 +955,7 @@ sa9013e30,Abrir el maletero,Open the boot
 seae5b7bc,{A}. Depósito: {g} de {d} L. Maletero: {m} de {c}.,{A}. Tank: {g} of {d} L. Boot: {m} of {c}.
 s036a5df8,El depósito ya está lleno.,The tank is already full.
 s7d7c7e44,"Llenas el depósito {dv} con las garrafas: {l} L, {e}.","You fill up {dv} from the cans: {l} L, {e}."
+sa462c032,"Vas con {v} a la gasolinera de la salida y llenas el depósito: {l} L, {e}. Vuelta al aparcamiento.","You take {v} to the petrol station on the way out and fill up the tank: {l} L, {e}. Back to the car park."
 s30e044fa,No te cabe nada más encima.,You can't carry any more.
 s52465e63,Sacas {g} de {n}.,You take out {g} of {n}.
 sf454b922,Guardas {q} en el maletero.,You put {q} in the boot.
@@ -1990,6 +1991,7 @@ s4c0acb47,Kits de carpa devueltos (KAIA),Tent kits refunded (KAIA)
 sa4f130fc,La sala de cultivo de KAIA pasa a las carpas nuevas. Lo que no cabe se devuelve: {e} a la cuenta por los kits de más y {n} semillas por las plantas que no caben.,KAIA's grow room moves to the new tents. What doesn't fit is refunded: {e} to your account for the extra kits and {n} seeds for the plants that don't fit.
 s23317412,KAIA_CULT,KAIA_CULT
 s066ae4c4,"La sala de cultivo de KAIA, cerrada. Hasta tener la licencia de cultivo, aquí dentro no se planta nada.","KAIA's grow room, locked. Until you have the cultivation licence, nothing gets planted in here."
+sa4a2b640,El depósito de recogida: lo que sobra de cada mesa baja por su tubería de drenaje y se filtra antes de volver al tanque.,The collection tank: what each table drains runs down its pipe and is filtered before going back to the tank.
 s62ad04d6,"El tanque del riego centralizado, con el abono ya mezclado: las bombas lo llevan a cada mesa.","The central irrigation tank, with the nutrients already mixed in: the pumps carry it to every table."
 sa9e94427,"El programador del riego de las mesas: los turnos de cada una, el pH y la EC, en automático.","The tables' irrigation controller: each one's cycles, the pH and the EC, all automatic."
 s04708b3d,"El programador del riego de las mesas: los turnos de cada una, la acidez y la EC, en automático.","The tables' irrigation controller: each one's cycles, the acidity and the EC, all automatic."
@@ -1997,30 +1999,28 @@ s135969dd,"La sala, en obras: desagües, el cuadro trifásico y el clima industr
 sd2bdf196,"El cuadro de la sala: seis mesas con su LED doble, el riego centralizado y el clima. {q}","The room's control panel: six tables with their double LED, central irrigation and climate. {q}"
 s60bc25ab,Las lleva {n}.,{n} runs them.
 s5f6947bc,Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.,Nobody runs them: put someone from your crew in the room from your phone.
-scc1c24d3,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas de {n}: {k} de {m}.","The room panel: the LED timer, the drip and the climate. All automatic: long hours of light while they grow and fewer as soon as it is time to flower. {n} tents: {k} of {m}."
-se84388d0,Comprar una carpa · {e},Buy a tent · {e}
+s00dc0a86,{k} de {m} de {n},{k} of {m} of {n}
+sd4725d1f,Comprar: {n} · {e},Buy: {n} · {e}
+s5a758610,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas: {l}.","The room panel: the LED timer, the drip and the climate. All automatic: long light hours while they grow and fewer as soon as they flower. Tents: {l}."
 saaa33220,Ordenar la sala,Arrange the room
 s05d84f3f,Pasar a la {n} · {e},Move up to the {n} · {e}
-s055ef0d6,Reformar la sala · {e},Refit the room · {e}
-see44df19,Comprar una carpa,Buy a tent
+s22c05331,Montar la carpa de sala · {e},Set up the grow room tent · {e}
 sd1998ad6,Pasar a la,Move up to the
-s484dbabb,Reformar la sala,Refit the room
+s72092a97,Montar la carpa de sala,Set up the grow room tent
 s90e92b4b,"El kit de la {c}, a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y lo montan aquí.","The {c} kit, at shop price: {l}. {e} in total, by card; it arrives tomorrow and they set it up here."
 saa267e0a,Comprarlo,Buy it
 s7d640fd3,Kit de carpa (KAIA),Tent kit (KAIA)
 s25477d4f,"Pedido: la carpa {n} llega mañana, con sus LED, el extractor y el goteo. {p} plazas más.","Ordered: tent {n} arrives tomorrow, with its LEDs, the extractor and the drip. {p} more spots."
-s639d941f,"La {c}, con su kit a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y caben más.","The {c}, with its kit at shop price: {l}. {e} in total, by card; it arrives tomorrow and holds more."
-sae202cea,Las carpas de ahora se desmontan y se venden de segunda mano por {e}.,The current tents are taken down and sold second-hand for {e}.
-s82ef3618,"Antes, cosecha o arranca lo que tengas en las carpas.","First, harvest or pull up whatever you have in the tents."
-safbefe26,"Antes, espera a que llegue la carpa que tienes pedida.",
+safc9ceff,"La {c}, con su kit a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana. Las carpas que ya tienes se quedan: la sala se va llenando con las de cada tamaño, con su pasillo entre ellas.","The {c}, with its kit at shop price: {l}. In total, {e}, by card; it arrives tomorrow. The tents you already have stay: the room fills up with every size, with an aisle between them."
 s4d9e530d,Comprarla,Buy it
-s5ca3c99d,Carpas de segunda mano (KAIA),Second-hand tents (KAIA)
 sa6dbc08a,"Pedido: la primera {c} llega mañana, con sus LED, el extractor y el goteo; caben {m}.","Ordered: the first {c} arrives tomorrow, with its LEDs, the extractor and the drip; {m} fit."
-sfd4c407c,"Las {n} macetas que pusiste tú, a la mochila.",The {n} pots you put in go to your backpack.
 sf47682b4,"La sala entera como la nave: {l}. En total, {e}, con la tarjeta; la obra dura {d} días. Después, las mesas las lleva alguien de tu plantilla.","The whole room like the warehouse: {l}. {e} in total, by card; the works take {d} days. Afterwards, someone from your crew runs the tables."
 s110640e9,Las carpas se desmontan y se venden de segunda mano por {e}.,The tents are taken down and sold second-hand for {e}.
+s82ef3618,"Antes, cosecha o arranca lo que tengas en las carpas.","First, harvest or pull up whatever you have in the tents."
+safbefe26,"Antes, espera a que llegue la carpa que tienes pedida.",
 sc303f5e0,Hacer la obra,Do the works
 s0b8f532d,Obra de la sala de cultivo (KAIA),Grow room works (KAIA)
+s5ca3c99d,Carpas de segunda mano (KAIA),Second-hand tents (KAIA)
 s22e7890e,"Empieza la obra. El {f}, la sala con sus mesas.","The works begin. On {f}, the room with its tables."
 s100c7a74,"Sin la licencia de cultivo, las carpas se quedan vacías.","Without the cultivation licence, the tents stay empty."
 s1d69b400,Plaza {n},Spot {n}
@@ -2048,6 +2048,8 @@ s1bc7a687,Ponerlas,Put them in
 s6245d91a,Pedirlas y ponerlas,Order and put them in
 s3968dbb5,Macetas de la sala de cultivo (KAIA),Pots for the grow room (KAIA)
 scb460765,"La carpa {c}, con {n} macetas de {l} L y sus goteros.","Tent {c}, with {n} pots of {l} L and their drippers."
+sbfe46b5e,{nf} × {f},{nf} × {f}
+s0fb6bb0f,{w} W de LED,{w} W of LED
 saf20fb91,Ver la mitad del fondo,See the back half
 s9bfd29df,Ver la mitad de delante,See the front half
 s008ab8c0,"{c} · {p} plantas · {nf} × {f}
@@ -2057,6 +2059,15 @@ s37ccdf59,nada más,nothing else
 s32b5dfd9,Pones el {x} en la carpa.,You fit the {x} in the tent.
 sadd8f94d,"El esquema se cambia con la carpa vacía: primero, cosecha o quita lo que lleva.",The layout can only change with the tent empty: harvest or remove what is in it first.
 s39d6b660,Me,
+s0c931c56,"cortada, secándose","cut, drying"
+s1bfe98d7,"LED doble encendido, a 18/6.","Double LED on, at 18/6."
+sbff008d4,"LED doble encendido, a 12/12.","Double LED on, at 12/12."
+s8df2c012,LED doble apagado: sus horas de noche.,Double LED off: its night hours.
+s6703f18b,LED doble apagado.,Double LED off.
+s15deb414,"Mesa {i} · {que}. {l}
+A: la mesa · B: cerrar.","Table {i} · {que}. {l}
+A: the table · B: close."
+s575a0ac6,LAS MESAS,THE TABLES
 s5742a7d0,Arrancar y plantar,Uproot and plant
 sbfb12456,Llevarte lo seco · {g},Take the dried buds · {g}
 se7b42179,"Mesa {i} · {que} · {foco}
@@ -2083,14 +2094,16 @@ s184ad260,EL CLIMA DE LA SALA,GROW ROOM CLIMATE
 s607048fa,todo en su sitio,all in range
 s21efdf60,demasiado calor: la extracción no da para tantos focos,too hot: the extraction can't cope with so many lights
 s68ed04b7,hace frío,too cold
-s3fdebb64,"{t} °C · {h} % · VPD {v} kPa · luz a {a}/{b}, {l} · extracción al {c} %: {e}.
-A: el cuadro · B: cerrar.","{t} °C · {h} % · VPD {v} kPa · light at {a}/{b}, {l} · extraction at {c} %: {e}.
-A: the panel · B: close."
-s984079a5,"{t}° · {h} % · VPD {v} kPa · luz a {a}/{b}, {l} · extracción al {c} %: {e}.
-A: el cuadro · B: cerrar.","{t}° · {h} % · VPD {v} kPa · light at {a}/{b}, {l} · extraction at {c} %: {e}.
-A: the panel · B: close."
+sb9ec6b6a,"luz por carpa, a 18/6 y a 12/12, {l}","light per tent, at 18/6 and at 12/12, {l}"
 s399f0ce7,encendida,on
 scb1d5ad3,apagada,off
+sd6066c04,"luz a {a}/{b}, {l}","light at {a}/{b}, {l}"
+s1a867c21,"{t} °C · {h} % · VPD {v} kPa · {z} · extracción al {c} %: {e}.
+A: el cuadro · B: cerrar.","{t} °C · {h} % · VPD {v} kPa · {z} · extraction at {c} %: {e}.
+A: the panel · B: close."
+s1cebdb93,"{t}° · {h} % · VPD {v} kPa · {z} · extracción al {c} %: {e}.
+A: el cuadro · B: cerrar.","{t}° · {h} % · VPD {v} kPa · {z} · extraction at {c} %: {e}.
+A: the panel · B: close."
 s4e58915c,CANNADEX,CANNADEX
 s570950d9,GENOTECA,GENEBANK
 s2511e675,MOCHILA,BAG
@@ -3050,6 +3063,9 @@ s2c2a3a96,neonH,neonH
 scdc589d4,tuboS,tuboS
 sb4c03f0c,botesW,botesW
 sbc952707,neonG,neonG
+s1c032c45,mesaKP,
+s0eeb28db,drenKS,
+s339fa8d5,carpaKX,
 se00620e0,baldaS,baldaS
 sf2e78f6a,doorX,
 sa802c4ea,humoHecho,
@@ -4962,6 +4978,11 @@ s2f865542,labMicro2,labMicro2
 sd64a06b2,labBalanza2,labBalanza2
 s2bba7e85,frioF,
 s1e962b9a,mesaF,
+s08c6a1ed,iwT_kcs,
+se766c3cf,iwB_kcs,
+s516bd93e,riegoN,riegoN
+s1c7f083e,mesaKP2,
+s68b6a0a2,tanqueN,tanqueN
 s30a02292,ESTUDIANTE,STUDENT
 sf07acb89,Hola. Me ha dicho un amigo que tienes.,Hi. A friend said you've got some.
 s42927016,"Aupa, ¿tienes algo? Voy justo de dinero.","Hey, got anything? I'm a bit short on cash."
@@ -5828,8 +5849,6 @@ s207d87cf,Mide el riego y dosifica el abono sola en cada riego.,Measures the wat
 s2fe99616,apañada,makeshift
 sf62fb426,en marcha,up and running
 s23c85b4e,de concurso,award-grade
-s68b6a0a2,tanqueN,tanqueN
-s516bd93e,riegoN,riegoN
 s115d1f40,¡Esta canción es la mejor!,This song is the best!
 sabf5235f,"No pares, que viene el estribillo.","Don't stop, the chorus is coming."
 se2d96a12,Vengo cada sábado. El DJ es amigo mío.,I come every Saturday. The DJ's a mate.
@@ -6803,9 +6822,11 @@ s6e88f28d,Carpa de 400 × 400 × 200 cm,400 × 400 × 200 cm tent
 sa6b494ee,Ocho LED de 720 W,Eight 720 W LEDs
 sf9786037,Extractor de 315 mm con dos filtros de carbón,315 mm extractor with two carbon filters
 sa73fdb47,Goteo de 16 salidas con su depósito,16-outlet drip with its tank
+sbf6a296b,"Carpa de sala de 1.300 × 700 × 250 cm, con su puerta","Grow room tent, 1,300 × 700 × 250 cm, with its door"
 s1c226ee4,"Obra: desagües, cuadro trifásico y clima industrial","Works: drains, three-phase panel and industrial climate"
-s97f04eca,Seis mesas de 240 × 120 con su LED doble,Six 240 × 120 tables with their double LED
+sd7150e0b,Ocho mesas de flujo y reflujo de 240 × 120 con su LED doble,Eight 240 × 120 ebb and flow tables with their double LED
 s1a47c179,Riego centralizado con su tanque,Central irrigation with its tank
+sa9e51af4,Drenaje: tuberías y depósito de recogida,Drainage: pipes and collection tank
 sc2d98008,Extracción con filtros de carbón,Extraction with carbon filters
 sed28d3b4,Paneles de poliuretano de 80 mm y puerta frigorífica,80 mm polyurethane panels and a cold-room door
 s284c4628,"Equipo de frío de 1,5 kW para 4 °C",1.5 kW cooling unit for 4 °C
@@ -6924,6 +6945,21 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+s3fdebb64,"{t} °C · {h} % · VPD {v} kPa · luz a {a}/{b}, {l} · extracción al {c} %: {e}.
+A: el cuadro · B: cerrar.","{t} °C · {h} % · VPD {v} kPa · light at {a}/{b}, {l} · extraction at {c} %: {e}.
+A: the panel · B: close."
+s984079a5,"{t}° · {h} % · VPD {v} kPa · luz a {a}/{b}, {l} · extracción al {c} %: {e}.
+A: el cuadro · B: cerrar.","{t}° · {h} % · VPD {v} kPa · light at {a}/{b}, {l} · extraction at {c} %: {e}.
+A: the panel · B: close."
+scc1c24d3,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas de {n}: {k} de {m}.","The room panel: the LED timer, the drip and the climate. All automatic: long hours of light while they grow and fewer as soon as it is time to flower. {n} tents: {k} of {m}."
+se84388d0,Comprar una carpa · {e},Buy a tent · {e}
+s055ef0d6,Reformar la sala · {e},Refit the room · {e}
+see44df19,Comprar una carpa,Buy a tent
+s484dbabb,Reformar la sala,Refit the room
+s639d941f,"La {c}, con su kit a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana y caben más.","The {c}, with its kit at shop price: {l}. {e} in total, by card; it arrives tomorrow and holds more."
+sae202cea,Las carpas de ahora se desmontan y se venden de segunda mano por {e}.,The current tents are taken down and sold second-hand for {e}.
+sfd4c407c,"Las {n} macetas que pusiste tú, a la mochila.",The {n} pots you put in go to your backpack.
+s97f04eca,Seis mesas de 240 × 120 con su LED doble,Six 240 × 120 tables with their double LED
 sfcdfc8f0,"{A}, en el aparcamiento. Maletero: {g} de {c}.","{A}, in the car park. Boot: {g} of {c}."
 sf80e3683,Cargar el abono {dv},Load the fertiliser into {dv}
 s598dc5c6,"Con {m} pruebas, la oposición se sostiene. Tienes {n}.","With {m} pieces of evidence, the objection holds. You have {n}."

@@ -574,10 +574,29 @@ func epi_c(f):
 	var c: Image = f.c
 	var k := c.get_instance_id()
 	if not _epi.has(k):
-		_epi[k] = epi_img(c)
+		var q = epi_pl(c)
+		_epi[k] = q if q != null else epi_img(c)
 	var o: Dictionary = f.duplicate()
 	o.c = _epi[k]
 	return o
+
+# con PixelLab (lo pidió el usuario: «quiero que lo hagas con Pixel Lab» y «tienen que ser de calidad»; tools/sprites/pixellab_epi.py
+# → arte/epi_pl.png + .json): el protagonista de pie, parado y andando en las cuatro direcciones, cada fotograma por su clave del
+# atlas, y la protagonista igual (f-<dir>-<i>); lo demás (las acciones, sentado), por colores con epi_img. En el laboratorio
+# no se corre (_pj_frame en pinta.gd)
+static var EPI_PL := {}   # id de la imagen del atlas → la de PixelLab
+
+static func epi_pl(c: Image):
+	if EPI_PL.is_empty():
+		EPI_PL[0] = null   # ya mirado, aunque no esté
+		var j = JSON.parse_string(FileAccess.get_file_as_string("res://arte/epi_pl.json")) if FileAccess.file_exists("res://arte/epi_pl.json") else null
+		var im := Image.new()
+		if j is Dictionary and Atlas.carga() and im.load_png_from_buffer(FileAccess.get_file_as_bytes("res://arte/epi_pl.png")) == OK:
+			for k in j.frames:
+				if Atlas.d.frames.has(k):
+					var q: Dictionary = j.frames[k]
+					EPI_PL[Atlas.frame(k).get_instance_id()] = im.get_region(Rect2i(int(q.x), int(q.y), int(q.w), int(q.h)))
+	return EPI_PL.get(c.get_instance_id()) if c != null else null
 
 static func _rgb(p: Color) -> int:
 	return (p.r8 << 16) | (p.g8 << 8) | p.b8

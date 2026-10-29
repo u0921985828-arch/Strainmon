@@ -1,0 +1,31 @@
+es,en
+El depósito de recogida: lo que sobra de cada mesa baja por su tubería de drenaje y se filtra antes de volver al tanque.,The collection tank: what each table drains runs down its pipe and is filtered before going back to the tank.
+{k} de {m} de {n},{k} of {m} of {n}
+Comprar: {n} · {e},Buy: {n} · {e}
+"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas: {l}.","The room panel: the LED timer, the drip and the climate. All automatic: long light hours while they grow and fewer as soon as they flower. Tents: {l}."
+Montar la carpa de sala · {e},Set up the grow room tent · {e}
+Montar la carpa de sala,Set up the grow room tent
+"La {c}, con su kit a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana. Las carpas que ya tienes se quedan: la sala se va llenando con las de cada tamaño, con su pasillo entre ellas.","The {c}, with its kit at shop price: {l}. In total, {e}, by card; it arrives tomorrow. The tents you already have stay: the room fills up with every size, with an aisle between them."
+"cortada, secándose","cut, drying"
+"LED doble encendido, a 18/6.","Double LED on, at 18/6."
+"LED doble encendido, a 12/12.","Double LED on, at 12/12."
+LED doble apagado: sus horas de noche.,Double LED off: its night hours.
+LED doble apagado.,Double LED off.
+"Mesa {i} · {que}. {l}
+A: la mesa · B: cerrar.","Table {i} · {que}. {l}
+A: the table · B: close."
+LAS MESAS,THE TABLES
+"Carpa de sala de 1.300 × 700 × 250 cm, con su puerta","Grow room tent, 1,300 × 700 × 250 cm, with its door"
+Ocho mesas de flujo y reflujo de 240 × 120 con su LED doble,Eight 240 × 120 ebb and flow tables with their double LED
+Drenaje: tuberías y depósito de recogida,Drainage: pipes and collection tank
+"Vas con {v} a la gasolinera de la salida y llenas el depósito: {l} L, {e}. Vuelta al aparcamiento.","You take {v} to the petrol station on the way out and fill up the tank: {l} L, {e}. Back to the car park."
+{nf} × {f},{nf} × {f}
+{w} W de LED,{w} W of LED
+"luz por carpa, a 18/6 y a 12/12, {l}","light per tent, at 18/6 and at 12/12, {l}"
+"luz a {a}/{b}, {l}","light at {a}/{b}, {l}"
+"{t} °C · {h} % · VPD {v} kPa · {z} · extracción al {c} %: {e}.
+A: el cuadro · B: cerrar.","{t} °C · {h} % · VPD {v} kPa · {z} · extraction at {c} %: {e}.
+A: the panel · B: close."
+"{t}° · {h} % · VPD {v} kPa · {z} · extracción al {c} %: {e}.
+A: el cuadro · B: cerrar.","{t}° · {h} % · VPD {v} kPa · {z} · extraction at {c} %: {e}.
+A: the panel · B: close."

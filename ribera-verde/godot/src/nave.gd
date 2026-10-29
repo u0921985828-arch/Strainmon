@@ -299,6 +299,8 @@ func elegir_madres(i0 := 0):
 		return gancho_madres.call(i0)
 	var nmax: int = int(D.MADRES.max)
 	MADRES_V = {"i": clampi(i0, 0, nmax - 1)}
+	if not oraculo:
+		hud.hide()   # la vista entera, sin el recuadro del HUD encima
 	_dlg_fijo(desc_madres(MADRES_V), K("LAS MADRES"))
 	var pr := Motor.Prom.new()
 	push(func(b: String):
@@ -320,6 +322,7 @@ func elegir_madres(i0 := 0):
 	if not oraculo:
 		dlg.hide()
 		dlg_nm.hide()
+		update_hud()
 	return e
 
 const ArteM = preload("res://src/arte.gd")

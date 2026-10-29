@@ -204,6 +204,30 @@ func _corre() -> void:
 	var sv = JSON.parse_string(FileAccess.get_file_as_string(Juego.GUARDADO))
 	chk(sv is Dictionary and sv.carpas.size() == casa_c.size() and sv.pots.size() == casa_n and not str(sv.carpas).contains("kcs"), "guardada con lo de casa: %d carpas, %d plazas" % [sv.carpas.size() if sv is Dictionary else -1, sv.pots.size() if sv is Dictionary else -1])
 	chk(J.S.carpas.size() == 1, "y la vista, otra vez con la de KAIA")
+	# la copia en la nube al pausar la app (retencion.gd al_pausar), también con lo de casa
+	var stub := Node.new()
+	var sc := GDScript.new()
+	sc.source_code = "extends Node\nvar t := \"\"\nfunc nube_guarda(x: String) -> void:\n\tt = x\n"
+	sc.reload()
+	stub.set_script(sc)
+	var pn = J.plat_n
+	J.plat_n = stub
+	var pl0: bool = Datos.PLAY
+	Datos.PLAY = true
+	J.al_pausar()
+	Datos.PLAY = pl0
+	J.plat_n = pn
+	var nb = JSON.parse_string(String(stub.t))
+	chk(nb is Dictionary and nb.carpas.size() == casa_c.size() and nb.pots.size() == casa_n and not String(stub.t).contains("kcs") and J.S.carpas.size() == 1, "la copia de la nube al pausar, con lo de casa (%d carpas) y la vista sigue" % [nb.carpas.size() if nb is Dictionary else -1])
+	stub.free()
+	# ni misiones ni logros por lo de KAIA (S.carpas es la suya mientras la vista está abierta)
+	J.S.logros.erase("goteo")   # la carpa de KAIA lleva goteo; la de casa, no
+	var lg0: Dictionary = J.S.logros.duplicate()
+	var mi0: Dictionary = J.S.misiones.duplicate()
+	var trampa: bool = J.logro_ok("goteo")
+	J.revisa_logros()
+	J.revisa_misiones()
+	chk(trampa and J.S.logros == lg0 and J.S.misiones == mi0, "con la vista abierta (goteo a la vista: %s), ni logros ni misiones nuevos" % trampa)
 	# el temporizador, el de esta carpa
 	J.VC.sel = Vista.SEL_TEMP
 	J.VC.ocupado = true
@@ -219,6 +243,7 @@ func _corre() -> void:
 	chk(cierra(st), "B: fuera")
 	chk(J.KCV == null and J.S.carpas.size() == casa_c.size() and J.S.pots.size() == casa_n and J.S.macetas == casa_m and not D.CARPAS.keys().any(func(k): return String(k).begins_with("kc")), "al salir, lo de casa como estaba")
 	chk(J.kc_cc(0).get("t") == null and J.kc().p[2] is Dictionary, "y lo de KAIA, guardado en S.kc")
+	chk(J.S.logros.keys().all(func(l): return lg0.has(l) or J.logro_ok(l)), "al salir, ningún logro que no se cumpla en casa (%s)" % [J.S.logros.keys().filter(func(l): return not lg0.has(l))])
 	# 2 · el esquema de 16 de 25 L: 4 filas
 	J.S.kc.pat = [{"m": "tela25", "n": 16}]
 	J.kc()
@@ -232,18 +257,24 @@ func _corre() -> void:
 	await foto(dir, "s16")
 	cierra(st)
 	# 3 · la de 400 × 200 (8 plazas, 4 LED) y 18 de 35 L
-	J.S.kc = {"niv": 1, "kits": [0, 0], "p": []}
+	J.S.kc = {"niv": 1, "kits": [0, 0], "p": []}   # la de antes, de un nivel: a los sitios de su tamaño
 	J.kc()
+	var c4: int = J.kc_base(1)
+	var o4: int = J.kc_off(c4)
 	for i in 6:
-		J.kc().p[i] = planta("txoko", 0.15 * i + 0.1)
-	st = abre(0)
+		J.kc().p[o4 + i] = planta("txoko", 0.15 * i + 0.1)
+	st = abre(c4)
 	g = Vista.geo(J.S, 0)
 	chk(g.vc != null and g.pl.size() == 8 and g.vc.fxs.size() == 4 and int(g.C.filas) == 2, "400 × 200: 8 plazas en 2 filas y 4 LED (%d)" % g.pl.size())
 	await foto(dir, "m8")
 	cierra(st)
-	J.S.kc.pat = [{"m": "tela35", "n": 18}]
+	var pt: Array = J.S.kc.pat if J.S.kc.get("pat") is Array else []
+	while pt.size() <= c4:
+		pt.append(null)
+	pt[c4] = {"m": "tela35", "n": 18}
+	J.S.kc.pat = pt
 	J.kc()
-	st = abre(0)
+	st = abre(c4)
 	g = Vista.geo(J.S, 0)
 	chk(g.vc != null and g.pl.size() == 18 and int(g.C.filas) == 3, "18 de 35 L: 6 × 3 (%d)" % g.pl.size())
 	await foto(dir, "m18")
@@ -251,11 +282,13 @@ func _corre() -> void:
 	# 4 · la de 400 × 400, por mitades: delante y al fondo
 	J.S.kc = {"niv": 2, "kits": [0], "p": []}
 	J.kc()
+	var c6: int = J.kc_base(2)
+	var o6: int = J.kc_off(c6)
 	for i in 16:
-		J.kc().p[i] = planta("txoko", 0.05 * i + 0.1)
-	st = abre(0)
+		J.kc().p[o6 + i] = planta("txoko", 0.05 * i + 0.1)
+	st = abre(c6)
 	g = Vista.geo(J.S, 0)
-	chk(J.kc_mitades() == 2 and g.vc != null and g.pl.size() == 8 and int(J.KCV.a) == 0 and g.vc.fxs.size() == 4, "400 × 400: la mitad de delante, 8 plazas y 4 LED")
+	chk(J.kc_mitades(c6) == 2 and g.vc != null and g.pl.size() == 8 and int(J.KCV.a) == o6 and g.vc.fxs.size() == 4, "400 × 400: la mitad de delante, 8 plazas y 4 LED (%d %d %s %d %s)" % [J.kc_mitades(c6), g.pl.size(), J.KCV.get("a") if J.KCV else null, g.vc.fxs.size() if g.vc else -1, J.mode])
 	MENUS = []
 	QUIERO = ["Ver la mitad del fondo"]
 	J.VC.sel = -1
@@ -266,9 +299,60 @@ func _corre() -> void:
 		pass
 	for i in 40:
 		M.paso()
-	chk(J.KCV != null and int(J.KCV.h) == 1 and int(J.KCV.a) == 8 and J.S.pots[0] == J.kc().p[8], "la mitad del fondo: de la plaza 9 a la 16")
+	chk(J.KCV != null and int(J.KCV.h) == 1 and int(J.KCV.a) == o6 + 8 and J.S.pots[0] == J.kc().p[o6 + 8], "la mitad del fondo: de la plaza 9 a la 16 (%s %s)" % [J.KCV, J.mode])
 	await foto(dir, "l-fondo")
 	chk(cierra(st) and J.KCV == null and J.S.carpas.size() == casa_c.size(), "B: fuera, con lo de casa")
+	# 4b · la carpa de sala: A en una mesa abre su vista (la pared de la carpa, el LED doble y la mesa con sus plantas)
+	J.S.kc = {"niv": 2, "kits": [-1, -1, -1, -1, -1, -1, -1], "p": [], "v": 2, "f2": 0, "m": []}
+	J.kc()
+	for i in 8:
+		J.kc().m.append(null if i == 5 else {"k": "txoko", "f": Cultivo.nueva_planta(J.S, "txoko").f, "thc": 18.0, "y": 1.0, "dia": J.S.day, "g": 0, "t": 0, "abo": 1, "p": [.05, .3, .5, .7, .9, 0, .4, .8][i], "dn": 0, "am": 0, "ao": 0, "n": 0})
+	var SA: String = J.D.KAIA_CULT.f2.sala
+	J.enter_map(SA, 6, 7, "up")
+	J.S.min = 12 * 60
+	J.oraculo = false   # la vista solo sale con pantalla
+	J.update_hud()
+	var mp: Array = J.D.KAIA_CULT.f2.mesas[2]
+	var stm := {"fin": false}
+	var com := func():
+		await J.run(func(): await J.kc_obj(int(mp[0]), int(mp[1]), J.MAPS[SA].o[int(mp[1])][int(mp[0])]))
+		stm.fin = true
+	com.call()
+	var t1: float = M.reloj
+	while J.MESA_KV == null and M.reloj - t1 < 20000 and M.paso():
+		pass
+	chk(J.MESA_KV != null and int(J.MESA_KV.i) == 2 and not J.hud.visible, "A en la mesa 3: su vista, sin el HUD encima")
+	var R: Array = J.rects_mesak(J.MESA_KV)
+	var imgs := 0
+	for q in R:
+		if q is Array and q.size() > 1 and q[0] is String and q[0] == "@":
+			imgs += 1
+	chk(imgs >= 4, "la pared, los dos LED y la mesa: %d imágenes" % imgs)
+	J.press("right")
+	M.paso()
+	chk(int(J.MESA_KV.i) == 3, "▶: la mesa 4")
+	J.press("down")
+	M.paso()
+	chk(int(J.MESA_KV.i) == 7, "▼: la de debajo, la 8")
+	J.press("down")
+	M.paso()
+	chk(int(J.MESA_KV.i) == 7, "▼ en la fila de abajo: se queda")
+	J.press("left")
+	J.press("left")
+	M.paso()
+	chk(int(J.MESA_KV.i) == 5 and J.desc_mesak(J.MESA_KV).contains(J.K("vacía")), "la 6, vacía: %s" % J.desc_mesak(J.MESA_KV))
+	J.S.min = 2 * 60
+	chk(not J.luz_mesak(7) and J.luz_mesak(0) == false, "a las 2 de la noche, el LED apagado")
+	J.S.min = 20 * 60
+	chk(J.luz_mesak(0) and not J.luz_mesak(7), "a las 20: la que crece, a 18/6, encendida; la de flor, a 12/12, apagada")
+	await foto(dir, "mesa-v")
+	J.press("B")
+	t1 = M.reloj
+	while not stm.fin and M.reloj - t1 < 20000 and M.paso():
+		pass
+	chk(stm.fin and J.MESA_KV == null and J.hud.visible, "B: fuera, con el HUD")
+	J.S.min = 12 * 60
+	J.oraculo = true
 	# 5 · sin CAL o sin licencia, como antes
 	J.S.mar.erase("lic")
 	LOG = []
