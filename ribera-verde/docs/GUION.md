@@ -372,6 +372,13 @@ Un hilo propio por encima de la deuda: lo que pasó en la Copa de 1998. OBJETIVO
 - **Las pistas:** el ordenador (la oferta de 40.000 € de Garro, rechazada, el correo de la víspera —«cuando estuve en su casa»— y el ordenador encendido a las 11:40 del funeral); el cura de la catedral (un señor de traje de Ondarea preguntó cuándo acababa y se fue a las 11:05, al empezar: a Ribera Verde, media hora); el teatro (la víspera, Garro pidió una coartada: un ensayo que no hubo, cerrado por obras); Hacienda (Molina, sello de las 11:20 en Bilbao: a las 11:40 no llegaba); Koldo, ya conocido en el muelle (Darko salió en su txalupa a las seis y volvió de noche; él se quedó para el funeral).
 - **La acusación**, con cuatro pistas y el ordenador entre ellas, delante de quien te ayuda, una vez y si quieres («¿Le cuentas lo del piso?»; si no, o sin bastante, lo de siempre con esa persona): Garro devuelve el sobre de semillas de Malana de la tía (y reputación; Ondarea ya sabe que tienes la Haze: el Acto III); Darko o Molina, más calor y menos confianza, y Kiko avisa de que Garro sigue preguntando.
 
+## Las fiestas y la caza (con `Datos.CAL`, `src/caza.gd`, textos en `tools/caza.py`)
+
+- **Feria de semillas de primavera** (15-17 de mayo, mercado de la Ribera; SMS de Kiko la víspera): el especiero (Kashmiri), la florista (Vietnamese Black) y el verdulero (Highland Thai), 40 € cada una, en efectivo.
+- **Fiestas del barrio** (14-18 de agosto; SMS de la abuela Txaro): Patxi (Colombian Gold, de la tómbola de la txosna) y Txaro (Punto Rojo, de su vecino colombiano).
+- **Romería de la ermita** (8 de septiembre; SMS de Txaro): la serora, con el sobre de la tía (Ethiopian Highland).
+- **Por estación y tiempo:** Koldo con temporal (Zamal); en verano, Julen (Michoacán) e Iñaki (Durban Poison); en otoño, Bixente (Kif) y Arrieta (Swazi Gold); en invierno, Txomin (Lebanese), Delroy (Congolese), Kiko (Panama Red) y el capataz del muelle de Bilbao (Thai); en primavera, Andoni (Beldia) y Miren (Nepalese). Los que lo dicen en su pista, solo con confianza de amigos (20).
+
 ## La caja fuerte
 
 *Ordenador → «Notas de la tía»:*

@@ -102,6 +102,10 @@ func donde_semilla(k: String) -> String:
 		l.append(T("de premio en una misión"))
 	if recetas().has(k):
 		l.append(T("de su receta"))
+	if Datos.CAL:   # ESTUDIO, tanda 4: quién da cada landrace, y cuándo (caza.gd)
+		for e in D.CAZA.l:
+			if e.k == k:
+				l.append(I18n.v(e.pista))
 	return T("Semillas: {l}.", {"l": "; ".join(PackedStringArray(l))})
 
 # el diario de la tía Maite (1.16): su nota de cada variedad (DIARIO, de 12-menus; 1.25: todas)

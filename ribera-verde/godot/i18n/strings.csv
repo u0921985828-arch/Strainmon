@@ -447,6 +447,27 @@ s435af587,"Las herramientas de la tía: una azada con el mango partido, unas tij
 s4bf5ce22,Sacos de compost que la tía dejó hechos tierra. La huerta no necesita más.,"Bags of compost your aunt left, now turned to soil. The garden needs nothing more."
 s03920724,Un cubo con una pala de mano dentro.,A bucket with a hand trowel inside.
 s3269e3a7,Un manzano viejo que sigue dando manzanas pequeñas y ácidas.,"An old apple tree that still gives small, sour apples."
+s385f4fc7,SERORA,CARETAKER
+s3415cd79,ESPECIERO,SPICE SELLER
+se24c4114,FLORISTA,FLORIST
+s9f31dbfd,VERDULERO,GREENGROCER
+scb4eaf8a,PATXI,PATXI
+sd271f0a5,ABUELA TXARO,GRANNY TXARO
+s4d58eb16,JULEN,JULEN
+s6063410a,BIXENTE,BIXENTE
+s9c4f006a,ANDONI,ANDONI
+s2554a16b,TXOMIN,TXOMIN
+s5f0966c0,IÑAKI,IÑAKI
+s33c4252e,ARRIETA,ARRIETA
+sf30f515b,MIREN,MIREN
+s3e59d902,CAPATAZ,FOREMAN
+s239c408b,"{n} semillas de {s}, {e}.","{n} {s} seeds, {e}."
+s8e28e8bd,Comprar,Buy
+sf22e0cbd,No,No
+sfe17f6c0,"«Tú verás. Hasta que acabe la feria, aquí las tengo.»",«Up to you. I'll have them here until the fair ends.»
+s5cddb919,"«En la feria, solo efectivo.»","«At the fair, cash only.»"
+s5371e2db,{n} semillas de {s},{n} {s} seeds
+sc09d2f3c,Hoy: {f},Today: {f}
 scba946a8,La ría no duerme,The Estuary Never Sleeps
 sff6a0d46,Dos hermanas se reparten la casa de su madre en Deusto y no se ponen de acuerdo ni en el reloj de la cocina.,Two sisters split their mother's house in Deusto and can't even agree on the kitchen clock.
 s8bd93ba9,Marea baja,Low Tide
@@ -471,10 +492,7 @@ sb06aef74,FRUTERA,FRUIT SELLER
 s078d80d6,PESCADERO,FISHMONGER
 sa1c49b8a,CARNICERO,BUTCHER
 sf221d2b7,QUESERA,CHEESE SELLER
-s9f31dbfd,VERDULERO,GREENGROCER
 s69c88616,PANADERA,BAKER
-se24c4114,FLORISTA,FLORIST
-s3415cd79,ESPECIERO,SPICE SELLER
 se382f399,"«Vamos, que cerramos.» Te acompañan a la puerta.","“Come on, we're closing.” They walk you to the door."
 s9550ad3e,Cerrado. En la puerta: de {a} a {b}.,Closed. On the door: {a} to {b}.
 sd02b34a6,NPC,
@@ -487,15 +505,12 @@ sb3219449,ACTOR,ACTOR
 s538867ab,"«Antes venía mucha gente. Ahora, los turistas y yo.»","""Lots of people used to come. Now it's the tourists and me."""
 seccb95c9,FELIGRESA,PARISHIONER
 s268b4977,"«La ermita la cuido yo, que el cura sube una vez al mes. Tu tía subía en romería todos los años, con sus cuadernos.»","""I look after the chapel; the priest only comes up once a month. Your aunt came up on pilgrimage every year, with her notebooks."""
-s385f4fc7,SERORA,CARETAKER
 s83547788,"«Cierro a las ocho. Si te sientas, no hagas ruido.»","""I lock up at eight. If you sit down, keep quiet."""
 s1547cf1f,"«La campana no la toques, que baja todo el pueblo.»","""Don't touch the bell, or the whole village will come up."""
 s2ccbbfd8,entM,
 s8e9c3dea,«Ya tienes la tuya. Siéntate donde quieras; empieza a las nueve.»,"""You've already got yours. Sit wherever you like; it starts at nine."""
 s4fe8726c,"«La taquilla abre a las seis. Esta semana, {o}, a las nueve.»","""The box office opens at six. This week, {o}, at nine."""
 s06b43dc5,"«{o}, esta noche a las nueve. {e} la entrada.»","""{o}, tonight at nine. {e} a ticket."""
-s8e28e8bd,Comprar,Buy
-sf22e0cbd,No,No
 se3bba54c,"«Solo efectivo, cariño.»","""Cash only, love."""
 s82ba3be8,"«Platea, sin numerar. Que la disfrutes.»","""Stalls, unnumbered. Enjoy it."""
 s39ab1698,Sin entrada no hay función. La taquilla vende de seis a nueve.,"No ticket, no show. The box office sells from six to nine."
@@ -627,7 +642,6 @@ scc41fd06,Sacos de grano viejo. Ya te has echado hoy.,Sacks of old grain. You've
 s5453614b,"Sacos de grano viejo, blandos como un colchón.","Sacks of old grain, soft as a mattress."
 s039c6c4e,Echar una cabezada,Take a nap
 s16233070,Hora y media con el ruido del agua por debajo. Te levantas con harina en la ropa y la cabeza despejada.,An hour and a half with the sound of water below. You get up with flour on your clothes and a clear head.
-s3e59d902,CAPATAZ,FOREMAN
 sa591c6a7,"«Por hoy ya has cobrado. Mañana, a las siete.»","“You've been paid for today. Tomorrow, at seven.”"
 s95931b51,"«El camión ya ha salido. Mañana, a las siete, y no preguntes qué llevan las cajas.»","“The lorry's already left. Tomorrow, at seven, and don't ask what's in the crates.”"
 s5c629270,"«¿Vienes a descargar? Tres horas, {e} en mano.»","“Here to unload? Three hours, {e} cash in hand.”"
@@ -1601,7 +1615,6 @@ s9c1b9659,"«Haze del 98, fenotipo del limón. Madre: la que trajo Miren de su v
 s9b530489,"«Toño cambió mi tarro. Lo vi meterse en el bar de Baltasar con él debajo del brazo. No tengo pruebas, solo esto.»","""Toño swapped my jar. I saw him go into Baltasar's bar with it under his arm. I have no proof, only this."""
 s6bfbc9ff,"«Las semillas buenas, en la lata de galletas, debajo del manzano de la huerta. Que no las encuentre él.»","""The good seeds are in the biscuit tin, under the apple tree in the garden. Don't let him find them."""
 s0f8a1fcf,"Si el cuaderno dice lo que creo, ve a la huerta. Y no se lo cuentes a nadie del bar.","If the notebook says what I think, go to the garden. And don't tell anyone from the bar."
-sf30f515b,MIREN,MIREN
 s8f1f2a2c,Delroy me ha llamado. Sabía que vendrías.,Delroy called me. I knew you'd come.
 sd2a0cc3b,"La madre de esa Haze la traje yo de un viaje, en un bote de carretes de fotos. Tu tía la hizo suya.","I brought the mother of that Haze back from a trip, in a film canister. Your aunt made it her own."
 s98a52fbe,"Me dio su trozo del cuaderno la última vez que subió. Me dijo: «Si viene alguien con mis ojos, dáselo».","She gave me her piece of the notebook the last time she came up. She said: ""If someone with my eyes comes, give it to them""."
@@ -1618,7 +1631,6 @@ sb31eb28a,¿Qué haces?,What do you do?
 s715b269f,La vela tiembla y se queda quieta. La serora asiente sin decir nada.,The candle flickers and goes still. The caretaker nods without a word.
 s4dff5d17,No llevas tanto encima. Enciendes una vela de las de un euro igualmente.,You don't have that much on you. You light one of the one-euro candles anyway.
 s7e80ae7c,"Ella la habría encendido. Toma, es tuyo.","She would have lit it. Here, it's yours."
-sd271f0a5,ABUELA TXARO,GRANNY TXARO
 sd023b9da,"Pasa, pasa. Ya sabía yo que tarde o temprano vendrías a por el papel de tu tía.","Come in, come in. I knew sooner or later you'd come for your aunt's paper."
 sc5024d69,"Lo tengo en el costurero, debajo de los botones. Ella me dijo: «Txaro, tú no lo enseñes ni al cura».","I keep it in the sewing box, under the buttons. She told me: ""Txaro, don't show it even to the priest""."
 s120a45d8,¿Sabes que esa noche del 98 vino aquí llorando? Nunca la había visto así.,Did you know that night in '98 she came here crying? I'd never seen her like that.
@@ -2273,7 +2285,6 @@ s63b6b1ab,LLAMAR,CALL
 sd516193e,TOÑO,TOÑO
 s75c1db79,Te quedan {e} hasta el {f}. Don Baltasar no espera.,"You still owe {e}, due {f}. Don Baltasar doesn't wait."
 sb721c9af,Ahora mismo no debes nada. Que siga así.,You don't owe a thing right now. Keep it that way.
-s5f0966c0,IÑAKI,IÑAKI
 sff267d14,Ahora estoy en la mar. A la vuelta hablamos.,I'm out at sea. We'll talk when I'm back.
 sf0a6460c,Hoy ya he cargado. Mañana sale otro barco.,I've loaded today already. Another boat leaves tomorrow.
 sb0767447,"Al por mayor, de 100 g para arriba y hasta {kg} por carga. Pásate por el muelle.","Wholesale: 100 g and up, max {kg} per load. Come by the docks."
@@ -3135,7 +3146,6 @@ s98b8e2d3,Sale de juntar {a} con {b}.,Comes from joining {a} with {b}.
 se74b5a50,{n} · {f} · {g}.ª generación. {d} {de} Rinde ×{r} y se paga ×{p}.,{n} · {f} · gen {g}. {d} {de} Yields ×{r} and pays ×{p}.
 s798cb136,Aún no la has tenido.,You haven't had it yet.
 saad0def2,SMS · TXOMIN,SMS · TXOMIN
-s2554a16b,TXOMIN,TXOMIN
 s60303d62,el bajo,the basement
 sfa469901,"No me has pagado el bajo. Cambio la cerradura; lo de dentro y la fianza, para mí.",You didn't pay for the basement. I'm changing the lock; what's inside and the deposit are mine.
 sdfd6f990,La policía ha entrado en el bajo de la Kale Zaharra. Se lleva las bandejas y {g} de setas.,The police raided the Kale Zaharra basement. They took the trays and {g} of mushrooms.
@@ -3441,7 +3451,6 @@ sf85fb888,Darko es sobrino de Baltasar. Por eso nadie le dice nada.,Darko is Bal
 sf08c28fe,El sargento Molina cobra por mirar hacia otro lado. Lo sabe todo el barrio.,Sergeant Molina gets paid to look the other way. The whole barrio knows.
 s63b01d36,"Cuando tengas una mesa de genética, ven a verme. Algo sé de cruces.","Once you've got a genetics table, come see me. I know a bit about crosses."
 s468ca505,Cuarenta años cultivando en el monte. Te digo una cosa: {x},Forty years growing up in the hills. I'll tell you something: {x}
-scb4eaf8a,PATXI,PATXI
 sa6e1bab9,"Ya duermo de un tirón. Gracias, de verdad.","I sleep right through now. Thank you, truly."
 s10e57471,Tu tía me ayudaba igual. No se lo contábamos a nadie.,Your aunt helped me the same way. We never told a soul.
 s201ee223,"El aceite me ha devuelto el sueño. Gracias, de verdad.","The oil gave me my sleep back. Thank you, truly."
@@ -3487,7 +3496,6 @@ I'll pay {e}, half what it costs new."
 sd4f8e03d,"Lo que me vendas, vendido está: no se devuelve.","Whatever you sell me, stays sold: no take-backs."
 sa6ad744b,VENDERLE A BIXENTE,SELL TO BIXENTE
 sd482c654,¿Seguro que le vendes {x} por {e}? Lo vendido no se recupera.,Sure you want to sell him {x} for {e}? Once sold
-s6063410a,BIXENTE,BIXENTE
 sc7edf53c,Compro chatarra y vendo lo que se puede aprovechar. Vuelve cuando cultives en serio.,I buy scrap and sell what's still good. Come back when you grow for real.
 sf2e70439,"Esto es el rastro de la comarca: lo que a uno le sobra, a otro le hace falta. ¿Compras o vendes?",This is the county flea market: one man's spare is another man's need. Buying or selling?
 s47ea7ec5,Hoy no me queda nada que te sirva. Mañana entra más.,Nothing left that'd suit you today. More comes in tomorrow.
@@ -3535,8 +3543,6 @@ s53c99ab2,"Toma. La página que falta, y unas semillas de su Haze.","Here. The m
 s49d12089,la última página del diario y {n} semillas de {s},the last page of the diary and {n} {s} seeds
 sb2f2077f,"Léela en casa, con calma.","Read it at home, take your time."
 s5027cc08,Y esto también era de las dos. La de Laos: la guardábamos para la Amnesia.,And this was ours too. The Laos one: we kept it for the Amnesia.
-s5371e2db,{n} semillas de {s},{n} {s} seeds
-s9c4f006a,ANDONI,ANDONI
 sbcde4bf9,"El molino muele los domingos. Si te interesan las semillas viejas, vuelve más adelante.","The mill grinds on Sundays. If old seeds interest you, come back later on."
 s7e3e3c43,Hasta el {f} no tengo más semillas para cambiar.,No more seeds to swap until {f}.
 s6c22cb6c,"Mi abuelo guardaba semillas en botes de cristal, junto a la harina. Tengo de {s}.","My grandad kept seeds in glass jars, next to the flour. I've got {s}."
@@ -3686,7 +3692,6 @@ sf8effb2d,"{d} Si no te quedan semillas, mi aita tiene.","{d} If you're out of s
 sd805f088,{d} No te queda: mi aita lo vende en el growshop.,{d} You're out: my aita sells it at the growshop.
 s33ac791f,{d} Y te falta pH−: lo tiene mi aita.,{d} And you need corrector: my aita has it.
 sf488fa66,{d} Y te falta corrector: lo tiene mi aita.,
-s4d58eb16,JULEN,JULEN
 sb988b5ba,2 dosis de ORTUA BIO CRECIMIENTO,2 doses of ORTUA BIO GROW
 s1f57ba59,4 dosis de pH− ORTUA BIO,4 doses of ORTUA BIO Corrector
 sd063b2fd,4 dosis de Corrector ORTUA BIO,
@@ -3847,7 +3852,6 @@ s76e09fa5,Me han atracado en un portal. Se han llevado {g} de {l}. Me quedan {q}
 s3f014e45,Me han atracado en un portal. Se han llevado {g} de {l}.,Got mugged in a doorway. They took {g} of {l}.
 s34ee1e4a,Me han pagado {g} g con billetes falsos. No me he dado cuenta hasta el banco.,Got paid for {g} g in fake notes. Didn't notice till the bank.
 s0e4fdd95,Vendidos los últimos {g} g: {e} en tu buzón. Dame más cuando quieras.,Sold the last {g} g: {e} in your mailbox. Give me more whenever.
-s33c4252e,ARRIETA,ARRIETA
 s05426094,la nave,the warehouse
 se369d988,"Este mes puedes comprar la nave, hasta el {d}: quedan {r} y {g} de gastos. Por transferencia, en el notario.","This month you can buy the warehouse, until {d}: {r} left plus {g} in fees. By bank transfer, at the notary."
 sba988ab1,SMS · ARRIETA,SMS · ARRIETA
@@ -6687,6 +6691,60 @@ sea483ee8,Aroma único,Unique aroma
 se3963e00,Un olor que no tiene otra: su hierba se paga un 25 % más.,A smell no other has: its weed sells for 25 % more.
 s14ee5515,Resinosa,Resinous
 sa0563766,"Cubierta de tricomas: 1,5 puntos más de THC.",Covered in trichomes: 1.5 more THC points.
+s8d0761cf,Feria de semillas de primavera,Spring seed fair
+sd6b4c0f5,"Mañana empieza la feria de semillas en el mercado de la Ribera, en Bilbao. Tres días. Los de los puestos traen cosas que no verás en ningún banco.","The seed fair starts tomorrow at the Ribera market, in Bilbao. Three days. The stallholders bring things you won't see in any seed bank."
+sf870b742,Fiestas del barrio,Neighbourhood fiestas
+s151dce80,"Mañana empiezan las fiestas del barrio, cinco días. Ven a la calle, que tu tía no se perdía ni una y todos te preguntan.","The neighbourhood fiestas start tomorrow, five days. Come out to the street: your aunt never missed one and everyone asks about you."
+s6d4d4a77,Romería de la ermita,Hermitage pilgrimage
+sa02862e3,Mañana es la romería de la ermita. Tu tía subía todos los años con sus cuadernos. La serora guarda algo para quien suba.,Tomorrow is the pilgrimage to the hermitage. Your aunt went up every year with her notebooks. The serora is keeping something for whoever goes up.
+s79703f68,"Koldo, en el muelle, un día de temporal","Koldo, at the dock, on a stormy day"
+se5296040,"Con esta mar no sale nadie. Siéntate, que te cuento.","Nobody goes out in this sea. Sit down, I'll tell you something."
+sdac109fb,"Hace años me quedé en la Reunión un mes por un motor roto. Me traje esto en una lata de tabaco. Zamal, lo llaman allí. Para ti.","Years ago I was stuck on Réunion for a month with a broken engine. I brought this back in a tobacco tin. Zamal, they call it there. It's yours."
+s19ef4512,"la serora de la ermita, el día de la romería","the serora of the hermitage, on pilgrimage day"
+s00e9164c,"Has subido el día de la romería, como ella. Tu tía me dejó un sobre para quien viniera hoy.","You came up on pilgrimage day, like she did. Your aunt left me an envelope for whoever came today."
+s53bfdb68,"Dice: «Ethiopian Highland, de un monje de las tierras altas. Que suba al monte otra vez.»","It says: «Ethiopian Highland, from a monk in the highlands. Let it go back up the mountain.»"
+s851432cf,"el puesto de especias, en la feria de semillas","the spice stall, at the seed fair"
+s50f918ff,"Para la feria traigo lo de mi primo de Cachemira, en bolsitas de té. Semillas de Kashmiri, de su valle.","For the fair I bring my cousin's stuff from Kashmir, in tea bags. Kashmiri seeds, from his valley."
+s1b83c0fb,"el puesto de flores, en la feria de semillas","the flower stall, at the seed fair"
+s2658b020,"Las flores no se venden solas. Para los que saben, debajo del mostrador: Vietnamese Black, de los montes.","Flowers don't sell themselves. For those in the know, under the counter: Vietnamese Black, from the hills."
+s319a5435,"el puesto de verdura, en la feria de semillas","the vegetable stall, at the seed fair"
+se7fbcf13,Mi mujer es de Chiang Mai. Su padre las guardaba en el arroz: Highland Thai. Solo las saco en la feria.,My wife is from Chiang Mai. Her father kept these in the rice: Highland Thai. I only bring them out at the fair.
+s72bb9404,"Patxi, en las fiestas del barrio","Patxi, at the neighbourhood fiestas"
+seb174075,"¡Fiestas! Mira, esto lo ganó tu tía en la tómbola de la txosna, el último año. Me lo dejó a mí para que no lo fumara.","Fiestas! Look, your aunt won this at the txosna raffle, last year. She left it with me so she wouldn't smoke it."
+sb2395c7b,"Colombian Gold. De la sierra de Santa Marta, dijo ella. Tuyo.","Colombian Gold. From the Sierra de Santa Marta, she said. Yours."
+sf415e7f0,"la abuela Txaro, en las fiestas del barrio","Granny Txaro, at the neighbourhood fiestas"
+s85a446c8,"En fiestas se regala, que lo dice el refrán. Mi vecino colombiano me trajo de su tierra hace mil años.","At fiesta time you give gifts, as the saying goes. My Colombian neighbour brought me these from home ages ago."
+s0995856c,"Punto Rojo. Yo no sé qué es, pero tu tía decía que era buena. Toma.","Punto Rojo. I don't know what it is, but your aunt said it was good. Here."
+s8cdae2ae,"Julen, en verano, si sois amigos","Julen, in summer, if you're friends"
+sd9612aa3,"He vuelto de México. Lo de las playas, mentira: estuve en el altiplano, con un abuelo que cultiva como antes.","I'm back from Mexico. The beaches were a lie: I was up on the plateau, with an old man who grows the old way."
+sf874bd6e,Me dio estas. Michoacán. Mejor en tus manos que en las mías.,He gave me these. Michoacán. Better in your hands than mine.
+see99f1e3,"Bixente, en la chatarrería, en otoño","Bixente, at the scrapyard, in autumn"
+s2db145bb,"Un camionero de Tánger me dejó una caja de piezas en septiembre. Debajo de los tornillos, esto.","A trucker from Tangier left me a box of parts in September. Under the screws, this."
+s4f20c5ac,Kif del Rif. Yo de esto no entiendo; tú sí. Llévatelo.,Kif from the Rif. I don't know about this; you do. Take it.
+s19d007d4,"Andoni, en el molino, en primavera, si sois amigos","Andoni, at the mill, in spring, if you're friends"
+s614531cc,"En primavera limpio los botes del abuelo. Este no lo cambio, te lo regalo, que tú los cuidas.","In spring I clean my grandfather's jars. I won't trade this one, I'm giving it to you, because you look after them."
+s9ba8dcca,"Beldia, de Ketama. La más vieja que tengo.","Beldia, from Ketama. The oldest I have."
+sb1fe5ee3,"Txomin, en la Kale Zaharra, en invierno","Txomin, in the Kale Zaharra, in winter"
+s95f8b71d,En invierno las setas van lentas y yo me aburro. Ordenando el bajo salió un bote del dueño de antes.,"In winter the mushrooms are slow and I get bored. Tidying the basement, a jar turned up from the previous owner."
+s99103b76,"Pone «Bekaa». Libanesa, creo. Para ti, que las mías no son de esto.","It says «Bekaa». Lebanese, I think. For you, mine aren't this kind."
+s78e6a51b,"Iñaki, en verano, si sois amigos","Iñaki, in summer, if you're friends"
+sed421bee,"Un cliente sudafricano, de los que vienen a hacer surf. No tenía suelto y me pagó con esto.","A South African customer, one of the surfers. He had no change and paid me with this."
+sdb977b8a,"Durban Poison, dice. Tú que plantas, sácale partido.","Durban Poison, he says. You're the grower, make the most of it."
+s4c8963d7,"Arrieta, en la nave, en otoño, si sois amigos","Arrieta, at the warehouse, in autumn, if you're friends"
+s8314dcf9,"Vaciando la nave de al lado, un saco de semillas de pájaro. Y en medio, un sobre con letra de mujer.","Clearing out the warehouse next door, a sack of birdseed. And in the middle, an envelope in a woman's handwriting."
+s766b1b11,"Swazi Gold. Si es lo que creo, es de tu tía. Le alquilé un rincón hace años.","Swazi Gold. If it's what I think, it's your aunt's. I rented her a corner years ago."
+s54c3e621,"Delroy, en la asociación, en invierno, si sois amigos","Delroy, at the association, in winter, if you're friends"
+sa3a471c3,En invierno me acuerdo de los que se fueron. Tu tía y yo cambiamos semillas con un congoleño de Bilbao.,In winter I remember the ones who are gone. Your aunt and I swapped seeds with a Congolese man from Bilbao.
+s4eff10a4,Estas son las suyas: Congolese. Las guardaba para ella.,These are his: Congolese. I was keeping them for her.
+s9ea412b3,"Miren, en Errotabarri, en primavera, si sois amigos","Miren, in Errotabarri, in spring, if you're friends"
+scf72fff1,"En primavera tu tía venía a sembrar conmigo. Un año trajo estas de Nepal, de un viaje que no me quiso contar.","In spring your aunt came to sow with me. One year she brought these from Nepal, from a trip she wouldn't tell me about."
+s8343b21b,"Nepalese. Las colinas del Himalaya, decía. Ya es hora de que vuelvan a la tierra.","Nepalese. The Himalayan foothills, she said. It's time they went back into the ground."
+sa22b6e10,"Kiko, en el growshop, en invierno, si sois amigos","Kiko, at the grow shop, in winter, if you're friends"
+s064dd6c6,"En enero hago inventario. Detrás de las lámparas viejas, un sobre de tu tía: Panama Red, del 79, dice.","In January I do the stocktake. Behind the old lamps, an envelope from your aunt: Panama Red, from '79, it says."
+s5a465ff6,"No sé si germinarán. Si alguien lo consigue, eres tú.","I don't know if they'll germinate. If anyone can, it's you."
+s5a694619,"el capataz del almacén del muelle de Bilbao, en invierno","the foreman at the Bilbao dock warehouse, in winter"
+se985f7b2,"En invierno llegan menos cargueros. Uno de Bangkok dejó esto en un palé roto. Thai, de las selvas del norte.","Fewer freighters come in winter. One from Bangkok left this on a broken pallet. Thai, from the northern jungles."
+sda3f612a,Aquí nadie lo quiere. Llévatelo antes de que lo barra.,Nobody here wants it. Take it before I sweep it up.
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.

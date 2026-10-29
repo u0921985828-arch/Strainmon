@@ -877,3 +877,61 @@ II · HECHO,II · DONE
 "¿Darko? Ese día estaba en la mar, lo sabe todo el puerto. Ya se fue, pero sus chicos se enterarán.","Darko? That day he was at sea, the whole port knows. He's gone now, but his boys will hear of it."
 "¿Darko? Ese día estaba en la mar, lo sabe todo el puerto. Se va a enterar de que lo has dicho.","Darko? That day he was at sea, the whole port knows. He's going to hear that you said it."
 "Sospechosos: Darko, Unai Garro (Semillas Ondarea) y el sargento Molina. Pistas: {n}/{t}: el ordenador de la tía, la catedral, el teatro, Hacienda y el muelle. Con {m}, el ordenador entre ellas, habla con {a}.","Suspects: Darko, Unai Garro (Semillas Ondarea) and Sergeant Molina. Clues: {n}/{t}: your aunt's computer, the cathedral, the theatre, the tax office and the dock. With {m}, the computer among them, talk to {a}."
+"{n} semillas de {s}, {e}.","{n} {s} seeds, {e}."
+"«Tú verás. Hasta que acabe la feria, aquí las tengo.»",«Up to you. I'll have them here until the fair ends.»
+"«En la feria, solo efectivo.»","«At the fair, cash only.»"
+Hoy: {f},Today: {f}
+Feria de semillas de primavera,Spring seed fair
+"Mañana empieza la feria de semillas en el mercado de la Ribera, en Bilbao. Tres días. Los de los puestos traen cosas que no verás en ningún banco.","The seed fair starts tomorrow at the Ribera market, in Bilbao. Three days. The stallholders bring things you won't see in any seed bank."
+Fiestas del barrio,Neighbourhood fiestas
+"Mañana empiezan las fiestas del barrio, cinco días. Ven a la calle, que tu tía no se perdía ni una y todos te preguntan.","The neighbourhood fiestas start tomorrow, five days. Come out to the street: your aunt never missed one and everyone asks about you."
+Romería de la ermita,Hermitage pilgrimage
+Mañana es la romería de la ermita. Tu tía subía todos los años con sus cuadernos. La serora guarda algo para quien suba.,Tomorrow is the pilgrimage to the hermitage. Your aunt went up every year with her notebooks. The serora is keeping something for whoever goes up.
+"Koldo, en el muelle, un día de temporal","Koldo, at the dock, on a stormy day"
+"Con esta mar no sale nadie. Siéntate, que te cuento.","Nobody goes out in this sea. Sit down, I'll tell you something."
+"Hace años me quedé en la Reunión un mes por un motor roto. Me traje esto en una lata de tabaco. Zamal, lo llaman allí. Para ti.","Years ago I was stuck on Réunion for a month with a broken engine. I brought this back in a tobacco tin. Zamal, they call it there. It's yours."
+"la serora de la ermita, el día de la romería","the serora of the hermitage, on pilgrimage day"
+"Has subido el día de la romería, como ella. Tu tía me dejó un sobre para quien viniera hoy.","You came up on pilgrimage day, like she did. Your aunt left me an envelope for whoever came today."
+"Dice: «Ethiopian Highland, de un monje de las tierras altas. Que suba al monte otra vez.»","It says: «Ethiopian Highland, from a monk in the highlands. Let it go back up the mountain.»"
+"el puesto de especias, en la feria de semillas","the spice stall, at the seed fair"
+"Para la feria traigo lo de mi primo de Cachemira, en bolsitas de té. Semillas de Kashmiri, de su valle.","For the fair I bring my cousin's stuff from Kashmir, in tea bags. Kashmiri seeds, from his valley."
+"el puesto de flores, en la feria de semillas","the flower stall, at the seed fair"
+"Las flores no se venden solas. Para los que saben, debajo del mostrador: Vietnamese Black, de los montes.","Flowers don't sell themselves. For those in the know, under the counter: Vietnamese Black, from the hills."
+"el puesto de verdura, en la feria de semillas","the vegetable stall, at the seed fair"
+Mi mujer es de Chiang Mai. Su padre las guardaba en el arroz: Highland Thai. Solo las saco en la feria.,My wife is from Chiang Mai. Her father kept these in the rice: Highland Thai. I only bring them out at the fair.
+"Patxi, en las fiestas del barrio","Patxi, at the neighbourhood fiestas"
+"¡Fiestas! Mira, esto lo ganó tu tía en la tómbola de la txosna, el último año. Me lo dejó a mí para que no lo fumara.","Fiestas! Look, your aunt won this at the txosna raffle, last year. She left it with me so she wouldn't smoke it."
+"Colombian Gold. De la sierra de Santa Marta, dijo ella. Tuyo.","Colombian Gold. From the Sierra de Santa Marta, she said. Yours."
+"la abuela Txaro, en las fiestas del barrio","Granny Txaro, at the neighbourhood fiestas"
+"En fiestas se regala, que lo dice el refrán. Mi vecino colombiano me trajo de su tierra hace mil años.","At fiesta time you give gifts, as the saying goes. My Colombian neighbour brought me these from home ages ago."
+"Punto Rojo. Yo no sé qué es, pero tu tía decía que era buena. Toma.","Punto Rojo. I don't know what it is, but your aunt said it was good. Here."
+"Julen, en verano, si sois amigos","Julen, in summer, if you're friends"
+"He vuelto de México. Lo de las playas, mentira: estuve en el altiplano, con un abuelo que cultiva como antes.","I'm back from Mexico. The beaches were a lie: I was up on the plateau, with an old man who grows the old way."
+Me dio estas. Michoacán. Mejor en tus manos que en las mías.,He gave me these. Michoacán. Better in your hands than mine.
+"Bixente, en la chatarrería, en otoño","Bixente, at the scrapyard, in autumn"
+"Un camionero de Tánger me dejó una caja de piezas en septiembre. Debajo de los tornillos, esto.","A trucker from Tangier left me a box of parts in September. Under the screws, this."
+Kif del Rif. Yo de esto no entiendo; tú sí. Llévatelo.,Kif from the Rif. I don't know about this; you do. Take it.
+"Andoni, en el molino, en primavera, si sois amigos","Andoni, at the mill, in spring, if you're friends"
+"En primavera limpio los botes del abuelo. Este no lo cambio, te lo regalo, que tú los cuidas.","In spring I clean my grandfather's jars. I won't trade this one, I'm giving it to you, because you look after them."
+"Beldia, de Ketama. La más vieja que tengo.","Beldia, from Ketama. The oldest I have."
+"Txomin, en la Kale Zaharra, en invierno","Txomin, in the Kale Zaharra, in winter"
+En invierno las setas van lentas y yo me aburro. Ordenando el bajo salió un bote del dueño de antes.,"In winter the mushrooms are slow and I get bored. Tidying the basement, a jar turned up from the previous owner."
+"Pone «Bekaa». Libanesa, creo. Para ti, que las mías no son de esto.","It says «Bekaa». Lebanese, I think. For you, mine aren't this kind."
+"Iñaki, en verano, si sois amigos","Iñaki, in summer, if you're friends"
+"Un cliente sudafricano, de los que vienen a hacer surf. No tenía suelto y me pagó con esto.","A South African customer, one of the surfers. He had no change and paid me with this."
+"Durban Poison, dice. Tú que plantas, sácale partido.","Durban Poison, he says. You're the grower, make the most of it."
+"Arrieta, en la nave, en otoño, si sois amigos","Arrieta, at the warehouse, in autumn, if you're friends"
+"Vaciando la nave de al lado, un saco de semillas de pájaro. Y en medio, un sobre con letra de mujer.","Clearing out the warehouse next door, a sack of birdseed. And in the middle, an envelope in a woman's handwriting."
+"Swazi Gold. Si es lo que creo, es de tu tía. Le alquilé un rincón hace años.","Swazi Gold. If it's what I think, it's your aunt's. I rented her a corner years ago."
+"Delroy, en la asociación, en invierno, si sois amigos","Delroy, at the association, in winter, if you're friends"
+En invierno me acuerdo de los que se fueron. Tu tía y yo cambiamos semillas con un congoleño de Bilbao.,In winter I remember the ones who are gone. Your aunt and I swapped seeds with a Congolese man from Bilbao.
+Estas son las suyas: Congolese. Las guardaba para ella.,These are his: Congolese. I was keeping them for her.
+"Miren, en Errotabarri, en primavera, si sois amigos","Miren, in Errotabarri, in spring, if you're friends"
+"En primavera tu tía venía a sembrar conmigo. Un año trajo estas de Nepal, de un viaje que no me quiso contar.","In spring your aunt came to sow with me. One year she brought these from Nepal, from a trip she wouldn't tell me about."
+"Nepalese. Las colinas del Himalaya, decía. Ya es hora de que vuelvan a la tierra.","Nepalese. The Himalayan foothills, she said. It's time they went back into the ground."
+"Kiko, en el growshop, en invierno, si sois amigos","Kiko, at the grow shop, in winter, if you're friends"
+"En enero hago inventario. Detrás de las lámparas viejas, un sobre de tu tía: Panama Red, del 79, dice.","In January I do the stocktake. Behind the old lamps, an envelope from your aunt: Panama Red, from '79, it says."
+"No sé si germinarán. Si alguien lo consigue, eres tú.","I don't know if they'll germinate. If anyone can, it's you."
+"el capataz del almacén del muelle de Bilbao, en invierno","the foreman at the Bilbao dock warehouse, in winter"
+"En invierno llegan menos cargueros. Uno de Bangkok dejó esto en un palé roto. Thai, de las selvas del norte.","Fewer freighters come in winter. One from Bangkok left this on a broken pallet. Thai, from the northern jungles."
+Aquí nadie lo quiere. Llévatelo antes de que lo barra.,Nobody here wants it. Take it before I sweep it up.

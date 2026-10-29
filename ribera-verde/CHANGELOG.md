@@ -2,6 +2,11 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Siguiente (sin APK todavía) · las landraces por estación y por gente y las fiestas fijas (ESTUDIO, tanda 4; lo pidió el usuario: «metas mano a las mejoras que hablamos»; con `Datos.CAL`)
+
+- Diecisiete landraces del banco del PC también se cazan: las da la gente que ya está, una vez por partida, en su estación, un día de temporal o en su fiesta, y a veces con confianza (`CAZA` de `tools/caza.py`, `src/caza.gd`, `S.caza`): Koldo con temporal (Zamal), la serora en la romería (Ethiopian Highland), tres puestos del mercado de la Ribera en la feria (Kashmiri, Vietnamese Black y Highland Thai, 40 € en efectivo), Patxi y Txaro en las fiestas del barrio (Colombian Gold y Punto Rojo), y por estación Julen, Bixente, Andoni, Txomin, Iñaki, Arrieta, Delroy, Miren (después de la Luang Prabang), Kiko y el capataz del almacén del muelle de Bilbao. Con las 12 de `REGALO` y la Malana del Acto II, 30 que se cazan; el recetario dice quién y cuándo.
+- Tres fiestas fijas en el calendario, este año y el que viene: la feria de semillas de primavera (15-17 de mayo, en el mercado de la Ribera), las fiestas del barrio (14-18 de agosto) y la romería de la ermita (8 de septiembre); el SMS la víspera y el aviso al llegar. Prueba `tests/caza.gd`.
+
 ### Siguiente (sin APK todavía) · el Acto II, «Quién entró en el piso» (ESTUDIO, tanda 3; lo pidió el usuario: «metas mano a las mejoras que hablamos»; con `Datos.CAL`)
 
 - Cerrado el cuaderno azul, al día siguiente la abuela Txaro avisa de que vio luz en el piso de la tía la semana del entierro; en el diploma, la rueda de la caja está forzada (`a2_rueda`). Tres sospechosos: Darko, Unai Garro (un comprador de semillas de Bilbao, de Semillas Ondarea, inventada) y el sargento Molina (`src/acto2.gd`, `S.a2`).
