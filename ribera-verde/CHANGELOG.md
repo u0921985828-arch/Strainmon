@@ -2,7 +2,7 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### Siguiente (sin APK todavía)
+### 0.66.1 (código 91) · el cono de los agentes más suave; APK en `descargas/LandraceHunters.apk` (89 MB)
 
 - El cono de visión de los agentes, más suave (lo pidió el usuario: «hazlos más suaves»; con `Datos.CAL`): alfa 34 en vez de 87 (`VISTA_ALFA` en `pinta.gd`); sin CAL, como el HTML.
 
