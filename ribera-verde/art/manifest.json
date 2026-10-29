@@ -1482,6 +1482,16 @@
    ],
    "ajuste": "exacto",
    "nota": "las carpas de KAIA por niveles a 16 px/m: la base en el centro de la casilla de abajo a la izquierda (8, 79) y el mueble en sus w casillas desde x 0; las demás casillas (carpaG2) no se pintan"
+  },
+  "carpa_kx": {
+   "w": 208,
+   "h": 112,
+   "ancla": [
+    8,
+    111
+   ],
+   "ajuste": "exacto",
+   "nota": "la carpa de sala de KAIA de 13 × 7 casillas a 16 px/m: la base en el centro de la casilla de abajo a la izquierda (8, 111) y el mueble en sus 13 casillas desde x 0; las demás casillas (carpaG2) no se pintan"
   }
  },
  "fases": [
@@ -14089,10 +14099,29 @@
     "obj:carpaKM1",
     "obj:carpaKL0"
    ],
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/kaia_carpa.py",
-   "estilo_ref": "la carpa de las madres de la nave (carpaM de locales.py)",
-   "notas": "Lo pidió el usuario: «como en casa, cultivo con carpas, pero más grandes de primeras». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
-   "descripcion": "Las carpas de la sala de cultivo de KAIA por niveles (2 × 2, 4 × 2 y 4 × 4 m), plateadas y abiertas de frente, con un LED de barras por columna, el extractor y el filtro encima y el tubo al techo, y sus plantas (kcs-<n>, kcm-<n>, kcl-<n>)."
+   "origen": "la carpa de 150 del piso (carpa-g150-mapa, de PixelLab) alargada por columnas y filas suyas: python3 -I tools/sprites/a-mano/kaia_carpa.py",
+   "estilo_ref": "las carpas del piso (carpas-mapa y carpas-medias-mapa)",
+   "notas": "Lo pidió el usuario: «así no son las carpas, como te he dicho que las haga, de como están hechas en casa». Negras y cerradas, de frente con el techo a medio fondo, nunca en isométrica; solo con Datos.CAL.",
+   "descripcion": "Las carpas de la sala de cultivo de KAIA por niveles (2 × 2, 4 × 2 y 4 × 4 m), hechas como las del piso: negras y cerradas, con el techo a medio fondo, la barra plateada del armazón y la puerta con su cremallera (dos en las de 4 m) (kcs, kcm, kcl)."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "max_colores": 32,
+   "id": "kaia-carpa-sala",
+   "celda": "carpa_kx",
+   "cubre": [
+    "obj:carpaKX"
+   ],
+   "origen": "la carpa de 150 del piso (carpa-g150-mapa, de PixelLab) alargada por columnas y filas suyas: python3 -I tools/sprites/a-mano/kaia_carpa.py",
+   "estilo_ref": "las carpas del piso (carpas-mapa y carpas-medias-mapa)",
+   "notas": "Lo pidió el usuario: «así no son las carpas, como te he dicho que las haga, de como están hechas en casa». Negras y cerradas, de frente con el techo a medio fondo, nunca en isométrica; solo con Datos.CAL.",
+   "descripcion": "La carpa de sala de KAIA (1.300 × 700 × 250 cm), hecha como las del piso: negra y cerrada, el techo a medio fondo con sus travesaños, la barra plateada y la puerta para entrar andando en su casilla (kcx)."
   },
   {
    "fase": "F9",

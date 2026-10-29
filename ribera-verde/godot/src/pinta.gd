@@ -417,6 +417,8 @@ func _mundo() -> void:
 		list.append([2 * 16 - 1, _manguera_nave])   # 1.33: la manguera del riego, detrás de lo de la fila 2
 	if Datos.CAL and J.D.has("KAIA_CULT") and S.map == String(J.D.KAIA_CULT.f2.sala):   # las tuberías de drenaje de KAIA, detrás de las mesas
 		list.append([2 * 16 - 1, _tubos_dren])
+	if Datos.CAL and J.D.has("KAIA_CULT") and S.map == String(J.D.KAIA_CULT.mapa):   # el tubo de extracción de cada carpa, pegado al techo
+		list.append([1 << 20, _tubos_kaia])
 	if Atlas.ok and ambiente_on:
 		for e in J.ents:
 			_ambiente(e)
@@ -1215,8 +1217,9 @@ static func mascara_valla(mo: Array, o: String, tx: int, ty: int) -> int:
 	return (1 if es.call(tx, ty - 1) else 0) | (2 if es.call(tx + 1, ty) else 0) | (4 if es.call(tx, ty + 1) else 0) | (8 if es.call(tx - 1, ty) else 0)
 
 # los objetos de KAIA hechos con PixelLab (lo pidió el usuario: «hazlo con Pixel Lab», «EN ISOMETRICO NO»): o-<objeto> de
-# kaia_pl.png, de frente a 3/4; el pie en la fila de abajo y, a lo ancho, la casilla de la izquierda (OBJ_PL_ANCLA: x del ancla)
-const OBJ_PL_ANCLA := {"mesaKP": 8, "drenKS": 24, "carpaKX": 8}
+# kaia_pl.png, de frente a 3/4; el pie en la fila de abajo y, a lo ancho, la casilla de la izquierda (OBJ_PL_ANCLA: x del ancla).
+# Las mesas de la sala, como las de la nave (lo pidió el usuario: «lo quiero como la nave»): la mesaN, con sus plantas en la bandeja
+const OBJ_PL_ANCLA := {"drenKS": 24}
 static func obj_pl(o: String):
 	if not Datos.CAL or not OBJ_PL_ANCLA.has(o):
 		return null
@@ -1230,7 +1233,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	if seca:
 		o = "hg-" + o.substr(4)
 	var fpl = obj_pl(o)   # lo de KAIA de PixelLab (kaia_pl.png), de frente
-	var gr = Atlas.cubre("obj:" + o)
+	var gr = Atlas.cubre("obj:mesaN" if Datos.CAL and o == "mesaKP" else "obj:" + o)   # i18n-no
 	if not gr and fpl == null:
 		return
 	var an = null if fpl != null else Atlas.sobre.get("obj:" + o)
@@ -1238,7 +1241,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var md = J.mesa_de(o, tx, ty) if o == "mesaN" or o == "mesaKP" else null   # la mesa de la nave o de KAIA: {Me, fm, foco}  # i18n-no
 	var fm: int = int(md.fm) if md != null else 0
 	var pl = _plantas_mesa(gr if gr else Atlas.cubre("obj:mesaN"), md.Me, fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima  # i18n-no
-	var sp: String = ("mesaKP" if o == "mesaKP" else "mesaN-%d" % mini(fm, 1)) if md != null else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)  # i18n-no
+	var sp: String = ("mesaN-%d" % mini(fm, 1)) if md != null else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)  # i18n-no
 	var f = fpl if fpl != null else Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
 	var ge = Atlas.cubre("obj:e-" + o) if Datos.CAL and not an and fpl == null else null   # 1.47: a escala con el protagonista (escala.py), solo con CAL
 	var fd = _detalle_obj(o, tx) if Datos.CAL and not an and fpl == null else null   # 1.48: con lo que trae encima (detalle.py)
@@ -1423,6 +1426,23 @@ func _poleas_nave(x0: int, yb: int, t0 := 0) -> Array:
 func _tubos_dren() -> void:
 	for e in J.tubos_dren():
 		_rect(float(e[0]) - cam.x, float(e[1]) - cam.y, e[2], e[3], css(e[4]))
+
+# el tubo de cada carpa de KAIA a la pared (kaiacult.gd tubos_ext): de la boca del canto de atrás de su techo, recto por el techo de la
+# sala hasta el pasamuros de chapa de la pared, con sus abrazaderas
+func _tubos_kaia() -> void:
+	for q in J.tubos_ext():
+		var x: int = int(q[0]) - cam.x
+		var yw: int = int(q[1]) - cam.y
+		var yb: int = int(q[2]) - cam.y
+		_rect(x - 6, yw - 5, 13, 10, css("#2a2a34"))   # el pasamuros
+		_rect(x - 5, yw - 4, 11, 8, css("#b4b8c0"))
+		_rect(x - 5, yw - 4, 11, 1, css("#e4e8ee"))
+		_rect(x - 5, yw + 3, 11, 1, css("#8a8e98"))
+		for r in [[x - 4, yw - 3], [x + 4, yw - 3], [x - 4, yw + 2], [x + 4, yw + 2]]:
+			_rect(r[0], r[1], 1, 1, css("#7a7e86"))   # los remaches
+		_tubo(x - 2, yw - 1, 5, yb - yw + 1, false)
+		_rect(x - 3, yw + 3, 7, 2, css("#5a5e66"))   # la abrazadera en el pasamuros
+		_rect(x - 3, yb - 2, 7, 2, css("#5a5e66"))   # y en la boca de la carpa
 
 func _manguera_nave() -> void:
 	for e in J.manguera_nave():

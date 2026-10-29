@@ -1996,7 +1996,7 @@ s62ad04d6,"El tanque del riego centralizado, con el abono ya mezclado: las bomba
 sa9e94427,"El programador del riego de las mesas: los turnos de cada una, el pH y la EC, en automático.","The tables' irrigation controller: each one's cycles, the pH and the EC, all automatic."
 s04708b3d,"El programador del riego de las mesas: los turnos de cada una, la acidez y la EC, en automático.","The tables' irrigation controller: each one's cycles, the acidity and the EC, all automatic."
 s135969dd,"La sala, en obras: desagües, el cuadro trifásico y el clima industrial. Las mesas estarán montadas el {f}.","The room is under works: drains, the three-phase panel and industrial climate control. The tables will be set up on {f}."
-sd2bdf196,"El cuadro de la sala: seis mesas con su LED doble, el riego centralizado y el clima. {q}","The room's control panel: six tables with their double LED, central irrigation and climate. {q}"
+s087765b0,"El cuadro de la sala: ocho mesas con su LED doble, el riego centralizado y el clima. {q}","The room's control panel: eight tables with their double LED, central irrigation and climate. {q}"
 s60bc25ab,Las lleva {n}.,{n} runs them.
 s5f6947bc,Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.,Nobody runs them: put someone from your crew in the room from your phone.
 s00dc0a86,{k} de {m} de {n},{k} of {m} of {n}
@@ -2083,7 +2083,7 @@ s0e6f70cf,"Antes, llévate lo seco de esta mesa.","First, take the dried buds fr
 sb960ede7,¿QUÉ PLANTAS EN LA MESA?,WHAT GOES ON THE TABLE?
 sb8cca834,"Mesa {i}: {nom}{et}. La mesa entera de clones: enraízan, crecen a 18/6 y florecen a 12/12. Se cosecha entera en unos {d} días y vuelve a empezar.","Table {i}: {nom}{et}. A whole table of clones: they root, grow at 18/6 and flower at 12/12. It's harvested in one go in about {d} days and starts again."
 se14080f3,A la sala de KAIA,To the KAIA room
-sb49f8383,"{n}: «Mañana empiezo en la sala de cultivo de KAIA: las seis mesas, el riego y los cortes. {e} al día».","{n}: ""I start in KAIA's grow room tomorrow: the six tables, the watering and the harvests. {e} a day."""
+sc44dfde1,"{n}: «Mañana empiezo en la sala de cultivo de KAIA: las ocho mesas, el riego y los cortes. {e} al día».","{n}: ""I start in KAIA's grow room tomorrow: the eight tables, the watering and the harvests. {e} a day."""
 s3bc2ab46,sala de KAIA,KAIA room
 s3b43529a,"Lleva las mesas de la sala de cultivo de KAIA por {e} al día: con su cuidado, la cosecha da un {p} %.","Runs the tables in KAIA's grow room for {e} a day: with their care, the harvest yields {p} %."
 s5ef79f60,lookObj,
@@ -3063,9 +3063,7 @@ s2c2a3a96,neonH,neonH
 scdc589d4,tuboS,tuboS
 sb4c03f0c,botesW,botesW
 sbc952707,neonG,neonG
-s1c032c45,mesaKP,
 s0eeb28db,drenKS,
-s339fa8d5,carpaKX,
 se00620e0,baldaS,baldaS
 sf2e78f6a,doorX,
 sa802c4ea,humoHecho,
@@ -4980,9 +4978,11 @@ s2bba7e85,frioF,
 s1e962b9a,mesaF,
 s08c6a1ed,iwT_kcs,
 se766c3cf,iwB_kcs,
-s516bd93e,riegoN,riegoN
+s1c032c45,mesaKP,
 s1c7f083e,mesaKP2,
 s68b6a0a2,tanqueN,tanqueN
+s516bd93e,riegoN,riegoN
+s0bda5e79,drenKS2,
 s30a02292,ESTUDIANTE,STUDENT
 sf07acb89,Hola. Me ha dicho un amigo que tienes.,Hi. A friend said you've got some.
 s42927016,"Aupa, ¿tienes algo? Voy justo de dinero.","Hey, got anything? I'm a bit short on cash."
@@ -6828,6 +6828,7 @@ sd7150e0b,Ocho mesas de flujo y reflujo de 240 × 120 con su LED doble,Eight 240
 s1a47c179,Riego centralizado con su tanque,Central irrigation with its tank
 sa9e51af4,Drenaje: tuberías y depósito de recogida,Drainage: pipes and collection tank
 sc2d98008,Extracción con filtros de carbón,Extraction with carbon filters
+s339fa8d5,carpaKX,
 sed28d3b4,Paneles de poliuretano de 80 mm y puerta frigorífica,80 mm polyurethane panels and a cold-room door
 s284c4628,"Equipo de frío de 1,5 kW para 4 °C",1.5 kW cooling unit for 4 °C
 s4d95cc43,"Equipo de frío de 1,5 kW para 4°",1.5 kW cooling unit for 4°

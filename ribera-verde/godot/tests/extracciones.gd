@@ -30,6 +30,36 @@ func foto(e: Dictionary, T, now: float) -> Image:
 	im.convert(Image.FORMAT_RGBA8)
 	return im
 
+# la escena animada (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): sus 4 fotogramas de PixelLab, distintos de
+# la escena, y en pantalla, en el sitio de la escena, el fotograma que toca a cada hora
+func anima(e: Dictionary, T: Dictionary, k: String) -> String:
+	var Es = load("res://src/escena_extr.gd")
+	var b0: Image = Es.pl(k)
+	for i in range(1, 5):
+		var f: Image = Es.PL.get("%s/%d" % [k, i])
+		if f == null or f.get_size() != b0.get_size():
+			return "sin el fotograma %d" % i
+		if f.get_data() == b0.get_data():
+			return "el fotograma %d es la escena quieta" % i
+	var c := 8 * int(Es.PL_MS)
+	var t0: float = floorf(float(e.now) / c) * c + 1
+	var vistos := {}
+	var antes: Image = null
+	for paso in [0, 1, 2]:
+		var t: float = t0 + paso * int(Es.PL_MS)
+		var im: Image = await foto(e, T, t)
+		var y0: int = ((J.SH - 8) >> 1) - int(Es.H) - 10
+		var q: Image = im.get_region(Rect2i((J.SW - int(Es.W)) >> 1, y0, int(Es.W), int(Es.H)))
+		var esp: Image = Es.pl_t(k, t).duplicate()
+		esp.convert(Image.FORMAT_RGBA8)
+		if q.get_data() != esp.get_data():
+			return "a los %d ms no se ve el fotograma %d" % [int(t - t0), Es.foto_pl(k, t)]
+		vistos[Es.foto_pl(k, t)] = 1
+		if antes != null and antes.get_data() == q.get_data():
+			return "la escena no cambia a los %d ms" % int(t - t0)
+		antes = q
+	return "" if vistos.size() == 3 else "solo %d fotogramas" % vistos.size()
+
 func _corre() -> void:
 	var dir := arg("--salida")
 	Juego.GUARDADO = "user://prueba-extr.json"
@@ -78,6 +108,10 @@ func _corre() -> void:
 				fallos.append("%s %d: no se mueve" % [t, i])
 			if load("res://src/escena_extr.gd").pl("%s-%d" % [t, i]) == null:   # de PixelLab (lo pidió el usuario: «con esta calidad»)
 				fallos.append("%s %d: sin su escena de PixelLab" % [t, i])
+			else:
+				var m: String = await anima(e, T, "%s-%d" % [t, i])
+				if m != "":
+					fallos.append("%s %d: %s" % [t, i, m])
 			tot += 1
 	for k in ["manos", "epi", "auto", "flujo", "micro", "bal", "res"]:   # el laboratorio (bancotia.gd lab_ver): cada paso con su escena
 		var n: int = J.lab_pasos(k).size()
@@ -96,10 +130,15 @@ func _corre() -> void:
 				fallos.append("lab %s %d: no se mueve" % [k, i])
 			if load("res://src/escena_extr.gd").pl("l%s-%d" % [k, i]) == null:   # la escena es de PixelLab (lo pidió el usuario)
 				fallos.append("lab %s %d: sin su escena de PixelLab" % [k, i])
+			else:
+				var m: String = await anima(e, T, "l%s-%d" % [k, i])
+				if m != "":
+					fallos.append("lab %s %d: %s" % [k, i, m])
 			tot += 1
 	# el EPI a la vista: de PixelLab (pixellab_epi.py) parado y andando, con la bata, los guantes y las gafas y sin la gorra en las
 	# cuatro direcciones
 	J.TIRO = null
+	J.pintor.redibuja(now)   # el fotograma parado sale del reloj del pintor: siempre el mismo, no el de la última escena
 	var gr = J.grupo_pj()
 	for d in ["down", "up", "left", "right"]:
 		J.P.dir = d
@@ -125,7 +164,7 @@ func _corre() -> void:
 					az += 1
 				if p.g8 > p.r8 + 40 and p.g8 > p.b8 + 30:
 					gorra += 1
-		if bl < 20 or (d != "up" and az < 1) or gorra > 0:
+		if bl < (15 if d in ["left", "right"] else 20) or (d != "up" and az < 1) or gorra > 0:   # de lado se ve menos bata (16 px el peor parado)
 			fallos.append("EPI %s: de PixelLab, bata %d, guantes %d, gorra %d" % [d, bl, az, gorra])
 		var gp: Image = pl.duplicate()
 		gp.resize(32 * 8, 32 * 8, Image.INTERPOLATE_NEAREST)

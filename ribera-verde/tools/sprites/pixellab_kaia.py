@@ -8,6 +8,11 @@ from PIL import Image
 R = os.path.dirname(os.path.abspath(__file__))
 CRUDO = os.path.join(R, "pixellab-kaia", "crudo")
 SALE = os.path.join(R, "..", "..", "godot", "arte", "kaia_pl")
+# las escenas animadas (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): de cada una, los fotogramas 1-4 de
+# animate_image (pixellab-kaia/anim/<clave>-<i>.png; el 0 es la escena tal cual) en kaia_pl_anim.png, 4 por fila, una fila por
+# escena (aparte: una sola hoja pasaría de los 16384 px de alto de una textura), con su modo de anim.json (vaiven o bucle)
+ANIM = os.path.join(R, "pixellab-kaia", "anim")
+FOTOS = 4
 
 ELEGIDAS = {
 	"lmanos-0": "lmanos0-0", "lmanos-1": "lmanos1-2", "lmanos-2": "lmanos2-1",
@@ -29,8 +34,7 @@ ELEGIDAS = {
 	"moon-3": "moon3-0",
 	"mani-0": "mani0-0", "mani-1": "mani1-1", "mani-2": "mani2-0",
 	# lo de la sala de cultivo de KAIA, de frente (lo pidió el usuario: «EN ISOMETRICO NO»)
-	"o-mesaKP": "mesaP-13", "o-drenKS": "depF-1", "o-carpaKX": "carpaS-0",
-	"o-mesaF": "mesaF-0", "o-ledK": "led2-8",
+	"o-drenKS": "depF-1", "o-mesaF": "mesaF-0",
 }
 # la pared de la carpa de sala por dentro: una casilla de 16 × 32 que se repite sin costura, de dos tramos de pliegues lisos
 # de pared-0 (sin los cantos oscuros ni la hebilla del medio)
@@ -48,7 +52,7 @@ def limpia(im):
 				px[x, y] = px[x2, y]
 	return im
 
-SIN_FONDO = {"o-ledK"}   # los que PixelLab devolvió con el fondo pintado: fuera el color de la esquina (y lo que se le parece)
+SIN_FONDO = set()   # los que PixelLab devolvió con el fondo pintado: fuera el color de la esquina (y lo que se le parece)
 def quita_fondo(im):
 	px = im.load()
 	W, H = im.size
@@ -81,10 +85,24 @@ def main():
 		r[k] = [0, y, i.width, i.height]
 		y += i.height
 	hoja.save(SALE + ".png")
+	modos = json.load(open(ANIM + ".json"))
+	escenas = [k for k in ims if k in modos]
+	w, h = ims[escenas[0]].size
+	ha = Image.new("RGBA", (w * FOTOS, h * len(escenas)), (0, 0, 0, 0))
+	ra = {}
+	for n, k in enumerate(escenas):
+		assert ims[k].size == (w, h), k
+		for i in range(1, FOTOS + 1):
+			im = limpia(Image.open(os.path.join(ANIM, "%s-%d.png" % (k, i))).convert("RGBA"))
+			assert im.size == (w, h), (k, i, im.size)
+			ha.alpha_composite(im, ((i - 1) * w, n * h))
+			ra["%s/%d" % (k, i)] = [(i - 1) * w, n * h, w, h]
+	ha.save(SALE + "_anim.png")
 	with open(SALE + ".json", "w") as f:
-		json.dump({"r": r}, f, indent=0)
-	with open(SALE + ".png.import", "w") as f:
-		f.write('[remap]\n\nimporter="keep"\n')
-	print(len(r), "piezas", hoja.size)
+		json.dump({"r": r, "ra": ra, "anim": {k: modos[k][1] for k in escenas}}, f, indent=0)
+	for sale in (SALE + ".png", SALE + "_anim.png"):
+		with open(sale + ".import", "w") as f:
+			f.write('[remap]\n\nimporter="keep"\n')
+	print(len(r), "piezas", hoja.size, "·", len(escenas), "escenas animadas", ha.size)
 
 main()

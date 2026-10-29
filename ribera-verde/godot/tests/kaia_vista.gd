@@ -20,6 +20,46 @@ var QUIERO := []
 var n := 0
 var fallos := []
 
+# la vista de una mesa con plantas (lo pidió el usuario: «los sprites de las plantas no están dentro de la bandeja»; «el visor estilo a
+# casa con la carpa de fondo»): las cinco macetas de casa con el pie en el fondo de la bandeja (o-mesaF, filas 12 a 24) y dentro de su
+# ancho; cada planta encima de su maceta; los dos LED de 720 de casa, por encima de todas las plantas; el canto de delante encima
+func mesa_dentro(R: Array, que: String) -> void:
+	var A = load("res://src/arte.gd")
+	var mf: Image = load("res://src/escena_extr.gd").pl("o-mesaF")
+	var mi: Image = A.foto("maceta-c-tela11-20")
+	var led: Image = A.foto(J.MESAK_LED)
+	var x0: int = (J.SW - 240) >> 1
+	var my: int = J.MAD_H - 2 - mf.get_height()
+	var mx: int = x0 + ((240 - mf.get_width()) >> 1)
+	var mac := []
+	var leds := []
+	var pl := []
+	var canto := -1
+	for j in R.size():
+		var q = R[j]
+		if not (q is Array and q.size() > 3 and q[0] is String and q[0] == "@"):
+			continue
+		if q[1] is Image and q[1].get_size() == mi.get_size() and q[1].get_data() == mi.get_data():
+			mac.append([int(q[2]), int(q[3]) + mi.get_height(), j])
+		elif q[1] is Image and q[1].get_size() == led.get_size() and q[1].get_data() == led.get_data():
+			leds.append(int(q[3]) + led.get_height())
+		elif q[1] == mf and q.size() > 4 and q[4] is Rect2i and q[4].position.y == my + J.MESAK_CANTO:
+			canto = j
+		elif q[1] is Image and q[1] != mf and not mac.is_empty() and mac[-1][2] == j - 1:
+			pl.append([int(q[3]) + q[1].get_height() - A.alto(q[1]), int(q[3]) + q[1].get_height(), int(q[2]) + (q[1].get_width() >> 1), mac[-1][0] + (mi.get_width() >> 1)])
+	chk(mac.size() == 5, "%s: las cinco macetas (%d)" % [que, mac.size()])
+	for m in mac:
+		chk(m[1] >= my + 12 and m[1] <= my + J.MESAK_CANTO + 2 and m[0] >= mx + 8 and m[0] + mi.get_width() <= mx + 184, "%s: la maceta en la bandeja (x %d, base %d; la bandeja de %d a %d, el fondo de %d a %d)" % [que, m[0] - mx, m[1] - my, 8, 184, 12, J.MESAK_CANTO + 2])
+		chk(canto > m[2], "%s: el canto de la bandeja, delante de la maceta" % que)
+	chk(pl.size() == 5, "%s: una planta por maceta (%d)" % [que, pl.size()])
+	var cima := 1000
+	for p in pl:
+		chk(absi(p[2] - p[3]) <= 1, "%s: la planta, centrada en su maceta (%d, %d)" % [que, p[2], p[3]])
+		cima = mini(cima, p[0])
+	chk(leds.size() == 2, "%s: el LED doble, los dos LED de 720 de casa (%d)" % [que, leds.size()])
+	for b in leds:
+		chk(b <= cima - 4, "%s: el LED por encima de las plantas (su pie %d, la cima %d)" % [que, b, cima])
+
 func _initialize() -> void:
 	Datos.PLAY = false
 	_corre.call_deferred()
@@ -107,6 +147,7 @@ func cierra(st: Dictionary) -> bool:
 func foto(dir: String, k: String) -> void:
 	if dir == "":
 		return
+	var o0: bool = J.oraculo
 	J.oraculo = false
 	J.toast_box.hide()
 	J.dlg.hide()
@@ -116,7 +157,7 @@ func foto(dir: String, k: String) -> void:
 		for r in 4:
 			await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(dir.path_join("kaia-vista-%s.png" % k))
-	J.oraculo = true
+	J.oraculo = o0   # como estaba (la vista de las mesas, con pantalla)
 
 func dicho(t: String) -> bool:
 	return LOG.any(func(l): return String(l).contains(t))
@@ -305,8 +346,10 @@ func _corre() -> void:
 	# 4b · la carpa de sala: A en una mesa abre su vista (la pared de la carpa, el LED doble y la mesa con sus plantas)
 	J.S.kc = {"niv": 2, "kits": [-1, -1, -1, -1, -1, -1, -1], "p": [], "v": 2, "f2": 0, "m": []}
 	J.kc()
+	var ms := []   # kc() deja la sala de antes con sus ocho mesas vacías: aquí, las de la prueba, de una vez
 	for i in 8:
-		J.kc().m.append(null if i == 5 else {"k": "txoko", "f": Cultivo.nueva_planta(J.S, "txoko").f, "thc": 18.0, "y": 1.0, "dia": J.S.day, "g": 0, "t": 0, "abo": 1, "p": [.05, .3, .5, .7, .9, 0, .4, .8][i], "dn": 0, "am": 0, "ao": 0, "n": 0})
+		ms.append(null if i == 5 else {"k": "txoko", "f": Cultivo.nueva_planta(J.S, "txoko").f, "thc": 18.0, "y": 1.0, "dia": J.S.day, "g": 0, "t": 0, "abo": 1, "p": [.05, .3, .5, .7, .9, 0, .4, .8][i], "dn": 0, "am": 0, "ao": 0, "n": 0})
+	J.kc().m = ms
 	var SA: String = J.D.KAIA_CULT.f2.sala
 	J.enter_map(SA, 6, 7, "up")
 	J.S.min = 12 * 60
@@ -328,9 +371,17 @@ func _corre() -> void:
 		if q is Array and q.size() > 1 and q[0] is String and q[0] == "@":
 			imgs += 1
 	chk(imgs >= 4, "la pared, los dos LED y la mesa: %d imágenes" % imgs)
+	mesa_dentro(R, "mesa 3")
+	await foto(dir, "mesa-veg")
 	J.press("right")
 	M.paso()
 	chk(int(J.MESA_KV.i) == 3, "▶: la mesa 4")
+	mesa_dentro(J.rects_mesak(J.MESA_KV), "mesa 4")
+	var th: float = M.reloj
+	while M.reloj - th < 1500 and M.paso():   # el reloj sigue y el HUD se refresca cada 250 ms: no vuelve encima de la vista
+		pass
+	chk(J.MESA_KV != null and not J.hud.visible, "con el reloj andando, el HUD sigue sin salir encima de la vista")
+	await foto(dir, "mesa-flor")
 	J.press("down")
 	M.paso()
 	chk(int(J.MESA_KV.i) == 7, "▼: la de debajo, la 8")

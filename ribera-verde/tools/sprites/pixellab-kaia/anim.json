@@ -1,0 +1,202 @@
+{
+ "_": "Las escenas animadas (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): animate_image de PixelLab sobre la escena elegida de cada paso (crudo/<ELEGIDAS>), 4 fotogramas, semilla 7 (11 en las rehechas: tercer campo). anim/<clave>-<i>.png: el 0 es la escena tal cual y del 1 al 4 los de PixelLab. modo: vaiven (0 1 2 3 4 3 2 1) o bucle (1 2 3 4, lo que gira).",
+ "lmanos-0": [
+  "hands rub together under the running tap water, soap foam bubbles, the water stream flows",
+  "vaiven"
+ ],
+ "lmanos-1": [
+  "hands scrub each other with soap lather under the faucet, water falls and splashes",
+  "vaiven"
+ ],
+ "lmanos-2": [
+  "hands rub and dry with the paper towel, the towel crumples between the fingers",
+  "vaiven"
+ ],
+ "lepi-0": [
+  "fingers button up the white lab coat, the hands move closing the button",
+  "vaiven"
+ ],
+ "lepi-1": [
+  "hands lift the safety goggles up toward the face, the elastic strap stretches",
+  "vaiven"
+ ],
+ "lepi-2": [
+  "one hand pulls the blue nitrile glove tight over the other wrist, fingers flex",
+  "vaiven"
+ ],
+ "lauto-0": [
+  "the gloved hand places the glass tools into the wire basket one by one",
+  "vaiven"
+ ],
+ "lauto-1": [
+  "small puffs of steam rise from the autoclave valve, the pressure gauge needle trembles, the red display blinks",
+  "vaiven"
+ ],
+ "lauto-2": [
+  "the gloved finger taps the gauge and the needle swings slowly up and down",
+  "vaiven"
+ ],
+ "lflujo-0": [
+  "fine airflow particles drift down inside the laminar flow hood, the green light blinks",
+  "vaiven"
+ ],
+ "lflujo-1": [
+  "the gloved hand squeezes the spray bottle trigger, a mist of alcohol sprays out",
+  "vaiven"
+ ],
+ "lflujo-2": [
+  "gloved hands gently lift and turn the petri dish inside the hood",
+  "vaiven"
+ ],
+ "lmicro-0": [
+  "gloved hands slide the glass slide slowly under the microscope lens",
+  "vaiven"
+ ],
+ "lmicro-1": [
+  "only the gloved hand slowly turns the focus knob back and forth; the magnified seed in the circle stays exactly the same, smooth and unchanged",
+  "vaiven",
+  11
+ ],
+ "lbal-0": [
+  "the gloved finger taps the tare button of the scale, the green display flickers",
+  "vaiven"
+ ],
+ "lbal-1": [
+  "the gloved hand tips the paper envelope and small seeds fall onto the scale, the display digits change",
+  "vaiven"
+ ],
+ "lres-0": [
+  "the gloved hand drops the used gloves into the yellow biohazard bin, the lid sways",
+  "vaiven"
+ ],
+ "lres-1": [
+  "the hand in the blue nitrile glove wipes the steel bench with the white cloth back and forth; the glove stays blue the whole time",
+  "vaiven",
+  11
+ ],
+ "rosin-0": [
+  "only the hand slowly turns the temperature knob, the red digits on the small display change; the press plates and the paper stay exactly the same",
+  "vaiven",
+  11
+ ],
+ "rosin-1": [
+  "the hand pulls the press lever down, the heated plates squeeze and golden rosin oozes and drips out slowly between the plates",
+  "vaiven"
+ ],
+ "rosin-2": [
+  "hands fold and gently pull the parchment paper, the golden rosin spreads",
+  "vaiven"
+ ],
+ "seco-0": [
+  "hands shake the wooden sieve side to side, fine golden pollen falls onto the paper below",
+  "vaiven"
+ ],
+ "seco-1": [
+  "hands shake the sieve frame side to side, pollen sifts down onto the paper",
+  "vaiven"
+ ],
+ "seco-2": [
+  "hands shake the round sieve, fine golden dust falls through the mesh onto the pile",
+  "vaiven"
+ ],
+ "seco-3": [
+  "the hand scrapes the golden kief together with the plastic card",
+  "vaiven"
+ ],
+ "ice-0": [
+  "ice water pours from the pitcher into the bucket and splashes over the buds",
+  "vaiven"
+ ],
+ "ice-1": [
+  "the wooden paddle stirs the icy water in circles, buds and ice swirl",
+  "bucle"
+ ],
+ "ice-2": [
+  "hands lift the mesh bag, water drains and drips through the filter into the bucket",
+  "vaiven"
+ ],
+ "ice-3": [
+  "fingers crumble and spread the wet hash on the drying tray",
+  "vaiven"
+ ],
+ "charas-0": [
+  "hands gently rub the resinous bud between the palms, the leaves sway",
+  "vaiven"
+ ],
+ "charas-1": [
+  "fingers roll and rub the dark resin on the palm",
+  "vaiven"
+ ],
+ "charas-2": [
+  "fingers roll the dark hash ball between them",
+  "vaiven"
+ ],
+ "hash-0": [
+  "hands hold the folded paper over the hot plate, heat shimmer rises",
+  "vaiven"
+ ],
+ "hash-1": [
+  "hands turn the screw press handle, the plate presses down on the cloth bundle",
+  "vaiven"
+ ],
+ "moon-0": [
+  "hot oil bubbles in the small pan on the hot plate, the hand moves the handle slightly",
+  "vaiven"
+ ],
+ "moon-1": [
+  "chopsticks dip the bud into the golden oil, the oil drips down from it",
+  "vaiven"
+ ],
+ "moon-2": [
+  "fingers roll the oily bud in the bowl of kief, the kief coats it",
+  "vaiven"
+ ],
+ "moon-3": [
+  "the hand picks up the golden moonrock and turns it slowly",
+  "vaiven"
+ ],
+ "lava-0": [
+  "ice water pours from the jug into the washing machine drum onto the buds",
+  "vaiven"
+ ],
+ "lava-1": [
+  "the water and buds swirl in a circle inside the washing machine drum, the vortex rotates clockwise; hands and machine stay still",
+  "bucle"
+ ],
+ "lava-2": [
+  "water flows from the hose into the filter bucket, the water surface ripples",
+  "vaiven"
+ ],
+ "lava-3": [
+  "hands lift the stacked mesh bags, the water drains and drips down",
+  "vaiven"
+ ],
+ "stat-0": [
+  "hands shake the metal sieve, fine trichomes fall onto the black tray",
+  "vaiven"
+ ],
+ "stat-1": [
+  "the hand rubs the cloth on the acrylic sheet, trichomes jump up from the tray toward it",
+  "vaiven"
+ ],
+ "stat-2": [
+  "hands move the charged acrylic plate above the tray, trichomes float up and stick to it",
+  "vaiven"
+ ],
+ "stat-3": [
+  "the hand scrapes the trichomes off the acrylic plate with the card, golden dust falls",
+  "vaiven"
+ ],
+ "mani-0": [
+  "hands hold the branch, the scissors open and snip the fan leaves",
+  "vaiven"
+ ],
+ "mani-1": [
+  "the scissors open and close trimming the bud, small leaves fall",
+  "vaiven"
+ ],
+ "mani-2": [
+  "the scissors snip around the bud, the hand turns the bud, trimmings fall onto the tray",
+  "vaiven"
+ ]
+}

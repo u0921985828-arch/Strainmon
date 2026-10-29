@@ -56,11 +56,11 @@ func _corre() -> void:
 	J.enter_map("cult-muelle", 1, 4, "down")
 	J.mode = "world"
 	var C := "cult-muelle"
-	# la carpa 3 (8, 7): seis a la izquierda pisa el pasillo; una a la derecha, otra vez en la zona
+	# la carpa 2 (8, 6): seis a la izquierda pisa el pasillo; una a la derecha, otra vez en la zona
 	var vistos := []
 	var fin := {"r": null}
 	var co := func():
-		fin.r = await J.mover_pieza(C, "kcs2")
+		fin.r = await J.mover_pieza(C, "kcs1")
 	co.call()
 	M.paso()
 	for b in ["left", "left", "left", "left", "left", "left"]:
@@ -75,9 +75,9 @@ func _corre() -> void:
 	J.press("A")
 	for q in 30:
 		M.paso()
-	var p: Array = J.pos_pieza(C, "kcs2")
-	chk(fin.r == true and int(p[0]) == 3 and int(p[1]) == 7, "dejada en la zona (%s %s)" % [fin.r, p])
-	chk(J.MAPS[C].o[8][3] == "carpaKS2" and J.MAPS[C].o[7][3] == "carpaG2" and J.MAPS[C].o[8][8] == null and J.MAPS[C].o[8][11] == "carpaKS3", "en la sala, ya en su sitio nuevo")
+	var p: Array = J.pos_pieza(C, "kcs1")
+	chk(fin.r == true and int(p[0]) == 3 and int(p[1]) == 6, "dejada en la zona (%s %s)" % [fin.r, p])
+	chk(J.MAPS[C].o[7][3] == "carpaKS1" and J.MAPS[C].o[6][3] == "carpaG2" and J.MAPS[C].o[7][8] == null and J.MAPS[C].o[7][11] == "carpaKS2", "en la sala, ya en su sitio nuevo")
 	# guardar y cargar
 	J.S.kc.p[15] = {"sid": "txoko", "prog": .3, "water": 100, "health": 100, "fert": false, "pest": false}
 	var txt := JSON.stringify(J.S)
@@ -85,8 +85,8 @@ func _corre() -> void:
 	J.MAPS[C] = J.D.MAPS[C].duplicate(true)
 	Datos.enteros(J.MAPS[C])
 	J.enter_map(C, 1, 4, "down")
-	p = J.pos_pieza(C, "kcs2")
-	chk(int(p[0]) == 3 and int(p[1]) == 7 and J.MAPS[C].o[8][3] == "carpaKS2" and J.kc().p[15] is Dictionary, "tras guardar y cargar, igual")
+	p = J.pos_pieza(C, "kcs1")
+	chk(int(p[0]) == 3 and int(p[1]) == 6 and J.MAPS[C].o[7][3] == "carpaKS1" and J.kc().p[15] is Dictionary, "tras guardar y cargar, igual")
 	print("kaia_orden: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:
 		print("  FALLO: " + f)

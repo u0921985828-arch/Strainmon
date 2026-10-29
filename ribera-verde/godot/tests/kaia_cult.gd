@@ -88,6 +88,144 @@ func alcance_d(mapa: String, x0: int, y0: int) -> Dictionary:
 func delante(v: Dictionary, x: int, y: int) -> bool:
 	return [[0, 1], [0, -1], [1, 0], [-1, 0]].any(func(d): return v.has("%d,%d" % [x + d[0], y + d[1]]))
 
+# la red del riego y del drenaje de la sala (kaiacult.gd red_riego; lo pidió el usuario: «todas las conexiones de riego, de drenaje
+# hazlas con cabeza y pensando… LOGICAS»), contra los sprites (cajas_obj), no contra sus propias cuentas: cada red, de una pieza; la
+# impulsión, de la bomba del tanque al programador y por la electroválvula de cada mesa; el drenaje, de debajo del desagüe de cada
+# bandeja (mesaN: en su canto, a la derecha) al depósito de recogida y de él, de vuelta, al tanque; nada por el suelo de un pasillo:
+# debajo de las mesas, tapado por un aparato, pegado a una pared (la de la derecha o la de delante) o por encima de los aparatos
+func _caja(C: Array, o: String):
+	for c in C:
+		if c.o == o:
+			return c
+	return null
+
+func _opaco(c, x: int, y: int) -> bool:
+	var u: int = x - int(c.px)
+	var v: int = y - int(c.py)
+	return u >= 0 and v >= 0 and u < c.c.get_width() and v < c.c.get_height() and c.c.get_pixel(u, v).a8 > 0
+
+func _toca(t: Array, c) -> bool:   # el tramo pasa por un píxel del aparato (o pegado a él)
+	for q in _px(t):
+		for d in [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]:
+			if _opaco(c, q[0] + d[0], q[1] + d[1]):
+				return true
+	return false
+
+func _px(t: Array) -> Array:
+	var o := []
+	for y in range(mini(int(t[1]), int(t[3])), maxi(int(t[1]), int(t[3])) + 1):
+		for x in range(mini(int(t[0]), int(t[2])), maxi(int(t[0]), int(t[2])) + 1):
+			o.append([x, y])
+	return o
+
+func _junta(a: Array, b: Array) -> bool:   # dos tramos que se tocan (con 1 px de holgura, lo que mide el tubo)
+	return mini(int(a[0]), int(a[2])) <= maxi(int(b[0]), int(b[2])) + 1 and mini(int(b[0]), int(b[2])) <= maxi(int(a[0]), int(a[2])) + 1 and mini(int(a[1]), int(a[3])) <= maxi(int(b[1]), int(b[3])) + 1 and mini(int(b[1]), int(b[3])) <= maxi(int(a[1]), int(a[3])) + 1
+
+# el tubo de extracción de cada carpa a la pared (kaiacult.gd tubos_ext; lo pidió el usuario: «todas las conexiones… lógicas»): n tubos,
+# cada uno de la boca del techo de su carpa al pasamuros de la pared de atrás, sin pisarse (a un tubo como poco) y dentro de su carpa
+func tubos_ok(n: int, txt: String) -> void:
+	var T: Array = J.tubos_ext()
+	var m: Dictionary = J.MAPS[J.S.map]
+	var malos := []
+	for i in T.size():
+		var q: Array = T[i]
+		if int(q[1]) != int(J.KC_TUBO_PARED) or int(q[2]) <= int(q[1]) + 4 or int(q[2]) >= int(m.h) * 16:
+			malos.append("tubo %d: %s" % [i, q])
+		for k in range(i + 1, T.size()):
+			if absi(int(T[k][0]) - int(q[0])) < 9:
+				malos.append("tubos %d y %d juntos" % [i, k])
+		var x: int = int(q[0]) / 16
+		var y: int = (int(q[2]) + 40) / 16
+		var dentro := false
+		for dy in range(0, 4):
+			var o = m.o[mini(y + dy, int(m.h) - 1)][x] if x < int(m.w) else null
+			if o is String and (String(o).begins_with("carpa")):
+				dentro = true
+		if not dentro:
+			malos.append("tubo %d fuera de su carpa (%d, %d)" % [i, x, y])
+	chk(T.size() == n and malos.is_empty(), "%s: %d tubos a la pared %s" % [txt, T.size(), malos.slice(0, 4)])
+
+func red_logica(SA: String, ms: Dictionary) -> void:
+	var F2: Dictionary = J.D.KAIA_CULT.f2
+	var red: Array = J.red_riego()
+	var C: Array = J.cajas_obj(SA, ms.o)
+	var W: int = int(ms.w) * 16
+	var H: int = int(ms.h) * 16
+	var tq = _caja(C, "tanqueN")
+	var rg = _caja(C, "riegoN")
+	var dr = _caja(C, "drenKS")
+	chk(tq != null and rg != null and dr != null, "el tanque, el programador y el depósito, pintados")
+	if tq == null or rg == null or dr == null:
+		return
+	chk(red.size() >= 2 * 2 + F2.mesas.size() + 5, "la red: %d tramos" % red.size())
+	for tp in ["sum", "dren"]:   # cada red, de una pieza: sus tramos, juntos o por un aparato en el que entran los dos (el programador, el depósito)
+		var L: Array = red.filter(func(q): return q[4] == tp)
+		var ap: Array = [tq, rg] if tp == "sum" else [dr, tq]
+		var g := []   # de qué trozo es cada tramo (y, detrás, cada aparato)
+		for i in L.size() + ap.size():
+			g.append(i)
+		var une := func(i: int, j: int) -> bool:
+			if i < L.size() and j < L.size():
+				return _junta(L[i], L[j])
+			if i < L.size() and j >= L.size():
+				return _toca(L[i], ap[j - L.size()])
+			return false
+		var cambia := true
+		while cambia:
+			cambia = false
+			for i in g.size():
+				for j in g.size():
+					if g[i] != g[j] and une.call(i, j):
+						var a: int = mini(g[i], g[j])
+						g[i] = a
+						g[j] = a
+						cambia = true
+		var trozos := {}
+		for x in g:
+			trozos[x] = true
+		chk(trozos.size() == 1, "%s: de una pieza, con sus aparatos (%d trozos)" % ["la impulsión" if tp == "sum" else "el drenaje y la vuelta", trozos.size()])
+	chk(red.any(func(q): return q[4] == "sum" and _toca(q, tq)), "la impulsión sale de la bomba del tanque")
+	chk(red.any(func(q): return q[4] == "sum" and _toca(q, rg)), "y pasa por el programador")
+	chk(red.any(func(q): return q[4] == "dren" and not q[5] and _toca(q, dr)), "el drenaje llega al depósito de recogida")
+	chk(red.any(func(q): return q[4] == "dren" and q[5] and _toca(q, dr)) and red.any(func(q): return q[4] == "dren" and q[5] and _toca(q, tq)), "y la vuelta, del depósito al tanque, por encima")
+	for k in F2.mesas.size():
+		var mx: int = int(F2.mesas[k][0])
+		var my: int = int(F2.mesas[k][1])
+		var me = null
+		for c in C:
+			if c.o == "mesaKP" and int(c.x) == mx and int(c.y) == my:
+				me = c
+		chk(me != null, "la mesa %d, pintada" % (k + 1))
+		if me == null:
+			continue
+		# el desagüe de mesaN: el cuadradito oscuro del canto de la bandeja, a la derecha (celda 37-38, 37-38 del sprite)
+		var xd: int = int(me.px) + 37
+		var yd: int = int(me.py) + 38
+		var baja = null
+		for q in red:
+			if q[4] == "dren" and int(q[0]) == int(q[2]) and int(q[0]) >= xd - 1 and int(q[0]) <= xd + 2 and mini(int(q[1]), int(q[3])) >> 4 == my:
+				baja = q
+		chk(baja != null and mini(int(baja[1]), int(baja[3])) > yd and _opaco(me, int(baja[0]), mini(int(baja[1]), int(baja[3]))), "mesa %d: su bajante sale de debajo de la bandeja, bajo su desagüe (%s; el desagüe en %d, %d)" % [k + 1, baja, xd, yd])
+		chk(baja != null and red.any(func(q): return q[4] == "dren" and int(q[1]) == int(q[3]) and int(q[1]) == maxi(int(baja[1]), int(baja[3])) and int(baja[0]) >= mini(int(q[0]), int(q[2])) and int(baja[0]) <= maxi(int(q[0]), int(q[2]))), "mesa %d: y cae al colector de su fila" % (k + 1))
+		var xv: int = mx * 16 + 10
+		chk(red.any(func(q): return q[4] == "sum" and int(q[1]) == int(q[3]) and xv >= mini(int(q[0]), int(q[2])) and xv <= maxi(int(q[0]), int(q[2])) and int(q[1]) >= my * 16 + 9 and int(q[1]) <= my * 16 + 11), "mesa %d: la impulsión pasa por su electroválvula" % (k + 1))
+	var malos := []
+	for q in red:
+		if q[5]:
+			continue
+		for p in _px(q):
+			var tx: int = int(p[0]) >> 4
+			var ty: int = int(p[1]) >> 4
+			var ok: bool = p[0] >= W - 9 or p[1] >= H - 3 or (ty < ms.o.size() and tx < ms.o[ty].size() and ms.o[ty][tx] != null)
+			if not ok:
+				for c in C:
+					if _opaco(c, int(p[0]), int(p[1])):
+						ok = true
+						break
+			if not ok:
+				malos.append("%s %d,%d" % [q[4], p[0], p[1]])
+	chk(malos.is_empty(), "nada por el suelo de un pasillo: %s" % [malos.slice(0, 4)])
+
 func _corre() -> void:
 	Juego.GUARDADO = "user://prueba-kaia-cult.json"
 	Juego.AJUSTES = "user://prueba-kaia-cult-ajustes.json"
@@ -166,7 +304,7 @@ func _corre() -> void:
 	chk(mundo(C, 1, 2) and m.o[3][13] == null, "hoy no está")
 	J.S.day += 1
 	chk(mundo(C, 1, 2) and m.o[3][13] == "carpaKS0" and m.o[2][13] == "carpaG2" and m.o[2][14] == "carpaG2" and m.o[3][14] == "carpaG2" and m.o[4][13] == null, "mañana, montada en su sitio, 2 × 2")
-	chk(J.sprite_local("carpaKS0") == "kcs-0", "la carpa, vacía (%s)" % J.sprite_local("carpaKS0"))
+	chk(J.sprite_local("carpaKS0") == "kcs", "la carpa, cerrada como las de casa (%s)" % J.sprite_local("carpaKS0"))
 	chk(not MENUS.is_empty(), "el cuadro, con menú")
 	TIT = []
 	QUIERO = []
@@ -182,7 +320,7 @@ func _corre() -> void:
 	corre(func(): await J.object_action(2, 1))
 	chk(J.kc().kits.filter(func(d): return int(d) >= 0).size() == 4 and not MENUS.back().any(func(l): return str(l).begins_with("Comprar:")), "cuatro como mucho")
 	J.S.day += 1
-	chk(mundo(C, 1, 2) and m.o[3][13] == "carpaKS0" and m.o[7][13] == "carpaKS1" and m.o[8][8] == "carpaKS2" and m.o[8][11] == "carpaKS3", "las cuatro, en su sitio")
+	chk(mundo(C, 1, 2) and m.o[3][13] == "carpaKS0" and m.o[7][8] == "carpaKS1" and m.o[7][11] == "carpaKS2" and m.o[7][14] == "carpaKS3", "las cuatro, en su sitio")
 	var v := alcance_d(C, 1, 2)
 	for y in m.h:
 		for x in m.w:
@@ -194,7 +332,7 @@ func _corre() -> void:
 	# 6 · la regla de la zona y la del solape
 	chk(J.cabe_pieza(C, "kcs0", 0, 4) == "zona" and J.cabe_pieza(C, "kcs0", 1, 4) == "zona", "en el pasillo, no: «%s»" % J.cabe_pieza(C, "kcs0", 1, 4))
 	chk(J.cabe_pieza(C, "kcs0", 4, 5) == "", "en la zona libre, sí: «%s»" % J.cabe_pieza(C, "kcs0", 4, 5))
-	chk(J.cabe_pieza(C, "kcs0", 8, 5) == "solapa", "delante de otra carpa, con el tubo encima de ella, no: «%s»" % J.cabe_pieza(C, "kcs0", 8, 5))
+	chk(J.cabe_pieza(C, "kcs1", 13, 4) == "solapa", "pegada delante de otra carpa, con su techo encima de ella, no: «%s»" % J.cabe_pieza(C, "kcs1", 13, 4))
 	chk(str(D.ORDEN_MOTIVO.zona).contains("zona de cultivo") and str(D.ORDEN_MOTIVO.solapa).contains("encima"), "los motivos, dichos")
 	chk(J.cabe_pieza("home", "carpa0", 8, 2) != "zona", "las carpas de casa, sin la regla")
 	mundo("club-muelle", 14, 3)
@@ -220,7 +358,7 @@ func _corre() -> void:
 	MENUS = []
 	LOG = []
 	chk(corre(func(): await J.object_action(13, 3)) and J.kc().p[0] is Dictionary and J.kc().p[0].sid == "txoko" and int(J.S.seeds.get("txoko", 0)) == 2, "plantada en la plaza 1 (%s · %s · %s)" % [MENUS.slice(-3), J.kc().p.slice(0, 2), LOG.slice(-3)])
-	chk(J.sprite_local("carpaKS0") == "kcs-1" and J.sprite_local("carpaKS1") == "kcs-0", "la carpa 1, con una planta")
+	chk(J.sprite_local("carpaKS0") == "kcs" and J.sprite_local("carpaKS1") == "kcs", "con una planta, cerrada igual (las plantas, por dentro: kc_vista)")
 	QUIERO = ["Plaza 4", J.strain("txoko").n]
 	chk(corre(func(): await J.object_action(14, 2)) and J.kc().p[3] is Dictionary and J.kc_plantadas(0) == 2, "por la otra punta, la misma carpa, plaza 4")
 	# 8 · crecen solas, con el goteo, también fuera de la sala
@@ -260,7 +398,7 @@ func _corre() -> void:
 	chk(corre(func(): await J.object_action(2, 1)) and int(J.kc().niv) == 1 and int(J.kc().kits[4]) == int(J.S.day) + 1 and J.kc_kits() == 4 and J.kc().p[3] is Dictionary, "a las de 4 × 2: una pedida y las cuatro de 2 × 2 siguen (%s)" % [J.kc().kits])
 	chk(is_equal_approx(float(J.S.banco), bn - kps[1]), "por la cuenta, solo la nueva (%d €)" % int(bn - J.S.banco))
 	J.S.day += 1
-	chk(mundo(C, 1, 2) and m.o[3][3] == "carpaKM0" and m.o[2][6] == "carpaG2" and m.o[3][7] == null and m.o[3][13] == "carpaKS0" and J.sprite_local("carpaKM0") == "kcm-0", "mañana, la de 4 × 2 en su sitio, con las de antes")
+	chk(mundo(C, 1, 2) and m.o[3][3] == "carpaKM0" and m.o[2][6] == "carpaG2" and m.o[3][7] == null and m.o[3][13] == "carpaKS0" and J.sprite_local("carpaKM0") == "kcm", "mañana, la de 4 × 2 en su sitio, con las de antes")
 	QUIERO = ["Comprar: Carpa 400×200", "Comprarlo"]
 	corre(func(): await J.object_action(2, 1))
 	J.S.day += 1
@@ -274,6 +412,7 @@ func _corre() -> void:
 	corre(func(): await J.object_action(2, 1))
 	J.S.day += 1
 	chk(int(J.kc().niv) == 2 and mundo(C, 1, 2) and m.o[8][3] == "carpaKL0" and m.o[5][6] == "carpaG2" and J.kc_kits() == 7 and J.solapes_de(J.cajas_obj(C, m.o)).is_empty(), "la de 4 × 4 con las seis de antes, sin solapes")
+	tubos_ok(7, "las siete carpas")
 	MENUS = []
 	QUIERO = []
 	corre(func(): await J.object_action(2, 1))
@@ -306,6 +445,7 @@ func _corre() -> void:
 	J.S.day += int(KC.f2.dias)
 	var CX: Dictionary = KC.f2.carpa
 	chk(mundo(C, 1, 2) and m.o[int(CX.def[1]) + int(CX.tam[1]) - 1][int(CX.def[0])] == "carpaKX" and m.o[int(CX.def[1])][int(CX.def[0]) + int(CX.tam[0]) - 1] == "carpaG2", "la carpa de sala, en toda la zona")
+	tubos_ok(2, "la de sala")
 	sl = J.solapes_de(J.cajas_obj(C, m.o))
 	chk(sl.is_empty(), "la carpa de sala, sin solapes: %s" % [sl.slice(0, 3)])
 	v = alcance_d(C, 1, 2)
@@ -314,10 +454,11 @@ func _corre() -> void:
 	var SA: String = KC.f2.sala
 	chk(corre(func(): await J.object_action(int(CX.puerta[0]), int(CX.puerta[1]) - 1)) and J.S.map == SA and J.P.x == int(KC.f2.entra[0]) and J.P.y == int(KC.f2.entra[1]), "se entra en la carpa de sala (%s %d,%d)" % [J.S.map, J.P.x, J.P.y])
 	var ms: Dictionary = J.MAPS[SA]
-	chk(KC.f2.mesas.all(func(q): return ms.o[int(q[1])][int(q[0])] == "mesaKP" and ms.o[int(q[1])][int(q[0]) + 1] == "mesaKP2"), "las ocho mesas, montadas")
-	chk(ms.o[8][0] == "tanqueN" and ms.o[1][11] == "riegoN" and ms.o[8][12] == "drenKS" and ms.o[1][1] == "ctrlN", "el tanque, el programador, el depósito de drenaje y el cuadro")
+	chk(KC.f2.mesas.all(func(q): return ms.o[int(q[1])][int(q[0])] == "mesaKP" and ms.o[int(q[1])][int(q[0]) + 1] == "mesaKP2" and ms.o[int(q[1])][int(q[0]) + 2] == "mesaKP2"), "las ocho mesas de 240 cm, montadas en sus tres casillas")
+	chk(ms.o[8][8] == "tanqueN" and ms.o[8][10] == "riegoN" and ms.o[8][12] == "drenKS" and ms.o[1][1] == "ctrlN", "el tanque, el programador, el depósito de drenaje y el cuadro")
 	sl = J.solapes_de(J.cajas_obj(SA, ms.o))
 	chk(sl.is_empty(), "las mesas, sin solapes: %s" % [sl.slice(0, 3)])
+	red_logica(SA, ms)
 	v = alcance_d(SA, int(KC.f2.entra[0]), int(KC.f2.entra[1]))
 	for y in ms.h:
 		for x in ms.w:
@@ -420,6 +561,14 @@ func _corre() -> void:
 	chk(gs[0] < gs[1] and gs[1] < gs[2], "lleno, cada nivel rinde más: %s" % [gs])
 	J.S.kc = {"kits": [], "p": [], "f2": 3, "m": []}
 	chk(int(J.kc().niv) == 0 and J.kc().get("f2") == 3, "la reformada, igual")
+	# 13b · la sala reformada de antes, con seis mesas: las suyas siguen en su sitio y las dos que faltan, vacías (kc)
+	var m6 := []
+	for i in 6:
+		m6.append({"k": "txoko", "p": .1 * (i + 1), "dia": 1, "g": 0, "t": 0, "abo": 1, "dn": 0, "am": 0, "ao": 0, "n": 0})
+	J.S.kc = {"niv": 2, "kits": [], "p": [], "v": 2, "f2": 3, "m": m6.duplicate()}
+	var m8: Array = J.kc().m
+	chk(m8.size() == KC.f2.mesas.size() and m8.size() == 8 and m8.slice(0, 6) == m6 and m8[6] == null and m8[7] == null, "de seis mesas a ocho: las seis con lo suyo y dos vacías (%d)" % m8.size())
+	chk(J.kc().m.size() == 8 and J.kc_me(5) != null and J.kc_me(6) == null and J.kc_fase(6) == 0, "otra vez, igual: ocho")
 	# 14 · sin CAL, nada
 	Datos.CAL = false
 	chk(J.puertas_int("club-muelle").is_empty() and J.sprite_local("carpaKS0") == "carpaKS0" and not J.kc_hay(), "sin CAL, ni la puerta ni la sala")

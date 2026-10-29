@@ -631,7 +631,7 @@ carpaK2,carpaK2
 "El programador del riego de las mesas: los turnos de cada una, el pH y la EC, en automático.","The tables' irrigation controller: each one's cycles, the pH and the EC, all automatic."
 "El programador del riego de las mesas: los turnos de cada una, la acidez y la EC, en automático.","The tables' irrigation controller: each one's cycles, the acidity and the EC, all automatic."
 "La sala, en obras: desagües, el cuadro trifásico y el clima industrial. Las mesas estarán montadas el {f}.","The room is under works: drains, the three-phase panel and industrial climate control. The tables will be set up on {f}."
-"El cuadro de la sala: seis mesas con su LED doble, el riego centralizado y el clima. {q}","The room's control panel: six tables with their double LED, central irrigation and climate. {q}"
+"El cuadro de la sala: ocho mesas con su LED doble, el riego centralizado y el clima. {q}","The room's control panel: eight tables with their double LED, central irrigation and climate. {q}"
 Las lleva {n}.,{n} runs them.
 Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.,Nobody runs them: put someone from your crew in the room from your phone.
 "El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer.","The room's control panel: the LED timer, the drip and the climate. All automatic: long days while they grow and shorter ones once it's time to flower."
@@ -657,7 +657,7 @@ Lo de esta mesa aún se está secando: espera a que esté seco.,What came off th
 "Antes, llévate lo seco de esta mesa.","First, take the dried buds from this table."
 "Mesa {i}: {nom}{et}. La mesa entera de clones: enraízan, crecen a 18/6 y florecen a 12/12. Se cosecha entera en unos {d} días y vuelve a empezar.","Table {i}: {nom}{et}. A whole table of clones: they root, grow at 18/6 and flower at 12/12. It's harvested in one go in about {d} days and starts again."
 A la sala de KAIA,To the KAIA room
-"{n}: «Mañana empiezo en la sala de cultivo de KAIA: las seis mesas, el riego y los cortes. {e} al día».","{n}: ""I start in KAIA's grow room tomorrow: the six tables, the watering and the harvests. {e} a day."""
+"{n}: «Mañana empiezo en la sala de cultivo de KAIA: las ocho mesas, el riego y los cortes. {e} al día».","{n}: ""I start in KAIA's grow room tomorrow: the eight tables, the watering and the harvests. {e} a day."""
 sala de KAIA,KAIA room
 "Lleva las mesas de la sala de cultivo de KAIA por {e} al día: con su cuidado, la cosecha da un {p} %.","Runs the tables in KAIA's grow room for {e} a day: with their care, the harvest yields {p} %."
 "«Las {n} mesas que tienen plantas van bien: riego, poda y el corte cuando toca. Lo seco, al almacén del club».","""The {n} tables with plants are doing well: watering, pruning and the cut when it's due. The dried buds go to the club's storeroom."""

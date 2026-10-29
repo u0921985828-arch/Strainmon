@@ -51,7 +51,7 @@ static func pinta(pintor, T: Dictionary, now: float, x0: int, y0: int) -> void:
 	var i := int(T.get("paso", 0))
 	var n := int(T.get("n", 1))
 	P._rect(X - 2, Y - 2, W + 4, H + 10, Color("#26262e"))
-	var im := pl("%s-%d" % [String(T.esc), i])   # la escena de PixelLab de ese paso (lo pidió el usuario: «con esta calidad»)
+	var im := pl_t("%s-%d" % [String(T.esc), i], now)   # la escena de PixelLab de ese paso, animada (lo pidió el usuario: «con esta calidad»)
 	if im != null:
 		P._img(im, X, Y)
 	else:
@@ -65,7 +65,7 @@ static func pinta(pintor, T: Dictionary, now: float, x0: int, y0: int) -> void:
 			"moon": moon(i, t, p)
 			"stat": stat(i, t, p)
 			"mani": mani(i, t, p)
-			"lmanos", "lepi", "lauto", "lflujo", "lmicro", "lbal", "lres": lab_pl(String(T.esc), i)
+			"lmanos", "lepi", "lauto", "lflujo", "lmicro", "lbal", "lres": lab_pl(String(T.esc), i, now)
 			_: r(0, 0, W, H, Color("#2b2f3a"))
 	for k in n:   # los pasos: hechos, el de ahora y los que quedan
 		P._rect(X + W - 6 * n + 6 * k, Y + H + 3, 4, 3, Color("#58d080") if k == i else Color("#a0a0a8") if k < i else Color("#4a4a54"))
@@ -886,6 +886,9 @@ static func mani(i: int, t: float, p: float) -> void:
 # ── el laboratorio del banco de la tía (bancotia.gd lab_ver): cada paso, su escena de PixelLab (lo pidió el usuario: «quiero que lo
 # hagas con Pixel Lab, no lo hagas tú con dibujos»; tools/sprites/pixellab_kaia.py → arte/kaia_pl.png), con la barra debajo
 static var PL := {}
+static var PLA := {}   # las escenas animadas: clave → modo (vaiven o bucle); sus fotogramas, PL["<clave>/<1-4>"] (kaia_pl_anim.png)
+const PL_MS := 170   # lo que dura cada fotograma
+const PL_SEC := {"vaiven": [0, 1, 2, 3, 4, 3, 2, 1], "bucle": [1, 2, 3, 4]}   # 0, la escena tal cual
 
 static func carga_pl() -> bool:
 	if PL.size():
@@ -899,13 +902,29 @@ static func carga_pl() -> bool:
 	for k in j.r:
 		var q: Array = j.r[k]
 		PL[k] = im.get_region(Rect2i(int(q[0]), int(q[1]), int(q[2]), int(q[3])))
+	var ia := Image.new()
+	if j.has("ra") and ia.load_png_from_buffer(FileAccess.get_file_as_bytes("res://arte/kaia_pl_anim.png")) == OK:
+		for k in j.ra:
+			var q: Array = j.ra[k]
+			PL[k] = ia.get_region(Rect2i(int(q[0]), int(q[1]), int(q[2]), int(q[3])))
+		PLA = j.get("anim", {})
 	return true
 
 static func pl(k: String) -> Image:   # una pieza de PixelLab, o null
 	return PL.get(k) if carga_pl() else null
 
-static func lab_pl(k: String, i: int) -> void:
-	var im := pl("%s-%d" % [k, i])
+static func foto_pl(k: String, now: float) -> int:   # el fotograma de la escena k a la hora now (0 si no está animada)
+	if not carga_pl() or not PLA.has(k):
+		return 0
+	var sec: Array = PL_SEC.get(String(PLA[k]), [0])
+	return int(sec[int(now / PL_MS) % sec.size()])
+
+static func pl_t(k: String, now: float) -> Image:   # la escena k con su fotograma de ahora
+	var f := foto_pl(k, now)
+	return pl(k) if f == 0 else PL.get("%s/%d" % [k, f], pl(k))
+
+static func lab_pl(k: String, i: int, now := 0.0) -> void:
+	var im := pl_t("%s-%d" % [k, i], now)
 	if im == null:
 		r(0, 0, W, H, Color("#2b2f3a"))
 		return

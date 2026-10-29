@@ -60,6 +60,36 @@ func corre(f: Callable) -> bool:
 func dicho(t: String) -> bool:
 	return LOG.any(func(l): return String(l).contains(t))
 
+# la escena animada (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): sus 4 fotogramas de PixelLab, distintos de
+# la escena, y en pantalla, en el sitio de la escena, el fotograma que toca a cada hora
+func anima(now: float, T: Dictionary, k: String) -> String:
+	var Es = load("res://src/escena_extr.gd")
+	var b0: Image = Es.pl(k)
+	for i in range(1, 5):
+		var f: Image = Es.PL.get("%s/%d" % [k, i])
+		if f == null or f.get_size() != b0.get_size():
+			return "sin el fotograma %d" % i
+		if f.get_data() == b0.get_data():
+			return "el fotograma %d es la escena quieta" % i
+	var c := 8 * int(Es.PL_MS)
+	var t0: float = floorf(now / c) * c + 1
+	var vistos := {}
+	var antes: Image = null
+	for paso in [0, 1, 2]:
+		var t: float = t0 + paso * int(Es.PL_MS)
+		var im: Image = await foto(T, t)
+		var y0: int = ((J.SH - 8) >> 1) - int(Es.H) - 10
+		var q: Image = im.get_region(Rect2i((J.SW - int(Es.W)) >> 1, y0, int(Es.W), int(Es.H)))
+		var esp: Image = Es.pl_t(k, t).duplicate()
+		esp.convert(Image.FORMAT_RGBA8)
+		if q.get_data() != esp.get_data():
+			return "a los %d ms no se ve el fotograma %d" % [int(t - t0), Es.foto_pl(k, t)]
+		vistos[Es.foto_pl(k, t)] = 1
+		if antes != null and antes.get_data() == q.get_data():
+			return "la escena no cambia a los %d ms" % int(t - t0)
+		antes = q
+	return "" if vistos.size() == 3 else "solo %d fotogramas" % vistos.size()
+
 func foto(T, now: float) -> Image:
 	J.TIRO = T
 	J.pintor.redibuja(now)
@@ -107,6 +137,8 @@ func escenas(dir: String) -> void:
 		chk(a.get_data() != base.get_data(), "paso %d: se pinta" % i)
 		chk(a.get_data() != b.get_data(), "paso %d: se mueve" % i)
 		chk(load("res://src/escena_extr.gd").pl("mani-%d" % i) != null, "paso %d: su escena de PixelLab" % i)
+		var m: String = await anima(now, T, "mani-%d" % i)
+		chk(m == "", "paso %d: animada (%s)" % [i, m])
 	print("manicura: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:
 		print("  FALLO: " + f)

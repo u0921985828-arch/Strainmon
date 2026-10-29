@@ -90,6 +90,11 @@ func kc() -> Dictionary:
 	var n: int = kc_off(kc_ns())
 	while S.kc.p.size() < n:
 		S.kc.p.append(null)
+	if S.kc.get("f2") != null:   # la sala reformada de antes, con seis mesas: las que faltan hasta las ocho, vacías
+		if not (S.kc.get("m") is Array):
+			S.kc.m = []
+		while S.kc.m.size() < D.KAIA_CULT.f2.mesas.size():
+			S.kc.m.append(null)
 	return S.kc
 
 # todas las carpas que caben, por niveles (lo pidió el usuario: «los anteriores serían ir completando con las diferentes medidas la
@@ -256,21 +261,16 @@ func kc_de_pieza(k: String) -> int:   # kc<nivel><i> → la carpa
 			return kc_base(nv) + int(k.substr(3))
 	return -1
 
-# cada carpa con las plantas que tiene (kcs-<n>, kcm-<n>, kcl-<n>, de kaia_carpa.py)
+# cada carpa, cerrada como las de casa (lo pidió el usuario: «de como están hechas en casa»): kcs, kcm y kcl, y la de sala, kcx, de
+# kaia_carpa.py; lo de dentro se ve en su vista (kc_vista)
 func sprite_local(o: String) -> String:
 	if kc_hay():
-		var NV: Array = D.KAIA_CULT.niv
-		for nv in NV.size():
-			var N: Dictionary = NV[nv]
+		if o == String(D.KAIA_CULT.f2.carpa.obj):
+			return "kcx"   # i18n-no
+		for N in D.KAIA_CULT.niv:
 			if o.begins_with(N.obj) and o.substr(String(N.obj).length()).is_valid_int():
-				return "%s-%d" % [N.spr, kc_dibujo(kc_base(nv) + int(o.substr(String(N.obj).length())))]   # i18n-no
+				return String(N.spr)
 	return super(o)
-
-# las plantas que se dibujan en la carpa: el sprite tiene una por plaza del kit (N.plazas); con otro esquema, a esa escala
-func kc_dibujo(ci: int) -> int:
-	var q := kc_plantadas(ci)
-	var np: int = int(kc_Nc(ci).plazas)
-	return 0 if q == 0 else clampi(ceili(float(q) * np / float(kc_n(ci))), 1, np)
 
 func bt_entra(mapa: String) -> void:
 	super(mapa)
@@ -322,7 +322,7 @@ func kc_obj(x: int, y: int, o) -> bool:
 		var F2: Dictionary = D.KAIA_CULT.f2
 		await warp({"to": F2.sala, "x": int(F2.entra[0]), "y": int(F2.entra[1]), "dir": "up"})   # i18n-no
 		return true
-	if o == "drenKS":   # i18n-no
+	if o == "drenKS" or o == "drenKS2":   # i18n-no
 		await say(K("El depósito de recogida: lo que sobra de cada mesa baja por su tubería de drenaje y se filtra antes de volver al tanque."))
 		return true
 	var ci := kc_carpa_en(x, y)
@@ -362,7 +362,7 @@ func kc_cuadro() -> void:
 			return
 		if kc_f2():
 			var w = kc_cultiva()
-			txt = T("El cuadro de la sala: seis mesas con su LED doble, el riego centralizado y el clima. {q}", {"q": T("Las lleva {n}.", {"n": w.n}) if w != null else K("Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.")})
+			txt = T("El cuadro de la sala: ocho mesas con su LED doble, el riego centralizado y el clima. {q}", {"q": T("Las lleva {n}.", {"n": w.n}) if w != null else K("Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.")})
 			ops.append(K("Salir"))
 		else:
 			var NV: Array = D.KAIA_CULT.niv
@@ -821,7 +821,7 @@ func kc_mesa_idx(x: int, y: int) -> int:
 		return -1
 	var Ms: Array = D.KAIA_CULT.f2.mesas
 	for i in Ms.size():
-		if int(Ms[i][1]) == y and (int(Ms[i][0]) == x or int(Ms[i][0]) + 1 == x):
+		if int(Ms[i][1]) == y and x >= int(Ms[i][0]) and x <= int(Ms[i][0]) + 2:   # la mesa de 240 cm, en sus tres casillas
 			return i
 	return -1
 
@@ -846,12 +846,19 @@ func mesa_de(o: String, x: int, y: int):
 
 # ---------- cada mesa por dentro (lo pidió el usuario: «el visor de cada mesa (vista C): de fondo la pared de la carpa y delante la
 # mesa con sus plantas») ----------
-# La pared plateada de la carpa (carpa-c-pared), el LED doble de PixelLab (o-ledK) colgado de sus cuerdas a su temporizador (18/6
-# mientras crecen, 12/12 en flor), la mesa de flujo y reflujo de frente (o-mesaF) con su fila de plantas en la fase de la mesa, con
-# el tono de hoja y el cogollo de su variedad, y abajo a la derecha las ocho mesas de la sala. ◀ ▶ cambian de mesa (▲ ▼, de fila);
-# A, lo de la mesa (kc_mesa); B cierra. MESA_KV = {i: la mesa}
+# De fondo la pared plateada de la carpa (carpa-c-pared, la de casa) y, delante, la mesa de flujo y reflujo de frente (o-mesaF, de
+# PixelLab) con sus cinco macetas de tela de 11 L dentro de la bandeja, como en la nave (3 delante y 2 detrás, a tresbolillo), y en
+# cada una su planta de la vista C en la fase de la mesa, con el tono de hoja y el cogollo de su variedad; encima, el «LED doble»: dos
+# LED de 720 W de casa (foco-c-led720-78) colgados de sus cuerdas, que suben a medida que crecen las plantas, a su temporizador (18/6
+# mientras crecen, 12/12 en flor), y arriba a la derecha las ocho mesas de la sala. ◀ ▶ cambian de mesa (▲ ▼, de fila); A, lo de la
+# mesa (kc_mesa); B cierra. MESA_KV = {i: la mesa}
 const EscK = preload("res://src/escena_extr.gd")
-const MESAK_N := 6   # plantas a la vista en la mesa
+const MESAK_LED := "foco-c-led720-78"   # i18n-no
+const MESAK_MAC := [[-29, 17], [29, 17], [-58, 24], [0, 24], [58, 24]]   # cada maceta: x desde el centro de la mesa y la fila de su base
+const MESAK_CANTO := 23   # o-mesaF: el fondo de la bandeja, de la fila 12 a la 22; el canto de delante, desde la 23
+const MESAK_ALTO := 0.45   # px por cm de alto de las plantas (PLANTA_CM): más bajas que a escala, para que quepan bajo su LED
+const MESAK_TOPE := 28
+const MESAK_ESP := 44   # el sitio de cada planta a lo ancho (vc_planta_sprite)
 
 func vista_mesas(i0: int) -> void:
 	var i := i0
@@ -913,13 +920,13 @@ func elegir_mesak(i0 := 0):
 	return e
 
 var _mk_cache := {}
-func _mesak_planta(Me: Dictionary, fm: int, k: int):   # la planta k de la mesa en su fase, con los colores de su variedad
+func _mesak_planta(Me: Dictionary, fm: int, hp: int):   # la planta de la mesa en su fase y a su alto, con los colores de su variedad
 	var p := {"sid": lot_sid(Me.k), "f": Me.get("f")}
 	var po := Datos.porte_planta(S, p)
-	var n: String = "planta-c-h1-18" if fm == 1 else ("planta-c-%s2-32" % po if fm == 2 else "planta-c-%s-32" % po)
-	if not ArteM.hay(n):
+	var s = VistaM.vc_planta_sprite(po, fm, MESAK_ESP)
+	if s == null or not ArteM.hay(s.n):
 		return null
-	var hp: int = [0, 16, 26, 32, 34][fm] - (k % 2) * 2   # i18n-no
+	var n: String = s.n
 	var sc := Datos.color_cog(S, p)
 	var hj := Datos.hoja_planta(S, p)
 	var ck := "%s|%d|%s|%s" % [n, hp, sc, hj]
@@ -938,32 +945,52 @@ func rects_mesak(V: Dictionary) -> Array:
 	var H: int = MAD_H
 	var clip := Rect2i(x0, 0, 240, H)
 	var on := luz_mesak(i)
+	var Me = kc_me(i)
+	var viva: bool = Me != null and Me.get("h") == null
 	o.append([0, 0, SW, SH, "#0e0e12"])
 	if ArteM.hay("carpa-c-pared"):
 		o.append(["@", ArteM.foto("carpa-c-pared"), x0, -MAD_PARED, clip])
-	var led = EscK.pl("o-ledK")   # i18n-no
-	for fx in [x0 + 32, x0 + 128]:   # el LED doble, colgado del techo de la carpa
-		if led != null:
-			o.append([fx + 6, 0, 1, 11, ArteM.VC_CUERDA])
-			o.append([fx + 73, 0, 1, 11, ArteM.VC_CUERDA])
-			o.append(["@", led, fx, 2, clip])
-		if on:
-			o.append([fx + 4, 18, 72, H - 18, "rgba(255,244,214,0.08)"])
-	var Me = kc_me(i)
-	o.append_array(VistaM.temporizador(x0 + 8, 20, "veg" if Me == null or float(Me.p) < FLOR_MESA else "flor", on))
 	var mf = EscK.pl("o-mesaF")   # i18n-no
 	var my: int = H - 2 - mf.get_height()
 	var mx: int = x0 + ((240 - mf.get_width()) >> 1)
-	o.append(["@", mf, mx, my, clip])
-	if Me and Me.get("h") == null:
+	var cx0: int = mx + (mf.get_width() >> 1)
+	# las macetas en la bandeja, de atrás adelante, cada una con su planta (con el pie en su tierra, VC_TIERRA)
+	var mc := "maceta-c-tela11-20"   # i18n-no
+	var mi: Image = ArteM.foto(mc) if ArteM.hay(mc) else null
+	var ti: int = int(D.VC_TIERRA.get(mc, 17))
+	var cosas := []
+	var tope: int = my + 8   # lo más alto de las plantas: sin ellas, el LED a su altura más baja
+	if viva:
 		var fm := kc_fase(i)
-		for k in MESAK_N:
-			var im = _mesak_planta(Me, fm, k)
-			if im == null:
-				continue
-			var cx: int = mx + 28 + int(round(k * (mf.get_width() - 56) / float(MESAK_N - 1)))
-			o.append(["@", im, cx - (im.get_width() >> 1), my + 21 - im.get_height(), clip])
-		o.append(["@", mf, mx, my, Rect2i(x0, my + 17, 240, H - my - 17)])   # el canto de la bandeja, delante de los tiestos
+		var Dh: Array = D.PLANTA_CM[Datos.porte_planta(S, {"sid": lot_sid(Me.k), "f": Me.get("f")})].h
+		for k in MESAK_MAC.size():
+			var cx: int = cx0 + int(MESAK_MAC[k][0])
+			var yb: int = my + int(MESAK_MAC[k][1])
+			if mi != null:
+				cosas.append(["@", mi, cx - (mi.get_width() >> 1), yb - mi.get_height(), clip])
+			var im = _mesak_planta(Me, fm, mini(Datos.jsround(float(Dh[fm]) * MESAK_ALTO), MESAK_TOPE) - (k % 2) * 2)
+			if im != null:
+				var y: int = yb - ti - im.get_height() + 1
+				cosas.append(["@", im, cx - (im.get_width() >> 1), y, clip])
+				tope = mini(tope, y + im.get_height() - ArteM.alto(im))   # su cima: la primera fila con algo
+	# el LED doble, colgado de sus cuerdas del techo de la carpa: a 6 filas de lo más alto de las plantas
+	var fi: Image = ArteM.foto(MESAK_LED) if ArteM.hay(MESAK_LED) else null
+	if fi != null:
+		var cu: Array = ArteM.cuelga(fi)
+		var ly: int = clampi(tope - 6 - fi.get_height(), -4, 10)
+		for d in [-46, 46]:
+			var fx: int = cx0 + d - (fi.get_width() >> 1)
+			o.append([fx + int(cu[0]), 0, 1, ly + int(cu[2]), ArteM.VC_CUERDA])
+			o.append([fx + int(cu[1]), 0, 1, ly + int(cu[2]), ArteM.VC_CUERDA])
+			o.append(["@", fi, fx, ly, clip])
+	o.append_array(VistaM.temporizador(x0 + 8, 20, "veg" if Me == null or float(Me.p) < FLOR_MESA else "flor", on))
+	o.append(["@", mf, mx, my, clip])
+	o.append_array(cosas)
+	if viva:
+		o.append(["@", mf, mx, my, Rect2i(x0, my + MESAK_CANTO, 240, H - my - MESAK_CANTO)])   # el canto de la bandeja, delante de las macetas
+	if on and fi != null:   # la luz de los dos LED, de ellos hacia abajo
+		for d in [-46, 46]:
+			o.append([cx0 + d - 40, 12, 80, H - 12, "rgba(255,244,214,0.06)"])
 	if not on:
 		o.append([x0, 0, 240, H, "rgba(4,4,10,0.72)"])
 	var Ms: Array = D.KAIA_CULT.f2.mesas
@@ -974,28 +1001,133 @@ func rects_mesak(V: Dictionary) -> Array:
 		o.append([qx, qy, 6, 3, "#f8d040" if j == i else ("#58c060" if kc_me(j) else "#5a5e66")])
 	return o
 
-# las tuberías de drenaje de la sala (lo pidió el usuario: «con tuberías de drenaje a un depósito de recogida»): de la caja de cada
-# mesa baja su tubo por el suelo, por debajo de la mesa de delante, hasta el colector de la última fila, que va al depósito (drenKS);
-# rectángulos [x, y, w, h, color] en píxeles del mapa, que pinta.gd pinta detrás de las mesas
+# La red del riego y del drenaje de la sala (lo pidió el usuario: «todas las conexiones de riego, de drenaje hazlas con cabeza y
+# pensando… LOGICAS»), como en una sala de mesas de flujo y reflujo de verdad: la bomba del tanque (tanqueN) da al programador
+# (riegoN, con sus dosificadoras, que echan al tanque), que reparte la solución por la impulsión (PE negro): por el suelo, contra la
+# pared de delante y detrás del depósito, sube por la pared de la derecha y corre por debajo de cada fila de mesas, con una
+# electroválvula en cada mesa. Del desagüe de cada mesa baja su tubo al colector (PVC gris) de debajo de su fila, que cae por la pared
+# de la derecha al depósito de recogida (drenKS, en la esquina); de él, la bomba lo devuelve filtrado al tanque por la pared de
+# delante, por encima del programador. Nada cruza un pasillo: todo va por debajo de las mesas o pegado a las paredes.
+# Tramos [x0, y0, x1, y1, tipo, alto] en píxeles del mapa, en horizontal o en vertical (tipo: "sum", la impulsión; "dren", el drenaje
+# y la vuelta; alto: por la pared de delante, por encima de los aparatos); pinta.gd los pinta detrás de las mesas (tubos_dren)
 const DREN_COL := ["#3e434c", "#9aa0a8", "#c4c8ce"]   # el canto, el PVC y su brillo
+const SUM_COL := ["#16171c", "#4e525a"]   # el PE negro de la impulsión y su brillo
+func red_riego() -> Array:
+	var l := []
+	if not kc_hay():
+		return l
+	var F2: Dictionary = D.KAIA_CULT.f2
+	var pos := {}
+	for q in F2.o:
+		pos[String(q[2])] = [int(q[0]), int(q[1])]
+	if not (pos.has("tanqueN") and pos.has("riegoN") and pos.has("drenKS")):   # i18n-no
+		return l
+	var xs: int = int(F2.W) * 16 - 8   # por la pared de la derecha: la impulsión y, pegado a la pared, el colector
+	var xd: int = int(F2.W) * 16 - 5
+	var tq: Array = pos.tanqueN
+	var rg: Array = pos.riegoN
+	var dr: Array = pos.drenKS
+	var yf: int = int(rg[1]) * 16 + 13   # el suelo, contra la pared de delante
+	var yr: int = int(dr[1]) * 16 + 15 - 31 + 3   # la boca de arriba del depósito de recogida (o-drenKS, de pie en su casilla)
+	var filas := {}
+	for q in F2.mesas:
+		filas[int(q[1])] = mini(int(filas.get(int(q[1]), 1 << 20)), int(q[0]))
+	var ytop := 1 << 20
+	for r in filas:
+		var Y: int = int(r) * 16
+		ytop = mini(ytop, Y)
+		var xa: int = int(filas[r]) * 16 - 3   # desde el canto de la primera mesa de la fila
+		l.append([xa, Y + 10, xs, Y + 10, "sum", false])
+		l.append([xa, Y + 13, xd, Y + 13, "dren", false])
+	for q in F2.mesas:   # de cada mesa: su desagüe (el de mesaN, delante a la derecha) baja al colector
+		var x: int = int(q[0]) * 16 + 29
+		var Y: int = int(q[1]) * 16
+		l.append([x, Y + 9, x, Y + 13, "dren", false])
+	l.append([xs, ytop + 10, xs, yf, "sum", false])   # la impulsión: por la pared de la derecha y por el suelo, hasta el programador
+	l.append([int(rg[0]) * 16 + 8, yf, xs, yf, "sum", false])
+	# y antes, de la bomba del tanque (tanqueN: arriba a la derecha) al programador, a media altura, contra la pared de delante
+	l.append([int(tq[0]) * 16 + 21, int(tq[1]) * 16 - 4, int(rg[0]) * 16, int(tq[1]) * 16 - 4, "sum", true])
+	l.append([xd, ytop + 13, xd, yr, "dren", false])   # el colector, a la boca del depósito
+	var xv: int = int(dr[0]) * 16 - 4   # la vuelta: de la boca de la izquierda del depósito al tanque, por encima del programador
+	var xt: int = int(tq[0]) * 16 + 1
+	l.append([xt, yr - 1, xv, yr - 1, "dren", true])
+	l.append([xt, yr - 1, xt, int(tq[1]) * 16 + 15 - 31 + 9, "dren", true])
+	return l
+
+# los rectángulos [x, y, w, h, color] de red_riego, con una electroválvula en cada mesa y la abrazadera de cada bajada
 func tubos_dren() -> Array:
 	var l := []
 	if not kc_f2() or S.map != D.KAIA_CULT.f2.sala:
 		return l
-	var F2: Dictionary = D.KAIA_CULT.f2
-	var dr: Array = [-1, -1]
-	for q in F2.o:
-		if q[2] == "drenKS":   # i18n-no
-			dr = [int(q[0]), int(q[1])]
-	var yc: int = (int(dr[1]) - 1) * 16 + 11   # el colector, en la fila de encima del depósito
-	var x0 := 1 << 20
-	for q in F2.mesas:
-		var x: int = int(q[0]) * 16 + 15
-		x0 = mini(x0, x)
-		_tubo_v(l, x, int(q[1]) * 16 + 12, yc)
-	var xd: int = int(dr[0]) * 16 + 7
-	_tubo_h(l, x0, xd + 2, yc)
-	_tubo_v(l, xd, yc, int(dr[1]) * 16 + 4)
+	for t in red_riego():
+		var x0: int = mini(int(t[0]), int(t[2]))
+		var x1: int = maxi(int(t[0]), int(t[2]))
+		var y0: int = mini(int(t[1]), int(t[3]))
+		var y1: int = maxi(int(t[1]), int(t[3]))
+		if t[4] == "sum":   # i18n-no
+			if y0 == y1:
+				l.append([x0, y0, x1 - x0 + 2, 1, SUM_COL[1]])
+				l.append([x0, y0 + 1, x1 - x0 + 2, 1, SUM_COL[0]])
+			else:
+				l.append([x0, y0, 1, y1 - y0 + 2, SUM_COL[1]])
+				l.append([x0 + 1, y0, 1, y1 - y0 + 2, SUM_COL[0]])
+		elif y0 == y1:
+			_tubo_h(l, x0, x1, y0)
+		else:
+			_tubo_v(l, x0, y0, y1)
+	for q in D.KAIA_CULT.f2.mesas:   # la electroválvula de cada mesa, en la impulsión, con su piloto
+		var x: int = int(q[0]) * 16 + 9
+		var Y: int = int(q[1]) * 16
+		l.append([x, Y + 9, 4, 3, "#2a2c32"])
+		l.append([x + 1, Y + 9, 2, 1, "#6a6e76"])
+		l.append([x + 3, Y + 10, 1, 1, "#58e070"])
+	return l
+
+# el tubo de extracción de cada carpa a la pared, como en casa (lo pidió el usuario: «todas las conexiones… lógicas»): el extractor y el
+# filtro de carbón, colgados dentro; el tubo sale por la boca del techo, en su canto de atrás (como _tubos_casa), y va pegado al techo
+# de la sala hasta la pared de atrás, donde la atraviesa por un pasamuros de chapa en la fila de arriba. Uno por carpa (la de 400 ×
+# 400 lleva dos filtros en un tubo de 315 mm) y dos en la de sala; sin pisarse: si dos caen a menos de un tubo, el de delante se
+# corre por su techo. [x del tubo, y del pasamuros, y de la boca] en píxeles del mapa
+const KC_TUBO_PARED := 8   # el centro del pasamuros, en la fila de arriba de la pared
+func tubos_ext() -> Array:
+	var l := []
+	if not kc_hay() or S.map != D.KAIA_CULT.mapa:
+		return l
+	var m: Dictionary = MAPS[S.map]
+	var cs := []   # [x0, x1, y de la boca] de cada carpa, de atrás adelante
+	if kc_f2():
+		var C: Dictionary = D.KAIA_CULT.f2.carpa
+		var x0: int = int(C.def[0]) * 16
+		var w: int = int(C.tam[0]) * 16
+		var yb: int = (int(C.def[1]) + int(C.tam[1])) * 16 - 112 + 1   # la de sala, de 112 filas (kaia_carpa.py)
+		cs.append([x0 + w / 4, x0 + w / 4, yb])
+		cs.append([x0 + w * 3 / 4, x0 + w * 3 / 4, yb])
+	else:
+		for ty in m.h:
+			for tx in m.w:
+				var o = m.o[ty][tx]
+				if not (o is String):
+					continue
+				for N in D.KAIA_CULT.niv:
+					if o.begins_with(N.obj) and o.substr(String(N.obj).length()).is_valid_int():
+						var w: int = int(N.tam[0]) * 16
+						cs.append([tx * 16 + 6, tx * 16 + w - 7, (ty + 1) * 16 - (int(N.tam[1]) * 8 + 32) + 1])
+	cs.sort_custom(func(a, b): return a[2] < b[2])
+	var xs := []
+	for c in cs:
+		var xc: int = (int(c[0]) + int(c[1])) / 2
+		var x := xc
+		for d in range(0, 64):   # lo más cerca de su centro que no pise otro tubo
+			var ok := false
+			for x2 in [xc - d, xc + d]:
+				if x2 >= int(c[0]) and x2 <= int(c[1]) and xs.all(func(q): return absi(q - x2) >= 9):
+					x = x2
+					ok = true
+					break
+			if ok:
+				break
+		xs.append(x)
+		l.append([x, KC_TUBO_PARED, int(c[2])])
 	return l
 
 func _tubo_v(l: Array, x: int, y0: int, y1: int) -> void:
@@ -1118,7 +1250,7 @@ func staff_op(w: Dictionary, op: String) -> bool:
 		libre(w)
 		w.rol = "kaia"
 		sfx("sel")
-		await say(T("{n}: «Mañana empiezo en la sala de cultivo de KAIA: las seis mesas, el riego y los cortes. {e} al día».", {"n": w.n, "e": Datos.eur(D.PLANTILLA.sueldo.kaia)}))
+		await say(T("{n}: «Mañana empiezo en la sala de cultivo de KAIA: las ocho mesas, el riego y los cortes. {e} al día».", {"n": w.n, "e": Datos.eur(D.PLANTILLA.sueldo.kaia)}))
 		return true
 	return await super(w, op)
 
@@ -1179,7 +1311,6 @@ func clima_v(s: String) -> Dictionary:
 			cg = calor_nave() / maxf(1.0, float(D.EXTR_NAVE[int(N.ex)].cap))
 			sof = sofoco_nave()
 		t0 = 21.0 + 9.0 * cg   # a la carga justa de la extracción, 30 °C (el tope de T_OK); pasada, el sofoco (sofoco_nave)
-		dn = 0.0   # el calor de la nave (calor_nave) no depende de la hora: el mismo de día y de noche
 		hr0 = clampf(50.0 + 3.0 * nf - 4.0 * int(N.ex if N != null else 0), 35, 75)
 	elif S.get("kc") is Dictionary:
 		kc()
@@ -1210,11 +1341,9 @@ func clima_v(s: String) -> Dictionary:
 				hs[12 if ck == "flor" or (ck == "auto" and flor) else 18] = 1
 		if hs.size():
 			hz = int(hs.keys().max())
-		# la extracción de cada kit va a la medida de sus LED: con todas encendidas, al 70 %; la temperatura y la humedad, con lo que
-		# hay encendido y con las plantas que transpiran
+		# la extracción de cada kit va a la medida de sus LED: con todas encendidas, al 70 %; el controlador las tiene en su consigna
+		# (KAIA_CULT.clima), como siempre (lo dijo el usuario: «el controlador está bien»)
 		cg = .7 * float(hs.size() > 0)
-		t0 = 21.0 + 6.0 * cg
-		hr0 = clampf(48.0 + 14.0 * float(nf) / maxf(1.0, float(nc) * 6.0), 40, 70)
 	var on := func(m: int) -> bool:
 		if nf == 0:
 			return false

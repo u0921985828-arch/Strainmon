@@ -162,7 +162,7 @@ func _corre() -> void:
 	J.kc().p[0] = planta("txoko", 0.2)
 	J.kc().p[1] = planta("txoko", 0.4)
 	var c: Dictionary = J.clima_v("kaia")
-	chk(absf(float(c.t) - float(D.KAIA_CULT.clima.t)) < 1.0 and float(c.hr) >= 40 and float(c.hr) <= 70 and c.luz and int(c.hz) == 18, "KAIA a mediodía: %s °C, %s %%, luz a %d/%d" % [c.t, c.hr, c.hz, 24 - int(c.hz)])
+	chk(is_equal_approx(float(c.t), float(D.KAIA_CULT.clima.t)) and is_equal_approx(float(c.hr), float(D.KAIA_CULT.clima.hr)) and c.luz and int(c.hz) == 18, "KAIA a mediodía: %s °C, %s %%, luz a %d/%d" % [c.t, c.hr, c.hz, 24 - int(c.hz)])
 	chk(float(c.vpd) > .8 and float(c.vpd) < 1.8 and c.graf.size() == 24 and c.graf.filter(func(g): return g[1]).size() == 18, "el VPD (%.2f kPa) y las 24 horas, 18 con luz" % float(c.vpd))
 	J.S.min = 3 * 60
 	c = J.clima_v("kaia")
@@ -232,7 +232,7 @@ func _corre() -> void:
 	J.S.min = 2 * 60
 	var tn: float = float(J.clima_v("nave").t)
 	J.S.min = 12 * 60
-	chk(is_equal_approx(tn, float(J.clima_v("nave").t)), "el calor de la nave no depende de la hora (%.1f °C)" % tn)
+	chk(is_equal_approx(tn, float(J.clima_v("nave").t) - 4.0), "de noche, con los focos apagados, 4 °C menos, como siempre (%.1f °C)" % tn)
 	J.S.nave.f[2] = "sodio"
 	J.S.nave.m[3] = {"k": "txoko", "dia": int(J.S.day), "p": 0.5}
 	J.S.nave.ex = 0

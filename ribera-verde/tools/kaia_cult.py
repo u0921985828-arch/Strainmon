@@ -7,7 +7,7 @@
 # con el suelo de resina y desagüe del grow (floorG). Fase 1: las carpas por niveles (KAIA_CULT.niv: cuatro de 2 × 2 m, dos de 4 × 2 y
 # una de 4 × 4, con sus LED de 720 W, extractor y goteo) que se compran en el cuadro de la pared (ctrlN) y se ordenan desde él, solo encima de la zona de
 # cultivo y sin montarse encima de nada (zona y solapa en cabe_pieza, calle.gd). Fase 2 (KAIA_CULT.f2): la obra que la deja como la nave,
-# con seis mesas, tanque y riego, que lleva un trabajador de rol kaia (PLANTILLA.sueldo.kaia). src/kaiacult.gd le da la vida.
+# con ocho mesas, tanque y riego, que lleva un trabajador de rol kaia (PLANTILLA.sueldo.kaia). src/kaiacult.gd le da la vida.
 
 import json, os
 
@@ -33,7 +33,7 @@ VUELTA = [1, 1]      # la de la sala
 # rinde más por plaza (efi: 0,9; 1; 1,12), y así cada nivel compensa lo que cuesta. Cada carpa, una pieza de ORDENAR de su tamaño en casillas (1 casilla = 1 m).
 NIV = [
 	{"k": "s", "n": "Carpa 200×200", "cm": [200, 200, 200], "nf": 2, "plazas": 4, "efi": 0.9, "max": 4, "tam": [2, 2], "obj": "carpaKS", "spr": "kcs",
-		"def": [[13, 2], [13, 6], [8, 7], [11, 7]],
+		"def": [[13, 2], [8, 6], [11, 6], [14, 6]],
 		"kit": {"l": [["Carpa de 200 × 200 × 200 cm", 340], ["Dos LED de 720 W", 1900], ["Extractor de 200 mm con filtro de carbón", 320],
 			["Goteo de 4 salidas con su depósito", 140]]}},
 	{"k": "m", "n": "Carpa 400×200", "cm": [400, 200, 200], "nf": 4, "plazas": 8, "efi": 1.0, "max": 2, "tam": [4, 2], "obj": "carpaKM", "spr": "kcm",
@@ -64,7 +64,12 @@ KAIA_CULT = {
 		"carpa": {"obj": "carpaKX", "def": [3, 2], "tam": [13, 7], "puerta": [9, 8]},
 		"sala": "cult-sala", "W": 13, "H": 9, "sale": [6, 8], "entra": [6, 7],
 		"mesas": [[1, 3], [4, 3], [7, 3], [10, 3], [1, 6], [4, 6], [7, 6], [10, 6]],
-		"o": [[1, 1, "ctrlN"], [11, 1, "riegoN"], [0, 8, "tanqueN"], [12, 8, "drenKS"]], "npc": [6, 5]},
+		# el riego y el drenaje, con lógica (lo pidió el usuario: «todas las conexiones de riego, de drenaje hazlas con cabeza…
+		# LOGICAS»): el rincón del riego contra la pared de delante, a la derecha, fuera de los pasillos y de la puerta: el tanque, su
+		# bomba al programador con sus dosificadoras (una casilla más allá: cada uno, un poco más ancho que su casilla) y el depósito de
+		# recogida en la esquina (de 2 casillas); la impulsión y el colector suben por la pared de la derecha y corren por debajo de cada
+		# fila de mesas (tubos_dren)
+		"o": [[1, 1, "ctrlN"], [8, 8, "tanqueN"], [10, 8, "riegoN"], [11, 8, "drenKS2"], [12, 8, "drenKS"]], "npc": [6, 5]},
 }
 KAIA_CULT["f2"]["p"] = sum(x[1] for x in KAIA_CULT["f2"]["l"])
 
@@ -83,8 +88,8 @@ def sala():   # la carpa de sala por dentro: la tela plateada, el suelo de la zo
 	o = [[None] * W2 for _ in range(H2)]
 	for x, y, k in F["o"]:
 		o[y][x] = k
-	for x, y in F["mesas"]:
-		o[y][x], o[y][x + 1] = "mesaKP", "mesaKP2"
+	for x, y in F["mesas"]:   # la mesa de 240 cm de la nave (mesaN) ocupa sus tres casillas: cada fila, un banco seguido de pared a pared
+		o[y][x], o[y][x + 1], o[y][x + 2] = "mesaKP", "mesaKP2", "mesaKP2"
 	sx, sy = F["sale"]
 	return {"name": F["sala"], "w": W2, "h": H2, "g": g, "o": o, "doors": {}, "music": "club", "blds": [], "est": "itsaso",
 		"exits": {"%d,%d" % (sx, sy): {"to": MAPA, "x": F["carpa"]["puerta"][0], "y": F["carpa"]["puerta"][1] + 1, "dir": "down"}}}
@@ -130,17 +135,23 @@ def main():
 		for i, (x, y) in enumerate(N["def"]):   # las de un nivel, sin pisarse entre ellas
 			for x2, y2 in N["def"][i + 1:]:
 				assert x + w <= x2 or x2 + w <= x or y + h <= y2 or y2 + h <= y, N["k"]
-	for i, N in enumerate(NIV):   # las de todos los niveles, juntas, sin pisarse y con su pasillo
-		for N2 in NIV[i + 1:]:
-			for x, y in N["def"]:
-				for x2, y2 in N2["def"]:
-					w, h = N["tam"]; w2, h2 = N2["tam"]
-					assert x + w <= x2 or x2 + w2 <= x or y + h <= y2 or y2 + h2 <= y, (N["k"], N2["k"])
+	todas = [(x, y, N["tam"][0], N["tam"][1]) for N in NIV for x, y in N["def"]]
+	for i, (x, y, w, h) in enumerate(todas):   # las de todos los niveles, juntas, sin pisarse y con su pasillo de 1 m entre ellas
+		assert y + h <= H - 1, "delante de su puerta, sitio para abrirla"
+		for x2, y2, w2, h2 in todas[i + 1:]:
+			assert x + w < x2 or x2 + w2 < x or y + h < y2 or y2 + h2 < y, ((x, y), (x2, y2))
 	C = KAIA_CULT["f2"]["carpa"]
 	assert C["def"][0] == PASILLO and C["def"][0] + C["tam"][0] == W and C["def"][1] + C["tam"][1] == H - 1, "la carpa de sala, en toda la zona menos el paso"
 	F = KAIA_CULT["f2"]
 	for x, y in F["mesas"]:
-		assert 0 <= x and x + 1 < F["W"] and 2 <= y < F["H"] - 1, "cada mesa, dentro de la carpa"
+		assert 0 <= x and x + 2 < F["W"] and 2 <= y < F["H"] - 1, "cada mesa, dentro de la carpa"
+	for i, (x, y) in enumerate(F["mesas"]):   # sin pisarse
+		for x2, y2 in F["mesas"][i + 1:]:
+			assert y != y2 or x + 3 <= x2 or x2 + 3 <= x, "dos mesas, una encima de otra"
+	ocup = {(x + d, y) for x, y in F["mesas"] for d in range(3)} | {(x, y) for x, y, k in F["o"]}
+	sx, sy = F["sale"]; ex, ey = F["entra"]
+	assert (sx, sy) not in ocup and (ex, ey) not in ocup, "la puerta y la entrada, libres"
+	assert all(x != 0 for x, y in ocup if y >= 2), "la columna de la izquierda, libre: el paso entre los pasillos"
 	with open(DJ, "w", encoding="utf-8") as fh:
 		json.dump(D, fh, ensure_ascii=False, separators=(",", ":"))
 	print("kaia_cult: %s, %d mesas (obra %d €), mapa %s %d × %d" % (", ".join("%d × %s (%d plazas, kit %d €)" % (N["max"], N["n"], N["plazas"], N["kit"]["p"]) for N in NIV), len(KAIA_CULT["f2"]["mesas"]), KAIA_CULT["f2"]["p"], MAPA, W, H))

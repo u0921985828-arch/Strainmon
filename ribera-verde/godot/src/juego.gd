@@ -1049,10 +1049,10 @@ func hud_fisio() -> Array:
 func update_hud() -> void:
 	if oraculo:
 		return
-	if mode != "world" or S == null:
+	if mode != "world" or S == null or MESA_KV != null or MADRES_V != null:   # las vistas enteras (mesas de KAIA, madres), sin él encima
 		hud.hide()
 		return
-	var hh := "%02d" % int(floor(S.min / 60.0))
+	var hh :="%02d" % int(floor(S.min / 60.0))
 	var mm := "%02d" % (int(floor(int(S.min) % 60 / 10.0)) * 10)
 	hud_visto = sosp_hud()
 	var r := total_rosin()
