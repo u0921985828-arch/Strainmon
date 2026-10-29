@@ -4,6 +4,8 @@
 
 ### 0.66.0 (código 90) · las seis tandas del ESTUDIO y los esquemas de macetas; APK en `descargas/LandraceHunters.apk`
 
+- `descargas/LandraceHunters.apk` (89 MB, `apk-instalar.py` + `zipalign -P 16` + `apksigner`, la misma firma y el mismo paquete que la 0.65.4); AAB firmado de 82 MB, targetSdk 36, 16 KB en las 4 `.so`. Batería entera en verde antes de compilar.
+
 #### Los Actos III y IV, «La patente de la Haze» y «Lo que queda de la tía» (ESTUDIO, tanda 6; lo pidió el usuario: «metas mano a las mejoras que hablamos»; con `Datos.CAL`)
 
 - Cerrado el Acto II, desde el capítulo 7, Delroy avisa: Semillas Ondarea pide registrar como suyas la Haze del 98 y tres landraces del banco de la tía. Treinta días para oponerse desde el ordenador de la tía, con pruebas que salen de lo jugado: el cuaderno azul, la Haze del 98 fijada en F4, tres colecciones del banco de la tía, el correo de Garro (si le acusaste en el Acto II) y la firma de la asamblea (si contaste lo del cuaderno en la asociación); con tres, la oficina deniega el registro a los siete días (`src/acto3.gd`, `S.a3`).
