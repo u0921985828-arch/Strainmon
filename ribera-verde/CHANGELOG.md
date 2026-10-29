@@ -2,6 +2,11 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Siguiente (sin APK todavía) · la Copa de otoño por categorías (ESTUDIO, tanda 5; lo pidió el usuario: «metas mano a las mejoras que hablamos»; con `Datos.CAL`)
+
+- Cada 17 de octubre, desde el capítulo 7, el jurado de la plaza abre la Copa de otoño con cinco categorías —potencia (10 g curados), sabor (nota sobre 100: curado, afinado, aroma único y el aroma del año), landrace pura, cruce propio (sin receta) y extracción (2 g)—, una muestra por categoría y año (`COPA_OT` de `tools/copa_ot.py`, `src/copaot.gd`, `S.cot`).
+- Cuatro rivales —los tres de la CannaCup y Semillas Ondarea, la empresa del Acto II— con su nivel fijo, que suben cada año hasta un tope (`sube`, `tope`) y nunca bajan; el podio da 3.000/1.200/500 €, trofeo y prestigio, y tres oros el mismo año, la Copa absoluta (5.000 € y 3 de prestigio, `S.cot.abs`). SMS de la asociación a 3 días y el mismo día, y la fecha en el calendario. Prueba `tests/copa_ot.gd`.
+
 ### Siguiente (sin APK todavía) · las landraces por estación y por gente y las fiestas fijas (ESTUDIO, tanda 4; lo pidió el usuario: «metas mano a las mejoras que hablamos»; con `Datos.CAL`)
 
 - Diecisiete landraces que ya no se venden en el banco del PC: solo las da la gente que ya está, una vez por partida, en su estación, un día de temporal o en su fiesta, y a veces con confianza (`CAZA` de `tools/caza.py`, `src/caza.gd`, `S.caza`): Koldo con temporal (Zamal), la serora en la romería (Ethiopian Highland), tres puestos del mercado de la Ribera en la feria (Kashmiri, Vietnamese Black y Highland Thai, 40 € en efectivo), Patxi y Txaro en las fiestas del barrio (Colombian Gold y Punto Rojo), y por estación Julen, Bixente, Andoni, Andoni, Iñaki, Arrieta, Delroy, Miren (después de la Luang Prabang), Kiko y el capataz del almacén del muelle de Bilbao. Con las 12 de `REGALO` y la Malana del Acto II, 30 que se cazan; el recetario dice quién y cuándo.

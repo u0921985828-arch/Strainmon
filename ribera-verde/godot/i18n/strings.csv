@@ -687,6 +687,23 @@ s8b7c4857,"Lo que se pasa de la potencia contratada lo nota la compañía, y la 
 s084147c7,LA INSTALACIÓN ELÉCTRICA,THE WIRING
 s42b882aa,En la cuenta {e},In the account {e}
 s224febdd,Pedido: {n} · lo instalan mañana,Ordered: {n} · installed tomorrow
+s7c101d3d,{p} puntos,{p} points
+sc6dd9d9a,Bienvenido a la COPA DE OTOÑO de la asociación: cinco categorías y una muestra por categoría.,Welcome to the association's AUTUMN CUP: five categories and one entry per category.
+s93efa3f2,"Este año, en sabor, se premia el aroma {a}. Gana tres categorías y te llevas la Copa absoluta.","This year, in flavour, the {a} aroma is rewarded. Win three categories and the overall Cup is yours."
+sb234e641,fuera del podio,off the podium
+s815ca030,"Los rivales mejoran cada año. Este año, en sabor, el aroma {a}.","The rivals improve every year. This year, in flavour, the {a} aroma."
+sd2fa8104,COPA DE OTOÑO,AUTUMN CUP
+s59263730,Prestigio {p} · {t} trofeos,Prestige {p} · {t} trophies
+s4736ccf6,Para {c} no traes nada que valga. {d},You bring nothing that counts for {c}. {d}
+s669d40c5,{c}: el jurado ha decidido.,{c}: the jury has decided.
+s1bb22d93,"Esta vez, fuera del podio. Los demás también trabajan todo el año.",Off the podium this time. The others work all year too.
+s29bc2991,"{e} y el trofeo de {c}, {p}.º puesto","{e} and the {c} trophy, {p} place"
+sf2a15ba9,¡{n} categorías ganadas! La COPA ABSOLUTA de {y} es tuya.,{n} categories won! The {y} OVERALL CUP is yours.
+s19c4df8f,{e} y la Copa absoluta,{e} and the overall Cup
+s486f7b46,"Hoy es la Copa de otoño, en la plaza de Ribera Verde: potencia, sabor, landrace pura, cruce propio y extracción.","Today is the Autumn Cup, in the Ribera Verde square: potency, flavour, pure landrace, own cross and extract."
+sc4ea6f46,"El {d}, la Copa de otoño en la plaza de Ribera Verde: cinco categorías, una muestra en cada una.","On {d}, the Autumn Cup in the Ribera Verde square: five categories, one entry in each."
+sdb247fe0,"En sabor, este año, el aroma {a}. Los rivales vienen más fuertes que el año pasado.","In flavour, this year, the {a} aroma. The rivals are stronger than last year."
+sdfdc0077,Copa de otoño en la plaza,Autumn Cup in the square
 s457a182b,"Puerto Viejo, en la costa: el puerto, la lonja y el club de los marineros.","Puerto Viejo, on the coast: the harbour, the fish market and the sailors' club."
 sb6f597e2,"Ribera Verde, tu barrio, en la ría: el piso de la tía, el barrio alto y los astilleros.","Ribera Verde, your neighbourhood, on the estuary: your aunt's flat, the upper town and the shipyards."
 sc39b7de7,"Ibarbide, la ciudad grande: el Casco Viejo, el Ensanche y la Kale Zaharra.","Ibarbide, the big city: the Old Town, the Ensanche and Kale Zaharra."
@@ -6746,6 +6763,15 @@ s5a465ff6,"No sé si germinarán. Si alguien lo consigue, eres tú.","I don't kn
 s5a694619,"el capataz del almacén del muelle de Bilbao, en invierno","the foreman at the Bilbao dock warehouse, in winter"
 se985f7b2,"En invierno llegan menos cargueros. Uno de Bangkok dejó esto en un palé roto. Thai, de las selvas del norte.","Fewer freighters come in winter. One from Bangkok left this on a broken pallet. Thai, from the northern jungles."
 sda3f612a,Aquí nadie lo quiere. Llévatelo antes de que lo barra.,Nobody here wants it. Take it before I sweep it up.
+sc57864d0,El THC de un tarro curado del todo. 10 g.,The THC of a fully cured jar. 10 g.
+s2d36aa56,Sabor,Flavour
+s6ea57c25,"Nota de cata sobre 100: el curado, el afinado, el aroma único y el aroma del año. 10 g de cogollo.","Tasting score out of 100: the cure, the fine-curing, the unique aroma and the aroma of the year. 10 g of bud."
+sbe11bbff,Landrace pura,Pure landrace
+s9ba686a9,"El THC de una landrace sin cruzar, curada del todo. 10 g.","The THC of an uncrossed landrace, fully cured. 10 g."
+s6ee8b1ef,Cruce propio,Own cross
+s0cb7dc3c,"El THC de un cruce tuyo, sin receta, curado del todo. 10 g.","The THC of a cross of your own, not from a recipe, fully cured. 10 g."
+saeb6ee81,El THC de una extracción sin disolventes. 2 g.,The THC of a solventless extract. 2 g.
+sade66c52,Semillas Ondarea,Semillas Ondarea
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.

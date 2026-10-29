@@ -380,6 +380,12 @@ Un hilo propio por encima de la deuda: lo que pasó en la Copa de 1998. OBJETIVO
 - **Por estación y tiempo:** Koldo con temporal, ya conocido en el muelle (Zamal); en verano, Julen (Michoacán) e Iñaki (Durban Poison); en otoño, Bixente (Kif) y Arrieta (Swazi Gold); en invierno, Andoni (Lebanese), Delroy (Congolese), Kiko (Panama Red) y el capataz del muelle de Bilbao (Thai); en primavera, Andoni (Beldia) y Miren (Nepalese). Los que lo dicen en su pista, solo con confianza de amigos (20).
 - **Ninguna se vende:** con `Datos.CAL`, estas diecisiete salen del banco del PC; quien dice que no en la feria, ese día vuelve a lo suyo, y una fiesta sin nada que dar no manda SMS ni avisa.
 
+## La Copa de otoño (con `Datos.CAL`, `src/copaot.gd`, datos en `tools/copa_ot.py`)
+
+- **El 17 de octubre**, desde el capítulo 7, en la plaza de Ribera Verde; SMS de la asociación a tres días y el mismo día.
+- **Cinco categorías**, una muestra en cada una por año: potencia, sabor (con el aroma del año), landrace pura, cruce propio y extracción.
+- **Los rivales:** Txoko Berdea, Huerta Oihana, Los de Arratia y Semillas Ondarea, la empresa de Unai Garro; cada año un poco mejores. Tres oros el mismo año, la Copa absoluta.
+
 ## La caja fuerte
 
 *Ordenador → «Notas de la tía»:*

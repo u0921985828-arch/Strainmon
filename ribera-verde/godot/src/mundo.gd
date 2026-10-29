@@ -1645,7 +1645,7 @@ func npc_cond(d: Dictionary) -> bool:
 		"tono2":
 			return S.get("encargo") != null
 		"jurado":
-			return S.ch == 6 or cup_hoy()   # MAESTRO [5]: y los días de la CannaCup
+			return S.ch == 6 or cup_hoy() or copa_ot_hoy()   # MAESTRO [5]: y los días de la CannaCup; ESTUDIO, tanda 5: y el de la Copa de otoño
 		"julen":   # 1.23: en el piso hasta la primera cosecha; después, en el growshop
 			return (S.flags.get("kiko1") and not S.flags.get("harvest1")) if d.map == "home" else (true if S.flags.get("harvest1") else false)
 	if d.id.begins_with("est_") or d.id in ["camareraV", "vipA", "vipB", "gentD1", "gentD2", "gentD3"]:   # i18n-no · 1.47: el estanco, el reservado de GAUA y su gente de abajo
@@ -3077,6 +3077,9 @@ func hilo_talk(_id: String) -> bool:
 
 func hilo_dia() -> void:
 	pass
+
+func copa_ot_hoy() -> bool:   # la Copa de otoño (copaot.gd)
+	return false
 
 func hilo_entra(_mapa: String) -> void:
 	pass
