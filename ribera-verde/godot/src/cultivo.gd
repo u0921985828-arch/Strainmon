@@ -254,6 +254,8 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 	var auto: bool = Datos.CAL and s.get("auto")
 	if auto and f.get("ciclo") == "flor":   # 1.52: la auto florece por la edad; a 12/12 tiene menos luz y crece menos
 		g *= float(Datos.carga().AUTO.rinde_1212)
+	if ra_tiene(p, "enana"):   # ESTUDIO, tanda 2: la enana, más deprisa
+		g *= 1 + float(Datos.carga().RAREZAS.r.enana.crec)
 	if p.prog >= .65:   # MAESTRO [5]: el IV de floración
 		g *= 1 + float(Datos.carga().IVS.flor) * iv_f(p.get("f"), 2)
 		g *= 1 + fam(S, "flor")
@@ -343,6 +345,59 @@ static func genes(S: Dictionary, sid: String, f: Dictionary) -> void:
 	if Datos.hash_str("sh|%d|%s|%d|%d" % [int(f.id), sid, int(S.day), int(S.get("min", 0))]) % 100000 < float(D.SHINY.p) * 100000:
 		var cs: Array = D.SHINY.c.keys()
 		f.sh = cs[Datos.hash_str("shc|%d" % int(f.id)) % cs.size()]
+	rarezas_de(S, sid, f)
+
+# ESTUDIO, tanda 2: las rarezas heredables (RAREZAS, tools/rarezas.py). Cada línea guarda las suyas con su nivel de fijación
+# (S.ra[sid][k], de 1 a RAREZAS.fija); una planta saca cada una con la probabilidad de su nivel (RAREZAS.niv) y, sin tenerla su
+# línea, 1 de cada 1/RAREZAS.p sale con una al azar. f.ra = [rasgos]. Por hash, como los IVs: no mueve el azar de lo demás
+static func rarezas_de(S: Dictionary, sid: String, f: Dictionary) -> void:
+	var D := Datos.carga()
+	if not D.has("RAREZAS"):
+		return
+	var R: Dictionary = D.RAREZAS
+	var L: Dictionary = S.get("ra", {}).get(sid, {})
+	var o := []
+	for k in R.orden:
+		if L.has(k) and Datos.hash_str("ra|%s|%d|%s|%d" % [k, int(f.id), sid, int(S.day)]) % 100000 < float(R.niv[clampi(int(L[k]), 0, int(R.fija))]) * 100000:
+			o.append(k)
+	if Datos.hash_str("ra0|%d|%s|%d" % [int(f.id), sid, int(S.day)]) % 100000 < float(R.p) * 100000:
+		var k: String = R.orden[Datos.hash_str("rak|%d" % int(f.id)) % R.orden.size()]
+		if not o.has(k):
+			o.append(k)
+	if o.size():
+		f.ra = o
+
+static func ra_tiene(p, k: String) -> bool:
+	return Datos.CAL and p is Dictionary and p.get("f") is Dictionary and p.f.get("ra") is Array and p.f.ra.has(k)
+
+# la línea aprende las rarezas de la planta de la que salen sus semillas: una nueva, a nivel 1; una que ya llevaba, un nivel más
+# (generación a generación, hasta fijarla). Devuelve [[rasgo, nivel]…] con lo que ha cambiado
+static func hereda_ra(S: Dictionary, sid: String, fe) -> Array:
+	var ch := []
+	if not Datos.CAL or not (fe is Dictionary) or not (fe.get("ra") is Array):
+		return ch
+	if not (S.get("ra") is Dictionary):
+		S.ra = {}
+	if not S.ra.has(sid):
+		S.ra[sid] = {}
+	var tope := int(Datos.carga().RAREZAS.fija)
+	for k in fe.ra:
+		var a := int(S.ra[sid].get(k, 0))
+		if a < tope:
+			S.ra[sid][k] = a + 1
+			ch.append([k, a + 1])
+	return ch
+
+# el cruce se lleva las rarezas de las dos líneas, un nivel por debajo (al menos 1): hay que volver a fijarlas
+static func cruza_ra(S: Dictionary, a: String, b: String, r: String) -> void:
+	if not Datos.CAL or not (S.get("ra") is Dictionary):
+		return
+	var o: Dictionary = S.ra.get(r, {}).duplicate()
+	for x in [a, b]:
+		for k in S.ra.get(x, {}):
+			o[k] = maxi(int(o.get(k, 0)), maxi(1, int(S.ra[x][k]) - 1))
+	if o.size():
+		S.ra[r] = o
 
 # de -1 (IV 1) a 1 (IV 31); 0 sin IVs
 static func iv_f(fe, i: int) -> float:
@@ -448,12 +503,21 @@ static func cosecha(S: Dictionary, i: int) -> Dictionary:
 static func gramos_planta(S: Dictionary, p: Dictionary, f: Dictionary) -> int:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"y": 1}
-	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + abo_de(p.get("fo")).rend * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0))) * (1 + float(Datos.carga().IVS.prod) * iv_f(fe, 1)) * (1 + fam(S, "g"))))
+	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + abo_de(p.get("fo")).rend * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0))) * (1 + float(Datos.carga().IVS.prod) * iv_f(fe, 1)) * (1 + fam(S, "g")) * ra_g(p)))
+
+# ESTUDIO, tanda 2: la enana rinde menos y la segunda cosecha de la doble, su parte
+static func ra_g(p: Dictionary) -> float:
+	var x := 1.0
+	if ra_tiene(p, "enana"):
+		x *= 1 + float(Datos.carga().RAREZAS.r.enana.g)
+	if Datos.CAL and p.get("rb"):
+		x *= float(Datos.carga().RAREZAS.r.doble.g2)
+	return x
 
 static func thc_cosecha(S: Dictionary, p: Dictionary, f: Dictionary) -> float:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"t": 1}
-	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) * (1 + float(Datos.carga().IVS.pot) * iv_f(fe, 0)) * (1 + fam(S, "thc")) + f.thc + abo_de(p.get("fo")).thc * fq(p)) * 10) / 10.0)
+	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) * (1 + float(Datos.carga().IVS.pot) * iv_f(fe, 0)) * (1 + fam(S, "thc")) + f.thc + abo_de(p.get("fo")).thc * fq(p) + (float(Datos.carga().RAREZAS.r.resina.thc) if ra_tiene(p, "resina") else 0.0)) * 10) / 10.0)
 
 static func plantas_vivas(S: Dictionary, ci: int) -> bool:
 	var H := huecos(S)

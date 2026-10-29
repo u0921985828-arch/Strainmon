@@ -782,3 +782,29 @@ Maceta de tela 50 L,Fabric pot 50 L
 "50 L · hasta 410 g por planta · cosecha +10% · riego ×0,95 · menos plagas
 Para las carpas de KAIA: en el esquema de cada carpa.","50 L · up to 410 g per plant · harvest +10% · watering ×0.95 · fewer pests
 For the KAIA tents: in each tent's layout."
+RAREZAS,RAREZAS
+Rasgo raro: {n}. {d},Rare trait: {n}. {d}
+"Sus semillas lo llevan: de la {s}, {p} de cada 100 saldrán {n}. Fijado en la línea.","Its seeds carry it: from the {s}, {p} in 100 will come out {n}. Fixed in the line."
+"Sus semillas lo llevan: de la {s}, {p} de cada 100 saldrán {n}. Cultívalas y cosecha semillas de las que lo saquen para fijarlo.","Its seeds carry it: from the {s}, {p} in 100 will come out {n}. Grow them and harvest seeds from the ones that show it to fix it."
+"Sin semillas de esta planta, el rasgo no pasa a la línea: sus esquejes sí son ella.","Without seeds from this plant, the trait doesn't pass to the line: its cuttings are still her."
+Doble cosecha: la planta rebrota. Vuelve a vegetativo y dará una segunda cosecha más pequeña.,"Double harvest: the plant regrows. It goes back to veg and will give a second, smaller harvest."
+Rasgo raro: {n},Rare trait: {n}
+Rebrotada: segunda cosecha,Regrown: second harvest
+CUADERNO DE FENOTIPOS,PHENOTYPE NOTEBOOK
+"Cada planta rara que has cosechado, con sus rasgos, el día y el sitio, y lo que lleva ya su línea.","Every rare plant you've harvested, with its traits, the day and the place, and what its line already carries."
+rara (no se hereda),rare (not inherited)
+{n} al {p} %,{n} at {p} %
+Su línea: {x}.,Its line: {x}.
+Su línea no lleva ningún rasgo: cosecha semillas de una planta que lo saque.,Its line carries no trait: harvest seeds from a plant that shows one.
+en la nave,in the warehouse
+en la huerta,in the vegetable garden
+en la sala de KAIA,in the KAIA grow room
+en {m},in {m}
+Enana,Dwarf
+Porte bajo y compacto: crece un 15 % más deprisa y rinde un 10 % menos.,Short and compact: grows 15 % faster and yields 10 % less.
+Doble cosecha,Double harvest
+Rebrota una vez después de cosecharla: vuelve a vegetativo y da una segunda cosecha del 60 %.,Regrows once after harvest: goes back to veg and gives a second harvest of 60 %.
+Aroma único,Unique aroma
+Un olor que no tiene otra: su hierba se paga un 25 % más.,A smell no other has: its weed sells for 25 % more.
+Resinosa,Resinous
+"Cubierta de tricomas: 1,5 puntos más de THC.",Covered in trichomes: 1.5 more THC points.

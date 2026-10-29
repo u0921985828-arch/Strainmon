@@ -362,7 +362,7 @@ func pagar_casa(e: float) -> float:
 func mover_lote(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
 	var b: Dictionary = de[k]
 	if a.has(k):
-		junta_lote(a[k], g, b.thc, b.get("cu", 0), b.get("dia"), b.get("mc", 0), b.get("af", 0))
+		junta_lote(a[k], g, b.thc, b.get("cu", 0), b.get("dia"), b.get("mc", 0), b.get("af", 0), b.get("ar", 0))
 	else:
 		a[k] = {"g": g, "thc": b.thc}
 		a[k].merge(cura_de(b))
@@ -455,7 +455,7 @@ func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 
 func calidad(b: Dictionary, flor := false) -> float:
 	var q: float = 1 + D.CURADO.precio * float(b.get("cu", 0)) + D.MANICURA.precio * float(b.get("mc", 0)) + D.CAMAROTE.extra * float(b.get("af", 0))   # 1.43.6: afinado en el camarote
 	if Datos.CAL and flor:   # MAESTRO [5]: la hierba verde vale poco y en tarros, semana a semana, más; la rara, ×SHINY.x
-		q *= verde(b) * (float(D.SHINY.x) if b.get("sh") else 1.0)
+		q *= verde(b) * (float(D.SHINY.x) if b.get("sh") else 1.0) * (1 + float(D.RAREZAS.r.aroma.x) * float(b.get("ar", 0)))   # ESTUDIO, tanda 2
 	if Datos.CAL and b.get("oz"):   # MAESTRO [6]: secada con el ozono en la sala, sin terpenos
 		q *= float(D.OLOR_NAVE.oz_q)
 	return q
@@ -477,14 +477,21 @@ func cura_de(b: Dictionary) -> Dictionary:
 		o.cu = b.cu
 	if b.get("mc"):
 		o.mc = b.mc
+	if b.get("ar"):
+		o.ar = b.ar
 	if b.get("af"):
 		o.af = b.af
 	if b.get("sh"):
 		o.sh = b.sh
 	return o
 
-func junta_lote(t: Dictionary, g: float, thc: float, cu, dia, mc = 0, af = 0) -> void:
+func junta_lote(t: Dictionary, g: float, thc: float, cu, dia, mc = 0, af = 0, ar = 0) -> void:
 	var nn: float = t.g + g
+	var xa: float = (float(t.get("ar", 0)) * t.g + float(ar if ar else 0) * g) / nn   # ESTUDIO, tanda 2: lo de aroma único, por gramos
+	if xa:
+		t.ar = xa
+	else:
+		t.erase("ar")
 	var fa: float = (float(t.get("af", 0)) * t.g + float(af if af else 0) * g) / nn   # 1.43.6: lo afinado en el camarote, por gramos
 	if fa:
 		t.af = fa

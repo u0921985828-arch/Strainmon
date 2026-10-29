@@ -467,7 +467,7 @@ func pot_action(i: int, hu = null) -> void:
 		opts.append(K("Sacar esqueje"))
 	opts.append_array([K("Nombrar"), K("Arrancar"), K("Salir")])
 	var c: int = await ask(T("{s}{e} · {st} {p}%\nAgua {w}% · Salud {h}%{pl}", {"s": s.n, "e": etiq(p.get("f")), "st": stage_name(p), "p": int(floor(p.prog * 100)), "w": Datos.jsround(p.water),
-		"h": Datos.jsround(p.health), "pl": (T(" · PLAGA") if p.pest else "") + (T(" · BOTRITIS") if Datos.CAL and p.get("bot") else "")}), opts)
+		"h": Datos.jsround(p.health), "pl": (T(" · PLAGA") if p.pest else "") + (T(" · BOTRITIS") if Datos.CAL and p.get("bot") else "") + ra_txt(p)}), opts)
 	var op: String = opts[c]
 	if op == "Regar":
 		var v: Array = hu.v if hu else pos_plaza(i)
@@ -878,19 +878,30 @@ func harvest(i: int, hu = null) -> void:
 	if sh:
 		lk += "!"
 	add_buds(lk, g, thc)
+	if Cultivo.ra_tiene(p, "aroma"):   # ESTUDIO, tanda 2: lo de aroma único, por gramos en su lote
+		S.buds[lk].ar = float(S.buds[lk].get("ar", 0)) + g / float(S.buds[lk].g)
 	if Datos.CAL:   # MAESTRO [5]: cuenta para su familia de la CannaDex
 		cult_apunta(p.sid)
+		apunta_album(p)
+	var ch := []
 	if nn:
 		add_seeds(p.sid, nn)
 		if Datos.CAL and fe.get("iv"):
 			Cultivo.hereda_iv(S, p.sid, fe.iv)
+		ch = Cultivo.hereda_ra(S, p.sid, fe)
 	var sobra := mini(g, int(floor(peso_encima() - cap_mochila())))   # lo que no cabe encima, a la caja fuerte (1.36; antes, al arcón)
 	var a_caja := mini(sobra, int(floor(D.CAJA[int(S.caja.nivel)].g - caja_g()))) if sobra >= 1 and S.get("caja") else 0
 	if a_caja >= 1:
 		mover_lote(S.buds, S.caja.buds, lk, a_caja)
 	if p.get("f") and p.f.get("id"):
 		S.fenos[str(int(p.f.id))] = cl
-	L[i] = null
+	var rebrota: bool = Cultivo.ra_tiene(p, "doble") and not p.get("rb")
+	if rebrota:   # ESTUDIO, tanda 2: la doble cosecha vuelve a vegetativo una vez
+		p.rb = 1
+		p.prog = float(D.RAREZAS.r.doble.vuelve)
+		p.erase("bot")
+	else:
+		L[i] = null
 	sfx("get")
 	if S.rec.get(p.sid) == 1:   # una variedad de receta sacada en la mesa, cosechada (capítulo 4)
 		S.rec[p.sid] = 2
@@ -912,6 +923,17 @@ func harvest(i: int, hu = null) -> void:
 		var ct := K("cogollos morados") if sh == "morada" else (K("cogollos albinos") if sh == "albina" else K("cogollos dorados"))
 		await say(T("¡Una planta rara, de {c}! Va a su lote y se paga {x} veces más.", {"c": ct, "x": int(D.SHINY.x)}))
 		await say(K("Sus semillas no salen así: solo sus esquejes son esta misma planta. Si no le sacaste ninguno, se ha perdido."))
+	if Datos.CAL and fe.get("ra") is Array:   # ESTUDIO, tanda 2: las rarezas, al cuaderno; las que se heredan, a la línea
+		for k in fe.ra:
+			var Rk: Dictionary = D.RAREZAS.r[k]
+			await say(T("Rasgo raro: {n}. {d}", {"n": I18n.v(Rk.n), "d": I18n.v(Rk.d)}))
+		for c in ch:
+			var pc := roundi(float(D.RAREZAS.niv[int(c[1])]) * 100)
+			await say(T("Sus semillas lo llevan: de la {s}, {p} de cada 100 saldrán {n}. Fijado en la línea.", {"s": s.n, "p": pc, "n": I18n.v(D.RAREZAS.r[c[0]].n).to_lower()}) if int(c[1]) >= int(D.RAREZAS.fija) else T("Sus semillas lo llevan: de la {s}, {p} de cada 100 saldrán {n}. Cultívalas y cosecha semillas de las que lo saquen para fijarlo.", {"s": s.n, "p": pc, "n": I18n.v(D.RAREZAS.r[c[0]].n).to_lower()}))
+		if fe.ra.size() and not nn:
+			await say(K("Sin semillas de esta planta, el rasgo no pasa a la línea: sus esquejes sí son ella."))
+	if rebrota:
+		await say(K("Doble cosecha: la planta rebrota. Vuelve a vegetativo y dará una segunda cosecha más pequeña."))
 	if nn:
 		var hs := {"n": nn, "s": s.n}
 		if cria:
@@ -929,6 +951,29 @@ func harvest(i: int, hu = null) -> void:
 			await say(T("Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en {d} días: algo más de THC y se vende más cara. Sin curar no pierde nada.", {"d": int(D.CURADO.dias)}))   # 1.36: ya no pierde THC; curando, sube
 	S.flags.harvest1 = true
 	await check_story()
+
+# ESTUDIO, tanda 2: los rasgos raros de una planta, en su ficha (se ven desde que sale de plántula); la que ya rebrotó, también
+func ra_txt(p: Dictionary) -> String:
+	var t := ""
+	if Datos.CAL and p.get("f") is Dictionary and p.f.get("ra") is Array and p.prog >= .35:
+		var l := []
+		for k in p.f.ra:
+			l.append(I18n.v(D.RAREZAS.r[k].n))
+		t = "\n" + T("Rasgo raro: {n}", {"n": y_lista(l)})
+	if Datos.CAL and p.get("rb"):
+		t += "\n" + K("Rebrotada: segunda cosecha")
+	return t
+
+# ESTUDIO, tanda 2: el cuaderno de fenotipos (S.album): cada planta rara o con rasgos, con su variedad, el día y el sitio, una vez
+func apunta_album(p: Dictionary) -> void:
+	var fe = p.get("f")
+	if not (fe is Dictionary) or not (fe.get("ra") is Array or fe.get("sh")):
+		return
+	if not (S.get("album") is Array):
+		S.album = []
+	if S.album.any(func(a): return int(a.id) == int(fe.get("id", -1))):
+		return
+	S.album.append({"id": int(fe.get("id", 0)), "sid": p.sid, "ra": (fe.ra.duplicate() if fe.get("ra") is Array else []), "sh": fe.get("sh", ""), "d": int(S.day), "m": String(S.map)})   # el nombre, de S.fnom al enseñarlo (nom_planta)
 
 # estabilizar: la línea cruzada consigo misma sube una generación (F1 → F2 → F3 → estable)
 func estabilizar(k: String, coste := 2) -> bool:   # coste 1: en el laboratorio del banco de la tía (bancotia.gd)
@@ -1766,6 +1811,7 @@ func lab_action():
 	var r := Datos.cross_result(S, A, Bk)
 	if Datos.CAL:   # MAESTRO [5]: la línea nueva, con lo mejor de las dos
 		Cultivo.cruza_iv(S, A, Bk, r)
+		Cultivo.cruza_ra(S, A, Bk, r)   # ESTUDIO, tanda 2: las rarezas de las dos, un nivel por debajo
 	var is_new: bool = not S.disc.get(r)
 	var s = strain(r)
 	if is_new and not D.SHOP.any(func(it): return it.get("sid") == r):   # la de tienda sigue estable

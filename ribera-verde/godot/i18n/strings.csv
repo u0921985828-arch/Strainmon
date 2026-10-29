@@ -638,6 +638,7 @@ s99ba3814,Germinando,Germinating
 s5f328648,Plántula,Seedling
 s7106e485,Vegetativo,Vegetative
 s155aeee2,Floración,Flowering
+s79101fe1,RAREZAS,RAREZAS
 s606c9e88,DEX,
 s9c2c1caf,RECIPES,
 s808a2361,BANCO,BANK
@@ -1191,6 +1192,11 @@ sd33e9c01,cogollos albinos,albino buds
 saf51fbb3,cogollos dorados,golden buds
 sa6919769,"¡Una planta rara, de {c}! Va a su lote y se paga {x} veces más.","A rare plant, with {c}! It goes to its own batch and sells for {x} times as much."
 sd4d45dd3,"Sus semillas no salen así: solo sus esquejes son esta misma planta. Si no le sacaste ninguno, se ha perdido.","Its seeds won't come out like this: only its clones are this same plant. If you didn't take any, it's gone."
+sf9e86d47,Rasgo raro: {n}. {d},Rare trait: {n}. {d}
+s12387b4b,"Sus semillas lo llevan: de la {s}, {p} de cada 100 saldrán {n}. Fijado en la línea.","Its seeds carry it: from the {s}, {p} in 100 will come out {n}. Fixed in the line."
+s2d6020d9,"Sus semillas lo llevan: de la {s}, {p} de cada 100 saldrán {n}. Cultívalas y cosecha semillas de las que lo saquen para fijarlo.","Its seeds carry it: from the {s}, {p} in 100 will come out {n}. Grow them and harvest seeds from the ones that show it to fix it."
+se2c9bdfa,"Sin semillas de esta planta, el rasgo no pasa a la línea: sus esquejes sí son ella.","Without seeds from this plant, the trait doesn't pass to the line: its cuttings are still her."
+s99fc39ef,Doble cosecha: la planta rebrota. Vuelve a vegetativo y dará una segunda cosecha más pequeña.,"Double harvest: the plant regrows. It goes back to veg and will give a second, smaller harvest."
 sa1905e75,Las plantas de la línea se han polinizado entre ellas: recoges {n} semillas de {s}.,The plants of the line pollinated each other: you collect {n} seeds of {s}.
 s949320f4,Son semillas regulares: algún macho ha polinizado unas flores. Recoges {n} semillas de {s}.,They're regular seeds: some male pollinated a few flowers. You collect {n} seeds of {s}.
 sb62d5589,Son semillas regulares: algún macho ha polinizado unas flores. Recoges {n} semilla de {s}.,They're regular seeds: some male pollinated a few flowers. You collect {n} seed of {s}.
@@ -1199,6 +1205,8 @@ s0ac446a8,Una flor hermafrodita ha polinizado unas pocas: recoges {n} semilla de
 s3ff11748,"Sale verde: recién cortada se paga poco, y no está seca del todo hasta los {d} días.","It's green: freshly cut it sells cheap, and it isn't fully dry until {d} days."
 s57a56002,"Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura y vale más cada semana en el tarro.","With curing jars (Kiko sells them), it cures in the safe and is worth more every week in the jar."
 s893d0923,"Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en {d} días: algo más de THC y se vende más cara. Sin curar no pierde nada.","It comes out uncured. With some curing jars (Kiko sells them), it cures in the safe in {d} days: a bit more THC and it sells for more. Uncured, it loses nothing."
+sb1173803,Rasgo raro: {n},Rare trait: {n}
+s87e19281,Rebrotada: segunda cosecha,Regrown: second harvest
 sdd1e1958,¿Estabilizar {s} (F{g})? Gastas 2 semillas y guardas 1.,Stabilise {s} (F{g})? You use 2 seeds and keep 1.
 s34d514e6,¿Estabilizar {s} (F{g})? Gastas 1 semilla y guardas 1.,Stabilise {s} (F{g})? You use 1 seed and keep 1.
 sd25d8ecd,Estabilizar,Stabilise
@@ -1924,8 +1932,19 @@ sa4558d6b,TODAS,ALL
 s34150029,"Todas las variedades, en su orden.","Every strain, in order."
 s45d814aa,TUS CRUCES,YOUR CROSSES
 s48ec4192,Las variedades que has sacado tú en la mesa de cruces.,
+s41122cc5,CUADERNO DE FENOTIPOS,PHENOTYPE NOTEBOOK
+s6488bb7f,"Cada planta rara que has cosechado, con sus rasgos, el día y el sitio, y lo que lleva ya su línea.","Every rare plant you've harvested, with its traits, the day and the place, and what its line already carries."
 s6e55b5c5,LA ÚLTIMA PÁGINA,THE LAST PAGE
 s384f2b34,{a}/{b} · {c} propias,{a}/{b} · {c} your own
+s4b01b12e,rara (no se hereda),rare (not inherited)
+s9d862b06,{n} al {p} %,{n} at {p} %
+s39e05d9e,Su línea: {x}.,Its line: {x}.
+sd0372920,Su línea no lleva ningún rasgo: cosecha semillas de una planta que lo saque.,Its line carries no trait: harvest seeds from a plant that shows one.
+s2bcc1a8a,en el piso,in the flat
+s21bd20c8,en la nave,in the warehouse
+s108e3c2b,en la huerta,in the vegetable garden
+sa4a4169b,en la sala de KAIA,in the KAIA grow room
+sc988c682,en {m},in {m}
 sbda0b4c2,Ver la hoja,See the leaf
 se1e8811d,Lo que entra,What goes in
 s77a57a50,Leerlo todo,Read it all
@@ -2011,7 +2030,6 @@ s767bcfa8,Kit Ice-o-lator,Ice water kit
 s2954f6a4,Kit Ice Hash,
 sb390a67a,Agua con hielo y bolsas de malla: la resina más limpia. Se usa en la mesa del piso.,Ice water and mesh bags: the cleanest resin. Used at the flat table.
 sfabfa85b,Mallas 00,00 mesh
-s2bcc1a8a,en el piso,in the flat
 sed6caa2f,"La malla «doble cero» de la tía: dry sift de lo más fino, solo las cabezas. Se usa en los tamices del piso.","Auntie's «double zero» mesh: the finest dry sift, heads only. Used with the flat's screens."
 s5e7c66ae,Lavadora de extracción,Extraction washer
 s541ec757,Ice-o-lator en grande: bate sola con las bolsas de malla. Está montada junto a la nevera.,"An ice water kit, but big: it churns the mesh bags by itself. Set up by the fridge."
@@ -6605,6 +6623,14 @@ sd2984e1c,Maceta de tela 50 L,Fabric pot 50 L
 s7c8781f2,"50 L · hasta 410 g por planta · cosecha +10% · riego ×0,95 · menos plagas
 Para las carpas de KAIA: en el esquema de cada carpa.","50 L · up to 410 g per plant · harvest +10% · watering ×0.95 · fewer pests
 For the KAIA tents: in each tent's layout."
+s051616e4,Enana,Dwarf
+sfd0947e5,Porte bajo y compacto: crece un 15 % más deprisa y rinde un 10 % menos.,Short and compact: grows 15 % faster and yields 10 % less.
+s281190bd,Doble cosecha,Double harvest
+s1e23ca8c,Rebrota una vez después de cosecharla: vuelve a vegetativo y da una segunda cosecha del 60 %.,Regrows once after harvest: goes back to veg and gives a second harvest of 60 %.
+sea483ee8,Aroma único,Unique aroma
+se3963e00,Un olor que no tiene otra: su hierba se paga un 25 % más.,A smell no other has: its weed sells for 25 % more.
+s14ee5515,Resinosa,Resinous
+sa0563766,"Cubierta de tricomas: 1,5 puntos más de THC.",Covered in trichomes: 1.5 more THC points.
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.

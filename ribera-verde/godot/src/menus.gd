@@ -255,6 +255,8 @@ func cannadex() -> void:
 			{"label": K("TODAS"), "right": dex_cuenta(D.DEX), "ic": icono("cogollo"), "q": "todas", "desc": K("Todas las variedades, en su orden.")}]
 		if cust.size():
 			items.append({"label": K("TUS CRUCES"), "right": str(cust.size()), "ic": icono("cogollo"), "q": "cust", "desc": K("Las variedades que has sacado tú en la mesa de cruces.")})
+		if S.get("album") is Array and S.album.size():   # ESTUDIO, tanda 2: el cuaderno de fenotipos
+			items.append({"label": K("CUADERNO DE FENOTIPOS"), "right": str(S.album.size()), "ic": icono("guardar"), "q": "album", "desc": K("Cada planta rara que has cosechado, con sus rasgos, el día y el sitio, y lo que lleva ya su línea.")})
 		if S.flags.get("pagina"):   # la página que falta (1.17)
 			items.append({"label": K("LA ÚLTIMA PÁGINA"), "ic": icono("guardar"), "q": "pagina", "desc": "«%s»" % I18n.v(D.PAGINA)})
 		items.append({"label": K("Volver"), "desc": ""})
@@ -283,6 +285,42 @@ func cannadex() -> void:
 				await dex_cruces(cust)
 			"pagina":
 				await leer(K("LA ÚLTIMA PÁGINA"), "«%s»" % I18n.v(D.PAGINA))
+			"album":
+				await cuaderno_fenos()
+
+# ESTUDIO, tanda 2: el cuaderno de fenotipos, de la última a la primera: la planta, sus rasgos, cuándo y dónde, y cómo va su línea
+func cuaderno_fenos() -> void:
+	var j := 0
+	while true:
+		var it := []
+		var l: Array = S.album.duplicate()
+		l.reverse()
+		for a in l:
+			var r := []
+			for k in a.get("ra", []):
+				r.append(I18n.v(D.RAREZAS.r[k].n))
+			if String(a.get("sh", "")) != "":
+				r.append(K("rara (no se hereda)"))
+			var li := []
+			for k in S.get("ra", {}).get(a.sid, {}):
+				li.append(T("{n} al {p} %", {"n": I18n.v(D.RAREZAS.r[k].n), "p": roundi(float(D.RAREZAS.niv[int(S.ra[a.sid][k])]) * 100)}))
+			it.append({"label": strain(a.sid).n + nom_planta({"id": a.id}), "right": Datos.fd_corto(int(a.d)), "ic": ic_cog(a.sid),
+				"desc": T("{r} · {l}", {"r": y_lista(r), "l": lugar_album(String(a.m))}) + "\n" + (T("Su línea: {x}.", {"x": y_lista(li)}) if li.size() else K("Su línea no lleva ningún rasgo: cosecha semillas de una planta que lo saque."))})
+		it.append({"label": K("Volver"), "desc": ""})
+		j = await menu(it, {"cls": "full", "title": K("CUADERNO DE FENOTIPOS"), "title2": str(S.album.size()), "desc": true, "initial": j})
+		if j < 0 or j >= l.size():
+			return
+
+func lugar_album(m: String) -> String:
+	if m == "home":   # i18n-no
+		return K("en el piso")
+	if m.begins_with("nave"):
+		return K("en la nave")
+	if m == "huerta":   # i18n-no
+		return K("en la huerta")
+	if m.begins_with("cult-"):
+		return K("en la sala de KAIA")
+	return T("en {m}", {"m": nombre_lugar(m)})
 
 func dex_familias() -> void:
 	var i := 0
