@@ -159,7 +159,7 @@ func _corre() -> void:
 	MENUS = []
 	QUIERO = ["Plaza 16", J.strain("txoko").n]
 	chk(corre(func(): await J.object_action(14, 2)) and J.kc().p[15] is Dictionary and J.kc_plantadas(0) == 1 and MENUS.size() and MENUS[0].size() == 18, "la carpa 1, con 16 plazas: plantada la 16 (%d filas)" % [MENUS[0].size() if MENUS.size() else 0])
-	chk(J.sprite_local("carpaKS0") == "kcs" and J.sprite_local("carpaKS1") == "kcs", "cerradas, como las de casa: %s %s" % [J.sprite_local("carpaKS0"), J.sprite_local("carpaKS1")])
+	chk(J.sprite_local("carpaKS0") == "kcs" and J.sprite_local("carpaKS1") == "kcsi", "cerradas, como las de casa (la 2.ª, con la puerta a la izquierda): %s %s" % [J.sprite_local("carpaKS0"), J.sprite_local("carpaKS1")])
 	for j in 15:
 		J.kc().p[j] = planta.duplicate(true)
 	chk(J.sprite_local("carpaKS0") == "kcs", "llena, la misma carpa cerrada")

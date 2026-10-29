@@ -60,6 +60,119 @@ func mesa_dentro(R: Array, que: String) -> void:
 	for b in leds:
 		chk(b <= cima - 4, "%s: el LED por encima de las plantas (su pie %d, la cima %d)" % [que, b, cima])
 
+# lo de la pared del servicio y del techo, en la vista C de una carpa de KAIA (lo pidió el usuario: «el extractor y el intractor o lo
+# que sea se verá… en la vista C, dependiendo de dónde esté la mesa colocada», «los depósitos se deben de dibujar de diferentes tamaños
+# también» y «lo más realista posible… coherencia y lógica»): la puerta lateral, la ventana y el intractor (kc-serv-*) en la pared del
+# lado con más sitio libre en el mapa (kc_lado: sl), como el sprite del mapa (kcsi a la izquierda), dentro de esa pared y por encima
+# del suelo; el extractor con su filtro, arriba en la mitad contraria, donde sale su tubo por el techo en el mapa (en la de 4 × 4, solo
+# en la mitad del fondo; delante, la puerta y la ventana, y al fondo, la manga y la ventana); el temporizador, en la otra pared; los
+# LED, separados; el depósito, fuera (en el mapa, el de su nivel; en la vista no se ve: solo su pasamuros) y el goteo, de sus litros;
+# y nada encima de nada: temporizador (con su cable), cada cosa del servicio, filtro, LED y pasamuros
+var TAM := {}   # litros → tamaño del depósito en el mapa
+func _caja(r: Array) -> Rect2i:
+	return Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3]))
+
+func servicio_ok(ci: int, que: String) -> void:
+	var A = load("res://src/arte.gd")
+	var g: Dictionary = Vista.geo(J.S, 0)
+	var sl: bool = g.C.get("sl", false)
+	var xl: int = int(g.vc.xl)
+	var xr: int = xl + int(g.vc.w)
+	var N: Dictionary = J.kc_Nc(ci)
+	var h: int = int(J.KCV.h) if J.KCV != null else 0
+	var mi: int = J.kc_mitades(ci)
+	chk(sl == (J.kc_lado(ci) < 0) and J.sprite_local(String(N.obj) + str(J.kc_iN(ci))).ends_with("i") == sl, "%s: el servicio, en el lado con más sitio en el mapa (la %s), como su sprite (%s)" % [que, "izquierda" if sl else "derecha", J.sprite_local(String(N.obj) + str(J.kc_iN(ci)))])
+	var quiero: Array = ["puerta", "ventana", "manga"] if mi == 1 else (["puerta", "ventana"] if h == 0 else ["manga", "ventana"])
+	var sv: Array = Vista.kc_servicio(g)
+	chk(sv.map(func(e): return String(e.n).trim_prefix("kc-serv-")) == quiero, "%s: %s en la pared del servicio (%s)" % [que, quiero, sv.map(func(e): return e.n)])
+	var fuera := []   # lo que se sale de su pared (a u px de la esquina de atrás: de la fila 4 al suelo, 138,4 + 0,8 u)
+	var grupos := {}
+	for e in sv:
+		var im: Image = e.im
+		var of: Array = A.off[e.n]
+		chk(int(e.x) == (xl - int(of[0]) - im.get_width() if sl else xr + int(of[0])) and int(e.y) == int(of[1]), "%s: %s en su sitio de la tira, en espejo a la izquierda (x %d)" % [que, e.n, e.x])
+		var orig: Image = A.foto(e.n).duplicate()
+		if sl:
+			orig.flip_x()
+		chk(orig.get_data() == im.get_data(), "%s: %s, el dibujo de kaia_vc.py%s" % [que, e.n, " en espejo" if sl else ""])
+		for yy in im.get_height():
+			for xx in im.get_width():
+				if im.get_pixel(xx, yy).a == 0:
+					continue
+				var X: int = int(e.x) + xx
+				var Y: int = int(e.y) + yy
+				var u: int = xl - 1 - X if sl else X - xr
+				if u < 0 or u > 43 or Y < 4 or Y >= roundi(138.4 + .8 * u):
+					fuera.append([e.n, X, Y])
+		var ur: Rect2i = im.get_used_rect()
+		grupos[String(e.n)] = [Rect2i(int(e.x) + ur.position.x, int(e.y) + ur.position.y, ur.size.x, ur.size.y)]
+	chk(fuera.is_empty(), "%s: el servicio, dentro de su pared y por encima del suelo (%s)" % [que, fuera.slice(0, 4)])
+	# el depósito, fuera: en el mapa, el de su nivel, a su lado (kc_dep), y el goteo de sus litros
+	var dn: String = String(N.ds) + ("" if int(J.kc_dep(ci)[0]) < 0 else "d")
+	var p: Array = J.kc_pos(ci)
+	var dp: Array = J.kc_dep(ci)
+	var m: Dictionary = J.MAPS[J.D.KAIA_CULT.mapa]
+	chk(String(m.o[int(p[1]) + int(dp[1])][int(p[0]) + int(dp[0])]) == dn and bool(g.C.get("depi", false)) == (int(dp[0]) < 0), "%s: el depósito, fuera, el de su nivel (%s), y su manguera por esa pared" % [que, dn])
+	var mf = Atlas.frame_de(Atlas.cubre("obj:" + dn), dn, "unica", 0, {"i": 0})
+	if mf != null and mf.get("c") != null:
+		TAM[int(N.dl)] = mf.c.get_used_rect().size
+	chk(Cultivo.goteo_l(J.S, 0) == int(N.dl) and int(N.dl) == 25 * int(N.plazas), "%s: el goteo, de los litros de su depósito (%d L)" % [que, Cultivo.goteo_l(J.S, 0)])
+	# el extractor, arriba en la mitad contraria al servicio, donde sale su tubo en el mapa; en la de 4 × 4, solo al fondo
+	var tubo := -1
+	var mitad := false
+	for q in J.tubos_ext():
+		if int(q[3]) == ci:
+			tubo = int(q[0])
+			mitad = bool(q[4])
+	var ux: float = J.kc_ux(ci)
+	var ext: bool = mi == 1 or h == 1
+	var f: Dictionary = Vista.kc_filtro(g)
+	chk(bool(g.C.get("ext", true)) == ext, "%s: el extractor %s" % [que, "a la vista" if ext else "en la otra mitad"])
+	chk(tubo >= 0 and absf(ux - float(tubo - int(p[0]) * 16) / (int(N.tam[0]) * 16)) < 1e-6 and absf(float(g.C.ux) - ux) < 1e-6 and mitad and ((ux > .5) if sl else (ux < .5)), "%s: el tubo, por la mitad contraria al servicio, sin pisar nada (%.2f del ancho; %s)" % [que, ux, "en su mitad" if mitad else "de reserva"])
+	chk(not f.is_empty() and int(f.xd) == xl + roundi(ux * int(g.vc.w)), "%s: el extractor, donde sale su tubo (x %d)" % [que, f.get("xd", -1)])
+	chk(int(g.C.fil[1]) == 1, "%s: un filtro con su extractor (%s)" % [que, g.C.fil])
+	var tp: Array = Vista.temporizador(int(g.tx), int(g.ty), "auto", false)
+	chk((int(g.tx) == xr + 13) if sl else (int(g.tx) == xl - 24), "%s: el temporizador, en la pared de enfrente del servicio (x %d)" % [que, g.tx])
+	grupos["temporizador"] = tp.map(_caja)
+	if ext and not f.is_empty():
+		var fr: Rect2i = f.im.get_used_rect()
+		grupos["filtro"] = [Rect2i(int(f.x) + fr.position.x - 1, int(f.y) + fr.position.y, fr.size.x + 2, fr.size.y)]   # con su temblor de 1 px
+	var fc: Image = A.foto(g.vc.foco.n)
+	var fu: Rect2i = fc.get_used_rect()
+	var leds: Array = g.vc.fxs.map(func(cx): return Rect2i(int(cx) - (fc.get_width() >> 1) + fu.position.x, int(g.vc.fy) - 15 + fu.position.y, fu.size.x, fu.size.y))
+	chk(String(g.vc.foco.n) == ("foco-c-led720-75" if String(N.k) == "s" else "foco-c-led720-36"), "%s: los LED de KAIA, un poco más estrechos que su parte (%s)" % [que, g.vc.foco.n])
+	var juntos := []
+	for k in range(1, leds.size()):
+		if leds[k].position.x <= leds[k - 1].end.x:
+			juntos.append(k)
+	chk(juntos.is_empty(), "%s: los LED, separados (%s)" % [que, leds])
+	grupos["LED"] = leds
+	# las cuerdas de cada LED, con su trinquete y su rueda (lo pidió el usuario: «No quiero que ningún objeto… se superponga sobre
+	# otro»): el filtro no cuelga encima de ninguna; en la de 2 × 2, tumbado de lado entre las dos de un LED; en las de 4 m (cuatro LED a
+	# lo ancho, el de 75 cm no cabe de lado), de frente a fondo, con su tapa redonda (kc-filtrof-*)
+	var pol := []
+	for cx in g.vc.fxs:
+		for e in Vista.poleas(fc, int(g.vc.fy), int(cx)):
+			pol.append(Rect2i(int(e[0]), int(e[1]), int(e[2]), int(e[3])))
+	grupos["poleas"] = pol
+	var T: Dictionary = Vista.kc_techo(float(g.W), float(g.H), int(g.c.nf), String(g.c.foco), g.C.fil)
+	chk(int(T.w) == int(g.vc.w) and int(T.xl) == int(g.vc.xl) and absf(float(T.Z) - float(g.vc.Z)) < 1e-9 and T.oc.size() == pol.size(), "%s: el techo de kc_techo, el de la vista (%d %d %d)" % [que, T.w, g.vc.w, T.oc.size()])
+	if ext:
+		chk(String(f.get("de", "")) == ("lado" if String(N.k) == "s" else "frente"), "%s: el filtro, %s (%s)" % [que, "de lado" if String(N.k) == "s" else "de frente a fondo", f.get("k")])
+		chk(J.kc_cabe_filtro(ci, tubo - int(p[0]) * 16), "%s: su tubo, por donde el filtro cabe" % que)
+	var l0: Dictionary = g.vc.lg[0]
+	grupos["pasamuros"] = [Rect2i(int(l0.xl) - 1 if g.C.get("depi") else int(l0.xw) - 1, int(l0.y) - 2, 3, 4)]
+	var malos := []
+	var ks: Array = grupos.keys()
+	for i in ks.size():
+		for j in range(i + 1, ks.size()):
+			for a in grupos[ks[i]]:
+				for b in grupos[ks[j]]:
+					if a.intersects(b) and not malos.has([ks[i], ks[j]]):
+						malos.append([ks[i], ks[j]])
+						malos.append([a, b])
+	chk(malos.is_empty(), "%s: nada encima de nada en la pared y el techo (%s)" % [que, malos])
+
 func _initialize() -> void:
 	Datos.PLAY = false
 	_corre.call_deferred()
@@ -223,6 +336,7 @@ func _corre() -> void:
 	chk(g.vc != null and g.pl.size() == 4 and g.vc.fxs.size() == 2 and g.vc.w <= Vista.VC_KC_W + 1, "la vista C: 4 plazas, 2 LED a lo ancho (%s), %d px" % [g.vc.fxs if g.vc else null, g.vc.w if g.vc else 0])
 	chk(J.S.pots[0] == J.kc().p[0] and J.S.pots[3] == J.kc().p[3] and J.S.pots[2] == null, "las plantas, las de KAIA")
 	await foto(dir, "s4")
+	servicio_ok(0, "la 1.ª de 2 × 2")
 	# plantar desde la vista, en la plaza vacía (con su hu: en S.kc.p)
 	J.S.seeds.txoko = int(J.S.seeds.get("txoko", 0)) + 3
 	J.VC.sel = 2
@@ -297,9 +411,63 @@ func _corre() -> void:
 	chk(ys.size() == 4 and ys.keys().all(func(y): return int(y) >= 140 and int(y) <= 158), "cuatro filas en el suelo: %s" % [ys.keys()])
 	await foto(dir, "s16")
 	cierra(st)
+	# 2b · la 4.ª de 2 × 2, contra la pared de la sala con el depósito a la izquierda: en espejo (kcsi), con el temporizador enfrente
+	st = abre(3)
+	g = Vista.geo(J.S, 0)
+	chk(J.KCV != null and int(J.KCV.ci) == 3 and g.vc != null and g.C.get("depi") and J.sprite_local("carpaKS3") == "kcsi", "la 4.ª de 2 × 2: su depósito y su servicio, a la izquierda (%s)" % [J.KCV])
+	servicio_ok(3, "la 4.ª de 2 × 2")
+	await foto(dir, "s-izq")
+	cierra(st)
+	# 2c · depende de dónde estén las carpas, y se queda donde se dejó: la 3.ª de 2 × 2, de serie, con el servicio a la derecha y el
+	# extractor a la izquierda; con la 4.ª movida a la otra punta, igual (el lado no cambia al mover otra: S.kc.ld); movida ella a (4, 3),
+	# el lado con más sitio ahí, y con la 4.ª pegada luego a ese lado, el mismo: la puerta no salta de pared
+	st = abre(2)
+	g = Vista.geo(J.S, 0)
+	var ux0: float = J.kc_ux(2)
+	chk(not g.C.get("sl", true) and J.sprite_local("carpaKS2") == "kcs" and ux0 < .5, "la 3.ª de 2 × 2, de serie: el servicio a la derecha (%s) y el tubo a la izquierda (%.2f)" % [J.sprite_local("carpaKS2"), ux0])
+	servicio_ok(2, "la 3.ª de 2 × 2")
+	await foto(dir, "s3-sitio")
+	cierra(st)
+	if not (J.S.get("coloca") is Dictionary):
+		J.S.coloca = {}
+	J.S.coloca[C] = {"kcs3": [4, 2]}
+	J.enter_map(C, 4, 5, "up")
+	J.mode = "world"
+	corre(func(): pass)
+	st = abre(2)
+	g = Vista.geo(J.S, 0)
+	chk(J.kc_pos(3) == [4, 2] and not g.C.get("sl", true) and J.sprite_local("carpaKS2") == "kcs" and absf(J.kc_ux(2) - ux0) < 1e-6, "con la 4.ª en (4, 2): la 3.ª, igual (%s, %.2f → %.2f)" % [J.sprite_local("carpaKS2"), ux0, J.kc_ux(2)])
+	servicio_ok(2, "la 3.ª de 2 × 2, con la 4.ª movida")
+	cierra(st)
+	st = abre(3)
+	servicio_ok(3, "la 4.ª de 2 × 2, movida")
+	cierra(st)
+	J.S.coloca[C] = {"kcs2": [4, 3]}
+	J.enter_map(C, 4, 5, "up")
+	J.mode = "world"
+	corre(func(): pass)
+	var L0: int = J.kc_lado(2)
+	J.S.coloca[C]["kcs3"] = [7, 3]
+	J.enter_map(C, 4, 5, "up")
+	J.mode = "world"
+	corre(func(): pass)
+	st = abre(2)
+	g = Vista.geo(J.S, 0)
+	chk(J.kc_pos(2) == [4, 3] and J.kc_pos(3) == [7, 3] and J.kc_lado(2) == L0 and J.kc_lado_en(2, J.MAPS[C].o, J.kc_pos(2)) != L0 and bool(g.C.get("sl", false)) == (L0 < 0), "la 3.ª en (4, 3), con la 4.ª pegada después: la puerta, donde se dejó (%d)" % L0)
+	servicio_ok(2, "la 3.ª de 2 × 2, movida, con la 4.ª al lado")
+	await foto(dir, "s3-movida")
+	cierra(st)
+	J.S.coloca.erase(C)
+	J.kc().erase("ld")
+	J.enter_map(C, 4, 5, "up")
+	J.mode = "world"
+	corre(func(): pass)
 	# 3 · la de 400 × 200 (8 plazas, 4 LED) y 18 de 35 L
 	J.S.kc = {"niv": 1, "kits": [0, 0], "p": []}   # la de antes, de un nivel: a los sitios de su tamaño
 	J.kc()
+	J.enter_map(C, 4, 5, "up")   # la sala, con las carpas de este nivel (y sus tubos)
+	J.mode = "world"
+	corre(func(): pass)
 	var c4: int = J.kc_base(1)
 	var o4: int = J.kc_off(c4)
 	for i in 6:
@@ -308,6 +476,7 @@ func _corre() -> void:
 	g = Vista.geo(J.S, 0)
 	chk(g.vc != null and g.pl.size() == 8 and g.vc.fxs.size() == 4 and int(g.C.filas) == 2, "400 × 200: 8 plazas en 2 filas y 4 LED (%d)" % g.pl.size())
 	await foto(dir, "m8")
+	servicio_ok(c4, "la de 4 × 2")
 	cierra(st)
 	var pt: Array = J.S.kc.pat if J.S.kc.get("pat") is Array else []
 	while pt.size() <= c4:
@@ -323,6 +492,9 @@ func _corre() -> void:
 	# 4 · la de 400 × 400, por mitades: delante y al fondo
 	J.S.kc = {"niv": 2, "kits": [0], "p": []}
 	J.kc()
+	J.enter_map(C, 4, 5, "up")
+	J.mode = "world"
+	corre(func(): pass)
 	var c6: int = J.kc_base(2)
 	var o6: int = J.kc_off(c6)
 	for i in 16:
@@ -330,6 +502,8 @@ func _corre() -> void:
 	st = abre(c6)
 	g = Vista.geo(J.S, 0)
 	chk(J.kc_mitades(c6) == 2 and g.vc != null and g.pl.size() == 8 and int(J.KCV.a) == o6 and g.vc.fxs.size() == 4, "400 × 400: la mitad de delante, 8 plazas y 4 LED (%d %d %s %d %s)" % [J.kc_mitades(c6), g.pl.size(), J.KCV.get("a") if J.KCV else null, g.vc.fxs.size() if g.vc else -1, J.mode])
+	servicio_ok(c6, "la de 4 × 4, delante")
+	await foto(dir, "l-delante")
 	MENUS = []
 	QUIERO = ["Ver la mitad del fondo"]
 	J.VC.sel = -1
@@ -342,6 +516,10 @@ func _corre() -> void:
 		M.paso()
 	chk(J.KCV != null and int(J.KCV.h) == 1 and int(J.KCV.a) == o6 + 8 and J.S.pots[0] == J.kc().p[o6 + 8], "la mitad del fondo: de la plaza 9 a la 16 (%s %s)" % [J.KCV, J.mode])
 	await foto(dir, "l-fondo")
+	servicio_ok(c6, "la de 4 × 4, al fondo")
+	var ls: Array = TAM.keys()
+	ls.sort()
+	chk(ls == [100, 200, 400] and TAM[100].x <= TAM[200].x and TAM[200].x <= TAM[400].x and TAM[100].y < TAM[200].y and TAM[200].y < TAM[400].y, "los depósitos, cada uno a su tamaño: %s" % [TAM])
 	chk(cierra(st) and J.KCV == null and J.S.carpas.size() == casa_c.size(), "B: fuera, con lo de casa")
 	# 4b · la carpa de sala: A en una mesa abre su vista (la pared de la carpa, el LED doble y la mesa con sus plantas)
 	J.S.kc = {"niv": 2, "kits": [-1, -1, -1, -1, -1, -1, -1], "p": [], "v": 2, "f2": 0, "m": []}

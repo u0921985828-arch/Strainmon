@@ -1440,9 +1440,14 @@ func _tubos_fuera() -> void:
 		_rect(float(e[0]) - cam.x, float(e[1]) - cam.y, e[2], e[3], css(e[4]))
 
 # el tubo de cada carpa de KAIA a la pared (kaiacult.gd tubos_ext): de la boca del canto de atrás de su techo, recto por el techo de la
-# sala hasta el pasamuros de chapa de la pared, con sus abrazaderas
+# sala hasta el pasamuros de chapa de la pared, con sus abrazaderas; las que van al colector, por su ramal en T hasta él, y el colector,
+# por el techo hasta su salida, con un codo curvo en cada giro (como _tubo_codos)
 func _tubos_kaia() -> void:
-	for q in J.tubos_ext():
+	var L: Array = J.tubos_ext()
+	for q in L:
+		var tipo: String = String(q[6]) if q.size() > 6 else "recto"   # i18n-no
+		if tipo == "rama":
+			continue
 		var x: int = int(q[0]) - cam.x
 		var yw: int = int(q[1]) - cam.y
 		var yb: int = int(q[2]) - cam.y
@@ -1452,9 +1457,38 @@ func _tubos_kaia() -> void:
 		_rect(x - 5, yw + 3, 11, 1, css("#8a8e98"))
 		for r in [[x - 4, yw - 3], [x + 4, yw - 3], [x - 4, yw + 2], [x + 4, yw + 2]]:
 			_rect(r[0], r[1], 1, 1, css("#7a7e86"))   # los remaches
-		_tubo(x - 2, yw - 1, 5, yb - yw + 1, false)
+		if tipo != "col":
+			_tubo(x - 2, yw - 1, 5, yb - yw + 1, false)
+			_rect(x - 3, yw + 3, 7, 2, css("#5a5e66"))   # la abrazadera en el pasamuros
+			_rect(x - 3, yb - 2, 7, 2, css("#5a5e66"))   # y en la boca de la carpa
+			continue
+		var izq: bool = x <= int(q[5][0]) - cam.x   # sale por la izquierda de los ramales
+		var xf: int = (int(q[5][1]) if izq else int(q[5][0])) - cam.x   # el ramal de la punta, con su codo
+		var yc: int = yb - 2   # la fila de arriba del tramo del techo
+		var ram := []
+		var yf: int = yb + 6
+		for r in L:
+			if r.size() > 6 and String(r[6]) == "rama":
+				ram.append([int(r[0]) - cam.x, int(r[2]) - cam.y])
+				if int(r[0]) - cam.x == xf:
+					yf = int(r[2]) - cam.y
+		var re: int = clampi(yc - yw - 10, 0, 3)
+		var rf: int = clampi(yf - yc - 6, 0, 3)
+		var xl: int = mini(x, xf)
+		var xr: int = maxi(x, xf)
+		var rl: int = re if izq else rf
+		var rr: int = rf if izq else re
+		_tubo(x - 2, yw - 1, 5, yc - re - (yw - 1), false, true)   # de la pared a su codo
+		_tubo(xl + 3 + rl, yc, xr - 2 - rr - (xl + 3 + rl), 5, true, true)   # por el techo
+		_tubo(xf - 2, yc + 5 + rf, 5, yf - (yc + 5 + rf), false, true)   # el ramal de la punta
+		_codo(x - 2, yc, re, 1 if izq else -1, true)
+		_codo(xf - 2, yc, rf, -1 if izq else 1)
+		for r in ram:
+			if r[0] != xf:   # los de en medio, en T por debajo, con su abrazadera
+				_tubo(r[0] - 2, yc + 5, 5, r[1] - (yc + 5), false, true)
+				_rect(r[0] - 3, yc + 5, 7, 2, css("#5a5e66"))
+			_rect(r[0] - 3, r[1] - 2, 7, 2, css("#5a5e66"))   # en la boca de su carpa
 		_rect(x - 3, yw + 3, 7, 2, css("#5a5e66"))   # la abrazadera en el pasamuros
-		_rect(x - 3, yb - 2, 7, 2, css("#5a5e66"))   # y en la boca de la carpa
 
 func _manguera_nave() -> void:
 	for e in J.manguera_nave():
@@ -1736,17 +1770,18 @@ func _tubo_codos(xa: int, xb: int, yc: int, ya: int, yb: int) -> void:
 	_codo(xr - 2, yc, rr, -1)
 
 # el codo: un cuarto de toro de 5 px de grueso y ri de radio por dentro, con el tramo de bajada en x0..x0+4 desde el techo y0; lado 1,
-# el del techo sale a la derecha; -1, a la izquierda. Arriba, la luz como en el tramo del techo; en la bajada, como en la bajada
+# el del techo sale a la derecha; -1, a la izquierda. Arriba, la luz como en el tramo del techo; en la bajada, como en la bajada. Con
+# arriba, en espejo: el tramo sube desde el del techo (y0..y0+4), que sigue con la luz arriba
 const TUBO_C := ["#2a2a34", "#e4e8ee", "#b4b8c0", "#8a8e98", "#2a2a34"]
-func _codo(x0: int, y0: int, ri: int, lado: int) -> void:
+func _codo(x0: int, y0: int, ri: int, lado: int, arriba := false) -> void:
 	var R := 5.0 + ri
-	var pv := Vector2(x0 - ri if lado < 0 else x0 + 5 + ri, y0 + 5 + ri)   # el centro de la curva, en la esquina de dentro
+	var pv := Vector2(x0 - ri if lado < 0 else x0 + 5 + ri, y0 - ri if arriba else y0 + 5 + ri)   # el centro de la curva, en la esquina de dentro
 	for j in 5 + ri:
 		for i in 5 + ri:
 			var px: int = (x0 - ri + i) if lado < 0 else (x0 + i)
-			var py: int = y0 + j
+			var py: int = (y0 - ri + j) if arriba else (y0 + j)
 			var dx := absf(px + 0.5 - pv.x)
-			var dy := pv.y - (py + 0.5)
+			var dy := absf(py + 0.5 - pv.y)
 			var r := sqrt(dx * dx + dy * dy)
 			if r > R + 0.35 or r < ri - 0.35:
 				continue
@@ -1755,7 +1790,7 @@ func _codo(x0: int, y0: int, ri: int, lado: int) -> void:
 			if b == 0 or b == 4:
 				c = TUBO_C[0]
 			elif dy > dx:   # en el tramo del techo: la fila
-				c = TUBO_C[b]
+				c = TUBO_C[4 - b if arriba else b]
 			else:   # en la bajada: la columna, con la luz a la izquierda
 				c = TUBO_C[4 - b if lado < 0 else b]
 			_rect(px, py, 1, 1, css(c))

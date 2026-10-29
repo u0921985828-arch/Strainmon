@@ -29,6 +29,8 @@ A: the panel · B: close."
 "{t}° · {h} % · VPD {v} kPa · {z} · extracción al {c} %: {e}.
 A: el cuadro · B: cerrar.","{t}° · {h} % · VPD {v} kPa · {z} · extraction at {c} %: {e}.
 A: the panel · B: close."
-"El depósito del goteo de la carpa {n}, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.","The drip tank of tent {n}, outside it: its pump sends the water with the nutrients down the hose, which goes in through the tent wall, to each pot."
+"El depósito del goteo de la carpa {n}, de {l} L, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.","The {l} L drip tank of tent {n}, outside it: its pump sends the water with the nutrients down the hose, which goes in through the tent wall, to each pot."
 "El rincón del riego, fuera de la carpa: el tanque con el abono ya mezclado, el programador que lo manda a cada mesa por la boca de servicio y el depósito de recogida, al que vuelve por ella lo que sobra.","The watering corner, outside the tent: the tank with the nutrients already mixed, the controller that sends it to each table through the service port, and the runoff tank, where whatever is left comes back through it."
 El filtro de carbón y el extractor de la carpa: el aire sale limpio por el tubo del techo y entra el de fuera por los intractores de abajo.,The tent's carbon filter and exhaust fan: the air leaves clean through the ceiling duct and fresh air comes in through the intake fans below.
+Así una carpa se queda sin sitio al lado de su puerta lateral.,That would leave a tent with no room beside its side door.
+Así el tubo de una carpa no llega a la pared sin pasar por encima de otra cosa.,That way a tent's duct can't reach the wall without running over something else.

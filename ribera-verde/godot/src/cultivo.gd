@@ -182,7 +182,10 @@ static func factura_sala(S: Dictionary) -> int:
 # (c.dep litros, unas cinco cosechas con la carpa llena; sin el campo, lleno; con él, las garrafas no se usan)
 static func goteo_l(S: Dictionary, ci: int) -> int:
 	var D := Datos.carga()
-	var cm: Array = D.CARPAS[S.carpas[ci].t].cm
+	var C: Dictionary = D.CARPAS[S.carpas[ci].t]
+	if C.has("dl"):   # las de KAIA (kc_def): su depósito, de 25 L por salida
+		return int(C.dl)
+	var cm: Array = C.cm
 	return Datos.jsround(D.GOTEO_X * Datos.jsround(cm[0] * cm[2] / 1e4 * D.LITROS_M2))
 
 static func garrafa_l(S: Dictionary, i: int) -> int:

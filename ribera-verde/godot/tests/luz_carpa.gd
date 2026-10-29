@@ -1,6 +1,6 @@
 # Landrace Hunters (Godot) — el foco, encendido por el temporizador (lo pidió el usuario: «cuando esté en 12 h y esté a oscuras se
 # tiene que ver a oscuras»), con Datos.CAL. Cultivo.foco_on: desde las 6:00, 18 h (18/6) o 12 h (12/12; en automático, en cuanto
-# una florece). En la vista C: en sus horas de luz, igual que antes (y que sin CAL); en las de noche, la carpa a oscuras, sin haz.
+# una florece). En la vista C: en sus horas de luz, igual a cualquier hora; en las de noche, la carpa a oscuras, sin haz.
 #   xvfb-run … --rendering-driver opengl3 --script res://tests/luz_carpa.gd -- --sin-arranque [--pintar <dir>]
 extends SceneTree
 
@@ -108,7 +108,8 @@ func _corre() -> void:
 		var g = Vista.geo(S, 0)
 		if g.vc == null or not Cultivo.plantas_vivas(S, 0):
 			continue
-		var a: Image = await pinta(con(e, "flor", 12), false)
+		# sin CAL cambian el tresbolillo y el tallo a la vista (tallo_vista.gd, plantacion.gd): de día, igual a otra hora de luz
+		var a: Image = await pinta(con(e, "flor", 8), true)
 		var dia: Image = await pinta(con(e, "flor", 12), true)
 		var noche: Image = await pinta(con(e, "flor", 22), true)
 		if dir != "":
@@ -122,7 +123,7 @@ func _corre() -> void:
 			for x in range(0, 240, 2):
 				if lum(a.get_pixel(x, y)) > .04:
 					P.append(Vector2i(x, y))
-		ok("%s: de día, igual que sin CAL" % e.k, distintos(a, dia) == 0)
+		ok("%s: de día, igual a otra hora de luz" % e.k, distintos(a, dia) == 0)
 		ok("%s: de noche, a oscuras (≤ 25 %%)" % e.k, media(noche, P) <= .25 * media(dia, P))
 	Datos.CAL = true
 	for f in fallos:

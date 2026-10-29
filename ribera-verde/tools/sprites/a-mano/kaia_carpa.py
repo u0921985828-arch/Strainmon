@@ -8,7 +8,8 @@
 #  · la de 150 (24 × 40): columnas 0 poste de luz, 1-2 tela de luz, 3 cremallera, 4-9 la puerta, 10 cremallera, 11 tela de luz,
 #    12-22 el lado de sombra, 23 poste; filas 0-1 canto del techo, 2-6 techo, 7 barra plateada, 8-38 el frente (la puerta de la 11 a
 #    la 38) y 39 el pie.
-#  · kcs, la de 200 × 200 (32 × 48); kcm, la de 400 × 200 con dos puertas (64 × 48); kcl, la de 400 × 400 (64 × 64); kcx, la de
+#  · kcs, la de 200 × 200 (32 × 48); kcm, la de 400 × 200 con dos puertas (64 × 48); kcl, la de 400 × 400 (64 × 64), y, con el
+#    servicio a la izquierda, kcsi, kcmi y kcli; kcx, la de
 #    sala de 1.300 × 700 × 250 con la puerta para entrar andando en la casilla 6 (208 × 112), la luz hasta pasada la puerta.
 # Celda carpa_kc de 80 × 80 (kcs, kcm, kcl) y carpa_kx de 208 × 112 (kcx), con la base en la fila de abajo y el mueble en sus
 # casillas desde x 0. El tubo de extracción de cada una a la pared lo pinta el juego (kaiacult.gd, como el de casa).
@@ -81,14 +82,16 @@ TONO = [(32, 32, 36), (48, 48, 56), (69, 71, 78), (76, 85, 96), (94, 96, 104), (
 def pon(px, x, y, t):
     px[x, y] = TONO[t] + (255,)
 
-def puerta_lat(px, x0, x1, y0, y1):
-    """la puerta lateral: la cremallera en U de x0 a x1 desde y0, abierta por abajo, con el tirador abajo a la izquierda"""
+def puerta_lat(px, x0, x1, y0, y1, luz=False):
+    """la puerta lateral: la cremallera en U de x0 a x1 desde y0, abierta por abajo, con el tirador abajo a la izquierda (con luz,
+    en la tela de luz: un tono más claro todo)"""
+    z, e, t0, t1 = (4, 2, 5, 6) if luz else (2, 1, 4, 5)
     for y in range(y0 + 1, y1 + 1):
-        pon(px, x0, y, 2); pon(px, x1, y, 2)
+        pon(px, x0, y, z); pon(px, x1, y, z)
     for x in range(x0 + 1, x1):
-        pon(px, x, y0, 2)
-    pon(px, x0 + 1, y0 + 1, 1); pon(px, x1 - 1, y0 + 1, 1)   # las esquinas, redondeadas por dentro
-    pon(px, x0, y1 - 2, 4); pon(px, x0, y1 - 1, 5)          # el tirador
+        pon(px, x, y0, z)
+    pon(px, x0 + 1, y0 + 1, e); pon(px, x1 - 1, y0 + 1, e)   # las esquinas, redondeadas por dentro
+    pon(px, x0, y1 - 2, t0); pon(px, x0, y1 - 1, t1)        # el tirador
 
 def ventana(px, x0, y0, w, h, luz):
     """la ventana de malla de w × h: el marco con velcro, la malla a cuadros y la solapa enrollada encima"""
@@ -122,14 +125,37 @@ def intractor(px, x0, yb, yp, luz):
         pon(px, x0, y, 4); pon(px, x0 + 3, y, 0)
     pon(px, x0 + 1, yb - 2, 5); pon(px, x0 + 2, yb - 2, 5)
 
+def puerta_frente(px, x0, x1, y0, yb):
+    """la puerta de entrar en el lado de sombra (la de kcsi): como la de la tela de luz (el dobladillo de arriba, las dos cremalleras
+    hasta el suelo y el umbral oscuro), un tono más apagada"""
+    pon(px, x0, y0, 2); pon(px, x1, y0, 2)
+    for x in range(x0 + 1, x1):
+        pon(px, x, y0, 4)
+    for y in range(y0 + 1, yb):
+        pon(px, x0, y, 4); pon(px, x1, y, 4)
+    for x in range(x0, x1 + 1):
+        pon(px, x, yb, 0)
+
 def detalles(im, w, frente, tipo):
     """los de cada carpa: frente = la primera fila del frente; la de abajo, im.height - 1"""
     px = im.load()
     yb = im.height - 1                                     # la fila del pie
-    if tipo == 's':                                        # la de 200: luz 0-15 (la puerta), sombra 16-30
+    if tipo == 'si':                                       # la de 200 con el servicio a la izquierda (kcsi): todo en espejo
+        puerta_frente(px, 18, 28, frente + 3, yb)          # la puerta, en el lado de sombra
+        puerta_lat(px, 6, 14, frente + 5, yb - 1, True)
+        ventana(px, 1, frente + 9, 4, 5, True)
+        intractor(px, 1, yb, yb - 13, True)
+    elif tipo == 's':                                      # la de 200: luz 0-15 (la puerta), sombra 16-30
         puerta_lat(px, 18, 26, frente + 5, yb - 1)
         ventana(px, 27, frente + 9, 4, 5, False)
         intractor(px, 27, yb, yb - 13, False)
+    elif tipo == 'mi':                                     # las de 400 con el servicio a la izquierda (kcmi, kcli): las de 400 en espejo
+        for x0 in (34, 50):                                # las dos puertas de entrar, en el lado de sombra
+            puerta_frente(px, x0, x0 + 10, frente + 3, yb)
+        ventana(px, 45, yb - 8, 5, 5, False)               # entre las dos
+        puerta_lat(px, 17, 29, frente + 5, yb - 1, True)
+        ventana(px, 8, yb - 8, 7, 5, True)
+        intractor(px, 2, yb, yb - 12, True)
     else:                                                  # las de 400: luz 0-30 (dos puertas), sombra 31-62
         ventana(px, 14, yb - 8, 5, 5, True)                # entre las dos puertas
         puerta_lat(px, 34, 46, frente + 5, yb - 1)
@@ -189,6 +215,20 @@ if __name__ == '__main__':
             armazon(im, d * 8, ys=(d * 4 - 1,))                          # la de 400 × 400, el travesaño de en medio
         assert im.size == (w * 16, d * 8 + 32), (spr, im.size)
         detalles(im, w, d * 8, spr[2])
+        guarda(en_celda(im, 80, 80), 'kaia-carpa', spr)
+    # la de 200 × 200 de al lado de la pared de la sala (kaia_cult.py: su depósito, a la izquierda): el servicio —la puerta lateral, la
+    # ventana y el intractor— en el lado de su depósito y la puerta de entrar en el de sombra (kaiacult.gd sprite_local)
+    im = filas(columnas(g, [0, 1, 2] + [LUZ] * 11 + [11] + estira(12, 22, 16) + [23]), rows(16, 32))
+    detalles(im, 2, 16, 'si')
+    guarda(en_celda(im, 80, 80), 'kaia-carpa', 'kcsi')
+    # y las de 400 con el servicio a la izquierda (kcmi, kcli): el lado del servicio es el que tiene más sitio libre al lado
+    # (kaiacult.gd kc_lado), así que cualquiera puede llevarlo a la izquierda; las puertas de entrar, en el de sombra
+    for spr, d in (('kcmi', 2), ('kcli', 4)):
+        im = filas(columnas(g, [0, 1, 2] + [LUZ] * 27 + [11] + estira(12, 22, 32) + [23]), rows(d * 8, 32))
+        if d == 4:
+            armazon(im, d * 8, ys=(d * 4 - 1,))
+        assert im.size == (64, d * 8 + 32), (spr, im.size)
+        detalles(im, 4, d * 8, 'mi')
         guarda(en_celda(im, 80, 80), 'kaia-carpa', spr)
     # la de sala: 13 × 7 casillas, 2,5 m de alto (40 filas) y el techo hasta el fondo de su huella (72); la puerta de 2 m (32 filas)
     # en la casilla 6 (x 96, la de C.puerta en kaia_cult.py), de 14 columnas de tela entre sus cremalleras

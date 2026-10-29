@@ -46,7 +46,6 @@ var encima := Node2D.new()
 var S: Dictionary
 var VC: Dictionary
 var g: Dictionary
-const VC_DEP_I := Vector2i(-6, 26)   # el depósito de la izquierda: arriba a la izquierda cuelga el extractor; debajo, por fuera del cable del temporizador
 var now := 0.0
 var sw := 240
 var sh := 160   # el alto del lienzo (180 en el juego): la escena va abajo
@@ -114,17 +113,17 @@ static func geo(S: Dictionary, ci: int):
 		o.w = int(k.xf[1]) - int(k.xf[0]) + 1
 		o.s = 0
 		o.yf = 155
-	var cols := int(C.cols)
 	var pl := []
 	var hu := Cultivo.huecos(S)
 	for i in hu.size():
 		var q: Dictionary = hu[i]
 		if q.c != ci:
 			continue
-		var col: int = q.j % cols
-		var fila: int = q.j / cols
-		var n := mini(cols, int(C.plazas) - fila * cols)
-		pl.append({"i": i, "col": col, "fila": fila, "cx": (col + .5) * W / n, "cy": (fila + .5) * Dp / C.filas})
+		var r := plaza_rejilla(C, q.j)
+		r.i = i
+		pl.append(r)
+	if Datos.CAL:
+		tresbolillo(pl, W, S.macetas)
 	for a in pl:
 		var d := 2 * minf(minf(a.cx, W - a.cx), minf(a.cy, Dp - a.cy))
 		for b in pl:
@@ -157,8 +156,44 @@ static func geo(S: Dictionary, ci: int):
 			if p:
 				q.alto += Procedural.alto_planta(Datos.porte_planta(S, p), 0 if p.get("dead") else Cultivo.plant_stage(p), true if p.get("dead") else false, q)
 	o.tx = (int(o.vc.xl) - 24) if o.vc else (int(o.x0) - 16)   # el temporizador (1.10), a la izquierda de la carpa
+	if o.vc and C.get("sl"):   # KAIA, con el servicio a la izquierda (kc_lado): en la pared de la derecha, en espejo
+		o.tx = int(o.vc.xl) + int(o.vc.w) + 13
 	o.ty = 84
 	return o
+
+# la plaza j de la carpa C en su rejilla: columna, fila y centro (cm desde la esquina izquierda de atrás)
+static func plaza_rejilla(C: Dictionary, j: int) -> Dictionary:
+	var cols := int(C.cols)
+	var col: int = j % cols
+	var fila: int = j / cols
+	var n := mini(cols, int(C.plazas) - fila * cols)
+	return {"col": col, "fila": fila, "cx": (col + .5) * float(C.cm[0]) / n, "cy": (fila + .5) * float(C.cm[2]) / C.filas}
+
+# (lo pidió el usuario: «un plano desde arriba… para aprovechar el espacio y que desde la vista C se vean lo mejor posible las plantas…
+# en tres bolillos… en las que se pueda»): las filas seguidas con las mismas plazas se corren a un lado y a otro, alternas, un cuarto de
+# su separación o lo que deje la maceta más ancha de la fila hasta la pared (TRES_HOLGURA cm); con menos de TRES_MIN cm, quietas. Una
+# fila con otro número de plazas ya cae entre las de al lado. Lo dibuja tests/plantacion.gd (docs/plano/plantacion)
+const TRES_HOLGURA := 2.0
+const TRES_MIN := 3.0
+static func tresbolillo(pl: Array, W: float, macetas: Array) -> void:
+	var D := Datos.carga()
+	var F := {}
+	for q in pl:
+		if not F.has(q.fila):
+			F[q.fila] = {"n": 0, "d": 0.0}
+		F[q.fila].n += 1
+		var k: String = macetas[q.i] if D.MACETA_CM.has(macetas[q.i]) else "plastico7"
+		F[q.fila].d = maxf(F[q.fila].d, float(D.MACETA_CM[k][0]))
+	var lado := {}
+	var sg := 1
+	for f in range(F.size()):
+		var n: int = F[f].n
+		if F.has(f - 1) and F[f - 1].n == n or F.has(f + 1) and F[f + 1].n == n:
+			var s := minf(W / (4 * n), W / (2 * n) - F[f].d / 2 - TRES_HOLGURA)
+			lado[f] = s * sg if s >= TRES_MIN else 0.0
+			sg = -sg
+	for q in pl:
+		q.cx += float(lado.get(q.fila, 0.0))
 
 # el temporizador de enchufe (1.10, 09b-carpa: vcTemp), como rectángulos [x, y, w, h, color]: caja blanca de 11 × 13 con su rueda
 # de 16 pinzas (las bajadas, CICLOS[k].on, del color de su modo) y, debajo, el enchufe y el piloto; cuelga de su cable desde arriba
@@ -190,9 +225,20 @@ static func vista_c(S: Dictionary, g: Dictionary):
 	var w := Datos.jsround(W * Z)
 	# las campanas de sodio son foco-c-NN; el CFL, foco-c-cfl-NN, y los LED, con su modelo (foco-c-led200-NN)
 	var pf: String = "foco-c-" if tipo == "sodio" else ("foco-c-" + c.foco + "-" if tipo == "led" else "foco-c-" + tipo + "-")
-	var foco = vc_sprite(pf, D.FOCO_CM.get(c.foco, 45) * Z, true)
+	var pxf: float = D.FOCO_CM.get(c.foco, 45) * Z
+	if g.C.get("kc"):   # los LED de KAIA (c.nf a lo ancho), un poco más estrechos que su parte, para que se vean separados
+		pxf = minf(pxf, float(w) / maxi(1, int(c.get("nf", 1))) - 3)
+	var foco = vc_sprite(pf, pxf, true)
 	if not Arte.hay("carpa-c-pared") or not Arte.hay("carpa-c-luz") or foco == null:
 		return null
+	# el techo para el foco: en las de KAIA, el extractor con su filtro cuelga donde sale su tubo (kc_filtro) y el LED no sube más que
+	# su parte de abajo (le quita su alto a la carpa, como de verdad); en las demás, y en la mitad de delante de la de 4 × 4, VCA.boca
+	var tope := int(VCA.boca)
+	if g.C.get("kc") and g.C.get("ext", true):
+		var T := kc_techo(W, g.H, maxi(1, int(c.get("nf", 1))), String(c.foco), g.C.get("fil", [50, 1]))
+		var f := kc_filtro_en(T, int(T.xl) + Datos.jsround(float(g.C.get("ux", .5)) * int(T.w)), float(g.C.get("ux", .5)) < .5) if not T.is_empty() else {}
+		if not f.is_empty():
+			tope = maxi(tope, 3 + Arte.alto(f.im) + 15 - Arte.foto(foco.n).get_used_rect().position.y)
 	var filas: Array = D.VC_FILA[int(g.C.filas) - 1] if int(g.C.filas) <= D.VC_FILA.size() else filas_n(int(g.C.filas))
 	var wy := func(y: float) -> float: return w + 32 * (y - VCA.fondo) / 19
 	var yq := func(q: Dictionary) -> int: return int(filas[mini(q.fila, filas.size() - 1)])
@@ -225,7 +271,7 @@ static func vista_c(S: Dictionary, g: Dictionary):
 			if s == null:
 				return null
 			r.p = s
-			r.hp = mini(Arte.alto(Arte.foto(s.n)), mini(Datos.jsround(minf(Dh[st] - (4 if muerta else 0), q.ch) * Z), int(floor(y - r.tierra - VCA.boca - D.FOCO_SEP[c.foco] * Z))))
+			r.hp = mini(Arte.alto(Arte.foto(s.n)), mini(Datos.jsround(minf(Dh[st] - (4 if muerta else 0), q.ch) * Z), int(floor(y - r.tierra - tope - D.FOCO_SEP[c.foco] * Z))))
 			# el foco, a la distancia de su fase de la cima de cada planta (la que lo tiene más cerca manda); de la muerta, a la de seguridad
 			if not muerta:
 				viva = true
@@ -262,7 +308,7 @@ static func vista_c(S: Dictionary, g: Dictionary):
 			f.xw = Datos.jsround(120 + wy.call(f.y) / 2) - 1
 			f.xl = Datos.jsround(120 - wy.call(f.y) / 2)   # la pared izquierda, por donde entra en las de KAIA con el depósito a ese lado
 	# la boca del foco (fy): baja hasta su distancia de las plantas, nunca por encima del techo (VCA.boca); sin vivas (apagado), arriba
-	fy = maxi(int(VCA.boca), fy) if viva else int(VCA.boca)
+	fy = maxi(tope, fy) if viva else tope
 	var fxs := []   # dónde cuelga cada foco: uno en el centro; en las de KAIA, sus LED repartidos a lo ancho (c.nf)
 	var nf := maxi(1, int(c.get("nf", 1)))
 	for k in nf:
@@ -334,6 +380,110 @@ static func img_planta(S_: Dictionary, p: Dictionary, v: Dictionary) -> Image:
 		im = Arte.seca(im)
 	return im
 
+# la textura de la planta de la plaza q (la seca, de su porte en marrón) o null si no hay
+static func tex_planta(S_: Dictionary, q: Dictionary) -> ImageTexture:
+	var p = S_.pots[q.i]
+	var v: Dictionary = q.v
+	if p == null or v.p == null:
+		return null
+	var k := ("seca|%s|%d" % [v.p.n, v.hp]) if v.muerta else clave_planta(S_, p, v)
+	var t: ImageTexture = Arte.texs.get(k)
+	if t == null:
+		var im := Arte.recolor(Arte.aplasta(Arte.altura(v.p.n, v.hp)[1], v.hp), Datos.carga().VC_SECA) if v.muerta else img_planta(S_, p, v)
+		t = Arte.tex(k, im)
+		t.set_meta("uso", uso_de(im))
+	return t
+
+# su garrafa (sin goteo), o null
+static func garrafa_sp(S_: Dictionary, q: Dictionary):
+	var ca: Dictionary = S_.carpas[Cultivo.huecos(S_)[q.i].c]
+	var gar := Cultivo.garrafa_l(S_, q.i) if ca.get("garrafas") and not ca.get("goteo") else 0
+	return vc_sprite("extra-c-garrafa-", 100 * pow(gar / 1000.0 / (.7 * .5 * .85), 1 / 3.0) * q.v.Z, true) if gar else null
+
+# (lo pidió el usuario: «lo mismo con las plantas, lo que viene siendo el tallo y la tierra… tiene que estar a la vista») la tierra de
+# cada maceta (de su borde a 2 filas por debajo de la superficie, zona_tierra) y las VC_TALLO filas de abajo de su tallo (zona_tallo):
+# si una maceta, una planta o una garrafa que se pinta después (más adelante, o al lado en su fila) las pisa, se vuelven a pintar
+# encima al A_VISTA, vistas a través (a_la_vista, _a_la_vista). Las de delante de la fila elegida ya van en transparencia: ni pisan ni
+# se repintan
+const VC_TALLO := 8
+const A_VISTA := 166 / 255.0
+
+# lo pintado de la planta (Rect2i) y las columnas del pie de su tallo (la última fila con algo); va en la textura (tex_planta)
+static func uso_de(im: Image) -> Array:
+	var u := im.get_used_rect()
+	var a := im.get_width()
+	var b := -1
+	var y := u.end.y - 1
+	while b < 0 and y >= u.position.y:
+		for x in im.get_width():
+			if im.get_pixel(x, y).a8 > 0:
+				a = mini(a, x)
+				b = maxi(b, x)
+		y -= 1
+	return [u, a, b]
+
+static func uso_planta(t: ImageTexture) -> Array:
+	if not t.has_meta("uso"):
+		t.set_meta("uso", uso_de(t.get_image()))
+	return t.get_meta("uso")
+
+static func zona_tierra(q: Dictionary) -> Rect2i:
+	var mi := Arte.foto(q.v.m.n)
+	var cx: Array = Arte.caja(mi)
+	var rim: int = q.y - 31 + (mi.get_height() - Arte.alto(mi))
+	return Rect2i(q.x - 16 + int(cx[0]), rim, int(cx[1]) - int(cx[0]) + 1, q.y - int(q.v.tierra) + 3 - rim)
+
+static func zona_tallo(S_: Dictionary, q: Dictionary) -> Rect2i:
+	var t := tex_planta(S_, q)
+	if t == null:
+		return Rect2i()
+	var u: Array = uso_planta(t)
+	var yb: int = q.y - int(q.v.tierra)
+	var x: int = q.x - (t.get_width() >> 1)
+	var h := mini(VC_TALLO, t.get_height())
+	return Rect2i(x + int(u[1]) - 1, yb - h + 1, int(u[2]) - int(u[1]) + 3, h)
+
+# lo que pinta la plaza q: su maceta, su planta (1 px más a cada lado, por el balanceo) y su garrafa
+static func cajas_de(S_: Dictionary, q: Dictionary) -> Array:
+	var mi := Arte.foto(q.v.m.n)
+	var cx: Array = Arte.caja(mi)
+	var top: int = mi.get_height() - Arte.alto(mi)
+	var o := [Rect2i(q.x - 16 + int(cx[0]), q.y - 31 + top, int(cx[1]) - int(cx[0]) + 1, mi.get_height() - top)]
+	var t := tex_planta(S_, q)
+	if t != null:
+		var u: Rect2i = uso_planta(t)[0]
+		o.append(Rect2i(q.x - (t.get_width() >> 1) + u.position.x - 1, q.y - int(q.v.tierra) - t.get_height() + 1 + u.position.y, u.size.x + 2, u.size.y))
+	var gs = garrafa_sp(S_, q)
+	if gs:
+		var gf := Arte.foto(gs.n)
+		var gu := gf.get_used_rect()
+		o.append(Rect2i(q.x - 16 + int(cx[1]) - 1 - 24 + gu.position.x, q.y - 3 - 47 + gu.position.y, gu.size.x, gu.size.y))
+	return o
+
+# las plazas (de orden) cuya tierra o tallo pisa algo que se pinta después
+static func a_la_vista(S_: Dictionary, g_: Dictionary, fsel := 0) -> Array:
+	var o := []
+	if not Datos.CAL or g_.is_empty() or g_.vc == null:
+		return o
+	var ord := orden(g_)
+	var cs := []
+	for q in ord:
+		cs.append(cajas_de(S_, q) if q.fila >= fsel else [])
+	for j in ord.size():
+		var q: Dictionary = ord[j]
+		if q.fila < fsel:
+			continue
+		var zs := [zona_tierra(q), zona_tallo(S_, q)]
+		var pisa := false
+		for k in range(j + 1, ord.size()):
+			for r in cs[k]:
+				for z in zs:
+					if z.has_area() and r.intersects(z):
+						pisa = true
+		if pisa:
+			o.append(q)
+	return o
+
 # las barras, de delante atrás: cada una encima de su planta (2 filas de aire) y, si pisa otra, encima de esa. La de la
 # plaza elegida deja sitio encima para el cursor (CUR filas); si la elegida no tiene barra (vacía o muerta), su cursor
 # también aparta las barras
@@ -352,16 +502,28 @@ static func barras(S_: Dictionary, g_: Dictionary, sel := -1) -> Array:
 			cajas.append(caja_cursor(pos_cursor(g_, sel, [])))
 	var pl: Array = g_.pl.duplicate()
 	pl.sort_custom(func(a, b): return a.y > b.y or (a.y == b.y and (a.x < b.x or (a.x == b.x and a.i < b.i))))
+	# con CAL, la tierra y el tallo de las demás (de la fila elegida y de detrás) también apartan la barra (a_la_vista)
+	var zs := []
+	if Datos.CAL and g_.get("vc") != null:
+		var fs := fila_sel(g_, sel)
+		for q in g_.pl:
+			if q.fila >= fs:
+				zs.append([q.i, zona_tierra(q)])
+				zs.append([q.i, zona_tallo(S_, q)])
 	for q in pl:
 		if not con_barra(S_, q):
 			continue
 		var p: Dictionary = S_.pots[q.i]
 		var r := Rect2i(q.x - (BW >> 1), q.y - q.alto + 3 - BH, BW + (BP if p.pest else 0), BH)
 		var cur := CUR if q.i == sel else 0
+		var ob: Array = cajas.duplicate()
+		for z in zs:
+			if z[0] != q.i and z[1].has_area():
+				ob.append(z[1])
 		var mueve := true
 		while mueve:
 			mueve = false
-			for c in cajas:
+			for c in ob:
 				if c.grow(1).intersects(r.grow_individual(0, cur, 0, 0)):
 					r.position.y = c.position.y - BH - 1
 					mueve = true
@@ -429,7 +591,13 @@ func _pinta_base() -> void:
 	# el filtro de carbón, colgado del techo arriba a la izquierda (el extractor tiembla 1 px), y el ventilador de pinza en el poste
 	# del fondo derecho, a 55 cm del suelo, siempre girando
 	var kk := Cultivo.kit_de(c)   # (1.11) el kit de 100 mm, a 30 cm; el de 150, a 50; el de 125, según la carpa
-	if kk != "":
+	if g.C.get("kc"):   # KAIA: el extractor donde sale su tubo (en la de 4 × 4, solo en la mitad del fondo) y su servicio (kc_servicio)
+		var f := kc_filtro(g) if g.C.get("ext", true) else {}
+		if not f.is_empty():
+			base.draw_texture(Arte.tex(f.k, f.im), Vector2(int(f.x) + int(floor(now / 90)) % 2, f.y))
+		for e in kc_servicio(g):
+			base.draw_texture(Arte.tex(e.k, e.im), Vector2(e.x, e.y))
+	elif kk != "":
 		var fs = vc_sprite("extra-c-filtro-", (30 if kk == "filtro100" or kk == "filtro" and (c.t == "p60" or c.t == "p80") else 50) * g.vc.Z, true)
 		var fi := Arte.foto(fs.n)
 		base.draw_texture(Arte.tex("x|" + fs.n, fi), Vector2(g.vc.xl + 10 - 47 + int(floor(now / 90)) % 2, 3 - (fi.get_height() - Arte.alto(fi))))
@@ -444,6 +612,96 @@ func _pinta_base() -> void:
 			fa = q.fila
 			_ramal(g.vc.lg, fa, al)
 		_planta(q, al)
+	for q in a_la_vista(S, g, fsel):
+		_a_la_vista(q)
+
+# las carpas de KAIA por dentro (kc_def; lo pidió el usuario: «el extractor y el intractor… se verá… en la vista C, dependiendo de
+# dónde esté la mesa colocada» y «lo más realista posible… coherencia y lógica»): el servicio (la puerta lateral, la ventana de malla
+# y la manga del intractor, kc_def.serv) va en la pared del lado con más sitio libre al lado de la carpa en el mapa (kc_lado: sl, la
+# izquierda), como en su sprite (kcs/kcsi); el aire entra por abajo por ese lado y sale por arriba por el otro: el extractor con su
+# filtro cuelga del techo donde sale su tubo (ux, en la mitad contraria). El depósito del goteo está fuera (la tela no deja verlo): solo
+# entra su manguera por el pasamuros (depi). Los sprites, de kaia_vc.py, dibujados en la tira de la pared de la derecha de la plantilla
+# (VCA.lado): Arte.off es su esquina en la tira (u px desde la esquina de atrás, la fila); en la de la izquierda, en espejo
+static func kc_servicio(g_: Dictionary) -> Array:
+	var o := []
+	var sl: bool = g_.C.get("sl", false)
+	var xr: int = int(g_.vc.xl) + int(g_.vc.w)
+	for s in g_.C.get("serv", []):
+		var n := "kc-serv-" + String(s)
+		if not Arte.hay(n) or not Arte.off.has(n):
+			continue
+		var im := Arte.foto(n)
+		var of: Array = Arte.off[n]
+		var k := "kcs|%s|%s" % [n, sl]
+		if sl:
+			var e: Image = Arte.cache.get(k)
+			if e == null:
+				e = im.duplicate()
+				e.flip_x()
+				Arte.cache[k] = e
+			im = e
+		o.append({"k": k, "im": im, "x": int(g_.vc.xl) - int(of[0]) - im.get_width() if sl else xr + int(of[0]), "y": int(of[1]), "n": n})
+	return o
+
+# el extractor con su filtro (kc_def.fil: su largo), colgado del techo donde sale su tubo (ux) y hacia la pared más cerca
+static func kc_filtro(g_: Dictionary) -> Dictionary:
+	var T := kc_techo(float(g_.W), float(g_.H), maxi(1, int(g_.c.get("nf", 1))), String(g_.c.foco), g_.C.get("fil", [50, 1]))
+	var ux := float(g_.C.get("ux", .5))
+	return kc_filtro_en(T, int(g_.vc.xl) + Datos.jsround(ux * int(g_.vc.w)), ux < .5) if not T.is_empty() else {}
+
+# el techo de una carpa de KAIA en su vista C, como en vista_c: su escala, su ancho y, de cada LED (nf a lo ancho), las columnas de sus
+# dos cuerdas con su trinquete y su rueda (poleas); con eso, el extractor con su filtro cuelga donde no lo cruza ninguna (kc_filtro_en)
+# y el tubo del mapa sale por donde cabe (kaiacult.gd kc_cabe_filtro)
+static func kc_techo(W: float, H: float, nf: int, foco_k: String, fil: Array) -> Dictionary:
+	var D := Datos.carga()
+	var Z: float = minf((float(D.VCA.base) - float(D.VCA.boca)) / (H - 28), VC_KC_W / W)
+	var w := Datos.jsround(W * Z)
+	var foco = vc_sprite("foco-c-" + foco_k + "-", minf(D.FOCO_CM.get(foco_k, 45) * Z, float(w) / maxi(1, nf) - 3), true)
+	var fs = vc_sprite("extra-c-filtro-", float(fil[0]) * Z, true)
+	if foco == null or fs == null:
+		return {}
+	var fc := Arte.foto(foco.n)
+	var oc := []
+	for k in maxi(1, nf):
+		for e in poleas(fc, int(D.VCA.boca) + 30, 120 + Datos.jsround((k + .5) * w / maxi(1, nf) - w / 2.0)):
+			oc.append([int(e[0]), int(e[0]) + int(e[2]) - 1])
+	return {"Z": Z, "w": w, "xl": 120 - (w >> 1), "fs": fs, "oc": oc}
+
+# el extractor con su filtro, con su tubo en la columna xd (donde sale por el techo en el mapa): tumbado de lado hacia la pared más
+# cerca (izq0) o, si así lo cruza una cuerda, hacia la otra; si de lado no cabe entre las cuerdas de un LED (en las de 4 m, con cuatro
+# LED a lo ancho, el de 75 cm no cabe), tumbado de frente a fondo (kc-filtrof-*, de kaia_vc.py: su tapa redonda), como se cuelga de
+# verdad entre dos LED; con su temblor de 1 px y otro de aire, sin tocar ninguna cuerda, trinquete ni rueda ({} si no cabe de ninguna)
+static func kc_filtro_en(T: Dictionary, xd: int, izq0: bool) -> Dictionary:
+	var libre := func(a: int, b: int) -> bool: return T.oc.all(func(o): return int(o[1]) < a - 1 or int(o[0]) > b + 2)
+	var fi := Arte.foto(T.fs.n)
+	var bb: Array = Arte.caja(fi)
+	var y := 3 - (fi.get_height() - Arte.alto(fi))
+	for iz in [izq0, not izq0]:
+		var cx: int = int(bb[0]) + 3   # el tubo de aluminio, encima del extractor (columnas 1 a 6 desde el canto)
+		var a: int = xd - cx + int(bb[0])
+		var b: int = xd - cx + int(bb[1])
+		if iz:   # hacia la izquierda: en espejo, con el extractor a la derecha
+			cx = fi.get_width() - 1 - cx
+			a = xd - cx + fi.get_width() - 1 - int(bb[1])
+			b = xd - cx + fi.get_width() - 1 - int(bb[0])
+		if not libre.call(a, b):
+			continue
+		var k: String = "x|%s|%s" % [T.fs.n, "i" if iz else "d"]
+		var im := fi
+		if iz:
+			im = Arte.cache.get(k)
+			if im == null:
+				im = fi.duplicate()
+				im.flip_x()
+				Arte.cache[k] = im
+		return {"k": k, "im": im, "x": xd - cx, "y": y, "xd": xd, "de": "lado"}
+	var n: String = "kc-filtrof-" + str(T.fs.a)
+	if Arte.hay(n):
+		var ff := Arte.foto(n)
+		var bf: Array = Arte.caja(ff)
+		if libre.call(xd - 23 + int(bf[0]), xd - 23 + int(bf[1])):   # el tubo, en las columnas 22 a 25: la 23, como el de lado
+			return {"k": "x|" + n, "im": ff, "x": xd - 23, "y": 3 - (ff.get_height() - Arte.alto(ff)), "xd": xd, "de": "frente"}
+	return {}
 
 # la manguera del goteo de la fila fa (2 px: tubo y brillo), de su primera llave a la pared derecha; la de la primera fila entra
 # por la pared (pasamuros) y las demás bajan por la pared desde la de detrás
@@ -496,7 +754,7 @@ func _planta(q: Dictionary, al: float) -> void:
 	var rim: int = q.y - 31 + (mi.get_height() - Arte.alto(mi))
 	# su garrafa (sin goteo), detrás de la maceta a la derecha, con el agua que le queda; el tubo del gotero va del tapón a la tierra
 	var gar := Cultivo.garrafa_l(S, q.i) if ca.get("garrafas") and not ca.get("goteo") else 0
-	var gs = vc_sprite("extra-c-garrafa-", 100 * pow(gar / 1000.0 / (.7 * .5 * .85), 1 / 3.0) * v.Z, true) if gar else null
+	var gs = garrafa_sp(S, q)
 	var gc: int = q.x - 16 + mx1 - 1
 	var gb: int = q.y - 3
 	# su sombra en el suelo (1.10 P5): del ancho de la maceta, debajo de su base
@@ -526,17 +784,10 @@ func _planta(q: Dictionary, al: float) -> void:
 		_rect(q.x + 3, ty, 1, rim + 2 - ty, osc)
 	if p == null or v.p == null:
 		return
+	var t := tex_planta(S, q)
 	if v.muerta:   # seca: los verdes de hoja y tallo a marrones, quieta
-		var ks := "seca|%s|%d" % [v.p.n, v.hp]
-		var ts: ImageTexture = Arte.texs.get(ks)
-		if ts == null:
-			ts = Arte.tex(ks, Arte.recolor(Arte.aplasta(Arte.altura(v.p.n, v.hp)[1], v.hp), D.VC_SECA))
-		base.draw_texture(ts, Vector2(q.x - (ts.get_width() >> 1), q.y - v.tierra - ts.get_height() + 1), mod)
+		base.draw_texture(t, Vector2(q.x - (t.get_width() >> 1), q.y - v.tierra - t.get_height() + 1), mod)
 		return
-	var k := clave_planta(S, p, v)
-	var t: ImageTexture = Arte.texs.get(k)
-	if t == null:
-		t = Arte.tex(k, img_planta(S, p, v))
 	var yb: int = q.y - v.tierra
 	var b := t.get_height() - 1
 	# se mece; con el ventilador encendido, el doble de deprisa
@@ -555,6 +806,39 @@ func _balanceo(t: Texture2D, x: int, y: int, b: int, a: int, tt: float, mod: Col
 		var dx := Datos.jsround(a * s * pow(maxf(0, float(b - r) / b), 1.5))
 		base.draw_texture_rect_region(t, Rect2(x + dx, y + r, t.get_width(), 2), Rect2(0, r, t.get_width(), 2), mod)
 
+# lo de _balanceo que cae dentro de z (en px de la escena)
+func _trozo(t: Texture2D, x: int, y: int, b: int, a: int, tt: float, mod: Color, z: Rect2i) -> void:
+	var s := sin(tt / 950) * .7 + sin(tt / 410) * .3
+	for r in range(0, t.get_height(), 2):
+		var dx := Datos.jsround(a * s * pow(maxf(0, float(b - r) / b), 1.5)) if a and b > 0 else 0
+		var f := Rect2i(x + dx, y + r, t.get_width(), mini(2, t.get_height() - r)).intersection(z)
+		if f.has_area():
+			base.draw_texture_rect_region(t, Rect2(f), Rect2(f.position - Vector2i(x + dx, y), f.size), mod)
+
+# la tierra y el pie del tallo de q otra vez, encima de lo que las pisa (a_la_vista): la maceta, el microtubo que entra en la tierra y la
+# planta (en la tierra, toda; por encima del borde, solo el tallo), al A_VISTA
+func _a_la_vista(q: Dictionary) -> void:
+	var v: Dictionary = q.v
+	var mod := Color(1, 1, 1, A_VISTA)
+	var zt := zona_tierra(q)
+	var o := Vector2i(q.x - 16, q.y - 31)
+	base.draw_texture_rect_region(Arte.tex("m|" + v.m.n, Arte.foto(v.m.n)), Rect2(zt), Rect2(zt.position - o, zt.size), mod)
+	var ca: Dictionary = S.carpas[Cultivo.huecos(S)[q.i].c]
+	if ca.get("goteo", false) and q.has("yl") or garrafa_sp(S, q):
+		_rect(q.x + 3, zt.position.y, 1, 2, Color(Color.html("#1c1d22"), A_VISTA))
+	var t := tex_planta(S, q)
+	if t == null:
+		return
+	var zs := zona_tallo(S, q)
+	var arriba := Rect2i(zs.position, Vector2i(zs.size.x, maxi(0, zt.position.y - zs.position.y)))
+	var p: Dictionary = S.pots[q.i]
+	var yb: int = q.y - v.tierra
+	var b := t.get_height() - 1
+	var a := 0 if v.muerta or p.water <= 0 else 1
+	var tt: float = now * (2 if ca.get("vent") else 1) + q.x * 37
+	for z in [zt, arriba]:
+		_trozo(t, q.x - (t.get_width() >> 1), yb - b, b, a, tt, mod, z)
+
 func _pinta_encima() -> void:
 	if g.is_empty() or g.vc == null:
 		return
@@ -570,16 +854,14 @@ func _pinta_encima() -> void:
 			for e in poleas(fc, fy, int(cx)):
 				encima.draw_rect(Rect2(e[0], e[1], e[2], e[3]), e[4])
 		encima.draw_texture(Arte.tex("foco|%s|%s" % [g.vc.foco.n, on], im), Vector2(fx, fy - 15))
-	# el depósito del goteo está fuera: arriba a la derecha, en pequeño, con el agua que le queda en la mirilla
-	if g.vc.lg != null:
+	# el depósito del goteo está fuera: arriba a la derecha, en pequeño, con el agua que le queda en la mirilla (el de KAIA, en el suelo
+	# al lado de la carpa: la tela no deja verlo; solo entra su manguera, _ramal)
+	if g.vc.lg != null and not g.C.get("kc"):
 		var l := Cultivo.goteo_l(S, VC.ci)
 		var dep = g.c.get("dep")
 		var di := Arte.nivel(Arte.foto("extra-c-deposito"), D.VC_AGUA.deposito, (float(dep) if dep != null else float(l)) / l)
 		var dx: int = g.vc.xl + g.vc.w + 22 - 24
 		var dy := 8 - 28
-		if D.CARPAS.get(g.c.t, {}).get("depi"):   # a la izquierda (KAIA, kc_def), en espejo y por debajo del extractor
-			dx = 240 - dx - di.get_width() + VC_DEP_I.x
-			dy += VC_DEP_I.y
 		encima.draw_texture(Arte.tex("img|%d" % di.get_instance_id(), di), Vector2(dx, dy))
 	var bs := barras(S, g, VC.sel)
 	var fsel := fila_sel(g, VC.sel)

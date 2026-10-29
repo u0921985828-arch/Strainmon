@@ -7,6 +7,7 @@ const Datos = preload("res://src/datos.gd")
 
 static var img: Image
 static var spr := {}        # sprite → [[x, y, w, h], …] (un rect por fotograma)
+static var off := {}        # lo pegado recortado (kaia_vc.py): sprite → [x, y] de su esquina en su lienzo
 static var rampa: Array = []
 static var cache := {}
 static var texs := {}
@@ -20,6 +21,7 @@ static func carga() -> void:
 	var j = JSON.parse_string(FileAccess.get_file_as_string("res://arte/carpa.json"))
 	spr = j.sprites
 	rampa = j.rampa
+	off = j.get("off", {})
 
 static func hay(n: String) -> bool:
 	carga()

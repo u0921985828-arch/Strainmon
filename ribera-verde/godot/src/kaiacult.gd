@@ -241,6 +241,110 @@ func kc_carpa_en(x: int, y: int, dep := false) -> int:   # la carpa (N.tam casil
 func kc_dep(ci: int) -> Array:   # la casilla de su depósito del goteo, desde la de arriba a la izquierda de la carpa (kaia_cult.py: NIV.dep)
 	return kc_Nc(ci).dep[kc_iN(ci)]
 
+# el lado del servicio de la carpa ci (la puerta lateral, la ventana de malla y la manga del intractor, abajo): el que tiene más casillas
+# libres al lado donde se dejó, donde cabe quien la abre y de donde viene el aire limpio (lo pidió el usuario: «el extractor y el
+# intractor… se verá… dependiendo de dónde esté la mesa colocada»); si empatan, el de su depósito, que hay que tener a mano. 1, la
+# derecha; -1, la izquierda. Se queda al montarla: mover otra carpa no le cambia las aberturas (S.kc.ld[ci] = [lado, x, y], del sitio
+# donde se calculó; de serie, el de su sitio de serie con las siete en el suyo, kc_lado_serie), y ORDENAR no deja tapárselo (cabe_pieza).
+# El extractor va arriba en el lado contrario (kc_ruta): el aire entra abajo por un lado y sale arriba por el otro
+func kc_lado(ci: int) -> int:
+	var mapa: String = D.KAIA_CULT.mapa
+	var p := kc_pos(ci)
+	var k := "kc%s%d" % [kc_Nc(ci).k, kc_iN(ci)]   # i18n-no
+	var co = S.get("coloca")
+	var movida: bool = (co is Dictionary and co.get(mapa) is Dictionary and co[mapa].has(k)) or (ORDEN != null and ORDEN.mapa == mapa and ORDEN.k == k)
+	if not movida:
+		return kc_lado_serie(ci)
+	var ld = kc().get("ld", {}).get(str(ci)) if kc().get("ld") is Dictionary else null
+	if ld is Array and int(ld[1]) == int(p[0]) and int(ld[2]) == int(p[1]):
+		return int(ld[0])
+	var l := kc_lado_en(ci, MAPS[mapa].o, p)
+	if ORDEN == null and S.map == mapa and not _kc_mt:   # donde la dejaste, con la sala montada
+		if not (kc().get("ld") is Dictionary):
+			S.kc.ld = {}
+		S.kc.ld[str(ci)] = [l, int(p[0]), int(p[1])]
+	return l
+
+# las casillas de suelo libres en O al lado (lado) de la carpa ci en p a las que se llega (v: andable con O)
+func kc_libres(ci: int, O: Array, p: Array, lado: int, v = null) -> int:
+	var m: Dictionary = MAPS[D.KAIA_CULT.mapa]
+	if v == null:
+		v = andable(m, O)
+	var t: Array = kc_Nc(ci).tam
+	var x: int = int(p[0]) - 1 if lado < 0 else int(p[0]) + int(t[0])
+	var n := 0
+	for y in range(int(p[1]), int(p[1]) + int(t[1])):
+		if x >= 0 and x < int(m.w) and y >= 0 and y < int(m.h) and String(m.g[y][x]).begins_with("floor") and not O[y][x] and v.has("%d,%d" % [x, y]):
+			n += 1
+	return n
+
+func kc_lado_en(ci: int, O: Array, p: Array) -> int:   # el lado con más sitio en O con la carpa ci en p (si empatan, el de su depósito)
+	var v := andable(MAPS[D.KAIA_CULT.mapa], O)
+	var iz := kc_libres(ci, O, p, -1, v)
+	var de := kc_libres(ci, O, p, 1, v)
+	if iz != de:
+		return -1 if iz > de else 1
+	return -1 if int(kc_dep(ci)[0]) < 0 else 1
+
+var _kc_ls := {}
+var _kc_mt := false   # montando la sala (kc_monta): aún no está entera
+func kc_lado_serie(ci: int) -> int:   # el de su sitio de serie, con las siete en el suyo (kaia_cult.py NIV.def)
+	if not _kc_ls.has(ci):
+		var mapa: String = D.KAIA_CULT.mapa
+		var O: Array = D.MAPS[mapa].o.map(func(r): return r.duplicate())
+		for P_ in D.ORDEN_P[mapa].piezas:
+			var d: Array = def_p(P_)
+			for c in celdas_p(P_, int(d[0]), int(d[1])):
+				O[int(c[1])][int(c[0])] = c[2]
+		var d: Array = def_p(pieza_de(mapa, "kc%s%d" % [kc_Nc(ci).k, kc_iN(ci)]))   # i18n-no
+		_kc_ls[ci] = kc_lado_en(ci, O, d)
+	return int(_kc_ls[ci])
+
+func kc_ancla(o) -> int:   # la carpa del objeto o, si es el ancla de una (carpaKS0…), o -1
+	if not (o is String):
+		return -1
+	var NV: Array = D.KAIA_CULT.niv
+	for nv in NV.size():
+		var N: Dictionary = NV[nv]
+		if o.begins_with(N.obj) and o.substr(String(N.obj).length()).is_valid_int():
+			return kc_base(nv) + int(o.substr(String(N.obj).length()))
+	return -1
+
+# ORDENAR en la sala de cultivo (lo pidió el usuario: «coherencia y lógica»): además de lo de siempre (calle.gd), ninguna carpa con su
+# lado de servicio tapado (servicio: la que mueves, con el lado que le quedaría ahí) y todas con camino para su tubo a la pared (tubo)
+func cabe_pieza(mapa: String, k: String, x: int, y: int, O = null, jug := true, sol := true) -> String:
+	var r: String = super(mapa, k, x, y, O, jug, sol)
+	if r != "" or not sol or not kc_hay() or mapa != D.KAIA_CULT.mapa or kc_f2() or kc_obra():
+		return r
+	var ci := kc_de_pieza(k)
+	if ci < 0:
+		return r
+	if O == null:
+		O = sin_pieza(mapa, k)
+	var O2: Array = O.map(func(rr): return rr.duplicate())
+	for c in celdas_p(pieza_de(mapa, k), x, y):
+		O2[int(c[1])][int(c[0])] = c[2]
+	var lados := {}
+	var v := andable(MAPS[mapa], O2)
+	for a in kc_anclas(O2):
+		var cj: int = a[0]
+		var l: int = kc_lado_en(ci, O2, [x, y]) if cj == ci else kc_lado(cj)
+		if kc_libres(cj, O2, [a[1], a[2]], l, v) < 1:
+			return "servicio"   # i18n-no
+		lados[cj] = l
+	if not kc_ruta(O2, lados).ok:
+		return "tubo"   # i18n-no
+	return ""
+
+func kc_anclas(O: Array) -> Array:   # [carpa, x, y de su casilla de arriba a la izquierda] de cada carpa en O
+	var l := []
+	for ty in O.size():
+		for tx in O[ty].size():
+			var ci := kc_ancla(O[ty][tx])
+			if ci >= 0:
+				l.append([ci, tx, ty - int(kc_Nc(ci).tam[1]) + 1])
+	return l
+
 func kc_plantadas(ci: int) -> int:
 	var n := 0
 	var o := kc_off(ci)
@@ -274,9 +378,12 @@ func sprite_local(o: String) -> String:
 	if kc_hay():
 		if o == String(D.KAIA_CULT.f2.carpa.obj):
 			return "kcx"   # i18n-no
-		for N in D.KAIA_CULT.niv:
+		var NV: Array = D.KAIA_CULT.niv
+		for nv in NV.size():
+			var N: Dictionary = NV[nv]
 			if o.begins_with(N.obj) and o.substr(String(N.obj).length()).is_valid_int():
-				return String(N.spr)
+				var ci := kc_base(nv) + int(o.substr(String(N.obj).length()))
+				return String(N.spr) + ("i" if ci < kc_ns() and kc_lado(ci) < 0 else "")   # el servicio a la izquierda (kcsi, kcmi, kcli)  # i18n-no
 	return super(o)
 
 func bt_entra(mapa: String) -> void:
@@ -293,7 +400,9 @@ func kc_monta() -> void:
 		_kc0 = m.o.duplicate(true)
 	m.o = _kc0.duplicate(true)   # siempre desde la sala vacía: lo de antes no se queda debajo
 	m.erase("opos")
+	_kc_mt = true
 	aplica_orden(mapa)
+	_kc_mt = false
 	if not kc_f2():
 		return
 	# el último nivel (lo pidió el usuario: «que la carpa ocupe finalmente todo el suelo preparado para la carpa»): la carpa de sala,
@@ -334,8 +443,9 @@ func kc_obj(x: int, y: int, o) -> bool:
 	if o == "drenKS" or o == "drenKS2" or o == "drenKB" or o == "drenKB2":   # i18n-no
 		await say(K("El depósito de recogida: lo que sobra de cada mesa baja por su tubería de drenaje y se filtra antes de volver al tanque."))
 		return true
-	if o == "depK" or o == "depKd":   # el depósito del goteo de una carpa, fuera de ella (kaia_cult.py: NIV.dep)  # i18n-no
-		await say(T("El depósito del goteo de la carpa {n}, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.", {"n": kc_carpa_en(x, y, true) + 1}))
+	if o is String and DEP_BD.has(o):   # el depósito del goteo de una carpa, fuera de ella (kaia_cult.py: NIV.dep)
+		var cd := kc_carpa_en(x, y, true)
+		await say(T("El depósito del goteo de la carpa {n}, de {l} L, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.", {"n": cd + 1, "l": int(kc_Nc(cd).dl)}))
 		return true
 	var ci := kc_carpa_en(x, y)
 	if ci >= 0:
@@ -657,20 +767,35 @@ func kc_mitades(ci: int) -> int:   # la de 400 × 400 se ve en dos mitades de 40
 	var cm: Array = kc_Nc(ci).cm
 	return 2 if float(cm[1]) > 200 else 1
 
-func kc_def(ci: int) -> Dictionary:
+# la carpa ci como las de casa (D.CARPAS) para su vista C; la de 400 × 400, la mitad h (0, la de delante; 1, la del fondo): su tubo sale
+# por la boca del fondo del techo, así que el extractor solo se ve en la del fondo (ext), y en la pared del servicio (sl: la de la
+# izquierda) la puerta lateral va en la de delante y la manga del intractor en la del fondo, con una ventana en cada una (serv)
+func kc_def(ci: int, h := 0) -> Dictionary:
 	var N: Dictionary = kc_Nc(ci)
 	var mi := kc_mitades(ci)
 	var W: float = float(N.cm[0])
 	var Dp: float = float(N.cm[1]) / mi
 	var nv: int = kc_n(ci) / mi
 	var cols := maxi(1, roundi(sqrt(nv * W / Dp)))
-	return {"n": N.n, "w": 2, "cm": [W, float(N.cm[2]), Dp], "cols": cols, "filas": ceili(float(nv) / cols), "plazas": nv, "wmax": int(D.FOCOS[D.KAIA_CULT.foco].w) * int(N.nf), "lmax": int(D.MACETAS.get(kc_pat(ci).m, {"l": 25}).l), "kc": true, "depi": int(kc_dep(ci)[0]) < 0}
+	return {"n": N.n, "w": 2, "cm": [W, float(N.cm[2]), Dp], "cols": cols, "filas": ceili(float(nv) / cols), "plazas": nv, "wmax": int(D.FOCOS[D.KAIA_CULT.foco].w) * int(N.nf), "lmax": int(D.MACETAS.get(kc_pat(ci).m, {"l": 25}).l), "kc": true, "depi": int(kc_dep(ci)[0]) < 0,
+		"dl": int(N.dl), "ds": String(N.ds), "fil": N.fil, "ux": kc_ux(ci), "sl": kc_lado(ci) < 0, "ext": mi == 1 or h == 1,
+		"serv": ["puerta", "ventana", "manga"] if mi == 1 else (["puerta", "ventana"] if h == 0 else ["manga", "ventana"])}   # i18n-no
+
+# dónde sale su tubo de extracción por el techo (tubos_ext), de 0 (su canto izquierdo) a 1 (el derecho): ahí cuelga el extractor con
+# su filtro en la vista C (lo pidió el usuario: «el extractor y el intractor… se verá… dependiendo de dónde esté la mesa colocada»)
+func kc_ux(ci: int) -> float:
+	var p := kc_pos(ci)
+	var w: int = int(kc_Nc(ci).tam[0]) * 16
+	for q in tubos_ext():
+		if int(q[3]) == ci:
+			return clampf(float(int(q[0]) - int(p[0]) * 16) / w, 0.0, 1.0)
+	return 0.5
 
 func kc_vista_on() -> void:
 	var ci: int = KCV.ci
 	var mi := kc_mitades(ci)
 	var t := "kc%s%d-%d" % [kc_Nc(ci).k, kc_n(ci), KCV.h]   # i18n-no
-	D.CARPAS[t] = kc_def(ci)
+	D.CARPAS[t] = kc_def(ci, int(KCV.h))
 	var c := kc_cc(ci)
 	c.t = t
 	c.nf = int(kc_Nc(ci).nf) / mi
@@ -1145,9 +1270,17 @@ func tubos_fuera() -> Array:
 # el tubo de extracción de cada carpa a la pared, como en casa (lo pidió el usuario: «todas las conexiones… lógicas»): el extractor y el
 # filtro de carbón, colgados dentro; el tubo sale por la boca del techo, en su canto de atrás (como _tubos_casa), y va pegado al techo
 # de la sala hasta la pared de atrás, donde la atraviesa por un pasamuros de chapa en la fila de arriba. Uno por carpa (la de 400 ×
-# 400 lleva dos filtros en un tubo de 315 mm) y dos en la de sala; sin pisarse: si dos caen a menos de un tubo, el de delante se
-# corre por su techo. [x del tubo, y del pasamuros, y de la boca] en píxeles del mapa
+# 400 lleva dos filtros en un tubo de 315 mm) y dos en la de sala. Sin pisar nada (lo pidió el usuario: «No quiero que ningún objeto de
+# pared o suelo se superponga sobre otro»): ni otra carpa, ni un depósito, ni lo de la pared, ni otro tubo (a un tubo como poco), con
+# los pasamuros separados; recto, si cabe, por la mitad de su techo contraria al servicio (kc_lado) y, si no (las que tienen otra carpa
+# detrás), al colector: un tubo por el techo del paso de delante de las de atrás, al que llega cada una por su ramal en T y que sale a
+# la pared por un lado, con sus codos (kc_ruta). Cada uno, [x, y de arriba, y de abajo, carpa, en su mitad, [x0, x1] del colector,
+# tipo] en píxeles del mapa: «recto», del pasamuros a la boca; «rama», del colector a la boca; «col», el colector (carpa -2), del
+# pasamuros a su altura y de x0 a x1
 const KC_TUBO_PARED := 8   # el centro del pasamuros, en la fila de arriba de la pared
+# lo que ocupa cada depósito del goteo en su casilla (kaia_riego.py, a su tamaño: 100, 200 y 400 L): [columna de la izquierda, de la
+# derecha, filas de alto desde el suelo]; el «d», a la derecha de su carpa
+const DEP_BD := {"depK": [3, 14, 16], "depKd": [1, 12, 16], "depKm": [2, 14, 22], "depKmd": [1, 13, 22], "depKl": [0, 14, 25], "depKld": [1, 15, 25]}   # i18n-no
 # la manguera del depósito del goteo de cada carpa (NIV.dep: a su lado) a su pared, del grifo, a 40 cm del suelo como en casa
 # (pinta.gd _y_goteo), con el pasamuros en el poste: [clave de orden, rectángulos]. El grifo del bidón, en sus filas 40-42 (la manguera,
 # en la 41: el grifo, en sus columnas 20-21, con el canto en la 22; en espejo, depKd, a la derecha de su carpa, en la 10-11 y la 9)
@@ -1169,52 +1302,196 @@ func tubos_dep() -> Array:
 	return l
 
 func tubos_ext() -> Array:
-	var l := []
 	if not kc_hay() or S.map != D.KAIA_CULT.mapa:
-		return l
-	var m: Dictionary = MAPS[S.map]
-	var cs := []   # [x0, x1, y de la boca] de cada carpa, de atrás adelante
+		return []
 	if kc_f2():
+		var l := []
 		var C: Dictionary = D.KAIA_CULT.f2.carpa
 		var x0: int = int(C.def[0]) * 16
 		var yb: int = (int(C.def[1]) + int(C.tam[1])) * 16 - 112 + 1   # la de sala, de 112 filas (kaia_carpa.py)
 		for e in D.KAIA_CULT.f2.ext:   # encima de cada extractor de dentro (f2.ext: sus columnas)
-			cs.append([x0 + int(e) * 16 + 8, x0 + int(e) * 16 + 8, yb])
-	else:
-		for ty in m.h:
-			for tx in m.w:
-				var o = m.o[ty][tx]
-				if not (o is String):
-					continue
-				for N in D.KAIA_CULT.niv:
-					if o.begins_with(N.obj) and o.substr(String(N.obj).length()).is_valid_int():
-						var w: int = int(N.tam[0]) * 16
-						cs.append([tx * 16 + 6, tx * 16 + w - 7, (ty + 1) * 16 - (int(N.tam[1]) * 8 + 32) + 1])
-	cs.sort_custom(func(a, b): return a[2] < b[2])
-	var bd := []   # los depósitos del goteo del suelo (el bidón, de la columna 3 a la 14 de su casilla; en espejo, de la 1 a la 12), que el tubo no tape
-	for ty in m.h:
-		for tx in m.w:
-			if m.o[ty][tx] == "depK" or m.o[ty][tx] == "depKd":   # i18n-no
-				var x0: int = tx * 16 + (3 if m.o[ty][tx] == "depK" else 1)   # i18n-no
-				bd.append([x0, x0 + 11, ty * 16, ty * 16 + 15])
-	var xs := []
-	for c in cs:
-		var xc: int = (int(c[0]) + int(c[1])) / 2
-		var x := xc
-		var lib := func(x2: int) -> bool:   # ni a 9 px de otro tubo ni encima de un depósito que quede debajo de su recorrido
-			return xs.all(func(q): return absi(q - x2) >= 9) and bd.all(func(b): return int(b[3]) < KC_TUBO_PARED or int(b[2]) > int(c[2]) or x2 + 2 < int(b[0]) or x2 - 2 > int(b[1]))
-		for d in range(0, 64):   # lo más cerca de su centro que no pise otro tubo
-			var ok := false
-			for x2 in [xc - d, xc + d]:
-				if x2 >= int(c[0]) and x2 <= int(c[1]) and lib.call(x2):
-					x = x2
-					ok = true
-					break
-			if ok:
+			l.append([x0 + int(e) * 16 + 8, KC_TUBO_PARED, yb, -1, true, [], "recto"])   # i18n-no
+		return l
+	var m: Dictionary = MAPS[S.map]
+	var lados := {}
+	for a in kc_anclas(m.o):
+		lados[int(a[0])] = kc_lado(int(a[0]))
+	return kc_ruta(m.o, lados).l
+
+const KC_PM := 6   # medio pasamuros: 13 px de ancho
+var _kc_rc := {}
+# los tubos de las carpas de O con los lados de servicio lados: {l: los tubos (tubos_ext), ok: si todas tienen camino sin pisar nada}
+func kc_ruta(O: Array, lados: Dictionary) -> Dictionary:
+	var key := "%s|%d" % [lados, O.hash()]
+	if _kc_rc.has(key):
+		return _kc_rc[key]
+	if _kc_rc.size() > 64:
+		_kc_rc.clear()
+	var mapa: String = D.KAIA_CULT.mapa
+	var Wp: int = int(MAPS[mapa].w) * 16
+	var yw: int = KC_TUBO_PARED
+	var pared := {}
+	for e in D.PUERTAS_INT.get(mapa, []):
+		pared["%d,%d" % [int(e.x), int(e.y)]] = true
+	var obs := []   # lo que no se pisa: [x0, y0, x1, y1, su carpa o -1]
+	var cs := []   # cada carpa: [x0, x1 del tubo, y de su boca, carpa], de atrás adelante
+	for ty in O.size():
+		for tx in O[ty].size():
+			var o = O[ty][tx]
+			var ci := kc_ancla(o)
+			if ci >= 0:
+				var t: Array = kc_Nc(ci).tam
+				var y0: int = (ty + 1) * 16 - (int(t[1]) * 8 + 32)
+				obs.append([tx * 16, y0, (tx + int(t[0])) * 16 - 1, (ty + 1) * 16 - 1, ci])
+				cs.append([tx * 16 + 6, (tx + int(t[0])) * 16 - 7, y0 + 1, ci])
+			elif o is String and DEP_BD.has(o):   # el depósito, lo que ocupa su sprite
+				var q: Array = DEP_BD[o]
+				obs.append([tx * 16 + int(q[0]), ty * 16 + 16 - int(q[2]), tx * 16 + int(q[1]), ty * 16 + 15, -1])
+			elif (o is String and o != "carpaG2") or pared.has("%d,%d" % [tx, ty]):   # lo demás, su casilla; lo de la pared, hasta arriba
+				obs.append([tx * 16, 0 if ty <= 1 else ty * 16, tx * 16 + 15, ty * 16 + 15, -1])
+	cs.sort_custom(func(a, b): return a[2] < b[2] if a[2] != b[2] else a[0] < b[0])
+	var fuera := {}   # las que van al colector aunque quepan rectas (su tubo recto lo cortaría)
+	var out := {}
+	for intento in cs.size() + 1:
+		var l := []
+		var segs := []   # los tramos rectos ya puestos: [x0, y0, x1, y1]
+		var pms := []
+		var R := []
+		for c in cs:
+			var ci: int = c[3]
+			var h := _kc_mitad(c, int(lados.get(ci, 1)))
+			var x := -1
+			if not fuera.has(ci):
+				x = _kc_busca(h, func(x2): return _kc_pm(obs, Wp, x2, pms) and _kc_libre(obs, [x2 - 2, yw - 5, x2 + 2, int(c[2])], ci, segs))
+			if x < 0:
+				R.append(c)
+				continue
+			segs.append([x - 2, yw - 5, x + 2, int(c[2])])
+			pms.append(x)
+			l.append([x, yw, int(c[2]), ci, true, [], "recto"])   # i18n-no
+		if R.is_empty():
+			out = {"l": l, "ok": true}
+			break
+		var col := _kc_colector(obs, Wp, R, lados, segs, pms)
+		if not col.is_empty():
+			out = {"l": l + col, "ok": true}
+			break
+		var bmin: int = R.map(func(c): return int(c[2])).min()
+		var xr: int = (int(R.map(func(c): return int(c[0])).min()) + int(R.map(func(c): return int(c[1])).max())) / 2
+		var otra := -1
+		var dm := 99999
+		for q in l:   # la recta de su fila más cerca de ellas, también al colector, y otra vez
+			if int(q[2]) > bmin - 24 and absi(int(q[0]) - xr) < dm:
+				dm = absi(int(q[0]) - xr)
+				otra = int(q[3])
+		if otra >= 0:
+			fuera[otra] = true
+			continue
+		for c in R:   # sin camino (una partida de antes): recto donde caiga, para que se vea
+			var h := _kc_mitad(c, int(lados.get(int(c[3]), 1)))
+			var x := _kc_busca(h, func(x2): return segs.all(func(b): return absi(int(b[0]) + 2 - x2) >= 9))
+			if x < 0:
+				x = int(h[2])
+			segs.append([x - 2, yw - 5, x + 2, int(c[2])])
+			l.append([x, yw, int(c[2]), int(c[3]), false, [], "recto"])   # i18n-no
+		out = {"l": l, "ok": false}
+	_kc_rc[key] = out
+	return out
+
+func _kc_mitad(c: Array, lado: int) -> Array:   # [x0, x1, x preferida, carpa, su canto izquierdo] de la mitad del techo contraria al servicio, a un cuarto de su ancho
+	var x0: int = c[0]
+	var x1: int = c[1]
+	var xm: int = (x0 + x1 + 1) / 2
+	if lado < 0:   # el servicio a la izquierda: el tubo, por la derecha
+		return [xm + 1, x1, x0 + (x1 - x0) * 3 / 4, int(c[3]), x0 - 6]
+	return [x0, xm - 1, x0 + (x1 - x0) / 4, int(c[3]), x0 - 6]
+
+func _kc_busca(h: Array, f: Callable) -> int:   # la x de h más cerca de la preferida que cumpla f y donde le cabe el filtro en su vista C, o -1
+	for d in int(h[1]) - int(h[0]) + 1:
+		for x in [int(h[2]) - d, int(h[2]) + d]:
+			if x >= int(h[0]) and x <= int(h[1]) and (h.size() < 5 or kc_cabe_filtro(int(h[3]), x - int(h[4]))) and f.call(x):
+				return x
+	return -1
+
+# si con su tubo a dx px de su canto izquierdo el extractor con su filtro cuelga en su vista C sin tocar ninguna cuerda de los LED
+# (vista.gd kc_techo y kc_filtro_en: de lado o de frente a fondo); sin el arte de la vista, sí
+var _kc_cf := {}
+func kc_cabe_filtro(ci: int, dx: int) -> bool:
+	var N: Dictionary = kc_Nc(ci)
+	var k := "%s|%d" % [N.k, dx]
+	if not _kc_cf.has(k):
+		var T: Dictionary = VistaM.kc_techo(float(N.cm[0]), float(N.cm[2]), int(N.nf) / kc_mitades(ci), String(D.KAIA_CULT.foco), N.fil)
+		var ux := float(dx) / (int(N.tam[0]) * 16)
+		_kc_cf[k] = T.is_empty() or not VistaM.kc_filtro_en(T, int(T.xl) + Datos.jsround(ux * int(T.w)), ux < .5).is_empty()
+	return _kc_cf[k]
+
+func _kc_cruza(a: Array, b: Array, e: int) -> bool:
+	return int(a[0]) <= int(b[2]) + e and int(b[0]) - e <= int(a[2]) and int(a[1]) <= int(b[3]) + e and int(b[1]) - e <= int(a[3])
+
+func _kc_libre(obs: Array, r: Array, ci: int, segs: Array) -> bool:   # r, sin pisar nada (menos su carpa) ni a menos de un tubo de otro
+	for b in obs:
+		if (ci < 0 or int(b[4]) != ci) and _kc_cruza(r, b, 0):
+			return false
+	for b in segs:
+		if _kc_cruza(r, b, 4):
+			return false
+	return true
+
+func _kc_pm(obs: Array, Wp: int, x: int, pms: Array) -> bool:   # el pasamuros en x: en la pared, sin pisar lo de la pared ni otro
+	if x - KC_PM < 0 or x + KC_PM > Wp - 1:
+		return false
+	for q in pms:
+		if absi(int(q) - x) < 2 * KC_PM + 2:
+			return false
+	for b in obs:
+		if _kc_cruza([x - KC_PM, KC_TUBO_PARED - 5, x + KC_PM, KC_TUBO_PARED + 4], b, 0):
+			return false
+	return true
+
+# el colector de las carpas R: a la altura yt, lo más cerca de sus bocas, un ramal por carpa en su mitad y la salida a la pared por la
+# izquierda de todos o por la derecha (la más corta), con su codo; [] si no cabe
+func _kc_colector(obs: Array, Wp: int, R: Array, lados: Dictionary, segs: Array, pms: Array) -> Array:
+	var yw: int = KC_TUBO_PARED
+	var bmin: int = R.map(func(c): return int(c[2])).min()
+	var bajo := []   # hasta dónde baja libre un tubo desde la pared en cada x
+	for x in Wp:
+		var y := 99999
+		for b in obs:
+			if x - 2 <= int(b[2]) and int(b[0]) <= x + 2:
+				y = mini(y, int(b[1]) - 1)
+		for b in segs:
+			if x - 2 <= int(b[2]) + 4 and int(b[0]) - 4 <= x + 2:
+				y = mini(y, int(b[1]) - 5)
+		bajo.append(y)
+	for yt in range(bmin - 9, yw + 16, -1):
+		var ram := []
+		for c in R:
+			var ci: int = c[3]
+			var x := _kc_busca(_kc_mitad(c, int(lados.get(ci, 1))), func(x2): return ram.all(func(q): return absi(int(q) - x2) >= 9) and _kc_libre(obs, [x2 - 2, yt - 2, x2 + 2, int(c[2])], ci, segs))
+			if x < 0:
 				break
-		xs.append(x)
-		l.append([x, KC_TUBO_PARED, int(c[2])])
-	return l
+			ram.append(x)
+		if ram.size() < R.size():
+			continue
+		var xa: int = ram.min()
+		var xb: int = ram.max()
+		var mejor := []
+		for lado in [-1, 1]:
+			var xs: Array = range(xa - 12, KC_PM - 1, -1) if lado < 0 else range(xb + 12, Wp - KC_PM)
+			for x2 in xs:
+				if int(bajo[x2]) >= yt + 2 and _kc_pm(obs, Wp, x2, pms) and _kc_libre(obs, [mini(x2, xa) - 2, yt - 2, maxi(x2, xb) + 2, yt + 2], -1, segs):
+					var lg: int = absi(x2 - (xa if lado < 0 else xb))
+					if mejor.is_empty() or lg < int(mejor[1]):
+						mejor = [x2, lg]
+					break
+		if mejor.is_empty():
+			continue
+		var xe: int = mejor[0]
+		var l := [[xe, yw, yt, -2, true, [mini(xe, xa), maxi(xe, xb)], "col"]]   # i18n-no
+		for i in R.size():
+			l.append([ram[i], yt, int(R[i][2]), int(R[i][3]), true, [], "rama"])   # i18n-no
+		return l
+	return []
 
 func _tubo_v(l: Array, x: int, y0: int, y1: int) -> void:
 	l.append([x - 1, y0, 1, y1 - y0 + 1, DREN_COL[0]])

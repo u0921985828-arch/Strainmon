@@ -124,34 +124,83 @@ func _px(t: Array) -> Array:
 func _junta(a: Array, b: Array) -> bool:   # dos tramos que se tocan (con 1 px de holgura, lo que mide el tubo)
 	return mini(int(a[0]), int(a[2])) <= maxi(int(b[0]), int(b[2])) + 1 and mini(int(b[0]), int(b[2])) <= maxi(int(a[0]), int(a[2])) + 1 and mini(int(a[1]), int(a[3])) <= maxi(int(b[1]), int(b[3])) + 1 and mini(int(b[1]), int(b[3])) <= maxi(int(a[1]), int(a[3])) + 1
 
-# el tubo de extracción de cada carpa a la pared (kaiacult.gd tubos_ext; lo pidió el usuario: «todas las conexiones… lógicas»): n tubos,
-# cada uno de la boca del techo de su carpa al pasamuros de la pared de atrás, sin pisarse (a un tubo como poco) y dentro de su carpa
+# el tubo de extracción de cada carpa a la pared (kaiacult.gd tubos_ext; lo pidió el usuario: «todas las conexiones… lógicas» y «No
+# quiero que ningún objeto de pared o suelo se superponga sobre otro»): n carpas servidas, cada una de la boca del techo de su carpa,
+# recto al pasamuros de la pared de atrás o por su ramal al colector, que sale a la pared; sin pisarse (a un tubo como poco), con los
+# pasamuros separados y dentro de la pared, y ningún tramo por encima de un píxel de otra carpa, de un depósito o de lo de la pared
 func tubos_ok(n: int, txt: String) -> void:
 	var T: Array = J.tubos_ext()
 	var m: Dictionary = J.MAPS[J.S.map]
+	var C: Array = J.cajas_obj(J.S.map, m.o)
 	var malos := []
+	var serv := {}
+	var pms := []
+	var tr := []   # cada tramo: [x0, y0, x1, y1, su carpa (-1, la de sala; -2, el colector)]
+	var col = null
 	for i in T.size():
 		var q: Array = T[i]
-		if int(q[1]) != int(J.KC_TUBO_PARED) or int(q[2]) <= int(q[1]) + 4 or int(q[2]) >= int(m.h) * 16:
+		var ci: int = int(q[3])
+		var tipo: String = String(q[6])
+		if (tipo == "rama") == (int(q[1]) == int(J.KC_TUBO_PARED)) or int(q[2]) <= int(q[1]) + 4 or int(q[2]) >= int(m.h) * 16:
 			malos.append("tubo %d: %s" % [i, q])
-		for k in range(i + 1, T.size()):
-			if absi(int(T[k][0]) - int(q[0])) < 9:
-				malos.append("tubos %d y %d juntos" % [i, k])
-		var x: int = int(q[0]) / 16
-		var y: int = (int(q[2]) + 40) / 16
-		var dentro := false
-		for dy in range(0, 4):
-			var o = m.o[mini(y + dy, int(m.h) - 1)][x] if x < int(m.w) else null
-			if o is String and (String(o).begins_with("carpa")):
-				dentro = true
-		if not dentro:
-			malos.append("tubo %d fuera de su carpa (%d, %d)" % [i, x, y])
-	chk(T.size() == n and malos.is_empty(), "%s: %d tubos a la pared %s" % [txt, T.size(), malos.slice(0, 4)])
+		if tipo != "rama":
+			pms.append(int(q[0]))
+		tr.append([int(q[0]) - 2, int(q[1]), int(q[0]) + 2, int(q[2]), ci])
+		if tipo == "col":
+			col = q
+			tr.append([int(q[5][0]) - 2, int(q[2]) - 2, int(q[5][1]) + 2, int(q[2]) + 2, ci])
+		elif ci >= 0:
+			serv[ci] = true
+			var p: Array = J.kc_pos(ci)
+			var t: Array = J.kc_Nc(ci).tam
+			if int(q[0]) < int(p[0]) * 16 + 6 or int(q[0]) > (int(p[0]) + int(t[0])) * 16 - 7 or int(q[2]) != (int(p[1]) + int(t[1])) * 16 - (int(t[1]) * 8 + 32) + 1:
+				malos.append("tubo %d, fuera de la boca de su carpa: %s" % [i, q])
+			if not bool(q[4]):
+				malos.append("tubo %d, fuera de su mitad" % i)
+			if not J.kc_cabe_filtro(ci, int(q[0]) - int(p[0]) * 16):   # y donde su filtro cuelga en la vista C sin tocar una cuerda
+				malos.append("tubo %d, donde su filtro no cabe entre las cuerdas: %s" % [i, q])
+		elif m.o[int(q[2]) / 16 + 3][int(q[0]) / 16] == null:
+			malos.append("tubo %d, sin la carpa de sala debajo" % i)
+	for q in T:
+		if String(q[6]) == "rama" and (col == null or int(q[1]) != int(col[2]) or int(q[0]) < int(col[5][0]) or int(q[0]) > int(col[5][1])):
+			malos.append("ramal sin colector: %s" % [q])
+	for i in pms.size():
+		if pms[i] - J.KC_PM < 0 or pms[i] + J.KC_PM > int(m.w) * 16 - 1:
+			malos.append("pasamuros fuera de la pared en %d" % pms[i])
+		for k in range(i + 1, pms.size()):
+			if absi(pms[k] - pms[i]) < 2 * J.KC_PM + 2:
+				malos.append("pasamuros %d y %d, montados" % [pms[i], pms[k]])
+	for i in tr.size():
+		for k in range(i + 1, tr.size()):
+			var a: Array = tr[i]
+			var b: Array = tr[k]
+			if int(a[4]) == -2 or int(b[4]) == -2:
+				continue   # el colector, empalmado con sus ramales
+			if a[0] <= b[2] + 4 and b[0] - 4 <= a[2] and a[1] <= b[3] and b[1] <= a[3]:
+				malos.append("tubos %s y %s, juntos" % [a, b])
+	for t in tr:
+		for c in C:
+			var ca: int = J.kc_ancla(c.o) if c.o is String else -1
+			if (ca >= 0 and ca == int(t[4])) or String(c.o) == "carpaG2":
+				continue
+			var pisa := false
+			for yy in range(maxi(int(t[1]), int(c.py)), mini(int(t[3]), int(c.py) + c.c.get_height() - 1) + 1):
+				for xx in range(int(t[0]), int(t[2]) + 1):
+					if _opaco(c, xx, yy):
+						pisa = true
+						break
+				if pisa:
+					break
+			if pisa and not (int(t[4]) == -1 and String(c.o) == "carpaKX"):
+				malos.append("un tubo (%s) encima de %s (%d, %d)" % [t, c.o, c.x, c.y])
+	chk(serv.size() + (T.size() if T.size() and int(T[0][3]) == -1 else 0) == n and malos.is_empty(), "%s: %d tubos a la pared, %d al colector %s" % [txt, pms.size(), T.filter(func(q): return String(q[6]) == "rama").size(), malos.slice(0, 4)])
 
 # el depósito del goteo de cada carpa de la fase 1 (kaia_cult.py NIV.dep; lo pidió el usuario: «que tampoco sea el depósito… tendrá que
 # estar fuera de las carpas y demás. Esas cosas hay que hacerlas con lógica»), contra los sprites: n, cada uno fuera de su carpa y
 # pegado a uno de sus lados, con el grifo hacia ella (depKd a su derecha, depK a su izquierda) y su manguera del grifo al poste de la
-# carpa; ningún tubo de extracción del techo por encima de un depósito; en la vista C, el depósito en pequeño a ese lado (depi)
+# carpa; ningún tubo de extracción del techo por encima de un depósito; en la vista C, el depósito en pequeño a ese lado (depi). Cada
+# uno, a su tamaño (lo pidió el usuario: «los depósitos se deben de dibujar de diferentes tamaños también»): el de más litros, más alto
+# y más ancho en el mapa (NIV.ds, kaia_riego.py)
 func deps_ok(n: int, txt: String) -> void:
 	var m: Dictionary = J.MAPS[J.S.map]
 	var C: Array = J.cajas_obj(J.S.map, m.o)
@@ -163,6 +212,7 @@ func deps_ok(n: int, txt: String) -> void:
 	var malos := []
 	var k := 0
 	var mg: Array = J.tubos_dep()
+	var tam := {}   # litros → [ancho, alto] del sprite en el mapa
 	for ci in J.kc_ns():
 		if not J.kc_tiene(ci):
 			continue
@@ -175,9 +225,14 @@ func deps_ok(n: int, txt: String) -> void:
 		var izq := int(d[0]) < 0
 		var cb = en.call(x, y)
 		var ct = en.call(int(p[0]), int(p[1]) + int(t[1]) - 1)
-		if m.o[y][x] != ("depK" if izq else "depKd") or not (int(d[0]) == -1 or int(d[0]) == int(t[0])) or int(d[1]) < 0 or int(d[1]) >= int(t[1]) or cb == null or ct == null:
+		var N: Dictionary = J.kc_Nc(ci)
+		if m.o[y][x] != String(N.ds) + ("" if izq else "d") or not (int(d[0]) == -1 or int(d[0]) == int(t[0])) or int(d[1]) < 0 or int(d[1]) >= int(t[1]) or cb == null or ct == null:
 			malos.append("carpa %d: %s en (%d, %d)" % [ci, m.o[y][x], x, y])
 			continue
+		var ur: Rect2i = cb.c.get_used_rect()
+		if tam.has(int(N.dl)) and tam[int(N.dl)] != [ur.size.x, ur.size.y]:
+			malos.append("carpa %d: el depósito de %d L, de otro tamaño que el de su nivel" % [ci, int(N.dl)])
+		tam[int(N.dl)] = [ur.size.x, ur.size.y]
 		if J.kc_carpa_en(x, y) >= 0 or J.kc_carpa_en(x, y, true) != ci or J.kc_def(ci).depi != izq:
 			malos.append("carpa %d: el depósito, dentro, de otra o en la vista al otro lado" % ci)
 		var X: int = x * 16
@@ -200,7 +255,12 @@ func deps_ok(n: int, txt: String) -> void:
 				for xx in range(int(q[0]) - 2, int(q[0]) + 3):
 					if yy >= int(q[1]) and yy <= int(q[2]) and _opaco(cb, xx, yy):
 						malos.append("carpa %d: un tubo del techo encima del depósito" % ci)
-	chk(k == n and malos.is_empty(), "%s: %d depósitos, cada uno a su lado y con su manguera %s" % [txt, k, malos.slice(0, 4)])
+	var ls: Array = tam.keys()
+	ls.sort()
+	for i in range(1, ls.size()):
+		if not (tam[ls[i]][0] >= tam[ls[i - 1]][0] and tam[ls[i]][1] > tam[ls[i - 1]][1]):
+			malos.append("el depósito de %d L, no más grande que el de %d L: %s" % [ls[i], ls[i - 1], tam])
+	chk(k == n and malos.is_empty(), "%s: %d depósitos, cada uno a su lado, a su tamaño (%s) y con su manguera %s" % [txt, k, tam, malos.slice(0, 4)])
 
 # cada red de L, de una pieza con sus aparatos (cajas o rectángulos [x, y, w, h])
 func _de_una(L: Array, ap: Array) -> int:
@@ -380,7 +440,7 @@ func _corre() -> void:
 	var PZ: Array = D.ORDEN_P[C].piezas
 	chk(D.MAPS.has(C) and int(D.MAPS[C].w) == 16 and int(D.MAPS[C].h) == 10 and PZ.size() == 7 and PZ.all(func(q): return q.zona == ["floorG"] and q.si == "kc"), "la sala de 16 × 10, con las siete carpas de los tres niveles, que van en la zona")
 	var NV: Array = KC.niv
-	chk(NV.size() == 3 and NV.map(func(q): return [int(q.max), int(q.tam[0]), int(q.tam[1])]) == [[4, 2, 2], [2, 4, 2], [1, 4, 4]] and PZ.all(func(q): return q.o.size() == int(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].tam[0]) * int(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].tam[1]) + 1 and q.o.back()[2] in ["depK", "depKd"]), "los niveles: 4 de 2 × 2, 2 de 4 × 2 y 1 de 4 × 4, cada pieza de su tamaño y su depósito")
+	chk(NV.size() == 3 and NV.map(func(q): return [int(q.max), int(q.tam[0]), int(q.tam[1])]) == [[4, 2, 2], [2, 4, 2], [1, 4, 4]] and PZ.all(func(q): return q.o.size() == int(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].tam[0]) * int(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].tam[1]) + 1 and q.o.back()[2] == String(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].ds) + ("" if int(q.o.back()[0]) < 0 else "d")), "los niveles: 4 de 2 × 2, 2 de 4 × 2 y 1 de 4 × 4, cada pieza de su tamaño y su depósito")
 	chk(D.PUERTAS_INT["club-muelle"].any(func(q): return q.to == C and int(q.x) == 15 and int(q.y) == 1 and q.llave == "kc"), "la puerta, en la pared de KAIA")
 	chk(D.MAPS["club-muelle"].o[2][14] == "jukebox" and D.MAPS["club-muelle"].o[2][15] == null and D.ORDEN_P["club-muelle"].pie.any(func(c): return int(c[0]) == 15 and int(c[1]) == 2), "la gramola, a un lado; delante de la puerta, libre")
 	var cm: Dictionary = D.MAPS[C]
@@ -417,7 +477,7 @@ func _corre() -> void:
 	chk(mundo(C, 1, 2) and m.o[3][13] == null, "hoy no está")
 	J.S.day += 1
 	chk(mundo(C, 1, 2) and m.o[3][13] == "carpaKS0" and m.o[2][13] == "carpaG2" and m.o[2][14] == "carpaG2" and m.o[3][14] == "carpaG2" and m.o[4][13] == null, "mañana, montada en su sitio, 2 × 2")
-	chk(J.sprite_local("carpaKS0") == "kcs", "la carpa, cerrada como las de casa (%s)" % J.sprite_local("carpaKS0"))
+	chk(J.sprite_local("carpaKS0") == "kcs", "la carpa, cerrada como las de casa, con el servicio del lado con más sitio en su sitio de serie: a la derecha, la de su depósito, que empatan (%s)" % J.sprite_local("carpaKS0"))
 	chk(not MENUS.is_empty(), "el cuadro, con menú")
 	TIT = []
 	QUIERO = []
@@ -446,10 +506,28 @@ func _corre() -> void:
 	var sl: Array = J.solapes_de(J.cajas_obj(C, m.o))
 	chk(sl.is_empty(), "las cuatro carpas, sin solapes: %s" % [sl.slice(0, 3)])
 	# 6 · la regla de la zona y la del solape
-	chk(J.cabe_pieza(C, "kcs0", 0, 4) == "zona" and J.cabe_pieza(C, "kcs0", 1, 4) == "zona", "en el pasillo, no: «%s»" % J.cabe_pieza(C, "kcs0", 1, 4))
+	chk(J.cabe_pieza(C, "kcs0", 1, 4) == "zona" and J.cabe_pieza(C, "kcs0", 2, 4) == "zona", "en el pasillo, no: «%s»" % J.cabe_pieza(C, "kcs0", 1, 4))
 	chk(J.cabe_pieza(C, "kcs0", 4, 5) == "", "en la zona libre, sí: «%s»" % J.cabe_pieza(C, "kcs0", 4, 5))
-	chk(J.cabe_pieza(C, "kcs3", 13, 4) == "solapa", "pegada delante de otra carpa, con su techo encima de ella, no: «%s»" % J.cabe_pieza(C, "kcs3", 13, 4))
-	chk(J.cabe_pieza(C, "kcs1", 9, 4) == "solapa", "ni con su depósito debajo del techo de otra carpa: «%s»" % J.cabe_pieza(C, "kcs1", 9, 4))
+	chk(J.cabe_pieza(C, "kcs3", 8, 8) == "solapa", "pegada delante de otra carpa, con su techo encima de ella, no: «%s»" % J.cabe_pieza(C, "kcs3", 8, 8))
+	chk(J.cabe_pieza(C, "kcs2", 10, 5) == "solapa", "ni con su depósito debajo del techo de otra carpa: «%s»" % J.cabe_pieza(C, "kcs2", 10, 5))
+	chk(J.cabe_pieza(C, "kcs2", 6, 6) == "servicio", "ni tapando el sitio de al lado de la puerta lateral de otra: «%s»" % J.cabe_pieza(C, "kcs2", 6, 6))
+	chk(J.cabe_pieza(C, "kcs0", 9, 3) == "tubo", "ni dejando a una sin camino para su tubo hasta la pared: «%s»" % J.cabe_pieza(C, "kcs0", 9, 3))
+	chk(str(D.ORDEN_MOTIVO.servicio).contains("puerta lateral") and str(D.ORDEN_MOTIVO.tubo).contains("tubo"), "los motivos del servicio y del tubo, dichos")
+	# el lado de la puerta, donde se dejó: no cambia al mover otra
+	J.S.coloca = {C: {"kcs2": [4, 3]}}
+	J.MAPS[C].erase("opos")
+	mundo(C, 1, 2)
+	var L0: int = J.kc_lado(2)
+	chk(J.kc().get("ld", {}).get("2") == [L0, 4, 3], "movida, su lado se guarda (%s)" % [J.kc().get("ld")])
+	J.S.coloca[C]["kcs3"] = [7, 3]
+	J.MAPS[C].erase("opos")
+	mundo(C, 1, 2)
+	chk(J.kc_lado_en(2, J.MAPS[C].o, J.kc_pos(2)) != L0 and J.kc_lado(2) == L0, "otra al lado: con más sitio por el otro, la puerta sigue donde estaba (%d → %d)" % [L0, J.kc_lado(2)])
+	J.S.coloca = {}
+	J.kc().erase("ld")
+	J.MAPS[C].erase("opos")
+	mundo(C, 1, 2)
+	chk(J.kc_lado(2) == J.kc_lado_serie(2) and J.sprite_local("carpaKS2") == "kcs", "de serie, el de serie")
 	chk(str(D.ORDEN_MOTIVO.zona).contains("zona de cultivo") and str(D.ORDEN_MOTIVO.solapa).contains("encima"), "los motivos, dichos")
 	chk(J.cabe_pieza("home", "carpa0", 8, 2) != "zona", "las carpas de casa, sin la regla")
 	mundo("club-muelle", 14, 3)
@@ -475,7 +553,7 @@ func _corre() -> void:
 	MENUS = []
 	LOG = []
 	chk(corre(func(): await J.object_action(13, 3)) and J.kc().p[0] is Dictionary and J.kc().p[0].sid == "txoko" and int(J.S.seeds.get("txoko", 0)) == 2, "plantada en la plaza 1 (%s · %s · %s)" % [MENUS.slice(-3), J.kc().p.slice(0, 2), LOG.slice(-3)])
-	chk(J.sprite_local("carpaKS0") == "kcs" and J.sprite_local("carpaKS1") == "kcs", "con una planta, cerrada igual (las plantas, por dentro: kc_vista)")
+	chk(J.sprite_local("carpaKS0") == "kcs" and J.sprite_local("carpaKS1") == "kcsi", "con una planta, cerrada igual (las plantas, por dentro: kc_vista)")
 	QUIERO = ["Plaza 4", J.strain("txoko").n]
 	chk(corre(func(): await J.object_action(14, 2)) and J.kc().p[3] is Dictionary and J.kc_plantadas(0) == 2, "por la otra punta, la misma carpa, plaza 4")
 	# 8 · crecen solas, con el goteo, también fuera de la sala
@@ -515,7 +593,19 @@ func _corre() -> void:
 	chk(corre(func(): await J.object_action(2, 1)) and int(J.kc().niv) == 1 and int(J.kc().kits[4]) == int(J.S.day) + 1 and J.kc_kits() == 4 and J.kc().p[3] is Dictionary, "a las de 4 × 2: una pedida y las cuatro de 2 × 2 siguen (%s)" % [J.kc().kits])
 	chk(is_equal_approx(float(J.S.banco), bn - kps[1]), "por la cuenta, solo la nueva (%d €)" % int(bn - J.S.banco))
 	J.S.day += 1
-	chk(mundo(C, 1, 2) and m.o[3][3] == "carpaKM0" and m.o[2][6] == "carpaG2" and m.o[3][7] == "depKd" and m.o[2][7] == null and m.o[3][13] == "carpaKS0" and J.sprite_local("carpaKM0") == "kcm", "mañana, la de 4 × 2 en su sitio, con las de antes")
+	chk(mundo(C, 1, 2) and m.o[3][3] == "carpaKM0" and m.o[2][6] == "carpaG2" and m.o[2][7] == "depKmd" and m.o[3][7] == null and m.o[3][13] == "carpaKS0" and J.sprite_local("carpaKM0") == "kcmi", "mañana, la de 4 × 2 en su sitio, con las de antes")
+	# el lado del servicio (puerta lateral, ventana e intractor; kc_lado): el que tiene más casillas libres al lado a las que se llega
+	# y, si empatan, el de su depósito, en su sitio de serie con las siete en el suyo; con el servicio a la izquierda, el sprite en
+	# espejo (kcsi, kcmi). De serie, la 4.ª de 2 × 2, contra la pared de la sala, a la izquierda (al lado de su depósito queda una
+	# casilla); la 3.ª, con los depósitos de la 2.ª y el suyo a la izquierda, a la derecha; la 2.ª, a la izquierda; la 1.ª, entre el
+	# hueco de delante del depósito de la 2.ª de 4 × 2 y el de delante del suyo (1 y 1), a la derecha, la del suyo
+	var lados := []
+	for ci in J.kc_ns():
+		if int(J.kc().kits[ci]) >= 0:
+			var ob: String = String(J.kc_Nc(ci).obj) + str(J.kc_iN(ci))
+			if J.sprite_local(ob).ends_with("i") != (J.kc_lado(ci) < 0):
+				lados.append(ob)
+	chk(lados.is_empty() and J.sprite_local("carpaKS3") == "kcsi" and J.sprite_local("carpaKS2") == "kcs" and J.sprite_local("carpaKS1") == "kcsi" and J.sprite_local("carpaKS0") == "kcs" and J.sprite_local("carpaKM0") == "kcmi", "el servicio de cada carpa, del lado con más sitio (%s)" % [lados])
 	QUIERO = ["Comprar: Carpa 400×200", "Comprarlo"]
 	corre(func(): await J.object_action(2, 1))
 	J.S.day += 1

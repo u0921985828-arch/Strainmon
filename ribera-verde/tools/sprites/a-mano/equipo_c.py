@@ -49,7 +49,8 @@ def barras(w, n, cw=48, driver=True):
             for x in range(bx + 1, bx1): L.p(x, y, LR if (x + 2 * y) % 3 == 0 else LB)
     return L
 
-# LED 100 (25 cm): 26 en la de 60, 22 en la de 80, 20 en las de 200 · LED 200 (30 cm): 31, 26 y 23 · 480 (60): 47 · 720 (100): 78
+# LED 100 (25 cm): 26 en la de 60, 22 en la de 80, 20 en las de 200 · LED 200 (30 cm): 31, 26 y 23 · 480 (60): 47 · 720 (100): 78 y,
+# en las de KAIA, 75 y 36 (un poco menos que su ancho, para que se vean separados)
 # todos de barras: 3 el de 100, 4 el de 200, 6 el de 480 y 8 el de 720
 sale('carpa-c-focos-led', 'foco-c-led100-26', barras(26, 3, driver=False))
 sale('carpa-c-focos-led', 'foco-c-led100-20', barras(20, 3, driver=False))
@@ -57,6 +58,8 @@ sale('carpa-c-focos-led', 'foco-c-led200-30', barras(30, 4))
 sale('carpa-c-focos-led', 'foco-c-led200-24', barras(24, 4))
 sale('carpa-c-focos-led-ancho', 'foco-c-led480-47', barras(47, 6, 80))   # 47 no cabe en la de 48 sin tocar el borde
 sale('carpa-c-focos-led-ancho', 'foco-c-led720-78', barras(78, 8, 80))
+sale('carpa-c-focos-led-ancho', 'foco-c-led720-75', barras(75, 8, 80))   # los de KAIA (kaia_vc.py los pega en carpa.png): dos a lo ancho de la de 2 m
+sale('carpa-c-focos-led-ancho', 'foco-c-led720-36', barras(36, 8, 80))   # y cuatro de las de 4 m (Z 0,39), con aire entre ellos
 
 # CFL de las carpas de 200 cm (35 cm × 0,78 = 27): la campana aprobada sin 9 columnas ni 3 filas (repartidas, ni el contorno ni el
 # tubo), 25 px (con 27, el armario 80, de 31, se quedaría esta y no la de 34); sin colores nuevos

@@ -8747,15 +8747,19 @@
    "coste_real": 0,
    "cubre": [
     "misc:foco-c-led480-47",
-    "misc:foco-c-led720-78"
+    "misc:foco-c-led720-78",
+    "misc:foco-c-led720-75",
+    "misc:foco-c-led720-36"
    ],
    "celda": "foco_c_ancho",
    "ajuste_por_sprite": {
     "foco-c-led480-47": "exacto",
-    "foco-c-led720-78": "exacto"
+    "foco-c-led720-78": "exacto",
+    "foco-c-led720-75": "exacto",
+    "foco-c-led720-36": "exacto"
    },
    "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
-   "descripcion": "LED 480 (6 barras: 47 px no caben en la celda de 48 sin tocar su borde) y LED 720 (8 barras) de la vista C, de barras como los de 720 W: barras delgadas de fondo a fondo con aire entre ellas; de frente, el travesaño, la fuente encima y la punta de cada barra con su cara de diodos encendida.",
+   "descripcion": "LED 480 (6 barras: 47 px no caben en la celda de 48 sin tocar su borde) y LED 720 (8 barras) de la vista C, de barras como los de 720 W: barras delgadas de fondo a fondo con aire entre ellas; de frente, el travesaño, la fuente encima y la punta de cada barra con su cara de diodos encendida; el de 720 W también a 75 y a 36 px para las carpas de KAIA (dos a lo ancho de las de 2 m y cuatro de las de 4 m, un poco menos que su ancho para que se vean separados; tools/sprites/a-mano/kaia_vc.py los pega en el atlas de la vista C).",
    "notas": "1.10 P3. LED 480: 60 cm × 0,78 = 47 px. LED 720: 100 cm × 0,78 = 78 px (las de 120 y 150, las únicas con vatios para él). Misma paleta que carpa-c-focos-led.",
    "montaje": "tal cual (equipo_c.py), en la celda de 80 × 16 con la boca en la fila 15, centrada",
    "aprobado": "2026-10-08: lámina B de la vista C (LED 720 con extras y goteo, LED 480, LED 200 con garrafas, CFL de 25 px, muertas y sombras), aprobada por la persona: «Mola»"
@@ -14102,7 +14106,7 @@
    "origen": "la carpa de 150 del piso (carpa-g150-mapa, de PixelLab) alargada por columnas y filas suyas: python3 -I tools/sprites/a-mano/kaia_carpa.py",
    "estilo_ref": "las carpas del piso (carpas-mapa y carpas-medias-mapa)",
    "notas": "Lo pidió el usuario: «así no son las carpas, como te he dicho que las haga, de como están hechas en casa». Negras y cerradas, de frente con el techo a medio fondo, nunca en isométrica; solo con Datos.CAL.",
-   "descripcion": "Las carpas de la sala de cultivo de KAIA por niveles (2 × 2, 4 × 2 y 4 × 4 m), hechas como las del piso: negras y cerradas, con el techo a medio fondo, la barra plateada del armazón y la puerta con su cremallera (dos en las de 4 m) (kcs, kcm, kcl)."
+   "descripcion": "Las carpas de la sala de cultivo de KAIA por niveles (2 × 2, 4 × 2 y 4 × 4 m), hechas como las del piso: negras y cerradas, con el techo a medio fondo, la barra plateada del armazón y la puerta con su cremallera (dos en las de 4 m) (kcs, kcm, kcl), con la puerta lateral, la ventana de malla y el intractor en el lado del servicio, el que tiene más sitio libre al lado (kaiacult.gd kc_lado); con el servicio a la izquierda, kcsi, kcmi y kcli, con las puertas de entrar en el lado de sombra."
   },
   {
    "fase": "F9",
@@ -14139,19 +14143,27 @@
     "obj:riegoKB",
     "obj:drenKB",
     "obj:depK",
-    "obj:depKd"
+    "obj:depKd",
+    "obj:depKm",
+    "obj:depKmd",
+    "obj:depKl",
+    "obj:depKld"
    ],
    "ajuste_por_sprite": {
     "tanqueKB": "exacto",
     "riegoKB": "exacto",
     "drenKB": "exacto",
     "depK": "exacto",
-    "depKd": "exacto"
+    "depKd": "exacto",
+    "depKm": "exacto",
+    "depKmd": "exacto",
+    "depKl": "exacto",
+    "depKld": "exacto"
    },
-   "origen": "el tanque y el programador de la nave (locales-alto) y el depósito de recogida de la sala (o-drenKS, de PixelLab), más bajos quitando filas suyas, y el bidón de la huerta (bidonA) para el depósito del goteo de cada carpa: python3 -I tools/sprites/a-mano/kaia_riego.py",
+   "origen": "el tanque y el programador de la nave (locales-alto) y el depósito de recogida de la sala (o-drenKS, de PixelLab), más bajos quitando filas suyas, y el bidón de la huerta (bidonA) para el depósito del goteo de cada carpa, y los de 200 y 400 L a mano en su estilo: python3 -I tools/sprites/a-mano/kaia_riego.py",
    "estilo_ref": "el tanque y el programador de la nave (tanqueN, riegoN) y el depósito de recogida de KAIA (o-drenKS)",
-   "notas": "Lo pidió el usuario: «que tampoco sea el depósito, por ejemplo, tendrá que estar fuera de las carpas y demás. Esas cosas hay que hacerlas con lógica». De una casilla de alto (1 m a 16 px/m), para no montarse en la carpa de sala; solo con Datos.CAL.",
-   "descripcion": "El rincón del riego de la carpa de sala de KAIA, fuera de ella: el tanque bajo, el programador en su mueble bajo y el depósito de recogida con su bomba (tanqueKB, riegoKB, drenKB), y el depósito del goteo de cada carpa de la fase 1, a su lado, con el grifo hacia ella (depK a su izquierda, depKd a su derecha)."
+   "notas": "Lo pidió el usuario: «que tampoco sea el depósito, por ejemplo, tendrá que estar fuera de las carpas y demás. Esas cosas hay que hacerlas con lógica». De una casilla de alto (1 m a 16 px/m), para no montarse en la carpa de sala; solo con Datos.CAL. Los depósitos, a su tamaño (lo pidió el usuario: «los depósitos se deben de dibujar de diferentes tamaños también»): de más de una casilla los de 200 y 400 L, sin pisar nada.",
+   "descripcion": "El rincón del riego de la carpa de sala de KAIA, fuera de ella: el tanque bajo, el programador en su mueble bajo y el depósito de recogida con su bomba (tanqueKB, riegoKB, drenKB), y el depósito del goteo de cada carpa de la fase 1, a su lado, con el grifo hacia ella (depK a su izquierda, depKd a su derecha): el bidón de 100 L en las de 2 × 2, el de 200 L en las de 4 × 2 (depKm, depKmd) y el depósito de 400 L con tapa de rosca en la de 4 × 4 (depKl, depKld), a su tamaño real, sobre bloques y con el grifo a la misma altura."
   },
   {
    "fase": "F9",

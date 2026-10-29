@@ -1992,7 +1992,7 @@ sa4f130fc,La sala de cultivo de KAIA pasa a las carpas nuevas. Lo que no cabe se
 s23317412,KAIA_CULT,KAIA_CULT
 s066ae4c4,"La sala de cultivo de KAIA, cerrada. Hasta tener la licencia de cultivo, aquí dentro no se planta nada.","KAIA's grow room, locked. Until you have the cultivation licence, nothing gets planted in here."
 sa4a2b640,El depósito de recogida: lo que sobra de cada mesa baja por su tubería de drenaje y se filtra antes de volver al tanque.,The collection tank: what each table drains runs down its pipe and is filtered before going back to the tank.
-s186b5684,"El depósito del goteo de la carpa {n}, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.","The drip tank of tent {n}, outside it: its pump sends the water with the nutrients down the hose, which goes in through the tent wall, to each pot."
+s72a1bd20,"El depósito del goteo de la carpa {n}, de {l} L, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.","The {l} L drip tank of tent {n}, outside it: its pump sends the water with the nutrients down the hose, which goes in through the tent wall, to each pot."
 s62ad04d6,"El tanque del riego centralizado, con el abono ya mezclado: las bombas lo llevan a cada mesa.","The central irrigation tank, with the nutrients already mixed in: the pumps carry it to every table."
 s4fa33be1,"El rincón del riego, fuera de la carpa: el tanque con el abono ya mezclado, el programador que lo manda a cada mesa por la boca de servicio y el depósito de recogida, al que vuelve por ella lo que sobra.","The watering corner, outside the tent: the tank with the nutrients already mixed, the controller that sends it to each table through the service port, and the runoff tank, where whatever is left comes back through it."
 sa9e94427,"El programador del riego de las mesas: los turnos de cada una, el pH y la EC, en automático.","The tables' irrigation controller: each one's cycles, the pH and the EC, all automatic."
@@ -2071,6 +2071,7 @@ s15deb414,"Mesa {i} · {que}. {l}
 A: la mesa · B: cerrar.","Table {i} · {que}. {l}
 A: the table · B: close."
 s575a0ac6,LAS MESAS,THE TABLES
+s324d6f9f,carpaG2,
 s5742a7d0,Arrancar y plantar,Uproot and plant
 sbfb12456,Llevarte lo seco · {g},Take the dried buds · {g}
 se7b42179,"Mesa {i} · {que} · {foco}
@@ -5980,19 +5981,20 @@ sb61b234e,Los sofás de la izquierda,
 sd467cb00,Los sofás de la derecha,
 s4abfe96e,ORDENAR LA SALA DE CULTIVO,ARRANGE THE GROW ROOM
 sc9f664d2,La carpa 1,Tent 1
-s324d6f9f,carpaG2,
 se1a5bf19,carpaKS0,
 sabcb7a7e,depKd,
 s50ff3568,La carpa 2,Tent 2
 s96a28f8f,carpaKS1,
 s27f805fe,La carpa 3,Tent 3
 s0fabde35,carpaKS2,
+s152d576d,depK,
 sb99c905d,La carpa 4,Tent 4
 s78aceea3,carpaKS3,
-s152d576d,depK,
 s35e480c6,carpaKM0,
+sfe0966c4,depKmd,
 s42e3b050,carpaKM1,
 s2cffb187,carpaKL0,
+se7125785,depKld,
 sca19c6c2,Ahí no cabe.,It won't fit there.
 sc20453b7,Ahí ya hay algo.,Something's already there.
 s13045d4c,Ese hueco es para la carpa.,That spot is for the tent.
@@ -6001,6 +6003,8 @@ s28deb4b2,Así no se podría pasar.,Nobody could get past.
 s4c2ac553,La manguera no llegaría a todas las mesas.,The hose wouldn't reach every table.
 sd0b04296,"Las carpas, en la zona de cultivo: sobre el suelo con desagüe, no en el pasillo.","Tents go in the grow area: on the floor with the drain, not in the corridor."
 s4594dbb4,Ahí quedaría montado encima de otra cosa.,It would end up on top of something else.
+sad69458c,Así una carpa se queda sin sitio al lado de su puerta lateral.,That would leave a tent with no room beside its side door.
+s86ed9c65,Así el tubo de una carpa no llega a la pared sin pasar por encima de otra cosa.,That way a tent's duct can't reach the wall without running over something else.
 s85e53511,Xabier,Xabier
 sd32b800f,Rosario,Rosario
 s98d0677a,Eneko,Eneko
@@ -6813,19 +6817,21 @@ sa44d715d,carpaKS,
 s4a4eb085,Carpa de 200 × 200 × 200 cm,200 × 200 × 200 cm tent
 s25a45974,Dos LED de 720 W,Two 720 W LEDs
 s0cf9a845,Extractor de 200 mm con filtro de carbón,200 mm extractor with carbon filter
-se8568cc7,Goteo de 4 salidas con su depósito,4-outlet drip with its tank
+s2eb44050,Goteo de 4 salidas con su depósito de 100 L,4-outlet drip with its 100 L tank
 s484d8b8c,Carpa 400×200,400×200 tent
 s5e424c3e,carpaKM,
+sd217c2da,depKm,
 sce6d2d50,Carpa de 400 × 200 × 200 cm,400 × 200 × 200 cm tent
 s21abddcc,Cuatro LED de 720 W,Four 720 W LEDs
 s0334d841,Extractor de 250 mm con filtro de carbón,250 mm extractor with carbon filter
-s97eb37a5,Goteo de 8 salidas con su depósito,8-outlet drip with its tank
+s2bcbc827,Goteo de 8 salidas con su depósito de 200 L,8-outlet drip with its 200 L tank
 s4cc0f73e,Carpa 400×400,400×400 tent
 s29457ca8,carpaKL,
+sa510f24c,depKl,
 s6e88f28d,Carpa de 400 × 400 × 200 cm,400 × 400 × 200 cm tent
 sa6b494ee,Ocho LED de 720 W,Eight 720 W LEDs
-sf9786037,Extractor de 315 mm con dos filtros de carbón,315 mm extractor with two carbon filters
-sa73fdb47,Goteo de 16 salidas con su depósito,16-outlet drip with its tank
+s2f54420c,Extractor de 315 mm con su filtro de carbón,315 mm extractor with its carbon filter
+s3fc2843f,Goteo de 16 salidas con su depósito de 400 L,16-outlet drip with its 400 L tank
 sbf6a296b,"Carpa de sala de 1.300 × 700 × 250 cm, con su puerta","Grow room tent, 1,300 × 700 × 250 cm, with its door"
 s1c226ee4,"Obra: desagües, cuadro trifásico y clima industrial","Works: drains, three-phase panel and industrial climate"
 sd7150e0b,Ocho mesas de flujo y reflujo de 240 × 120 con su LED doble,Eight 240 × 120 ebb and flow tables with their double LED
@@ -6954,6 +6960,11 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+sf9786037,Extractor de 315 mm con dos filtros de carbón,315 mm extractor with two carbon filters
+s186b5684,"El depósito del goteo de la carpa {n}, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.","The drip tank of tent {n}, outside it: its pump sends the water with the nutrients down the hose, which goes in through the tent wall, to each pot."
+se8568cc7,Goteo de 4 salidas con su depósito,4-outlet drip with its tank
+s97eb37a5,Goteo de 8 salidas con su depósito,8-outlet drip with its tank
+sa73fdb47,Goteo de 16 salidas con su depósito,16-outlet drip with its tank
 s3fdebb64,"{t} °C · {h} % · VPD {v} kPa · luz a {a}/{b}, {l} · extracción al {c} %: {e}.
 A: el cuadro · B: cerrar.","{t} °C · {h} % · VPD {v} kPa · light at {a}/{b}, {l} · extraction at {c} %: {e}.
 A: the panel · B: close."
