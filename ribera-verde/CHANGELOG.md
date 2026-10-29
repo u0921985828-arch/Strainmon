@@ -2,7 +2,7 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### Sin versión aún · KAIA como en casa, el laboratorio a la vista y el clima en pantalla (lo pidió el usuario; con `Datos.CAL`)
+### 0.67.0 (código 92) · KAIA como en casa, el laboratorio a la vista y el clima en pantalla (lo pidió el usuario; con `Datos.CAL`); APK en `descargas/LandraceHunters.apk` (87 MB)
 
 - El servicio de las carpas de KAIA, en su pared también en el mapa (revisión por ataque): la puerta lateral, sus ventanas de malla y el intractor ya no se dibujan en el frente del sprite (`kaia_carpa.py`, `detalles`); van en la pared del lado (`kc_lado`), la que enseña la vista C. En el frente, solo las puertas de entrar y, en las de 400, la ventana de entre las dos. kaia_cult 342/0, kaia_vista 272/0, patrones 50/0, solapes 73/0.
 - El tallo y la tierra, a la vista (lo pidió el usuario: «lo mismo con las plantas, lo que viene siendo el tallo y la tierra… tiene que estar a la vista»): en la vista C, si una maceta, una planta o una garrafa de delante pisa la tierra (del borde de la maceta a 2 filas bajo la superficie, `zona_tierra`) o las 8 filas de abajo del tallo (`zona_tallo`) de otra, esa tierra y ese tallo se repintan encima al 65 % (`a_la_vista`, `_a_la_vista`, `A_VISTA` en `vista.gd`), y las barras se apartan de ellas; prueba `tests/tallo_vista.gd` (compone el orden de pintado píxel a píxel).
