@@ -266,7 +266,8 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 			g = maxf(0, minf(g, Datos.carga().VEG_TOPE - p.prog))
 		elif f.get("ciclo") == "flor" and p.prog >= .35 and p.prog < .65:   # 12/12 en vegetativo: crece al doble y lo que se salta la acorta
 			var e := minf(g, (.65 - p.prog) / 2)
-			p.corta = minf(1, float(p.get("corta", 0)) + e / .15)
+			if not (Datos.CAL and p.get("rb")):   # la que rebrota (doble cosecha) vuelve en una carpa a 12/12: no se acorta otra vez
+				p.corta = minf(1, float(p.get("corta", 0)) + e / .15)
 			g += e
 		p.prog = minf(1, p.prog + g)
 	if p.water <= 0:
@@ -357,21 +358,42 @@ static func rarezas_de(S: Dictionary, sid: String, f: Dictionary) -> void:
 	var R: Dictionary = D.RAREZAS
 	var L: Dictionary = S.get("ra", {}).get(sid, {})
 	var o := []
+	var nl := {}   # el nivel de su línea al nacer (0: le salió sola): sus semillas serán la generación siguiente (hereda_ra)
 	for k in R.orden:
 		if L.has(k) and Datos.hash_str("ra|%s|%d|%s|%d" % [k, int(f.id), sid, int(S.day)]) % 100000 < float(R.niv[clampi(int(L[k]), 0, int(R.fija))]) * 100000:
 			o.append(k)
+			nl[k] = int(L[k])
 	if Datos.hash_str("ra0|%d|%s|%d" % [int(f.id), sid, int(S.day)]) % 100000 < float(R.p) * 100000:
 		var k: String = R.orden[Datos.hash_str("rak|%d" % int(f.id)) % R.orden.size()]
 		if not o.has(k):
 			o.append(k)
+			nl[k] = 0
 	if o.size():
 		f.ra = o
+		f.ral = nl
 
 static func ra_tiene(p, k: String) -> bool:
-	return Datos.CAL and p is Dictionary and p.get("f") is Dictionary and p.f.get("ra") is Array and p.f.ra.has(k)
+	return p is Dictionary and ra_f(p.get("f"), k)
 
-# la línea aprende las rarezas de la planta de la que salen sus semillas: una nueva, a nivel 1; una que ya llevaba, un nivel más
-# (generación a generación, hasta fijarla). Devuelve [[rasgo, nivel]…] con lo que ha cambiado
+static func ra_f(fe, k: String) -> bool:
+	return Datos.CAL and fe is Dictionary and fe.get("ra") is Array and fe.ra.has(k)
+
+# en las mesas de la nave y de KAIA, los clones son la planta: la enana rinde menos, la resinosa da más THC y el aroma va al lote
+static func ra_g_mesa(fe) -> float:
+	return 1 + float(Datos.carga().RAREZAS.r.enana.g) if ra_f(fe, "enana") else 1.0
+
+static func ra_crec(fe) -> float:
+	return 1 + float(Datos.carga().RAREZAS.r.enana.crec) if ra_f(fe, "enana") else 1.0
+
+static func ra_thc(fe) -> float:
+	return float(Datos.carga().RAREZAS.r.resina.thc) if ra_f(fe, "resina") else 0.0
+
+static func ra_ar(fe) -> float:
+	return 1.0 if ra_f(fe, "aroma") else 0.0
+
+# la línea aprende las rarezas de la planta de la que salen sus semillas, que son la generación siguiente a la suya: un nivel
+# más que el que tenía su línea cuando nació (f.ral; 1 si le salió sola), hasta fijarlo. Sus hermanas, sus esquejes o la segunda
+# cosecha de la doble son la misma generación: no suben más. Devuelve [[rasgo, nivel]…] con lo que ha cambiado
 static func hereda_ra(S: Dictionary, sid: String, fe) -> Array:
 	var ch := []
 	if not Datos.CAL or not (fe is Dictionary) or not (fe.get("ra") is Array):
@@ -381,11 +403,26 @@ static func hereda_ra(S: Dictionary, sid: String, fe) -> Array:
 	if not S.ra.has(sid):
 		S.ra[sid] = {}
 	var tope := int(Datos.carga().RAREZAS.fija)
+	var nl: Dictionary = fe.get("ral", {}) if fe.get("ral") is Dictionary else {}
 	for k in fe.ra:
 		var a := int(S.ra[sid].get(k, 0))
-		if a < tope:
-			S.ra[sid][k] = a + 1
-			ch.append([k, a + 1])
+		var n := mini(tope, int(nl.get(k, 0)) + 1)
+		if n > a:
+			S.ra[sid][k] = n
+			ch.append([k, n])
+	return ch
+
+# estabilizar la línea (granja.gd) también es una generación: sus rarezas suben un nivel y, estable, quedan fijadas
+static func estabiliza_ra(S: Dictionary, k: String, estable: bool) -> Array:
+	var ch := []
+	if not Datos.CAL or not (S.get("ra") is Dictionary) or not (S.ra.get(k) is Dictionary):
+		return ch
+	var tope := int(Datos.carga().RAREZAS.fija)
+	for r in S.ra[k]:
+		var n := tope if estable else mini(tope, int(S.ra[k][r]) + 1)
+		if n > int(S.ra[k][r]):
+			S.ra[k][r] = n
+			ch.append([r, n])
 	return ch
 
 # el cruce se lleva las rarezas de las dos líneas, un nivel por debajo (al menos 1): hay que volver a fijarlas

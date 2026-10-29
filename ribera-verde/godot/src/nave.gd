@@ -613,7 +613,7 @@ func secadero_nave() -> void:
 		var q: int = mini(int(floor(Me.g)), cabe - lleva)
 		if q < 1:
 			break
-		add_buds(Me.k, q, Me.t, null, 0, Me.get("cd", S.day))
+		add_buds(Me.k, q, Me.t, null, 0, Me.get("cd", S.day), 0, Cultivo.ra_ar(Me.get("f")))
 		if staff_ok() and String(S.nave.get("oz", "")) == "sala":   # MAESTRO [6]: el ozono en la sala quema los terpenos
 			S.buds[Me.k].oz = 1
 		Me.g = Datos.jsround((Me.g - q) * 10) / 10.0

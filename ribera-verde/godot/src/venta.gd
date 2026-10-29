@@ -299,14 +299,18 @@ func cuidar_casa(w: Dictionary) -> int:
 		var sc := semillas_cosecha(p)
 		var q: int = g - int(floor(g * D.PLANTILLA.sisa * (5 - w.lea)))
 		if q >= 1:
-			add_buds(p.sid + "*" if cl == "estrella" else p.sid, q, thc, S.caja.buds if S.get("caja") else S.buds)
+			add_buds(p.sid + "*" if cl == "estrella" else p.sid, q, thc, S.caja.buds if S.get("caja") else S.buds, 0, -1, 0, Cultivo.ra_ar(p.get("f")))
 		if sc.n:
 			add_seeds(p.sid, sc.n)
+			Cultivo.hereda_ra(S, p.sid, p.get("f"))   # ESTUDIO, tanda 2: sus rarezas, a la línea
 		if p.get("f") and p.f.get("id"):
 			S.fenos[str(int(p.f.id))] = cl
 		if S.rec.get(p.sid) == 1:
 			S.rec[p.sid] = 2
-		S.pots[i] = null
+		if Datos.CAL:
+			apunta_album(p)
+		if not rebrote(p):   # la doble cosecha se queda en su maceta
+			S.pots[i] = null
 		tot += q
 	if tot:
 		S.flags.harvest1 = true
@@ -463,7 +467,7 @@ func nave_dia() -> void:
 			N.ab.o = Datos.jsround((N.ab.o - R.dosis) * 10) / 10.0
 			Me.ao = int(Me.get("ao", 0)) + 1
 		var p0 := p
-		p += 1.0 / float(strain(lot_sid(Me.k)).d)
+		p += 1.0 / float(strain(lot_sid(Me.k)).d) * Cultivo.ra_crec(Me.get("f"))
 		if Datos.CAL and N.has("bc") and p0 < FLOR_MESA and p >= FLOR_MESA:   # 1.43: antes de pasarla a 12/12, la bandeja de clones
 			corta_bandeja(int(W[i].mesa), Me)
 		if p < 1:
@@ -497,8 +501,8 @@ func cosecha_mesa(Me: Dictionary, i: int, w: Dictionary, so: float) -> Dictionar
 	var am := float(Me.get("am", 0)) / dn
 	var ao := float(Me.get("ao", 0)) / dn
 	var g: float = float(F.w) * float(F.gpw) * float(strain(lot_sid(Me.k)).y) / float(D.Y_MEDIA) * float(Me.y) * nave_g(w) / float(D.NAVE.g) \
-		* (1 + float(R.rend)) * so * (1 + float(D.ABONO.rend) * am + float(D.ABONO_BIO.rend) * ao) * (1 + Cultivo.fam(S, "g"))
-	var thc: float = Me.thc * (1 + Cultivo.fam(S, "thc")) + float(F.thc) + float(R.thc) + float(D.ABONO.thc) * am + float(D.ABONO_BIO.thc) * ao
+		* (1 + float(R.rend)) * so * (1 + float(D.ABONO.rend) * am + float(D.ABONO_BIO.rend) * ao) * (1 + Cultivo.fam(S, "g")) * Cultivo.ra_g_mesa(Me.get("f"))
+	var thc: float = Me.thc * (1 + Cultivo.fam(S, "thc")) + float(F.thc) + float(R.thc) + float(D.ABONO.thc) * am + float(D.ABONO_BIO.thc) * ao + Cultivo.ra_thc(Me.get("f"))
 	if Datos.CAL:   # MAESTRO [5]: cosechada, cuenta para su familia de la CannaDex
 		cult_apunta(lot_sid(Me.k))
 	return {"g": Datos.jsround(g * 10) / 10.0, "t": Datos.jsround(thc * 10) / 10.0}

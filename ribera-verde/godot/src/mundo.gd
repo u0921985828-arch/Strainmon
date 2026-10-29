@@ -425,14 +425,14 @@ func lot_nombre(k: String) -> String:
 	return strain(lot_sid(k)).n + (" ★" if k.contains("*") else "") + (T(" (rara)") if k.get_slice("~", 0).ends_with("!") else "")
 
 # L: otro sitio (la caja fuerte); cu y dia: el curado y el día de la cosecha (1.29; sin dar dia, hoy; dia null, sin día, como los de antes)
-func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 0) -> void:
+func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 0, ar = 0.0) -> void:
 	if L == null:
 		L = S.buds
 	if dia != null and float(dia) < 0:
 		dia = S.day
 	if L.has(k):
 		var b: Dictionary = L[k]
-		junta_lote(b, g, thc, cu, dia, mc)
+		junta_lote(b, g, thc, cu, dia, mc, 0, ar)
 		b.erase("cata")   # 1.15: lo que entra nuevo no está catado ni analizado
 		b.erase("ana")
 	else:
@@ -443,6 +443,8 @@ func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 
 			L[k].cu = cu
 		if mc:
 			L[k].mc = mc
+		if ar:   # ESTUDIO, tanda 2: la parte de aroma único
+			L[k].ar = ar
 		if k.ends_with("!"):
 			L[k].sh = 1
 	discover(lot_sid(k))
@@ -513,7 +515,7 @@ func junta_lote(t: Dictionary, g: float, thc: float, cu, dia, mc = 0, af = 0, ar
 	t.g = nn
 
 func y_lista(l: Array) -> String:
-	return (", ".join(l.slice(0, -1)) + " y " + l[-1]) if l.size() > 1 else l[0]
+	return (", ".join(l.slice(0, -1)) + (" and " if I18n.en() else " y ") + l[-1]) if l.size() > 1 else l[0]   # i18n-no
 
 # la nevera (1.36): los extractos, en frío
 func nevera() -> Dictionary:

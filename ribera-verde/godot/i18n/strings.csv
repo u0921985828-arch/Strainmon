@@ -1210,6 +1210,8 @@ s87e19281,Rebrotada: segunda cosecha,Regrown: second harvest
 sdd1e1958,¿Estabilizar {s} (F{g})? Gastas 2 semillas y guardas 1.,Stabilise {s} (F{g})? You use 2 seeds and keep 1.
 s34d514e6,¿Estabilizar {s} (F{g})? Gastas 1 semilla y guardas 1.,Stabilise {s} (F{g})? You use 1 seed and keep 1.
 sd25d8ecd,Estabilizar,Stabilise
+s9d862b06,{n} al {p} %,{n} at {p} %
+s85331fe6,Sus rarezas suben con la línea: {l},Its rare traits rise with the line: {l}
 sa9447a70,"{s} ya es una línea estable: todas sus plantas salen iguales.
 Guardas 1 semilla.","{s} is now a stable line: all its plants come out the same.
 You keep 1 seed."
@@ -1937,7 +1939,6 @@ s6488bb7f,"Cada planta rara que has cosechado, con sus rasgos, el día y el siti
 s6e55b5c5,LA ÚLTIMA PÁGINA,THE LAST PAGE
 s384f2b34,{a}/{b} · {c} propias,{a}/{b} · {c} your own
 s4b01b12e,rara (no se hereda),rare (not inherited)
-s9d862b06,{n} al {p} %,{n} at {p} %
 s39e05d9e,Su línea: {x}.,Its line: {x}.
 sd0372920,Su línea no lleva ningún rasgo: cosecha semillas de una planta que lo saque.,Its line carries no trait: harvest seeds from a plant that shows one.
 s2bcc1a8a,en el piso,in the flat

@@ -10,6 +10,7 @@ const Datos = preload("res://src/datos.gd")
 const Juego = preload("res://src/juego.gd")
 const Atlas = preload("res://src/atlas.gd")
 const Cultivo = preload("res://src/cultivo.gd")
+const I18n = preload("res://src/i18n.gd")
 
 var J
 var M
@@ -165,7 +166,15 @@ func _corre() -> void:
 	sin.erase("ar")
 	chk(is_equal_approx(J.calidad(lt, true) / J.calidad(sin, true), 1 + float(R.r.aroma.x)), "y se paga un 25 % más")
 	chk(J.S.album.size() == 1 and int(J.S.album[0].id) == 9001 and J.S.album[0].sid == "ria" and J.S.album[0].ra == ["doble", "aroma"] and int(J.S.album[0].d) == int(J.S.day) and J.S.album[0].m == "home", "al cuaderno, con el día y el sitio (%s)" % [J.S.album])
-	# la segunda: más pequeña, y se acaba
+	# la segunda: crece en la carpa a 12/12 sin acortarse otra vez, más pequeña, y se acaba
+	var ff: Dictionary = f.duplicate()
+	ff.ciclo = "flor"
+	var pasos := 0
+	while J.S.pots[0].prog < 1 and pasos < 400:
+		Cultivo.plant_step(J.S, J.S.pots[0], 1.0, ff)
+		pasos += 1
+	chk(float(J.S.pots[0].get("corta", 0)) == 0.0, "rebrotada a 12/12, no se acorta (%s)" % [J.S.pots[0].get("corta")])
+	J.S.pots[0].erase("corta")
 	J.S.pots[0].prog = 1.0
 	J.S.pots[0].health = 100.0
 	J.S.pots[0].water = 100.0
@@ -175,7 +184,7 @@ func _corre() -> void:
 	var g2 := cosechado()
 	chk(J.S.pots[0] == null and not dicho("la planta rebrota"), "la segunda no rebrota")
 	chk(absi(g2 - roundi(g1 * float(R.r.doble.g2))) <= 1, "la segunda, del 60 %% (%d g y %d g)" % [g1, g2])
-	chk(J.S.ra.ria.doble == 2 and J.S.ra.ria.aroma == 2 and dicho("50 de cada 100"), "otra generación: nivel 2 (%s)" % [J.S.ra])
+	chk(J.S.ra.ria.doble == 1 and J.S.ra.ria.aroma == 1 and not dicho("50 de cada 100"), "la misma planta es la misma generación: sigue a nivel 1 (%s)" % [J.S.ra])
 	chk(J.S.album.size() == 1, "la misma planta, una vez en el cuaderno")
 	# sin semillas (línea estable de tienda, sin hermafrodita) el rasgo no pasa
 	J.S.gen.erase("ria")
@@ -186,13 +195,45 @@ func _corre() -> void:
 	if not dicho("semillas"):
 		chk(not J.S.ra.ria.has("resina") and dicho("Sin semillas de esta planta"), "sin semillas, la línea no la aprende")
 	chk(J.S.album.size() == 2, "pero va al cuaderno")
-	# 5 · hasta fijarlo, y no más
-	var fe := {"ra": ["doble"]}
+	# 5 · generación a generación: hermanas y esquejes de la misma no suben; las semillas de cada generación, uno
 	var ch := []
-	for j in 4:
-		ch = Cultivo.hereda_ra(J.S, "ria", fe)
+	for j in 6:   # seis hermanas de la 1.ª generación (nacidas con la línea a nivel 1)
+		Cultivo.hereda_ra(J.S, "ria", {"ra": ["doble"], "ral": {"doble": 1}})
+	chk(J.S.ra.ria.doble == 2, "seis hermanas de una generación suben la línea una vez (%s)" % [J.S.ra.ria])
+	var fr: Dictionary = Cultivo.roll_feno(J.S, "ria")
+	while not (fr.get("ra") is Array and fr.ra.has("doble")):
+		fr = Cultivo.roll_feno(J.S, "ria")
+	chk(int(fr.get("ral", {}).get("doble", -1)) == 2, "la que nace lo sabe: su línea iba a nivel 2 (%s)" % [fr.get("ral")])
+	for j in range(2, 6):
+		ch = Cultivo.hereda_ra(J.S, "ria", {"ra": ["doble"], "ral": {"doble": j}})
 	chk(J.S.ra.ria.doble == int(R.fija) and ch.is_empty(), "fijada en la 4.ª generación y ahí se queda (%s)" % [J.S.ra.ria])
+	J.S.ra.ria = {"resina": 1}
+	chk(Cultivo.estabiliza_ra(J.S, "ria", false) == [["resina", 2]] and J.S.ra.ria.resina == 2, "estabilizar es una generación: un nivel más")
+	chk(Cultivo.estabiliza_ra(J.S, "ria", true) == [["resina", int(R.fija)]], "y la línea estable, fijada")
+	J.S.ra.ria.erase("resina")
+	J.S.ra.ria.doble = int(R.fija)
 	chk(cuenta("ria", "doble", 300) == 300, "fijada, todas la sacan")
+	# 5b · el gerente cosecha igual: rebrota, el aroma al lote, las semillas a la línea y al cuaderno
+	J.S.ra.erase("limon")
+	for j in J.S.pots.size():
+		J.S.pots[j] = null
+	J.S.pots[1] = planta("limon", ["doble", "aroma"], 9300)
+	J.S.gen["limon"] = 1
+	J.queued.clear()
+	J.cuidar_casa({"n": "Ane", "lea": 5})
+	J.queued.clear()
+	var lh: Dictionary = (J.S.caja.buds if J.S.get("caja") is Dictionary else J.S.buds).get("limon", {})
+	chk(J.S.pots[1] is Dictionary and int(J.S.pots[1].get("rb", 0)) == 1, "con el gerente, la doble rebrota")
+	chk(is_equal_approx(float(lh.get("ar", 0)), 1.0), "y su lote lleva el aroma (%s)" % [lh])
+	chk(J.S.album.any(func(x): return int(x.id) == 9300), "y va al cuaderno")
+	J.S.gen.erase("limon")
+	# 5c · las mesas: los clones son la planta
+	chk(is_equal_approx(Cultivo.ra_g_mesa({"ra": ["enana"]}), 1 + float(R.r.enana.g)) and is_equal_approx(Cultivo.ra_crec({"ra": ["enana"]}), 1 + float(R.r.enana.crec)) and is_equal_approx(Cultivo.ra_thc({"ra": ["resina"]}), float(R.r.resina.thc)) and Cultivo.ra_ar({"ra": ["aroma"]}) == 1.0 and Cultivo.ra_g_mesa({}) == 1.0, "en las mesas, la enana, la resinosa y el aroma")
+	# 5d · en inglés, «and»
+	var lg = I18n.LANG
+	I18n.LANG = "en"
+	chk(J.y_lista(["a", "b"]) == "a and b", "la lista en inglés, con «and»: %s" % J.y_lista(["a", "b"]))
+	I18n.LANG = lg
 	# 6 · el cruce, un nivel por debajo
 	J.S.ra = {"aa": {"enana": 3}, "bb": {"resina": 1, "enana": 1}}
 	Cultivo.cruza_ra(J.S, "aa", "bb", "cc")
@@ -207,7 +248,7 @@ func _corre() -> void:
 	# 8 · el cuaderno en la CannaDex
 	MENUS = []
 	QUIERO = ["CUADERNO DE FENOTIPOS", "Volver", "Volver"]
-	chk(corre(func(): await J.cannadex()) and MENUS.size() >= 2 and MENUS[1].size() == 3 and String(MENUS[1][1]).begins_with(J.strain("ria").n), "el cuaderno, en la CannaDex: %s" % [MENUS])
+	chk(corre(func(): await J.cannadex()) and MENUS.size() >= 2 and MENUS[1].size() == J.S.album.size() + 1 and String(MENUS[1][0]).begins_with(J.strain(String(J.S.album[-1].sid)).n), "el cuaderno, en la CannaDex: %s" % [MENUS])
 	# 9 · una partida de antes, sin rarezas ni cuaderno
 	J.S.erase("ra")
 	J.S.erase("album")

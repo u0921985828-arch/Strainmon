@@ -570,7 +570,7 @@ func kc_mesa(i: int) -> void:
 		if q < 1:
 			await say(K("No te cabe nada más en la mochila."))
 			return
-		add_buds(Me.k, q, Me.t, null, 0, Me.get("cd", S.day))
+		add_buds(Me.k, q, Me.t, null, 0, Me.get("cd", S.day), 0, Cultivo.ra_ar(Me.get("f")))
 		Me.g = Datos.jsround((Me.g - q) * 10) / 10.0
 		sfx("get")
 		update_hud()
@@ -606,7 +606,7 @@ func kc_dia() -> void:
 		var cabe: float = maxf(0, float(D.MERCADO.alm.g) - alm_g("muelle"))
 		var q: int = mini(int(floor(g)), int(floor(cabe)))
 		if q >= 1:
-			add_buds(Me.k, q, Me.h.t, al.buds, 0, int(Me.h.d))
+			add_buds(Me.k, q, Me.h.t, al.buds, 0, int(Me.h.d), 0, Cultivo.ra_ar(Me.get("f")))
 		var resto: float = g - q
 		if resto >= .05:
 			Me.t = Datos.jsround((Me.t * Me.g + Me.h.t * resto) / (Me.g + resto) * 10) / 10.0 if Me.g + resto > 0 else Me.h.t
@@ -622,7 +622,7 @@ func kc_dia() -> void:
 			continue
 		Me.dn = int(Me.get("dn", 0)) + 1
 		Me.am = int(Me.get("am", 0)) + 1   # el abono va en el riego centralizado, cada día
-		var p: float = float(Me.p) + 1.0 / float(strain(lot_sid(Me.k)).d)
+		var p: float = float(Me.p) + 1.0 / float(strain(lot_sid(Me.k)).d) * Cultivo.ra_crec(Me.get("f"))
 		if p < 1:
 			Me.p = Datos.jsround(p * 1000) / 1000.0
 			continue
@@ -640,8 +640,8 @@ func kc_cosecha(Me: Dictionary, w: Dictionary) -> Dictionary:
 	var dn := maxf(1, float(Me.get("dn", 1)))
 	var am := float(Me.get("am", 0)) / dn
 	var g: float = float(F.w) * float(F.gpw) * float(strain(lot_sid(Me.k)).y) / float(D.Y_MEDIA) * float(Me.y) * nave_g(w) / float(D.NAVE.g) \
-		* (1 + float(D.ABONO.rend) * am) * (1 + Cultivo.fam(S, "g"))
-	var thc: float = Me.thc * (1 + Cultivo.fam(S, "thc")) + float(F.thc) + float(D.ABONO.thc) * am
+		* (1 + float(D.ABONO.rend) * am) * (1 + Cultivo.fam(S, "g")) * Cultivo.ra_g_mesa(Me.get("f"))
+	var thc: float = Me.thc * (1 + Cultivo.fam(S, "thc")) + float(F.thc) + float(D.ABONO.thc) * am + Cultivo.ra_thc(Me.get("f"))
 	cult_apunta(lot_sid(Me.k))
 	return {"g": Datos.jsround(g * 10) / 10.0, "t": Datos.jsround(thc * 10) / 10.0}
 

@@ -466,6 +466,8 @@ func pot_action(i: int, hu = null) -> void:
 	if p.prog >= .2 and p.prog < .65 and not (Datos.CAL and s.get("auto")):   # 1.52: las autos no se clonan
 		opts.append(K("Sacar esqueje"))
 	opts.append_array([K("Nombrar"), K("Arrancar"), K("Salir")])
+	if Datos.CAL and p.prog >= .35:   # ESTUDIO, tanda 2: un fenotipo raro, al cuaderno en cuanto lo ves
+		apunta_album(p)
 	var c: int = await ask(T("{s}{e} · {st} {p}%\nAgua {w}% · Salud {h}%{pl}", {"s": s.n, "e": etiq(p.get("f")), "st": stage_name(p), "p": int(floor(p.prog * 100)), "w": Datos.jsround(p.water),
 		"h": Datos.jsround(p.health), "pl": (T(" · PLAGA") if p.pest else "") + (T(" · BOTRITIS") if Datos.CAL and p.get("bot") else "") + ra_txt(p)}), opts)
 	var op: String = opts[c]
@@ -877,9 +879,7 @@ func harvest(i: int, hu = null) -> void:
 	var sh = fe.get("sh") if Datos.CAL else null   # MAESTRO [5]: la rara, a su lote (×SHINY.x); sus semillas no la llevan
 	if sh:
 		lk += "!"
-	add_buds(lk, g, thc)
-	if Cultivo.ra_tiene(p, "aroma"):   # ESTUDIO, tanda 2: lo de aroma único, por gramos en su lote
-		S.buds[lk].ar = float(S.buds[lk].get("ar", 0)) + g / float(S.buds[lk].g)
+	add_buds(lk, g, thc, null, 0, -1, 0, Cultivo.ra_ar(fe))   # ESTUDIO, tanda 2: lo de aroma único, por gramos en su lote
 	if Datos.CAL:   # MAESTRO [5]: cuenta para su familia de la CannaDex
 		cult_apunta(p.sid)
 		apunta_album(p)
@@ -895,12 +895,8 @@ func harvest(i: int, hu = null) -> void:
 		mover_lote(S.buds, S.caja.buds, lk, a_caja)
 	if p.get("f") and p.f.get("id"):
 		S.fenos[str(int(p.f.id))] = cl
-	var rebrota: bool = Cultivo.ra_tiene(p, "doble") and not p.get("rb")
-	if rebrota:   # ESTUDIO, tanda 2: la doble cosecha vuelve a vegetativo una vez
-		p.rb = 1
-		p.prog = float(D.RAREZAS.r.doble.vuelve)
-		p.erase("bot")
-	else:
+	var rebrota := rebrote(p)
+	if not rebrota:
 		L[i] = null
 	sfx("get")
 	if S.rec.get(p.sid) == 1:   # una variedad de receta sacada en la mesa, cosechada (capítulo 4)
@@ -952,6 +948,16 @@ func harvest(i: int, hu = null) -> void:
 	S.flags.harvest1 = true
 	await check_story()
 
+# ESTUDIO, tanda 2: la doble cosecha vuelve a vegetativo una vez, sin lo que le acortó la primera (true: sigue en su sitio)
+func rebrote(p: Dictionary) -> bool:
+	if not Cultivo.ra_tiene(p, "doble") or p.get("rb"):
+		return false
+	p.rb = 1
+	p.prog = float(D.RAREZAS.r.doble.vuelve)
+	for x in ["bot", "corta"]:
+		p.erase(x)
+	return true
+
 # ESTUDIO, tanda 2: los rasgos raros de una planta, en su ficha (se ven desde que sale de plántula); la que ya rebrotó, también
 func ra_txt(p: Dictionary) -> String:
 	var t := ""
@@ -991,6 +997,12 @@ func estabilizar(k: String, coste := 2) -> bool:   # coste 1: en el laboratorio 
 	await wait(450)
 	await fade(0, true)
 	var GE := int(D.GEN_ESTABLE)
+	var ch := Cultivo.estabiliza_ra(S, k, g + 1 >= GE)   # ESTUDIO, tanda 2: sus rarezas suben con la generación
+	if ch.size():
+		var l := []
+		for c in ch:
+			l.append(T("{n} al {p} %", {"n": I18n.v(D.RAREZAS.r[c[0]].n).to_lower(), "p": roundi(float(D.RAREZAS.niv[int(c[1])]) * 100)}))
+		toast(T("Sus rarezas suben con la línea: {l}", {"l": y_lista(l)}), 2200)
 	if g + 1 >= GE:
 		S.gen.erase(k)
 		sfx("get")
