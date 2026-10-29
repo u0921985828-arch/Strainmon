@@ -2320,6 +2320,14 @@ func suma_mer(id: String, g: float) -> void:
 func t_clima(cl: Dictionary) -> String:
 	return ""
 
+var CLIMA_V = null   # {s}: el controlador de clima a la vista (kaiacult.gd vista_clima, con CAL)
+
+func vista_clima(_s: String) -> bool:
+	return true
+
+func clima_v(_s: String) -> Dictionary:
+	return {}
+
 func talk_kaia(N: String) -> void:
 	pass
 

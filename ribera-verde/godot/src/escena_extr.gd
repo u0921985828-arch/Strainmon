@@ -61,6 +61,13 @@ static func pinta(pintor, T: Dictionary, now: float, x0: int, y0: int) -> void:
 		"moon": moon(i, t, p)
 		"stat": stat(i, t, p)
 		"mani": mani(i, t, p)
+		"lmanos": l_manos(i, t, p)
+		"lepi": l_epi(i, t, p)
+		"lauto": l_auto(i, t, p)
+		"lflujo": l_flujo(i, t, p)
+		"lmicro": l_micro(i, t, p)
+		"lbal": l_bal(i, t, p)
+		"lres": l_res(i, t, p)
 		_: r(0, 0, W, H, Color("#2b2f3a"))
 	for k in n:   # los pasos: hechos, el de ahora y los que quedan
 		P._rect(X + W - 6 * n + 6 * k, Y + H + 3, 4, 3, Color("#58d080") if k == i else Color("#a0a0a8") if k < i else Color("#4a4a54"))
@@ -877,3 +884,380 @@ static func mani(i: int, t: float, p: float) -> void:
 	var tx := cx + 22 + 3 * sin(t * 2.3)
 	var ty := cy - 4 + (6 * sin(t * 1.7) if i else -6.0)
 	tijeras(tx, ty, abre)
+
+# ── el laboratorio del banco de la tía (bancotia.gd lab_ver; lo pidió el usuario: «los minijuegos o visuales de cómo funcionan las
+# máquinas del labo»): el lavamanos de pedal, el EPI, el autoclave, la cabina de flujo laminar, el microscopio, la balanza de
+# precisión y los contenedores. El azulejo blanco y la encimera de acero de laboratorio.py; la barra, debajo, como en las extracciones
+static var AZ := Color("#e8ecf0")   # el azulejo
+static var AZ_J := Color("#c8d0d8")
+static var INOX := Color("#b8c0c8")
+static var INOX_C := Color("#dde2e8")
+static var INOX_O := Color("#7a828c")
+static var NITRILO := Color("#6ab0e8")
+static var NITRILO_O := Color("#3a80c0")
+static var BATA := Color("#f2f4f6")
+static var BATA_O := Color("#b8c0cc")
+static var AMARILLO := Color("#f0c828")
+static var CRISTAL := Color("#a8e0f0")
+static var LED_V := Color("#58d080")
+
+static func labo(suelo: int) -> void:   # la pared de azulejo y la encimera de acero
+	r(0, 0, W, suelo, AZ)
+	for y in range(0, suelo, 8):
+		r(0, y, W, 1, AZ_J)
+		for x in range((y / 8 % 2) * 4, W, 8):
+			r(x, y, 1, 8, AZ_J)
+	r(0, suelo, W, H - suelo, INOX)
+	r(0, suelo, W, 1, INOX_C)
+	r(0, suelo + 2, W, 1, INOX_O)
+
+const LETRA := {"C": "111100100100111", "%": "101001010100101", "k": "100101110101101", "P": "111101111100100", "a": "000011101101011", "V": "101101101101010", "D": "110101101101110", "/": "001001010100100", "H": "101101111101101", "R": "110101110101101", "T": "111010010010010", "-": "000000111000000"}
+
+static func cifra(x: float, y: float, d, c: Color, s := 1) -> void:   # una cifra (o una letra de LETRA) de 3 × 5, a s veces (las pantallas)
+	var F := ["111101101101111", "010110010010111", "111001111100111", "111001111001111", "101101111001001", "111100111001111", "111100111101111", "111001010010010", "111101111101111", "111101111001111"]
+	var f: String = LETRA.get(d, "") if d is String else F[clampi(int(d), 0, 9)]
+	for k in f.length():
+		if f[k] == "1":
+			r(x + (k % 3) * s, y + (k / 3) * s, s, s, c)
+
+static func numero(x: float, y: float, v: String, c: Color, s := 1) -> float:   # cifras, letras y la coma, de izquierda a derecha; devuelve dónde acaba
+	var xx := x
+	for ch in v:
+		if ch == "," or ch == ".":   # la coma: el punto y su cola
+			r(xx, y + 4 * s, s, s, c)
+			if ch == "," and s > 1:
+				r(xx - 1, y + 5 * s, 1, 1, c)
+			xx += 2 * s
+		elif ch == "°":
+			r(xx, y, 2 * s, s, c)
+			r(xx, y + s, s, s, c)
+			r(xx + s, y + s, s, s, c)
+			xx += 3 * s
+		elif ch == " ":
+			xx += 2 * s
+		elif ch.is_valid_int():
+			cifra(xx, y, int(ch), c, s)
+			xx += 4 * s
+		else:
+			cifra(xx, y, ch, c, s)
+			xx += 4 * s
+	return xx
+
+static func guantes(cx: float, cy: float, frota: float, azul: bool) -> void:   # las dos manos juntas, frotando (de frente)
+	for lado in [-1, 1]:
+		var x: float = cx + lado * (7 + frota * 3)
+		var c: Color = NITRILO if azul else PIEL
+		var o: Color = NITRILO_O if azul else PIEL_O
+		elipse(x, cy, 8, 6, K)
+		elipse(x, cy, 7, 5, c)
+		for k in 4:
+			r(x - 6 + k * 3.5, cy - 12 + absi(k - 1), 3, 8, K)
+			r(x - 6 + k * 3.5, cy - 11 + absi(k - 1), 2, 7, c)
+		r(x - 5, cy + 4, 10, 1, o)
+		r(x - 4, cy + 6, 8, 10, BATA)   # el puño de la bata
+		r(x - 4, cy + 6, 8, 1, BATA_O)
+
+static func l_manos(i: int, t: float, p: float) -> void:
+	labo(50)
+	# el lavabo de acero, con su grifo de cuello de cisne y el pedal abajo
+	borde(40, 50, 80, 14, INOX)
+	r(44, 52, 72, 8, INOX_O)
+	r(76, 14, 6, 3, K)
+	r(78, 14, 3, 18, K)
+	r(79, 15, 1, 16, INOX_C)
+	r(70, 14, 12, 2, INOX_C)
+	r(70, 16, 2, 4, INOX_C)
+	borde(100, 70, 14, 4, Color("#3a3a44"))   # el pedal
+	var agua := i != 1
+	if agua:
+		for k in 8:
+			var yy := 20 + fr(t * 2 + k / 8.0) * 30
+			px(71, yy, AGUA_C)
+			px(70, yy + 1, AGUA)
+	var fr2 := sin(t * 9) * (1.0 if i < 2 else .3)
+	guantes(72, 34 + (6 if i == 2 else 0), fr2, false)
+	if i <= 1:   # la espuma del jabón, que crece al frotar; aclarando, se va
+		for k in 10 + i * 8:
+			px(58 + h(k) * 28, 28 + h(k + 11) * 14, Color.WHITE)
+	if i == 2:   # el papel del dispensador, de la pared
+		borde(130, 16, 20, 22, Color("#9aa0a8"))
+		r(134, 38, 12, 8 + 4 * sin(t * 2), PAPEL)
+
+static func l_epi(i: int, t: float, p: float) -> void:
+	labo(62)
+	if i == 0:   # la bata colgada y abrochándose: los botones, de abajo arriba
+		borde(56, 8, 48, 52, BATA)
+		r(78, 8, 1, 52, BATA_O)
+		r(60, 8, 10, 6, BATA_O)
+		r(90, 8, 10, 6, BATA_O)
+		r(56, 20, 6, 36, BATA_O)
+		r(98, 20, 6, 36, BATA_O)
+		var nb := int(fr(t / 2.4) * 5) + 1
+		for k in 5:
+			disco(79, 54 - k * 10, 1.5, K if k < nb else BATA_O)
+		borde(64, 40, 10, 8, BATA)   # el bolsillo
+	elif i == 1:   # las gafas, que bajan a la cara (la silueta de la cabeza)
+		disco(80, 40, 22, Color("#d8c0a8"))
+		r(58, 18, 44, 10, Color("#4a2a2b"))
+		var y := 10 + minf(1, fr(t / 1.8) * 1.4) * 26
+		r(56, y + 3, 48, 2, Color("#3a4450"))   # la goma
+		borde(62, y, 16, 9, CRISTAL)
+		borde(82, y, 16, 9, CRISTAL)
+		r(78, y + 3, 4, 2, Color("#3a4450"))
+		r(64, y + 1, 4, 2, Color.WHITE)
+		r(84, y + 1, 4, 2, Color.WHITE)
+	else:   # el guante de nitrilo, de la punta de los dedos al puño de la bata
+		var f := fr(t / 1.6)
+		var cy := 40.0
+		elipse(80, cy, 16, 12, K)
+		elipse(80, cy, 15, 11, PIEL)
+		for k in 4:
+			r(68 + k * 7 - 1, cy - 24 + absi(k - 1) * 3 - 1, 6, 16, K)
+			r(68 + k * 7, cy - 24 + absi(k - 1) * 3, 4, 15, PIEL)
+		var hasta := cy - 26 + f * 50   # lo azul baja de las puntas
+		for k in 4:
+			var y0 := cy - 24 + absi(k - 1) * 3
+			r(68 + k * 7, y0, 4, clampf(hasta - y0, 0, 15), NITRILO)
+		r(66, cy - 11, 28, clampf(hasta - (cy - 11), 0, 22), NITRILO)
+		r(64, cy + 10, 32, 14, BATA)
+		r(64, cy + 10, 32, 1, BATA_O)
+		if f > .8:
+			r(64, cy + 8, 32, 3, NITRILO_O)   # por encima del puño
+
+static func l_auto(i: int, t: float, p: float) -> void:
+	labo(66)
+	# el autoclave de sobremesa: el cuerpo de acero, la tapa redonda con su volante y el panel con el manómetro
+	borde(30, 14, 100, 50, INOX)
+	r(32, 16, 96, 2, INOX_C)
+	disco(66, 40, 20, K)
+	disco(66, 40, 19, INOX_C if i else INOX_O)
+	if i == 0:   # abierta: la cesta con las pinzas, el bisturí y las placas, que entra
+		var e := minf(1, fr(t / 2.2) * 1.3)
+		borde(46 + (1 - e) * 30, 34, 40, 14, Color("#9aa0a8"))
+		for k in 4:
+			r(50 + (1 - e) * 30 + k * 9, 30, 2, 12, Color("#4a4c54"))
+		disco(80 + (1 - e) * 30, 40, 4, CRISTAL)
+		r(56 + (1 - e) * 30, 33, 8, 2, Color("#e8d8a0"))   # la cinta indicadora
+	else:
+		for k in 6:   # el volante de la tapa
+			var a := k * PI / 3 + (t * .8 if i == 1 else 0.0)
+			linea(66, 40, 66 + cos(a) * 15, 40 + sin(a) * 15, INOX_O)
+		disco(66, 40, 4, Color("#4a4c54"))
+	borde(98, 20, 26, 40, Color("#3a3c44"))
+	esfera(111, 32, p, .7, .12)
+	var temp := 121 if i == 2 else (20 + int(fr(t / 3) * 100) if i == 1 else 20)
+	r(102, 44, 18, 7, Color("#10141a"))
+	numero(104, 45, str(temp), LED_V)
+	if i == 2:   # el vapor por la válvula y la cinta que cambia de color
+		for k in 5:
+			var fy := fr(t * .8 + k / 5.0)
+			px(112 + sin(fy * 9 + k) * 3, 18 - fy * 16, Color(1, 1, 1, 1 - fy))
+		r(103, 54, 16, 3, Color("#e8d8a0").lerp(Color("#3a2a20"), fr(t / 4)))
+
+static func l_flujo(i: int, t: float, p: float) -> void:
+	labo(64)
+	# la cabina de flujo laminar: el filtro arriba, el aire que baja en tiras, la mampara de cristal y la mesa de acero
+	borde(16, 4, 128, 58, Color("#d8dce0"))
+	r(20, 6, 120, 8, Color("#9aa0a8"))
+	for k in 30:
+		r(22 + k * 4, 7, 2, 6, Color("#b8c0c8"))
+	r(20, 14, 120, 42, Color("#e8f4f8"))
+	for k in 12:   # el aire, de arriba abajo, en tiras rectas
+		var yy := 14 + fr(t * 1.5 + h(k)) * 36
+		r(26 + k * 10, yy, 1, 5, Color("#b8d8e8"))
+	r(20, 52, 120, 4, INOX)
+	if i == 1:   # el alcohol al 70 %: el pulverizador y sus gotas
+		borde(110, 24, 10, 18, Color("#f4f4f4"))
+		r(112, 20, 6, 4, Color("#3a6ab0"))
+		for k in 8:
+			var f := fr(t * 2 + k / 8.0)
+			px(108 - f * 40, 30 + f * 18 + h(k) * 4, AGUA_C)
+	if i == 2:   # en el centro, la placa y las pinzas con la semilla
+		elipse(80, 50, 14, 3, K)
+		elipse(80, 49, 13, 2, CRISTAL)
+		var y := 30 + absf(sin(t * 1.4)) * 14
+		linea(96, y - 12, 82, y, Color("#4a4c54"))
+		linea(97, y - 11, 83, y + 1, Color("#7a828c"))
+		r(81, y, 2, 2, Color("#6a4a2a"))
+		guantes(108, 44, 0, true)
+	r(16, 4, 128, 2, Color("#4a4c54"))
+	r(20, 14, 120, 1, Color(1, 1, 1, .6))   # la mampara
+	r(140 - 6, 58, 4, 2, LED_V if fr(t) < .8 else Color("#2a5a3a"))
+
+static func l_micro(i: int, t: float, p: float) -> void:
+	labo(66)
+	if i == 0:   # el microscopio de lado: la base, el brazo, el tubo y la platina, con el portaobjetos que entra
+		borde(24, 60, 44, 6, Color("#2a2a34"))
+		r(56, 14, 8, 46, Color("#3a3c44"))
+		borde(30, 10, 10, 34, Color("#4a4c54"))
+		r(28, 6, 14, 6, K)
+		borde(26, 44, 40, 4, Color("#3a3c44"))
+		var e := minf(1, fr(t / 2) * 1.3)
+		borde(24 + (1 - e) * 40, 41, 18, 2, CRISTAL)
+		r(32 + (1 - e) * 40, 41, 3, 2, Color("#6a4a2a"))
+		disco(60, 38, 4, INOX_O)   # el tornillo
+		r(80, 20, 70, 30, Color("#f4f4f4"))
+		r(80, 20, 70, 1, Color("#c8d0d8"))
+	else:   # por el ocular: la semilla, borrosa o nítida según la barra
+		var foco := clampf(1 - absf(p - .7) * 4, 0, 1)
+		disco(80, 38, 34, K)
+		disco(80, 38, 33, Color("#f0f0e8"))
+		var b := int((1 - foco) * 4)
+		for k in b + 1:
+			elipse(80 + (k - b / 2.0), 38, 18, 12, Color(.42, .3, .18, 1.0 / (b + 1)))
+		if foco > .6:   # las vetas de la cubierta, que solo se ven enfocada
+			for k in 6:
+				linea(66 + k * 5, 30 + h(k) * 4, 70 + k * 5, 46 - h(k + 3) * 4, Color("#3a2616"))
+			elipse(74, 33, 3, 2, Color("#9a7a50"))
+		disco(132, 60, 5, INOX_O)
+		r(131, 55 + int(p * 8), 3, 2, K)
+
+static func l_bal(i: int, t: float, p: float) -> void:
+	labo(64)
+	# la balanza de precisión: la urna de cristal, el plato y la pantalla
+	borde(36, 54, 88, 10, Color("#e8e8ec"))
+	r(40, 10, 80, 44, Color(.66, .88, .94, .35))
+	r(40, 10, 80, 1, Color("#7a9aa8"))
+	r(40, 10, 1, 44, Color("#7a9aa8"))
+	r(119, 10, 1, 44, Color("#7a9aa8"))
+	elipse(80, 50, 18, 3, INOX_O)
+	elipse(80, 49, 17, 2, INOX_C)
+	r(60, 46, 40, 2, PAPEL)
+	r(56, 57, 30, 6, Color("#10141a"))
+	var v := "0,000"
+	if i == 1:   # las semillas caen al papel y la cifra baja hasta quedarse quieta
+		var n := int(fr(t / 3) * 12)
+		for k in n:
+			r(66 + h(k) * 26, 44 - (2 if k % 3 else 1), 2, 2, Color("#6a4a2a"))
+		var g: float = n * .021 + (sin(t * 7) * .004 if absf(p - .7) > .12 else 0.0)
+		v = "%.3f" % maxf(0, g)
+		v = v.replace(".", ",")
+	numero(58, 58, v, LED_V)
+	r(98, 58, 6, 4, Color("#4a4c54"))   # la tecla de tara
+	if i == 0:
+		r(98, 58, 6, 4, AMARILLO if fr(t) < .5 else Color("#4a4c54"))
+
+static func l_res(i: int, t: float, p: float) -> void:
+	labo(66)
+	if i == 0:   # al contenedor amarillo: las puntas, las placas y lo que ha tocado las muestras
+		borde(56, 26, 48, 40, AMARILLO)
+		r(52, 22, 56, 6, Color("#d0a818"))
+		r(52, 22, 56, 1, K)
+		r(70, 40, 20, 12, Color("#d0a818"))
+		for k in 3:
+			var f := fr(t / 1.4 + k / 3.0)
+			if f < .7:
+				disco(72 + k * 8, 2 + f * 26, 3, CRISTAL)
+		borde(116, 40, 20, 26, Color("#d03030"))   # el rojo, para lo que corta
+		r(114, 36, 24, 5, Color("#a02020"))
+	else:   # la mesa limpia con alcohol: el paño que va y viene
+		r(10, 60, 140, 4, INOX_C)
+		var x := 40 + sin(t * 2.2) * 40
+		borde(x, 52, 30, 8, Color("#f4f4f4"))
+		guantes(x + 15, 46, 0, true)
+		for k in 6:
+			px(x - 6 - k * 6, 61, Color(1, 1, 1, .8 - k * .12))
+
+# ── el controlador de clima, a la vista (kaiacult.gd vista_clima, con CAL; lo pidió el usuario: «el controlador de clima de KAIA, que
+# sea visual, también aplicar a la nave»): la caja de la pared con su pantalla —temperatura, humedad y VPD, las 24 horas con la luz
+# del temporizador y la temperatura de cada hora sobre la franja buena—, el sol o la luna del temporizador y el extractor girando
+# a la carga que lleva, con sus pilotos ───
+const LCD := Color("#0e1a14")
+const LCD_V := Color("#7af0a0")
+const LCD_O := Color("#2e5a3e")
+const LCD_M := Color("#f06050")
+
+static func clima(pintor, C: Dictionary, now: float, x0: int, y0: int) -> void:
+	P = pintor
+	X = x0
+	Y = y0
+	var t := now / 1000.0
+	var D: Dictionary = pintor.J.D
+	P._rect(X - 2, Y - 2, W + 4, H + 4, Color("#26262e"))
+	r(0, 0, W, H, Color("#3a3e48"))   # la pared
+	for y in range(0, H, 6):
+		r(0, y, W, 1, Color("#363a44"))
+	borde(4, 3, 152, 70, Color("#454a54"))   # la caja, con sus cuatro tornillos
+	r(4, 3, 152, 1, Color("#5a606c"))
+	for e in [[7, 6], [151, 6], [7, 69], [151, 69]]:
+		r(e[0], e[1], 2, 2, Color("#80868f"))
+	# la pantalla
+	borde(10, 7, 92, 62, LCD)
+	var bt: bool = float(C.t) >= float(D.T_OK[0]) and float(C.t) <= float(D.T_OK[1])
+	var bh: bool = float(C.hr) >= float(D.HR_OK[0]) and float(C.hr) <= float(D.HR_OK[1])
+	# el termómetro y la temperatura
+	r(13, 10, 2, 8, LCD_V if bt else LCD_M)
+	disco(14, 19, 2, LCD_V if bt else LCD_M)
+	var xe := numero(22, 10, ("%.1f" % float(C.t)).replace(".", ","), LCD_V if bt else LCD_M, 2)
+	numero(xe + 1, 10, "°C", LCD_V if bt else LCD_M)
+	# la gota y la humedad
+	var ch := LCD_V if bh else LCD_M
+	px(14, 25, ch)
+	r(13, 26, 3, 2, ch)
+	r(12, 28, 5, 3, ch)
+	r(13, 31, 3, 1, ch)
+	xe = numero(22, 25, str(roundi(float(C.hr))), ch, 2)
+	numero(xe + 1, 25, "%", ch)
+	# el VPD
+	var bv: bool = float(C.vpd) >= .4 and float(C.vpd) <= 1.6
+	numero(62, 13, "VPD", LCD_O)   # i18n-no
+	numero(62, 20, ("%.1f" % float(C.vpd)).replace(".", ","), LCD_V if bv else LCD_M)
+	numero(62, 27, "kPa", LCD_O)   # i18n-no
+	# las 24 horas: la franja buena, las horas de luz y la temperatura de cada hora
+	var gx := 14
+	var gy := 40
+	var gh := 24
+	var t_a := 10.0
+	var t_b := 40.0
+	var yb := func(v: float) -> float: return gy + gh - 1 - clampf((v - t_a) / (t_b - t_a), 0, 1) * (gh - 1)
+	for hh in 24:
+		r(gx + hh * 3, gy, 3, gh, Color("#14281c") if C.graf[hh][1] else Color("#0a120e"))
+	var y1: float = yb.call(float(D.T_OK[1]))
+	var y0b: float = yb.call(float(D.T_OK[0]))
+	r(gx, y1, 72, y0b - y1 + 1, Color(.48, .94, .63, .12))
+	r(gx, y1, 72, 1, LCD_O)
+	r(gx, y0b, 72, 1, LCD_O)
+	for hh in 24:
+		var v: float = float(C.graf[hh][0])
+		var ok: bool = v >= float(D.T_OK[0]) and v <= float(D.T_OK[1])
+		r(gx + hh * 3, yb.call(v), 3, 1, LCD_V if ok else LCD_M)
+	var ah := int(C.min) / 60   # la hora de ahora, que parpadea
+	if fr(t) < .6:
+		r(gx + ah * 3 + 1, gy, 1, gh, Color(1, 1, 1, .5))
+	for hh in [0, 6, 12, 18]:   # las marcas de las horas
+		r(gx + hh * 3, gy + gh, 1, 2, LCD_O)
+	# el temporizador: el sol o la luna, y las horas de luz
+	borde(108, 7, 42, 26, Color("#2c3038"))
+	if C.luz:
+		disco(120, 17, 4, Color("#f8d040"))
+		for k in 8:
+			var a := k * PI / 4 + t * .5
+			px(120 + cos(a) * 7, 17 + sin(a) * 7, Color("#f8d040"))
+	else:
+		disco(120, 17, 4, Color("#d8dce8"))
+		disco(122, 15, 4, Color("#2c3038"))
+	numero(128, 12, "%d/%d" % [int(C.hz), 24 - int(C.hz)], LCD_V if C.hz == 18 else Color("#f0b040"))
+	r(110, 27, 38, 3, Color("#16161c"))   # el día: las horas encendidas, desde las 6
+	for hh in 24:
+		if C.graf[hh][1]:
+			r(110 + roundi(hh * 38.0 / 24), 27, 2, 3, Color("#f8d040"))
+	r(110 + roundi(ah * 38.0 / 24), 26, 1, 5, Color("#ffffff"))
+	# el extractor, girando a su carga
+	borde(108, 37, 42, 30, Color("#2c3038"))
+	var cg := float(C.cg)
+	disco(122, 51, 10, Color("#1c1e24"))
+	disco(122, 51, 9, Color("#5a606c"))
+	var gi: float = t * (2 + 10 * clampf(cg, 0, 1.5)) if C.nf else 0.0
+	for k in 3:
+		var a: float = gi + k * TAU / 3
+		linea(122, 51, 122 + cos(a) * 8, 51 + sin(a) * 8, Color("#c8ccd4"), 2)
+	disco(122, 51, 2, Color("#2a2a34"))
+	var cc := Color("#58c060") if cg <= .8 else (Color("#e0a040") if cg <= 1.0 else LCD_M)
+	r(135, 42, 4, 22, Color("#16161c"))
+	var hb := roundi(22 * clampf(cg, 0, 1.25) / 1.25)
+	r(135, 64 - hb, 4, hb, cc)
+	# los pilotos: la temperatura, la humedad y la luz
+	for k in 3:
+		var ok: bool = [bt, bh, true][k]
+		var on: bool = ok or fr(t * 2) < .5
+		r(142 + 0 * k, 42 + k * 8, 4, 4, (Color("#58d080") if ok else LCD_M) if on else Color("#30323a"))

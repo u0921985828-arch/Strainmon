@@ -2,6 +2,13 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Sin versión aún · KAIA como en casa, el laboratorio a la vista y el clima en pantalla (lo pidió el usuario; con `Datos.CAL`)
+
+- La gasolina en el aparcamiento: A en el coche, «Echar gasolina (N L · €)» de las garrafas (`op_gasolina`, también en el garaje), y «Cargar abono en el <coche>» (`eventos.gd`); prueba `tests/vehiculos.gd`.
+- Las carpas de KAIA, como las de casa (lo pidió el usuario: «te dije que como las de casa… tiene que ser visual»): A en una carpa abre la vista C de casa con sus plantas en filas, los LED repartidos a lo ancho (`fxs` en `vista.gd`, `luz_led` en `arte.gd`), el temporizador y plantar, regar y lo demás desde la vista; la de 400 × 400, por mitades (`kc_vista`, `kc_vista_on/off`, `KCV` en `kaiacult.gd`: mientras está abierta, la carpa de KAIA ocupa el sitio de las de casa y el tiempo y el guardado las devuelven a su sitio); el equipo y el esquema desde la vista (`kc_equipo`); sin pantalla, la lista de antes (`kc_lista`); prueba nueva `tests/kaia_vista.gd`.
+- El laboratorio, a la vista (lo pidió el usuario: «que el personaje de verdad se pusiera una bata, unas gafas y demás, que sean visuales como las extracciones»): con el EPI puesto, el protagonista con la bata blanca, los guantes de nitrilo azules y las gafas, de pie y sentado (`epi_c`/`epi_img` en `bancotia.gd`, por colores del sprite en las cuatro direcciones); y cada cosa del laboratorio con sus pasos reales, su barra y su escena encima, como las extracciones: lavarse las manos, ponerse el EPI, el autoclave a 121 °C, la cabina de flujo, el microscopio, la balanza y los residuos (`lab_pasos`, `lab_ver`; escenas `lmanos`…`lres` en `escena_extr.gd`); en `tests/extracciones.gd` (50 escenas).
+- El controlador de clima, a la vista (lo pidió el usuario: «el controlador de clima de KAIA, que sea visual, también aplicar a la nave»): el cuadro de KAIA y el de la nave abren su pantalla con la temperatura, la humedad y el VPD, las 24 horas con la luz del temporizador y la temperatura de cada hora sobre la franja buena, el sol o la luna y el extractor girando a su carga, con sus pilotos (`clima_v`, `vista_clima` en `kaiacult.gd`, `clima` en `escena_extr.gd`); en la nave, la temperatura sale del calor de los focos sobre lo que saca la extracción (pasada la carga, el sofoco); prueba nueva `tests/clima_vista.gd`.
+
 ### 0.66.1 (código 91) · el cono de los agentes más suave; APK en `descargas/LandraceHunters.apk` (89 MB)
 
 - El cono de visión de los agentes, más suave (lo pidió el usuario: «hazlos más suaves»; con `Datos.CAL`): alfa 34 en vez de 87 (`VISTA_ALFA` en `pinta.gd`); sin CAL, como el HTML.

@@ -441,6 +441,7 @@ func lab_obj(_x: int, _y: int, o) -> bool:
 			elif lab().get("m"):
 				await say(K("Ya te has lavado las manos. Ahora, la percha."))
 			else:
+				await lab_ver("manos")
 				lab().m = true
 				sfx("agua")   # i18n-no
 				await say(K("Te lavas las manos con jabón, entre los dedos y hasta las muñecas, y te las secas con papel. El grifo, con el pedal."))
@@ -450,10 +451,13 @@ func lab_obj(_x: int, _y: int, o) -> bool:
 			elif not lab().get("m"):
 				await say(K("Antes de los guantes, las manos: el lavamanos está al lado."))
 			else:
+				await lab_ver("epi")
 				lab().e = true
 				sfx("get")   # i18n-no
 				await say(K("Te pones la bata y te la abrochas, las gafas y los guantes de nitrilo por encima de los puños. Ya puedes pasar la línea amarilla."))
 		"labFlujo":
+			if lab_norma(true) == "":
+				await lab_ver("flujo")
 			await bt_lab()
 		"labAutoclave":
 			var no := lab_norma()
@@ -462,6 +466,7 @@ func lab_obj(_x: int, _y: int, o) -> bool:
 			elif int(lab().get("at", -1)) == int(S.day):
 				await say(K("El instrumental de hoy ya está esterilizado, en sus botes con la cinta que cambia de color."))
 			elif await ask(K("El autoclave: el instrumental, a presión y con vapor, para que no lleve nada de fuera a las semillas. ¿Esterilizarlo ahora? Es media hora."), [K("Esterilizar"), K("Nada")]) == 0:
+				await lab_ver("auto")
 				advance_time(int(D.LAB.esteril))
 				lab().at = int(S.day)
 				sfx("get")   # i18n-no
@@ -469,6 +474,7 @@ func lab_obj(_x: int, _y: int, o) -> bool:
 				await say(K("El instrumental, esterilizado: la cinta de los botes ha cambiado de color. Ya se puede trabajar en la cabina."))
 		"labResiduos":
 			if lab().get("r") and lab_norma() == "":
+				await lab_ver("res")
 				lab().r = false
 				sfx("get")   # i18n-no
 				await say(K("Las placas, las puntas y lo que ha tocado las muestras, al contenedor amarillo. La cabina, limpia con alcohol. El puesto, listo."))
@@ -476,9 +482,14 @@ func lab_obj(_x: int, _y: int, o) -> bool:
 				await say(K("El contenedor amarillo, para lo que toca las muestras, y el rojo, para lo que corta. Se los lleva un gestor autorizado: nada de eso va a la basura de casa."))
 		"labMicro":
 			var no := lab_norma()
+			var bien := await lab_ver("micro") if no == "" else 0
+			if no == "" and bien < 2:
+				await say(K("Te cuesta enfocar: las vetas se ven a ratos."))
 			await say(no if no != "" else K("Al microscopio, una semilla de cada línea: la cubierta, las vetas, si está madura. Lo que no se ve a simple vista se apunta en el cuaderno, con la fecha."))
 		"labBalanza":
 			var no := lab_norma()
+			if no == "":
+				await lab_ver("bal")
 			await say(no if no != "" else K("La balanza de precisión, con su urna para que el aire no la mueva. Cada lote de semillas se pesa y se apunta: las vanas no llegan al peso."))
 		"labEstufa":
 			await say(K("La estufa de germinación: las semillas, en placas a oscuras y a temperatura fija. Cada placa, con su etiqueta."))
@@ -498,6 +509,37 @@ func lab_obj(_x: int, _y: int, o) -> bool:
 			return false
 	return true
 
+# cada cosa del laboratorio, a la vista (lo pidió el usuario: «los minijuegos o visuales de cómo funcionan las máquinas del labo»):
+# sus pasos de verdad, con su barra y la escena encima (escena_extr.gd, l<k>); devuelve los pasos en el verde
+func lab_pasos(k: String) -> Array:
+	match k:
+		"manos":
+			return [[K("Agua templada y jabón: palmas, dorsos y entre los dedos."), .14], [K("Las uñas y las muñecas, veinte segundos frotando."), .12], [K("Aclara con el pedal y sécate con papel."), .14]]
+		"epi":
+			return [[K("La bata, abrochada hasta arriba."), .14], [K("Las gafas, bien ajustadas."), .14], [K("Los guantes de nitrilo, por encima de los puños de la bata."), .12]]
+		"auto":
+			return [[K("Las pinzas, el bisturí y las placas, a la cesta, con su cinta."), .14], [K("La tapa cerrada: sube a 121 °C con vapor."), .12], [K("Veinte minutos a 1 bar; luego, que baje la presión antes de abrir."), .12]]
+		"flujo":
+			return [[K("La cabina encendida: diez minutos de aire antes de empezar."), .14], [K("Alcohol al 70 % en la mesa y en los guantes."), .12], [K("En el centro, lejos del borde y sin tapar la rejilla."), .1]]
+		"micro":
+			return [[K("La semilla, en el portaobjetos, a la platina."), .14], [K("Enfoca con el tornillo hasta ver las vetas."), .1]]
+		"bal":
+			return [[K("El papel en el plato y la tara a cero."), .14], [K("Las semillas, hasta que la cifra se quede quieta."), .12]]
+		"res":
+			return [[K("Lo usado, al contenedor amarillo; lo que corta, al rojo."), .14], [K("La mesa, limpia con alcohol de dentro afuera."), .12]]
+	return []
+
+func lab_ver(k: String) -> int:
+	if not Datos.CAL:
+		return 0
+	var ok := 0
+	var Pa := lab_pasos(k)
+	for ip in Pa.size():
+		var d: float = await tiro_billar(String(Pa[ip][0]), "dir", float(Pa[ip][1]), float(D.MANICURA.per), K("LABORATORIO"), {"esc": "l" + k, "paso": ip, "n": Pa.size()})
+		if absf(d - float(D.BILLAR.centro)) <= float(Pa[ip][1]):
+			ok += 1
+	return ok
+
 # las normas: en el laboratorio no se come, no se bebe y no se fuma
 func catar(k: String, g := -1.0) -> void:
 	if en_lab():
@@ -510,3 +552,84 @@ func catar_extr(k: String, g: float) -> void:
 		await say(K("En el laboratorio no se come, no se bebe y no se fuma. Es la segunda norma del cartel."))
 		return
 	await super(k, g)
+
+# El EPI, a la vista (lo pidió el usuario: «que el personaje de verdad se pusiera una bata, unas gafas y demás»): en el laboratorio,
+# con lab().e, el fotograma del protagonista con la bata blanca hasta medio muslo (la camiseta, las mangas y el pantalón de arriba),
+# los guantes de nitrilo azules en las manos y las gafas en la fila de los ojos (de espaldas, la goma por el pelo). Por colores del
+# sprite: vale para todos los fotogramas, de las cuatro direcciones y de los dos protagonistas
+const EPI_CAMISA := [0xc83839, 0xa03031]
+const EPI_PIEL := [0xe8b894, 0x7a5a3a, 0x7a5a3b]
+const EPI_PANT := [0x6c7483, 0x36466f, 0x535b6b, 0x2c333c]
+const EPI_BLANCO := 0xf4f4f4
+const EPI_RAYA := 0x180e1e
+const EPI_COL := {"bata": Color8(232, 236, 240), "bata2": Color8(184, 192, 204), "guante": Color8(106, 176, 232), "guante2": Color8(58, 128, 192), "cristal": Color8(168, 224, 240), "cristal2": Color8(90, 160, 192), "montura": Color8(58, 68, 80)}
+var _epi := {}
+
+func epi_puesto() -> bool:
+	return en_lab() and bool(lab().get("e"))
+
+func epi_c(f):
+	if f == null or not epi_puesto():
+		return f
+	var c: Image = f.c
+	var k := c.get_instance_id()
+	if not _epi.has(k):
+		_epi[k] = epi_img(c)
+	var o: Dictionary = f.duplicate()
+	o.c = _epi[k]
+	return o
+
+static func _rgb(p: Color) -> int:
+	return (p.r8 << 16) | (p.g8 << 8) | p.b8
+
+static func epi_img(c: Image) -> Image:
+	var o: Image = c.duplicate()
+	var W := o.get_width()
+	var H := o.get_height()
+	var t := -1   # la primera fila de la camiseta: el pecho
+	for y in H:
+		for x in W:
+			var p := c.get_pixel(x, y)
+			if p.a8 > 0 and _rgb(p) in EPI_CAMISA:
+				t = y
+				break
+		if t >= 0:
+			break
+	if t < 0:
+		return o
+	var ojo := -1   # la fila de los ojos (el blanco de los ojos, encima del pecho); de espaldas, 6 filas por encima
+	for y in range(maxi(0, t - 10), t):
+		for x in W:
+			var p := c.get_pixel(x, y)
+			if p.a8 > 0 and _rgb(p) == EPI_BLANCO:
+				ojo = y
+		if ojo >= 0:
+			break
+	var espalda := ojo < 0
+	if espalda:
+		ojo = t - 6
+	for y in H:
+		for x in W:
+			var p := c.get_pixel(x, y)
+			if p.a8 == 0:
+				continue
+			var n := _rgb(p)
+			var cl = null
+			if y == ojo and n != EPI_RAYA:
+				if espalda:
+					cl = EPI_COL.montura
+				elif n == EPI_BLANCO:
+					cl = EPI_COL.cristal
+				elif n in EPI_PIEL and _rgb(c.get_pixel(clampi(x - 1, 0, W - 1), y)) != EPI_BLANCO and _rgb(c.get_pixel(clampi(x + 1, 0, W - 1), y)) != EPI_BLANCO:
+					cl = EPI_COL.montura
+				else:
+					cl = EPI_COL.cristal2
+			elif y >= t and n in EPI_CAMISA:
+				cl = EPI_COL.bata if n == EPI_CAMISA[0] else EPI_COL.bata2
+			elif y >= t and n in EPI_PIEL:
+				cl = (EPI_COL.guante if n == EPI_PIEL[0] else EPI_COL.guante2) if y >= t + 3 else EPI_COL.bata
+			elif y >= t and y <= t + 7 and (n in EPI_PANT or n == EPI_BLANCO):
+				cl = EPI_COL.bata2 if n == EPI_PANT[1] or n == EPI_PANT[3] else EPI_COL.bata
+			if cl != null:
+				o.set_pixel(x, y, Color(cl, p.a))
+	return o

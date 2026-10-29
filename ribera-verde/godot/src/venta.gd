@@ -1028,6 +1028,8 @@ func obj_local(x: int, y: int, o) -> bool:
 				await bandejas_nave()
 				return true
 			"tanqueN", "riegoN", "ctrlN":   # 1.52.1: el riego, que también se mueve desde aquí · i18n-no
+				if o == "ctrlN" and not await vista_clima("nave"):   # el controlador de clima, a la vista (kaiacult.gd) · i18n-no
+					return true
 				if puertas_int("nave").size():
 					if await ask(T("El riego de la nave: {n}.", {"n": D.RIEGO_NAVE[int(S.nave.rg)].n}), [K("Ordenar la nave"), K("Nada")]) == 0:
 						await ordenar("nave")

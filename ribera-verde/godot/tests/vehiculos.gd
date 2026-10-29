@@ -257,7 +257,7 @@ func _corre() -> void:
 	S.items.ofert = 8
 	S.coches.utilitario.en = "puerto"   # el abono, desde el aparcamiento (en el garaje, la gasolina: lo pidió el usuario)
 	J.enter_map("puerto", int(D.PARADAS.puerto.a[0]), int(D.PARADAS.puerto.a[1]), "down")
-	QUIERO = ["Cargar el abono del utilitario"]
+	QUIERO = ["Cargar abono en el utilitario"]
 	chk(corre(func(): await J.coche_menu("utilitario")), "aparcamiento → cargar el abono")
 	chk(int(J.mal_ab("utilitario").m) == 20 and int(J.mal_ab("utilitario").o) == 8 and int(S.items.fert) == 0 and int(S.items.ofert) == 0, "el abono, en el maletero: %s" % [J.mal_ab("utilitario")])
 	chk(absf(J.mal_peso("utilitario") - 28 * float(D.MALETERO.dosis)) < 0.01, "pesa: %.0f g" % J.mal_peso("utilitario"))
@@ -277,6 +277,20 @@ func _corre() -> void:
 	QUIERO = ["Nada"]
 	corre(func(): await J.coche_menu("utilitario"))
 	chk(MENUS.size() and not MENUS[0].has("Rellenar los tanques de la nave"), "fuera de Valdehierro, no se rellena: %s" % [MENUS])
+	chk(MENUS.size() and MENUS[0][2].begins_with("Echar gasolina") and MENUS[0].has("Viajar") and MENUS[0].has("Maletero"), "en el aparcamiento, también la gasolina: %s" % [MENUS])
+	# 7c2) echar gasolina en el aparcamiento (lo pidió el usuario: «arregla lo de rellenar la gasolina»)
+	S.coches.utilitario.gas = 10.0
+	var ef0: float = float(S.money)
+	S.money = maxf(ef0, 500.0)
+	ef0 = float(S.money)
+	QUIERO = ["Echar gasolina"]
+	MENUS = []
+	chk(corre(func(): await J.coche_menu("utilitario")), "aparcamiento → echar gasolina")
+	chk(absf(J.gas_de("utilitario") - float(J.TANQUE.get("utilitario", 40))) < 0.11 and float(S.money) < ef0, "depósito lleno desde el aparcamiento: %.1f L, %.0f → %.0f €" % [J.gas_de("utilitario"), ef0, S.money])
+	MENUS = []
+	QUIERO = ["Nada"]
+	corre(func(): await J.coche_menu("utilitario"))
+	chk(MENUS.size() and MENUS[0][2] == "Echar gasolina (lleno)", "lleno: %s" % [MENUS])
 	S.coches.utilitario.erase("en")
 	S.nave = nave0
 	# 7d) el estado de cada vehículo se guarda con la partida (S.coches: dónde está, km, maletero y abono), JSON puro

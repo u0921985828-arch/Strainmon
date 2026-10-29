@@ -260,6 +260,7 @@ s67f713d4,labResiduos,labResiduos
 s2240aea4,"Las placas, las puntas y lo que ha tocado las muestras, al contenedor amarillo. La cabina, limpia con alcohol. El puesto, listo.","Dishes, tips and whatever touched the samples into the yellow bin. The cabinet wiped with alcohol. The bench, ready."
 s0138122e,"El contenedor amarillo, para lo que toca las muestras, y el rojo, para lo que corta. Se los lleva un gestor autorizado: nada de eso va a la basura de casa.","The yellow bin is for what touches the samples, the red one for sharps. A licensed waste company collects them: none of it goes in the household rubbish."
 se643b528,labMicro,labMicro
+sbb668d3d,Te cuesta enfocar: las vetas se ven a ratos.,Hard to focus: the veins come and go.
 sc845a9c3,"Al microscopio, una semilla de cada línea: la cubierta, las vetas, si está madura. Lo que no se ve a simple vista se apunta en el cuaderno, con la fecha.","Under the microscope, one seed from each line: the shell, the stripes, whether it's ripe. What the naked eye misses goes in the notebook, with the date."
 s93cf2ab4,labBalanza,labBalanza
 s9462ae68,"La balanza de precisión, con su urna para que el aire no la mueva. Cada lote de semillas se pesa y se apunta: las vanas no llegan al peso.","The precision balance, with its draft shield so the air doesn't move it. Each seed batch is weighed and logged: the empty ones fall short."
@@ -277,6 +278,26 @@ sf0a221fb,labBotiquin,labBotiquin
 s6c94ffce,"El botiquín: gasas, vendas, tiritas, suero y guantes. Al lado, con la letra de la tía, el teléfono de urgencias.","The first-aid kit: gauze, bandages, plasters, saline and gloves. Next to it, in your aunt's handwriting, the emergency number."
 s0cfb4005,labTaburete,labTaburete
 s1caa4bf7,"Un taburete de laboratorio, regulable y con ruedas.","A lab stool, adjustable and on castors."
+s500d99b8,"Agua templada y jabón: palmas, dorsos y entre los dedos.","Warm water and soap: palms, backs and between the fingers."
+s32264e06,"Las uñas y las muñecas, veinte segundos frotando.","Nails and wrists, twenty seconds of scrubbing."
+sc1827d23,Aclara con el pedal y sécate con papel.,Rinse with the pedal and dry with paper.
+sc1b0026c,"La bata, abrochada hasta arriba.","The lab coat, buttoned to the top."
+s477d998b,"Las gafas, bien ajustadas.","The goggles, fitted snugly."
+s8f08f735,"Los guantes de nitrilo, por encima de los puños de la bata.","Nitrile gloves, pulled over the coat cuffs."
+s0d7be7df,"Las pinzas, el bisturí y las placas, a la cesta, con su cinta.","Tweezers, scalpel and plates into the basket, with their tape."
+s21345125,La tapa cerrada: sube a 121 °C con vapor.,Lid shut: it climbs to 121 °C with steam.
+s8b8958af,La tapa cerrada: sube a 121° con vapor.,Lid shut: it climbs to 121° with steam.
+s12587658,"Veinte minutos a 1 bar; luego, que baje la presión antes de abrir.",Twenty minutes at 1 bar; then let the pressure drop before opening.
+s127fe4d2,La cabina encendida: diez minutos de aire antes de empezar.,Hood switched on: ten minutes of airflow before starting.
+s20a19329,Alcohol al 70 % en la mesa y en los guantes.,70 % alcohol on the bench and on the gloves.
+s2ed9fca9,"En el centro, lejos del borde y sin tapar la rejilla.","In the middle, away from the edge, without blocking the grille."
+sa00dfde1,"La semilla, en el portaobjetos, a la platina.","The seed on the slide, onto the stage."
+sd0f00f7f,Enfoca con el tornillo hasta ver las vetas.,Focus with the knob until you see the veins.
+sa8113064,El papel en el plato y la tara a cero.,Paper on the pan and tare to zero.
+scbec3079,"Las semillas, hasta que la cifra se quede quieta.","The seeds, until the reading settles."
+s4dff2742,"Lo usado, al contenedor amarillo; lo que corta, al rojo.",Used items in the yellow bin; sharps in the red one.
+sea1a4c37,"La mesa, limpia con alcohol de dentro afuera.",Wipe the bench with alcohol from the inside out.
+s103eff3e,LABORATORIO,LAB
 s72d67d11,"En el laboratorio no se come, no se bebe y no se fuma. Es la segunda norma del cartel.","No eating, drinking or smoking in the lab. It's the second rule on the sign."
 sbe658eaa,escZ,
 s3a223bdb,"La escalera del paso subterráneo, por debajo de las vías.","The stairs to the underpass, under the tracks."
@@ -919,8 +940,10 @@ s2a1d17f9,{q}: {e} (te quedan a deber {f}),{q}: {e} (you still owe {f})
 sf332a444,"{a}, en el taller. {tx}.","{a}, at the garage. {tx}."
 sfb00cb13,Viajar,Travel
 sbeda21a5,Maletero,Boot
-sfcdfc8f0,"{A}, en el aparcamiento. Maletero: {g} de {c}.","{A}, in the car park. Boot: {g} of {c}."
-sf80e3683,Cargar el abono {dv},Load the fertiliser into {dv}
+s90c0d06d,"{A}, en el aparcamiento. Depósito: {g} de {d} L. Maletero: {m} de {c}.","{A}, in the car park. Tank: {g} of {d} L. Boot: {m} of {c}."
+s42851d7a,Echar gasolina ({l} L · {e}),Fill up ({l} L · {e})
+s17c66a14,Echar gasolina (lleno),Fill up (full)
+s134d796a,Cargar abono en {v},Load fertiliser into {v}
 s13b6f339,Rellenar los tanques de la nave,Refill the warehouse tanks
 sd82d8661,"Descargas el abono en la nave: MEATZA ×{m} y ORTUA BIO ×{o}. Los tanques, llenos: MEATZA ×{tm} · ORTUA BIO ×{to}.",You unload the fertiliser at the warehouse: MEATZA ×{m} and ORTUA BIO ×{o}. The tanks now hold MEATZA ×{tm} · ORTUA BIO ×{to}.
 s02f43829,En el maletero no cabe más.,The boot is full.
@@ -929,8 +952,6 @@ sdf439b17,No cabe todo: el resto se queda fuera.,Not everything fits: the rest s
 s84a3d684,El garaje de la tía. Está vacío: aquí se guarda lo que compres en AUTOS RIBERA.,Your aunt's garage. It's empty: whatever you buy at AUTOS RIBERA is kept here.
 s6ac5d7a0,Salir en {v},Drive out in {v}
 sa9013e30,Abrir el maletero,Open the boot
-s42851d7a,Echar gasolina ({l} L · {e}),Fill up ({l} L · {e})
-s17c66a14,Echar gasolina (lleno),Fill up (full)
 seae5b7bc,{A}. Depósito: {g} de {d} L. Maletero: {m} de {c}.,{A}. Tank: {g} of {d} L. Boot: {m} of {c}.
 s036a5df8,El depósito ya está lleno.,The tank is already full.
 s7d7c7e44,"Llenas el depósito {dv} con las garrafas: {l} L, {e}.","You fill up {dv} from the cans: {l} L, {e}."
@@ -2027,6 +2048,14 @@ s1bc7a687,Ponerlas,Put them in
 s6245d91a,Pedirlas y ponerlas,Order and put them in
 s3968dbb5,Macetas de la sala de cultivo (KAIA),Pots for the grow room (KAIA)
 scb460765,"La carpa {c}, con {n} macetas de {l} L y sus goteros.","Tent {c}, with {n} pots of {l} L and their drippers."
+saf20fb91,Ver la mitad del fondo,See the back half
+s9bfd29df,Ver la mitad de delante,See the front half
+s008ab8c0,"{c} · {p} plantas · {nf} × {f}
+Lleva: {l}","{c} · {p} plants · {nf} × {f}
+Fitted: {l}"
+s37ccdf59,nada más,nothing else
+s32b5dfd9,Pones el {x} en la carpa.,You fit the {x} in the tent.
+sadd8f94d,"El esquema se cambia con la carpa vacía: primero, cosecha o quita lo que lleva.",The layout can only change with the tent empty: harvest or remove what is in it first.
 s39d6b660,Me,
 s5742a7d0,Arrancar y plantar,Uproot and plant
 sbfb12456,Llevarte lo seco · {g},Take the dried buds · {g}
@@ -2049,6 +2078,19 @@ s3b43529a,"Lleva las mesas de la sala de cultivo de KAIA por {e} al día: con su
 s5ef79f60,lookObj,
 se56a8ca1,"«Las {n} mesas que tienen plantas van bien: riego, poda y el corte cuando toca. Lo seco, al almacén del club».","""The {n} tables with plants are doing well: watering, pruning and the cut when it's due. The dried buds go to the club's storeroom."""
 sc63b883b,"«Las mesas, vacías. Planta en ellas y me encargo del resto».","""The tables are empty. Plant them and I'll take care of the rest."""
+s0d7963e0,EL CLIMA DE LA NAVE,WAREHOUSE CLIMATE
+s184ad260,EL CLIMA DE LA SALA,GROW ROOM CLIMATE
+s607048fa,todo en su sitio,all in range
+s21efdf60,demasiado calor: la extracción no da para tantos focos,too hot: the extraction can't cope with so many lights
+s68ed04b7,hace frío,too cold
+s3fdebb64,"{t} °C · {h} % · VPD {v} kPa · luz a {a}/{b}, {l} · extracción al {c} %: {e}.
+A: el cuadro · B: cerrar.","{t} °C · {h} % · VPD {v} kPa · light at {a}/{b}, {l} · extraction at {c} %: {e}.
+A: the panel · B: close."
+s984079a5,"{t}° · {h} % · VPD {v} kPa · luz a {a}/{b}, {l} · extracción al {c} %: {e}.
+A: el cuadro · B: cerrar.","{t}° · {h} % · VPD {v} kPa · light at {a}/{b}, {l} · extraction at {c} %: {e}.
+A: the panel · B: close."
+s399f0ce7,encendida,on
+scb1d5ad3,apagada,off
 s4e58915c,CANNADEX,CANNADEX
 s570950d9,GENOTECA,GENEBANK
 s2511e675,MOCHILA,BAG
@@ -6882,6 +6924,8 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+sfcdfc8f0,"{A}, en el aparcamiento. Maletero: {g} de {c}.","{A}, in the car park. Boot: {g} of {c}."
+sf80e3683,Cargar el abono {dv},Load the fertiliser into {dv}
 s598dc5c6,"Con {m} pruebas, la oposición se sostiene. Tienes {n}.","With {m} pieces of evidence, the objection holds. You have {n}."
 sc7581981,"Garro se lleva la madre, las semillas de la Haze y las notas. El barrio se enterará.","Garro takes the mother, the Haze seeds and the notes. The neighbourhood will find out."
 sea3cbab4,"Semillas Ondarea quiere registrar como suyas la Haze del 98 y landraces del banco de la tía. Oponte desde su ordenador antes del {f}, con {m} pruebas. Tienes {n}.","Semillas Ondarea wants to register the Haze of '98 and landraces from your aunt's bank as their own. Object from her computer before {f}, with {m} pieces of evidence. You have {n}."

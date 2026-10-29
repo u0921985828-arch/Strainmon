@@ -184,13 +184,15 @@ static func vista_c(S: Dictionary, g: Dictionary):
 	var tipo: String = D.FOCOS[c.foco].tipo
 	var VCA: Dictionary = D.VCA
 	var Z: float = (VCA.base - VCA.boca) / (g.H - 28)
+	if g.C.get("kc"):   # las carpas grandes de KAIA (kaiacult.gd): como mucho VC_KC_W px de ancho, más lejos
+		Z = minf(Z, VC_KC_W / W)
 	var w := Datos.jsround(W * Z)
 	# las campanas de sodio son foco-c-NN; el CFL, foco-c-cfl-NN, y los LED, con su modelo (foco-c-led200-NN)
 	var pf: String = "foco-c-" if tipo == "sodio" else ("foco-c-" + c.foco + "-" if tipo == "led" else "foco-c-" + tipo + "-")
 	var foco = vc_sprite(pf, D.FOCO_CM.get(c.foco, 45) * Z, true)
 	if not Arte.hay("carpa-c-pared") or not Arte.hay("carpa-c-luz") or foco == null:
 		return null
-	var filas: Array = D.VC_FILA[int(g.C.filas) - 1]
+	var filas: Array = D.VC_FILA[int(g.C.filas) - 1] if int(g.C.filas) <= D.VC_FILA.size() else filas_n(int(g.C.filas))
 	var wy := func(y: float) -> float: return w + 32 * (y - VCA.fondo) / 19
 	var yq := func(q: Dictionary) -> int: return int(filas[mini(q.fila, filas.size() - 1)])
 	var xy := func(q: Dictionary, y: float) -> int: return Datos.jsround(120 + (q.cx / W - .5) * wy.call(y))
@@ -259,15 +261,27 @@ static func vista_c(S: Dictionary, g: Dictionary):
 			f.xw = Datos.jsround(120 + wy.call(f.y) / 2) - 1
 	# la boca del foco (fy): baja hasta su distancia de las plantas, nunca por encima del techo (VCA.boca); sin vivas (apagado), arriba
 	fy = maxi(int(VCA.boca), fy) if viva else int(VCA.boca)
-	return {"Z": Z, "w": w, "xl": 120 - (w >> 1), "foco": foco, "tipo": tipo, "lg": lg, "fy": fy}
+	var fxs := []   # dónde cuelga cada foco: uno en el centro; en las de KAIA, sus LED repartidos a lo ancho (c.nf)
+	var nf := maxi(1, int(c.get("nf", 1)))
+	for k in nf:
+		fxs.append(120 + Datos.jsround((k + .5) * w / nf - w / 2.0))
+	return {"Z": Z, "w": w, "xl": 120 - (w >> 1), "foco": foco, "tipo": tipo, "lg": lg, "fy": fy, "fxs": fxs}
+
+# las carpas de KAIA de más de dos filas (de delante atrás, de la fila 158 a la 140 del suelo)
+const VC_KC_W := 156.0
+static func filas_n(n: int) -> Array:
+	var o := []
+	for i in n:
+		o.append(158 - Datos.jsround(i * 18.0 / maxi(1, n - 1)))
+	return o
 
 # ---------- dibujo ----------
 # las poleas del foco bajado (vcPoleas), como rectángulos [x, y, w, h, color]: una por lado, colgada del techo (fila VCA.boca − 15) por
 # fuera de cada extremo de la fila de arriba de la campana; la cuerda que sostiene baja por su borde de dentro hasta la campana y la que
 # se tira, por el de fuera, 8 filas, con su tirador
-static func poleas(fc: Image, fy: int) -> Array:
+static func poleas(fc: Image, fy: int, cx0 := 120) -> Array:
 	var cu := Arte.cuelga(fc)
-	var fx := 120 - (fc.get_width() >> 1)
+	var fx := cx0 - (fc.get_width() >> 1)
 	var y0 := int(Datos.carga().VCA.boca) - 15
 	var K: Color = Arte.VC_CUERDA
 	var M: Color = Arte.VC_POLEA[0]
@@ -390,7 +404,7 @@ func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240, alto := 1
 	luz.visible = on and g.vc != null
 	luz.material.set_shader_parameter("oscuro", 1.0)
 	if luz.visible:
-		luz.texture = Arte.tex("luz|%s|%s|%d|%d" % [g.c.t, g.vc.tipo, g.vc.foco.a, g.vc.fy], Arte.luz(g.c.t, g.vc))
+		luz.texture = Arte.tex("luz|%s|%s|%d|%d|%d" % [g.c.t, g.vc.tipo, g.vc.foco.a, g.vc.fy, g.vc.fxs.size()], Arte.luz(g.c.t, g.vc))
 		luz.material.set_shader_parameter("fuerza", Datos.carga().LUZ_C.get(g.vc.tipo, [0, 1])[1])
 	elif g.vc != null and Cultivo.plantas_vivas(S, VC.ci):   # la noche del temporizador: sin haz y a oscuras
 		luz.visible = true
@@ -542,12 +556,13 @@ func _pinta_encima() -> void:
 	var fc := Arte.foto(g.vc.foco.n)
 	var im := fc if on else Arte.apagado(fc)
 	# la campana, con la boca en fy; bajada, cuelga de dos poleas del techo (poleas) y luego se pinta ella
-	var fx := 120 - (fc.get_width() >> 1)
 	var fy: int = g.vc.fy
-	if fy > int(D.VCA.boca):
-		for e in poleas(fc, fy):
-			encima.draw_rect(Rect2(e[0], e[1], e[2], e[3]), e[4])
-	encima.draw_texture(Arte.tex("foco|%s|%s" % [g.vc.foco.n, on], im), Vector2(fx, fy - 15))
+	for cx in g.vc.get("fxs", [120]):
+		var fx: int = int(cx) - (fc.get_width() >> 1)
+		if fy > int(D.VCA.boca):
+			for e in poleas(fc, fy, int(cx)):
+				encima.draw_rect(Rect2(e[0], e[1], e[2], e[3]), e[4])
+		encima.draw_texture(Arte.tex("foco|%s|%s" % [g.vc.foco.n, on], im), Vector2(fx, fy - 15))
 	# el depósito del goteo está fuera: arriba a la derecha, en pequeño, con el agua que le queda en la mirilla
 	if g.vc.lg != null:
 		var l := Cultivo.goteo_l(S, VC.ci)

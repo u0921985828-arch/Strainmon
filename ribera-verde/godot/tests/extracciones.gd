@@ -76,6 +76,50 @@ func _corre() -> void:
 			if a.get_data() == b.get_data():
 				fallos.append("%s %d: no se mueve" % [t, i])
 			tot += 1
+	for k in ["manos", "epi", "auto", "flujo", "micro", "bal", "res"]:   # el laboratorio (bancotia.gd lab_ver): cada paso con su escena
+		var n: int = J.lab_pasos(k).size()
+		for i in n:
+			var T: Dictionary = e.TIRO.duplicate()
+			T.merge({"esc": "l" + k, "paso": i, "n": n, "per": float(J.D.MANICURA.per), "mov": 0.0, "ritmo": 0.0}, true)
+			var sin_esc: Dictionary = T.duplicate()
+			sin_esc.erase("esc")
+			var base: Image = await foto(e, sin_esc, now)
+			var a: Image = await foto(e, T, now)
+			var b: Image = await foto(e, T, now + 1730)
+			a.save_png(dir.path_join("lab-%s-%d-a.png" % [k, i]))
+			if a.get_data() == base.get_data():
+				fallos.append("lab %s %d: no se pinta" % [k, i])
+			if a.get_data() == b.get_data():
+				fallos.append("lab %s %d: no se mueve" % [k, i])
+			tot += 1
+	# el EPI a la vista: con la bata, los guantes y las gafas en las cuatro direcciones
+	J.TIRO = null
+	var gr = J.grupo_pj()
+	for d in ["down", "up", "left", "right"]:
+		J.P.dir = d
+		var f = J.pintor._pj_frame(J.P, gr, true, 0.0)
+		if f == null:
+			fallos.append("EPI %s: sin fotograma" % d)
+			continue
+		var o: Image = J.epi_img(f.c)
+		var cu := {}
+		for y in o.get_height():
+			for x in o.get_width():
+				var p := o.get_pixel(x, y)
+				if p.a8 > 0:
+					for c in ["bata", "guante", "cristal", "montura"]:
+						if p.is_equal_approx(J.EPI_COL[c]):
+							cu[c] = int(cu.get(c, 0)) + 1
+		if int(cu.get("bata", 0)) < 20:
+			fallos.append("EPI %s: sin bata %s" % [d, cu])
+		if d != "up" and int(cu.get("guante", 0)) < 1:
+			fallos.append("EPI %s: sin guantes %s" % [d, cu])
+		if int(cu.get("cristal", 0)) + int(cu.get("montura", 0)) < 1:
+			fallos.append("EPI %s: sin gafas %s" % [d, cu])
+		var gx: Image = o.duplicate()
+		gx.resize(o.get_width() * 8, o.get_height() * 8, Image.INTERPOLATE_NEAREST)
+		gx.save_png(dir.path_join("epi-%s.png" % d))
+		tot += 1
 	for x in fallos:
 		print("  FALLO ", x)
 	print("extracciones: %d escenas, %d fallos" % [tot, fallos.size()])

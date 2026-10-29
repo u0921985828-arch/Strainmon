@@ -183,19 +183,19 @@ func _corre() -> void:
 	LOG = []
 	MENUS = []
 	QUIERO = ["Salir"]
-	corre(func(): await J.kc_carpa(1))
+	corre(func(): await J.kc_lista(1))
 	chk(J.kc_puedes(1) == "9 de 35 L", "la carpa 2: con 9 de 35 L en la mochila, puedes 9 de 35 L («%s»)" % J.kc_puedes(1))
 	var b0: float = float(J.S.banco)
 	QUIERO = ["Esquema de la carpa", "9 macetas de 35 L", "Ponerlas"]
-	chk(corre(func(): await J.kc_carpa(1)) and J.kc_n(1) == 9 and J.kc_pat(1).m == "tela35" and is_equal_approx(float(J.S.banco), b0) and it_m("tela35") == 0, "9 de 35 L con las tuyas, sin pagar; las del kit, no (quedan %d)" % it_m("tela35"))
+	chk(corre(func(): await J.kc_lista(1)) and J.kc_n(1) == 9 and J.kc_pat(1).m == "tela35" and is_equal_approx(float(J.S.banco), b0) and it_m("tela35") == 0, "9 de 35 L con las tuyas, sin pagar; las del kit, no (quedan %d)" % it_m("tela35"))
 	chk(J.kc().p.size() == 16 + 9 + 4 + 4 and J.kc_off(2) == 25 and J.kc().p[15] is Dictionary, "las plazas: 16 + 9 + 4 + 4")
 	QUIERO = ["Esquema de la carpa", "9 macetas de 35 L"]
 	LOG = []
-	chk(corre(func(): await J.kc_carpa(1)) and dicho("ya lleva ese esquema"), "el mismo, no")
+	chk(corre(func(): await J.kc_lista(1)) and dicho("ya lleva ese esquema"), "el mismo, no")
 	J.S.banco = 0
 	QUIERO = ["Esquema de la carpa", "4 macetas de 50 L", "Pedirlas y ponerlas"]
 	LOG = []
-	chk(corre(func(): await J.kc_carpa(1)) and J.kc_n(1) == 9 and dicho("tarjeta no pasa"), "sin dinero, se queda como estaba")
+	chk(corre(func(): await J.kc_lista(1)) and J.kc_n(1) == 9 and dicho("tarjeta no pasa"), "sin dinero, se queda como estaba")
 	J.S.banco = 100000
 	# 6 · al pasar al nivel siguiente, las macetas que pusiste, a la mochila
 	J.kc().p[15] = null

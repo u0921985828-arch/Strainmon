@@ -315,20 +315,21 @@ const VC_LZ := [[198, 130, 77], [231, 150, 86], [255, 172, 82], [255, 224, 149]]
 # haz por barra (de la última fila del sprite del foco) que baja hasta el pie de la pared abriéndose lo justo para que los de fuera
 # lleguen a las paredes de la carpa. Bajo las barras, el núcleo; con un haz, el haz; con dos o más, el resplandor; entre haces, nada
 static func luz_led(t: String, vc: Dictionary) -> Image:
-	var k := "vc|%s|luz-led|%s|%d" % [t, vc.foco.n, vc.fy]
+	var k := "vc|%s|luz-led|%s|%d|%d" % [t, vc.foco.n, vc.fy, vc.get("fxs", [120]).size()]
 	if cache.has(k):
 		return cache[k]
 	var o: Image = fondo(t, vc, "luz-led").duplicate()
 	var fc := foto(vc.foco.n)
 	var fw := fc.get_width()
-	var ox := 120 - (fw >> 1)
 	var B := []
-	for i in fw:
-		if fc.get_pixel(i, fc.get_height() - 1).a8:
-			if B.size() and B[-1][1] == ox + i - 1:
-				B[-1][1] = ox + i
-			else:
-				B.append([ox + i, ox + i])
+	for cx in vc.get("fxs", [120]):   # cada foco (los LED de las carpas de KAIA, a lo ancho), sus tiras de luz
+		var ox: int = int(cx) - (fw >> 1)
+		for i in fw:
+			if fc.get_pixel(i, fc.get_height() - 1).a8:
+				if B.size() and B[-1][1] >= ox + i - 1:
+					B[-1][1] = maxi(B[-1][1], ox + i)
+				else:
+					B.append([ox + i, ox + i])
 	var V: Dictionary = Datos.carga().VCA
 	var X0: int = vc.xl
 	var X1: int = vc.xl + vc.w - 1
@@ -406,7 +407,7 @@ static func luz(t: String, vc: Dictionary) -> Image:
 	var lc: Dictionary = Datos.carga().LUZ_C
 	if not lc.has(vc.tipo):
 		return L
-	var k := "vc|%s|luz|%s|%d|%d" % [t, vc.tipo, vc.foco.a, vc.fy]
+	var k := "vc|%s|luz|%s|%d|%d|%d" % [t, vc.tipo, vc.foco.a, vc.fy, vc.get("fxs", [120]).size()]
 	if cache.has(k):
 		return cache[k]
 	var c: Array = lc[vc.tipo][0]

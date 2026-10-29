@@ -659,6 +659,8 @@ func _encima() -> void:
 	if J.SETAS_V != null:   # 1.43.9: las baldas del bajo de las setas, a la vista
 		for e in J.rects_bajo(J.SETAS_V):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+	if J.CLIMA_V != null:   # el controlador de clima de KAIA y de la nave, a la vista (kaiacult.gd vista_clima)
+		Escena.clima(self, J.clima_v(J.CLIMA_V.s), now, (J.SW - Escena.W) >> 1, 6)
 	if J.MADRES_V != null:   # el armario de las madres de la nave, por dentro (nave.gd rects_madres, con CAL)
 		for e in J.rects_madres(J.MADRES_V):
 			if typeof(e[0]) == TYPE_STRING:   # ['@', imagen, x, y, recorte]
@@ -1804,7 +1806,7 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 	if f == null:
 		return
 	if isP:
-		f = J.ropa_c(f, gr)   # ropa y pelo (1.21)
+		f = J.ropa_c(J.epi_c(f), gr)   # ropa y pelo (1.21); en el laboratorio, con el EPI (epi_c)
 	var xp: int = Datos.jsround(e.px - cam.x) + 8
 	var yp: int = Datos.jsround(e.py - cam.y) + 15
 	if esc != null and int(esc.h) > 0:   # hundido h px en la escalera: lo de debajo de los peldaños no se ve (sin sombra)
@@ -1864,7 +1866,7 @@ func _pj_sentado() -> void:
 	var f = frame_sentado(gr, mesa)
 	if f == null:
 		return
-	f = J.ropa_c(f, gr)
+	f = J.ropa_c(J.epi_c(f), gr)
 	var c: Image = f.c
 	var g: Array = J.sent_geo(J.SENT.get("k"))
 	var sube: int = 9 - int(g[1])   # 1.55.3: lo que sube la cadera desde la de pie (la 9 de la casilla), por asiento (SENT_GEO)

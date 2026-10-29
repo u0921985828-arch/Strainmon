@@ -464,24 +464,30 @@ func kilometros(k: String, km: int) -> String:
 # control de tráfico, MALETERO.vacio.f)
 func coche_menu(k: String):
 	var V: Dictionary = D.CONCE.v[k]
-	var ops := [K("Viajar"), K("Maletero")]
+	var ops := [K("Viajar"), K("Maletero"), op_gasolina(k)]   # (lo pidió el usuario: «arregla lo de rellenar la gasolina»)
 	ops.append_array(ops_abono(k))
 	ops.append(K("Nada"))
-	var j: int = await ask(T("{A}, en el aparcamiento. Maletero: {g} de {c}.", {"A": mayus(V.art), "g": g_txt(mal_peso(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), ops)
+	var j: int = await ask(T("{A}, en el aparcamiento. Depósito: {g} de {d} L. Maletero: {m} de {c}.", {"A": mayus(V.art), "g": n(snappedf(gas_de(k), 0.1)), "d": int(TANQUE.get(k, 40)), "m": g_txt(mal_peso(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), ops)
 	var op: String = ops[j] if j >= 0 and j < ops.size() else ""
 	if j == 0:
 		await conducir(k)
 	elif j == 1:
 		await maletero(k)
-	elif op != "":
+	elif j == 2:
+		await repostar(k)
+	elif op != "" and op != K("Nada"):
 		await accion_abono(k, op)
+
+func op_gasolina(k: String) -> String:   # «Echar gasolina (N L · €)» o «(lleno)», en el garaje y en el aparcamiento
+	var falta: int = int(floor(int(TANQUE.get(k, 40)) - gas_de(k)))
+	return T("Echar gasolina ({l} L · {e})", {"l": falta, "e": Datos.eur(ceili(falta * float(D.CONCE.litro)))}) if falta >= 1 else K("Echar gasolina (lleno)")
 
 # (MAESTRO [3]: «rellenar tanques de abono de la nave»): las garrafas de abono de floración que llevas, al maletero; en Valdehierro,
 # del maletero a la estantería y los tanques de la nave (S.nave.ab)
 func ops_abono(k: String) -> Array:
 	var o := []
 	if int(S.items.get("fert", 0)) + int(S.items.get("ofert", 0)) > 0:
-		o.append(T("Cargar el abono {dv}", {"dv": de_art(String(D.CONCE.v[k].art))}))
+		o.append(T("Cargar abono en {v}", {"v": String(D.CONCE.v[k].art)}))   # (lo pidió el usuario: «cargar abono en el <coche>»)
 	if S.map == "valdehierro" and S.get("nave") and float(mal_ab(k).m) + float(mal_ab(k).o) > 0:   # i18n-no
 		o.append(K("Rellenar los tanques de la nave"))
 	return o
@@ -527,9 +533,7 @@ func garaje_menu():
 func garaje_coche(k: String) -> void:
 	var V: Dictionary = D.CONCE.v[k]
 	var dep: int = int(TANQUE.get(k, 40))
-	var falta: int = int(floor(dep - gas_de(k)))
-	var e: int = ceili(falta * float(D.CONCE.litro))
-	var ops := [T("Salir en {v}", {"v": String(V.art)}), K("Abrir el maletero"), T("Echar gasolina ({l} L · {e})", {"l": falta, "e": Datos.eur(e)}) if falta >= 1 else K("Echar gasolina (lleno)"), K("Nada")]
+	var ops := [T("Salir en {v}", {"v": String(V.art)}), K("Abrir el maletero"), op_gasolina(k), K("Nada")]
 	var j: int = await ask(T("{A}. Depósito: {g} de {d} L. Maletero: {m} de {c}.", {"A": mayus(V.art), "g": n(snappedf(gas_de(k), 0.1)), "d": dep, "m": g_txt(mal_peso(k)), "c": _kg(int(D.MALETERO.kg.get(k, 0)))}), ops)
 	if j == 0:
 		await conducir(k)

@@ -214,12 +214,15 @@ func save():
 	S.dir = P.dir
 	if Datos.PLAY and not oraculo:   # fase 6: la hora del móvil al guardar, para el progreso offline
 		S.ts = ahora()
+	var kf := kc_guarda_fuera()   # con una carpa de KAIA abierta, lo de casa en su sitio
 	var o: Dictionary = S
 	var cola := cola_guardar()
 	if cola.size():
 		o = S.duplicate()
 		o["_cola"] = cola
-	return escribe_partida(JSON.stringify(o, "", false, true))
+	var r := escribe_partida(JSON.stringify(o, "", false, true))
+	kc_guarda_dentro(kf)
+	return r
 
 static func escribe_partida(t: String) -> bool:
 	var tmp := GUARDADO + ".tmp"

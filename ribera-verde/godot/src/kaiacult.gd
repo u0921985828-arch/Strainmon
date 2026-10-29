@@ -141,8 +141,13 @@ func kc_f(ci := 0, P = null) -> Dictionary:
 	var np := float(P.n)
 	var w: float = float(F.w) * float(N.nf)
 	var dens := minf(1, w / (float(cm[0]) * float(cm[1]) / 1e4 * float(D.W_M2)))
-	return {"g": w * float(F.gpw) / np * float(M.rend) * float(N.get("efi", 1.0)), "cap": float(M.cap), "crec": float(F.crec) * (.85 + .15 * dens) * float(M.crec) * Cultivo.f_clima(KC.clima),
-		"thc": float(F.thc) * dens, "agua": float(F.agua) * float(M.agua), "plaga": float(M.plaga), "dens": dens, "hr": float(KC.clima.hr), "moho": 1.0, "ciclo": "auto"}   # i18n-no
+	var o := {"g": w * float(F.gpw) / np * float(M.rend) * float(N.get("efi", 1.0)), "cap": float(M.cap), "crec": float(F.crec) * (.85 + .15 * dens) * float(M.crec) * Cultivo.f_clima(KC.clima),
+		"thc": float(F.thc) * dens, "agua": float(F.agua) * float(M.agua), "plaga": float(M.plaga), "dens": dens, "hr": float(KC.clima.hr), "moho": 1.0, "ciclo": Cultivo.ciclo_de(kc_cc(ci))}
+	if kc_cc(ci).get("vent"):   # el ventilador, como en casa (Cultivo.factores)
+		o.crec *= float(D.VENT.crec)
+		o.plaga *= float(D.VENT.plaga)
+		o.moho = float(D.VENT.moho)
+	return o
 
 func kc_pos(ci: int) -> Array:
 	return pos_pieza(D.KAIA_CULT.mapa, "kc%s%d" % [kc_N().k, ci])
@@ -257,6 +262,8 @@ func kc_obj(x: int, y: int, o) -> bool:
 # el cuadro de la pared: el temporizador, el clima y lo que se compra para la sala
 func kc_cuadro() -> void:
 	var KC: Dictionary = D.KAIA_CULT
+	if not kc_obra() and not await vista_clima("kaia"):
+		return
 	while true:
 		var ops := []
 		var txt := ""
@@ -382,11 +389,19 @@ func kc_reforma() -> void:
 	sfx("get")
 	await say(T("Empieza la obra. El {f}, la sala con sus mesas.", {"f": Datos.fd(int(S.kc.f2), S.day)}))
 
-# las plazas de una carpa: cada una, con su planta o vacía; A, lo de siempre (pot_action)
+# las plazas de una carpa: como las de casa (lo pidió el usuario: «te dije que como las de casa… tiene que ser visual»), A abre la
+# carpa por dentro (abrir_carpa, la vista C de granja.gd) con sus plantas, sus LED repartidos a lo ancho, el temporizador y su equipo;
+# la de 400 × 400, por mitades (delante y al fondo). kc_lista, la de antes, sin el atlas
 func kc_carpa(ci: int) -> void:
 	if not kc_lic():
 		await say(K("Sin la licencia de cultivo, las carpas se quedan vacías."))
 		return
+	if Atlas.ok and ArteM.hay("carpa-c-pared") and not oraculo:   # las pruebas sin pantalla, la lista (la vista: tests/kaia_vista.gd)
+		await kc_vista(ci)
+		return
+	await kc_lista(ci)
+
+func kc_lista(ci: int) -> void:
 	var np := kc_n(ci)
 	var o := kc_off(ci)
 	var P := kc_pat(ci)
@@ -503,6 +518,161 @@ func kc_devuelve_macetas() -> int:
 func plants_advance(mn: int) -> void:
 	super(mn)
 	kc_avanza(mn)
+
+# ---------- la carpa de KAIA por dentro, con la vista de las de casa ----------
+# Mientras está abierta (KCV), S.carpas, S.pots y S.macetas son los de esa carpa (o de su mitad): una carpa de casa con el tipo
+# kc<nivel><plazas>[-mitad] (kc_def, en D.CARPAS solo mientras se ve), su equipo de S.kc.cc[ci] y sus plantas, las de S.kc.p (los
+# mismos diccionarios). Lo de la planta va por pot_action con su hu (kc_hu); el tiempo y el guardado, con lo de casa en su sitio
+# (kc_vista_off/on alrededor de advance_time y de save)
+var KCV = null
+
+func kc_cc(ci: int) -> Dictionary:   # el equipo de la carpa ci: el kit (sus LED, el extractor con su filtro y el goteo) y lo que le pongas
+	if not (kc().get("cc") is Array):
+		S.kc.cc = []
+	while S.kc.cc.size() <= ci:
+		S.kc.cc.append({"foco": String(D.KAIA_CULT.foco), "filtro150": true, "goteo": true})
+	return S.kc.cc[ci]
+
+func kc_mitades() -> int:   # la de 400 × 400 se ve en dos mitades de 400 × 200
+	var cm: Array = kc_N().cm
+	return 2 if float(cm[1]) > 200 else 1
+
+func kc_def(ci: int) -> Dictionary:
+	var N: Dictionary = kc_N()
+	var mi := kc_mitades()
+	var W: float = float(N.cm[0])
+	var Dp: float = float(N.cm[1]) / mi
+	var nv: int = kc_n(ci) / mi
+	var cols := maxi(1, roundi(sqrt(nv * W / Dp)))
+	return {"n": N.n, "w": 2, "cm": [W, float(N.cm[2]), Dp], "cols": cols, "filas": ceili(float(nv) / cols), "plazas": nv, "wmax": int(D.FOCOS[D.KAIA_CULT.foco].w) * int(N.nf), "lmax": int(D.MACETAS.get(kc_pat(ci).m, {"l": 25}).l), "kc": true}
+
+func kc_vista_on() -> void:
+	var ci: int = KCV.ci
+	var mi := kc_mitades()
+	var t := "kc%s%d-%d" % [kc_N().k, kc_n(ci), KCV.h]   # i18n-no
+	D.CARPAS[t] = kc_def(ci)
+	var c := kc_cc(ci)
+	c.t = t
+	c.nf = int(kc_N().nf) / mi
+	var nv: int = kc_n(ci) / mi
+	var a: int = kc_off(ci) + int(KCV.h) * nv
+	if KCV.get("bak") == null:
+		KCV.bak = {"carpas": S.carpas, "pots": S.pots, "macetas": S.macetas}
+	S.carpas = [c]
+	S.pots = kc().p.slice(a, a + nv)
+	var ms := []
+	for j in nv:
+		ms.append(String(kc_pat(ci).m))
+	S.macetas = ms
+	KCV.a = a
+	KCV.t = t
+
+func kc_vista_off() -> void:
+	if KCV == null or KCV.get("bak") == null:
+		return
+	S.carpas = KCV.bak.carpas
+	S.pots = KCV.bak.pots
+	S.macetas = KCV.bak.macetas
+	KCV.bak = null
+	var c := kc_cc(int(KCV.ci))
+	c.erase("t")
+	c.erase("nf")
+	D.CARPAS.erase(KCV.t)
+
+func kc_vista(ci: int, h := 0) -> void:
+	KCV = {"ci": ci, "h": clampi(h, 0, kc_mitades() - 1)}
+	kc_vista_on()
+	await abrir_carpa(0)
+	var sig = KCV.get("sig")
+	kc_vista_off()
+	KCV = null
+	if sig != null:   # de una mitad a la otra
+		await kc_vista(ci, int(sig))
+
+func advance_time(mn: int) -> void:
+	if KCV != null and KCV.get("bak") != null:
+		kc_vista_off()
+		super(mn)
+		if KCV != null:
+			kc_vista_on()
+		return
+	super(mn)
+
+func kc_guarda_fuera() -> bool:   # juego.gd save: lo de casa en su sitio mientras se escribe la partida
+	if KCV != null and KCV.get("bak") != null:
+		kc_vista_off()
+		return true
+	return false
+
+func kc_guarda_dentro(b: bool) -> void:
+	if b and KCV != null:
+		kc_vista_on()
+
+func _vc_accion() -> void:
+	if KCV == null:
+		await super()
+		return
+	if VC.sel == Vista.SEL_TEMP:
+		await temporizador(0)
+	elif VC.sel < 0:
+		await kc_equipo()
+	else:
+		var gi: int = int(KCV.a) + int(VC.sel)
+		var hu := kc_hu(gi)
+		hu.v = pos_plaza(VC.sel)
+		await pot_action(gi, hu)
+		if KCV != null and KCV.get("bak") != null:
+			kc_vista_on()
+	if VC:
+		VC.ocupado = false
+	vc_ficha()
+
+# el equipo de la carpa de KAIA (A en sus LED): lo que se le puede poner como en casa, el esquema de macetas y, en la de 400 × 400, la
+# otra mitad
+func kc_equipo() -> void:
+	var ci: int = KCV.ci
+	var N: Dictionary = kc_N()
+	var ex := extras_libres(0)
+	var ops := []
+	for k in ex:
+		ops.append(T("Poner {x}", {"x": I18n.v(String(D.EXTRAS[k].c)).to_lower()}))
+	ops.append(K("Esquema de la carpa"))
+	if kc_mitades() > 1:
+		ops.append(K("Ver la mitad del fondo") if int(KCV.h) == 0 else K("Ver la mitad de delante"))
+	ops.append(K("Salir"))
+	var lst: Array = [I18n.v(String(D.FOCOS[D.KAIA_CULT.foco].n))]
+	for k in D.EXTRAS:
+		if kc_cc(ci).get(k):
+			lst.append(I18n.v(String(D.EXTRAS[k].c)).to_lower())
+	var j: int = await ask(T("{c} · {p} plantas · {nf} × {f}\nLleva: {l}", {"c": N.n, "p": kc_n(ci), "nf": int(N.nf), "f": I18n.v(String(D.FOCOS[D.KAIA_CULT.foco].n)), "l": ", ".join(lst.slice(1)) if lst.size() > 1 else K("nada más")}), ops)
+	if j < 0 or j >= ops.size():
+		return
+	if j < ex.size():
+		var x: String = ex[j]
+		var vk := poner_extra(0, x)
+		await say(T("Pones el {x} en la carpa.", {"x": I18n.v(String(D.EXTRAS[x].n)).to_lower()}) + "\n" + I18n.v(String(D.EXTRAS[x].d)) + (T("\nEl {k} vuelve a la mochila.", {"k": I18n.v(String(D.EXTRAS[vk].c)).to_lower()}) if vk != "" else ""))
+		return
+	var op: String = ops[j]
+	if op == K("Esquema de la carpa"):
+		if not kc_vacia(ci):
+			await say(K("El esquema se cambia con la carpa vacía: primero, cosecha o quita lo que lleva."))
+			return
+		kc_vista_off()
+		await kc_esquema(ci)
+		KCV.h = 0
+		kc_vista_on()
+		VC.sel = -1
+	elif op == K("Ver la mitad del fondo") or op == K("Ver la mitad de delante"):
+		KCV.sig = 1 - int(KCV.h)
+		J_salir_carpa()
+
+func kc_vacia(ci: int) -> bool:
+	return kc_plantadas(ci) == 0
+
+func J_salir_carpa() -> void:   # cierra la vista (como B) para abrir la otra mitad
+	if VC and handlers.size():
+		VC.ocupado = false
+		handlers[-1].call("B")
 
 # cada rato crecen con su carpa; el goteo las deja regadas
 func kc_avanza(mn: int) -> void:
@@ -692,3 +862,74 @@ func hilo_talk(id: String) -> bool:
 			await say(T("«Las {n} mesas que tienen plantas van bien: riego, poda y el corte cuando toca. Lo seco, al almacén del club».", {"n": vivas}) if vivas else K("«Las mesas, vacías. Planta en ellas y me encargo del resto»."), w.n.to_upper())
 			return true
 	return await super(id)
+
+# el controlador de clima, a la vista (lo pidió el usuario: «el controlador de clima de KAIA, que sea visual, también aplicar a la
+# nave»): el cuadro de KAIA y el de la nave abren su pantalla (escena_extr.gd clima) con la temperatura, la humedad y el VPD, las 24
+# horas del temporizador y el extractor a su carga; A, a lo de siempre; B, cerrar. Lo que enseña, de lo que ya cuenta el juego: en
+# KAIA, el clima de la sala (KAIA_CULT.clima) y el temporizador por la fase de sus plantas; en la nave, la temperatura por el calor
+# de sus focos sobre lo que saca la extracción (calor_nave, EXTR_NAVE.cap: pasada la carga, el sofoco) y 12/12 con una mesa en flor
+func clima_v(s: String) -> Dictionary:
+	var hz := 18
+	var nf := 0
+	var cg := 0.0
+	var t0: float = float(D.KAIA_CULT.clima.t)
+	var hr0: float = float(D.KAIA_CULT.clima.hr)
+	if s == "nave":
+		var N = S.get("nave")
+		var cal := 0.0
+		if N != null:
+			for i in N.m.size():
+				if N.m[i]:
+					nf += 1
+					if fase_mesa(i) >= 3:
+						hz = 12
+			cal = calor_nave()
+			cg = cal / maxf(1.0, float(D.EXTR_NAVE[int(N.ex)].cap))
+		t0 = 21.0 + 7.0 * cg
+		hr0 = clampf(50.0 + 3.0 * nf - 4.0 * int(N.ex if N != null else 0), 35, 75)
+	elif S.get("kc") is Dictionary:
+		kc()
+		var cl = kc_cc(0).get("ciclo")
+		for p in S.kc.p:
+			if p is Dictionary and not p.get("dead"):
+				nf += 1
+				if Cultivo.plant_stage(p) >= 3:
+					hz = 12
+		if cl == "flor":
+			hz = 12
+		elif cl == "veg":
+			hz = 18
+		cg = .7 if nf else 0.0
+	var on := func(m: int) -> bool: return nf > 0 and posmod(m - Cultivo.LUZ_DESDE, 24 * 60) < hz * 60
+	var graf := []
+	for hh in 24:
+		var l: bool = on.call(hh * 60)
+		graf.append([t0 if l else t0 - 4.0, l])
+	var luz: bool = on.call(int(S.min))
+	var t: float = t0 if luz else t0 - 4.0
+	var hr: float = hr0 if luz else minf(hr0 + 6.0, 90)
+	var es := .6108 * exp(17.27 * t / (t + 237.3))
+	return {"t": t, "hr": hr, "vpd": es * (1 - hr / 100.0), "luz": luz, "hz": hz, "nf": nf, "cg": cg, "graf": graf, "min": int(S.min), "s": s}
+
+func vista_clima(s: String) -> bool:
+	if not Datos.CAL or oraculo or gancho_menu.is_valid():
+		return true
+	var C := clima_v(s)
+	CLIMA_V = {"s": s}
+	var nm: String = K("EL CLIMA DE LA NAVE") if s == "nave" else K("EL CLIMA DE LA SALA")
+	var est: String = K("todo en su sitio")
+	if float(C.t) > float(D.T_OK[1]):
+		est = K("demasiado calor: la extracción no da para tantos focos")
+	elif float(C.t) < float(D.T_OK[0]):
+		est = K("hace frío")
+	_dlg_fijo(T("{t} °C · {h} % · VPD {v} kPa · luz a {a}/{b}, {l} · extracción al {c} %: {e}.\nA: el cuadro · B: cerrar.", {"t": ("%.1f" % float(C.t)).replace(".", ","), "h": roundi(float(C.hr)), "v": ("%.1f" % float(C.vpd)).replace(".", ","), "a": int(C.hz), "b": 24 - int(C.hz), "l": K("encendida") if C.luz else K("apagada"), "c": roundi(100 * float(C.cg)), "e": est}), nm)
+	var pr := Motor.Prom.new()
+	push(func(b: String):
+		if b == "A" or b == "B":
+			pop()
+			pr.res(b == "A"))
+	var e = await Motor.espera(pr)
+	CLIMA_V = null
+	dlg.hide()
+	dlg_nm.hide()
+	return bool(e)

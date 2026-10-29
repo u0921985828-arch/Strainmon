@@ -77,14 +77,14 @@ A: take out · B: close."
 al vacío,vacuum-sealed
 MALETERO,BOOT
 "Solo cambia cómo te ves: lo demás, igual.",It only changes how you look: everything else is the same.
-"{A}, en el aparcamiento. Maletero: {g} de {c}.","{A}, in the car park. Boot: {g} of {c}."
+"{A}, en el aparcamiento. Depósito: {g} de {d} L. Maletero: {m} de {c}.","{A}, in the car park. Tank: {g} of {d} L. Boot: {m} of {c}."
 Viajar,Travel
 El garaje de la tía. Está vacío: aquí se guarda lo que compres en AUTOS RIBERA.,Your aunt's garage. It's empty: whatever you buy at AUTOS RIBERA is kept here.
 Salir en {v},Drive out in {v}
 Maletero {dv},Boot {dv}
 El garaje de la tía.,Your aunt's garage.
 Curada en el maletero {dv}: {l},Cured in the boot {dv}: {l}
-Cargar el abono {dv},Load the fertiliser into {dv}
+Cargar abono en {v},Load fertiliser into {v}
 Rellenar los tanques de la nave,Refill the warehouse tanks
 "Descargas el abono en la nave: MEATZA ×{m} y ORTUA BIO ×{o}. Los tanques, llenos: MEATZA ×{tm} · ORTUA BIO ×{to}.",You unload the fertiliser at the warehouse: MEATZA ×{m} and ORTUA BIO ×{o}. The tanks now hold MEATZA ×{tm} · ORTUA BIO ×{to}.
 Cargas el abono en el maletero: MEATZA ×{m} y ORTUA BIO ×{o} dosis.,You load the fertiliser into the boot: MEATZA ×{m} and ORTUA BIO ×{o} doses.
@@ -638,3 +638,45 @@ La general,The main road
 Carretera del molino,Mill road
 Pista de los acantilados,Cliff track
 Carretera de la ribera,Riverside road
+Te cuesta enfocar: las vetas se ven a ratos.,Hard to focus: the veins come and go.
+"Agua templada y jabón: palmas, dorsos y entre los dedos.","Warm water and soap: palms, backs and between the fingers."
+"Las uñas y las muñecas, veinte segundos frotando.","Nails and wrists, twenty seconds of scrubbing."
+Aclara con el pedal y sécate con papel.,Rinse with the pedal and dry with paper.
+"La bata, abrochada hasta arriba.","The lab coat, buttoned to the top."
+"Las gafas, bien ajustadas.","The goggles, fitted snugly."
+"Los guantes de nitrilo, por encima de los puños de la bata.","Nitrile gloves, pulled over the coat cuffs."
+"Las pinzas, el bisturí y las placas, a la cesta, con su cinta.","Tweezers, scalpel and plates into the basket, with their tape."
+La tapa cerrada: sube a 121 °C con vapor.,Lid shut: it climbs to 121 °C with steam.
+La tapa cerrada: sube a 121° con vapor.,Lid shut: it climbs to 121° with steam.
+"Veinte minutos a 1 bar; luego, que baje la presión antes de abrir.",Twenty minutes at 1 bar; then let the pressure drop before opening.
+La cabina encendida: diez minutos de aire antes de empezar.,Hood switched on: ten minutes of airflow before starting.
+Alcohol al 70 % en la mesa y en los guantes.,70 % alcohol on the bench and on the gloves.
+"En el centro, lejos del borde y sin tapar la rejilla.","In the middle, away from the edge, without blocking the grille."
+"La semilla, en el portaobjetos, a la platina.","The seed on the slide, onto the stage."
+Enfoca con el tornillo hasta ver las vetas.,Focus with the knob until you see the veins.
+El papel en el plato y la tara a cero.,Paper on the pan and tare to zero.
+"Las semillas, hasta que la cifra se quede quieta.","The seeds, until the reading settles."
+"Lo usado, al contenedor amarillo; lo que corta, al rojo.",Used items in the yellow bin; sharps in the red one.
+"La mesa, limpia con alcohol de dentro afuera.",Wipe the bench with alcohol from the inside out.
+LABORATORIO,LAB
+Ver la mitad del fondo,See the back half
+Ver la mitad de delante,See the front half
+"{c} · {p} plantas · {nf} × {f}
+Lleva: {l}","{c} · {p} plants · {nf} × {f}
+Fitted: {l}"
+nada más,nothing else
+Pones el {x} en la carpa.,You fit the {x} in the tent.
+"El esquema se cambia con la carpa vacía: primero, cosecha o quita lo que lleva.",The layout can only change with the tent empty: harvest or remove what is in it first.
+EL CLIMA DE LA NAVE,WAREHOUSE CLIMATE
+EL CLIMA DE LA SALA,GROW ROOM CLIMATE
+todo en su sitio,all in range
+demasiado calor: la extracción no da para tantos focos,too hot: the extraction can't cope with so many lights
+hace frío,too cold
+"{t} °C · {h} % · VPD {v} kPa · luz a {a}/{b}, {l} · extracción al {c} %: {e}.
+A: el cuadro · B: cerrar.","{t} °C · {h} % · VPD {v} kPa · light at {a}/{b}, {l} · extraction at {c} %: {e}.
+A: the panel · B: close."
+"{t}° · {h} % · VPD {v} kPa · luz a {a}/{b}, {l} · extracción al {c} %: {e}.
+A: el cuadro · B: cerrar.","{t}° · {h} % · VPD {v} kPa · light at {a}/{b}, {l} · extraction at {c} %: {e}.
+A: the panel · B: close."
+encendida,on
+apagada,off
