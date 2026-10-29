@@ -7,7 +7,7 @@
 # Cadena: … → kaiacult → salafria → acto2 → retencion → juego.
 extends "res://src/salafria.gd"
 
-const A2 := {"min": 4, "rep": 5, "confia": 10, "semilla": "malana", "n": 3, "calor_darko": 10, "calor_molina": 20, "pierde": 5}   # i18n-no
+const A2 := {"ch": 5, "min": 4, "rep": 5, "confia": 10, "semilla": "malana", "n": 3, "calor_darko": 10, "calor_molina": 20, "pierde": 5}   # i18n-no
 const PISTAS := ["pc", "catedral", "teatro", "hacienda", "muelle"]   # i18n-no
 const SOSPECHOSOS := ["darko", "garro", "molina"]   # i18n-no
 const CULPABLE := "garro"   # i18n-no
@@ -18,6 +18,8 @@ var A2_PASOS := [[I18n.K("Luz en el piso"), I18n.K("La abuela Txaro vio luz en e
 	[I18n.K("Luz en el piso"), I18n.K("La abuela Txaro vio luz en el piso de tu tía la semana del entierro. Mira la caja de detrás del diploma.")],
 	[I18n.K("Quién entró en el piso"), ""],
 	[I18n.K("El piso, cerrado"), ""]]
+
+var _a2_salta := false
 
 func a2() -> Dictionary:
 	if not (S.get("a2") is Dictionary):
@@ -47,21 +49,24 @@ func a2_sospechoso(k: String) -> String:
 # al amanecer: cerrado el cuaderno azul un día antes, Txaro escribe
 func hilo_dia() -> void:
 	super()
-	if not hilo_visible() or hilo_p() < 6 or a2_p() != 0 or int(S.day) <= int(hilo().d.get("6", S.day)):
+	if not hilo_visible() or hilo_p() < 6 or a2_p() != 0 or int(S.ch) < int(A2.ch) or int(S.day) <= int(hilo().d.get("6", S.day)):
 		return
 	a2_paso(1)
-	var L := [K("{N}, una cosa que no te he contado. La semana del entierro de tu tía vi luz en su piso de madrugada, dos noches seguidas."),
-		K("Tú aún no habías llegado. Y la llave solo la tenía ella. Mira lo de detrás del diploma, que ella ahí guardaba lo suyo.")]
+	var L := [K("{N}, una cosa que no te he contado. El día del entierro de tu tía no pude ir, por la cadera. A media mañana, desde mi ventana, vi luz en su piso."),
+		K("Estabais todos en el funeral. La llave de repuesto la dejaba en la maceta del rellano: lo sabía todo el que la visitaba. Mira lo de detrás del diploma, que ella ahí guardaba lo suyo.")]
 	queue("a2txaro", func(): await talk(K("SMS · ABUELA TXARO"), L), [[K("SMS · ABUELA TXARO"), L]])   # i18n-no
 
 # el diploma: la rueda forzada abre la investigación
 func diploma_action():
 	if a2_p() == 1:
 		await a2_rueda()
+		return
 	await super()
 
 func a2_rueda() -> void:
-	await talk(K("EL DIPLOMA"), [K("Descuelgas el diploma. Alrededor de la rueda de la caja, la pintura está levantada: marcas de destornillador, viejas."),
+	var nueva: bool = S.get("caja") is Dictionary and int(S.caja.get("nivel", 1)) >= 2
+	await talk(K("EL DIPLOMA"), [K("Te acuerdas de la caja vieja que quitó Kiko para poner la empotrada: alrededor de la rueda tenía la pintura levantada, marcas de destornillador.") if nueva else
+		K("Descuelgas el diploma. Alrededor de la rueda de la caja, la pintura está levantada: marcas de destornillador, viejas."),
 		K("Alguien intentó abrirla sin la combinación antes de que tú llegaras. No pudo: la caja aguanta. Buscaba algo que la tía guardaba."),
 		K("El cuaderno azul. Y por esas fechas solo tres personas preguntaban por él: Darko, un comprador de semillas de Bilbao que le escribía, y el sargento Molina.")])
 	a2_paso(2)
@@ -69,8 +74,8 @@ func a2_rueda() -> void:
 	var ay := a2_ayuda()
 	var pk: String = AYUDA_PISTA[ay]
 	a2().pi[pk] = int(S.day)
-	var L: Array = {"delroy": [K("Lo de la caja... Te cuento lo único que sé: Molina estuvo esa mañana en Hacienda, en Bilbao. Hice cola detrás de él. Él no fue.")],
-		"baltasar": [K("Ya me han contado lo del diploma. A Darko no lo busques: ese día estaba en la mar con Koldo, todo el barrio lo vio salir. No es de los míos, pero eso no.")],
+	var L: Array = {"delroy": [K("Lo de la caja... Te cuento lo único que sé: Molina no vino al funeral. Me dijo que tenía un recurso en Hacienda, en Bilbao, esa misma mañana. Pregunta allí.")],
+		"baltasar": [K("Ya me han contado lo del diploma. A Darko no lo busques: es mi sobrino y ese día estaba en la mar, en la txalupa de Koldo. Todo el puerto lo vio salir.")],
 		"kiko": [K("Lo del piso... Tu tía me dijo que le escribía un tío de Bilbao por el ordenador, uno que quería comprarle la Haze. Mira su correo.")]}[ay]
 	queue("a2ayuda", func(): await talk(K("SMS · ") + a2_ayuda_n(), L), [[K("SMS · ") + a2_ayuda_n(), L]])   # i18n-no
 
@@ -84,13 +89,19 @@ func hilo_talk(id: String) -> bool:
 			pk = "teatro"
 		elif id == "bi_funcionaria":   # i18n-no
 			pk = "hacienda"
-		elif id == "koldo":   # i18n-no
+		elif id == "koldo" and S.get("mar") != null:   # i18n-no · la primera vez, su presentación (eventos.gd)
 			pk = "muelle"
 		if pk != "" and not a2().pi.has(pk) and not ciudad_cerrada():
 			await a2_pista(pk, id)
 			return true
-		if id == a2_ayuda():
-			await a2_ayudante()
+		if id == a2_ayuda() and not _a2_salta:
+			if await a2_ayudante():
+				return true
+			# lo de siempre con esa persona: hilo_talk no puede volver con false después de esperar (tras un await, el match de
+			# npc_talk ya no casa), así que se vuelve a entrar por npc_talk sin el Acto II
+			_a2_salta = true
+			await npc_talk({"id": id})
+			_a2_salta = false
 			return true
 	return await super(id)
 
@@ -106,37 +117,43 @@ func a2_pista(pk: String, id := "") -> void:
 			await talk(K("EL ORDENADOR DE LA TÍA"), [K("En el correo de la tía, un hilo con un tal Unai Garro, de Semillas Ondarea, Bilbao. Dos semanas antes del entierro."),
 				K("«Le ofrezco cuarenta mil euros por la madre de su Haze del 98 y sus notas de cría. Es mi última oferta.»"),
 				K("La tía contestó una línea: «No está en venta. No vuelva a escribirme.»"),
-				K("Y el registro del ordenador dice que alguien lo encendió el día del entierro, a las 11:40, cuando estaba toda la gente en la catedral.")])
+				K("Otro correo, de la víspera: «Como le dije cuando estuve en su casa, mañana no la molesto más.» Garro conocía el piso."),
+				K("Y el registro del ordenador dice que alguien lo encendió el día del entierro, a las 11:40, cuando estaba toda la gente en la catedral. Abrió la carpeta de los cuadernos; las notas de la tía no dicen nada a quien no la conociera.")])
 		"catedral":
 			await talk(K("SACERDOTE"), [K("¿El funeral de Maite? Aquí, a las once. Estaba medio barrio, y llorando."),
 				K("Solo me extrañó un señor de traje, de fuera. Me preguntó a qué hora acababa y si la familia volvería luego a casa."),
-				K("Se fue antes de la comunión. Dejó una tarjeta en el cepillo, fíjate: «Semillas Ondarea». No volví a verlo.")])
+				K("Se fue en cuanto empezó la misa, a las once y cinco. Dejó una tarjeta en el cepillo, fíjate: «Semillas Ondarea». No volví a verlo.")])
 		"teatro":
 			await talk(K("AINHOA") if id == "bi_ainhoa" else K("TAQUILLERA"),
-				[K("¿Garro? Sí, el de las semillas tiene abono. Cuando vino la policía a preguntar por un robo, dijo que esa mañana estaba aquí, en el ensayo general."),
+				[K("¿Garro? Sí, el de las semillas tiene abono. La víspera del entierro de tu tía me pidió que, si alguien preguntaba, dijera que esa mañana estuvo aquí, en el ensayo general."),
 				K("Ese día no hubo ensayo: el teatro estuvo cerrado toda la semana por la obra del tejado. Aún tengo el cartel en el cajón.")])
 		"hacienda":
 			await talk(K("FUNCIONARIA"), [K("Esto no se lo puedo enseñar... pero el registro de entrada es público."),
-				K("El sargento Molina presentó un recurso aquí ese día. Sello de las 11:20, ventanilla 3. De Bilbao a Ribera Verde hay media hora larga.")])
+				K("El sargento Molina presentó un recurso aquí ese día. Sello de las 11:20, ventanilla 3. De Bilbao a Ribera Verde hay media hora larga: a las 11:40 no llegaba.")])
 		"muelle":
-			await talk(K("KOLDO"), [K("¿Darko? Ese día salimos juntos a por chipirones a las seis de la mañana y no volvimos hasta la noche, con mala mar."),
-				K("Tendrá sus cosas, pero ese día estaba vomitando por la borda de mi txalupa, no en el piso de tu tía.")])
+			await talk(K("KOLDO"), [K("¿Darko? El día del entierro me pidió la txalupa para salir a por chipirones con su primo. Lo vi salir a las seis y volver de noche, con mala mar."),
+				K("Yo me quedé en tierra, para ir al funeral de Maite. Tendrá sus cosas, pero ese día Darko estaba en la mar, no en el piso de tu tía.")])
 	a2().pi[pk] = int(S.day)
 	await got(T("una pista del piso ({n}/{t})", {"n": a2_pistas(), "t": PISTAS.size()}))
 	if a2_pistas() >= int(A2.min):
 		await say(T("Ya tienes bastante. Habla con {n}.", {"n": a2_ayuda_n().capitalize()}))
 
-func a2_ayudante() -> void:
+func a2_ayudante() -> bool:
 	var N := a2_ayuda_n()
-	if a2_pistas() < int(A2.min):
-		await say(T("«Aún no tienes bastante: {n} de {t}. Pregunta en el teatro, en la catedral, en Hacienda, en el muelle y mira el ordenador de tu tía.»", {"n": a2_pistas(), "t": int(A2.min)}), N)
-		return
+	var A := a2()
+	if a2_pistas() < int(A2.min) or not A.pi.has("pc"):
+		if int(A.get("rec", -1)) != int(S.day):
+			A.rec = int(S.day)
+			await say(T("«Aún no tienes bastante: {n} de {t}. Pregunta en el teatro, en la catedral, en Hacienda y en el muelle, y sobre todo mira el ordenador de tu tía.»", {"n": a2_pistas(), "t": int(A2.min)}), N)
+		return false
+	if await ask(K("¿Le cuentas lo del piso de la tía?"), [K("Sí"), K("Ahora no")], N) != 0:
+		return false
 	await talk(N, [K("A ver, cuéntame lo que tienes."), K("Tres nombres y un piso forzado. Piénsalo bien: acusar a alguien en este barrio no se deshace.")])
 	var ops := SOSPECHOSOS.map(func(k): return a2_sospechoso(k))
 	ops.append(K("Aún no lo tengo claro"))
 	var c: int = await ask(K("¿Quién entró en el piso de la tía?"), ops, N)
 	if c < 0 or c >= SOSPECHOSOS.size():
-		return
+		return true
 	var k: String = SOSPECHOSOS[c]
 	a2().acu = k
 	a2_paso(3)
@@ -155,11 +172,13 @@ func a2_ayudante() -> void:
 		S.heat = minf(100.0, float(S.heat) + int(A2.calor_darko if darko else A2.calor_molina))
 		confia(a2_ayuda(), -int(A2.pierde))
 		update_hud()
-		await talk(N, [K("¿Darko? Ese día estaba en la mar, lo sabe todo el muelle. Se va a enterar de que lo has dicho.") if darko else
+		await talk(N, [(K("¿Darko? Ese día estaba en la mar, lo sabe todo el puerto. Ya se fue, pero sus chicos se enterarán.") if S.flags.get("darkoFin") else K("¿Darko? Ese día estaba en la mar, lo sabe todo el puerto. Se va a enterar de que lo has dicho.")) if darko else
 			K("¿Molina? Estaba en Hacienda, en Bilbao, con el sello en la mano. Y ahora sabe que lo has acusado tú."),
 			K("Lo dicho no se deshace. El que entró sigue por ahí.")])
 		var L := [K("Me han dicho que un tal Garro, de Semillas Ondarea, va preguntando por la Haze de tu tía. A lo mejor te equivocaste de nombre.")]
 		queue("a2fin", func(): await talk(K("SMS · KIKO"), L), [[K("SMS · KIKO"), L]])   # i18n-no
+	return true
+
 
 # OBJETIVO → LA TÍA MAITE: el cuaderno y, después, el Acto II
 func hilo_menu() -> void:
@@ -171,7 +190,7 @@ func hilo_menu() -> void:
 	for i in range(1, mini(p, 3) + 1):
 		var d: String = A2_PASOS[i][1]
 		if i == 2:
-			d = T("Sospechosos: Darko, Unai Garro (Semillas Ondarea) y el sargento Molina. Pistas: {n}/{t}: el ordenador de la tía, la catedral, el teatro, Hacienda y el muelle. Con {m}, habla con {a}.",
+			d = T("Sospechosos: Darko, Unai Garro (Semillas Ondarea) y el sargento Molina. Pistas: {n}/{t}: el ordenador de la tía, la catedral, el teatro, Hacienda y el muelle. Con {m}, el ordenador entre ellas, habla con {a}.",
 				{"n": a2_pistas(), "t": PISTAS.size(), "m": int(A2.min), "a": a2_ayuda_n().capitalize()})
 		if i == 3:
 			d = K("Acertaste: fue Garro, de Semillas Ondarea.") if a2().acu == CULPABLE else T("Acusaste a {s}. No fue.", {"s": a2_sospechoso(String(a2().acu))})

@@ -95,6 +95,10 @@ func _corre() -> void:
 	J.hilo_dia()
 	chk(J.a2_p() == 0, "el mismo día, nada")
 	J.S.hilo.d["6"] = int(J.S.day) - 1
+	J.S.ch = 4
+	J.hilo_dia()
+	chk(J.a2_p() == 0, "antes del cap. 5 (Molina), nada")
+	J.S.ch = 5
 	J.hilo_dia()
 	chk(J.a2_p() == 1 and J.queued.has("a2txaro"), "al día siguiente, el SMS de Txaro")
 	J.queued.clear()
@@ -102,7 +106,7 @@ func _corre() -> void:
 	LOG = []
 	chk(corre(func(): await J.diploma_action()), "el diploma")
 	chk(J.a2_p() == 2 and dicho("marcas de destornillador") and dicho("Darko"), "la rueda, forzada, y los tres nombres")
-	chk(J.a2().pi.keys() == ["hacienda"] and dicho("Molina estuvo esa mañana en Hacienda"), "Delroy da la pista de Hacienda (%s)" % [J.a2().pi])
+	chk(J.a2().pi.keys() == ["hacienda"] and dicho("Molina no vino al funeral"), "Delroy da la pista de Hacienda (%s)" % [J.a2().pi])
 	J.queued.clear()
 	chk(J.hilo_derecha() == "II · 1/5", "OBJETIVO: %s" % J.hilo_derecha())
 	# 3 · las pistas
@@ -111,9 +115,16 @@ func _corre() -> void:
 	LOG = []
 	chk(corre(func(): await J.pc_action()) and not dicho("11:40"), "una vez")
 	var r := {"v": false}
+	var mar0 = J.S.get("mar")
+	J.S.mar = null
+	chk(corre(func(): r.v = await J.hilo_talk("koldo")) and not r.v and not J.a2().pi.has("muelle"), "Koldo sin conocerlo: su presentación primero")
+	J.S.mar = {}
 	chk(corre(func(): r.v = await J.hilo_talk("koldo")) and r.v and J.a2().pi.has("muelle") and dicho("chipirones"), "Koldo: Darko estaba en la mar")
+	J.S.mar = mar0
 	LOG = []
-	chk(corre(func(): r.v = await J.hilo_talk("delroy")) and r.v and dicho("Aún no tienes bastante") and J.a2_p() == 2, "con 3 de 4, Delroy dice que falta")
+	chk(corre(func(): r.v = await J.hilo_talk("delroy")) and r.v and dicho("Aún no tienes bastante") and J.a2_p() == 2, "con 3 de 4, Delroy dice que falta y sigue con lo suyo")
+	LOG = []
+	chk(corre(func(): r.v = await J.hilo_talk("delroy")) and r.v and not dicho("Aún no tienes bastante"), "una vez al día")
 	J.S.map = "catedral-in"
 	J.S.min = 600
 	LOG = []
@@ -125,7 +136,10 @@ func _corre() -> void:
 	var sem := int(J.S.seeds.get("malana", 0))
 	var rep := float(J.S.rep)
 	MENUS = []
-	QUIERO = ["Unai Garro"]
+	QUIERO = ["Ahora no"]
+	chk(corre(func(): r.v = await J.hilo_talk("delroy")) and r.v and J.a2_p() == 2 and J.a2().acu == "", "«Ahora no»: lo de siempre")
+	MENUS = []
+	QUIERO = ["Sí", "Unai Garro"]
 	LOG = []
 	chk(corre(func(): r.v = await J.hilo_talk("delroy")) and r.v, "la acusación")
 	chk(J.a2_p() == 3 and J.a2().acu == "garro" and int(J.S.seeds.get("malana", 0)) == sem + 3 and is_equal_approx(float(J.S.rep), rep + 5), "Garro: acertaste, las semillas de Malana y la reputación")
@@ -142,11 +156,14 @@ func _corre() -> void:
 	J.a2_paso(1)
 	chk(corre(func(): await J.diploma_action()) and J.a2().pi.keys() == ["muelle"], "Baltasar da la del muelle")
 	J.queued.clear()
-	for k in ["pc", "teatro", "hacienda"]:
+	for k in ["catedral", "teatro", "hacienda"]:
 		J.a2().pi[k] = int(J.S.day)
+	LOG = []
+	chk(corre(func(): r.v = await J.hilo_talk("baltasar")) and r.v and dicho("mira el ordenador") and J.a2().acu == "", "sin el ordenador no se acusa")
+	J.a2().pi["pc"] = int(J.S.day)
 	var h0 := float(J.S.heat)
 	var cf := int(J.S.rel.get("baltasar", 0)) if J.S.get("rel") is Dictionary else 0
-	QUIERO = ["Darko"]
+	QUIERO = ["Sí", "Darko"]
 	chk(corre(func(): r.v = await J.hilo_talk("baltasar")) and r.v and J.a2().acu == "darko", "acusar a Darko")
 	chk(is_equal_approx(float(J.S.heat), minf(100, h0 + 10)), "más calor (%s)" % J.S.heat)
 	J.queued.clear()
@@ -155,6 +172,18 @@ func _corre() -> void:
 	J.S.hilo.el = 2
 	J.a2_paso(1)
 	chk(corre(func(): await J.diploma_action()) and J.a2().pi.keys() == ["pc"], "Kiko da la del ordenador")
+	J.queued.clear()
+	MENUS = []
+	LOG = []
+	chk(corre(func(): await J.npc_talk({"id": "kiko"})) and dicho("Aún no tienes bastante") and MENUS.size() > 0, "Kiko sigue vendiendo durante la investigación (%s)" % [MENUS])
+	# 6b · con la caja empotrada, la rueda era la de la caja vieja
+	var caja0 = J.S.get("caja")
+	J.S.caja = {"nivel": 2}
+	J.S.erase("a2")
+	J.a2_paso(1)
+	LOG = []
+	chk(corre(func(): await J.diploma_action()) and dicho("caja vieja que quitó Kiko") and J.a2_p() == 2, "la empotrada: la caja vieja")
+	J.S.caja = caja0
 	J.queued.clear()
 	# 7 · sin CAL, nada
 	J.S.erase("a2")
