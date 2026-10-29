@@ -65,15 +65,86 @@ sed946f62,"¿Molina? Estaba en Hacienda, en Bilbao, con el sello en la mano. Y a
 s8793440d,Lo dicho no se deshace. El que entró sigue por ahí.,What's said can't be unsaid. Whoever got in is still out there.
 s25b78bb7,"Me han dicho que un tal Garro, de Semillas Ondarea, va preguntando por la Haze de tu tía. A lo mejor te equivocaste de nombre.","I hear a guy called Garro, from Semillas Ondarea, is asking about your aunt's Haze. Maybe you got the wrong name."
 s080ab8eb,SMS · KIKO,SMS · KIKO
+sf77a797e,Volver,Back
+s3da3d075,LA TÍA MAITE,YOUR AUNT MAITE
 sae74e60f,HECHO,DONE
 s001b6a33,"Sospechosos: Darko, Unai Garro (Semillas Ondarea) y el sargento Molina. Pistas: {n}/{t}: el ordenador de la tía, la catedral, el teatro, Hacienda y el muelle. Con {m}, el ordenador entre ellas, habla con {a}.","Suspects: Darko, Unai Garro (Semillas Ondarea) and Sergeant Molina. Clues: {n}/{t}: your aunt's computer, the cathedral, the theatre, the tax office and the dock. With {m}, the computer among them, talk to {a}."
 sc901489a,"Acertaste: fue Garro, de Semillas Ondarea.","You got it: it was Garro, from Semillas Ondarea."
 s95eef900,Acusaste a {s}. No fue.,You accused {s}. It wasn't them.
 s0f81721b,AHORA,NOW
-sf77a797e,Volver,Back
-s3da3d075,LA TÍA MAITE,YOUR AUNT MAITE
 safc289c6,II · {n}/{t},II · {n}/{t}
 s94771d0f,II · HECHO,II · DONE
+s24e66ecc,La patente de la Haze,The Haze patent
+s10219ea2,"La oposición, presentada","The objection, filed"
+s598838f3,La resolución,The decision
+s27ac6714,Lo que queda de la tía,What is left of your aunt
+sb2c768c0,"El cuaderno azul de 1998, con las notas de cría de la tía","The blue notebook from 1998, with your aunt's breeding notes"
+sc86e9a33,La Haze del 98 fijada en F{g}: la línea es estable y es vuestra,The Haze of '98 fixed at F{g}: the line is stable and it is yours
+s6d5ec276,El banco de la tía con {n} colecciones entregadas: las landraces eran de todos,Your aunt's bank with {n} collections handed in: the landraces belonged to everyone
+s7c1259a8,El correo de Garro ofreciendo dinero por la Haze: sabía que no era suya,Garro's email offering money for the Haze: he knew it wasn't his
+sb796174b,La firma de la asamblea de la asociación,The signature of the association's assembly
+s04374b05,Malas noticias. Semillas Ondarea ha pedido en la Oficina de Variedades Vegetales registrar como suyas la «Haze 98» y tres landraces del banco de tu tía.,"Bad news. Semillas Ondarea has applied at the Plant Variety Office to register ""Haze 98"" and three landraces from your aunt's bank as their own."
+s3029e17b,"Si se lo dan, nadie podrá vender ni regalar esas semillas con su nombre. Hay plazo para oponerse hasta el {f}, desde el ordenador de tu tía. Hacen falta pruebas.","If they get it, nobody will be able to sell or give away those seeds under their name. You can object until {f}, from your aunt's computer. Evidence is needed."
+s43c5be08,"La oficina ha denegado el registro de Ondarea: la Haze del 98 y esas landraces existían antes que ellos, y eran de todos. Lo ha firmado esta mañana.","The office has refused Ondarea's registration: the Haze of '98 and those landraces existed before them, and belonged to everyone. It was signed this morning."
+sbefe0f1f,Garro no se va a quedar quieto. Te llamará.,Garro won't sit still. He'll call you.
+sc143f7cd,"La oficina ha concedido el registro a Semillas Ondarea. Sin pruebas, la Haze del 98 es suya en los papeles.","The office has granted the registration to Semillas Ondarea. Without evidence, on paper the Haze of '98 is theirs."
+sd56c0508,"No puedes vender ni regalar sus semillas con ese nombre. Garro te va a llamar, y ahora tiene la sartén por el mango.","You can't sell or give away its seeds under that name. Garro is going to call you, and now he holds all the cards."
+s8bc8c530,La sede electrónica de la Oficina de Variedades Vegetales. Expediente de Semillas Ondarea: «Haze 98» y tres landraces.,"The Plant Variety Office's online portal. Semillas Ondarea's file: ""Haze 98"" and three landraces."
+s5e18eb8e,Plazo de oposición hasta el {f}. Lo que puedes adjuntar hoy:,Objection deadline: {f}. What you can attach today:
+s598dc5c6,"Con {m} pruebas, la oposición se sostiene. Tienes {n}.","With {m} pieces of evidence, the objection holds. You have {n}."
+sc319aed2,¿Presentas la oposición?,Do you file the objection?
+sd36335aa,Presentarla ahora,File it now
+s93150e70,Todavía no,Not yet
+s7faa29c5,"la oposición, presentada con {n} pruebas: la resolución, el {f}","the objection, filed with {n} pieces of evidence: the decision, on {f}"
+s60be7903,LLAMADA · UNAI GARRO,CALL · UNAI GARRO
+s62dd770e,Sé que me acusaste delante de medio barrio. No te lo voy a negar: quería esa Haze y la sigo queriendo.,I know you accused me in front of half the neighbourhood. I won't deny it: I wanted that Haze and I still do.
+s89293818,"No nos conocemos, pero yo a ti sí: tienes la Haze de Maite.","We haven't met, but I know you: you have Maite's Haze."
+s53d64ab0,La oficina te ha dado la razón. Me da igual: la quiero en mi catálogo y pago por ella.,The office sided with you. I don't care: I want it in my catalogue and I'll pay for it.
+s5b5605a6,"La Haze del 98 ya es mía en los papeles. Te ofrezco algo por la madre y las notas, y te dejo en paz.","On paper the Haze of '98 is mine now. I'll offer you something for the mother and the notes, and leave you alone."
+s554e9fba,"{e} por la madre de la Haze del 98, sus semillas y las notas de cría. Hoy.","{e} for the mother of the Haze of '98, its seeds and the breeding notes. Today."
+s9762caed,El banco de la tía es del barrio,Your aunt's bank belongs to the neighbourhood
+s8df08287,Lo que es de todos no se vende.,What belongs to everyone is not for sale.
+sb9c3435f,"Antes tienes que abrir el banco de semillas de la tía: todas sus colecciones, con la Haze del 98 fijada.","First you have to open your aunt's seed bank: all her collections, with the Haze of '98 fixed."
+s677f3330,Vender a Semillas Ondarea · {e},Sell to Semillas Ondarea · {e}
+sc7581981,"Garro se lleva la madre, las semillas de la Haze y las notas. El barrio se enterará.","Garro takes the mother, the Haze seeds and the notes. The neighbourhood will find out."
+s214c1b7d,Irte con Miren a Errotabarri,Go with Miren to Errotabarri
+s3f8eb7aa,"Subir al monte con la Haze fijada, lejos de todo.","Go up the mountain with the fixed Haze, far from everything."
+sc51db865,Hace falta la Haze del 98 fijada y la confianza de Miren ({r}/{m}).,You need the Haze of '98 fixed and Miren's trust ({r}/{m}).
+sdde9e615,Colgar,Hang up
+s80ab96b0,Que vuelva a llamar.,Let him call again.
+s8defb20a,"Sin la oposición ganada, Ondarea irá a por ti.","Without winning the objection, Ondarea will come after you."
+s03e9e467,LA OFERTA DE ONDAREA,ONDAREA'S OFFER
+s45956d98,«Volveré a llamar. Siempre vuelvo a llamar.»,"""I'll call again. I always call again."""
+s4b2cd447,Garro ha colgado sin despedirse. Lo que está en el banco del barrio no lo puede comprar nadie.,Garro has hung up without a goodbye. Nobody can buy what is in the neighbourhood bank.
+s420271c6,Esta tarde vienen los socios a pedir semillas. Uno de ellos se ha llevado la Haze del 98 para su huerta. Como quería ella.,This afternoon the members are coming to ask for seeds. One of them has taken the Haze of '98 for his garden. As she wanted.
+s65a41156,"FIN · el banco de la tía, de todos ({r} de reputación)","THE END · your aunt's bank, everyone's ({r} reputation)"
+s772168c6,Ya me he enterado. No te voy a decir nada: el dinero también es la vida.,I've heard. I won't say anything: money is life too.
+se38f76c7,Pero la Haze de tu tía ya lleva el nombre de otro. Eso no lo arregla ninguna transferencia.,But your aunt's Haze carries someone else's name now. No bank transfer fixes that.
+s7533a6d6,"FIN · {e} en la cuenta y la Haze del 98, de Ondarea","THE END · {e} in the account and the Haze of '98, Ondarea's"
+sf30f515b,MIREN,MIREN
+sdbdbef2d,Sube cuando quieras. Arriba la tierra es buena y nadie pregunta.,Come up whenever you like. Up here the soil is good and nobody asks questions.
+sdae3fa6e,Tu tía siempre dijo que la Haze tenía que volver al monte. Tú la has fijado: ahora no se pierde.,Your aunt always said the Haze had to go back to the mountain. You fixed it: now it won't be lost.
+sdc8108f7,"Lo de abajo no se acaba porque te vayas. Pero aquí arriba, al menos, la cosecha es tuya.","What goes on down there doesn't end because you leave. But up here, at least, the harvest is yours."
+s229cdf51,"FIN · con Miren, en Errotabarri, con la Haze del 98","THE END · with Miren, in Errotabarri, with the Haze of '98"
+sd2b4ea32,CARTA · ABOGADOS DE ONDAREA,LETTER · ONDAREA'S LAWYERS
+s13facfeb,Requerimiento: cese inmediato en la reproducción y distribución de la variedad registrada «Haze 98».,"Notice: immediate cessation of the reproduction and distribution of the registered variety ""Haze 98""."
+s2141496d,Se ha dado traslado a las autoridades. Cualquier semilla de la variedad en su poder será intervenida.,The authorities have been informed. Any seed of the variety in your possession will be seized.
+s104e45f1,Han venido con un notario y se han llevado las semillas de la Haze. La policía ya sabe tu nombre.,They came with a notary and took the Haze seeds. The police know your name now.
+s3edb6022,"Lo que queda de la tía es lo que tengas en las carpas y lo que recuerde el barrio. Empieza otra vez, despacio.","What is left of your aunt is what you have in your tents and what the neighbourhood remembers. Start again, slowly."
+s1b053be9,FIN · la caída: sin la Haze del 98 y con calor +{c},THE END · the fall: without the Haze of '98 and heat +{c}
+s8bf9ab8c,"La historia de la tía Maite termina aquí. La partida sigue: tus carpas, tu gente y tus semillas.","Aunt Maite's story ends here. The game goes on: your tents, your people and your seeds."
+sea3cbab4,"Semillas Ondarea quiere registrar como suyas la Haze del 98 y landraces del banco de la tía. Oponte desde su ordenador antes del {f}, con {m} pruebas. Tienes {n}.","Semillas Ondarea wants to register the Haze of '98 and landraces from your aunt's bank as their own. Object from her computer before {f}, with {m} pieces of evidence. You have {n}."
+scae59312,Presentada con {n} pruebas. La oficina resuelve el {f}.,Filed with {n} pieces of evidence. The office decides on {f}.
+s43152ecc,La oficina dio la razón a la tía.,The office sided with your aunt.
+sbd0ff1bb,La oficina dio el registro a Ondarea.,The office granted the registration to Ondarea.
+s8d017562,Unai Garro llama con su oferta: lo que elijas lo decide lo que has cultivado.,Unai Garro calls with his offer: what you can choose depends on what you have grown.
+s4fa51d52,"El banco de la tía, de todos.","Your aunt's bank, everyone's."
+s87d4c408,Vendiste la Haze del 98 a Ondarea.,You sold the Haze of '98 to Ondarea.
+seccb2844,Te fuiste con Miren a Errotabarri con la Haze fijada.,You went with Miren to Errotabarri with the fixed Haze.
+s221d6e34,La caída: Ondarea se llevó la Haze.,The fall: Ondarea took the Haze.
+s05e2172a,III · {n}/{m},III · {n}/{m}
+s42d2c76a,IV · HECHO,IV · DONE
+se327537e,IV · AHORA,IV · NOW
 s6cba58f0,BANCO_TIA,
 sb0633d67, (sin fijar), (not fixed)
 sefbd28ea,Abre la cámara fría: una semilla de lo que hayas guardado cada {d} días.,Opens the cold room: one seed of whatever you have stored every {d} days.
@@ -106,7 +177,6 @@ s6db9cfb3,"La Haze del 98 va en el último cajón: antes, las otras cinco colecc
 sdabdcde3,"Te faltan semillas para esa colección. Mira la lista: cada variedad, en su cajón.","You're missing seeds for that collection. Check the list: each strain, in its drawer."
 sf9e8dbf0,¿Entregar «{n}»? Las semillas se quedan en el banco.,Hand in «{n}»? The seeds stay in the bank.
 s4ffa4842,Entregar,Hand over
-s93150e70,Todavía no,Not yet
 s0aa75975,"«{c}», en su cajón. {z}: destapado.
 {p}",
 s74de5797,EL BANCO DE SEMILLAS,THE SEED BANK
@@ -459,7 +529,6 @@ s9c4f006a,ANDONI,ANDONI
 s2554a16b,TXOMIN,TXOMIN
 s5f0966c0,IÑAKI,IÑAKI
 s33c4252e,ARRIETA,ARRIETA
-sf30f515b,MIREN,MIREN
 s3e59d902,CAPATAZ,FOREMAN
 s239c408b,"{n} semillas de {s}, {e}.","{n} {s} seeds, {e}."
 s8e28e8bd,Comprar,Buy
@@ -690,6 +759,7 @@ s224febdd,Pedido: {n} · lo instalan mañana,Ordered: {n} · installed tomorrow
 s7c101d3d,{p} puntos,{p} points
 sc6dd9d9a,Bienvenido a la COPA DE OTOÑO de la asociación: cinco categorías y una muestra por categoría.,Welcome to the association's AUTUMN CUP: five categories and one entry per category.
 s93efa3f2,"Este año, en sabor, se premia el aroma {a}. Gana tres categorías y te llevas la Copa absoluta.","This year, in flavour, the {a} aroma is rewarded. Win three categories and the overall Cup is yours."
+sfa9a8386,{p}.º puesto,place {p}
 sb234e641,fuera del podio,off the podium
 s815ca030,"Los rivales mejoran cada año. Este año, en sabor, el aroma {a}.","The rivals improve every year. This year, in flavour, the {a} aroma."
 sd2fa8104,COPA DE OTOÑO,AUTUMN CUP
@@ -697,12 +767,13 @@ s59263730,Prestigio {p} · {t} trofeos,Prestige {p} · {t} trophies
 s4736ccf6,Para {c} no traes nada que valga. {d},You bring nothing that counts for {c}. {d}
 s669d40c5,{c}: el jurado ha decidido.,{c}: the jury has decided.
 s1bb22d93,"Esta vez, fuera del podio. Los demás también trabajan todo el año.",Off the podium this time. The others work all year too.
-s29bc2991,"{e} y el trofeo de {c}, {p}.º puesto","{e} and the {c} trophy, {p} place"
+s29bc2991,"{e} y el trofeo de {c}, {p}.º puesto","{e} and the {c} trophy, place {p}"
 sf2a15ba9,¡{n} categorías ganadas! La COPA ABSOLUTA de {y} es tuya.,{n} categories won! The {y} OVERALL CUP is yours.
 s19c4df8f,{e} y la Copa absoluta,{e} and the overall Cup
 s486f7b46,"Hoy es la Copa de otoño, en la plaza de Ribera Verde: potencia, sabor, landrace pura, cruce propio y extracción.","Today is the Autumn Cup, in the Ribera Verde square: potency, flavour, pure landrace, own cross and extract."
 sc4ea6f46,"El {d}, la Copa de otoño en la plaza de Ribera Verde: cinco categorías, una muestra en cada una.","On {d}, the Autumn Cup in the Ribera Verde square: five categories, one entry in each."
 sdb247fe0,"En sabor, este año, el aroma {a}. Los rivales vienen más fuertes que el año pasado.","In flavour, this year, the {a} aroma. The rivals are stronger than last year."
+sd7512fe0,"En sabor, este año, el aroma {a}. Es la primera edición: los rivales ya llevan años preparándose.","In flavour, this year, the {a} aroma. It is the first edition: the rivals have been preparing for years."
 sdfdc0077,Copa de otoño en la plaza,Autumn Cup in the square
 s457a182b,"Puerto Viejo, en la costa: el puerto, la lonja y el club de los marineros.","Puerto Viejo, on the coast: the harbour, the fish market and the sailors' club."
 sb6f597e2,"Ribera Verde, tu barrio, en la ría: el piso de la tía, el barrio alto y los astilleros.","Ribera Verde, your neighbourhood, on the estuary: your aunt's flat, the upper town and the shipyards."
@@ -2260,7 +2331,6 @@ sc5c101b8,Pisos,Flats
 s51a7e3d2,Banca,Banking
 s6044a85c,Calendario,Calendar
 s14a5d6d3,Mapa,Map
-sdde9e615,Colgar,Hang up
 s09a37899,"MÓVIL · {d}, {h} · {n} mensajes","PHONE · {d}, {h} · {n} messages"
 s1a5ec259,"MÓVIL · {d}, {h} · {n} mensaje","PHONE · {d}, {h} · {n} message"
 s24a353c6,"MÓVIL · {d}, {h}","PHONE · {d}, {h}"

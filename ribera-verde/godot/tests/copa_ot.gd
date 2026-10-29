@@ -119,6 +119,15 @@ func _corre() -> void:
 				sube = false
 	chk(sube, "los rivales: en su rango el primer año, más fuertes después, nunca por encima del tope")
 	chk(J.cot_rivales("pot", 2026) == J.cot_rivales("pot", 2026), "los mismos rivales cada vez que miras")
+	var nunca := true
+	for c in C.cats:
+		for yy in range(2026, 2045):
+			var a0: Array = J.cot_rivales(String(c.k), yy)
+			var a1: Array = J.cot_rivales(String(c.k), yy + 1)
+			for j in a0.size():
+				if float(a1[j][1]) < float(a0[j][1]) or (float(a1[j][1]) == float(a0[j][1]) and float(a0[j][1]) < float(c.tope)):
+					nunca = false
+	chk(nunca, "año a año, cada rival sube o se queda en su tope")
 	# 3 · cada categoría pide lo suyo
 	J.S.buds = {}
 	J.S.rosin = {}
@@ -162,12 +171,18 @@ func _corre() -> void:
 	var g0 := float(J.S.buds["ria"].g)
 	QUIERO = ["Potencia", "Skunk"]
 	chk(corre(func(): r.v = await J.hilo_talk("jurado")) and is_equal_approx(float(J.S.buds["ria"].g), g0), "potencia otra vez, no")
-	# 7 · fuera del podio: sin premio
-	J.S.buds["thai"].thc = 10.0
+	# 7 · fuera del podio, sin premio; el bronce, con su prestigio
 	m0 = float(J.S.money)
-	QUIERO = ["Landrace", "Thai"]
+	QUIERO = ["Sabor", "Lemon"]
 	LOG = []
-	chk(corre(func(): r.v = await J.hilo_talk("jurado")) and int(J.cot_ano(y).get("land", 0)) == 5 and is_equal_approx(float(J.S.money), m0) and dicho("fuera del podio"), "landrace floja: 5.º, nada")
+	chk(corre(func(): r.v = await J.hilo_talk("jurado")) and int(J.cot_ano(y).get("sab", 0)) == 5 and is_equal_approx(float(J.S.money), m0) and dicho("fuera del podio"), "sabor sin curar: 5.º, nada")
+	var lr: Array = J.cot_rivales("land", y)
+	lr.sort_custom(func(a, b): return a[1] > b[1])
+	J.S.buds["thai"].thc = float(lr[2][1]) + 0.05
+	m0 = float(J.S.money)
+	p0 = int(J.S.prest)
+	QUIERO = ["Landrace", "Thai"]
+	chk(corre(func(): r.v = await J.hilo_talk("jurado")) and int(J.cot_ano(y).get("land", 0)) == 3 and is_equal_approx(float(J.S.money), m0 + 500) and int(J.S.prest) == p0 + 1, "landrace, 3.º: 500 € y 1 de prestigio")
 	# 8 · tres oros: la Copa absoluta, una vez
 	QUIERO = ["Cruce propio", J.strain(xs).n]
 	chk(corre(func(): r.v = await J.hilo_talk("jurado")) and int(J.cot_ano(y).get("cru", 0)) == 1, "cruce propio, 1.º")
@@ -176,7 +191,7 @@ func _corre() -> void:
 	LOG = []
 	chk(corre(func(): r.v = await J.hilo_talk("jurado")) and int(J.cot_ano(y).get("ext", 0)) == 1, "extracción, 1.º")
 	chk(J.cot().abs == [2026] and is_equal_approx(float(J.S.money), m0 + 3000 + 5000) and dicho("ABSOLUTA"), "tres oros: la Copa absoluta y 5.000 € (%s)" % [J.cot().abs])
-	chk(J.cot().tro.size() == 3, "tres trofeos (%d)" % J.cot().tro.size())
+	chk(J.cot().tro.size() == 4, "cuatro trofeos (%d)" % J.cot().tro.size())
 	# 9 · el SMS, a 3 días y el mismo día
 	J.queued.clear()
 	J.S.day = d26 - 3
@@ -202,9 +217,20 @@ func _corre() -> void:
 	# 11 · otro día, el jurado de siempre: no la Copa de otoño
 	J.S.day = d26 + 1
 	chk(corre(func(): r.v = await J.hilo_talk("jurado")) and not r.v, "otro día, no")
-	# 12 · el año siguiente, otra vez todas
+	# 12 · el año siguiente, otra vez todas; por npc_talk, el jurado de la plaza
 	J.S.day = Datos.dia_de(2027, 10, 17)
 	chk(J.cot_ano(2027).is_empty(), "el año siguiente, de cero")
+	MENUS = []
+	QUIERO = ["Salir"]
+	chk(corre(func(): await J.npc_talk({"id": "jurado"})) and MENUS.any(func(mm): return mm.size() == 6 and mm[0] == "Potencia"), "por npc_talk, la Copa de otoño")
+	# 12b · un cuarto oro el mismo año no da otra Copa absoluta
+	J.S.day = Datos.dia_de(2028, 10, 17)
+	J.cot().y["2028"] = {"pot": 1, "cru": 1, "ext": 1}
+	J.cot().abs.append(2028)
+	J.S.buds["thai"] = {"g": 30.0, "thc": 25.0, "cu": 1.0}
+	var m4 := float(J.S.money)
+	QUIERO = ["Landrace", "Thai"]
+	chk(corre(func(): r.v = await J.hilo_talk("jurado")) and int(J.cot_ano(2028).get("land", 0)) == 1 and is_equal_approx(float(J.S.money), m4 + 3000) and J.cot().abs == [2026, 2028], "el cuarto oro: 3.000 € y ninguna absoluta más")
 	# 13 · sin CAL, nada
 	Datos.CAL = false
 	Datos.carga()

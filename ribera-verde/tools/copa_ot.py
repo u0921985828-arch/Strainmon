@@ -12,7 +12,7 @@ DATOS = os.path.join(RAIZ, 'godot', 'datos', 'datos.json')
 CATS = [
 	{"k": "pot", "n": "Potencia", "g": 10, "r": [22, 26], "sube": 0.5, "tope": 30,
 		"d": "El THC de un tarro curado del todo. 10 g."},
-	{"k": "sab", "n": "Sabor", "g": 10, "r": [68, 82], "sube": 2, "tope": 96,
+	{"k": "sab", "n": "Sabor", "g": 10, "r": [62, 74], "sube": 1, "tope": 88,
 		"d": "Nota de cata sobre 100: el curado, el afinado, el aroma único y el aroma del año. 10 g de cogollo."},
 	{"k": "land", "n": "Landrace pura", "g": 10, "r": [15, 18], "sube": 0.3, "tope": 21,
 		"d": "El THC de una landrace sin cruzar, curada del todo. 10 g."},
@@ -25,9 +25,9 @@ CATS = [
 COPA = {
 	"m": 10, "d": 17, "ch": 7, "aviso": 3, "mapa": "town",
 	"cats": CATS,
-	"premio": [3000, 1200, 500], "prest": [2, 1, 0],
+	"premio": [3000, 1200, 500], "prest": [2, 1, 1],
 	"abs": {"n": 3, "eur": 5000, "prest": 3},
-	"sab": {"base": 40, "cu": 25, "af": 10, "ar": 15, "aroma": 10},
+	"sab": {"base": 50, "cu": 25, "af": 10, "ar": 8, "aroma": 7},
 	"rivales": ["Txoko Berdea", "Huerta Oihana", "Los de Arratia", "Semillas Ondarea"],
 }
 
@@ -37,6 +37,9 @@ def main():
 	assert len({c["k"] for c in CATS}) == len(CATS) == 5
 	for c in CATS:
 		assert c["r"][0] < c["r"][1] <= c["tope"], c["k"]
+	# el sabor se gana sin rarezas el primer año (curado del todo y afinado): base + cu + af por encima del mejor rival
+	sb0 = COPA["sab"]
+	assert sb0["base"] + sb0["cu"] + sb0["af"] > CATS[1]["r"][1] + CATS[1]["sube"]
 	assert len(COPA["premio"]) == len(COPA["prest"]) == 3
 	sb = COPA["sab"]
 	assert sb["base"] + sb["cu"] + sb["af"] + sb["ar"] + sb["aroma"] == 100

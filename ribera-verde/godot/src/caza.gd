@@ -2,7 +2,7 @@
 # que hablamos»; solo con Datos.CAL): CAZA de tools/caza.py. Diecisiete personas dan, una vez por partida, una landrace en su
 # estación, un día de temporal o en su fiesta (S.caza = {k: día}; con CAL no se venden en el banco del PC); las fiestas —la feria de semillas de primavera en Bilbao, las
 # del barrio en agosto y la romería de la ermita— salen en el calendario, con su SMS la víspera y un aviso al llegar (S.fiv).
-# Cadena: … → salafria → acto2 → caza → copaot → retencion → juego.
+# Cadena: … → salafria → acto2 → caza → copaot → acto3 → retencion → juego.
 extends "res://src/acto2.gd"
 
 const CAZA_COLOR := "#e0a020"   # i18n-no

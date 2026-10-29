@@ -106,7 +106,7 @@ func cup_rivales(ed: int) -> Array:
 	var r := []
 	for j in C.rivales.size():
 		var x := float(C.rival[0]) + float(Datos.hash_str("cupr%d|%d" % [j, ed]) % int((float(C.rival[1]) - float(C.rival[0])) * 10 + 1)) / 10.0 + float(C.subeY) * anos
-		r.append([String(C.rivales[j]), x])
+		r.append([I18n.v(String(C.rivales[j])), x])
 	return r
 
 func cup_puntos(sid: String, b: Dictionary, P: Dictionary) -> float:

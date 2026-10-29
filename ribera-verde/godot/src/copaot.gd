@@ -3,7 +3,7 @@
 # —potencia, sabor, landrace pura, cruce propio y extracción—, una muestra por categoría y año (S.cot.y[año][cat] = puesto). Los
 # rivales suben cada año hasta su tope; el podio da dinero, trofeo y prestigio (S.prest, como la CannaCup), y ganar tres
 # categorías el mismo año, la Copa absoluta (S.cot.abs).
-# Cadena: … → acto2 → caza → copaot → retencion → juego.
+# Cadena: … → acto2 → caza → copaot → acto3 → retencion → juego.
 extends "res://src/caza.gd"
 
 const COT_COLOR := "#d07020"   # i18n-no
@@ -41,7 +41,7 @@ func cot_rivales(k: String, y: int) -> Array:
 		var paso := int((float(c.r[1]) - float(c.r[0])) * 10) + 1
 		var ru := maxi(1, int(float(c.sube) * 8))
 		var x := float(c.r[0]) + float(Datos.hash_str("cot|%s|%d" % [k, j]) % paso) / 10.0 + float(c.sube) * cot_anos(y) + float(Datos.hash_str("cot|%s|%d|%d" % [k, j, y]) % ru) / 10.0
-		r.append([String(rv[j]), minf(float(c.tope), Datos.jsround(x * 10) / 10.0)])
+		r.append([I18n.v(String(rv[j])), minf(float(c.tope), Datos.jsround(x * 10) / 10.0)])
 	return r
 
 # las muestras que valen para esa categoría: [[clave, lote]…]
@@ -100,7 +100,7 @@ func talk_copa_ot() -> void:
 		var items := []
 		for c in C.cats:
 			var pl = hecho.get(String(c.k))
-			items.append({"label": I18n.v(String(c.n)), "right": (T("{p}.º", {"p": int(pl)}) if int(pl) <= 3 else K("fuera del podio")) if pl != null else "",
+			items.append({"label": I18n.v(String(c.n)), "right": (T("{p}.º puesto", {"p": int(pl)}) if int(pl) <= 3 else K("fuera del podio")) if pl != null else "",
 				"disabled": pl != null, "desc": I18n.v(String(c.d))})
 		items.append({"label": K("Salir"), "desc": T("Los rivales mejoran cada año. Este año, en sabor, el aroma {a}.", {"a": cot_aroma(y)})})
 		i = await menu(items, {"cls": "full", "title": K("COPA DE OTOÑO"), "title2": T("Prestigio {p} · {t} trofeos", {"p": int(S.get("prest", 0)), "t": cot().tro.size()}), "desc": true, "initial": i})
@@ -185,7 +185,7 @@ func hilo_dia() -> void:
 	if falta != 0 and falta != int(D.COPA_OT.aviso):
 		return
 	var L := [T("Hoy es la Copa de otoño, en la plaza de Ribera Verde: potencia, sabor, landrace pura, cruce propio y extracción.") if falta == 0 else T("El {d}, la Copa de otoño en la plaza de Ribera Verde: cinco categorías, una muestra en cada una.", {"d": Datos.fd(copa_ot_dia(y), S.day)}),
-		T("En sabor, este año, el aroma {a}. Los rivales vienen más fuertes que el año pasado.", {"a": cot_aroma(y)})]
+		T("En sabor, este año, el aroma {a}. Los rivales vienen más fuertes que el año pasado.", {"a": cot_aroma(y)}) if cot_anos(y) > 0 else T("En sabor, este año, el aroma {a}. Es la primera edición: los rivales ya llevan años preparándose.", {"a": cot_aroma(y)})]
 	queue("copaot", func(): await talk(K("SMS · ASOCIACIÓN"), L), [[K("SMS · ASOCIACIÓN"), L]])   # i18n-no
 
 func marcas_cal() -> Array:

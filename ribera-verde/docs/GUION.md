@@ -380,6 +380,12 @@ Un hilo propio por encima de la deuda: lo que pasó en la Copa de 1998. OBJETIVO
 - **Por estación y tiempo:** Koldo con temporal, ya conocido en el muelle (Zamal); en verano, Julen (Michoacán) e Iñaki (Durban Poison); en otoño, Bixente (Kif) y Arrieta (Swazi Gold); en invierno, Andoni (Lebanese), Delroy (Congolese), Kiko (Panama Red) y el capataz del muelle de Bilbao (Thai); en primavera, Andoni (Beldia) y Miren (Nepalese). Los que lo dicen en su pista, solo con confianza de amigos (20).
 - **Ninguna se vende:** con `Datos.CAL`, estas diecisiete salen del banco del PC; quien dice que no en la feria, ese día vuelve a lo suyo, y una fiesta sin nada que dar no manda SMS ni avisa.
 
+## Los Actos III y IV (con `Datos.CAL`, `src/acto3.gd`)
+
+- **III · La patente de la Haze:** al día siguiente de cerrar el Acto II, desde el capítulo 7, SMS de Delroy: Semillas Ondarea pide en la Oficina de Variedades Vegetales registrar la «Haze 98» y tres landraces del banco de la tía. Treinta días para oponerse desde el ordenador de la tía.
+- **Las pruebas** salen de lo jugado: el cuaderno azul de 1998; la Haze del 98 fijada en F4; tres colecciones del banco de la tía; el correo de Garro (solo si le acusaste a él en el Acto II); la firma de la asamblea (solo si contaste lo del cuaderno en la asociación). Con tres, a los siete días la oficina deniega el registro; con menos, o sin presentarla, se lo concede.
+- **IV · Lo que queda de la tía:** Garro llama cada semana (si le acusaste, lo sabe). Ofrece 250.000 € por la madre, las semillas y las notas (60.000 € si ganó). Los finales: el banco del barrio (solo con el banco de la tía abierto), vender a Ondarea (dinero a la cuenta, sin la Haze, menos reputación y confianza), irte con Miren a Errotabarri (con la Haze fijada y su confianza) o colgar: con la oposición ganada vuelve a llamar; perdida, la caída (abogados, notario, sin la Haze y con calor). Acompaña quien te ayudó en el Acto II. La partida sigue después.
+
 ## La Copa de otoño (con `Datos.CAL`, `src/copaot.gd`, datos en `tools/copa_ot.py`)
 
 - **El 17 de octubre**, desde el capítulo 7, en la plaza de Ribera Verde; SMS de la asociación a tres días y el mismo día.

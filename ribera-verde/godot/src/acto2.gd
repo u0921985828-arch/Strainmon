@@ -4,7 +4,7 @@
 # de Semillas Ondarea) y el sargento Molina— y cinco pistas: el ordenador de la tía, el cura de la catedral, el teatro, Hacienda y
 # Koldo en el muelle. Quien te ayuda sale de lo que elegiste con el cuaderno (Delroy, Baltasar o Kiko) y te da una pista; con
 # A2.min pistas se acusa delante de él. S.a2 = {p: paso, pi: {pista: día}, acu: a quién acusaste, d: día de cada paso}.
-# Cadena: … → kaiacult → salafria → acto2 → caza → copaot → retencion → juego.
+# Cadena: … → kaiacult → salafria → acto2 → caza → copaot → acto3 → retencion → juego.
 extends "res://src/salafria.gd"
 
 const A2 := {"ch": 5, "min": 4, "rep": 5, "confia": 10, "semilla": "malana", "n": 3, "calor_darko": 10, "calor_molina": 20, "pierde": 5}   # i18n-no
@@ -185,6 +185,11 @@ func hilo_menu() -> void:
 	if a2_p() == 0:
 		await super()
 		return
+	var it := hilo_items()
+	it.append({"label": K("Volver"), "desc": ""})
+	await menu(it, {"cls": "full", "title": K("LA TÍA MAITE"), "desc": true, "initial": maxi(0, it.size() - 2)})
+
+func hilo_items() -> Array:   # los pasos hechos y el de ahora (los Actos III y IV añaden los suyos, acto3.gd)
 	var p := a2_p()
 	var it := [{"label": HILO_PASOS[6][0], "right": K("HECHO"), "desc": HILO_PASOS[6][1]}]
 	for i in range(1, mini(p, 3) + 1):
@@ -195,8 +200,7 @@ func hilo_menu() -> void:
 		if i == 3:
 			d = K("Acertaste: fue Garro, de Semillas Ondarea.") if a2().acu == CULPABLE else T("Acusaste a {s}. No fue.", {"s": a2_sospechoso(String(a2().acu))})
 		it.append({"label": A2_PASOS[i][0], "right": K("HECHO") if i < p or p == 3 else K("AHORA"), "desc": d})
-	it.append({"label": K("Volver"), "desc": ""})
-	await menu(it, {"cls": "full", "title": K("LA TÍA MAITE"), "desc": true, "initial": maxi(0, it.size() - 2)})
+	return it
 
 func hilo_derecha() -> String:
 	if a2_p() == 0:
