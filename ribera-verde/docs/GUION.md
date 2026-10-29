@@ -377,7 +377,8 @@ Un hilo propio por encima de la deuda: lo que pasó en la Copa de 1998. OBJETIVO
 - **Feria de semillas de primavera** (15-17 de mayo, mercado de la Ribera; SMS de Kiko la víspera): el especiero (Kashmiri), la florista (Vietnamese Black) y el verdulero (Highland Thai), 40 € cada una, en efectivo.
 - **Fiestas del barrio** (14-18 de agosto; SMS de la abuela Txaro): Patxi (Colombian Gold, de la tómbola de la txosna) y Txaro (Punto Rojo, de su vecino colombiano).
 - **Romería de la ermita** (8 de septiembre; SMS de Txaro): la serora, con el sobre de la tía (Ethiopian Highland).
-- **Por estación y tiempo:** Koldo con temporal (Zamal); en verano, Julen (Michoacán) e Iñaki (Durban Poison); en otoño, Bixente (Kif) y Arrieta (Swazi Gold); en invierno, Txomin (Lebanese), Delroy (Congolese), Kiko (Panama Red) y el capataz del muelle de Bilbao (Thai); en primavera, Andoni (Beldia) y Miren (Nepalese). Los que lo dicen en su pista, solo con confianza de amigos (20).
+- **Por estación y tiempo:** Koldo con temporal, ya conocido en el muelle (Zamal); en verano, Julen (Michoacán) e Iñaki (Durban Poison); en otoño, Bixente (Kif) y Arrieta (Swazi Gold); en invierno, Andoni (Lebanese), Delroy (Congolese), Kiko (Panama Red) y el capataz del muelle de Bilbao (Thai); en primavera, Andoni (Beldia) y Miren (Nepalese). Los que lo dicen en su pista, solo con confianza de amigos (20).
+- **Ninguna se vende:** con `Datos.CAL`, estas diecisiete salen del banco del PC; quien dice que no en la feria, ese día vuelve a lo suyo, y una fiesta sin nada que dar no manda SMS ni avisa.
 
 ## La caja fuerte
 

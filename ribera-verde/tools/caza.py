@@ -2,7 +2,8 @@
 # mano a las mejoras que hablamos»; solo con Datos.CAL). Escribe CAZA en godot/datos/datos.json:
 #  · fi: las fiestas del calendario (mes, día, cuántos días, el mapa donde se celebran y el SMS de la víspera);
 #  · l: diecisiete landraces que, además del banco del PC, da la gente una vez por partida: en su estación (est), un día de
-#    temporal (cl), en una fiesta (fi), con confianza (rel), desde un capítulo (ch) y, en la feria, por dinero (eur). Con las 13
+#    temporal (cl), en una fiesta (fi), con confianza (rel), desde un capítulo (ch), conocido el muelle (mar) y, en la feria, por
+#    dinero (eur). Con CAL no se venden en el banco del PC (Datos._aplica_auto): solo las da la gente. Con las 13
 #    de REGALO y la Malana del Acto II, 30 que se cazan. Todas reales; los textos, propios.
 #   python3 -I tools/caza.py
 import json, os
@@ -20,7 +21,7 @@ FIESTAS = [
 ]
 
 L = [
-	{"k": "zamal", "q": "koldo", "cl": ["tormenta"], "n": 3, "pista": "Koldo, en el muelle, un día de temporal",
+	{"k": "zamal", "q": "koldo", "cl": ["tormenta"], "mar": 1, "n": 3, "pista": "Koldo, en el muelle, un día de temporal",
 		"t": ["Con esta mar no sale nadie. Siéntate, que te cuento.",
 			"Hace años me quedé en la Reunión un mes por un motor roto. Me traje esto en una lata de tabaco. Zamal, lo llaman allí. Para ti."]},
 	{"k": "etiopia", "q": "bi_serora", "fi": "romeria", "n": 3, "pista": "la serora de la ermita, el día de la romería",
@@ -47,9 +48,9 @@ L = [
 	{"k": "beldia", "q": "andoni", "est": ["primavera"], "rel": 20, "n": 3, "pista": "Andoni, en el molino, en primavera, si sois amigos",
 		"t": ["En primavera limpio los botes del abuelo. Este no lo cambio, te lo regalo, que tú los cuidas.",
 			"Beldia, de Ketama. La más vieja que tengo."]},
-	{"k": "libano", "q": "txomin", "est": ["invierno"], "n": 3, "pista": "Txomin, en la Kale Zaharra, en invierno",
-		"t": ["En invierno las setas van lentas y yo me aburro. Ordenando el bajo salió un bote del dueño de antes.",
-			"Pone «Bekaa». Libanesa, creo. Para ti, que las mías no son de esto."]},
+	{"k": "libano", "q": "andoni", "est": ["invierno"], "n": 3, "pista": "Andoni, en el molino, en invierno",
+		"t": ["En invierno el molino para y yo ordeno el desván. Salió un bote de mi abuelo, de cuando estuvo embarcado.",
+			"Pone «Bekaa». Libanesa. Llévatela, que tú las haces crecer."]},
 	{"k": "durban", "q": "inaki", "est": ["verano"], "rel": 20, "n": 3, "pista": "Iñaki, en verano, si sois amigos",
 		"t": ["Un cliente sudafricano, de los que vienen a hacer surf. No tenía suelto y me pagó con esto.",
 			"Durban Poison, dice. Tú que plantas, sácale partido."]},
@@ -75,6 +76,7 @@ def main():
 	D = json.loads(s)
 	ks = [e["k"] for e in L]
 	assert len(set(ks)) == len(ks) == 17
+	assert all(e["q"] != "txomin" for e in L)   # con PLAY no está (npc_cond)
 	assert not (set(ks) & set(D["REGALO"])), set(ks) & set(D["REGALO"])
 	fk = {f["k"] for f in FIESTAS}
 	for e in L:

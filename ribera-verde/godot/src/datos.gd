@@ -114,6 +114,9 @@ static func _aplica_auto() -> void:
 		D.DEX.append_array(D.AUTO.dex)
 		D.RECIPES.merge(D.AUTO.recipes)
 		D.BANCO.append_array(D.AUTO.banco)
+		if D.has("CAZA"):   # i18n-no · ESTUDIO, tanda 4: las landraces de la caza no se venden: solo las da la gente (caza.gd)
+			var ck: Array = D.CAZA.l.map(func(e): return String(e.k))
+			D.BANCO = D.BANCO.filter(func(b): return not ck.has(String(b[0])))
 	# MAESTRO [4]: el fungicida, el preventivo y el sellado de la botritis, al final de la tienda (solo con CAL)
 	if D.has("BOTRITIS"):
 		if not D._base.has("SHOP"):

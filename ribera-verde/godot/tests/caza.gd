@@ -107,7 +107,8 @@ func _corre() -> void:
 	chk(J.fiesta_de(Datos.dia_de(2026, 9, 8)).get("k") == "romeria" and J.fiesta_de(Datos.dia_de(2027, 9, 8)).get("k") == "romeria", "la romería, el 8 de septiembre de cada año")
 	J.S.day = Datos.dia_de(2026, 7, 1)
 	var mk: Array = J.marcas_cal().filter(func(m): return m.c == J.CAZA_COLOR)
-	chk(mk.size() == 18 and mk.any(func(m): return m.d == Datos.dia_de(2027, 5, 16)), "en el calendario, este año y el que viene (%d)" % mk.size())
+	chk(mk.size() == 6 and mk.any(func(m): return m.d == Datos.dia_de(2027, 5, 15) and String(m.t).contains("3 días")), "en el calendario, una marca por fiesta, este año y el que viene (%d)" % mk.size())
+	chk(not D.BANCO.any(func(b): return ks.has(b[0])), "ninguna de la caza se vende en el banco del PC")
 	# 2 · la víspera, el SMS; el primer día, no; al llegar, el aviso una vez
 	J.S.day = feria - 1
 	J.queued.clear()
@@ -130,9 +131,13 @@ func _corre() -> void:
 	QUIERO = ["Comprar"]
 	LOG = []
 	chk(corre(func(): r.v = await J.hilo_talk("bi_me_es")) and r.v and int(J.S.seeds.get("kashmir", 0)) == s0 and not J.caza().has("kashmir"), "sin dinero, nada")
+	chk(corre(func(): r.v = await J.hilo_talk("bi_me_es")) and not r.v, "y ese día, lo que vende de siempre")
+	J.S.erase("cazaN")
 	J.S.money = 100.0
 	QUIERO = ["No"]
 	chk(corre(func(): r.v = await J.hilo_talk("bi_me_es")) and r.v and int(J.S.seeds.get("kashmir", 0)) == s0, "«No»: nada")
+	chk(corre(func(): r.v = await J.hilo_talk("bi_me_es")) and not r.v, "dicho que no, ese día no insiste")
+	J.S.erase("cazaN")
 	QUIERO = ["Comprar"]
 	LOG = []
 	chk(corre(func(): r.v = await J.hilo_talk("bi_me_es")) and r.v and int(J.S.seeds.get("kashmir", 0)) == s0 + 3 and is_equal_approx(float(J.S.money), 60.0) and dicho("Cachemira"), "comprada: 3 semillas por 40 €")
@@ -172,12 +177,18 @@ func _corre() -> void:
 			ds = d
 	chk(dt > 0 and ds > 0, "hay días de tormenta y de sol")
 	var mar0 = J.S.get("mar")
+	J.S.erase("mar")
+	J.S.day = dt
+	chk(corre(func(): r.v = await J.hilo_talk("koldo")) and not r.v and not J.caza().has("zamal"), "Koldo, sin conocerle aún, no")
 	J.S.mar = {}
 	J.S.day = ds
 	chk(corre(func(): r.v = await J.hilo_talk("koldo")) and not r.v, "Koldo con sol, no")
 	J.S.day = dt
 	chk(corre(func(): r.v = await J.hilo_talk("koldo")) and r.v and J.caza().has("zamal"), "Koldo con temporal: Zamal")
-	J.S.mar = mar0
+	if mar0 == null:
+		J.S.erase("mar")
+	else:
+		J.S.mar = mar0
 	# 7 · Miren, después de lo suyo
 	J.S.day = Datos.dia_de(2027, 4, 10)
 	J.S.rel["miren"] = 30
@@ -186,7 +197,22 @@ func _corre() -> void:
 	J.S.flags.lao = true
 	chk(corre(func(): r.v = await J.hilo_talk("miren")) and r.v and J.caza().has("nepal"), "Miren, después: Nepalese")
 	# 8 · el recetario dice quién
-	chk(J.donde_semilla("swazi").contains("Arrieta") and J.donde_semilla("swazi").contains("banco de semillas"), "el recetario: %s" % J.donde_semilla("swazi"))
+	chk(J.donde_semilla("swazi").contains("Arrieta") and not J.donde_semilla("swazi").contains("banco de semillas"), "el recetario: %s" % J.donde_semilla("swazi"))
+	# 8b · la Lebanese, Andoni en invierno (Txomin no está en Google Play)
+	J.S.day = Datos.dia_de(2027, 1, 10)
+	chk(corre(func(): r.v = await J.hilo_talk("andoni")) and r.v and J.caza().has("libano"), "Andoni en invierno: Lebanese")
+	# 8c · cazado lo de la fiesta, el año siguiente ya no hay SMS ni aviso
+	for ce in D.CAZA.l:
+		if ce.get("fi") == "romeria":
+			J.caza()[ce.k] = 1
+	J.queued.clear()
+	J.S.day = Datos.dia_de(2027, 9, 7)
+	J.hilo_dia()
+	chk(not J.queued.has("fiestaromeria"), "romería sin nada que dar: sin SMS")
+	J.S.day = Datos.dia_de(2027, 9, 8)
+	TOAST.clear()
+	J.hilo_entra("ermita-in")
+	chk(TOAST.is_empty(), "ni aviso")
 	# 9 · cuando no le toca, lo de siempre: npc_talk sigue (el cuaderno azul, ya cerrado)
 	J.S.hilo = {"p": 6, "tr": {"miren": 1, "serora": 1, "txaro": 1}, "cor": 2, "el": 0, "d": {"6": int(J.S.day)}}
 	MENUS = []

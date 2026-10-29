@@ -468,6 +468,7 @@ sfe17f6c0,"«Tú verás. Hasta que acabe la feria, aquí las tengo.»",«Up to y
 s5cddb919,"«En la feria, solo efectivo.»","«At the fair, cash only.»"
 s5371e2db,{n} semillas de {s},{n} {s} seeds
 sc09d2f3c,Hoy: {f},Today: {f}
+s3983daf9,"{n}, {d} días","{n}, {d} days"
 scba946a8,La ría no duerme,The Estuary Never Sleeps
 sff6a0d46,Dos hermanas se reparten la casa de su madre en Deusto y no se ponen de acuerdo ni en el reloj de la cocina.,Two sisters split their mother's house in Deusto and can't even agree on the kitchen clock.
 s8bd93ba9,Marea baja,Low Tide
@@ -6724,9 +6725,9 @@ s4f20c5ac,Kif del Rif. Yo de esto no entiendo; tú sí. Llévatelo.,Kif from the
 s19d007d4,"Andoni, en el molino, en primavera, si sois amigos","Andoni, at the mill, in spring, if you're friends"
 s614531cc,"En primavera limpio los botes del abuelo. Este no lo cambio, te lo regalo, que tú los cuidas.","In spring I clean my grandfather's jars. I won't trade this one, I'm giving it to you, because you look after them."
 s9ba8dcca,"Beldia, de Ketama. La más vieja que tengo.","Beldia, from Ketama. The oldest I have."
-sb1fe5ee3,"Txomin, en la Kale Zaharra, en invierno","Txomin, in the Kale Zaharra, in winter"
-s95f8b71d,En invierno las setas van lentas y yo me aburro. Ordenando el bajo salió un bote del dueño de antes.,"In winter the mushrooms are slow and I get bored. Tidying the basement, a jar turned up from the previous owner."
-s99103b76,"Pone «Bekaa». Libanesa, creo. Para ti, que las mías no son de esto.","It says «Bekaa». Lebanese, I think. For you, mine aren't this kind."
+s8adc3b21,"Andoni, en el molino, en invierno","Andoni, at the mill, in winter"
+sda9786be,"En invierno el molino para y yo ordeno el desván. Salió un bote de mi abuelo, de cuando estuvo embarcado.","In winter the mill stops and I tidy the loft. A jar of my grandfather's turned up, from his days at sea."
+s4720ed92,"Pone «Bekaa». Libanesa. Llévatela, que tú las haces crecer.","It says ""Bekaa"". Lebanese. Take it, you make them grow."
 s78e6a51b,"Iñaki, en verano, si sois amigos","Iñaki, in summer, if you're friends"
 sed421bee,"Un cliente sudafricano, de los que vienen a hacer surf. No tenía suelto y me pagó con esto.","A South African customer, one of the surfers. He had no change and paid me with this."
 sdb977b8a,"Durban Poison, dice. Tú que plantas, sácale partido.","Durban Poison, he says. You're the grower, make the most of it."
@@ -6776,6 +6777,9 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+sb1fe5ee3,"Txomin, en la Kale Zaharra, en invierno","Txomin, in the Kale Zaharra, in winter"
+s95f8b71d,En invierno las setas van lentas y yo me aburro. Ordenando el bajo salió un bote del dueño de antes.,"In winter the mushrooms are slow and I get bored. Tidying the basement, a jar turned up from the previous owner."
+s99103b76,"Pone «Bekaa». Libanesa, creo. Para ti, que las mías no son de esto.","It says «Bekaa». Lebanese, I think. For you, mine aren't this kind."
 s260b73ae,"{N}, una cosa que no te he contado. La semana del entierro de tu tía vi luz en su piso de madrugada, dos noches seguidas.","{N}, something I haven't told you. The week of your aunt's funeral I saw a light in her flat in the small hours, two nights running."
 seef4db24,"Tú aún no habías llegado. Y la llave solo la tenía ella. Mira lo de detrás del diploma, que ella ahí guardaba lo suyo.",You hadn't arrived yet. And only she had the key. Look behind the diploma: that's where she kept her things.
 s13f23f48,"Lo de la caja... Te cuento lo único que sé: Molina estuvo esa mañana en Hacienda, en Bilbao. Hice cola detrás de él. Él no fue.",About the safe... Here's the only thing I know: Molina was at the tax office in Bilbao that morning. I queued behind him. It wasn't him.

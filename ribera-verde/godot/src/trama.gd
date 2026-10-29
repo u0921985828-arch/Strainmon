@@ -704,6 +704,10 @@ func landrace_trueque() -> String:
 	for k in D.REGALO:
 		if S.disc.get(k) and str(D.STRAINS[k].o).begins_with("Landrace") and not D.BANCO.any(func(b): return b[0] == k):
 			r.append(k)
+	if Datos.CAL and D.has("CAZA") and S.get("caza") is Dictionary:   # i18n-no · ESTUDIO, tanda 4: y las de la caza que ya te dieron
+		for e in D.CAZA.l:
+			if S.caza.has(String(e.k)) and S.disc.get(String(e.k)):
+				r.append(String(e.k))
 	var l := []
 	for b in D.BANCO:
 		if S.ch >= int(b[2]):

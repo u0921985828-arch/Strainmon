@@ -1,6 +1,6 @@
 # Las landraces por estación y por gente y las fiestas fijas (ESTUDIO, tanda 4; lo pidió el usuario: «metas mano a las mejoras
 # que hablamos»; solo con Datos.CAL): CAZA de tools/caza.py. Diecisiete personas dan, una vez por partida, una landrace en su
-# estación, un día de temporal o en su fiesta (S.caza = {k: día}); las fiestas —la feria de semillas de primavera en Bilbao, las
+# estación, un día de temporal o en su fiesta (S.caza = {k: día}; con CAL no se venden en el banco del PC); las fiestas —la feria de semillas de primavera en Bilbao, las
 # del barrio en agosto y la romería de la ermita— salen en el calendario, con su SMS la víspera y un aviso al llegar (S.fiv).
 # Cadena: … → salafria → acto2 → caza → retencion → juego.
 extends "res://src/acto2.gd"
@@ -42,6 +42,10 @@ func caza_ok(e: Dictionary) -> bool:
 		return false
 	if e.has("flag") and not S.flags.get(String(e.flag)):
 		return false
+	if e.has("mar") and S.get("mar") == null:   # Koldo, después de conocerle en el muelle
+		return false
+	if S.get("cazaN") is Dictionary and int(S.cazaN.get(String(e.k), -1)) == int(S.day):   # i18n-no · dicho que no hoy: lo de siempre
+		return false
 	return rel(String(e.q)) >= int(e.get("rel", 0))
 
 # npc_talk: la landrace de esa persona, si toca hoy; si no, lo de siempre (false, sin esperar: ver hilo_talk en acto2.gd)
@@ -63,9 +67,11 @@ func caza_da(e: Dictionary) -> void:
 	var nom := String(strain(k).n).to_upper()
 	if e.has("eur"):
 		if await ask(T("{n} semillas de {s}, {e}.", {"n": int(e.n), "s": nom, "e": Datos.eur(float(e.eur))}), [K("Comprar"), K("No")], N) != 0:
+			caza_no(k)
 			await say(K("«Tú verás. Hasta que acabe la feria, aquí las tengo.»"), N)
 			return
 		if float(S.money) < float(e.eur):
+			caza_no(k)
 			sfx("bad")
 			await say(K("«En la feria, solo efectivo.»"), N)
 			return
@@ -76,13 +82,22 @@ func caza_da(e: Dictionary) -> void:
 	caza()[k] = int(S.day)
 	await got(T("{n} semillas de {s}", {"n": int(e.n), "s": nom}))
 
+func caza_no(k: String) -> void:   # por hoy, no vuelve a ofrecerla: lo que vende de siempre
+	if not (S.get("cazaN") is Dictionary):   # i18n-no
+		S.cazaN = {}
+	S.cazaN[k] = int(S.day)
+
+# si en esa fiesta queda alguien con su landrace por dar (las fiestas vuelven cada año; lo de la caza, una vez)
+func fiesta_pend(f: Dictionary) -> bool:
+	return D.CAZA.l.any(func(e): return String(e.get("fi", "")) == String(f.k) and not caza().has(String(e.k)))
+
 # al amanecer: la víspera de cada fiesta, su SMS
 func hilo_dia() -> void:
 	super()
 	if not Datos.CAL or int(S.ch) < 2:
 		return
 	var f := fiesta_de(int(S.day) + 1)
-	if f.is_empty() or not fiesta_de(int(S.day)).is_empty():
+	if f.is_empty() or not fiesta_de(int(S.day)).is_empty() or not fiesta_pend(f):
 		return
 	var de: String = K("SMS · ") + I18n.v(f.de)
 	var L := [I18n.v(f.sms)]
@@ -92,12 +107,12 @@ func hilo_dia() -> void:
 func hilo_entra(mapa: String) -> void:
 	super(mapa)
 	var f := fiesta_de(int(S.day))
-	if f.is_empty() or String(f.mapa) != mapa or int(S.get("fiv", -1)) == int(S.day):
+	if f.is_empty() or String(f.mapa) != mapa or int(S.get("fiv", -1)) == int(S.day) or not fiesta_pend(f):
 		return
 	S.fiv = int(S.day)
 	toast(T("Hoy: {f}", {"f": I18n.v(f.n)}), 2200)
 
-# los días de fiesta, en el calendario (este año y el que viene)
+# las fiestas, en el calendario (este año y el que viene): una marca, el primer día, con los días que dura (que no tape los plazos)
 func marcas_cal() -> Array:
 	var r := super()
 	if not Datos.CAL:
@@ -105,8 +120,7 @@ func marcas_cal() -> Array:
 	var y: int = int(Datos.fecha(int(S.day)).y)
 	for yy in [y, y + 1]:
 		for f in D.CAZA.fi:
-			var a := fiesta_ini(f, yy)
-			for i in int(f.dias):
-				r.append({"d": a + i, "c": CAZA_COLOR, "t": I18n.v(f.n)})
+			var t: String = I18n.v(f.n) if int(f.dias) < 2 else T("{n}, {d} días", {"n": I18n.v(f.n), "d": int(f.dias)})
+			r.append({"d": fiesta_ini(f, yy), "c": CAZA_COLOR, "t": t})
 	r.sort_custom(func(a, b): return a.d < b.d)
 	return r
