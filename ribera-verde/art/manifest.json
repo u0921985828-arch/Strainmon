@@ -14132,6 +14132,36 @@
    "coste_real": 0,
    "tipo": "objeto",
    "max_colores": 32,
+   "id": "kaia-riego",
+   "celda": "mueble_escala",
+   "cubre": [
+    "obj:tanqueKB",
+    "obj:riegoKB",
+    "obj:drenKB",
+    "obj:depK",
+    "obj:depKd"
+   ],
+   "ajuste_por_sprite": {
+    "tanqueKB": "exacto",
+    "riegoKB": "exacto",
+    "drenKB": "exacto",
+    "depK": "exacto",
+    "depKd": "exacto"
+   },
+   "origen": "el tanque y el programador de la nave (locales-alto) y el depósito de recogida de la sala (o-drenKS, de PixelLab), más bajos quitando filas suyas, y el bidón de la huerta (bidonA) para el depósito del goteo de cada carpa: python3 -I tools/sprites/a-mano/kaia_riego.py",
+   "estilo_ref": "el tanque y el programador de la nave (tanqueN, riegoN) y el depósito de recogida de KAIA (o-drenKS)",
+   "notas": "Lo pidió el usuario: «que tampoco sea el depósito, por ejemplo, tendrá que estar fuera de las carpas y demás. Esas cosas hay que hacerlas con lógica». De una casilla de alto (1 m a 16 px/m), para no montarse en la carpa de sala; solo con Datos.CAL.",
+   "descripcion": "El rincón del riego de la carpa de sala de KAIA, fuera de ella: el tanque bajo, el programador en su mueble bajo y el depósito de recogida con su bomba (tanqueKB, riegoKB, drenKB), y el depósito del goteo de cada carpa de la fase 1, a su lado, con el grifo hacia ella (depK a su izquierda, depKd a su derecha)."
+  },
+  {
+   "fase": "F9",
+   "herramienta": "importado",
+   "estado": "hecho",
+   "familia": "importado",
+   "paleta": "propia",
+   "coste_real": 0,
+   "tipo": "objeto",
+   "max_colores": 32,
    "id": "sala-fria",
    "celda": "objeto_1x1",
    "cubre": [

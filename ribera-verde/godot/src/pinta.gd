@@ -419,6 +419,10 @@ func _mundo() -> void:
 		list.append([2 * 16 - 1, _tubos_dren])
 	if Datos.CAL and J.D.has("KAIA_CULT") and S.map == String(J.D.KAIA_CULT.mapa):   # el tubo de extracción de cada carpa, pegado al techo
 		list.append([1 << 20, _tubos_kaia])
+		if J.D.KAIA_CULT.f2.get("fuera"):   # y el riego de fuera de la carpa de sala, por su frente y detrás de los aparatos
+			list.append([int(J.D.KAIA_CULT.f2.fuera[0][1]) * 16 - 1, _tubos_fuera])
+		for q in J.tubos_dep():   # y la manguera del depósito de cada carpa de 400, a su lado
+			list.append([q[0], _rects_cam.bind(q[1])])
 	if Atlas.ok and ambiente_on:
 		for e in J.ents:
 			_ambiente(e)
@@ -1425,6 +1429,14 @@ func _poleas_nave(x0: int, yb: int, t0 := 0) -> Array:
 # y la bajada; 1.37: guiada del tanque a cada mesa, donde estén (manguera_nave, mundo.gd)
 func _tubos_dren() -> void:
 	for e in J.tubos_dren():
+		_rect(float(e[0]) - cam.x, float(e[1]) - cam.y, e[2], e[3], css(e[4]))
+
+func _rects_cam(rs: Array) -> void:
+	for e in rs:
+		_rect(float(e[0]) - cam.x, float(e[1]) - cam.y, e[2], e[3], css(e[4]))
+
+func _tubos_fuera() -> void:
+	for e in J.tubos_fuera():
 		_rect(float(e[0]) - cam.x, float(e[1]) - cam.y, e[2], e[3], css(e[4]))
 
 # el tubo de cada carpa de KAIA a la pared (kaiacult.gd tubos_ext): de la boca del canto de atrás de su techo, recto por el techo de la

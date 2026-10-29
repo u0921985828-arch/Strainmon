@@ -71,34 +71,129 @@ def armazon(im, techo, xs=(), ys=()):
             arista(x, y, True); arista(x + 1, y, False)
     return im
 
+# lo que tienen las carpas de verdad (lo pidió el usuario: «en esas carpas pues hay puertas laterales, ventilaciones, agujeros para
+# extractor, intractor y eso»), con los siete tonos de la de 150: la puerta lateral en el lado de sombra (la cremallera en U, más
+# apagada que la del frente), las ventanas de malla de abajo con su solapa enrollada encima, y la boca de abajo del intractor (la
+# manga con su cordón) con su tubo de aluminio hasta el intractor, en el suelo. El tubo de extracción sale por la boca del techo
+# (lo pinta el juego, kaiacult.gd tubos_ext); la manguera del goteo entra por el canto de su lado, desde su depósito de fuera.
+TONO = [(32, 32, 36), (48, 48, 56), (69, 71, 78), (76, 85, 96), (94, 96, 104), (138, 142, 152), (178, 184, 196)]
+
+def pon(px, x, y, t):
+    px[x, y] = TONO[t] + (255,)
+
+def puerta_lat(px, x0, x1, y0, y1):
+    """la puerta lateral: la cremallera en U de x0 a x1 desde y0, abierta por abajo, con el tirador abajo a la izquierda"""
+    for y in range(y0 + 1, y1 + 1):
+        pon(px, x0, y, 2); pon(px, x1, y, 2)
+    for x in range(x0 + 1, x1):
+        pon(px, x, y0, 2)
+    pon(px, x0 + 1, y0 + 1, 1); pon(px, x1 - 1, y0 + 1, 1)   # las esquinas, redondeadas por dentro
+    pon(px, x0, y1 - 2, 4); pon(px, x0, y1 - 1, 5)          # el tirador
+
+def ventana(px, x0, y0, w, h, luz):
+    """la ventana de malla de w × h: el marco con velcro, la malla a cuadros y la solapa enrollada encima"""
+    marco, a, b = (4, 0, 2) if luz else (2, 0, 1)
+    for x in range(x0, x0 + w):
+        pon(px, x, y0, marco); pon(px, x, y0 + h - 1, marco)
+        pon(px, x, y0 - 1, 5 if (x - x0) % 2 == 0 else 4)   # la solapa, enrollada y atada
+    for y in range(y0, y0 + h):
+        pon(px, x0, y, marco); pon(px, x0 + w - 1, y, marco)
+    for y in range(y0 + 1, y0 + h - 1):
+        for x in range(x0 + 1, x0 + w - 1):
+            pon(px, x, y, a if (x + y) % 2 else b)
+
+def boca(px, x0, y0, luz):
+    """la manga de 4 × 4 (125 mm) con su cordón: el aro y el agujero"""
+    aro = 4 if luz else 2
+    for x, y in ((1, 0), (2, 0), (0, 1), (3, 1), (0, 2), (3, 2), (1, 3), (2, 3)):
+        pon(px, x0 + x, y0 + y, aro)
+    for x, y in ((1, 1), (2, 1), (1, 2), (2, 2)):
+        pon(px, x0 + x, y0 + y, 0)
+    pon(px, x0 + 4, y0 + 2, 5)   # el cordón
+
+def intractor(px, x0, yb, yp, luz):
+    """la boca de abajo (x0, yp) y, de ella al suelo (yb), el tubo de aluminio y el intractor en línea: el aire limpio entra por abajo"""
+    boca(px, x0, yp, luz)
+    for y in range(yp + 4, yb - 3):
+        pon(px, x0 + 1, y, 6); pon(px, x0 + 2, y, 5)
+    for y in range(yb - 3, yb):                           # el intractor, de pie en el suelo, con su motor
+        for x in range(x0, x0 + 4):
+            pon(px, x, y, 1)
+        pon(px, x0, y, 4); pon(px, x0 + 3, y, 0)
+    pon(px, x0 + 1, yb - 2, 5); pon(px, x0 + 2, yb - 2, 5)
+
+def detalles(im, w, frente, tipo):
+    """los de cada carpa: frente = la primera fila del frente; la de abajo, im.height - 1"""
+    px = im.load()
+    yb = im.height - 1                                     # la fila del pie
+    if tipo == 's':                                        # la de 200: luz 0-15 (la puerta), sombra 16-30
+        puerta_lat(px, 18, 26, frente + 5, yb - 1)
+        ventana(px, 27, frente + 9, 4, 5, False)
+        intractor(px, 27, yb, yb - 13, False)
+    else:                                                  # las de 400: luz 0-30 (dos puertas), sombra 31-62
+        ventana(px, 14, yb - 8, 5, 5, True)                # entre las dos puertas
+        puerta_lat(px, 34, 46, frente + 5, yb - 1)
+        ventana(px, 49, yb - 8, 7, 5, False)
+        intractor(px, 58, yb, yb - 12, False)
+    return im
+
+def detalles_sala(im, xs):
+    """la de sala: dos ventanas y dos intractores en la tela de luz, la puerta lateral pasada la de entrar y, a la derecha, la boca de
+    servicio (BOCA_SALA), por la que entra la impulsión del riego y sale el drenaje, por encima del rincón del riego"""
+    px = im.load()
+    yb = im.height - 1
+    for x in (14, 54):
+        ventana(px, x, yb - 9, 14, 6, True)
+    for x in (34, 74):
+        intractor(px, x, yb, yb - 14, True)
+    puerta_lat(px, xs + 4, xs + 18, yb - 32, yb - 1)
+    bx, by = BOCA_SALA
+    for y in range(by, by + 6):                            # la boca de servicio: la manga ancha con su aro
+        for x in range(bx, bx + 8):
+            borde = y in (by, by + 5) or x in (bx, bx + 7)
+            if borde and (x, y) not in ((bx, by), (bx + 7, by), (bx, by + 5), (bx + 7, by + 5)):
+                pon(px, x, y, 4)
+            elif not borde:
+                pon(px, x, y, 0)
+    pon(px, bx + 8, by + 3, 5)                              # el cordón
+    return im
+
+# la boca de servicio de la de sala, en el sprite (x, y de su esquina; la de kaiacult.gd KC_BOCA): baja, a medio metro, justo encima
+# del tubo de entrada del depósito de recogida, que está fuera con el tanque y el programador (kaia_cult.py, f2.fuera); el drenaje cae
+# por su parte de abajo y la impulsión entra por su lado (kaiacult.gd red_fuera)
+BOCA_SALA = (176, 100)
+
 def en_celda(im, w, h):
     out = Image.new('RGBA', (w, h), (0, 0, 0, 0))
     out.paste(im, (0, h - im.height), im)
     return out
 
 def guarda(im, asset, spr):
-    d = P('art', 'crudo', asset, spr, 'unica')
+    d = os.path.join(os.environ['SALE'], asset, spr, 'unica') if os.environ.get('SALE') else P('art', 'crudo', asset, spr, 'unica')
     os.makedirs(d, exist_ok=True)
     for v in glob.glob(os.path.join(d, '*.png')): os.remove(v)
     im.save(os.path.join(d, '00.png'))
     print(asset, spr, im.size, im.getbbox(), len({p for p in im.get_flattened_data() if p[3]}), 'colores')
 
+SOMBRA_SALA = 112             # la de sala: el lado de sombra, pasada la puerta de entrar (con la puerta lateral)
 NIVELES = {'kcs': (2, 2), 'kcm': (4, 2), 'kcl': (4, 4)}   # ancho y fondo (m), 2 m de alto
 
 if __name__ == '__main__':
     g = lee('art/procesado/carpas-mapa/carpa-g150-mapa/unica/00.png')
     assert g.size == (24, 40), g.size
-    for v in glob.glob(P('art', 'crudo', 'kaia-carpa', 'kc*')):   # las de antes (abiertas, kcs-<n>…), fuera
+    for v in ([] if os.environ.get('SALE') else glob.glob(P('art', 'crudo', 'kaia-carpa', 'kc*'))):   # las de antes (abiertas, kcs-<n>…), fuera
         shutil.rmtree(v)
     for spr, (w, d) in NIVELES.items():
         im = filas(columnas(g, cols_kc(w)), rows(d * 8, 32))
         if d == 4:
             armazon(im, d * 8, ys=(d * 4 - 1,))                          # la de 400 × 400, el travesaño de en medio
         assert im.size == (w * 16, d * 8 + 32), (spr, im.size)
+        detalles(im, w, d * 8, spr[2])
         guarda(en_celda(im, 80, 80), 'kaia-carpa', spr)
     # la de sala: 13 × 7 casillas, 2,5 m de alto (40 filas) y el techo hasta el fondo de su huella (72); la puerta de 2 m (32 filas)
     # en la casilla 6 (x 96, la de C.puerta en kaia_cult.py), de 14 columnas de tela entre sus cremalleras
-    im = filas(columnas(g, cols_sala(208, 97, 14, 150)), rows(72, 40, 32))
+    im = filas(columnas(g, cols_sala(208, 97, 14, SOMBRA_SALA)), rows(72, 40, 32))
     armazon(im, 72, ys=(19, 39, 58))
+    detalles_sala(im, SOMBRA_SALA)
     assert im.size == (208, 112), im.size
     guarda(im, 'kaia-carpa-sala', 'kcx')

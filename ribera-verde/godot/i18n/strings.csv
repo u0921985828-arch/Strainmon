@@ -1992,9 +1992,12 @@ sa4f130fc,La sala de cultivo de KAIA pasa a las carpas nuevas. Lo que no cabe se
 s23317412,KAIA_CULT,KAIA_CULT
 s066ae4c4,"La sala de cultivo de KAIA, cerrada. Hasta tener la licencia de cultivo, aquí dentro no se planta nada.","KAIA's grow room, locked. Until you have the cultivation licence, nothing gets planted in here."
 sa4a2b640,El depósito de recogida: lo que sobra de cada mesa baja por su tubería de drenaje y se filtra antes de volver al tanque.,The collection tank: what each table drains runs down its pipe and is filtered before going back to the tank.
+s186b5684,"El depósito del goteo de la carpa {n}, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.","The drip tank of tent {n}, outside it: its pump sends the water with the nutrients down the hose, which goes in through the tent wall, to each pot."
 s62ad04d6,"El tanque del riego centralizado, con el abono ya mezclado: las bombas lo llevan a cada mesa.","The central irrigation tank, with the nutrients already mixed in: the pumps carry it to every table."
+s4fa33be1,"El rincón del riego, fuera de la carpa: el tanque con el abono ya mezclado, el programador que lo manda a cada mesa por la boca de servicio y el depósito de recogida, al que vuelve por ella lo que sobra.","The watering corner, outside the tent: the tank with the nutrients already mixed, the controller that sends it to each table through the service port, and the runoff tank, where whatever is left comes back through it."
 sa9e94427,"El programador del riego de las mesas: los turnos de cada una, el pH y la EC, en automático.","The tables' irrigation controller: each one's cycles, the pH and the EC, all automatic."
 s04708b3d,"El programador del riego de las mesas: los turnos de cada una, la acidez y la EC, en automático.","The tables' irrigation controller: each one's cycles, the acidity and the EC, all automatic."
+s48ed018b,El filtro de carbón y el extractor de la carpa: el aire sale limpio por el tubo del techo y entra el de fuera por los intractores de abajo.,The tent's carbon filter and exhaust fan: the air leaves clean through the ceiling duct and fresh air comes in through the intake fans below.
 s135969dd,"La sala, en obras: desagües, el cuadro trifásico y el clima industrial. Las mesas estarán montadas el {f}.","The room is under works: drains, the three-phase panel and industrial climate control. The tables will be set up on {f}."
 s087765b0,"El cuadro de la sala: ocho mesas con su LED doble, el riego centralizado y el clima. {q}","The room's control panel: eight tables with their double LED, central irrigation and climate. {q}"
 s60bc25ab,Las lleva {n}.,{n} runs them.
@@ -4980,9 +4983,6 @@ s08c6a1ed,iwT_kcs,
 se766c3cf,iwB_kcs,
 s1c032c45,mesaKP,
 s1c7f083e,mesaKP2,
-s68b6a0a2,tanqueN,tanqueN
-s516bd93e,riegoN,riegoN
-s0bda5e79,drenKS2,
 s30a02292,ESTUDIANTE,STUDENT
 sf07acb89,Hola. Me ha dicho un amigo que tienes.,Hi. A friend said you've got some.
 s42927016,"Aupa, ¿tienes algo? Voy justo de dinero.","Hey, got anything? I'm a bit short on cash."
@@ -5849,6 +5849,8 @@ s207d87cf,Mide el riego y dosifica el abono sola en cada riego.,Measures the wat
 s2fe99616,apañada,makeshift
 sf62fb426,en marcha,up and running
 s23c85b4e,de concurso,award-grade
+s68b6a0a2,tanqueN,tanqueN
+s516bd93e,riegoN,riegoN
 s115d1f40,¡Esta canción es la mejor!,This song is the best!
 sabf5235f,"No pares, que viene el estribillo.","Don't stop, the chorus is coming."
 se2d96a12,Vengo cada sábado. El DJ es amigo mío.,I come every Saturday. The DJ's a mate.
@@ -5980,12 +5982,14 @@ s4abfe96e,ORDENAR LA SALA DE CULTIVO,ARRANGE THE GROW ROOM
 sc9f664d2,La carpa 1,Tent 1
 s324d6f9f,carpaG2,
 se1a5bf19,carpaKS0,
+sabcb7a7e,depKd,
 s50ff3568,La carpa 2,Tent 2
 s96a28f8f,carpaKS1,
 s27f805fe,La carpa 3,Tent 3
 s0fabde35,carpaKS2,
 sb99c905d,La carpa 4,Tent 4
 s78aceea3,carpaKS3,
+s152d576d,depK,
 s35e480c6,carpaKM0,
 s42e3b050,carpaKM1,
 s2cffb187,carpaKL0,
@@ -6829,6 +6833,10 @@ s1a47c179,Riego centralizado con su tanque,Central irrigation with its tank
 sa9e51af4,Drenaje: tuberías y depósito de recogida,Drainage: pipes and collection tank
 sc2d98008,Extracción con filtros de carbón,Extraction with carbon filters
 s339fa8d5,carpaKX,
+s0f174f10,tanqueKB,
+sf6974d06,riegoKB,
+s645b0829,drenKB,
+s58037d69,drenKB2,
 sed28d3b4,Paneles de poliuretano de 80 mm y puerta frigorífica,80 mm polyurethane panels and a cold-room door
 s284c4628,"Equipo de frío de 1,5 kW para 4 °C",1.5 kW cooling unit for 4 °C
 s4d95cc43,"Equipo de frío de 1,5 kW para 4°",1.5 kW cooling unit for 4°

@@ -222,7 +222,7 @@ func kc_hu(i: int) -> Dictionary:
 	var p := kc_pos(ci)
 	return {"l": kc().p, "v": [int(p[0]) * 16 + int(t[0]) * 8, (int(p[1]) + int(t[1]) - 1) * 16], "f": kc_f(ci)}
 
-func kc_carpa_en(x: int, y: int) -> int:   # la carpa (N.tam casillas) con la casilla (x, y), o -1
+func kc_carpa_en(x: int, y: int, dep := false) -> int:   # la carpa (N.tam casillas) con la casilla (x, y), o -1; con dep, la de ese depósito
 	if kc_f2() or kc_obra():
 		return -1
 	for ci in kc_ns():
@@ -230,9 +230,16 @@ func kc_carpa_en(x: int, y: int) -> int:   # la carpa (N.tam casillas) con la ca
 			continue
 		var t: Array = kc_Nc(ci).tam
 		var p := kc_pos(ci)
-		if y >= int(p[1]) and y < int(p[1]) + int(t[1]) and x >= int(p[0]) and x < int(p[0]) + int(t[0]):
+		if dep:
+			var d := kc_dep(ci)
+			if x == int(p[0]) + int(d[0]) and y == int(p[1]) + int(d[1]):
+				return ci
+		elif y >= int(p[1]) and y < int(p[1]) + int(t[1]) and x >= int(p[0]) and x < int(p[0]) + int(t[0]):
 			return ci
 	return -1
+
+func kc_dep(ci: int) -> Array:   # la casilla de su depósito del goteo, desde la de arriba a la izquierda de la carpa (kaia_cult.py: NIV.dep)
+	return kc_Nc(ci).dep[kc_iN(ci)]
 
 func kc_plantadas(ci: int) -> int:
 	var n := 0
@@ -298,6 +305,8 @@ func kc_monta() -> void:
 		for dx in int(C.tam[0]):
 			m.o[y0 + dy][x0 + dx] = "carpaG2"   # i18n-no
 	m.o[y0 + int(C.tam[1]) - 1][x0] = String(C.obj)
+	for q in D.KAIA_CULT.f2.get("fuera", []):   # el rincón del riego, fuera de la carpa (red_fuera)  # i18n-no
+		m.o[int(q[1])][int(q[0])] = String(q[2])
 
 func kc_en_sala(x: int, y: int) -> bool:   # la casilla (x, y) de cult-muelle es de la carpa de sala
 	if not kc_f2():
@@ -322,8 +331,11 @@ func kc_obj(x: int, y: int, o) -> bool:
 		var F2: Dictionary = D.KAIA_CULT.f2
 		await warp({"to": F2.sala, "x": int(F2.entra[0]), "y": int(F2.entra[1]), "dir": "up"})   # i18n-no
 		return true
-	if o == "drenKS" or o == "drenKS2":   # i18n-no
+	if o == "drenKS" or o == "drenKS2" or o == "drenKB" or o == "drenKB2":   # i18n-no
 		await say(K("El depósito de recogida: lo que sobra de cada mesa baja por su tubería de drenaje y se filtra antes de volver al tanque."))
+		return true
+	if o == "depK" or o == "depKd":   # el depósito del goteo de una carpa, fuera de ella (kaia_cult.py: NIV.dep)  # i18n-no
+		await say(T("El depósito del goteo de la carpa {n}, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.", {"n": kc_carpa_en(x, y, true) + 1}))
 		return true
 	var ci := kc_carpa_en(x, y)
 	if ci >= 0:
@@ -343,8 +355,14 @@ func kc_obj(x: int, y: int, o) -> bool:
 		"tanqueN":   # i18n-no
 			await say(K("El tanque del riego centralizado, con el abono ya mezclado: las bombas lo llevan a cada mesa."))
 			return true
-		"riegoN":   # i18n-no
+		"tanqueKB":   # el rincón del riego, fuera de la carpa de sala  # i18n-no
+			await say(K("El rincón del riego, fuera de la carpa: el tanque con el abono ya mezclado, el programador que lo manda a cada mesa por la boca de servicio y el depósito de recogida, al que vuelve por ella lo que sobra."))
+			return true
+		"riegoN", "riegoKB":   # i18n-no
 			await say(K("El programador del riego de las mesas: los turnos de cada una, el pH y la EC, en automático."))
+			return true
+		"filtroN", "extrG":   # i18n-no
+			await say(K("El filtro de carbón y el extractor de la carpa: el aire sale limpio por el tubo del techo y entra el de fuera por los intractores de abajo."))
 			return true
 	return false
 
@@ -646,7 +664,7 @@ func kc_def(ci: int) -> Dictionary:
 	var Dp: float = float(N.cm[1]) / mi
 	var nv: int = kc_n(ci) / mi
 	var cols := maxi(1, roundi(sqrt(nv * W / Dp)))
-	return {"n": N.n, "w": 2, "cm": [W, float(N.cm[2]), Dp], "cols": cols, "filas": ceili(float(nv) / cols), "plazas": nv, "wmax": int(D.FOCOS[D.KAIA_CULT.foco].w) * int(N.nf), "lmax": int(D.MACETAS.get(kc_pat(ci).m, {"l": 25}).l), "kc": true}
+	return {"n": N.n, "w": 2, "cm": [W, float(N.cm[2]), Dp], "cols": cols, "filas": ceili(float(nv) / cols), "plazas": nv, "wmax": int(D.FOCOS[D.KAIA_CULT.foco].w) * int(N.nf), "lmax": int(D.MACETAS.get(kc_pat(ci).m, {"l": 25}).l), "kc": true, "depi": int(kc_dep(ci)[0]) < 0}
 
 func kc_vista_on() -> void:
 	var ci: int = KCV.ci
@@ -1001,34 +1019,29 @@ func rects_mesak(V: Dictionary) -> Array:
 		o.append([qx, qy, 6, 3, "#f8d040" if j == i else ("#58c060" if kc_me(j) else "#5a5e66")])
 	return o
 
-# La red del riego y del drenaje de la sala (lo pidió el usuario: «todas las conexiones de riego, de drenaje hazlas con cabeza y
-# pensando… LOGICAS»), como en una sala de mesas de flujo y reflujo de verdad: la bomba del tanque (tanqueN) da al programador
-# (riegoN, con sus dosificadoras, que echan al tanque), que reparte la solución por la impulsión (PE negro): por el suelo, contra la
-# pared de delante y detrás del depósito, sube por la pared de la derecha y corre por debajo de cada fila de mesas, con una
-# electroválvula en cada mesa. Del desagüe de cada mesa baja su tubo al colector (PVC gris) de debajo de su fila, que cae por la pared
-# de la derecha al depósito de recogida (drenKS, en la esquina); de él, la bomba lo devuelve filtrado al tanque por la pared de
-# delante, por encima del programador. Nada cruza un pasillo: todo va por debajo de las mesas o pegado a las paredes.
+# el riego y el drenaje de la carpa de sala (lo pidió el usuario: «todas las conexiones de riego, de drenaje hazlas con cabeza y
+# pensando… LOGICAS» y «que tampoco sea el depósito… tendrá que estar fuera de las carpas»), como en una sala de mesas de flujo y
+# reflujo de verdad: dentro, la impulsión (PE negro) corre por debajo de cada fila de mesas, con una electroválvula en cada una, y del
+# desagüe de cada mesa baja su tubo al colector (PVC gris) de debajo de su fila; los dos bajan por la pared de la derecha y salen por
+# la boca de servicio del frente (red_riego). Fuera, en el paso de delante de la carpa (f2.fuera, red_fuera): la bomba del tanque da
+# al programador (riegoN, con sus dosificadoras), que sube la solución a la boca por el frente de la carpa; el drenaje baja de la boca
+# por gravedad al tubo de arriba del depósito de recogida (drenKS, en la esquina), y su bomba lo devuelve filtrado al tanque por el
+# suelo, por detrás de los aparatos. Nada cruza un pasillo ni otro tubo: todo va por debajo de las mesas, pegado a una pared o por el
+# frente de la carpa, por encima de los aparatos.
 # Tramos [x0, y0, x1, y1, tipo, alto] en píxeles del mapa, en horizontal o en vertical (tipo: "sum", la impulsión; "dren", el drenaje
-# y la vuelta; alto: por la pared de delante, por encima de los aparatos); pinta.gd los pinta detrás de las mesas (tubos_dren)
+# y la vuelta; alto: por el frente de la carpa o por encima de los aparatos); pinta.gd los pinta detrás de las mesas (tubos_dren) y
+# de los aparatos (tubos_fuera)
 const DREN_COL := ["#3e434c", "#9aa0a8", "#c4c8ce"]   # el canto, el PVC y su brillo
 const SUM_COL := ["#16171c", "#4e525a"]   # el PE negro de la impulsión y su brillo
+const KC_BOCA := [176, 100, 8, 6]   # la boca de servicio en el sprite de la carpa de sala (kaia_carpa.py BOCA_SALA): x, y, ancho y alto
 func red_riego() -> Array:
 	var l := []
 	if not kc_hay():
 		return l
 	var F2: Dictionary = D.KAIA_CULT.f2
-	var pos := {}
-	for q in F2.o:
-		pos[String(q[2])] = [int(q[0]), int(q[1])]
-	if not (pos.has("tanqueN") and pos.has("riegoN") and pos.has("drenKS")):   # i18n-no
-		return l
 	var xs: int = int(F2.W) * 16 - 8   # por la pared de la derecha: la impulsión y, pegado a la pared, el colector
 	var xd: int = int(F2.W) * 16 - 5
-	var tq: Array = pos.tanqueN
-	var rg: Array = pos.riegoN
-	var dr: Array = pos.drenKS
-	var yf: int = int(rg[1]) * 16 + 13   # el suelo, contra la pared de delante
-	var yr: int = int(dr[1]) * 16 + 15 - 31 + 3   # la boca de arriba del depósito de recogida (o-drenKS, de pie en su casilla)
+	var yf: int = int(F2.H) * 16 - 1   # el canto de delante: la boca de servicio
 	var filas := {}
 	for q in F2.mesas:
 		filas[int(q[1])] = mini(int(filas.get(int(q[1]), 1 << 20)), int(q[0]))
@@ -1043,23 +1056,49 @@ func red_riego() -> Array:
 		var x: int = int(q[0]) * 16 + 29
 		var Y: int = int(q[1]) * 16
 		l.append([x, Y + 9, x, Y + 13, "dren", false])
-	l.append([xs, ytop + 10, xs, yf, "sum", false])   # la impulsión: por la pared de la derecha y por el suelo, hasta el programador
-	l.append([int(rg[0]) * 16 + 8, yf, xs, yf, "sum", false])
-	# y antes, de la bomba del tanque (tanqueN: arriba a la derecha) al programador, a media altura, contra la pared de delante
-	l.append([int(tq[0]) * 16 + 21, int(tq[1]) * 16 - 4, int(rg[0]) * 16, int(tq[1]) * 16 - 4, "sum", true])
-	l.append([xd, ytop + 13, xd, yr, "dren", false])   # el colector, a la boca del depósito
-	var xv: int = int(dr[0]) * 16 - 4   # la vuelta: de la boca de la izquierda del depósito al tanque, por encima del programador
-	var xt: int = int(tq[0]) * 16 + 1
-	l.append([xt, yr - 1, xv, yr - 1, "dren", true])
-	l.append([xt, yr - 1, xt, int(tq[1]) * 16 + 15 - 31 + 9, "dren", true])
+	l.append([xs, ytop + 10, xs, yf, "sum", false])   # la impulsión, de la boca de servicio por la pared de la derecha
+	l.append([xd, ytop + 13, xd, yf, "dren", false])   # y el colector, a la boca
 	return l
 
-# los rectángulos [x, y, w, h, color] de red_riego, con una electroválvula en cada mesa y la abrazadera de cada bajada
-func tubos_dren() -> Array:
+# la boca de servicio en cult-muelle: [x, y, ancho, alto] en píxeles del mapa (la carpa de sala, de 112 filas, con el pie en su fila de abajo)
+func kc_boca() -> Array:
+	var C: Dictionary = D.KAIA_CULT.f2.carpa
+	return [int(C.def[0]) * 16 + int(KC_BOCA[0]), (int(C.def[1]) + int(C.tam[1])) * 16 - 112 + int(KC_BOCA[1]), int(KC_BOCA[2]), int(KC_BOCA[3])]
+
+# lo de fuera, contra sus sprites (kaia_riego.py, de una casilla de alto y con el pie en la fila de abajo de la suya; columnas de su
+# celda de 32): el tanque (tanqueKB: el cuerpo de la 7 a la 24 y su salida, que acaba en la 28, en las filas 3 y 4), el programador
+# (riegoKB: las dosificadoras de la 8 a la 20 y el mueble, de la 7 a la 22, desde la fila 5) y el depósito de recogida (drenKB: el
+# tubo de entrada de la 11 a la 14, arriba, y la bomba de la 24 a la 31, abajo). La salida del tanque da al programador; de su
+# mueble sube la impulsión por el frente de la carpa y entra por el lado de la boca; el drenaje cae de la boca, recto, al tubo de
+# entrada del depósito, y la vuelta, de la bomba al tanque, va por el suelo, por detrás de los aparatos
+func red_fuera() -> Array:
 	var l := []
-	if not kc_f2() or S.map != D.KAIA_CULT.f2.sala:
+	if not kc_hay() or not kc_f2():
 		return l
-	for t in red_riego():
+	var pos := {}
+	for q in D.KAIA_CULT.f2.get("fuera", []):
+		pos[String(q[2])] = [int(q[0]), int(q[1])]
+	if not (pos.has("tanqueKB") and pos.has("riegoKB") and pos.has("drenKB")):   # i18n-no
+		return l
+	var b := kc_boca()
+	var tq: Array = pos.tanqueKB
+	var rg: Array = pos.riegoKB
+	var dr: Array = pos.drenKB
+	var Y: int = int(rg[1]) * 16   # la fila de arriba de los aparatos
+	var xp: int = int(rg[0]) * 16 - 8 + 21   # el canto de la derecha del mueble del programador
+	var ys: int = int(b[1]) + 2   # por el agujero de la boca
+	l.append([int(tq[0]) * 16 + 21, Y + 3, int(rg[0]) * 16 - 1, Y + 3, "sum", true])   # de la salida del tanque al programador
+	l.append([xp, ys, xp, Y + 5, "sum", true])   # de su mueble sube por el frente de la carpa
+	l.append([xp, ys, int(b[0]) + 1, ys, "sum", true])   # y entra por el lado de la boca
+	var xe: int = int(dr[0]) * 16 - 8 + 12   # el drenaje: de la boca, recto abajo, al tubo de entrada del depósito
+	l.append([xe, int(b[1]) + int(b[3]) - 2, xe, Y + 1, "dren", true])
+	l.append([int(tq[0]) * 16 + 13, Y + 12, int(dr[0]) * 16 - 8 + 24, Y + 12, "dren", false])   # la vuelta: de la bomba al tanque, por detrás
+	return l
+
+# los rectángulos [x, y, w, h, color] de una red (red_riego o red_fuera)
+func _tubos_de(red: Array) -> Array:
+	var l := []
+	for t in red:
 		var x0: int = mini(int(t[0]), int(t[2]))
 		var x1: int = maxi(int(t[0]), int(t[2]))
 		var y0: int = mini(int(t[1]), int(t[3]))
@@ -1075,13 +1114,33 @@ func tubos_dren() -> Array:
 			_tubo_h(l, x0, x1, y0)
 		else:
 			_tubo_v(l, x0, y0, y1)
+	return l
+
+# los de la carpa de sala por dentro, con una electroválvula en cada mesa y, en el canto de delante, el pasamuros de la boca de servicio
+func tubos_dren() -> Array:
+	if not kc_f2() or S.map != D.KAIA_CULT.f2.sala:
+		return []
+	var l := _tubos_de(red_riego())
 	for q in D.KAIA_CULT.f2.mesas:   # la electroválvula de cada mesa, en la impulsión, con su piloto
 		var x: int = int(q[0]) * 16 + 9
 		var Y: int = int(q[1]) * 16
 		l.append([x, Y + 9, 4, 3, "#2a2c32"])
 		l.append([x + 1, Y + 9, 2, 1, "#6a6e76"])
 		l.append([x + 3, Y + 10, 1, 1, "#58e070"])
+	var xs: int = int(D.KAIA_CULT.f2.W) * 16 - 8
+	var yf: int = int(D.KAIA_CULT.f2.H) * 16 - 1
+	l.append([xs - 3, yf - 3, 11, 4, "#2a2a34"])   # el pasamuros, con su aro y el agujero por el que salen
+	l.append([xs - 2, yf - 2, 9, 3, "#8a8e98"])
+	l.append([xs - 1, yf - 1, 7, 2, "#16171c"])
+	for e in _tubos_de([[xs, yf - 6, xs, yf - 2, "sum", false], [xs + 3, yf - 6, xs + 3, yf - 2, "dren", false]]):
+		l.append(e)   # los tubos, entrando en él
 	return l
+
+# los de fuera, delante de la carpa de sala
+func tubos_fuera() -> Array:
+	if not kc_f2() or S.map != D.KAIA_CULT.mapa:
+		return []
+	return _tubos_de(red_fuera())
 
 # el tubo de extracción de cada carpa a la pared, como en casa (lo pidió el usuario: «todas las conexiones… lógicas»): el extractor y el
 # filtro de carbón, colgados dentro; el tubo sale por la boca del techo, en su canto de atrás (como _tubos_casa), y va pegado al techo
@@ -1089,6 +1148,26 @@ func tubos_dren() -> Array:
 # 400 lleva dos filtros en un tubo de 315 mm) y dos en la de sala; sin pisarse: si dos caen a menos de un tubo, el de delante se
 # corre por su techo. [x del tubo, y del pasamuros, y de la boca] en píxeles del mapa
 const KC_TUBO_PARED := 8   # el centro del pasamuros, en la fila de arriba de la pared
+# la manguera del depósito del goteo de cada carpa (NIV.dep: a su lado) a su pared, del grifo, a 40 cm del suelo como en casa
+# (pinta.gd _y_goteo), con el pasamuros en el poste: [clave de orden, rectángulos]. El grifo del bidón, en sus filas 40-42 (la manguera,
+# en la 41: el grifo, en sus columnas 20-21, con el canto en la 22; en espejo, depKd, a la derecha de su carpa, en la 10-11 y la 9)
+func tubos_dep() -> Array:
+	var l := []
+	if not kc_hay() or kc_f2() or kc_obra() or S.map != D.KAIA_CULT.mapa:
+		return l
+	for ci in kc_ns():
+		if not kc_tiene(ci):
+			continue
+		var d := kc_dep(ci)
+		var p := kc_pos(ci)
+		var X: int = (int(p[0]) + int(d[0])) * 16
+		var yb: int = (int(p[1]) + int(d[1]) + 1) * 16 - 1
+		var y := yb - 6
+		var xh: int = X + 15 if int(d[0]) < 0 else X - 1   # de la columna de al lado del grifo a la pared de su carpa
+		var xp: int = X + 16 if int(d[0]) < 0 else X - 1
+		l.append([yb + 1, [[xh, y - 1, 2, 1, "#4a4c54"], [xh, y, 2, 1, "#1c1d22"], [xp, y - 2, 1, 4, "#3a3c44"]]])
+	return l
+
 func tubos_ext() -> Array:
 	var l := []
 	if not kc_hay() or S.map != D.KAIA_CULT.mapa:
@@ -1098,10 +1177,9 @@ func tubos_ext() -> Array:
 	if kc_f2():
 		var C: Dictionary = D.KAIA_CULT.f2.carpa
 		var x0: int = int(C.def[0]) * 16
-		var w: int = int(C.tam[0]) * 16
 		var yb: int = (int(C.def[1]) + int(C.tam[1])) * 16 - 112 + 1   # la de sala, de 112 filas (kaia_carpa.py)
-		cs.append([x0 + w / 4, x0 + w / 4, yb])
-		cs.append([x0 + w * 3 / 4, x0 + w * 3 / 4, yb])
+		for e in D.KAIA_CULT.f2.ext:   # encima de cada extractor de dentro (f2.ext: sus columnas)
+			cs.append([x0 + int(e) * 16 + 8, x0 + int(e) * 16 + 8, yb])
 	else:
 		for ty in m.h:
 			for tx in m.w:
@@ -1113,14 +1191,22 @@ func tubos_ext() -> Array:
 						var w: int = int(N.tam[0]) * 16
 						cs.append([tx * 16 + 6, tx * 16 + w - 7, (ty + 1) * 16 - (int(N.tam[1]) * 8 + 32) + 1])
 	cs.sort_custom(func(a, b): return a[2] < b[2])
+	var bd := []   # los depósitos del goteo del suelo (el bidón, de la columna 3 a la 14 de su casilla; en espejo, de la 1 a la 12), que el tubo no tape
+	for ty in m.h:
+		for tx in m.w:
+			if m.o[ty][tx] == "depK" or m.o[ty][tx] == "depKd":   # i18n-no
+				var x0: int = tx * 16 + (3 if m.o[ty][tx] == "depK" else 1)   # i18n-no
+				bd.append([x0, x0 + 11, ty * 16, ty * 16 + 15])
 	var xs := []
 	for c in cs:
 		var xc: int = (int(c[0]) + int(c[1])) / 2
 		var x := xc
+		var lib := func(x2: int) -> bool:   # ni a 9 px de otro tubo ni encima de un depósito que quede debajo de su recorrido
+			return xs.all(func(q): return absi(q - x2) >= 9) and bd.all(func(b): return int(b[3]) < KC_TUBO_PARED or int(b[2]) > int(c[2]) or x2 + 2 < int(b[0]) or x2 - 2 > int(b[1]))
 		for d in range(0, 64):   # lo más cerca de su centro que no pise otro tubo
 			var ok := false
 			for x2 in [xc - d, xc + d]:
-				if x2 >= int(c[0]) and x2 <= int(c[1]) and xs.all(func(q): return absi(q - x2) >= 9):
+				if x2 >= int(c[0]) and x2 <= int(c[1]) and lib.call(x2):
 					x = x2
 					ok = true
 					break

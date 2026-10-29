@@ -32,19 +32,25 @@ VUELTA = [1, 1]      # la de la sala
 # 4 × 4 conviven en la zona de cultivo con un pasillo de 1 m (el esquema que aprobó: «Sí, así»), y el último nivel es la carpa de sala. Cuanto más grande, menos pared por planta y mejor reparte el aire y la luz:
 # rinde más por plaza (efi: 0,9; 1; 1,12), y así cada nivel compensa lo que cuesta. Cada carpa, una pieza de ORDENAR de su tamaño en casillas (1 casilla = 1 m).
 NIV = [
-	{"k": "s", "n": "Carpa 200×200", "cm": [200, 200, 200], "nf": 2, "plazas": 4, "efi": 0.9, "max": 4, "tam": [2, 2], "obj": "carpaKS", "spr": "kcs",
+	{"k": "s", "n": "Carpa 200×200", "cm": [200, 200, 200], "nf": 2, "plazas": 4, "efi": 0.9, "max": 4, "tam": [2, 2], "obj": "carpaKS", "spr": "kcs", "dep": [[2, 1], [2, 1], [2, 1], [-1, 0]],
 		"def": [[13, 2], [8, 6], [11, 6], [14, 6]],
 		"kit": {"l": [["Carpa de 200 × 200 × 200 cm", 340], ["Dos LED de 720 W", 1900], ["Extractor de 200 mm con filtro de carbón", 320],
 			["Goteo de 4 salidas con su depósito", 140]]}},
-	{"k": "m", "n": "Carpa 400×200", "cm": [400, 200, 200], "nf": 4, "plazas": 8, "efi": 1.0, "max": 2, "tam": [4, 2], "obj": "carpaKM", "spr": "kcm",
+	{"k": "m", "n": "Carpa 400×200", "cm": [400, 200, 200], "nf": 4, "plazas": 8, "efi": 1.0, "max": 2, "tam": [4, 2], "obj": "carpaKM", "spr": "kcm", "dep": [[4, 1], [4, 1]],
 		"def": [[3, 2], [8, 2]],
 		"kit": {"l": [["Carpa de 400 × 200 × 200 cm", 620], ["Cuatro LED de 720 W", 3800], ["Extractor de 250 mm con filtro de carbón", 480],
 			["Goteo de 8 salidas con su depósito", 240]]}},
-	{"k": "l", "n": "Carpa 400×400", "cm": [400, 400, 200], "nf": 8, "plazas": 16, "efi": 1.12, "max": 1, "tam": [4, 4], "obj": "carpaKL", "spr": "kcl",
+	{"k": "l", "n": "Carpa 400×400", "cm": [400, 400, 200], "nf": 8, "plazas": 16, "efi": 1.12, "max": 1, "tam": [4, 4], "obj": "carpaKL", "spr": "kcl", "dep": [[4, 3]],
 		"def": [[3, 5]],
 		"kit": {"l": [["Carpa de 400 × 400 × 200 cm", 980], ["Ocho LED de 720 W", 7600], ["Extractor de 315 mm con dos filtros de carbón", 1200],
 			["Goteo de 16 salidas con su depósito", 420]]}},
 ]
+# El depósito del goteo de cada carpa, fuera de ella (lo pidió el usuario: «que tampoco sea el depósito… tendrá que estar fuera de las
+# carpas y demás. Esas cosas hay que hacerlas con lógica»), a su lado, donde entra su manguera en la vista C (vista.gd: el depósito
+# arriba, en pequeño, y el pasamuros en la pared de ese lado): dep, la casilla del de cada carpa desde la de arriba a la izquierda de
+# esa carpa, a su derecha en la fila de delante (depKd, con el grifo hacia ella) y, en la última de 200, que va contra la pared de la
+# derecha, a su izquierda en la de atrás (depK), junto al de la de al lado. Va en su pieza de ORDENAR (pieza): se mueve con ella y no
+# se monta en nada
 for N in NIV:
 	N["kit"]["p"] = sum(x[1] for x in N["kit"]["l"])
 
@@ -65,11 +71,15 @@ KAIA_CULT = {
 		"sala": "cult-sala", "W": 13, "H": 9, "sale": [6, 8], "entra": [6, 7],
 		"mesas": [[1, 3], [4, 3], [7, 3], [10, 3], [1, 6], [4, 6], [7, 6], [10, 6]],
 		# el riego y el drenaje, con lógica (lo pidió el usuario: «todas las conexiones de riego, de drenaje hazlas con cabeza…
-		# LOGICAS»): el rincón del riego contra la pared de delante, a la derecha, fuera de los pasillos y de la puerta: el tanque, su
-		# bomba al programador con sus dosificadoras (una casilla más allá: cada uno, un poco más ancho que su casilla) y el depósito de
-		# recogida en la esquina (de 2 casillas); la impulsión y el colector suben por la pared de la derecha y corren por debajo de cada
-		# fila de mesas (tubos_dren)
-		"o": [[1, 1, "ctrlN"], [8, 8, "tanqueN"], [10, 8, "riegoN"], [11, 8, "drenKS2"], [12, 8, "drenKS"]], "npc": [6, 5]},
+		# LOGICAS» y «que tampoco sea el depósito… tendrá que estar fuera de las carpas»): dentro, solo las tuberías, que corren por
+		# debajo de cada fila de mesas y bajan por la pared de la derecha hasta la boca de servicio del frente (tubos_dren); fuera, en el
+		# paso de delante de la carpa y a la derecha de su puerta (fuera, en casillas de cult-muelle), el tanque, su bomba al programador
+		# con sus dosificadoras (una casilla más allá: cada uno, un poco más ancho que su casilla) y el depósito de recogida en la
+		# esquina (de 2 casillas), debajo de la boca (kaiacult.gd red_fuera); de una casilla de alto, para no montarse en la carpa
+		# (kaia_riego.py: tanqueKB, riegoKB y drenKB, con drenKB2 de relleno). Contra la pared de atrás, el cuadro y, debajo de cada tubo
+		# de extracción (ext: sus columnas), el filtro de carbón y el extractor de la nave
+		"o": [[1, 1, "ctrlN"], [2, 1, "filtroN"], [3, 1, "extrG"], [8, 1, "filtroN"], [9, 1, "extrG"]], "ext": [3, 9],
+		"fuera": [[11, 9, "tanqueKB"], [13, 9, "riegoKB"], [14, 9, "drenKB"], [15, 9, "drenKB2"]], "npc": [6, 5]},
 }
 KAIA_CULT["f2"]["p"] = sum(x[1] for x in KAIA_CULT["f2"]["l"])
 
@@ -77,6 +87,8 @@ def pieza(N, i, d):   # la carpa de w × h: el dibujo en la casilla de abajo a l
 	w, h = N["tam"]
 	o = [[dx, dy, "carpaG2"] for dy in range(h) for dx in range(w) if not (dx == 0 and dy == h - 1)]
 	o.append([0, h - 1, "%s%d" % (N["obj"], i)])
+	dx, dy = N["dep"][i]
+	o.append([dx, dy, "depKd" if dx > 0 else "depK"])   # su depósito del goteo, fuera, con el grifo hacia la carpa
 	return {"k": "kc%s%d" % (N["k"], i), "n": "La carpa %d" % (i + 1), "o": o, "def": d, "zona": [ZONA], "si": "kc"}
 
 PIEZAS = [pieza(N, i, d) for N in NIV for i, d in enumerate(N["def"])]
@@ -140,6 +152,18 @@ def main():
 		assert y + h <= H - 1, "delante de su puerta, sitio para abrirla"
 		for x2, y2, w2, h2 in todas[i + 1:]:
 			assert x + w < x2 or x2 + w2 < x or y + h < y2 or y2 + h2 < y, ((x, y), (x2, y2))
+	ocu = {(x + dx, y + dy) for x, y, w, h in todas for dx in range(w) for dy in range(h)}
+	puertas = {(x + dx, y + h) for x, y, w, h in todas for dx in range(w // 2)}   # delante de sus puertas (en su mitad de luz: kaia_carpa.py)
+	deps = [(x + N["dep"][i][0], y + N["dep"][i][1]) for N in NIV for i, (x, y) in enumerate(N["def"])]
+	assert len(set(deps)) == len(deps), "cada depósito, el suyo"
+	for N in NIV:   # el depósito, fuera de su carpa y a su lado, en una de sus filas
+		w, h = N["tam"]
+		assert len(N["dep"]) == N["max"], N["k"]
+		for dx, dy in N["dep"]:
+			assert dx in (-1, w) and 0 <= dy < h, N["k"]
+	for c in deps:   # en la zona de cultivo, sin pisar ninguna carpa ni lo de delante de sus puertas ni el cuadro
+		assert PASILLO <= c[0] < W and 2 <= c[1] < H and c not in ocu and c not in puertas, c
+		assert c != (KAIA_CULT["ctrl"][0], KAIA_CULT["ctrl"][1] + 1), c
 	C = KAIA_CULT["f2"]["carpa"]
 	assert C["def"][0] == PASILLO and C["def"][0] + C["tam"][0] == W and C["def"][1] + C["tam"][1] == H - 1, "la carpa de sala, en toda la zona menos el paso"
 	F = KAIA_CULT["f2"]
@@ -152,6 +176,15 @@ def main():
 	sx, sy = F["sale"]; ex, ey = F["entra"]
 	assert (sx, sy) not in ocup and (ex, ey) not in ocup, "la puerta y la entrada, libres"
 	assert all(x != 0 for x, y in ocup if y >= 2), "la columna de la izquierda, libre: el paso entre los pasillos"
+	for e in F["ext"]:   # cada extractor, debajo de su tubo y en la pared de atrás
+		assert [e, 1, "extrG"] in F["o"] and 0 < e < F["W"] - 1, e
+	px, py = C["puerta"]
+	fu = {(x, y) for x, y, k in F["fuera"]}
+	assert len(fu) == len(F["fuera"]), "lo de fuera, sin pisarse"
+	for x, y, k in F["fuera"]:   # lo de fuera, en el paso de delante de la carpa, en la zona de cultivo y a la derecha de su puerta
+		assert y == C["def"][1] + C["tam"][1] and y < H and PASILLO <= x < W and x > px + 1, (x, y, k)
+	assert (px, py + 1) not in fu and (px + 1, py + 1) not in fu, "delante de la puerta de la carpa, libre"
+	assert min(x for x, y in fu) == px + 2, "el tanque, al lado del paso: se llega a él"
 	with open(DJ, "w", encoding="utf-8") as fh:
 		json.dump(D, fh, ensure_ascii=False, separators=(",", ":"))
 	print("kaia_cult: %s, %d mesas (obra %d €), mapa %s %d × %d" % (", ".join("%d × %s (%d plazas, kit %d €)" % (N["max"], N["n"], N["plazas"], N["kit"]["p"]) for N in NIV), len(KAIA_CULT["f2"]["mesas"]), KAIA_CULT["f2"]["p"], MAPA, W, H))

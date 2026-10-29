@@ -46,6 +46,7 @@ var encima := Node2D.new()
 var S: Dictionary
 var VC: Dictionary
 var g: Dictionary
+const VC_DEP_I := Vector2i(-6, 26)   # el depósito de la izquierda: arriba a la izquierda cuelga el extractor; debajo, por fuera del cable del temporizador
 var now := 0.0
 var sw := 240
 var sh := 160   # el alto del lienzo (180 en el juego): la escena va abajo
@@ -259,6 +260,7 @@ static func vista_c(S: Dictionary, g: Dictionary):
 		for f in lg:
 			f.x = int(f.x)
 			f.xw = Datos.jsround(120 + wy.call(f.y) / 2) - 1
+			f.xl = Datos.jsround(120 - wy.call(f.y) / 2)   # la pared izquierda, por donde entra en las de KAIA con el depósito a ese lado
 	# la boca del foco (fy): baja hasta su distancia de las plantas, nunca por encima del techo (VCA.boca); sin vivas (apagado), arriba
 	fy = maxi(int(VCA.boca), fy) if viva else int(VCA.boca)
 	var fxs := []   # dónde cuelga cada foco: uno en el centro; en las de KAIA, sus LED repartidos a lo ancho (c.nf)
@@ -462,6 +464,11 @@ func _ramal(lg: Array, fa: int, al: float) -> void:
 		var n := maxi(absi(f.xw - a.xw), f.y - a.y)
 		for k in (n + 1 if n > 0 else 0):
 			_rect(a.xw + Datos.jsround(float(f.xw - a.xw) * k / n), a.y + Datos.jsround(float(f.y - a.y) * k / n), 1, 1, osc)
+	elif Datos.carga().CARPAS.get(g.c.t, {}).get("depi"):   # el depósito a la izquierda (KAIA, kc_def): entra por la pared izquierda
+		_rect(f.xl, f.y - 1, f.x - f.xl, 1, Color(Color.html("#4a4c54"), al))
+		_rect(f.xl, f.y, f.x - f.xl, 1, osc)
+		_rect(f.xl - 1, f.y - 2, 3, 4, Color(Color.html("#3a3c44"), al))
+		_rect(f.xl, f.y - 1, 1, 2, osc)
 	else:
 		_rect(f.xw - 1, f.y - 2, 3, 4, Color(Color.html("#3a3c44"), al))
 		_rect(f.xw, f.y - 1, 1, 2, osc)
@@ -568,7 +575,12 @@ func _pinta_encima() -> void:
 		var l := Cultivo.goteo_l(S, VC.ci)
 		var dep = g.c.get("dep")
 		var di := Arte.nivel(Arte.foto("extra-c-deposito"), D.VC_AGUA.deposito, (float(dep) if dep != null else float(l)) / l)
-		encima.draw_texture(Arte.tex("img|%d" % di.get_instance_id(), di), Vector2(g.vc.xl + g.vc.w + 22 - 24, 8 - 28))
+		var dx: int = g.vc.xl + g.vc.w + 22 - 24
+		var dy := 8 - 28
+		if D.CARPAS.get(g.c.t, {}).get("depi"):   # a la izquierda (KAIA, kc_def), en espejo y por debajo del extractor
+			dx = 240 - dx - di.get_width() + VC_DEP_I.x
+			dy += VC_DEP_I.y
+		encima.draw_texture(Arte.tex("img|%d" % di.get_instance_id(), di), Vector2(dx, dy))
 	var bs := barras(S, g, VC.sel)
 	var fsel := fila_sel(g, VC.sel)
 	for b in bs:

@@ -88,11 +88,14 @@ func alcance_d(mapa: String, x0: int, y0: int) -> Dictionary:
 func delante(v: Dictionary, x: int, y: int) -> bool:
 	return [[0, 1], [0, -1], [1, 0], [-1, 0]].any(func(d): return v.has("%d,%d" % [x + d[0], y + d[1]]))
 
-# la red del riego y del drenaje de la sala (kaiacult.gd red_riego; lo pidió el usuario: «todas las conexiones de riego, de drenaje
-# hazlas con cabeza y pensando… LOGICAS»), contra los sprites (cajas_obj), no contra sus propias cuentas: cada red, de una pieza; la
-# impulsión, de la bomba del tanque al programador y por la electroválvula de cada mesa; el drenaje, de debajo del desagüe de cada
-# bandeja (mesaN: en su canto, a la derecha) al depósito de recogida y de él, de vuelta, al tanque; nada por el suelo de un pasillo:
-# debajo de las mesas, tapado por un aparato, pegado a una pared (la de la derecha o la de delante) o por encima de los aparatos
+# la red del riego y del drenaje de la sala (kaiacult.gd red_riego y red_fuera; lo pidió el usuario: «todas las conexiones de riego,
+# de drenaje hazlas con cabeza y pensando… LOGICAS» y «que tampoco sea el depósito… tendrá que estar fuera de las carpas»), contra los
+# sprites (cajas_obj), no contra sus propias cuentas. Dentro: cada red, de una pieza, por la electroválvula de cada mesa y de debajo
+# del desagüe de cada bandeja (mesaN: en su canto, a la derecha) al colector, y las dos a la boca de servicio del canto de delante;
+# nada por el suelo de un pasillo (debajo de las mesas, pegado a la pared de la derecha o a la de delante). Fuera: el tanque, el
+# programador y el depósito, en el paso de delante de la carpa; la impulsión, de la bomba del tanque al programador y de él a la
+# boca; el drenaje, de la boca al tubo de entrada del depósito, por encima, y la vuelta, de su bomba al tanque; ningún tubo encima de
+# otro y nada por el suelo por el que se anda
 func _caja(C: Array, o: String):
 	for c in C:
 		if c.o == o:
@@ -145,49 +148,116 @@ func tubos_ok(n: int, txt: String) -> void:
 			malos.append("tubo %d fuera de su carpa (%d, %d)" % [i, x, y])
 	chk(T.size() == n and malos.is_empty(), "%s: %d tubos a la pared %s" % [txt, T.size(), malos.slice(0, 4)])
 
+# el depósito del goteo de cada carpa de la fase 1 (kaia_cult.py NIV.dep; lo pidió el usuario: «que tampoco sea el depósito… tendrá que
+# estar fuera de las carpas y demás. Esas cosas hay que hacerlas con lógica»), contra los sprites: n, cada uno fuera de su carpa y
+# pegado a uno de sus lados, con el grifo hacia ella (depKd a su derecha, depK a su izquierda) y su manguera del grifo al poste de la
+# carpa; ningún tubo de extracción del techo por encima de un depósito; en la vista C, el depósito en pequeño a ese lado (depi)
+func deps_ok(n: int, txt: String) -> void:
+	var m: Dictionary = J.MAPS[J.S.map]
+	var C: Array = J.cajas_obj(J.S.map, m.o)
+	var en := func(x: int, y: int):
+		for c in C:
+			if int(c.x) == x and int(c.y) == y:
+				return c
+		return null
+	var malos := []
+	var k := 0
+	var mg: Array = J.tubos_dep()
+	for ci in J.kc_ns():
+		if not J.kc_tiene(ci):
+			continue
+		k += 1
+		var p: Array = J.kc_pos(ci)
+		var t: Array = J.kc_Nc(ci).tam
+		var d: Array = J.kc_dep(ci)
+		var x: int = int(p[0]) + int(d[0])
+		var y: int = int(p[1]) + int(d[1])
+		var izq := int(d[0]) < 0
+		var cb = en.call(x, y)
+		var ct = en.call(int(p[0]), int(p[1]) + int(t[1]) - 1)
+		if m.o[y][x] != ("depK" if izq else "depKd") or not (int(d[0]) == -1 or int(d[0]) == int(t[0])) or int(d[1]) < 0 or int(d[1]) >= int(t[1]) or cb == null or ct == null:
+			malos.append("carpa %d: %s en (%d, %d)" % [ci, m.o[y][x], x, y])
+			continue
+		if J.kc_carpa_en(x, y) >= 0 or J.kc_carpa_en(x, y, true) != ci or J.kc_def(ci).depi != izq:
+			malos.append("carpa %d: el depósito, dentro, de otra o en la vista al otro lado" % ci)
+		var X: int = x * 16
+		var hy: int = (y + 1) * 16 - 1 - 6
+		var xg: int = X + 13 if izq else X + 2   # el grifo
+		var xp: int = X + 16 if izq else X - 1   # el poste de la carpa
+		var gc: Color = cb.c.get_pixel(xg - int(cb.px), hy - int(cb.py)) if _opaco(cb, xg, hy) else Color(0, 0, 0, 0)
+		if not (gc.a > 0 and gc.r > .55 and gc.b < .45) or not _opaco(ct, xp, hy):
+			malos.append("carpa %d: el grifo (%s) o el poste, no a la altura de la manguera" % [ci, gc])
+		var hay := false
+		for q in mg:
+			for r in q[1]:
+				var r1: int = int(r[0]) + int(r[2]) - 1   # del poste al canto del grifo
+				if int(r[1]) == hy and int(r[3]) == 1 and ((izq and r1 == xp and int(r[0]) <= xg + 2) or (not izq and int(r[0]) == xp and r1 >= xg - 2)):
+					hay = true
+		if not hay:
+			malos.append("carpa %d: sin manguera del grifo a la carpa" % ci)
+		for q in J.tubos_ext():
+			for yy in range(int(cb.py), int(cb.py) + cb.c.get_height()):
+				for xx in range(int(q[0]) - 2, int(q[0]) + 3):
+					if yy >= int(q[1]) and yy <= int(q[2]) and _opaco(cb, xx, yy):
+						malos.append("carpa %d: un tubo del techo encima del depósito" % ci)
+	chk(k == n and malos.is_empty(), "%s: %d depósitos, cada uno a su lado y con su manguera %s" % [txt, k, malos.slice(0, 4)])
+
+# cada red de L, de una pieza con sus aparatos (cajas o rectángulos [x, y, w, h])
+func _de_una(L: Array, ap: Array) -> int:
+	var g := []
+	for i in L.size() + ap.size():
+		g.append(i)
+	var une := func(i: int, j: int) -> bool:
+		if i < L.size() and j < L.size():
+			return _junta(L[i], L[j])
+		if i < L.size() and j >= L.size():
+			return _toca_ap(L[i], ap[j - L.size()])
+		return false
+	var cambia := true
+	while cambia:
+		cambia = false
+		for i in g.size():
+			for j in g.size():
+				if g[i] != g[j] and une.call(i, j):
+					var a: int = mini(g[i], g[j])
+					g[i] = a
+					g[j] = a
+					cambia = true
+	var trozos := {}
+	for x in g:
+		trozos[x] = true
+	return trozos.size()
+
+func _toca_ap(t: Array, c) -> bool:   # un aparato (su caja) o la boca de servicio (un rectángulo)
+	if c is Array:
+		for q in _px(t):
+			if q[0] >= c[0] - 1 and q[0] <= c[0] + c[2] and q[1] >= c[1] - 1 and q[1] <= c[1] + c[3]:
+				return true
+		return false
+	return _toca(t, c)
+
+func _arriba(c) -> int:   # la primera fila pintada de un aparato, en el mapa
+	for v in c.c.get_height():
+		for u in c.c.get_width():
+			if c.c.get_pixel(u, v).a8 > 0:
+				return int(c.py) + v
+	return 1 << 20
+
+func _pisa(a: Array, b: Array) -> bool:   # dos rectángulos [x, y, w, h, color] que se montan
+	return a[0] < b[0] + b[2] and b[0] < a[0] + a[2] and a[1] < b[1] + b[3] and b[1] < a[1] + a[3]
+
 func red_logica(SA: String, ms: Dictionary) -> void:
 	var F2: Dictionary = J.D.KAIA_CULT.f2
 	var red: Array = J.red_riego()
 	var C: Array = J.cajas_obj(SA, ms.o)
 	var W: int = int(ms.w) * 16
 	var H: int = int(ms.h) * 16
-	var tq = _caja(C, "tanqueN")
-	var rg = _caja(C, "riegoN")
-	var dr = _caja(C, "drenKS")
-	chk(tq != null and rg != null and dr != null, "el tanque, el programador y el depósito, pintados")
-	if tq == null or rg == null or dr == null:
-		return
-	chk(red.size() >= 2 * 2 + F2.mesas.size() + 5, "la red: %d tramos" % red.size())
-	for tp in ["sum", "dren"]:   # cada red, de una pieza: sus tramos, juntos o por un aparato en el que entran los dos (el programador, el depósito)
+	chk(not ms.o.any(func(r): return r.any(func(c): return c in ["tanqueN", "riegoN", "drenKS", "drenKS2"])), "dentro de la carpa, ni el tanque, ni el programador, ni el depósito")
+	chk(red.size() >= 2 * 2 + F2.mesas.size() + 2, "la red: %d tramos" % red.size())
+	for tp in ["sum", "dren"]:
 		var L: Array = red.filter(func(q): return q[4] == tp)
-		var ap: Array = [tq, rg] if tp == "sum" else [dr, tq]
-		var g := []   # de qué trozo es cada tramo (y, detrás, cada aparato)
-		for i in L.size() + ap.size():
-			g.append(i)
-		var une := func(i: int, j: int) -> bool:
-			if i < L.size() and j < L.size():
-				return _junta(L[i], L[j])
-			if i < L.size() and j >= L.size():
-				return _toca(L[i], ap[j - L.size()])
-			return false
-		var cambia := true
-		while cambia:
-			cambia = false
-			for i in g.size():
-				for j in g.size():
-					if g[i] != g[j] and une.call(i, j):
-						var a: int = mini(g[i], g[j])
-						g[i] = a
-						g[j] = a
-						cambia = true
-		var trozos := {}
-		for x in g:
-			trozos[x] = true
-		chk(trozos.size() == 1, "%s: de una pieza, con sus aparatos (%d trozos)" % ["la impulsión" if tp == "sum" else "el drenaje y la vuelta", trozos.size()])
-	chk(red.any(func(q): return q[4] == "sum" and _toca(q, tq)), "la impulsión sale de la bomba del tanque")
-	chk(red.any(func(q): return q[4] == "sum" and _toca(q, rg)), "y pasa por el programador")
-	chk(red.any(func(q): return q[4] == "dren" and not q[5] and _toca(q, dr)), "el drenaje llega al depósito de recogida")
-	chk(red.any(func(q): return q[4] == "dren" and q[5] and _toca(q, dr)) and red.any(func(q): return q[4] == "dren" and q[5] and _toca(q, tq)), "y la vuelta, del depósito al tanque, por encima")
+		chk(_de_una(L, []) == 1, "%s: de una pieza" % ("la impulsión" if tp == "sum" else "el drenaje"))
+		chk(L.any(func(q): return maxi(int(q[1]), int(q[3])) == H - 1 and int(q[0]) >= W - 9), "%s: a la boca de servicio, por la pared de la derecha" % ("la impulsión" if tp == "sum" else "el drenaje"))
 	for k in F2.mesas.size():
 		var mx: int = int(F2.mesas[k][0])
 		var my: int = int(F2.mesas[k][1])
@@ -211,8 +281,6 @@ func red_logica(SA: String, ms: Dictionary) -> void:
 		chk(red.any(func(q): return q[4] == "sum" and int(q[1]) == int(q[3]) and xv >= mini(int(q[0]), int(q[2])) and xv <= maxi(int(q[0]), int(q[2])) and int(q[1]) >= my * 16 + 9 and int(q[1]) <= my * 16 + 11), "mesa %d: la impulsión pasa por su electroválvula" % (k + 1))
 	var malos := []
 	for q in red:
-		if q[5]:
-			continue
 		for p in _px(q):
 			var tx: int = int(p[0]) >> 4
 			var ty: int = int(p[1]) >> 4
@@ -225,6 +293,51 @@ func red_logica(SA: String, ms: Dictionary) -> void:
 			if not ok:
 				malos.append("%s %d,%d" % [q[4], p[0], p[1]])
 	chk(malos.is_empty(), "nada por el suelo de un pasillo: %s" % [malos.slice(0, 4)])
+
+func red_fuera(MA: String) -> void:
+	var m: Dictionary = J.MAPS[MA]
+	var F2: Dictionary = J.D.KAIA_CULT.f2
+	var red: Array = J.red_fuera()
+	var C: Array = J.cajas_obj(MA, m.o)
+	var tq = _caja(C, "tanqueKB")
+	var rg = _caja(C, "riegoKB")
+	var dr = _caja(C, "drenKB")
+	var b: Array = J.kc_boca()
+	chk(tq != null and rg != null and dr != null, "fuera, el tanque, el programador y el depósito, pintados")
+	if tq == null or rg == null or dr == null:
+		return
+	var CX: Dictionary = F2.carpa
+	chk(F2.fuera.all(func(q): return int(q[1]) == int(CX.def[1]) + int(CX.tam[1]) and m.o[int(q[1])][int(q[0])] == q[2]), "en el paso de delante de la carpa de sala")
+	chk([tq, rg, dr].all(func(c): return _arriba(c) >= (int(CX.def[1]) + int(CX.tam[1])) * 16), "de una casilla de alto: ninguno se monta en la carpa")
+	var ca = _caja(C, String(CX.obj))
+	chk(ca != null and _opaco(ca, int(b[0]) + 3, int(b[1]) + 3) and int(b[1]) + int(b[3]) <= _arriba(dr), "la boca de servicio, en el frente de la carpa y por encima del depósito (%s)" % [b])
+	var S_: Array = red.filter(func(q): return q[4] == "sum")
+	var Dr: Array = red.filter(func(q): return q[4] == "dren")
+	chk(_de_una(S_, [tq, rg, b]) == 1, "la impulsión, de una pieza con el tanque, el programador y la boca")
+	chk(S_.any(func(q): return _toca(q, tq)) and S_.any(func(q): return _toca(q, rg)) and S_.any(func(q): return _toca_ap(q, b)), "de la bomba del tanque al programador y de él a la boca")
+	chk(_de_una(Dr, [b, dr, tq]) == 1, "el drenaje y la vuelta, de una pieza con la boca, el depósito y el tanque")
+	var cae = null   # el tramo que entra en el depósito: de la boca, recto abajo, a su tubo de entrada
+	for q in Dr:
+		if int(q[0]) == int(q[2]) and _toca(q, dr) and _toca_ap(q, b) and maxi(int(q[1]), int(q[3])) <= _arriba(dr) + 2:
+			cae = q
+	chk(cae != null, "el drenaje cae de la boca, recto, al tubo de arriba del depósito")
+	chk(Dr.any(func(q): return not q[5] and _toca(q, dr) and _toca(q, tq)), "y la vuelta, de la bomba del depósito al tanque, por detrás")
+	var rs: Array = J._tubos_de(S_)
+	var rd: Array = J._tubos_de(Dr)
+	var pisan := []
+	for a in rs:
+		for c in rd:
+			if _pisa(a, c):
+				pisan.append([a.slice(0, 4), c.slice(0, 4)])
+	chk(pisan.is_empty(), "ningún tubo encima de otro: %s" % [pisan.slice(0, 2)])
+	var v := alcance_d(MA, 1, 2)
+	var malos := []
+	for q in red:
+		for p in _px(q):
+			if v.has("%d,%d" % [int(p[0]) >> 4, int(p[1]) >> 4]):
+				malos.append("%s %d,%d" % [q[4], p[0], p[1]])
+	chk(malos.is_empty(), "fuera, nada por el suelo por el que se anda: %s" % [malos.slice(0, 4)])
+	chk(delante(v, int(F2.fuera[0][0]), int(F2.fuera[0][1])), "se llega al rincón del riego")
 
 func _corre() -> void:
 	Juego.GUARDADO = "user://prueba-kaia-cult.json"
@@ -267,7 +380,7 @@ func _corre() -> void:
 	var PZ: Array = D.ORDEN_P[C].piezas
 	chk(D.MAPS.has(C) and int(D.MAPS[C].w) == 16 and int(D.MAPS[C].h) == 10 and PZ.size() == 7 and PZ.all(func(q): return q.zona == ["floorG"] and q.si == "kc"), "la sala de 16 × 10, con las siete carpas de los tres niveles, que van en la zona")
 	var NV: Array = KC.niv
-	chk(NV.size() == 3 and NV.map(func(q): return [int(q.max), int(q.tam[0]), int(q.tam[1])]) == [[4, 2, 2], [2, 4, 2], [1, 4, 4]] and PZ.all(func(q): return q.o.size() == int(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].tam[0]) * int(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].tam[1])), "los niveles: 4 de 2 × 2, 2 de 4 × 2 y 1 de 4 × 4, cada pieza de su tamaño")
+	chk(NV.size() == 3 and NV.map(func(q): return [int(q.max), int(q.tam[0]), int(q.tam[1])]) == [[4, 2, 2], [2, 4, 2], [1, 4, 4]] and PZ.all(func(q): return q.o.size() == int(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].tam[0]) * int(NV[["s", "m", "l"].find(str(q.k).substr(2, 1))].tam[1]) + 1 and q.o.back()[2] in ["depK", "depKd"]), "los niveles: 4 de 2 × 2, 2 de 4 × 2 y 1 de 4 × 4, cada pieza de su tamaño y su depósito")
 	chk(D.PUERTAS_INT["club-muelle"].any(func(q): return q.to == C and int(q.x) == 15 and int(q.y) == 1 and q.llave == "kc"), "la puerta, en la pared de KAIA")
 	chk(D.MAPS["club-muelle"].o[2][14] == "jukebox" and D.MAPS["club-muelle"].o[2][15] == null and D.ORDEN_P["club-muelle"].pie.any(func(c): return int(c[0]) == 15 and int(c[1]) == 2), "la gramola, a un lado; delante de la puerta, libre")
 	var cm: Dictionary = D.MAPS[C]
@@ -321,6 +434,9 @@ func _corre() -> void:
 	chk(J.kc().kits.filter(func(d): return int(d) >= 0).size() == 4 and not MENUS.back().any(func(l): return str(l).begins_with("Comprar:")), "cuatro como mucho")
 	J.S.day += 1
 	chk(mundo(C, 1, 2) and m.o[3][13] == "carpaKS0" and m.o[7][8] == "carpaKS1" and m.o[7][11] == "carpaKS2" and m.o[7][14] == "carpaKS3", "las cuatro, en su sitio")
+	deps_ok(4, "las cuatro")
+	LOG.clear()
+	chk(corre(func(): await J.object_action(13, 6)) and dicho("depósito del goteo de la carpa 4"), "A en el depósito de la carpa 4: el suyo, fuera de ella")
 	var v := alcance_d(C, 1, 2)
 	for y in m.h:
 		for x in m.w:
@@ -332,7 +448,8 @@ func _corre() -> void:
 	# 6 · la regla de la zona y la del solape
 	chk(J.cabe_pieza(C, "kcs0", 0, 4) == "zona" and J.cabe_pieza(C, "kcs0", 1, 4) == "zona", "en el pasillo, no: «%s»" % J.cabe_pieza(C, "kcs0", 1, 4))
 	chk(J.cabe_pieza(C, "kcs0", 4, 5) == "", "en la zona libre, sí: «%s»" % J.cabe_pieza(C, "kcs0", 4, 5))
-	chk(J.cabe_pieza(C, "kcs1", 13, 4) == "solapa", "pegada delante de otra carpa, con su techo encima de ella, no: «%s»" % J.cabe_pieza(C, "kcs1", 13, 4))
+	chk(J.cabe_pieza(C, "kcs3", 13, 4) == "solapa", "pegada delante de otra carpa, con su techo encima de ella, no: «%s»" % J.cabe_pieza(C, "kcs3", 13, 4))
+	chk(J.cabe_pieza(C, "kcs1", 9, 4) == "solapa", "ni con su depósito debajo del techo de otra carpa: «%s»" % J.cabe_pieza(C, "kcs1", 9, 4))
 	chk(str(D.ORDEN_MOTIVO.zona).contains("zona de cultivo") and str(D.ORDEN_MOTIVO.solapa).contains("encima"), "los motivos, dichos")
 	chk(J.cabe_pieza("home", "carpa0", 8, 2) != "zona", "las carpas de casa, sin la regla")
 	mundo("club-muelle", 14, 3)
@@ -398,7 +515,7 @@ func _corre() -> void:
 	chk(corre(func(): await J.object_action(2, 1)) and int(J.kc().niv) == 1 and int(J.kc().kits[4]) == int(J.S.day) + 1 and J.kc_kits() == 4 and J.kc().p[3] is Dictionary, "a las de 4 × 2: una pedida y las cuatro de 2 × 2 siguen (%s)" % [J.kc().kits])
 	chk(is_equal_approx(float(J.S.banco), bn - kps[1]), "por la cuenta, solo la nueva (%d €)" % int(bn - J.S.banco))
 	J.S.day += 1
-	chk(mundo(C, 1, 2) and m.o[3][3] == "carpaKM0" and m.o[2][6] == "carpaG2" and m.o[3][7] == null and m.o[3][13] == "carpaKS0" and J.sprite_local("carpaKM0") == "kcm", "mañana, la de 4 × 2 en su sitio, con las de antes")
+	chk(mundo(C, 1, 2) and m.o[3][3] == "carpaKM0" and m.o[2][6] == "carpaG2" and m.o[3][7] == "depKd" and m.o[2][7] == null and m.o[3][13] == "carpaKS0" and J.sprite_local("carpaKM0") == "kcm", "mañana, la de 4 × 2 en su sitio, con las de antes")
 	QUIERO = ["Comprar: Carpa 400×200", "Comprarlo"]
 	corre(func(): await J.object_action(2, 1))
 	J.S.day += 1
@@ -413,6 +530,7 @@ func _corre() -> void:
 	J.S.day += 1
 	chk(int(J.kc().niv) == 2 and mundo(C, 1, 2) and m.o[8][3] == "carpaKL0" and m.o[5][6] == "carpaG2" and J.kc_kits() == 7 and J.solapes_de(J.cajas_obj(C, m.o)).is_empty(), "la de 4 × 4 con las seis de antes, sin solapes")
 	tubos_ok(7, "las siete carpas")
+	deps_ok(7, "las siete carpas")
 	MENUS = []
 	QUIERO = []
 	corre(func(): await J.object_action(2, 1))
@@ -446,6 +564,10 @@ func _corre() -> void:
 	var CX: Dictionary = KC.f2.carpa
 	chk(mundo(C, 1, 2) and m.o[int(CX.def[1]) + int(CX.tam[1]) - 1][int(CX.def[0])] == "carpaKX" and m.o[int(CX.def[1])][int(CX.def[0]) + int(CX.tam[0]) - 1] == "carpaG2", "la carpa de sala, en toda la zona")
 	tubos_ok(2, "la de sala")
+	red_fuera(C)
+	LOG = []
+	chk(corre(func(): await J.object_action(int(KC.f2.fuera[0][0]), int(KC.f2.fuera[0][1]))) and dicho("rincón del riego"), "el rincón del riego lo dice")
+	chk(alcance_d(C, 1, 2).has("%d,%d" % [int(KC.f2.fuera[0][0]) - 1, int(KC.f2.fuera[0][1])]), "y se llega a él")
 	sl = J.solapes_de(J.cajas_obj(C, m.o))
 	chk(sl.is_empty(), "la carpa de sala, sin solapes: %s" % [sl.slice(0, 3)])
 	v = alcance_d(C, 1, 2)
@@ -455,7 +577,7 @@ func _corre() -> void:
 	chk(corre(func(): await J.object_action(int(CX.puerta[0]), int(CX.puerta[1]) - 1)) and J.S.map == SA and J.P.x == int(KC.f2.entra[0]) and J.P.y == int(KC.f2.entra[1]), "se entra en la carpa de sala (%s %d,%d)" % [J.S.map, J.P.x, J.P.y])
 	var ms: Dictionary = J.MAPS[SA]
 	chk(KC.f2.mesas.all(func(q): return ms.o[int(q[1])][int(q[0])] == "mesaKP" and ms.o[int(q[1])][int(q[0]) + 1] == "mesaKP2" and ms.o[int(q[1])][int(q[0]) + 2] == "mesaKP2"), "las ocho mesas de 240 cm, montadas en sus tres casillas")
-	chk(ms.o[8][8] == "tanqueN" and ms.o[8][10] == "riegoN" and ms.o[8][12] == "drenKS" and ms.o[1][1] == "ctrlN", "el tanque, el programador, el depósito de drenaje y el cuadro")
+	chk(ms.o[1][1] == "ctrlN" and KC.f2.ext.all(func(e): return ms.o[1][int(e)] == "extrG" and ms.o[1][int(e) - 1] == "filtroN"), "el cuadro y, en la pared de atrás, cada extractor con su filtro de carbón")
 	sl = J.solapes_de(J.cajas_obj(SA, ms.o))
 	chk(sl.is_empty(), "las mesas, sin solapes: %s" % [sl.slice(0, 3)])
 	red_logica(SA, ms)
@@ -465,7 +587,7 @@ func _corre() -> void:
 			if ms.o[y][x] and ms.o[y][x] != "mesaKP2":
 				chk(delante(v, x, y), "se llega a %s (%d, %d)" % [ms.o[y][x], x, y])
 	LOG = []
-	chk(corre(func(): await J.object_action(12, 8)) and dicho("drenaje"), "el depósito de recogida lo dice")
+	chk(corre(func(): await J.object_action(int(KC.f2.ext[0]), 1)) and dicho("filtro de carbón"), "el extractor lo dice")
 	chk(mundo(SA, int(KC.f2.sale[0]), int(KC.f2.sale[1]) - 1), "dentro")
 	# 11 · las mesas: plantar y, sin nadie, no avanzan
 	QUIERO = ["Plantar", J.strain("txoko").n]
