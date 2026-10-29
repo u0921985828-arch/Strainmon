@@ -364,6 +364,14 @@ Un hilo propio por encima de la deuda: lo que pasó en la Copa de 1998. OBJETIVO
    - *Guardártelo* → se cierra ahí.
 5. **El final**: SMS de Kiko según lo elegido y según si te paraste con la gente (la cena, la vela, el café: dos o más).
 
+## Acto II · Quién entró en el piso (con `Datos.CAL`, `src/acto2.gd`)
+
+- **Arranque:** al día siguiente de cerrar el cuaderno azul, SMS de la abuela Txaro: vio luz en el piso de la tía dos noches la semana del entierro, cuando tú aún no habías llegado.
+- **El diploma:** la rueda de la caja tiene marcas de destornillador viejas; alguien buscaba el cuaderno azul. Tres nombres: Darko, Unai Garro (comprador de semillas de Bilbao, de Semillas Ondarea, empresa inventada) y el sargento Molina.
+- **Quién te ayuda** (por lo que hiciste con el cuaderno): Delroy si lo contaste en la asociación (Molina estaba en Hacienda), Baltasar si fuiste a por él (Darko estaba en la mar), Kiko si te lo guardaste (mira el correo de la tía).
+- **Las pistas:** el ordenador (la oferta de 40.000 € de Garro, rechazada, y el ordenador encendido a las 11:40 del funeral); el cura de la catedral (un señor de traje de Ondarea preguntó cuándo acababa y se fue antes); el teatro (la coartada de Garro, un ensayo que no hubo: cerrado por obras); Hacienda (Molina, sello de las 11:20 en Bilbao); Koldo (Darko, en la txalupa todo el día).
+- **La acusación**, con cuatro pistas, delante de quien te ayuda, una vez: Garro devuelve el sobre de semillas de Malana de la tía (y reputación; Ondarea ya sabe que tienes la Haze: el Acto III); Darko o Molina, más calor y menos confianza, y Kiko avisa de que Garro sigue preguntando.
+
 ## La caja fuerte
 
 *Ordenador → «Notas de la tía»:*

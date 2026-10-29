@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Siguiente (sin APK todavía) · el Acto II, «Quién entró en el piso» (ESTUDIO, tanda 3; lo pidió el usuario: «metas mano a las mejoras que hablamos»; con `Datos.CAL`)
+
+- Cerrado el cuaderno azul, al día siguiente la abuela Txaro avisa de que vio luz en el piso de la tía la semana del entierro; en el diploma, la rueda de la caja está forzada (`a2_rueda`). Tres sospechosos: Darko, Unai Garro (un comprador de semillas de Bilbao, de Semillas Ondarea, inventada) y el sargento Molina (`src/acto2.gd`, `S.a2`).
+- Cinco pistas, sin morbo: el correo de la tía en su ordenador (la oferta de Garro y el ordenador encendido durante el funeral), el cura de la catedral, el teatro (la coartada de Garro, falsa), Hacienda (Molina, con sello a la misma hora) y Koldo en el muelle (Darko, en la mar). Quien te ayuda sale de lo que hiciste con el cuaderno —Delroy, Baltasar o Kiko— y te da una (`AYUDA`, `AYUDA_PISTA`).
+- Con cuatro, se acusa delante de él, una vez y para siempre (`S.a2.acu`): Garro devuelve las semillas de Malana de la tía (+3 semillas y reputación); Darko o Molina, más calor y menos confianza. OBJETIVO → LA TÍA MAITE sigue con el Acto II. Prueba `tests/acto2.gd`.
+
 ### Siguiente (sin APK todavía) · rarezas heredables y el cuaderno de fenotipos (ESTUDIO, tanda 2; lo pidió el usuario: «metas mano a las mejoras que hablamos»; con `Datos.CAL`)
 
 - Rasgos raros que se heredan (`RAREZAS` de `tools/rarezas.py`): 1 de cada 50 plantas sale con uno sin que lo lleve su línea —enana (crece un 15 % más deprisa y rinde un 10 % menos), doble cosecha (rebrota una vez a vegetativo y da una segunda cosecha del 60 %), aroma único (su hierba se paga un 25 % más, por gramos en el lote: `ar` en `junta_lote`, `mover_lote`, `cura_de` y `calidad`) y resinosa (+1,5 de THC)—. Por hash de la planta (`Datos.hash_str`), sin tocar el azar del juego (`rarezas_de` al final de `genes`, `ra_tiene`).

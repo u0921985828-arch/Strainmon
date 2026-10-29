@@ -3,7 +3,7 @@
 # 4 °C y mesa de acero; tienda online, con la tarjeta, al día siguiente). Con la obra hecha, las máquinas de extracción que tengas
 # (MUEBLE_EXTR) dejan el piso y se montan aquí, en fila contra la pared (FRIA.pos), y lo que se saca aquí rinde FRIA.rend más.
 # En Google Play, donde el sótano no se vende para setas, la obra lo habilita también (FRIA.p_play).
-# S.fria = {d: el día en que acaban}. Datos de tools/sala_fria.py. Cadena: … → bancotia → kaiacult → salafria → retencion → juego.
+# S.fria = {d: el día en que acaban}. Datos de tools/sala_fria.py. Cadena: … → bancotia → kaiacult → salafria → acto2 → retencion → juego.
 extends "res://src/kaiacult.gd"
 
 var _fria_t := ""   # la extracción que se está haciendo en la sala fría (para sale_extr)

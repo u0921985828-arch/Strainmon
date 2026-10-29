@@ -21,7 +21,7 @@
 # n: plazas}; sin él, el del kit (N.plazas macetas de KAIA_CULT.maceta). KC_PATRON[N.k] dice cuántas de cada maceta llenan la carpa
 # (tools/patrones.py); la luz de la carpa se reparte entre las n, al mismo ritmo: más plantas pequeñas (más fenotipos donde
 # elegir) o menos y más grandes (las de 50 L rinden más por cosecha).
-# Datos de tools/kaia_cult.py (KAIA_CULT, MAPS["cult-muelle"]). Cadena: … → hilo → bancotia → kaiacult → salafria → retencion → juego.
+# Datos de tools/kaia_cult.py (KAIA_CULT, MAPS["cult-muelle"]). Cadena: … → hilo → bancotia → kaiacult → salafria → acto2 → retencion → juego.
 extends "res://src/bancotia.gd"
 
 var _kc0 = null   # los muebles de la sala tal como vienen de datos.json, para montar las mesas encima

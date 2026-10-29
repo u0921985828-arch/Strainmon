@@ -809,3 +809,54 @@ Un olor que no tiene otra: su hierba se paga un 25 % más.,A smell no other has:
 Resinosa,Resinous
 "Cubierta de tricomas: 1,5 puntos más de THC.",Covered in trichomes: 1.5 more THC points.
 Sus rarezas suben con la línea: {l},Its rare traits rise with the line: {l}
+Luz en el piso,A light in the flat
+La abuela Txaro vio luz en el piso de tu tía la semana del entierro. Mira la caja de detrás del diploma.,Grandma Txaro saw a light in your aunt's flat the week of the funeral. Check the safe behind the diploma.
+Quién entró en el piso,Who got into the flat
+"El piso, cerrado","The flat, closed"
+"Unai Garro, de Semillas Ondarea","Unai Garro, from Semillas Ondarea"
+El sargento Molina,Sergeant Molina
+"{N}, una cosa que no te he contado. La semana del entierro de tu tía vi luz en su piso de madrugada, dos noches seguidas.","{N}, something I haven't told you. The week of your aunt's funeral I saw a light in her flat in the small hours, two nights running."
+"Tú aún no habías llegado. Y la llave solo la tenía ella. Mira lo de detrás del diploma, que ella ahí guardaba lo suyo.",You hadn't arrived yet. And only she had the key. Look behind the diploma: that's where she kept her things.
+SMS · ABUELA TXARO,SMS · GRANDMA TXARO
+EL DIPLOMA,THE DIPLOMA
+"Descuelgas el diploma. Alrededor de la rueda de la caja, la pintura está levantada: marcas de destornillador, viejas.","You take down the diploma. Around the safe's dial the paint is chipped: screwdriver marks, old ones."
+Alguien intentó abrirla sin la combinación antes de que tú llegaras. No pudo: la caja aguanta. Buscaba algo que la tía guardaba.,Someone tried to open it without the combination before you arrived. They couldn't: the safe held. They were after something your aunt kept.
+"El cuaderno azul. Y por esas fechas solo tres personas preguntaban por él: Darko, un comprador de semillas de Bilbao que le escribía, y el sargento Molina.","The blue notebook. And back then only three people asked about it: Darko, a seed buyer from Bilbao who wrote to her, and Sergeant Molina."
+una pista: «QUIÉN ENTRÓ EN EL PISO»,a lead: «WHO GOT INTO THE FLAT»
+"Lo de la caja... Te cuento lo único que sé: Molina estuvo esa mañana en Hacienda, en Bilbao. Hice cola detrás de él. Él no fue.",About the safe... Here's the only thing I know: Molina was at the tax office in Bilbao that morning. I queued behind him. It wasn't him.
+"Ya me han contado lo del diploma. A Darko no lo busques: ese día estaba en la mar con Koldo, todo el barrio lo vio salir. No es de los míos, pero eso no.","I've heard about the diploma. Don't go after Darko: that day he was at sea with Koldo, the whole neighbourhood saw him leave. He's no friend of mine, but not that."
+"Lo del piso... Tu tía me dijo que le escribía un tío de Bilbao por el ordenador, uno que quería comprarle la Haze. Mira su correo.","About the flat... Your aunt told me some guy from Bilbao kept emailing her, wanting to buy her Haze. Check her email."
+EL ORDENADOR DE LA TÍA,YOUR AUNT'S COMPUTER
+"En el correo de la tía, un hilo con un tal Unai Garro, de Semillas Ondarea, Bilbao. Dos semanas antes del entierro.","In your aunt's email, a thread with one Unai Garro, from Semillas Ondarea, Bilbao. Two weeks before the funeral."
+«Le ofrezco cuarenta mil euros por la madre de su Haze del 98 y sus notas de cría. Es mi última oferta.»,«I offer you forty thousand euros for the mother of your '98 Haze and your breeding notes. This is my final offer.»
+La tía contestó una línea: «No está en venta. No vuelva a escribirme.»,Your aunt replied in one line: «It's not for sale. Don't write to me again.»
+"Y el registro del ordenador dice que alguien lo encendió el día del entierro, a las 11:40, cuando estaba toda la gente en la catedral.","And the computer's log says someone switched it on the day of the funeral, at 11:40, while everyone was at the cathedral."
+"¿El funeral de Maite? Aquí, a las once. Estaba medio barrio, y llorando.","Maite's funeral? Here, at eleven. Half the neighbourhood came, and in tears."
+"Solo me extrañó un señor de traje, de fuera. Me preguntó a qué hora acababa y si la familia volvería luego a casa.","The only odd one was a man in a suit, not from here. He asked me what time it would end and whether the family would go home afterwards."
+"Se fue antes de la comunión. Dejó una tarjeta en el cepillo, fíjate: «Semillas Ondarea». No volví a verlo.","He left before communion. He dropped a card in the collection box, imagine: «Semillas Ondarea». I never saw him again."
+"¿Garro? Sí, el de las semillas tiene abono. Cuando vino la policía a preguntar por un robo, dijo que esa mañana estaba aquí, en el ensayo general.","Garro? Yes, the seed man has a season ticket. When the police came asking about a burglary, he said he was here that morning, at the dress rehearsal."
+Ese día no hubo ensayo: el teatro estuvo cerrado toda la semana por la obra del tejado. Aún tengo el cartel en el cajón.,There was no rehearsal that day: the theatre was closed all week for the roof works. I still have the sign in the drawer.
+Esto no se lo puedo enseñar... pero el registro de entrada es público.,I can't show you this... but the entry register is public.
+"El sargento Molina presentó un recurso aquí ese día. Sello de las 11:20, ventanilla 3. De Bilbao a Ribera Verde hay media hora larga.","Sergeant Molina filed an appeal here that day. Stamped at 11:20, window 3. Bilbao to Ribera Verde is a good half hour."
+"¿Darko? Ese día salimos juntos a por chipirones a las seis de la mañana y no volvimos hasta la noche, con mala mar.","Darko? That day we went out together for squid at six in the morning and didn't come back till night, in rough seas."
+"Tendrá sus cosas, pero ese día estaba vomitando por la borda de mi txalupa, no en el piso de tu tía.","He's got his faults, but that day he was throwing up over the side of my boat, not in your aunt's flat."
+una pista del piso ({n}/{t}),a lead on the flat ({n}/{t})
+Ya tienes bastante. Habla con {n}.,You have enough. Talk to {n}.
+"«Aún no tienes bastante: {n} de {t}. Pregunta en el teatro, en la catedral, en Hacienda, en el muelle y mira el ordenador de tu tía.»","«You don't have enough yet: {n} of {t}. Ask at the theatre, the cathedral, the tax office, the dock, and check your aunt's computer.»"
+"A ver, cuéntame lo que tienes.","Go on, tell me what you've got."
+Tres nombres y un piso forzado. Piénsalo bien: acusar a alguien en este barrio no se deshace.,Three names and a forced flat. Think hard: you can't take back an accusation in this neighbourhood.
+Aún no lo tengo claro,I'm not sure yet
+¿Quién entró en el piso de la tía?,Who got into your aunt's flat?
+Garro. Quería la Haze y la tía se la negó. Sabía cuándo estaría el piso vacío y mintió con el teatro.,Garro. He wanted the Haze and your aunt said no. He knew when the flat would be empty and lied about the theatre.
+"Lo llamamos juntos. Al tercer tono, cuelga. A la hora, un mensajero trae un sobre sin remite.","We call him together. On the third ring he hangs up. An hour later, a courier brings an envelope with no sender."
+"Dentro, el sobre de semillas de Malana que tu tía guardaba en el cajón de la cocina. Es lo único que pudo llevarse.","Inside, the packet of Malana seeds your aunt kept in the kitchen drawer. It's the only thing he managed to take."
+"Semillas Ondarea sigue preguntando por la Haze de tu tía. Ahora sabe que la tienes tú. Ten cuidado, que esto no se ha acabado.","Semillas Ondarea is still asking about your aunt's Haze. Now they know you have it. Be careful, this isn't over."
+"¿Darko? Ese día estaba en la mar, lo sabe todo el muelle. Se va a enterar de que lo has dicho.","Darko? He was at sea that day, the whole dock knows it. He's going to hear you said it."
+"¿Molina? Estaba en Hacienda, en Bilbao, con el sello en la mano. Y ahora sabe que lo has acusado tú.","Molina? He was at the tax office in Bilbao, with the stamp to prove it. And now he knows you accused him."
+Lo dicho no se deshace. El que entró sigue por ahí.,What's said can't be unsaid. Whoever got in is still out there.
+"Me han dicho que un tal Garro, de Semillas Ondarea, va preguntando por la Haze de tu tía. A lo mejor te equivocaste de nombre.","I hear a guy called Garro, from Semillas Ondarea, is asking about your aunt's Haze. Maybe you got the wrong name."
+"Sospechosos: Darko, Unai Garro (Semillas Ondarea) y el sargento Molina. Pistas: {n}/{t}: el ordenador de la tía, la catedral, el teatro, Hacienda y el muelle. Con {m}, habla con {a}.","Suspects: Darko, Unai Garro (Semillas Ondarea) and Sergeant Molina. Leads: {n}/{t}: your aunt's computer, the cathedral, the theatre, the tax office and the dock. With {m}, talk to {a}."
+"Acertaste: fue Garro, de Semillas Ondarea.","You got it: it was Garro, from Semillas Ondarea."
+Acusaste a {s}. No fue.,You accused {s}. It wasn't them.
+II · {n}/{t},II · {n}/{t}
+II · HECHO,II · DONE
