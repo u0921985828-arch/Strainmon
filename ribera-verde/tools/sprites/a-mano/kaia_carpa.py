@@ -73,7 +73,8 @@ def armazon(im, techo, xs=(), ys=()):
     return im
 
 # lo que tienen las carpas de verdad (lo pidió el usuario: «en esas carpas pues hay puertas laterales, ventilaciones, agujeros para
-# extractor, intractor y eso»), con los siete tonos de la de 150: la puerta lateral en el lado de sombra (la cremallera en U, más
+# extractor, intractor y eso»), con los siete tonos de la de 150 (en las de KAIA, solo la de sala los lleva en el frente; las otras, en
+# la pared del lado, que sale en la vista C): la puerta lateral en el lado de sombra (la cremallera en U, más
 # apagada que la del frente), las ventanas de malla de abajo con su solapa enrollada encima, y la boca de abajo del intractor (la
 # manga con su cordón) con su tubo de aluminio hasta el intractor, en el suelo. El tubo de extracción sale por la boca del techo
 # (lo pinta el juego, kaiacult.gd tubos_ext); la manguera del goteo entra por el canto de su lado, desde su depósito de fuera.
@@ -140,27 +141,16 @@ def detalles(im, w, frente, tipo):
     """los de cada carpa: frente = la primera fila del frente; la de abajo, im.height - 1"""
     px = im.load()
     yb = im.height - 1                                     # la fila del pie
-    if tipo == 'si':                                       # la de 200 con el servicio a la izquierda (kcsi): todo en espejo
-        puerta_frente(px, 18, 28, frente + 3, yb)          # la puerta, en el lado de sombra
-        puerta_lat(px, 6, 14, frente + 5, yb - 1, True)
-        ventana(px, 1, frente + 9, 4, 5, True)
-        intractor(px, 1, yb, yb - 13, True)
-    elif tipo == 's':                                      # la de 200: luz 0-15 (la puerta), sombra 16-30
-        puerta_lat(px, 18, 26, frente + 5, yb - 1)
-        ventana(px, 27, frente + 9, 4, 5, False)
-        intractor(px, 27, yb, yb - 13, False)
-    elif tipo == 'mi':                                     # las de 400 con el servicio a la izquierda (kcmi, kcli): las de 400 en espejo
-        for x0 in (34, 50):                                # las dos puertas de entrar, en el lado de sombra
+    # el servicio (la puerta lateral, sus ventanas de malla y la manga del intractor) va en la pared del lado, la de kc_lado, como en
+    # la vista C: en 3/4 de frente no se ve. En el frente, solo las puertas de entrar (y, en las de 400, la ventana de entre las dos)
+    if tipo == 'si':                                       # la de 200 con el servicio a la izquierda (kcsi): la puerta, en el de sombra
+        puerta_frente(px, 18, 28, frente + 3, yb)
+    elif tipo == 'mi':                                     # las de 400 con el servicio a la izquierda (kcmi, kcli)
+        for x0 in (34, 50):
             puerta_frente(px, x0, x0 + 10, frente + 3, yb)
         ventana(px, 45, yb - 8, 5, 5, False)               # entre las dos
-        puerta_lat(px, 17, 29, frente + 5, yb - 1, True)
-        ventana(px, 8, yb - 8, 7, 5, True)
-        intractor(px, 2, yb, yb - 12, True)
-    else:                                                  # las de 400: luz 0-30 (dos puertas), sombra 31-62
+    elif tipo != 's':                                      # las de 400: luz 0-30 (dos puertas), sombra 31-62
         ventana(px, 14, yb - 8, 5, 5, True)                # entre las dos puertas
-        puerta_lat(px, 34, 46, frente + 5, yb - 1)
-        ventana(px, 49, yb - 8, 7, 5, False)
-        intractor(px, 58, yb, yb - 12, False)
     return im
 
 def detalles_sala(im, xs):
