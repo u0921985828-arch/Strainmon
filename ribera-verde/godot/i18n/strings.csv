@@ -89,9 +89,13 @@ s43c5be08,"La oficina ha denegado el registro de Ondarea: la Haze del 98 y esas 
 sbefe0f1f,Garro no se va a quedar quieto. Te llamará.,Garro won't sit still. He'll call you.
 sc143f7cd,"La oficina ha concedido el registro a Semillas Ondarea. Sin pruebas, la Haze del 98 es suya en los papeles.","The office has granted the registration to Semillas Ondarea. Without evidence, on paper the Haze of '98 is theirs."
 sd56c0508,"No puedes vender ni regalar sus semillas con ese nombre. Garro te va a llamar, y ahora tiene la sartén por el mango.","You can't sell or give away its seeds under that name. Garro is going to call you, and now he holds all the cards."
+saa849bf6,"En el escritorio, el expediente de Ondarea.","On the desk, the Ondarea file."
+s1bffc3b2,Abrir el expediente,Open the file
+sdd52b5ff,Lo de siempre,The usual
 s8bc8c530,La sede electrónica de la Oficina de Variedades Vegetales. Expediente de Semillas Ondarea: «Haze 98» y tres landraces.,"The Plant Variety Office's online portal. Semillas Ondarea's file: ""Haze 98"" and three landraces."
 s5e18eb8e,Plazo de oposición hasta el {f}. Lo que puedes adjuntar hoy:,Objection deadline: {f}. What you can attach today:
-s598dc5c6,"Con {m} pruebas, la oposición se sostiene. Tienes {n}.","With {m} pieces of evidence, the objection holds. You have {n}."
+sd37b6c22,"Con {m} pruebas, la Haze fijada entre ellas, la oposición se sostiene. Tienes {n}{f}.","With {m} pieces of evidence, the stabilised Haze among them, the objection holds. You have {n}{f}."
+s21ec609f,", sin la Haze fijada",", without the stabilised Haze"
 sc319aed2,¿Presentas la oposición?,Do you file the objection?
 sd36335aa,Presentarla ahora,File it now
 s93150e70,Todavía no,Not yet
@@ -106,7 +110,9 @@ s9762caed,El banco de la tía es del barrio,Your aunt's bank belongs to the neig
 s8df08287,Lo que es de todos no se vende.,What belongs to everyone is not for sale.
 sb9c3435f,"Antes tienes que abrir el banco de semillas de la tía: todas sus colecciones, con la Haze del 98 fijada.","First you have to open your aunt's seed bank: all her collections, with the Haze of '98 fixed."
 s677f3330,Vender a Semillas Ondarea · {e},Sell to Semillas Ondarea · {e}
-sc7581981,"Garro se lleva la madre, las semillas de la Haze y las notas. El barrio se enterará.","Garro takes the mother, the Haze seeds and the notes. The neighbourhood will find out."
+s9ccc1bd8,"Garro se lleva las semillas de la Haze, los tarros y las notas. El barrio se enterará.","Garro takes the Haze seeds, the jars and the notes. The neighbourhood will find out."
+s49d80076," Sin fijar, paga la mitad."," Not stabilised, he pays half."
+sdfabee8b,Sin semillas de la Haze del 98 no hay nada que venderle.,Without seeds of the Haze of '98 there is nothing to sell him.
 s214c1b7d,Irte con Miren a Errotabarri,Go with Miren to Errotabarri
 s3f8eb7aa,"Subir al monte con la Haze fijada, lejos de todo.","Go up the mountain with the fixed Haze, far from everything."
 sc51db865,Hace falta la Haze del 98 fijada y la confianza de Miren ({r}/{m}).,You need the Haze of '98 fixed and Miren's trust ({r}/{m}).
@@ -114,8 +120,10 @@ sdde9e615,Colgar,Hang up
 s80ab96b0,Que vuelva a llamar.,Let him call again.
 s8defb20a,"Sin la oposición ganada, Ondarea irá a por ti.","Without winning the objection, Ondarea will come after you."
 s03e9e467,LA OFERTA DE ONDAREA,ONDAREA'S OFFER
+se4787451,«Piénsatelo. Te vuelvo a llamar.»,«Think it over. I'll call you back.»
 s45956d98,«Volveré a llamar. Siempre vuelvo a llamar.»,"""I'll call again. I always call again."""
 s4b2cd447,Garro ha colgado sin despedirse. Lo que está en el banco del barrio no lo puede comprar nadie.,Garro has hung up without a goodbye. Nobody can buy what is in the neighbourhood bank.
+s47b5353d,"Ondarea tendrá el registro, pero la Haze ya está en cien huertas del barrio. Eso no hay papel que lo recoja.","Ondarea will have the registration, but the Haze is already in a hundred gardens in the neighbourhood. No paper can take that back."
 s420271c6,Esta tarde vienen los socios a pedir semillas. Uno de ellos se ha llevado la Haze del 98 para su huerta. Como quería ella.,This afternoon the members are coming to ask for seeds. One of them has taken the Haze of '98 for his garden. As she wanted.
 s65a41156,"FIN · el banco de la tía, de todos ({r} de reputación)","THE END · your aunt's bank, everyone's ({r} reputation)"
 s772168c6,Ya me he enterado. No te voy a decir nada: el dinero también es la vida.,I've heard. I won't say anything: money is life too.
@@ -133,8 +141,9 @@ s104e45f1,Han venido con un notario y se han llevado las semillas de la Haze. La
 s3edb6022,"Lo que queda de la tía es lo que tengas en las carpas y lo que recuerde el barrio. Empieza otra vez, despacio.","What is left of your aunt is what you have in your tents and what the neighbourhood remembers. Start again, slowly."
 s1b053be9,FIN · la caída: sin la Haze del 98 y con calor +{c},THE END · the fall: without the Haze of '98 and heat +{c}
 s8bf9ab8c,"La historia de la tía Maite termina aquí. La partida sigue: tus carpas, tu gente y tus semillas.","Aunt Maite's story ends here. The game goes on: your tents, your people and your seeds."
-sea3cbab4,"Semillas Ondarea quiere registrar como suyas la Haze del 98 y landraces del banco de la tía. Oponte desde su ordenador antes del {f}, con {m} pruebas. Tienes {n}.","Semillas Ondarea wants to register the Haze of '98 and landraces from your aunt's bank as their own. Object from her computer before {f}, with {m} pieces of evidence. You have {n}."
+sf5f86a9e,"Semillas Ondarea quiere registrar como suyas la Haze del 98 y landraces del banco de la tía. Oponte desde su ordenador antes del {f}, con {m} pruebas y la Haze fijada entre ellas. Tienes {n}.","Semillas Ondarea wants to register the Haze of '98 and landraces from your aunt's bank as theirs. Object from her computer before {f}, with {m} pieces of evidence and the stabilised Haze among them. You have {n}."
 scae59312,Presentada con {n} pruebas. La oficina resuelve el {f}.,Filed with {n} pieces of evidence. The office decides on {f}.
+s69f28219,Sin la Haze fijada.,Without the stabilised Haze.
 s43152ecc,La oficina dio la razón a la tía.,The office sided with your aunt.
 sbd0ff1bb,La oficina dio el registro a Ondarea.,The office granted the registration to Ondarea.
 s8d017562,Unai Garro llama con su oferta: lo que elijas lo decide lo que has cultivado.,Unai Garro calls with his offer: what you can choose depends on what you have grown.
@@ -6873,6 +6882,9 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+s598dc5c6,"Con {m} pruebas, la oposición se sostiene. Tienes {n}.","With {m} pieces of evidence, the objection holds. You have {n}."
+sc7581981,"Garro se lleva la madre, las semillas de la Haze y las notas. El barrio se enterará.","Garro takes the mother, the Haze seeds and the notes. The neighbourhood will find out."
+sea3cbab4,"Semillas Ondarea quiere registrar como suyas la Haze del 98 y landraces del banco de la tía. Oponte desde su ordenador antes del {f}, con {m} pruebas. Tienes {n}.","Semillas Ondarea wants to register the Haze of '98 and landraces from your aunt's bank as their own. Object from her computer before {f}, with {m} pieces of evidence. You have {n}."
 sb1fe5ee3,"Txomin, en la Kale Zaharra, en invierno","Txomin, in the Kale Zaharra, in winter"
 s95f8b71d,En invierno las setas van lentas y yo me aburro. Ordenando el bajo salió un bote del dueño de antes.,"In winter the mushrooms are slow and I get bored. Tidying the basement, a jar turned up from the previous owner."
 s99103b76,"Pone «Bekaa». Libanesa, creo. Para ti, que las mías no son de esto.","It says «Bekaa». Lebanese, I think. For you, mine aren't this kind."

@@ -16,6 +16,7 @@ var M
 var LOG := []
 var MENUS := []
 var QUIERO := []
+var PULSA_B := false
 var n := 0
 var fallos := []
 
@@ -37,6 +38,9 @@ func _menu(items: Array, o: Dictionary) -> Dictionary:
 	MENUS.append(labels)
 	var k := labels.size() - 1
 	var q: String = QUIERO.pop_front() if QUIERO.size() else ""
+	if q == "@B":   # cerrar el menú con B
+		PULSA_B = true
+		q = ""
 	for i in labels.size():
 		if q != "" and labels[i].begins_with(q) and not dis[i]:
 			k = i
@@ -83,7 +87,9 @@ func _corre() -> void:
 	J.gancho_toast = func(_h, _ms): pass
 	M.intervalo(func():
 		if J.handlers.size():
-			J.press("A"), 12)
+			var b := "B" if PULSA_B else "A"
+			PULSA_B = false   # antes de pulsar: la pulsación puede abrir el menú siguiente
+			J.press(b), 12)
 	M.intervalo(func(): J.update(1000 / 60.0), 1000 / 60.0)
 	J.queued.clear()
 	J.pending.clear()
@@ -121,13 +127,20 @@ func _corre() -> void:
 	J.S.gen["silver"] = 1
 	J.S.erase("bt")
 	# 2 · la oposición, desde el ordenador de la tía
-	QUIERO = ["Todavía no"]
+	QUIERO = ["Lo de siempre"]
 	LOG = []
-	chk(corre(func(): await J.pc_action()) and J.a3_p() == 1 and dicho("Oficina de Variedades"), "«Todavía no»: sin presentar")
-	QUIERO = ["Presentarla"]
-	chk(corre(func(): await J.pc_action()) and J.a3_p() == 2 and J.a3().pr.size() == 3, "presentada con 3 pruebas")
+	chk(corre(func(): await J.pc_action()) and J.a3_p() == 1 and not dicho("Expediente de Semillas"), "«Lo de siempre»: el ordenador, sin el expediente")
+	QUIERO = ["Abrir", "Todavía no"]
 	LOG = []
-	chk(corre(func(): await J.pc_action()) and not dicho("Oficina de Variedades"), "presentada, el ordenador de siempre")
+	chk(corre(func(): await J.pc_action()) and J.a3_p() == 1 and dicho("Expediente de Semillas") and dicho("sin la Haze fijada"), "«Todavía no»: sin presentar; avisa de que falta la Haze fijada")
+	chk(not J.a3_vale(["cuaderno", "correo", "asamblea"]) and J.a3_vale(["cuaderno", "fijada", "correo"]), "tres pruebas sin la Haze fijada no bastan")
+	J.S.gen["silver"] = int(D.GEN_ESTABLE)
+	QUIERO = ["Abrir", "Presentarla"]
+	chk(corre(func(): await J.pc_action()) and J.a3_p() == 2 and J.a3().pr.size() == 4 and J.a3().pr.has("fijada"), "presentada con 4 pruebas, la Haze fijada entre ellas")
+	J.S.gen["silver"] = 1
+	chk(J.hilo_derecha() == "III · 4/3", "OBJETIVO, con lo presentado: %s" % J.hilo_derecha())
+	LOG = []
+	chk(corre(func(): await J.pc_action()) and not dicho("Expediente de Semillas"), "presentada, el ordenador de siempre")
 	# 3 · la resolución, a los A3.dias
 	var d2: int = J.a3_dia(2)
 	J.S.day = d2 + int(A3.dias) - 1
@@ -135,7 +148,7 @@ func _corre() -> void:
 	chk(J.a3_p() == 2, "antes de tiempo, nada")
 	J.S.day = d2 + int(A3.dias)
 	J.hilo_dia()
-	chk(J.a3_p() == 3 and int(J.a3().gan) == 1 and J.queued.has("a3res"), "con 3 pruebas, ganada")
+	chk(J.a3_p() == 3 and int(J.a3().gan) == 1 and J.queued.has("a3res"), "con la Haze fijada, ganada")
 	J.queued.clear()
 	J.hilo_dia()
 	chk(not J.queued.has("a3garro"), "el mismo día, Garro no llama")
@@ -147,7 +160,7 @@ func _corre() -> void:
 	QUIERO = ["Colgar"]
 	MENUS = []
 	LOG = []
-	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "" and dicho("Sé que me acusaste") and dicho("250.000"), "colgar: sin final; Garro sabe que le acusaste")
+	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "" and dicho("Sé que me acusaste") and dicho("125.000"), "colgar: sin final; Garro sabe que le acusaste")
 	chk(MENUS.size() > 0 and MENUS[0].size() == 4, "las cuatro salidas (%s)" % [MENUS])
 	J.S.day += 1
 	J.hilo_dia()
@@ -156,6 +169,9 @@ func _corre() -> void:
 	J.hilo_dia()
 	chk(J.queued.has("a3garro"), "a los %d días, sí" % int(A3.llamada))
 	J.queued.clear()
+	QUIERO = ["@B"]
+	LOG = []
+	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "" and dicho("Piénsatelo"), "cerrar con B: sin final")
 	# 5 · lo que no tienes no se elige: sin el banco abierto ni la Haze fijada, el banco y Miren no
 	QUIERO = ["El banco"]
 	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "", "el banco, sin abrir, no se elige")
@@ -164,9 +180,19 @@ func _corre() -> void:
 	# 6 · vender: el dinero a la cuenta, sin la Haze, menos reputación
 	var b0 := float(J.S.get("banco", 0))
 	var r0 := float(J.S.rep)
+	J.S.buds["silver"] = {"g": 20.0, "thc": 18.0}
+	J.S.buds["kush"] = {"g": 5.0, "thc": 18.0}
+	J.S.rosin["silver~bho"] = {"g": 2.0, "thc": 60.0}
+	J.S.seeds.erase("silver")
+	QUIERO = ["Vender"]
+	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "", "sin semillas de la Haze, «Vender» no se elige")
+	J.S.seeds["silver"] = 5
+	MENUS = []
 	QUIERO = ["Vender"]
 	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "vender" and J.a3_p() == 4, "vender a Ondarea: el final")
-	chk(is_equal_approx(float(J.S.banco), b0 + 250000) and not J.S.seeds.has("silver") and float(J.S.rep) < r0, "250.000 € a la cuenta, sin la Haze, menos reputación")
+	chk(MENUS.size() > 0 and String(MENUS[0][1]).contains("125.000"), "sin fijar, la mitad: %s" % [MENUS])
+	chk(is_equal_approx(float(J.S.banco), b0 + 125000) and not J.S.seeds.has("silver") and float(J.S.rep) < r0, "125.000 € a la cuenta, sin la Haze, menos reputación")
+	chk(not J.S.buds.has("silver") and not J.S.rosin.has("silver~bho") and J.S.buds.has("kush"), "los cogollos y los extractos de la Haze se van; lo demás, no")
 	chk(J.hilo_derecha() == "IV · HECHO", "OBJETIVO: %s" % J.hilo_derecha())
 	var it: Array = J.hilo_items()
 	chk(it.size() == 1 + 3 + 4 and String(it[-1].desc).contains("Vendiste"), "OBJETIVO: los pasos del III y el IV (%d)" % it.size())
@@ -187,7 +213,7 @@ func _corre() -> void:
 	h0 = float(J.S.heat)
 	QUIERO = ["Colgar"]
 	LOG = []
-	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "caida" and dicho("60.000"), "perdida y sin ceder: la caída (oferta de 60.000 €)")
+	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "caida" and dicho("30.000"), "perdida y sin ceder: la caída (sin fijar, 30.000 €)")
 	chk(is_equal_approx(float(J.S.heat), h0 + int(A3.calor)) and not J.S.seeds.has("silver"), "la caída: calor +%d y sin la Haze" % int(A3.calor))
 	# 8 · Miren, con la Haze fijada y su confianza
 	J.S.a3 = {"p": 3, "d": {"3": int(J.S.day) - 1}, "pr": [], "gan": 1, "fin": ""}
@@ -201,7 +227,12 @@ func _corre() -> void:
 	J.S.bt = {"c": {}, "fin": int(J.S.day) - 3}
 	r0 = float(J.S.rep)
 	QUIERO = ["El banco"]
-	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "banco" and is_equal_approx(float(J.S.rep), r0 + int(A3.rep)), "con el banco abierto: de todos")
+	LOG = []
+	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "banco" and is_equal_approx(float(J.S.rep), r0 + int(A3.rep)) and dicho("colgado sin despedirse"), "con el banco abierto: de todos")
+	J.S.a3 = {"p": 3, "d": {"3": int(J.S.day) - 1}, "pr": [], "gan": 0, "fin": ""}
+	QUIERO = ["El banco"]
+	LOG = []
+	chk(corre(func(): await J.a3_llamada()) and J.a3().fin == "banco" and dicho("cien huertas") and not dicho("colgado sin despedirse"), "perdida y con el banco abierto: el texto de la oposición perdida")
 	# 10 · lo de antes cambia las pruebas: sin acusar a Garro y guardándote el cuaderno, solo una; perdida
 	J.S.a2.acu = "molina"
 	J.S.hilo.el = 2
@@ -209,8 +240,9 @@ func _corre() -> void:
 	J.S.erase("bt")
 	J.S.a3 = {"p": 1, "d": {"1": int(J.S.day)}, "pr": [], "gan": 0, "fin": ""}
 	chk(J.a3_pruebas() == ["cuaderno"], "acusando a Molina y sin la asamblea: %s" % [J.a3_pruebas()])
-	QUIERO = ["Presentarla"]
+	QUIERO = ["Abrir", "Presentarla"]
 	chk(corre(func(): await J.pc_action()) and J.a3_p() == 2, "presentada con 1")
+	chk(J.hilo_items().any(func(x): return String(x.get("desc", "")).contains("Sin la Haze fijada")), "OBJETIVO: avisa de que falta la Haze fijada")
 	J.S.day += int(A3.dias)
 	J.hilo_dia()
 	chk(J.a3_p() == 3 and int(J.a3().gan) == 0, "con 1 prueba, perdida")

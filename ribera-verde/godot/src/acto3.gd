@@ -2,9 +2,10 @@
 # III, «La patente de la Haze»: cerrado el Acto II, Semillas Ondarea pide registrar como suyas la Haze del 98 y landraces del banco
 # de la tía. Hay A3.plazo días para oponerse desde el ordenador de la tía, con pruebas que salen de lo que has hecho: el cuaderno
 # azul, la Haze del 98 fijada (la genética), el banco de la tía con colecciones entregadas, el correo de Garro (si le acusaste en el
-# Acto II) y la firma de la asamblea (si contaste lo del cuaderno en la asociación). Con A3.min, la oficina deniega el registro.
+# Acto II) y la firma de la asamblea (si contaste lo del cuaderno en la asociación). Con A3.min y la Haze fijada entre ellas, la
+# oficina deniega el registro.
 # IV, «Lo que queda de la tía»: Garro llama con su oferta y los finales los decide la genética: abrir el banco (completo), vender a
-# Ondarea, irte con Miren con la Haze fijada o, perdida la oposición y sin ceder, la caída. Quien te acompaña es quien te ayudó.
+# Ondarea (con sus semillas; sin fijar, a mitad de precio), irte con Miren con la Haze fijada o, perdida la oposición y sin ceder, la caída. Quien te acompaña es quien te ayudó.
 # S.a3 = {p: paso, d: {paso: día}, pr: pruebas presentadas, gan: 1 ganada, fin: el final, ll: día de la última llamada}.
 # Cadena: … → acto2 → caza → copaot → acto3 → retencion → juego.
 extends "res://src/copaot.gd"
@@ -78,7 +79,7 @@ func hilo_dia() -> void:
 	elif p == 1 and int(S.day) > a3_dia(1) + int(A3.plazo):
 		a3_resuelve(false)
 	elif p == 2 and int(S.day) >= a3_dia(2) + int(A3.dias):
-		a3_resuelve(a3().pr.size() >= int(A3.min))
+		a3_resuelve(a3_vale(a3().pr))
 	elif p == 3 and a3().fin == "" and int(S.day) > a3_dia(3) and int(S.day) >= int(a3().get("ll", -100)) + int(A3.llamada):
 		queue("a3garro", a3_llamada)
 
@@ -90,9 +91,13 @@ func a3_resuelve(gana: bool) -> void:
 		K("No puedes vender ni regalar sus semillas con ese nombre. Garro te va a llamar, y ahora tiene la sartén por el mango.")]
 	queue("a3res", func(): await talk(K("SMS · DELROY"), L), [[K("SMS · DELROY"), L]])   # i18n-no
 
-# el ordenador de la tía: la oposición, con las pruebas que tengas
+# la oposición se sostiene con A3.min pruebas y, entre ellas, la Haze fijada: sin la línea estable no hay variedad que defender
+func a3_vale(pr: Array) -> bool:
+	return pr.has("fijada") and pr.size() >= int(A3.min)
+
+# el ordenador de la tía: el expediente, si quieres, o lo de siempre
 func pc_action():
-	if a3_p() == 1:
+	if a3_p() == 1 and await ask(K("En el escritorio, el expediente de Ondarea."), [K("Abrir el expediente"), K("Lo de siempre")], K("EL ORDENADOR DE LA TÍA")) == 0:
 		await a3_oposicion()
 	await super()
 
@@ -103,7 +108,7 @@ func a3_oposicion() -> void:
 		l.append(("✓ " if pr.has(k) else "· ") + a3_prueba_n(k))
 	await talk(K("EL ORDENADOR DE LA TÍA"), [K("La sede electrónica de la Oficina de Variedades Vegetales. Expediente de Semillas Ondarea: «Haze 98» y tres landraces."),
 		T("Plazo de oposición hasta el {f}. Lo que puedes adjuntar hoy:", {"f": Datos.fd(a3_dia(1) + int(A3.plazo), S.day)}) + "\n" + "\n".join(l),
-		T("Con {m} pruebas, la oposición se sostiene. Tienes {n}.", {"m": int(A3.min), "n": pr.size()})])
+		T("Con {m} pruebas, la Haze fijada entre ellas, la oposición se sostiene. Tienes {n}{f}.", {"m": int(A3.min), "n": pr.size(), "f": "" if pr.has("fijada") else T(", sin la Haze fijada")})])
 	if await ask(K("¿Presentas la oposición?"), [K("Presentarla ahora"), K("Todavía no")], K("EL ORDENADOR DE LA TÍA")) != 0:
 		return
 	a3().pr = pr
@@ -112,8 +117,20 @@ func a3_oposicion() -> void:
 	await got(T("la oposición, presentada con {n} pruebas: la resolución, el {f}", {"n": pr.size(), "f": Datos.fd(a3_dia(2) + int(A3.dias), S.day)}))
 
 # la llamada de Garro: la oferta y los finales
-func a3_oferta() -> int:
-	return int(A3.venta[0 if int(a3().gan) else 1])
+func a3_oferta() -> int:   # fijada vale el doble: lo que compra Ondarea es la línea estable
+	return int(A3.venta[0 if int(a3().gan) else 1]) / (1 if a3_fijada() else 2)
+
+func a3_tiene_haze() -> bool:
+	return int(S.seeds.get(String(A3.haze), 0)) > 0
+
+# vender o la caída: las semillas, los cogollos y los extractos de la Haze se van
+func a3_quita_haze() -> void:
+	var h := String(A3.haze)
+	S.seeds.erase(h)
+	for L in [S.buds, S.rosin]:
+		for k in L.keys():
+			if lot_sid(k) == h:
+				L.erase(k)
 
 func a3_llamada() -> void:
 	var A := a3()
@@ -127,12 +144,16 @@ func a3_llamada() -> void:
 	var con_miren: bool = a3_fijada() and rel("miren") >= int(A3.miren)
 	var it := [{"label": K("El banco de la tía es del barrio"), "disabled": not abierto,
 			"desc": K("Lo que es de todos no se vende.") if abierto else K("Antes tienes que abrir el banco de semillas de la tía: todas sus colecciones, con la Haze del 98 fijada.")},
-		{"label": T("Vender a Semillas Ondarea · {e}", {"e": Datos.eur(a3_oferta())}), "desc": K("Garro se lleva la madre, las semillas de la Haze y las notas. El barrio se enterará.")},
+		{"label": T("Vender a Semillas Ondarea · {e}", {"e": Datos.eur(a3_oferta())}), "disabled": not a3_tiene_haze(),
+			"desc": (K("Garro se lleva las semillas de la Haze, los tarros y las notas. El barrio se enterará.") + ("" if a3_fijada() else K(" Sin fijar, paga la mitad."))) if a3_tiene_haze() else K("Sin semillas de la Haze del 98 no hay nada que venderle.")},
 		{"label": K("Irte con Miren a Errotabarri"), "disabled": not con_miren,
 			"desc": K("Subir al monte con la Haze fijada, lejos de todo.") if con_miren else T("Hace falta la Haze del 98 fijada y la confianza de Miren ({r}/{m}).", {"r": rel("miren"), "m": int(A3.miren)})},
 		{"label": K("Colgar"), "desc": K("Que vuelva a llamar.") if int(A.gan) else K("Sin la oposición ganada, Ondarea irá a por ti.")}]
 	var i: int = await menu(it, {"cls": "full", "title": K("LA OFERTA DE ONDAREA"), "desc": true, "initial": 3})
-	if i < 0 or i == 3:
+	if i < 0:   # cerrar el menú no es una respuesta: volverá a llamar
+		await say(K("«Piénsatelo. Te vuelvo a llamar.»"), N)
+		return
+	if i == 3:
 		if int(A.gan):
 			await say(K("«Volveré a llamar. Siempre vuelvo a llamar.»"), N)
 			return
@@ -147,19 +168,21 @@ func a3_final(k: String) -> void:
 	var ay := a2_ayuda_n()
 	match k:
 		"banco":
-			await talk(ay, [K("Garro ha colgado sin despedirse. Lo que está en el banco del barrio no lo puede comprar nadie."),
+			await talk(ay, [K("Garro ha colgado sin despedirse. Lo que está en el banco del barrio no lo puede comprar nadie.") if int(A.gan) else
+				K("Ondarea tendrá el registro, pero la Haze ya está en cien huertas del barrio. Eso no hay papel que lo recoja."),
 				K("Esta tarde vienen los socios a pedir semillas. Uno de ellos se ha llevado la Haze del 98 para su huerta. Como quería ella.")])
 			S.rep = float(S.rep) + int(A3.rep)
 			S.prest = int(S.get("prest", 0)) + int(A3.prest)
 			await got(T("FIN · el banco de la tía, de todos ({r} de reputación)", {"r": int(A3.rep)}))
 		"vender":
-			S.banco = float(S.get("banco", 0)) + a3_oferta()
-			S.seeds.erase(String(A3.haze))
+			var e := a3_oferta()
+			S.banco = float(S.get("banco", 0)) + e
+			a3_quita_haze()
 			S.rep = float(S.rep) - int(A3.pierde)
 			confia(a2_ayuda(), -int(A3.pierde))
 			await talk(ay, [K("Ya me he enterado. No te voy a decir nada: el dinero también es la vida."),
 				K("Pero la Haze de tu tía ya lleva el nombre de otro. Eso no lo arregla ninguna transferencia.")])
-			await got(T("FIN · {e} en la cuenta y la Haze del 98, de Ondarea", {"e": Datos.eur(a3_oferta())}))
+			await got(T("FIN · {e} en la cuenta y la Haze del 98, de Ondarea", {"e": Datos.eur(e)}))
 		"miren":
 			confia("miren", 10)
 			await talk(K("MIREN"), [K("Sube cuando quieras. Arriba la tierra es buena y nadie pregunta."),
@@ -168,7 +191,7 @@ func a3_final(k: String) -> void:
 			await got(K("FIN · con Miren, en Errotabarri, con la Haze del 98"))
 		"caida":
 			S.heat = minf(100.0, float(S.heat) + int(A3.calor))
-			S.seeds.erase(String(A3.haze))
+			a3_quita_haze()
 			update_hud()
 			await talk(K("CARTA · ABOGADOS DE ONDAREA"), [K("Requerimiento: cese inmediato en la reproducción y distribución de la variedad registrada «Haze 98»."),
 				K("Se ha dado traslado a las autoridades. Cualquier semilla de la variedad en su poder será intervenida.")])
@@ -186,9 +209,9 @@ func hilo_items() -> Array:
 		var d := ""
 		match i:
 			1:
-				d = T("Semillas Ondarea quiere registrar como suyas la Haze del 98 y landraces del banco de la tía. Oponte desde su ordenador antes del {f}, con {m} pruebas. Tienes {n}.", {"f": Datos.fd(a3_dia(1) + int(A3.plazo), S.day), "m": int(A3.min), "n": a3_pruebas().size()})
+				d = T("Semillas Ondarea quiere registrar como suyas la Haze del 98 y landraces del banco de la tía. Oponte desde su ordenador antes del {f}, con {m} pruebas y la Haze fijada entre ellas. Tienes {n}.", {"f": Datos.fd(a3_dia(1) + int(A3.plazo), S.day), "m": int(A3.min), "n": a3_pruebas().size()})
 			2:
-				d = T("Presentada con {n} pruebas. La oficina resuelve el {f}.", {"n": a3().pr.size(), "f": Datos.fd(a3_dia(2) + int(A3.dias), S.day)})
+				d = T("Presentada con {n} pruebas. La oficina resuelve el {f}.", {"n": a3().pr.size(), "f": Datos.fd(a3_dia(2) + int(A3.dias), S.day)}) + ("" if a3().pr.has("fijada") else " " + K("Sin la Haze fijada."))
 			3:
 				d = (K("La oficina dio la razón a la tía.") if int(a3().gan) else K("La oficina dio el registro a Ondarea.")) + " " + K("Unai Garro llama con su oferta: lo que elijas lo decide lo que has cultivado.")
 			4:
@@ -201,5 +224,5 @@ func hilo_derecha() -> String:
 	if p == 0:
 		return super()
 	if p < 3:
-		return T("III · {n}/{m}", {"n": a3_pruebas().size(), "m": int(A3.min)})
+		return T("III · {n}/{m}", {"n": (a3_pruebas() if p == 1 else a3().pr).size(), "m": int(A3.min)})
 	return K("IV · HECHO") if p == 4 else K("IV · AHORA")
