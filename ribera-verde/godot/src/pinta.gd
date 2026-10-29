@@ -2054,13 +2054,15 @@ func _vfx(c, capa: String) -> void:
 		var dx := floori(fi / 6.0) if v.sube and capa == "town" else 0
 		_dibujar(v.id, "efecto", "unica", t, v.x - c.x + dx, v.y - c.y - dy, {"esp": true} if v.get("esp") else {})
 
+const VISTA_ALFA := 34   # el cono de los agentes con CAL: antes 87 (lo pidió el usuario: «hazlos más suaves»)
+
 # de día, por dónde mira cada agente (de noche, no: sigilo); con la alarma, ninguno (pintarVistas, 10b-patrulla)
 func _vistas() -> void:
 	if J.is_night() or J.SOSP.alarma != null:
 		return
 	var m: Dictionary = J.MAPS[J.S.map]
 	var R := int(J.D.PAT.vista[0])
-	var col := Color8(255, 230, 60, 87)
+	var col := Color8(255, 230, 60, VISTA_ALFA if Datos.CAL else 87)   # con CAL, más suave (lo pidió el usuario)
 	for e in J.ents:
 		if not e.get("pat"):
 			continue

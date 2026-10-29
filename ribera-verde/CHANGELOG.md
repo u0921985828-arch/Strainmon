@@ -2,6 +2,10 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Siguiente (sin APK todavía)
+
+- El cono de visión de los agentes, más suave (lo pidió el usuario: «hazlos más suaves»; con `Datos.CAL`): alfa 34 en vez de 87 (`VISTA_ALFA` en `pinta.gd`); sin CAL, como el HTML.
+
 ### 0.66.0 (código 90) · las seis tandas del ESTUDIO y los esquemas de macetas; APK en `descargas/LandraceHunters.apk`
 
 - `descargas/LandraceHunters.apk` (89 MB, `apk-instalar.py` + `zipalign -P 16` + `apksigner`, la misma firma y el mismo paquete que la 0.65.4); AAB firmado de 82 MB, targetSdk 36, 16 KB en las 4 `.so`. Batería entera en verde antes de compilar.
