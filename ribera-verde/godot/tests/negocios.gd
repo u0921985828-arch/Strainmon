@@ -161,7 +161,7 @@ func _corre() -> void:
 				var f3 = Atlas.frame_de("edificio-" + N.puerta, "puerta", "unica", 0, {"i": -1})
 				var ox: int = int(N.x) * 16 - 8 + int(N.dx) - int(b.x0) * 16
 				var oy: int = (int(N.dy) + 1) * 16 - 32 - int(b.y0) * 16
-				var igual: bool = fb != null and f0 != null and ox >= 0 and ox + f0.c.get_width() <= fb.c.get_width()
+				var igual: bool = fb != null and f0 != null and ox + f0.c.get_used_rect().position.x >= 0 and ox + f0.c.get_used_rect().end.x <= fb.c.get_width()   # 0.69.3: lo transparente del sprite puede salirse (las corridas dentro de él)
 				var dif := 0
 				# 0.69.2: la puerta, más alta y ancha que la de la fachada (puertas_altas.py, a la medida del protagonista): lo que cambia
 				# respecto de la base, solo en las columnas de su hueco y su marco (5 px a cada lado)
@@ -177,6 +177,8 @@ func _corre() -> void:
 				if igual:
 					for yy in f0.c.get_height():
 						for xx in f0.c.get_width():
+							if ox + xx < 0 or ox + xx >= fb.c.get_width():
+								continue
 							if f0.c.get_pixel(xx, yy) != fb.c.get_pixel(ox + xx, oy + yy) and (xx < hx0 - 5 or xx > hx1 + 5):
 								igual = false
 				chk(igual and dif > 60, "%s: la puerta cerrada calca la fachada en (%d, %d) y se abre (%d px)" % [k, ox, oy, dif])

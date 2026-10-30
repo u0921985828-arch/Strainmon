@@ -636,7 +636,8 @@ func _mundo() -> void:
 	if LZ and LZ.get("fondo"):
 		_rect(0, 0, J.SW, SH, css(LZ.fondo))
 
-# el tiempo en la calle (1.52): nubes que apagan, lluvia y nieve que caen, niebla y algún relámpago con tormenta
+# el tiempo en la calle (1.52): nubes que apagan, lluvia y nieve que caen y niebla; la tormenta, más oscura y con más lluvia, sin
+# relámpagos (lo pidió el usuario: «sigue habiendo destellos… pam, pam, cada cierto tiempo»): la pantalla entera en blanco cada 7 s
 func _tiempo(now: float) -> void:
 	var k: String = Datos.tiempo(int(J.S.day), int(J.S.min)).k
 	if k == "sol":
@@ -662,8 +663,6 @@ func _tiempo(now: float) -> void:
 			var x := fposmod(hx % J.SW - y / 3.0, J.SW)
 			_rect(int(x), int(y), 1, 3, Color8(200, 220, 240, 200))   # la gota inclinada: dos trazos
 			_rect(int(x) - 1, int(y) + 3, 1, 3, Color8(200, 220, 240, 200))
-	if k == "tormenta" and fposmod(now, 7000.0) < 120.0 and not Vista.CALMA:
-		_rect(0, 0, J.SW, SH, Color8(255, 255, 240, 110))
 
 # al aire libre: las zonas de la calle y, con CAL (MAESTRO [4]), el muelle de Puerto Viejo, que ya no está siempre a pleno sol:
 # el atardecer, el tiempo, la noche y sus farolas como en la calle
@@ -2038,6 +2037,21 @@ func _aparcado(k: String, x: int, y: int, d: String, dx := 0) -> void:   # dx: e
 		if f:
 			_pinta(f, xp, yp)
 
+# en una puerta de 2 casillas (ancha), entrando, el protagonista se va al medio de las dos a lo largo del paso (lo pidió el usuario:
+# «tiene que entrar perfecto el personaje en la puerta»): así entra entero por el hueco, que está centrado en la puerta
+func _dx_ancha() -> int:
+	var P: Dictionary = J.P
+	var m: Dictionary = J.MAPS[J.S.map]
+	for b in m.get("blds", []):
+		if not b.get("ancha") or b.get("doorX") == null:
+			continue
+		var dy: int = b.y0 + b.h - 1
+		if P.y != dy or (P.x != b.doorX and P.x != b.doorX + 1) or J.puerta_cerrada(m, b):
+			continue
+		var k := clampf(P.t / P.dur, 0.0, 1.0) if P.moving and P.fy == dy + 1 else (0.0 if P.moving else 1.0)
+		return Datos.jsround((8.0 if P.x == b.doorX else -8.0) * k)
+	return 0
+
 func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 	var gr = J.grupo_pj() if isP else Atlas.grupo_look(look)
 	if not gr:
@@ -2051,7 +2065,7 @@ func _pj(e: Dictionary, look, isP: bool, dur: float) -> void:
 		return
 	if isP:
 		f = J.ropa_c(J.epi_c(f), gr)   # ropa y pelo (1.21); en el laboratorio, con el EPI (epi_c)
-	var xp: int = Datos.jsround(e.px - cam.x) + 8
+	var xp: int = Datos.jsround(e.px - cam.x) + 8 + (_dx_ancha() if isP and Datos.CAL else 0)
 	var yp: int = Datos.jsround(e.py - cam.y) + 15
 	if esc != null and int(esc.h) > 0:   # hundido h px en la escalera: lo de debajo de los peldaños no se ve (sin sombra)
 		var im: Image = f.c

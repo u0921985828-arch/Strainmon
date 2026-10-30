@@ -1081,6 +1081,30 @@ def puenteV():
     return lz
 
 
+
+# la puerta de los edificios que se entran (lo pidió el usuario: «tiene que entrar perfecto el personaje en la puerta»): el hueco oscuro,
+# centrado en la columna de su puerta (c, la raya entre sus dos casillas en las anchas) y hasta el suelo, con 18 px libres de ancho y
+# 32 de alto (el protagonista, 16 × 27 de espaldas), recto, en arco o apuntado; la junta de las dos hojas, en el medio
+PORTALES = {'estacion': (64, 'recto', CR), 'diputacion': (64, 'arco', '#4a3020'), 'camposE': (64, 'arco', MAR),
+            'abandoE': (64, 'recto', CR), 'concordia': (32, 'recto', CR), 'milagrosa': (32, 'arco', '#4a3020'),
+            'teatro': (64, 'arco', CR), 'catedral': (32, 'apuntado', '#4a3020'), 'sanAnton': (64, 'apuntado', '#4a3020')}
+
+
+def portal(k, lz):
+    if k not in PORTALES:
+        return lz
+    c, forma, col = PORTALES[k]
+    H = lz.h
+    x0 = c - 10
+    if forma == 'recto':
+        lz.caja(x0, H - 34, 20, 34, col, MAR)
+    elif forma == 'arco':
+        arco(lz, x0, 20, H - 38, H - 1, col, MAR)
+    else:
+        apuntado(lz, x0, 20, H - 42, H - 1, col, MAR)
+    lz.vl(c, H - 30, H - 1, '#1e1c1a')
+    return lz
+
 ICONOS = {'sanNicolas': sanNicolas, 'kiosko': kiosko, 'plazaN': lambda: plaza_frente(256, 64, 1531, True),
           'plazaS': lambda: plaza_frente(112, 64, 1533), 'plazaL': plaza_ala, 'plazaR': plaza_ala,
           'cascoB': lambda: cascoB('cascoB'), 'cascoB2': lambda: cascoB('cascoB2'), 'catedral': catedral4, 'mercadoR': mercadoR,
@@ -1402,10 +1426,10 @@ def ascensor():
 SPRITES = {
     'torres': lambda: [guarda('edificio-' + k, torre(k)) for k in TORRES],
     'ensanches': lambda: [guarda('edificio-' + k, ensanche(k)) for k in ENSANCHES],
-    'estacion': lambda: guarda('edificio-estacion', estacion()),
-    'iconos': lambda: [guarda('edificio-' + k, f()) for k, f in ICONOS.items()],
+    'estacion': lambda: guarda('edificio-estacion', portal('estacion', estacion())),
+    'iconos': lambda: [guarda('edificio-' + k, portal(k, f())) for k, f in ICONOS.items()],
     'iconos2': lambda: [sale(estatua(), 'props-bilbao-alto', 'estatua'), sale(puenteV(), 'tiles-bilbao', 'puenteV')],
-    'teatro': lambda: guarda('edificio-teatro', teatro()),
+    'teatro': lambda: guarda('edificio-teatro', portal('teatro', teatro())),
     'mercado': lambda: guarda('edificio-mercado', mercado()),
     'grua': lambda: guarda('edificio-grua', grua()),
     'tiles': lambda: [sale(f(), 'tiles-bilbao', k) for k, f in (('via', via), ('viaV', lambda: via(True)), ('viaX', lambda: via(False, True)),

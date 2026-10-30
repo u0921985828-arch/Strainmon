@@ -25,11 +25,11 @@ func chk(c: bool, txt: String) -> void:
 	if not c:
 		fallos.append(txt)
 
-func foto(dir: String, k: String) -> void:
+func foto(dir: String, k: String, t := 1000.0) -> void:
 	J.toast_box.hide()
 	for q in 2:
 		await process_frame
-		J.pintor.redibuja(1000.0)
+		J.pintor.redibuja(t)
 		for r in 4:
 			await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(dir.path_join("tiempo-%s.png" % k))
@@ -130,6 +130,20 @@ func _corre() -> void:
 			S.day = dia_con(k)
 			S.min = 12 * 60
 			await foto(dir, "calle-" + k)
+		# sin relámpagos (lo pidió el usuario: «sigue habiendo destellos… pam, pam, cada cierto tiempo»): con tormenta, la calle no se
+		# aclara de golpe en ningún momento de los 7 s en los que antes caía uno
+		S.day = dia_con("tormenta")
+		var luz := []
+		for t in [7050.0, 14030.0, 3500.0]:
+			await foto(dir, "tormenta-%d" % int(t), t)
+			var im := Image.load_from_file(dir.path_join("tiempo-tormenta-%d.png" % int(t)))
+			var s := 0.0
+			for y in range(0, im.get_height(), 8):
+				for x in range(0, im.get_width(), 8):
+					var c := im.get_pixel(x, y)
+					s += c.r + c.g + c.b
+			luz.append(s)
+		chk(luz[0] < luz[2] * 1.05 and luz[1] < luz[2] * 1.05, "con tormenta, sin relámpago que aclare la pantalla: %s" % [luz])
 		J.enter_map("home", 4, 6, "up")
 		S.day = dia_con("lluvia")
 		J.MOVIL_V = {"ops": ops, "i": 0}

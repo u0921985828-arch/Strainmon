@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.69.3 (código 97) · El protagonista entra entero en cada puerta y sin relámpagos (lo pidió el usuario: «tiene que entrar perfecto el personaje en la puerta. No, no entra ninguno bien» y «sigue habiendo destellos… pam, pam, cada cierto tiempo»; con `Datos.CAL`)
+
+- Las puertas de la calle (`tools/sprites/a-mano/puertas_altas.py`, reescrito): el hueco, de la columna 7 a la 24 y de la fila 1 al suelo del sprite de la puerta, donde cabe el protagonista de espaldas con 1 px de aire; las que estaban corridas (la asociación, el club de Kalea, el bajo de las setas y el estanco del casco) se corren dentro del sprite y su `dx` pasa a 0 en `datos.json`; la corredera de la nave se abre del todo; la del casco (el taller y el estanco de Ibarbide), en la esquina de su fachada, sin la jamba que se salía de ella (`RECORTA`).
+- En las puertas anchas (dos casillas), el protagonista entra por el medio, no por una de las hojas (`_dx_ancha` en `pinta.gd`).
+- Bilbao: las nueve fachadas que se entran y no le dejaban (las estaciones, la Diputación, Campos Elíseos, la de la Concordia, la Milagrosa, el Arriaga, la catedral y San Antón), con su portal oscuro de 18 px libres recto, en arco o apuntado hasta el suelo (`PORTALES`, `portal` en `tools/sprites/a-mano/bilbao.py`).
+- La tormenta ya no pone la pantalla entera en blanco cada 7 s (`_tiempo` en `pinta.gd`): más oscura y con lluvia, sin relámpagos.
+- Prueba `tests/puertas_alto.gd`: en todas las puertas, sus 30 fotogramas de espaldas (él y ella, quieto, andando y corriendo) dentro del hueco abierto, de jamba a jamba (67 comprobaciones, 0 fallos; con las fachadas de antes, las nueve de Bilbao fallaban); `--pintar <dir>`, las capturas. `tests/tiempo.gd`: con tormenta, la calle no se aclara en el instante en que caía el relámpago (falla con el de antes).
+
 ### 0.69.2 (código 96) · Las puertas, a la medida del protagonista (lo pidió el usuario: «la puerta es demasiado pequeña para el personaje»; con y sin `Datos.CAL`)
 
 - Medido: a 16 px/m el protagonista mide 27 px (1,70 m); había puertas de 18 a 26 px de alto (GAUA, 1,1 m; el club del Ensanche, el bar y la casa, 1,3 m) y hojas de 9 px (la asociación, el club de Kalea, el estanco del casco, el bajo de las setas): al pasar, la cabeza salía por encima del dintel.
