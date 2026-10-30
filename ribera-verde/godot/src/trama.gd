@@ -1396,6 +1396,32 @@ func sec_premio(sc: Dictionary) -> void:
 		await got(T("{n} semillas de {s}", {"n": int(R.seeds[1]), "s": D.STRAINS[R.seeds[0]].n.to_upper()}))
 	sec_pon(sc.id, 2)
 	toast(T("Recado hecho: {t}", {"t": sc.t}), 1600)
+	if sc.get("tia"):
+		await ruta_testimonio(sc)
+
+# la ruta de la tía (tools/ruta_tia.py; lo pidió el usuario: «que haya cosas para hacer en cada pueblo… que la historia tenga algo
+# que ver»): los recados con «tia», uno por pueblo, y su testimonio (h); con RUTA_TIA.min, una prueba del Acto III (acto3.gd)
+func ruta_tia() -> Array:
+	return D.get("SECUNDARIAS", []).filter(func(sc): return sc.get("tia"))
+
+func huellas() -> Array:
+	return ruta_tia().filter(func(sc): return sec_estado(sc.id) == 2)
+
+func ruta_testimonio(sc: Dictionary) -> void:
+	sfx("get")
+	await say(T("Testimonio para la tía: {h}", {"h": sc.h}))
+	var n := huellas().size()
+	var m := ruta_tia().size()
+	if n < m:
+		await say(T("Testimonios de la comarca: {n}/{m}. Lo apuntas en START → OBJETIVO → RECADOS.", {"n": n, "m": m}))
+		return
+	if S.flags.get("rutaTia"):
+		return
+	S.flags.rutaTia = int(S.day)
+	S.rep = int(S.rep) + int(D.RUTA_TIA.todos.rep)
+	var L := [K("Me ha llamado media comarca. Pello, Rosario, Esteban, Itziar, Pilar, Joseba… Has ido pueblo por pueblo detrás de tu tía."),
+		K("Lo que te han contado lo he apuntado en la asociación, con nombre y fecha. Si alguien quiere quedarse con sus semillas, que venga a discutirlo con todos ellos.")]
+	queue("rutaTia", func(): await talk(K("SMS · DELROY"), L), [[K("SMS · DELROY"), L]])   # i18n-no
 
 func talk_sec(eid: String) -> void:
 	var b := eid.begins_with("secb_")
@@ -1460,10 +1486,16 @@ func recados_ver() -> Array:
 
 func recados_menu() -> void:
 	var it := []
+	var rt := ruta_tia().filter(func(sc): return int(S.ch) >= int(sc.ch))
+	if rt.size():
+		it.append({"label": K("LA RUTA DE LA TÍA"), "right": "%d/%d" % [huellas().size(), ruta_tia().size()], "desc": T("En cada pueblo hay alguien que conoció a la tía Maite. Hecho su recado, te da su testimonio; con {m}, es una prueba más para defender sus semillas.", {"m": int(D.RUTA_TIA.min)})})
 	for sc in recados_ver():
 		var st := sec_estado(sc.id)
 		var donde: String = ZONA_N.get(sc.a.map if st != 1 else sc.b.map, "")
-		it.append({"label": sc.t, "right": K("HECHO") if st == 2 else (K("EN MARCHA") if st == 1 else donde), "desc": T("{d}\nLleva el paquete a {n} ({z}).", {"d": sc.d, "n": I18n.v(sc.b.n).to_lower(), "z": donde}) if st == 1 else sc.d})
+		var d: String = T("{d}\nLleva el paquete a {n} ({z}).", {"d": sc.d, "n": I18n.v(sc.b.n).to_lower(), "z": donde}) if st == 1 else sc.d
+		if sc.get("tia") and st == 2:
+			d += "\n" + T("Testimonio: {h}", {"h": sc.h})
+		it.append({"label": ("· " if sc.get("tia") else "") + sc.t, "right": K("HECHO") if st == 2 else (K("EN MARCHA") if st == 1 else donde), "desc": d})
 	if it.is_empty():
 		it.append({"label": K("Nada todavía"), "desc": K("Los recados salen por la comarca según el capítulo: busca a la gente con el «!».")})
 	it.append({"label": K("Volver"), "desc": ""})

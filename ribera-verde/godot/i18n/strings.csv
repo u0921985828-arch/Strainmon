@@ -83,6 +83,7 @@ sc86e9a33,La Haze del 98 fijada en F{g}: la línea es estable y es vuestra,The H
 s6d5ec276,El banco de la tía con {n} colecciones entregadas: las landraces eran de todos,Your aunt's bank with {n} collections handed in: the landraces belonged to everyone
 s7c1259a8,El correo de Garro ofreciendo dinero por la Haze: sabía que no era suya,Garro's email offering money for the Haze: he knew it wasn't his
 sb796174b,La firma de la asamblea de la asociación,The signature of the association's assembly
+s734c4a17,Los testimonios de la comarca: {n} personas que conocieron a la tía y sus semillas,The county's testimonies: {n} people who knew your aunt and her seeds
 s04374b05,Malas noticias. Semillas Ondarea ha pedido en la Oficina de Variedades Vegetales registrar como suyas la «Haze 98» y tres landraces del banco de tu tía.,"Bad news. Semillas Ondarea has applied at the Plant Variety Office to register ""Haze 98"" and three landraces from your aunt's bank as their own."
 s3029e17b,"Si se lo dan, nadie podrá vender ni regalar esas semillas con su nombre. Hay plazo para oponerse hasta el {f}, desde el ordenador de tu tía. Hacen falta pruebas.","If they get it, nobody will be able to sell or give away those seeds under their name. You can object until {f}, from your aunt's computer. Evidence is needed."
 s43c5be08,"La oficina ha denegado el registro de Ondarea: la Haze del 98 y esas landraces existían antes que ellos, y eran de todos. Lo ha firmado esta mañana.","The office has refused Ondarea's registration: the Haze of '98 and those landraces existed before them, and belonged to everyone. It was signed this morning."
@@ -1992,6 +1993,7 @@ s4c0acb47,Kits de carpa devueltos (KAIA),Tent kits refunded (KAIA)
 sa4f130fc,La sala de cultivo de KAIA pasa a las carpas nuevas. Lo que no cabe se devuelve: {e} a la cuenta por los kits de más y {n} semillas por las plantas que no caben.,KAIA's grow room moves to the new tents. What doesn't fit is refunded: {e} to your account for the extra kits and {n} seeds for the plants that don't fit.
 s23317412,KAIA_CULT,KAIA_CULT
 s066ae4c4,"La sala de cultivo de KAIA, cerrada. Hasta tener la licencia de cultivo, aquí dentro no se planta nada.","KAIA's grow room, locked. Until you have the cultivation licence, nothing gets planted in here."
+sdf625d79,"La tela de la carpa de sala, cerrada: se entra por su puerta, la cremallera de delante.","The grow room tent's fabric, closed: you go in through its door, the zip at the front."
 sa4a2b640,El depósito de recogida: lo que sobra de cada mesa baja por su tubería de drenaje y se filtra antes de volver al tanque.,The collection tank: what each table drains runs down its pipe and is filtered before going back to the tank.
 s72a1bd20,"El depósito del goteo de la carpa {n}, de {l} L, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.","The {l} L drip tank of tent {n}, outside it: its pump sends the water with the nutrients down the hose, which goes in through the tent wall, to each pot."
 s62ad04d6,"El tanque del riego centralizado, con el abono ya mezclado: las bombas lo llevan a cada mesa.","The central irrigation tank, with the nutrients already mixed in: the pumps carry it to every table."
@@ -2005,7 +2007,7 @@ s60bc25ab,Las lleva {n}.,{n} runs them.
 s5f6947bc,Nadie las lleva: pon a alguien de tu plantilla en la sala desde el móvil.,Nobody runs them: put someone from your crew in the room from your phone.
 s00dc0a86,{k} de {m} de {n},{k} of {m} of {n}
 sd4725d1f,Comprar: {n} · {e},Buy: {n} · {e}
-s5a758610,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas: {l}.","The room panel: the LED timer, the drip and the climate. All automatic: long light hours while they grow and fewer as soon as they flower. Tents: {l}."
+sd4cab7e5,"El cuadro de la sala: el clima, el goteo y la corriente de las carpas. La luz la lleva el temporizador de cada carpa, dentro: muchas horas mientras crecen y menos en cuanto toca florecer. Carpas: {l}.","The room panel: the climate, the drip and the power for the tents. The light is run by each tent's own timer, inside: long hours while they grow and fewer as soon as they flower. Tents: {l}."
 saaa33220,Ordenar la sala,Arrange the room
 s05d84f3f,Pasar a la {n} · {e},Move up to the {n} · {e}
 s22c05331,Montar la carpa de sala · {e},Set up the grow room tent · {e}
@@ -3828,6 +3830,11 @@ s345425c1,el Casco Viejo,the Casco Viejo
 s91aab659,el Ensanche,the Ensanche
 s985ae267,la Kale Zaharra,the Kale Zaharra
 sf9e6e120,Recado hecho: {t},Errand done: {t}
+se1e94af4,Testimonio para la tía: {h},Testimony for your aunt: {h}
+s51b9cff0,Testimonios de la comarca: {n}/{m}. Lo apuntas en START → OBJETIVO → RECADOS.,County testimonies: {n}/{m}. You note it down in START → OBJECTIVE → ERRANDS.
+sd783532b,rutaTia,rutaTia
+s9d29cbf2,"Me ha llamado media comarca. Pello, Rosario, Esteban, Itziar, Pilar, Joseba… Has ido pueblo por pueblo detrás de tu tía.","Half the county has called me. Pello, Rosario, Esteban, Itziar, Pilar, Joseba… You've gone town by town after your aunt."
+s9bc44a3a,"Lo que te han contado lo he apuntado en la asociación, con nombre y fecha. Si alguien quiere quedarse con sus semillas, que venga a discutirlo con todos ellos.","I've written down what they told you at the association, with names and dates. If anyone wants to keep her seeds, they can come and argue it with all of them."
 s47cec53b,Trae.,Hand it over.
 s95df008c,"Ya sabes: a {n}, en {z}. Date prisa.","You know: to {n}, in {z}. Hurry up."
 sb7288df3,¿Llevas el paquete?,Will you take the package?
@@ -3837,10 +3844,13 @@ sabc7ddd0,el paquete para {n},the package for {n}
 sb4a0ae39,"No llevas nada. Si vuelves con algo, aquí estaré.",You've got nothing. Come back with something and I'll be here.
 s8dc8e302,¿Se lo das?,Give it to them?
 s7ad3fcb2,"Cuando tengas lo que te pido, vuelve.",Come back when you have what I asked for.
-s7d509355,EN MARCHA,ONGOING
+s495287f9,LA RUTA DE LA TÍA,YOUR AUNT'S TRAIL
+s69484ac0,"En cada pueblo hay alguien que conoció a la tía Maite. Hecho su recado, te da su testimonio; con {m}, es una prueba más para defender sus semillas.","In every town there's someone who knew aunt Maite. Do their errand and they give you their testimony; with {m}, it's one more piece of evidence to defend her seeds."
 s58c83eae,"{d}
 Lleva el paquete a {n} ({z}).","{d}
 Take the package to {n} ({z})."
+sc51ac28d,Testimonio: {h},Testimony: {h}
+s7d509355,EN MARCHA,ONGOING
 s3943074d,Nada todavía,Nothing yet
 s34c6f84d,Los recados salen por la comarca según el capítulo: busca a la gente con el «!».,Errands pop up around the district by chapter: look for people with a «!».
 s19633201,gRiego,
@@ -4083,6 +4093,7 @@ se3b6d2bf,"Un calendario de un taller de neumáticos, de hace años.","A tyre sh
 s58e9feba,La nave ya no es tuya.,The warehouse isn't yours anymore.
 s9e1559c2,La cama de la habitación de la nave: se oyen los extractores al otro lado de la pared.,The bed in the warehouse room: you can hear the extractors through the wall.
 sb3d428c6,Un armario con ropa de faena y una muda limpia.,A wardrobe with work clothes and a clean change.
+s19eec57c,"La estantería del despacho: carpetas con las facturas, los contratos y el libro de la nave.","The office shelf: folders with the invoices, the contracts and the warehouse logbook."
 s207b874d,"La mesilla, con un flexo y el cargador del móvil.","The nightstand, with a desk lamp and the phone charger."
 s4db7a223,La percha: un mono de trabajo y un chubasquero.,The coat rack: overalls and a raincoat.
 s1d325743,"El plano de la nave, con las mesas, las tomas de agua y la luz.","The warehouse plan, with the tables, water points and power."
@@ -6332,6 +6343,64 @@ sd55f0f22,Yo no puedo entrar en Ibarbide: me conocen. Lleva este sobre al mozo d
 sac518944,El sobre. Bien. Dile al camionero que todo en orden.,The envelope. Good. Tell the trucker all's in order.
 sce9c5628,"Esto es lo acordado. Si te paran, no me conoces.","This is what we agreed. If they stop you, you don't know me."
 sf5cc6c24,Ni te conozco ni te he visto.,I don't know you and I never saw you.
+s753d8c19,Las semillas del frontón,The seeds of the pelota court
+sdaf99245,"Pello, junto al frontón de Mendialde, cambiaba semillas con tu tía. Llévale 3 g de lo tuyo.","Pello, by the pelota court in Mendialde, used to swap seeds with your aunt. Bring him 3 g of yours."
+s52893b19,¿Eres de la familia de Maite? Tienes su cara de pedir perdón por adelantado.,Are you Maite's family? You've got her look of apologising in advance.
+s92592dea,"Cada octubre subía con un sobre de semillas y las cambiábamos aquí, contra el frontón, por las mías de maíz.","Every October she came up with an envelope of seeds and we swapped them here, against the court wall, for my maize ones."
+sdc903b56,Tráeme 3 gramos de lo que cultivas. Quiero saber si te ha dejado la mano.,Bring me 3 grams of what you grow. I want to know if she left you her touch.
+se5aa17a2,Esto lo ha criado alguien con paciencia. Como ella.,Someone patient raised this. Like her.
+s3c93a767,"Si alguna vez te preguntan desde cuándo se reparten esas semillas por aquí, di que Pello las cambia desde el 91. Lo firmo donde haga falta.","If anyone ever asks how long those seeds have been shared around here, say Pello has swapped them since '91. I'll sign it wherever needed."
+s5cab5100,"Desde el 91, en este frontón. No se me olvida.","Since '91, at this court. I don't forget."
+sbfec91fa,Pello: las semillas de la tía se cambian en el frontón de Mendialde desde 1991.,Pello: your aunt's seeds have been swapped at the Mendialde pelota court since 1991.
+s4a652109,Las cartas del faro,The lighthouse letters
+s051470c9,"Rosario, la viuda del farero de Puerto Viejo, guardaba cartas de tu tía. Lleva el paquete a una socia de la asociación, en el barrio alto.","Rosario, the Puerto Viejo lighthouse keeper's widow, kept letters from your aunt. Take the bundle to a member of the association, in the upper quarter."
+sdd87b7e5,"Mi marido llevó el faro treinta años. Tu tía le escribía desde Jamaica, desde la India, desde donde fuera.","My husband kept the lighthouse for thirty years. Your aunt wrote to him from Jamaica, from India, from wherever."
+s356f3cca,En cada carta venían semillas pegadas con celo. Él las guardaba en la lata de las galletas.,Every letter came with seeds taped to it. He kept them in the biscuit tin.
+s1c783173,"Las cartas son de la asociación, no mías. Llévaselas a la socia del barrio alto, la del kiosko.","The letters belong to the association, not to me. Take them to the member in the upper quarter, the one by the bandstand."
+s1a65afa3,"¿Cartas de Maite? A ver… Sí, es su letra.","Letters from Maite? Let's see… Yes, that's her handwriting."
+sf8aa06c9,Aquí pone la fecha de cada semilla y de dónde venía. Esto vale más que la sede entera.,It says here when each seed came and where from. This is worth more than the whole clubhouse.
+s3c771d39,"Las guardo en la asociación. Si un día alguien dice que esas semillas son suyas, aquí están las fechas.","I'll keep them at the association. If someday someone says those seeds are theirs, here are the dates."
+se7430433,"Las cartas del faro, a buen recaudo.","The lighthouse letters, safe and sound."
+seab74f3a,"Las cartas del faro: cada semilla con su fecha y su origen, de puño y letra de la tía.","The lighthouse letters: each seed with its date and origin, in your aunt's own hand."
+s6b047580,ESTEBAN,ESTEBAN
+sa1d3a59e,Los de la fundición,The foundry crowd
+s37a86e46,"Esteban, jubilado de la fundición de Valdehierro, junto a la chimenea. Quiere 5 g para los compañeros.","Esteban, retired from the Valdehierro foundry, by the chimney. He wants 5 g for his mates."
+s65432c2b,En la huelga del 92 estuvimos cuarenta días dentro. Tu tía subía cada semana con una bolsa para las espaldas.,In the '92 strike we were inside for forty days. Your aunt came up every week with a bag for our backs.
+sec8902f7,No cobraba. Decía que lo pagaríamos cuando hubiese convenio.,She never charged. She said we'd pay once there was an agreement.
+s8b4b0207,Seguimos quedando los jueves debajo de la chimenea. ¿Nos traes 5 gramos?,We still meet on Thursdays under the chimney. Will you bring us 5 grams?
+s2dbab1a7,Como entonces. Esto se reparte entre todos.,Like back then. This gets shared among everyone.
+s19b5bcd3,"La planta que nos traía la cultivaba con semillas suyas, de las de la lata. Lo sabe media Valdehierro.","The plant she brought us she grew from her own seeds, the ones in the tin. Half of Valdehierro knows it."
+s11e4124d,"Los jueves, aquí, debajo de la chimenea.","Thursdays, here, under the chimney."
+s1b3c960c,Esteban: en la huelga del 92 la tía repartía en la fundición lo que sacaba de sus semillas.,Esteban: in the '92 strike your aunt shared at the foundry what she grew from her seeds.
+sf0f8e7fb,Entre las colmenas,Among the hives
+s032db1e8,"Itziar, la del colmenar de Errotabarri, quiere 3 g de una índica (60 % o más).","Itziar, from the Errotabarri apiary, wants 3 g of an indica (60 % or more)."
+sf3e4c604,"Tu tía sembraba entre mis colmenas. Las abejas no se acercan a la flor, pero el polen se lo llevan a casa.","Your aunt sowed among my hives. The bees don't go near the flower, but they take the pollen home."
+s7be8feb9,"Me pagaba en semillas. De índicas, que son las que aguantan el frío de aquí.","She paid me in seeds. Indicas, the ones that stand the cold up here."
+s28a5be12,Tráeme 3 gramos de una índica y te cuento lo que me dejó apuntado.,Bring me 3 grams of an indica and I'll tell you what she left written down.
+s85208bb8,Esto huele a lo que ella sacaba de aquí.,This smells like what she used to grow here.
+scd277572,"Me dejó un cuaderno de campo: qué sembraba cada año entre las colmenas. Te lo leo cuando quieras, y lo leo en voz alta delante de quien haga falta.","She left me a field notebook: what she sowed among the hives every year. I'll read it to you whenever you like, and out loud in front of whoever needs to hear it."
+s55799ebe,El cuaderno del colmenar sigue en el cajón.,The apiary notebook is still in the drawer.
+sfb4f34b3,"Itziar: el cuaderno del colmenar apunta lo que la tía sembraba en Errotabarri, año por año.","Itziar: the apiary notebook records what your aunt sowed in Errotabarri, year by year."
+s0daa1559,PILAR,PILAR
+s0cef7ddb,El periódico del 98,The '98 newspaper
+s41b6df91,"Pilar, la del quiosco de prensa del Casco Viejo, guarda algo de tu tía. Quiere 2 g.","Pilar, from the newspaper kiosk in the Old Town, is keeping something of your aunt's. She wants 2 g."
+scf598908,Este quiosco era de mi padre. En el 98 vendió todos los periódicos de la Copa en una mañana.,This kiosk was my father's. In '98 he sold every newspaper with the Cup in one morning.
+sa63da4ae,"Salía tu tía en la foto, con el diploma del segundo premio y con aquel jamaicano.","Your aunt was in the photo, with the second-prize diploma and that Jamaican man."
+s306e9772,"Me quedé uno. Te lo cambio por 2 gramos, que el periódico no me quita el insomnio.","I kept one. I'll swap it for 2 grams, the newspaper doesn't cure my insomnia."
+sa9fe96db,"Toma. Mira el pie de foto: «Maite, de Ribera Verde, segunda en la Copa con una Haze de semilla propia».","Here. Look at the caption: «Maite, from Ribera Verde, second in the Cup with a Haze from her own seed»."
+s3f490c3a,"Semilla propia, pone. En el 98. Que nadie te diga otra cosa.","Her own seed, it says. In '98. Don't let anyone tell you otherwise."
+s50810d42,El del 98 ya lo tienes tú.,You've got the '98 one now.
+s514db8e9,"El periódico del 98: «Maite, de Ribera Verde, segunda en la Copa con una Haze de semilla propia».","The '98 newspaper: «Maite, from Ribera Verde, second in the Cup with a Haze from her own seed»."
+sa9dff4d7,JOSEBA,JOSEBA
+sb4f1ea74,La cabina de la grúa,The crane cabin
+s18b2c016,"Joseba, el último gruista de los astilleros, quiere 10 g de más del 18 % de THC.","Joseba, the last crane operator at the shipyards, wants 10 g of over 18 % THC."
+s206cda0c,Esta grúa no se mueve desde que cerraron. Yo tengo la llave de la cabina.,This crane hasn't moved since they closed. I've got the key to the cabin.
+s529e5ccd,"Cuando la policía apretaba, tu tía guardaba ahí arriba lo suyo. Nadie sube a una grúa parada.","When the police were pressing, your aunt kept her stuff up there. Nobody climbs a stopped crane."
+s307898ba,"Tráeme 10 gramos buenos, de más del 18, y te digo qué dejó allí.","Bring me 10 good grams, over 18, and I'll tell you what she left there."
+s59d502fe,Arriba quedó una caja de madera con sus sobres. Las fechas de los sobres empiezan en el 89.,Up there there's a wooden box with her envelopes. The dates on the envelopes start in '89.
+sd732a9c0,"Se lo dije a la asociación y lo tienen apuntado. Lo que es de ella, de ella era antes que de nadie.",I told the association and they've got it written down. What's hers was hers before anyone's.
+s561a3cf9,"La grúa, quieta. La caja, en la asociación.","The crane, still. The box, at the association."
+s8df56a0a,"Joseba: los sobres de la cabina de la grúa empiezan en 1989, antes que cualquier registro.","Joseba: the envelopes in the crane cabin start in 1989, before any registration."
 s9a116053,puertaI,puertaI
 s15af655d,La puerta del pasillo del sótano,The basement hallway door
 sd4382de7,La puerta del salón,The living room door
@@ -6930,6 +6999,7 @@ s6ee8b1ef,Cruce propio,Own cross
 s0cb7dc3c,"El THC de un cruce tuyo, sin receta, curado del todo. 10 g.","The THC of a cross of your own, not from a recipe, fully cured. 10 g."
 saeb6ee81,El THC de una extracción sin disolventes. 2 g.,The THC of a solventless extract. 2 g.
 sade66c52,Semillas Ondarea,Semillas Ondarea
+s9315d584,"La ruta de la tía (tools/ruta_tia.py): los recados de D.SECUNDARIAS con «tia»; min, los testimonios que hacen una prueba del Acto III; todos, el aviso de Delroy.","La ruta de la tía (tools/ruta_tia.py): los recados de D.SECUNDARIAS con «tia»; min, los testimonios que hacen una prueba del Acto III; todos, el aviso de Delroy."
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -6961,6 +7031,7 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+s5a758610,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas: {l}.","The room panel: the LED timer, the drip and the climate. All automatic: long light hours while they grow and fewer as soon as they flower. Tents: {l}."
 sf9786037,Extractor de 315 mm con dos filtros de carbón,315 mm extractor with two carbon filters
 s186b5684,"El depósito del goteo de la carpa {n}, fuera de ella: su bomba manda el agua con el abono por la manguera, que entra por la pared de la carpa, a cada maceta.","The drip tank of tent {n}, outside it: its pump sends the water with the nutrients down the hose, which goes in through the tent wall, to each pot."
 se8568cc7,Goteo de 4 salidas con su depósito,4-outlet drip with its tank
@@ -7128,3 +7199,4 @@ s836ff227,"«{c}», en su cajón. {z}: destapado.","«{c}», in its drawer. {z}:
 sa66e2ad4,{p},{p}
 sfa36793c,Antes, espera a que llegue la carpa que tienes pedida.
 s3d36940f,{n} × {l} L,{n} × {l} L
+sa79d0bf3,¿Cartas de Maite? A ver… Sí, es su letra.

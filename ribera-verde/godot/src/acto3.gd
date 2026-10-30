@@ -12,7 +12,7 @@ extends "res://src/copaot.gd"
 
 const A3 := {"ch": 7, "plazo": 30, "dias": 7, "min": 3, "llamada": 7, "banco": 3, "miren": 30, "rep": 10, "prest": 3,   # i18n-no
 	"venta": [250000, 60000], "pierde": 15, "calor": 30, "haze": "silver"}   # i18n-no
-const PRUEBAS3 := ["cuaderno", "fijada", "banco", "correo", "asamblea"]   # i18n-no
+const PRUEBAS3 := ["cuaderno", "fijada", "banco", "correo", "asamblea", "ruta"]   # i18n-no
 const FINALES := ["banco", "vender", "miren", "caida"]   # i18n-no
 
 var A3_PASOS := [["", ""], [I18n.K("La patente de la Haze"), ""], [I18n.K("La oposición, presentada"), ""], [I18n.K("La resolución"), ""],
@@ -53,6 +53,8 @@ func a3_pruebas() -> Array:
 				ok = String(a2().get("acu", "")) == CULPABLE
 			"asamblea":
 				ok = int(hilo().get("el", 2)) == 0
+			"ruta":   # la ruta de la tía por los pueblos (trama.gd)
+				ok = huellas().size() >= int(D.RUTA_TIA.min)
 		if ok:
 			r.append(k)
 	return r
@@ -62,7 +64,8 @@ func a3_prueba_n(k: String) -> String:
 		"fijada": T("La Haze del 98 fijada en F{g}: la línea es estable y es vuestra", {"g": int(D.GEN_ESTABLE)}),
 		"banco": T("El banco de la tía con {n} colecciones entregadas: las landraces eran de todos", {"n": int(A3.banco)}),
 		"correo": K("El correo de Garro ofreciendo dinero por la Haze: sabía que no era suya"),
-		"asamblea": K("La firma de la asamblea de la asociación")}[k]
+		"asamblea": K("La firma de la asamblea de la asociación"),
+		"ruta": T("Los testimonios de la comarca: {n} personas que conocieron a la tía y sus semillas", {"n": huellas().size()})}[k]
 
 # al amanecer: el aviso de Delroy, la resolución y las llamadas de Garro
 func hilo_dia() -> void:

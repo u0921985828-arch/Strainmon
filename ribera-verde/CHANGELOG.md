@@ -2,6 +2,13 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.70.0 (código 99) · Cosas que hacer en cada pueblo, un día más corto y los ladrones de noche (lo pidió el usuario: «que haya cosas para hacer en cada pueblo… que la historia tenga algo que ver», «el tiempo del día… un intermedio» y «que por el día no aparezcan carteristas, ni ladrones… que sea la noche»; con `Datos.CAL`)
+
+- La ruta de la tía (`tools/ruta_tia.py` → `SECUNDARIAS` con `tia` y `RUTA_TIA` en `datos.json`): seis recados, uno por pueblo y junto a su sitio (el frontón de Mendialde, el faro de Puerto Viejo, la chimenea de Valdehierro, el colmenar de Errotabarri, la prensa de Ibarbide y la grúa de los astilleros), de gente que conoció a la tía Maite; hecho el recado, su testimonio (`ruta_testimonio` en `trama.gd`). Con tres, una prueba más en la oposición del Acto III (`ruta` en `PRUEBAS3`, `acto3.gd`); con los seis, reputación y SMS de Delroy. En OBJETIVO → RECADOS, la fila LA RUTA DE LA TÍA con la cuenta y cada testimonio.
+- El reloj: un día del juego, 8 minutos de verdad (antes 12); en OPCIONES → RELOJ, 8, 12, 24 o 4 (`RELOJ_DIA`, `aj.rl`, `reloj_i` en `juego.gd`; quien había elegido 24 lo conserva).
+- Los ladrones y carteristas de la calle, solo de noche (21:00–6:00; `prob_ladron` en `calle.gd`); de día queda la policía. Los chicos de Darko en los astilleros y las peleas por fiado siguen como antes.
+- Prueba `tests/ruta_tia.gd` (44 comprobaciones, 0 fallos); `tests/reloj.gd` (15) y `tests/recados.gd` (94), al día.
+
 ### 0.69.4 (código 98) · Sin destellos en la casa ni en la carpa (lo dijo el usuario: «pasaba eso, pero en interiores… en la casa, en el armario no puede pasar»)
 
 - Las cachés de texturas (`Atlas.tex` y `Arte.tex`, la de la vista C) tenían un tope que, al llenarse, hacía `clear()`: soltaba las texturas que ya estaban en la orden de pintar de ese fotograma (`draw_texture` solo guarda el RID) y las plantas, la pared o la luz de la carpa, o lo que no sale de las hojas del atlas en el piso, salían en blanco o sin pintar un fotograma. Ahora van por generaciones (`tx`/`tx_v`, `texs`/`texs_v`, `tex_de`): al llenarse, las de ahora pasan a las de antes y la que se vuelve a pedir vuelve a las de ahora; la que se usa cada fotograma no se suelta nunca.

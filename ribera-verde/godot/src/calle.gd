@@ -495,10 +495,19 @@ func on_step_end() -> void:
 	if S.ch >= 2 and S.cool <= 0 and SOSP.alarma == null:
 		var g := gramos_flor()   # el rosin también atrae ladrones (1.10)
 		var tall: bool = m.g[P.y][P.x] == "tallgrass"
-		var pt: float = .004 * (2.5 if is_night() else 1.0) * (3.0 if tall else 1.0) * Z.lad if (g >= 5 or S.money >= 150) else 0.0
-		if Cultivo.azar() < pt:
+		var pt := prob_ladron(g, tall, Z)
+		if Cultivo.azar() < pt:   # el azar se tira siempre: de día con pt 0, la misma cuenta
 			S.cool = 25
 			run(func(): await battle("thief"))
+
+# la probabilidad de que salga un ladrón en este paso. Con CAL, solo de noche (lo pidió el usuario: «por el día hay policía…
+# que sea la noche el hándicap de estar por la calle»); sin CAL, como el HTML (de día, 1; de noche, 2,5)
+func prob_ladron(g: float, tall: bool, Z: Dictionary) -> float:
+	if not (g >= 5 or S.money >= 150):
+		return 0.0
+	if Datos.CAL and not is_night():
+		return 0.0
+	return .004 * (2.5 if is_night() else 1.0) * (3.0 if tall else 1.0) * Z.lad
 
 func update_ents(dt: float) -> void:
 	var free := is_free()
