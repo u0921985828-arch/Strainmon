@@ -637,7 +637,7 @@ func _mundo() -> void:
 		_rect(0, 0, J.SW, SH, css(LZ.fondo))
 
 # el tiempo en la calle (1.52): nubes que apagan, lluvia y nieve que caen y niebla; la tormenta, más oscura y con más lluvia, sin
-# relámpagos (lo pidió el usuario: «sigue habiendo destellos… pam, pam, cada cierto tiempo»): la pantalla entera en blanco cada 7 s
+# relámpagos (lo pidió el usuario: «sigue habiendo destellos… pam, pam, cada cierto tiempo»)
 func _tiempo(now: float) -> void:
 	var k: String = Datos.tiempo(int(J.S.day), int(J.S.min)).k
 	if k == "sol":

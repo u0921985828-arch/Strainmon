@@ -70,13 +70,24 @@ static func dibuja(L: CanvasItem, im: Image, dst: Rect2, src = null, mod := Colo
 	else:
 		L.draw_texture_rect_region(hojas[r[0]], dst, Rect2(b.position + s.position, s.size), mod)
 
+# R7: tope por generaciones (lo vio el usuario: «destellos… pam, pam, cada cierto tiempo», en la casa y en el armario): al llenarse,
+# las de ahora pasan a ser las de antes y las de antes se sueltan; la que se vuelve a pedir, vuelve a las de ahora. Con tx.clear(), las
+# texturas que ya estaban en la orden de pintar de este fotograma (o en un lienzo que no se repinta, el suelo) se soltaban y salían
+# en blanco o sin pintar un fotograma
+static var tx_v := {}
 static func tex(im: Image) -> ImageTexture:
 	var k := im.get_instance_id()
-	if not tx.has(k):
-		if tx.size() > 2048:   # R7: tope
-			tx.clear()
-		tx[k] = ImageTexture.create_from_image(im)
-	return tx[k]
+	var t = tx.get(k)
+	if t == null:
+		t = tx_v.get(k)
+		if t == null:
+			t = ImageTexture.create_from_image(im)
+		if tx.size() >= TX_TOPE:
+			tx_v = tx
+			tx = {}
+		tx[k] = t
+	return t
+const TX_TOPE := 2048
 
 static func anim_de(g, s: String):
 	if not g or not ok:

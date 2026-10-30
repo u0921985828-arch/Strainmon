@@ -2,6 +2,11 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.69.4 (código 98) · Sin destellos en la casa ni en la carpa (lo dijo el usuario: «pasaba eso, pero en interiores… en la casa, en el armario no puede pasar»)
+
+- Las cachés de texturas (`Atlas.tex` y `Arte.tex`, la de la vista C) tenían un tope que, al llenarse, hacía `clear()`: soltaba las texturas que ya estaban en la orden de pintar de ese fotograma (`draw_texture` solo guarda el RID) y las plantas, la pared o la luz de la carpa, o lo que no sale de las hojas del atlas en el piso, salían en blanco o sin pintar un fotograma. Ahora van por generaciones (`tx`/`tx_v`, `texs`/`texs_v`, `tex_de`): al llenarse, las de ahora pasan a las de antes y la que se vuelve a pedir vuelve a las de ahora; la que se usa cada fotograma no se suelta nunca.
+- Prueba `tests/texturas.gd` (19 comprobaciones, 0 fallos; con el código de antes, 16 fallos).
+
 ### 0.69.3 (código 97) · El protagonista entra entero en cada puerta y sin relámpagos (lo pidió el usuario: «tiene que entrar perfecto el personaje en la puerta. No, no entra ninguno bien» y «sigue habiendo destellos… pam, pam, cada cierto tiempo»; con `Datos.CAL`)
 
 - Las puertas de la calle (`tools/sprites/a-mano/puertas_altas.py`, reescrito): el hueco, de la columna 7 a la 24 y de la fila 1 al suelo del sprite de la puerta, donde cabe el protagonista de espaldas con 1 px de aire; las que estaban corridas (la asociación, el club de Kalea, el bajo de las setas y el estanco del casco) se corren dentro del sprite y su `dx` pasa a 0 en `datos.json`; la corredera de la nave se abre del todo; la del casco (el taller y el estanco de Ibarbide), en la esquina de su fachada, sin la jamba que se salía de ella (`RECORTA`).

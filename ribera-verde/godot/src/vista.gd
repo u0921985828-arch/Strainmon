@@ -387,7 +387,7 @@ static func tex_planta(S_: Dictionary, q: Dictionary) -> ImageTexture:
 	if p == null or v.p == null:
 		return null
 	var k := ("seca|%s|%d" % [v.p.n, v.hp]) if v.muerta else clave_planta(S_, p, v)
-	var t: ImageTexture = Arte.texs.get(k)
+	var t: ImageTexture = Arte.tex_de(k)
 	if t == null:
 		var im := Arte.recolor(Arte.aplasta(Arte.altura(v.p.n, v.hp)[1], v.hp), Datos.carga().VC_SECA) if v.muerta else img_planta(S_, p, v)
 		t = Arte.tex(k, im)

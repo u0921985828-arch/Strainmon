@@ -499,9 +499,25 @@ static func nivel(im: Image, par: Array, fr: float) -> Image:
 	cache[k] = o
 	return o
 
+# R7: tope por generaciones, como Atlas.tex (texs.clear() soltaba las del fotograma que se estaba pintando: destellos en la carpa)
+static var texs_v := {}
+static func tex_de(k: String):
+	var t = texs.get(k)
+	if t == null:
+		t = texs_v.get(k)
+		if t != null:
+			if texs.size() >= TEXS_TOPE:
+				texs_v = texs
+				texs = {}
+			texs[k] = t
+	return t
 static func tex(k: String, im: Image) -> ImageTexture:
-	if not texs.has(k):
-		if texs.size() > 2048:   # R7: tope
-			texs.clear()
-		texs[k] = ImageTexture.create_from_image(im)
-	return texs[k]
+	var t = tex_de(k)
+	if t == null:
+		t = ImageTexture.create_from_image(im)
+		if texs.size() >= TEXS_TOPE:
+			texs_v = texs
+			texs = {}
+		texs[k] = t
+	return t
+const TEXS_TOPE := 2048
