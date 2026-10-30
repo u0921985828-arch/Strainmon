@@ -1825,6 +1825,7 @@ s77062307,CRÉDITOS,CREDITS
 s2bc78bf7,Hay una partida guardada. ¿Empezar de cero y sobrescribirla?,There is a saved game. Start over and overwrite it?
 s6164e4fb,Pega aquí la partida exportada,Paste the exported save here
 sa046d78b,No hay ninguna partida en la nube.,There's no save in the cloud.
+s201968cd,"La partida ha llegado cortada o cambiada. Cópiala entera, desde LH1. hasta el final.","The save arrived cut off or changed. Copy all of it, from LH1. to the end."
 s06fa9c41,Eso no es una partida exportada.,That's not an exported save.
 se720947b,"¿Cargar la partida de {n}, {f}? La de ahora se pierde.","Load {n}'s game, {f}? The current one will be lost."
 se556ef72,"¿Cargar la partida de {n}, {f}? La guardada se pierde.","Load {n}'s game, {f}? The saved one will be lost."

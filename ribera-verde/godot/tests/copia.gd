@@ -85,7 +85,7 @@ func _corre() -> void:
 	chk(MENUS.size() >= 2 and not MENUS[0].has("EXPORTAR PARTIDA") and not MENUS[0].has("IMPORTAR PARTIDA"), "OPCIONES sin exportar ni importar: %s" % [MENUS])
 	chk(MENUS[0][-2] == "COPIA DE SEGURIDAD" and MENUS[0][-1] == "VOLVER", "COPIA, la penúltima: %s" % [MENUS[0] if MENUS.size() else []])
 	chk(MENUS[1] == ["EXPORTAR PARTIDA", "IMPORTAR PARTIDA", "VOLVER"], "el submenú: %s" % [MENUS])
-	var s = JSON.parse_string(J.exportado) if J.exportado != "" else null
+	var s = JSON.parse_string(Juego.abre_partida(J.exportado)) if J.exportado != "" else null   # comprimida con CAL (copia_comp.gd)
 	chk(s is Dictionary and int(s.day) == int(J.S.day), "exportada")
 	QUIERO = ["COPIA", "VOLVER", "VOLVER"]
 	MENUS = []

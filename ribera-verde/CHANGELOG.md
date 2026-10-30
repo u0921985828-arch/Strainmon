@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### La partida exportada, comprimida y cifrada (lo pidió el usuario: «que no ocupe tanto»; con `Datos.CAL`)
+
+- EXPORTAR PARTIDA da `LH1.` + el JSON comprimido con gzip, cifrado con XOR por clave y en base64, más un punto y una suma de 8 cifras (`cierra_partida` en `menus.gd`): la partida llena pasa de 50.221 a 14.433 caracteres y no se lee a simple vista.
+- IMPORTAR PARTIDA (`abre_partida`) acepta el texto con espacios, saltos de línea o texto alrededor, y también el JSON de antes (del primer `{` al último `}`); la suma se mira antes de descomprimir, y si no cuadra avisa de que ha llegado cortada o cambiada.
+- Sin `CAL`, exportar da el JSON de siempre (`historia.gd` contra el HTML). `descargas/partida-llena.txt`, ahora en LH1. Prueba `tests/copia_comp.gd` (20/0).
+
 ### 0.67.0 (código 92) · KAIA como en casa, el laboratorio a la vista y el clima en pantalla (lo pidió el usuario; con `Datos.CAL`); APK en `descargas/LandraceHunters.apk` (87 MB)
 
 - El servicio de las carpas de KAIA, en su pared también en el mapa (revisión por ataque): la puerta lateral, sus ventanas de malla y el intractor ya no se dibujan en el frente del sprite (`kaia_carpa.py`, `detalles`); van en la pared del lado (`kc_lado`), la que enseña la vista C. En el frente, solo las puertas de entrar y, en las de 400, la ventana de entre las dos. kaia_cult 342/0, kaia_vista 272/0, patrones 50/0, solapes 73/0.

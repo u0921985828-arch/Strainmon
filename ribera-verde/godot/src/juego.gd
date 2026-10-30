@@ -551,10 +551,11 @@ func importar(desde_titulo := false, nube = null) -> void:
 		if nube != null:
 			await say(K("No hay ninguna partida en la nube."))
 		return
+	t = abre_partida(t)
 	var js := JSON.new()   # (JSON.parse_string avisa en la consola si no es JSON)
 	var s = limpia_import(Datos.enteros(js.data)) if js.parse(t) == OK and js.data is Dictionary else null
 	if not partida_valida(s):
-		await say(K("Eso no es una partida exportada."))
+		await say(K("La partida ha llegado cortada o cambiada. Cópiala entera, desde LH1. hasta el final.") if t == "" else K("Eso no es una partida exportada."))
 		return
 	var A := {"n": s.name, "f": Datos.fd(int(s.day))}
 	var preg: String = T("¿Cargar la partida de {n}, {f}? La de ahora se pierde.", A) if not desde_titulo else (T("¿Cargar la partida de {n}, {f}? La guardada se pierde.", A) if FileAccess.file_exists(GUARDADO) else T("¿Cargar la partida de {n}, {f}?", A))

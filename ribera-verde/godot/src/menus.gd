@@ -60,8 +60,42 @@ func _registro_inv() -> Array:
 	r.reverse()
 	return r
 
+# la partida exportada, comprimida y cifrada (lo pidió el usuario: que no ocupe tanto): «LH1.» + base64 de la partida en gzip con
+# XOR por PARTIDA_CLAVE + «.» + los 8 primeros del md5 de lo cifrado (avisa si llega cortada). Pasa de unos 50 KB a unos 14 KB
+const PARTIDA_PRE := "LH1."   # i18n-no
+const PARTIDA_CLAVE := "RiberaVerde-Maite98"   # i18n-no
+const PARTIDA_B64 := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=."   # i18n-no
+static func _xor(b: PackedByteArray) -> PackedByteArray:
+	var k := PARTIDA_CLAVE.to_utf8_buffer()
+	for i in b.size():
+		b[i] = b[i] ^ k[i % k.size()]
+	return b
+
+static func cierra_partida(json: String) -> String:
+	var c := Marshalls.raw_to_base64(_xor(json.to_utf8_buffer().compress(FileAccess.COMPRESSION_GZIP)))
+	return PARTIDA_PRE + c + "." + c.md5_text().substr(0, 8)
+
+# lo pegado, en JSON: el comprimido (LH1., sin espacios ni saltos de línea en medio) o el JSON de antes, sin lo que sobre
+# delante y detrás; "" si no cuadra (cortado o cambiado)
+static func abre_partida(t: String) -> String:
+	var i := t.find(PARTIDA_PRE)
+	if i >= 0:
+		var c := ""
+		for ch in t.substr(i + PARTIDA_PRE.length()):
+			if ch in PARTIDA_B64:
+				c += ch
+		var p := c.split(".")
+		if p.size() < 2 or p[0].md5_text().substr(0, 8) != p[1].substr(0, 8):   # la suma, antes de abrirla
+			return ""
+		return _xor(Marshalls.base64_to_raw(p[0])).decompress_dynamic(-1, FileAccess.COMPRESSION_GZIP).get_string_from_utf8()
+	var a := t.find("{")
+	var z := t.rfind("}")
+	return t.substr(a, z - a + 1) if a >= 0 and z > a else t
+
 func exportar() -> void:
 	exportado = JSON.stringify(S, "", false, true)
+	if Datos.CAL:   # sin CAL, el JSON de antes (historia.gd contra el HTML)
+		exportado = cierra_partida(exportado)
 	DisplayServer.clipboard_set(exportado)
 	await say(K("Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla."))
 
