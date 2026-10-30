@@ -405,6 +405,9 @@ func kc_monta() -> void:
 	_kc_mt = false
 	if not kc_f2():
 		return
+	var cq: Array = D.KAIA_CULT.ctrl   # con la carpa de sala, su cuadro va dentro (f2.o): fuera no queda otro para lo mismo
+	if String(m.o[int(cq[1])][int(cq[0])]) == "ctrlN":   # i18n-no
+		m.o[int(cq[1])][int(cq[0])] = null
 	# el último nivel (lo pidió el usuario: «que la carpa ocupe finalmente todo el suelo preparado para la carpa»): la carpa de sala,
 	# que se entra por su puerta; dentro (cult-sala), las 8 mesas de flujo y reflujo con su riego y su drenaje
 	var C: Dictionary = D.KAIA_CULT.f2.carpa
@@ -436,8 +439,12 @@ func bt_obj(x: int, y: int, o) -> bool:
 	return await super(x, y, o)
 
 func kc_obj(x: int, y: int, o) -> bool:
-	if S.map == D.KAIA_CULT.mapa and kc_en_sala(x, y):   # la carpa de sala: se entra por su cremallera
+	if S.map == D.KAIA_CULT.mapa and kc_en_sala(x, y):   # la carpa de sala: se entra por su cremallera, no por la tela
 		var F2: Dictionary = D.KAIA_CULT.f2
+		var pu: Array = F2.carpa.get("puerta", [x, y])
+		if absi(x - int(pu[0])) > 1 or absi(y - int(pu[1])) > 1:
+			await say(K("La tela de la carpa de sala, cerrada: se entra por su puerta, la cremallera de delante."))
+			return true
 		await warp({"to": F2.sala, "x": int(F2.entra[0]), "y": int(F2.entra[1]), "dir": "up"})   # i18n-no
 		return true
 	if o == "drenKS" or o == "drenKS2" or o == "drenKB" or o == "drenKB2":   # i18n-no
@@ -504,7 +511,7 @@ func kc_cuadro() -> void:
 					var op := T("Comprar: {n} · {e}", {"n": I18n.v(N.n), "e": Datos.eur(N.kit.p)})
 					ops.append(op)
 					compra[op] = nv
-			txt = T("El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas: {l}.", {"l": ", ".join(PackedStringArray(tl))})
+			txt = T("El cuadro de la sala: el clima, el goteo y la corriente de las carpas. La luz la lleva el temporizador de cada carpa, dentro: muchas horas mientras crecen y menos en cuanto toca florecer. Carpas: {l}.", {"l": ", ".join(PackedStringArray(tl))})
 			if kc_kits() >= 1:
 				ops.append(K("Ordenar la sala"))
 			var sig = kc_sig()

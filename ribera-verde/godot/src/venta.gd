@@ -897,9 +897,8 @@ func obj_local(x: int, y: int, o) -> bool:
 			"escritorio", "escritorio2":
 				await escritorio_nave()
 				return true
-			"estanteN":
-				await estante_nave()
-				return true
+			"estanteN":   # la de los abonos es la de la nave (0, 2); la del despacho, de papeles
+				txt = K("La estantería del despacho: carpetas con las facturas, los contratos y el libro de la nave.")
 			"mesita":
 				txt = K("La mesilla, con un flexo y el cargador del móvil.")
 			"perchero":
@@ -1027,9 +1026,12 @@ func obj_local(x: int, y: int, o) -> bool:
 			"clonN", "clonN2":   # 1.43 · i18n-no
 				await bandejas_nave()
 				return true
+			"extrN", "extrG":   # el clima de la nave, en la extracción que lo lleva (el ctrlN es el del riego; el filtro, solo su texto) · i18n-no
+				if OBJ_MUDO.has("nave:" + o):
+					await say(String(OBJ_MUDO["nave:" + o]))
+				await vista_clima("nave")
+				return true
 			"tanqueN", "riegoN", "ctrlN":   # 1.52.1: el riego, que también se mueve desde aquí · i18n-no
-				if o == "ctrlN" and not await vista_clima("nave"):   # el controlador de clima, a la vista (kaiacult.gd) · i18n-no
-					return true
 				if puertas_int("nave").size():
 					if await ask(T("El riego de la nave: {n}.", {"n": D.RIEGO_NAVE[int(S.nave.rg)].n}), [K("Ordenar la nave"), K("Nada")]) == 0:
 						await ordenar("nave")

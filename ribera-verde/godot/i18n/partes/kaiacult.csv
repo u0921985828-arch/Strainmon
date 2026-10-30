@@ -2,7 +2,8 @@ es,en
 El depósito de recogida: lo que sobra de cada mesa baja por su tubería de drenaje y se filtra antes de volver al tanque.,The collection tank: what each table drains runs down its pipe and is filtered before going back to the tank.
 {k} de {m} de {n},{k} of {m} of {n}
 Comprar: {n} · {e},Buy: {n} · {e}
-"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas: {l}.","The room panel: the LED timer, the drip and the climate. All automatic: long light hours while they grow and fewer as soon as they flower. Tents: {l}."
+"El cuadro de la sala: el clima, el goteo y la corriente de las carpas. La luz la lleva el temporizador de cada carpa, dentro: muchas horas mientras crecen y menos en cuanto toca florecer. Carpas: {l}.","The room panel: the climate, the drip and the power for the tents. The light is run by each tent's own timer, inside: long hours while they grow and fewer as soon as they flower. Tents: {l}."
+"La estantería del despacho: carpetas con las facturas, los contratos y el libro de la nave.","The office shelf: folders with the invoices, the contracts and the warehouse logbook."
 Montar la carpa de sala · {e},Set up the grow room tent · {e}
 Montar la carpa de sala,Set up the grow room tent
 "La {c}, con su kit a precio de tienda: {l}. En total, {e}, con la tarjeta; llega mañana. Las carpas que ya tienes se quedan: la sala se va llenando con las de cada tamaño, con su pasillo entre ellas.","The {c}, with its kit at shop price: {l}. In total, {e}, by card; it arrives tomorrow. The tents you already have stay: the room fills up with every size, with an aisle between them."
@@ -34,3 +35,4 @@ A: the panel · B: close."
 El filtro de carbón y el extractor de la carpa: el aire sale limpio por el tubo del techo y entra el de fuera por los intractores de abajo.,The tent's carbon filter and exhaust fan: the air leaves clean through the ceiling duct and fresh air comes in through the intake fans below.
 Así una carpa se queda sin sitio al lado de su puerta lateral.,That would leave a tent with no room beside its side door.
 Así el tubo de una carpa no llega a la pared sin pasar por encima de otra cosa.,That way a tent's duct can't reach the wall without running over something else.
+"La tela de la carpa de sala, cerrada: se entra por su puerta, la cremallera de delante.","The grow room tent's fabric, closed: you go in through its door, the zip at the front."

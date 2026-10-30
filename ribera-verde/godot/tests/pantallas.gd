@@ -20,6 +20,7 @@ const TOL_C := 5
 # 1.43.1 (lo pidió el usuario: ruedas gordas y con llanta en todos los vehículos): en estas escenas la bici y el patinete ya no
 # son los del HTML congelado; lo de fuera de la celda del vehículo (32 × 32) sigue teniendo que salir igual
 const RUEDAS := ["calle-bici", "calle-patinete"]
+const PUERTA_DX := {"callejon": Rect2i(264, 0, 48, 24)}   # 0.69: la puerta del bajo de las setas, sobre su casilla (dx 8; en el HTML, 8 px a la izquierda)
 
 var J
 var fallos: Array = []
@@ -91,6 +92,9 @@ func _corre() -> void:
 		print("%-18s SW %d · píxeles distintos %5d (más de 1: %5d) · diferencia máxima %d" % [k, im.get_width(), n, n2, mx])
 		if k in RUEDAS and mx > tol and caja.size.x <= 32 and caja.size.y <= 32:
 			print("%-18s   el vehículo (1.43.1), en %s: lo demás, igual" % [k, caja])
+			mx = 0
+		if PUERTA_DX.has(k) and mx > tol and PUERTA_DX[k].encloses(caja):
+			print("%-18s   la puerta del bajo, en %s: lo demás, igual" % [k, caja])
 			mx = 0
 		if mx > tol:
 			fallos.append("%s: diferencia máxima %d (> %d)" % [k, mx, tol])

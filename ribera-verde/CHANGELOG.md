@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.69.0 (código 94) · Cada controlador en su sala y lo que no cuadraba (lo pidió el usuario: «si hay un controlador de clima fuera de la sala del cultivo… y luego hay otro controlador dentro»; con `Datos.CAL`); con las entradas y la translucidez de abajo; APK en `descargas/LandraceHunters.apk`
+
+- KAIA, fase 2: con la carpa de sala, el cuadro del pasillo (`ctrlN` en `KAIA_CULT.ctrl`) se quita en `kc_monta`; solo queda el de dentro (`f2.o`), que lleva el clima, el goteo y la corriente.
+- KAIA, fase 1: el cuadro ya no dice que lleva la luz; la lleva el temporizador de cada carpa (18/6 creciendo, 12/12 en flor).
+- KAIA: la carpa de sala solo se entra por su puerta (la cremallera de delante, `f2.carpa.puerta` ±1); desde cualquier otra casilla, la tela cerrada.
+- La nave: el clima, en el extractor que lo lleva (`extrN`/`extrG`, con su texto), no en el controlador del riego (`ctrlN`, solo el riego); el filtro, solo su texto.
+- La nave: la estantería del despacho y la habitación, las carpetas del despacho, no otra estantería de abonos de la nave.
+
 ### Las entradas, cuadradas con las baldosas (lo pidió el usuario: «todas las entradas a edificios y demás deberían estar cuadradas con las baldosas»; con `Datos.CAL`)
 
 - Bilbao: las casillas de puerta de San Antón (42), la parroquia de Zorroza (22) y la de Indautxu (4), debajo de la puerta que dibuja su fachada (`PUERTAS` en `tools/bilbao.py`, con su salida de dentro).
