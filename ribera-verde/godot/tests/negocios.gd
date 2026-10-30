@@ -153,7 +153,7 @@ func _corre() -> void:
 			var dd = m.doors.get("%d,%d" % [int(N.x) + j, int(N.dy)])
 			chk(dd is Dictionary and dd.gate == "neg:" + k and dd.to == "loc-" + k and m.g[int(N.dy)][int(N.x) + j] == N.tile, "%s: la puerta %d %s" % [k, j, dd])
 		chk(m.blds.any(func(b): return b.get("doorX") == int(N.x) and b.get("puerta") == N.puerta), "%s: el edificio con su puerta" % k)
-		# la puerta, la de la fachada: cerrada, sus píxeles son los de la base en el mismo sitio (estilo, tamaño y lugar); abierta, distinta
+		# la puerta, la de la fachada: cerrada, sus píxeles son los de la base en el mismo sitio (estilo y lugar; fuera de su hueco); abierta, distinta
 		for b in m.blds:
 			if b.get("doorX") == int(N.x) and Atlas.ok:
 				var fb = Atlas.frame_de("edificio-" + b.get("fachada", b.id), "base", "unica", 0, {"i": 0})
@@ -163,13 +163,22 @@ func _corre() -> void:
 				var oy: int = (int(N.dy) + 1) * 16 - 32 - int(b.y0) * 16
 				var igual: bool = fb != null and f0 != null and ox >= 0 and ox + f0.c.get_width() <= fb.c.get_width()
 				var dif := 0
+				# 0.69.2: la puerta, más alta y ancha que la de la fachada (puertas_altas.py, a la medida del protagonista): lo que cambia
+				# respecto de la base, solo en las columnas de su hueco y su marco (5 px a cada lado)
+				var hx0 := 999
+				var hx1 := -1
+				if igual and f3:
+					for yy in f0.c.get_height():
+						for xx in f0.c.get_width():
+							if f3.c.get_pixel(xx, yy) != f0.c.get_pixel(xx, yy):
+								dif += 1
+								hx0 = mini(hx0, xx)
+								hx1 = maxi(hx1, xx)
 				if igual:
 					for yy in f0.c.get_height():
 						for xx in f0.c.get_width():
-							if f0.c.get_pixel(xx, yy) != fb.c.get_pixel(ox + xx, oy + yy):
+							if f0.c.get_pixel(xx, yy) != fb.c.get_pixel(ox + xx, oy + yy) and (xx < hx0 - 5 or xx > hx1 + 5):
 								igual = false
-							if f3 and f3.c.get_pixel(xx, yy) != f0.c.get_pixel(xx, yy):
-								dif += 1
 				chk(igual and dif > 60, "%s: la puerta cerrada calca la fachada en (%d, %d) y se abre (%d px)" % [k, ox, oy, dif])
 		chk(llega(L.map, [int(N.x), int(N.dy) + 1], [int(N.x), int(N.dy)]), "%s: se llega a la puerta" % k)
 		chk(llega(L.map, [int(N.x), int(N.dy) + 1], [int(L.x), int(L.y)]), "%s: se llega al rótulo" % k)

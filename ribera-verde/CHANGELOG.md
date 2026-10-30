@@ -2,6 +2,13 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.69.2 (código 96) · Las puertas, a la medida del protagonista (lo pidió el usuario: «la puerta es demasiado pequeña para el personaje»; con y sin `Datos.CAL`)
+
+- Medido: a 16 px/m el protagonista mide 27 px (1,70 m); había puertas de 18 a 26 px de alto (GAUA, 1,1 m; el club del Ensanche, el bar y la casa, 1,3 m) y hojas de 9 px (la asociación, el club de Kalea, el estanco del casco, el bajo de las setas): al pasar, la cabeza salía por encima del dintel.
+- `tools/sprites/a-mano/puertas_altas.py`: cada puerta de la calle (sus 4 fotogramas, en `art/procesado` y en el crudo) sube a 29 px de hueco (1,80 m) y las estrechas se ensanchan 2–4 px, repitiendo la fila y la columna de su hoja que menos cambian, solo en su hueco y 4 px de marco (sin dibujar nada nuevo); en el bar, el club del Ensanche y GAUA, con el rótulo justo encima, sube la planta baja entera de la fachada.
+- Bilbao (`bilbao.py`): la estación de la plaza, la de la ría, la parroquia de Zorroza, la Diputación y el portón del molino, con puertas de 1,8 a 2 m (la vidriera, el ventanal y la marquesina, más arriba).
+- Prueba `tests/puertas_alto.gd`: cada puerta, abierta, con un hueco más alto que el protagonista y de 10 px de ancho o más (40 comprobaciones; con las de antes, 22 fallos). `tests/pantallas.gd` deja pasar la puerta y, en esas tres, la fachada (`FACHADA_ALTA`); `tests/negocios.gd`, lo de su hueco y su marco.
+
 ### 0.69.1 (código 95) · Más fluido en la web (lo pidió el usuario: «optimizar lo que son los FPS para que vaya más fluido el juego… en web»; con y sin `Datos.CAL`); plugin de WordPress 1.6.6 en `descargas/landrace-hunters-1.6.6.zip`
 
 - El suelo de cada mapa (baldosa, orilla, arena del agua, lo de Bilbao) se pinta una vez al entrar, en trozos de 16 × 16 casillas que solo se mandan a la tarjeta si se ven (`suelo`, `_suelo_mira`, `_suelo_pinta`, `SUELO_TROZO` en `pinta.gd`), y cada fotograma solo se mueve con la cámara; se repintan las casillas que cambian con el tiempo (animadas, la pista de GAUA, la playa; `_suelo_dinamica`) y la que pisa el protagonista. Se vuelve a pintar si cambia el mapa o su suelo (`m.g.hash()`).

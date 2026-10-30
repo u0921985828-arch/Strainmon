@@ -800,7 +800,7 @@ def diputacion():
     lz.r(50, 30, 6, 36, CR); lz.r(60, 30, 6, 36, CR); lz.r(70, 30, 6, 36, CR)
     balaustrada(lz, 42, 85, 64, P2, P3)
     M.sillar(lz, 0, 70, W, 26, (P1, P3, P0), bw=14, bh=6, sem=1583)         # el almohadillado
-    arco(lz, 52, 24, 72, H - 1, '#4a3020', P3)
+    arco(lz, 50, 28, 67, H - 1, '#4a3020', P3)                              # la puerta, de 1,8 m
     for x in (10, 30, 90, 110):
         arco(lz, x, 10, 74, 90, CR, P3)
     lz.r(0, H - 2, W, 2, P3)
@@ -893,7 +893,7 @@ def abandoE():
     piedra(lz, 0, 20, W, H - 20, (PB, PBS, PBL), sem=1603)
     lz.hl(0, W - 1, 20, PBO)
     cx, top = 64, 24                                                        # la vidriera, en arco
-    for y in range(top, 84):
+    for y in range(top, 74):
         for x in range(30, 98):
             dx = x + .5 - cx
             yc = top + 34
@@ -910,11 +910,11 @@ def abandoE():
         lz.r(x - 2, 20, 22, H - 20, PBL)
         for y in (28, 52):
             M.ventana(lz, x + 3, y, 12, 16, PBO, CR, CRL, PBS, cruz=True)
-    lz.r(20, 86, 88, 4, VERDE); lz.hl(20, 107, 89, VERDES)                  # la marquesina
+    lz.r(20, 75, 88, 4, VERDE); lz.hl(20, 107, 78, VERDES)                  # la marquesina (puertas de 1,9 m: más altas que el protagonista)
     for x in range(22, 106, 14):
-        lz.vl(x, 90, H - 3, VERDES)
+        lz.vl(x, 79, H - 3, VERDES)
     for x in range(26, 104, 14):
-        lz.caja(x, 92, 10, H - 94, CR, MAR)
+        lz.caja(x, 80, 10, H - 82, CR, MAR)
     lz.r(0, H - 2, W, 2, PBO)
     return lz
 
@@ -933,16 +933,16 @@ def concordia():
             if (x // 6 + y // 6) % 2 and (x < 10 or x > 52):
                 lz.r(x, y, 6, 6, '#6fb4a4')
     lz.r(10, 12, 44, 4, VERDE); lz.hl(10, 53, 15, VERDES)
-    lz.caja(24, 18, 16, 14, BL, VERDES); lz.vl(32, 20, 25, MAR); lz.hl(32, 35, 25, MAR)   # el reloj
-    arco(lz, 12, 40, 34, 80, CR, VERDE)                                     # el ventanal
+    lz.caja(24, 17, 16, 12, BL, VERDES); lz.vl(32, 19, 23, MAR); lz.hl(32, 35, 23, MAR)   # el reloj
+    arco(lz, 12, 40, 30, 61, CR, VERDE)                                     # el ventanal
     for x in range(16, 52, 6):
-        lz.vl(x, 40, 80, VERDE)
-    for y in range(46, 80, 8):
+        lz.vl(x, 30, 61, VERDE)
+    for y in range(36, 61, 8):
         lz.hl(13, 50, y, VERDE)
-    lz.p(18, 44, CRL); lz.p(19, 44, CRL)
-    lz.r(10, 81, 44, 3, VERDE)
-    for x in (16, 36):
-        lz.caja(x, 84, 12, H - 85, CR, VERDES)
+    lz.p(18, 34, CRL); lz.p(19, 34, CRL)
+    lz.r(10, 62, 44, 3, VERDE)
+    for x in (16, 36):                                                      # las puertas, de 1,9 m
+        lz.caja(x, 65, 12, H - 66, CR, VERDES)
     lz.r(0, H - 2, W, 2, VERDES)
     return lz
 
@@ -992,10 +992,10 @@ def iglesiaZ():
     M.ladrillos(lz, 0, 54, 64, H - 54, LAD, sem=1623)
     lz.r(0, 54, 64, 3, HOL); lz.r(0, 54, 4, H - 54, HO); lz.r(60, 54, 4, H - 54, HO)
     for i, x in enumerate(range(14, 50, 6)):                                # la vidriera en franjas verticales
-        lz.r(x, 60, 4, 34, CR if i % 2 else '#8ab0c8'); lz.hl(x, x + 3, 60, CRL)
-    lz.r(12, 58, 40, 2, HOO); lz.r(12, 94, 40, 2, HOO)
-    lz.r(16, 100, 32, 3, HOO); lz.r(20, 103, 24, H - 106, '#4a3020')        # la marquesina y la puerta
-    lz.vl(32, 103, H - 4, '#2a1c14')
+        lz.r(x, 60, 4, 26, CR if i % 2 else '#8ab0c8'); lz.hl(x, x + 3, 60, CRL)
+    lz.r(12, 58, 40, 2, HOO); lz.r(12, 86, 40, 2, HOO)
+    lz.r(16, 91, 32, 3, HOO); lz.r(20, 94, 24, H - 97, '#4a3020')         # la marquesina y la puerta, de 1,9 m
+    lz.vl(32, 94, H - 4, '#2a1c14')
     for x in range(72, 90):                                                 # el campanario exento, prismático
         lz.vl(x, 8, H - 3, HOL if x < 75 else HO if x < 86 else HOO)
     lz.r(74, 18, 14, 14, '#3a3a42'); lz.r(79, 22, 4, 6, '#b08a3a')          # el hueco de la campana
@@ -1041,16 +1041,16 @@ def molino():
         lz.hl(0, 63, y, S1)
     lz.r(64, 4, 64, H - 4, '#d8cfb6')                                       # la molienda
     lz.r(64, 4, 64, 3, '#efe8d4'); lz.hl(64, 127, 7, S3)
-    for y in range(14, H - 30, 14):
+    for y in range(14, H - 38, 14):
         for x in range(70, 124, 12):
             M.ventana(lz, x, y, 7, 8, S3, CR, CRL, S1, cruz=False)
     lz.r(96, 0, 18, 14, S1); lz.caja(98, 2, 14, 10, S0, S3)                 # la torre de elevadores
     for y in range(20, 60):                                                 # el tubo que baja a los silos
         lz.p(62 + (y - 20) // 6, y, '#9a7a4a'); lz.p(63 + (y - 20) // 6, y, '#7a5a34')
-    lz.r(80, H - 26, 32, 26, '#5a5e66')                                     # el muelle de carga: el portón, en sus dos casillas (rel 80-112)
-    for y in range(H - 25, H, 2):
+    lz.r(80, H - 34, 32, 34, '#5a5e66')                                     # el muelle de carga: el portón, en sus dos casillas (rel 80-112), de 2 m
+    for y in range(H - 33, H, 2):
         lz.hl(81, 110, y, '#7c8088')
-    lz.vl(80, H - 26, H - 1, '#3e4248'); lz.vl(111, H - 26, H - 1, '#3e4248')
+    lz.vl(80, H - 34, H - 1, '#3e4248'); lz.vl(111, H - 34, H - 1, '#3e4248')
     lz.r(0, H - 4, W, 4, S3)
     return lz
 

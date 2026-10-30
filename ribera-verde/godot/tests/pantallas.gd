@@ -20,10 +20,28 @@ const TOL_C := 5
 # 1.43.1 (lo pidió el usuario: ruedas gordas y con llanta en todos los vehículos): en estas escenas la bici y el patinete ya no
 # son los del HTML congelado; lo de fuera de la celda del vehículo (32 × 32) sigue teniendo que salir igual
 const RUEDAS := ["calle-bici", "calle-patinete"]
+# las puertas a la medida del protagonista (tools/sprites/a-mano/puertas_altas.py, lo pidió el usuario: «la puerta es demasiado pequeña
+# para el personaje»): la puerta, y la fachada entera de las que suben con su rótulo, no son ya las del HTML; lo demás, igual
+const FACHADA_ALTA := ["bar", "club-ensanche", "disco"]
 const PUERTA_DX := {"callejon": Rect2i(264, 0, 48, 24)}   # 0.69: la puerta del bajo de las setas, sobre su casilla (dx 8; en el HTML, 8 px a la izquierda)
 
 var J
 var fallos: Array = []
+
+func puertas_altas() -> Array:
+	var r := []
+	var mk: String = J.D.DEMO.map if J.mode == "title" else (J.S.map if J.S else "")   # en el título, la partida de fondo (DEMO)
+	if not J.MAPS.has(mk) or not (J.mode in ["world", "title"]):
+		return r
+	var cam: Vector2i = J.pintor.cam
+	for b in J.MAPS[mk].get("blds", []):
+		if b.get("doorX") == null:
+			continue
+		if b.get("fachada", b.id) in FACHADA_ALTA:
+			r.append(Rect2i(int(b.x0) * 16 - cam.x, int(b.y0) * 16 - cam.y, int(b.w) * 16, int(b.h) * 16))
+		var dy: int = int(b.y0) + int(b.h) - 1
+		r.append(Rect2i(int(b.doorX) * 16 - 8 + int(b.get("dx", 0)) - cam.x, (dy + 1) * 16 - 32 - cam.y, 32, 32))
+	return r
 
 func _initialize() -> void:
 	Datos.PLAY = false   # la versión entera (con PLAY, las de Google Play: tests/play.gd)
@@ -73,11 +91,17 @@ func _corre() -> void:
 		var mx := 0
 		var tol := TOL_C if k.begins_with("carpa-c") else TOL
 		var caja := Rect2i()
+		var altas := puertas_altas()
+		var mx_p := 0
 		for y in im.get_height():
 			for x in im.get_width():
 				var a := im.get_pixel(x, y)
 				var b := ref.get_pixel(x, y)
 				var d := maxi(absi(a.r8 - b.r8), maxi(absi(a.g8 - b.g8), absi(a.b8 - b.b8)))
+				if d and altas.any(func(r): return r.has_point(Vector2i(x, y))):
+					mx_p = maxi(mx_p, d)
+					dif.set_pixel(x, y, Color(0, 0, 1))
+					continue
 				if d:
 					n += 1
 					mx = maxi(mx, d)
@@ -90,6 +114,8 @@ func _corre() -> void:
 					dif.set_pixel(x, y, Color(b.r, b.g, b.b).darkened(.7))
 		dif.save_png(dir.path_join("dif-p-%s.png" % k))
 		print("%-18s SW %d · píxeles distintos %5d (más de 1: %5d) · diferencia máxima %d" % [k, im.get_width(), n, n2, mx])
+		if mx_p > tol:
+			print("%-18s   las puertas a la medida del protagonista (diferencia %d): lo demás, igual" % [k, mx_p])
 		if k in RUEDAS and mx > tol and caja.size.x <= 32 and caja.size.y <= 32:
 			print("%-18s   el vehículo (1.43.1), en %s: lo demás, igual" % [k, caja])
 			mx = 0
