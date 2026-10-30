@@ -7,7 +7,7 @@ OUT=${1:-/tmp/lh-tests}; mkdir -p "$OUT"
 X=(xvfb-run -a -s "-screen 0 2600x1700x24")
 P=(--rendering-driver opengl3 --audio-driver Dummy --resolution 1560x720)
 export LIBGL_ALWAYS_SOFTWARE=1
-GRAF=" mandos_geo pixel ciclo extracciones pantallas prueba capas capturas capturas_ui perf ftue retratos raton luz_carpa "
+GRAF=" mandos_geo pixel ciclo extracciones pantallas prueba capas capturas capturas_ui perf ftue retratos raton luz_carpa suelo_cache "
 for f in tests/*.gd; do
   t=$(basename "$f" .gd)
   case "$GRAF" in *" $t "*) continue;; esac
@@ -21,6 +21,7 @@ for t in prueba capas; do
 done
 echo "== extracciones"; timeout 1200 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/extracciones.gd -- --sin-arranque --salida "$OUT/ex" 2>&1 | grep -E "^extracciones: |SCRIPT ERROR|Parse Error" | tail -3
 echo "== luz_carpa"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/luz_carpa.gd -- --sin-arranque 2>&1 | grep -E "^luz_carpa: |FALLO|SCRIPT ERROR|Parse Error" | tail -5
+echo "== suelo_cache"; timeout 1500 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/suelo_cache.gd -- --sin-arranque 2>&1 | grep -E "^suelo_cache: |FALLO|SCRIPT ERROR|Parse Error" | tail -5
 echo "== retratos"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/retratos.gd -- --sin-arranque 2>&1 | grep -E "^retratos: |SCRIPT ERROR|Parse Error" | tail -3
 echo "== pantallas"; mkdir -p "$OUT/pp"; cp ../tools/ref/pantallas/html-p-*.png "$OUT/pp/"
 timeout 1500 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/pantallas.gd -- --sin-arranque --pintar "$OUT/pp" 2>&1 | grep -E "^C2 pantallas: |SCRIPT ERROR|Parse Error" | tail -3
