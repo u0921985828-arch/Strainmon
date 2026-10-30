@@ -186,14 +186,17 @@ const TAPA_ALFA := 0.45
 const TAPA_PX := 12
 const TAPA_PIES := 4   # lo vio el usuario: el seto de la fila de abajo, que asoma 1 o 2 px sobre su casilla, rozaba los pies y salía en un
 						# cuadro translúcido; lo que solo roza las últimas filas (los pies, las ruedas) no tapa
+const TAPA_FILA := 4   # bajando junto a un mueble, en los últimos 4 px antes de su fila se encendía 1-2 fotogramas y se apagaba al pasar
 var alfa := 1.0
 
 func caja_pj() -> Rect2i:   # el cuerpo del protagonista en la pantalla (sus pies en px + 8, py + 15, como en _pj)
 	var P: Dictionary = J.P
 	return Rect2i(Datos.jsround(P.px - cam.x) + 2, Datos.jsround(P.py - cam.y) - 11, 12, 26)
 
-func tapa_pj(im: Image, x: int, y: int, pie: float) -> bool:
+func tapa_pj(im: Image, x: int, y: int, pie: float, umbral := TAPA_PX) -> bool:
 	if not Datos.CAL or J.SENT != null or pie <= float(J.P.py) or J.mode != "world":
+		return false
+	if umbral == TAPA_PX and pie - float(J.P.py) <= TAPA_FILA:   # a punto de llegar a su fila (y pasar delante): no se enciende
 		return false
 	var cj := caja_pj()
 	cj.size.y -= TAPA_PIES
@@ -205,7 +208,7 @@ func tapa_pj(im: Image, x: int, y: int, pie: float) -> bool:
 		for xx in range(b.position.x, b.end.x):
 			if im.get_pixel(xx - x, yy - y).a > .5:
 				nn += 1
-				if nn >= TAPA_PX:
+				if nn >= umbral:
 					return true
 	return false
 
@@ -262,6 +265,55 @@ func _capt_tex(im: Image) -> ImageTexture:
 			_capt_t.append(tx)
 	_capt_n += 1
 	return tx
+
+# las piezas seguidas de un mismo mueble en su fila (la barra, el mostrador, el banco largo), translúcidas juntas: si una tapa, todas
+# (lo vio el usuario: medio mostrador translúcido y el resto entero); de los árboles y el monte, solo las que le pisan el cuerpo
+var _tapa_reg := {}   # «tx,ty» → {o, c, x, y, pie, pl}, de cada objeto alto del fotograma (_arte_obj)
+var _tapa_res := {}
+var _tapa_mem := {}   # «mapa:tx,ty» → si estaba translúcido el fotograma de antes: se queda así mientras le pise el cuerpo, aunque sea
+					  # con menos de TAPA_PX píxeles (si no, al pasar por el canto de una copa se encendía y apagaba en 1-3 px: destellos)
+func _tapa_propia(k: String) -> bool:
+	if not _tapa_res.has(k):
+		var r: Dictionary = _tapa_reg[k]
+		var km: String = String(J.S.map) + ":" + k
+		var u: int = 1 if Datos.CAL and _tapa_mem.get(km, false) else TAPA_PX
+		_tapa_res[k] = tapa_pj(r.c, r.x, r.y, r.pie, u) or (r.pl and tapa_encima(r.x, r.y, r.c.get_width(), r.pie))
+		_tapa_mem[km] = _tapa_res[k]
+	return _tapa_res[k]
+
+func tapa_obj(tx: int, ty: int) -> bool:
+	var k := "%d,%d" % [tx, ty]
+	if not _tapa_reg.has(k):
+		return false
+	if _tapa_propia(k):
+		return true
+	if not Datos.CAL:
+		return false
+	var r: Dictionary = _tapa_reg[k]
+	if r.o in J.SOLAPE_LIBRE and not _pisa_cuerpo(r):
+		return false
+	for dx in [-1, 1]:
+		var a: Dictionary = r
+		var x: int = tx + int(dx)
+		while _tapa_reg.has("%d,%d" % [x, ty]):
+			var b: Dictionary = _tapa_reg["%d,%d" % [x, ty]]
+			if b.o != r.o or not Rect2i(a.x - 1, a.y, a.c.get_width() + 2, a.c.get_height()).intersects(Rect2i(b.x, b.y, b.c.get_width(), b.c.get_height())):
+				break
+			if _tapa_propia("%d,%d" % [x, ty]):
+				return true
+			a = b
+			x += dx
+	return false
+
+func _pisa_cuerpo(r: Dictionary) -> bool:   # algún píxel opaco sobre el cuerpo del protagonista, delante de él
+	if r.pie <= float(J.P.py):
+		return false
+	var b := caja_pj().intersection(Rect2i(r.x, r.y, r.c.get_width(), r.c.get_height()))
+	for yy in range(b.position.y, b.end.y):
+		for xx in range(b.position.x, b.end.x):
+			if r.c.get_pixel(xx - r.x, yy - r.y).a > .5:
+				return true
+	return false
 
 func _con_alfa(tapa: bool, f: Callable) -> void:
 	if tapa:
@@ -367,6 +419,8 @@ func _mundo() -> void:
 	var mt: Dictionary = m.get("tras", {}) if Datos.CAL else {}
 	# hasta 6 filas por debajo y 2 casillas a cada lado de la pantalla (1.10, 14-render.js): los objetos altos (el árbol, de 6
 	# filas; el monte, 3 de ancho) se ven aunque su pie esté fuera
+	_tapa_reg.clear()
+	_tapa_res.clear()
 	for ty in range(ty0, ty0 + ceili(SH / 16.0) + 7):
 		for tx in range(tx0 - (15 if S.map == "muelle" else 2), tx0 + ceili(J.SW / 16.0) + 3):   # 1.51: los barcos del muelle, de hasta 15 casillas
 			if tx < 0 or ty < 0 or tx >= m.w or ty >= m.h:
@@ -1321,10 +1375,14 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		return
 	if f.cel.h > 16:
 		var pie: int = ty * 16 + mini(0, d.dy)
+		var mx0: int = Datos.jsround(xp - f.cel.ancla[0])
+		var my0: int = Datos.jsround(yp - f.cel.ancla[1])
+		var f0 = Atlas.frame_de(an[0][0], an[0][1], "unica", 0, {"i": 0}) if an else null   # lo animado (la fuente), por su 1.er fotograma: no parpadea
+		_tapa_reg["%d,%d" % [tx, ty]] = {"o": o, "c": f0.c if f0 != null else f.c, "x": mx0, "y": my0, "pie": pie, "pl": pl != null}
 		list.append([pie, func():
 			var mx: int = Datos.jsround(xp - f.cel.ancla[0])
 			var my: int = Datos.jsround(yp - f.cel.ancla[1])
-			var tapa: bool = tapa_pj(f.c, mx, my, pie) or (pl != null and tapa_encima(mx, my, f.c.get_width(), pie))
+			var tapa: bool = tapa_obj(tx, ty)
 			if pl == null and (md == null or md.foco == null) and ex.is_empty():   # lo que va solo (un árbol, una farola): sin capa
 				_con_alfa(tapa, _pinta_mesa.bind(f, xp, yp, pl, md, fm, ex))
 				return

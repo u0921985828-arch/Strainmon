@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### La translucidez, baldosa a baldosa (lo pidió el usuario: «revisa cada baldosa para asegurar que no hay errores de transparencia y destellos cuando opaca algún objeto»; con `Datos.CAL`)
+
+- Las piezas seguidas de un mismo mueble en su fila (mostrador, barra, banco largo) se vuelven translúcidas juntas: antes, medio mostrador translúcido y el resto entero (`tapa_obj`, `_tapa_reg` en `pinta.gd`); de los árboles y el monte, solo las que pisan el cuerpo.
+- Sin destellos: lo translúcido se queda así mientras le pise el cuerpo (`_tapa_mem`), no se enciende en los últimos 4 px antes de su fila (`TAPA_FILA`) y lo animado (la fuente) se mide por su primer fotograma.
+- El atlas, revisado: 3.041 sprites sin un píxel semitransparente. Prueba `tests/tapa_mapas.gd` (187.425 posiciones en todos los mapas; antes, 6.366 piezas partidas y 102 destellos).
+
 ### 0.68.0 (código 93) · La partida exportada, comprimida y cifrada (lo pidió el usuario: «que no ocupe tanto»; con `Datos.CAL`); APK en `descargas/LandraceHunters.apk`
 
 - EXPORTAR PARTIDA da `LH1.` + el JSON comprimido con gzip, cifrado con XOR por clave y en base64, más un punto y una suma de 8 cifras (`cierra_partida` en `menus.gd`): la partida llena pasa de 50.221 a 14.433 caracteres y no se lee a simple vista.
