@@ -1021,7 +1021,7 @@ func comprar_mercado(id: String, N: String, pool: Array) -> void:
 # el almacén del club (1.45, de presidente): lo que dejas en sus estanterías (S.aso.al: buds y rosin, hasta MERCADO.alm.g de flor)
 # lo retiran los socios del dispensario cada mañana (aso_dia), MERCADO.alm.dia g de flor al día, a precio de dispensario
 func alm_club(id := "rv") -> Dictionary:
-	var A: Dictionary = S.mar if id == "muelle" else aso()   # MAESTRO [6]: el de KAIA, igual
+	var A: Dictionary = S.get("mar", {}) if id == "muelle" else aso()   # MAESTRO [6]: el de KAIA, igual
 	if not (A.get("al") is Dictionary):
 		A.al = {"buds": {}, "rosin": {}, "tot": 0}
 	return A.al

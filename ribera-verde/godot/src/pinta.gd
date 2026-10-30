@@ -28,6 +28,7 @@ const HIERBA := ["grass", "flowers", "tallgrass"]
 const FUMA := ["fum", "puro", "pipa", "vap"]
 
 var J = null
+var suelo := Node2D.new()   # 0.69.1: el suelo del mapa, pintado una vez y movido con la cámara (debajo de c0)
 var c0 := Node2D.new()
 var ad := Node2D.new()
 var vc = Vista.new()
@@ -42,8 +43,10 @@ var L: CanvasItem            # la capa en la que se pinta
 var cache := {}
 
 func _init() -> void:
-	for n in [c0, ad, vc, c1]:
+	for n in [suelo, c0, ad, vc, c1]:
 		add_child(n)
+	suelo.visible = false
+	suelo.draw.connect(_suelo_negro)
 	var m := CanvasItemMaterial.new()
 	m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	ad.material = m
@@ -87,10 +90,14 @@ func redibuja(t: float) -> void:
 			vc.pinta(J.S, J.VC, now, J.SW, SH)
 	elif modo == "world":
 		cam = camara()
+		_suelo_mira()
 	elif modo == "demo":
 		var sv: Array = J.demo_entra(now)
 		cam = camara()
+		_suelo_mira()
 		J.demo_sale(sv)
+	if modo != "world" and modo != "demo":
+		suelo.visible = false
 	c0.queue_redraw()
 	ad.queue_redraw()
 	c1.queue_redraw()
@@ -138,6 +145,90 @@ func _capa(ci: CanvasItem, n: int) -> void:
 					_img_clip(im, int(e[2]), int(e[3]), Rect2i(0, 0, im.get_width(), im.get_height()), cl, Color.WHITE)
 				continue
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
+
+# 0.69.1 (lo pidió el usuario: «optimizar los FPS para que vaya más fluido», en la web): el suelo de cada casilla (la baldosa, su
+# orilla, la arena del agua y lo de Bilbao) se pinta una vez por mapa en `suelo`, en coordenadas del mapa, y cada fotograma solo se
+# mueve con la cámara; en c0 se repintan las casillas que cambian con el tiempo (las animadas, la pista de GAUA, la playa) y la que
+# pisa el protagonista (la animación de pisar, el detalle de la hierba que se esconde). Se vuelve a pintar si cambia el mapa o su suelo
+var SUELO_ON := true   # las pruebas lo apagan para comparar con el de antes
+var _suelo_k := ""
+var _suelo_din := {}   # tx + (ty << 12) de las casillas que se repintan cada fotograma
+
+func _suelo_casilla(m: Dictionary, tx: int, ty: int, sx: int, sy: int) -> void:
+	var k: String = m.g[ty][tx]
+	if _arte_tile(k, tx, ty, sx, sy):
+		if k == "water":
+			_playa_agua(m, tx, ty, sx, sy)
+		_arte_orilla(m, k, tx, ty, sx, sy)
+		if m.has("dec"):   # Bilbao: lo del suelo (tapa, imbornal, cebra) a ritmo fijo, de tools/bilbao.py
+			_arte_dec(m.dec.get("%d,%d" % [tx, ty], ""), sx, sy)
+
+func _suelo_dinamica(m: Dictionary, k: String, tx: int, ty: int) -> bool:
+	if k == "cristalV":  # i18n-no
+		var md: Dictionary = J.MAPS.disco
+		k = md.g[ty][tx] if ty < md.g.size() and tx < md.g[ty].size() else "floorD"  # i18n-no
+	if k.begins_with("hito_"):
+		k = k.substr(5)
+	if k == "baile" or k == "arena":  # i18n-no
+		return true
+	if k == "water" and Datos.CAL and _vecinas(m, tx, ty, ["arena"]).any(func(f): return f.has(true)):  # i18n-no
+		return true
+	var an = Atlas.sobre.get("tile:" + k)
+	return an != null and Atlas.anim_de(an[0][0], an[0][1]) != null and Atlas.anim_de(an[0][0], an[0][1]).get("bucle")
+
+func _suelo_mira() -> void:
+	if not SUELO_ON or not Atlas.ok or not J.S or not J.MAPS.has(J.S.map):
+		suelo.visible = false
+		return
+	var m: Dictionary = J.MAPS[J.S.map]
+	var k := "%s|%d|%d|%s|%d" % [J.S.map, m.g.hash(), m.get("dec", {}).hash(), Datos.CAL, Atlas.sobre.size()]
+	if k != _suelo_k:
+		_suelo_k = k
+		_suelo_din.clear()
+		_vista_c.clear()
+		for ty in int(m.h):
+			for tx in int(m.w):
+				if _suelo_dinamica(m, String(m.g[ty][tx]), tx, ty):
+					_suelo_din[tx + (ty << 12)] = true
+		# en trozos de SUELO_TROZO casillas: el motor solo manda a la tarjeta los que se ven
+		for c in suelo.get_children():
+			suelo.remove_child(c)
+			c.queue_free()
+		for cy in range(0, int(m.h), SUELO_TROZO):
+			for cx in range(0, int(m.w), SUELO_TROZO):
+				var t := Node2D.new()
+				t.position = Vector2(cx * 16, cy * 16)
+				t.draw.connect(_suelo_pinta.bind(t, cx, cy))
+				suelo.add_child(t)
+		suelo.queue_redraw()
+	if suelo.position != Vector2(-cam.x, -cam.y):
+		suelo.position = Vector2(-cam.x, -cam.y)
+		suelo.queue_redraw()   # el negro de fuera, solo un rectángulo
+	suelo.visible = true
+
+const SUELO_TROZO := 16
+
+func _suelo_negro() -> void:   # lo de fuera del mapa, negro (la pantalla entera, se mueva como se mueva la cámara)
+	suelo.draw_rect(Rect2(-suelo.position - Vector2(64, 64), Vector2(2048, 2048)), Color.BLACK)
+
+func _suelo_pinta(t: Node2D, cx: int, cy: int) -> void:
+	if not J or not J.S:
+		return
+	var sv = J.demo_entra(now) if modo == "demo" else null
+	if J.MAPS.has(J.S.map):
+		var m: Dictionary = J.MAPS[J.S.map]
+		var L0 := L
+		L = t
+		var a0 := alfa
+		alfa = 1.0
+		for ty in range(cy, mini(cy + SUELO_TROZO, int(m.h))):
+			for tx in range(cx, mini(cx + SUELO_TROZO, int(m.w))):
+				if not _suelo_din.has(tx + (ty << 12)):
+					_suelo_casilla(m, tx, ty, (tx - cx) * 16, (ty - cy) * 16)
+		L = L0
+		alfa = a0
+	if sv != null:
+		J.demo_sale(sv)
 
 # ---------- utilidades de dibujo ----------
 func OX() -> int:
@@ -410,7 +501,9 @@ func _mundo() -> void:
 	var S: Dictionary = J.S
 	var P: Dictionary = J.P
 	var m: Dictionary = J.MAPS[S.map]
-	_rect(0, 0, J.SW, SH, Color.BLACK)
+	var cs := suelo.visible and SUELO_ON
+	if not cs:
+		_rect(0, 0, J.SW, SH, Color.BLACK)
 	var tx0 := floori(cam.x / 16.0)
 	var ty0 := floori(cam.y / 16.0)
 	var list := []
@@ -427,13 +520,8 @@ func _mundo() -> void:
 				continue
 			var sx: int = tx * 16 - cam.x
 			var sy: int = ty * 16 - cam.y
-			var k: String = m.g[ty][tx]
-			if _arte_tile(k, tx, ty, sx, sy):
-				if k == "water":
-					_playa_agua(m, tx, ty, sx, sy)
-				_arte_orilla(m, k, tx, ty, sx, sy)
-				if m.has("dec"):   # Bilbao: lo del suelo (tapa, imbornal, cebra) a ritmo fijo, de tools/bilbao.py
-					_arte_dec(m.dec.get("%d,%d" % [tx, ty], ""), sx, sy)
+			if not cs or _suelo_din.has(tx + (ty << 12)) or (tx == P.x and ty == P.y):   # con el suelo pintado, solo lo que se mueve y la casilla que se pisa
+				_suelo_casilla(m, tx, ty, sx, sy)
 			var o = m.o[ty][tx]
 			if o and o != "carpa":
 				_arte_obj(o, tx, ty, tras if mt.has("%d,%d" % [tx, ty]) else list, sombras)
@@ -2215,6 +2303,7 @@ func _vfx(c, capa: String) -> void:
 
 const VISTA_ALFA := 34   # el cono de los agentes con CAL: antes 87 (lo pidió el usuario: «hazlos más suaves»)
 
+var _vista_c := {}
 # de día, por dónde mira cada agente (de noche, no: sigilo); con la alarma, ninguno (pintarVistas, 10b-patrulla)
 func _vistas() -> void:
 	if J.is_night() or J.SOSP.alarma != null:
@@ -2222,14 +2311,23 @@ func _vistas() -> void:
 	var m: Dictionary = J.MAPS[J.S.map]
 	var R := int(J.D.PAT.vista[0])
 	var col := Color8(255, 230, 60, VISTA_ALFA if Datos.CAL else 87)   # con CAL, más suave (lo pidió el usuario)
+	if _vista_c.size() > 512:
+		_vista_c.clear()
 	for e in J.ents:
 		if not e.get("pat"):
 			continue
-		for y in range(e.y - R, e.y + R + 1):
-			for x in range(e.x - R, e.x + R + 1):
-				if (x == e.x and y == e.y) or J.tile_solid(m, x, y) or not J.ve_casilla(e, x, y, 0):
-					continue
-				_rect(x * 16 - cam.x, y * 16 - cam.y, 16, 16, col)
+		var kc := "%s|%d|%d|%s" % [J.S.map, e.x, e.y, e.dir]   # 0.69.1: las casillas del cono, una vez por sitio y dirección
+		var cs = _vista_c.get(kc)
+		if cs == null:
+			cs = []
+			for y in range(e.y - R, e.y + R + 1):
+				for x in range(e.x - R, e.x + R + 1):
+					if (x == e.x and y == e.y) or J.tile_solid(m, x, y) or not J.ve_casilla(e, x, y, 0):
+						continue
+					cs.append(Vector2i(x, y))
+			_vista_c[kc] = cs
+		for q in cs:
+			_rect(q.x * 16 - cam.x, q.y * 16 - cam.y, 16, 16, col)
 
 func _bocadillo(x: int, y: int, ch: String, col: Color) -> void:
 	_rect(x - 1, y - 1, 9, 10, css("#26262e"))

@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### 0.69.1 (código 95) · Más fluido en la web (lo pidió el usuario: «optimizar lo que son los FPS para que vaya más fluido el juego… en web»; con y sin `Datos.CAL`); plugin de WordPress 1.6.6 en `descargas/landrace-hunters-1.6.6.zip`
+
+- El suelo de cada mapa (baldosa, orilla, arena del agua, lo de Bilbao) se pinta una vez al entrar, en trozos de 16 × 16 casillas que solo se mandan a la tarjeta si se ven (`suelo`, `_suelo_mira`, `_suelo_pinta`, `SUELO_TROZO` en `pinta.gd`), y cada fotograma solo se mueve con la cámara; se repintan las casillas que cambian con el tiempo (animadas, la pista de GAUA, la playa; `_suelo_dinamica`) y la que pisa el protagonista. Se vuelve a pintar si cambia el mapa o su suelo (`m.g.hash()`).
+- El cono de vista de la policía, calculado una vez por sitio y dirección del agente (`_vista_c`).
+- Medido (escritorio, el mismo fotograma de la calle): el mapa pasa de 42 a 14 ms de GDScript por fotograma; el cono, de 3,7 a 0,4 ms.
+- `epi_puesto` sin el error de `bool(null)` y el almacén de KAIA sin `S.mar`, que salían al pintar esos mapas con una partida vieja.
+- Prueba `tests/suelo_cache.gd`: en los 91 mapas, de día y de noche, con el suelo pintado 3,1 s antes, la pantalla igual píxel a píxel que pintándolo casilla a casilla (364 comprobaciones; sin detectar lo que se mueve, fallan la playa y GAUA).
+
 ### 0.69.0 (código 94) · Cada controlador en su sala y lo que no cuadraba (lo pidió el usuario: «si hay un controlador de clima fuera de la sala del cultivo… y luego hay otro controlador dentro»; con `Datos.CAL`); con las entradas y la translucidez de abajo; APK en `descargas/LandraceHunters.apk`
 
 - KAIA, fase 2: con la carpa de sala, el cuadro del pasillo (`ctrlN` en `KAIA_CULT.ctrl`) se quita en `kc_monta`; solo queda el de dentro (`f2.o`), que lleva el clima, el goteo y la corriente.

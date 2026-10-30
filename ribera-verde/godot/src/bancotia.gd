@@ -566,7 +566,7 @@ const EPI_COL := {"bata": Color8(232, 236, 240), "bata2": Color8(184, 192, 204),
 var _epi := {}
 
 func epi_puesto() -> bool:
-	return en_lab() and bool(lab().get("e"))
+	return en_lab() and lab().get("e", false) == true
 
 func epi_c(f):
 	if f == null or not epi_puesto():
