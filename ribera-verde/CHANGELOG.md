@@ -2,7 +2,7 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### La partida exportada, comprimida y cifrada (lo pidió el usuario: «que no ocupe tanto»; con `Datos.CAL`)
+### 0.68.0 (código 93) · La partida exportada, comprimida y cifrada (lo pidió el usuario: «que no ocupe tanto»; con `Datos.CAL`); APK en `descargas/LandraceHunters.apk`
 
 - EXPORTAR PARTIDA da `LH1.` + el JSON comprimido con gzip, cifrado con XOR por clave y en base64, más un punto y una suma de 8 cifras (`cierra_partida` en `menus.gd`): la partida llena pasa de 50.221 a 14.433 caracteres y no se lee a simple vista.
 - IMPORTAR PARTIDA (`abre_partida`) acepta el texto con espacios, saltos de línea o texto alrededor, y también el JSON de antes (del primer `{` al último `}`); la suma se mira antes de descomprimir, y si no cuadra avisa de que ha llegado cortada o cambiada.
