@@ -808,25 +808,25 @@ def diputacion():
 
 
 def camposE():
-    """el teatro modernista (7 × 7): fachada crema con el gran arco de herradura en medio, la tracería de hierro que lo llena
+    """el teatro modernista (8 × 7): fachada crema con el gran arco de herradura en medio, la tracería de hierro que lo llena
     como una ola, las torrecillas y las vidrieras de colores"""
-    W, H = 112, 112
+    W, H = 128, 112
     lz = Lienzo(W, H)
     C0, C1, C2, C3 = '#eadcbc', '#d2c09a', '#f8f0dc', '#8a7650'
     lz.r(0, 0, W, 14, '#8e8a84')
-    for cx in (12, 100):                                                    # torrecillas
+    for cx in (12, 116):                                                    # torrecillas
         cupula(lz, cx, 4, 10, 14, (C1, C2, C3))
     lz.r(0, 14, W, H - 14, C0)
     R = azar(1591)
     for _ in range(200):
         lz.p(int(R() * W), 14 + int(R() * (H - 16)), C1)
-    for x in (0, 88):
+    for x in (0, 104):
         lz.r(x, 14, 24, H - 14, C2); lz.vl(x + 23, 14, H - 1, C1)
         for y in (24, 46, 68):
             M.ventana(lz, x + 7, y, 10, 14, C3, CR, CRL, C1, cruz=True)
-    cx, top = 56, 18                                                        # el arco de herradura
+    cx, top = 64, 18                                                        # el arco de herradura
     for y in range(top, H - 4):
-        for x in range(24, 88):
+        for x in range(32, 96):
             dx = x + .5 - cx
             yc = top + 30
             rr = 30
@@ -845,9 +845,9 @@ def camposE():
             lz.p(x, y, VERDEL)
             lz.p(x + 1, y, VERDE)
     for y in range(64, H - 6, 6):
-        for x in range(36, 76, 8):
+        for x in range(44, 84, 8):
             lz.r(x, y, 4, 3, ('#4a72b4', '#e0b84a', '#c04848', '#5ab868')[(x // 8 + y // 6) % 4])
-    lz.r(40, H - 26, 32, 22, '#4a3020'); lz.vl(56, H - 25, H - 5, '#2e2016')
+    lz.r(48, H - 26, 32, 22, '#4a3020'); lz.vl(64, H - 25, H - 5, '#2e2016')   # la puerta, en sus dos casillas (rel 48-80)
     lz.r(0, H - 4, W, 4, C3)
     return lz
 
@@ -1047,9 +1047,10 @@ def molino():
     lz.r(96, 0, 18, 14, S1); lz.caja(98, 2, 14, 10, S0, S3)                 # la torre de elevadores
     for y in range(20, 60):                                                 # el tubo que baja a los silos
         lz.p(62 + (y - 20) // 6, y, '#9a7a4a'); lz.p(63 + (y - 20) // 6, y, '#7a5a34')
-    lz.r(80, H - 26, 30, 26, '#5a5e66')                                     # el muelle de carga
+    lz.r(80, H - 26, 32, 26, '#5a5e66')                                     # el muelle de carga: el portón, en sus dos casillas (rel 80-112)
     for y in range(H - 25, H, 2):
-        lz.hl(81, 108, y, '#7c8088')
+        lz.hl(81, 110, y, '#7c8088')
+    lz.vl(80, H - 26, H - 1, '#3e4248'); lz.vl(111, H - 26, H - 1, '#3e4248')
     lz.r(0, H - 4, W, 4, S3)
     return lz
 

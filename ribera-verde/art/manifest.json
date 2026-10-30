@@ -13453,7 +13453,7 @@
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-camposE",
    "tipo": "edificio",
-   "celda": "edificio_7x7",
+   "celda": "edificio_8x7",
    "descripcion": "el teatro modernista del Ensanche",
    "cubre": [
     "tile:roofT_camposE",

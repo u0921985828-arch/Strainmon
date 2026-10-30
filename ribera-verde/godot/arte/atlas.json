@@ -171,53 +171,53 @@
   "edificio-camposE/base/unica/00": {
    "x": 128,
    "y": 656,
-   "w": 112,
+   "w": 128,
    "h": 112
   },
   "edificio-carlton/base/unica/00": {
-   "x": 240,
+   "x": 256,
    "y": 656,
    "w": 112,
    "h": 112
   },
   "edificio-casco3/base/unica/00": {
-   "x": 352,
+   "x": 368,
    "y": 656,
    "w": 80,
    "h": 112
   },
   "edificio-club-ensanche/base/unica/00": {
-   "x": 432,
+   "x": 448,
    "y": 656,
    "w": 128,
    "h": 112
   },
   "edificio-club-kaia/base/unica/00": {
-   "x": 560,
+   "x": 576,
    "y": 656,
    "w": 80,
    "h": 112
   },
   "edificio-disco/base/unica/00": {
-   "x": 640,
+   "x": 656,
    "y": 656,
    "w": 128,
    "h": 112
   },
   "edificio-grua/base/unica/00": {
-   "x": 768,
+   "x": 784,
    "y": 656,
    "w": 64,
    "h": 112
   },
   "edificio-gruaT/base/unica/00": {
-   "x": 832,
+   "x": 848,
    "y": 656,
    "w": 64,
    "h": 112
   },
   "edificio-marinera5-ruina/base/unica/00": {
-   "x": 896,
+   "x": 912,
    "y": 656,
    "w": 80,
    "h": 112
@@ -18431,10 +18431,10 @@
    ]
   },
   "edificio-camposE": {
-   "w": 112,
+   "w": 128,
    "h": 112,
    "ancla": [
-    56,
+    64,
     111
    ]
   },

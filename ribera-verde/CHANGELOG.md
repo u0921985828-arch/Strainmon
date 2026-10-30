@@ -2,6 +2,13 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Las entradas, cuadradas con las baldosas (lo pidió el usuario: «todas las entradas a edificios y demás deberían estar cuadradas con las baldosas»; con `Datos.CAL`)
+
+- Bilbao: las casillas de puerta de San Antón (42), la parroquia de Zorroza (22) y la de Indautxu (4), debajo de la puerta que dibuja su fachada (`PUERTAS` en `tools/bilbao.py`, con su salida de dentro).
+- El Teatro del Ensanche, de 8 casillas (antes 7, con la puerta a caballo de dos): el arco y la puerta, centrados en sus dos casillas (`camposE` en `tools/sprites/a-mano/bilbao.py`, doorX 34); el molino de mareas entra por el portón del muelle de carga, de 32 px en sus dos casillas (doorX 16); el almacén del muelle, con su puerta de 32 px encima de las dos.
+- El bajo de las setas: la puerta de encima, sobre la de la fachada (`dx` 8; antes 8 px a la izquierda de su casilla).
+- Prueba `tests/puertas_rejilla.gd`: en todos los mapas, la hoja de cada puerta (o el hueco oscuro de la fachada en Bilbao) centrada en sus casillas; 69 comprobaciones (antes, 7 fuera).
+
 ### La translucidez, baldosa a baldosa (lo pidió el usuario: «revisa cada baldosa para asegurar que no hay errores de transparencia y destellos cuando opaca algún objeto»; con `Datos.CAL`)
 
 - Las piezas seguidas de un mismo mueble en su fila (mostrador, barra, banco largo) se vuelven translúcidas juntas: antes, medio mostrador translúcido y el resto entero (`tapa_obj`, `_tapa_reg` en `pinta.gd`); de los árboles y el monte, solo las que pisan el cuerpo.

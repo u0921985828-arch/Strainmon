@@ -360,7 +360,7 @@ def abando(DEC):
 	for y in (10, 12):                                             # el paseo de la ría
 		C[y][57] = "Y"
 	edif(C, blds, "diputacion", 30, 20, 8, 6)                      # el sur
-	edif(C, blds, "camposE", 31, 28, 7, 7)
+	edif(C, blds, "camposE", 31, 28, 8, 7)
 	edif(C, blds, "abandoE", 46, 20, 8, 7)
 	edif(C, blds, "concordia", 54, 20, 4, 6)
 	edif(C, blds, "carlton", 17, 23, 7, 7)
@@ -484,14 +484,16 @@ def casco(DEC):
 # puente y la de Indautxu; el segundo teatro, el del Ensanche (teatro:camposE); la Diputación, con la ventanilla de Hacienda
 # (hacienda); y en La Punta, el molino de mareas (molino) y el almacén del muelle, con su jornal (almacen). Una clave «id@x0»
 # elige uno de varios edificios iguales. Las torres, los bloques y los pisos, sin entrar: son casas de otros.
+# la casilla de la puerta de cada edificio que se entra (la 1.ª de las dos), debajo del arco o de las puertas que dibuja su fachada
+# (lo pidió el usuario: «todas las entradas a edificios deberían estar cuadradas con las baldosas»; tests/puertas_rejilla.gd)
 PUERTAS = {
 	"casco": {"teatro": ["teatro-in", "teatro", 9], "catedral": ["catedral-in", "iglesia:catedral", 28], "mercadoR": ["mercado-in", "mercado", 23],
-		"sanNicolas": ["sannicolas-in", "iglesia:sanNicolas", 18], "sanAnton": ["sananton-in", "iglesia:sanAnton", 41]},
-	"zorroza": {"iglesiaZ": ["iglesiaz-in", "iglesia:iglesiaZ", 23], "estacion": ["zorrozae-in", "estacion:estacion", 8]},
-	"abando": {"milagrosa": ["milagrosa-in", "iglesia:milagrosa", 5], "camposE": ["campose-in", "teatro:camposE", 33],
+		"sanNicolas": ["sannicolas-in", "iglesia:sanNicolas", 18], "sanAnton": ["sananton-in", "iglesia:sanAnton", 42]},
+	"zorroza": {"iglesiaZ": ["iglesiaz-in", "iglesia:iglesiaZ", 22], "estacion": ["zorrozae-in", "estacion:estacion", 8]},
+	"abando": {"milagrosa": ["milagrosa-in", "iglesia:milagrosa", 4], "camposE": ["campose-in", "teatro:camposE", 34],
 		"abandoE": ["abandoe-in", "estacion:abandoE", 49], "concordia": ["concordia-in", "estacion:concordia", 55],
 		"diputacion": ["hacienda-in", "hacienda", 33]},
-	"lapunta": {"molino": ["molino-in", "molino", 14], "nave@32": ["almacen-in", "almacen", 34]},
+	"lapunta": {"molino": ["molino-in", "molino", 16], "nave@32": ["almacen-in", "almacen", 34]},
 }
 IN_N = {"teatro-in": "Teatro", "catedral-in": "La catedral", "mercado-in": "Mercado de la Ribera", "sannicolas-in": "San Nicolás",
 	"iglesiaz-in": "La parroquia", "sananton-in": "San Antón", "milagrosa-in": "La parroquia de Indautxu", "campose-in": "Teatro del Ensanche",
@@ -652,7 +654,7 @@ def molino_in():
 		o[y][x] = "sacos"
 	o[6][2], o[6][3] = "bench", "bench"
 	o[7][12] = "cajasMe"
-	salida(m, (6, 7), "lapunta", 14, 14)
+	salida(m, (6, 7), "lapunta", 16, 14)
 	return m
 
 
@@ -677,10 +679,10 @@ def interiores(B):
 	IN = {"teatro-in": teatro_in(), "mercado-in": mercado_in(),
 		"catedral-in": iglesia_in("catedral", "La catedral", 16, 16, "casco", 28, 26),
 		"sannicolas-in": iglesia_in("sanNicolas", "San Nicolás", 14, 14, "casco", 18, 7, "retabloB"),
-		"iglesiaz-in": iglesia_in("iglesiaZ", "La parroquia", 14, 13, "zorroza", 23, 28, "cruzZ"),
-		"sananton-in": iglesia_in("sanAnton", "San Antón", 12, 12, "casco", 41, 39, "retabloB"),
-		"milagrosa-in": iglesia_in("milagrosa", "La parroquia de Indautxu", 14, 15, "abando", 5, 35),
-		"campose-in": teatro_in("Teatro del Ensanche", "abando", 33, 35),
+		"iglesiaz-in": iglesia_in("iglesiaZ", "La parroquia", 14, 13, "zorroza", 22, 28, "cruzZ"),
+		"sananton-in": iglesia_in("sanAnton", "San Antón", 12, 12, "casco", 42, 39, "retabloB"),
+		"milagrosa-in": iglesia_in("milagrosa", "La parroquia de Indautxu", 14, 15, "abando", 4, 35),
+		"campose-in": teatro_in("Teatro del Ensanche", "abando", 34, 35),
 		"zorrozae-in": estacion_in("Estación de Zorroza", 16, "zorroza", 8, 14),
 		"abandoe-in": estacion_in("Estación de Abando", 22, "abando", 49, 27),
 		"concordia-in": estacion_in("Estación de la Concordia", 14, "abando", 55, 26),
@@ -698,7 +700,7 @@ def interiores(B):
 				continue
 			to, gate, dx = P[kb]
 			dy = int(b["y0"]) + int(b["h"]) - 1
-			b["doorX"], b["ancha"] = dx, 1
+			b["doorX"], b["ancha"], b["dx"] = dx, 1, 8   # la puerta de 32 px, encima de sus dos casillas (la del almacén del muelle)
 			for i in (0, 1):
 				assert m["g"][dy + 1][dx + i] not in ("water",) and not m["o"][dy + 1][dx + i], "%s: delante de %s (%d, %d)" % (k, b["id"], dx + i, dy + 1)
 				m["g"][dy][dx + i] = "door_" + b["id"]
