@@ -1,0 +1,29 @@
+{
+  "grupo": "edificio-growcity",
+  "celda": [
+    96,
+    96
+  ],
+  "tope_colores": 15,
+  "secuencias": 2,
+  "fotogramas": 5,
+  "semitransparentes": 0,
+  "en_paleta_antes": 25.1,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [
+    "base: #6f9fc4→#5a8aa4",
+    "base: #d0c2a2→#d8d2c4",
+    "base: #f4f4ee→#e8dcc0",
+    "base: #5ab868→#2f8a4a",
+    "base: #6a4a2a→#5a3a24",
+    "base: #f0e8a0→#e8dcc0",
+    "base: #1f5a30→#3a3a40"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "puerta/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

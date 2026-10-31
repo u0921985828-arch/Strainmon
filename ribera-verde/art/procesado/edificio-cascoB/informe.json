@@ -1,0 +1,19 @@
+{
+  "grupo": "edificio-cascoB",
+  "celda": [
+    48,
+    64
+  ],
+  "tope_colores": 32,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 15.7,
+  "distancia_media": 0,
+  "colores_finales": 18,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

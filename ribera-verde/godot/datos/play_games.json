@@ -1,0 +1,114 @@
+{
+ "_nota": "Fase 6 (U7): los 27 LOGROS del juego en Play Games. «id» es el id que da Play Console al crear cada logro (CgkI…); vacío, el logro no se envía. «app_id» es el id numérico del proyecto de Play Games. «puntos» suman 1000 como mucho (múltiplos de 5).",
+ "app_id": "",
+ "logros": {
+  "venta": {
+   "id": "",
+   "puntos": 10
+  },
+  "cosecha": {
+   "id": "",
+   "puntos": 10
+  },
+  "diario": {
+   "id": "",
+   "puntos": 10
+  },
+  "estrella": {
+   "id": "",
+   "puntos": 30
+  },
+  "receta": {
+   "id": "",
+   "puntos": 20
+  },
+  "recetas10": {
+   "id": "",
+   "puntos": 60
+  },
+  "jack": {
+   "id": "",
+   "puntos": 100
+  },
+  "mitad": {
+   "id": "",
+   "puntos": 50
+  },
+  "genoteca": {
+   "id": "",
+   "puntos": 90
+  },
+  "landraces": {
+   "id": "",
+   "puntos": 60
+  },
+  "tia": {
+   "id": "",
+   "puntos": 40
+  },
+  "rosin": {
+   "id": "",
+   "puntos": 20
+  },
+  "cata": {
+   "id": "",
+   "puntos": 15
+  },
+  "club": {
+   "id": "",
+   "puntos": 20
+  },
+  "presidente": {
+   "id": "",
+   "puntos": 50
+  },
+  "goteo": {
+   "id": "",
+   "puntos": 20
+  },
+  "carpas": {
+   "id": "",
+   "puntos": 30
+  },
+  "plazo": {
+   "id": "",
+   "puntos": 30
+  },
+  "libre": {
+   "id": "",
+   "puntos": 70
+  },
+  "ventas10": {
+   "id": "",
+   "puntos": 30
+  },
+  "ventas100": {
+   "id": "",
+   "puntos": 60
+  },
+  "rival": {
+   "id": "",
+   "puntos": 30
+  },
+  "darko": {
+   "id": "",
+   "puntos": 50
+  },
+  "plantilla": {
+   "id": "",
+   "puntos": 25
+  },
+  "nave": {
+   "id": "",
+   "puntos": 40
+  },
+  "ruedas": {
+   "id": "",
+   "puntos": 15
+  },
+  "casa": {
+   "id": "",
+   "puntos": 15
+  }
+ }
+}

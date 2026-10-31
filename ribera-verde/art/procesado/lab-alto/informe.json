@@ -1,0 +1,19 @@
+{
+  "grupo": "lab-alto",
+  "celda": [
+    32,
+    48
+  ],
+  "tope_colores": 32,
+  "secuencias": 14,
+  "fotogramas": 14,
+  "semitransparentes": 0,
+  "en_paleta_antes": 30.1,
+  "distancia_media": 0,
+  "colores_finales": 14,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

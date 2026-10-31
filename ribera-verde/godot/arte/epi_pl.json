@@ -1,0 +1,436 @@
+{
+ "frames": {
+  "player-f/base/east/00": {
+   "h": 32,
+   "w": 32,
+   "x": 256,
+   "y": 160
+  },
+  "player-f/base/north/00": {
+   "h": 32,
+   "w": 32,
+   "x": 256,
+   "y": 192
+  },
+  "player-f/base/south/00": {
+   "h": 32,
+   "w": 32,
+   "x": 256,
+   "y": 128
+  },
+  "player-f/base/west/00": {
+   "h": 32,
+   "w": 32,
+   "x": 256,
+   "y": 224
+  },
+  "player-f/idle/east/00": {
+   "h": 32,
+   "w": 32,
+   "x": 0,
+   "y": 160
+  },
+  "player-f/idle/east/01": {
+   "h": 32,
+   "w": 32,
+   "x": 32,
+   "y": 160
+  },
+  "player-f/idle/east/02": {
+   "h": 32,
+   "w": 32,
+   "x": 64,
+   "y": 160
+  },
+  "player-f/idle/east/03": {
+   "h": 32,
+   "w": 32,
+   "x": 96,
+   "y": 160
+  },
+  "player-f/idle/north/00": {
+   "h": 32,
+   "w": 32,
+   "x": 0,
+   "y": 192
+  },
+  "player-f/idle/north/01": {
+   "h": 32,
+   "w": 32,
+   "x": 32,
+   "y": 192
+  },
+  "player-f/idle/north/02": {
+   "h": 32,
+   "w": 32,
+   "x": 64,
+   "y": 192
+  },
+  "player-f/idle/north/03": {
+   "h": 32,
+   "w": 32,
+   "x": 96,
+   "y": 192
+  },
+  "player-f/idle/south/00": {
+   "h": 32,
+   "w": 32,
+   "x": 0,
+   "y": 128
+  },
+  "player-f/idle/south/01": {
+   "h": 32,
+   "w": 32,
+   "x": 32,
+   "y": 128
+  },
+  "player-f/idle/south/02": {
+   "h": 32,
+   "w": 32,
+   "x": 64,
+   "y": 128
+  },
+  "player-f/idle/south/03": {
+   "h": 32,
+   "w": 32,
+   "x": 96,
+   "y": 128
+  },
+  "player-f/idle/west/00": {
+   "h": 32,
+   "w": 32,
+   "x": 0,
+   "y": 224
+  },
+  "player-f/idle/west/01": {
+   "h": 32,
+   "w": 32,
+   "x": 32,
+   "y": 224
+  },
+  "player-f/idle/west/02": {
+   "h": 32,
+   "w": 32,
+   "x": 64,
+   "y": 224
+  },
+  "player-f/idle/west/03": {
+   "h": 32,
+   "w": 32,
+   "x": 96,
+   "y": 224
+  },
+  "player-f/walk/east/00": {
+   "h": 32,
+   "w": 32,
+   "x": 128,
+   "y": 160
+  },
+  "player-f/walk/east/01": {
+   "h": 32,
+   "w": 32,
+   "x": 160,
+   "y": 160
+  },
+  "player-f/walk/east/02": {
+   "h": 32,
+   "w": 32,
+   "x": 192,
+   "y": 160
+  },
+  "player-f/walk/east/03": {
+   "h": 32,
+   "w": 32,
+   "x": 224,
+   "y": 160
+  },
+  "player-f/walk/north/00": {
+   "h": 32,
+   "w": 32,
+   "x": 128,
+   "y": 192
+  },
+  "player-f/walk/north/01": {
+   "h": 32,
+   "w": 32,
+   "x": 160,
+   "y": 192
+  },
+  "player-f/walk/north/02": {
+   "h": 32,
+   "w": 32,
+   "x": 192,
+   "y": 192
+  },
+  "player-f/walk/north/03": {
+   "h": 32,
+   "w": 32,
+   "x": 224,
+   "y": 192
+  },
+  "player-f/walk/south/00": {
+   "h": 32,
+   "w": 32,
+   "x": 128,
+   "y": 128
+  },
+  "player-f/walk/south/01": {
+   "h": 32,
+   "w": 32,
+   "x": 160,
+   "y": 128
+  },
+  "player-f/walk/south/02": {
+   "h": 32,
+   "w": 32,
+   "x": 192,
+   "y": 128
+  },
+  "player-f/walk/south/03": {
+   "h": 32,
+   "w": 32,
+   "x": 224,
+   "y": 128
+  },
+  "player-f/walk/west/00": {
+   "h": 32,
+   "w": 32,
+   "x": 128,
+   "y": 224
+  },
+  "player-f/walk/west/01": {
+   "h": 32,
+   "w": 32,
+   "x": 160,
+   "y": 224
+  },
+  "player-f/walk/west/02": {
+   "h": 32,
+   "w": 32,
+   "x": 192,
+   "y": 224
+  },
+  "player-f/walk/west/03": {
+   "h": 32,
+   "w": 32,
+   "x": 224,
+   "y": 224
+  },
+  "player/base/east/00": {
+   "h": 32,
+   "w": 32,
+   "x": 256,
+   "y": 32
+  },
+  "player/base/north/00": {
+   "h": 32,
+   "w": 32,
+   "x": 256,
+   "y": 64
+  },
+  "player/base/south/00": {
+   "h": 32,
+   "w": 32,
+   "x": 256,
+   "y": 0
+  },
+  "player/base/west/00": {
+   "h": 32,
+   "w": 32,
+   "x": 256,
+   "y": 96
+  },
+  "player/idle/east/00": {
+   "h": 32,
+   "w": 32,
+   "x": 0,
+   "y": 32
+  },
+  "player/idle/east/01": {
+   "h": 32,
+   "w": 32,
+   "x": 32,
+   "y": 32
+  },
+  "player/idle/east/02": {
+   "h": 32,
+   "w": 32,
+   "x": 64,
+   "y": 32
+  },
+  "player/idle/east/03": {
+   "h": 32,
+   "w": 32,
+   "x": 96,
+   "y": 32
+  },
+  "player/idle/north/00": {
+   "h": 32,
+   "w": 32,
+   "x": 0,
+   "y": 64
+  },
+  "player/idle/north/01": {
+   "h": 32,
+   "w": 32,
+   "x": 32,
+   "y": 64
+  },
+  "player/idle/north/02": {
+   "h": 32,
+   "w": 32,
+   "x": 64,
+   "y": 64
+  },
+  "player/idle/north/03": {
+   "h": 32,
+   "w": 32,
+   "x": 96,
+   "y": 64
+  },
+  "player/idle/south/00": {
+   "h": 32,
+   "w": 32,
+   "x": 0,
+   "y": 0
+  },
+  "player/idle/south/01": {
+   "h": 32,
+   "w": 32,
+   "x": 32,
+   "y": 0
+  },
+  "player/idle/south/02": {
+   "h": 32,
+   "w": 32,
+   "x": 64,
+   "y": 0
+  },
+  "player/idle/south/03": {
+   "h": 32,
+   "w": 32,
+   "x": 96,
+   "y": 0
+  },
+  "player/idle/west/00": {
+   "h": 32,
+   "w": 32,
+   "x": 0,
+   "y": 96
+  },
+  "player/idle/west/01": {
+   "h": 32,
+   "w": 32,
+   "x": 32,
+   "y": 96
+  },
+  "player/idle/west/02": {
+   "h": 32,
+   "w": 32,
+   "x": 64,
+   "y": 96
+  },
+  "player/idle/west/03": {
+   "h": 32,
+   "w": 32,
+   "x": 96,
+   "y": 96
+  },
+  "player/walk/east/00": {
+   "h": 32,
+   "w": 32,
+   "x": 128,
+   "y": 32
+  },
+  "player/walk/east/01": {
+   "h": 32,
+   "w": 32,
+   "x": 160,
+   "y": 32
+  },
+  "player/walk/east/02": {
+   "h": 32,
+   "w": 32,
+   "x": 192,
+   "y": 32
+  },
+  "player/walk/east/03": {
+   "h": 32,
+   "w": 32,
+   "x": 224,
+   "y": 32
+  },
+  "player/walk/north/00": {
+   "h": 32,
+   "w": 32,
+   "x": 128,
+   "y": 64
+  },
+  "player/walk/north/01": {
+   "h": 32,
+   "w": 32,
+   "x": 160,
+   "y": 64
+  },
+  "player/walk/north/02": {
+   "h": 32,
+   "w": 32,
+   "x": 192,
+   "y": 64
+  },
+  "player/walk/north/03": {
+   "h": 32,
+   "w": 32,
+   "x": 224,
+   "y": 64
+  },
+  "player/walk/south/00": {
+   "h": 32,
+   "w": 32,
+   "x": 128,
+   "y": 0
+  },
+  "player/walk/south/01": {
+   "h": 32,
+   "w": 32,
+   "x": 160,
+   "y": 0
+  },
+  "player/walk/south/02": {
+   "h": 32,
+   "w": 32,
+   "x": 192,
+   "y": 0
+  },
+  "player/walk/south/03": {
+   "h": 32,
+   "w": 32,
+   "x": 224,
+   "y": 0
+  },
+  "player/walk/west/00": {
+   "h": 32,
+   "w": 32,
+   "x": 128,
+   "y": 96
+  },
+  "player/walk/west/01": {
+   "h": 32,
+   "w": 32,
+   "x": 160,
+   "y": 96
+  },
+  "player/walk/west/02": {
+   "h": 32,
+   "w": 32,
+   "x": 192,
+   "y": 96
+  },
+  "player/walk/west/03": {
+   "h": 32,
+   "w": 32,
+   "x": 224,
+   "y": 96
+  }
+ }
+}

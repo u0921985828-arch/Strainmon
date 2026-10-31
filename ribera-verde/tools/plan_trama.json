@@ -1,0 +1,48 @@
+{
+ "base": "trama",
+ "antepasados": [
+  "ui",
+  "mundo",
+  "calle",
+  "granja"
+ ],
+ "modulos": [
+  [
+   "menus",
+   1755
+  ],
+  [
+   "policia",
+   2185
+  ],
+  [
+   "movil",
+   2950
+  ],
+  [
+   "venta",
+   3929
+  ],
+  [
+   "nave",
+   5239
+  ],
+  [
+   "setas",
+   6206
+  ],
+  [
+   "eventos",
+   8036
+  ]
+ ],
+ "desc": {
+  "policia": "F8 (de trama.gd): el combate, la caja fuerte, el robo de Darko y los encargos de Baltasar, la sala.",
+  "movil": "F8 (de trama.gd): el móvil y su pantalla (llamadas, SMS, tienda online, banca, GENTE).",
+  "venta": "F8 (de trama.gd): la plantilla, la compra de la nave, los locales por dentro y el club con el socio y el billar.",
+  "nave": "F8 (de trama.gd): la nave por dentro, GAUA, la asociación y los mercados.",
+  "setas": "F8 (de trama.gd): el bajo de las setas, la caja y la nevera por dentro, ordenar y el carro de esquejes.",
+  "eventos": "F8 (de trama.gd): el calendario y el mapa, las bandejas de clones, el concesionario, el muelle, las obras, abrir con llave y los gestos.",
+  "menus": "F8 (de trama.gd): el menú START y la ficha de la variedad."
+ }
+}

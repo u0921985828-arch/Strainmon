@@ -1,0 +1,27 @@
+{
+  "grupo": "props-bilbao-ancho",
+  "celda": [
+    48,
+    48
+  ],
+  "tope_colores": 32,
+  "secuencias": 4,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 2.6,
+  "distancia_media": 0,
+  "colores_finales": 32,
+  "fundidos": [
+    "escZ: #716e69→#79756f",
+    "escZ: #3b3833→#3b3832",
+    "escZ: #595651→#5a5750",
+    "escZ: #817e78→#88857e",
+    "escZ: #4b4842→#4c4942",
+    "escZ: #7a766e→#7a766f",
+    "escZ: #6c6860→#6a6760"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

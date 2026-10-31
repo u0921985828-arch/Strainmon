@@ -1,0 +1,160 @@
+es,en
+GENOTECA,GENEBANK
+MOCHILA,BACKPACK
+MÓVIL,PHONE
+{n} SMS,{n} SMS
+PLANTAS,PLANTS
+OBJETIVO,GOALS
+cap. {n},ch. {n}
+GUARDAR,SAVE
+OPCIONES,OPTIONS
+SALIR,EXIT
+REGISTRO,LOG
+JUEGO COMPLETO,FULL GAME
+Todavía no has hablado con nadie.,You haven't talked to anyone yet.
+Partida guardada.,Game saved.
+No se ha podido guardar la partida.,Couldn't save the game.
+Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla.,Game copied to the clipboard. Paste it into a note or an email to keep it.
+"{r}, en ese orden","{r}, in that order"
+en el growshop de Kiko desde el cap. {n},at Kiko's grow shop from ch. {n}
+en el banco de semillas del PC desde el cap. {n},in the seed bank on the PC from ch. {n}
+de premio en una misión,as a mission reward
+de su receta,from its recipe
+Semillas: {l}.,Seeds: {l}.
+{n} recetas,{n} recipes
+receta,recipe
+tienda,shop
+landrace,landrace
+o,or
+La última página,The last page
+Volver,Back
+DIARIO DE LA TÍA MAITE,AUNT MAITE'S DIARY
+lo que entra,what goes in
+Nuevo nombre de la variedad,New strain name
+Ya hay una variedad con ese nombre.,There's already a strain with that name.
+La {a} pasa a llamarse {v}.,{a} is now called {v}.
+"Su cuaderno: las {n} variedades, lo que apuntó de cada una, las recetas de los cruces y dónde conseguir las semillas.","Her notebook: all {n} strains, her notes on each, the cross recipes and where to get the seeds."
+Cata: {c},Tasting: {c}
+Sin descubrir.,Not discovered.
+Pulsa A para cambiarle el nombre.,Press A to rename it.
+{a}/{b} · {c} propias,{a}/{b} · {c} your own
+Ver la hoja,See the leaf
+Cambiar el nombre,Rename
+"Autofloreciente: florece por la edad, sin cambiar la luz.","Autoflower: blooms by age, no light change needed."
+SATIVA,SATIVA
+HIBRIDO SATIVA,SATIVA HYBRID
+EQUILIBRADO,BALANCED
+HIBRIDO INDICA,INDICA HYBRID
+INDICA,INDICA
+Dinero,Cash
+Lo que llevas encima. Don Baltasar también lo cuenta.,What you carry. Don Baltasar counts it too.
+{n} de {kg},{n} of {kg}
+Cogollos y extractos que llevas encima. Lo que no cabe al cosechar va a la caja fuerte.,Buds and extracts on you. What doesn't fit at harvest goes to the safe.
+Caja fuerte,Safe
+"{n}, detrás del diploma. Caben {e} y {kg}.
+Lo que está dentro no lo llevas encima.","{n}, behind the diploma. Holds {e} and {kg}.
+What's inside isn't on you."
+Nevera,Fridge
+"Los extractos, en frío, en casa (caben {n} g). Un control en la calle no la ve; una redada se la lleva.","Extracts, kept cold at home (holds {n} g). A street check won't see it; a raid takes it."
+Vida,Health
+"Se recupera durmiendo, comiendo o con el tiempo.","Comes back with sleep, food or time."
+Pelea,Fighting
+nivel {n},level {n}
+Medidor de pH y EC,Water meter
+Con él corriges el pH justo y ves la EC y el pH de cada maceta en PLANTAS.,Lets you fix the water just right and see how each pot is doing in PLANTS.
+Tarros de curado,Curing jars
+en casa,at home
+Los cogollos en la caja fuerte y los extractos en la nevera se curan en {d} días: suben un {t} % de THC y se venden un {p} % más caros.,Buds in the safe and extracts in the fridge cure in {d} days: +{t} % THC and they sell for {p} % more.
+Insecticida (tratamientos),Insecticide (doses)
+Úsalo en una maceta con plaga.,Use it on a pot with pests.
+Spray de pimienta,Pepper spray
+Solo en combate.,Fights only.
+Bocata,Sandwich
+Pulsa A para comerlo: +15 de vida.,Press A to eat it: +15 health.
+Maceta {n},Pot {n}
+Se cambia en una plaza vacía de la carpa.,Swap it in an empty spot in the tent.
+Foco {n},Light {n}
+Se cuelga desde la vista de carpa: ▲ hasta el foco y A.,Hang it from the tent view: ▲ up to the light and A.
+Se ponen desde la vista de carpa: ▲ hasta el foco y A.,Fit them from the tent view: ▲ up to the light and A.
+Se pone desde la vista de carpa: ▲ hasta el foco y A.,Fit it from the tent view: ▲ up to the light and A.
+Semilla {n},Seed {n}
+Pulsa A para tirarlas.,Press A to throw them away.
+Esqueje {n},Clone {n}
+"Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el {d}.
+Pulsa A para ponerle nombre o tirarlo.","Rooting in the propagator. Plant it in an empty spot before {d} ends.
+Press A to name it or bin it."
+"Cogollos de un fenotipo estrella, en lote aparte.","Star phenotype buds, kept as their own batch."
+Cogollos listos para vender.,Buds ready to sell.
+"Pulsa A para catarlo, analizarlo o tirarlo.","Press A to taste, test or bin it."
+Pulsa A para catarlo o tirarlo.,Press A to taste or bin it.
+{n}: extracción sin disolventes. La compran los catadores.,{n}: solventless extract. Tasters buy it.
+Pulsa A para tirarlo.,Press A to bin it.
+Papel de liar,Rolling papers
+hojas,sheets
+Una hoja por porro. En el estanco.,One sheet per joint. At the tobacconist.
+Filtros,Tips
+Cada porro gasta uno. En el estanco.,Each joint uses one. At the tobacconist.
+Tabaco de liar,Rolling tobacco
+"Para mezclar: 0,7 g por porro y el porro lleva menos hierba. En el estanco.","For mixing: 0.7 g per joint, so it takes less weed. At the tobacconist."
+Mechero,Lighter
+"Para el porro, la pipa y el bong.","For the joint, the pipe and the bong."
+Grinder,Grinder
+"El porro te sale con 0,4 g de hierba en vez de 0,5.",Your joint takes 0.4 g of weed instead of 0.5.
+Pipa de cristal,Glass pipe
+"Sentado en un sofá o una silla: 0,2 g de cogollo o 0,1 de extracto.",Sitting on a sofa or chair: 0.2 g of bud or 0.1 of extract.
+Bong de cristal,Glass bong
+"Sentado: 0,3 g de cogollo o 0,1 de extracto.",Sitting: 0.3 g of bud or 0.1 of extract.
+Vaporizador,Vaporizer
+"Sentado: 0,2 g de cogollo o 0,1 de extracto, sin mechero; en la calle huele menos.","Sitting: 0.2 g of bud or 0.1 of extract, no lighter; smells less outside."
+{n} {u},{n} {u}
+Prensa de rosin,Rosin press
+en la mesa,on the table
+"De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso.","From 5 g of bud, 1 g of rosin with triple the THC. Used at the flat table."
+Tamices de seda,Silk screens
+"Dry sift: de la flor, el kief con algo más del doble de THC. Se usa en la mesa del piso.",Dry sift: kief from the flower with just over double the THC. Used at the flat table.
+Kit Ice-o-lator,Ice water kit
+Agua con hielo y bolsas de malla: la resina más limpia. Se usa en la mesa del piso.,Ice water and mesh bags: the cleanest resin. Used at the flat table.
+Mallas 00,00 mesh
+en el piso,in the flat
+"La malla «doble cero» de la tía: dry sift de lo más fino, solo las cabezas. Se usa en los tamices del piso.","Auntie's «double zero» mesh: the finest dry sift, heads only. Used with the flat's screens."
+Lavadora de extracción,Extraction washer
+Ice-o-lator en grande: bate sola con las bolsas de malla. Está montada junto a la nevera.,"An ice water kit, but big: it churns the mesh bags by itself. Set up by the fridge."
+Máquina de static,Static machine
+La placa cargada levanta las cabezas de resina de la flor fría: la resina más pura.,The charged plate lifts the resin heads off cold flower: the purest resin.
+{n} g encima · {c} g en la caja,{n} g on you · {c} g in the safe
+{n} g encima,{n} g on you
+Te comes el bocata. +15 de vida,You eat the sandwich. +15 health
+Tirar 1,Bin 1
+Tirar todas,Bin all
+Nada,Nothing
+Tirar,Bin
+{n} semillas de {s}.,{n} {s} seeds.
+1 semilla de {s}.,1 {s} seed.
+Tiras las {n} semillas.,You bin the {n} seeds.
+Tiras 1 semilla.,You bin 1 seed.
+Sala,Room
+Sin termohigrómetro no sabes la temperatura ni la humedad de la sala. Kiko lo vende.,Without a thermo-hygrometer you can't tell the room's temperature or humidity. Kiko sells one.
+"{p} plantas · foco {f}, {w} W/m² (poca luz: crecen más despacio y con menos THC)
+Luz: {e} al día con plantas · hasta {wm} W, macetas de {l} L y {lm} L de tierra ({lc} puestos).
+{x}{d}","{p} plants · {f} light, {w} W/m² (low light: slower growth, less THC)
+Power: {e} a day with plants · up to {wm} W, {l} L pots and {lm} L of soil ({lc} in use).
+{x}{d}"
+"dentro, de día {c}","inside, by day {c}"
+"{p} plantas · foco {f}, {w} W/m²
+Luz: {e} al día con plantas · hasta {wm} W, macetas de {l} L y {lm} L de tierra ({lc} puestos).
+{x}{d}","{p} plants · {f} light, {w} W/m²
+Power: {e} a day with plants · up to {wm} W, {l} L pots and {lm} L of soil ({lc} in use).
+{x}{d}"
+{n} · vacía,{n} · empty
+Maceta de {n}. Planta algo desde la carpa de tu piso.,{n} pot. Plant something from the tent in your flat.
+Se ha secado. Retírala.,It's dried up. Clear it out.
+"{f} · Agua {a}% · Salud {s}%
+{p}{b} · maceta de {m}.","{f} · Water {a}% · Health {s}%
+{p}{b} · {m} pot."
+Lista para cosechar,Ready to harvest
+PLAGA: trátala con insecticida.,PESTS: treat it with insecticide.
+muerta,dead
+LISTA,READY
+CULTIVO,GROW
+Luz {e}/día,Power {e}/day
+Luz apagada,Lights off

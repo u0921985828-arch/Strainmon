@@ -1,0 +1,19 @@
+{
+  "grupo": "puerto-barcoA",
+  "celda": [
+    240,
+    80
+  ],
+  "tope_colores": 32,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 29.3,
+  "distancia_media": 0,
+  "colores_finales": 21,
+  "fundidos": [],
+  "huerfanos_quitados": 1,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

@@ -1,0 +1,20 @@
+{
+  "grupo": "interior-bar",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 13.59,
+  "colores_finales": 5,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #6c441e≈#6a421c, #8a623c≈#8e623e, #9e7650≈#a0744c"
+  ]
+}
