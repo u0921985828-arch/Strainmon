@@ -137,6 +137,17 @@ func _corre() -> void:
 		ok("%s: de día, igual a otra hora de luz" % e.k, distintos(a, dia) == 0)
 		ok("%s: de noche, a oscuras (≤ 25 %%)" % e.k, media(noche, P) <= .25 * media(dia, P))
 		ok("%s: de noche, con la luz verde de trabajo" % e.k, verde(noche, P))
+		# la campana (se pinta encima de la capa de la luz) también, a oscuras y en verde (lo dijo el usuario: «el foco… no entra en
+		# el filtro, ni se oscurece»)
+		var C := []
+		var gv = Vista.geo(con(e, "flor", 22), 0)
+		var fc := Arte.foto(gv.vc.foco.n)
+		for cx in gv.vc.get("fxs", [120]):
+			for y in range(int(gv.vc.fy) - 15, int(gv.vc.fy) - 15 + fc.get_height()):
+				for x in range(int(cx) - (fc.get_width() >> 1), int(cx) + (fc.get_width() >> 1)):
+					if x >= 0 and x < 240 and y >= 0 and y < 160 and lum(a.get_pixel(x, y)) > .04:
+						C.append(Vector2i(x, y))
+		ok("%s: de noche, la campana a oscuras y en verde" % e.k, C.size() > 20 and media(noche, C) <= .3 * media(dia, C) and verde(noche, C))
 	# lo dijo el usuario: «la lámpara CFL… no se ve la luz cuando está encendida» y, apagado, «no hay nada que refleje la luz en las
 	# paredes»: con CAL, el CFL encendido tiñe de su azul el suelo y la pared (píxeles con el azul 20 por encima del rojo, abajo) y la
 	# carpa sin plantas (apagada) sale a oscuras como la noche
