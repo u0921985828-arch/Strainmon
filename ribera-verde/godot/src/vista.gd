@@ -568,9 +568,9 @@ func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240, alto := 1
 	luz.visible = on and g.vc != null
 	luz.material.set_shader_parameter("oscuro", 1.0)
 	if luz.visible:
-		luz.texture = Arte.tex("luz|%s|%s|%d|%d|%d" % [g.c.t, g.vc.tipo, g.vc.foco.a, g.vc.fy, g.vc.fxs.size()], Arte.luz(g.c.t, g.vc))
-		luz.material.set_shader_parameter("fuerza", Datos.carga().LUZ_C.get(g.vc.tipo, [0, 1])[1])
-	elif g.vc != null and Cultivo.plantas_vivas(S, VC.ci):   # la noche del temporizador: sin haz y a oscuras
+		luz.texture = Arte.tex("luz|%s|%s|%d|%d|%d|%s" % [g.c.t, g.vc.tipo, g.vc.foco.a, g.vc.fy, g.vc.fxs.size(), Datos.CAL], Arte.luz(g.c.t, g.vc))
+		luz.material.set_shader_parameter("fuerza", Arte.luz_c().get(g.vc.tipo, [0, 1])[1])
+	elif g.vc != null and (Datos.CAL or Cultivo.plantas_vivas(S, VC.ci)):   # apagado (la noche del temporizador o, con CAL, sin plantas): sin haz y a oscuras
 		luz.visible = true
 		luz.texture = Arte.tex("luz|vacia", Image.create(240, 160, false, Image.FORMAT_RGBA8))
 		luz.material.set_shader_parameter("oscuro", NOCHE_C)

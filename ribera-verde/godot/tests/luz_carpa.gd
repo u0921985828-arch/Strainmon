@@ -56,6 +56,9 @@ func pinta(S: Dictionary, cal: bool) -> Image:
 	sv.queue_free()
 	return im
 
+const AZUL := 30
+const AZUL_N := 700   # antes del cambio, 14; después, unos 1450
+
 func lum(c: Color) -> float:
 	return .299 * c.r + .587 * c.g + .114 * c.b
 
@@ -125,6 +128,32 @@ func _corre() -> void:
 					P.append(Vector2i(x, y))
 		ok("%s: de día, igual a otra hora de luz" % e.k, distintos(a, dia) == 0)
 		ok("%s: de noche, a oscuras (≤ 25 %%)" % e.k, media(noche, P) <= .25 * media(dia, P))
+	# lo dijo el usuario: «la lámpara CFL… no se ve la luz cuando está encendida» y, apagado, «no hay nada que refleje la luz en las
+	# paredes»: con CAL, el CFL encendido tiñe de su azul el suelo y la pared (píxeles con el azul 20 por encima del rojo, abajo) y la
+	# carpa sin plantas (apagada) sale a oscuras como la noche
+	var e1: Dictionary = O.escenas.filter(func(x): return x.k == "p60-cfl")[0]
+	var dia: Image = await pinta(con(e1, "flor", 12), true)
+	var azul := 0
+	for y in range(80, 160):
+		for x in 240:
+			var c := dia.get_pixel(x, y)
+			if c.b8 - c.r8 >= AZUL and lum(c) > .5:
+				azul += 1
+	ok("p60-cfl: el CFL encendido se ve (%d px azules)" % azul, azul >= AZUL_N)
+	for k in ["p60-cfl", "p60-cfl-muertas"]:
+		var e: Dictionary = O.escenas.filter(func(x): return x.k == k)[0]
+		var S := con(e, "flor", 12)
+		for i in S.pots.size():
+			S.pots[i] = null
+		var vacia: Image = await pinta(S, true)
+		var P := []
+		for y in range(0, 160, 2):
+			for x in range(0, 240, 2):
+				if lum(dia.get_pixel(x, y)) > .04:
+					P.append(Vector2i(x, y))
+		ok("%s: sin plantas, apagada y a oscuras" % k, not Cultivo.foco_on(S, 0) and media(vacia, P) <= .25 * media(dia, P))
+		var sin: Image = await pinta(S, false)
+		ok("%s: sin CAL, sin plantas, como el HTML (sin oscurecer)" % k, media(sin, P) > .5 * media(dia, P))
 	Datos.CAL = true
 	for f in fallos:
 		print("FALLO  ", f)

@@ -404,12 +404,23 @@ static func cuelga(c: Image) -> Array:
 	return o
 
 # la luz de cada tipo de foco: la del sodio, tal cual; las demás, con su color (misma luminosidad). Los LED, de barras, la suya (luz_led)
+# el color y la fuerza de la luz por tipo de foco: los de LUZ_C (como el HTML) y, con CAL, los de LUZ_CAL encima (lo dijo el
+# usuario: «la lámpara CFL… no se ve la luz cuando está encendida»: el blanco azulado a 0,6 se perdía en la pared plateada)
+const LUZ_CAL := {"cfl": [[150, 205, 255], 1.0]}
+static func luz_c() -> Dictionary:
+	var lc: Dictionary = Datos.carga().LUZ_C
+	if not Datos.CAL:
+		return lc
+	var r := lc.duplicate()
+	r.merge(LUZ_CAL, true)
+	return r
+
 static func luz(t: String, vc: Dictionary) -> Image:
 	var L := luz_led(t, vc) if vc.tipo == "led" and hay("carpa-c-luz-led") else luz_baja(t, vc)
-	var lc: Dictionary = Datos.carga().LUZ_C
+	var lc := luz_c()
 	if not lc.has(vc.tipo):
 		return L
-	var k := "vc|%s|luz|%s|%d|%d|%d" % [t, vc.tipo, vc.foco.a, vc.fy, vc.get("fxs", [120]).size()]
+	var k := "vc|%s|luz|%s|%d|%d|%d|%s" % [t, vc.tipo, vc.foco.a, vc.fy, vc.get("fxs", [120]).size(), Datos.CAL]
 	if cache.has(k):
 		return cache[k]
 	var c: Array = lc[vc.tipo][0]
