@@ -1,18 +1,18 @@
 <?php
 /**
- * Plugin Name: Wolf Cave Web
+ * Plugin Name: WOLFCADE Web
  * Description: Portada de Landrace Hunters con huecos de anuncios (Mantis, afiliados de bancos de semillas o cualquier red que acepte contenido +18 de cannabis), aviso de cookies que solo carga los anuncios con permiso, /ads.txt, páginas legales y la privacidad de las apps (/privacidad-app/).
  * Version: 1.1.0
- * Author: Wolf Cave
+ * Author: WOLFCADE
  * License: GPL-2.0-or-later
- * Text Domain: wolfcave-web
+ * Text Domain: wolfcade-web
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-final class Wolfcave_Web {
+final class Wolfcade_Web {
 
 	const VERSION = '1.1.0';
 	const OPTION  = 'kpweb';
@@ -118,7 +118,7 @@ final class Wolfcave_Web {
 	 * (1.51.1); se traslada tal cual para que la dirección no se rompa al borrarlo.
 	 */
 	private static function app_privacy() {
-		$owner = self::opt( 'owner' ) ? self::opt( 'owner' ) : 'Wolf Cave';
+		$owner = self::opt( 'owner' ) ? self::opt( 'owner' ) : 'WOLFCADE';
 		$mail  = self::opt( 'email' ) ? self::opt( 'email' ) : get_option( 'admin_email' );
 		$p     = static function ( $t ) { return '<p>' . esc_html( $t ) . '</p>'; };
 		$h     = static function ( $t ) { return '<h2>' . esc_html( $t ) . '</h2>'; };
@@ -240,19 +240,19 @@ final class Wolfcave_Web {
 			}
 		}
 		do_action( 'kp_shield_purge' );
-		wp_safe_redirect( admin_url( 'options-general.php?page=wolfcave-web&legal=1' ) );
+		wp_safe_redirect( admin_url( 'options-general.php?page=wolfcade-web&legal=1' ) );
 		exit;
 	}
 
 	/* --------------------------------------------------------------- Panel */
 
 	public static function action_links( $links ) {
-		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=wolfcave-web' ) ) . '">Ajustes</a>' );
+		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=wolfcade-web' ) ) . '">Ajustes</a>' );
 		return $links;
 	}
 
 	public static function menu() {
-		add_options_page( 'Web y anuncios', 'Web y anuncios', 'manage_options', 'wolfcave-web', array( __CLASS__, 'page' ) );
+		add_options_page( 'Web y anuncios', 'Web y anuncios', 'manage_options', 'wolfcade-web', array( __CLASS__, 'page' ) );
 	}
 
 	public static function settings() {
@@ -367,5 +367,5 @@ register_activation_hook(
 		do_action( 'kp_shield_purge' );
 	}
 );
-register_uninstall_hook( __FILE__, array( 'Wolfcave_Web', 'uninstall' ) );
-Wolfcave_Web::init();
+register_uninstall_hook( __FILE__, array( 'Wolfcade_Web', 'uninstall' ) );
+Wolfcade_Web::init();

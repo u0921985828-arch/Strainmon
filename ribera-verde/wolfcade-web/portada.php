@@ -3,22 +3,22 @@
  * Portada: Landrace Hunters con su botón de jugar, aviso +18 y huecos de anuncios.
  * Página propia (ignora el tema), como la del juego.
  *
- * @package wolfcave-web
+ * @package wolfcade-web
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$kpw_o     = Wolfcave_Web::opts();
+$kpw_o     = Wolfcade_Web::opts();
 $kpw_title = Landrace_Hunters::opt( 'title' ) ? Landrace_Hunters::opt( 'title' ) : 'Landrace Hunters';
 $kpw_play  = Landrace_Hunters::play_url();
 $kpw_icon  = trailingslashit( Landrace_Hunters::game_url() ) . 'icon-576.png';
 $kpw_text  = $kpw_o['texto'] ? $kpw_o['texto'] : 'Un RPG de barrio en pixel art: cultiva tus propias variedades, crúzalas para conseguir genética única, véndelas en los clubs y esquiva a la policía y a los rivales. Gratis, en el navegador, sin descargas y con la partida guardada en tu dispositivo.';
 $kpw_desc  = wp_strip_all_tags( $kpw_text );
 $kpw_ads   = array_filter( array( 'top' => $kpw_o['ad_top'], 'mid' => $kpw_o['ad_mid'], 'side' => $kpw_o['ad_side'], 'bot' => $kpw_o['ad_bot'] ) );
-$kpw_owner = $kpw_o['owner'] ? $kpw_o['owner'] : 'Wolf Cave';
-$kpw_img   = trailingslashit( Wolfcave_Web::url() ) . 'img/';   // 1.1.0: los sprites del juego, en pixel art
+$kpw_owner = $kpw_o['owner'] ? $kpw_o['owner'] : 'WOLFCADE';
+$kpw_img   = trailingslashit( Wolfcade_Web::url() ) . 'img/';   // 1.1.0: los sprites del juego, en pixel art
 
 $kpw_ad = static function ( $where ) use ( $kpw_ads ) {
 	if ( empty( $kpw_ads[ $where ] ) ) {
@@ -114,7 +114,7 @@ footer a,footer button{color:var(--mute);font:inherit;background:none;border:0;p
 	<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
 		<path d="M4 20V9l4-5 1.5 3h5L16 4l4 5v11z"/><path d="M9.5 20v-4a2.5 2.5 0 0 1 5 0v4"/>
 	</svg>
-	<b>Wolf <i>Cave</i></b>
+	<b>WOLF<i>CADE</i></b>
 </header>
 <div class="kpw-wrap">
 <main>
@@ -143,8 +143,8 @@ footer a,footer button{color:var(--mute);font:inherit;background:none;border:0;p
 	<section class="kpw-caps">
 		<h2>Así se juega</h2>
 		<div>
-			<img src="<?php echo esc_url( $kpw_img . 'cap-1.jpg' ); ?>" width="960" height="452" alt="La calle del barrio con lluvia, el dinero y el calor en pantalla" loading="lazy">
-			<img src="<?php echo esc_url( $kpw_img . 'cap-2.jpg' ); ?>" width="960" height="431" alt="Un armario de cultivo por dentro, con dos plantas en floración" loading="lazy">
+			<img src="<?php echo esc_url( $kpw_img . 'cap-plaza.jpg' ); ?>" width="960" height="540" alt="La plaza del barrio, con gente, la fuente y los clientes esperando" loading="lazy">
+			<img src="<?php echo esc_url( $kpw_img . 'cap-club.jpg' ); ?>" width="960" height="540" alt="Un club por dentro, con sus sofás, el dispensario y la mesa de billar" loading="lazy">
 		</div>
 	</section>
 	<?php $kpw_ad( 'mid' ); ?>
@@ -154,7 +154,7 @@ footer a,footer button{color:var(--mute);font:inherit;background:none;border:0;p
 </div>
 <footer>
 	<span>© <?php echo esc_html( gmdate( 'Y' ) . ' ' . $kpw_owner ); ?></span>
-	<?php foreach ( Wolfcave_Web::legal_links() as $kpw_l ) : ?>
+	<?php foreach ( Wolfcade_Web::legal_links() as $kpw_l ) : ?>
 		<a href="<?php echo esc_url( $kpw_l[1] ); ?>"><?php echo esc_html( $kpw_l[0] ); ?></a>
 	<?php endforeach; ?>
 	<?php if ( $kpw_ads ) : ?>
