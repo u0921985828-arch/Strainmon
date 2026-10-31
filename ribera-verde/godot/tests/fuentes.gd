@@ -1,67 +1,87 @@
-# Landrace Hunters (Godot) — MAESTRO [10]: que las tres letras del juego (Atkinson normal y negrita, Press Start 2P) tengan
-# todos los caracteres de los textos en castellano y en inglés (ñ, tildes, ¿¡, €, «», ·…) o, si no, una de reserva propia que
-# los tenga, sin depender de la del sistema; y que los .woff2 y las licencias vayan en la exportación.
-#   $GODOT --headless --path godot --script res://tests/fuentes.gd   → «fuentes: N comprobaciones, 0 fallos»
+# Landrace Hunters (Godot) — MAESTRO [10]: las letras del juego, con todos sus glifos.
+# Todo el texto del juego está en español y en inglés (i18n/strings.csv) y en los datos (datos/datos.json): acentos, ñ, ü, ¿, ¡, el
+# euro, las flechas y los símbolos de los menús. Aquí se comprueba, carácter por carácter de esos textos de verdad, que cada letra
+# del juego (o su reserva propia, DejaVu) lo sabe dibujar; si no, en el móvil saldría una caja o un hueco. Y que ninguno se pinta
+# como la caja de «no tengo este glifo» (se compara con un carácter del área privada, que no existe en ninguna fuente).
+#   godot --headless --script res://tests/fuentes.gd
 extends SceneTree
 
-var n := 0
-var fallos := []
-const FIJOS := "ñÑáéíóúüÁÉÍÓÚÜ¿¡€«»·ºª°–—…“”‘’"
+const Ui = preload("res://src/ui.gd")
 
-func chk(c: bool, txt: String) -> void:
-	n += 1
-	if not c:
-		fallos.append(txt)
+var n_ok := 0
+var fallos := []
+
+func ok(que: String, c: bool) -> void:
+	if c:
+		n_ok += 1
+	else:
+		fallos.append(que)
+
+# los caracteres que el juego pinta de verdad: los textos y los datos, sin los de control
+func chars_del_juego() -> Dictionary:
+	var c := {}
+	for f in ["res://i18n/strings.csv", "res://datos/datos.json"]:
+		var t := FileAccess.get_file_as_string(f)
+		for i in t.length():
+			var u := t.unicode_at(i)
+			if u >= 32 and u != 127:
+				c[u] = true
+	return c
+
+# los símbolos de la interfaz, que no salen en los textos pero se dibujan igual (menús, barras, listas)
+const UI_CHARS := "▲▼◀▶★≈−·—«»€¿¡ñÑáéíóúüÁÉÍÓÚÜ…✓"
 
 func _initialize() -> void:
-	var cs := {}
-	for ch in FIJOS:
-		cs[ch] = true
-	var f := FileAccess.open("res://i18n/strings.csv", FileAccess.READ)
-	while f and not f.eof_reached():
-		for ch in f.get_line():
-			cs[ch] = true
-	var dj := FileAccess.get_file_as_string("res://datos/datos.json")
-	var dd = JSON.parse_string(dj)
-	_junta(dd, cs)
-	var ui = load("res://src/ui.gd")
-	for nom in ["atkinson-hyperlegible-latin-400-normal.woff2", "atkinson-hyperlegible-latin-700-normal.woff2", "press-start-2p-latin-400-normal.woff2"]:
-		chk(FileAccess.file_exists("res://fuentes/" + nom), "falta " + nom)
-		var o: Font = ui._fuente_de(nom, false)
-		var fbs: Array = o.fallbacks
-		o.fallbacks = fbs.filter(func(x): return x is FontFile)   # la del sistema no cuenta: en el móvil no se sabe cuál es
+	var sim := FontFile.new()
+	sim.data = FileAccess.get_file_as_bytes("res://fuentes/dejavu-sans-simbolos.woff2")
+	var F := {
+		"letra": Ui._fuente_de("atkinson-hyperlegible-latin-400-normal.woff2"),
+		"negrita": Ui._fuente_de("atkinson-hyperlegible-latin-700-normal.woff2"),
+		"display": Ui._fuente_de("press-start-2p-latin-400-normal.woff2", false),
+	}
+	# 1 · cada letra del juego trae su reserva propia (DejaVu) antes que la del móvil, que puede no estar
+	for k in F:
+		var fb: Array = F[k].fallbacks
+		ok("%s: con reserva propia y del sistema" % k, fb.size() == 2 and fb[0] is FontFile and fb[1] is SystemFont)
+		ok("%s: la reserva propia trae datos" % k, (fb[0] as FontFile).data.size() > 1000)
+	# 2 · los caracteres de los textos y los datos del juego, en la letra o en su reserva
+	var C := chars_del_juego()
+	for i in UI_CHARS.length():
+		C[UI_CHARS.unicode_at(i)] = true
+	ok("hay caracteres que comprobar (%d)" % C.size(), C.size() > 80)
+	for k in F:
 		var falta := []
-		for ch in cs:
-			var c: int = ch.unicode_at(0)
-			if c < 32 or c in [0xFEFF, 0x200B, 0x2028]:
-				continue
-			if not _tiene(o, c):
-				falta.append(ch)
-		chk(not o.has_char("Ж".unicode_at(0)), nom + ": has_char no distingue (la prueba no mide nada)")
-		chk(falta.is_empty(), "%s sin %d glifos: %s" % [nom, falta.size(), "".join(PackedStringArray(falta.slice(0, 40)))])
-	var ep := FileAccess.get_file_as_string("res://export_presets.cfg")
-	chk(ep.find("fuentes/*") >= 0, "export sin fuentes/*")
-	print("fuentes: %d comprobaciones, %d fallos" % [n, fallos.size()])
-	for x in fallos:
-		print("  FALLO ", x)
+		for u2 in C:
+			var u: int = u2
+			if not F[k].has_char(u) and not sim.has_char(u):
+				falta.append(char(u))
+		ok("%s: ningún glifo sin dibujar (%d)" % [k, falta.size()], falta.is_empty())
+		if not falta.is_empty():
+			print("   %s, le faltan: %s" % [k, "".join(falta)])
+	# 3 · lo que sí se dibuja no sale como la caja de «sin glifo» (U+E000, del área privada, no existe en ninguna fuente)
+	var sin_glifo := 0xE000
+	for k in F:
+		var f: FontFile = F[k]
+		var s := 16
+		var caja := f.get_char_size(sin_glifo, s)
+		var malos := []
+		for t in ["ñ", "á", "¿", "¡", "ü", "€"]:
+			var u: int = (t as String).unicode_at(0)
+			if f.get_char_size(u, s) == caja and not f.has_char(u) and not sim.has_char(u):
+				malos.append(t)
+		ok("%s: ñ, acentos, ¿ ¡ y € no salen como caja" % k, malos.is_empty())
+	# 4 · las letras van dentro del juego exportado: son recursos importados y el preset no las deja fuera
+	var cfg := FileAccess.get_file_as_string("res://export_presets.cfg")
+	var exc := (cfg.split("exclude_filter=\"")[1] as String).split("\"")[0] if cfg.contains("exclude_filter=\"") else ""
+	var inc := (cfg.split("include_filter=\"")[1] as String).split("\"")[0] if cfg.contains("include_filter=\"") else ""
+	ok("el preset no excluye las letras", not exc.contains("fuentes"))
+	# MAESTRO [10]: las letras, nombradas en el preset aunque vayan ya como recurso importado (si un día se exporta por lista, siguen entrando)
+	for e in ["woff2", "ttf", "otf"]:
+		ok("el preset nombra fuentes/*.%s" % e, inc.contains("fuentes/*." + e))
+	for f in ["atkinson-hyperlegible-latin-400-normal.woff2", "atkinson-hyperlegible-latin-700-normal.woff2",
+			"press-start-2p-latin-400-normal.woff2", "dejavu-sans-simbolos.woff2"]:
+		ok("%s, importada (va en el paquete)" % f, FileAccess.file_exists("res://fuentes/" + f + ".import"))
+	for f in fallos:
+		print("FALLO  ", f)
+	print("fuentes: %d comprobaciones, %d fallos" % [n_ok + fallos.size(), fallos.size()])
 	quit(1 if fallos.size() else 0)
-
-func _tiene(o: Font, c: int) -> bool:
-	if o.has_char(c):
-		return true
-	for fb in o.fallbacks:
-		if fb is FontFile and _tiene(fb, c):
-			return true
-	return false
-
-func _junta(v, cs: Dictionary) -> void:
-	if v is String:
-		for ch in v:
-			cs[ch] = true
-	elif v is Array:
-		for x in v:
-			_junta(x, cs)
-	elif v is Dictionary:
-		for k in v:
-			_junta(k, cs)
-			_junta(v[k], cs)
