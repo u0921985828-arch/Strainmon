@@ -26,6 +26,9 @@ func _ready() -> void:
 		plat().consultar()
 	if OS.get_cmdline_user_args().has("--sin-arranque"):
 		return
+	if OS.get_cmdline_user_args().has("--rend"):
+		_rend.call_deferred()
+		return
 	if Datos.CAL and not OS.get_cmdline_user_args().has("--sin-carga"):
 		_arranca.call_deferred()   # las pruebas que ponen oraculo al añadir el juego, al título de antes
 	else:
@@ -88,8 +91,13 @@ func _process(dt: float) -> void:
 			zona_vista = zs
 			ajusta()
 	var ms := dt * 1000
+	var t0 := Time.get_ticks_usec() if not rend_t.is_empty() else 0
 	M.avanza(M.reloj + ms)
 	update(minf(50, ms))
+	if t0:
+		var t1 := Time.get_ticks_usec()
+		rend_t.guion += t1 - t0
+		t0 = t1
 	# R2: con un menú, el lector o la caja de importar encima del mapa o de la carpa (el reloj parado, nada se mueve detrás), o con
 	# la pantalla en negro, el lienzo no se repinta ni se vuelve a componer: se queda el último fotograma (uno más tras taparse,
 	# por si el guion cambió algo justo antes de abrir el menú)
@@ -99,11 +107,17 @@ func _process(dt: float) -> void:
 		quieto_n = 0
 	if quieto_n < 2:
 		pintor.redibuja(M.reloj)
+	if t0:
+		var t1 := Time.get_ticks_usec()
+		rend_t.redibuja += t1 - t0
+		t0 = t1
 	vision_borracho()
 	var upd := SubViewport.UPDATE_DISABLED if quieto_n >= 3 else SubViewport.UPDATE_ALWAYS
 	if sv.render_target_update_mode != upd:
 		sv.render_target_update_mode = upd
 	_process_ui()
+	if t0:
+		rend_t.ui += Time.get_ticks_usec() - t0
 
 # MAESTRO [2]: de FISIO.vision de borrachera para arriba, la pantalla en triple con los colores separados (aberración); más
 # fuerte cuanto más cerca de FISIO.tope. Sin borrachera, sin material (la pantalla de siempre)
@@ -1076,3 +1090,37 @@ func update_hud() -> void:
 			[I18n.v("ROSIN"), Datos.coma(Datos.jsround(r * 10) / 10.0) + " g", Color("#f0c050")]] + hud_fisio())
 		return
 	hud_pon("%s · %s:%s\n%s · %d g%s" % [Datos.fd_hud(S.day), hh, mm, Datos.eur(S.money), int(floor(total_buds())), ro], Datos.jsround(S.heat), sp, SOSP.alarma != null, od)
+
+# --rend (el juego web, en las pruebas de fluidez: tools/web-rend.js; lo pidió el usuario: «que no vaya petado»): sin título, una partida con el tutorial saltado que pasa por
+# REND_MAPAS y escribe en la consola, cada 4 s, los fotogramas por segundo y lo que cuesta cada uno (proceso y dibujo)
+var rend_t := {}
+const REND_MAPAS := [["home", 6, 5], ["town", 20, 12], ["alto", 20, 15], ["abando", 20, 15], ["casco", 20, 15], ["zorroza", 20, 15], ["nave", 7, 6]]
+func _rend() -> void:
+	S = new_state()
+	S.name = "PRUEBA"
+	saltar_tutorial()
+	S.ch = 8
+	enter_game()
+	titulo.hide()
+	mode = "world"
+	for m in REND_MAPAS:
+		enter_map(m[0], m[1], m[2], "down")
+		mode = "world"
+		queued.clear()
+		pending.clear()
+		var f0 := Engine.get_frames_drawn()
+		var t0 := Time.get_ticks_usec()
+		var pr := 0.0
+		var n := 0
+		rend_t = {"guion": 0, "redibuja": 0, "ui": 0, "capa0": 0, "capa1": 0, "capa2": 0}
+		while Time.get_ticks_usec() - t0 < 4000000:
+			await get_tree().process_frame
+			pr += Performance.get_monitor(Performance.TIME_PROCESS)
+			n += 1
+		var fps := (Engine.get_frames_drawn() - f0) / ((Time.get_ticks_usec() - t0) / 1e6)
+		var de := []
+		for k in rend_t:
+			de.append("%s %.1f" % [k, rend_t[k] / 1000.0 / maxf(1, n)])
+		print("REND %s %.1f fps · proceso %.1f ms · %s" % [m[0], fps, pr / maxf(1, n) * 1000.0, ", ".join(de)])
+	rend_t = {}
+	print("REND fin")

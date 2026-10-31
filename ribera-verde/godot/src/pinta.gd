@@ -50,9 +50,9 @@ func _init() -> void:
 	var m := CanvasItemMaterial.new()
 	m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	ad.material = m
-	c0.draw.connect(func(): _capa(c0, 0))
-	ad.draw.connect(func(): _capa(ad, 1))
-	c1.draw.connect(func(): _capa(c1, 2))
+	c0.draw.connect(func(): _capa_t(c0, 0))
+	ad.draw.connect(func(): _capa_t(ad, 1))
+	c1.draw.connect(func(): _capa_t(c1, 2))
 	vc.visible = false
 
 # render(now): mundo, combate, carpa (B o C) o título; en otro modo, nada
@@ -101,6 +101,15 @@ func redibuja(t: float) -> void:
 	c0.queue_redraw()
 	ad.queue_redraw()
 	c1.queue_redraw()
+
+# --rend: lo que cuesta cada capa (J.rend_t, en µs)
+func _capa_t(ci: CanvasItem, n: int) -> void:
+	if J.rend_t.is_empty():
+		_capa(ci, n)
+		return
+	var t0 := Time.get_ticks_usec()
+	_capa(ci, n)
+	J.rend_t["capa%d" % n] += Time.get_ticks_usec() - t0
 
 func _capa(ci: CanvasItem, n: int) -> void:
 	L = ci
@@ -190,16 +199,29 @@ func _suelo_mira() -> void:
 			for tx in int(m.w):
 				if _suelo_dinamica(m, String(m.g[ty][tx]), tx, ty):
 					_suelo_din[tx + (ty << 12)] = true
-		# en trozos de SUELO_TROZO casillas: el motor solo manda a la tarjeta los que se ven
+		# en trozos de SUELO_TROZO casillas: el motor solo manda a la tarjeta los que se ven. Cada trozo se pinta UNA vez en su
+		# propia textura (un SubViewport que se actualiza una vez) y luego es un solo cuadro: antes, el motor volvía a procesar sus
+		# 256 casillas cada fotograma, lo que más pesaba en la web (lo pidió el usuario: «que no vaya petado… lo más fluido posible»)
 		for c in suelo.get_children():
 			suelo.remove_child(c)
 			c.queue_free()
 		for cy in range(0, int(m.h), SUELO_TROZO):
 			for cx in range(0, int(m.w), SUELO_TROZO):
 				var t := Node2D.new()
-				t.position = Vector2(cx * 16, cy * 16)
 				t.draw.connect(_suelo_pinta.bind(t, cx, cy))
-				suelo.add_child(t)
+				var vp := SubViewport.new()
+				vp.size = Vector2i(mini(SUELO_TROZO, int(m.w) - cx), mini(SUELO_TROZO, int(m.h) - cy)) * 16
+				vp.transparent_bg = true
+				vp.disable_3d = true
+				vp.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+				vp.render_target_update_mode = SubViewport.UPDATE_ONCE
+				vp.add_child(t)
+				suelo.add_child(vp)
+				var sp := Sprite2D.new()
+				sp.texture = vp.get_texture()
+				sp.centered = false
+				sp.position = Vector2(cx * 16, cy * 16)
+				suelo.add_child(sp)
 		suelo.queue_redraw()
 	if suelo.position != Vector2(-cam.x, -cam.y):
 		suelo.position = Vector2(-cam.x, -cam.y)
@@ -651,18 +673,46 @@ func _tiempo(now: float) -> void:
 	if k == "nubes":
 		return
 	var n := 110 if k == "nieve" else 170
+	if _lluvia_h.is_empty():
+		for i in 170:
+			_lluvia_h.append(Datos.hash_str("ll%d" % i))
+	var lote := PackedInt32Array()   # en la web (lo pidió el usuario: «que no vaya petado»), las 340 gotas en un solo dibujo, no una a una
 	for i in n:
-		var hx := Datos.hash_str("ll%d" % i)
+		var hx: int = _lluvia_h[i]
 		if k == "nieve":
 			var y := fposmod((hx >> 9) % SH + now / 40.0, SH)
 			var x := fposmod(hx % J.SW + 3.0 * sin(now / 600.0 + i), J.SW)
-			_rect(int(x), int(y), 1 + (hx >> 3) % 2, 1 + (hx >> 3) % 2, Color8(255, 255, 255, 235))
+			lote.append_array([int(x), int(y), 1 + (hx >> 3) % 2, 1 + (hx >> 3) % 2])
 		else:
 			var v := 0.35 + float((hx >> 5) % 10) / 40.0
 			var y := fposmod((hx >> 9) % SH + now * v, SH)
 			var x := fposmod(hx % J.SW - y / 3.0, J.SW)
-			_rect(int(x), int(y), 1, 3, Color8(200, 220, 240, 200))   # la gota inclinada: dos trazos
-			_rect(int(x) - 1, int(y) + 3, 1, 3, Color8(200, 220, 240, 200))
+			lote.append_array([int(x), int(y), 1, 3, int(x) - 1, int(y) + 3, 1, 3])   # la gota inclinada: dos trazos
+	_rects_lote(lote, Color8(255, 255, 255, 235) if k == "nieve" else Color8(200, 220, 240, 200))
+
+var _lluvia_h := []
+var LOTE_ON := true   # tests/lluvia_lote.gd lo apaga para comparar
+# muchos rectángulos de un color (x, y, w, h seguidos) en un solo dibujo de triángulos: los mismos píxeles que _rect uno a uno
+func _rects_lote(r: PackedInt32Array, c: Color) -> void:
+	if _capt != null or not LOTE_ON:
+		for i in range(0, r.size(), 4):
+			_rect(r[i], r[i + 1], r[i + 2], r[i + 3], c)
+		return
+	if alfa < 1.0:
+		c.a *= alfa
+	var pt := PackedVector2Array()
+	var ix := PackedInt32Array()
+	for i in range(0, r.size(), 4):
+		var q := pt.size()
+		var x := float(r[i])
+		var y := float(r[i + 1])
+		pt.append_array([Vector2(x, y), Vector2(x + r[i + 2], y), Vector2(x + r[i + 2], y + r[i + 3]), Vector2(x, y + r[i + 3])])
+		ix.append_array([q, q + 1, q + 2, q, q + 2, q + 3])
+	if pt.size():
+		var cs := PackedColorArray()
+		cs.resize(pt.size())
+		cs.fill(c)
+		RenderingServer.canvas_item_add_triangle_array(L.get_canvas_item(), ix, pt, cs)
 
 # al aire libre: las zonas de la calle y, con CAL (MAESTRO [4]), el muelle de Puerto Viejo, que ya no está siempre a pleno sol:
 # el atardecer, el tiempo, la noche y sus farolas como en la calle
