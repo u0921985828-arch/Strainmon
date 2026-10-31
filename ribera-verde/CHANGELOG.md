@@ -2,7 +2,7 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### 0.72.0 · El maquetado de la interfaz, repasado (lo preguntó el usuario: «el maquetado de la UI sería posible analizarlo y mejorarlo?»; solo Godot, con `Datos.CAL`)
+### 0.72.0 (código 101) · El maquetado de la interfaz, repasado (lo preguntó el usuario: «el maquetado de la UI sería posible analizarlo y mejorarlo?»; solo Godot, con `Datos.CAL`)
 
 - Un director de interfaz miró las doce pantallas de `tests/capturas_ui.gd` en un móvil de 2400 × 1080 a 420 ppp y de ahí salen seis arreglos:
   - **La pregunta ya no se tapa**: el menú de opciones de un `ask` se colocaba a 49 u fijas del suelo, pero una caja de diálogo con busto mide unas 70, así que el menú caía encima y escondía lo que se preguntaba. Ahora se apoya justo encima del diálogo (`_coloca` en `ui.gd`).
