@@ -54,7 +54,8 @@ const ok = (q, c) => { console.log((c ? 'ok   ' : 'FALLO') + ' ' + q); if (!c) f
 
 (async () => {
   await new Promise((r) => servidor.listen(PUERTO, r));
-  const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+  const exe = process.env.CHROMIUM_PATH || '';
+  const b = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'], ...(exe ? { executablePath: exe } : {}) });
   const ctx = await b.newContext({ viewport: { width: 960, height: 540 } });
   const p = await ctx.newPage();
   const errores = [];
