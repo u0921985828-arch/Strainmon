@@ -407,6 +407,11 @@ static func cuelga(c: Image) -> Array:
 # el color y la fuerza de la luz por tipo de foco: los de LUZ_C (como el HTML) y, con CAL, los de LUZ_CAL encima (lo dijo el
 # usuario: «la lámpara CFL… no se ve la luz cuando está encendida»: el blanco azulado a 0,6 se perdía en la pared plateada)
 const LUZ_CAL := {"cfl": [[150, 205, 255], 1.0]}
+# con el foco apagado, la luz verde de trabajo (lo pidió el usuario: «como si tuviese luz verde en el armario para no joder las
+# plantas en crecimiento y flora sobre todo»): en la vista C, lo que se ve multiplicado por VERDE_C (en luz, un 19 %); en las vistas
+# de rectángulos (las madres, las mesas de KAIA), VERDE_R encima
+const VERDE_C := Vector3(.09, .26, .12)
+const VERDE_R := "rgba(6,30,12,0.82)"
 static func luz_c() -> Dictionary:
 	var lc: Dictionary = Datos.carga().LUZ_C
 	if not Datos.CAL:

@@ -396,7 +396,7 @@ func rects_madres(V: Dictionary) -> Array:
 		else:   # el hueco: el sitio de la maceta, marcado en el suelo
 			o.append_array([[cx - 8, yb - 1, 16, 1, "#8a8e96"], [cx - 8, yb - 12, 1, 11, "#8a8e96"], [cx + 7, yb - 12, 1, 11, "#8a8e96"]])
 	if not on:   # la noche del temporizador: la carpa a oscuras
-		o.append([x0, 0, 240, MAD_H, "rgba(4,4,10,0.72)"])
+		o.append([x0, 0, 240, MAD_H, ArteM.VERDE_R])
 	var cx: int = st[clampi(int(V.i), 0, st.size() - 1)][0]   # el sitio elegido
 	o.append_array([[cx - 20, 22, 40, 1, "#f8d040"], [cx - 20, MAD_H - 1, 40, 1, "#f8d040"], [cx - 20, 22, 1, MAD_H - 22, "#f8d040"], [cx + 19, 22, 1, MAD_H - 22, "#f8d040"]])
 	return o

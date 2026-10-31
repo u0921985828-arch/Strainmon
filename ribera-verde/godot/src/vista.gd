@@ -22,14 +22,14 @@ const OSC := Color8(0x26, 0x26, 0x2e)
 const SEL_TEMP := -2   # VC.sel del temporizador (1.10)
 const RUEDA := [[3, 0], [4, 0], [5, 1], [6, 2], [6, 3], [6, 4], [5, 5], [4, 6], [3, 6], [2, 6], [1, 5], [0, 4], [0, 3], [0, 2], [1, 1], [2, 0]]
 const VACIO := Color8(0x4a, 0x4a, 0x56)
-# con CAL, en las horas de noche del temporizador (Cultivo.foco_on), la carpa a oscuras: lo que se ve, a NOCHE_C
-const NOCHE_C := .16
+# con CAL, con el foco apagado (las horas de noche del temporizador, Cultivo.foco_on, o sin plantas), la carpa a oscuras con la luz
+# verde de trabajo (Arte.VERDE_C; lo pidió el usuario: «como si tuviese luz verde en el armario para no joder las plantas»)
 
 const OVERLAY := """// i18n-no
 shader_type canvas_item;
 uniform sampler2D pantalla : hint_screen_texture, filter_nearest;
 uniform float fuerza = 1.0;
-uniform float oscuro = 1.0;
+uniform vec3 oscuro = vec3(1.0);
 void fragment() {
 	vec4 s = texture(TEXTURE, UV);
 	vec3 b = texture(pantalla, SCREEN_UV).rgb;
@@ -566,14 +566,14 @@ func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240, alto := 1
 		n.position = Vector2(ox, sh - 160)
 	var on := Cultivo.foco_on(S, VC.ci)
 	luz.visible = on and g.vc != null
-	luz.material.set_shader_parameter("oscuro", 1.0)
+	luz.material.set_shader_parameter("oscuro", Vector3.ONE)
 	if luz.visible:
 		luz.texture = Arte.tex("luz|%s|%s|%d|%d|%d|%s" % [g.c.t, g.vc.tipo, g.vc.foco.a, g.vc.fy, g.vc.fxs.size(), Datos.CAL], Arte.luz(g.c.t, g.vc))
 		luz.material.set_shader_parameter("fuerza", Arte.luz_c().get(g.vc.tipo, [0, 1])[1])
 	elif g.vc != null and (Datos.CAL or Cultivo.plantas_vivas(S, VC.ci)):   # apagado (la noche del temporizador o, con CAL, sin plantas): sin haz y a oscuras
 		luz.visible = true
 		luz.texture = Arte.tex("luz|vacia", Image.create(240, 160, false, Image.FORMAT_RGBA8))
-		luz.material.set_shader_parameter("oscuro", NOCHE_C)
+		luz.material.set_shader_parameter("oscuro", Arte.VERDE_C)
 	base.queue_redraw()
 	encima.queue_redraw()
 
@@ -846,14 +846,18 @@ func _pinta_encima() -> void:
 	var on := Cultivo.foco_on(S, VC.ci)
 	var fc := Arte.foto(g.vc.foco.n)
 	var im := fc if on else Arte.apagado(fc)
+	# apagado (con CAL), la campana, sus poleas y el depósito, a oscuras con la luz verde de trabajo, como lo demás (lo dijo el usuario:
+	# «el foco se tendría que ver a oscuras»): se pintan encima de la capa de la luz y no les llegaba
+	var V := Arte.VERDE_C
+	var tn := Color(V.x, V.y, V.z) if Datos.CAL and not on else Color.WHITE
 	# la campana, con la boca en fy; bajada, cuelga de dos poleas del techo (poleas) y luego se pinta ella
 	var fy: int = g.vc.fy
 	for cx in g.vc.get("fxs", [120]):
 		var fx: int = int(cx) - (fc.get_width() >> 1)
 		if fy > int(D.VCA.boca):
 			for e in poleas(fc, fy, int(cx)):
-				encima.draw_rect(Rect2(e[0], e[1], e[2], e[3]), e[4])
-		encima.draw_texture(Arte.tex("foco|%s|%s" % [g.vc.foco.n, on], im), Vector2(fx, fy - 15))
+				encima.draw_rect(Rect2(e[0], e[1], e[2], e[3]), e[4] * tn)
+		encima.draw_texture(Arte.tex("foco|%s|%s" % [g.vc.foco.n, on], im), Vector2(fx, fy - 15), tn)
 	# el depósito del goteo está fuera: arriba a la derecha, en pequeño, con el agua que le queda en la mirilla (el de KAIA, en el suelo
 	# al lado de la carpa: la tela no deja verlo; solo entra su manguera, _ramal)
 	if g.vc.lg != null and not g.C.get("kc"):
@@ -862,7 +866,7 @@ func _pinta_encima() -> void:
 		var di := Arte.nivel(Arte.foto("extra-c-deposito"), D.VC_AGUA.deposito, (float(dep) if dep != null else float(l)) / l)
 		var dx: int = g.vc.xl + g.vc.w + 22 - 24
 		var dy := 8 - 28
-		encima.draw_texture(Arte.tex("img|%d" % di.get_instance_id(), di), Vector2(dx, dy))
+		encima.draw_texture(Arte.tex("img|%d" % di.get_instance_id(), di), Vector2(dx, dy), tn)
 	var bs := barras(S, g, VC.sel)
 	var fsel := fila_sel(g, VC.sel)
 	for b in bs:

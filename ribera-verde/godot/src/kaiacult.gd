@@ -1142,7 +1142,7 @@ func rects_mesak(V: Dictionary) -> Array:
 		for d in [-46, 46]:
 			o.append([cx0 + d - 40, 12, 80, H - 12, "rgba(255,244,214,0.06)"])
 	if not on:
-		o.append([x0, 0, 240, H, "rgba(4,4,10,0.72)"])
+		o.append([x0, 0, 240, H, ArteM.VERDE_R])
 	var Ms: Array = D.KAIA_CULT.f2.mesas
 	var fila: int = Ms.size() >> 1
 	for j in Ms.size():   # las ocho mesas de la sala, en su sitio: la elegida en amarillo

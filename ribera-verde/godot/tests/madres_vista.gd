@@ -97,7 +97,7 @@ func _corre() -> void:
 	chk(imgs.size() >= 1 + 2 + 2 * 2, "la pared, los LED y dos madres con su maceta: %d imágenes" % imgs.size())
 	chk(J.luz_madres(), "a las 10, el LED encendido")
 	J.S.min = 3 * 60
-	chk(not J.luz_madres() and J.rects_madres({"i": 0}).any(func(q): return typeof(q[0]) != TYPE_STRING and str(q[4]).begins_with("rgba(4,4,10")), "a las 3, sus 6 horas de noche: a oscuras")
+	chk(not J.luz_madres() and J.rects_madres({"i": 0}).any(func(q): return typeof(q[0]) != TYPE_STRING and str(q[4]) == J.ArteM.VERDE_R), "a las 3, sus 6 horas de noche: a oscuras con la luz verde de trabajo")
 	J.S.min = 10 * 60
 	chk(J.sitios_madres().size() == int(D.MADRES.max) and J.sitios_madres().all(func(q): return q[0] - 20 >= 0 and q[0] + 20 <= J.SW), "un sitio por madre, dentro de la pantalla")
 	var im1 = J._madre_img(J.S.nave.ma[0])

@@ -69,6 +69,14 @@ func media(im: Image, P: Array) -> float:
 		t += lum(im.get_pixel(p.x, p.y))
 	return t / maxf(1, P.size())
 
+# la luz verde de trabajo (lo pidió el usuario): en lo que se ve, el verde por encima del rojo y del azul
+func verde(im: Image, P: Array) -> bool:
+	var c := Vector3.ZERO
+	for p in P:
+		var q := im.get_pixel(p.x, p.y)
+		c += Vector3(q.r, q.g, q.b)
+	return c.y > 1.5 * c.x and c.y > 1.5 * c.z
+
 func distintos(a: Image, b: Image) -> int:
 	var n := 0
 	for y in 160:
@@ -128,6 +136,7 @@ func _corre() -> void:
 					P.append(Vector2i(x, y))
 		ok("%s: de día, igual a otra hora de luz" % e.k, distintos(a, dia) == 0)
 		ok("%s: de noche, a oscuras (≤ 25 %%)" % e.k, media(noche, P) <= .25 * media(dia, P))
+		ok("%s: de noche, con la luz verde de trabajo" % e.k, verde(noche, P))
 	# lo dijo el usuario: «la lámpara CFL… no se ve la luz cuando está encendida» y, apagado, «no hay nada que refleje la luz en las
 	# paredes»: con CAL, el CFL encendido tiñe de su azul el suelo y la pared (píxeles con el azul 20 por encima del rojo, abajo) y la
 	# carpa sin plantas (apagada) sale a oscuras como la noche
@@ -151,7 +160,7 @@ func _corre() -> void:
 			for x in range(0, 240, 2):
 				if lum(dia.get_pixel(x, y)) > .04:
 					P.append(Vector2i(x, y))
-		ok("%s: sin plantas, apagada y a oscuras" % k, not Cultivo.foco_on(S, 0) and media(vacia, P) <= .25 * media(dia, P))
+		ok("%s: sin plantas, apagada y a oscuras" % k, not Cultivo.foco_on(S, 0) and media(vacia, P) <= .25 * media(dia, P) and verde(vacia, P))
 		var sin: Image = await pinta(S, false)
 		ok("%s: sin CAL, sin plantas, como el HTML (sin oscurecer)" % k, media(sin, P) > .5 * media(dia, P))
 	Datos.CAL = true
