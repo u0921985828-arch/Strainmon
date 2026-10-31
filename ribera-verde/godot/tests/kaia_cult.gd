@@ -400,6 +400,7 @@ func red_fuera(MA: String) -> void:
 	chk(delante(v, int(F2.fuera[0][0]), int(F2.fuera[0][1])), "se llega al rincón del riego")
 
 func _corre() -> void:
+	Cultivo.pm = 4242   # el Park-Miller del oráculo: sin él, `azar()` cae en randf() y una plaga podía secar la planta de la carpa
 	Juego.GUARDADO = "user://prueba-kaia-cult.json"
 	Juego.AJUSTES = "user://prueba-kaia-cult-ajustes.json"
 	Datos.CAL = true
