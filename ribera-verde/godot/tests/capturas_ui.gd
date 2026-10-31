@@ -8,7 +8,7 @@ extends SceneTree
 const Datos = preload("res://src/datos.gd")
 const Juego = preload("res://src/juego.gd")
 
-const PANTALLAS := ["combate", "start", "opciones", "dialogo", "tienda", "genoteca", "mochila", "movil"]
+const PANTALLAS := ["combate", "start", "opciones", "dialogo", "tienda", "genoteca", "mochila", "movil", "objetivo", "carpa", "pregunta", "aviso"]
 
 var J
 var cortes := []
@@ -72,6 +72,14 @@ func _corre() -> void:
 				J.mochila()
 			"movil":
 				J.movil_menu()
+			"objetivo":
+				J.objetivo_menu()
+			"carpa":                     # la vista de carpa: la ficha de la izquierda y el cursor sobre la pantalla de 240
+				J.abrir_carpa(0)
+			"pregunta":                  # un diálogo con opciones (el caso más apretado: texto + menú a la vez)
+				J.ask("¿Le compras el carro de esquejes a Kiko por 240 €?", [J.K("Sí, me lo llevo"), J.K("Ahora no")], "KIKO")
+			"aviso":                     # el aviso de arriba (toast), con el HUD al lado
+				J.toast("Has llegado al capítulo 2: ya puedes vender en la calle.", 60000.0)
 		await espera(90)
 		_mira_cortes(p)
 		if p == "combate" and Datos.PLAY:   # 1.58: la caja del jugador no tapa al jugador (lo de la izquierda) ni pisa la del enemigo
