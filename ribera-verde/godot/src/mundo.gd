@@ -2173,6 +2173,72 @@ func arboles_fuera(k: String) -> void:
 			elif pisa:
 				m.tras["%d,%d" % [tx, ty]] = true
 
+# Ni la puerta ni su rótulo, tapados (lo dijo el usuario: «seguramente algún letrero o algo tapará las puertas de varios lugares»):
+# con CAL, el mobiliario de la calle que deje píxeles sobre el hueco de una puerta que se entra —o sobre la franja de encima, donde
+# va el rótulo del local— se quita de ahí (no se corre: las farolas van a ritmo fijo y moverlas rompe la fila). Se guarda lo de antes
+# en `_estorbo0` y sin CAL vuelve.
+const PUERTA_ALTO := 64   # px de la puerta y su rótulo, desde el pie del edificio
+var _estorbo0 := {}
+var _estorbo_k := {}
+
+func puertas_libres(k: String) -> void:
+	if not MAPS.has(k) or not D.ZONAS.has(k):
+		return
+	var m: Dictionary = MAPS[k]
+	var clave := str(m.get("blds", []))
+	if Datos.CAL and (_estorbo_k.get(k) == clave or not Atlas.carga()):
+		return
+	for q in _estorbo0.get(k, []):   # lo de antes, en su sitio
+		m.o[q[1]][q[0]] = q[2]
+	_estorbo0.erase(k)
+	_estorbo_k.erase(k)
+	if not Datos.CAL:
+		return
+	_estorbo_k[k] = clave
+	_estorbo0[k] = []
+	var huecos := []
+	for b in m.get("blds", []):
+		if b.get("doorX") == null:
+			continue
+		var w: int = 32 if b.get("ancha") else 16
+		var x0: int = int(b.doorX) * 16 + int(b.get("dx", 0))
+		var yb: int = (int(b.y0) + int(b.h)) * 16
+		huecos.append(Rect2i(x0, yb - PUERTA_ALTO, w, PUERTA_ALTO))
+	if huecos.is_empty():
+		return
+	for ty in int(m.h):
+		for tx in int(m.w):
+			var o = m.o[ty][tx]
+			if o == null or o in ARBOLES:   # los árboles ya los coloca arboles_fuera
+				continue
+			if not _tapa_puerta(m, o, tx, ty, huecos):
+				continue
+			# se quita, no se corre: el mobiliario va a ritmo fijo (farolas cada 8, enfrentadas) y moverlo rompe la fila;
+			# delante de una entrada, lo natural es que no haya nada
+			_estorbo0[k].append([tx, ty, o])
+			m.o[ty][tx] = null
+
+# ¿el objeto o, puesto en (tx, ty), deja píxeles sobre alguno de esos huecos de puerta?
+func _tapa_puerta(m: Dictionary, o, tx: int, ty: int, huecos: Array) -> bool:
+	var d: Dictionary = Pintor.desfase(o, tx, ty)
+	var gr = Atlas.cubre("obj:" + String(o))
+	if gr == null:
+		return false
+	var f = Atlas.frame_de(gr, String(o), "unica", 0, {"i": 0, "esp": d.esp})
+	if f == null:
+		return false
+	var p := Vector2i(tx * 16 + 8 + int(d.dx) - int(f.cel.ancla[0]), ty * 16 + 15 + int(d.dy) - int(f.cel.ancla[1]))
+	for h in huecos:
+		var r: Rect2i = Rect2i(p, f.c.get_size()).intersection(h)
+		var n := 0
+		for y in range(r.position.y, r.end.y):
+			for x in range(r.position.x, r.end.x):
+				if f.c.get_pixel(x - p.x, y - p.y).a8 > 32:
+					n += 1
+					if n > 4:
+						return true
+	return false
+
 # ¿se tocan dos imágenes (a en pa, b en pb) en algún píxel con algo?
 static func _pisa(a: Image, pa: Vector2i, b: Image, pb: Vector2i) -> bool:
 	var r := Rect2i(pa, a.get_size()).intersection(Rect2i(pb, b.get_size()))
@@ -2237,6 +2303,7 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	montar_garaje(name_)
 	montar_aparcamiento(name_)
 	arboles_fuera(name_)   # con CAL, ningún árbol encima de un edificio
+	puertas_libres(name_)   # ni una farola ni un cartel sobre una puerta o su rótulo
 	vallas_dentro(name_)   # con CAL, la valla encima de lo que acota
 	hilo_entra(name_)   # con CAL, la lata de la tía en la huerta (hilo.gd)
 	bt_entra(name_)   # con CAL, el banco de semillas de la tía (bancotia.gd)

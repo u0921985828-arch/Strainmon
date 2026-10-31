@@ -203,9 +203,21 @@ func _corre() -> void:
 		if k != "casco":
 			var y1 := CALLE_Y + 1
 			var y4 := CALLE_Y + 4
+			# las farolas, a ritmo y enfrentadas; puede faltar alguna: con CAL se quita la que taparía una puerta o su rótulo
+			# (puertas_libres en mundo.gd), así que cada acera es un subconjunto del mismo ritmo
 			var fa: Array = xs_o(m, y1, "lamp")
-			chk(fa.size() >= 3 and fa == xs_o(m, y4, "lamp"), "%s: las farolas de las dos aceras, enfrentadas %s %s" % [k, fa, xs_o(m, y4, "lamp")])
-			chk(a_ritmo(fa, 8), "%s: las farolas cada 8 %s" % [k, fa])
+			var fb: Array = xs_o(m, y4, "lamp")
+			var todas := []
+			for x in fa:
+				if not todas.has(x):
+					todas.append(x)
+			for x in fb:
+				if not todas.has(x):
+					todas.append(x)
+			todas.sort()
+			chk(fa.size() >= 3 and fb.size() >= 3 and fa.all(func(x): return todas.has(x)) and fb.all(func(x): return todas.has(x)),
+				"%s: las farolas de las dos aceras, enfrentadas %s %s" % [k, fa, fb])
+			chk(a_ritmo(todas, 8), "%s: las farolas cada 8 %s" % [k, todas])
 			var it: Array = xs_dec(m, CALLE_Y + 2, "imbT")
 			chk(it.size() >= 3 and it == xs_dec(m, CALLE_Y + 3, "imbB") and a_ritmo(it, 8), "%s: los imbornales, a los dos lados y cada 8 %s" % [k, it])
 			var ta: Array = xs_dec(m, CALLE_Y + 3, "tapa")
