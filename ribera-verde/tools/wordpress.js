@@ -10,6 +10,7 @@
        en index.html, los tamaños de fileSizes.
     3. Lo comprime en descargas/landrace-hunters-<versión del plugin>.zip.
   Uso: node tools/wordpress.js --motor <carpeta con index.js, index.wasm e index.audio.worklet.js> [--sin-zip --salida <dir>]
+       node tools/wordpress.js --cifrar [--sin-zip --salida <dir>]   (index.pck cifrado; antes, tools/plantilla-web.sh)
 */
 const { execFileSync } = require('child_process');
 const fs = require('fs');
@@ -21,7 +22,20 @@ const GODOT = process.env.GODOT || '/home/user/godot-bin/Godot_v4.7-stable_linux
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 && i + 1 < process.argv.length ? process.argv[i + 1] : d; };
 const MOTOR_F = ['index.js', 'index.wasm', 'index.audio.worklet.js', 'index.audio.position.worklet.js'];   // 4.7: con el de la posición
 // 0.51: sin --motor, el de la plantilla web sin hilos de Godot 4.7 instalada (godot.* → index.*)
-const PLANTILLA = path.join(os.homedir(), '.local/share/godot/export_templates/4.7.stable/web_nothreads_release.zip');
+// --cifrar (lo pidió el usuario: «que los scripts no se puedan leer del paquete»): el index.pck cifrado con AES-256 por la clave de
+// ~/.landrace/pck.key (64 hex, fuera del repo; nunca se imprime) y el motor de la plantilla compilada con esa misma clave
+// (tools/plantilla-web.sh → ~/.landrace/web_nothreads_release.zip, o LH_PLANTILLA). Con la plantilla oficial no se podría leer.
+const CIFRAR = process.argv.includes('--cifrar');
+const CLAVE_F = process.env.LH_CLAVE || path.join(os.homedir(), '.landrace/pck.key');
+const PLANTILLA = CIFRAR ? (process.env.LH_PLANTILLA || path.join(os.homedir(), '.landrace/web_nothreads_release.zip'))
+  : path.join(os.homedir(), '.local/share/godot/export_templates/4.7.stable/web_nothreads_release.zip');
+let CLAVE = '';
+if (CIFRAR) {
+  CLAVE = fs.existsSync(CLAVE_F) ? fs.readFileSync(CLAVE_F, 'utf8').trim() : '';
+  if (!/^[0-9a-f]{64}$/i.test(CLAVE)) throw new Error('--cifrar: falta la clave de 64 hex en ' + CLAVE_F);
+  if (!fs.existsSync(PLANTILLA)) throw new Error('--cifrar: falta la plantilla web compilada con la clave (tools/plantilla-web.sh): ' + PLANTILLA);
+  if (arg('--motor', process.env.LH_MOTOR || '')) throw new Error('--cifrar: el motor sale de la plantilla cifrada, sin --motor');
+}
 let MOTOR = arg('--motor', process.env.LH_MOTOR || '');
 if (!MOTOR && fs.existsSync(PLANTILLA)) {
   MOTOR = fs.mkdtempSync(path.join(os.tmpdir(), 'lh-motor-'));
@@ -62,10 +76,10 @@ export_filter="all_resources"
 include_filter="${filtro('include_filter')}"
 exclude_filter="${filtro('exclude_filter')}"
 export_path=""
-encryption_include_filters=""
+encryption_include_filters="${CIFRAR ? '*' : ''}"
 encryption_exclude_filters=""
-encrypt_pck=false
-encrypt_directory=false
+encrypt_pck=${CIFRAR}
+encrypt_directory=${CIFRAR}
 script_export_mode=2
 
 [preset.0.options]
@@ -92,7 +106,8 @@ const PCK = path.join(GAME, 'index.pck');
 try {
   execFileSync(GODOT, ['--headless', '--path', PROY, '--import'], { stdio: 'ignore', timeout: 600000 });
 } catch (e) { /* --import sale con error si no hay nada que importar; el export de abajo dice si falta algo */ }
-execFileSync(GODOT, ['--headless', '--path', PROY, '--export-pack', 'Web', PCK], { stdio: 'inherit', timeout: 900000 });
+execFileSync(GODOT, ['--headless', '--path', PROY, '--export-pack', 'Web', PCK], { stdio: 'inherit', timeout: 900000,
+  env: CIFRAR ? { ...process.env, GODOT_SCRIPT_ENCRYPTION_KEY: CLAVE } : process.env });
 if (!fs.existsSync(PCK) || fs.statSync(PCK).size < 1 << 20) throw new Error('el export no dejó index.pck');
 fs.chmodSync(PCK, 0o644);
 
