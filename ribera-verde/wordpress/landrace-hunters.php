@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Landrace_Hunters {
 
-	const VERSION   = '1.7.0';
+	const VERSION   = '1.7.1';
 	/** El plugin ligero (para servidores que no dejan subir más de unos MB) baja el resto del juego de aquí, en el propio servidor. */
 	const FULL_URL  = 'https://raw.githubusercontent.com/u0921985828-arch/Strainmon/claude/new-session-7quvtm/ribera-verde/descargas/landrace-hunters-%s.zip';
 	const PIEZAS    = array( 'index.js', 'index.wasm', 'index.pck', 'index.audio.worklet.js', 'index.audio.position.worklet.js' );
