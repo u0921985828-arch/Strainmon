@@ -3,11 +3,18 @@
 	AddType application/wasm .wasm
 	AddType application/octet-stream .pck
 </IfModule>
+# El .pck va cifrado desde la 1.6.9: comprimirlo no baja nada y gasta procesador, así que se queda fuera.
 <IfModule mod_deflate.c>
-	AddOutputFilterByType DEFLATE application/wasm application/javascript text/html
+	AddOutputFilterByType DEFLATE application/wasm application/javascript text/javascript text/html
 </IfModule>
 <IfModule mod_headers.c>
+	# 1.7.0: un mes en el navegador (antes un día). Quien tenga el juego guardado en el móvil (sw.js) no vuelve
+	# a pedir nada al servidor, y al actualizar el plugin esa copia se rehace sola, sin esperar a que caduque.
 	<FilesMatch "\.(wasm|js|pck|png)$">
-		Header set Cache-Control "public, max-age=86400"
+		Header set Cache-Control "public, max-age=2592000, stale-while-revalidate=86400"
+	</FilesMatch>
+	# El trabajador, nunca guardado: es lo que avisa de que hay versión nueva.
+	<FilesMatch "^lh-sw\.js$">
+		Header set Cache-Control "no-cache, max-age=0, must-revalidate"
 	</FilesMatch>
 </IfModule>

@@ -1,11 +1,11 @@
 === Landrace Hunters ===
-Version: 1.6.9
+Version: 1.7.0
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.6.9.zip → Activar.
-Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.6.9-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.7.0.zip → Activar.
+Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.7.0-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -14,6 +14,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
+1.7.0 — Landrace Hunters: el juego se guarda en el móvil la primera vez que se abre (sw.js). Después arranca sin pedirle nada al servidor, y hasta sin conexión; al actualizar el plugin, la copia guardada se rehace sola. El servidor aguanta así mucha más gente a la vez.
 1.6.9 — Landrace Hunters (Godot 0.70.0): el paquete del juego, cifrado con AES-256 (los scripts y los nombres de los archivos no se pueden leer del index.pck), con el motor web compilado con su clave.
 1.6.8 — Landrace Hunters (Godot 0.70.0): más fluido en el navegador: cada trozo del suelo se pinta una sola vez en su propia textura (de unas 200 llamadas de dibujo por fotograma a 60 en la calle) y la lluvia y la nieve van en un solo dibujo; en la calle, de unos 20 a unos 29 fotogramas por segundo en un ordenador sin tarjeta gráfica.
 1.6.7 — Landrace Hunters (Godot 0.70.0): la ruta de la tía (un recado con testimonio en cada pueblo, que cuenta en el Acto III), el día de 8 minutos (4, 12 o 24 en OPCIONES → RELOJ) y los ladrones y carteristas solo de noche.

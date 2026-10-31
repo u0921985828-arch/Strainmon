@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Landrace Hunters
  * Description: Hospeda el juego «Landrace Hunters» (Godot 4.3, versión web: la misma partida que la app de Android) dentro de WordPress: dirección propia a pantalla completa y atajo [landrace_hunters] para incrustarlo en cualquier página. Todo se sirve desde el propio plugin.
- * Version: 1.6.9
+ * Version: 1.7.0
  * Author: WOLFCADE
  * License: GPL-2.0-or-later
  * Text Domain: landrace-hunters
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Landrace_Hunters {
 
-	const VERSION   = '1.6.9';
+	const VERSION   = '1.7.0';
 	/** El plugin ligero (para servidores que no dejan subir más de unos MB) baja el resto del juego de aquí, en el propio servidor. */
 	const FULL_URL  = 'https://raw.githubusercontent.com/u0921985828-arch/Strainmon/claude/new-session-7quvtm/ribera-verde/descargas/landrace-hunters-%s.zip';
 	const PIEZAS    = array( 'index.js', 'index.wasm', 'index.pck', 'index.audio.worklet.js', 'index.audio.position.worklet.js' );
@@ -163,8 +163,30 @@ final class Landrace_Hunters {
 	public static function rewrite() {
 		$slug = self::opt( 'slug' );
 		if ( $slug ) {
+			add_rewrite_rule( '^' . preg_quote( $slug, '/' ) . '/sw\.js$', 'index.php?' . self::QUERY_VAR . '=sw', 'top' );
 			add_rewrite_rule( '^' . preg_quote( $slug, '/' ) . '/?$', 'index.php?' . self::QUERY_VAR . '=1', 'top' );
 		}
+	}
+
+	/** Dirección del trabajador que guarda el juego en el móvil (1.7.0). */
+	public static function sw_url() {
+		$slug = self::opt( 'slug' );
+		if ( get_option( 'permalink_structure' ) && $slug ) {
+			return home_url( '/' . $slug . '/sw.js' );
+		}
+		return add_query_arg( self::QUERY_VAR, 'sw', home_url( '/' ) );
+	}
+
+	/** Los archivos del juego que se guardan en el móvil: las piezas grandes y lo pequeño que las acompaña. */
+	public static function sw_files() {
+		$url = trailingslashit( self::game_url() );
+		$f   = array();
+		foreach ( array_merge( self::PIEZAS, array( 'index.png', 'icon-192.png', 'icon-576.png', 'lh-fs.js' ) ) as $n ) {
+			if ( is_readable( self::game_dir() . '/' . $n ) ) {
+				$f[] = $url . $n;
+			}
+		}
+		return $f;
 	}
 
 	/**
@@ -218,6 +240,9 @@ final class Landrace_Hunters {
 		if ( 'manifest' === $q ) {
 			self::manifest();
 		}
+		if ( 'sw' === $q ) {
+			self::sw();
+		}
 		// La página ya lleva su propia ETag y 304. Que ninguna caché de página (Kuboplay Shield)
 		// la guarde horas: al actualizar el plugin se seguiría sirviendo el HTML viejo.
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
@@ -241,6 +266,7 @@ final class Landrace_Hunters {
 		if ( self::opt( 'fs' ) ) {
 			$html = self::fullscreen( $html );
 		}
+		$html = self::sw_tag( $html );
 
 		$etag = '"' . md5( $html . self::VERSION ) . '"';
 
@@ -308,6 +334,53 @@ final class Landrace_Hunters {
 		$html  = preg_replace( '#</body>#i', $body . '</body>', $html, 1 );
 
 		return $html;
+	}
+
+	/**
+	 * Apunta la página al trabajador de arriba (1.7.0).
+	 *
+	 * Solo con enlaces permanentes: así el trabajador sale de «/<dirección>/sw.js» y manda nada más que en la
+	 * página del juego. Sin ellos la dirección es «/?landrace_hunters=1» y su ámbito sería el sitio entero, que
+	 * no hace falta para esto. El navegador que no sepa de trabajadores (o una página sin https) sigue igual.
+	 */
+	private static function sw_tag( $html ) {
+		$slug = self::opt( 'slug' );
+		if ( ! get_option( 'permalink_structure' ) || ! $slug ) {
+			return $html;
+		}
+		$sw = esc_url( self::sw_url() );
+		$sc = esc_url( self::play_url() );
+		$js = '<script>if("serviceWorker" in navigator){addEventListener("load",function(){'
+			. 'navigator.serviceWorker.register("' . $sw . '",{scope:"' . $sc . '"}).catch(function(){})})}</script>' . "\n";
+		return preg_replace( '#</body>#i', $js . '</body>', $html, 1 );
+	}
+
+	/**
+	 * El trabajador que guarda el juego en el móvil (1.7.0, lo pidió el usuario: «que el host esté mucho más libre»).
+	 *
+	 * Sale por la dirección del juego, no por la carpeta del plugin, para que su ámbito sea esa página; de todos
+	 * modos va la cabecera Service-Worker-Allowed, que es lo que hace falta cuando el sitio no tiene enlaces
+	 * permanentes y la dirección es «/?landrace_hunters=1». Arriba se le ponen la versión (el nombre de la caché)
+	 * y la lista de archivos, que el PHP sabe y el JavaScript no.
+	 */
+	private static function sw() {
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
+		}
+		$js = @file_get_contents( self::game_dir() . '/lh-sw.js' ); // phpcs:ignore WordPress.WP.AlternativeFunctions,WordPress.PHP.NoSilencedErrors
+		if ( false === $js ) {
+			status_header( 404 );
+			exit;
+		}
+		$pre = 'const LH_CACHE = ' . wp_json_encode( 'lh-' . self::VERSION ) . ";\n"
+			. 'const LH_FILES = ' . wp_json_encode( self::sw_files(), JSON_UNESCAPED_SLASHES ) . ";\n"
+			. 'const LH_PAGE = ' . wp_json_encode( self::play_url(), JSON_UNESCAPED_SLASHES ) . ";\n";
+		status_header( 200 );
+		header( 'Content-Type: text/javascript; charset=utf-8' );
+		header( 'Service-Worker-Allowed: ' . wp_parse_url( self::play_url(), PHP_URL_PATH ) );
+		header( 'Cache-Control: no-cache, max-age=0, must-revalidate' );
+		echo $pre . $js; // phpcs:ignore WordPress.Security.EscapeOutput
+		exit;
 	}
 
 	/** Manifiesto de la app instalable: abre a pantalla completa y en horizontal. */
