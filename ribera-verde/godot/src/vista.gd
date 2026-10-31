@@ -6,6 +6,7 @@
 # hojas (como el HTML desde la 1.10: barras, posCursor, vcBarra y vcDano de 09b-carpa.js).
 extends Node2D
 
+const VENT_BAJO := 6   # el ventilador de pinza, px por debajo de la boca del foco cuando las plantas suben
 const Datos = preload("res://src/datos.gd")
 const Cultivo = preload("res://src/cultivo.gd")
 const Arte = preload("res://src/arte.gd")
@@ -603,7 +604,15 @@ func _pinta_base() -> void:
 		base.draw_texture(Arte.tex("x|" + fs.n, fi), Vector2(g.vc.xl + 10 - 47 + int(floor(now / 90)) % 2, 3 - (fi.get_height() - Arte.alto(fi))))
 	if c.get("vent"):
 		var nv := posmod(int(floor(now / 70)), Arte.n_fotos("extra-c-vent"))
-		base.draw_texture(Arte.tex("x|vent|%d" % nv, Arte.foto("extra-c-vent", nv)), Vector2(xr + 1 - 24, int(D.VCA.fondo) - Datos.jsround(55 * g.vc.Z) - 47))
+		var vi := Arte.foto("extra-c-vent", nv)
+		var vaire: int = vi.get_height() - Arte.alto(vi)   # el sprite lleva su aire arriba: lo que se ve empieza más abajo
+		var vy: int = int(D.VCA.fondo) - Datos.jsround(55 * g.vc.Z) - 47
+		# con CAL, el ventilador sube con las plantas (lo dijo el usuario: «hay ciertos sprites que no funcionan bien… sin sentido»):
+		# a 55 cm se quedaba dentro de la copa de la planta de al lado, medio tapado; pinzado al poste justo debajo del foco se ve
+		# entero, que es como se pone de verdad cuando las plantas crecen
+		if Datos.CAL:
+			vy = mini(vy, int(g.vc.fy) + VENT_BAJO - vaire)
+		base.draw_texture(Arte.tex("x|vent|%d" % nv, vi), Vector2(xr + 1 - 24, vy))
 	var fsel := fila_sel(g, VC.sel)
 	var fa = null
 	for q in orden(g):

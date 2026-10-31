@@ -201,6 +201,81 @@ const APARC := {"puerto": [23, 10], "valdehierro": [22, 13], "mendialde": [20, 1
 const APARC_OBRA := {"valdehierro": [[21, 12], [22, 12], [23, 12], [24, 12], [25, 12], [23, 14], [24, 14], [23, 15]], "errotabarri": [[12, 18]]}   # i18n-no
 var _aparc0 := {}
 var _aparc_o := {}
+var _aparc_c := {}   # el carril de entrada de cada mapa: [[x, y, suelo de antes]…]
+# El aparcamiento se entra desde la calle (lo dijo el usuario: «hay ciertos sprites que no funcionan bien… sin sentido»): hasta la
+# 0.70 era un rectángulo de asfalto plantado en medio de la acera, sin salida. Ahora, si no toca una vía, se le traza un carril de
+# una casilla desde la boca del pasillo (arriba a la derecha, donde apunta su flecha) hasta la vía más cercana, por donde se anda y
+# sin pisar nada; sin CAL vuelve el suelo de antes.
+const APARC_CARRIL := 20   # lo más largo que se traza
+const APARC_VIA := ["road", "hormigon", "pista", "roto"]   # i18n-no
+
+func _aparc_es_via(g: String) -> bool:
+	for v in APARC_VIA:
+		if g.begins_with(v):
+			return true
+	return false
+
+func _aparc_quita_carril(mapa: String, m: Dictionary) -> void:
+	for c in _aparc_c.get(mapa, []):
+		m.g[int(c[1])][int(c[0])] = c[2]
+	_aparc_c.erase(mapa)
+
+# por dónde entra el coche al pueblo: las puertas de carretera del mapa (CARRETERAS.puertas), destino del carril cuando el pueblo
+# no tiene ninguna calle asfaltada (Puerto Viejo: todo plaza y adoquín)
+func _aparc_puertas(mapa: String) -> Array:
+	var o := []
+	for q in D.get("CARRETERAS", {}).get("puertas", {}).get(mapa, []):
+		o.append(Vector2i(int(q[0]), int(q[1])))
+	return o
+
+# el camino más corto de la boca a una vía, por casillas por las que se anda, sin objetos y fuera de los edificios
+func _aparc_ruta(m: Dictionary, boca: Vector2i, x0: int, y0: int, mapa := "") -> Array:
+	var puertas := _aparc_puertas(mapa)
+	var w: int = int(m.w)
+	var h: int = int(m.h)
+	var libre := func(x: int, y: int) -> bool:
+		if x < 0 or y < 0 or x >= w or y >= h:
+			return false
+		if x >= x0 and x < x0 + 3 and y >= y0 and y < y0 + 4:
+			return false
+		if m.o[y][x] != null or tile_solid(m, x, y) or not pisable(m, x, y):
+			return false
+		for b in m.blds:
+			if x >= int(b.x0) and x < int(b.x0) + int(b.w) and y >= int(b.y0) and y < int(b.y0) + int(b.h):
+				return false
+		return true
+	if not libre.call(boca.x, boca.y):
+		return []
+	var de := {boca: Vector2i(-1, -1)}
+	var cola := [boca]
+	var fin := Vector2i(-1, -1)
+	while cola.size() and fin.x < 0:
+		var q: Vector2i = cola.pop_front()
+		if de.size() > APARC_CARRIL * 24:
+			break
+		for d in [Vector2i(0, -1), Vector2i(0, 1), Vector2i(-1, 0), Vector2i(1, 0)]:
+			var n: Vector2i = q + d
+			if de.has(n):
+				continue
+			if puertas.has(n):   # la puerta de la carretera está en el borde y no se pisa: el carril acaba a su lado
+				de[n] = q
+				fin = n
+				break
+			if not libre.call(n.x, n.y):
+				continue
+			de[n] = q
+			if _aparc_es_via(String(m.g[n.y][n.x])):
+				fin = n
+				break
+			cola.append(n)
+	if fin.x < 0:
+		return []
+	var o := []
+	var c: Vector2i = de[fin]   # la vía ya es vía: el carril llega hasta ella
+	while c.x >= 0:
+		o.append(c)
+		c = de[c]
+	return o if o.size() <= APARC_CARRIL else []
 # las otras tres zonas de Bilbao, sin parada (se llega en autobús a Zorroza): con tu vehículo se va a cualquiera de las cuatro y se
 # aparca en la suya; para la gasolina, los km y el tiempo cuentan como Zorroza (parada_de) y entre dos de Bilbao, BILBAO_KM
 const BILBAO_Z := ["lapunta", "abando", "casco"]   # i18n-no
@@ -234,6 +309,27 @@ func montar_aparcamiento(mapa: String) -> void:
 		for i in APARC_OBRA[mapa].size():
 			var c: Array = APARC_OBRA[mapa][i]
 			m.o[c[1]][c[0]] = null if Datos.CAL else _aparc_o[mapa][i]
+	_aparc_quita_carril(mapa, m)
+	if Datos.CAL:   # el carril de entrada, si el aparcamiento no toca ya una vía
+		var toca := false
+		for i in 4:
+			for c in [Vector2i(x0 - 1, y0 + i), Vector2i(x0 + 3, y0 + i)]:
+				if c.x >= 0 and c.x < int(m.w) and _aparc_es_via(String(m.g[c.y][c.x])):
+					toca = true
+		for i in 3:
+			for c in [Vector2i(x0 + i, y0 - 1), Vector2i(x0 + i, y0 + 4)]:
+				if c.y >= 0 and c.y < int(m.h) and _aparc_es_via(String(m.g[c.y][c.x])):
+					toca = true
+		if not toca:
+			var r := _aparc_ruta(m, Vector2i(x0 + 2, y0 - 1), x0, y0, mapa)
+			if r.is_empty():
+				r = _aparc_ruta(m, Vector2i(x0 + 2, y0 + 4), x0, y0, mapa)
+			var g0 := []
+			for c in r:
+				g0.append([c.x, c.y, m.g[c.y][c.x]])
+				m.g[c.y][c.x] = "road"   # i18n-no
+			if g0.size():
+				_aparc_c[mapa] = g0
 	var bs: Array = m.blds.filter(func(q): return q.id != "aparcamiento")   # i18n-no
 	if Datos.CAL:
 		bs.append({"id": "aparcamiento", "x0": x0, "y0": y0, "w": 3, "h": 4})   # i18n-no
