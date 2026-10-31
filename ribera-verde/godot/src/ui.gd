@@ -116,6 +116,8 @@ var tt := 0.0
 var bp_r := 0.0   # de la caja de vida del jugador al borde derecho de la escena (--bpr)
 var be_r := 0.0   # con CAL: de las dos cajas de vida (arriba a la derecha) al borde derecho de la escena
 var scr := Rect2(0, 0, 240, SH)
+const MANDO_ALFA := .82    # 0.72: lo opaco del relleno de A, B, START, MÓVIL y SONIDO (antes 0,55: sobre la pared no se leían)
+const MANDO_CANTO := .45   # y su canto
 const CRUZ_HUECO := .16   # el hueco entre cada flecha y el cuadrado del medio, en brazos de la cruz (1.40)
 var zona_cruz := Rect2()   # zonas de toque de la cruceta y de A/B, y la cruz que se ve
 var zona_ab := Rect2()
@@ -425,10 +427,14 @@ func ajusta() -> void:
 	st.set_border_width_all(maxi(1, roundi(1.5 * _dp())))
 	st.set_corner_radius_all(roundi(kp * 1.2))
 	botones.mid.add_theme_stylebox_override("panel", st)
+	# 0.72: los mandos se leían según lo que tuvieran detrás (la B sobre la pared del piso daba 3,3:1 y sobre el negro 12:1): el
+	# relleno, más opaco, y el canto blanco, más marcado, para que el glifo se lea también sobre un fondo claro
+	var ma: float = MANDO_ALFA if Datos.CAL else .55
+	var mc: float = MANDO_CANTO if Datos.CAL else .22
 	for b in ["A", "B"]:
-		_estilo(botones[b], Color(109 / 255.0, 44 / 255.0, 75 / 255.0, .55), Color(154 / 255.0, 74 / 255.0, 114 / 255.0, .85), Color(1, 210 / 255.0, 230 / 255.0, .4), G.A.size.x / 2, kp * 3.8, "")
+		_estilo(botones[b], Color(109 / 255.0, 44 / 255.0, 75 / 255.0, ma), Color(154 / 255.0, 74 / 255.0, 114 / 255.0, .9), Color(1, 210 / 255.0, 230 / 255.0, maxf(.4, mc)), G.A.size.x / 2, kp * 3.8, "")
 	for b in ["START", "MOVIL", "SONIDO"]:   # i18n-no
-		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, .55), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, .22), kp * 3.5, kp * 2.6, "")
+		_estilo(botones[b], Color(24 / 255.0, 28 / 255.0, 34 / 255.0, ma), Color(70 / 255.0, 80 / 255.0, 96 / 255.0, .75), Color(1, 1, 1, mc), kp * 3.5, kp * 2.6, "")
 	# después de la letra: un botón no encoge por debajo de lo que pide la letra que tenía (de una ventana más grande)
 	_pon(botones.up, cruz.position + Vector2(a, 0), Vector2(a, a - g))
 	_pon(botones.left, cruz.position + Vector2(0, a), Vector2(a - g, a))
@@ -463,7 +469,8 @@ func ajusta() -> void:
 	# con CAL (el combate en su lado: el enemigo arriba a la izquierda y el protagonista abajo a la derecha), las dos cajas de vida,
 	# una encima de otra, arriba a la derecha (de 4 a 84 u): a la izquierda de SONIDO, START, MÓVIL, A o B si les caen encima
 	be_r = 6 * s
-	for n in ["sonido", "start", "movil", "A", "B"]:
+	# 0.72: el botón MÓVIL solo se ve andando por el mapa (en el combate está oculto), así que las cajas ya no se apartan de él
+	for n in (["sonido", "start", "A", "B"] if Datos.CAL else ["sonido", "start", "movil", "A", "B"]):
 		var r: Rect2 = G[n]
 		if r.position.y < ye + 84 * s + kp and r.end.y > ye + 4 * s - kp and r.end.x > er - 110 * s and r.position.x < er:
 			be_r = maxf(be_r, er - r.position.x + kp)
@@ -1408,7 +1415,9 @@ func menu(items_: Array, o := {}) -> int:
 	if not oraculo:
 		m_top = 0
 		menu_box.show()
-		if o.get("cls") == "full":
+		# 0.72: con el menú START, el HUD también se esconde: su cabecera ya dice la fecha, la hora y el dinero
+		if o.get("cls") == "full" or (Datos.CAL and o.get("cls") == "start"):
+			hud_tapado = true
 			hud.hide()
 		draw.call()
 		menu_redraw = draw
@@ -1417,6 +1426,7 @@ func menu(items_: Array, o := {}) -> int:
 		menu_redraw = Callable()
 		if not oraculo:
 			menu_box.hide()
+			hud_tapado = false
 			update_hud()
 			coloca_toast.call_deferred()
 		p.res(v)
@@ -1557,7 +1567,7 @@ func _pinta_menu(rows: int) -> void:
 			var dw := R.size.x - 6 * us - 18 * us
 			var nl := letra.get_multiline_string_size(dsc, HORIZONTAL_ALIGNMENT_LEFT, dw, roundi(8.5 * us)).y
 			var lineas := maxf(1, roundf(nl / letra.get_height(roundi(8.5 * us))))
-			alto -= maxf(24 * us, lineas * 11.5 * us) + 7 * us
+			alto -= maxf(desc_min() * us, lineas * 11.5 * us) + 7 * us
 		if Datos.CAL and not o.has("rows"):   # las 5 filas eran las de la pantalla de 160 px: en una más alta, todas las que caben (sin hueco debajo)
 			vis = m_items.size()
 		while vis > 1 and vis * lh > alto:
@@ -1624,6 +1634,14 @@ func _pinta_menu(rows: int) -> void:
 		maxw = maxf(maxw, ui_rect().size.x * .9 - 18 * us)
 	elif Datos.CAL and full:   # 1.50: a toda pantalla, la fila no la ensancha (el nombre entero va abajo, en la descripción)
 		maxw = ui_rect().size.x - 6 * us - 18 * us
+	# 0.72: si alguna fila de la lista lleva icono, las que no lo llevan reservan su hueco: el borde izquierdo de las etiquetas, recto
+	var ic_w := 0.0
+	if Datos.CAL:
+		for it2 in m_items:
+			if it2.get("ic"):
+				ic_w = maxf(ic_w, Atlas.ic_px(it2.ic.get_width(), us) + 2 * us)
+			elif it2.get("sw"):
+				ic_w = maxf(ic_w, 10 * us)
 	for k in range(m_top, mini(m_items.size(), m_top + vis)):
 		var it: Dictionary = m_items[k]
 		var f := HBoxContainer.new()
@@ -1658,8 +1676,17 @@ func _pinta_menu(rows: int) -> void:
 				sw_.draw_rect(Rect2(-.8 * us, y0 - .8 * us, 7.6 * us, 7.6 * us), Color("#404048"))
 				sw_.draw_rect(Rect2(0, y0, 6 * us, 6 * us), Color(swc)))
 			f.add_child(sw_)
+		elif ic_w > 0:
+			# la fila de una sección («▶ Semillas»): su flecha va en la columna del icono, no delante del texto
+			var e2 := Label.new()
+			e2.custom_minimum_size = Vector2(ic_w, lh)
+			e2.text = "▸" if String(it.label).begins_with("▸ ") else ""
+			e2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			e2.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			pon_letra(e2, letra, fs * .8, GRIS)
+			f.add_child(e2)
 		var l := Label.new()
-		l.text = it.label
+		l.text = String(it.label).substr(2) if Datos.CAL and ic_w > 0 and String(it.label).begins_with("▸ ") else it.label
 		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		pon_letra(l, letra, fs, DIS if it.get("disabled") else INK)
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1706,7 +1733,7 @@ func _pinta_menu(rows: int) -> void:
 		var dl := Label.new()
 		dl.text = _desc_sel(fs)
 		dl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		dl.custom_minimum_size = Vector2(0, 24 * us)
+		dl.custom_minimum_size = Vector2(0, desc_min() * us)
 		pon_letra(dl, letra, 8.5 * us, INK, 11.5 * us)
 		menu_col.add_child(dl)
 	menu_box.set_meta("cls", cls)
@@ -1727,6 +1754,12 @@ func _desc_sel(fs: float) -> String:
 		return dsc
 	return lab + ("\n" + dsc if dsc != "" else "")
 
+# 0.72: el pie de los menús reservaba siempre dos líneas (24 u) para una descripción que casi siempre ocupa una: quedaba un hueco
+# en blanco debajo y una fila menos en la lista (en una función: Datos.CAL cambia después de cargar el script)
+func desc_min() -> float:
+	return 11.5 if Datos.CAL else 24.0
+const FLECHA_H := 8.5    # alto de la fila de la flecha ▲▼ de los menús (0.72; antes 5 u, 15 px en el móvil: no se veía ni se tocaba)
+const FLECHA_FS := 8.0   # su letra
 func _flecha(t: String, b := "") -> Label:
 	var a := Label.new()
 	a.text = t
@@ -1737,9 +1770,10 @@ func _flecha(t: String, b := "") -> Label:
 				menu_box.get_meta("flecha").call(b))
 	a.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	a.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	a.custom_minimum_size = Vector2(0, 5 * us)
+	# 0.72: la marca de «sigue la lista» era de 4 u en una caja de 140: se ve y se toca (8,5 u de alto, el triángulo más grande)
+	a.custom_minimum_size = Vector2(0, (FLECHA_H if Datos.CAL else 5.0) * us)
 	a.clip_text = true
-	pon_letra(a, letra, 6 * us, ROJO, 0, false)
+	pon_letra(a, letra, (FLECHA_FS if Datos.CAL else 6.0) * us, ROJO, 0, false)
 	return a
 
 # coloca diálogo, menú y aviso en el escenario .ui (en el HTML, el CSS)
@@ -1808,7 +1842,12 @@ func _coloca() -> void:
 			elif cls == "titulo":   # 1.35: centrados, abajo, sin subir del lema
 				menu_box.position = Vector2(roundf(R.get_center().x - menu_box.size.x / 2), maxf(_tit_fin() + 4 * us, R.end.y - 6 * us - menu_box.size.y))
 			else:
-				menu_box.position = Vector2(R.end.x - 3 * us - menu_box.size.x, maxf(R.position.y + 3 * us, R.end.y - 49 * us - menu_box.size.y))
+				# 0.72: el menú de una pregunta, justo encima del diálogo, no a 49 u fijas del suelo: con el busto la caja mide unas
+				# 70 u y el menú le caía encima, tapando lo que se pregunta
+				var tope: float = R.end.y - 49 * us
+				if Datos.CAL and dlg.visible:
+					tope = minf(tope, dlg.position.y - 3 * us)
+				menu_box.position = Vector2(R.end.x - 3 * us - menu_box.size.x, maxf(R.position.y + 3 * us, tope - menu_box.size.y))
 	if lector.visible:   # como un menú a toda altura
 		lector.custom_minimum_size = R.size - Vector2(6 * us, 6 * us)
 		lector.size = lector.custom_minimum_size
@@ -1986,6 +2025,7 @@ var hud_alarma := false
 var hud_orden := false   # (1.11) con la orden de registro, la barra dice ORDEN
 var hud_tab := Control.new()
 var hud_filas := []   # 1.50: [[etiqueta, valor, color]] del recuadro; vacío, sin recuadro (sin Datos.CAL)
+var hud_tapado := false   # 0.72: un menú a pantalla completa o el START lo esconde hasta que se cierra
 var hud_ultimo := []   # R15: lo último que se puso; si no cambia, nada
 func hud_pon(t: String, heat: int, sosp := -1, alarma := false, orden := false, filas := []) -> void:
 	if oraculo:
@@ -2002,7 +2042,10 @@ func hud_pon(t: String, heat: int, sosp := -1, alarma := false, orden := false, 
 	hud_orden = orden
 	hud_sosp = sosp
 	hud_alarma = alarma
-	hud.show()
+	if hud_tapado:   # 0.72: con un menú que tapa la pantalla, el HUD no vuelve solo (el bucle llama a update_hud)
+		hud.hide()
+	else:
+		hud.show()
 	hud_bar.queue_redraw()
 	_coloca.call_deferred()
 

@@ -95,6 +95,7 @@ func _corre() -> void:
 			if Datos.CAL and (minf(rp.position.x, re.position.x) < es.position.x + 96 * k or maxf(rp.end.y, re.end.y) > es.position.y + 86 * k):
 				cortes.append("combate: las cajas (%s, %s) tapan al enemigo o al protagonista (escena %s)" % [re, rp, es])
 		_mira_hueco(p)
+		_mira_maquetado(p)
 		await RenderingServer.frame_post_draw
 		root.get_texture().get_image().save_png(dir.path_join("ui-%d-%s-%s.png" % [n + 1, p, idioma]))
 		n += 1
@@ -122,6 +123,33 @@ func _mira_cortes(p: String) -> void:
 				cortes.append("%s: «%s» %d > %d" % [p, c.text, w, r.size.x])
 		if r.end.x > vp.end.x + 1 or r.position.x < -1:
 			cortes.append("%s: «%s» fuera de la pantalla" % [p, String(c.text).left(30)])
+
+# 0.72, el repaso del maquetado: el menú no pisa el diálogo, el HUD no sale con un menú que ya dice lo mismo, las etiquetas de una
+# lista arrancan todas en la misma columna y la marca de «sigue la lista» se ve y se toca
+func _mira_maquetado(p: String) -> void:
+	if J.menu_box.visible and J.dlg.visible:
+		var rm: Rect2 = J.menu_box.get_global_rect()
+		var rd: Rect2 = J.dlg.get_global_rect()
+		if J.menu_box.get_meta("cls", "right") != "battle" and rm.intersects(rd):
+			cortes.append("%s: el menú %s pisa el diálogo %s" % [p, rm, rd])
+	if J.menu_box.visible and J.menu_box.get_meta("cls", "right") in ["full", "start"] and J.hud.visible:
+		cortes.append("%s: el HUD sale con el menú abierto, que ya dice la fecha y el dinero" % p)
+	for c in J.menu_col.get_children():
+		if not (c is VBoxContainer):
+			continue
+		var xs := {}
+		for fila in c.get_children():
+			if not (fila is HBoxContainer):
+				continue
+			for n in fila.get_children():
+				if n is Label and String(n.text).strip_edges() != "" and String(n.text) != "▸" and n.size_flags_horizontal == Control.SIZE_EXPAND_FILL:
+					xs[roundi(n.get_global_rect().position.x)] = true
+					break
+		if xs.size() > 1:
+			cortes.append("%s: las etiquetas de la lista arrancan en %s" % [p, xs.keys()])
+	for c in J.menu_col.get_children():
+		if c is Label and String(c.text) in ["▲", "▼"] and c.size.y < 8 * J.us - .5:
+			cortes.append("%s: la marca «%s» mide %.1f u de alto (mínimo 8)" % [p, c.text, c.size.y / J.us])
 
 # un menú con más filas de las que enseña no deja debajo de la última un hueco donde cabría otra (lo vio el usuario en la tienda)
 func _mira_hueco(p: String) -> void:
