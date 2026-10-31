@@ -47,6 +47,54 @@ func _pisa(e: Dictionary, r: Rect2i) -> int:
 				k += 1
 	return k
 
+# 2 · el rótulo pintado en la propia fachada, tampoco (lo dijo el usuario: «pues el letrero es importante»): el sprite de la puerta
+# cubre las 32 últimas filas del edificio en 32 px de ancho, y lo que repinta (el dintel subido por puertas_altas.py) se comía la
+# mitad baja del CLUB. Aquí, por cada fachada con rótulo, su caja (en px de la base) no toca ese rectángulo y, pegando la puerta
+# cerrada encima, no cambia ni un píxel del rótulo. Si se mueve un rótulo en tools/sprites/a-mano/locales.py, cámbiala aquí.
+const ROTULOS := {
+	"club-itsaso": [24, 50, 19, 9],      # la placa de latón, encima de la puerta
+	"club-fundicion": [55, 49, 19, 9],   # la placa crema con su aplique
+	"club-kalea": [41, 54, 19, 9],       # la placa en el estuco, sobre el portal
+	"asociacion": [7, 81, 44, 10],       # ASOCIACIÓN, a la izquierda de su portal
+	"club-ensanche": [25, 72, 15, 5],    # CLUB, en el toldo
+	"disco": [8, 71, 45, 7],             # GAUA en neón, con su luna
+}
+
+func _rotulos() -> void:
+	for mid in J.MAPS.keys():
+		var m: Dictionary = J.MAPS[mid]
+		for b in m.get("blds", []):
+			var k: String = String(b.get("puerta", b.id))
+			if b.get("doorX") == null or not ROTULOS.has(k):
+				continue
+			var fa = Atlas.frame_de("edificio-" + String(b.get("fachada", b.id)), "base", "unica", 0, {"i": 0})
+			var pu = Atlas.frame_de("edificio-" + k, "puerta", "unica", 0, {"i": 0})
+			if fa == null or pu == null:
+				continue
+			var c: Image = fa.c
+			var q: Image = pu.c
+			var px: int = int(b.doorX - b.x0) * 16 - 8 + int(b.get("dx", 0))
+			var py: int = c.get_height() - 32
+			var ro: Array = ROTULOS[k]
+			var rr := Rect2i(int(ro[0]), int(ro[1]), int(ro[2]), int(ro[3]))
+			chk(not rr.intersects(Rect2i(px, py, q.get_width(), q.get_height())),
+				"%s: el rótulo %s cae en el rectángulo de la puerta (%d, %d)" % [k, rr, px, py])
+			var tapa := 0
+			var pinta := 0
+			for y in range(rr.position.y, rr.end.y):
+				for x in range(rr.position.x, rr.end.x):
+					if x < 0 or y < 0 or x >= c.get_width() or y >= c.get_height():
+						continue
+					if c.get_pixel(x, y).a8 > 32:
+						pinta += 1
+					var sx: int = x - px
+					var sy: int = y - py
+					if sx >= 0 and sy >= 0 and sx < q.get_width() and sy < q.get_height() and q.get_pixel(sx, sy).a8 > 32:
+						tapa += 1
+			chk(pinta > rr.size.x * rr.size.y / 2, "%s: el rótulo no está donde dice ROTULOS (%d px pintados)" % [k, pinta])
+			chk(tapa == 0, "%s: su puerta tapa %d px del rótulo" % [k, tapa])
+			break   # una vez por fachada: el sprite es el mismo en todos los mapas
+
 func _corre() -> void:
 	Juego.GUARDADO = "user://prueba-puertas-libres.json"
 	Juego.AJUSTES = "user://prueba-puertas-libres-ajustes.json"
@@ -104,6 +152,7 @@ func _corre() -> void:
 			estorbos += malos.size()
 			chk(malos.is_empty(), "%s · %s, puerta en %d: %s" % [mid, b.id, int(b.doorX), malos.slice(0, 3)])
 	chk(mapas >= 8, "mapas de calle mirados: %d" % mapas)
+	_rotulos()
 	for f in fallos:
 		print("FALLO  ", f)
 	print("puertas_libres: %d comprobaciones, %d fallos (%d estorbos en %d mapas)" % [n, fallos.size(), estorbos, mapas])

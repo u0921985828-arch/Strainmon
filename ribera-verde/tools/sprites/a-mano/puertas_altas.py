@@ -19,8 +19,8 @@ MARCO = 4                     # px de marco a cada lado del hueco
 HX0, HX1 = 7, 24
 HY0 = 1
 # las de una casilla que estaban corridas (dx): su dibujo se corre dentro del sprite y su dx pasa a 0 (datos.json), en el mismo sitio
-CORRE = {'asociacion': -8, 'club-kalea': -8, 'bajo-setas': 8, 'casco-pu': -8}
-FACHADA = {'bar': 'bar', 'club-ensanche': 'club-ensanche', 'disco': 'disco'}
+CORRE = {'casco-pu': -8}   # las de locales.py ya se recortan en su sitio (dx 0): solo queda la del casco
+FACHADA = {'bar': 'bar', 'club-ensanche': 'club-ensanche', 'disco': 'disco', 'club-itsaso': 'club-itsaso', 'club-fundicion': 'club-fundicion'}
 # la puerta corredera de la nave se abría solo a medias (la hoja tapaba al protagonista): abierta, del todo
 ABRE = {'nave'}
 # la del casco (el taller y el estanco de Ibarbide) va en la última casilla de su fachada: lo que se sale de ella (la jamba derecha,

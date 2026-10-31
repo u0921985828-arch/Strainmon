@@ -61,11 +61,11 @@ def club_itsaso():
     """el club de Puerto Viejo, en la marinera azul (4 × 6): la placa de latón sobre la puerta, una hoja en el cristal y el farol;
     la puerta en las casillas 1-2 (recorte en x 16, y 64)"""
     lz = mundo.marinera('marinera2')
-    placa(lz, 24, 58, 'CLUB', *LATON)
+    placa(lz, 24, 54, 'CLUB', *LATON)
     lz.r(28, 72, 8, 6, '#c8d8d0'); lz.hl(28, 35, 72, '#e8f0ec')
     for (x, y) in ((31, 73), (32, 73), (30, 74), (31, 74), (32, 74), (33, 74), (31, 75), (32, 75), (29, 75), (34, 75), (31, 76)):
         lz.p(x, y, '#3f8a46')
-    lz.r(43, 62, 3, 4, '#2a2a34'); lz.p(44, 63, '#f0d070'); lz.p(44, 64, '#f0d070')   # el farol
+    lz.r(43, 58, 3, 4, '#2a2a34'); lz.p(44, 59, '#f0d070'); lz.p(44, 60, '#f0d070')   # el farol
     return lz, puertas(lz, 16, 64, (9, 5, 14, 27), 'simple')
 
 def club_fundicion():
@@ -77,13 +77,13 @@ def club_fundicion():
     lz.r(57, 70, 14, 26, '#45604f')
     lz.caja(59, 72, 10, 6, '#f0d070', MAR); lz.hl(60, 67, 73, '#f8e8a8')   # el ventanuco, con luz dentro
     lz.vl(57, 70, 95, '#5a7a66'); lz.r(68, 82, 2, 3, '#c8a040')    # el canto y la manilla
-    placa(lz, 55, 58, 'CLUB', '#e8e4d8', MAR, MAR)
-    lz.r(62, 54, 4, 3, MAR); lz.hl(62, 65, 57, '#f0d070')          # el aplique
+    placa(lz, 55, 54, 'CLUB', '#e8e4d8', MAR, MAR)
+    lz.r(62, 50, 4, 3, MAR); lz.hl(62, 65, 53, '#f0d070')          # el aplique
     return lz, puertas(lz, 48, 64, (9, 6, 14, 26), 'simple')
 
 def club_kalea():
     """el club del Casco Viejo (4 × 6): la lonja con el cristal esmerilado y la hoja, el portal de madera corrido a la casilla 3 y
-    la placa en la piedra (recorte en x 32, y 64: la puerta va con dx −8)"""
+    la placa en la piedra de encima del bajo (recorte en x 40, y 64)"""
     lz = mundo.casco('casco', 4, 6, 91)
     H = 96
     for y in range(H - 27, H - 1):                                 # el portal viejo, tapado con la piedra del recercado
@@ -96,8 +96,8 @@ def club_kalea():
             if lz.g(x, y)[:3] == (0x2e, 0x3c, 0x4c): lz.p(x, y, '#c8d8d0')
     for (x, y) in ((13, 80), (14, 80), (12, 81), (13, 81), (14, 81), (15, 81), (13, 82), (14, 82), (11, 82), (16, 82), (13, 83), (14, 84)):
         lz.p(x, y, '#3f8a46')
-    placa(lz, 27, 72, 'CLUB', *LATON)
-    return lz, puertas(lz, 32, 64, (18, 7, 10, 25), 'simple')
+    placa(lz, 41, 54, 'CLUB', *LATON)
+    return lz, puertas(lz, 40, 64, (10, 7, 10, 25), 'simple')
 
 def bajo(lz, x0, x1, c='#3a3a40'):
     """vacía el bajo de un bloque del Ensanche (y 82-108) entre x0 y x1"""
@@ -151,7 +151,7 @@ def disco():
 def asociacion():
     """la Asociación Cannábica Ribera Verde (1.32), en el barrio alto: la casa alta de almagre del Casco Viejo (5 × 7) con el bajo
     de la asociación: la lonja tapiada con la piedra, la ventana de cuarterones esmerilada con la hoja, la placa de latón encima y el
-    portal de la derecha, pintado de verde (recorte en x 48, y 80: la puerta va con dx −8)"""
+    portal de la derecha, pintado de verde (recorte en x 56, y 80)"""
     lz = mundo.casco('casco3', 5, 7, 93)
     H = 112
     for y in range(H - 29, H - 3):                                 # la lonja, tapiada con la piedra del recercado
@@ -167,7 +167,7 @@ def asociacion():
     lz.hl(7, 44, H - 5, PIEDRA[1])                                  # el alféizar
     lz.r(64, H - 25, 10, 25, '#2f5a3a'); lz.vl(69, H - 24, H - 1, '#1f4a30')   # el portal, verde
     lz.r(65, H - 23, 3, 8, '#3f7a4e'); lz.r(70, H - 23, 3, 8, '#3f7a4e'); lz.p(71, H - 12, '#e0b040')
-    return lz, puertas(lz, 48, 80, (16, 7, 10, 25), 'simple')
+    return lz, puertas(lz, 56, 80, (8, 7, 10, 25), 'simple')
 
 FACHADAS = {'club-itsaso': club_itsaso, 'club-fundicion': club_fundicion, 'club-kalea': club_kalea, 'club-ensanche': club_ensanche, 'disco': disco, 'asociacion': asociacion}
 
@@ -1236,7 +1236,7 @@ def cuboS():
 
 def bajo_setas():
     """la fachada del bajo (1.34): la casa alta de almagre del Casco Viejo (casco3) con la puerta de chapa del bajo en la casilla 2,
-    la rejilla de ventilación encima y el ventanuco con barrotes (recorte en x 32, y 80)"""
+    la rejilla de ventilación encima y el ventanuco con barrotes (recorte en x 24, y 80)"""
     lz = mundo.casco('casco3', 5, 7, 93)
     H = 112
     for y in range(H - 29, H - 1):                                 # la piedra lisa donde va la puerta
@@ -1248,7 +1248,7 @@ def bajo_setas():
     lz.vl(36, H - 24, H - 1, G2); lz.p(42, H - 13, '#c8a040')       # el canto y el cerrojo
     lz.caja(36, H - 29, 8, 3, '#2a2a30', G0)                        # la rejilla de ventilación
     for x in range(37, 43, 2): lz.p(x, H - 28, G2)
-    return lz, puertas(lz, 32, 80, (3, 7, 10, 25), 'simple')
+    return lz, puertas(lz, 24, 80, (11, 7, 10, 25), 'simple')
 
 # ---------------------------------------------------------------------------------------------------------- 1.34: la sala de madres
 # (lo pidió el usuario: «un indoor en la nave con madres para tener ahí las genéticas seleccionadas»): la carpa de 120 × 120 de la
