@@ -7,8 +7,9 @@
 set -euo pipefail
 SRC=${1:-/home/user/godot-src}
 EMSDK=${2:-/home/user/emsdk}
-CLAVE_F=${LH_CLAVE:-$HOME/.landrace/pck.key}
-OUT=$HOME/.landrace/web_nothreads_release.zip
+LH_DIR=${LH_DIR:-/home/user/.landrace}
+CLAVE_F=${LH_CLAVE:-$LH_DIR/pck.key}
+OUT=$LH_DIR/web_nothreads_release.zip
 grep -qE '^[0-9a-fA-F]{64}$' "$CLAVE_F" || { echo "falta la clave de 64 hex en $CLAVE_F"; exit 1; }
 [ -d "$SRC/.git" ] || git clone -q --depth 1 --branch 4.7-stable https://github.com/godotengine/godot "$SRC"
 if [ ! -x "$EMSDK/emsdk" ]; then git clone -q --depth 1 https://github.com/emscripten-core/emsdk.git "$EMSDK"; fi

@@ -26,8 +26,9 @@ const MOTOR_F = ['index.js', 'index.wasm', 'index.audio.worklet.js', 'index.audi
 // ~/.landrace/pck.key (64 hex, fuera del repo; nunca se imprime) y el motor de la plantilla compilada con esa misma clave
 // (tools/plantilla-web.sh → ~/.landrace/web_nothreads_release.zip, o LH_PLANTILLA). Con la plantilla oficial no se podría leer.
 const CIFRAR = process.argv.includes('--cifrar');
-const CLAVE_F = process.env.LH_CLAVE || path.join(os.homedir(), '.landrace/pck.key');
-const PLANTILLA = CIFRAR ? (process.env.LH_PLANTILLA || path.join(os.homedir(), '.landrace/web_nothreads_release.zip'))
+const LH_DIR = process.env.LH_DIR || '/home/user/.landrace';   // la de la upload key (godot-aab.js), fuera del repo
+const CLAVE_F = process.env.LH_CLAVE || path.join(LH_DIR, 'pck.key');
+const PLANTILLA = CIFRAR ? (process.env.LH_PLANTILLA || path.join(LH_DIR, 'web_nothreads_release.zip'))
   : path.join(os.homedir(), '.local/share/godot/export_templates/4.7.stable/web_nothreads_release.zip');
 let CLAVE = '';
 if (CIFRAR) {
