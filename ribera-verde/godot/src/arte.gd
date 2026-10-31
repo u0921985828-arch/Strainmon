@@ -423,14 +423,21 @@ static func luz_c() -> Dictionary:
 static func luz(t: String, vc: Dictionary) -> Image:
 	var L := luz_led(t, vc) if vc.tipo == "led" and hay("carpa-c-luz-led") else luz_baja(t, vc)
 	var lc := luz_c()
-	if not lc.has(vc.tipo):
+	if not lc.has(vc.tipo) and not Datos.CAL:
 		return L
 	var k := "vc|%s|luz|%s|%d|%d|%d|%s" % [t, vc.tipo, vc.foco.a, vc.fy, vc.get("fxs", [120]).size(), Datos.CAL]
 	if cache.has(k):
 		return cache[k]
+	var o: Image = L.duplicate()
+	# con CAL, nada de luz por encima de la boca de la carpa (lo dijo el usuario: «arriba, cuando está encendido el foco, salen como
+	# un poco de reflejo… es un error»: el brillo de las filas 3 a 6, en el techo, por encima del foco)
+	if Datos.CAL:
+		o.fill_rect(Rect2i(0, 0, 240, int(Datos.carga().VCA.boca)), Color(0, 0, 0, 0))
+	if not lc.has(vc.tipo):
+		cache[k] = o
+		return o
 	var c: Array = lc[vc.tipo][0]
 	var lk: float = .299 * c[0] + .587 * c[1] + .114 * c[2]
-	var o: Image = L.duplicate()
 	for y in 160:
 		for x in 240:
 			var p := o.get_pixel(x, y)

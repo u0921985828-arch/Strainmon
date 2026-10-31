@@ -148,6 +148,58 @@ func _corre() -> void:
 					if x >= 0 and x < 240 and y >= 0 and y < 160 and lum(a.get_pixel(x, y)) > .04:
 						C.append(Vector2i(x, y))
 		ok("%s: de noche, la campana a oscuras y en verde" % e.k, C.size() > 20 and media(noche, C) <= .3 * media(dia, C) and verde(noche, C))
+	# en todas las carpas y con todos los focos (lo dijo el usuario: «lo mismo tiene que pasar en todas las carpas y con todas las
+	# luces»): de noche, a oscuras y en verde, la campana también; de día, nada de luz por encima de la boca de la carpa (lo dijo el
+	# usuario: «arriba, cuando está encendido el foco, salen como un poco de reflejo… es un error»)
+	var boca := int(Datos.carga().VCA.boca)
+	var vistas := {}
+	for e in O.escenas:
+		if e.html == null:
+			continue
+		for f in Datos.carga().FOCOS:
+			var x: Dictionary = e.duplicate(true)
+			x.foco = f
+			var S := estado(x)
+			var g = Vista.geo(S, 0)
+			if g.vc == null or not Cultivo.plantas_vivas(S, 0):
+				continue
+			var q := "%s+%s" % [e.k, f]
+			Datos.CAL = true
+			var L := Arte.luz(e.t, g.vc)
+			var n := 0
+			for y in boca:
+				for i in 240:
+					if L.get_pixel(i, y).a8:
+						n += 1
+			ok("%s: nada de luz encima de la boca (%d px)" % [q, n], n == 0)
+			Datos.CAL = false
+			var n0 := 0
+			var L0 := Arte.luz(e.t, g.vc)
+			for y in boca:
+				for i in 240:
+					if L0.get_pixel(i, y).a8:
+						n0 += 1
+			vistas[q] = n0
+			var dia: Image = await pinta(con(x, "flor", 12), true)
+			var noche: Image = await pinta(con(x, "flor", 22), true)
+			var P := []
+			for y in range(0, 160, 2):
+				for i in range(0, 240, 2):
+					if lum(dia.get_pixel(i, y)) > .04:
+						P.append(Vector2i(i, y))
+			ok("%s: de noche, a oscuras y en verde" % q, media(noche, P) <= .25 * media(dia, P) and verde(noche, P))
+			var C := []
+			var gv = Vista.geo(con(x, "flor", 22), 0)
+			var fc := Arte.foto(gv.vc.foco.n)
+			for cx in gv.vc.get("fxs", [120]):
+				for y in range(int(gv.vc.fy) - 15, int(gv.vc.fy) - 15 + fc.get_height()):
+					for i in range(int(cx) - (fc.get_width() >> 1), int(cx) + (fc.get_width() >> 1)):
+						if i >= 0 and i < 240 and y >= 0 and y < 160 and lum(dia.get_pixel(i, y)) > .04:
+							C.append(Vector2i(i, y))
+			ok("%s: de noche, el foco a oscuras y en verde" % q, C.size() > 20 and media(noche, C) <= .3 * media(dia, C) and verde(noche, C))
+	ok("sin CAL, el reflejo de arriba sigue (como el HTML)", vistas.values().max() > 0)
+	print("combinaciones carpa+foco: ", vistas.size())
+	Datos.CAL = false
 	# lo dijo el usuario: «la lámpara CFL… no se ve la luz cuando está encendida» y, apagado, «no hay nada que refleje la luz en las
 	# paredes»: con CAL, el CFL encendido tiñe de su azul el suelo y la pared (píxeles con el azul 20 por encima del rojo, abajo) y la
 	# carpa sin plantas (apagada) sale a oscuras como la noche
