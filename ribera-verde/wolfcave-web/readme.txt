@@ -1,4 +1,4 @@
-=== Kuboplay Web ===
+=== Wolf Cave Web ===
 Stable tag: 1.1.0
 Requires PHP: 7.0
 License: GPLv2 or later
@@ -18,6 +18,9 @@ Portada de Landrace Hunters con anuncios, aviso de cookies, ads.txt y páginas l
 == Changelog ==
 
 = 1.1.0 =
+* Marca Wolf Cave: barra de la casa arriba, nombre y pie. Cuatro huecos de anuncios (arriba, del medio,
+  columna de 300×600 en pantallas anchas y abajo) y capturas del juego en la portada. Ningún anuncio, por
+  ancho que sea, puede estirar la página en el móvil.
 * La portada con el arte del juego: el rótulo LANDRACE HUNTERS, el club, el protagonista y una
   planta en pixel art (img/), y la hoja de marca de agua en los tres recuadros. Pesan 20 KB en total.
 

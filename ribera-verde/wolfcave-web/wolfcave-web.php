@@ -1,18 +1,18 @@
 <?php
 /**
- * Plugin Name: Kuboplay Web
+ * Plugin Name: Wolf Cave Web
  * Description: Portada de Landrace Hunters con huecos de anuncios (Mantis, afiliados de bancos de semillas o cualquier red que acepte contenido +18 de cannabis), aviso de cookies que solo carga los anuncios con permiso, /ads.txt, páginas legales y la privacidad de las apps (/privacidad-app/).
  * Version: 1.1.0
- * Author: Kuboplay
+ * Author: Wolf Cave
  * License: GPL-2.0-or-later
- * Text Domain: kuboplay-web
+ * Text Domain: wolfcave-web
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-final class Kuboplay_Web {
+final class Wolfcave_Web {
 
 	const VERSION = '1.1.0';
 	const OPTION  = 'kpweb';
@@ -39,6 +39,8 @@ final class Kuboplay_Web {
 				'address' => isset( $old['address'] ) ? $old['address'] : '',
 				'email'   => ! empty( $old['email'] ) ? $old['email'] : get_option( 'admin_email' ),
 				'ad_top'  => '',
+				'ad_mid'  => '',
+				'ad_side' => '',
 				'ad_bot'  => '',
 				'ads_txt' => '',
 				'texto'   => '',
@@ -116,7 +118,7 @@ final class Kuboplay_Web {
 	 * (1.51.1); se traslada tal cual para que la dirección no se rompa al borrarlo.
 	 */
 	private static function app_privacy() {
-		$owner = self::opt( 'owner' ) ? self::opt( 'owner' ) : 'WOLFCADE';
+		$owner = self::opt( 'owner' ) ? self::opt( 'owner' ) : 'Wolf Cave';
 		$mail  = self::opt( 'email' ) ? self::opt( 'email' ) : get_option( 'admin_email' );
 		$p     = static function ( $t ) { return '<p>' . esc_html( $t ) . '</p>'; };
 		$h     = static function ( $t ) { return '<h2>' . esc_html( $t ) . '</h2>'; };
@@ -238,19 +240,19 @@ final class Kuboplay_Web {
 			}
 		}
 		do_action( 'kp_shield_purge' );
-		wp_safe_redirect( admin_url( 'options-general.php?page=kuboplay-web&legal=1' ) );
+		wp_safe_redirect( admin_url( 'options-general.php?page=wolfcave-web&legal=1' ) );
 		exit;
 	}
 
 	/* --------------------------------------------------------------- Panel */
 
 	public static function action_links( $links ) {
-		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=kuboplay-web' ) ) . '">Ajustes</a>' );
+		array_unshift( $links, '<a href="' . esc_url( admin_url( 'options-general.php?page=wolfcave-web' ) ) . '">Ajustes</a>' );
 		return $links;
 	}
 
 	public static function menu() {
-		add_options_page( 'Web y anuncios', 'Web y anuncios', 'manage_options', 'kuboplay-web', array( __CLASS__, 'page' ) );
+		add_options_page( 'Web y anuncios', 'Web y anuncios', 'manage_options', 'wolfcave-web', array( __CLASS__, 'page' ) );
 	}
 
 	public static function settings() {
@@ -274,6 +276,8 @@ final class Kuboplay_Web {
 			'address' => isset( $in['address'] ) ? sanitize_text_field( wp_unslash( $in['address'] ) ) : '',
 			'email'   => isset( $in['email'] ) ? sanitize_email( wp_unslash( $in['email'] ) ) : '',
 			'ad_top'  => $raw( 'ad_top' ),
+			'ad_mid'  => $raw( 'ad_mid' ),
+			'ad_side' => $raw( 'ad_side' ),
 			'ad_bot'  => $raw( 'ad_bot' ),
 			'ads_txt' => isset( $in['ads_txt'] ) ? implode( "\n", array_filter( array_map( 'sanitize_text_field', preg_split( '/\R/', (string) wp_unslash( $in['ads_txt'] ) ) ) ) ) : '',
 			'texto'   => isset( $in['texto'] ) ? sanitize_textarea_field( wp_unslash( $in['texto'] ) ) : '',
@@ -326,7 +330,9 @@ final class Kuboplay_Web {
 				<p>Pega el código que te da la red (Mantis, el programa de afiliados de un banco de semillas…). Solo se carga si el visitante acepta las cookies.</p>
 				<table class="form-table" role="presentation">
 					<?php
-					$a( 'ad_top', 'Anuncio de arriba', 'Bajo el botón «Jugar». Por ejemplo un banner de 300×250 o 728×90.' );
+					$a( 'ad_top', 'Anuncio de arriba', 'Bajo el botón «Jugar», lo primero que se ve. Por ejemplo 728×90 o 300×250.' );
+					$a( 'ad_mid', 'Anuncio del medio', 'Entre las capturas del juego y lo que trae. Por ejemplo 336×280.' );
+					$a( 'ad_side', 'Anuncio de la columna', 'Al lado del contenido en pantallas anchas (un rascacielos de 300×600); en el móvil baja al final. Deja esto vacío si no tienes uno vertical.' );
 					$a( 'ad_bot', 'Anuncio de abajo', 'Al final de la portada, antes del pie.' );
 					$a( 'ads_txt', 'ads.txt', 'Una línea por red, tal como te la dé (por ejemplo <code>mantisadnetwork.com, 1234, DIRECT</code>). Se sirve en <code>/ads.txt</code>. Vacío: no hay ads.txt.', 4 );
 					?>
@@ -361,5 +367,5 @@ register_activation_hook(
 		do_action( 'kp_shield_purge' );
 	}
 );
-register_uninstall_hook( __FILE__, array( 'Kuboplay_Web', 'uninstall' ) );
-Kuboplay_Web::init();
+register_uninstall_hook( __FILE__, array( 'Wolfcave_Web', 'uninstall' ) );
+Wolfcave_Web::init();
