@@ -1,11 +1,11 @@
 === Landrace Hunters ===
-Version: 1.6.6
+Version: 1.6.7
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.6.6.zip → Activar.
-Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.6.6-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.6.7.zip → Activar.
+Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.6.7-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -14,6 +14,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
+1.6.7 — Landrace Hunters (Godot 0.70.0): la ruta de la tía (un recado con testimonio en cada pueblo, que cuenta en el Acto III), el día de 8 minutos (4, 12 o 24 en OPCIONES → RELOJ) y los ladrones y carteristas solo de noche.
 1.6.6 — Landrace Hunters (Godot 0.69.1): más fluido en el navegador (el suelo de cada mapa se pinta una vez y no en cada fotograma, y el cono de la policía se calcula una vez por sitio), cada controlador de clima en su sala, las entradas cuadradas con las baldosas y lo translúcido sin destellos.
 1.6.5 — Landrace Hunters (Godot 0.65.2): sin las franjas blancas detrás de árboles y farolas al ponerte detrás; la mesa con plantas, translúcida en una sola capa.
 1.6.4 — Landrace Hunters (Godot 0.65.1): KAIA por niveles, las madres por dentro, la sala fría del sótano, la manicura a la vista, el billar con efecto y un rival que piensa rápido, y lo que tapa al protagonista, translúcido (la mesa con sus plantas, en una sola capa).
