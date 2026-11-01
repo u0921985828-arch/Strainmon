@@ -2,6 +2,15 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Créditos al día (lo pidió el usuario: «quiero que actualices bien los créditos y añadas a Josu, a Ander, a Bitxone, a Edorta»; solo Godot)
+
+- Los beta testers, los ocho: Kerman, Ibai, Adrián, Urko, **Josu, Ander, Bitxone y Edorta**.
+- **ARTE**, lo que hay de verdad hoy: de PixelLab, los personajes, los muebles de los locales y parte de los escenarios, revisados y retocados a mano; a mano y píxel a píxel, las carpas por dentro, las plantas, el equipo, las extracciones, los planos de cerca de cada acción, la calle y sus firmes, los pueblos, las zonas de ciudad, los interiores, los vehículos, los iconos, la interfaz y el icono de la app.
+- **MÚSICA Y SONIDO**: las canciones por zona, hora y momento, compuestas y grabadas para el juego (faltaban: solo se nombraba el chiptune), más el chiptune y sus efectos.
+- **FUENTES**: la DejaVu Sans, que se usa de reserva para los glifos que no trae la del móvil y cuya licencia ya salía en LICENCIAS, ahora también aquí.
+- **FICCIÓN**: Ibarbide y Hiriburu con los demás sitios, los negocios, y la línea de que las zonas de ciudad son un homenaje de forma, sin rótulos, escudos ni marcas de nadie.
+- `CREDITOS` en `godot/src/juego.gd`, con su inglés en `godot/i18n/partes/juego.csv`; `tests/ciclo.gd` comprueba los ocho nombres.
+
 ### 0.72.0 (código 101) · El maquetado de la interfaz, repasado (lo preguntó el usuario: «el maquetado de la UI sería posible analizarlo y mejorarlo?»; solo Godot, con `Datos.CAL`)
 
 - Un director de interfaz miró las doce pantallas de `tests/capturas_ui.gd` en un móvil de 2400 × 1080 a 420 ppp y de ahí salen seis arreglos:

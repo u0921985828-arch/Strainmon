@@ -749,20 +749,22 @@ Un juego desarrollado por WolfCade.
 Hecho con Godot Engine.
 
 AGRADECIMIENTOS
-A los beta testers Kerman, Ibai, Adrián y Urko.
+A los beta testers Kerman, Ibai, Adrián, Urko, Josu, Ander, Bitxone y Edorta, que lo rompieron antes que nadie.
 
 ARTE
-Personajes, escenarios y objetos: PixelLab (pixellab.ai), revisados y retocados a mano. Carpas por dentro, plantas, equipo, muebles, iconos y el icono de la app: dibujados a mano, píxel a píxel.
+Personajes, muebles de los locales y parte de los escenarios: PixelLab (pixellab.ai), revisados y retocados a mano.
+Dibujado a mano, píxel a píxel: las carpas por dentro, las plantas, el equipo de cultivo, las extracciones, los planos de cerca de cada acción, la calle y sus firmes, los pueblos, las zonas de ciudad, los interiores, los vehículos, los iconos, la interfaz y el icono de la app.
 
 MÚSICA Y SONIDO
-Chiptune original, sintetizado en el propio juego.
+Canciones originales por zona, hora y momento, compuestas y grabadas para el juego; chiptune original sintetizado en el propio juego, y todos sus efectos.
 
 FUENTES
 Press Start 2P · Copyright 2012 The Press Start 2P Project Authors. SIL Open Font License 1.1.
 Atkinson Hyperlegible · Copyright 2020 Braille Institute of America, Inc. SIL Open Font License 1.1.
+DejaVu Sans · Bitstream Vera Fonts Copyright 2003 Bitstream, Inc. Licencia entera en LICENCIAS.
 
 FICCIÓN
-Ribera Verde, Mendialde, Puerto Viejo, Valdehierro, Errotabarri y sus personajes son inventados: cualquier parecido con personas o lugares reales es casualidad. Las variedades llevan el nombre de genéticas conocidas y su historia es solo información.
+Ribera Verde, Mendialde, Puerto Viejo, Valdehierro, Errotabarri, Ibarbide, Hiriburu, sus negocios y sus personajes son inventados: cualquier parecido con personas, locales o lugares reales es casualidad. Las zonas de ciudad son un homenaje de forma, sin rótulos, escudos ni marcas de nadie. Las variedades llevan el nombre de genéticas conocidas y su historia es solo información.
 El cultivo y la venta de cannabis son delito en muchos países. Este juego no anima a consumir ni a vender.
 
 Gracias por jugar.""")
