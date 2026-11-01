@@ -2,7 +2,7 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### Créditos al día (lo pidió el usuario: «quiero que actualices bien los créditos y añadas a Josu, a Ander, a Bitxone, a Edorta»; solo Godot)
+### 0.73.0 (código 102) · Créditos al día (lo pidió el usuario: «quiero que actualices bien los créditos y añadas a Josu, a Ander, a Bitxone, a Edorta»; solo Godot)
 
 - Los beta testers, los ocho: Kerman, Ibai, Adrián, Urko, **Josu, Ander, Bitxone y Edorta**.
 - **ARTE**, lo que hay de verdad hoy: de PixelLab, los personajes, los muebles de los locales y parte de los escenarios, revisados y retocados a mano; a mano y píxel a píxel, las carpas por dentro, las plantas, el equipo, las extracciones, los planos de cerca de cada acción, la calle y sus firmes, los pueblos, las zonas de ciudad, los interiores, los vehículos, los iconos, la interfaz y el icono de la app.
