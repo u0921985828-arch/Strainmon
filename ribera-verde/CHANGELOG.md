@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El agujero negro de la calle (0.74, lo vio el usuario: «¿Y ese pedazo de error en el mapa?»; solo Godot, con `Datos.CAL`)
+
+- El **carril de entrada del aparcamiento** (y el suelo del propio aparcamiento) se ponían con la clave `road`, que **no existe en el atlas**: `_arte_tile` no pinta nada y la casilla se queda negra, un tajo negro en la acera de hasta 20 casillas. Ahora es `roadX`, el asfalto de cruce del mosaico (`mo-roadX`), que sí tiene arte y sigue contando como vía (`APARC_VIA` va por `begins_with("road")`).
+- 54 casillas negras en 6 mapas: Puerto Viejo (17), Abando (15), el Casco Viejo (14), Zorroza (3), Valdehierro (3) y Errotabarri (2).
+- Prueba nueva `tests/suelo_negro.gd` (90 mapas montados): ninguna casilla de `g` se queda sin arte de suelo y sin un sprite de edificio que la tape. Con el código de antes, 6 mapas con fallo.
+
 ### Las licencias de las bibliotecas de Android, dentro del juego (0.74)
 
 - CRÉDITOS → LICENCIAS añade el bloque **ANDROID: BIBLIOTECAS DE TERCEROS** (Play Billing, Play Games v2, AndroidX y Sentry) con su aviso de copyright y el texto entero de la **Apache 2.0** y de la **MIT** de Sentry, que es lo que esas licencias obligan a incluir: `godot/licencias/AVISOS-ANDROID.txt` y `APACHE-2.0.txt`, metidos en el `include_filter` del export.

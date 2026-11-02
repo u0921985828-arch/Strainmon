@@ -302,7 +302,7 @@ func montar_aparcamiento(mapa: String) -> void:
 		_aparc0[mapa] = g0
 	for y in 4:
 		for x in 3:
-			m.g[y0 + y][x0 + x] = "road" if Datos.CAL else _aparc0[mapa][y][x]   # i18n-no
+			m.g[y0 + y][x0 + x] = "roadX" if Datos.CAL else _aparc0[mapa][y][x]   # i18n-no
 	if APARC_OBRA.has(mapa):   # lo que se quita para que quepa con aire (sin CAL, vuelve)
 		if not _aparc_o.has(mapa):
 			_aparc_o[mapa] = APARC_OBRA[mapa].map(func(c): return m.o[c[1]][c[0]])
@@ -327,7 +327,7 @@ func montar_aparcamiento(mapa: String) -> void:
 			var g0 := []
 			for c in r:
 				g0.append([c.x, c.y, m.g[c.y][c.x]])
-				m.g[c.y][c.x] = "road"   # i18n-no
+				m.g[c.y][c.x] = "roadX"   # i18n-no
 			if g0.size():
 				_aparc_c[mapa] = g0
 	var bs: Array = m.blds.filter(func(q): return q.id != "aparcamiento")   # i18n-no
