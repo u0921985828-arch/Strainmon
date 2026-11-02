@@ -907,12 +907,111 @@ def tierra(moj=False):
     return L
 
 
+# ── EL ESQUEJE, la revista mensual (lo pidió el usuario: «un periódico del cannabis o alguna revista») ──
+# Letras de 3 × 5 para la cabecera y los rótulos de la portada (el nombre es propio y no se traduce)
+REV_LET = {
+	'A': ['010', '101', '111', '101', '101'], 'B': ['110', '101', '110', '101', '110'], 'C': ['011', '100', '100', '100', '011'],
+	'D': ['110', '101', '101', '101', '110'], 'E': ['111', '100', '110', '100', '111'], 'F': ['111', '100', '110', '100', '100'],
+	'G': ['111', '100', '101', '101', '111'], 'H': ['101', '101', '111', '101', '101'], 'I': ['111', '010', '010', '010', '111'],
+	'J': ['001', '001', '001', '101', '111'], 'L': ['100', '100', '100', '100', '111'], 'M': ['101', '111', '111', '101', '101'],
+	'N': ['101', '111', '111', '111', '101'], 'O': ['111', '101', '101', '101', '111'], 'P': ['111', '101', '111', '100', '100'],
+	'Q': ['111', '101', '101', '111', '001'], 'R': ['110', '101', '110', '101', '101'], 'S': ['111', '100', '111', '001', '111'],
+	'T': ['111', '010', '010', '010', '010'], 'U': ['101', '101', '101', '101', '111'], 'V': ['101', '101', '101', '101', '010'],
+	'X': ['101', '101', '010', '101', '101'], 'Y': ['101', '101', '010', '010', '010'], 'Z': ['111', '001', '010', '100', '111'],
+	'.': ['000', '000', '000', '000', '010'], 'º': ['110', '110', '000', '000', '000'], ' ': ['000'] * 5,
+}
+
+def rev_texto(L, x, y, t, c):
+	for ch in t.upper():
+		f = REV_LET.get(ch, REV_LET[' '])
+		for j, fila in enumerate(f):
+			for i, b in enumerate(fila):
+				if b == '1':
+					L.p(x + i, y + j, c)
+		x += 4
+	return x
+
+def f_revista():
+	"""la portada de EL ESQUEJE sobre la mesa, de cerca (144 × 96): papel crema, cabecera verde, foto de un cogollo
+	recuadrada, el titular en líneas de texto que no se leen y el pie con el precio"""
+	PAPEL = ('#c8bc9a', '#dcd2b4', '#ece4ca', '#f6f0dc')
+	VERDE = ('#1e3a1a', '#2f5a26', '#3c7a28', '#58a040')
+	L = lz(144, 96)
+	# la mesa alrededor (las vetas de la madera de la tía)
+	for y in range(96):
+		for x in range(144):
+			L.p(x, y, MAD[2] if (x * 7 + y * 11) % 19 else '#bc8a52')
+	for y in (12, 40, 68, 90):
+		L.hl(0, 143, y, MAD[1])
+	# la revista, un poco girada: sombra, canto de las hojas y la portada
+	X0, Y0, W, H = 16, 6, 112, 86
+	L.r(X0 + 3, Y0 + 4, W, H, '#6a4a28')          # la sombra
+	L.r(X0 - 2, Y0 + 2, W + 2, H - 2, PAPEL[0])   # el canto de las hojas
+	L.hl(X0 - 2, X0 + W - 1, Y0 + 4, PAPEL[1])
+	L.caja(X0, Y0, W, H, PAPEL[2], '#8a7a58')
+	for j in range(Y0 + 1, Y0 + H - 1):           # la luz del papel, arriba a la izquierda
+		for i in range(X0 + 1, X0 + W - 1):
+			if (i - X0) + (j - Y0) < 30:
+				L.p(i, j, PAPEL[3])
+	# la cabecera verde con el nombre
+	L.r(X0 + 1, Y0 + 1, W - 2, 13, VERDE[2])
+	L.hl(X0 + 1, X0 + W - 2, Y0 + 1, VERDE[3])
+	L.hl(X0 + 1, X0 + W - 2, Y0 + 13, VERDE[0])
+	rev_texto(L, X0 + 7, Y0 + 5, 'EL ESQUEJE', '#f6f0dc')
+	rev_texto(L, X0 + 7, Y0 + 16, 'REVISTA DE CULTIVO', '#6a6248')
+	# la foto: un cogollo con sus hojas, recuadrado, a la izquierda
+	FX, FY, FW, FH = X0 + 6, Y0 + 24, 46, 38
+	L.caja(FX, FY, FW, FH, '#1a2414', '#8a7a58')
+	for j in range(FY + 1, FY + FH - 1):          # el fondo de la foto, en degradado
+		for i in range(FX + 1, FX + FW - 1):
+			L.p(i, j, '#24341c' if (i + j) % 3 else '#1e2c18')
+	cx, cy = FX + FW // 2, FY + FH - 6
+	for s_ in (-1, 1):                            # dos hojas palmeadas abajo, de cinco dedos
+		for d in range(5):
+			largo = 8 - abs(d - 2) * 2
+			ang = 2.0 - d * .45
+			for t_ in range(largo):
+				x = cx + s_ * (6 + int(round(math.cos(ang) * t_)))
+				y = cy + 1 - int(round(math.sin(ang) * t_))
+				L.p(x, y, HOJA[2] if t_ < largo - 2 else HOJA[1])
+				if t_ and t_ < largo - 2:
+					L.p(x, y + 1, HOJA[1])
+	for k in range(5):                            # la cola: cinco pisos de cogollo, ancha abajo y en punta
+		w = 7 - k
+		yy = cy - 4 - k * 5
+		for j in range(6):
+			for i in range(-w, w + 1):
+				if abs(i) * 3 <= (w + 1) * 3 - j * 2 - (3 if j > 3 else 0):
+					L.p(cx + i, yy + j, COG[2] if (i * 2 + j + k) % 4 else COG[1])
+		for i in (-w, -w + 1, w - 1, w):          # los pistilos que asoman
+			L.p(cx + i, yy + 1 + (i % 2), PISTILO[1])
+			L.p(cx + i, yy + 4, PISTILO[0])
+		for i in range(-w + 1, w, 3):             # el brillo de la resina
+			L.p(cx + i, yy + 2, TRICOMA)
+	L.r(cx - 1, cy - 2, 2, 6, TALLO[1])
+	L.p(cx + 1, cy + 2, TALLO[0])
+	# el titular y el cuerpo: líneas de texto que no se leen (dos columnas)
+	TX = X0 + 56
+	for j, ancho in enumerate((50, 44, 36)):      # el titular, en negro y más gordo
+		L.r(TX, Y0 + 26 + j * 6, ancho, 2, '#3a3428')
+	for j in range(9):                            # el cuerpo
+		L.r(TX, Y0 + 48 + j * 4, 48 - (14 if j == 8 else 0), 1, '#7a7258')
+	for j in range(5):                            # la columna de debajo de la foto
+		L.r(X0 + 6, Y0 + 64 + j * 4, 44 - (18 if j == 4 else 0), 1, '#7a7258')
+	# el pie: la franja con el número y el precio
+	L.r(X0 + 1, Y0 + H - 8, W - 2, 7, VERDE[1])
+	L.hl(X0 + 1, X0 + W - 2, Y0 + H - 8, VERDE[2])
+	rev_texto(L, X0 + 5, Y0 + H - 7, 'LANDRACE HUNTERS', '#d8e8c8')
+	return L
+
+
 # ── a la salida ──
 sale('gs-f-carpa', f_carpa()); sale('gs-f-mesa', f_mesa()); sale('gs-f-cuarto', f_cuarto()); sale('gs-f-calle', f_calle())
 sale('gs-f-cama-n', f_cama(False)); sale('gs-f-cama-d', f_cama(True))
 sale('acc-f-portal', f_puerta_portal()); sale('acc-f-local', f_puerta_local()); sale('acc-f-club', f_puerta_club())
 sale('acc-f-franco', f_puerta_franco()); sale('acc-f-nave', f_persiana()); sale('acc-f-setas', f_puerta_bajo())
 sale('gs-maceta', maceta()); sale('gs-maceta-m', maceta(True))
+sale('gs-f-revista', f_revista())
 sale('gs-f-huerta', f_huerta()); sale('gs-tierra', tierra()); sale('gs-tierra-m', tierra(True))
 sale('gs-planta-v', planta()); sale('gs-planta-f', planta(True))
 # 0.55: la regadera a mano ya no sale (gs-regar, de PixelLab)

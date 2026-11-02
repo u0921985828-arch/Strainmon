@@ -133,6 +133,10 @@ func shop(T: Dictionary = {}) -> void:
 		var ft := filtra_tienda(list, F)
 		var filas: Array = ft.filas
 		list = ft.list
+		# EL ESQUEJE (revista.gd): el número del mes, en los dos growshops y en los estancos
+		if rev_hay() and (not T.has("lista") or T.get("lista") == "ESTANCO") and not rev_tiene(rev_num()):
+			list.append({"rev": true, "lbl": I18n.v(String(D.REVISTA.cab.n)), "p": 0, "ch": 0, "eur": rev_precio("est" if T.get("lista") == "ESTANCO" else ("ane" if T.N != "KIKO" else "kiko")),
+				"desc": T("{s}. El número de {m}.", {"s": I18n.v(String(D.REVISTA.cab.sub)), "m": rev_mes(rev_num())})})
 		var items := filas.duplicate()
 		for it in list:
 			var ic = null
@@ -151,7 +155,7 @@ func shop(T: Dictionary = {}) -> void:
 			elif it.get("carpa"):
 				ic = icono(Atlas.ico_carpa(it.carpa))
 			var mk := marca_de(it) if Datos.CAL and not it.get("sid") else ""
-			items.append({"label": it.lbl, "right": Datos.eur(precio_t(T, it)) + ("/u" if it.get("sid") else ""), "sw": D.STRAINS[it.sid].c if it.get("sid") else null, "ic": ic,
+			items.append({"label": it.lbl, "right": Datos.eur(it.eur) if it.get("rev") else Datos.eur(precio_t(T, it)) + ("/u" if it.get("sid") else ""), "sw": D.STRAINS[it.sid].c if it.get("sid") else null, "ic": ic,
 				"desc": strain_line(it.sid) if it.get("sid") else (I18n.v(String(it.get("desc", ""))) + ("" if mk == "" else T(" Marca: {m}.", {"m": mk})))})
 		items.append({"label": K("Salir"), "desc": K("Volver al mostrador.")})
 		i = await menu(items, {"cls": "full", "title": T.t, "title2": I18n.T("Tienes {e}", {"e": Datos.eur(S.money)}), "desc": true, "initial": clampi(i, 0, items.size() - 1)})
@@ -162,6 +166,9 @@ func shop(T: Dictionary = {}) -> void:
 		if i < 0 or i - filas.size() >= list.size():
 			break
 		var it: Dictionary = list[i - filas.size()]
+		if it.get("rev"):   # EL ESQUEJE (revista.gd)
+			await rev_compra("est" if T.get("lista") == "ESTANCO" else ("ane" if T.N != "KIKO" else "kiko"))
+			continue
 		if it.get("sid"):
 			if await comprar_semillas(it) and T.N == "KIKO":
 				confia("kiko", 1)
@@ -2141,12 +2148,13 @@ static func _suave(a: float) -> float:
 # gráfico»). Como la llave de la 1.53 (mismo recuadro, ACCESO_V, A o B lo pasan), un plano de detalle de lo que haces: regar, tratar la
 # plaga, abonar, plantar, sacar un esqueje, cosechar, manicurar, polinizar, fumar (porro, pipa, bong o vaporizador), vender y pagar
 const GESTOS := {"regar": 1200, "tratar": 1200, "abonar": 1200, "plantar": 1200, "sembrar": 1200, "esqueje": 1200, "cosechar": 1300, "manicurar": 1300,
-	"polen": 1200, "fumar": 1400, "vender": 1200, "pagar": 1300, "dormir": 1300}
+	"polen": 1200, "fumar": 1400, "vender": 1200, "pagar": 1300, "dormir": 1300, "revista": 1200}   # EL ESQUEJE (revista.gd)
 
 const GESTO_SON := {"regar": [[150, "agua"], [550, "agua"]], "tratar": [[250, "agua"], [600, "agua"]], "abonar": [[200, "agua"]],
 	"plantar": [[350, "tick"], [900, "tick"]], "sembrar": [[450, "tick"], [900, "tick"]], "esqueje": [[450, "tijera"]], "cosechar": [[450, "tijera"], [850, "tick"]],
 	"manicurar": [[250, "tijera"], [500, "tijera"], [750, "tijera"], [1000, "tijera"]], "polen": [[450, "tick"], [700, "tick"]],
-	"fumar": [[100, "chispa"]], "vender": [[600, "coin"]], "pagar": [[200, "tick"], [400, "tick"], [600, "tick"], [800, "tick"], [1000, "coin"]]}
+	"fumar": [[100, "chispa"]], "vender": [[600, "coin"]], "pagar": [[200, "tick"], [400, "tick"], [600, "tick"], [800, "tick"], [1000, "coin"]],
+	"revista": [[200, "tick"], [700, "tick"]]}
 
 # ---------- (lo pidió el usuario: «eso no son sprites en condiciones en el mismo estilo que los muebles del juego»): el plano de
 # cerca, 144 × 96 a escala de la vista C, compuesto con los sprites de tools/sprites/a-mano/gestos.py (la planta, la maceta y la pared

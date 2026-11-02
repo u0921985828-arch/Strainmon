@@ -153,7 +153,7 @@ func recoger_salvaje(i: int) -> void:
 		discover(w.sid)
 		campo_s().r[str(i)] = S.day
 		sfx("get")
-		await say(T("Cortas una punta de la {s} y la envuelves en papel húmedo. Plántala antes del {d}.", {"s": s.n, "d": Datos.fd(S.day + D.ESQUEJE_DIAS + 1, S.day)}))
+		await say(T("Cortas una punta de la {s} y la envuelves en papel húmedo. Plántala antes del {d}.", {"s": s.n, "d": Datos.fd(S.day + esq_dias() + 1, S.day)}))
 	MAPS[S.map].o[int(D.CAMPO.sitios[i][1])][int(D.CAMPO.sitios[i][0])] = null
 
 # el arcón del caserío: lo que escondes aquí no lo encuentran ni la redada ni Darko

@@ -12303,6 +12303,10 @@
     {
      "nombre": "gs-tierra-m",
      "celda": "gs_c"
+    },
+    {
+     "nombre": "gs-f-revista",
+     "celda": "gs_fondo"
     }
    ],
    "cubre": [
@@ -12401,7 +12405,8 @@
     "misc:acc-f-setas",
     "misc:gs-f-huerta",
     "misc:gs-tierra",
-    "misc:gs-tierra-m"
+    "misc:gs-tierra-m",
+    "misc:gs-f-revista"
    ],
    "descripcion": "1.54.1: el plano de cerca de cada acción: fondos (carpa, mesa, salón, calle, cama de noche y de siesta, la huerta al sol) y piezas (manos, herramientas, plantas, humo, billetes)."
   },

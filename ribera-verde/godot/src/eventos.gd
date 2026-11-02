@@ -2356,6 +2356,12 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 			if t > 1000:   # empuja el montón y se va por la esquina
 				var e: float = _mv(0, 70, (t - 1000) / 200.0)
 				_gsm(R, "gm-vacia", 84 + e, 34 + e)
+		"revista":   # EL ESQUEJE (revista.gd): la portada del número sube a la mesa y las manos la sostienen por los lados
+			_gsp(R, "gs-f-cuarto", 0, 0)
+			var e: float = _mv(96, 0, t / 300.0) if t < 1000 else _mv(0, 24, (t - 1000) / 200.0)
+			_gsp(R, "gs-f-revista", 0, e)
+			_gsm(R, "gm-vacia", 4, 56 + e)
+			_gsm(R, "gm-vacia", 112, 56 + e)
 		"dormir":   # en la cama, de noche (o la siesta, de día); respira y suben las zetas
 			_gsp(R, "gs-f-cama-d" if c == "siesta" else "gs-f-cama-n", 0, 0)
 			_gsp(R, "gs-dormido-%d" % (1 if fmod(t, 1000) > 500 else 0), 16, 30)   # 1.55.1: de lado, tapado, el pecho sube y baja

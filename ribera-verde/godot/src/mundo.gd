@@ -454,12 +454,18 @@ func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 
 # (1.36), 1/CURADO.dias al día; curado se vende CURADO.precio más caro (calidad) y el THC sube CURADO.thc por lo que se cura (1.36). 1.36: sin curar ya no
 # pierde THC; los extractos se curan en frío en la nevera (S.nevera.rosin, sin tarros) y el manicurado (mc, de 0 a 1) pela los
 # cogollos: MANICURA.precio más caro. Al juntar dos lotes, el THC, lo curado, lo manicurado y el día van por gramos
+# los días que aguanta un esqueje sin plantar: uno más con las técnicas de esquejes de EL ESQUEJE (revista.gd)
+func esq_dias() -> int:
+	return int(D.ESQUEJE_DIAS) + (1 if Cultivo.rev_bono(S, "clon") >= .1 else 0)
+
 func calidad(b: Dictionary, flor := false) -> float:
 	var q: float = 1 + D.CURADO.precio * float(b.get("cu", 0)) + D.MANICURA.precio * float(b.get("mc", 0)) + D.CAMAROTE.extra * float(b.get("af", 0))   # 1.43.6: afinado en el camarote
 	if Datos.CAL and flor:   # MAESTRO [5]: la hierba verde vale poco y en tarros, semana a semana, más; la rara, ×SHINY.x
 		q *= verde(b) * (float(D.SHINY.x) if b.get("sh") else 1.0) * (1 + float(D.RAREZAS.r.aroma.x) * float(b.get("ar", 0)))   # ESTUDIO, tanda 2
 	if Datos.CAL and b.get("oz"):   # MAESTRO [6]: secada con el ozono en la sala, sin terpenos
 		q *= float(D.OLOR_NAVE.oz_q)
+	if Datos.CAL:   # EL ESQUEJE (revista.gd): el lavado de raíces, el secado lento y el curado en tarro
+		q *= 1 + Cultivo.rev_bono(S, "cal")
 	return q
 
 # recién cortada, VERDE.min; seca del todo a los VERDE.dias; y lo curado, VERDE.semana más por semana (hasta VERDE.semanas)
@@ -3143,6 +3149,45 @@ func hilo_talk(_id: String) -> bool:
 	return false
 
 func hilo_dia() -> void:
+	pass
+
+# EL ESQUEJE, la revista mensual (revista.gd)
+func rev_dia() -> void:
+	pass
+
+func rev_hay() -> bool:
+	return false
+
+func rev_compra(_donde := "prensa") -> void:   # i18n-no
+	pass
+
+func rev_menu() -> void:
+	pass
+
+func rev_ficha() -> String:
+	return ""
+
+func rev_num(_dia := -1) -> int:
+	return 0
+func rev() -> Dictionary:
+	return {}
+func rev_precio(_donde := "prensa") -> float:   # i18n-no
+	return 0.0
+func rev_mes(_n: int) -> String:
+	return ""
+func rev_titular(_n: int) -> String:
+	return ""
+func rev_lee(_n: int) -> void:
+	pass
+func rev_guarda(_n: int) -> void:
+	pass
+func rev_bono(_e: String) -> float:
+	return 0.0
+
+func rev_tiene(_n: int) -> bool:
+	return false
+
+func rev_suscribe() -> void:
 	pass
 
 func copa_ot_hoy() -> bool:   # la Copa de otoño (copaot.gd)

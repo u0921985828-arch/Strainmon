@@ -281,7 +281,7 @@ static func plant_step(S: Dictionary, p: Dictionary, h: float, f: Dictionary) ->
 		p.health += h
 	var D := Datos.carga()
 	if f.get("hr", 0) > D.HR_OK[1] and p.prog >= .65 and p.prog < 1:   # moho: humedad alta en floración (1.10)
-		p.health -= h * (f.hr - D.HR_OK[1]) * D.MOHO * float(f.get("moho", 1.0)) * (1 - float(D.IVS.res) * iv_f(p.get("f"), 3)) * (1 - fam(S, "res"))   # MAESTRO [5]: resistencia a hongos
+		p.health -= h * (f.hr - D.HR_OK[1]) * D.MOHO * float(f.get("moho", 1.0)) * (1 - float(D.IVS.res) * iv_f(p.get("f"), 3)) * (1 - fam(S, "res")) * (1 - rev_bono(S, "moho"))   # MAESTRO [5]: resistencia a hongos; EL ESQUEJE: el defoliado y la limpieza
 	p.health = clampf(p.health, 0, 100)
 	if p.health <= 0:
 		p.dead = true
@@ -457,6 +457,19 @@ static func fam(S: Dictionary, b: String) -> float:
 			t += float(F[k].v)
 	return t
 
+# EL ESQUEJE (revista.gd): lo que suman las técnicas aprendidas (S.rev.tec) de ese efecto, con su tope
+static func rev_bono(S: Dictionary, e: String) -> float:
+	if not Datos.CAL or not (S.get("rev") is Dictionary) or not (S.rev.get("tec") is Array) or S.rev.tec.is_empty():
+		return 0.0
+	var R = Datos.carga().get("REVISTA")
+	if R == null:
+		return 0.0
+	var t := 0.0
+	for tc in R.tec:
+		if String(tc.e) == e and S.rev.tec.has(String(tc.k)):
+			t += float(tc.v)
+	return minf(t, float(R.tope.get(e, 1.0)))
+
 static func fam_llena(S: Dictionary, k: String) -> bool:
 	if not (S.get("cult") is Dictionary):
 		return false
@@ -543,7 +556,7 @@ static func cosecha(S: Dictionary, i: int) -> Dictionary:
 static func gramos_planta(S: Dictionary, p: Dictionary, f: Dictionary) -> int:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"y": 1}
-	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + abo_de(p.get("fo")).rend * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0))) * (1 + float(Datos.carga().IVS.prod) * iv_f(fe, 1)) * (1 + fam(S, "g")) * ra_g(p)))
+	return maxi(1, Datos.jsround(minf(f.cap, f.g * s.y / Datos.carga().Y_MEDIA * (.4 + .6 * p.health / 100) * (1 + abo_de(p.get("fo")).rend * fq(p)) * fe.y) * (1 - Datos.carga().CORTA_REND * float(p.get("corta", 0))) * (1 + float(Datos.carga().IVS.prod) * iv_f(fe, 1)) * (1 + fam(S, "g")) * (1 + rev_bono(S, "rend")) * ra_g(p)))
 
 # ESTUDIO, tanda 2: la enana rinde menos y la segunda cosecha de la doble, su parte
 static func ra_g(p: Dictionary) -> float:
@@ -557,7 +570,7 @@ static func ra_g(p: Dictionary) -> float:
 static func thc_cosecha(S: Dictionary, p: Dictionary, f: Dictionary) -> float:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"t": 1}
-	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) * (1 + float(Datos.carga().IVS.pot) * iv_f(fe, 0)) * (1 + fam(S, "thc")) + f.thc + abo_de(p.get("fo")).thc * fq(p) + (float(Datos.carga().RAREZAS.r.resina.thc) if ra_tiene(p, "resina") else 0.0)) * 10) / 10.0)
+	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) * (1 + float(Datos.carga().IVS.pot) * iv_f(fe, 0)) * (1 + fam(S, "thc")) * (1 + rev_bono(S, "thc")) + f.thc + abo_de(p.get("fo")).thc * fq(p) + (float(Datos.carga().RAREZAS.r.resina.thc) if ra_tiene(p, "resina") else 0.0)) * 10) / 10.0)
 
 static func plantas_vivas(S: Dictionary, ci: int) -> bool:
 	var H := huecos(S)

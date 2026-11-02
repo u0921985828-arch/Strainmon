@@ -242,7 +242,7 @@ func madre_ops(i: int) -> void:
 			return
 		M.e = int(M.e) - q
 		sfx("get")
-		var fq := Datos.fd(int(S.day) + int(D.ESQUEJE_DIAS) + 1, S.day)
+		var fq := Datos.fd(int(S.day) + esq_dias() + 1, S.day)
 		await say(T("{q} esquejes de la {m}, al propagador. Plántalos antes del {f}.", {"q": q, "m": madre_txt(M), "f": fq}) if q > 1 else T("Un esqueje de la {m}, al propagador. Plántalos antes del {f}.", {"m": madre_txt(M), "f": fq}))
 		return
 	if op == K("Cortarle esquejes"):   # con CAL: tú, con las tijeras, las puntas de las ramas de abajo (le cuesta algo de vigor)
@@ -255,7 +255,7 @@ func madre_ops(i: int) -> void:
 		M.cd = int(S.day)
 		M.v = maxi(0, int(M.v) - int(D.MADRES.get("corte_p", 5)))
 		sfx("get")
-		var fq := Datos.fd(int(S.day) + int(D.ESQUEJE_DIAS) + 1, S.day)
+		var fq := Datos.fd(int(S.day) + esq_dias() + 1, S.day)
 		await say(T("Le cortas {q} esquejes a la {m}, al propagador. Plántalos antes del {f}. Mañana, más.", {"q": q, "m": madre_txt(M), "f": fq}) if q > 1 else T("Le cortas un esqueje a la {m}, al propagador. Plántalo antes del {f}. Mañana, más.", {"m": madre_txt(M), "f": fq}))
 		return
 	if op == K("Quitarla"):

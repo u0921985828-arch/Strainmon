@@ -688,7 +688,8 @@ s3bcb6652,Hasta las {h},Until {h}
 sbc4a252c,La torre del reloj marca las {h}. En su banco corrido se espera bien.,The clock tower says {h}. Its long bench is a good place to wait.
 sf8f1a27c,Las {h}. Las campanas de la torre dan la hora sobre tu cabeza.,{h}. The tower bells strike the hour above your head.
 s25bb55de,El quiosco de prensa. El periódico de hoy ya lo tienes.,The newsstand. You already have today's paper.
-s64fdeccd,"El quiosco de prensa. El periódico, {e}.","The newsstand. The paper, {e}."
+s66ba0ec3,El periódico ({e}),The newspaper ({e})
+sfee9b716,"El quiosco de prensa. Periódicos, revistas y cromos.","The newsstand. Newspapers, magazines and trading cards."
 sbb9fe894,No llevas suelto.,You've no change on you.
 sa4b55995,"El tiempo de mañana: {t}, de {a} a {b} °C.","Tomorrow's weather: {t}, from {a} to {b} °C."
 s336b4bcc,"El tiempo de mañana: {t}, de {a} a {b}°.","Tomorrow's weather: {t}, from {a} to {b}°."
@@ -840,6 +841,7 @@ s5f328648,Plántula,Seedling
 s7106e485,Vegetativo,Vegetative
 s155aeee2,Floración,Flowering
 s79101fe1,RAREZAS,RAREZAS
+s960ae85c,REVISTA,MAGAZINE
 s606c9e88,DEX,
 s9c2c1caf,RECIPES,
 s808a2361,BANCO,BANK
@@ -1528,9 +1530,13 @@ s20cf94a8,"La huerta: depósitos, riego y herramientas","The garden: tanks, irri
 s82853181,"Bidones y depósitos de agua, el goteo con bomba solar, las herramientas y la motoazada: llegan al día siguiente a la huerta.","Water drums and tanks, drip irrigation with a solar pump, the tools and the rotary tiller: they arrive at the garden the next day."
 s2c1cb4ca,La instalación eléctrica,The wiring
 sd1541010,Placas solares y generador insonorizado para el piso y la nave: lo que pasa de la potencia contratada deja firma térmica.,Solar panels and a silent generator for the flat and the warehouse: anything over the contracted power leaves a thermal signature.
+s412550a8,{r}: suscripción,{r}: subscription
+scbeb8f20, · te quedan {q}, · {q} left
+s33a83c40,"{n} números de {r}, {s}. Llega al buzón el día 1 de cada mes.","{n} issues of {r}, {s}. It lands in your mailbox on the 1st of each month."
 sfa78c4b9,"Con tarjeta, de la cuenta del banco.","By card, from your bank account."
 s3a1d6591,TIENDA ONLINE,ONLINE SHOP
 sb1ead1df,Muebles y transporte · en la cuenta {e},Furniture and transport · in the account {e}
+seac3c9d9,Suscrito a {r}: {n} números,Subscribed to {r}: {n} issues
 s6d058a0e,Pedido: {n} · los obreros vienen mañana,Ordered: {n} · the builders come tomorrow
 sed705066,"La envasadora, en casa: se usa desde el maletero.",The sealer is at home: use it from the boot.
 sfe38af21, · {n} mañana, · {n} tomorrow
@@ -1946,6 +1952,11 @@ sfd6ac111,"Este juego usa Godot Engine, con licencia MIT:
 ","This game uses Godot Engine, under the MIT license:
 
 "
+s076eead0,"
+
+ANDROID: BIBLIOTECAS DE TERCEROS
+
+",
 sc4af1884,"
 
 GODOT ENGINE: PARTES DE TERCEROS","
@@ -1993,7 +2004,6 @@ s4929112a, · {g} g rosin, · {g} g rosin
 s52e4628c,EFECTIVO,CASH
 s26e3f421,FLORES,BUDS
 s99a32bef,ROSIN,ROSIN
-sb689d9c5,PRUEBA,
 s26909437,REND %s %.1f fps · proceso %.1f ms · %s,
 s0e6e6084,REND fin,
 s4c0acb47,Kits de carpa devueltos (KAIA),Tent kits refunded (KAIA)
@@ -3279,6 +3289,41 @@ s2ee6cac3,¡Gracias! Ya tienes el juego completo.,Thanks! You now have the full 
 sbaa4da2f,"La compra está pendiente. Cuando se confirme, sigue desde START · JUEGO COMPLETO.","The purchase is pending. Once confirmed, carry on from START · FULL GAME."
 sad7ca9d6,Compra cancelada.,Purchase cancelled.
 sd5542ba8,No se ha podido hacer la compra. Inténtalo más tarde.,The purchase couldn't go through. Try again later.
+s528f9ff7,{m} de {y},
+se76c1fbf,Dónde conseguirla: {p}.,
+s087ed473,De esta no dicen de dónde sale. Alguien de la comarca la tendrá.,
+sf09c72fa,Esta ya la tienes en la GENOTECA.,
+s98320be0,CAZA,
+sada3041d,REGALO,
+s329afdaf,la tía la escondió en algún sitio de la comarca,
+sd8774a62,de receta: {r},
+s89bd8eb8,"Flor al por mayor, en la lonja: {e} el gramo al {t} % de THC.",
+s8e26bd1a,En los clubs: {e} el gramo al {t} %.,At the clubs: {e} a gram at {t} %.
+s29b193bc,"Extracción, a los catadores: {e} el gramo al {t} %.","Extraction, to the tasters: {e} a gram at {t} %."
+sca30e275,"Precios de referencia: lo curado y lo manicurado sube, y lo verde baja.","Reference prices: cured and trimmed goes up, green goes down."
+s42f80b1e,El jurado de la plaza prepara la Copa de otoño. Se abrirá a quien tenga algo que presentar.,The panel in the square is getting the autumn Cup ready. It will open to anyone with something to enter.
+s7d3d3552,"Copa de otoño: el {d} de {m}, en la plaza. Cinco categorías.","Autumn Cup: {d} {m}, in the square. Five categories."
+s2518db6d,{c}: {p}º puesto.,{c}: place {p}.
+s9f36d6c1,Este año aún no se ha presentado nada a tu nombre.,Nothing has been entered in your name this year yet.
+s4572a52b,"Con la licencia del muelle, la distribuidora puede mover género legal cada día. La revista recuerda que lo que sale de ahí va con papeles.","With the dock licence, the distributor can move legal product every day. The magazine reminds you that whatever leaves there goes with paperwork."
+s4f25087a,"KAIA abre en el muelle con dispensario para socios. A los treinta días de abrir, la ley permite pedir licencia de distribuidora.","KAIA opens at the dock with a members' dispensary. Thirty days after opening, the law allows applying for a distributor licence."
+sf590d2c2,"Las asociaciones con presidencia al día pueden tener dispensario para socios. Fuera de eso, nada de vender a quien no es socio.","Associations with their chair in order may run a members' dispensary. Beyond that, no selling to non-members."
+s8230b6bf,"Las asociaciones piden una ley clara: cultivo compartido, dispensario para socios y nada de venta a la calle.","The associations are asking for a clear law: shared growing, a members' dispensary and no street sales."
+sef0e6c79,"{r}, el número de {m}. Ese ya lo tienes.","{r}, the {m} issue. You already have that one."
+s8b2e5f10,Comprarla ({e}),Buy it ({e})
+se8e06bb5,"{r}, {s}. El número de {m}: «{t}».","{r}, {s}. The {m} issue: “{t}”."
+sf1574a09,Aprendes una técnica: {n},You learn a technique: {n}
+s645e46ab,Tienes en el buzón el número de {m}: «{t}».,The {m} issue is in your mailbox: “{t}”.
+s4f8b62fa,Te quedan {q} números de la suscripción.,You have {q} issues left on the subscription.
+s7c766478,Era el último de la suscripción: se renueva en la tienda online.,That was the last one of the subscription: renew it in the online shop.
+sec466510,{n} de {t} números,{n} of {t} issues
+sac063dd2,{n} números guardados · {t} técnicas aprendidas.,{n} issues kept · {t} techniques learned.
+s7ebb3f07,cosecha +{p} %,harvest +{p} %
+sf65470bb,calidad +{p} %,quality +{p} %
+s546f9c98,THC +{p} %,THC +{p} %
+s7c4428ee,menos moho ({p} %),less mould ({p} %)
+s0b2504d4,esquejes más resistentes,hardier cuttings
+s3a5af9f5,Pulsa A para releer cualquier número.,Press A to read any issue again.
 sd063a769,FRIA,
 sa55ad4e6,"La sala de al lado del sótano, a {t} °C: {l}. Las máquinas de extracción bajan allí y rinden más en frío.","The room next to the basement, at {t} °C: {l}. The extraction machines go down there and yield more in the cold."
 s0562b6e7,"La sala de al lado del sótano, a {t}°: {l}. Las máquinas de extracción bajan allí y rinden más en frío.","The room next to the basement, at {t}°: {l}. The extraction machines go down there and yield more in the cold."
@@ -3560,6 +3605,7 @@ s770159ff,Buenas. ¿Qué te pongo?,Hi there. What'll it be?
 s703d5c31,"Hola, majo. Dime.","Hey, love. Go on."
 s761cb832,"Buenas. Tabaco, papel, mecheros… lo que quieras.","Hi. Tobacco, papers, lighters… whatever you need."
 se3452d10,ESTANCO_MAS,ESTANCO_MAS
+s15651b2e,{s}. El número de {m}.,{s}. The {m} issue.
 s33bb533e, Marca: {m}., Brand: {m}.
 s5ffd8c72,Volver al mostrador.,Back to the counter.
 sc8d45ec6,Tienes {e},You have {e}
@@ -7007,6 +7053,70 @@ s0cb7dc3c,"El THC de un cruce tuyo, sin receta, curado del todo. 10 g.","The THC
 saeb6ee81,El THC de una extracción sin disolventes. 2 g.,The THC of a solventless extract. 2 g.
 sade66c52,Semillas Ondarea,Semillas Ondarea
 s9315d584,"La ruta de la tía (tools/ruta_tia.py): los recados de D.SECUNDARIAS con «tia»; min, los testimonios que hacen una prueba del Acto III; todos, el aviso de Delroy.","La ruta de la tía (tools/ruta_tia.py): los recados de D.SECUNDARIAS con «tia»; min, los testimonios que hacen una prueba del Acto III; todos, el aviso de Delroy."
+s45315200,EL ESQUEJE,THE CUTTING
+s079046ea,revista mensual de cultivo,monthly growing magazine
+s8e81deb6,Edita la Federación de Clubs de la Comarca · Redacción en el Ensanche,Published by the Federation of Clubs of the County · Newsroom in the Ensanche
+s73390572,La poda apical,Topping
+s4e3f933d,"Cortar la punta del tallo principal cuando la planta tiene cuatro o cinco pisos de hojas. La planta deja de tirar hacia arriba y reparte la fuerza entre las ramas de abajo: en vez de una cola grande y seis pequeñas, salen cuatro o seis colas parecidas. Se hace en crecimiento y nunca en floración. Con el mismo foco y la misma maceta, se llena más superficie: de aquí sale el cuatro por ciento más de cosecha que verás en tus próximos cortes.","Cut the tip of the main stem when the plant has four or five sets of leaves. The plant stops reaching upwards and spreads its strength among the lower branches: instead of one big cola and six small ones, you get four or six similar colas. It is done in growth, never in flower. With the same lamp and the same pot you fill more surface: that is where the four per cent more harvest you will see in your next cuts comes from."
+s9466d045,El lavado de raíces,Root flushing
+s40aa1551,"Los últimos días antes de cortar, solo agua. La planta tira de lo que tiene guardado en las hojas y el cogollo sale limpio: ni sabor a abono ni ceniza negra. Se nota en la cata y en lo que te pagan por el lote, no en el peso. Si has abonado fuerte, alarga el lavado; si has llevado la planta justa de comida, con menos días basta.","Water only for the last days before cutting. The plant draws on what it has stored in the leaves and the bud comes out clean: no fertiliser taste, no black ash. It shows in the tasting and in what you are paid for the batch, not in the weight. If you have fed heavily, flush for longer; if you kept the plant lean, fewer days will do."
+sa11fad7f,El defoliado justo,Just enough defoliation
+sa3751743,"Quitar las hojas grandes que tapan los cogollos de dentro, y solo esas. Entra aire y entra luz donde antes había sombra y humedad parada: es ahí donde empieza el moho. Dos manos como mucho, una al entrar en floración y otra a mitad, y nunca a una planta tocada o recién trasplantada. No es poda estética: es ventilación.","Take off the big leaves that cover the inner buds, and only those. Air and light get in where there was shade and still damp before: that is where mould starts. Two passes at most, one going into flower and one halfway, and never on a stressed or freshly transplanted plant. This is not pruning for looks: it is ventilation."
+s18d9151d,El trasplante a tiempo,Transplanting on time
+s2354821a,"La raíz que da la vuelta al fondo de la maceta y se queda dando vueltas no vuelve a crecer igual. Se trasplanta cuando las raíces llegan al borde del cepellón y antes de que lo aten: la planta no se para ni un día. Trasplantar tarde cuesta una semana de crecimiento; trasplantar pronto, a una maceta enorme, encharca el sustrato.",A root that turns at the bottom of the pot and keeps circling never grows the same again. Transplant when the roots reach the edge of the root ball and before they bind it: the plant does not stop for a single day. Transplanting late costs a week of growth; transplanting early into a huge pot waterlogs the substrate.
+s2dbe9697,La malla horizontal,The horizontal net
+s76922a8e,"Una malla a un palmo y medio de la maceta, y las ramas se van metiendo por los cuadros a medida que crecen. Todas las puntas quedan a la misma altura, y a la misma altura del foco: no hay colas quemadas arriba ni cogollos de aire abajo. Se monta en crecimiento, antes de cambiar la luz; después ya no se mueve nada.","A net a hand and a half above the pot, and the branches are tucked through the squares as they grow. Every tip ends up at the same height, and at the same distance from the lamp: no burnt colas up top and no airy buds below. Set it up in growth, before you switch the light; after that nothing moves."
+s5f023245,Riego por peso,Watering by weight
+seefc8303,"Coge la maceta por el borde y levántala. Si pesa como un ladrillo mojado, no toca; si vuela, toca. Se riega por peso, no por días. Con el peso aprendes cuánta agua pide cada planta, y las raíces se hacen a buscar el agua en vez de nadar en ella. La maceta siempre mojada acaba con la raíz ahogada y la planta amarilla.","Take the pot by the rim and lift it. If it weighs like a wet brick, not yet; if it flies up, now. You water by weight, not by days. With the weight you learn how much water each plant asks for, and the roots get used to looking for water instead of swimming in it. A pot that is always wet ends with drowned roots and a yellow plant."
+s86587680,Los tricomas al corte,Trichomes at harvest
+sab0fd5fa,"El punto de corte no se mira en el calendario, se mira con una lupa en la resina de los cogollos de arriba: cuando las cabezas pasan de transparentes a blancas lechosas, es el día. Antes, el cogollo pesa menos y pega menos; mucho después, se vuelve pesado y tumba. Dos días de diferencia cambian el efecto de toda la cosecha.","You do not read the harvest point off the calendar, you read it with a loupe in the resin of the top buds: when the heads turn from clear to milky white, that is the day. Earlier, the bud weighs less and hits less; much later, it turns heavy and knocks you out. Two days of difference change the effect of the whole harvest."
+s92b8fc1d,El secado lento,Slow drying
+sf382bd2b,"El cogollo se seca en una habitación fresca, a oscuras y con el aire moviéndose despacio, nunca con un calefactor ni al sol. Rápido por fuera y verde por dentro es lo que huele a heno. Lento, el cogollo se dobla y el tallo cruje: ese es el que después cura bien en el tarro.","Bud dries in a cool room, in the dark, with the air moving slowly, never with a heater or in the sun. Fast outside and green inside is what smells of hay. Slowly, the bud bends and the stem snaps: that is the one that later cures well in the jar."
+se03a4698,Las madres por turnos,Mothers in turns
+s232f0e8d,"Una madre a la que le quitas todos los esquejes el mismo día tarda semanas en volver. Se corta por turnos, de una rama cada vez, y la madre no se para: siempre hay una parte de la planta creciendo mientras la otra se recupera. Y el esqueje se coge de las ramas de abajo, que enraízan antes que las puntas.","A mother you take every cutting from on the same day takes weeks to come back. Cut in turns, one branch at a time, and the mother never stops: part of the plant is always growing while the rest recovers. And take the cutting from the lower branches, which root sooner than the tips."
+s287cb448,Calor de fondo para los esquejes,Bottom heat for cuttings
+sd88c5fd8,"El esqueje no enraíza con calor en las hojas, enraíza con calor en el taco. El propagador templado por abajo y el aire de la habitación fresco: la raíz tira y la hoja no se gasta. Si se ponen mustios el primer día es normal; si se ponen amarillos, les sobra luz. Nada de abono hasta que haya raíz.","A cutting does not root from heat on the leaves, it roots from heat in the plug. The propagator warm underneath and the room air cool: the root pushes and the leaf is not spent. Drooping on the first day is normal; turning yellow means too much light. No fertiliser until there are roots."
+s3353b284,La limpieza entre ciclos,Cleaning between cycles
+sa026ce4d,"Entre cosecha y cosecha, la carpa se vacía y se limpia: paredes, bandeja, ventiladores, los filos de la cremallera. Las esporas y los bichos del ciclo anterior están ahí esperando a las plantas nuevas, que son las más blandas. Media hora de trapo ahorra un ciclo entero perdido por moho.","Between one harvest and the next, the tent is emptied and cleaned: walls, tray, fans, the edges of the zip. The spores and bugs from the previous cycle are in there waiting for the new plants, which are the softest. Half an hour with a cloth saves a whole cycle lost to mould."
+s82f928ad,El curado en tarro,Curing in the jar
+s974607bd,"El tarro se llena a tres cuartos, se cierra y se abre un rato cada día los primeros días. Lo que queda de humedad dentro del cogollo se reparte y sale, y lo que olía a verde se convierte en olor a variedad. Es el paso que más cambia el precio y el que más gente se salta por tener prisa.","Fill the jar three quarters full, close it and open it for a while each day during the first days. What moisture is left inside the bud spreads out and leaves, and what smelled green turns into the smell of the strain. It is the step that changes the price the most and the one most people skip out of impatience."
+s101bf585,"«Un otoño tranquilo»: la comarca, sin sustos","“A quiet autumn”: the county, with no scares"
+sa6b0eac1,La policía refuerza las patrullas en los barrios,Police step up patrols in the neighbourhoods
+se35d4ad7,Investigación abierta por venta de marihuana en la comarca,Investigation opened over marijuana sales in the county
+sc43308d6,Un juzgado autoriza registros: qué dice la ley y qué no,A court authorises searches: what the law says and what it does not
+s110ab946,Los clubs piden una ley que ponga orden,The clubs call for a law that sets things straight
+s13c2b8a1,KAIA abre en el muelle: un club con dispensario,KAIA opens at the dock: a club with a dispensary
+seb622652,Licencia para el muelle: la primera distribuidora legal de la comarca,Licence for the dock: the county's first legal distributor
+sd1b96313,Se acerca la Copa de otoño: cinco categorías y un jurado nuevo,The autumn Cup is coming: five categories and a new panel
+sc439ea37,"La Copa de otoño, al detalle: quién ganó y con qué",The autumn Cup in detail: who won and with what
+s42e090ff,"Hace años, en esta comarca, una mujer guardaba semillas","Years ago, in this county, a woman kept seeds"
+sd3d3b9fc,El cuaderno azul: la memoria genética de un barrio,The blue notebook: a neighbourhood's genetic memory
+s6388bda6,Chatarrería de Valdehierro,Valdehierro scrapyard
+s750267fe,"«Material de cultivo de segunda mano. Lo que entra esta semana, a mitad. Pregunta por Bixente.»","“Second-hand growing gear. Whatever comes in this week, half price. Ask for Bixente.”"
+s389c7a13,Clubs de la comarca,Clubs of the county
+se6c983cd,«Se busca género de una variedad concreta para el dispensario del mes. Se paga por encima del precio de siempre.»,“Looking for a particular strain for this month's dispensary. Paying above the usual price.”
+s4a8671c0,Tablón de la feria,Fair noticeboard
+s44bb9416,"«Intercambio de semillas de colección. Quien traiga algo de su tierra, se va con algo de otra.»","“Collector seed swap. Bring something from your land, leave with something from another.”"
+sfd688618,Se busca,Wanted
+s68e38618,"«Hacen falta manos para manicurar. Por días, pagado al terminar. Preguntar en los clubs.»","“Hands needed for trimming. By the day, paid when you finish. Ask at the clubs.”"
+sbe57bbb8,Lonja de Puerto Viejo,Puerto Viejo fish market
+sf677b82a,"«Compra de flor y de extracción al por mayor. Lotes grandes, pago en el día.»","“Buying flower and extraction wholesale. Big batches, paid same day.”"
+s02f3c771,Growshop,Growshop
+s1d20f3f3,«Liquidación de focos de la temporada pasada. Mientras queden.»,“Clearing out last season's lamps. While they last.”
+sb18c1eb8,«Llevo tres cosechas con las puntas quemadas y le echaba la culpa al foco. Era el abono. Menos es más.» — Un socio de Mendialde,“Three harvests with burnt tips and I blamed the lamp. It was the fertiliser. Less is more.” — A member from Mendialde
+s4103c1d2,«Mi vecina me denunció por el olor. Puse un filtro de carbón como es debido y se acabó el problema. No es ilegal oler a nada.» — Un lector del Ensanche,“My neighbour reported me over the smell. I fitted a carbon filter properly and that was the end of it. Smelling of nothing is not illegal.” — A reader from the Ensanche
+sde0d7970,"«Después de veinte años, lo mejor que he fumado era una planta de semilla regalada, sin nombre y sin papeles.» — Un jubilado de Errotabarri","“After twenty years, the best I ever smoked was a plant from a seed someone gave me, with no name and no paperwork.” — A pensioner from Errotabarri"
+s36001cfa,"«Guardo las semillas en un tarro, en la nevera, con un sobre de los que vienen en las zapatillas. Me han germinado de hace doce años.» — Una socia de Puerto Viejo","“I keep my seeds in a jar, in the fridge, with one of those sachets that come in shoeboxes. I have germinated twelve-year-old ones.” — A member from Puerto Viejo"
+s8692e69f,«Dejad de perseguir el veinticinco por ciento. Preguntad a quién le gusta lo que cultiváis.» — Un catador,“Stop chasing twenty-five per cent. Ask who likes what you grow.” — A taster
+sef0576c9,«Las landraces no son una moda: son lo que había antes de que todo oliera igual.» — Un lector del barrio alto,“Landraces are not a fad: they are what there was before everything smelled the same.” — A reader from the upper neighbourhood
+sa29d96de,PORTADA,FRONT PAGE
+s08efd72d,LA VARIEDAD DEL MES,STRAIN OF THE MONTH
+se3678202,TALLER,WORKSHOP
+s2f790a97,MERCADO,MARKET
+s02b1a252,LA COPA Y LAS CATAS,THE CUP AND THE TASTINGS
+s2d689012,CLASIFICADOS,CLASSIFIEDS
+s4c2c97d7,CARTAS,LETTERS
+s143602e0,LEGAL,LEGAL
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -7038,6 +7148,7 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+s64fdeccd,"El quiosco de prensa. El periódico, {e}.","The newsstand. The paper, {e}."
 sfe29142c,"LANDRACE HUNTERS · genética de barrio
 Versión {v} para Android
 

@@ -1,0 +1,99 @@
+es,en
+El periódico ({e}),The newspaper ({e})
+"El quiosco de prensa. Periódicos, revistas y cromos.","The newsstand. Newspapers, magazines and trading cards."
+REVISTA,MAGAZINE
+{r}: suscripción,{r}: subscription
+ · te quedan {q}, · {q} left
+"{n} números de {r}, {s}. Llega al buzón el día 1 de cada mes.","{n} issues of {r}, {s}. It lands in your mailbox on the 1st of each month."
+Suscrito a {r}: {n} números,Subscribed to {r}: {n} issues
+En los clubs: {e} el gramo al {t} %.,At the clubs: {e} a gram at {t} %.
+"Extracción, a los catadores: {e} el gramo al {t} %.","Extraction, to the tasters: {e} a gram at {t} %."
+"Precios de referencia: lo curado y lo manicurado sube, y lo verde baja.","Reference prices: cured and trimmed goes up, green goes down."
+El jurado de la plaza prepara la Copa de otoño. Se abrirá a quien tenga algo que presentar.,The panel in the square is getting the autumn Cup ready. It will open to anyone with something to enter.
+"Copa de otoño: el {d} de {m}, en la plaza. Cinco categorías.","Autumn Cup: {d} {m}, in the square. Five categories."
+{c}: {p}º puesto.,{c}: place {p}.
+Este año aún no se ha presentado nada a tu nombre.,Nothing has been entered in your name this year yet.
+"Con la licencia del muelle, la distribuidora puede mover género legal cada día. La revista recuerda que lo que sale de ahí va con papeles.","With the dock licence, the distributor can move legal product every day. The magazine reminds you that whatever leaves there goes with paperwork."
+"KAIA abre en el muelle con dispensario para socios. A los treinta días de abrir, la ley permite pedir licencia de distribuidora.","KAIA opens at the dock with a members' dispensary. Thirty days after opening, the law allows applying for a distributor licence."
+"Las asociaciones con presidencia al día pueden tener dispensario para socios. Fuera de eso, nada de vender a quien no es socio.","Associations with their chair in order may run a members' dispensary. Beyond that, no selling to non-members."
+"Las asociaciones piden una ley clara: cultivo compartido, dispensario para socios y nada de venta a la calle.","The associations are asking for a clear law: shared growing, a members' dispensary and no street sales."
+"{r}, el número de {m}. Ese ya lo tienes.","{r}, the {m} issue. You already have that one."
+Comprarla ({e}),Buy it ({e})
+"{r}, {s}. El número de {m}: «{t}».","{r}, {s}. The {m} issue: “{t}”."
+Aprendes una técnica: {n},You learn a technique: {n}
+Tienes en el buzón el número de {m}: «{t}».,The {m} issue is in your mailbox: “{t}”.
+Te quedan {q} números de la suscripción.,You have {q} issues left on the subscription.
+Era el último de la suscripción: se renueva en la tienda online.,That was the last one of the subscription: renew it in the online shop.
+{n} de {t} números,{n} of {t} issues
+{n} números guardados · {t} técnicas aprendidas.,{n} issues kept · {t} techniques learned.
+cosecha +{p} %,harvest +{p} %
+calidad +{p} %,quality +{p} %
+THC +{p} %,THC +{p} %
+menos moho ({p} %),less mould ({p} %)
+esquejes más resistentes,hardier cuttings
+Pulsa A para releer cualquier número.,Press A to read any issue again.
+{s}. El número de {m}.,{s}. The {m} issue.
+EL ESQUEJE,THE CUTTING
+revista mensual de cultivo,monthly growing magazine
+Edita la Federación de Clubs de la Comarca · Redacción en el Ensanche,Published by the Federation of Clubs of the County · Newsroom in the Ensanche
+La poda apical,Topping
+"Cortar la punta del tallo principal cuando la planta tiene cuatro o cinco pisos de hojas. La planta deja de tirar hacia arriba y reparte la fuerza entre las ramas de abajo: en vez de una cola grande y seis pequeñas, salen cuatro o seis colas parecidas. Se hace en crecimiento y nunca en floración. Con el mismo foco y la misma maceta, se llena más superficie: de aquí sale el cuatro por ciento más de cosecha que verás en tus próximos cortes.","Cut the tip of the main stem when the plant has four or five sets of leaves. The plant stops reaching upwards and spreads its strength among the lower branches: instead of one big cola and six small ones, you get four or six similar colas. It is done in growth, never in flower. With the same lamp and the same pot you fill more surface: that is where the four per cent more harvest you will see in your next cuts comes from."
+El lavado de raíces,Root flushing
+"Los últimos días antes de cortar, solo agua. La planta tira de lo que tiene guardado en las hojas y el cogollo sale limpio: ni sabor a abono ni ceniza negra. Se nota en la cata y en lo que te pagan por el lote, no en el peso. Si has abonado fuerte, alarga el lavado; si has llevado la planta justa de comida, con menos días basta.","Water only for the last days before cutting. The plant draws on what it has stored in the leaves and the bud comes out clean: no fertiliser taste, no black ash. It shows in the tasting and in what you are paid for the batch, not in the weight. If you have fed heavily, flush for longer; if you kept the plant lean, fewer days will do."
+El defoliado justo,Just enough defoliation
+"Quitar las hojas grandes que tapan los cogollos de dentro, y solo esas. Entra aire y entra luz donde antes había sombra y humedad parada: es ahí donde empieza el moho. Dos manos como mucho, una al entrar en floración y otra a mitad, y nunca a una planta tocada o recién trasplantada. No es poda estética: es ventilación.","Take off the big leaves that cover the inner buds, and only those. Air and light get in where there was shade and still damp before: that is where mould starts. Two passes at most, one going into flower and one halfway, and never on a stressed or freshly transplanted plant. This is not pruning for looks: it is ventilation."
+El trasplante a tiempo,Transplanting on time
+"La raíz que da la vuelta al fondo de la maceta y se queda dando vueltas no vuelve a crecer igual. Se trasplanta cuando las raíces llegan al borde del cepellón y antes de que lo aten: la planta no se para ni un día. Trasplantar tarde cuesta una semana de crecimiento; trasplantar pronto, a una maceta enorme, encharca el sustrato.",A root that turns at the bottom of the pot and keeps circling never grows the same again. Transplant when the roots reach the edge of the root ball and before they bind it: the plant does not stop for a single day. Transplanting late costs a week of growth; transplanting early into a huge pot waterlogs the substrate.
+La malla horizontal,The horizontal net
+"Una malla a un palmo y medio de la maceta, y las ramas se van metiendo por los cuadros a medida que crecen. Todas las puntas quedan a la misma altura, y a la misma altura del foco: no hay colas quemadas arriba ni cogollos de aire abajo. Se monta en crecimiento, antes de cambiar la luz; después ya no se mueve nada.","A net a hand and a half above the pot, and the branches are tucked through the squares as they grow. Every tip ends up at the same height, and at the same distance from the lamp: no burnt colas up top and no airy buds below. Set it up in growth, before you switch the light; after that nothing moves."
+Riego por peso,Watering by weight
+"Coge la maceta por el borde y levántala. Si pesa como un ladrillo mojado, no toca; si vuela, toca. Se riega por peso, no por días. Con el peso aprendes cuánta agua pide cada planta, y las raíces se hacen a buscar el agua en vez de nadar en ella. La maceta siempre mojada acaba con la raíz ahogada y la planta amarilla.","Take the pot by the rim and lift it. If it weighs like a wet brick, not yet; if it flies up, now. You water by weight, not by days. With the weight you learn how much water each plant asks for, and the roots get used to looking for water instead of swimming in it. A pot that is always wet ends with drowned roots and a yellow plant."
+Los tricomas al corte,Trichomes at harvest
+"El punto de corte no se mira en el calendario, se mira con una lupa en la resina de los cogollos de arriba: cuando las cabezas pasan de transparentes a blancas lechosas, es el día. Antes, el cogollo pesa menos y pega menos; mucho después, se vuelve pesado y tumba. Dos días de diferencia cambian el efecto de toda la cosecha.","You do not read the harvest point off the calendar, you read it with a loupe in the resin of the top buds: when the heads turn from clear to milky white, that is the day. Earlier, the bud weighs less and hits less; much later, it turns heavy and knocks you out. Two days of difference change the effect of the whole harvest."
+El secado lento,Slow drying
+"El cogollo se seca en una habitación fresca, a oscuras y con el aire moviéndose despacio, nunca con un calefactor ni al sol. Rápido por fuera y verde por dentro es lo que huele a heno. Lento, el cogollo se dobla y el tallo cruje: ese es el que después cura bien en el tarro.","Bud dries in a cool room, in the dark, with the air moving slowly, never with a heater or in the sun. Fast outside and green inside is what smells of hay. Slowly, the bud bends and the stem snaps: that is the one that later cures well in the jar."
+Las madres por turnos,Mothers in turns
+"Una madre a la que le quitas todos los esquejes el mismo día tarda semanas en volver. Se corta por turnos, de una rama cada vez, y la madre no se para: siempre hay una parte de la planta creciendo mientras la otra se recupera. Y el esqueje se coge de las ramas de abajo, que enraízan antes que las puntas.","A mother you take every cutting from on the same day takes weeks to come back. Cut in turns, one branch at a time, and the mother never stops: part of the plant is always growing while the rest recovers. And take the cutting from the lower branches, which root sooner than the tips."
+Calor de fondo para los esquejes,Bottom heat for cuttings
+"El esqueje no enraíza con calor en las hojas, enraíza con calor en el taco. El propagador templado por abajo y el aire de la habitación fresco: la raíz tira y la hoja no se gasta. Si se ponen mustios el primer día es normal; si se ponen amarillos, les sobra luz. Nada de abono hasta que haya raíz.","A cutting does not root from heat on the leaves, it roots from heat in the plug. The propagator warm underneath and the room air cool: the root pushes and the leaf is not spent. Drooping on the first day is normal; turning yellow means too much light. No fertiliser until there are roots."
+La limpieza entre ciclos,Cleaning between cycles
+"Entre cosecha y cosecha, la carpa se vacía y se limpia: paredes, bandeja, ventiladores, los filos de la cremallera. Las esporas y los bichos del ciclo anterior están ahí esperando a las plantas nuevas, que son las más blandas. Media hora de trapo ahorra un ciclo entero perdido por moho.","Between one harvest and the next, the tent is emptied and cleaned: walls, tray, fans, the edges of the zip. The spores and bugs from the previous cycle are in there waiting for the new plants, which are the softest. Half an hour with a cloth saves a whole cycle lost to mould."
+El curado en tarro,Curing in the jar
+"El tarro se llena a tres cuartos, se cierra y se abre un rato cada día los primeros días. Lo que queda de humedad dentro del cogollo se reparte y sale, y lo que olía a verde se convierte en olor a variedad. Es el paso que más cambia el precio y el que más gente se salta por tener prisa.","Fill the jar three quarters full, close it and open it for a while each day during the first days. What moisture is left inside the bud spreads out and leaves, and what smelled green turns into the smell of the strain. It is the step that changes the price the most and the one most people skip out of impatience."
+"«Un otoño tranquilo»: la comarca, sin sustos","“A quiet autumn”: the county, with no scares"
+La policía refuerza las patrullas en los barrios,Police step up patrols in the neighbourhoods
+Investigación abierta por venta de marihuana en la comarca,Investigation opened over marijuana sales in the county
+Un juzgado autoriza registros: qué dice la ley y qué no,A court authorises searches: what the law says and what it does not
+Los clubs piden una ley que ponga orden,The clubs call for a law that sets things straight
+KAIA abre en el muelle: un club con dispensario,KAIA opens at the dock: a club with a dispensary
+Licencia para el muelle: la primera distribuidora legal de la comarca,Licence for the dock: the county's first legal distributor
+Se acerca la Copa de otoño: cinco categorías y un jurado nuevo,The autumn Cup is coming: five categories and a new panel
+"La Copa de otoño, al detalle: quién ganó y con qué",The autumn Cup in detail: who won and with what
+"Hace años, en esta comarca, una mujer guardaba semillas","Years ago, in this county, a woman kept seeds"
+El cuaderno azul: la memoria genética de un barrio,The blue notebook: a neighbourhood's genetic memory
+Chatarrería de Valdehierro,Valdehierro scrapyard
+"«Material de cultivo de segunda mano. Lo que entra esta semana, a mitad. Pregunta por Bixente.»","“Second-hand growing gear. Whatever comes in this week, half price. Ask for Bixente.”"
+Clubs de la comarca,Clubs of the county
+«Se busca género de una variedad concreta para el dispensario del mes. Se paga por encima del precio de siempre.»,“Looking for a particular strain for this month's dispensary. Paying above the usual price.”
+Tablón de la feria,Fair noticeboard
+"«Intercambio de semillas de colección. Quien traiga algo de su tierra, se va con algo de otra.»","“Collector seed swap. Bring something from your land, leave with something from another.”"
+Se busca,Wanted
+"«Hacen falta manos para manicurar. Por días, pagado al terminar. Preguntar en los clubs.»","“Hands needed for trimming. By the day, paid when you finish. Ask at the clubs.”"
+Lonja de Puerto Viejo,Puerto Viejo fish market
+"«Compra de flor y de extracción al por mayor. Lotes grandes, pago en el día.»","“Buying flower and extraction wholesale. Big batches, paid same day.”"
+Growshop,Growshop
+«Liquidación de focos de la temporada pasada. Mientras queden.»,“Clearing out last season's lamps. While they last.”
+«Llevo tres cosechas con las puntas quemadas y le echaba la culpa al foco. Era el abono. Menos es más.» — Un socio de Mendialde,“Three harvests with burnt tips and I blamed the lamp. It was the fertiliser. Less is more.” — A member from Mendialde
+«Mi vecina me denunció por el olor. Puse un filtro de carbón como es debido y se acabó el problema. No es ilegal oler a nada.» — Un lector del Ensanche,“My neighbour reported me over the smell. I fitted a carbon filter properly and that was the end of it. Smelling of nothing is not illegal.” — A reader from the Ensanche
+"«Después de veinte años, lo mejor que he fumado era una planta de semilla regalada, sin nombre y sin papeles.» — Un jubilado de Errotabarri","“After twenty years, the best I ever smoked was a plant from a seed someone gave me, with no name and no paperwork.” — A pensioner from Errotabarri"
+"«Guardo las semillas en un tarro, en la nevera, con un sobre de los que vienen en las zapatillas. Me han germinado de hace doce años.» — Una socia de Puerto Viejo","“I keep my seeds in a jar, in the fridge, with one of those sachets that come in shoeboxes. I have germinated twelve-year-old ones.” — A member from Puerto Viejo"
+«Dejad de perseguir el veinticinco por ciento. Preguntad a quién le gusta lo que cultiváis.» — Un catador,“Stop chasing twenty-five per cent. Ask who likes what you grow.” — A taster
+«Las landraces no son una moda: son lo que había antes de que todo oliera igual.» — Un lector del barrio alto,“Landraces are not a fad: they are what there was before everything smelled the same.” — A reader from the upper neighbourhood
+PORTADA,FRONT PAGE
+LA VARIEDAD DEL MES,STRAIN OF THE MONTH
+TALLER,WORKSHOP
+MERCADO,MARKET
+LA COPA Y LAS CATAS,THE CUP AND THE TASTINGS
+CLASIFICADOS,CLASSIFIEDS
+CARTAS,LETTERS
+LEGAL,LEGAL

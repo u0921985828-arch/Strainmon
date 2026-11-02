@@ -137,10 +137,10 @@ func new_day() -> void:
 	energia_dia(av)   # MAESTRO [5]: la potencia contratada
 	var sec := 0
 	for e in S.esquejes:
-		if S.day - e.dia > D.ESQUEJE_DIAS:
+		if S.day - e.dia > esq_dias():
 			sec += 1
 	if sec:
-		S.esquejes = S.esquejes.filter(func(e): return S.day - e.dia <= D.ESQUEJE_DIAS)
+		S.esquejes = S.esquejes.filter(func(e): return S.day - e.dia <= esq_dias())
 		av.append(T("Se han secado {n} esquejes sin plantar", {"n": sec}) if sec > 1 else T("Se ha secado un esqueje sin plantar"))
 	var seb := 0
 	for e in S.bandejas:
@@ -168,6 +168,7 @@ func new_day() -> void:
 	conce_dia()   # 1.43
 	vencer_encargo_club()
 	hilo_dia()   # con CAL, el cuaderno azul de la tía (hilo.gd)
+	rev_dia()   # EL ESQUEJE: el número del mes al buzón si estás suscrito (revista.gd)
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 		queue("penalty", penalty_event)
 	elif S.due > 0 and (S.deadline - S.day == 3 or S.deadline == S.day):   # 1.11: a 3 días y el último
@@ -352,7 +353,7 @@ func plantar(i: int, hu = null) -> void:
 		var v = feno_visto(e.f)
 		var dv := T("Fenotipo estrella: THC ×{t} y cosecha ×{y}.", {"t": Datos.coma(e.f.t), "y": Datos.coma(e.f.y)}) if v == "estrella" else (T("Fenotipo flojo: rinde menos que la media.") if v == "floja" else T("Su fenotipo se sabrá cuando coseches a la madre o a un clon suyo."))
 		items.append({"label": T("Esqueje {s}{e}", {"s": s.n, "e": etiq(e.f)}), "right": K("bandeja") if eb[1] else K("esqueje"), "sw": s.c, "ic": ic_cog(e.sid),
-			"desc": T("Clon enraizado: la misma planta que su madre, con su fenotipo.\n{dv}\nSe seca si no lo plantas antes del {d}.", {"dv": dv, "d": Datos.fd(e.dia + (D.CARRO.dias if eb[1] else D.ESQUEJE_DIAS) + 1, S.day)})})
+			"desc": T("Clon enraizado: la misma planta que su madre, con su fenotipo.\n{dv}\nSe seca si no lo plantas antes del {d}.", {"dv": dv, "d": Datos.fd(e.dia + (D.CARRO.dias if eb[1] else esq_dias()) + 1, S.day)})})
 	items.append({"label": K("Cancelar"), "desc": ""})
 	var j: int = await menu(items, {"cls": "full", "title": K("¿QUÉ PLANTAS?"), "desc": true})
 	if j < 0 or j >= own.size() + esq.size():
@@ -400,7 +401,7 @@ func sacar_esqueje(i: int, hu = null) -> void:
 	gesto_p = p
 	await gesto("esqueje")   # 1.54
 	sfx("sel")
-	await say(T("Cortas una punta de la {s}{e} y la pones a enraizar.\nPlántala antes del {d}: es la misma planta.", {"s": s.n, "e": nom_planta(p.f), "d": Datos.fd(S.day + D.ESQUEJE_DIAS + 1, S.day)}))
+	await say(T("Cortas una punta de la {s}{e} y la pones a enraizar.\nPlántala antes del {d}: es la misma planta.", {"s": s.n, "e": nom_planta(p.f), "d": Datos.fd(S.day + esq_dias() + 1, S.day)}))
 	if carro_ya():
 		await say(T("O pínchala en el carro: allí aguanta {n} días.", {"n": int(D.CARRO.dias)}))
 
@@ -1381,6 +1382,10 @@ func tienda_online() -> void:
 			items.append(fria_item())
 		if Datos.CAL:   # MAESTRO [5]: la potencia contratada
 			items.append({"label": K("La instalación eléctrica"), "ener": 1, "desc": K("Placas solares y generador insonorizado para el piso y la nave: lo que pasa de la potencia contratada deja firma térmica.")})
+		if rev_hay():   # EL ESQUEJE (revista.gd): la suscripción de doce números, al buzón el día 1 de cada mes
+			var sus := int(rev().sus)
+			items.append({"label": T("{r}: suscripción", {"r": I18n.v(String(D.REVISTA.cab.n))}) + (T(" · te quedan {q}", {"q": sus}) if sus > 0 else ""), "rev": 1, "right": Datos.eur(float(D.REVISTA.cab.sus)),
+				"desc": T("{n} números de {r}, {s}. Llega al buzón el día 1 de cada mes.", {"n": int(D.REVISTA.cab.susn), "r": I18n.v(String(D.REVISTA.cab.n)), "s": I18n.v(String(D.REVISTA.cab.sub))})})
 		items.append({"label": K("Salir"), "desc": K("Con tarjeta, de la cuenta del banco.")})
 		i = await menu(items, {"cls": "full", "title": K("TIENDA ONLINE"), "title2": T("Muebles y transporte · en la cuenta {e}", {"e": Datos.eur(S.banco)}), "desc": true, "initial": i})
 		if i >= 0 and i < items.size() and items[i].get("ener"):
@@ -1391,6 +1396,12 @@ func tienda_online() -> void:
 			continue
 		if i >= 0 and i < items.size() and items[i].get("huerta"):
 			await huerta_tienda()
+			continue
+		if i >= 0 and i < items.size() and items[i].get("rev"):   # EL ESQUEJE (revista.gd)
+			if await tarjeta(float(D.REVISTA.cab.sus), K("Tienda online") + " · " + I18n.v(String(D.REVISTA.cab.n))):
+				rev_suscribe()
+				sfx("coin")
+				toast(T("Suscrito a {r}: {n} números", {"r": I18n.v(String(D.REVISTA.cab.n)), "n": int(D.REVISTA.cab.susn)}), 1400)
 			continue
 		if i == ks.size() + vs.size():
 			if ar == null and await tarjeta(AR.p, K("Tienda online") + " · " + AR.n):

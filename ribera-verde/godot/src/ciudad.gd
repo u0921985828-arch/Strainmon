@@ -393,19 +393,33 @@ func hito_obj(x: int, y: int) -> bool:
 				update_hud()
 				await fade(0)
 				await say(T("Las {h}. Las campanas de la torre dan la hora sobre tu cabeza.", {"h": hhmm(int(S.min))}))
-		"prensa":   # el quiosco de prensa del Ensanche: el periódico, el tiempo de mañana y cómo anda la policía
-			if int(C.get("prensa", -1)) == int(S.day):
+		"prensa":   # el quiosco de prensa del Ensanche: el periódico, el tiempo de mañana y cómo anda la policía; con CAL, la revista
+			var hoy: bool = int(C.get("prensa", -1)) == int(S.day)
+			var rv: bool = rev_hay() and not rev_tiene(rev_num())   # EL ESQUEJE (revista.gd): el número del mes
+			if hoy and not rv:
 				await say(K("El quiosco de prensa. El periódico de hoy ya lo tienes."))
-			elif await ask(T("El quiosco de prensa. El periódico, {e}.", {"e": Datos.eur(PERIODICO)}), [K("Comprar"), K("Nada")]) == 0:
-				if float(S.money) < PERIODICO:
-					await say(K("No llevas suelto."))
-					return true
-				S.money = snappedf(float(S.money) - PERIODICO, 0.01)
-				C.prensa = int(S.day)
-				sfx("coin")
-				update_hud()
-				var ti: Dictionary = Datos.tiempo(int(S.day) + 1, 720)
-				await say(T("El tiempo de mañana: {t}, de {a} a {b} °C.", {"t": I18n.v(String(ti.n)), "a": int(ti.min), "b": int(ti.max)}) + " " + [K("En sucesos, nada de la comarca."), K("En sucesos, la policía refuerza las patrullas del barrio."), K("En sucesos, «la policía investiga una red de venta de marihuana en la comarca».") , K("En sucesos, «un juzgado autoriza registros por tráfico de marihuana».")][nivel_poli()])
+				return true
+			var ops := []
+			if not hoy:
+				ops.append(T("El periódico ({e})", {"e": Datos.eur(PERIODICO)}))
+			if rv:
+				ops.append(T("{r} ({e})", {"r": I18n.v(String(D.REVISTA.cab.n)), "e": Datos.eur(rev_precio())}))
+			ops.append(K("Nada"))
+			var op: int = await ask(K("El quiosco de prensa. Periódicos, revistas y cromos."), ops)
+			if op < 0 or op >= ops.size() - 1:
+				return true
+			if rv and op == ops.size() - 2:
+				await rev_compra("prensa")
+				return true
+			if float(S.money) < PERIODICO:
+				await say(K("No llevas suelto."))
+				return true
+			S.money = snappedf(float(S.money) - PERIODICO, 0.01)
+			C.prensa = int(S.day)
+			sfx("coin")
+			update_hud()
+			var ti: Dictionary = Datos.tiempo(int(S.day) + 1, 720)
+			await say(T("El tiempo de mañana: {t}, de {a} a {b} °C.", {"t": I18n.v(String(ti.n)), "a": int(ti.min), "b": int(ti.max)}) + " " + [K("En sucesos, nada de la comarca."), K("En sucesos, la policía refuerza las patrullas del barrio."), K("En sucesos, «la policía investiga una red de venta de marihuana en la comarca».") , K("En sucesos, «un juzgado autoriza registros por tráfico de marihuana».")][nivel_poli()])
 		"colmenas":   # el colmenar de Errotabarri: un poco de miel del panal, una vez al día (y alguna picadura)
 			if int(C.get("miel", -1)) == int(S.day):
 				await say(K("El colmenar. Las abejas ya te tienen fichado: hoy, mejor no."))
@@ -432,7 +446,14 @@ func puesto(k: String) -> void:
 		return
 	var P_: Array = PUESTOS[k]
 	var N: String = OFICIO[k]
-	if await ask(T("«¿Qué te pongo? {q}, {e}.»", {"q": P_[0], "e": Datos.eur(P_[1])}), [K("Comprar"), K("Nada")], N) != 0:
+	# EL ESQUEJE (revista.gd): en el puesto de la panadera del mercado de la Ribera, el número del mes al lado del pan
+	var rv: bool = k == "pa" and rev_hay() and not rev_tiene(rev_num())
+	var ops := [K("Comprar"), T("{r} ({e})", {"r": I18n.v(String(D.REVISTA.cab.n)), "e": Datos.eur(rev_precio("mercado"))}), K("Nada")] if rv else [K("Comprar"), K("Nada")]
+	var op: int = await ask(T("«¿Qué te pongo? {q}, {e}.»", {"q": P_[0], "e": Datos.eur(P_[1])}), ops, N)
+	if rv and op == 1:
+		await rev_compra("mercado")
+		return
+	if op != 0:
 		return
 	if float(S.money) < float(P_[1]):
 		await say(K("«Sin dinero no hay género, majo.»"), N)

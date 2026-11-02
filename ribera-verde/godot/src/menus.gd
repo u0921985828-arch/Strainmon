@@ -586,8 +586,8 @@ func mochila() -> void:
 		for k in S.seeds:
 			rows.append({"label": T("Semilla {n}", {"n": strain(k).n}), "right": "×" + n(S.seeds[k]), "sw": strain(k).c, "ic": icono("semillas"), "desc": strain_line(k) + "\n" + T("Pulsa A para tirarlas."), "k": "s", "sid": k})
 		for e in S.esquejes:
-			rows.append({"label": T("Esqueje {n}", {"n": strain(e.sid).n + etiq(e.f)}), "right": Datos.fd_corto(e.dia + D.ESQUEJE_DIAS), "sw": strain(e.sid).c, "ic": ic_cog(e.sid),
-				"desc": T("Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el {d}.\nPulsa A para ponerle nombre o tirarlo.", {"d": Datos.fd(e.dia + D.ESQUEJE_DIAS, S.day)}), "k": "e", "e": e})
+			rows.append({"label": T("Esqueje {n}", {"n": strain(e.sid).n + etiq(e.f)}), "right": Datos.fd_corto(e.dia + esq_dias()), "sw": strain(e.sid).c, "ic": ic_cog(e.sid),
+				"desc": T("Enraizando en el propagador. Plántalo en una plaza vacía antes de que acabe el {d}.\nPulsa A para ponerle nombre o tirarlo.", {"d": Datos.fd(e.dia + esq_dias(), S.day)}), "k": "e", "e": e})
 		for k in S.buds:
 			var b: Dictionary = S.buds[k]
 			rows.append({"label": lot_nombre(k), "right": "%d g · %s%%" % [int(floor(b.g)), Datos.pct(b.thc)], "sw": strain(lot_sid(k)).c, "ic": ic_cog(lot_sid(k)),
@@ -607,6 +607,8 @@ func mochila() -> void:
 				var v := float(S.items.get(q[0], 0))
 				if v > 0:
 					rows.append({"label": q[1], "right": T("{n} {u}", {"n": n(floor(v * 10) / 10.0), "u": q[2]}) if q[2] != "" else "×" + n(v), "ic": icono(q[0]), "desc": q[3]})
+		if rev_hay() and not rev().col.is_empty():   # EL ESQUEJE (revista.gd): la pila de números, para releerlos
+			rows.append({"k": "rev", "label": I18n.v(String(D.REVISTA.cab.n)), "right": T("{n} n.º", {"n": rev().col.size()}), "ic": icono("objetivo"), "desc": rev_ficha()})
 		if S.items.get("prensa"):
 			rows.append({"label": K("Prensa de rosin"), "right": K("en la mesa"), "desc": K("De 5 g de cogollo, 1 g de rosin con el triple de THC. Se usa en la mesa del piso.")})
 		if S.items.get("tamiz"):
@@ -622,7 +624,9 @@ func mochila() -> void:
 		i = await menu(rows, {"cls": "full", "title": K("MOCHILA"), "title2": T("{n} g encima · {c} g en la caja", {"n": int(floor(total_buds())), "c": int(floor(caja_g()))}) if S.get("caja") else T("{n} g encima", {"n": int(floor(total_buds()))}), "desc": true, "initial": i})
 		if i < 0:
 			return
-		if rows[i].get("k") == "bocata":
+		if rows[i].get("k") == "rev":   # EL ESQUEJE (revista.gd)
+			await rev_menu()
+		elif rows[i].get("k") == "bocata":
 			if S.items.bocata > 0 and S.hp < S.hpMax:
 				S.items.bocata -= 1
 				S.hp = mini(S.hpMax, S.hp + 15)

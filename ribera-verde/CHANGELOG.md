@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### EL ESQUEJE, la revista mensual de cultivo (0.74, lo pidió el usuario: «Molaría que hubiese un periódico del cannabis o alguna revista, desarrolla»; solo Godot, con `Datos.CAL`)
+
+- **Un número por mes del calendario** (el n.º 1, el del mes en que empieza la partida; `rev_num`, `rev_mes`), armado con el estado de la partida: portada con **titular según el nivel de la policía, la ley del muelle, la Copa y el hilo de la tía**; LA VARIEDAD DEL MES (una de `STRAINS`, con su pista de `CAZA` o de `REGALO` si aún no la tienes); TALLER; MERCADO con los precios de verdad (lonja, clubs y catadores); LA COPA Y LAS CATAS; CLASIFICADOS; CARTAS; y LEGAL. Se lee con el lector de siempre (`leer`), con su plano de detalle al abrirla (gesto `revista`).
+- **Doce técnicas de cultivo reales**, una por número, que ciclan: poda apical, lavado de raíces, defoliado, trasplante a tiempo, malla horizontal, riego por peso, tricomas al corte, secado lento, madres por turnos, calor de fondo, limpieza entre ciclos y curado en tarro. La primera vez que se lee un número **la técnica se aprende** y **da su efecto de verdad**, pequeño y con tope (`Cultivo.rev_bono`, `REVISTA.tope`): cosecha +15 % como mucho (`gramos_planta`), calidad +12 % (`calidad`), THC +2 % (`thc_cosecha`), moho −25 % y esquejes que aguantan un día más (`esq_dias`). Nada de dosis ni de cifras de abono.
+- **Dónde se compra** (4,50 €): el quiosco de prensa del Ensanche, los dos growshops (GROW IBARBIDE hace su 10 %), los estancos y el puesto de la panadera del mercado de la Ribera. **Suscripción** de doce números (45 €) en la tienda online: llega al buzón el día 1 de cada mes, con SMS.
+- Los números se guardan y se releen desde la MOCHILA (`rev_menu`), con la ficha de lo que llevas aprendido (`rev_ficha`).
+- `tools/revista.py` → `REVISTA` en `datos.json`; `godot/src/revista.gd` (cadena … → acto3 → **revista** → retencion → juego), `S.rev = {col, tec, sus}`; portada a mano en `tools/sprites/a-mano/gestos.py` (`gs-f-revista`). Prueba nueva `tests/revista.gd` (119 comprobaciones), con el caso reservado de los doce números leídos: cada efecto queda exactamente en su tope y el n.º 13 recicla la técnica del n.º 1.
+
 ### El fondo negro de la iglesia (0.74, lo vio el usuario: «ahí en la iglesia también se ve como el sprite tiene un fondo negro»; solo Godot, con `Datos.CAL`)
 
 - El sprite no tenía nada: las casillas de un edificio llevan en `g` claves sin arte de suelo (`wall_`, `roofT_`, `roofB_`, `win_`, `door_`), así que **donde la fachada es transparente** —el hueco entre las dos torres de la parroquia de Zorroza, el alero del molino, el remate de la catedral— se veía el negro de debajo, como un marco alrededor del campanario.
