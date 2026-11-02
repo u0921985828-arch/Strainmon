@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Todos los textos, centrados (0.74, lo pidió el usuario: «tienen que estar todos los textos, centrados y maquetados correctamente, en botones, cuadros de texto y demás»; solo Godot, con `Datos.CAL`)
+
+- El texto de los mandos (SONIDO, START, MÓVIL, A y B) quedaba ~1 píxel de rejilla alto y medio a la izquierda dentro de su pastilla: Ribera Pixel dibuja la mayúscula en la parte de arriba de la caja de línea y el píxel de separación cuelga a la derecha. Se compensa con el margen de la caja de cada botón (`BOTON_DY`, `BOTON_DX` en `_estilo` de `ui.gd`), que es lo que Godot usa para centrarlo.
+- La letra, con el alto de línea centrado en la mayúscula (`setupHorizontalHeader` de 9/−2, antes 8/−2).
+- `tests/capturas_ui.gd` lo mide en la imagen ya pintada (`_mira_botones`: la tinta clara dentro del botón contra el centro del botón, con 3/4 de píxel de rejilla de tolerancia) y comprueba además (`_mira_centrado`) que ningún botón se queda corto para su texto, que un texto centrado cabe en su caja y que lo que va dentro de cada caja (diálogo, menú, aviso, nombre, ficha de la carpa) respeta su margen a los dos lados: 12 pantallas, 0 cortes.
+
 ### La tipografía, maquetada (lo pidió el usuario: «hay que maquetarlo bien, la tipografía»; solo Godot, con `Datos.CAL`)
 
 - **Espacio de 4 px** (antes 3): el número ya no se pega a la palabra («Agua 70 %»).

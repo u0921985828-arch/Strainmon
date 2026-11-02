@@ -118,6 +118,11 @@ var be_r := 0.0   # con CAL: de las dos cajas de vida (arriba a la derecha) al b
 var scr := Rect2(0, 0, 240, SH)
 const MANDO_ALFA := .82    # 0.72: lo opaco del relleno de A, B, START, MÓVIL y SONIDO (antes 0,55: sobre la pared no se leían)
 const MANDO_CANTO := .45   # y su canto
+# 0.74: lo que hay que bajar y correr el texto de un botón para que quede centrado de verdad en su pastilla,
+# en partes del cuerpo de la letra (medido en pantalla con tests/capturas_ui.gd), y el margen de serie del tema
+const BOTON_DY := .0965
+const BOTON_DX := .045
+const BOTON_M := 4.0
 const CRUZ_HUECO := .16   # el hueco entre cada flecha y el cuadrado del medio, en brazos de la cruz (1.40)
 var zona_cruz := Rect2()   # zonas de toque de la cruceta y de A/B, y la cruz que se ve
 var zona_ab := Rect2()
@@ -756,6 +761,15 @@ func _estilo(n: Button, bg: Color, on: Color, borde: Color, r: float, px: float,
 			"right":
 				s.corner_radius_top_left = 0
 				s.corner_radius_bottom_left = 0
+		if Datos.CAL:
+			# 0.74 (lo pidió el usuario: «todos los textos, centrados»): Ribera Pixel dibuja la mayúscula
+			# arriba de la caja de línea (no tiene minúsculas con descendente en estos rótulos) y el píxel de
+			# separación cuelga a la derecha, así que el texto quedaba ~1 px de rejilla alto y medio a la
+			# izquierda; se compensa con el margen de la caja, que es lo que Godot usa para centrarlo
+			s.content_margin_top = BOTON_M + 2.0 * BOTON_DY * px
+			s.content_margin_bottom = BOTON_M
+			s.content_margin_left = BOTON_M + 2.0 * BOTON_DX * px
+			s.content_margin_right = BOTON_M
 		n.add_theme_stylebox_override(e[0], s)
 	n.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	n.add_theme_font_size_override("font_size", maxi(8, roundi(px)))

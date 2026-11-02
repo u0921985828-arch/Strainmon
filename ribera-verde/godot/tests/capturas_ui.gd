@@ -96,8 +96,11 @@ func _corre() -> void:
 				cortes.append("combate: las cajas (%s, %s) tapan al enemigo o al protagonista (escena %s)" % [re, rp, es])
 		_mira_hueco(p)
 		_mira_maquetado(p)
+		_mira_centrado(p)
 		await RenderingServer.frame_post_draw
-		root.get_texture().get_image().save_png(dir.path_join("ui-%d-%s-%s.png" % [n + 1, p, idioma]))
+		var img := root.get_texture().get_image()
+		_mira_botones(p, img)
+		img.save_png(dir.path_join("ui-%d-%s-%s.png" % [n + 1, p, idioma]))
 		n += 1
 		J.queue_free()
 		await espera(2)
@@ -214,3 +217,94 @@ func _monta(e: Dictionary) -> void:
 	for c in e.P:
 		J.P[c] = e.P[c]
 	J.mode = e.mode
+
+# 0.74 (lo pidió el usuario: «todos los textos, centrados y maquetados correctamente, en botones, cuadros
+# de texto y demás»): el texto de un botón, centrado en él; un Label centrado, con su texto dentro; y el
+# contenido de cada caja, con el mismo aire a izquierda y derecha.
+func _mira_centrado(p: String) -> void:
+	for n in _todos(J):
+		if n is Button and n.is_visible_in_tree() and String(n.text).strip_edges() != "":
+			var f: Font = n.get_theme_font("font")
+			var fs: int = n.get_theme_font_size("font_size")
+			var r: Rect2 = n.get_global_rect()
+			var an: float = f.get_string_size(n.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+			if an > r.size.x + 1:
+				cortes.append("%s: el botón «%s» no da para su texto (%d > %d)" % [p, n.text, an, r.size.x])
+				continue
+		if n is Label and n.is_visible_in_tree() and String(n.text).strip_edges() != "" \
+				and n.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER and n.autowrap_mode == TextServer.AUTOWRAP_OFF:
+			var f2: Font = n.get_theme_font("font")
+			var fs2: int = n.get_theme_font_size("font_size")
+			var an2: float = f2.get_string_size(n.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2).x
+			var r2: Rect2 = n.get_global_rect()
+			if an2 > r2.size.x + 1:
+				cortes.append("%s: el texto centrado «%s» no cabe (%d > %d)" % [p, n.text, an2, r2.size.x])
+	# las cajas: su contenido, con el mismo aire a los dos lados
+	for par2 in [["diálogo", J.dlg], ["menú", J.menu_box], ["aviso", J.toast_box], ["nombre", J.name_box], ["ficha", J.vc_info]]:
+		var caja: Control = par2[1]
+		if caja == null or not caja.is_visible_in_tree() or caja.get_child_count() == 0:
+			continue
+		var rc: Rect2 = caja.get_global_rect()
+		# el rectángulo que envuelve todo lo que lleva dentro (el diálogo, p. ej., lleva retrato y texto)
+		var rh := Rect2()
+		var hay := false
+		for c3 in caja.get_children():
+			if c3 is Control and (c3 as Control).is_visible_in_tree() and c3 != J.retrato:   # el busto va en el hueco que le reserva el margen
+				rh = (c3 as Control).get_global_rect() if not hay else rh.merge((c3 as Control).get_global_rect())
+				hay = true
+		if not hay:
+			continue
+		# lo que lleva dentro respeta el margen de la caja a los dos lados (ni pegado ni desbordado); el texto
+		# de párrafo no tiene por qué llenarla, así que solo se mira el mínimo, no la simetría
+		var ai: float = rh.position.x - rc.position.x
+		var ad: float = rc.end.x - rh.end.x
+		var sb2: StyleBox = caja.get_theme_stylebox("panel")
+		var mi: float = (sb2.content_margin_left if sb2 and sb2.content_margin_left >= 0.0 else 0.0)
+		var md: float = (sb2.content_margin_right if sb2 and sb2.content_margin_right >= 0.0 else 0.0)
+		if ai < mi - 1.0 or ad < md - 1.0:
+			cortes.append("%s: la caja del %s, con %.1f u a la izquierda y %.1f a la derecha (margen %.1f/%.1f)" % [p, par2[0], ai / J.us, ad / J.us, mi / J.us, md / J.us])
+
+# el texto de los mandos, centrado de verdad en su pastilla: se mide la tinta clara dentro del botón en la
+# imagen ya pintada y se compara con el centro del botón (lo pidió el usuario: «todos los textos, centrados»)
+func _mira_botones(p: String, img: Image) -> void:
+	for k in ["SONIDO", "START", "A", "B"]:   # los de pastilla oscura: MÓVIL va sobre el mapa y la medida por color no vale
+		var b: Button = J.botones.get(k)
+		if b == null or not b.is_visible_in_tree() or String(b.text).strip_edges() == "":
+			continue
+		var r: Rect2i = Rect2i(b.get_global_rect())
+		r = r.grow(-roundi(6 * J.us)).intersection(Rect2i(Vector2i.ZERO, img.get_size()))
+		if r.size.x < 4 or r.size.y < 4:
+			continue
+		var x0 := 1 << 30
+		var x1 := -1
+		var y0 := 1 << 30
+		var y1 := -1
+		for y in range(r.position.y, r.end.y):
+			for x in range(r.position.x, r.end.x):
+				var c := img.get_pixel(x, y)
+				# la letra es casi blanca y sin color; el icono del botón B y la pastilla, no
+				if c.a > .5 and (c.r + c.g + c.b) / 3.0 > .8 and maxf(maxf(c.r, c.g), c.b) - minf(minf(c.r, c.g), c.b) < .12:
+					x0 = mini(x0, x); x1 = maxi(x1, x); y0 = mini(y0, y); y1 = maxi(y1, y)
+		if x1 < 0:
+			cortes.append("%s: el botón %s sin texto a la vista" % [p, k])
+			continue
+		if OS.get_environment("LH_DBG") != "" and p == "start":
+			# el rectángulo de la pastilla que se ve (lo que no es fondo del mapa), para comparar con el del botón
+			var r2 := Rect2i(b.get_global_rect()).grow(roundi(6 * J.us)).intersection(Rect2i(Vector2i.ZERO, img.get_size()))
+			var a0 := 1 << 30; var a1 := -1; var b0 := 1 << 30; var b1 := -1
+			for y in range(r2.position.y, r2.end.y):
+				for x in range(r2.position.x, r2.end.x):
+					var c2 := img.get_pixel(x, y)
+					if (c2.r + c2.g + c2.b) / 3.0 < .3:
+						a0 = mini(a0, x); a1 = maxi(a1, x); b0 = mini(b0, y); b1 = maxi(b1, y)
+			print("DBG %s botón %s pastilla x %d-%d y %d-%d · texto x %d-%d y %d-%d" % [k, b.get_global_rect(), a0, a1, b0, b1, x0, x1, y0, y1])
+		var cx: float = (x0 + x1 + 1) / 2.0
+		var cy: float = (y0 + y1 + 1) / 2.0
+		var rc := b.get_global_rect()
+		# tolerancia: 3/4 del píxel de la rejilla de la letra (1 px de rejilla = cuerpo / 10), que es lo que
+		# puede bailar al redondear la línea base y el píxel de separación entre letras
+		var tol: float = maxf(1.0, .75 * b.get_theme_font_size("font_size") / 10.0)
+		if absf(cx - rc.get_center().x) > tol:
+			cortes.append("%s: el texto de %s, %.1f px fuera del centro a lo ancho (tope %.1f)" % [p, k, cx - rc.get_center().x, tol])
+		if absf(cy - rc.get_center().y) > tol:
+			cortes.append("%s: el texto de %s, %.1f px fuera del centro a lo alto (tope %.1f)" % [p, k, cy - rc.get_center().y, tol])

@@ -254,7 +254,9 @@ def ttf(g, destino, estilo='Regular'):
     fb.setupCharacterMap(cmap)
     fb.setupGlyf(glifos)
     fb.setupHorizontalMetrics(anchos)
-    fb.setupHorizontalHeader(ascent=U * 8, descent=-U * 2)
+    # el alto de línea, centrado en la mayúscula (lo pidió el usuario: «todos los textos, centrados»):
+    # la caja va de −2 a +9 y la mayúscula, de 0 a 7, así que su centro (3,5) es el de la caja
+    fb.setupHorizontalHeader(ascent=U * 9, descent=-U * 2)
     fb.setupNameTable({
         'familyName': NOMBRE, 'styleName': estilo,
         'uniqueFontIdentifier': '%s %s 1.0' % (NOMBRE, estilo),
@@ -267,7 +269,7 @@ def ttf(g, destino, estilo='Regular'):
     })
     cursiva = 'Italic' in estilo
     negrita = 'Bold' in estilo
-    fb.setupOS2(sTypoAscender=U * 8, sTypoDescender=-U * 2, usWinAscent=U * 9, usWinDescent=U * 2,
+    fb.setupOS2(sTypoAscender=U * 9, sTypoDescender=-U * 2, usWinAscent=U * 9, usWinDescent=U * 2,
                 sxHeight=U * 5, sCapHeight=U * 7, fsType=0,
                 usWeightClass=700 if negrita else 400,
                 fsSelection=(1 if cursiva else 0) | (32 if negrita else 0) |
