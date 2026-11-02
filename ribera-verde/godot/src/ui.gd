@@ -667,6 +667,9 @@ func _estilos() -> void:
 	dlg.add_theme_stylebox_override("panel", caja(us, 8, 12) if Datos.CAL else caja(us, 6, 10))
 	var ft := fs_txt((9.5 if Datos.CAL else 10.0) * us)
 	pon_letra(dlg_txt, letra, ft, INK, (14.5 if Datos.CAL else 13.5) * us * ft / (10 * us))
+	# 0.74: el texto, centrado en la caja (su alto lo manda el busto, y se apoyaba arriba)
+	dlg_txt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER if Datos.CAL else VERTICAL_ALIGNMENT_TOP
+	dlg_txt.size_flags_vertical = Control.SIZE_EXPAND_FILL if Datos.CAL else Control.SIZE_FILL
 	dlg_nm.add_theme_stylebox_override("panel", plana(LINEA, 3 * us, 2.5 * us, 5 * us))
 	pon_letra(dlg_nm_txt, negrita, 8 * us, Color.WHITE, 0, false)
 	caja_menu = caja(us, 5, 7)
@@ -1291,12 +1294,18 @@ func type_text(text: String, name_ := "") -> void:
 		dlg_nm_txt.text = I18n.v(name_)
 		_pon_retrato(name_, full, 0)
 		dlg_more.hide()
-		dlg_txt.text = ""
+		if Datos.CAL:   # 0.74: el texto entero desde el principio y visible letra a letra (visible_characters),
+			dlg_txt.text = full   # para que el bloque no suba mientras se escribe y pueda ir centrado en la caja
+			dlg_txt.visible_characters = 0
+			dlg_txt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		else:
+			dlg_txt.text = ""
 		_coloca.call_deferred()
 	var fin := func():
 		M.quita(st.iv)
 		if not oraculo:
 			dlg_txt.text = full
+			dlg_txt.visible_characters = -1
 			retrato_hab = false
 			if retrato.visible and retrato_l != null:
 				retrato.texture = Retrato.textura(retrato_l[0], retrato_l[1], retrato_e, 0)
@@ -1306,7 +1315,10 @@ func type_text(text: String, name_ := "") -> void:
 	st.iv = M.intervalo(func():
 		st.i = mini(st.i + paso, full.length())
 		if not oraculo:
-			dlg_txt.text = full.substr(0, st.i)
+			if Datos.CAL:
+				dlg_txt.visible_characters = st.i
+			else:
+				dlg_txt.text = full.substr(0, st.i)
 		st.n += 1
 		if st.n % 3 == 0:
 			sfx("blip")
@@ -1617,8 +1629,21 @@ func _pinta_menu(rows: int) -> void:
 		m_top = m_i - vis + 1
 	if Datos.CAL:   # 1.50: si caben más filas (la descripción de ahora es más corta), sin hueco debajo de la última
 		m_top = clampi(m_top, 0, maxi(0, m_items.size() - vis))
+	# 0.72: si alguna fila de la lista lleva icono, las que no lo llevan reservan su hueco: el borde izquierdo de las etiquetas, recto
+	var ic_w := 0.0
+	if Datos.CAL:
+		for it2 in m_items:
+			if it2.get("ic"):
+				ic_w = maxf(ic_w, Atlas.ic_px(it2.ic.get_width(), us) + 2 * us)
+			elif it2.get("sw"):
+				ic_w = maxf(ic_w, 10 * us)
 	if o.get("title"):
 		var t := HBoxContainer.new()
+		if Datos.CAL:   # 0.74: el título arranca en la misma columna que las etiquetas de la lista
+			t.add_theme_constant_override("separation", 0)   # el hueco lo ponen los espaciadores, no el tema
+			var sang := Control.new()
+			sang.custom_minimum_size = Vector2(10 * us + ic_w, 0)
+			t.add_child(sang)
 		var a := Label.new()
 		a.text = o.title
 		pon_letra(a, negrita, 8.5 * us, LINEA, 0, false)
@@ -1626,7 +1651,9 @@ func _pinta_menu(rows: int) -> void:
 		t.add_child(a)
 		if o.get("title2"):
 			if Datos.CAL:   # con Ribera Pixel la fecha y el dinero se tocaban: un hueco fijo entre los dos
-				t.add_theme_constant_override("separation", roundi(4 * us))
+				var hueco2 := Control.new()
+				hueco2.custom_minimum_size = Vector2(4 * us, 0)
+				t.add_child(hueco2)
 			var b := Label.new()
 			b.text = o.title2
 			pon_letra(b, negrita, 8.5 * us, LINEA, 0, false)
@@ -1660,14 +1687,6 @@ func _pinta_menu(rows: int) -> void:
 		maxw = maxf(maxw, ui_rect().size.x * .9 - 18 * us)
 	elif Datos.CAL and full:   # 1.50: a toda pantalla, la fila no la ensancha (el nombre entero va abajo, en la descripción)
 		maxw = ui_rect().size.x - 6 * us - 18 * us
-	# 0.72: si alguna fila de la lista lleva icono, las que no lo llevan reservan su hueco: el borde izquierdo de las etiquetas, recto
-	var ic_w := 0.0
-	if Datos.CAL:
-		for it2 in m_items:
-			if it2.get("ic"):
-				ic_w = maxf(ic_w, Atlas.ic_px(it2.ic.get_width(), us) + 2 * us)
-			elif it2.get("sw"):
-				ic_w = maxf(ic_w, 10 * us)
 	for k in range(m_top, mini(m_items.size(), m_top + vis)):
 		var it: Dictionary = m_items[k]
 		var f := HBoxContainer.new()

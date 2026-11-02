@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El cuadro de texto y el menú (0.74, lo dijo el usuario: «el cuadro de texto y el menú están mal, no están perfectos»; solo Godot, con `Datos.CAL`)
+
+- La **cabecera del menú** arranca en la misma columna que las etiquetas de la lista (un espaciador de 10 u + la columna del icono, con la separación del contenedor a 0, que metía 4 u de más) y el texto de la derecha acaba donde las cifras de las filas. El ancho de la columna del icono (`ic_w`) se calcula ahora antes de pintar el título.
+- El **texto del diálogo**, centrado en la caja (su alto lo manda el busto y se apoyaba arriba): `vertical_alignment` y `size_flags_vertical` en `_estilos`.
+- La **máquina de escribir** ya no reescribe el texto letra a letra (`dlg_txt.text`), sino que lo pone entero y descubre las letras con `visible_characters`: el bloque no se mueve mientras se escribe y se puede centrar.
+
 ### Todos los textos, centrados (0.74, lo pidió el usuario: «tienen que estar todos los textos, centrados y maquetados correctamente, en botones, cuadros de texto y demás»; solo Godot, con `Datos.CAL`)
 
 - El texto de los mandos (SONIDO, START, MÓVIL, A y B) quedaba ~1 píxel de rejilla alto y medio a la izquierda dentro de su pastilla: Ribera Pixel dibuja la mayúscula en la parte de arriba de la caja de línea y el píxel de separación cuelga a la derecha. Se compensa con el margen de la caja de cada botón (`BOTON_DY`, `BOTON_DX` en `_estilo` de `ui.gd`), que es lo que Godot usa para centrarlo.
