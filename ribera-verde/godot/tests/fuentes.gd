@@ -81,9 +81,9 @@ func _initialize() -> void:
 	for f in ["atkinson-hyperlegible-latin-400-normal.woff2", "atkinson-hyperlegible-latin-700-normal.woff2",
 			"press-start-2p-latin-400-normal.woff2", "dejavu-sans-simbolos.woff2"]:
 		ok("%s, importada (va en el paquete)" % f, FileAccess.file_exists("res://fuentes/" + f + ".import"))
-	# 5 · Ribera Pixel, la familia propia del juego (Regular, Bold, Italic y Bold Italic)
+	# 5 · Ribera Pixel, la familia propia del juego: Regular y Bold (sin cursiva, lo dijo el usuario: el juego no la usa)
 	var RP := {}
-	for a in ["RiberaPixel.ttf", "RiberaPixel-Bold.ttf", "RiberaPixel-Italic.ttf", "RiberaPixel-BoldItalic.ttf"]:
+	for a in ["RiberaPixel.ttf", "RiberaPixel-Bold.ttf"]:
 		ok("%s está en fuentes/" % a, FileAccess.file_exists("res://fuentes/" + a))
 		var ff := Ui._fuente_de(a, false)
 		ok("%s carga (%d bytes)" % [a, ff.data.size()], ff.data.size() > 5000)
@@ -108,6 +108,8 @@ func _initialize() -> void:
 				sueltos += 1
 		ok("%s: proporcional (%d anchos distintos)" % [a, anchos.size()], anchos.size() > 2)
 		ok("%s: cada avance, píxeles enteros" % a, sueltos == 0)
+	for a in ["RiberaPixel-Italic.ttf", "RiberaPixel-BoldItalic.ttf"]:
+		ok("%s no está (sin cursiva)" % a, not FileAccess.file_exists("res://fuentes/" + a))
 	for f in fallos:
 		print("FALLO  ", f)
 	print("fuentes: %d comprobaciones, %d fallos" % [n_ok + fallos.size(), fallos.size()])

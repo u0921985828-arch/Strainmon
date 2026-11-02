@@ -8,11 +8,11 @@
 # anchos variables (es proporcional, no monoespaciada) y 1 px de separación entre letras.
 # Los acentos se pegan por código sobre la vocal (ACENTOS), así que todos caen a la misma altura.
 #
-# Cuatro estilos (lo pidió el usuario: «que tenga Bold, Regular, Cursiva…»). Se dibuja el REGULAR y los
-# otros tres salen de él por código, que es lo que mantiene la familia coherente:
+# Dos pesos (lo pidió el usuario: «con tener la regular y la negrita, vale… lo de la cursiva igual lo
+# quitamos»; el juego no usa cursiva). Se dibuja el REGULAR y la negrita sale de él por código, que es
+# lo que mantiene la familia coherente:
 #   · Bold          cada píxel se engorda 1 px a la derecha (trazo 2; el avance crece con el glifo).
-#   · Italic        el glifo se corre en diagonal por bandas de BANDA filas desde la línea de base.
-#   · Bold Italic   las dos cosas.
+# `inclina` se queda en el archivo por si algún día hace falta una cursiva: no se usa.
 #
 # Sale: arte/fuente/RiberaPixel.ttf (bitmap trazado a contornos cuadrados; cada píxel es un cuadrado
 # exacto de la rejilla, así que al tamaño múltiplo de 10 px no hay ni medio píxel de antialias)
@@ -36,8 +36,6 @@ NOMBRE = 'Ribera Pixel'
 ESTILOS = {   # archivo: (nombre del estilo, engorda, inclina)
     'RiberaPixel.ttf': ('Regular', False, False),
     'RiberaPixel-Bold.ttf': ('Bold', True, False),
-    'RiberaPixel-Italic.ttf': ('Italic', False, True),
-    'RiberaPixel-BoldItalic.ttf': ('Bold Italic', True, True),
 }
 
 # tilde, diéresis y virgulilla, pegadas encima de la letra base (fila −2 sobre su caja)
@@ -271,7 +269,7 @@ def main(argv):
     lineas = ['LANDRACE HUNTERS', 'Cosecha la Haze: 27,5 % · 1.200 €',
               'ñÑ áéíóú ü ¿? ¡! «» ▲▼◀▶ ★ ≈ → 0123456789',
               'El zorro ágil brincó sobre el perro, ¿eh?']
-    ims = [png(mapas[e], lineas[1], 4) for e in ('Regular', 'Bold', 'Italic', 'Bold Italic')]
+    ims = [png(mapas[e], lineas[1], 4) for e in ('Regular', 'Bold')]
     ims += [png(mapas['Regular'], t, 4) for t in (lineas[0], lineas[2], lineas[3])]
     W = max(i.width for i in ims) + 16
     H = sum(i.height for i in ims) + 16 * len(ims)
