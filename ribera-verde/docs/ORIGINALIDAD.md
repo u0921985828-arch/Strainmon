@@ -3,11 +3,14 @@
 Documento de respaldo para registrar la obra y acreditar su autoría. Hecho el 2 de noviembre de 2026
 sobre la versión de Godot del juego (`ribera-verde/godot/`).
 
-> **Aviso previo, en una línea:** un videojuego **no se patenta**, se **registra como obra** (propiedad
-> intelectual / derechos de autor) y, aparte, su **nombre y su logo se registran como marca**. Las
-> patentes protegen invenciones técnicas, y las reglas o mecánicas de un juego no son patentables como
-> tales. Lo que este documento acredita es lo que de verdad protege a la obra: que **todo lo que se
-> publica es original o está licenciado**, y que hay **rastro fechado** de cómo se hizo.
+> **Aviso previo, en una línea:** un videojuego **no se patenta**. Se **registra como obra** (derecho de
+> autor: guion, arte, música y código), su interfaz puede registrarse como **diseño industrial**, y su
+> **nombre y su logo, como marca**. El detalle, en §7. Lo que este documento acredita es lo que de verdad
+> sostiene todo eso: que **todo lo que se publica es original o está licenciado**, y que hay **rastro
+> fechado** de cómo se hizo.
+>
+> Esto es una guía de trabajo, no asesoramiento jurídico: antes de presentar nada, que lo mire un
+> abogado de propiedad intelectual.
 
 ---
 
@@ -121,24 +124,83 @@ Regla permanente del proyecto (`CLAUDE.md`), aplicada desde el primer día:
 
 ---
 
-## 7. Qué hacer para proteger la obra (pasos reales)
+## 7. Cómo se protege cada parte (las cuatro vías)
 
-1. **Registro de la Propiedad Intelectual** (en España, el Registro territorial de tu comunidad). Se
-   registra como **programa de ordenador** y, si se quiere, por separado como obra audiovisual y las
-   composiciones musicales. Se aporta: el código fuente (listado o soporte), una memoria descriptiva,
-   capturas y los datos del titular. Sirve de prueba de autoría con fecha.
-2. **Marca**, para el nombre: **LANDRACE HUNTERS** (y, si interesa, **WOLFCADE**) en la OEPM, clase 9
-   (programas de videojuego) y clase 41 (servicios de entretenimiento); si el mercado es europeo, marca
-   de la UE en la EUIPO. El nombre comercial es lo único que de verdad impide que otro publique un juego
-   llamado igual.
-3. **Depósito fechado alternativo o complementario**: un notario, un sello de tiempo o el propio
-   historial de git publicado en GitHub con fechas.
-4. **Licencia de distribución**: decidir y escribir en el repositorio bajo qué condiciones se publica
-   (todos los derechos reservados es lo normal en un juego comercial).
-5. Guardar junto al registro: **los términos de PixelLab y el recibo de la suscripción**, las licencias
-   de las tres fuentes y este documento.
+El derecho de autor **nace solo**, en el momento de crear la obra y plasmarla en un soporte: no hay que
+registrar nada para tenerlo. Lo que da el registro es **prueba con fecha** ante un plagio. Cada parte
+del juego se defiende por una vía distinta:
 
----
+### 7.1 Argumento, guion y diálogos → derecho de autor
+
+- Protege **la expresión concreta**: cómo se cuenta la historia y los textos exactos. **No protege la
+  idea abstracta**: otro puede hacer un juego de cultivo sin copiar nada si su historia y sus diálogos
+  son distintos.
+- Dónde está lo nuestro, ya escrito y fechado: `docs/GUION.md` (el hilo del cuaderno azul de la tía
+  Maite y los cuatro actos), `godot/i18n/strings.csv` (todos los diálogos, línea a línea),
+  `godot/datos/datos.json` (misiones, recados, personajes) y `docs/GDD.md`.
+- **Qué hacer:** registrarlo en el Registro de la Propiedad Intelectual y/o sellarlo con marca de tiempo
+  (Safe Creative, un sello de tiempo cualificado o acta notarial). Aportar el guion y el volcado de
+  diálogos como un PDF único, con la fecha y la versión.
+
+### 7.2 Pantallas, estética y arte → derecho de autor + diseño industrial
+
+- **Derecho de autor (obra artística):** sprites, escenarios, personajes, iconos, interfaz y el icono de
+  la app. Ventaja nuestra: el arte está en **código fuente** (`tools/sprites/a-mano/*.py`), así que se
+  acredita el proceso, no solo el resultado.
+- **Diseño industrial:** si la interfaz o el HUD son distintivos, se registran en la **OEPM** (España) o
+  en la **EUIPO** (dibujo o modelo comunitario) e impiden copiar la disposición exacta de menús y
+  pantallas. Candidatos claros aquí: el HUD con sus filas, los mandos flotantes, la vista C de la carpa,
+  el cuadro de diálogo con busto y cinta de nombre, y la ficha de la carpa.
+- **Ojo con el plazo:** el dibujo o modelo comunitario exige novedad, con un **periodo de gracia de 12
+  meses** desde la primera divulgación pública. Si el juego ya se enseñó, hay que registrar dentro de ese
+  año.
+- **Qué hacer:** sacar las capturas con `tests/capturas.gd` (`store/`) y presentar las vistas de cada
+  pantalla que se quiera registrar.
+
+### 7.3 Código fuente → derecho de autor (como obra literaria)
+
+- El código está protegido **automáticamente**: nadie puede copiarlo, descompilarlo ni reutilizarlo sin
+  permiso. Son `godot/src/*.gd`, `tools/*.js`, `tools/*.py` y los generadores de datos.
+- **Qué hacer:** registrarlo como **programa de ordenador** (se aporta un listado del código, normalmente
+  las primeras y últimas páginas o el fuente entero en soporte), escribir en el repositorio bajo qué
+  licencia se publica (en un juego comercial, «todos los derechos reservados») y mantener el repositorio
+  privado y con copia.
+
+### 7.4 Nombre y logo → marca
+
+- **LANDRACE HUNTERS** (y, si interesa, **WOLFCADE** y **STRAINBOY**) se registran como **marca** en la
+  OEPM o, para toda la UE, en la **EUIPO**. Clases: **9** (programas de videojuego) y **41** (servicios
+  de entretenimiento).
+- Es lo único que impide de verdad que otro publique un juego con el mismo título. El derecho de autor
+  **no protege los títulos**.
+- **Qué hacer antes:** comprobar que el nombre está libre en los buscadores de la OEPM y la EUIPO, y
+  registrar el logo tal como se usa.
+
+### 7.5 Patente: cuándo sí (y por qué aquí no)
+
+No se patenta ni el juego ni su argumento ni sus reglas. Sí se patentan **innovaciones técnicas**: un
+accesorio o hardware propio, o un algoritmo que resuelva un problema técnico concreto (el caso clásico
+es la patente de Bandai Namco sobre los minijuegos durante las pantallas de carga). Para un desarrollo
+independiente queda descartada por coste y complejidad; además, nada de este juego encaja ahí.
+
+### 7.6 Lo que hay que guardar junto al registro
+
+- Este documento.
+- Los **términos de PixelLab** y el recibo de la suscripción.
+- Las licencias de las tres fuentes de terceros (ya en `godot/fuentes/`).
+- El historial de git exportado (`git log`) como prueba de fechas, y el ZIP del fuente con su suma de
+  verificación.
+
+### 7.7 Resumen de la estrategia
+
+| Qué | Vía | Dónde | Automático | Qué aporta registrarlo |
+| --- | --- | --- | --- | --- |
+| Argumento, guion y diálogos | Derecho de autor | Registro de la Propiedad Intelectual · Safe Creative · notario | Sí | Prueba de fecha ante un plagio |
+| Arte, pantallas y música | Derecho de autor | Igual que arriba | Sí | Igual |
+| Interfaz y HUD | Diseño industrial | OEPM · EUIPO | No | Impide copiar la disposición exacta (12 meses de gracia) |
+| Código fuente | Derecho de autor (programa de ordenador) | Registro de la Propiedad Intelectual | Sí | Prueba de titularidad del software |
+| Nombre y logo | Marca | OEPM · EUIPO (clases 9 y 41) | **No** | Uso exclusivo del nombre en el sector |
+| Invención técnica | Patente | OEPM | No | No aplica a este juego |
 
 ## 8. Cabos sueltos que conviene atar antes de publicar
 
