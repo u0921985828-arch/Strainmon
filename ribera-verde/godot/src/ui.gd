@@ -1275,6 +1275,109 @@ var registro: Array = []
 func recortada(text: String) -> bool:
 	return Datos.PLAY and S != null and D.has("RECORTE") and int(S.get("ch", 1)) <= int(D.RECORTE.ch) and D.RECORTE.quita.has(text)
 
+# 0.74 (lo pidió el usuario: «que el cuadro de texto únicamente pueda tener máximo 4 líneas… igual bajarle
+# un poco el tamaño de la letra»): el cuadro siempre mide DLG_LINEAS líneas y, si el texto da más, el cuerpo
+# baja de DLG_FS en DLG_FS hasta que quepa (nunca por debajo de DLG_FS_MIN).
+const DLG_LINEAS := 4
+const DLG_FS := 9.5     # el cuerpo de serie, en u
+const DLG_FS_MIN := 7.5
+const DLG_FS_PASO := .5
+func _cuerpo_dlg(_full: String, _con_nombre: bool) -> void:
+	_dlg_px = DLG_FS
+	_pon_dlg_txt(_dlg_px, true)
+
+var _dlg_px := DLG_FS
+var _dlg_w := 0.0   # el ancho del texto del cuadro, medido al colocarlo
+func _pon_dlg_txt(px: float, alto_fijo: bool) -> void:
+	var ft := fs_txt(px * us)
+	pon_letra(dlg_txt, letra, ft, INK, (14.5 if Datos.CAL else 13.5) * us * ft / (10 * us))
+	dlg_txt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	dlg_txt.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	# el alto, el de DLG_LINEAS líneas: todas las cajas miden igual. Si ni al cuerpo más pequeño cabe, se
+	# quita el tope y la caja crece, que es mejor que cortar el texto.
+	dlg_txt.custom_minimum_size = Vector2(0, DLG_LINEAS * _alto_linea(ft) if alto_fijo else 0.0)
+
+# el ancho que le queda al texto en el cuadro (lo mismo que reparte _coloca)
+func _ancho_dlg(con_nombre: bool) -> float:
+	var rw := retrato_w()
+	var con: bool = con_nombre and rw > 0
+	var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
+	return ui_rect().size.x - 6 * us - ((126 if bt else 10) + 2) * us \
+		- ((RETRATO_M + rw + 2 + 7) if con else (10 + 2)) * us
+
+# 0.74 (lo pidió el usuario: «que el cuadro de texto únicamente pueda tener máximo 4 líneas»): el texto se
+# parte en páginas de DLG_LINEAS líneas como mucho, por frases y, si una no cabe, por palabras. Cada página
+# se lee y se pasa con A, como siempre.
+func paginas_dlg(txt: String, con_nombre: bool) -> Array:
+	# el ancho de verdad es el del Label una vez colocado (_dlg_w); mientras no se sepa, la cuenta de _coloca
+	# con un margen de sobra, que es mejor pasarse de corto que cortar una línea
+	var ancho: float = _dlg_w if _dlg_w > 2 else _ancho_dlg(con_nombre) * .83
+	if ancho <= 2 or txt.strip_edges() == "":
+		return [txt]
+	var palabras: PackedStringArray = txt.replace("\n", " \n ").split(" ", false)
+	var out: Array = []
+	var cur := ""
+	for w in palabras:
+		var pal: String = "\n" if w == "\n" else w
+		var pru: String = pal if cur == "" else (cur + ("" if pal == "\n" else " ") + pal)
+		if cur != "" and _lineas_dlg(pru, ancho, DLG_FS) > DLG_LINEAS:
+			out.append(cur)
+			cur = "" if pal == "\n" else pal   # una página no empieza por un salto de línea
+		else:
+			cur = pru
+	if cur != "":
+		out.append(cur)
+	return out if out.size() > 0 else [txt]
+
+func _alto_linea(ft: float) -> float:
+	var fsz: int = maxi(5, roundi(ft))
+	return maxf(letra.get_height(fsz), roundf(14.5 * us * ft / (10 * us)))
+
+func _lineas_dlg(txt: String, ancho: float, px: float) -> int:
+	# se cuentan las líneas como las parte el Label (por palabras): medir el alto del bloque no vale, porque
+	# el interlineado y el redondeo bailan
+	if ancho <= 1:
+		return 1
+	var fsz: int = maxi(5, roundi(fs_txt(px * us)))
+	var esp: float = letra.get_string_size(" ", HORIZONTAL_ALIGNMENT_LEFT, -1, fsz).x
+	var n := 0
+	for linea in txt.split("\n"):
+		n += 1   # cada línea escrita ocupa una, aunque esté vacía
+		var w := 0.0
+		for pal in (linea as String).split(" ", false):
+			var aw: float = letra.get_string_size(pal, HORIZONTAL_ALIGNMENT_LEFT, -1, fsz).x
+			if w > 0 and w + esp + aw > ancho:
+				n += 1
+				w = aw
+			else:
+				w += (esp if w > 0 else 0.0) + aw
+	return maxi(1, n)
+
+# con el ancho del cuadro ya puesto (desde _coloca): si el texto da más de DLG_LINEAS líneas, el cuerpo baja
+# de paso en paso hasta que quepa (lo pidió el usuario: «máximo 4 líneas… o bajarle el tamaño de la letra»)
+func _mide_dlg() -> void:
+	# el Label ya tiene su ancho: él dice cuántas líneas salen de verdad. Si pasan de DLG_LINEAS, el cuerpo
+	# baja un paso y se vuelve a colocar (esto se repite hasta que quepa o se llegue al cuerpo más pequeño)
+	if oraculo or not Datos.CAL or not dlg.visible or String(dlg_txt.text) == "":
+		return
+	var ancho: float = dlg_txt.size.x
+	if ancho <= 2:
+		return
+	if retrato.visible:
+		_dlg_w = ancho
+	# el Label manda: su cuenta es la buena. El cálculo con la fuente sirve para probar cuerpos sin esperar
+	# un fotograma por cada uno; el desfase entre los dos se corrige con lo que dice el Label ahora.
+	var n: int = dlg_txt.get_line_count()
+	var ajuste: int = n - _lineas_dlg(dlg_txt.text, ancho, _dlg_px)
+	var px: float = _dlg_px
+	while n > DLG_LINEAS and px > DLG_FS_MIN + .01:
+		px = maxf(DLG_FS_MIN, px - DLG_FS_PASO)
+		n = _lineas_dlg(dlg_txt.text, ancho, px) + ajuste
+	if absf(px - _dlg_px) > .01 or (n > DLG_LINEAS) == (dlg_txt.custom_minimum_size.y > 0):
+		_dlg_px = px
+		_pon_dlg_txt(px, n <= DLG_LINEAS)
+		_coloca.call_deferred()
+
 func type_text(text: String, name_ := "") -> void:
 	if gancho_texto.is_valid():
 		gancho_texto.call(text, name_)
@@ -1295,9 +1398,9 @@ func type_text(text: String, name_ := "") -> void:
 		_pon_retrato(name_, full, 0)
 		dlg_more.hide()
 		if Datos.CAL:   # 0.74: el texto entero desde el principio y visible letra a letra (visible_characters),
+			_cuerpo_dlg(full, name_ != "")   # el cuerpo que hace que quepa en DLG_LINEAS
 			dlg_txt.text = full   # para que el bloque no suba mientras se escribe y pueda ir centrado en la caja
 			dlg_txt.visible_characters = 0
-			dlg_txt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		else:
 			dlg_txt.text = ""
 		_coloca.call_deferred()
@@ -1368,6 +1471,16 @@ func _parpadeo() -> void:
 func say(text: String, name_ := "", keep := false) -> void:
 	if recortada(text):
 		return
+	if Datos.CAL and not oraculo:
+		var pg: Array = paginas_dlg(nm(text), name_ != "")
+		if pg.size() > 1:
+			for i in pg.size() - 1:
+				await _say1(pg[i], name_, true)
+			await _say1(pg[pg.size() - 1], name_, keep)
+			return
+	await _say1(text, name_, keep)
+
+func _say1(text: String, name_ := "", keep := false) -> void:
 	await type_text(text, name_)
 	if not oraculo:
 		dlg_more.show()
@@ -1862,6 +1975,7 @@ func _coloca() -> void:
 			dlg_nm.size.x = retrato_marco.size.x
 			dlg_nm.position = retrato_marco.position + Vector2(0, retrato_marco.size.y - dlg_nm.size.y)
 		dlg_more.position = dlg.position + dlg.size - Vector2(8 * us + 8 * us, 4 * us + 5 * us)
+		_mide_dlg()
 		dlg_more.size = Vector2(8 * us, 7 * us)
 		# La primera vez, el texto aún no sabe su ancho y el cuadro sale de toda la pantalla; se recoloca al fotograma siguiente
 		if dlg.size.y > R.size.y * 0.6 and not get_tree().process_frame.is_connected(_coloca):

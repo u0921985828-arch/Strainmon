@@ -2,6 +2,13 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El cuadro de texto, de 4 líneas como mucho (0.74, lo pidió el usuario: «que el cuadro de texto únicamente pueda tener máximo 4 líneas… o igual bajarle un poco el tamaño de la letra»; solo Godot, con `Datos.CAL`)
+
+- La caja mide siempre **4 líneas** (`DLG_LINEAS`) y el texto que no cabe se **parte en páginas** que se pasan con A como siempre (`paginas_dlg` en `ui.gd`, desde `say`): el corte va por palabras, nunca a mitad de una.
+- Si una página sigue pasándose (una palabra larguísima, un idioma más ancho), el **cuerpo baja** de medio en medio punto de `DLG_FS` (9,5 u) a `DLG_FS_MIN` (7,5 u) con el ancho ya medido del Label (`_mide_dlg`, llamado desde `_coloca`); si ni al mínimo cabe, se quita el tope de alto y la caja crece, que es mejor que cortar texto.
+- El alto fijo lo pone `_pon_dlg_txt` y las líneas se cuentan como las parte el Label, por palabras (`_lineas_dlg`).
+- Prueba `tests/dialogo_lineas.gd`: los 120 textos más largos del juego, con retrato y sin él, página a página, midiendo el Label de verdad (`get_line_count`).
+
 ### El cuadro de texto y el menú (0.74, lo dijo el usuario: «el cuadro de texto y el menú están mal, no están perfectos»; solo Godot, con `Datos.CAL`)
 
 - La **cabecera del menú** arranca en la misma columna que las etiquetas de la lista (un espaciador de 10 u + la columna del icono, con la separación del contenedor a 0, que metía 4 u de más) y el texto de la derecha acaba donde las cifras de las filas. El ancho de la columna del icono (`ic_w`) se calcula ahora antes de pintar el título.
