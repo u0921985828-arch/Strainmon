@@ -1441,7 +1441,10 @@ func type_text(text: String, name_ := "") -> void:
 # MAESTRO [8]: el retrato (con Datos.CAL, fuera de las pruebas contra el HTML): quien habla por su nombre o con quien hablas en
 # vivo (retrato_de, en mundo.gd), con el gesto por el tono de lo que dice (Retrato.expresion)
 const RETRATO_W := 32
-const RETRATO_M := 5   # el margen de la ficha del retrato al canto de la caja de diálogo (u)
+# El margen de la ficha del retrato al canto de la caja (u). 8 u = los mismos 40 px que le quedan por
+# arriba y por abajo con la caja de 4 líneas, para que el busto se vea centrado también a la izquierda
+# (lo dijo el usuario: «desde el borde hasta el sprite tendría que haber la misma distancia»).
+const RETRATO_M := 8
 
 # el ancho del retrato en u: el del busto (64) o RETRATO_W el dibujado
 func retrato_w() -> int:
