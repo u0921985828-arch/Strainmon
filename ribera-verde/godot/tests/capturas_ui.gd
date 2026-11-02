@@ -147,6 +147,23 @@ func _mira_maquetado(p: String) -> void:
 					break
 		if xs.size() > 1:
 			cortes.append("%s: las etiquetas de la lista arrancan en %s" % [p, xs.keys()])
+	# el icono de una fila y su texto, a la misma altura (lo pidió el usuario: «que esté alineado con el icono que tenga»)
+	for n in _todos(J.menu_col):
+		if not (n is HBoxContainer):
+			continue
+		var tx: TextureRect = null
+		var lb: Label = null
+		for c2 in n.get_children():
+			if c2 is TextureRect and tx == null:
+				tx = c2
+			elif c2 is Label and lb == null and String(c2.text).strip_edges() != "":
+				lb = c2
+		if tx == null or lb == null or not tx.is_visible_in_tree():
+			continue
+		var cy_ic: float = tx.get_global_rect().get_center().y
+		var cy_tx: float = lb.get_global_rect().get_center().y
+		if absf(cy_ic - cy_tx) > 1.0 * J.us:
+			cortes.append("%s: el icono de «%s» a %.1f u de su texto" % [p, lb.text, (cy_ic - cy_tx) / J.us])
 	# la cabecera de un menú con dos textos (la fecha y el dinero del START): nunca pegados
 	for c in J.menu_col.get_children():
 		if not (c is HBoxContainer) or c.get_child_count() != 2:

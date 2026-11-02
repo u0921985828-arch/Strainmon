@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### La tipografía, maquetada (lo pidió el usuario: «hay que maquetarlo bien, la tipografía»; solo Godot, con `Datos.CAL`)
+
+- **Espacio de 4 px** (antes 3): el número ya no se pega a la palabra («Agua 70 %»).
+- **Cifras tabulares**: las diez al mismo avance, así los precios y las columnas de números cuadran unos debajo de otros.
+- El **%** rehecho: los dos ojos en las esquinas y la barra entre ellos (antes el ojo de abajo se comía la barra y se leía como una X). El **1** con pie entero y el **7** con el travesaño corto, que se confundían con la i y con la Z.
+- El **diálogo**, con aire: caja de 8 × 12 (antes 6 × 10), cuerpo de 9,5 u (10) e interlineado de 14,5 u (13,5), para que el texto no se coma el recuadro.
+- `tests/capturas_ui.gd` comprueba además que el icono de cada fila y su texto van a la misma altura (menos de 1 u): 12 pantallas, 0 cortes.
+
 ### Ribera Pixel, de serie en el juego (lo pidió el usuario: «actualízalo y a ver qué tal se ve»; solo Godot, con `Datos.CAL`)
 
 - `_fuente_de` en `ui.gd` carga **Ribera Pixel** en los tres sitios: `letra` (Regular), `negrita` (Bold) y `display` (Regular), sin suavizado, para que cada píxel de la rejilla caiga entero. Sin `Datos.CAL` (las pruebas de píxel contra el HTML) siguen Atkinson y Press Start 2P, que es contra lo que están hechos los oráculos.
