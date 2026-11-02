@@ -98,11 +98,16 @@ func _initialize() -> void:
 		ok("%s: ningún glifo sin dibujar (%d)" % [a, falta2.size()], falta2.is_empty())
 		if not falta2.is_empty():
 			print("   %s, le faltan: %s" % [a, "".join(falta2)])
-		# monoespaciada: todas las letras miden lo mismo
+		# proporcional (anchos variables, como la quiso el usuario) y cada avance, múltiplo entero del píxel
 		var anchos := {}
+		var sueltos := 0
 		for t2 in ["A", "i", "m", "W", "1", ".", "ñ"]:
-			anchos[ff.get_char_size((t2 as String).unicode_at(0), 32).x] = true
-		ok("%s: monoespaciada (%d anchos)" % [a, anchos.size()], anchos.size() == 1)
+			var an: float = ff.get_char_size((t2 as String).unicode_at(0), 100).x
+			anchos[an] = true
+			if not is_equal_approx(fmod(an, 10.0), 0.0):
+				sueltos += 1
+		ok("%s: proporcional (%d anchos distintos)" % [a, anchos.size()], anchos.size() > 2)
+		ok("%s: cada avance, píxeles enteros" % a, sueltos == 0)
 	for f in fallos:
 		print("FALLO  ", f)
 	print("fuentes: %d comprobaciones, %d fallos" % [n_ok + fallos.size(), fallos.size()])
