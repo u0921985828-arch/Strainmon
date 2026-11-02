@@ -10,6 +10,8 @@ const Pinta = preload("res://src/pinta.gd")
 const Atlas = preload("res://src/atlas.gd")
 
 var J
+# los que no están en datos.json: se crean al montarlos (campo.gd, mundo.gd)
+const EXTRA := ["huerta", "camarote", "nave-s", "sotano", "alm-rv", "alm-muelle", "lab-rv", "banco-rv", "cult-sala", "fria"]
 
 func _initialize() -> void:
 	Datos.PLAY = false
@@ -61,11 +63,23 @@ func _corre() -> void:
 	var tot := 0
 	var n := 0
 	var fallos := []
-	for k in J.D.MAPS.keys():
-		var md = J.D.MAPS[k]
+	var vistos := {}
+	var cola: Array = J.D.MAPS.keys()
+	cola.append_array(EXTRA)
+	var i := 0
+	while i < cola.size():
+		var k = cola[i]
+		i += 1
+		if vistos.has(k) or not J.MAPS.has(k):
+			continue
+		vistos[k] = true
+		var md = J.MAPS[k]
 		if not md is Dictionary or not md.has("g"):
 			continue
 		J.enter_map(String(k), 1, 1, "right")
+		for q in J.MAPS.keys():   # los mapas que se montan al entrar (la huerta, las salas) también
+			if not vistos.has(q) and not cola.has(q):
+				cola.append(q)
 		var m: Dictionary = J.MAPS[String(k)]
 		var rr := rects(m)
 		var hue := []
