@@ -289,7 +289,7 @@ func _corre() -> void:
 	chk(float(J.S.money) >= m0 + 5 and float(J.S.money) <= m0 + 15, "la chatarra: %s" % J.S.money)
 	J.enter_map("ensanche", 21, 17, "up")
 	m0 = float(J.S.money)
-	t = hace(["Comprar"], func(): await J.object_action(21, 16))
+	t = hace(["El periódico"], func(): await J.object_action(21, 16))   # con la revista, el quiosco tiene dos cosas que comprar
 	chk(float(J.S.money) == m0 - J.PERIODICO and "mañana" in t and "°C" in t, "el periódico: %s %s" % [J.S.money, t])
 	J.enter_map("ibarbide", 21, 16, "up")
 	J.S.min = 600
