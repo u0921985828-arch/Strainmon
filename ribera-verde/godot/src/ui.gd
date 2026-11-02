@@ -657,9 +657,11 @@ func pon_letra(l: Control, f: Font, px: float, c: Color, alto := 0.0, sombra := 
 		l.add_theme_constant_override("line_spacing", roundi(alto - f.get_height(maxi(5, roundi(px)))))
 
 func _estilos() -> void:
-	dlg.add_theme_stylebox_override("panel", caja(us, 6, 10))
-	var ft := fs_txt(10 * us)
-	pon_letra(dlg_txt, letra, ft, INK, 13.5 * us * ft / (10 * us))
+	# con Ribera Pixel, el texto del diálogo pide aire: más margen en la caja, el cuerpo medio punto menor
+	# y el interlineado un poco mayor, para que no se coma el recuadro (lo pidió el usuario)
+	dlg.add_theme_stylebox_override("panel", caja(us, 8, 12) if Datos.CAL else caja(us, 6, 10))
+	var ft := fs_txt((9.5 if Datos.CAL else 10.0) * us)
+	pon_letra(dlg_txt, letra, ft, INK, (14.5 if Datos.CAL else 13.5) * us * ft / (10 * us))
 	dlg_nm.add_theme_stylebox_override("panel", plana(LINEA, 3 * us, 2.5 * us, 5 * us))
 	pon_letra(dlg_nm_txt, negrita, 8 * us, Color.WHITE, 0, false)
 	caja_menu = caja(us, 5, 7)
