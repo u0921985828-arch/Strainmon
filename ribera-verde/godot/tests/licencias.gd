@@ -41,9 +41,12 @@ func _corre() -> void:
 	chk(t.find("Permission is hereby granted") >= 0, "el texto de la MIT de Sentry")
 	chk(t.find("Licensed under the Apache License") >= 0 or t.find("APPENDIX: How to apply") >= 0, "el texto entero de la Apache 2.0")
 	chk(t.length() > 20000, "la pantalla trae los textos enteros (%d letras)" % t.length())
-	# 3 · los créditos nombran lo que se usa
+	# 3 · los créditos: solo WOLFCADE y los beta testers (lo pidió el usuario)
 	var c: String = J.CREDITOS
-	for k in ["Godot", "PixelLab", "Press Start 2P", "Atkinson", "DejaVu"]:
+	for k in ["WOLFCADE", "BETA TESTERS", "Kerman, Ibai, Adrián, Urko, Josu, Ander, Bitxone y Edorta"]:
 		chk(c.find(k) >= 0, "CRÉDITOS nombra «%s»" % k)
+	for k in ["Godot", "PixelLab", "Press Start 2P", "Atkinson", "DejaVu"]:
+		chk(c.find(k) < 0, "CRÉDITOS no nombra a terceros: «%s» (va en LICENCIAS)" % k)
+	chk(c.find("LICENCIAS") >= 0, "CRÉDITOS remite a CRÉDITOS · LICENCIAS")
 	print("licencias: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	quit(1 if fallos.size() > 0 else 0)

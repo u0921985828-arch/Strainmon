@@ -2,7 +2,13 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### EL ESQUEJE, la revista mensual de cultivo (0.74, lo pidió el usuario: «Molaría que hubiese un periódico del cannabis o alguna revista, desarrolla»; solo Godot, con `Datos.CAL`)
+### Solo WOLFCADE en los créditos (0.75, lo pidió el usuario: «Quiero que únicamente como creador del juego aparezca WOLFCADE, como empresa de desarrolo de juegos y los beta tester»)
+
+- `CREDITOS` (`src/juego.gd`) queda con el título y la versión, «Un juego de WOLFCADE.», los ocho BETA TESTERS, el aviso de FICCIÓN y la línea que remite a CRÉDITOS · LICENCIAS. Fuera «Hecho con Godot Engine», AGRADECIMIENTOS, ARTE (PixelLab), MÚSICA Y SONIDO y FUENTES.
+- `licencias()` no se toca: Godot (MIT), las tres fuentes enteras, los avisos de Android, la Apache 2.0 y las partes de terceros siguen completos en CRÉDITOS · LICENCIAS.
+- Inglés al día en `i18n/partes/juego.csv`. Pruebas: `tests/licencias.gd` 27/0 (el bloque 3 ahora exige WOLFCADE y los beta testers, y que CRÉDITOS no nombre a terceros) y `tests/ciclo.gd` 0 fallos.
+
+### EL ESQUEJE, la revista mensual de cultivo (0.75, lo pidió el usuario: «Molaría que hubiese un periódico del cannabis o alguna revista, desarrolla»; solo Godot, con `Datos.CAL`)
 
 - **Un número por mes del calendario** (el n.º 1, el del mes en que empieza la partida; `rev_num`, `rev_mes`), armado con el estado de la partida: portada con **titular según el nivel de la policía, la ley del muelle, la Copa y el hilo de la tía**; LA VARIEDAD DEL MES (una de `STRAINS`, con su pista de `CAZA` o de `REGALO` si aún no la tienes); TALLER; MERCADO con los precios de verdad (lonja, clubs y catadores); LA COPA Y LAS CATAS; CLASIFICADOS; CARTAS; y LEGAL. Se lee con el lector de siempre (`leer`), con su plano de detalle al abrirla (gesto `revista`).
 - **Doce técnicas de cultivo reales**, una por número, que ciclan: poda apical, lavado de raíces, defoliado, trasplante a tiempo, malla horizontal, riego por peso, tricomas al corte, secado lento, madres por turnos, calor de fondo, limpieza entre ciclos y curado en tarro. La primera vez que se lee un número **la técnica se aprende** y **da su efecto de verdad**, pequeño y con tope (`Cultivo.rev_bono`, `REVISTA.tope`): cosecha +15 % como mucho (`gramos_planta`), calidad +12 % (`calidad`), THC +2 % (`thc_cosecha`), moho −25 % y esquejes que aguantan un día más (`esq_dias`). Nada de dosis ni de cifras de abono.
