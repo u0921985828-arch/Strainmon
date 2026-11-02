@@ -6,7 +6,7 @@
 
 - El sprite no tenía nada: las casillas de un edificio llevan en `g` claves sin arte de suelo (`wall_`, `roofT_`, `roofB_`, `win_`, `door_`), así que **donde la fachada es transparente** —el hueco entre las dos torres de la parroquia de Zorroza, el alero del molino, el remate de la catedral— se veía el negro de debajo, como un marco alrededor del campanario.
 - Ahora, antes del edificio, se pinta el **suelo de la casilla pisable más cercana** (la acera, la plaza o el agua que lo rodea), buscando primero hacia abajo: `_tile_hay` y `_suelo_base` en `pinta.gd`, con la clave de cada casilla calculada una vez por mapa.
-- Prueba nueva `tests/negro_render.gd` (gráfica): pinta 14 mapas enteros, trozo a trozo, y busca cuadros lisos de 8 × 8 muy oscuros. Con el código de antes, 32 en Zorroza, el Casco Viejo y Abando; ahora, ninguno.
+- Prueba nueva `tests/negro_render.gd` (gráfica): pinta 27 mapas enteros, trozo a trozo, y busca cuadros lisos de 8 × 8 muy oscuros. Con el código de antes, 32 en Zorroza, el Casco Viejo y Abando; ahora, ninguno.
 
 ### El agujero negro de la calle (0.74, lo vio el usuario: «¿Y ese pedazo de error en el mapa?»; solo Godot, con `Datos.CAL`)
 

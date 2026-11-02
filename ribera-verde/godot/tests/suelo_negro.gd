@@ -30,6 +30,16 @@ func res_(k: String) -> bool:
 		return true
 	return Atlas.frame_de(Atlas.cubre("tile:" + k), k, "unica", 0, {"i": 0}) != null
 
+# lo mismo que _suelo_base de pinta.gd: el suelo de la casilla pisable más cercana, hacia abajo primero
+func _base(m: Dictionary, tx: int, ty: int) -> String:
+	for d in range(1, 13):
+		for q in [Vector2i(tx, ty + d), Vector2i(tx, ty - d), Vector2i(tx - d, ty), Vector2i(tx + d, ty)]:
+			if q.x < 0 or q.y < 0 or q.x >= int(m.w) or q.y >= int(m.h):
+				continue
+			if res_(String(m.g[q.y][q.x])):
+				return String(m.g[q.y][q.x])
+	return ""
+
 func rects(m: Dictionary) -> Array:
 	var r := []
 	for b in m.get("blds", []):
@@ -95,7 +105,7 @@ func _corre() -> void:
 					if px >= r[0] and py >= r[1] and px + 16 <= r[0] + r[2] and py + 16 <= r[1] + r[3]:
 						ok = true
 						break
-				if not ok:
+				if not ok and _base(m, x, y) == "":   # ni sprite que la tape ni suelo de alrededor que pintar debajo (_suelo_base de pinta.gd)
 					hue.append("%s(%d,%d)" % [t, x, y])
 		n += 1
 		if hue.size():

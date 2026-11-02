@@ -12,7 +12,9 @@ var J
 var n := 0
 var fallos := []
 
-const MAPAS := ["zorroza", "casco", "abando", "lapunta", "town", "alto", "puerto", "mendialde", "ibarbide", "ensanche", "valdehierro", "errotabarri", "astilleros", "muelle"]
+const MAPAS := ["zorroza", "casco", "abando", "lapunta", "town", "alto", "puerto", "mendialde", "ibarbide", "ensanche",
+	"valdehierro", "errotabarri", "astilleros", "muelle", "callejon", "comarcal", "metropoli",
+	"catedral-in", "sannicolas-in", "iglesiaz-in", "mercado-in", "teatro-in", "home", "nave", "club-rv", "disco", "growcity"]
 
 func _initialize() -> void:
 	Datos.PLAY = false
@@ -42,14 +44,14 @@ func plano(k: String) -> Image:
 	var xs := []
 	var x := 0
 	while true:
-		xs.append(mini(x, mw - sw))
+		xs.append(maxi(0, mini(x, mw - sw)))
 		if x + sw >= mw:
 			break
 		x += sw
 	var ys := []
 	var y := 0
 	while true:
-		ys.append(mini(y, mh - 180))
+		ys.append(maxi(0, mini(y, mh - 180)))
 		if y + 180 >= mh:
 			break
 		y += 180
@@ -63,7 +65,14 @@ func plano(k: String) -> Image:
 				await RenderingServer.frame_post_draw
 			var im: Image = J.sv.get_texture().get_image()
 			im.convert(Image.FORMAT_RGBA8)
-			big.blit_rect(im, Rect2i(0, 0, sw, 180), Vector2i(cx, cy))
+			# por la cámara de verdad: en un mapa más pequeño que la pantalla queda aire a los lados, que no es el mapa
+			var c: Vector2i = J.pintor.cam
+			var sx0: int = maxi(0, cx - c.x)
+			var sy0: int = maxi(0, cy - c.y)
+			var w0: int = mini(sw - sx0, mw - (sx0 + c.x))
+			var h0: int = mini(180 - sy0, mh - (sy0 + c.y))
+			if w0 > 0 and h0 > 0:
+				big.blit_rect(im, Rect2i(sx0, sy0, w0, h0), Vector2i(sx0 + c.x, sy0 + c.y))
 	return big
 
 const LADO := 8   # un cuadro de 8 × 8 negros no sale de ningún sprite del juego; un agujero de suelo, sí
