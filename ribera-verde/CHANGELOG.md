@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Ribera Pixel, de serie en el juego (lo pidió el usuario: «actualízalo y a ver qué tal se ve»; solo Godot, con `Datos.CAL`)
+
+- `_fuente_de` en `ui.gd` carga **Ribera Pixel** en los tres sitios: `letra` (Regular), `negrita` (Bold) y `display` (Regular), sin suavizado, para que cada píxel de la rejilla caiga entero. Sin `Datos.CAL` (las pruebas de píxel contra el HTML) siguen Atkinson y Press Start 2P, que es contra lo que están hechos los oráculos.
+- Dos arreglos de maquetado que destapó la letra nueva: la ficha de la carpa pasa de 66 a **74 u** de ancho (con `Carpa 100×100` se cortaba con puntos suspensivos) y la cabecera de los menús con dos textos reserva **4 u de hueco** entre ellos (en START la fecha y el dinero se tocaban: «08:00150 €»).
+- `tests/capturas_ui.gd` comprueba ahora ese hueco de la cabecera: 12 pantallas, 0 cortes.
+
 ### Ribera Pixel, la fuente propia (lo pidió el usuario: «analices y las modifiques para que no tengamos problemas con copyright, de las típicas letras de Pokémon, y así conseguimos un detalle más original»)
 
 - Las siete que mandó, analizadas una a una por los metadatos de su archivo: solo **Good Old DOS** es libre (SIL OFL 1.1). Las otras seis son no comerciales (FontStruct NC, CC BY-NC-SA) o «all rights reserved», y **Parisienne** además prohíbe las obras derivadas. Tabla en `tools/fuente/LICENCIAS-ORIGEN.md`.

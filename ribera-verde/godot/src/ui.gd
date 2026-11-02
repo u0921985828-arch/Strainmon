@@ -128,9 +128,17 @@ func _ready() -> void:
 	Atlas.carga()
 	if oraculo:
 		return
-	letra = _fuente("atkinson-hyperlegible-latin-400-normal.woff2")
-	negrita = _fuente("atkinson-hyperlegible-latin-700-normal.woff2")
-	display = _fuente("press-start-2p-latin-400-normal.woff2", false)
+	# Ribera Pixel, la letra propia del juego (dibujada a mano, sin deuda de licencia): sin suavizado, que cada
+	# píxel de la rejilla caiga entero. Sin CAL (las pruebas contra el HTML) siguen las de antes, que es contra
+	# las que están hechos los oráculos de píxel.
+	if Datos.CAL:
+		letra = _fuente("RiberaPixel.ttf", false)
+		negrita = _fuente("RiberaPixel-Bold.ttf", false)
+		display = _fuente("RiberaPixel.ttf", false)
+	else:
+		letra = _fuente("atkinson-hyperlegible-latin-400-normal.woff2")
+		negrita = _fuente("atkinson-hyperlegible-latin-700-normal.woff2")
+		display = _fuente("press-start-2p-latin-400-normal.woff2", false)
 	set_anchors_preset(PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var fondo := ColorRect.new()
@@ -1601,6 +1609,8 @@ func _pinta_menu(rows: int) -> void:
 		a.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		t.add_child(a)
 		if o.get("title2"):
+			if Datos.CAL:   # con Ribera Pixel la fecha y el dinero se tocaban: un hueco fijo entre los dos
+				t.add_theme_constant_override("separation", roundi(4 * us))
 			var b := Label.new()
 			b.text = o.title2
 			pon_letra(b, negrita, 8.5 * us, LINEA, 0, false)
@@ -1887,10 +1897,12 @@ func _coloca() -> void:
 		hud.reset_size()
 		hud.position = scr.position + Vector2(HUD_M * u, HUD_M * u)
 	if vc_info.visible:
+		# con Ribera Pixel el nombre de la carpa pide un poco más de sitio (antes se cortaba con puntos suspensivos)
+		var vcw: float = (74.0 if Datos.CAL else 66.0) * u
 		vc_info.position = Vector2(3 * u, 3 * u)
-		vc_info.size = Vector2(66 * u, 0)
+		vc_info.size = Vector2(vcw, 0)
 		vc_info.reset_size()
-		vc_info.size.x = 66 * u
+		vc_info.size.x = vcw
 	if bE.visible and Datos.CAL:   # el enemigo arriba a la izquierda: su caja y, debajo, la del jugador, arriba a la derecha
 		bE.reset_size()
 		bP.reset_size()

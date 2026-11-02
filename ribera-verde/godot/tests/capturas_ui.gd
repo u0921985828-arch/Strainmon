@@ -147,6 +147,19 @@ func _mira_maquetado(p: String) -> void:
 					break
 		if xs.size() > 1:
 			cortes.append("%s: las etiquetas de la lista arrancan en %s" % [p, xs.keys()])
+	# la cabecera de un menú con dos textos (la fecha y el dinero del START): nunca pegados
+	for c in J.menu_col.get_children():
+		if not (c is HBoxContainer) or c.get_child_count() != 2:
+			continue
+		var i0: Label = c.get_child(0) as Label
+		var i1: Label = c.get_child(1) as Label
+		if i0 == null or i1 == null:
+			continue
+		var f0: Font = i0.get_theme_font("font")
+		var an: float = f0.get_string_size(i0.text, HORIZONTAL_ALIGNMENT_LEFT, -1, i0.get_theme_font_size("font_size")).x
+		var hueco: float = i1.get_global_rect().position.x - (i0.get_global_rect().position.x + an)
+		if hueco < 2 * J.us:
+			cortes.append("%s: la cabecera «%s» y «%s» a %.1f u" % [p, i0.text, i1.text, hueco / J.us])
 	for c in J.menu_col.get_children():
 		if c is Label and String(c.text) in ["▲", "▼"] and c.size.y < 8 * J.us - .5:
 			cortes.append("%s: la marca «%s» mide %.1f u de alto (mínimo 8)" % [p, c.text, c.size.y / J.us])
