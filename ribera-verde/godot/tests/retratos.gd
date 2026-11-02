@@ -242,20 +242,28 @@ func _corre() -> void:
 	chk(J.retrato_e == Retrato.DUDA and R.texture.get_image().get_data() == celda.call("unai", "d0"), "con «¿», dudando")
 	chk(corre(func(): await J.type_text("Hoy hace buen día en el barrio.", "UNAI")), "type_text bloqueado (tranquilo)")
 	chk(not J.retrato_hab and J.retrato_e == Retrato.NEUTRO, "escrito y tranquilo")
+	# La ventana del parpadeo son 130 ms de cada 3,6 s: con un fotograma lento se puede saltar, así que no
+	# se espera al reloj, se llama a _parpadeo cada fotograma y se sale en cuanto el ojo cambia.
 	var tw := Time.get_ticks_msec()
-	while Time.get_ticks_msec() % J.PARPADEO[0] >= J.PARPADEO[1] - 40 and Time.get_ticks_msec() - tw < 8000:
+	while J.retrato_ojo == 0 and Time.get_ticks_msec() - tw < 30000:
+		J._parpadeo()
 		await process_frame
-	J._parpadeo()
 	chk(J.retrato_ojo == 1 and R.texture.get_image().get_data() == celda.call("unai", "p"), "parpadea")
-	while Time.get_ticks_msec() % J.PARPADEO[0] < J.PARPADEO[1] and Time.get_ticks_msec() - tw < 8000:
+	tw = Time.get_ticks_msec()
+	while J.retrato_ojo == 1 and Time.get_ticks_msec() - tw < 30000:
+		J._parpadeo()
 		await process_frame
-	J._parpadeo()
 	chk(J.retrato_ojo == 0 and R.texture.get_image().get_data() == i0.get_data(), "abre los ojos")
 	J.retrato_hab = true
-	while Time.get_ticks_msec() % J.PARPADEO[0] >= J.PARPADEO[1] - 40 and Time.get_ticks_msec() - tw < 16000:
+	tw = Time.get_ticks_msec()
+	var ciego := true
+	while Time.get_ticks_msec() - tw < J.PARPADEO[0] + 400:
+		J._parpadeo()
+		if J.retrato_ojo != 0:
+			ciego = false
+			break
 		await process_frame
-	J._parpadeo()
-	chk(J.retrato_ojo == 0, "no parpadea escribiendo")
+	chk(ciego and J.retrato_ojo == 0, "no parpadea escribiendo")
 	J.retrato_hab = false
 	chk(corre(func(): await J.type_text("¡Gracias, de lujo!", "UNAI")), "type_text bloqueado (contento)")
 	chk(J.retrato_e == Retrato.ALEGRE and R.texture.get_image().get_data() == celda.call("unai", "a0"), "contento al acabar")
