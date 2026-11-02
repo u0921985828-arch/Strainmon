@@ -473,7 +473,9 @@ func titulo_e_intro() -> void:
 	check("en la intro suena la música de casa, tras el fundido", so.actual == "home" and so.musica.playing and so.musica.stream == so.temas.home)
 	# tocar la caja de diálogo es A: acaba el texto que se está escribiendo
 	await hasta(func(): return J.dlg.visible and J.dlg_txt.text.length() > 3, 300)
+	# 0.74: el Label lleva el texto entero desde el principio y lo que crece es visible_characters
 	var antes: String = J.dlg_txt.text
+	var vis0: int = J.dlg_txt.visible_characters
 	var c: Vector2 = J.dlg.get_global_rect().get_center()
 	for on in [true, false]:
 		var e := InputEventMouseButton.new()
@@ -483,7 +485,8 @@ func titulo_e_intro() -> void:
 		e.global_position = c
 		root.push_input(e)
 		await espera(2)
-	check("tocar la caja de diálogo es A (acaba el texto: «%s…» → %d letras)" % [antes, J.dlg_txt.text.length()], J.dlg_txt.text.begins_with(antes) and J.dlg_txt.text.length() > antes.length() + 10 and J.dlg_more.visible)
+	var vis1: int = J.dlg_txt.visible_characters
+	check("tocar la caja de diálogo es A (acaba el texto: «%s…» → %d de %d letras)" % [antes.substr(0, 40), vis1, antes.length()], J.dlg_txt.text.begins_with(antes.substr(0, mini(20, antes.length()))) and (vis1 < 0 or vis1 >= antes.length()) and vis1 != vis0 and J.dlg_more.visible)
 	await foto("1-intro")
 	# el nombre: menú en bucle (▲ en la primera pasa a la última y ▼ vuelve) y «Otro...» con el teclado
 	check("la intro llega al menú del nombre", await pasa(func(): return J.menu_box.visible, 400) and etiquetas() == ["EDDIE", "ÁLEX", "LUR", "ANDER", "Otro..."])
