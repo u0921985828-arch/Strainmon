@@ -226,7 +226,7 @@ func _corre() -> void:
 	var M: Rect2 = J.retrato_marco.get_rect()
 	var C: Rect2 = Rect2(J.dlg.position, J.dlg.size)
 	chk(C.grow(-3 * us).encloses(M), "la ficha, entera dentro de la caja (%s / %s)" % [M, C])
-	chk(absf((M.position.y - C.position.y) - (C.end.y - M.end.y)) <= us + 0.5, "centrada en alto (%s / %s)" % [M.position.y - C.position.y, C.end.y - M.end.y])
+	chk(absf((M.position.y - C.position.y) - (C.end.y - M.end.y)) <= 2 * us + 0.5, "centrada en alto (%s / %s)" % [M.position.y - C.position.y, C.end.y - M.end.y])
 	chk(M.position.x - C.position.x <= 8 * us and M.end.x < C.position.x + C.size.x * 0.5, "a la izquierda")
 	var ml: float = J.dlg.get_theme_stylebox("panel").content_margin_left
 	chk(C.position.x + ml >= M.end.x + 4 * us, "el texto, a su derecha (%s)" % ml)

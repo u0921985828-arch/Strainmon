@@ -1961,10 +1961,11 @@ func _coloca() -> void:
 		if con:
 			retrato.size = Vector2(rw, rw) * us
 			# 0.74 (lo dijo el usuario: «la línea que pasa por en medio del sprite y por en medio del texto no
-			# está en el mismo punto»): lo que se ve del busto acaba donde empieza la cinta del nombre, así que
-			# el conjunto baja media cinta para que su eje sea el del texto
-			var cinta: float = (dlg_nm.size.y / us if Datos.CAL and dlg_nm.size.y > 0 else 0.0)
-			retrato.position = dlg.position + Vector2(RETRATO_M + 1, floorf((dlg.size.y / us - rw + cinta) / 2)) * us
+			# está en el mismo punto»): se probó a bajar la ficha media cinta para que el eje del busto fuera el
+			# del texto, y a la vista quedaba peor (la cinta se pegaba al borde de abajo), así que el usuario
+			# dijo «tal y como estaba antes estaba bien»: la ficha entera, marco y cinta, va centrada en la caja
+			var cinta: float = 0.0
+			retrato.position = dlg.position + Vector2(RETRATO_M + 1, roundf((dlg.size.y / us - rw + cinta) / 2)) * us
 			var sm := StyleBoxFlat.new()
 			sm.bg_color = Retrato.FONDO
 			sm.border_color = LINEA

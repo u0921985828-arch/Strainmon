@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### La ficha del diálogo, centrada otra vez (0.74, lo dijo el usuario: «el sprite no está centrado donde debería… hay píxeles de aire que no los cuentas»; solo Godot, con `Datos.CAL`)
+
+- Medido en la captura: el busto sí estaba centrado por su cuadro de 64 u, pero la **cinta del nombre** cuelga por debajo, así que la ficha entera quedaba 24 px por debajo del centro (60 px de aire arriba, 16 abajo).
+- Se quita la bajada de media cinta de la 0.74 (se había puesto para que el eje del busto fuera el del texto, y a la vista quedaba peor): **la ficha entera, marco y cinta, va centrada en la caja**, y el reparto se redondea en vez de truncar (`roundf`), que deja 1 u de diferencia como mucho.
+- `tests/capturas_ui.gd` lo comprueba por el aire de arriba y el de abajo de la ficha (antes medía el eje busto-texto): 12 pantallas, 0 cortes. `tests/retratos.gd`, 474 comprobaciones, 0 fallos.
+
 ### El cuadro de texto, de 4 líneas como mucho (0.74, lo pidió el usuario: «que el cuadro de texto únicamente pueda tener máximo 4 líneas… o igual bajarle un poco el tamaño de la letra»; solo Godot, con `Datos.CAL`)
 
 - La caja mide siempre **4 líneas** (`DLG_LINEAS`) y el texto que no cabe se **parte en páginas** que se pasan con A como siempre (`paginas_dlg` en `ui.gd`, desde `say`): el corte va por palabras, nunca a mitad de una.
