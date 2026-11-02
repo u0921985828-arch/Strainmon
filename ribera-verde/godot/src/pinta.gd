@@ -163,8 +163,55 @@ var SUELO_ON := true   # las pruebas lo apagan para comparar con el de antes
 var _suelo_k := ""
 var _suelo_din := {}   # tx + (ty << 12) de las casillas que se repintan cada fotograma
 
+# 0.74 (lo vio el usuario: «ahí en la iglesia también se ve como el sprite tiene un fondo negro»): las casillas de un edificio
+# (wall_, roofT_, roofB_, win_, door_) no tienen arte de suelo, así que donde el sprite de la fachada es transparente —el hueco
+# entre las dos torres de la iglesia de Zorroza, el alero del molino, el remate de la catedral— se veía el negro de debajo. Antes
+# del edificio se pinta el suelo de la casilla pisable más cercana (la acera, la plaza o el agua que lo rodea), buscando primero
+# hacia abajo. La clave de cada casilla se calcula una vez por mapa
+var _base_k := ""
+var _base := {}
+func _tile_hay(k: String) -> bool:
+	if k == "" or k == "cristalV" or k.begins_with("wall_") or k.begins_with("roofT_") or k.begins_with("roofB_") or k.begins_with("win_") or k.begins_with("door_"):   # i18n-no
+		return false
+	if k.begins_with("cv") or k == "arena" or k == "surco" or k == "surcoV" or k == "iwT_kcs" or k == "iwB_kcs":   # i18n-no
+		return true
+	if k.begins_with("hito_"):   # i18n-no
+		return _tile_hay(k.substr(5))
+	if Atlas.sobre.has("tile:" + k):
+		return true
+	if Datos.CAL and MOSAICO_TILE.has(k):
+		return true
+	return Atlas.frame_de(Atlas.cubre("tile:" + k), k, "unica", 0, {"i": 0}) != null
+
+func _suelo_base(m: Dictionary, tx: int, ty: int) -> String:
+	var ck := "%s|%d" % [J.S.map, m.g.hash()]
+	if ck != _base_k:
+		_base_k = ck
+		_base.clear()
+	var id := tx + (ty << 12)
+	var v = _base.get(id)
+	if v != null:
+		return v
+	var r := ""
+	for d in range(1, 13):
+		for q in [Vector2i(tx, ty + d), Vector2i(tx, ty - d), Vector2i(tx - d, ty), Vector2i(tx + d, ty)]:
+			if q.x < 0 or q.y < 0 or q.x >= int(m.w) or q.y >= int(m.h):
+				continue
+			var k2 := String(m.g[q.y][q.x])
+			if _tile_hay(k2):
+				r = k2
+				break
+		if r != "":
+			break
+	_base[id] = r
+	return r
+
 func _suelo_casilla(m: Dictionary, tx: int, ty: int, sx: int, sy: int) -> void:
 	var k: String = m.g[ty][tx]
+	if Datos.CAL and not _tile_hay(k):   # debajo del edificio, el suelo de alrededor
+		var b := _suelo_base(m, tx, ty)
+		if b != "":
+			_arte_tile(b, tx, ty, sx, sy)
 	if _arte_tile(k, tx, ty, sx, sy):
 		if k == "water":
 			_playa_agua(m, tx, ty, sx, sy)

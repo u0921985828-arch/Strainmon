@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El fondo negro de la iglesia (0.74, lo vio el usuario: «ahí en la iglesia también se ve como el sprite tiene un fondo negro»; solo Godot, con `Datos.CAL`)
+
+- El sprite no tenía nada: las casillas de un edificio llevan en `g` claves sin arte de suelo (`wall_`, `roofT_`, `roofB_`, `win_`, `door_`), así que **donde la fachada es transparente** —el hueco entre las dos torres de la parroquia de Zorroza, el alero del molino, el remate de la catedral— se veía el negro de debajo, como un marco alrededor del campanario.
+- Ahora, antes del edificio, se pinta el **suelo de la casilla pisable más cercana** (la acera, la plaza o el agua que lo rodea), buscando primero hacia abajo: `_tile_hay` y `_suelo_base` en `pinta.gd`, con la clave de cada casilla calculada una vez por mapa.
+- Prueba nueva `tests/negro_render.gd` (gráfica): pinta 14 mapas enteros, trozo a trozo, y busca cuadros lisos de 8 × 8 muy oscuros. Con el código de antes, 32 en Zorroza, el Casco Viejo y Abando; ahora, ninguno.
+
 ### El agujero negro de la calle (0.74, lo vio el usuario: «¿Y ese pedazo de error en el mapa?»; solo Godot, con `Datos.CAL`)
 
 - El **carril de entrada del aparcamiento** (y el suelo del propio aparcamiento) se ponían con la clave `road`, que **no existe en el atlas**: `_arte_tile` no pinta nada y la casilla se queda negra, un tajo negro en la acera de hasta 20 casillas. Ahora es `roadX`, el asfalto de cruce del mosaico (`mo-roadX`), que sí tiene arte y sigue contando como vía (`APARC_VIA` va por `begins_with("road")`).
