@@ -81,6 +81,28 @@ func _initialize() -> void:
 	for f in ["atkinson-hyperlegible-latin-400-normal.woff2", "atkinson-hyperlegible-latin-700-normal.woff2",
 			"press-start-2p-latin-400-normal.woff2", "dejavu-sans-simbolos.woff2"]:
 		ok("%s, importada (va en el paquete)" % f, FileAccess.file_exists("res://fuentes/" + f + ".import"))
+	# 5 · Ribera Pixel, la familia propia del juego (Regular, Bold, Italic y Bold Italic)
+	var RP := {}
+	for a in ["RiberaPixel.ttf", "RiberaPixel-Bold.ttf", "RiberaPixel-Italic.ttf", "RiberaPixel-BoldItalic.ttf"]:
+		ok("%s está en fuentes/" % a, FileAccess.file_exists("res://fuentes/" + a))
+		var ff := Ui._fuente_de(a, false)
+		ok("%s carga (%d bytes)" % [a, ff.data.size()], ff.data.size() > 5000)
+		RP[a] = ff
+	for a in RP:
+		var ff: FontFile = RP[a]
+		var falta2 := []
+		for u3 in C:
+			var u4: int = u3
+			if not ff.has_char(u4) and not sim.has_char(u4):
+				falta2.append(char(u4))
+		ok("%s: ningún glifo sin dibujar (%d)" % [a, falta2.size()], falta2.is_empty())
+		if not falta2.is_empty():
+			print("   %s, le faltan: %s" % [a, "".join(falta2)])
+		# monoespaciada: todas las letras miden lo mismo
+		var anchos := {}
+		for t2 in ["A", "i", "m", "W", "1", ".", "ñ"]:
+			anchos[ff.get_char_size((t2 as String).unicode_at(0), 32).x] = true
+		ok("%s: monoespaciada (%d anchos)" % [a, anchos.size()], anchos.size() == 1)
 	for f in fallos:
 		print("FALLO  ", f)
 	print("fuentes: %d comprobaciones, %d fallos" % [n_ok + fallos.size(), fallos.size()])
