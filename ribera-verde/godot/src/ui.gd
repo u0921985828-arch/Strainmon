@@ -1295,7 +1295,10 @@ func _pon_dlg_txt(px: float, alto_fijo: bool) -> void:
 	dlg_txt.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	# el alto, el de DLG_LINEAS líneas: todas las cajas miden igual. Si ni al cuerpo más pequeño cabe, se
 	# quita el tope y la caja crece, que es mejor que cortar el texto.
-	dlg_txt.custom_minimum_size = Vector2(0, DLG_LINEAS * _alto_linea(ft) if alto_fijo else 0.0)
+	# el alto se redondea a un múltiplo de 4 u para que la caja mida un número par de u y la ficha caiga
+	# centrada al píxel (con 406 px de caja quedaban 40 arriba y 36 abajo; con 410, 40 y 40)
+	var h: float = ceilf(DLG_LINEAS * _alto_linea(ft) / (4.0 * us)) * 4.0 * us
+	dlg_txt.custom_minimum_size = Vector2(0, h if alto_fijo else 0.0)
 
 # el ancho que le queda al texto en el cuadro (lo mismo que reparte _coloca)
 func _ancho_dlg(con_nombre: bool) -> float:

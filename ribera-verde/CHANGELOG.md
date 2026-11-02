@@ -11,6 +11,7 @@
 ### La ficha del diálogo, centrada otra vez (0.74, lo dijo el usuario: «el sprite no está centrado donde debería… hay píxeles de aire que no los cuentas»; solo Godot, con `Datos.CAL`)
 
 - Medido en la captura: el busto sí estaba centrado por su cuadro de 64 u, pero la **cinta del nombre** cuelga por debajo, así que la ficha entera quedaba 24 px por debajo del centro (60 px de aire arriba, 16 abajo).
+- La **caja se redondea a un alto par** en píxeles de rejilla (el alto del texto, a un múltiplo de 4 u): con 406 px la ficha caía a 40 px del borde de arriba y 36 del de abajo, y con 410 quedan 40 y 40 exactos (lo dijo el usuario: «no está perfecto, está casi»).
 - Se quita la bajada de media cinta de la 0.74 (se había puesto para que el eje del busto fuera el del texto, y a la vista quedaba peor): **la ficha entera, marco y cinta, va centrada en la caja**, y el reparto se redondea en vez de truncar (`roundf`), que deja 1 u de diferencia como mucho.
 - `tests/capturas_ui.gd` lo comprueba por el aire de arriba y el de abajo de la ficha (antes medía el eje busto-texto): 12 pantallas, 0 cortes. `tests/retratos.gd`, 474 comprobaciones, 0 fallos.
 
