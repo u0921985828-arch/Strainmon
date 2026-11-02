@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Las licencias de las bibliotecas de Android, dentro del juego (0.74)
+
+- CRÉDITOS → LICENCIAS añade el bloque **ANDROID: BIBLIOTECAS DE TERCEROS** (Play Billing, Play Games v2, AndroidX y Sentry) con su aviso de copyright y el texto entero de la **Apache 2.0** y de la **MIT** de Sentry, que es lo que esas licencias obligan a incluir: `godot/licencias/AVISOS-ANDROID.txt` y `APACHE-2.0.txt`, metidos en el `include_filter` del export.
+- Prueba nueva `tests/licencias.gd` (23 comprobaciones): los archivos existen, van en la exportación y la pantalla trae todos los avisos y textos.
+- De paso, `i18n.py cuenta` vuelve a 0: el nombre del jugador de la medida de rendimiento y los nombres de archivo de la fuente quedan marcados `# i18n-no`. Y `package.json` lleva una descripción propia en vez de citar otro juego.
+
 ### La ficha del diálogo, centrada otra vez (0.74, lo dijo el usuario: «el sprite no está centrado donde debería… hay píxeles de aire que no los cuentas»; solo Godot, con `Datos.CAL`)
 
 - Medido en la captura: el busto sí estaba centrado por su cuadro de 64 u, pero la **cinta del nombre** cuelga por debajo, así que la ficha entera quedaba 24 px por debajo del centro (60 px de aire arriba, 16 abajo).

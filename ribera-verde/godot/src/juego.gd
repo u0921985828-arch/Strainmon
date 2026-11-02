@@ -797,6 +797,9 @@ func licencias() -> String:
 	var t := I18n.v("Este juego usa Godot Engine, con licencia MIT:\n\n") + Engine.get_license_text()
 	for f in ["OFL-PressStart2P.txt", "OFL-AtkinsonHyperlegible.txt", "LICENCIA-DejaVu.txt"]:   # i18n-no
 		t += "\n\n— %s —\n\n%s" % [f.trim_prefix("OFL-").trim_prefix("LICENCIA-").trim_suffix(".txt"), FileAccess.get_file_as_string("res://fuentes/" + f).strip_edges()]   # i18n-no
+	# las bibliotecas de Android que entran en el AAB: la Apache 2.0 obliga a incluir su aviso
+	t += I18n.v("\n\nANDROID: BIBLIOTECAS DE TERCEROS\n\n") + FileAccess.get_file_as_string("res://licencias/AVISOS-ANDROID.txt").strip_edges()
+	t += "\n\n" + FileAccess.get_file_as_string("res://licencias/APACHE-2.0.txt").strip_edges()   # i18n-no
 	t += I18n.v("\n\nGODOT ENGINE: PARTES DE TERCEROS")
 	for c in Engine.get_copyright_info():
 		t += "\n\n" + str(c.name)
@@ -1099,7 +1102,7 @@ var rend_t := {}
 const REND_MAPAS := [["home", 6, 5], ["town", 20, 12], ["alto", 20, 15], ["abando", 20, 15], ["casco", 20, 15], ["zorroza", 20, 15], ["nave", 7, 6]]
 func _rend() -> void:
 	S = new_state()
-	S.name = "PRUEBA"
+	S.name = "PRUEBA"   # i18n-no: el nombre del jugador en la medida de rendimiento, no se ve en el juego
 	saltar_tutorial()
 	S.ch = 8
 	enter_game()

@@ -2,7 +2,7 @@
   "name": "ribera-verde",
   "version": "1.57.2",
   "private": true,
-  "description": "RPG de cultivo en pixel art estilo portátil de 16 bits, inspirado en las mecánicas de Weed Firm.",
+  "description": "Landrace Hunters: RPG de cultivo y genética landrace en pixel art, con el aire de una portátil de 16 bits.",
   "scripts": {
     "build": "node tools/build.js",
     "test": "node tools/build.js && node tools/test-historia.js && node tools/test-accesos.js",

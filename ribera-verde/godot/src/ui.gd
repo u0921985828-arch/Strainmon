@@ -137,9 +137,9 @@ func _ready() -> void:
 	# píxel de la rejilla caiga entero. Sin CAL (las pruebas contra el HTML) siguen las de antes, que es contra
 	# las que están hechos los oráculos de píxel.
 	if Datos.CAL:
-		letra = _fuente("RiberaPixel.ttf", false)
-		negrita = _fuente("RiberaPixel-Bold.ttf", false)
-		display = _fuente("RiberaPixel.ttf", false)
+		letra = _fuente("RiberaPixel.ttf", false)   # i18n-no: nombres de archivo
+		negrita = _fuente("RiberaPixel-Bold.ttf", false)   # i18n-no
+		display = _fuente("RiberaPixel.ttf", false)   # i18n-no
 	else:
 		letra = _fuente("atkinson-hyperlegible-latin-400-normal.woff2")
 		negrita = _fuente("atkinson-hyperlegible-latin-700-normal.woff2")

@@ -73,7 +73,7 @@ Parte de los personajes, los muebles de los locales y algunos escenarios se gene
 | **Atkinson Hyperlegible** | Braille Institute of America, 2020 | SIL OFL 1.1 | Licencia entera en `godot/fuentes/OFL-AtkinsonHyperlegible.txt` y en LICENCIAS. Uso sin modificar. |
 | **DejaVu Sans** | Bitstream Vera Fonts © 2003 Bitstream, Inc. | Licencia Bitstream Vera / DejaVu | Licencia entera en `godot/fuentes/LICENCIA-DejaVu.txt` y en LICENCIAS. Uso sin modificar. |
 | **Playwright, pngjs** | sus autores | Apache 2.0 / MIT | Solo herramientas de desarrollo (`devDependencies`): **no viajan en el juego publicado**. |
-| **Bibliotecas de Android del AAB** | Google (Play Billing, Play Games v2, AndroidX) y Sentry | Apache 2.0 (Sentry: MIT) | Se enlazan en la compilación de Android (`godot/addons/landrace_play`). **Sus avisos todavía no salen en la pantalla de LICENCIAS** (ahora lista Godot y las tres fuentes): ver §8. |
+| **Bibliotecas de Android del AAB** | Google (Play Billing, Play Games v2, AndroidX) y Sentry | Apache 2.0 (Sentry: MIT) | Se enlazan en la compilación de Android (`godot/addons/landrace_play`). Sus avisos, con el texto entero de la Apache 2.0 y de la MIT de Sentry, salen en CRÉDITOS → LICENCIAS (`godot/licencias/`). |
 
 Las tres fuentes de terceros se incluyen **sin modificar** y con su licencia completa, que es justo lo
 que esas licencias exigen. El texto de la interfaz va con la fuente propia.
@@ -204,11 +204,6 @@ independiente queda descartada por coste y complejidad; además, nada de este ju
 
 ## 8. Cabos sueltos que conviene atar antes de publicar
 
-- `package.json` describe el proyecto como «inspirado en las mecánicas de Weed Firm». **Las mecánicas de
-  un juego no están protegidas** y ahí no hay infracción, pero citar otro título en la descripción de un
-  paquete que se publica no aporta nada y puede confundir: conviene reescribir esa línea con una
-  descripción propia antes de publicar.
-- **Añadir a CRÉDITOS → LICENCIAS los avisos de las bibliotecas de Android** que entran en el AAB (Play Billing, Play Games v2, AndroidX y Sentry): la Apache 2.0 obliga a incluir su aviso de copyright, y hoy esa pantalla solo trae Godot y las tres fuentes.
 - Repasar que ningún sprite procesado conserve el nombre de la referencia de la que se partió.
 - Antes del registro, exportar el código fuente en un soporte fijo (PDF o ZIP con suma de verificación)
   y anotar la suma en este documento.
