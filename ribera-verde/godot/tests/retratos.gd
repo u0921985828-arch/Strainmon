@@ -227,7 +227,9 @@ func _corre() -> void:
 	var C: Rect2 = Rect2(J.dlg.position, J.dlg.size)
 	chk(C.grow(-3 * us).encloses(M), "la ficha, entera dentro de la caja (%s / %s)" % [M, C])
 	chk(absf((M.position.y - C.position.y) - (C.end.y - M.end.y)) <= 2 * us + 0.5, "centrada en alto (%s / %s)" % [M.position.y - C.position.y, C.end.y - M.end.y])
-	chk(M.position.x - C.position.x <= 8 * us and M.end.x < C.position.x + C.size.x * 0.5, "a la izquierda")
+	# el aire de la izquierda, el mismo que el de arriba y el de abajo (lo pidió el usuario)
+	chk(absf((M.position.x - C.position.x) - (M.position.y - C.position.y)) <= us + 0.5 \
+		and M.end.x < C.position.x + C.size.x * 0.5, "a la izquierda, con el mismo aire (%s / %s)" % [M.position.x - C.position.x, M.position.y - C.position.y])
 	var ml: float = J.dlg.get_theme_stylebox("panel").content_margin_left
 	chk(C.position.x + ml >= M.end.x + 4 * us, "el texto, a su derecha (%s)" % ml)
 	var N: Rect2 = J.dlg_nm.get_rect()

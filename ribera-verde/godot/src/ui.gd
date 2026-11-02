@@ -1300,13 +1300,29 @@ func _pon_dlg_txt(px: float, alto_fijo: bool) -> void:
 	var h: float = ceilf(DLG_LINEAS * _alto_linea(ft) / (4.0 * us)) * 4.0 * us
 	dlg_txt.custom_minimum_size = Vector2(0, h if alto_fijo else 0.0)
 
+# el alto que mide el cuadro con sus DLG_LINEAS líneas, en u (no depende del texto: el Label tiene ese alto
+# fijo), para saber de antemano el aire que le queda a la ficha del retrato
+func _alto_dlg_u(rw: float) -> float:
+	var sb := dlg.get_theme_stylebox("panel")
+	if sb == null:
+		return rw + 2 + 2 * RETRATO_M
+	var hl: float = ceilf(DLG_LINEAS * _alto_linea(fs_txt(_dlg_px * us)) / (4.0 * us)) * 4.0 * us
+	return maxf(rw + 2 + 2 * RETRATO_M, (sb.content_margin_top + sb.content_margin_bottom + hl) / us)
+
+# 0.74 (lo pidió el usuario: «desde el borde hasta el sprite tendría que haber la misma distancia que del
+# sprite arriba y del sprite abajo… visualmente tiene que quedar centrado»): el aire de la izquierda no es
+# una constante, es el mismo que le queda a la ficha por arriba y por abajo, que lo manda el alto del cuadro
+func _aire_ficha(rw: float, alto_u := 0.0) -> float:
+	var h: float = alto_u if alto_u > 1 else _alto_dlg_u(rw)
+	return maxf(RETRATO_M, roundf((h - rw) / 2.0) - 1.0)
+
 # el ancho que le queda al texto en el cuadro (lo mismo que reparte _coloca)
 func _ancho_dlg(con_nombre: bool) -> float:
 	var rw := retrato_w()
 	var con: bool = con_nombre and rw > 0
 	var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
 	return ui_rect().size.x - 6 * us - ((126 if bt else 10) + 2) * us \
-		- ((RETRATO_M + rw + 2 + 7) if con else (10 + 2)) * us
+		- ((_aire_ficha(rw) + rw + 2 + 7) if con else (10 + 2)) * us
 
 # 0.74 (lo pidió el usuario: «que el cuadro de texto únicamente pueda tener máximo 4 líneas»): el texto se
 # parte en páginas de DLG_LINEAS líneas como mucho, por frases y, si una no cabe, por palabras. Cada página
@@ -1955,7 +1971,7 @@ func _coloca() -> void:
 		# en el combate, el texto no pasa por debajo del menú de la derecha (118 de ancho): .dlg con padding-right 126 en el CSS
 		var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
 		dlg.get_theme_stylebox("panel").content_margin_right = ((126 if bt else 10) + 2) * us
-		dlg.get_theme_stylebox("panel").content_margin_left = ((RETRATO_M + rw + 2 + 7) if con else (10 + 2)) * us
+		dlg.get_theme_stylebox("panel").content_margin_left = ((_aire_ficha(rw) + rw + 2 + 7) if con else (10 + 2)) * us
 		dlg.reset_size()
 		dlg.size.x = R.size.x - 6 * us
 		dlg.position = Vector2(R.position.x + 3 * us, R.end.y - 3 * us - dlg.size.y)
@@ -1970,8 +1986,8 @@ func _coloca() -> void:
 			# está en el mismo punto»): se probó a bajar la ficha media cinta para que el eje del busto fuera el
 			# del texto, y a la vista quedaba peor (la cinta se pegaba al borde de abajo), así que el usuario
 			# dijo «tal y como estaba antes estaba bien»: la ficha entera, marco y cinta, va centrada en la caja
-			var cinta: float = 0.0
-			retrato.position = dlg.position + Vector2(RETRATO_M + 1, roundf((dlg.size.y / us - rw + cinta) / 2)) * us
+			var aire: float = _aire_ficha(rw, dlg.size.y / us)
+			retrato.position = dlg.position + Vector2(aire + 1, aire + 1) * us
 			var sm := StyleBoxFlat.new()
 			sm.bg_color = Retrato.FONDO
 			sm.border_color = LINEA
