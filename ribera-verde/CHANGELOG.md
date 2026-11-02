@@ -2,6 +2,15 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Ribera Pixel, la fuente propia (lo pidió el usuario: «analices y las modifiques para que no tengamos problemas con copyright, de las típicas letras de Pokémon, y así conseguimos un detalle más original»)
+
+- Las siete que mandó, analizadas una a una por los metadatos de su archivo: solo **Good Old DOS** es libre (SIL OFL 1.1). Las otras seis son no comerciales (FontStruct NC, CC BY-NC-SA) o «all rights reserved», y **Parisienne** además prohíbe las obras derivadas. Tabla en `tools/fuente/LICENCIAS-ORIGEN.md`.
+- **Ninguna se ha tocado**: modificar una fuente con copyright crea una obra derivada, que sigue infringiendo. Solo sirvieron de referencia de estilo.
+- En su lugar, **Ribera Pixel**: 138 glifos dibujados píxel a píxel (`tools/fuente/glifos_may.py`, `glifos_min.py`, `glifos_sig.py`), con mayúsculas, minúsculas, cifras, signos, todo el español (ñÑ, acentos, diéresis, ¿¡, «») y los símbolos del juego (€, ·, ▲▼◀▶, ★, ≈, →, …). Caja de 7 filas, altura de x de 5, descendentes de 2, trazo de 1 px y anchos variables.
+- Rasgos propios, para que no suene a ninguna fuente de consola conocida: esquinas achaflanadas en las curvas, vértices cerrados con un píxel de chaflán, R con pata diagonal, G con espolón, 1 con pie y 7 con travesaño.
+- `python3 -I tools/fuente/ribera_pixel.py` escribe `godot/fuentes/RiberaPixel.ttf` (20 KB, cada píxel un cuadrado exacto: 0 subpíxeles grises a tamaño múltiplo de la rejilla) y la muestra `tools/fuente/muestra-ribera-pixel.png`. Godot la carga y tiene los 132 caracteres que usa el juego.
+- **Todavía no está puesta de serie**: cambiarla toca todas las pantallas y las pruebas de píxel (`pantallas.gd`, `capturas_ui.gd`), así que espera el visto bueno.
+
 ### 0.73.0 (código 102) · Créditos al día (lo pidió el usuario: «quiero que actualices bien los créditos y añadas a Josu, a Ander, a Bitxone, a Edorta»; solo Godot)
 
 - Los beta testers, los ocho: Kerman, Ibai, Adrián, Urko, **Josu, Ander, Bitxone y Edorta**.
