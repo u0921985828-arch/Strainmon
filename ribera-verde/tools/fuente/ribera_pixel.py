@@ -31,6 +31,7 @@ P = lambda *a: os.path.join(RAIZ, *a)   # noqa: E731
 ALTO = 7          # filas de la mayúscula
 DESC = 2          # filas de descendente
 SEP = 1           # píxeles entre letras
+ESPACIO = 4       # el ancho del espacio (con 3 el número se pegaba a la palabra: «Agua70 %»)
 BANDA = 3         # filas por escalón de la cursiva
 NOMBRE = 'Ribera Pixel'
 ESTILOS = {   # archivo: (nombre del estilo, engorda, inclina)
@@ -59,8 +60,13 @@ def filas(g):
     return [f.ljust(w, '.') for f in g]
 
 
-def recorta(f):
-    """quita las columnas vacías de los lados; devuelve (filas, ancho)"""
+def recorta(f, tipo='cuerpo'):
+    """quita las columnas vacías de los lados; devuelve (filas, ancho).
+
+    Las cifras no se recortan: su relleno es lo que las centra en la caja tabular.
+    """
+    if tipo == 'cifra':
+        return f, len(f[0])
     cols = [i for i in range(len(f[0])) if any(r[i] == 'x' for r in f)]
     if not cols:
         return f, len(f[0])
@@ -127,12 +133,30 @@ def inclina(f, base):
     return out
 
 
+def tabular(d):
+    """las diez cifras, al mismo avance: la más ancha manda y las demás se centran en esa caja.
+
+    Así los precios y las columnas de números cuadran unos debajo de otros («1.200 €» y «150 €»).
+    """
+    rec = {}
+    for k, v in d.items():
+        rec[k] = recorta(filas(v))
+    w = max(w2 for _, w2 in rec.values())
+    out = {}
+    for k, (f, w2) in rec.items():
+        izq = (w - w2) // 2
+        out[k] = tuple('.' * izq + r + '.' * (w - w2 - izq) for r in f)
+    return out
+
+
 def mapa(bold=False, italic=False):
     """carácter → filas, con la línea de base siempre bajo la fila ALTO−1 del cuerpo"""
     g = {}
-    for d in (MAY, MIN, CIF, SIG):
+    for d in (MAY, MIN, SIG):
         for k, v in d.items():
             g[k] = ('cuerpo', filas(v))
+    for k, v in tabular(CIF).items():
+        g[k] = ('cifra', filas(v))
     for k, (b, t) in VOCALES.items():
         base = MAY.get(b) or MIN.get(b) or CIF.get(b)
         g[k] = ('alto', filas(con_acento(base, t)))
@@ -148,7 +172,7 @@ def mapa(bold=False, italic=False):
 
 
 def avance(f, w):
-    return w + SEP if w else 3   # el espacio, 3 px
+    return w + SEP if w else ESPACIO
 
 
 def png(g, texto, u=1):
@@ -159,7 +183,7 @@ def png(g, texto, u=1):
         if c not in g:
             c = '?'
         tipo, f = g[c]
-        rf, w = recorta(f)
+        rf, w = recorta(f, tipo)
         piezas.append((tipo, rf, w))
         an += avance(rf, w)
     alto = ALTO + DESC + 2
@@ -167,7 +191,7 @@ def png(g, texto, u=1):
     px = im.load()
     x = 0
     for tipo, f, w in piezas:
-        dy = 0 if tipo == 'cuerpo' else -2    # con acento, el cuerpo baja 0 y el acento sube 2 filas
+        dy = -2 if tipo == 'alto' else 0    # con acento, el cuerpo baja 0 y el acento sube 2 filas
         for j, fila in enumerate(f):
             for i, ch in enumerate(fila):
                 if ch != 'x':
@@ -202,10 +226,10 @@ def ttf(g, destino, estilo='Regular'):
         if c == ' ':
             continue
         tipo, f = g[c]
-        rf, w = recorta(f)
+        rf, w = recorta(f, tipo)
         n = 'uni%04X' % ord(c)
         nombres[c] = n
-        dy = 0 if tipo == 'cuerpo' else -2
+        dy = -2 if tipo == 'alto' else 0
         p = TTGlyphPen(None)
         for j, fila in enumerate(rf):
             i = 0
