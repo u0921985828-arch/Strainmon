@@ -6,6 +6,8 @@
 
 - La **cabecera del menú** arranca en la misma columna que las etiquetas de la lista (un espaciador de 10 u + la columna del icono, con la separación del contenedor a 0, que metía 4 u de más) y el texto de la derecha acaba donde las cifras de las filas. El ancho de la columna del icono (`ic_w`) se calcula ahora antes de pintar el título.
 - El **texto del diálogo**, centrado en la caja (su alto lo manda el busto y se apoyaba arriba): `vertical_alignment` y `size_flags_vertical` en `_estilos`.
+- El **busto y el texto, al mismo eje** (lo dijo el usuario: «la línea que pasa por en medio del sprite y por en medio del texto no está en el mismo punto»): lo que se ve del busto acaba donde empieza la cinta del nombre, así que la ficha baja media cinta; medido en la captura, de 15 px de desfase a 3,5.
+- La **caja del diálogo, más alta** (lo dijo el usuario: «hay hueco encima y debajo de la foto, pero el texto está ajustado»): margen vertical de 11 u (antes 8), para que el texto tenga aire como la foto.
 - La **máquina de escribir** ya no reescribe el texto letra a letra (`dlg_txt.text`), sino que lo pone entero y descubre las letras con `visible_characters`: el bloque no se mueve mientras se escribe y se puede centrar.
 
 ### Todos los textos, centrados (0.74, lo pidió el usuario: «tienen que estar todos los textos, centrados y maquetados correctamente, en botones, cuadros de texto y demás»; solo Godot, con `Datos.CAL`)

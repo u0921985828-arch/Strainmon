@@ -167,6 +167,24 @@ func _mira_maquetado(p: String) -> void:
 		var cy_tx: float = lb.get_global_rect().get_center().y
 		if absf(cy_ic - cy_tx) > 1.0 * J.us:
 			cortes.append("%s: el icono de «%s» a %.1f u de su texto" % [p, lb.text, (cy_ic - cy_tx) / J.us])
+	# el busto y el texto del diálogo, al mismo eje (lo dijo el usuario: «la línea que pasa por en medio del
+	# sprite y por en medio del texto no está en el mismo punto»); lo que se ve del busto acaba donde empieza
+	# la cinta del nombre
+	if J.dlg.visible and J.retrato.visible and String(J.dlg_txt.text).strip_edges() != "":
+		var rb: Rect2 = J.retrato.get_global_rect()
+		if J.dlg_nm.visible:
+			rb.size.y -= J.dlg_nm.get_global_rect().size.y
+		var f3: Font = J.dlg_txt.get_theme_font("font")
+		var fs3: int = J.dlg_txt.get_theme_font_size("font_size")
+		var lineas: int = J.dlg_txt.get_line_count()
+		var sep: float = J.dlg_txt.get_theme_constant("line_spacing")
+		var alto: float = lineas * (f3.get_height(fs3) + sep) - sep
+		var rt: Rect2 = J.dlg_txt.get_global_rect()
+		var cy_t: float = rt.get_center().y
+		if alto < rt.size.y - 1:   # con el texto centrado, su bloque va en medio de su caja
+			cy_t = rt.position.y + rt.size.y / 2.0
+		if absf(rb.get_center().y - cy_t) > 2.0 * J.us:
+			cortes.append("%s: el busto y el texto, a %.1f u de eje" % [p, (rb.get_center().y - cy_t) / J.us])
 	# la cabecera de un menú con dos textos (la fecha y el dinero del START): nunca pegados
 	for c in J.menu_col.get_children():
 		if not (c is HBoxContainer) or c.get_child_count() != 2:

@@ -664,7 +664,7 @@ func pon_letra(l: Control, f: Font, px: float, c: Color, alto := 0.0, sombra := 
 func _estilos() -> void:
 	# con Ribera Pixel, el texto del diálogo pide aire: más margen en la caja, el cuerpo medio punto menor
 	# y el interlineado un poco mayor, para que no se coma el recuadro (lo pidió el usuario)
-	dlg.add_theme_stylebox_override("panel", caja(us, 8, 12) if Datos.CAL else caja(us, 6, 10))
+	dlg.add_theme_stylebox_override("panel", caja(us, 11, 12) if Datos.CAL else caja(us, 6, 10))
 	var ft := fs_txt((9.5 if Datos.CAL else 10.0) * us)
 	pon_letra(dlg_txt, letra, ft, INK, (14.5 if Datos.CAL else 13.5) * us * ft / (10 * us))
 	# 0.74: el texto, centrado en la caja (su alto lo manda el busto, y se apoyaba arriba)
@@ -1847,7 +1847,11 @@ func _coloca() -> void:
 		dlg_nm.position = dlg.position + Vector2(6 * us, -12 * us)
 		if con:
 			retrato.size = Vector2(rw, rw) * us
-			retrato.position = dlg.position + Vector2(RETRATO_M + 1, floorf((dlg.size.y / us - rw) / 2)) * us
+			# 0.74 (lo dijo el usuario: «la línea que pasa por en medio del sprite y por en medio del texto no
+			# está en el mismo punto»): lo que se ve del busto acaba donde empieza la cinta del nombre, así que
+			# el conjunto baja media cinta para que su eje sea el del texto
+			var cinta: float = (dlg_nm.size.y / us if Datos.CAL and dlg_nm.size.y > 0 else 0.0)
+			retrato.position = dlg.position + Vector2(RETRATO_M + 1, floorf((dlg.size.y / us - rw + cinta) / 2)) * us
 			var sm := StyleBoxFlat.new()
 			sm.bg_color = Retrato.FONDO
 			sm.border_color = LINEA
