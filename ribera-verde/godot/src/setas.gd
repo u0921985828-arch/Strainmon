@@ -1482,6 +1482,8 @@ func elegir_carro(i0 := 0):
 		return gancho_carro.call()
 	var cap: int = D.CARRO.bandejas * D.CARRO.plazas
 	CARRO_V = {"i": clampi(i0, 0, cap - 1)}
+	if not oraculo:
+		hud.hide()   # la vista entera, sin el recuadro del HUD encima (como las madres y las mesas de KAIA)
 	_dlg_fijo(desc_carro(CARRO_V), K("CARRO DE ESQUEJES"))
 	var pr := Motor.Prom.new()
 	push(func(b: String):
@@ -1501,6 +1503,7 @@ func elegir_carro(i0 := 0):
 	if not oraculo:
 		dlg.hide()
 		dlg_nm.hide()
+		update_hud()
 	return e
 
 func _esqueje(o: Array, cx: int, y: int, hj: String, k := 1, seco := false, bm: Array = CLON) -> void:
@@ -1655,6 +1658,8 @@ func elegir_bajo(i0 := 0):
 		return gancho_bajo.call(i0)
 	SETAS_V = {"i": clampi(i0, 0, 2 * n_baldas() - 1)}
 	var tit := K("EL SÓTANO") if es_sot() else K("EL BAJO")
+	if not oraculo:
+		hud.hide()
 	_dlg_fijo(desc_bajo(SETAS_V), tit)
 	var pr := Motor.Prom.new()
 	push(func(b: String):
@@ -1674,6 +1679,7 @@ func elegir_bajo(i0 := 0):
 	if not oraculo:
 		dlg.hide()
 		dlg_nm.hide()
+		update_hud()
 	return e
 
 # la vista hasta B: con A sobre una bandeja, el menú de las bandejas (y se vuelve a las baldas); sobre un hueco, que las prepara Txomin

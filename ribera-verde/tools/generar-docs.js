@@ -179,6 +179,15 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 - **Cosecha (g):** \`mín(tope de la maceta, W × g/W ÷ plazas de la carpa × rend de la maceta × rinde/${D.c.Y_MEDIA} × (0,4 + 0,6 × salud/100) × (abono ? 1,25 : 1) × fenotipo)\`. Una plaza vacía es luz perdida.
 - **THC final:** \`THC × fenotipo × (0,85 + 0,15 × salud/100) + thc del foco + (abono ? 0,3 : 0)\` (tope 35 %).
 - **Rinde (g/m²) de la tabla:** lo que daría con un LED a ${D.c.W_M2} W/m², abonada y sana.
+
+## Lo que añade la versión de Godot (0.76)
+
+Este documento describe el juego HTML, congelado en la 1.37, que sigue siendo la fuente de los datos y los oráculos. En Godot
+(\`godot/\`, con \`Datos.CAL\`) la genética lleva además: los IV y las variedades raras (\`IVS\`, \`SHINY\`), las familias de la CannaDex
+(\`FAMILIAS\`, que suman a los gramos y al THC), las dieciséis autoflorecientes (\`AUTO\`, que florecen por edad), los rasgos raros
+heredables (\`RAREZAS\`: enana, doble cosecha —también en las mesas de la nave y de KAIA—, aroma único y resinosa) y el mismo techo
+del THC (\`Cultivo.THC_TOPE\`) en casa, en la huerta, en la nave y en KAIA. Las tablas de todo eso están en
+[MAESTRO.md](MAESTRO.md) y en [REPASO-ESTRUCTURA.md](REPASO-ESTRUCTURA.md).
 `;
   fs.writeFileSync(path.join(ROOT, 'docs/GENETICA.md'), g);
 

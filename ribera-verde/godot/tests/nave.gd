@@ -73,7 +73,7 @@ func r1(x: float) -> float:
 # lo que da una mesa entera al final del ciclo, contado aquí aparte: W × g/W × variedad × fenotipo × cuidado × riego × abono
 func espera_g(sid: String, foco: String, y: float, cui: int, ab: float) -> float:
 	var F: Dictionary = D.FOCO_NAVE[foco]
-	return r1(float(F.w) * float(F.gpw) * float(D.STRAINS[sid].y) / float(D.Y_MEDIA) * y * (float(D.NAVE.g) + float(D.NAVE.gC) * (cui - 3)) / float(D.NAVE.g) * (1 + float(D.ABONO.rend) * ab))
+	return r1(float(F.w) * float(F.gpw) * float(F.get("rend", 1)) * float(D.STRAINS[sid].y) / float(D.Y_MEDIA) * y * (float(D.NAVE.g) + float(D.NAVE.gC) * (cui - 3)) / float(D.NAVE.g) * (1 + float(D.ABONO.rend) * ab))
 
 func pinta(dir: String, k: String, A: Dictionary) -> void:
 	J.ALMACEN = A

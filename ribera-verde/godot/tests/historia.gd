@@ -858,11 +858,11 @@ func _pasos() -> void:
 			return chk(bien and I.ria == "65" and absf(I.media - 50) < 1 and absf(I.sd - D.GENETICA.landrace.si) < 1 and Cultivo.tipo_gen(J.S, "ria") == "estable"
 				and Cultivo.tipo_gen(J.S, "txoko") == "f1" and Cultivo.tipo_gen(J.S, "limon") == "poli" and Cultivo.tipo_gen(J.S, "thai") == "landrace"
 				and re("Cruce F1: [^\\n]*\\n2\\.ª generación · Skunk #1 × Afghani$", J.strain_line("txoko")) and re("origen incierto", J.strain_line("mango")), {"R": R, "I": I}))
-	step("Árbol por generaciones (1.11; 1.24, hasta la 4.ª; 1.26, más cruces clásicos): las 53 de la tabla con su generación y ✔/≈; todas salen en la mesa desde landraces y tienda; sin criadores", [], func():
-		var T := {1: "Skunk #1 ✔|Haze ≈|Northern Lights ≈|Purple Thai ✔|Trainwreck ≈|AK-47 ✔|Laughing Buddha ✔|Cannalope Haze ✔|Master Kush ≈|Purple Kush ≈|Congo × Panama ✔|Malawi × Panama ✔|Malawi × PCK ✔|Kali Mist ≈|White Widow ≈",
-			2: "Blueberry ✔|Super Skunk ✔|Shiva Skunk ✔|Critical Mass ✔|Cheese ✔|NL5 × Haze ✔|Neville's Haze ✔|Silver Haze ≈|Chocolope ✔|Pineapple Express ≈|Tangie ✔|Amnesia Haze ≈|Purple Haze ≈|White Russian ✔|Chronic ✔|White Rhino ≈",
-			3: "Jack Herer ✔|Super Silver Haze ✔|Blue Dream ✔|Blue Cheese ✔|Lemon Haze ≈|Sour Diesel ≈|Kali 47 ✔|Critical Kali Mist ✔|Big Bud ≈|Blue Widow ✔|White Shark ✔|Hawaiian Snow ✔|Ice ✔|Critical 47 ≈|Critical Cheese ≈|Northern Light Blue ✔",
-			4: "Super Lemon Haze ✔|Jack Flash ✔|Jack 47 ✔|Sour Tangie ✔|NL × Big Bud ✔|Critical Jack ≈"}
+	step("Árbol por generaciones (1.11; 1.24, hasta la 4.ª; 1.26, más cruces clásicos): las 53 de la tabla con su generación y ✔/≈; todas salen en la mesa desde landraces y tienda; sin criadores", [], func():   # 0.76: la tabla, al árbol coherente con los padres (57 con gen); el título no se toca, es la clave del oráculo
+		var T := {1: "Skunk #1 ✔|Purple Afghani ✔|Kali Mist ≈|California Orange ✔|Chemdawg ≈|Haze ≈|Northern Lights ≈|Purple Thai ✔|Trainwreck ≈|AK-47 ✔|Laughing Buddha ✔|Master Kush ≈|Congo × Panama ✔|Malawi × Panama ✔|Malawi × PCK ✔|White Widow ≈",
+			2: "Super Skunk ✔|Blueberry ✔|Lemon Skunk ✔|Cheese ✔|Cannalope Haze ✔|Purple Kush ≈|Critical Mass ✔|Shiva Skunk ✔|NL5 × Haze ✔|Silver Haze ≈|Pineapple Express ≈|Tangie ✔|Amnesia Haze ≈|Purple Haze ≈|White Russian ✔|White Rhino ≈",
+			3: "Lemon Haze ≈|Big Bud ≈|Neville's Haze ✔|Chocolope ✔|Jack Herer ✔|Super Silver Haze ✔|Blue Dream ✔|Blue Cheese ✔|Sour Diesel ≈|Kali 47 ✔|Critical Kali Mist ✔|Blue Widow ✔|Chronic ✔|White Shark ✔|Ice ✔|Critical 47 ≈|Critical Cheese ≈|Northern Light Blue ✔",
+			4: "Super Lemon Haze ✔|Hawaiian Snow ✔|Jack Flash ✔|Jack 47 ✔|Sour Tangie ✔|NL × Big Bud ✔|Critical Jack ≈"}
 		var tabla := true
 		for g in [1, 2, 3, 4]:
 			var l := []

@@ -19,6 +19,8 @@ Contrato de tokens y de confianza: Eddie tiene límite de uso y quiere el result
 - **Preguntar a Eddie**, siempre con el formato ❓ de SALIDA, nunca en prosa.
 - **Nunca repitas un porcentaje**, ni seguido ni separado, en ninguna línea. Ningún % se escribe a mano: solo lo saca `ma.py`, que lo impide.
 
+El modo se rompe por GOTEO, no por un mensaje largo: una línea por turno —«ya corre», «sigue corriendo», «he encontrado esto», el mismo % otra vez— es la forma en que de verdad se incumple. Si vas a escribir y no es entregable, respuesta a Eddie, bloqueo o dato que falta, no escribas: llama a la siguiente herramienta. El avance se cuenta cuando CAMBIA, y el hallazgo intermedio va a `ESTADO.md`, que es lo que sobrevive a una autocompactación; el chat no.
+
 ## ARRANQUE
 1. Si existe `ESTADO.md` en la raíz del proyecto, léelo primero y continúa desde ahí. Ni repitas lo hecho ni reintentes caminos cerrados.
    **Tras compactar, reabrir sesión o perder el hilo** con una tarea LARGA en curso: `ma.py next` antes de nada. Dice el % calculado, la siguiente subtarea y lo que falta, leyendo solo el disco. Sigue por ahí; no hay línea de % hasta el siguiente `set`.
@@ -84,10 +86,11 @@ LISTO: [lo reversible ya preparado y dónde]
 **LÍNEAS DE PROGRESO** (las saca `ma.py`, nunca a mano):
 - Avance: `(trabajando · 30.0 % · tests unidad 31/31 +0.7 · CHANGELOG 1/1 +10.0)`. Nombra cada subtarea que avanzó; la suma de los aportes es exactamente el salto.
 - Imprevisto: `(trabajando · 27.2 % (−2.8) · +25 min: README sin contar)`.
-- Esperando, **sin %** (si no, repetiría el último): `(trabajando · esperando expo.py, 1 h 25 de ~1 h 40 · faltan 6 subtareas)`. Úsala solo cuando no haya nada contable que esperar o si Eddie pregunta «¿cómo va?».
+- Esperando, **sin %**: `(trabajando · esperando expo.py, 1 h 25 de ~1 h 40 · faltan 6 subtareas)`. **Solo si Eddie pregunta «¿cómo va?»**; esperar no es avanzar, así que mientras corre algo largo se espera en silencio: ni «sigue corriendo», ni «quedan 5 min», ni el hallazgo que acabas de leer (eso va a `ESTADO.md`).
+- La línea de avance sale **cuando el número CAMBIA**, o sea al cerrar un paso. Un paso que sigue abierto no se comenta: la misma línea dos veces es un fallo del modo, y veinte veces es gastarle los tokens a Eddie para no decir nada.
 - En tareas CORTAS basta `(trabajando · paso N/M)`.
 
-**Turno forzado** = el arnés reabre el turno sin que Eddie escriba: stop hook, continuación automática, **mensaje de un subagente o tarea en segundo plano terminada**. No es una pregunta ni un hito que contar: si avanzó algo, `ma.py set` (que emite la línea); si no, nada, o `esperando` si hace falta texto. Nunca prosa («llevo 3 de 4 bloques…»).
+**Turno forzado** = el arnés reabre el turno sin que Eddie escriba: stop hook, continuación automática, **mensaje de un subagente o tarea en segundo plano terminada**. **No es una pregunta y no se contesta**: sigues trabajando. Si avanzó algo, `ma.py set` (que emite la línea); si no, nada. Nunca prosa («llevo 3 de 4 bloques…») ni repetir el % de antes.
 
 ---
 

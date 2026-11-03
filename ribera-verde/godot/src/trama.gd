@@ -999,22 +999,22 @@ func cap4_sigue() -> void:
 	show_objective()
 
 # fase 6 (retencion.gd): la demo, los objetivos diarios y Play Games
-func demo_corta() -> bool:
+func demo_corta() -> bool:   # → retencion.gd
 	return false
 
-func demo_menu() -> bool:
+func demo_menu() -> bool:   # → retencion.gd
 	return false
 
-func diario_revisa() -> void:
+func diario_revisa() -> void:   # → retencion.gd
 	pass
 
-func diarios_txt() -> String:
+func diarios_txt() -> String:   # → retencion.gd
 	return ""
 
-func diario_menu() -> void:
+func diario_menu() -> void:   # → retencion.gd
 	pass
 
-func logro_play(_id: String) -> void:
+func logro_play(_id: String) -> void:   # → retencion.gd
 	pass
 
 func chapter(nn: int) -> void:
@@ -2169,230 +2169,221 @@ static func _mv(a: float, b: float, f: float) -> float:
 	return a + (b - a) * _suave(f)
 
 # F8: lo que vive en los módulos de después de la cadena (menus, policia, movil, venta, nave, setas, eventos), declarado aquí para quien lo llama antes
-func SL():
+func SL():   # → setas.gd
 	pass
 
-func _dlg_fijo(t: String, nombre: String) -> void:
+func _dlg_fijo(t: String, nombre: String) -> void:   # → setas.gd
 	pass
 
-func _marco(o: Array, x: int, y: int, w: int, h: int) -> void:
+func _marco(o: Array, x: int, y: int, w: int, h: int) -> void:   # → setas.gd
 	pass
 
-func alijo_franco() -> void:
+func alijo_franco() -> void:   # → eventos.gd
 	pass
 
-func almacen_club(_id := "rv") -> void:
+func almacen_club(_id := "rv") -> void:   # → nave.gd
 	pass
 
-func alm_g(_id := "rv") -> float:
+func alm_g(_id := "rv") -> float:   # → nave.gd
 	return 0.0
 
-func vista_disp(_H: Dictionary, _key: String) -> bool:
+func vista_disp(_H: Dictionary, _key: String) -> bool:   # → setas.gd
 	return true
 
-func aso() -> Dictionary:
+func aso() -> Dictionary:   # → nave.gd
 	return {}
 
-func aso_dia() -> void:
+func aso_dia() -> void:   # → nave.gd
 	pass
 
-func bajar_vip() -> void:
+func bajar_vip() -> void:   # → nave.gd
 	pass
 
-func bajo_menu(T: String) -> void:
+func bajo_menu(T: String) -> void:   # → setas.gd
 	pass
 
-func balda_i(x: int) -> int:
+func balda_i(x: int) -> int:   # → setas.gd
 	return 0
 
-func bandejas_listas() -> Array:
+func bandejas_listas() -> Array:   # → eventos.gd
 	return []
 
-func bandejas_nave() -> void:
+func bandejas_nave() -> void:   # → eventos.gd
 	pass
 
-func carpa_madres() -> void:
+func carpa_madres() -> void:   # → nave.gd
 	pass
 
-func rects_madres(_V: Dictionary) -> Array:
-	return []
-
-func comprar_mercado(id: String, N: String, pool: Array) -> void:
+func comprar_mercado(id: String, N: String, pool: Array) -> void:   # → nave.gd
 	pass
 
-func corta_bandeja(i: int, Me: Dictionary) -> void:
+func corta_bandeja(i: int, Me: Dictionary) -> void:   # → eventos.gd
 	pass
 
-func cuanto(txt: String, mx: float, pasos: Array, fmt: Callable):
+func cuanto(txt: String, mx: float, pasos: Array, fmt: Callable):   # → policia.gd
 	pass
 
-func elegir_almacen(t: String, i0 := 0):
+func elegir_almacen(t: String, i0 := 0):   # → setas.gd
 	pass
 
-func elegir_cal() -> void:
+func elegir_cal() -> void:   # → eventos.gd
 	pass
 
-func elegir_mapa() -> void:
+func elegir_mapa() -> void:   # → eventos.gd
 	pass
 
-func encargo_baltasar(N: String):
+func encargo_baltasar(N: String):   # → policia.gd
 	pass
 
-func entra_aso(d: Dictionary) -> void:
+func entra_aso(d: Dictionary) -> void:   # → nave.gd
 	pass
 
-func entrada_disco() -> bool:
+func entrada_disco() -> bool:   # → nave.gd
 	return false
 
-func escritorio_nave() -> void:
+func escritorio_nave() -> void:   # → nave.gd
 	pass
 
-func estante_nave() -> void:
+func estante_nave() -> void:   # → nave.gd
 	pass
 
-func extr_accion(k: String) -> void:
+func extr_accion(k: String) -> void:   # → movil.gd
 	pass
 
-func fase_seta(b: Dictionary) -> String:
+func fase_seta(b: Dictionary) -> String:   # → setas.gd
 	return ""
 
-func ficha_expo(k: String) -> void:
+func ficha_expo(k: String) -> void:   # → eventos.gd
 	pass
 
-func ficha_pelea() -> String:   # la fila Pelea de la MOCHILA
+func ficha_pelea() -> String:   # la fila Pelea de la MOCHILA   → policia.gd
 	return ""
 
-func franco_dia() -> void:
+func franco_dia() -> void:   # → eventos.gd
 	pass
 
-func gente() -> void:
+func gente() -> void:   # → movil.gd
 	pass
 
-func guardar_almacen(t: String):
+func guardar_almacen(t: String):   # → setas.gd
 	pass
 
-func libre(w: Dictionary) -> void:
+func libre(w: Dictionary) -> void:   # → venta.gd
 	pass
 
-func llamar() -> bool:
+func llamar() -> bool:   # → movil.gd
 	return false
 
-func lleno_arm(k: String) -> int:
+func lleno_arm(k: String) -> int:   # → setas.gd
 	return 0
 
-func lote_accion(k: String) -> void:
+func lote_accion(k: String) -> void:   # → movil.gd
 	pass
 
-func mar_dia() -> void:
+func mar_dia() -> void:   # → eventos.gd
 	pass
 
-func mar_noray(x: int) -> void:
+func mar_noray(x: int) -> void:   # → eventos.gd
 	pass
 
-func mar_ok() -> bool:
+func mar_ok() -> bool:   # → eventos.gd
 	return false
 
-func mesa_nave(i: int) -> void:
+func mesa_nave(i: int) -> void:   # → nave.gd
 	pass
 
-func mesa_setas() -> void:
+func mesa_setas() -> void:   # → setas.gd
 	pass
 
-func mochila() -> void:
+func mochila() -> void:   # → menus.gd
 	pass
 
-func nave_nueva() -> Dictionary:
+func nave_nueva() -> Dictionary:   # → nave.gd
 	return {}
 
-func nave_stock() -> float:
+func nave_stock() -> float:   # → nave.gd
 	return 0.0
 
-func nivel_pelea() -> int:
+func nivel_pelea() -> int:   # → policia.gd
 	return 0
 
-func noche_gaua() -> Dictionary:
+func noche_gaua() -> Dictionary:   # → nave.gd
 	return {}
 
-func noche_ya() -> bool:
+func noche_ya() -> bool:   # → nave.gd
 	return false
 
-func plantas() -> void:
+func plantas() -> void:   # → menus.gd
 	pass
 
-func plantilla() -> void:
+func plantilla() -> void:   # → venta.gd
 	pass
 
-func plantilla_dia() -> void:
+func plantilla_dia() -> void:   # → venta.gd
 	pass
 
-func pool_mayor() -> Array:
+func pool_mayor() -> Array:   # → nave.gd
 	return []
 
-func pulverizar_bajo() -> bool:
+func pulverizar_bajo() -> bool:   # → setas.gd
 	return false
 
-func reloj_txt() -> String:
+func reloj_txt() -> String:   # → movil.gd
 	return ""
 
-func resto_mer(id: String, tope: float) -> float:
+func resto_mer(id: String, tope: float) -> float:   # → nave.gd
 	return 0.0
 
-func rival_b(kind := "rival") -> Dictionary:
+func rival_b(kind := "rival") -> Dictionary:   # → movil.gd
 	return {}
 
-func sala_desc() -> String:
+func sala_desc() -> String:   # → policia.gd
 	return ""
 
-func secadero_nave() -> void:
+func secadero_nave() -> void:   # → nave.gd
 	pass
 
-func sofoco_nave() -> float:
+func sofoco_nave() -> float:   # → nave.gd
 	return 0.0
 
-func sot_ya() -> bool:
+func sot_ya() -> bool:   # → setas.gd
 	return false
 
-func subir_vip() -> void:
+func subir_vip() -> void:   # → nave.gd
 	pass
 
-func suma_mer(id: String, g: float) -> void:
+func suma_mer(id: String, g: float) -> void:   # → nave.gd
 	pass
 
-func t_clima(cl: Dictionary) -> String:
+func t_clima(cl: Dictionary) -> String:   # → policia.gd
 	return ""
 
 var CLIMA_V = null   # {s}: el controlador de clima a la vista (kaiacult.gd vista_clima, con CAL)
 
-func vista_clima(_s: String) -> bool:
+func vista_clima(_s: String) -> bool:   # → kaiacult.gd
 	return true
 
-func clima_v(_s: String) -> Dictionary:
-	return {}
-
-func talk_kaia(N: String) -> void:
+func talk_kaia(N: String) -> void:   # → eventos.gd
 	pass
 
-func dispensario_kaia(_N: String) -> void:
+func dispensario_kaia(_N: String) -> void:   # → eventos.gd
 	pass
 
 func dispensario_aso() -> void:   # nave.gd
 	pass
 
-func diseno_kaia(_N: String) -> void:
+func tirar_lote(k: String, r: bool) -> void:   # → movil.gd
 	pass
 
-func tirar_lote(k: String, r: bool) -> void:
+func trabajo(w: Dictionary) -> void:   # → venta.gd
 	pass
 
-func trabajo(w: Dictionary) -> void:
-	pass
-
-func txt_secando(o: String) -> String:
+func txt_secando(o: String) -> String:   # → setas.gd
 	return ""
 
-func vista_armario() -> void:
+func vista_armario() -> void:   # → setas.gd
 	pass
 
-func vista_bajo(i0 := 0) -> void:
+func vista_bajo(i0 := 0) -> void:   # → setas.gd
 	pass
 

@@ -221,8 +221,30 @@ func vender_coche(l: Array) -> void:
 		return
 	var k: String = l[j]
 	var v := valor_coche(k)
-	if await ask(T("Por {a} te damos {v}. ¿Trato hecho?", {"a": D.CONCE.v[k].art, "v": Datos.eur(v)}), [K("Vender"), K("No")], A) != 0:
+	var pm := mal_peso(k)   # lo del maletero no se vende con el coche: se saca antes (si no, se perdía)
+	# ni la caja fuerte ni la mochila son un pozo sin fondo: si lo del maletero no cabe, no se vende hasta vaciarlo
+	var h_caja: float = maxf(0, floor(float(D.CAJA[int(S.caja.nivel)].g) - caja_g())) if S.get("caja") else 0.0
+	var h_mochila: float = floor(libre_mochila())
+	if pm >= .1 and pm > h_caja + h_mochila + .05:
+		await say(T("En el maletero llevas {g} y no te caben: tienes sitio para {h}. Vacíalo antes de venderlo.", {"g": g_txt(pm), "h": g_txt(h_caja + h_mochila)}), A)
 		return
+	if await ask(T("Por {a} te damos {v}. ¿Trato hecho?", {"a": D.CONCE.v[k].art, "v": Datos.eur(v)}) + (" " + T("Lo del maletero ({g}) lo sacamos antes.", {"g": g_txt(pm)}) if pm >= .1 else ""), [K("Vender"), K("No")], A) != 0:
+		return
+	if pm >= .1:   # los cogollos, a la caja fuerte lo que quepa y el resto encima; el abono, a los botes de casa
+		var bu: Dictionary = mal(k).buds
+		for q in bu.keys():
+			var g: float = float(bu[q].g)
+			var a_caja: float = minf(g, h_caja) if S.get("caja") else 0.0
+			if a_caja >= .1:
+				mover_lote(bu, S.caja.buds, q, a_caja)
+				h_caja -= a_caja
+			if float(bu.get(q, {"g": 0}).g) >= .1:
+				mover_lote(bu, S.buds, q, float(bu[q].g))
+		var ab := mal_ab(k)
+		for par in [["fert", "m"], ["ofert", "o"]]:   # i18n-no
+			if int(ab[par[1]]) > 0:
+				S.items[par[0]] = int(S.items.get(par[0], 0)) + int(ab[par[1]])
+				ab[par[1]] = 0
 	S.coches.erase(k)
 	abono_banco(v, T("{n} · venta", {"n": D.CONCE.n}))
 	sfx("coin")
@@ -1075,8 +1097,12 @@ func talk_gorka() -> void:
 				sfx("get")
 		elif l == "Dejar el piso":
 			if await confirm(K("¿Dejas el piso franco? Lo que haya en el alijo y en la caja te lo llevas tú.")):
-				for k in F.buds.keys():
-					mover_lote(F.buds, S.buds, k, F.buds[k].g)
+				for k in F.buds.keys():   # lo que no quepa en la mochila, a la caja fuerte de casa
+					var g0 := minf(float(F.buds[k].g), floor(libre_mochila()))
+					if g0 >= .1:
+						mover_lote(F.buds, S.buds, k, g0)
+					if F.buds.has(k):
+						mover_lote(F.buds, S.caja.buds if S.get("caja") else S.buds, k, float(F.buds[k].g))
 				S.money += int(F.caja)
 				S.franco = null
 				update_hud()
@@ -1333,10 +1359,6 @@ func kaia_tiron(L: Dictionary) -> float:
 		return 1.0
 	return clampf(pow(float(L.p0) / float(L.pg), 2.0), .4, 1.6)
 
-# el dispensario de KAIA, tuyo: lo que hay, rellenarlo con más del mismo lote, el precio y retirar lo que queda
-func gestiona_kaia(N: String) -> void:
-	await disp_gestiona(N, S.mar, "kaia", kaia_dia(), D.MAR.kaia.g)
-
 func disp_gestiona(N: String, M_: Dictionary, key: String, base: float, gs0: Array) -> void:
 	var KP: Dictionary = D.MAR.kaia.precio
 	while M_.get(key) is Dictionary:
@@ -1378,10 +1400,20 @@ func disp_gestiona(N: String, M_: Dictionary, key: String, base: float, gs0: Arr
 			if not await confirm(T("¿Te llevas los {g} de {n} que quedan?", {"g": g_txt(L.g), "n": nm_})):
 				continue
 			var thc: float = float(L.get("thc", strain(lot_sid(L.k)).thc))
+			var cabe := minf(float(L.g), floor(libre_mochila()))   # el tope de la mochila, como en el almacén del club
+			if cabe < .1:
+				sfx("bad")
+				await say(K("No te cabe más en la mochila."), N)
+				continue
 			if x:
-				add_rosin(L.k, L.g, thc)
+				add_rosin(L.k, cabe, thc)
 			else:
-				add_buds(L.k, L.g, thc)
+				add_buds(L.k, cabe, thc)
+			if cabe < float(L.g) - .05:
+				L.g = Datos.jsround((float(L.g) - cabe) * 10) / 10.0
+				sfx("get")
+				await say(T("Te llevas {g}; el resto se queda en la vitrina.", {"g": g_txt(cabe)}), N)
+				continue
 			M_[key] = null
 			sfx("get")
 			await say(K("Vaciado. El dispensario, a la espera de lo que traigas."), N)
@@ -2212,7 +2244,7 @@ func _gs_maceta(R: Array, pl: String, moja := false, V := {}) -> void:
 # tapa la semilla, en los tonos del bancal. gesto_sol, en campo.gd
 var _gs_sol := false
 const GS_TIERRA_SOL := {"#3e2c1e": "#5a3c22", "#56402a": "#906238"}   # i18n-no
-func gesto_sol() -> bool:
+func gesto_sol() -> bool:   # → campo.gd
 	return false
 
 func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:

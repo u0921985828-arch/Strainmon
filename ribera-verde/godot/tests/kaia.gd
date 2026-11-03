@@ -156,12 +156,28 @@ func _corre() -> void:
 	QUIERO = ["El dispensario", "Rellenar", "%d g" % int(K.g[0]), "Nada", "Nada"]
 	corre(func(): await J.talk_kaia("Encargada"))
 	chk(absf(float(L.g) - g0 - float(K.g[0])) < .01 and absf(b0 - J.total_buds() - float(K.g[0])) < .01, "rellenar: +%d g" % int(K.g[0]))
-	# 6 · retirar lo que queda
+	# 6 · retirar lo que queda: con sitio, vuelve todo; con la mochila a tope, solo lo que cabe y el resto se queda en la vitrina
 	g0 = float(L.g)
 	b0 = J.total_buds()
+	S.items.bolsa = D.MOCHILAS.size() - 1   # la maleta: sitio de sobra para lo que vuelve
 	QUIERO = ["El dispensario", "Retirar lo que queda", "Sí", "Nada"]
 	corre(func(): await J.talk_kaia("Encargada"))
 	chk(S.mar.get("kaia") == null and absf(J.total_buds() - b0 - g0) < .01, "retirado: vuelven %s g" % g0)
+	QUIERO = ["El dispensario", lote(), "%d g" % int(K.g[0]), "Nada"]
+	corre(func(): await J.talk_kaia("Encargada"))
+	var L2 = S.mar.get("kaia")
+	chk(L2 is Dictionary and float(L2.g) >= float(K.g[0]) - .01, "vuelve a haber lote: %s" % [L2])
+	if L2 is Dictionary:
+		g0 = float(L2.g)
+		b0 = J.total_buds()
+		S.items.bolsa = 0   # la mochila de serie, llena a tope: no cabe nada
+		var relleno := maxf(0, J.cap_mochila() - J.peso_encima())
+		if relleno > 0:
+			J.add_buds("ria", relleno, 10.0)
+		QUIERO = ["El dispensario", "Retirar lo que queda", "Sí", "Nada"]
+		corre(func(): await J.talk_kaia("Encargada"))
+		chk(S.mar.get("kaia") is Dictionary and absf(float(S.mar.kaia.g) - g0) < .01, "sin sitio, el lote se queda en la vitrina: %s" % [S.mar.get("kaia")])
+		S.items.bolsa = D.MOCHILAS.size() - 1
 	# 7 · la vitrina es el dispensario
 	MENUS.clear()
 	QUIERO = ["Nada"]

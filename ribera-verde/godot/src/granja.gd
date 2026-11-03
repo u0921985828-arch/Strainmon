@@ -89,7 +89,7 @@ func advance_time(mn: int) -> void:
 			new_day()
 
 # fase 6: los objetivos diarios cuentan riegos, plantas y cosechas (retencion.gd)
-func cuenta(_k: String) -> void:
+func cuenta(_k: String) -> void:   # → retencion.gd
 	pass
 
 func tick_minute() -> void:
@@ -1613,7 +1613,7 @@ func carro_action() -> void:
 		sel = mini(S.bandejas.size(), cap - 1)
 
 # la vista del carro (en trama.gd): el taco elegido (0-23: la bandeja de arriba, 0-11, y la de abajo, 12-23) o null
-func elegir_carro(_i0 := 0):
+func elegir_carro(_i0 := 0):   # → setas.gd
 	return null
 
 # banco de semillas: las landraces en sobres de SOBRE semillas; el pedido llega al día siguiente (new_day)
@@ -2029,19 +2029,19 @@ func abrir_carpa(ci):
 	await fade(0)
 
 # ---------- virtuales: las definen trama y juego ----------
-func save():
+func save():   # → juego.gd
 	return true
-func genoteca():
+func genoteca():   # → menus.gd
 	pass
-func show_objective():
+func show_objective():   # → trama.gd
 	pass
-func raid_event():
+func raid_event():   # → trama.gd
 	pass
-func aviso_orden():
+func aviso_orden():   # → trama.gd
 	pass
-func recuerdo_plazo():
+func recuerdo_plazo():   # → trama.gd
 	pass
-func penalty_event():
+func penalty_event():   # → trama.gd
 	pass
 
 # ---------- el banco, los recibos y los locales (1.35, 11k-banco) ----------
@@ -2238,10 +2238,6 @@ func local_de(m: String, x: int, y: int) -> String:
 			return k
 	return ""
 
-func del_neg(L: Dictionary) -> String:   # «las llaves del lavadero», «de la taberna»
-	var t: String = L.neg
-	return "del " + t.substr(3) if t.begins_with("el ") else ("de la " + t.substr(3) if t.begins_with("la ") else t)   # i18n-no
-
 # F7: la frase según el artículo del negocio (L.neg: «el lavadero…», «la taberna»), con {n} sin el artículo
 func por_neg(L: Dictionary, s_el: String, s_la: String, s_otro: String, a := {}) -> String:
 	var t: String = L.neg
@@ -2394,9 +2390,11 @@ func neg_caja(k: String) -> void:
 			sfx("get")
 			await say(T("Hecho: {m}.", {"m": I18n.v(String(M.n)).to_lower()}))
 		elif op == "Dejar el local":
-			if await ask(T("¿Dejas {n}? Te devuelven la fianza a la cuenta; las mejoras se quedan.", {"n": L.neg}), [K("Dejarlo"), K("No")]) != 0:
+			var cj: int = int(o.caja) if int(o.dia) == S.day else 0   # lo metido hoy aún no ha entrado en la cuenta
+			if await ask(T("¿Dejas {n}? Te devuelven la fianza a la cuenta; las mejoras se quedan y lo de la caja de hoy se queda en el negocio.", {"n": L.neg}) if cj > 0 else T("¿Dejas {n}? Te devuelven la fianza a la cuenta; las mejoras se quedan.", {"n": L.neg}), [K("Dejarlo"), K("No")]) != 0:
 				continue
 			S.loc.erase(k)
+			build_ents()   # el empleado se va con el local
 			abono_banco(L.fianza, K("Fianza") + " · " + L.n)
 			sfx("coin")
 			update_hud()
@@ -2435,6 +2433,9 @@ func neg_limpiar(k: String) -> void:
 
 func talk_neg(k: String) -> void:
 	var N: Dictionary = D.NEGOCIO.k[k]
+	if not S.loc.has(k):   # lo dejaste desde dentro y el empleado sigue en pantalla hasta salir (como en venta.gd)
+		await say(K("Ya no es tuyo: devuelve las llaves al salir."))
+		return
 	var o := neg_o(k)
 	var Tn: String = N.emp[2]
 	var q: String = T("Ayer hicimos {e}.", {"e": Datos.eur(int(o.ay))}) + " " + T("El local {c}.", {"c": neg_cuidado(k)}) + (T(" Y nos estamos quedando sin {g}.", {"g": N.gn}) if int(o.st) <= 1 else "")

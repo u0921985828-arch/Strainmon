@@ -42,6 +42,25 @@ var ambiente_on := true      # las pruebas de pantalla lo apagan (el HTML tira d
 var L: CanvasItem            # la capa en la que se pinta
 var cache := {}
 
+# R7: tope por generaciones, como Atlas.tex (lo vio el usuario: destellos «pam, pam» en la casa y en el armario). Con
+# cache.clear() se soltaba de golpe lo que el fotograma estaba pintando; así, al llenarse, lo de ahora pasa a ser lo de
+# antes, lo de antes se suelta y lo que se vuelve a pedir sube otra vez a lo de ahora.
+const CACHE_TOPE := 512
+var cache_v := {}
+func _cpon(k, v):
+	if cache.size() >= CACHE_TOPE:
+		cache_v = cache
+		cache = {}
+	cache[k] = v
+	return v
+func _ctiene(k) -> bool:
+	if cache.has(k):
+		return true
+	if cache_v.has(k):
+		_cpon(k, cache_v[k])
+		return true
+	return false
+
 func _init() -> void:
 	for n in [suelo, c0, ad, vc, c1]:
 		add_child(n)
@@ -170,6 +189,18 @@ var _suelo_din := {}   # tx + (ty << 12) de las casillas que se repintan cada fo
 # hacia abajo. La clave de cada casilla se calcula una vez por mapa
 var _base_k := ""
 var _base := {}
+# R9: la clave de la rejilla (m.g.hash(), que recorre hasta 48 × 34 casillas, y la del suelo de Bilbao) se calculaba en cada
+# llamada de _suelo_base y otra vez en _suelo_mira: era más caro formar la clave de la caché que lo que la caché ahorraba. El
+# hash sigue siendo el mismo —detecta igual ordenar() y los montajes—, pero se saca una vez por fotograma
+var _gh_f := -1
+var _gh := ""
+func _mapa_gh() -> String:
+	var f := Engine.get_frames_drawn()
+	if f != _gh_f:
+		_gh_f = f
+		var m: Dictionary = J.MAPS[J.S.map]
+		_gh = "%d|%d|%d" % [m.g.hash(), m.get("dec", {}).hash(), m.o.hash()]
+	return _gh
 func _tile_hay(k: String) -> bool:
 	if k == "" or k == "cristalV" or k.begins_with("wall_") or k.begins_with("roofT_") or k.begins_with("roofB_") or k.begins_with("win_") or k.begins_with("door_"):   # i18n-no
 		return false
@@ -184,7 +215,7 @@ func _tile_hay(k: String) -> bool:
 	return Atlas.frame_de(Atlas.cubre("tile:" + k), k, "unica", 0, {"i": 0}) != null
 
 func _suelo_base(m: Dictionary, tx: int, ty: int) -> String:
-	var ck := "%s|%d" % [J.S.map, m.g.hash()]
+	var ck := String(J.S.map) + "|" + _mapa_gh()
 	if ck != _base_k:
 		_base_k = ck
 		_base.clear()
@@ -237,7 +268,7 @@ func _suelo_mira() -> void:
 		suelo.visible = false
 		return
 	var m: Dictionary = J.MAPS[J.S.map]
-	var k := "%s|%d|%d|%s|%d" % [J.S.map, m.g.hash(), m.get("dec", {}).hash(), Datos.CAL, Atlas.sobre.size()]
+	var k := "%s|%s|%s|%d" % [J.S.map, _mapa_gh(), Datos.CAL, Atlas.sobre.size()]
 	if k != _suelo_k:
 		_suelo_k = k
 		_suelo_din.clear()
@@ -509,7 +540,7 @@ func _fondo_ancho(img: Image, cortes = null) -> void:
 	var ox := OX()
 	var oy := OY()
 	var key := "fa|%d|%d|%s" % [img.get_instance_id(), J.SW, str(cortes)]
-	if not cache.has(key):
+	if not _ctiene(key):
 		var o := Image.create(J.SW, SH, false, Image.FORMAT_RGBA8)
 		o.blit_rect(img, Rect2i(Vector2i.ZERO, img.get_size()), Vector2i(ox, oy))
 		var esp := img.duplicate()
@@ -531,9 +562,7 @@ func _fondo_ancho(img: Image, cortes = null) -> void:
 			var b := o.get_region(Rect2i(0, oy, J.SW, oy))
 			b.flip_y()
 			o.blit_rect(b, Rect2i(0, 0, J.SW, oy), Vector2i.ZERO)
-		if cache.size() > 512:   # R7: tope
-			cache.clear()
-		cache[key] = o
+		_cpon(key, o)
 	_img(cache[key], 0, 0)
 
 # ---------- mundo ----------
@@ -766,6 +795,7 @@ func _rects_lote(r: PackedInt32Array, c: Color) -> void:
 func _al_raso() -> bool:
 	return J.D.ZONAS.has(J.S.map) or (Datos.CAL and (J.S.map in ["muelle", "comarcal", "huerta"] or J.S.map.begins_with("carr-")))
 
+var _far_c := {}
 func _farolas_mapa() -> Array:   # las farolas de un mapa sin LAMPS: las «lamp» que tenga
 	var o := []
 	var m: Dictionary = J.MAPS[J.S.map]
@@ -790,7 +820,16 @@ func _farolas() -> void:
 	if a <= .2:
 		return
 	var im := _farola(a)
-	for l in J.D.LAMPS.get(J.S.map, _farolas_mapa()):
+	var ls = J.D.LAMPS.get(J.S.map)   # R10: el segundo argumento de get() se evalúa siempre, y _farolas_mapa() barre el mapa
+	if ls == null:
+		var fk := String(J.S.map) + "|" + _mapa_gh()   # con la rejilla y los objetos dentro: si el mapa se remonta, se rehace
+		ls = _far_c.get(fk)
+		if ls == null:
+			ls = _farolas_mapa()
+			if _far_c.size() > 32:
+				_far_c.clear()
+			_far_c[fk] = ls
+	for l in ls:
 		var x: int = l[0] * 16 + 8 - cam.x
 		var y: int = l[1] * 16 + 2 - cam.y
 		if x < -30 or y < -30 or x > J.SW + 30 or y > SH + 30:
@@ -813,7 +852,7 @@ func _manchas() -> void:
 
 func _mancha(a: float, tipo: String) -> Image:
 	var key := "mancha|%f|%s" % [a, tipo]
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var c := css(J.D.FOCO_LUZ[tipo] + "1)")
 	var im := Image.create(40, 24, false, Image.FORMAT_RGBA8)
@@ -823,9 +862,7 @@ func _mancha(a: float, tipo: String) -> Image:
 			var t := clampf((d - 1) / 17.0, 0, 1)
 			var al := minf(1, a * 1.2) * (1 - t)
 			im.set_pixel(x, y, Color8(Datos.jsround(c.r8 * al), Datos.jsround(c.g8 * al), Datos.jsround(c.b8 * al), 255))
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = im
+	_cpon(key, im)
 	return im
 
 # la luz de los locales (luzLocal, 14-render; LUZ_CLUB, LUZ_DISCO y, 1.31, los LED de la nave, _luz_nave): cada luz, un degradado radial (r 1 → r) sumado; los focos de
@@ -865,7 +902,7 @@ func _luces_local() -> void:
 
 func _luz(r: int, c: String, a: float) -> Image:
 	var key := "luz|%d|%s|%f" % [r, c, a]
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var cc := c.split(",")
 	var im := Image.create(2 * r, 2 * r, false, Image.FORMAT_RGBA8)
@@ -874,9 +911,7 @@ func _luz(r: int, c: String, a: float) -> Image:
 			var d := Vector2(x + .5 - r, y + .5 - r).length()
 			var al := a * (1 - clampf((d - 1) / (r - 1.0), 0, 1))
 			im.set_pixel(x, y, Color8(Datos.jsround(int(cc[0]) * al), Datos.jsround(int(cc[1]) * al), Datos.jsround(int(cc[2]) * al), 255))
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = im
+	_cpon(key, im)
 	return im
 
 # encima de todo (1.30): la barra del billar mientras apuntas (pintaTiro, 14-render); 1.35: la mesa de la partida (MESA_B) y dos
@@ -927,10 +962,8 @@ func _encima() -> void:
 	if J.MAPA_V != null:   # 1.42: el mapa de la comarca, un croquis (croquis.gd)
 		var mt: bool = J.metro_ya()   # con la autopista a Hiriburu
 		var kc := "croquis|%d|%s" % [int(J.S.ch), mt]
-		if not cache.has(kc):
-			if cache.size() > 512:   # R7: tope
-				cache.clear()
-			cache[kc] = Croquis.imagen(J.D, int(J.S.ch), mt)
+		if not _ctiene(kc):
+			_cpon(kc, Croquis.imagen(J.D, int(J.S.ch), mt))
 		var al: int = J.alto_libre()
 		var o := Croquis.origen_mapa(J.SW, al)
 		_img(cache[kc], o.x, o.y)
@@ -945,10 +978,8 @@ func _encima() -> void:
 		for e in J.rects_ficha(J.FICHA_V):
 			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 		var hk: String = "hoja|" + str(J.FICHA_V.l[J.FICHA_V.i])
-		if not cache.has(hk):
-			if cache.size() > 512:   # R7: tope
-				cache.clear()
-			cache[hk] = Hoja.imagen(Hoja.params(J.D, J.S, J.FICHA_V.l[J.FICHA_V.i]))
+		if not _ctiene(hk):
+			_cpon(hk, Hoja.imagen(Hoja.params(J.D, J.S, J.FICHA_V.l[J.FICHA_V.i])))
 		var hp: Vector2i = J.hoja_xy()
 		_img(cache[hk], hp.x, hp.y)
 	if J.ALMACEN != null or J.MOVIL_V != null:   # la caja fuerte y la nevera por dentro (1.36); 1.51, el móvil
@@ -979,7 +1010,7 @@ func _tiro() -> void:
 
 func _farola(a: float) -> Image:
 	var key := "far|%f" % a
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var im := Image.create(60, 60, false, Image.FORMAT_RGBA8)
 	for y in 60:
@@ -988,9 +1019,7 @@ func _farola(a: float) -> Image:
 			var t := clampf((d - 1) / 27.0, 0, 1)
 			var al := a * .7 * (1 - t)
 			im.set_pixel(x, y, Color8(Datos.jsround(255 * al), Datos.jsround(214 * al), Datos.jsround(120 * al), 255))
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = im
+	_cpon(key, im)
 	return im
 
 func _arte_dec(n: String, sx: int, sy: int) -> void:
@@ -2063,7 +2092,7 @@ func _tubo(x: int, y: int, w: int, h: int, horiz: bool, abierto := false) -> voi
 func _sitio(st: Dictionary) -> void:
 	var w: float = st.w * 16 - 3
 	var key := "sit|%d" % w
-	if not cache.has(key):
+	if not _ctiene(key):
 		var h := 15.0
 		var pts := [Vector2(0, 0), Vector2(w, 0), Vector2(w, h), Vector2(0, h), Vector2(0, 0)]
 		var lon := 2 * (w + h)
@@ -2081,9 +2110,7 @@ func _sitio(st: Dictionary) -> void:
 							o[Vector2i(xx + 1, yy)] = c
 			trazos.append(o)
 			s += 5
-		if cache.size() > 512:   # R7: tope
-			cache.clear()
-		cache[key] = trazos
+		_cpon(key, trazos)
 	var col := Color8(60, 70, 90)
 	var a := Datos.jsround(.45 * 255) / 255.0
 	var x0: int = st.x * 16 - cam.x
@@ -2497,10 +2524,10 @@ func _comb_frame(who: String):
 # una imagen en espejo, una vez (el fondo del combate en su lado)
 func _espejo_img(img: Image) -> Image:
 	var k := "esp|%d" % img.get_instance_id()
-	if not cache.has(k):
+	if not _ctiene(k):
 		var o := img.duplicate()
 		o.flip_x()
-		cache[k] = o
+		_cpon(k, o)
 	return cache[k]
 
 # ---------- título e intro ----------
@@ -2536,8 +2563,8 @@ func _titulo() -> void:
 		var el: Dictionary
 		var o0 := Vector2i(ox + 120, 104 + oy)
 		if mk:
-			if not cache.has("el|canvas"):
-				cache["el|canvas"] = _mascara_a(mk)
+			if not _ctiene("el|canvas"):
+				_cpon("el|canvas", _mascara_a(mk))
 			el = cache["el|canvas"]
 			o0 = Vector2i(ox + 84, 95 + oy)
 		else:
@@ -2559,7 +2586,7 @@ func _raya(x0: float, y: int, w: float, c: Color) -> void:
 # cobertura de una elipse centrada en (0, 0) con 16 × 16 muestras por píxel: {Vector2i(x, y) relativo: 0-1}
 func _elipse(rx: float, ry: float) -> Dictionary:
 	var key := "el|%f|%f" % [rx, ry]
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var o := {}
 	for y in range(-ceili(ry) - 1, ceili(ry) + 1):
@@ -2573,9 +2600,7 @@ func _elipse(rx: float, ry: float) -> Dictionary:
 						n += 1
 			if n:
 				o[Vector2i(x, y)] = n / 256.0
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = o
+	_cpon(key, o)
 	return o
 
 # arteRetrato: el personaje a ×k, de frente, con su idle si lo tiene; pies en (cx, fy)
@@ -2699,7 +2724,7 @@ func _cono() -> void:
 	var c: Dictionary = g.c
 	var F: Dictionary = D.FOCOS[c.foco]
 	var key := "cono|%s|%s|%s" % [c.t, c.foco, g.has("plata")]
-	if not cache.has(key):
+	if not _ctiene(key):
 		var a: float = .05 + .09 * minf(1, F.w / 600.0)
 		var lw := Datos.jsround(D.FOCO_CM.get(c.foco, 40) * D.VB.M / 2)
 		var hw: float = g.w / 2.0 + g.s
@@ -2718,9 +2743,7 @@ func _cono() -> void:
 			var t := clampf((p.y + .5 - fy) / (yf - fy), 0, 1)
 			var al: float = a * (1 - t) * cob[p]
 			o[p] = Color8(Datos.jsround(luz.r8 * al), Datos.jsround(luz.g8 * al), Datos.jsround(luz.b8 * al), 255)
-		if cache.size() > 512:   # R7: tope
-			cache.clear()
-		cache[key] = o
+		_cpon(key, o)
 	L.draw_set_transform(Vector2(OX(), OY()))
 	var o: Dictionary = cache[key]
 	for p in o:

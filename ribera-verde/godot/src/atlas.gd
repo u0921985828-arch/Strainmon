@@ -150,12 +150,31 @@ static func duracion(g, s: String) -> float:
 	return n_fotos(g, s) * 1000.0 / fps(a) if a else 0.0
 
 # o.i: índice fijo · o.ph: fase 0-1 del ciclo · si no, por tiempo t (ms) con fps y bucle del atlas
-static func frame_de(g, s: String, dir: String, t: float, o := {}):
+static var _fd := {}         # «grupo|anim|dir» → [claves, espejo, fps, bucle, celda]
+# R8: lo de frame_de que no depende del tiempo, una vez por grupo+anim+dirección. Es la primitiva de las casillas, los objetos,
+# los muñecos y la vista C (unas 160 llamadas por fotograma), y repetía claves_de, anim_de dos veces y la celda en cada una.
+# El atlas (d) no cambia después de carga(), así que la memo no necesita generaciones; carga() la vacía.
+static func _fd_de(g, s: String, dir: String):
+	var k := "%s|%s|%s" % [g, s, dir]
+	var v = _fd.get(k)
+	if v != null:
+		return v
 	var r = claves_de(g, s, dir)
 	if r == null:
 		return null
-	var ks: Array = r[0]
 	var a = anim_de(g, s)
+	var cel = a.get("celda")
+	if cel == null:
+		cel = d.celdas[g]
+	v = [r[0], r[1], (a.fps if a.get("fps") else 8), a.get("bucle"), cel]
+	_fd[k] = v
+	return v
+
+static func frame_de(g, s: String, dir: String, t: float, o := {}):
+	var r = _fd_de(g, s, dir)
+	if r == null:
+		return null
+	var ks: Array = r[0]
 	var n := ks.size()
 	var i: int
 	if o.has("i"):
@@ -163,12 +182,10 @@ static func frame_de(g, s: String, dir: String, t: float, o := {}):
 	elif o.has("ph"):
 		i = int(floor(o.ph * n)) % n
 	else:
-		i = int(floor(maxf(0, t) * (a.fps if a.get("fps") else 8) / 1000.0))
-		var bucle = o.bucle if o.has("bucle") else a.get("bucle")
+		i = int(floor(maxf(0, t) * r[2] / 1000.0))
+		var bucle = o.bucle if o.has("bucle") else r[3]
 		i = i % n if bucle else mini(n - 1, i)
-	var cel = a.get("celda")
-	if cel == null:
-		cel = d.celdas[g]
+	var cel = r[4]
 	var esp := true if o.get("esp") else false   # o.esp (orgánico): en espejo
 	return {"c": espejo(ks[i]) if r[1] != esp else frame(ks[i]), "i": i, "n": n, "cel": cel}
 

@@ -99,7 +99,7 @@ function atlasCarpa() {
     (sprites[n] = sprites[n] || [])[i] = [px, py, r.w, r.h];
   }
   fs.mkdirSync(path.join(GD, 'arte'), { recursive: true });
-  fs.writeFileSync(path.join(GD, 'arte/carpa.png'), PNG.sync.write(out));
+  fs.writeFileSync(path.join(GD, 'arte/carpa.png'), PNG.sync.write(out, { deflateLevel: 9, deflateStrategy: 0 }));   // como el atlas: compresión normal, no Z_RLE
   fs.writeFileSync(path.join(GD, 'arte/carpa.json'), JSON.stringify({ sprites, rampa: d.rampas['carpa-c-plantas-a'].cogollo.rampa }));
   // el atlas entero para el resto del juego (mapa, personajes, combate, título, iconos), tal cual
   for (const f of ['atlas.png', 'atlas.json']) fs.copyFileSync(path.join(ROOT, 'assets/sprites', f), path.join(GD, 'arte', f));

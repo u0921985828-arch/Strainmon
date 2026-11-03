@@ -1009,10 +1009,10 @@ func comprar_mercado(id: String, N: String, pool: Array) -> void:
 	S.money -= e
 	q.g = int(q.g) - g
 	if q.x != "":
-		add_rosin(q.k if q.x == "rosin" else q.k + "~" + q.x, g, q.thc)
+		add_rosin(q.k if q.x == "rosin" else q.k + "~" + q.x, g, q.thc, 1)   # comprado hecho: sin prima de calidad al revenderlo
 		discover(q.k)
 	else:
-		add_buds(q.k, g, q.thc, S.buds, 1)
+		add_buds(q.k, g, q.thc, S.buds, 1, -1, 0, 0.0, 1)   # curado y comprado hecho (cp): se revende a lo que vale
 	confia(id.substr(5) if id.begins_with("club_") else id, 1)
 	update_hud()
 	sfx("coin")

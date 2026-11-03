@@ -33,9 +33,6 @@ func ef_de(sid: String) -> String:
 	var ind := float(Datos.ind_de(S, lot_sid(sid)))
 	return "indica" if ind >= 65 else ("sativa" if ind <= 35 else "hibrida")
 
-func ef_txt(ef: String) -> String:
-	return {"indica": K("índica"), "sativa": K("sativa"), "hibrida": K("híbrida")}[ef]
-
 func gusto_de(id: String) -> Dictionary:
 	var h := _h("gusto|" + id)
 	return {"ar": String(D.AROMAS[(h / 3) % D.AROMAS.size()])}

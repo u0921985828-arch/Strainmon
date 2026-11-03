@@ -7,6 +7,25 @@ const Datos = preload("res://src/datos.gd")
 
 static var cache := {}
 
+# R7: tope por generaciones, como Atlas.tex (lo vio el usuario: destellos «pam, pam» en la casa y en el armario). Con
+# cache.clear() se soltaba de golpe lo que el fotograma estaba pintando; así, al llenarse, lo de ahora pasa a ser lo de
+# antes, lo de antes se suelta y lo que se vuelve a pedir sube otra vez a lo de ahora.
+const CACHE_TOPE := 512
+static var cache_v := {}
+static func _cpon(k, v):
+	if cache.size() >= CACHE_TOPE:
+		cache_v = cache
+		cache = {}
+	cache[k] = v
+	return v
+static func _ctiene(k) -> bool:
+	if cache.has(k):
+		return true
+	if cache_v.has(k):
+		_cpon(k, cache_v[k])
+		return true
+	return false
+
 static func col(h: String) -> Color:
 	return Pintor.col(h)
 
@@ -105,7 +124,7 @@ static func VK() -> Dictionary:
 # el mueble del piso: frente de tela negra y techo visto desde arriba; pies en (w/2, alto − 1)
 static func carpa_mapa(tk: String) -> Image:
 	var key := "cm|" + tk
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var cm: Array = Datos.carga().CARPAS[tk].cm
 	var w := Datos.jsround(cm[0] * .16)
@@ -137,15 +156,13 @@ static func carpa_mapa(tk: String) -> Image:
 		t.F(w - 9, ht + hf - 9, 6, 4, K.osc)
 		for i in range(0, 6, 2):
 			t.F(w - 9 + i, ht + hf - 9, 1, 4, "#3a3c44")
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = t.im
+	_cpon(key, t.im)
 	return t.im
 
 # la carpa abierta en 3/4: lienzo de (ancho + corrimiento + 2) × (alto + fondo + 3); el frente izquierdo del suelo en (1, alto − 2)
 static func carpa34(tk: String) -> Image:
 	var key := "c34|" + tk
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var D := Datos.carga()
 	var VB: Dictionary = D.VB
@@ -200,14 +217,12 @@ static func carpa34(tk: String) -> Image:
 	t.linea(P.call(0, Dp / 2, H - 4), P.call(W, Dp / 2, H - 4), K.marco2)
 	var bo: Array = P.call(W - 12, Dp, H - 14)
 	t.blob(bo[0], bo[1], 3.5, 3.5, "#26272c", K.som)
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = t.im
+	_cpon(key, t.im)
 	return t.im
 
 # el cuarto: pared del piso y suelo de tarima en 3/4 (240 × 160: la pared llega a VB.PARED)
 static func cuarto34() -> Image:
-	if cache.has("cuarto"):
+	if _ctiene("cuarto"):
 		return cache.cuarto
 	var t := Pintor.new(240, 160, 11)
 	var c := "#ead8b4"
@@ -229,7 +244,7 @@ static func cuarto34() -> Image:
 	t.P(192, 106, "#3a3a44")
 	t.P(194, 106, "#3a3a44")
 	t.F(193, 109, 1, y0 - 109 - 5, "#5a5e68")
-	cache.cuarto = t.im
+	_cpon("cuarto", t.im)
 	return t.im
 
 static func maceta_px(k: String) -> Dictionary:
@@ -241,7 +256,7 @@ static func maceta_px(k: String) -> Dictionary:
 # maceta en 3/4: lienzo w × (hb + e); el centro de la base en (w/2, e/2 + hb)
 static func maceta34(k: String) -> Image:
 	var key := "m34|" + k
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var D := Datos.carga()
 	var M: Array = D.MACETA_CM.get(k, D.MACETA_CM.plastico7)
@@ -273,9 +288,7 @@ static func maceta34(k: String) -> Image:
 		t.F(1, Datos.jsround(ry + hb * .45), w - 2, 1, Datos.shade(cu, -18))
 		t.F(0, Datos.jsround(ry + 1), 1, 2, Datos.shade(bo, -20))
 		t.F(w - 1, Datos.jsround(ry + 1), 1, 2, Datos.shade(bo, -20))
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = t.im
+	_cpon(key, t.im)
 	return t.im
 
 # alto en px de la planta en la vista B; en una plaza q, con su tope (q.ch)
@@ -290,7 +303,7 @@ static func alto_planta(po: String, st: int, dead: bool, q = null) -> int:
 # planta en 3/4 de un porte y una fase (9 = muerta). Lienzo 48 × 80 con la base del tallo en (24, 79)
 static func planta34(po: String, st: int, dry: bool, bud: String, cw := 1e9, ch := 1e9) -> Image:
 	var key := "p34|%s%d%s%s|%d|%d" % [po, st, dry, bud, Datos.jsround(minf(cw, 999)), Datos.jsround(minf(ch, 999))]
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var D := Datos.carga()
 	var VB: Dictionary = D.VB
@@ -321,18 +334,14 @@ static func planta34(po: String, st: int, dry: bool, bud: String, cw := 1e9, ch 
 		t.F(cx, top + 2, 1, H - 2, g2)
 		t.blob(cx - 2, top + 1.5, 2, 1.2, g1, g2, g3)
 		t.blob(cx + 3, top + 1.5, 2, 1.2, g1, g2, g3)
-		if cache.size() > 512:   # R7: tope
-			cache.clear()
-		cache[key] = t.im
+		_cpon(key, t.im)
 		return t.im
 	if f == 1:
 		t.F(cx, top + 3, 1, H - 3, g2)
 		hoja.call(cx - 3, B - H * .45, 1.5)
 		hoja.call(cx + 3, B - H * .6, 1.5)
 		hoja.call(cx + .5, top + 3, 1.6)
-		if cache.size() > 512:   # R7: tope
-			cache.clear()
-		cache[key] = t.im
+		_cpon(key, t.im)
 		return t.im
 	var pisos := 5 if po == "s" else 6
 	var abeto := .3 if po == "s" else .62
@@ -367,15 +376,13 @@ static func planta34(po: String, st: int, dry: bool, bud: String, cw := 1e9, ch 
 				t.P(px, py, "#ffffff")
 	else:
 		hoja.call(cx + .5, top + 4.5, 1.6 if mu else 2.2)
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = t.im
+	_cpon(key, t.im)
 	return t.im
 
 # foco colgado en 3/4, a su ancho real; lienzo (ancho + 2) × 10 con la parte de abajo en la última fila
 static func foco34(id: String) -> Image:
 	var key := "f34|" + id
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var D := Datos.carga()
 	var tipo: String = D.FOCOS[id].tipo
@@ -415,9 +422,7 @@ static func foco34(id: String) -> Image:
 		for i in int(floor(w / 3.0)):
 			t.F(2 + i * 3, 9, 2, 1, d[i % 3])
 		t.F(cx - 3, 4, 6, 1, "#5a5e68")
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = t.im
+	_cpon(key, t.im)
 	return t.im
 
 # extras de la carpa: ventilador de pinza, filtro de carbón con su extractor, depósito de goteo (el de 650 L) y garrafa (la de una
@@ -429,7 +434,7 @@ static func extra34(k: String) -> Image:
 	if k == "garrafas":
 		return garrafa34(Datos.jsround(DD.GARRAFA_X * 25))
 	var key := "x34|" + k
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var t: Pintor
 	if k == "vent":
@@ -450,9 +455,7 @@ static func extra34(k: String) -> Image:
 		t.F(30, 1, 2, 10, "#2a2b30")
 		t.blob(4, 6, 3.5, 3.5, "#3a3c44", "#1c1d22", "#6a6e78")
 		t.F(6, 4, 2, 4, "#a8aebb")
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = t.im
+	_cpon(key, t.im)
 	return t.im
 
 # el depósito del goteo de l litros, a su tamaño real: cilindro de pie, de alto 1,3 × el diámetro (en m; VB.M px/cm), con aros cada 20 cm
@@ -464,7 +467,7 @@ static func deposito_px(l: float) -> Dictionary:
 
 static func deposito34(l: float) -> Image:
 	var key := "dep|" + Datos.js_num(l)
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var dp := deposito_px(l)
 	var w: int = dp.w
@@ -497,9 +500,7 @@ static func deposito34(l: float) -> Image:
 			if dentro.call(px, py, ry, ry):
 				t.P(px, py, "#5a7a98")
 	t.F(Datos.jsround(r) - 2, Datos.jsround(ry) - 1, 4, 2, "#1c1d22")
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = t.im
+	_cpon(key, t.im)
 	return t.im
 
 # una garrafa de l litros, a su tamaño real (ancho 0,7 × el alto; fondo 0,5): plástico blanco, asa y tapón con el gotero
@@ -510,7 +511,7 @@ static func garrafa_px(l: float) -> Dictionary:
 
 static func garrafa34(l: float) -> Image:
 	var key := "gar|" + Datos.js_num(l)
-	if cache.has(key):
+	if _ctiene(key):
 		return cache[key]
 	var gp := garrafa_px(l)
 	var w: int = gp.w
@@ -526,9 +527,7 @@ static func garrafa34(l: float) -> Image:
 	t.F(a, 1, 1, 3, o)
 	t.F(w - 4, 0, 3, 3, "#3a6aa8")
 	t.F(w - 4, 0, 3, 1, "#6a9ad8")
-	if cache.size() > 512:   # R7: tope
-		cache.clear()
-	cache[key] = t.im
+	_cpon(key, t.im)
 	return t.im
 
 # ---------- antialias como el del canvas (lo que no cae en píxeles enteros) ----------

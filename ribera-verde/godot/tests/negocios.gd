@@ -433,6 +433,31 @@ func _corre() -> void:
 		chk(med.cajonT.x <= 14, "taller: el armario de herramientas, de 68 cm (%s)" % [med.cajonT])
 		chk(med.lavabT.x <= 13, "taller: el lavabo, de 60 cm (%s)" % [med.lavabT])
 		chk(med.cafeM.x <= 15 and med.cafeM.y >= 28, "taller: la máquina de café, de 80 cm × 1,8 m (%s)" % [med.cafeM])
+	# Comprar hecho para revenderlo no puede dar beneficio (la auditoría de economía: con el factor de antes, comprar a Iñaki y
+	# mandarlo a Róterdam daba un +72 % sin cultivar nada). Lo comprado en un mercado lleva cp = 1 y su calidad no sube de 1,
+	# aunque lo cures, lo manicures, lo afines en el camarote y te sepas la revista entera: así no hay margen seguro.
+	var px_max := 0.0
+	for rt in D.MAR.rutas:
+		px_max = maxf(px_max, float(rt.px))
+	S.rev = {"tec": []}
+	for tc in D.REVISTA.tec:   # la revista entera aprendida: el bono de calidad, a tope
+		S.rev.tec.append(String(tc.k))
+	var b := {"g": 100.0, "thc": 20.0, "cu": 1, "mc": 1, "af": 1, "dia": S.day - 60, "cp": 1}
+	chk(absf(J.calidad(b, true) - 1.0) < 1e-6, "lo comprado hecho no gana prima de calidad: %s" % J.calidad(b, true))
+	var bx := {"g": 10.0, "thc": 60.0, "cu": 1, "cp": 1}
+	chk(absf(J.calidad(bx) - 1.0) < 1e-6, "ni las extracciones compradas: %s" % J.calidad(bx))
+	var sin_cp := {"g": 100.0, "thc": 20.0, "cu": 1, "mc": 1, "af": 1, "dia": S.day - 60}
+	chk(J.calidad(sin_cp, true) > 1.0, "lo tuyo sí la gana: %s" % J.calidad(sin_cp, true))
+	# flor: comprar al por mayor cuesta precio_mayor × f; el mejor destino del mar paga precio_mayor × px × calidad
+	var compra: float = J.precio_mayor(20.0) * float(D.MERCADO.mayor.f)
+	var ventas: Array = [J.precio_mayor(20.0) * px_max * J.calidad(b, true), J.precio_club(20.0) * J.calidad(b, true), J.precio_calle(20.0) * J.calidad(b, true)]
+	for venta in ventas:
+		chk(compra >= venta - 1e-6, "comprar flor al por mayor (%s €/g) cuesta más de lo que se saca revendiéndola (%s €/g)" % [compra, venta])
+	# extracciones: comprar a Iñaki o a la lonja y venderlas en un club o en un dispensario
+	for xt in D.MERCADO.x:
+		var cx: float = J.precio_rosin(60.0) * float(D.EXTR[xt].px) * float(D.MERCADO.mayor.fx)
+		var vx: float = J.precio_extr("ria~" + xt if xt != "rosin" else "ria", 60.0, "club") * J.calidad(bx)
+		chk(cx >= vx - 1e-6, "comprar %s al por mayor (%s €/g) cuesta más de lo que paga el club (%s €/g)" % [xt, cx, vx])
 	for x in fallos:
 		print("  FALLO ", x)
 	print("negocios: %d comprobaciones, %d fallos" % [n, fallos.size()])

@@ -245,6 +245,17 @@ func _corre() -> void:
 	chk(is_equal_approx(float(al.x.get("ar", 0)), 1.0), "mover medio lote, con su aroma")
 	J.junta_lote(al.x, 10.0, 18.0, 0, null)
 	chk(is_equal_approx(float(al.x.ar), 0.5), "juntado con otro sin él, la mitad (%s)" % [al.x])
+	# 7b · la doble cosecha en las mesas de la nave y de KAIA (los clones son la planta): rebrotan una vez, a la mitad del ciclo, y
+	# esa segunda cosecha rinde su parte; la enana sigue rindiendo menos
+	var Me := {"k": "ria", "f": {"id": 9300, "ra": ["doble"]}}
+	chk(J.mesa_rebrote(Me) and int(Me.get("rb", 0)) == 1, "la mesa de una doble rebrota (%s)" % [Me])
+	chk(is_equal_approx(Cultivo.ra_g_mesa(Me.f, Me.get("rb") != null), float(R.r.doble.g2)), "y esa segunda cosecha, su parte (%s)" % [Cultivo.ra_g_mesa(Me.f, true)])
+	chk(not J.mesa_rebrote(Me) and Me.get("rb") == null, "la segunda no rebrota y la mesa vuelve a los clones")
+	chk(not J.mesa_rebrote({"k": "ria", "f": {"id": 9301, "ra": ["enana"]}}), "una mesa sin la doble no rebrota")
+	chk(is_equal_approx(Cultivo.ra_g_mesa({"ra": ["enana"]}, true), (1 + float(R.r.enana.g)) * float(R.r.doble.g2)), "enana y rebrotada, las dos cosas")
+	Datos.CAL = false
+	chk(not J.mesa_rebrote({"k": "ria", "f": {"id": 9302, "ra": ["doble"]}}), "sin CAL, ninguna mesa rebrota")
+	Datos.CAL = true
 	# 8 · el cuaderno en la CannaDex
 	MENUS = []
 	QUIERO = ["CUADERNO DE FENOTIPOS", "Volver", "Volver"]

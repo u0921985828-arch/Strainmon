@@ -138,6 +138,7 @@ func libre(w: Dictionary) -> void:
 	w.erase("dia")
 	w.erase("mesa")
 	w.erase("loc")
+	build_ents()   # el muñeco de su puesto (el de la sala de KAIA, el navero) se va con el puesto
 
 func plantilla() -> void:
 	if staff_ok():   # MAESTRO [6]: por local
@@ -478,13 +479,25 @@ func nave_dia() -> void:
 			c.t = Datos.jsround((Me.h.t * Me.h.g + c.t * c.g) / (Me.h.g + c.g) * 10) / 10.0
 			c.g = Datos.jsround((Me.h.g + c.g) * 10) / 10.0
 		Me.h = {"g": c.g, "t": c.t, "d": S.day}
-		if N.has("bc"):   # 1.43: la mesa vuelve a empezar con su bandeja (la de antes de la 1.43, con los clones que ya tenía)
+		var rb := mesa_rebrote(Me)   # ESTUDIO tanda 2: la doble cosecha, también en las mesas
+		if N.has("bc") and not rb:   # 1.43: la mesa vuelve a empezar con su bandeja (la de antes de la 1.43, con los clones que ya tenía)
 			N.bc = N.bc.filter(func(b): return int(b.m) != int(W[i].mesa))
-		Me.p = float(D.NAVE.clon)
+		Me.p = float(D.RAREZAS.r.doble.vuelve) if rb else float(D.NAVE.clon)
 		Me.n = int(Me.get("n", 0)) + 1
 		Me.dn = 0
 		Me.am = 0
 		Me.ao = 0
+
+# ESTUDIO, tanda 2: la doble cosecha en las mesas de la nave y de KAIA (los clones son la planta): cortada la mesa, rebrota una vez
+# y el ciclo siguiente arranca a la mitad (RAREZAS.r.doble.vuelve), sin clones nuevos; esa segunda cosecha rinde su parte (g2)
+func mesa_rebrote(Me: Dictionary) -> bool:
+	if not Datos.CAL or not Cultivo.ra_f(Me.get("f"), "doble"):
+		return false
+	if Me.get("rb") != null:
+		Me.erase("rb")
+		return false
+	Me.rb = 1
+	return true
 
 # lo que va del ciclo de una mesa (0-1): Me.p o, en una mesa de antes de la 1.41 (por días), lo que llevaría desde que se plantó
 func prog_mesa(Me: Dictionary) -> float:
@@ -500,9 +513,11 @@ func cosecha_mesa(Me: Dictionary, i: int, w: Dictionary, so: float) -> Dictionar
 	var dn := maxf(1, float(Me.get("dn", 1)))
 	var am := float(Me.get("am", 0)) / dn
 	var ao := float(Me.get("ao", 0)) / dn
-	var g: float = float(F.w) * float(F.gpw) * float(strain(lot_sid(Me.k)).y) / float(D.Y_MEDIA) * float(Me.y) * nave_g(w) / float(D.NAVE.g) \
-		* (1 + float(R.rend)) * so * (1 + float(D.ABONO.rend) * am + float(D.ABONO_BIO.rend) * ao) * (1 + Cultivo.fam(S, "g")) * Cultivo.ra_g_mesa(Me.get("f"))
+	var g: float = float(F.w) * float(F.gpw) * (float(F.get("rend", 1)) if Datos.CAL else 1.0) * float(strain(lot_sid(Me.k)).y) / float(D.Y_MEDIA) * float(Me.y) * nave_g(w) / float(D.NAVE.g) \
+		* (1 + float(R.rend)) * so * (1 + float(D.ABONO.rend) * am + float(D.ABONO_BIO.rend) * ao) * (1 + Cultivo.fam(S, "g")) * Cultivo.ra_g_mesa(Me.get("f"), Me.get("rb") != null)
 	var thc: float = Me.thc * (1 + Cultivo.fam(S, "thc")) + float(F.thc) + float(R.thc) + float(D.ABONO.thc) * am + float(D.ABONO_BIO.thc) * ao + Cultivo.ra_thc(Me.get("f"))
+	if Datos.CAL:   # el mismo techo que en casa (Cultivo.thc_cosecha)
+		thc = minf(Cultivo.THC_TOPE, thc)
 	if Datos.CAL:   # MAESTRO [5]: cosechada, cuenta para su familia de la CannaDex
 		cult_apunta(lot_sid(Me.k))
 	return {"g": Datos.jsround(g * 10) / 10.0, "t": Datos.jsround(thc * 10) / 10.0}
@@ -1317,9 +1332,6 @@ func extraer(t: String):
 	sfx("get")
 	var ar := {"e": E.n, "l": lot_nombre(base_extr(k)), "r": Datos.coma(r), "t": Datos.pct(thc)}
 	await say(T("Te sale perfecto. {e} de {l}: {r} g con un {t} % de THC.", ar) if q >= 1 else T("Te sale bien, con algo de pérdida. {e} de {l}: {r} g con un {t} % de THC.", ar) if q >= .5 else T("Te sale regular: pierdes bastante. {e} de {l}: {r} g con un {t} % de THC.", ar))
-
-func una_bola(m: int) -> String:
-	return "una" if m == 1 else str(m)
 
 func talk_billar(k: String):
 	var B: Dictionary = D.BILLAR

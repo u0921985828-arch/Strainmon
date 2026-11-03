@@ -21,9 +21,6 @@ func bt() -> Dictionary:
 func bt_abierto() -> bool:
 	return Datos.CAL and S != null and D.has("BANCO_TIA") and hilo_p() >= 5
 
-func bt_visible() -> bool:
-	return bt_abierto()
-
 func bt_col(id: String) -> Dictionary:
 	for c in D.BANCO_TIA.col:
 		if c.id == id:

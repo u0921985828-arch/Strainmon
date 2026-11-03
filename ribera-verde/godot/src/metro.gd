@@ -285,8 +285,8 @@ func pisos_dia() -> void:
 func metro_ok() -> bool:
 	return Datos.CAL and D.has("METRO") and S != null
 
-func metro_ya() -> bool:
-	return metro_ok() and S.get("metro") is Dictionary
+func metro_ya() -> bool:   # abierta de verdad: la marca es el día de apertura («d»), que solo pone metro_dia
+	return metro_ok() and S.get("metro") is Dictionary and S.metro.has("d")
 
 func patrimonio() -> float:
 	var t: float = float(S.money) + float(S.get("banco", 0))
@@ -342,6 +342,8 @@ func _vale(L, rosin: bool) -> float:
 	return t
 
 func metro_d() -> Dictionary:
+	if not S.get("metro") is Dictionary:   # por si se llega aquí antes de que Hiriburu se abra: sin «d», no la abre
+		S.metro = {}
 	var M_: Dictionary = S.metro
 	if not M_.has("ter"):
 		var ter := {}
@@ -354,13 +356,6 @@ func metro_d() -> Dictionary:
 	if not M_.has("sob"):
 		M_.sob = 0
 	return M_
-
-func barrio_de(x: int, y: int) -> String:
-	for b in D.METRO.barrios:
-		var r: Array = D.METRO.barrios[b].r
-		if x >= int(r[0]) and y >= int(r[1]) and x < int(r[2]) and y < int(r[3]):
-			return b
-	return ""
 
 func control(b: String) -> int:
 	return int(metro_d().ter[b].c) if metro_ya() else 0

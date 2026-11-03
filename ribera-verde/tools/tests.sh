@@ -31,4 +31,6 @@ echo "== ciclo"; timeout 1800 "${X[@]}" "$G" --path . "${P[@]}" --fixed-fps 60 -
 for L in es en; do echo "== capturas_ui $L"; timeout 900 "${X[@]}" "$G" --path . --rendering-driver opengl3 --audio-driver Dummy --resolution 2400x1080 --script res://tests/capturas_ui.gd -- --salida "$OUT/capui-$L" --idioma $L --dpi 420 2>&1 | grep -E "^capturas_ui: |SCRIPT ERROR|Parse Error" | tail -3; done
 echo "== dialogo_lineas"; timeout 900 "${X[@]}" "$G" --path . --rendering-driver opengl3 --audio-driver Dummy --resolution 2400x1080 --script res://tests/dialogo_lineas.gd 2>&1 | grep -E "^dialogo_lineas: |^FALLO|SCRIPT ERROR|Parse Error" | tail -5
 echo "== ftue"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --fixed-fps 60 --script res://tests/ftue.gd 2>&1 | grep -E "^ftue: |^FALLO|SCRIPT ERROR|Parse Error" | tail -3
+echo "== png_opt"; (cd .. && python3 -I tools/png-opt.py --check godot/arte) 2>&1 | tail -3   # desde godot/, «..» ya es ribera-verde
+echo "== virtuales"; (cd .. && python3 -I tools/virtuales.py --check) 2>&1 | tail -3
 echo FIN_BATERIA

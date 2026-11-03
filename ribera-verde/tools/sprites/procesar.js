@@ -251,7 +251,10 @@ function buildAtlas() {
     }
   }
   fs.mkdirSync(ATLAS_DIR, { recursive: true });
-  fs.writeFileSync(path.join(ATLAS_DIR, 'atlas.png'), PNG.sync.write(atlas));
+  // El atlas viaja crudo dentro del paquete (importer="keep" en Godot), así que cada byte de más es un byte
+  // de más en la APK. pngjs comprime por defecto con Z_RLE (deflateStrategy 3), que en un atlas grande
+  // deja el archivo al doble; con la estrategia normal baja un 56 %, con los mismos píxeles.
+  fs.writeFileSync(path.join(ATLAS_DIR, 'atlas.png'), PNG.sync.write(atlas, { deflateLevel: 9, deflateStrategy: 0 }));
   fs.writeFileSync(path.join(ATLAS_DIR, 'atlas.json'), JSON.stringify({ version: 2, imagen: 'atlas.png', tamano: [W, H], frames: pos, celdas, anims, rampas, rampas_cambio, cubre, ambiente, fumador, menores }, null, 1) + '\n');
   return { n: frames.length, W, H };
 }

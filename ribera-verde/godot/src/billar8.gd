@@ -63,9 +63,6 @@ static func nueva(nb: String) -> Dictionary:
 	return {"b": b, "gr": ["", ""], "turno": 0, "mano": true, "saque": true, "ang": 0.0, "f": 0.0, "fase": "coloca",
 		"tiros": 0, "nb": nb, "ultimo": "", "anim": 0.0, "np": 0, "caen": []}
 
-static func en_mesa(V: Dictionary, n: int) -> bool:
-	return V.b[n].en
-
 static func quedan(V: Dictionary, g: String) -> int:
 	var c := 0
 	for d in V.b:

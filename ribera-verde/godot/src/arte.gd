@@ -12,6 +12,25 @@ static var rampa: Array = []
 static var cache := {}
 static var texs := {}
 
+# R7: tope por generaciones, como Atlas.tex (lo vio el usuario: destellos «pam, pam» en la casa y en el armario). Con
+# cache.clear() se soltaba de golpe lo que el fotograma estaba pintando; así, al llenarse, lo de ahora pasa a ser lo de
+# antes, lo de antes se suelta y lo que se vuelve a pedir sube otra vez a lo de ahora.
+const CACHE_TOPE := 1024
+static var cache_v := {}
+static func _cpon(k, v):
+	if cache.size() >= CACHE_TOPE:
+		cache_v = cache
+		cache = {}
+	cache[k] = v
+	return v
+static func _ctiene(k) -> bool:
+	if cache.has(k):
+		return true
+	if cache_v.has(k):
+		_cpon(k, cache_v[k])
+		return true
+	return false
+
 static func carga() -> void:
 	if img:
 		return
@@ -32,11 +51,9 @@ static func n_fotos(n: String) -> int:
 
 static func foto(n: String, i := 0) -> Image:
 	var k := "f|%s|%d" % [n, i]
-	if not cache.has(k):
+	if not _ctiene(k):
 		var r: Array = spr[n][i]
-		if cache.size() > 1024:   # R7: tope
-			cache.clear()
-		cache[k] = img.get_region(Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3])))
+		_cpon(k, img.get_region(Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3]))))
 	return cache[k]
 
 # anchos (px) de la familia de sprites «pre» + ancho, en el orden del atlas
@@ -53,7 +70,7 @@ static func anchos(pre: String) -> Array:
 # alto del dibujo: de la última fila a la primera con algo
 static func alto(im: Image) -> int:
 	var k := im.get_instance_id()
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var a := 0
 	for y in im.get_height():
@@ -65,22 +82,18 @@ static func alto(im: Image) -> int:
 		if hay_px:
 			a = im.get_height() - y
 			break
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = a
+	_cpon(k, a)
 	return a
 
 # de los fotogramas del sprite n, el más bajo que no baja de h: [alto, imagen, índice]
 static func altura(n: String, h: int) -> Array:
 	var k := "alt|" + n
-	if not cache.has(k):
+	if not _ctiene(k):
 		var L := []
 		for i in n_fotos(n):
 			L.append([alto(foto(n, i)), foto(n, i), i])
 		L.sort_custom(func(a, b): return a[0] < b[0] or (a[0] == b[0] and a[2] < b[2]))
-		if cache.size() > 1024:   # R7: tope
-			cache.clear()
-		cache[k] = L
+		_cpon(k, L)
 	for e in cache[k]:
 		if e[0] >= h:
 			return e
@@ -93,7 +106,7 @@ static func aplasta(c: Image, h: int) -> Image:
 	if h >= a:
 		return c
 	var k := "apl|%d|%d" % [c.get_instance_id(), h]
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var W := c.get_width()
 	var H := c.get_height()
@@ -125,9 +138,7 @@ static func aplasta(c: Image, h: int) -> Image:
 		if not fuera.has(s):
 			y -= 1
 			o.blit_rect(c, Rect2i(0, s, W, 1), Vector2i(0, y))
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = o
+	_cpon(k, o)
 	return o
 
 # colores exactos (#rrggbb → #rrggbb)
@@ -249,7 +260,7 @@ static func dano(im: Image, c0: Image, nivel: int, sem: int) -> Image:
 # la campana con la boca apagada: los tonos cálidos y los casi blancos (el tubo del CFL) pasan a gris oscuro
 static func apagado(c: Image) -> Image:
 	var k := "off|%d" % c.get_instance_id()
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var o: Image = c.duplicate()
 	for y in o.get_height():
@@ -258,9 +269,7 @@ static func apagado(c: Image) -> Image:
 			if p.a8 and (p.r8 > p.b8 + 40 or mini(p.r8, mini(p.g8, p.b8)) > 190):
 				var l := Datos.jsround((p.r8 * .3 + p.g8 * .59 + p.b8 * .11) * .3)
 				o.set_pixel(x, y, Color8(l, l + 2, l + 4, p.a8))
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = o
+	_cpon(k, o)
 	return o
 
 # pared o luz de la carpa: la de 240 × 160 con la pared del fondo recortada a su ancho (los laterales, con los postes del fondo, enteros)
@@ -271,7 +280,7 @@ static func luz_k(vc: Dictionary) -> float:
 static func fondo(t: String, vc: Dictionary, capa: String) -> Image:
 	var kl := luz_k(vc) if capa.begins_with("luz") else 1.0
 	var k := "vc|%s|%s" % [t, capa] + ("|%d" % vc.foco.a if kl > 1 else "")
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var s := foto("carpa-c-" + capa)
 	if kl > 1:
@@ -298,9 +307,7 @@ static func fondo(t: String, vc: Dictionary, capa: String) -> Image:
 				var p := o.get_pixel(i, y)
 				if p.a8:
 					o.set_pixel(i, y, Color8((p.r8 * (256 - kk)) >> 8, (p.g8 * (256 - kk)) >> 8, (p.b8 * (256 - kk)) >> 8, p.a8))
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = o
+	_cpon(k, o)
 	return o
 
 static func _pega(o: Image, s: Image, sx: int, w: int, dx: int) -> void:
@@ -318,7 +325,7 @@ const VC_LZ := [[198, 130, 77], [231, 150, 86], [255, 172, 82], [255, 224, 149]]
 # lleguen a las paredes de la carpa. Bajo las barras, el núcleo; con un haz, el haz; con dos o más, el resplandor; entre haces, nada
 static func luz_led(t: String, vc: Dictionary) -> Image:
 	var k := "vc|%s|luz-led|%s|%d|%d" % [t, vc.foco.n, vc.fy, vc.get("fxs", [120]).size()]
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var o: Image = fondo(t, vc, "luz-led").duplicate()
 	var fc := foto(vc.foco.n)
@@ -353,9 +360,7 @@ static func luz_led(t: String, vc: Dictionary) -> Image:
 				continue
 			var z: Array = VC_LZ[3 if y < y0 + 2 else (2 if n > 1 else 1)]
 			o.set_pixel(i, y, Color8(z[0], z[1], z[2], 255))
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = o
+	_cpon(k, o)
 	return o
 
 # la de sodio (y la del CFL) con el foco bajado (vcLuzBaja): en la pared del fondo, de la boca al pie (138), baja con él; arriba, nada
@@ -368,15 +373,13 @@ static func luz_baja(t: String, vc: Dictionary) -> Image:
 	if dy <= 0:
 		return L
 	var k := "vc|%s|luz-baja|%d|%d" % [t, vc.foco.a, vc.fy]
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var o: Image = L.duplicate()
 	o.fill_rect(Rect2i(vc.xl, y0, vc.w, y1 + 1 - y0), Color(0, 0, 0, 0))
 	if y1 + 1 - y0 - dy > 0:
 		o.blit_rect(L, Rect2i(vc.xl, y0, vc.w, y1 + 1 - y0 - dy), Vector2i(vc.xl, y0 + dy))
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = o
+	_cpon(k, o)
 	return o
 
 # de dónde cuelga la campana (vcCuelga): la primera y la última columna con algo de su fila de arriba (las cuerdas de los LED) y esa fila
@@ -384,7 +387,7 @@ const VC_CUERDA := Color8(28, 29, 34)
 const VC_POLEA := [Color8(58, 60, 68), Color8(122, 133, 132)]   # cuerpo y brillo de la rueda
 static func cuelga(c: Image) -> Array:
 	var k := "cuelga|%d" % c.get_instance_id()
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var o := [0, 0, 0]
 	for r in c.get_height():
@@ -398,9 +401,7 @@ static func cuelga(c: Image) -> Array:
 		if a >= 0:
 			o = [a, b, r]
 			break
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = o
+	_cpon(k, o)
 	return o
 
 # la luz de cada tipo de foco: la del sodio, tal cual; las demás, con su color (misma luminosidad). Los LED, de barras, la suya (luz_led)
@@ -426,7 +427,7 @@ static func luz(t: String, vc: Dictionary) -> Image:
 	if not lc.has(vc.tipo) and not Datos.CAL:
 		return L
 	var k := "vc|%s|luz|%s|%d|%d|%d|%s" % [t, vc.tipo, vc.foco.a, vc.fy, vc.get("fxs", [120]).size(), Datos.CAL]
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var o: Image = L.duplicate()
 	# con CAL, nada de luz por encima de la boca de la carpa (lo dijo el usuario: «arriba, cuando está encendido el foco, salen como
@@ -434,7 +435,7 @@ static func luz(t: String, vc: Dictionary) -> Image:
 	if Datos.CAL:
 		o.fill_rect(Rect2i(0, 0, 240, int(Datos.carga().VCA.boca)), Color(0, 0, 0, 0))
 	if not lc.has(vc.tipo):
-		cache[k] = o
+		_cpon(k, o)
 		return o
 	var c: Array = lc[vc.tipo][0]
 	var lk: float = .299 * c[0] + .587 * c[1] + .114 * c[2]
@@ -444,16 +445,14 @@ static func luz(t: String, vc: Dictionary) -> Image:
 			if p.a8:
 				var l := (.299 * p.r8 + .587 * p.g8 + .114 * p.b8) / lk
 				o.set_pixel(x, y, Color8(Datos.u8(minf(255, c[0] * l)), Datos.u8(minf(255, c[1] * l)), Datos.u8(minf(255, c[2] * l)), p.a8))
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = o
+	_cpon(k, o)
 	return o
 
 # columnas (primera y última) con algo de cada imagen
 # la primera fila con algo (alfa) de una imagen, o su alto si está vacía (1.33, filaArriba de 11j-locales: la punta de las plantas)
 static func fila_arriba(im: Image) -> int:
 	var k := "arriba|%d" % im.get_instance_id()
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var r := im.get_height()
 	for y in im.get_height():
@@ -465,14 +464,12 @@ static func fila_arriba(im: Image) -> int:
 		if hay:
 			r = y
 			break
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = r
+	_cpon(k, r)
 	return r
 
 static func caja(im: Image) -> Array:
 	var k := "caja|%d" % im.get_instance_id()
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var a := im.get_width()
 	var b := -1
@@ -481,9 +478,7 @@ static func caja(im: Image) -> Array:
 			if im.get_pixel(x, y).a8 > 0:
 				a = mini(a, x)
 				b = maxi(b, x)
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = [a, b]
+	_cpon(k, [a, b])
 	return cache[k]
 
 # el agua de la garrafa y del depósito pequeño: los píxeles «dentro» (par[0]) de las fr filas de abajo (fracción de las filas que
@@ -492,7 +487,7 @@ static func nivel(im: Image, par: Array, fr: float) -> Image:
 	var K := Datos.hexi(par[0])
 	# las filas del agua (y0, y1), una vez por imagen: se pide cada fotograma
 	var kf := "nivf|%d|%s" % [im.get_instance_id(), par[0]]
-	if not cache.has(kf):
+	if not _ctiene(kf):
 		var a := im.get_height()
 		var b := -1
 		for y in im.get_height():
@@ -501,14 +496,12 @@ static func nivel(im: Image, par: Array, fr: float) -> Image:
 				if p.a8 and ((p.r8 << 16) | (p.g8 << 8) | p.b8) == K:
 					a = mini(a, y)
 					b = maxi(b, y)
-		if cache.size() > 1024:   # R7: tope
-			cache.clear()
-		cache[kf] = [a, b]
+		_cpon(kf, [a, b])
 	var y0: int = cache[kf][0]
 	var y1: int = cache[kf][1]
 	var n := 0 if y1 < 0 else Datos.jsround((y1 - y0 + 1) * clampf(fr, 0, 1))
 	var k := "niv|%d|%d" % [im.get_instance_id(), n]
-	if cache.has(k):
+	if _ctiene(k):
 		return cache[k]
 	var A := Color.html(par[1])
 	var o: Image = im.duplicate()
@@ -517,9 +510,7 @@ static func nivel(im: Image, par: Array, fr: float) -> Image:
 			var p := o.get_pixel(x, y)
 			if p.a8 and ((p.r8 << 16) | (p.g8 << 8) | p.b8) == K:
 				o.set_pixel(x, y, Color8(A.r8, A.g8, A.b8, p.a8))
-	if cache.size() > 1024:   # R7: tope
-		cache.clear()
-	cache[k] = o
+	_cpon(k, o)
 	return o
 
 # R7: tope por generaciones, como Atlas.tex (texs.clear() soltaba las del fotograma que se estaba pintando: destellos en la carpa)

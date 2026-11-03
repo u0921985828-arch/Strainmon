@@ -131,9 +131,6 @@ func kc_pedida(ci: int) -> bool:
 	var k: Array = kc().kits
 	return ci >= 0 and ci < k.size() and int(k[ci]) > int(S.day)
 
-func kc_N() -> Dictionary:   # el nivel de las carpas
-	return D.KAIA_CULT.niv[clampi(int(S.kc.get("niv", 0)), 0, D.KAIA_CULT.niv.size() - 1)]
-
 func kc_pat(ci: int) -> Dictionary:   # el esquema de la carpa ci: {m: maceta, n: plazas}
 	var l: Array = S.kc.get("pat", []) if S.get("kc") is Dictionary else []
 	if ci >= 0 and ci < l.size() and l[ci] is Dictionary:
@@ -1591,7 +1588,7 @@ func kc_dia() -> void:
 			continue
 		var c := kc_cosecha(Me, w)
 		Me.h = {"g": c.g, "t": c.t, "d": S.day}
-		Me.p = float(D.NAVE.clon)
+		Me.p = float(D.RAREZAS.r.doble.vuelve) if mesa_rebrote(Me) else float(D.NAVE.clon)
 		Me.n = int(Me.get("n", 0)) + 1
 		Me.dn = 0
 		Me.am = 0
@@ -1602,9 +1599,10 @@ func kc_cosecha(Me: Dictionary, w: Dictionary) -> Dictionary:
 	var F: Dictionary = D.FOCO_NAVE[D.KAIA_CULT.f2.foco]
 	var dn := maxf(1, float(Me.get("dn", 1)))
 	var am := float(Me.get("am", 0)) / dn
-	var g: float = float(F.w) * float(F.gpw) * float(strain(lot_sid(Me.k)).y) / float(D.Y_MEDIA) * float(Me.y) * nave_g(w) / float(D.NAVE.g) \
-		* (1 + float(D.ABONO.rend) * am) * (1 + Cultivo.fam(S, "g")) * Cultivo.ra_g_mesa(Me.get("f"))
+	var g: float = float(F.w) * float(F.gpw) * float(F.get("rend", 1)) * float(strain(lot_sid(Me.k)).y) / float(D.Y_MEDIA) * float(Me.y) * nave_g(w) / float(D.NAVE.g) \
+		* (1 + float(D.ABONO.rend) * am) * (1 + Cultivo.fam(S, "g")) * Cultivo.ra_g_mesa(Me.get("f"), Me.get("rb") != null)
 	var thc: float = Me.thc * (1 + Cultivo.fam(S, "thc")) + float(F.thc) + float(D.ABONO.thc) * am + Cultivo.ra_thc(Me.get("f"))
+	thc = minf(Cultivo.THC_TOPE, thc)   # el mismo techo que en casa y en la nave
 	cult_apunta(lot_sid(Me.k))
 	return {"g": Datos.jsround(g * 10) / 10.0, "t": Datos.jsround(thc * 10) / 10.0}
 

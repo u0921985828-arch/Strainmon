@@ -362,7 +362,7 @@ func pagar_casa(e: float) -> float:
 func mover_lote(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
 	var b: Dictionary = de[k]
 	if a.has(k):
-		junta_lote(a[k], g, b.thc, b.get("cu", 0), b.get("dia"), b.get("mc", 0), b.get("af", 0), b.get("ar", 0))
+		junta_lote(a[k], g, b.thc, b.get("cu", 0), b.get("dia"), b.get("mc", 0), b.get("af", 0), b.get("ar", 0), b.get("cp", 0))
 	else:
 		a[k] = {"g": g, "thc": b.thc}
 		a[k].merge(cura_de(b))
@@ -376,6 +376,11 @@ func mover_rosin(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
 	if a.has(k):
 		var t: Dictionary = a[k]
 		var c: float = (float(t.get("cu", 0)) * t.g + float(b.get("cu", 0)) * g) / (t.g + g)   # 1.36: con lo curado en la nevera
+		var xc: float = (float(t.get("cp", 0)) * t.g + float(b.get("cp", 0)) * g) / (t.g + g)   # y con la parte comprada hecha
+		if xc:
+			t.cp = xc
+		else:
+			t.erase("cp")
 		t.thc = (t.thc * t.g + b.thc * g) / (t.g + g)
 		t.g = Datos.jsround((t.g + g) * 10) / 10.0
 		if c:
@@ -386,6 +391,8 @@ func mover_rosin(de: Dictionary, a: Dictionary, k: String, g: float) -> void:
 		a[k] = {"g": g, "thc": b.thc}
 		if b.get("cu"):
 			a[k].cu = b.cu
+		if b.get("cp"):
+			a[k].cp = b.cp
 	b.g = Datos.jsround((b.g - g) * 10) / 10.0
 	if b.g < .1:
 		de.erase(k)
@@ -425,14 +432,14 @@ func lot_nombre(k: String) -> String:
 	return strain(lot_sid(k)).n + (" ★" if k.contains("*") else "") + (T(" (rara)") if k.get_slice("~", 0).ends_with("!") else "")
 
 # L: otro sitio (la caja fuerte); cu y dia: el curado y el día de la cosecha (1.29; sin dar dia, hoy; dia null, sin día, como los de antes)
-func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 0, ar = 0.0) -> void:
+func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 0, ar = 0.0, cp = 0) -> void:
 	if L == null:
 		L = S.buds
 	if dia != null and float(dia) < 0:
 		dia = S.day
 	if L.has(k):
 		var b: Dictionary = L[k]
-		junta_lote(b, g, thc, cu, dia, mc, 0, ar)
+		junta_lote(b, g, thc, cu, dia, mc, 0, ar, cp)
 		b.erase("cata")   # 1.15: lo que entra nuevo no está catado ni analizado
 		b.erase("ana")
 	else:
@@ -445,6 +452,8 @@ func add_buds(k: String, g: float, thc: float, L = null, cu = 0, dia = -1, mc = 
 			L[k].mc = mc
 		if ar:   # ESTUDIO, tanda 2: la parte de aroma único
 			L[k].ar = ar
+		if cp:   # lo comprado hecho en un mercado: su parte no gana prima de calidad (abajo, calidad)
+			L[k].cp = cp
 		if k.ends_with("!"):
 			L[k].sh = 1
 	discover(lot_sid(k))
@@ -466,6 +475,10 @@ func calidad(b: Dictionary, flor := false) -> float:
 		q *= float(D.OLOR_NAVE.oz_q)
 	if Datos.CAL:   # EL ESQUEJE (revista.gd): el lavado de raíces, el secado lento y el curado en tarro
 		q *= 1 + Cultivo.rev_bono(S, "cal")
+	# lo comprado hecho (cp, la parte comprada en un mercado) ya viene curado y manicurado: su parte se vende a lo que vale, sin
+	# prima, para que comprar al por mayor y revender no dé un margen seguro (arbitraje)
+	if Datos.CAL and float(b.get("cp", 0)) > 0:
+		q = 1 + (q - 1) * (1 - minf(1, float(b.cp)))
 	return q
 
 # recién cortada, VERDE.min; seca del todo a los VERDE.dias; y lo curado, VERDE.semana más por semana (hasta VERDE.semanas)
@@ -491,10 +504,17 @@ func cura_de(b: Dictionary) -> Dictionary:
 		o.af = b.af
 	if b.get("sh"):
 		o.sh = b.sh
+	if b.get("cp"):
+		o.cp = b.cp
 	return o
 
-func junta_lote(t: Dictionary, g: float, thc: float, cu, dia, mc = 0, af = 0, ar = 0) -> void:
+func junta_lote(t: Dictionary, g: float, thc: float, cu, dia, mc = 0, af = 0, ar = 0, cp = 0) -> void:
 	var nn: float = t.g + g
+	var xc: float = (float(t.get("cp", 0)) * t.g + float(cp if cp else 0) * g) / nn   # la parte comprada hecha, por gramos
+	if xc:
+		t.cp = xc
+	else:
+		t.erase("cp")
 	var xa: float = (float(t.get("ar", 0)) * t.g + float(ar if ar else 0) * g) / nn   # ESTUDIO, tanda 2: lo de aroma único, por gramos
 	if xa:
 		t.ar = xa
@@ -672,9 +692,14 @@ func total_rosin() -> float:
 		t += S.rosin[k].g
 	return t
 
-func add_rosin(k: String, g: float, thc: float) -> void:
+func add_rosin(k: String, g: float, thc: float, cp = 0) -> void:
 	if S.rosin.has(k):
 		var b: Dictionary = S.rosin[k]
+		var xc: float = (float(b.get("cp", 0)) * b.g + float(cp if cp else 0) * g) / (b.g + g)
+		if xc:
+			b.cp = xc
+		else:
+			b.erase("cp")
 		if b.get("cu"):
 			b.cu = b.cu * b.g / (b.g + g)
 			if not b.cu:
@@ -683,6 +708,8 @@ func add_rosin(k: String, g: float, thc: float) -> void:
 		b.g = Datos.jsround((b.g + g) * 10) / 10.0
 	else:
 		S.rosin[k] = {"g": g, "thc": thc}
+		if cp:
+			S.rosin[k].cp = cp
 
 func use_rosin(k: String, g: float) -> void:
 	var b: Dictionary = S.rosin[k]
@@ -1431,9 +1458,6 @@ func grupo_pj():
 func es_chica() -> bool:
 	return Datos.CAL and S != null and S.get("sexo") == "f"
 
-func es_chico() -> bool:   # solo si lo eligió (las partidas de antes no tienen sexo: sin pasiva)
-	return Datos.CAL and S != null and S.get("sexo") == "m"
-
 # las casillas que ve una patrulla (de día o de noche; persiguiéndote, el doble)
 func vista_pat(caza := false) -> int:
 	var v := int(float(D.PAT.vista[0 if caza else (1 if is_night() else 0)]) * (2 if caza else 1))
@@ -1794,6 +1818,8 @@ func npc_talk(d: Dictionary) -> void:
 			await say(pick([K("Las casas son de colores para que cada pescador viera la suya desde el mar."), K("Dicen que en este puerto se paga bien... y que la policía mira poco."), K("He venido a por anchoas y me han ofrecido de todo.")]), K("TURISTA"))
 		"obrero":
 			await say(pick([K("La fundición cerró hace años. Ahora el solar es del chatarrero."), K("Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera."), K("De Valdehierro a Ribera Verde, veinte minutos de autobús.")]), K("OBRERO"))
+		_:   # salida por defecto: un muñeco que se queda en pantalla hasta el próximo build_ents (p. ej. el de KAIA al cambiarle el
+			await say(K("Hoy no toca aquí."))   # puesto desde la PLANTILLA) no se queda mudo, sin pitido y sin texto
 
 func mk_ent(d: Dictionary) -> Dictionary:
 	var look = d.get("lookObj")
@@ -2408,13 +2434,13 @@ var FUMAR := {
 
 const NO_FUMAR := ["bar", "disco", "disco-vip", "shop", "growcity"]
 
-func talk_vip(_i: int) -> void:   # trama (1.47)
+func talk_vip(_i: int) -> void:   # trama (1.47)   → nave.gd
 	pass
 
-func talk_estanco(_k: String) -> void:   # trama (1.47)
+func talk_estanco(_k: String) -> void:   # trama (1.47)   → trama.gd
 	pass
 
-func marca_cata(_k: String, _r: bool, _sid: String, _thc: float) -> void:   # trama (1.47)
+func marca_cata(_k: String, _r: bool, _sid: String, _thc: float) -> void:   # trama (1.47)   → movil.gd
 	pass
 
 # ---------- clientes y venta (10-calle) ----------
@@ -2443,180 +2469,172 @@ static func _hash_t(x: int, y: int) -> int:
 	return (a * a + x * 7 + y * 3) % 9973
 
 # ---------- virtuales: las definen granja, trama y juego ----------
-func check_story():
+func check_story():   # → trama.gd
 	pass
 
-func revisa_misiones() -> void:
+func revisa_misiones() -> void:   # → trama.gd
 	pass
 
-func talk_kiko():
+func talk_kiko():   # → trama.gd
 	pass
 
-func talk_julen():
+func talk_julen():   # → trama.gd
 	pass
 
-func itin_ok(_id: String) -> bool:
-	return false
-
-func talk_ane():
+func talk_ane():   # → trama.gd
 	pass
 
-func talk_nerea():
+func talk_nerea():   # → trama.gd
 	pass
 
-func talk_bixente():
+func talk_bixente():   # → trama.gd
 	pass
 
-func talk_andoni():
+func talk_andoni():   # → trama.gd
 	pass
 
-func extraer(_t: String):
+func extraer(_t: String):   # → venta.gd
 	pass
 
-func talk_nave():
+func talk_nave():   # → venta.gd
 	pass
 
-func talk_txomin():
+func talk_txomin():   # → setas.gd
 	pass
 
-func setas_dia():
+func setas_dia():   # → setas.gd
 	pass
 
-func talk_miren():
+func talk_miren():   # → trama.gd
 	pass
 
-func talk_josune():
+func talk_josune():   # → trama.gd
 	pass
 
-func talk_baltasar():
+func talk_baltasar():   # → trama.gd
 	pass
 
-func talk_patxi():
+func talk_patxi():   # → trama.gd
 	pass
 
-func talk_txaro():
+func talk_txaro():   # → trama.gd
 	pass
 
 func talk_sec(_id: String) -> void:   # 1.51 (trama.gd)
 	pass
 
-func talk_koldo() -> void:   # 1.51 (trama.gd)
+func talk_koldo() -> void:   # 1.51 (trama.gd)   → eventos.gd
 	pass
 
-func talk_gorka() -> void:   # 1.51 (trama.gd)
+func talk_gorka() -> void:   # 1.51 (trama.gd)   → eventos.gd
 	pass
 
-func talk_setero() -> void:   # 1.51 (trama.gd)
+func talk_setero() -> void:   # 1.51 (trama.gd)   → setas.gd
 	pass
 
-func sec_estado(_id: String) -> int:
+func sec_estado(_id: String) -> int:   # → trama.gd
 	return 0
 
-func talk_inaki():
+func talk_inaki():   # → trama.gd
 	pass
 
-func talk_cop():
+func talk_cop():   # → trama.gd
 	pass
 
-func talk_darko():
+func talk_darko():   # → trama.gd
 	pass
 
-func talk_molina():
+func talk_molina():   # → trama.gd
 	pass
 
-func talk_jurado():
+func talk_jurado():   # → trama.gd
 	pass
 
-func talk_tono_almacen():
+func talk_tono_almacen():   # → policia.gd
 	pass
 
-func diploma_action():
+func diploma_action():   # → policia.gd
 	pass
 
-func instalar_caja():
+func instalar_caja():   # → policia.gd
 	pass
 
-func vencer_encargo():
+func vencer_encargo():   # → policia.gd
 	pass
 
-func robo_darko():
+func robo_darko():   # → policia.gd
 	pass
 
-func recibir_envio():
+func recibir_envio():   # → movil.gd
 	pass
 
-func talk_begona():
+func talk_begona():   # → movil.gd
 	pass
 
-func talk_club(_k):
+func talk_club(_k):   # → movil.gd
 	pass
 
 # la asociación (1.32, trama.gd)
-func delroy_aqui() -> bool:
+func delroy_aqui() -> bool:   # → nave.gd
 	return false
 
-func talk_delroy():
+func talk_delroy():   # → nave.gd
 	pass
 
 # los locales (1.30, trama.gd)
-func naveros() -> Array:
-	return []
 
-func navero_de(_i: int):
+func navero_de(_i: int):   # → venta.gd
 	return null
 
-func nave_vista() -> void:
+func nave_vista() -> void:   # → venta.gd
 	pass
 
-func entra_local(_d):
+func entra_local(_d):   # → venta.gd
 	pass
 
-func advance_time(_mn: int) -> void:   # granja (1.47: fumar sentado)
+func advance_time(_mn: int) -> void:   # granja (1.47: fumar sentado)   → granja.gd
 	pass
 
-func obj_local(_x: int, _y: int, _o) -> bool:
+func obj_local(_x: int, _y: int, _o) -> bool:   # → venta.gd
 	return false
 
-func disco_abierta() -> bool:
+func disco_abierta() -> bool:   # → trama.gd
 	return false
 
-func echar_disco():
+func echar_disco():   # → nave.gd
 	pass
 
-func talk_socio(_k):
+func talk_socio(_k):   # → venta.gd
 	pass
 
-func talk_billar(_k):
+func talk_billar(_k):   # → venta.gd
 	pass
 
-func talk_navero(_i):
+func talk_navero(_i):   # → nave.gd
 	pass
 
-func cuida_madres():
+func cuida_madres():   # → nave.gd
 	return null
 
 func sprite_local(o: String) -> String:
 	return o
 
-func bandejas_balda(_x: int) -> Array:
-	return []
-
-func talk_madres():
+func talk_madres():   # → nave.gd
 	pass
 
-func talk_conce():   # trama (1.43)
+func talk_conce():   # trama (1.43)   → eventos.gd
 	pass
 
-func coches_mios() -> Array:
+func coches_mios() -> Array:   # → eventos.gd
 	return []
 
-func conducir(_k):
+func conducir(_k):   # → eventos.gd
 	pass
 
 func volante_llega(_w: Dictionary):   # con CAL, en eventos.gd
 	return null
 
-func volante_fin(_vo: Dictionary) -> void:
+func volante_fin(_vo: Dictionary) -> void:   # → eventos.gd
 	pass
 
 func coche_menu(_k: String):   # MAESTRO [3], en eventos.gd
@@ -2634,112 +2652,109 @@ func maletero(_k: String) -> void:   # MAESTRO [3], en eventos.gd
 func montar_aparcamiento(_mapa: String) -> void:   # MAESTRO [3], en calle.gd
 	pass
 
-func llegada_parque(_mapa: String, _k: String) -> Array:   # MAESTRO [3], en calle.gd
-	return []
-
 func montar_garaje(_mapa: String) -> void:   # MAESTRO [3], en calle.gd
 	pass
 
-func seguro_anio(_k) -> int:
+func seguro_anio(_k) -> int:   # → eventos.gd
 	return 0
 
-func conce_dia() -> void:
+func conce_dia() -> void:   # → eventos.gd
 	pass
 
-func talk_gente_club(_k, _j):
+func talk_gente_club(_k, _j):   # → venta.gd
 	pass
 
-func talk_presi(_k):
+func talk_presi(_k):   # → movil.gd
 	pass
 
-func talk_gorila():
+func talk_gorila():   # → nave.gd
 	pass
 
-func talk_barra():
+func talk_barra():   # → nave.gd
 	pass
 
-func talk_dj():
+func talk_dj():   # → nave.gd
 	pass
 
-func talk_rrpp():
+func talk_rrpp():   # → nave.gd
 	pass
 
-func talk_baila(_i):
+func talk_baila(_i):   # → nave.gd
 	pass
 
-func curro_dia():
+func curro_dia():   # → movil.gd
 	pass
 
-func vencer_encargo_club():
+func vencer_encargo_club():   # → movil.gd
 	pass
 
-func notas_tia():
+func notas_tia():   # → policia.gd
 	pass
 
-func pedir_caja():
+func pedir_caja():   # → policia.gd
 	pass
 
-func cajero():
+func cajero():   # → granja.gd
 	pass
 
-func rotulo_local(_k):
+func rotulo_local(_k):   # → granja.gd
 	pass
 
-func local_de(_m: String, _x: int, _y: int) -> String:
+func local_de(_m: String, _x: int, _y: int) -> String:   # → granja.gd
 	return ""
 
-func battle(_kind):
+func battle(_kind):   # → policia.gd
 	pass
 
-func rival_venta(_z):
+func rival_venta(_z):   # → movil.gd
 	pass
 
-func recetario():
+func recetario():   # → menus.gd
 	pass
 
-func start_menu():
+func start_menu():   # → menus.gd
 	pass
 
-func movil_menu():
+func movil_menu():   # → movil.gd
 	pass
 
-func mueble_action(_k):
+func mueble_action(_k):   # → granja.gd
 	pass
 
-func abrir_carpa(_ci):
+func abrir_carpa(_ci):   # → granja.gd
 	pass
 
-func bed_action(_txt := ""):
+func bed_action(_txt := ""):   # → granja.gd
 	pass
 
-func pc_action():
+func pc_action():   # → granja.gd
 	pass
 
-func lab_action():
+func lab_action():   # → granja.gd
 	pass
 
-func mueble_extr(_o: String):   # 1.36, en trama.gd
+func mueble_extr(_o: String):   # 1.36, en trama.gd   → setas.gd
 	pass
 
-func manicura_action():
+func manicura_action():   # → setas.gd
 	pass
 
-func nevera_action():
+func nevera_action():   # → setas.gd
 	pass
 
-func camarote_action():   # 1.43.6, en trama.gd
+func camarote_action():   # 1.43.6, en trama.gd   → setas.gd
 	pass
 
 func talk_neg(_k: String):   # 1.45, en granja.gd
 	pass
 
-func letter_action():
+func letter_action():   # → granja.gd
 	pass
 
-func parada_action():
+func parada_action():   # → granja.gd
 	pass
 
-func title_press(_b):
+func title_press(_b):   # → juego.gd
 	pass
 
 # ---------- ordenar la casa, la asociación y la nave (1.37, 12d-orden) ----------
@@ -2753,77 +2768,72 @@ var RIEGO_CACHE = null
 
 const DIRS_ORDEN := [[0, 1], [-1, 0], [1, 0], [0, -1]]
 
-func ordenar(_mapa: String) -> void:   # trama
+func ordenar(_mapa: String) -> void:   # trama   → setas.gd
 	pass
 
-func acceso(_k: String, _c := "", _ok := true) -> void:   # trama (1.53)
+func acceso(_k: String, _c := "", _ok := true) -> void:   # trama (1.53)   → eventos.gd
 	pass
 
 const GESTO_DE := {"regar": "regar", "plantar": "plantar", "sembrar": "sembrar", "cosechar": "cosechar", "cruzar": "polen", "vender": "vender"}   # accion() → gesto (1.54)
 
-func gesto(_k: String, _o := {}) -> void:   # trama (1.54)
+func gesto(_k: String, _o := {}) -> void:   # trama (1.54)   → eventos.gd
 	pass
 
 # la planta (S.pots[i]) o la variedad (sid) del próximo gesto: sale tal como es (tamaño, fase, colores, daños) o con sus colores
 var gesto_p = null
 var gesto_sid := ""
 
-func cifras_acceso(_k: String) -> String:   # trama
+func cifras_acceso(_k: String) -> String:   # trama   → eventos.gd
 	return ""
 
 # F8: lo que vive en los módulos de después de la cadena (calle), declarado aquí para quien lo llama antes
-func accion(nn: String, vf = null) -> void:
+
+func alarma(e: Dictionary) -> void:   # → calle.gd
 	pass
 
-func alarma(e: Dictionary) -> void:
+func aplica_orden(mapa: String) -> void:   # → calle.gd
 	pass
 
-func aplica_orden(mapa: String) -> void:
-	pass
-
-func celdas_p(P_: Dictionary, x: int, y: int) -> Array:
+func celdas_p(P_: Dictionary, x: int, y: int) -> Array:   # → calle.gd
 	return []
 
-func coloca_gente(mapa: String) -> void:
+func coloca_gente(mapa: String) -> void:   # → calle.gd
 	pass
 
-func delante() -> Array:
+func delante() -> Array:   # → calle.gd
 	return []
 
-func gente_p(P_: Dictionary, x: int, y: int) -> Array:
+func gente_p(P_: Dictionary, x: int, y: int) -> Array:   # → calle.gd
 	return []
 
-func heat_warn() -> void:
+func heat_warn() -> void:   # → calle.gd
 	pass
 
-func montar_club(mapa: String) -> void:
+func montar_club(mapa: String) -> void:   # → calle.gd
 	pass
 
-func pieza_de(mapa: String, k: String) -> Dictionary:
+func pieza_de(mapa: String, k: String) -> Dictionary:   # → calle.gd
 	return {}
 
-func piezas_ya(mapa: String) -> Array:
+func piezas_ya(mapa: String) -> Array:   # → calle.gd
 	return []
 
-func pisable(m: Dictionary, x: int, y: int) -> bool:
+func pisable(m: Dictionary, x: int, y: int) -> bool:   # → calle.gd
 	return false
 
-func pon_patrullas() -> void:
+func pon_patrullas() -> void:   # → calle.gd
 	pass
 
-func pos_mesa(i: int) -> Array:
+func pos_mesa(i: int) -> Array:   # → calle.gd
 	return []
 
-func pos_pieza(mapa: String, k: String) -> Array:
+func pos_pieza(mapa: String, k: String) -> Array:   # → calle.gd
 	return []
 
-func quita_orden(mapa: String) -> void:
+func quita_orden(mapa: String) -> void:   # → calle.gd
 	pass
 
-func reset_sosp() -> void:
-	pass
-
-func sosp_hud():
+func reset_sosp() -> void:   # → calle.gd
 	pass
 
 func montar_campo(_mapa: String) -> void:   # MAESTRO [4], en campo.gd
@@ -2877,52 +2887,52 @@ func huerta_tienda() -> void:   # en campo.gd
 	pass
 
 # MAESTRO [6], en gestion.gd
-func staff_ok() -> bool:
+func staff_ok() -> bool:   # → gestion.gd
 	return false
 
 func lealtad(w: Dictionary) -> int:
 	return int(w.lea)
 
-func pon_lealtad(_w: Dictionary, _v: int) -> void:
+func pon_lealtad(_w: Dictionary, _v: int) -> void:   # → gestion.gd
 	pass
 
-func eficiencia(_w: Dictionary) -> int:
+func eficiencia(_w: Dictionary) -> int:   # → gestion.gd
 	return 0
 
-func tira_topo(_w: Dictionary, _tag: String) -> void:
+func tira_topo(_w: Dictionary, _tag: String) -> void:   # → gestion.gd
 	pass
 
-func staff_dia() -> void:
+func staff_dia() -> void:   # → gestion.gd
 	pass
 
-func contable_dia() -> void:
+func contable_dia() -> void:   # → gestion.gd
 	pass
 
-func robos_dia() -> void:
+func robos_dia() -> void:   # → gestion.gd
 	pass
 
-func carbon_dia() -> void:
+func carbon_dia() -> void:   # → gestion.gd
 	pass
 
-func olor_nave() -> float:
-	return float(D.EXTR_NAVE[int(S.nave.ex)].olor)
+func olor_nave() -> float:   # lo de verdad, en gestion.gd; aquí solo el hueco de la cadena
+	return 1.0
 
 func chivato_nave() -> float:
 	return 1.0
 
-func seg_tiene(_k: String, _it: String) -> bool:
+func seg_tiene(_k: String, _it: String) -> bool:   # → gestion.gd
 	return false
 
-func ops_staff(_w: Dictionary) -> Array:
+func ops_staff(_w: Dictionary) -> Array:   # → gestion.gd
 	return []
 
-func staff_op(_w: Dictionary, _op: String) -> bool:
+func staff_op(_w: Dictionary, _op: String) -> bool:   # → gestion.gd
 	return false
 
-func plantilla_locales() -> void:
+func plantilla_locales() -> void:   # → gestion.gd
 	pass
 
-func panel_club(_id: String, _N: String) -> void:
+func panel_club(_id: String, _N: String) -> void:   # → gestion.gd
 	pass
 
 func kaia_estilo() -> String:   # eventos
@@ -2931,26 +2941,26 @@ func kaia_estilo() -> String:   # eventos
 func carbon(_N: Dictionary) -> float:
 	return 100.0
 
-func olor_txt() -> String:
+func olor_txt() -> String:   # → gestion.gd
 	return ""
 
-func olor_menu() -> void:
+func olor_menu() -> void:   # → gestion.gd
 	pass
 
-func seguridad_menu() -> void:
+func seguridad_menu() -> void:   # → gestion.gd
 	pass
 
-func seguridad_local(_k: String) -> void:
+func seguridad_local(_k: String) -> void:   # → gestion.gd
 	pass
 
-func monitores() -> void:
+func monitores() -> void:   # → gestion.gd
 	pass
 
 # MAESTRO [7], en vida.gd
-func cal_saludo(_c: Dictionary, _N: String) -> bool:
+func cal_saludo(_c: Dictionary, _N: String) -> bool:   # → vida.gd
 	return false
 
-func cal_busco(_c: Dictionary) -> String:
+func cal_busco(_c: Dictionary) -> String:   # → vida.gd
 	return ""
 
 func cal_precio(_c: Dictionary, _sid: String, _b: Dictionary) -> float:
@@ -2959,85 +2969,85 @@ func cal_precio(_c: Dictionary, _sid: String, _b: Dictionary) -> float:
 func cal_acc(_c: Dictionary, _sid: String, _b: Dictionary, _j: int, acc: float) -> float:
 	return acc
 
-func cal_frase(_k: String, _c: Dictionary) -> String:
+func cal_frase(_k: String, _c: Dictionary) -> String:   # → vida.gd
 	return ""
 
-func cal_vendido(_c: Dictionary, _sid: String, _b: Dictionary, _N: String) -> void:
+func cal_vendido(_c: Dictionary, _sid: String, _b: Dictionary, _N: String) -> void:   # → vida.gd
 	pass
 
-func cal_fiar(_c: Dictionary, _e: int) -> int:
+func cal_fiar(_c: Dictionary, _e: int) -> int:   # → vida.gd
 	return 0
 
-func cal_charla(_e) -> void:
+func cal_charla(_e) -> void:   # → vida.gd
 	pass
 
 func carta(bb: String) -> Array:
 	return BEBIDAS[bb]
 
-func arma_rival() -> void:
+func arma_rival() -> void:   # → vida.gd
 	pass
 
 func mod_comb() -> Dictionary:
 	return {"acc": 0.0, "esq": 0.0, "huir": 0.0, "recibe": 1.0}
 
-func facil_combate() -> void:
+func facil_combate() -> void:   # → vida.gd
 	pass
 
-func aviso_colocon() -> void:
+func aviso_colocon() -> void:   # → vida.gd
 	pass
 
-func aturdido() -> bool:
+func aturdido() -> bool:   # → vida.gd
 	return false
 
-func recibe_txt() -> String:
+func recibe_txt() -> String:   # → vida.gd
 	return ""
 
-func corte() -> void:
+func corte() -> void:   # → vida.gd
 	pass
 
-func golpe_txt(_mv: String) -> String:
+func golpe_txt(_mv: String) -> String:   # → vida.gd
 	return ""
 
-func arma_d() -> int:
+func arma_d() -> int:   # → vida.gd
 	return 0
 
-func tras_golpe() -> void:
+func tras_golpe() -> void:   # → vida.gd
 	pass
 
-func sangra_tick() -> void:
+func sangra_tick() -> void:   # → vida.gd
 	pass
 
 func filtra_tienda(list: Array, _F: Dictionary) -> Dictionary:
 	return {"filas": [], "list": list}
 
-func marca_de(_it: Dictionary) -> String:
+func marca_de(_it: Dictionary) -> String:   # → vida.gd
 	return ""
 
-func armas_venta() -> Array:
+func armas_venta() -> Array:   # → vida.gd
 	return []
 
-func cal_llamar_filas() -> Array:
+func cal_llamar_filas() -> Array:   # → vida.gd
 	return []
 
-func entrega_encargo(_E: Dictionary) -> void:
+func entrega_encargo(_E: Dictionary) -> void:   # → vida.gd
 	pass
 
-func gusto_txt(_id: String) -> String:
+func gusto_txt(_id: String) -> String:   # → vida.gd
 	return ""
 
-func arq_txt(_a: String) -> String:
+func arq_txt(_a: String) -> String:   # → vida.gd
 	return ""
 
-func arq_de(_c: Dictionary) -> String:
+func arq_de(_c: Dictionary) -> String:   # → vida.gd
 	return ""
 
-func fiados() -> Array:
+func fiados() -> Array:   # → vida.gd
 	return []
 
-func deudas() -> void:
+func deudas() -> void:   # → vida.gd
 	pass
 
-func vida_dia() -> void:
+func vida_dia() -> void:   # → vida.gd
 	pass
 
 func navc_action():   # MAESTRO [8], en setas.gd
@@ -3047,208 +3057,200 @@ func caja_desp():   # MAESTRO [8], en nave.gd
 	pass
 
 # MAESTRO [9], en metro.gd
-func pisos_ok() -> bool:
+func pisos_ok() -> bool:   # → metro.gd
 	return false
 
-func pisos() -> void:
+func pisos() -> void:   # → metro.gd
 	pass
 
-func pisos_dia() -> void:
+func pisos_dia() -> void:   # → metro.gd
 	pass
 
-func metro_ya() -> bool:
+func metro_ya() -> bool:   # → metro.gd
 	return false
 
-func metro_dia() -> void:
+func metro_dia() -> void:   # → metro.gd
 	pass
 
-func metro_npcs(_mapa: String) -> Array:
+func metro_npcs(_mapa: String) -> Array:   # → metro.gd
 	return []
 
-func talk_metro(_id: String) -> void:
+func talk_metro(_id: String) -> void:   # → metro.gd
 	pass
 
-func vip_puerta(_k: String) -> bool:
+func vip_puerta(_k: String) -> bool:   # → metro.gd
 	return true
 
-func obj_vip(_o) -> bool:
+func obj_vip(_o) -> bool:   # → metro.gd
 	return false
 
-func metro_llegada() -> void:
+func metro_llegada() -> void:   # → metro.gd
 	pass
 
 func piso_n(k: String) -> String:
 	return k
 
-func look_rival(_R: Dictionary) -> Dictionary:
+func look_rival(_R: Dictionary) -> Dictionary:   # → movil.gd
 	return {}
 
 func cult_apunta(_sid: String) -> void:   # MAESTRO [5], en copa.gd
 	pass
 
-func cup_hoy() -> bool:
+func cup_hoy() -> bool:   # → copa.gd
 	return false
 
-func talk_cup() -> void:
+func talk_cup() -> void:   # → copa.gd
 	pass
 
-func cup_aviso() -> void:
+func cup_aviso() -> void:   # → copa.gd
 	pass
 
-func cup_marcas() -> Array:
+func cup_marcas() -> Array:   # → copa.gd
 	return []
 
-func energia_dia(_av: Array) -> void:
+func energia_dia(_av: Array) -> void:   # → copa.gd
 	pass
 
-func energia_tienda() -> void:
+func energia_tienda() -> void:   # → copa.gd
 	pass
 
-func fam_menu() -> void:
+func fam_menu() -> void:   # → copa.gd
 	pass
 
 func fam_cuenta() -> Array:
 	return [0, 0]
 
-func fam_bono_txt(_F: Dictionary) -> String:
+func fam_bono_txt(_F: Dictionary) -> String:   # → copa.gd
 	return ""
 
-func cup_trofeos() -> Array:
+func cup_trofeos() -> Array:   # → copa.gd
 	return []
 
 # Bilbao por dentro (ciudad.gd)
-func entra_ciudad(_t: String) -> bool:
+func entra_ciudad(_t: String) -> bool:   # → ciudad.gd
 	return true
 
-func ciudad_abierta(_t: String) -> bool:
+func ciudad_abierta(_t: String) -> bool:   # → ciudad.gd
 	return true
 
-func obj_ciudad(_o) -> bool:
+func obj_ciudad(_o) -> bool:   # → ciudad.gd
 	return false
 
-func ciudad_cerrada() -> bool:
+func ciudad_cerrada() -> bool:   # → ciudad.gd
 	return false
 
-func echar_ciudad() -> void:
+func echar_ciudad() -> void:   # → ciudad.gd
 	pass
 
-func talk_ciudad(_id: String) -> void:
+func talk_ciudad(_id: String) -> void:   # → ciudad.gd
 	pass
 
-func ciudad_npcs(_mapa: String) -> Array:
+func ciudad_npcs(_mapa: String) -> Array:   # → ciudad.gd
 	return []
 
-func funcion_teatro() -> void:
+func funcion_teatro() -> void:   # → ciudad.gd
 	pass
 
-func rato_iglesia() -> void:
+func rato_iglesia() -> void:   # → ciudad.gd
 	pass
 
 # el cuaderno azul de la tía (hilo.gd)
-func hilo_talk(_id: String) -> bool:
+func hilo_talk(_id: String) -> bool:   # → hilo.gd
 	return false
 
-func hilo_dia() -> void:
+func hilo_dia() -> void:   # → hilo.gd
 	pass
 
 # EL ESQUEJE, la revista mensual (revista.gd)
-func rev_dia() -> void:
+func rev_dia() -> void:   # → revista.gd
 	pass
 
-func rev_hay() -> bool:
+func rev_hay() -> bool:   # → revista.gd
 	return false
 
-func rev_compra(_donde := "prensa") -> void:   # i18n-no
+func rev_compra(_donde := "prensa") -> void:   # i18n-no   → revista.gd
 	pass
 
-func rev_menu() -> void:
+func rev_menu() -> void:   # → revista.gd
 	pass
 
-func rev_ficha() -> String:
+func rev_ficha() -> String:   # → revista.gd
 	return ""
 
-func rev_num(_dia := -1) -> int:
+func rev_num(_dia := -1) -> int:   # → revista.gd
 	return 0
-func rev() -> Dictionary:
+func rev() -> Dictionary:   # → revista.gd
 	return {}
-func rev_precio(_donde := "prensa") -> float:   # i18n-no
+func rev_precio(_donde := "prensa") -> float:   # i18n-no   → revista.gd
 	return 0.0
-func rev_mes(_n: int) -> String:
+func rev_mes(_n: int) -> String:   # → revista.gd
 	return ""
-func rev_titular(_n: int) -> String:
-	return ""
-func rev_lee(_n: int) -> void:
-	pass
-func rev_guarda(_n: int) -> void:
-	pass
-func rev_bono(_e: String) -> float:
-	return 0.0
 
-func rev_tiene(_n: int) -> bool:
+func rev_tiene(_n: int) -> bool:   # → revista.gd
 	return false
 
-func rev_suscribe() -> void:
+func rev_suscribe() -> void:   # → revista.gd
 	pass
 
 func copa_ot_hoy() -> bool:   # la Copa de otoño (copaot.gd)
 	return false
 
-func hilo_entra(_mapa: String) -> void:
+func hilo_entra(_mapa: String) -> void:   # → hilo.gd
 	pass
 
-func hilo_visible() -> bool:
+func hilo_visible() -> bool:   # → hilo.gd
 	return false
 
-func hilo_menu() -> void:
+func hilo_menu() -> void:   # → hilo.gd
 	pass
 
-func hilo_derecha() -> String:
+func hilo_derecha() -> String:   # → hilo.gd
 	return ""
 
 # el banco de semillas de la tía (bancotia.gd)
-func bt_entra(_mapa: String) -> void:
+func bt_entra(_mapa: String) -> void:   # → bancotia.gd
 	pass
 
-func bt_obj(_x: int, _y: int, _o) -> bool:
+func bt_obj(_x: int, _y: int, _o) -> bool:   # → bancotia.gd
 	return false
 
-func linea_lab(_nx: int, _ny: int) -> bool:
+func linea_lab(_nx: int, _ny: int) -> bool:   # → bancotia.gd
 	return false
 
-func aviso_linea() -> void:
+func aviso_linea() -> void:   # → bancotia.gd
 	pass
 
-func bt_zona(_z: String) -> bool:
+func bt_zona(_z: String) -> bool:   # → bancotia.gd
 	return false
 
 # la sala de cultivo de KAIA (kaiacult.gd)
-func kc_cerrada() -> bool:
+func kc_cerrada() -> bool:   # → kaiacult.gd
 	return false
 
 # la sala fría del sótano (salafria.gd)
-func fria_cerrada() -> bool:
+func fria_cerrada() -> bool:   # → salafria.gd
 	return false
 
-func fria_ya() -> bool:
+func fria_ya() -> bool:   # → salafria.gd
 	return false
 
-func fria_venta() -> bool:
+func fria_venta() -> bool:   # → salafria.gd
 	return false
 
-func fria_item() -> Dictionary:
+func fria_item() -> Dictionary:   # → salafria.gd
 	return {}
 
-func fria_tienda() -> void:
+func fria_tienda() -> void:   # → salafria.gd
 	pass
 
-func bt_abierto() -> bool:
+func bt_abierto() -> bool:   # → bancotia.gd
 	return false
 
-func bt_objetivo() -> String:
+func bt_objetivo() -> String:   # → bancotia.gd
 	return ""
 
-func bt_menu(_ver := true) -> void:
+func bt_menu(_ver := true) -> void:   # → bancotia.gd
 	pass
 
-func bt_derecha() -> String:
+func bt_derecha() -> String:   # → bancotia.gd
 	return ""

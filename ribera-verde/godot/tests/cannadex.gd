@@ -221,6 +221,20 @@ func _corre() -> void:
 	chk(MENUS.size() > 0 and MENUS[0][1][0] == "GENOTECA" and not menu_de("GENOTECA").is_empty() and menu_de("CANNADEX").is_empty(), "sin CAL: la Genoteca de antes")
 	Datos.CAL = true
 
+	# 6 · el árbol tiene que crecer: un cruce es de generación posterior a la de sus padres (la auditoría de genética:
+	# la Cannalope Haze salía de la misma generación que su madre, y la Neville's Haze y la Chronic, de la de sus padres)
+	var mal_gen := []
+	for r in D.RECIPES:
+		var hijo: String = D.RECIPES[r]
+		var g = D.STRAINS[hijo].get("gen") if D.STRAINS.has(hijo) else null
+		if g == null:
+			continue
+		for pk in String(r).split("+"):
+			var gp = D.STRAINS[pk].get("gen") if D.STRAINS.has(pk) else null
+			if gp != null and int(gp) >= int(g):
+				mal_gen.append("%s (%d) ← %s (%d)" % [hijo, int(g), pk, int(gp)])
+	chk(mal_gen.is_empty(), "las generaciones crecen de padre a hijo (%s)" % [mal_gen])
+
 	for f in fallos:
 		print("FALLO  ", f)
 	print("cannadex: %d comprobaciones, %d fallos" % [n, fallos.size()])

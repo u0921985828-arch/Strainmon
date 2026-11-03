@@ -908,7 +908,9 @@ s093d1ab3,"Firmado. {A}, a tu nombre: en {d} días está matriculada y te aviso 
 s6b0d745d,"Firmado. {A}, a tu nombre: en {d} días está matriculado y te aviso por SMS.{x}","Signed. {A}, in your name: registered in {d} days, I'll text you.{x}"
 s949363c9,"Pagaste {p} y lleva {km} km. Te damos {v}, por transferencia.","You paid {p} and it has {km} km. We give you {v}, by transfer."
 sff351cfa,VENDER,SELL
+s84a8ed70,En el maletero llevas {g} y no te caben: tienes sitio para {h}. Vacíalo antes de venderlo.,The boot holds {g} and it will not fit: you have room for {h}. Empty it before selling.
 s0027ccd7,Por {a} te damos {v}. ¿Trato hecho?,For {a} we'll give you {v}. Deal?
+s24a10af2,Lo del maletero ({g}) lo sacamos antes.,We'll empty the boot ({g}) first.
 s3ed1ff3a,{n} · venta,{n} · sale
 s4201d831,Hecho: {v} en tu cuenta. El seguro se da de baja hoy.,Done: {v} in your account. The insurance is cancelled today.
 s564c74b4,"El año de póliza son {e}, de la cuenta, y no hay.","A year's policy is {e} from your account, and it isn't there."
@@ -1107,6 +1109,8 @@ s487e035f,"Tu dispensario, jefe: {g} de {n} a {p} € el gramo. Salen unos {d} a
 scdf9da60,"No llevas más {n}. Para cambiar de género, retira lo que queda y deja otro.",
 s42a301a8,¿Cuánta {n} más dejas? Llevas {g}.,
 sc14844ca,¿Te llevas los {g} de {n} que quedan?,
+s8bc98a40,No te cabe más en la mochila.,Your bag is full.
+s9dc2880e,Te llevas {g}; el resto se queda en la vitrina.,You take {g}; the rest stays in the display case.
 s87f8ff32,"Vaciado. El dispensario, a la espera de lo que traigas.",
 s7d5218b4,Marinero,
 s2cde5944,De barrio,
@@ -1695,6 +1699,7 @@ s4fe2b2ac,"{m}: {p}, con tarjeta. Vende un {a} % más y por la caja pasa un {b} 
 s5fc2fb68,Hacerla,Do it
 s8edcc283,Obra,Works
 sf58ac244,Hecho: {m}.,Done: {m}.
+s1232c2a6,¿Dejas {n}? Te devuelven la fianza a la cuenta; las mejoras se quedan y lo de la caja de hoy se queda en el negocio.,Give up {n}? The deposit goes back to your account; the upgrades and today's till stay with the business.
 sd14f7097,¿Dejas {n}? Te devuelven la fianza a la cuenta; las mejoras se quedan.,Give up {n}? The deposit goes back to your account; the upgrades stay.
 s271068ae,Has dejado {n}. Devuelves las llaves al salir.,You've given up {n}. You hand back the keys on the way out.
 s37410a5c,"Género ({g}): queda para {s} días. Sin género vende un {p} % de lo normal. ¿Pides para {d} días por {e}, con tarjeta?","Stock ({g}): enough for {s} days. Without stock it sells {p} % of normal. Order {d} days' worth for {e}, by card?"
@@ -1704,6 +1709,7 @@ saf5d2af0,Género para {d} días,Stock for {d} days
 s5f4e7968,El local {c} ({p} %). ¿Lo friegas y lo ordenas? Es una hora.,The premises are {c} ({p} %). Mop and tidy up? It takes an hour.
 sbe4a37d8,Limpiar,Clean
 sab466d2f,El local reluce,The place is spotless
+sbf90bc1e,Ya no es tuyo: devuelve las llaves al salir.,It's not yours anymore: hand back the keys on the way out.
 sd901e250,Ayer hicimos {e}.,Yesterday we made {e}.
 s31a93853,El local {c}.,The place is {c}.
 s86f811af, Y nos estamos quedando sin {g}., And we're running out of {g}.
@@ -2682,6 +2688,7 @@ s7de6fe53,La fundición cerró hace años. Ahora el solar es del chatarrero.,The
 s66377f69,"Aquí la gente cobra poco y paga poco. Y de noche, cuidado con la cartera.","Folks here earn little and pay little. And at night, mind your wallet."
 sd7b60c46,"De Valdehierro a Ribera Verde, veinte minutos de autobús.",Valdehierro to Ribera Verde: twenty minutes by bus.
 s1444f9e6,OBRERO,WORKER
+s54e40091,Hoy no toca aquí.,Nothing to do here today.
 se8b03c86,SECUNDARIAS,
 s15a01798,2 × SPRAY DE PIMIENTA,2 × PEPPER SPRAY
 s1669f450,3 dosis de MEATZA FLORACIÓN,3 doses of MEATZA BLOOM
@@ -4115,7 +4122,6 @@ s1f3154c8,La barra del reservado. Pídele a la camarera.,The VIP bar. Order from
 s3b1f5993,"El neón de {n}, también arriba.","The {n} neon, up here too."
 sb0f0f4bf,Un altavoz: aquí arriba la música llega más limpia.,A speaker: up here the music sounds cleaner.
 s50c6444c,"Tu mesa: sofá de terciopelo, cubitera y botella. Desde aquí se ve toda la pista por el cristal.","Your table: velvet sofa, ice bucket and bottle. From here you see the whole floor through the glass."
-sbf90bc1e,Ya no es tuyo: devuelve las llaves al salir.,It's not yours anymore: hand back the keys on the way out.
 s1ca81f3c,"La cama del cuartucho: un somier de 90, una manta de cuadros y la radio en la mesilla.","The back-room bed: a narrow single, a checked blanket and the radio on the nightstand."
 sa09dd676,armR,armR
 s6efcdf15,mesaC,mesaC
@@ -4296,9 +4302,6 @@ s03d183ad,"La {n}, a la esquina.","The {n}, corner pocket."
 sd0f7e229,"Esta, a defender.",Playing safe.
 s5aa0a26d,"La {n}, por banda.","The {n}, off the rail."
 s1641fb63,GENTE7,GENTE7
-s643e6825,índica,indica
-s78adc8eb,sativa,sativa
-s60bda0b9,híbrida,hybrid
 s93e1d722,Le gusta la de olor {a}.,Likes it with a {a} smell.
 s49392ee3,"Oye… lo de lo que te debo, que no me olvido. Dame un poco más.","Listen… about what I owe you, I haven't forgotten. Give me a bit longer."
 s6a2c7ceb,"Por fiarme el otro día, te cuento una cosa:","For giving me credit the other day, I'll tell you something:"
@@ -4399,12 +4402,16 @@ s1ff3ef0e,Híbrido de los noventa · ≈ origen incierto,Nineties hybrid · ≈ 
 s89805576,"Olor químico, a gasóleo. Salió de unas semillas sin papeles a principios de los noventa.","Chemical, diesel smell. Came from some unlabeled seeds in the early nineties."
 sf2380787,Afghani,Afghani
 s95d66794,Landrace · montañas del norte de Afganistán,Landrace · mountains of northern Afghanistan
+s41d24096,"Índica de las montañas del Rif, trabajada allí desde antiguo para sacar resina a mano.","Indica from the Rif mountains, worked there since old times for hand-rubbed resin."
 se7c5c70c,Hindu Kush,Hindu Kush
 sa473db88,"Landrace · cordillera del Hindu Kush, entre Afganistán y Pakistán","Landrace · Hindu Kush range, between Afghanistan and Pakistan"
+s5945c73f,"Landrace índica de la cordillera del Hindú Kush: porte bajo, mucha resina y ciclo corto.","Indica landrace from the Hindu Kush range: short, very resinous and quick to finish."
 s2e22e6da,Acapulco Gold,Acapulco Gold
 saac3f3fc,"Landrace · costa de Guerrero, México","Landrace · Guerrero coast, Mexico"
+s52352584,"Sativa mexicana de la costa de Guerrero, famosa por su color dorado y su efecto despierto.","Mexican sativa from the Guerrero coast, famous for its golden colour and its awake effect."
 sef42aa9f,Malawi Gold,Malawi Gold
 sea9bfbd7,"Landrace · sativa de África oriental, floración muy larga","Landrace · East African sativa, very long flowering"
+s298c3bf6,"Sativa del sur de África, de cogollos largos y floración muy lenta; se curaba prensada en hoja.","Sativa from southern Africa, long buds and a very slow flowering; it used to be cured pressed in leaf."
 s64af2432,Michoacán,Michoacán
 s166dfb22,"Landrace · altiplano de Michoacán, México","Landrace · Michoacán highlands, Mexico"
 s0c981778,"Sativa de altura, espigada y cerebral. Aguanta bien el sol fuerte.","Highland sativa, lanky and heady. Handles strong sun well."
@@ -6685,6 +6692,8 @@ s98e01229,Las autos,The autos
 s87704938,Txoko Berdea,Txoko Berdea
 se5ff5286,Huerta Oihana,Huerta Oihana
 s08de7e76,Los de Arratia,The Arratia crew
+s643e6825,índica,indica
+s60bda0b9,híbrida,hybrid
 s2cb6aa77,Generador diésel insonorizado,Silent diesel generator
 s55379088,"Cubre hasta 5 kW por encima de lo contratado, sin ruido: lo que pasa de la potencia no lo ve la compañía. Gasta gasóleo cada día que trabaja (en efectivo).","Covers up to 5 kW over the contract, silently: the power company never sees the excess. Burns diesel every day it runs (paid in cash)."
 s6bcc8de0,Placas solares,Solar panels
@@ -7127,6 +7136,7 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+s78adc8eb,sativa,sativa
 s64fdeccd,"El quiosco de prensa. El periódico, {e}.","The newsstand. The paper, {e}."
 s5a758610,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas: {l}.","The room panel: the LED timer, the drip and the climate. All automatic: long light hours while they grow and fewer as soon as they flower. Tents: {l}."
 sf9786037,Extractor de 315 mm con dos filtros de carbón,315 mm extractor with two carbon filters

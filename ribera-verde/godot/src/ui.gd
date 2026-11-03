@@ -1164,12 +1164,12 @@ func ajustes_guarda() -> void:
 	DirAccess.rename_absolute(AJUSTES + ".tmp", AJUSTES)
 
 # OPCIONES (título y menú START): la define juego.gd
-func opciones(_desde_titulo := false) -> void:
+func opciones(_desde_titulo := false) -> void:   # → juego.gd
 	pass
 
 # un texto largo a toda altura, con scroll (▲ ▼ de línea en línea, el dedo) y en páginas (◀ ▶) hasta A, B o START
 # fase 6: el embudo del FTUE (retencion.gd)
-func evento(_k: String) -> void:
+func evento(_k: String) -> void:   # → retencion.gd
 	pass
 
 func leer(t: String, texto: String) -> void:
@@ -1243,10 +1243,10 @@ static func paginas(texto: String, tope := 3500) -> Array[String]:
 	return out
 
 # ---------- virtuales (las definen mundo, granja, trama y juego) ----------
-func world_press(_b: String) -> void:
+func world_press(_b: String) -> void:   # → calle.gd
 	pass
 
-func update_hud() -> void:
+func update_hud() -> void:   # → juego.gd
 	pass
 
 # ---------- interfaz (07-interfaz) ----------
@@ -1466,7 +1466,7 @@ const RETRATO_M := 8
 func retrato_w() -> int:
 	return retrato.texture.get_width() if retrato.texture else RETRATO_W
 
-func retrato_de(_n: String):
+func retrato_de(_n: String):   # → mundo.gd
 	return null
 
 func _pon_retrato(name_: String, full: String, boca: int) -> void:

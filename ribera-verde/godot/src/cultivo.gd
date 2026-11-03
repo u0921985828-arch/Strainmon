@@ -382,8 +382,13 @@ static func ra_f(fe, k: String) -> bool:
 	return Datos.CAL and fe is Dictionary and fe.get("ra") is Array and fe.ra.has(k)
 
 # en las mesas de la nave y de KAIA, los clones son la planta: la enana rinde menos, la resinosa da más THC y el aroma va al lote
-static func ra_g_mesa(fe) -> float:
-	return 1 + float(Datos.carga().RAREZAS.r.enana.g) if ra_f(fe, "enana") else 1.0
+static func ra_g_mesa(fe, rb := false) -> float:
+	var x := 1.0
+	if ra_f(fe, "enana"):
+		x *= 1 + float(Datos.carga().RAREZAS.r.enana.g)
+	if rb:   # la segunda cosecha de la doble, en una mesa de la nave o de KAIA: su parte, como en casa (ra_g)
+		x *= float(Datos.carga().RAREZAS.r.doble.g2)
+	return x
 
 static func ra_crec(fe) -> float:
 	return 1 + float(Datos.carga().RAREZAS.r.enana.crec) if ra_f(fe, "enana") else 1.0
@@ -567,10 +572,14 @@ static func ra_g(p: Dictionary) -> float:
 		x *= float(Datos.carga().RAREZAS.r.doble.g2)
 	return x
 
+# el techo del THC de una cosecha, el mismo en casa, en la nave y en KAIA (antes solo lo miraba la casa, y una mesa de
+# Jack Herer podía salir al 45 %)
+const THC_TOPE := 35.0
+
 static func thc_cosecha(S: Dictionary, p: Dictionary, f: Dictionary) -> float:
 	var s = Datos.strain(S, p.sid)
 	var fe: Dictionary = p.f if p.get("f") is Dictionary else {"t": 1}
-	return minf(35, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) * (1 + float(Datos.carga().IVS.pot) * iv_f(fe, 0)) * (1 + fam(S, "thc")) * (1 + rev_bono(S, "thc")) + f.thc + abo_de(p.get("fo")).thc * fq(p) + (float(Datos.carga().RAREZAS.r.resina.thc) if ra_tiene(p, "resina") else 0.0)) * 10) / 10.0)
+	return minf(THC_TOPE, Datos.jsround((s.thc * fe.t * (.85 + .15 * p.health / 100) * (1 + float(Datos.carga().IVS.pot) * iv_f(fe, 0)) * (1 + fam(S, "thc")) * (1 + rev_bono(S, "thc")) + f.thc + abo_de(p.get("fo")).thc * fq(p) + (float(Datos.carga().RAREZAS.r.resina.thc) if ra_tiene(p, "resina") else 0.0)) * 10) / 10.0)
 
 static func plantas_vivas(S: Dictionary, ci: int) -> bool:
 	var H := huecos(S)
