@@ -39,6 +39,12 @@ se arregló en esta tanda y lo que se deja medido para la siguiente. Cada línea
 Línea base (llvmpipe, `--rend`), coste de GDScript en `capa0`: `home` 1,9 · `nave` 2,3 · `zorroza` 3,5 · `casco` 3,9 ·
 `abando` 4,6 · `town` 6,6 ms. Los 37–149 ms de `proceso` son rasterizado por software, no código.
 
+Medida de después (0.79, misma máquina y misma resolución, con el proceso de la corrida anterior cerrado:
+`--rend --rend-cierra`): `home` 1,7 · `nave` 2,0 · `zorroza` 3,0 · `casco` 3,3 · `abando` 3,5 · `alto` 3,4 ·
+`town` 4,0 ms, de 51,9 fps en `home` a 41,0 en `town`. Baja en los seis mapas de la línea base, y donde más en
+los que tenían más objetos y suelo animado (`town` −39 %, `abando` −24 %, `casco` −15 %). Una corrida con otra
+medida viva a la vez da `capa0` un 25–30 % más alto (`town` 5,3): las corridas van de una en una.
+
 | | hallazgo | estado |
 |---|---|---|
 | ALTO | `Atlas.frame_de` no memorizaba nada y se llama ~160 veces por fotograma (1,0–2,1 ms) | **aplicado** (`_fd_de`: claves, espejo, fps, bucle y celda por grupo+anim+dirección) |

@@ -1118,3 +1118,5 @@ func _rend() -> void:
 		print("REND %s %.1f fps · proceso %.1f ms · %s" % [m[0], fps, pr / maxf(1, n) * 1000.0, ", ".join(de)])
 	rend_t = {}
 	print("REND fin")
+	if OS.get_cmdline_user_args().has("--rend-cierra"):   # 0.79: la medida se cierra sola, para no contaminar la siguiente corrida
+		get_tree().quit()
