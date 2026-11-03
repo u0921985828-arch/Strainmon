@@ -110,6 +110,14 @@ func _initialize() -> void:
 		ok("%s: cada avance, píxeles enteros" % a, sueltos == 0)
 	for a in ["RiberaPixel-Italic.ttf", "RiberaPixel-BoldItalic.ttf"]:
 		ok("%s no está (sin cursiva)" % a, not FileAccess.file_exists("res://fuentes/" + a))
+	# 6 · cada letra que el juego lee con FileAccess va con importer="keep" (lo vio el usuario: en el móvil salía la letra
+	# del sistema). Con el importador de fuentes, al exportar, el archivo de fuentes/ se cambia por su .fontdata y
+	# FileAccess.get_file_as_bytes devuelve 0 bytes: el FontFile se queda vacío y se cae a la reserva del sistema.
+	for f in ["RiberaPixel.ttf", "RiberaPixel-Bold.ttf", "atkinson-hyperlegible-latin-400-normal.woff2",
+			"atkinson-hyperlegible-latin-700-normal.woff2", "press-start-2p-latin-400-normal.woff2",
+			"dejavu-sans-simbolos.woff2"]:
+		var imp := FileAccess.get_file_as_string("res://fuentes/" + f + ".import")
+		ok("%s: importer=\"keep\" (si no, en la APK no viaja el archivo)" % f, imp.contains("importer=\"keep\""))
 	for f in fallos:
 		print("FALLO  ", f)
 	print("fuentes: %d comprobaciones, %d fallos" % [n_ok + fallos.size(), fallos.size()])

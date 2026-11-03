@@ -2,6 +2,12 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### La letra propia, también en el móvil (0.75.1, lo vio el usuario: «la nueva fuente de texto… ¿por qué no lo has aplicado?»)
+
+- `fuentes/RiberaPixel.ttf` y `RiberaPixel-Bold.ttf` iban como recurso importado (`importer="font_data_dynamic"`): al exportar, Godot cambia el archivo de `fuentes/` por su `.fontdata`, así que `FileAccess.get_file_as_bytes("res://fuentes/RiberaPixel.ttf")` devolvía 0 bytes en la APK, el `FontFile` se quedaba vacío y el texto salía con la reserva del sistema (la sans del móvil). En el escritorio el archivo sí está, y por eso las pruebas no lo veían.
+- Los dos `.import` pasan a `importer="keep"`, como los `woff2`, y el archivo viaja entero en el paquete.
+- Prueba: bloque 6 de `tests/fuentes.gd`, que exige `importer="keep"` en las seis letras que el juego lee con `FileAccess` (39 comprobaciones, 0 fallos; con el `.import` de antes, 1 fallo).
+
 ### Sin alusiones a terceros en el código ni en los archivos (0.75, lo pidió el usuario: «Que en el código y archivos no haya ningún comentario o alusión a algún estilo de algo que tenga copyright»)
 
 - Fuera los nombres de franquicias y consolas comerciales de comentarios, documentos y textos (`docs/ESTUDIO.md`, `docs/ORIGINALIDAD.md`, `CONTEXTO.md`, `README.md`, `docs/PROMPTS_SPRITES.md`, `prompts/*.json`, `src/audio.js`, `src/isogame.js`): se habla de «portátil de 16 bits», «franquicias comerciales» y «un simulador de granja comercial». `tools/ficha.py` mide las fichas sin nombrar marcas.
