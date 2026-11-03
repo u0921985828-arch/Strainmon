@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### La instalación a medias, avisada (plugin de WordPress 1.7.5, lo vio el usuario: el juego en su WordPress salía con «Failed loading file 'index.pck'»)
+
+- **Qué pasaba.** El zip 1.7.4 está bien (`index.wasm` e `index.js` idénticos a los del 1.7.3, el `index.pck` con su cabecera `GDPC` y sus `flags` 3, y la prueba `tools/web-sw.js` del zip con 0 fallos y el título del juego en pantalla). El aviso sale cuando una pieza del juego llega **cortada** al servidor (una subida por FTP que se corta, una descarga a medias del plugin ligero): el motor pide el paquete, el tamaño no cuadra y se queda en negro. Reproducido recortando el `index.pck` a 21,0 MB de 24,0: la pantalla queda negra y, con el código de antes, ni el plugin ni el trabajador del navegador lo avisaban.
+- **El plugin lo mide.** La exportación web de Godot escribe en `index.html` el tamaño que espera de cada pieza (`fileSizes`): `tamanos()` lo lee y `piezas_malas()` compara con lo que hay en disco. La dirección del juego responde con el aviso (503) nombrando la pieza y, en Ajustes → Landrace Hunters, sale en rojo con el tamaño que tiene y el que debe tener, y el botón para volver a descargar el juego.
+- **El navegador no se queda con la pieza mala.** El trabajador (`game/lh-sw.js`) recibe los tamaños en `LH_SIZES` (los pone el PHP, como la lista de archivos), mide cada respuesta y solo guarda la que llega entera; mientras falte una, no marca la copia como entera (`lh-entera`) y **no borra la copia buena de antes**, así que el juego sigue abriendo con la versión que ya funcionaba.
+- **Probado.** `tools/web-sw.js` lleva el caso reservado: con una pieza a medias comprueba que no se guarda y que la instalación no se da por entera (2/0); con el juego entero, los cinco de siempre (0 fallos). Zips en `descargas/landrace-hunters-1.7.5.zip` (32,3 MB) y `-ligero.zip` (34 KB).
+
+
 ### La medida de fluidez, cerrada (0.79, lo pidió el usuario: «Cumple con todo lo pendiente»); plugin de WordPress 1.7.4 en `descargas/landrace-hunters-1.7.4.zip`
 
 - **El pintado, medido antes y después.** Lo único que el repaso 0.76 dejaba sin cerrar era repetir la medida `--rend` con la máquina tranquila. Con el coste de GDScript en `capa0` (llvmpipe, 1280 × 720): `home` 1,9 → **1,7** · `nave` 2,3 → **2,0** · `zorroza` 3,5 → **3,0** · `casco` 3,9 → **3,3** · `abando` 4,6 → **3,5** · `town` 6,6 → **4,0** ms, de 51,9 fps en el piso a 41,0 en el pueblo. Baja en los seis mapas de la línea base, y donde más donde hay más objetos y suelo animado (`town` −39 %, `abando` −24 %, `casco` −15 %): son la caché del sprite de cada objeto, los trozos aparte del suelo animado y los lotes de rectángulos de la tanda anterior. Las cifras, en `docs/REPASO-ESTRUCTURA.md` § 3.

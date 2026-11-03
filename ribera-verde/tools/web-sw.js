@@ -2,6 +2,9 @@
 // no le pide nada al servidor y que sigue arrancando con el servidor apagado (lo pidió el usuario: «que el host esté
 // mucho más libre»). Un servidor de pruebas imita lo que hace landrace-hunters.php (la página con su <base> y el
 // registro, y /<dirección>/sw.js con la versión y la lista de archivos arriba) y Chromium lo juega de verdad.
+// Desde la 1.7.5 lleva además el caso reservado: si alguna pieza del juego está a medias (un tamaño
+// distinto del que index.html declara en «fileSizes»), comprueba que el trabajador no la guarda y no
+// da la instalación por entera, en vez de dejar la pantalla en negro sin avisar.
 //   node tools/web-sw.js <carpeta del plugin> [puerto]
 const http = require('http');
 const fs = require('fs');
@@ -16,6 +19,18 @@ const VER = (fs.readFileSync(path.join(RAIZ, 'landrace-hunters.php'), 'utf8').ma
 const PIEZAS = ['index.js', 'index.wasm', 'index.pck', 'index.audio.worklet.js', 'index.audio.position.worklet.js',
   'index.png', 'icon-192.png', 'icon-576.png', 'lh-fs.js'];
 const TIPO = { '.js': 'text/javascript', '.wasm': 'application/wasm', '.pck': 'application/octet-stream', '.png': 'image/png', '.html': 'text/html' };
+const HTML = fs.readFileSync(path.join(GAME, 'index.html'), 'utf8');
+// Los tamaños que el juego espera de cada pieza, como los lee el plugin (tamanos() en el PHP).
+const SIZES = (() => {
+  const m = HTML.match(/fileSizes"?\s*:\s*(\{[^}]*\})/);
+  const o = {};
+  if (m) { for (const [k, v] of Object.entries(JSON.parse(m[1]))) o[path.basename(k)] = +v; }
+  return o;
+})();
+const rotas = PIEZAS.filter((f) => {
+  const q = path.join(GAME, f);
+  return SIZES[f] > 0 && fs.existsSync(q) && fs.statSync(q).size !== SIZES[f];
+});
 
 const pedidos = [];
 const base = (p) => `http://localhost:${PUERTO}${p}`;
@@ -24,7 +39,7 @@ const servidor = http.createServer((req, res) => {
   const u = req.url.split('?')[0];
   pedidos.push(u);
   if (u === `/${SLUG}/` || u === `/${SLUG}`) {   // la página: index.html con <base> y el registro, como maybe_serve()
-    let html = fs.readFileSync(path.join(GAME, 'index.html'), 'utf8')
+    let html = HTML
       .replace('<meta charset="utf-8">', `<meta charset="utf-8">\n\t\t<base href="${base('/game/')}">`)
       .replace('</body>', `<script>if("serviceWorker" in navigator){addEventListener("load",function(){`
         + `navigator.serviceWorker.register("${base(`/${SLUG}/sw.js`)}",{scope:"${base(`/${SLUG}/`)}"}).catch(function(){})})}</script>\n</body>`);
@@ -33,7 +48,10 @@ const servidor = http.createServer((req, res) => {
   }
   if (u === `/${SLUG}/sw.js`) {   // el trabajador, como sw(): la versión y la lista de archivos arriba
     const files = PIEZAS.filter((f) => fs.existsSync(path.join(GAME, f))).map((f) => base('/game/' + f));
+    const sizes = {};
+    for (const u of files) { const n = path.basename(u); if (SIZES[n] > 0) sizes[u] = SIZES[n]; }
     const pre = `const LH_CACHE = ${JSON.stringify('lh-' + VER)};\nconst LH_FILES = ${JSON.stringify(files)};\n`
+      + `const LH_SIZES = ${JSON.stringify(sizes)};\n`
       + `const LH_PAGE = ${JSON.stringify(base(`/${SLUG}/`))};\n`;
     res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8', 'Service-Worker-Allowed': `/${SLUG}/`, 'Cache-Control': 'no-cache' });
     return res.end(pre + fs.readFileSync(path.join(GAME, 'lh-sw.js'), 'utf8'));
@@ -60,6 +78,25 @@ const ok = (q, c) => { console.log((c ? 'ok   ' : 'FALLO') + ' ' + q); if (!c) f
   const p = await ctx.newPage();
   const errores = [];
   p.on('pageerror', (e) => errores.push(e.message));
+
+  if (rotas.length) {   // caso reservado: una pieza a medias no se guarda ni cuenta como instalación entera
+    await p.goto(base(`/${SLUG}/`));
+    await p.waitForTimeout(30000);
+    await p.waitForFunction(() => navigator.serviceWorker.controller != null, null, { timeout: 60000 }).catch(() => {});
+    const dentro = await p.evaluate(async () => {
+      const ns = await caches.keys();
+      const out = [];
+      for (const n of ns) { const c = await caches.open(n); for (const k of await c.keys()) out.push(k.url); }
+      return out;
+    });
+    for (const f of rotas) ok(`la pieza a medias (${f}) no se guarda`, !dentro.some((u) => u.endsWith('/' + f)));
+    ok('la instalación no se da por entera', !dentro.some((u) => u.endsWith('/lh-entera')));
+    if (process.argv[4]) await p.screenshot({ path: process.argv[4] });
+    await b.close();
+    await new Promise((r) => servidor.close(r));
+    console.log(`web-sw (pieza a medias): ${fallos} fallos`);
+    process.exit(fallos ? 1 : 0);
+  }
 
   // 1 · la primera visita: el servidor entrega el juego entero
   await p.goto(base(`/${SLUG}/`));

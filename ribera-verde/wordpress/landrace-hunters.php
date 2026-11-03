@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Landrace Hunters
  * Description: Hospeda el juego «Landrace Hunters» (Godot 4.3, versión web: la misma partida que la app de Android) dentro de WordPress: dirección propia a pantalla completa y atajo [landrace_hunters] para incrustarlo en cualquier página. Todo se sirve desde el propio plugin.
- * Version: 1.7.0
+ * Version: 1.7.5
  * Author: WOLFCADE
  * License: GPL-2.0-or-later
  * Text Domain: landrace-hunters
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Landrace_Hunters {
 
-	const VERSION   = '1.7.4';
+	const VERSION   = '1.7.5';
 	/** El plugin ligero (para servidores que no dejan subir más de unos MB) baja el resto del juego de aquí, en el propio servidor. */
 	const FULL_URL  = 'https://raw.githubusercontent.com/u0921985828-arch/Strainmon/claude/new-session-7quvtm/ribera-verde/descargas/landrace-hunters-%s.zip';
 	const PIEZAS    = array( 'index.js', 'index.wasm', 'index.pck', 'index.audio.worklet.js', 'index.audio.position.worklet.js' );
@@ -44,14 +44,59 @@ final class Landrace_Hunters {
 		return plugins_url( 'game', __FILE__ );
 	}
 
-	/** ¿Están las piezas grandes del juego? (el plugin ligero no las trae: se descargan desde el panel). */
-	public static function game_ready() {
-		foreach ( self::PIEZAS as $f ) {
-			if ( ! is_readable( self::game_dir() . '/' . $f ) ) {
-				return false;
+	/**
+	 * Los tamaños que el juego espera de cada pieza (1.7.5).
+	 * La exportación web de Godot los escribe en index.html («fileSizes»): si una pieza
+	 * llega a medias (una subida cortada, un FTP que se corta, una descarga a la mitad),
+	 * el motor se queda en negro con «Failed loading file 'index.pck'» y nada lo avisaba.
+	 */
+	public static function tamanos() {
+		static $cache = null;
+		if ( null !== $cache ) {
+			return $cache;
+		}
+		$cache = array();
+		$file  = self::game_file();
+		if ( is_readable( $file ) ) {
+			$html = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+			if ( preg_match( '#fileSizes"?\s*:\s*(\{[^}]*\})#', (string) $html, $m ) ) {
+				$j = json_decode( $m[1], true );
+				if ( is_array( $j ) ) {
+					foreach ( $j as $k => $v ) {
+						$cache[ basename( (string) $k ) ] = (int) $v;
+					}
+				}
 			}
 		}
-		return true;
+		return $cache;
+	}
+
+	/**
+	 * Las piezas que faltan o que están a medias, con su tamaño (1.7.5).
+	 * Devuelve array( nombre => array( 'hay' => bool, 'tiene' => bytes, 'debe' => bytes ) ).
+	 */
+	public static function piezas_malas() {
+		$sizes = self::tamanos();
+		$malas = array();
+		foreach ( self::PIEZAS as $f ) {
+			$p   = self::game_dir() . '/' . $f;
+			$hay = is_readable( $p );
+			$n   = $hay ? (int) filesize( $p ) : 0;
+			$d   = isset( $sizes[ $f ] ) ? (int) $sizes[ $f ] : 0;
+			if ( ! $hay || ( $d > 0 && $n !== $d ) ) {
+				$malas[ $f ] = array(
+					'hay'   => $hay,
+					'tiene' => $n,
+					'debe'  => $d,
+				);
+			}
+		}
+		return $malas;
+	}
+
+	/** ¿Están las piezas grandes del juego, y enteras? (el plugin ligero no las trae: se descargan desde el panel). */
+	public static function game_ready() {
+		return ! self::piezas_malas();
 	}
 
 	/**
@@ -189,6 +234,19 @@ final class Landrace_Hunters {
 		return $f;
 	}
 
+	/** Lo que tiene que pesar cada archivo guardado, por su dirección (1.7.5): así el móvil no guarda una descarga a medias. */
+	public static function sw_sizes() {
+		$url   = trailingslashit( self::game_url() );
+		$sizes = self::tamanos();
+		$out   = array();
+		foreach ( $sizes as $n => $v ) {
+			if ( $v > 0 && is_readable( self::game_dir() . '/' . $n ) ) {
+				$out[ $url . $n ] = (int) $v;
+			}
+		}
+		return $out;
+	}
+
 	/**
 	 * Al subir una versión nueva («Reemplazar actual con el subido») no se ejecuta la activación.
 	 * La primera visita tras el cambio vacía la caché de página de Kuboplay Shield, si está,
@@ -252,7 +310,23 @@ final class Landrace_Hunters {
 		$file = self::game_file();
 		if ( is_readable( $file ) && ! self::game_ready() ) {
 			status_header( 503 );
-			wp_die( esc_html__( 'Falta descargar el juego: en el escritorio de WordPress, Ajustes → Landrace Hunters → «Descargar el juego».', 'landrace-hunters' ) );
+			$malas = self::piezas_malas();
+			$medio = false;
+			foreach ( $malas as $d ) {
+				if ( $d['hay'] ) {
+					$medio = true;
+				}
+			}
+			// Una pieza a medias dejaba el juego en negro con «Failed loading file 'index.pck'» (1.7.5).
+			wp_die( esc_html(
+				$medio
+					? sprintf(
+						/* translators: %s: lista de archivos. */
+						__( 'El juego está incompleto en el servidor (%s llegó a medias). En el escritorio de WordPress, Ajustes → Landrace Hunters → «Descargar el juego».', 'landrace-hunters' ),
+						implode( ', ', array_keys( $malas ) )
+					)
+					: __( 'Falta descargar el juego: en el escritorio de WordPress, Ajustes → Landrace Hunters → «Descargar el juego».', 'landrace-hunters' )
+			) );
 		}
 		if ( ! is_readable( $file ) ) {
 			status_header( 500 );
@@ -374,6 +448,7 @@ final class Landrace_Hunters {
 		}
 		$pre = 'const LH_CACHE = ' . wp_json_encode( 'lh-' . self::VERSION ) . ";\n"
 			. 'const LH_FILES = ' . wp_json_encode( self::sw_files(), JSON_UNESCAPED_SLASHES ) . ";\n"
+			. 'const LH_SIZES = ' . wp_json_encode( self::sw_sizes(), JSON_UNESCAPED_SLASHES ) . ";\n"
 			. 'const LH_PAGE = ' . wp_json_encode( self::play_url(), JSON_UNESCAPED_SLASHES ) . ";\n";
 		status_header( 200 );
 		header( 'Content-Type: text/javascript; charset=utf-8' );
@@ -512,7 +587,24 @@ final class Landrace_Hunters {
 			<?php elseif ( 'error' === $lh ) : ?>
 				<div class="notice notice-error inline"><p>No se ha podido descargar: <?php echo esc_html( isset( $_GET['lh_msg'] ) ? rawurldecode( sanitize_text_field( wp_unslash( $_GET['lh_msg'] ) ) ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification ?></p></div>
 			<?php endif; ?>
-			<?php if ( ! self::game_ready() ) : ?>
+			<?php
+			$malas = self::piezas_malas();
+			$medio = false;
+			foreach ( $malas as $d ) {
+				if ( $d['hay'] ) {
+					$medio = true;
+				}
+			}
+			?>
+			<?php if ( $medio ) : ?>
+				<div class="notice notice-error inline"><p><strong>El juego está incompleto</strong>: alguna pieza llegó a medias al servidor, así que la pantalla se queda en negro («Failed loading file»). Pulsa el botón y el servidor se baja el juego entero otra vez.</p>
+					<ul style="list-style:disc;margin-left:20px">
+					<?php foreach ( $malas as $n => $d ) : ?>
+						<li><code><?php echo esc_html( $n ); ?></code>: <?php echo esc_html( $d['hay'] ? size_format( $d['tiene'] ) . ' de ' . size_format( $d['debe'] ) : 'no está' ); ?></li>
+					<?php endforeach; ?>
+					</ul>
+					<p><?php self::boton_descargar(); ?></p></div>
+			<?php elseif ( $malas ) : ?>
 				<div class="notice notice-warning inline"><p>Es el plugin ligero: el juego (unos 30 MB) se descarga directamente en el servidor, sin subirlo por el navegador.</p>
 					<p><?php self::boton_descargar(); ?></p></div>
 			<?php endif; ?>
