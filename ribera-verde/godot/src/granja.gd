@@ -46,11 +46,11 @@ func factura_luz() -> int:
 	for ci in S.carpas.size():
 		if S.carpas[ci] and plantas_vivas(ci):
 			e += luz_carpa(ci)
-	return e + Cultivo.factura_sala(S) + factura_carro()   # y el carro de esquejes (1.11)
+	return e + Cultivo.factura_sala(S) + factura_carro() + Cultivo.factura_potencia(S)   # el carro de esquejes (1.11) y la potencia (0.77)
 
 # el carro de esquejes (1.11, CARRO): con algún esqueje en las bandejas, los tubos T5 gastan luz a 18/6
 func factura_carro() -> int:
-	return Datos.jsround(D.CARRO.w * D.H_24 * 18 / 24.0 / 1000 * D.KWH) if S.bandejas.size() else 0
+	return Datos.jsround(D.CARRO.w * D.H_24 * 18 / 24.0 / 1000 * Cultivo.kwh_eur()) if S.bandejas.size() else 0
 
 func carro_ya() -> bool:
 	return "carro" in muebles_ya()
@@ -67,7 +67,7 @@ static func pc(t: String, f: float) -> String:
 func desc_foco(k: String) -> String:
 	var F: Dictionary = D.FOCOS[k]
 	return T("{w} W · ilumina {l}×{l} cm · {g} g/W ({ga} abonando){crece}{thc} · riego ×{agua}\nLuz: {kwh} kWh ({eur}) al día con plantas.", {"w": n(F.w), "l": n(F.lado), "g": Datos.coma(F.gpw),
-		"ga": Datos.coma(Datos.jsround(F.gpw * 1.25 * 100) / 100.0), "crece": pc(K("crece"), F.crec), "thc": T(" · THC +{p}", {"p": Datos.pct(F.thc)}) if F.thc else "", "agua": Datos.coma(F.agua), "kwh": kwh_foco(k), "eur": Datos.eur(kwh_foco(k) * D.KWH)})
+		"ga": Datos.coma(Datos.jsround(F.gpw * 1.25 * 100) / 100.0), "crece": pc(K("crece"), F.crec), "thc": T(" · THC +{p}", {"p": Datos.pct(F.thc)}) if F.thc else "", "agua": Datos.coma(F.agua), "kwh": kwh_foco(k), "eur": Datos.eur(kwh_foco(k) * Cultivo.kwh_eur())})
 
 func desc_maceta(k: String) -> String:
 	var Mc: Dictionary = D.MACETAS[k]
@@ -2159,9 +2159,17 @@ func recibos() -> Array:
 			if S.coches[k].get("iv") != null:
 				r.append([K("Impuesto de circulación") + " · " + String(D.CONCE.v[k].n), S.coches[k].iv, D.CONCE.v[k].ivtm, "cuenta", r.size()])
 	if S.protect and S.get("protHasta"):
-		r.append([K("Sargento Molina"), S.protHasta + 1, D.SOBORNO, "mano", r.size()])
+		r.append([K("Sargento Molina"), S.protHasta + 1, cuota_molina(), "mano", r.size()])
 	r.sort_custom(func(a, b): return a[1] < b[1] or a[1] == b[1] and a[4] < b[4])   # estable, como sort de JS
 	return r
+
+# 0.77: con CAL, la cuota no es fija: sube con lo facturado desde la última vez que se pagó (5 %%), para que la protección no
+# sea gratis cuando el negocio mueve miles al día (S.molS, la marca de S.sales del último pago)
+func cuota_molina() -> int:
+	if not Datos.CAL:
+		return int(D.SOBORNO)
+	var fact: float = maxf(0, float(S.get("sales", 0)) - float(S.get("molS", 0)))
+	return int(maxf(float(D.SOBORNO), Datos.jsround(fact * float(D.CUOTA_PCT))))
 
 func como(k: String) -> String:
 	return {"cuenta": K("de la cuenta"), "efectivo": K("en efectivo"), "mano": K("en mano, en la comisaría")}[k]
@@ -2331,7 +2339,8 @@ func neg_venta(k: String) -> int:
 	var o := neg_o(k)
 	var f: float = (0.4 + 0.6 * int(o.cu) / 100.0) * (1 + float(D.NEGOCIO.mjF) * int(o.mj)) * (1.0 if int(o.st) > 0 else float(D.NEGOCIO.sinGen))
 	var a: float = 1 + float(D.NEGOCIO.azar) * ((absi(hash("%s|%d" % [k, int(S.day)])) % 201) / 100.0 - 1)
-	return roundi(float(N.base) * f * a)
+	var base: float = float(N.basec) if Datos.CAL and N.has("basec") else float(N.base)   # 0.77: la quesería y la panadería, de 30.000 €, rinden lo que cuestan
+	return roundi(base * f * a)
 
 func neg_cuidado(k: String) -> String:
 	for c in D.NEGOCIO.cuTxt:
@@ -2408,7 +2417,7 @@ func neg_genero(k: String) -> void:
 	var N: Dictionary = D.NEGOCIO.k[k]
 	var o := neg_o(k)
 	var dias := int(D.NEGOCIO.st)
-	var e: int = roundi(float(N.gen) * dias)
+	var e: int = roundi((float(N.genc) if Datos.CAL and N.has("genc") else float(N.gen)) * dias)   # 0.77: el género, a la medida de lo que vende
 	if await ask(T("Género ({g}): queda para {s} días. Sin género vende un {p} % de lo normal. ¿Pides para {d} días por {e}, con tarjeta?", {"g": N.gn, "s": int(o.st), "p": roundi(float(D.NEGOCIO.sinGen) * 100), "d": dias, "e": Datos.eur(e)}), [K("Pedirlo"), K("No")]) != 0:
 		return
 	if not await tarjeta(e, K("Género") + " · " + L.n):

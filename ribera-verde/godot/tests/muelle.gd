@@ -201,7 +201,7 @@ func _corre() -> void:
 	var en: Dictionary = S.mar.env[0] if S.mar.env.size() else {}
 	chk(int(en.get("g", 0)) == cap and absf(S.buds[sid].g - (g0 - cap)) < .01, "se lleva %s del lote (%s)" % [J._kg(cap), en.get("g")])
 	chk(int(en.get("d", 0)) == S.day + int(B0.dias), "llega a los %d días" % B0.dias)
-	var esp: int = Datos.jsround(J.precio_mayor(24) * J.calidad(S.buds[sid], true) * 1.5 * cap)
+	var esp: int = Datos.jsround(J.precio_mayor(24) * J.calidad(S.buds[sid], true) * J.mar_px(R.rutas[0]) * cap)
 	chk(absi(int(en.get("e", 0)) - esp) <= 1, "lo que pagan: %s (%d)" % [en.get("e"), esp])
 	QUIERO = []
 	LOG.clear()
@@ -266,7 +266,7 @@ func _corre() -> void:
 	chk(corre(func(): await J.mar_noray(int(B0.nor))) and S.mar.env.size() == 1 and S.mar.env[0].ped and S.mar.ped == null, "el pedido, cumplido: %s" % [S.mar.env])
 	if S.mar.env.size():
 		var e2: Dictionary = S.mar.env[0]
-		var esp3: int = Datos.jsround(J.precio_mayor(24) * J.calidad(S.buds[sid], true) * 1.5 * 500 * float(R.ped.bonus))
+		var esp3: int = Datos.jsround(J.precio_mayor(24) * J.calidad(S.buds[sid], true) * J.mar_px(R.rutas[0]) * 500 * float(R.ped.bonus))
 		chk(absi(int(e2.e) - esp3) <= 1, "con la prima: %s (%d)" % [e2.e, esp3])
 		e2.mal = true
 		var h0: int = int(S.heat)

@@ -855,7 +855,7 @@ func talk_darko():
 # La primera vez, en la plaza; después, en la comisaría del barrio alto
 func talk_molina():
 	var N := K("SARGENTO MOLINA")
-	var sob := int(D.SOBORNO)
+	var sob := cuota_molina()
 	var cd := int(D.CUOTA_DIAS)
 	var plaza: bool = S.map == "town"
 	if not S.flags.get("molina1"):
@@ -871,6 +871,7 @@ func talk_molina():
 			S.money -= sob
 			S.protHasta = int(max(S.day, S.protHasta if S.protect else 0)) + cd
 			S.protect = true
+			S.molS = S.get("sales", 0)   # 0.77: desde aquí se cuenta lo facturado para la cuota siguiente
 			sfx("coin")
 			await say(T("Bien. Mis agentes mirarán hacia otro lado hasta el {f}.", {"f": Datos.fd(S.protHasta, S.day)}), N)
 	elif not S.protect:
@@ -1806,7 +1807,7 @@ func aviso_orden():
 func raid_event():
 	S.orden = 0
 	if S.protect:
-		S.heat = 50
+		S.heat = 75 if Datos.CAL else 50   # 0.77: parada la orden, el calor no se queda en la mitad: la siguiente llega antes
 		await talk(K("SMS · MOLINA"), [K("Esta noche había orden de entrada en tu piso. La he parado."), K("Baja el ritmo.")])
 		return
 	# E4 (fase 3): todo lo que se llevan, antes del primer aviso (si se cierra la app a medias, la redada ya ha pasado)

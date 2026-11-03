@@ -54,11 +54,11 @@ Línea base (llvmpipe, `--rend`), coste de GDScript en `capa0`: `home` 1,9 · `n
 | | hallazgo | estado |
 |---|---|---|
 | ALTO | comprar al por mayor y revender por mar daba +44 % a +72 % sin cultivar | **aplicado** (`MERCADO.mayor.f` 1,6 → 2,8, con prueba en `tests/negocios.gd`) |
-| ALTO | el mar paga por encima de la calle y sin tope de calor · la cuota de Molina anula calor y redadas | recomendado |
+| ALTO | el mar paga por encima de la calle y sin tope de calor · la cuota de Molina anula calor y redadas | **aplicado** (0.77: `MAR.rutas[*].pxc` ×1,1-1,4 y atunero de 25 kg · `cuota_molina()` con el 5 % de lo facturado y calor 75 al parar la orden) |
 | MEDIO | la deuda deja de importar en el cap. 5 · la calidad se acumula hasta ×2,21 y los documentos dicen +15 % | recomendado |
-| MEDIO | las máquinas de extracción caras rinden menos por gramo que la prensa de 250 € | recomendado |
-| MEDIO | quesería y panadería cuestan 30.000 € y rinden como el lavadero de 3.000 € · los clubs dominan a Iñaki | recomendado |
-| BAJO | la luz cuesta el 2,5 % de lo que da la carpa: elegir sodio o LED no cuesta nada | recomendado |
+| MEDIO | las máquinas de extracción caras rinden menos por gramo que la prensa de 250 € | **aplicado** (0.77: `EXTR.lava.rendc` 0,19, `EXTR.stat.rendc` 0,12 y `EXTR.rosin.topec` 80) |
+| MEDIO | quesería y panadería cuestan 30.000 € y rinden como el lavadero de 3.000 € · los clubs dominan a Iñaki | **aplicado** en los locales (0.77: `basec` 330 y 310, `genc` 70 y 65) · los clubs, recomendado |
+| BAJO | la luz cuesta el 2,5 % de lo que da la carpa: elegir sodio o LED no cuesta nada | **aplicado** (0.77: tarifa de potencia `POTENCIA`, 2.300 W de serie y 6 €/día por escalón de 1.150 W) |
 
 ## 5 · Genética y estadísticas
 

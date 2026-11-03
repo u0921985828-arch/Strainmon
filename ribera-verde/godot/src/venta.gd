@@ -1262,7 +1262,8 @@ func tiro_billar(txt: String, fase := "fuerza", a := 0.0, per := -1.0, nom := K(
 # las extracciones (1.35, 11l-extraccion): una tanda de barras; la calidad q es la parte que entra, y sale rend × (0,6 + 0,4 q)
 # del peso con thc × (0,9 + 0,1 q) veces el THC, hasta tope
 func sale_extr(E: Dictionary, g: float, q: float) -> float:
-	return maxf(.1, Datos.jsround(g * E.rend * (.6 + .4 * q) * 10) / 10.0)
+	var rend: float = float(E.rendc) if Datos.CAL and E.has("rendc") else float(E.rend)   # 0.77: la lavadora y la static rinden lo que cuestan
+	return maxf(.1, Datos.jsround(g * rend * (.6 + .4 * q) * 10) / 10.0)
 
 func extraer(t: String):
 	var E: Dictionary = D.EXTR[t]
@@ -1322,7 +1323,8 @@ func extraer(t: String):
 		thc = (b.thc * g + oil[1].thc * o + kf[1].thc * m) / (g + o + m)
 		use_rosin(oil[0], o)
 		use_rosin(kf[0], m)
-	thc = minf(E.tope, thc * E.thc * (.9 + .1 * q))
+	var tope_t: float = float(E.topec) if Datos.CAL and E.has("topec") else float(E.tope)   # 0.77: el rosin premia la flor de 27 % o más
+	thc = minf(tope_t, thc * E.thc * (.9 + .1 * q))
 	if kief:
 		use_rosin(k, g)
 	else:

@@ -161,7 +161,7 @@ func _corre() -> void:
 	var en: Dictionary = S.mar.env[0] if S.mar.env.size() else {}
 	chk(int(en.get("g", 0)) == 12000, "con los 12 kg (%s)" % en.get("g"))
 	chk(J.bodega_g(B.k) == 0, "y la bodega, vacía al salir")
-	var esp: int = Datos.jsround(J.precio_mayor(24) * J.calidad({"g": 1, "thc": 24, "dia": S.day}, true) * float(R.rutas[0].px) * 12000)
+	var esp: int = Datos.jsround(J.precio_mayor(24) * J.calidad({"g": 1, "thc": 24, "dia": S.day}, true) * J.mar_px(R.rutas[0]) * 12000)
 	chk(absi(int(en.get("e", 0)) - esp) <= 2, "lo que pagan, por todo: %s (%d)" % [en.get("e"), esp])
 	# 5 · la txalupa (3 kg) no carga más que su bodega aunque vengas con más
 	S.buds = {}

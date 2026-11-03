@@ -752,8 +752,16 @@ func mar_ok() -> bool:
 func barco_k(k: String) -> Dictionary:
 	for B in D.MAR.barcos:
 		if B.k == k:
+			if Datos.CAL and B.has("kgc"):   # 0.77: la bodega del atunero, más corta, para que no se amortice en un viaje
+				var C: Dictionary = B.duplicate()
+				C.kg = B.kgc
+				return C
 			return B
 	return {}
+
+# 0.77: con CAL, lo que paga cada destino baja a pxc (por debajo del club), para que el mar sea volumen y no el mejor precio
+func mar_px(rt: Dictionary) -> float:
+	return float(rt.pxc) if Datos.CAL and rt.has("pxc") else float(rt.px)
 
 func rutas_mar() -> Array:
 	var o := []
@@ -835,7 +843,7 @@ func talk_koldo() -> void:
 			var L := []
 			for j in R.rutas.size():
 				var rt: Dictionary = R.rutas[j]
-				L.append((T("{r}: {d} día más de viaje, pagan ×{px}.", {"r": rt.n, "d": int(rt.d), "px": Datos.coma(float(rt.px))}) if int(rt.d) == 1 else T("{r}: {d} días más de viaje, pagan ×{px}.", {"r": rt.n, "d": int(rt.d), "px": Datos.coma(float(rt.px))})) if float(M_.rep) >= float(rt.rep) else T("{r}: con reputación {rep}.", {"r": rt.n, "rep": int(rt.rep)}))
+				L.append((T("{r}: {d} día más de viaje, pagan ×{px}.", {"r": rt.n, "d": int(rt.d), "px": Datos.coma(mar_px(rt))}) if int(rt.d) == 1 else T("{r}: {d} días más de viaje, pagan ×{px}.", {"r": rt.n, "d": int(rt.d), "px": Datos.coma(mar_px(rt))})) if float(M_.rep) >= float(rt.rep) else T("{r}: con reputación {rep}.", {"r": rt.n, "rep": int(rt.rep)}))
 			await talk(N, L)
 		elif l == "Comprar un barco":
 			await comprar_barco(N)
@@ -922,7 +930,7 @@ func cargar_envio(B: Dictionary) -> void:
 	var ops := []
 	for j in rs:
 		var rt: Dictionary = R.rutas[j]
-		ops.append({"label": rt.n, "right": "×" + Datos.coma(float(rt.px)), "desc": T("{d} días de viaje con {b}.", {"d": int(B.dias) + int(rt.d), "b": B.n})})
+		ops.append({"label": rt.n, "right": "×" + Datos.coma(mar_px(rt)), "desc": T("{d} días de viaje con {b}.", {"d": int(B.dias) + int(rt.d), "b": B.n})})
 	ops.append({"label": K("Nada")})
 	var ir: int = await menu(ops, {"cls": "right", "title": K("¿A dónde?"), "desc": true})
 	if ir < 0 or ir >= rs.size():
@@ -988,7 +996,7 @@ func cargar_envio(B: Dictionary) -> void:
 	var gr: bool = S.mar.get("gr") and not S.mar.get("fin") and ri_ == int(R.gran.ruta) and tot >= int(R.gran.kg) * 1000
 	var e := 0.0
 	for c in carga:
-		e += precio_mayor(c[2]) * c[3] * float(rt.px) * c[1]
+		e += precio_mayor(c[2]) * c[3] * mar_px(rt) * c[1]
 		if not Datos.CAL:
 			use_buds(c[0], c[1])
 	if ped:

@@ -2,6 +2,17 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Lo que quedaba del repaso (0.77, lo pidió el usuario: «Pues cumple con lo pendiente al 100% y compila»)
+
+Los cuatro hallazgos de economía que el repaso 0.76 dejó en «recomendado», aplicados. Todos con claves nuevas que solo se leen con `Datos.CAL`, para que el oráculo del HTML (congelado en la 1.37) siga calcando cifra a cifra:
+
+- **La cuota de Molina ya no es gratis cuando el negocio mueve miles.** `cuota_molina()` (`granja.gd`) cobra el máximo entre el soborno de siempre y el 5 % de lo facturado desde el último pago (`D.CUOTA_PCT`, marca `S.molS` con `S.sales` al pagar), y parar una orden de registro deja el calor en 75 en vez de en la mitad, así que la siguiente llega antes.
+- **La luz se paga por lo que tienes enchufado.** Tarifa de potencia: lo contratado de serie son 3,45 kW… que nadie pasaba. Ahora `POTENCIA` (2.300 W de serie, escalones de 1.150 W a 6 €/día) cobra todos los días cada escalón de más, encendido o no (`Cultivo.potencia_w`, `Cultivo.factura_potencia`, sumada en la factura de la luz que ya sale en el título del menú CULTIVO), así que poner un LED de 720 W donde cabe uno de 400, o tres carpas con filtro de 150 y aire acondicionado, cuesta dinero.
+- **Las máquinas caras rinden lo que cuestan.** La lavadora de extracción (900 €) y la máquina de static (4.500 €) rendían menos por gramo que la prensa de 250 €: `EXTR.lava.rendc` 0,14 → 0,19 y `EXTR.stat.rendc` 0,06 → 0,12, y el rosin premia la flor potente con `EXTR.rosin.topec` 75 → 80 % de THC.
+- **Los locales de 30.000 € rinden lo que cuestan.** La quesería y la panadería vendían como el lavadero de 3.000 €: `NEGOCIO.k.<k>.basec` (330 y 310, contra 120 del lavadero) y `genc` (70 y 65) con el género a la medida (`neg_venta`, `neg_genero`).
+- **El mar es volumen, no el mejor precio.** Cada destino pagaba por encima de los clubs: `MAR.rutas[*].pxc` baja de ×1,5/1,75/2,0/2,4 a ×1,1/1,2/1,3/1,4 (`mar_px`) y la bodega del atunero pasa de 40 a 25 kg (`kgc`, `barco_k`), para que un envío no amortice el barco.
+- **Pruebas.** `tests/pendientes.gd` (25 comprobaciones, 0 fallos: la cuota por lo facturado, la tarifa por escalones con el carro de esquejes, el rendimiento de las dos máquinas y el tope del rosin, y lo que paga cada ruta, con y sin CAL); `tests/muelle.gd` y `tests/bodega.gd` calculan lo esperado con `mar_px`; `tests/economia.gd` sigue en verde (la deuda se salda igual con los tres perfiles de jugador) y `tests/negocios.gd` 351/0. La tarifa se cobra donde se cobra la luz de verdad (`Cultivo.avanza`), no solo en el título del menú.
+
 ### Repaso de estructura, arte, optimización y estadísticas (0.76, lo pidió el usuario: «mejoremos la estructura del juego… cómo está creado, los sprites, cómo funciona, la optimización… las estadísticas y esas movidas»)
 
 Seis auditorías (arquitectura, rendimiento, riesgos, sprites, economía y genética) y, de lo que salió, lo que se arregla ahora:

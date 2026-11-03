@@ -176,7 +176,7 @@ static func factura_sala(S: Dictionary) -> int:
 	for k in D.APARATOS:
 		if d.uso.get(k) or nc.uso.get(k):
 			kwh += D.APARATOS[k].w * D.H_24 * (D.H_DIA * d.uso.get(k, 0) + (1 - D.H_DIA) * nc.uso.get(k, 0)) * .5 / 1000
-	return Datos.jsround(kwh * D.KWH)
+	return Datos.jsround(kwh * kwh_eur())
 
 # riego automático en dos niveles: las garrafas (c.gar[j] litros por plaza, media cosecha; sin el valor, llena) y el goteo
 # (c.dep litros, unas cinco cosechas con la carpa llena; sin el campo, lleno; con él, las garrafas no se usan)
@@ -610,6 +610,35 @@ static func horas_luz(S: Dictionary, ci: int) -> int:
 	return 12 if k == "flor" else 18
 
 # € de luz al día de la carpa ci con plantas (foco H_LUZ horas; extras, día y noche)
+# 0.77: con CAL, la tarifa de potencia: lo que se tiene enchufado a la vez por encima de POTENCIA.gratis se paga al día, aunque
+# no esté encendido, así que poner un LED de 720 W donde cabe uno de 400 cuesta dinero todos los días
+static func kwh_eur() -> float:
+	return float(Datos.carga().KWH)
+
+static func potencia_w(S: Dictionary) -> int:
+	var D := Datos.carga()
+	var w := 0.0
+	for c in S.carpas:
+		if c:
+			w += float(D.FOCOS[c.foco].w)
+			for k in D.EXTRAS:
+				if c.get(k):
+					w += float(D.EXTRAS[k].w)
+	for k in D.APARATOS:
+		if S.get("sala") is Dictionary and S.sala.get(k):
+			w += float(D.APARATOS[k].w)
+	if S.get("bandejas") is Array and S.bandejas.size():
+		w += float(D.CARRO.w)
+	return int(w)
+
+static func factura_potencia(S: Dictionary) -> int:
+	var D := Datos.carga()
+	if not Datos.CAL or not D.has("POTENCIA"):
+		return 0
+	var P: Dictionary = D.POTENCIA
+	var sobra: float = maxf(0, potencia_w(S) - float(P.gratis))
+	return Datos.jsround(ceilf(sobra / float(P.paso)) * float(P.eur))
+
 static func luz_carpa(S: Dictionary, ci: int) -> int:
 	var D := Datos.carga()
 	var c: Dictionary = S.carpas[ci]
@@ -617,7 +646,7 @@ static func luz_carpa(S: Dictionary, ci: int) -> int:
 	for k in D.EXTRAS:
 		if c.get(k):
 			x += D.EXTRAS[k].w
-	return Datos.jsround((D.FOCOS[c.foco].w * D.CICLOS[ciclo_de(c)].h + x * D.H_24) / 1000 * D.KWH)
+	return Datos.jsround((D.FOCOS[c.foco].w * D.CICLOS[ciclo_de(c)].h + x * D.H_24) / 1000 * kwh_eur())
 
 # lo que se duerme en la cama (bedAction): 0, hasta las 7 (si ya son las 7, un día entero); 1, siesta de 3 h
 static func minutos_cama(S: Dictionary, c: int) -> int:
@@ -641,7 +670,7 @@ static func avanza(S: Dictionary, minutos: int) -> int:
 			for ci in S.carpas.size():
 				if S.carpas[ci] and plantas_vivas(S, ci):
 					e += luz_carpa(S, ci)
-			e += factura_sala(S)
+			e += factura_sala(S) + factura_potencia(S)   # 0.77: la tarifa de potencia, todos los días
 			var b: float = minf(float(S.get("banco", 0)), e)   # 1.35: domiciliada, de la cuenta y, si no llega, del efectivo
 			if b > 0:
 				S.banco -= b
