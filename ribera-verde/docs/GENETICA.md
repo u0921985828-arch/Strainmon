@@ -488,11 +488,26 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 - **THC final:** `THC × fenotipo × (0,85 + 0,15 × salud/100) + thc del foco + (abono ? 0,3 : 0)` (tope 35 %).
 - **Rinde (g/m²) de la tabla:** lo que daría con un LED a 400 W/m², abonada y sana.
 
-## Lo que añade la versión de Godot (0.76)
+## Lo que añade la versión de Godot (0.78)
 
-Este documento describe el juego HTML, congelado en la 1.37, que sigue siendo la fuente de los datos y los oráculos. En Godot
-(`godot/`, con `Datos.CAL`) la genética lleva además: los IV y las variedades raras (`IVS`, `SHINY`), las familias de la CannaDex
-(`FAMILIAS`, que suman a los gramos y al THC), las dieciséis autoflorecientes (`AUTO`, que florecen por edad), los rasgos raros
-heredables (`RAREZAS`: enana, doble cosecha —también en las mesas de la nave y de KAIA—, aroma único y resinosa) y el mismo techo
-del THC (`Cultivo.THC_TOPE`) en casa, en la huerta, en la nave y en KAIA. Las tablas de todo eso están en
-[MAESTRO.md](MAESTRO.md) y en [REPASO-ESTRUCTURA.md](REPASO-ESTRUCTURA.md).
+Este documento describe el juego HTML, congelado en la 1.37, que sigue siendo la fuente de los datos y los oráculos. Las tablas
+de arriba son las mismas en Godot, pero allí (`godot/`, con `Datos.CAL`) las dos fórmulas del final llevan más factores:
+
+- **Cosecha (g):** × (1 + el IV de producción: `IVS.prod` × `iv_f`) × (1 + `Cultivo.fam(S, "g")`, lo que suman las familias de
+  la CannaDex de ese tipo que ya tienes completas) × (1 + `Cultivo.rev_bono(S, "rend")`, las técnicas aprendidas en EL ESQUEJE)
+  × los rasgos raros (`Cultivo.ra_g`: la enana rinde un 10 % menos; la doble cosecha reparte el corte en dos).
+- **THC final:** × (1 + el IV de potencia: `IVS.pot` × `iv_f`) × (1 + `Cultivo.fam(S, "thc")`) × (1 + `rev_bono(S, "thc")`),
+  + 1,5 puntos si es resinosa, y en vez del tope del HTML, el techo común `Cultivo.THC_TOPE`, el mismo en casa, en la huerta,
+  en la nave y en KAIA.
+- **Los IV (la genética oculta):** cada línea lleva cuatro IV (potencia, producción, floración y resistencia) deterministas
+  (`Cultivo.iv_linea`, por `Datos.hash_str`, nunca por el azar), tirados en `IVS.basec` [10, 22]; el punto neutro es 16 y lo que
+  cuenta es `iv_f = (iv − 16) / 15`, así que una línea nueva nace en el centro (de media, `iv_f` +0,02) y puede salir buena o
+  mala. Hasta la 0.78 se tiraban en `IVS.base` [6, 18], que daba de media `iv_f` −0,25: cualquier línea sin trabajar empezaba
+  por debajo del punto neutro.
+- **Los rasgos raros (`RAREZAS`):** 1 de cada 50 plantas saca uno (enana, doble cosecha, aroma único, resinosa); pasa a la línea
+  por sus semillas y, en una feminizada de tienda, con los esquejes de la madre (`Cultivo.ra_sin_semilla`; antes hacía falta una
+  hermafrodita, 1 de cada 8 semillas, y fijarlo costaba 8 veces más) y se fija con cuatro cosechas. La doble cosecha vale lo
+  mismo en el piso, en la huerta y en las mesas de la nave y de KAIA (`prog_rebrote`: ×1,20 por día de ciclo).
+- **Las variedades raras** (`SHINY`, 1 de cada 500: morada, albina o dorada, ×5 al precio) y las **autoflorecientes** (`AUTO`:
+  la Ruderalis y dieciséis cruces con ella, que florecen por edad, sin madres ni esquejes). Las tablas de todo esto están en [MAESTRO.md](MAESTRO.md) y en
+  [REPASO-ESTRUCTURA.md](REPASO-ESTRUCTURA.md); lo medido, en `godot/tests/repaso_eco_gen.gd`.

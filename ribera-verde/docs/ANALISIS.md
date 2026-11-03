@@ -10,8 +10,13 @@ La primera versión de este análisis encontró 10 problemas (el resumen de abaj
 
 > Las cifras de este documento son las del juego HTML (congelado en la 1.37). La versión de Godot que se publica cambia
 > algunas con `Datos.CAL`: los ladrones y los carteristas solo de 21:00 a 6:00, los combates de ladrones y rivales al 80 %
-> de vida y de golpe, el colocón y la borrachera en la pelea y el techo común del THC. Ver [MAESTRO.md](MAESTRO.md) y
-> [REPASO-ESTRUCTURA.md](REPASO-ESTRUCTURA.md).
+> de vida y de golpe, el colocón y la borrachera en la pelea y el techo común del THC. Desde la 0.78, también la venta: cada
+> club compra de 150 a 300 g al día según la confianza y su entrega sube el calor 1 + 1 por cada 150 g (antes, 200 g a calor 1
+> fijo, así que vender a los clubs ganaba siempre a Iñaki), los cuatro IV de cada línea nacen en el punto neutro
+> (`IVS.basec` [10, 22]), la potencia contratada son 4,6 kW en el piso y en la nave (a tope se pasa, y por eso valen el
+> generador y las placas) y la calidad no es un +15 %, sino la cadena entera del curado, la manicura, el afinado, las semanas
+> en tarro y las técnicas de la revista (hasta ×2,44; ×3,04 con el aroma único y ×15,22 con una variedad rara). Ver
+> [MAESTRO.md](MAESTRO.md) y [REPASO-ESTRUCTURA.md](REPASO-ESTRUCTURA.md).
 
 Las cifras salen del código de la 1.10. `node tools/analisis-riesgos.js` escribe las tablas generadas con un modelo exacto, que aplica las mismas reglas que el código. Después, el mismo script juega cada caso con las funciones de verdad del juego (`onStepEnd`, `updatePatrullas` y `updatePlayer`, `battle` y `thiefRound`, `copRound`, `newDay` y `raidEvent`, `talkClient`, `talkInaki`, `ventaMayor`, `harvest`, `addBuds` y `talkJurado`), también con la caja llena (`S.caja`). Si alguna cifra no cuadra, para con un error y no escribe nada.
 

@@ -325,14 +325,14 @@ func migrate() -> void:
 		var tb := {4: D.DEUDA - D.PLAZOS["3"], 5: D.DEUDA - D.PLAZOS["3"], 6: D.PLAZOS["7"], 7: D.PLAZOS["7"]}
 		S.debt = 0 if S.ch >= 8 else int(tb.get(int(S.ch), 0) if tb.get(int(S.ch), 0) else D.DEUDA)
 		if S.get("due", 0) > 0:
-			S.due = int(D.PLAZOS[str(S.ch)]) if S.ch == 3 or S.ch == 5 else S.debt
+			S.due = mini(plazo_due(int(S.ch)), S.debt) if S.ch == 3 or S.ch == 5 else S.debt   # 0.78: lo pactado o medio plazo de lo facturado
 			S.deadline = maxi(int(S.get("deadline", 0)), S.day + (10 if S.ch == 5 else 7))   # R56 (0.78): la partida vieja puede no traer deadline
 		if S.ch >= 8:
 			S.imp0 = S.sales
 			S.impN = 0
 	# partidas guardadas por chapter() antes de poner el plazo: capítulo 5 o 7 sin nada que pagar
 	if (S.ch == 5 or S.ch == 7) and not (S.get("due", 0) > 0) and S.get("debt", 0) > 0:
-		S.due = mini(int(D.PLAZOS["5"]), S.debt) if S.ch == 5 else S.debt
+		S.due = mini(plazo_due(5), S.debt) if S.ch == 5 else S.debt   # 0.78: lo pactado o medio plazo de lo facturado
 		S.deadline = maxi(S.get("deadline", 0) if S.get("deadline") else 0, S.day + (10 if S.ch == 5 else 7))
 	if S.get("nave") != null and S.nave.get("r") == null:   # 1.35: los recibos, cada RECIBO.dias
 		S.nave.r = S.day + D.RECIBO.dias

@@ -388,11 +388,14 @@ func _corre() -> void:
 	chk(corre(func(): await J.comprar_mercado("club_rv", "CLUB", pool)) and S.rosin.has(kx), "extracción comprada: %s %s" % [kx, S.rosin])
 	S.buds = {"kali": {"g": 500.0, "thc": 20.0, "dia": S.day - 9, "cu": 1}}
 	mm = S.money
-	for i in 3:
+	# 0.78: el club tiene tope por día (MERCADO.club.topec, con la confianza del encargado), así que caben las entregas que
+	# quepan en ese tope: con los 100 g de quien no te conoce y entregas de 50 g, dos
+	var nv: int = int(J.club_tope("rv")) / int(D.CLUB.g[0])
+	for i in nv:
 		QUIERO = ["Kali", "%d g" % int(D.CLUB.g[0])]
 		chk(corre(func(): await J.vender_club("rv")), "venta al club %d" % i)
 	var vend: float = 500.0 - float(S.buds.kali.g)
-	chk(vend == 3 * int(D.CLUB.g[0]) and S.money > mm, "varias ventas al club: %s %d %s" % [vend, S.money - mm, MENUS.slice(-3)])
+	chk(nv >= 2 and vend == nv * int(D.CLUB.g[0]) and S.money > mm, "las %d entregas que caben en el tope del día: %s %d %s" % [nv, vend, S.money - mm, MENUS.slice(-3)])
 	LOG = []
 	S.buds.kali.g = 500.0
 	S.mer_v.club_rv.g = float(TC.tope)

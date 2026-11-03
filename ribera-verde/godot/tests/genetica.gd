@@ -37,12 +37,13 @@ func _corre() -> void:
 	var D = J.D
 	var IV: Dictionary = D.IVS
 	S.erase("iv")
-	# 1 · la línea: 4 valores de IVS.base, siempre los mismos para la misma variedad
+	# 1 · la línea: 4 valores de IVS.basec (repaso 0.76; sin CAL, IVS.base), siempre los mismos para la misma variedad
+	var IVB: Array = IV.basec if Datos.CAL and IV.has("basec") else IV.base
 	var L: Array = Cultivo.iv_linea(S, "ria").duplicate()
 	var ok := L.size() == 4
 	for v in L:
-		ok = ok and int(v) >= int(IV.base[0]) and int(v) <= int(IV.base[1])
-	chk(ok, "línea en %s: %s" % [IV.base, L])
+		ok = ok and int(v) >= int(IVB[0]) and int(v) <= int(IVB[1])
+	chk(ok, "línea en %s: %s" % [IVB, L])
 	S.erase("iv")
 	chk(Cultivo.iv_linea(S, "ria") == L, "la línea no depende de nada más")
 	# 2 · cada planta: los de su línea ± IVS.var, entre 1 y 31, sin tocar el azar

@@ -2165,8 +2165,8 @@ func recibos() -> Array:
 # 0.77: con CAL, la cuota no es fija: sube con lo facturado desde la última vez que se pagó (5 %%), para que la protección no
 # sea gratis cuando el negocio mueve miles al día (S.molS, la marca de S.sales del último pago)
 func cuota_molina() -> int:
-	if not Datos.CAL:
-		return int(D.SOBORNO)
+	if not Datos.CAL or not S.has("molS"):
+		return int(D.SOBORNO)   # sin la marca del último pago (partida migrada) no hay ventana que contar: la cuota pactada
 	var fact: float = maxf(0, float(S.get("sales", 0)) - float(S.get("molS", 0)))
 	return int(maxf(float(D.SOBORNO), Datos.jsround(fact * float(D.CUOTA_PCT))))
 

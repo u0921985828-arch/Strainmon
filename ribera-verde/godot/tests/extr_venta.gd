@@ -124,14 +124,26 @@ func _corre() -> void:
 	S.clubs.rv = true
 	S.clubDia = {}
 	S.rosin = {sid + "~hash": {"g": 40.0, "thc": 35.0}}
-	MENUS = []
-	QUIERO = ["Hachís", "25 g"]
-	m0 = S.money
+	# 0.78: el club tiene tope por día en gramos de flor (MERCADO.club.topec, con la confianza del encargado),
+	# así que de las cantidades de VENTA_EXTR.club_g solo salen las que caben en esa carga
 	b = S.rosin[sid + "~hash"].duplicate()
 	p = pg(sid + "~hash", b, "club")
+	var tope: float = J.club_tope("rv")
+	var caben := []
+	for g in VX.club_g:
+		if float(g) <= floor(b.g) and float(g) / float(D.ROSIN.rend) <= tope:
+			caben.append(int(g))
+	var gq: int = int(caben[caben.size() - 1])
+	MENUS = []
+	QUIERO = ["Hachís", "%d g" % gq]
+	m0 = S.money
+	var esp := []
+	for g in caben:
+		esp.append("%d g · %s" % [int(g), Datos.eur(int(g) * p)])
+	esp.append("Nada")
 	chk(corre(func(): await J.vender_club("rv")), "club bloqueado")
-	chk(MENUS.size() >= 2 and MENUS[1] == ["10 g · %s" % Datos.eur(10 * p), "25 g · %s" % Datos.eur(25 * p), "Nada"], "cantidades del club: %s" % [MENUS])
-	chk(S.money - m0 == Datos.jsround(25 * p) and absf(S.rosin[sid + "~hash"].g - 15.0) < 1e-6 and S.clubDia.rv == S.day, "club: %d %s" % [S.money - m0, S.rosin])
+	chk(caben.size() >= 1 and MENUS.size() >= 2 and MENUS[1] == esp, "las cantidades que caben en el tope del club (%d g de flor): %s" % [int(tope), MENUS])
+	chk(S.money - m0 == Datos.jsround(gq * p) and absf(S.rosin[sid + "~hash"].g - (40.0 - gq)) < 1e-6 and S.clubDia.rv == S.day, "club: %d %s" % [S.money - m0, S.rosin])
 	chk(p > J.precio_club(b.thc), "el club paga más el extracto: %s" % p)
 	# 5 · el dispensario de la asociación: el lote de rosin y lo que retiran los socios cada mañana
 	var A: Dictionary = J.aso()

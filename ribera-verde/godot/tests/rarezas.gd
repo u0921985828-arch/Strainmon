@@ -186,14 +186,16 @@ func _corre() -> void:
 	chk(absi(g2 - roundi(g1 * float(R.r.doble.g2))) <= 1, "la segunda, del 60 %% (%d g y %d g)" % [g1, g2])
 	chk(J.S.ra.ria.doble == 1 and J.S.ra.ria.aroma == 1 and not dicho("50 de cada 100"), "la misma planta es la misma generación: sigue a nivel 1 (%s)" % [J.S.ra])
 	chk(J.S.album.size() == 1, "la misma planta, una vez en el cuaderno")
-	# sin semillas (línea estable de tienda, sin hermafrodita) el rasgo no pasa
+	# sin semillas, una línea feminizada (D.FEM, las de la tienda) aprende el rasgo igual: se guarda con esquejes de la
+	# madre, no con semilla (repaso 0.76, «5 · Genética»: antes se fijaba 8 veces más despacio que una regular)
 	J.S.gen.erase("ria")
 	J.S.pots[0] = planta("ria", ["resina"], 9002)
 	Cultivo.pm = 7
 	LOG = []
 	chk(corre(func(): await J.harvest(0)), "cosecha sin semillas")
 	if not dicho("semillas"):
-		chk(not J.S.ra.ria.has("resina") and dicho("Sin semillas de esta planta"), "sin semillas, la línea no la aprende")
+		chk(J.S.ra.ria.has("resina") and dicho("Sin semillas de esta planta"), "sin semillas, la feminizada la aprende igual (%s)" % [J.S.ra.ria])
+	J.S.ra.ria.erase("resina")
 	chk(J.S.album.size() == 2, "pero va al cuaderno")
 	# 5 · generación a generación: hermanas y esquejes de la misma no suben; las semillas de cada generación, uno
 	var ch := []

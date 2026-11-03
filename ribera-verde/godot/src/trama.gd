@@ -867,7 +867,8 @@ func talk_molina():
 			S.money -= sob
 			S.protHasta = int(max(S.day, S.protHasta if S.protect else 0)) + cd
 			S.protect = true
-			S.molS = S.get("sales", 0)   # 0.77: desde aquí se cuenta lo facturado para la cuota siguiente
+			if Datos.CAL:   # 0.78: sin CAL no se crea la clave (el oráculo del HTML compara el S entero)
+				S.molS = S.get("sales", 0)   # 0.77: desde aquí se cuenta lo facturado para la cuota siguiente
 			sfx("coin")
 			await say(T("Bien. Mis agentes mirarán hacia otro lado hasta el {f}.", {"f": Datos.fd(S.protHasta, S.day)}), N)
 	elif not S.protect:
@@ -959,6 +960,8 @@ func talk_baltasar():
 	S.debt -= S.due
 	var paid = S.due
 	S.due = 0
+	if Datos.CAL:   # 0.78: desde aquí se cuenta lo facturado para el plazo siguiente (plazo_due)
+		S.plazoS = S.get("sales", 0)
 	sfx("coin")
 	toast(T("Pagado: {e}", {"e": Datos.eur(paid)}), 1500)
 	if S.ch == 3:
@@ -1683,12 +1686,13 @@ func check_story():
 		await talk(K("SMS · IÑAKI"), [T("Se corre la voz: {e} vendidos desde que pagaste a Baltasar.", {"e": Datos.eur(facturado())}), T("Desde hoy te cargo hasta {g} al día en el barco.", {"g": _kg(int(r.mayor))})])
 		show_objective()
 	if S.ch == 4 and S.flags.get("lab") and rec_count() >= 2:
-		S.due = int(D.PLAZOS["5"])
+		S.due = plazo_due(5)   # 0.78: lo pactado o medio plazo de lo facturado, lo que sea más
+		S.debt += S.due - int(D.PLAZOS["5"])   # lo que pide de más se suma a la deuda
 		S.deadline = S.day + dias_plazo(5)
 		if Datos.PLAY:
 			S.due0 = S.due
 		await chapter(5)
-		await talk(K("SMS · TOÑO"), [T("Don Baltasar quiere {e} en {n} días.", {"e": Datos.eur(D.PLAZOS["5"]), "n": dias_letra(dias_plazo(5))}), K("Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza.")])
+		await talk(K("SMS · TOÑO"), [T("Don Baltasar quiere {e} en {n} días.", {"e": Datos.eur(S.due), "n": dias_letra(dias_plazo(5))}), K("Otra cosa: un tal SARGENTO MOLINA pregunta por ti en la plaza.")])
 		show_objective()
 	# (lo pidió el usuario: «no existe mapa y sitio del bajo de las setas»; con Datos.CAL): nada te decía dónde estaba. Con
 	# Ibarbide abierta, una vez, el SMS de Julen con el sitio (también en MÓVIL → Mapa y en el cartel de la Kale Zaharra)
@@ -1702,6 +1706,18 @@ func check_story():
 # E5 (fase 3): todo lo que cambia, antes del primer aviso (guardada a medias, no se cuenta dos veces)
 # U3 (fase 5, con Datos.PLAY): el recargo, sobre lo que pedía el plazo (sin interés compuesto) y hasta RESCATE.tope; el primer impago de la partida,
 # el rescate de Toño (RESCATE: la mitad de recargo y más días a cambio de un recado); el embargo, como mucho uno por capítulo
+# 0.78 (repaso 4 · Economía): el plazo no se queda en la cifra pactada cuando el negocio ya mueve miles al día. Don Baltasar
+# pide lo pactado o la parte de PLAZO_PCT de lo facturado desde el plazo anterior, lo que sea más, y lo que pide de más sube
+# la deuda (el último plazo sigue siendo lo que quede). Los tres perfiles de tests/economia.gd facturan 5.949-9.430 € entre
+# plazos, así que el suelo de 12.000 € no se les mueve; el que tira de la nave o de Iñaki a diario factura 40.000 € en la misma
+# ventana.
+func plazo_due(ch: int) -> int:
+	var base: int = int(D.PLAZOS[str(ch)])
+	if not Datos.CAL or not D.has("PLAZO_PCT") or not S.has("plazoS"):
+		return base   # sin la marca del plazo anterior (partida migrada, tutorial saltado) no hay ventana que contar: lo pactado
+	var fact: float = maxf(0, float(S.get("sales", 0)) - float(S.get("plazoS", 0)))
+	return int(maxf(float(base), Datos.jsround(fact * float(D.PLAZO_PCT))))
+
 func dias_plazo(ch: int) -> int:
 	if Datos.PLAY and D.has("PLAZO_DIAS"):
 		return int(D.PLAZO_DIAS[str(ch)])

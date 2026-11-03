@@ -183,7 +183,10 @@ func _corre() -> void:
 	S.erase("nave")
 	chk(J.carga_w("casa") == 2400, "calefactor y aire: 2,4 kW (%d)" % J.carga_w("casa"))
 	var lim0: int = int(E.casa.lim)
+	var limc0 = E.casa.get("limc")   # repaso 0.76: con CAL, la potencia contratada sale de limc
 	E.casa.lim = 0
+	if limc0 != null:
+		E.casa.limc = 0
 	var h0 := 20
 	S.heat = h0
 	var av := []
@@ -215,6 +218,8 @@ func _corre() -> void:
 	chk(int(S.heat) == h0, "sin CAL, nada")
 	Datos.CAL = true
 	E.casa.lim = lim0
+	if limc0 != null:
+		E.casa.limc = limc0
 	S.ener = {}
 	S.heat = h0
 	J.energia_dia([])

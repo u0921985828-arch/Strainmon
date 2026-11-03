@@ -1621,7 +1621,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var est: bool = OBJ_CACHE and an == null and md == null and not seca and not o.begins_with("hg-")
 	var f = null
 	if est:
-		var ck := "of|%s|%d|%d|%s|%s|%s|%s" % [o, tx, ty, sp, d.esp, J.S.map, _mapa_gh()]
+		var ck := "of|%s|%d|%d|%s|%s|%s|%s|%s|%s" % [o, tx, ty, sp, d.esp, J.S.map, _mapa_gh(), Datos.CAL, Datos.PLAY]   # CAL y PLAY cambian el sprite (e-<x>, play) y en las pruebas cambian en vivo
 		if _ctiene(ck):
 			f = cache[ck]
 		else:

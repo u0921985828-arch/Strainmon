@@ -180,14 +180,29 @@ Cualquier pareja que no esté en la tabla de recetas genera un híbrido «propio
 - **THC final:** \`THC × fenotipo × (0,85 + 0,15 × salud/100) + thc del foco + (abono ? 0,3 : 0)\` (tope 35 %).
 - **Rinde (g/m²) de la tabla:** lo que daría con un LED a ${D.c.W_M2} W/m², abonada y sana.
 
-## Lo que añade la versión de Godot (0.76)
+## Lo que añade la versión de Godot (0.78)
 
-Este documento describe el juego HTML, congelado en la 1.37, que sigue siendo la fuente de los datos y los oráculos. En Godot
-(\`godot/\`, con \`Datos.CAL\`) la genética lleva además: los IV y las variedades raras (\`IVS\`, \`SHINY\`), las familias de la CannaDex
-(\`FAMILIAS\`, que suman a los gramos y al THC), las dieciséis autoflorecientes (\`AUTO\`, que florecen por edad), los rasgos raros
-heredables (\`RAREZAS\`: enana, doble cosecha —también en las mesas de la nave y de KAIA—, aroma único y resinosa) y el mismo techo
-del THC (\`Cultivo.THC_TOPE\`) en casa, en la huerta, en la nave y en KAIA. Las tablas de todo eso están en
-[MAESTRO.md](MAESTRO.md) y en [REPASO-ESTRUCTURA.md](REPASO-ESTRUCTURA.md).
+Este documento describe el juego HTML, congelado en la 1.37, que sigue siendo la fuente de los datos y los oráculos. Las tablas
+de arriba son las mismas en Godot, pero allí (\`godot/\`, con \`Datos.CAL\`) las dos fórmulas del final llevan más factores:
+
+- **Cosecha (g):** × (1 + el IV de producción: \`IVS.prod\` × \`iv_f\`) × (1 + \`Cultivo.fam(S, "g")\`, lo que suman las familias de
+  la CannaDex de ese tipo que ya tienes completas) × (1 + \`Cultivo.rev_bono(S, "rend")\`, las técnicas aprendidas en EL ESQUEJE)
+  × los rasgos raros (\`Cultivo.ra_g\`: la enana rinde un 10 % menos; la doble cosecha reparte el corte en dos).
+- **THC final:** × (1 + el IV de potencia: \`IVS.pot\` × \`iv_f\`) × (1 + \`Cultivo.fam(S, "thc")\`) × (1 + \`rev_bono(S, "thc")\`),
+  + 1,5 puntos si es resinosa, y en vez del tope del HTML, el techo común \`Cultivo.THC_TOPE\`, el mismo en casa, en la huerta,
+  en la nave y en KAIA.
+- **Los IV (la genética oculta):** cada línea lleva cuatro IV (potencia, producción, floración y resistencia) deterministas
+  (\`Cultivo.iv_linea\`, por \`Datos.hash_str\`, nunca por el azar), tirados en \`IVS.basec\` [10, 22]; el punto neutro es 16 y lo que
+  cuenta es \`iv_f = (iv − 16) / 15\`, así que una línea nueva nace en el centro (de media, \`iv_f\` +0,02) y puede salir buena o
+  mala. Hasta la 0.78 se tiraban en \`IVS.base\` [6, 18], que daba de media \`iv_f\` −0,25: cualquier línea sin trabajar empezaba
+  por debajo del punto neutro.
+- **Los rasgos raros (\`RAREZAS\`):** 1 de cada 50 plantas saca uno (enana, doble cosecha, aroma único, resinosa); pasa a la línea
+  por sus semillas y, en una feminizada de tienda, con los esquejes de la madre (\`Cultivo.ra_sin_semilla\`; antes hacía falta una
+  hermafrodita, 1 de cada 8 semillas, y fijarlo costaba 8 veces más) y se fija con cuatro cosechas. La doble cosecha vale lo
+  mismo en el piso, en la huerta y en las mesas de la nave y de KAIA (\`prog_rebrote\`: ×1,20 por día de ciclo).
+- **Las variedades raras** (\`SHINY\`, 1 de cada 500: morada, albina o dorada, ×5 al precio) y las **autoflorecientes** (\`AUTO\`:
+  la Ruderalis y dieciséis cruces con ella, que florecen por edad, sin madres ni esquejes). Las tablas de todo esto están en [MAESTRO.md](MAESTRO.md) y en
+  [REPASO-ESTRUCTURA.md](REPASO-ESTRUCTURA.md); lo medido, en \`godot/tests/repaso_eco_gen.gd\`.
 `;
   fs.writeFileSync(path.join(ROOT, 'docs/GENETICA.md'), g);
 
@@ -243,6 +258,8 @@ Skunk #1 sana y abonada, fenotipo medio (cosecha de 2,5 días):
 - **Calle:** ${dec(c.calle[0])}-${dec(c.calle[1])} €/g según el THC (× 0,85 estudiante, × 1 currela, × 1,15 turista, × 1,35 pijo; rebaja × 0,85, caro × 1,3). Cada cliente quiere 2-12 g.
 - **Al por mayor (Iñaki, en el muelle, desde el capítulo 3):** ${dec(c.mayor[0])}-${dec(c.mayor[1])} €/g, lotes de 100 g para arriba, una carga al día de hasta ${dec(c.IMPERIO[0].mayor / 1000)} kg (más en el imperio). Cada carga sube el calor 2 + 1 por cada 100 g.
 - **Curado (1.29):** los cogollos salen sin curar. En la caja fuerte (1.36: ya no hay arcón), con los tarros de Kiko (${c.tarros} €), se curan en ${c.CURADO.dias} días: ganan un ${dec(c.CURADO.thc * 100)} % de THC al perder agua y se venden un ${dec(c.CURADO.precio * 100)} % más caros (calle, Iñaki, la lonja, los clubs, los vendedores y la plantilla). Desde la 1.36, sin curar no pierden THC; los extractos se curan en frío en la nevera, también con los tarros (caben ${c.NEVERA.g} g) y se venden un ${dec(c.CURADO.precio * 100)} % más caros, y la mesa de manicurar suma un ${dec(c.MANICURA.precio * 100)} % a los cogollos.
+- **La calidad entera (Godot, con \`Datos.CAL\`):** ese 15 % del curado es solo el primer eslabón. \`calidad()\` multiplica el precio de cada venta por el curado (+15 %), la manicura (+10 %), el afinado del camarote (+10 %), las semanas en tarro (+8 % por semana, hasta ocho), las técnicas de EL ESQUEJE (+10 %), el aroma único (+25 %) y la variedad rara (×5), y lo recién cortado lo baja a ×0,35 hasta que se seca. Medido en \`godot/tests/repaso_eco_gen.gd\`: ×1,35 curado, manicurado y afinado; ×2,21 con las ocho semanas de tarro; ×2,44 con las tres técnicas de la revista; ×3,04 con el aroma único, y ×15,22 con una rara. Queda así a propósito (cada eslabón es una fase del oficio y ninguno se consigue sin trabajo, y la rara sale 1 de cada 500): lo que se quedaba en «+15 %» era este documento.
+- **Los clubs (Godot, con \`Datos.CAL\`):** cada club compra de 150 g al día sin conocerte a 300 g de socio (\`MERCADO.club.topec\`, por la confianza) y cada entrega sube el calor 1 + 1 por cada 150 g (\`CLUB.calorg\`): pagan mejor el gramo (6 €/g al 20 % de THC, frente a los 4 de Iñaki), pero mueven poco y hay que ganarse club por club. Iñaki se lleva 1 kg de una vez (10 kg en el imperio) y es el canal del volumen.
 - **Rosin (desde el capítulo 3, con la prensa de Kiko, ${c.prensa} €):** en la mesa del piso, ${dec(c.ROSIN.rend * 100)} % del peso de la flor con ${c.ROSIN.thc} veces su THC (hasta el ${c.ROSIN.tope} %), en media hora. Lo compran los catadores (bocadillo con una gota ámbar; 1-3 g; 2 al día en el barrio y 1 en los astilleros, en Puerto Viejo y en Valdehierro) a ${c.rosin.map(([t, p]) => `${dec(p)} €/g al ${t} %`).join(', ')}: prensar compensa desde el 12,5 % de THC de la flor. Cada gramo vendido sube el calor 2,5 (la flor, 0,5).
 - **Zonas:** ${Object.values(D.zonas).filter(z => z.precio !== 1).map(z => `en ${z.n === 'Astilleros' ? 'los astilleros' : z.n}, el gramo × ${dec(z.precio)}`).join('; ')} (las esquinas de Darko: 1 de cada 3 ventas acaba en pelea).
 - **Encargos de Don Baltasar (capítulo 8):** ${c.PAGO_ENCARGO} €/g por ${[...new Set(c.ENCARGO)].map(g => dec(g / 1000)).join(', ').replace(/, ([^,]*)$/, ' o $1')} kg según el rango del imperio, entregados de noche en el almacén de los astilleros en ${c.ENCARGO_DIAS} días.

@@ -68,11 +68,18 @@ func _initialize() -> void:
 		n += 1
 		if semi:
 			fallos.append("arte/%s tiene %d colores con alfa a medias (el arte va con alfa binario)" % [x, semi])
-		var sin_usar := 0
+		# la paleta se mide del propio arte (tools/sprites/paleta.js --solo-arte), asi que un color declarado que la hoja
+		# no usa es paleta vieja: o el arte cambio sin volver a medirla, o sobra una entrada. Tambien es fallo
+		var sinu := []
 		for c in decl:
 			if not decl[c]:
-				sin_usar += 1
-		print("  %s: %d colores declarados, %d sin usar" % [x, decl.size(), sin_usar])
+				sinu.append(c)
+		n += 1
+		if not sinu.is_empty():
+			sinu.sort()
+			fallos.append("arte/%s declara %d colores que ya no usa (vuelve a medir la paleta): %s%s"
+				% [x, sinu.size(), ", ".join(sinu.slice(0, 8)), " …" if sinu.size() > 8 else ""])
+		print("  %s: %d colores declarados, %d sin usar" % [x, decl.size(), sinu.size()])
 	for x in fallos:
 		print("FALLO ", x)
 	print("paleta: %d comprobaciones, %d fallos" % [n, fallos.size()])
