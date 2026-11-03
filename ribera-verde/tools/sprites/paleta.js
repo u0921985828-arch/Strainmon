@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 /*
-  Ribera Verde — saca la paleta real del juego de las referencias exportadas.
-  Uso:  node tools/sprites/paleta.js        (después de tools/sprites/referencias.js)
-  Sale: art/paleta/ribera.json  colores de sprites y fondos + paleta de identidad por personaje
+  Ribera Verde — saca la paleta real del juego: la del arte procedural de las referencias («maestra», «existentes»,
+  «fondos», «por_personaje») y la del arte que se publica, hoja por hoja («arte»: la lista cerrada de colores de cada
+  PNG de godot/arte, medida tal cual). La primera describe el estilo y es la que se le pasa a el generador de sprites; la
+  segunda es la que se puede comprobar, y la comprueba godot/tests/paleta.gd.
+  Uso:  node tools/sprites/paleta.js               (después de tools/sprites/referencias.js)
+        node tools/sprites/paleta.js --solo-arte   (solo vuelve a medir «arte»: no toca lo demás ni necesita referencias)
+  Sale: art/paleta/ribera.json  colores de sprites y fondos + paleta de identidad por personaje + la de cada hoja
         art/paleta/ribera.hex   formato Lospec (un color por línea)
         art/paleta/ribera.gpl   paleta de GIMP/Aseprite
         art/paleta/ribera.png   muestras 8×8 (para color_image / palette_image del generador de sprites)
@@ -30,6 +34,47 @@ const hsl = h => { const r = parseInt(h.slice(1, 3), 16) / 255, g = parseInt(h.s
   let hh = 0; if (d) hh = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
   return [(hh * 60 + 360) % 360, d ? d / (1 - Math.abs(2 * l - 1)) : 0, l]; };
 const order = (a, b) => { const A = hsl(a), B = hsl(b); const ga = A[1] < .12 ? -1 : Math.floor(A[0] / 30), gb = B[1] < .12 ? -1 : Math.floor(B[0] / 30); return ga - gb || A[2] - B[2]; };
+
+// ---------- la paleta real del arte que se publica (godot/arte/*.png) ----------
+// «maestra» y «existentes» salen del arte procedural de art/referencias: describen el estilo, no lo que de verdad usa
+// hoy cada hoja (el atlas solo tiene miles de colores más), así que un control contra ellas falla en todo y no
+// discrimina. «arte» es la medida de verdad: la lista cerrada de colores de cada hoja, con la que godot/tests/paleta.gd
+// falla si el arte se sale de ella (un color nuevo = volver a pasar este script a propósito).
+const ARTE = path.join(ROOT, 'godot', 'arte');
+function paletaArte() {
+  const hojas = {};
+  for (const f of fs.readdirSync(ARTE).filter(x => x.endsWith('.png')).sort()) {
+    const png = PNG.sync.read(fs.readFileSync(path.join(ARTE, f)));
+    const set = new Set(); let semi = 0;
+    for (let i = 0; i < png.data.length; i += 4) {
+      const a = png.data[i + 3];
+      if (!a) continue;
+      if (a < 255) semi++;
+      set.add(hex(png.data[i], png.data[i + 1], png.data[i + 2]).slice(1));
+    }
+    hojas[f] = { colores: set.size, semitransparentes: semi, lista: [...set].sort().join(' ') };
+  }
+  return hojas;
+}
+const ARTE_DESC = 'La paleta de cada hoja de godot/arte, medida tal cual ("lista": sus colores en hexadecimal, sin ' +
+  '«#», por orden y separados por un espacio): la lista está cerrada y ' +
+  'godot/tests/paleta.gd falla si una hoja usa un color que no está o si algún píxel es semitransparente. Se vuelve a ' +
+  'medir con «node tools/sprites/paleta.js --solo-arte» cuando el arte cambia a propósito.';
+
+if (process.argv.includes('--solo-arte')) {
+  const f = path.join(OUT, 'ribera.json');
+  const json = JSON.parse(fs.readFileSync(f, 'utf8'));
+  const antes = json.arte && json.arte.hojas ? json.arte.hojas : {};
+  const hojas = paletaArte();
+  json.arte = { descripcion: ARTE_DESC, hojas };
+  fs.writeFileSync(f, JSON.stringify(json, null, 2) + '\n');
+  for (const k of Object.keys(hojas)) {
+    const a = antes[k] ? String(antes[k].lista).split(' ') : [], n = hojas[k].lista.split(' ');
+    const nuevos = n.filter(c => !a.includes(c)).length, idos = a.filter(c => !n.includes(c)).length;
+    console.log(`${k}: ${hojas[k].colores} colores${antes[k] ? ` (${nuevos} nuevos, ${idos} que ya no salen)` : ''}${hojas[k].semitransparentes ? ` · ${hojas[k].semitransparentes} semitransparentes` : ''}`);
+  }
+  process.exit(0);
+}
 
 const files = walk(REF).filter(f => f.endsWith('.png') && !path.basename(f).startsWith('_'));
 const sprites = new Map(), fondos = new Map(), porPersonaje = {};
@@ -72,6 +117,7 @@ const soloFondos = [...fondos.keys()].filter(h => !sprites.has(h)).sort(order);
 const json = {
   descripcion: 'Paleta de Ribera Verde extraída del arte procedural. "maestra": paleta bloqueada para los sprites nuevos (incluye todos los colores de identidad de los personajes). "existentes": todos los colores que usa hoy el arte. "fondos": colores que solo salen en fondos de combate y título. "por_personaje": colores de identidad de cada uno.',
   maestra, existentes: lista, fondos: soloFondos,
+  arte: { descripcion: ARTE_DESC, hojas: paletaArte() },
   por_personaje: Object.fromEntries(Object.entries(porPersonaje).map(([k, s]) => [k, [...s].sort(order)])),
 };
 fs.mkdirSync(OUT, { recursive: true });

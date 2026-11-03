@@ -159,13 +159,14 @@ def labPila():
     return L
 
 def labDucha():
-    """la ducha de emergencia: el tubo verde que baja del techo, el brazo con la regadera de plato, el tirador triangular
-    colgado de su varilla, la señal verde y, en el suelo, el sumidero"""
+    """la ducha de emergencia, a su alto real: 37 px = 2,31 m a 16 px/m, con la regadera a 2,06 m (antes el tubo subía hasta
+    la fila 0 de la celda y la regadera quedaba a 2,69 m) — la columna verde, el brazo con la regadera de plato, el tirador
+    triangular colgado de su varilla, la señal verde y, en el suelo, el sumidero"""
     L = Lienzo(32, 48)
-    L.vl(21, 0, 45, VE[1]); L.vl(22, 0, 45, VE[0])                                        # el tubo
-    L.hl(13, 21, 3, VE[1]); L.hl(13, 21, 4, VE[0])                                        # el brazo
-    L.r(10, 5, 8, 2, AC[2]); L.hl(10, 17, 5, AC[3]); L.hl(11, 16, 7, AC[1])               # la regadera
-    L.vl(19, 5, 18, AC[0]); L.r(17, 19, 5, 1, AM[1]); L.p(18, 20, AM[1]); L.p(20, 20, AM[1]); L.p(19, 21, AM[1])   # el tirador
+    L.vl(21, 12, 45, VE[1]); L.vl(22, 12, 45, VE[0])                                      # el tubo
+    L.hl(13, 21, 12, VE[1]); L.hl(13, 21, 13, VE[0])                                      # el brazo
+    L.r(10, 14, 8, 2, AC[2]); L.hl(10, 17, 14, AC[3]); L.hl(11, 16, 16, AC[1])            # la regadera
+    L.vl(19, 14, 18, AC[0]); L.r(17, 19, 5, 1, AM[1]); L.p(18, 20, AM[1]); L.p(20, 20, AM[1]); L.p(19, 21, AM[1])   # el tirador
     L.r(8, 22, 6, 6, VE[1]); L.vl(10, 23, 26, '#f4f4ee'); L.hl(9, 12, 24, '#f4f4ee')       # la señal
     L.r(10, 43, 10, 3, AC[1]); L.hl(10, 19, 43, AC[2])                                    # el sumidero
     for x in range(11, 19, 2): L.p(x, 44, AC[0])

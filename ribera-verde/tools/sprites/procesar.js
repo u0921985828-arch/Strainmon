@@ -30,6 +30,7 @@
 const fs = require('fs');
 const path = require('path');
 const { PNG } = require('pngjs');
+const crypto = require('crypto');
 
 const ROOT = path.join(__dirname, '..', '..');
 const args = process.argv.slice(2);
@@ -222,10 +223,21 @@ function buildAtlas() {
   const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
   for (const f of walk(SALIDA)) if (f.endsWith('.png')) { const key = path.relative(SALIDA, f).replace(/\\/g, '/').replace(/\.png$/, ''); frames.push({ key, png: readPNG(f) }); }
   frames.sort((a, b) => b.png.height - a.png.height || a.key.localeCompare(b.key));
-  const W = 1024; let x = 0, y = 0, rowH = 0; const pos = {};
-  for (const f of frames) { if (x + f.png.width > W) { x = 0; y += rowH; rowH = 0; } pos[f.key] = { x, y, w: f.png.width, h: f.png.height }; x += f.png.width; rowH = Math.max(rowH, f.png.height); }
+  // Fotogramas repetidos: los que tienen los mismos píxeles (contando como igual todo lo transparente) comparten su sitio en
+  // el atlas; su clave apunta al mismo rectángulo. Así no se pegan dos veces ni ocupan dos veces en la GPU.
+  const huella = png => { const d = Buffer.from(png.data);
+    for (let i = 0; i < d.length; i += 4) if (!d[i + 3]) { d[i] = 0; d[i + 1] = 0; d[i + 2] = 0; }
+    return `${png.width}x${png.height}|${crypto.createHash('sha1').update(d).digest('hex')}`; };
+  const primero = new Map(), unicos = [];
+  for (const f of frames) { f.huella = huella(f.png); const p = primero.get(f.huella);
+    if (p === undefined) { primero.set(f.huella, f); unicos.push(f); } }
+  const W = 1024; let x = 0, y = 0, rowH = 0; const rect = new Map();
+  for (const f of unicos) { if (x + f.png.width > W) { x = 0; y += rowH; rowH = 0; } rect.set(f, { x, y, w: f.png.width, h: f.png.height }); x += f.png.width; rowH = Math.max(rowH, f.png.height); }
+  const pos = {};   // en el orden de siempre (el de «frames»): el orden de las claves manda en lo que se pinta encima de un tile
+  for (const f of frames) pos[f.key] = rect.get(primero.get(f.huella));
+  const repetidos = frames.length - unicos.length;
   const H = y + rowH, atlas = new PNG({ width: W, height: Math.max(1, H) });
-  for (const f of frames) PNG.bitblt(f.png, atlas, 0, 0, f.png.width, f.png.height, pos[f.key].x, pos[f.key].y);
+  for (const f of unicos) PNG.bitblt(f.png, atlas, 0, 0, f.png.width, f.png.height, pos[f.key].x, pos[f.key].y);
   // animaciones y celdas desde el manifiesto
   const anims = {}, celdas = {}, rampas = {};
   for (const key of Object.keys(pos)) {
@@ -256,7 +268,7 @@ function buildAtlas() {
   // deja el archivo al doble; con la estrategia normal baja un 56 %, con los mismos píxeles.
   fs.writeFileSync(path.join(ATLAS_DIR, 'atlas.png'), PNG.sync.write(atlas, { deflateLevel: 9, deflateStrategy: 0 }));
   fs.writeFileSync(path.join(ATLAS_DIR, 'atlas.json'), JSON.stringify({ version: 2, imagen: 'atlas.png', tamano: [W, H], frames: pos, celdas, anims, rampas, rampas_cambio, cubre, ambiente, fumador, menores }, null, 1) + '\n');
-  return { n: frames.length, W, H };
+  return { n: frames.length, W, H, repetidos };
 }
 
 const groups = args.includes('--todos') ? listDir(CRUDO).filter(g => !g.startsWith('_')) : args.filter((a, i) => !a.startsWith('--') && !args[i - 1]?.startsWith('--'));
@@ -270,5 +282,5 @@ for (const id of groups) {
     if (!ok) bad++;
   } catch (e) { console.log(`FALLO ${id}: ${e.message}`); bad++; }
 }
-if (args.includes('--atlas')) { const a = buildAtlas(); console.log(`ATLAS ${bad ? 'CON FALLOS PREVIOS' : 'OK'}: ${a.n} fotogramas en ${a.W}×${a.H}`); }
+if (args.includes('--atlas')) { const a = buildAtlas(); console.log(`ATLAS ${bad ? 'CON FALLOS PREVIOS' : 'OK'}: ${a.n} fotogramas en ${a.W}×${a.H}${a.repetidos ? ` (${a.repetidos} repetidos, un solo sitio para cada uno)` : ''}`); }
 process.exit(bad ? 1 : 0);

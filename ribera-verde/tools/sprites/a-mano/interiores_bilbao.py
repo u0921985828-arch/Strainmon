@@ -283,9 +283,11 @@ def columnaI():
     return L
 
 def cirioI():
+    """el cirio con su candelabro, a su alto real: 29 px = 1,81 m a 16 px/m (antes llegaba a 37 px, 2,31 m)
+    — la peana y el pie de hierro, el platillo, la vela de 10 px y la llama"""
     L = Lienzo(32, 48)
-    L.r(14, 40, 4, 6, OR[1]); L.hl(12, 19, 45, OR[0]); L.vl(15, 26, 39, OR[1])
-    L.r(13, 24, 6, 2, OR[2]); L.r(15, 14, 2, 10, '#f6f2e6'); L.p(15, 12, '#ffd060'); L.p(15, 13, '#ff9a30'); L.p(16, 13, '#ffd060')
+    L.r(14, 40, 4, 6, OR[1]); L.hl(12, 19, 45, OR[0]); L.vl(15, 34, 39, OR[1])
+    L.r(13, 32, 6, 2, OR[2]); L.r(15, 22, 2, 10, '#f6f2e6'); L.p(15, 20, '#ffd060'); L.p(15, 21, '#ff9a30'); L.p(16, 21, '#ffd060')
     L.contorno(K); suelo(L, 12, 19, K)
     return L
 

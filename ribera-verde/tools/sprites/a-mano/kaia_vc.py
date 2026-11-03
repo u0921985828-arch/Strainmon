@@ -20,13 +20,16 @@
 #    mismo largo, extra-c-filtro-28 y -39 de equipo_c.py: 12 y 15 px), con su aro y su brillo arriba a la izquierda, y debajo, algo
 #    desde abajo, la chapa perforada del cuerpo que se va al fondo; detrás, el tubo flexible que sube del extractor al techo y las dos
 #    cintas del techo a sus lados (celda de 48 × 48 como la de lado: lo de abajo en la fila 47 y el tubo en las columnas 22 a 25).
-# La de la izquierda es la misma en espejo (vista.gd kc_servicio). También pega los LED de 720 W de las carpas de KAIA (equipo_c.py:
-# foco-c-led720-75 y -36, un poco más estrechos que su ancho, para que se vean separados) en godot/arte/carpa.png + carpa.json (la
-# vista C lee de ahí, no del atlas): los del servicio en una franja nueva debajo de lo que había, con su sitio en la tira en «off».
+# La de la izquierda es la misma en espejo (vista.gd kc_servicio). Lo del servicio va a la hoja propia de la vista C
+# (godot/arte/carpa.png + carpa.json, que reparte tools/carpa_hoja.py), recortado y con su sitio en la tira en «off»; los LED de
+# 720 W de las carpas de KAIA (equipo_c.py: foco-c-led720-75 y -36, un poco más estrechos que su ancho, para que se vean
+# separados) salen del atlas como el resto de la vista C y aquí no se tocan.
 import json, os, sys
 R = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(R, 'tools'))
 os.chdir(R)
+import carpa_hoja
 from PIL import Image
 
 SUELO = 138.4
@@ -50,10 +53,7 @@ def p(im, x, yy, col):
 OSCURO = {B: M, M: '#929aa8', D: RA, RA: '#5c6372', BR: B}
 
 def tira():
-    j = json.load(open(os.path.join(R, 'godot', 'arte', 'carpa.json'), encoding='utf-8'))
-    x0, y0, w, h = j['sprites']['carpa-c-pared'][0]
-    pa = Image.open(os.path.join(R, 'godot', 'arte', 'carpa.png')).convert('RGBA').crop((x0, y0, x0 + w, y0 + h))
-    return pa.crop((196, 0, 240, 160))
+    return carpa_hoja.saca('carpa-c-pared').crop((196, 0, 240, 160))
 
 def puerta():
     im = lienzo()
@@ -170,41 +170,19 @@ def filtrof(df):
     return im
 
 def guarda(atlas):
-    pj = os.path.join(R, 'godot', 'arte', 'carpa.json'); pp = os.path.join(R, 'godot', 'arte', 'carpa.png')
-    j = json.load(open(pj, encoding='utf-8')); a = Image.open(pp).convert('RGBA')
-    import equipo_c
-    # los LED: en dos celdas libres de 80 × 16 (si ya estaban, en la suya)
-    leds = {n: equipo_c.SAL['carpa-c-focos-led-ancho'][n][0].im for n in ('foco-c-led720-75', 'foco-c-led720-36')}
-    libres = [(720, 96), (736, 112)]
-    for n, im in leds.items():
-        xy = tuple(j['sprites'][n][0][:2]) if n in j['sprites'] else libres.pop(0)
-        if n not in j['sprites']:
-            assert a.crop((xy[0], xy[1], xy[0] + 80, xy[1] + 16)).getbbox() is None, 'la celda de %s no está libre' % n
-            for fs in j['sprites'].values():
-                for x0, y0, w, h in fs:
-                    assert x0 >= xy[0] + 80 or x0 + w <= xy[0] or y0 >= xy[1] + 16 or y0 + h <= xy[1], 'la celda es de otro sprite'
-        a.paste(Image.new('RGBA', (80, 16), (0, 0, 0, 0)), xy); a.alpha_composite(im, xy)
-        j['sprites'][n] = [[xy[0], xy[1], 80, 16]]
-    # lo del servicio, recortado, en la franja de debajo (desde la fila 768) con su sitio en la tira
-    H0 = 768
-    hb = max(im.height if n.startswith('kc-filtrof-') else im.getbbox()[3] - im.getbbox()[1] for n, im in atlas.items())
-    b = Image.new('RGBA', (a.width, H0 + hb), (0, 0, 0, 0)); b.paste(a.crop((0, 0, a.width, H0)), (0, 0)); a = b
-    x = 0; off = {}
+    """lo del servicio, recortado, en la hoja propia de la vista C: el sitio lo reparte tools/carpa_hoja.py, que deja en el
+    atlas todo lo que ya está en él (los LED de 720 W de KAIA, foco-c-led720-75 y -36, entre ellos: salen del grupo
+    carpa-c-focos-led-ancho de equipo_c.py y no hace falta pegarlos aquí)"""
+    carpa_hoja.abre()
     for n, im in atlas.items():
-        bb = (0, 0, im.width, im.height) if n.startswith('kc-filtrof-') else im.getbbox(); cr = im.crop(bb)   # el filtro, su celda entera
-        a.alpha_composite(cr, (x, H0))
-        j['sprites'][n] = [[x, H0, cr.width, cr.height]]
-        off[n] = [bb[0], bb[1]]
-        x += cr.width + 2
-    j['off'] = off
-    a.save(pp); json.dump(j, open(pj, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-    print('carpa.png', a.size, off)
+        bb = (0, 0, im.width, im.height) if n.startswith('kc-filtrof-') else im.getbbox()   # el filtro, su celda entera
+        carpa_hoja.pon(n, im.crop(bb), (bb[0], bb[1]))
+    tam, nm = carpa_hoja.guarda()
+    print('carpa.png %dx%d, %d fotogramas propios' % (tam[0], tam[1], nm))
 
 def ver(atlas, d):
     """cada cosa sobre la tira de la pared de la derecha y, en espejo, la de la izquierda, a 6 ×"""
-    j = json.load(open(os.path.join(R, 'godot', 'arte', 'carpa.json'), encoding='utf-8'))
-    x0, y0, w, h = j['sprites']['carpa-c-pared'][0]
-    pa = Image.open(os.path.join(R, 'godot', 'arte', 'carpa.png')).convert('RGBA').crop((x0, y0, x0 + w, y0 + h))
+    pa = carpa_hoja.saca('carpa-c-pared')
     der = pa.crop((196, 0, 240, 160)); izq = pa.crop((0, 0, 44, 160))   # (la de la izquierda es la de la derecha en espejo)
     out = Image.new('RGBA', (44 * 4 + 12, 160), (255, 0, 255, 255))
     t = der.copy(); [t.alpha_composite(im) for im in atlas.values()]

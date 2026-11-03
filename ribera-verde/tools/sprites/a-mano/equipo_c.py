@@ -58,7 +58,7 @@ sale('carpa-c-focos-led', 'foco-c-led200-30', barras(30, 4))
 sale('carpa-c-focos-led', 'foco-c-led200-24', barras(24, 4))
 sale('carpa-c-focos-led-ancho', 'foco-c-led480-47', barras(47, 6, 80))   # 47 no cabe en la de 48 sin tocar el borde
 sale('carpa-c-focos-led-ancho', 'foco-c-led720-78', barras(78, 8, 80))
-sale('carpa-c-focos-led-ancho', 'foco-c-led720-75', barras(75, 8, 80))   # los de KAIA (kaia_vc.py los pega en carpa.png): dos a lo ancho de la de 2 m
+sale('carpa-c-focos-led-ancho', 'foco-c-led720-75', barras(75, 8, 80))   # los de KAIA (del atlas, como el resto de la vista C): dos a lo ancho de la de 2 m
 sale('carpa-c-focos-led-ancho', 'foco-c-led720-36', barras(36, 8, 80))   # y cuatro de las de 4 m (Z 0,39), con aire entre ellos
 
 # CFL de las carpas de 200 cm (35 cm × 0,78 = 27): la campana aprobada sin 9 columnas ni 3 filas (repartidas, ni el contorno ni el

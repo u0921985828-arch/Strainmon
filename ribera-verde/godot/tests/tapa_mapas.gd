@@ -65,8 +65,7 @@ func _corre() -> void:
 		var cs: Array = []
 		for k in Pn._tapa_reg:
 			var r: Dictionary = Pn._tapa_reg[k]
-			var q: PackedStringArray = k.split(",")
-			cs.append({"o": r.o, "x": int(q[0]), "y": int(q[1]), "c": r.c, "px": r.x, "py": r.y})
+			cs.append({"o": r.o, "x": int(k) & 4095, "y": int(k) >> 12, "c": r.c, "px": r.x, "py": r.y})   # R50: la clave de _tapa_reg es tx + (ty << 12)
 		if cs.is_empty():
 			continue
 		var P = J.P
