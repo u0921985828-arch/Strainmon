@@ -447,10 +447,8 @@ func venta_mayor(N: String) -> void:
 	if lots.is_empty():
 		await say(T("Al por mayor, de 100 g para arriba. Pago entre {a} y {b} € el gramo, según lo bueno que sea. Hasta {c} por carga.", {"a": _dos(precio_mayor(12)), "b": _dos(precio_mayor(30)), "c": _kg(mayor_dia())}) + (T(" Extracciones, de {n} g para arriba.", {"n": int(VX.min)}) if Datos.CAL else ""), N)
 		return
-	var it := lots.map(venta_item)
-	it.append({"label": K("Nada")})
-	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué lote?")})
-	if i < 0 or i >= lots.size():
+	var i := await _pide_lote(lots, K("¿Qué lote?"))   # R55
+	if i < 0:
 		await say(K("Otro día."), N)
 		return
 	var l: Array = lots[i]
@@ -657,10 +655,8 @@ func talk_nerea():
 	if lots.is_empty():
 		await say(T("Cargo para los barcos de fuera: de 100 a {g} g, un {p} % por encima de lo que paga Iñaki. Cada {d} días.", {"g": int(L.g), "p": Datos.jsround((L.f - 1) * 100), "d": int(L.dias)}) + (T(" Extracciones, de {n} g para arriba.", {"n": int(VX.min)}) if Datos.CAL else ""), N)
 		return
-	var it := lots.map(venta_item)
-	it.append({"label": K("Nada")})
-	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué lote?")})
-	if i < 0 or i >= lots.size():
+	var i := await _pide_lote(lots, K("¿Qué lote?"))   # R55
+	if i < 0:
 		await say(K("Otro día."), N)
 		return
 	var l: Array = lots[i]
@@ -2174,6 +2170,12 @@ func SL():   # → setas.gd
 	pass
 
 func _dlg_fijo(t: String, nombre: String) -> void:   # → setas.gd
+	pass
+
+func _vis_abre(_t: String, _nombre: String, _tapa_hud := false) -> Motor.Prom:   # → setas.gd
+	return null
+
+func _vis_cierra(_vuelve_hud := false) -> void:   # → setas.gd
 	pass
 
 func _marco(o: Array, x: int, y: int, w: int, h: int) -> void:   # → setas.gd

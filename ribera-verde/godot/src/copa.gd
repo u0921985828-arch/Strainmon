@@ -221,10 +221,17 @@ func carga_w(sitio: String) -> int:
 				w += float(D.FOCO_NAVE[S.nave.f[i]].w)
 	return int(w)
 
+# la potencia contratada del sitio (repaso 0.76, «5 · Genética y estadísticas»): con CAL, ENERGIA[sitio].limc.
+# Con los 5.750 W del piso y los 15.000 de la nave no se llegaba nunca (el piso a tope da 5.320 W y la nave 5.760),
+# así que el generador y las placas no podían hacer falta. 4.600 W es un escalón real de potencia contratada
+func ener_lim(sitio: String) -> int:
+	var E: Dictionary = D.ENERGIA[sitio]
+	return int(E.limc) if Datos.CAL and E.has("limc") else int(E.lim)
+
 # lo que pasa de la potencia: [exceso sin cubrir, W que cubre el generador]
 func exceso_w(sitio: String) -> Array:
 	var E: Dictionary = D.ENERGIA
-	var x: int = carga_w(sitio) - int(E[sitio].lim)
+	var x: int = carga_w(sitio) - ener_lim(sitio)
 	if ener_ya(sitio, "pl"):
 		x -= int(E.pl.w)
 	var g := 0
@@ -268,7 +275,7 @@ func energia_tienda() -> void:
 		var acc := []
 		for sitio in ss:
 			var r := exceso_w(sitio)
-			var est: String = T("{c} de {l} contratados", {"c": kw(carga_w(sitio)), "l": kw(int(E[sitio].lim))}) + (T(" · se pasa {w}", {"w": kw(r[0])}) if r[0] > 0 else "")
+			var est: String = T("{c} de {l} contratados", {"c": kw(carga_w(sitio)), "l": kw(ener_lim(sitio))}) + (T(" · se pasa {w}", {"w": kw(r[0])}) if r[0] > 0 else "")
 			for k in ["pl", "gen"]:
 				var Q: Dictionary = E[k]
 				var ped: bool = S.get("ener") is Dictionary and S.ener.get(sitio) is Dictionary and S.ener[sitio].has(k)

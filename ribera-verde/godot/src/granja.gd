@@ -889,6 +889,7 @@ func harvest(i: int, hu = null) -> void:
 		add_seeds(p.sid, nn)
 		if Datos.CAL and fe.get("iv"):
 			Cultivo.hereda_iv(S, p.sid, fe.iv)
+	if nn or Cultivo.ra_sin_semilla(p.sid):   # (repaso 0.76): en una feminizada, la rareza se guarda con esquejes de la madre
 		ch = Cultivo.hereda_ra(S, p.sid, fe)
 	var sobra := mini(g, int(floor(peso_encima() - cap_mochila())))   # lo que no cabe encima, a la caja fuerte (1.36; antes, al arcón)
 	var a_caja := mini(sobra, int(floor(D.CAJA[int(S.caja.nivel)].g - caja_g()))) if sobra >= 1 and S.get("caja") else 0
@@ -2029,8 +2030,6 @@ func abrir_carpa(ci):
 	await fade(0)
 
 # ---------- virtuales: las definen trama y juego ----------
-func save():   # → juego.gd
-	return true
 func genoteca():   # → menus.gd
 	pass
 func show_objective():   # → trama.gd

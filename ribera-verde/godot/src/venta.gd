@@ -303,7 +303,8 @@ func cuidar_casa(w: Dictionary) -> int:
 			add_buds(p.sid + "*" if cl == "estrella" else p.sid, q, thc, S.caja.buds if S.get("caja") else S.buds, 0, -1, 0, Cultivo.ra_ar(p.get("f")))
 		if sc.n:
 			add_seeds(p.sid, sc.n)
-			Cultivo.hereda_ra(S, p.sid, p.get("f"))   # ESTUDIO, tanda 2: sus rarezas, a la línea
+		if sc.n or Cultivo.ra_sin_semilla(p.sid):   # ESTUDIO, tanda 2: sus rarezas, a la línea (repaso 0.76: en una feminizada, sin semillas)
+			Cultivo.hereda_ra(S, p.sid, p.get("f"))
 		if p.get("f") and p.f.get("id"):
 			S.fenos[str(int(p.f.id))] = cl
 		if S.rec.get(p.sid) == 1:
@@ -482,7 +483,7 @@ func nave_dia() -> void:
 		var rb := mesa_rebrote(Me)   # ESTUDIO tanda 2: la doble cosecha, también en las mesas
 		if N.has("bc") and not rb:   # 1.43: la mesa vuelve a empezar con su bandeja (la de antes de la 1.43, con los clones que ya tenía)
 			N.bc = N.bc.filter(func(b): return int(b.m) != int(W[i].mesa))
-		Me.p = float(D.RAREZAS.r.doble.vuelve) if rb else float(D.NAVE.clon)
+		Me.p = prog_rebrote() if rb else float(D.NAVE.clon)
 		Me.n = int(Me.get("n", 0)) + 1
 		Me.dn = 0
 		Me.am = 0
@@ -498,6 +499,14 @@ func mesa_rebrote(Me: Dictionary) -> bool:
 		return false
 	Me.rb = 1
 	return true
+
+# (repaso 0.76, «5 · Genética»): dónde arranca el ciclo de una mesa que rebrota. En casa la planta vuelve a
+# RAREZAS.r.doble.vuelve de su ciclo entero (medio ciclo por el 60 % de cosecha: +20 % de rendimiento), pero una
+# mesa no arranca en 0, arranca en NAVE.clon con sus esquejes: poniéndola también en «vuelve» el rebrote se
+# quedaba en un +5,6 %, o sea en nada. Medido sobre lo que le queda al clon, la doble vale lo mismo que en casa
+func prog_rebrote() -> float:
+	var c: float = float(D.NAVE.clon)
+	return c + float(D.RAREZAS.r.doble.vuelve) * (1.0 - c)
 
 # lo que va del ciclo de una mesa (0-1): Me.p o, en una mesa de antes de la 1.41 (por días), lo que llevaría desde que se plantó
 func prog_mesa(Me: Dictionary) -> float:
@@ -820,6 +829,42 @@ func atras_puerta() -> void:
 func obj_local(x: int, y: int, o) -> bool:
 	if o == null:
 		return false
+	if await _ol_pre(x, o):   # R53 (0.78): obj_local era una cadena de 308 líneas con un if por mapa; cada mapa, en su función
+		return true
+	if await _ol_discovip(o):
+		return true
+	if await _ol_cuartot(o):
+		return true
+	if await _ol_naves(o):
+		return true
+	if await _ol_naveh(o):
+		return true
+	if await _ol_loc(o):
+		return true
+	if S.map == "nave" and o in ["bedT", "bedB"]:   # i18n-no   # 1.45: el camastro de la nave
+		await bed_action(K("El camastro de la nave, detrás de las mesas: se oyen los extractores toda la noche."))
+		return true
+	if (S.map == "club-rv" or S.map.begins_with("alm-")) and o == "almC":   # 1.45: el almacén del club; y en su sala (alm-<club>)
+		await almacen_club("muelle" if S.map == "alm-muelle" else "rv")
+		return true
+	if await _ol_alm(o):
+		return true
+	if await _ol_shop(o):
+		return true
+	if await _ol_club(o):
+		return true
+	if await _ol_nave(x, y, o):
+		return true
+	if await _ol_setas(x, o):
+		return true
+	if await _ol_conce(o):
+		return true
+	if await _ol_disco(o):
+		return true
+	return false
+
+# pre: lo suyo de obj_local (R53)
+func _ol_pre(x: int, o) -> bool:
 	var txt := ""
 	if S.map == "nave-r":   # la nave sin alquilar: los trastos del último
 		await say(K("Neumáticos viejos y bidones vacíos.") if o in ["neumT", "bidonT", "barrilT"] else (K("Sacos rotos de algo que ya no se sabe qué era.") if o == "sacos" else K("Cajas con polvo del último inquilino. Si la alquilas, Arrieta las saca.")))   # i18n-no
@@ -860,6 +905,14 @@ func obj_local(x: int, y: int, o) -> bool:
 	if Datos.CAL and o in ["escaleraDB", "escaleraDB2"]:   # i18n-no
 		await bajar_vip()
 		return true
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# discovip: lo suyo de obj_local (R53)
+func _ol_discovip(o) -> bool:
+	var txt := ""
 	if S.map == "disco-vip":
 		match o:
 			"bottles":
@@ -872,6 +925,14 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = K("Un altavoz: aquí arriba la música llega más limpia.")
 			"sofaV", "sofaV2", "mesaV":   # i18n-no
 				txt = K("Tu mesa: sofá de terciopelo, cubitera y botella. Desde aquí se ve toda la pista por el cristal.")
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# cuartot: lo suyo de obj_local (R53)
+func _ol_cuartot(o) -> bool:
+	var txt := ""
 	if S.map == "cuarto-t":   # 1.51: el cuartucho del taller, detrás de su puerta
 		if not S.loc.has("valde"):
 			await say(K("Ya no es tuyo: devuelve las llaves al salir."))
@@ -890,6 +951,14 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = K("La mesilla: la radio, un despertador y una revista de coches.")
 			"cuadro":
 				txt = K("Un calendario de un taller de neumáticos, de hace años.")
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# naves: lo suyo de obj_local (R53)
+func _ol_naves(o) -> bool:
+	var txt := ""
 	if S.map == "nave-s":   # el secadero y el curado, en su sala
 		if S.get("nave") == null:
 			await say(K("La nave ya no es tuya."))
@@ -897,6 +966,14 @@ func obj_local(x: int, y: int, o) -> bool:
 		if o == "secadero":   # i18n-no
 			await secadero_nave()
 			return true
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# naveh: lo suyo de obj_local (R53)
+func _ol_naveh(o) -> bool:
+	var txt := ""
 	if S.map == "nave-h" or S.map == "nave-d":   # 1.51: la habitación y el despacho de la nave
 		if S.get("nave") == null:
 			await say(K("La nave ya no es tuya."))
@@ -922,6 +999,14 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = K("El plano de la nave, con las mesas, las tomas de agua y la luz.")
 			"crate":
 				txt = K("Cajas de archivo: facturas de la luz, del agua y del sustrato.")
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# loc: lo suyo de obj_local (R53)
+func _ol_loc(o) -> bool:
+	var txt := ""
 	if S.map.begins_with("loc-") and Datos.CAL:   # 1.45: los negocios por dentro
 		var k: String = S.map.substr(4)
 		var N: Dictionary = D.NEGOCIO.k[k]
@@ -945,12 +1030,14 @@ func obj_local(x: int, y: int, o) -> bool:
 		else:
 			await say(N.txt.get(ob, ATREZO_TXT.get(S.map, {}).get(ob, T("Lo de {n}.", {"n": D.LOCALES[k].neg}))))   # 1.57.2: y el atrezo del taller
 		return true
-	if S.map == "nave" and o in ["bedT", "bedB"]:   # i18n-no   # 1.45: el camastro de la nave
-		await bed_action(K("El camastro de la nave, detrás de las mesas: se oyen los extractores toda la noche."))
-		return true
-	if (S.map == "club-rv" or S.map.begins_with("alm-")) and o == "almC":   # 1.45: el almacén del club; y en su sala (alm-<club>)
-		await almacen_club("muelle" if S.map == "alm-muelle" else "rv")
-		return true
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# alm: lo suyo de obj_local (R53)
+func _ol_alm(o) -> bool:
+	var txt := ""
 	if S.map.begins_with("alm-"):
 		match o:
 			"btable":
@@ -959,6 +1046,14 @@ func obj_local(x: int, y: int, o) -> bool:
 			"crate":
 				await say(K("Cajas de tarros nuevos, todavía con el cartón."))
 				return true
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# shop: lo suyo de obj_local (R53)
+func _ol_shop(o) -> bool:
+	var txt := ""
 	if S.map == "shop" or S.map == "growcity":   # los dos grows (1.34): lo nuevo de cada uno
 		match o:
 			"pizarra":
@@ -979,6 +1074,14 @@ func obj_local(x: int, y: int, o) -> bool:
 			return false
 		await say(txt)
 		return true
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# club: lo suyo de obj_local (R53)
+func _ol_club(o) -> bool:
+	var txt := ""
 	if S.map.begins_with("club-"):
 		var k: String = S.map.substr(5)
 		var C: Dictionary = D.CLUBS[k]
@@ -1018,6 +1121,14 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = K("Una kentia en una maceta de barro.")
 		if txt == "" and D.DECO_CLUB.has(o):   # 1.34: lo que cuelga de sus paredes
 			txt = D.DECO_CLUB[o]
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# nave: lo suyo de obj_local (R53)
+func _ol_nave(x: int, y: int, o) -> bool:
+	var txt := ""
 	if S.map == "nave":
 		if S.get("nave") == null:
 			await say(K("La nave está vacía."))
@@ -1053,6 +1164,14 @@ func obj_local(x: int, y: int, o) -> bool:
 					return true
 			"crate":
 				txt = K("Sacos de sustrato y macetas apiladas.")
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# setas: lo suyo de obj_local (R53)
+func _ol_setas(x: int, o) -> bool:
+	var txt := ""
 	if S.map == "setas" or S.map == "sotano":   # 1.34: el bajo de las setas por dentro (1.51: y el sótano de casa)
 		if SL() == null:
 			await say(K("El sótano está a medio hacer: mañana acaban los obreros.") if S.map == "sotano" else K("El bajo ya no es tuyo. Txomin cambiará la cerradura."))
@@ -1087,6 +1206,14 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = K("Cajas de bandejas vacías de Txomin, apiladas.")
 			"cuboS":
 				txt = K("Un cubo y un cepillo. Lo que se echa a perder, fuera.")
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# conce: lo suyo de obj_local (R53)
+func _ol_conce(o) -> bool:
+	var txt := ""
 	if S.map == "conce":   # 1.43
 		var C: Dictionary = D.CONCE
 		for k in C.orden:
@@ -1108,6 +1235,14 @@ func obj_local(x: int, y: int, o) -> bool:
 				txt = K("La mesa de Arantxa, con el ordenador y los contratos. Habla con ella.")
 			"plantDeco":
 				txt = K("Una planta de plástico con polvo.")
+	if txt == "":
+		return false
+	await say(txt)
+	return true
+
+# disco: lo suyo de obj_local (R53)
+func _ol_disco(o) -> bool:
+	var txt := ""
 	if S.map == "disco":
 		match o:
 			"bottles":

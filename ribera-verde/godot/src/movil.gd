@@ -80,8 +80,7 @@ func elegir_movil(ops: Array, i0 := 0) -> int:
 		var i: int = await menu(ops + [K("Colgar")], {"cls": "right", "cancel": true, "title": K("MÓVIL")})
 		return i if i >= 0 and i < ops.size() else -1
 	MOVIL_V = {"ops": ops, "i": clampi(i0, 0, ops.size() - 1)}
-	_dlg_fijo(desc_movil(MOVIL_V), I18n.v("MÓVIL"))
-	var pr := Motor.Prom.new()
+	var pr := _vis_abre(desc_movil(MOVIL_V), I18n.v("MÓVIL"))
 	push(func(b: String):
 		if b == "B" or b == "START":   # E11 (fase 3): en mayúsculas, como lo manda press
 			pop()
@@ -96,9 +95,7 @@ func elegir_movil(ops: Array, i0 := 0) -> int:
 			_dlg_fijo(desc_movil(MOVIL_V), I18n.v("MÓVIL")))
 	var e = await Motor.espera(pr)
 	MOVIL_V = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
+	_vis_cierra()
 	return int(e)
 
 func _ancho_cifras(t: String, k := 1) -> int:
@@ -662,13 +659,25 @@ func talk_presi(k: String):
 	elif op == li:
 		await invitar_club(id, k, N)
 
+# (repaso 0.76, «4 · Economía»): lo que un club te coge al día sube con la confianza de su encargado
+# (MERCADO.club.topec: de min sin conocerte a max con la de socio). Antes eran MERCADO.club.tope gramos fijos
+# en los cinco clubs desde el primer día: entre todos igualaban la carga diaria de Iñaki pagando el gramo un 43 %
+# más, así que el por mayor no servía para nada. Ahora el por mayor es el canal de volumen (una parada, sin
+# confianza, y hasta 10 kg al día con el imperio) y los clubs el del precio, por la puerta de atrás y poco a poco
+func club_tope(k: String) -> float:
+	var M: Dictionary = D.MERCADO.club
+	if not Datos.CAL or not M.has("topec"):
+		return float(M.tope)
+	var T_: Dictionary = M.topec
+	return float(T_.min) + (float(T_.max) - float(T_.min)) * clampf(float(rel(k)) / float(T_.rel), 0.0, 1.0)
+
 func vender_club(k: String) -> void:
 	var C: Dictionary = D.CLUBS[k]
 	var N: String = C.n
 	if not club_te_compra(k):
 		await no_compra(k)
 		return
-	var resto: float = resto_mer("club_" + k, D.MERCADO.club.tope) if Datos.CAL else 1e9   # 1.45: varios lotes al día, hasta el tope
+	var resto: float = resto_mer("club_" + k, club_tope(k)) if Datos.CAL else 1e9   # 1.45: varios lotes al día, hasta el tope
 	if (S.clubDia.get(k) == S.day and not Datos.CAL) or resto < 1:
 		await say(K("Hoy ya hemos cerrado caja. Mañana."), N)
 		return
@@ -677,10 +686,8 @@ func vender_club(k: String) -> void:
 	if lots.is_empty():
 		await say(T("De {g} g para arriba, entre {a} y {b} € el gramo según el THC. Una entrega al día.", {"g": int(D.CLUB.g[0]), "a": _dos(precio_club(12)), "b": _dos(precio_club(30))}) + (T(" Extracciones, de {g} g para arriba.", {"g": int(VX.club_g[0])}) if Datos.CAL else ""), N)
 		return
-	var it := lots.map(venta_item)
-	it.append({"label": K("Nada")})
-	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué lote?")})
-	if i < 0 or i >= lots.size():
+	var i := await _pide_lote(lots, K("¿Qué lote?"))   # R55
+	if i < 0:
 		return
 	var l: Array = lots[i]
 	var x := es_extr(l)
@@ -707,7 +714,9 @@ func vender_club(k: String) -> void:
 	usa_lote(l, g)
 	S.money += e
 	S.sales += e
-	S.heat = min(100, S.heat + D.CLUB.calor)
+	# (repaso 0.76): el calor, también por los gramos de la entrega (CLUB.calorg); antes +1 lo mismo por 50 que por 200 g
+	var gc: float = (g / D.ROSIN.rend if x else float(g)) / float(D.CLUB.calorg) if Datos.CAL and D.CLUB.has("calorg") else 0.0
+	S.heat = min(100, S.heat + D.CLUB.calor + gc)
 	S.rep += 1
 	S.clubDia[k] = S.day
 	if Datos.CAL:

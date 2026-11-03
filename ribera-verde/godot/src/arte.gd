@@ -1,12 +1,18 @@
 # Ribera Verde (Godot) — el arte de la vista C (arte/carpa.png + carpa.json, del atlas del HTML con tools/godot.js) y lo que
 # 01b-arte y 09b-carpa le hacen píxel a píxel: alto del dibujo, fotograma de cada alto, quitar filas (vcAplasta), colores de
 # la variedad (conRampa), campana apagada, luz de cada foco, pared recortada al ancho de la carpa y la planta seca
+#
+# La hoja de la vista C guardaba 175 de sus 181 rectángulos repetidos del atlas (el mismo dibujo dos veces en la app y dos
+# veces en memoria). Ahora los sprites que ya están en el atlas se cortan de él («atlas» en carpa.json, rectángulos de
+# atlas.png) y arte/carpa.png solo trae los propios, los que se dibujan a mano aquí (tools/carpa_hoja.py)
 extends RefCounted
 
 const Datos = preload("res://src/datos.gd")
+const Atlas = preload("res://src/atlas.gd")
 
 static var img: Image
 static var spr := {}        # sprite → [[x, y, w, h], …] (un rect por fotograma)
+static var en_atlas := {}   # sprite → true si su rect es del atlas y no de carpa.png
 static var off := {}        # lo pegado recortado (kaia_vc.py): sprite → [x, y] de su esquina en su lienzo
 static var rampa: Array = []
 static var cache := {}
@@ -41,6 +47,10 @@ static func carga() -> void:
 	spr = j.sprites
 	rampa = j.rampa
 	off = j.get("off", {})
+	for n in j.get("atlas", []):
+		en_atlas[n] = true
+	if not en_atlas.is_empty():
+		Atlas.carga()
 
 static func hay(n: String) -> bool:
 	carga()
@@ -53,7 +63,8 @@ static func foto(n: String, i := 0) -> Image:
 	var k := "f|%s|%d" % [n, i]
 	if not _ctiene(k):
 		var r: Array = spr[n][i]
-		_cpon(k, img.get_region(Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3]))))
+		var h: Image = Atlas.img if en_atlas.has(n) else img
+		_cpon(k, h.get_region(Rect2i(int(r[0]), int(r[1]), int(r[2]), int(r[3]))))
 	return cache[k]
 
 # anchos (px) de la familia de sprites «pre» + ancho, en el orden del atlas

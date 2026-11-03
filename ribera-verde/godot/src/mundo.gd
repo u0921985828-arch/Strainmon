@@ -72,6 +72,14 @@ func icono(k: String):
 func new_state() -> Dictionary:
 	return Datos.enteros(D.NEW_STATE.duplicate(true))
 
+# R52 (0.78): `call("relanzar")` y `call("save")` esquivaban el parser porque la función está en juego.gd, al final de la cadena.
+# Con el virtual y la bandera declarados aquí, en la base, se llaman por su nombre y el parser las ve
+var relanza := false   # E10: la partida importada se abre al cerrar los menús (juego.gd)
+func relanzar() -> void:   # → juego.gd
+	pass
+func save():   # → juego.gd
+	return true
+
 func is_free() -> bool:
 	return mode == "world" and lock == 0 and handlers.is_empty()
 
@@ -82,8 +90,8 @@ func run(fn: Callable) -> void:
 	lock += 1
 	await fn.call()
 	lock -= 1
-	if lock == 0 and get("relanza"):   # E10: la partida importada, con los menús ya cerrados
-		call("relanzar")
+	if lock == 0 and relanza:   # E10: la partida importada, con los menús ya cerrados
+		relanzar()
 	if lock == 0 and S and S.has("misiones"):   # 1.11: las misiones guiadas, al acabar cada guion (trama.gd)
 		revisa_misiones()
 
@@ -760,6 +768,13 @@ func es_extr(l: Array) -> bool:
 
 func venta_item(l: Array) -> Dictionary:
 	return rosin_item(l) if es_extr(l) else lot_item(l)
+
+# R55 (0.78): el prólogo que repetían las nueve ventas: los lotes como menú, con «Nada» al final; devuelve el elegido, o -1
+func _pide_lote(lots: Array, titulo: String) -> int:
+	var it := lots.map(venta_item)
+	it.append({"label": K("Nada")})
+	var i: int = await menu(it, {"cls": "right", "title": titulo})
+	return i if i >= 0 and i < lots.size() else -1
 
 func venta_nombre(l: Array) -> String:
 	return extr_nombre(l[0]) if es_extr(l) else lot_nombre(l[0])

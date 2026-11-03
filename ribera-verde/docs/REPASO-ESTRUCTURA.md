@@ -11,16 +11,16 @@ se arregló en esta tanda y lo que se deja medido para la siguiente. Cada línea
 
 | | hallazgo | estado |
 |---|---|---|
-| ALTO | 336 stubs de cadena en `mundo.gd` y `trama.gd`; 266 no dicen dónde está la implementación | recomendado: anotar `# → <archivo>.gd` con un script y una prueba `tests/virtuales.gd` |
-| ALTO | tres llamadas a funciones de las hijas por cadena de texto, para esquivar el parser | recomendado |
+| ALTO | 336 stubs de cadena en `mundo.gd` y `trama.gd`; 266 no dicen dónde está la implementación | **aplicado** (`tools/virtuales.py --check` en la batería: 0 sin rótulo) |
+| ALTO | tres llamadas a funciones de las hijas por cadena de texto, para esquivar el parser | **aplicado** (0.78: `relanzar()`, `save()` y `relanza` declarados en `mundo.gd`) |
 | ALTO | 34 copias de `if cache.size() > 1024: cache.clear()`: el fallo de los destellos que ya se arregló para las texturas seguía vivo para las imágenes | **aplicado** (`arte.gd`, `pinta.gd`, `procedural.gd`: tope por generaciones, `_cpon`/`_ctiene`) |
-| ALTO | nueve visores «en vitrina» con el mismo esqueleto de 12 líneas en cinco archivos | recomendado |
-| ALTO | `obj_local()` 308 líneas y `object_action()` 208: dos cadenas de `if S.map == …` | recomendado |
+| ALTO | nueve visores «en vitrina» con el mismo esqueleto de 12 líneas en cinco archivos | **aplicado** (0.78: `_vis_abre`/`_vis_cierra` en `setas.gd`) |
+| ALTO | `obj_local()` 308 líneas y `object_action()` 208: dos cadenas de `if S.map == …` | **aplicado** (0.78: una función por mapa, `_ol_*` en `venta.gd` y `_oa_*` en `calle.gd`) |
 | MEDIO | 17 lectores perezosos de `S` calcados, y `metro_d()` sin guarda | **aplicado** (la guarda de `metro_d`) |
 | MEDIO | nueve funciones que nadie nombra en `src`, `tests`, `tools` ni `docs` | **aplicado** (33 líneas fuera) |
 | MEDIO | `olor_nave()` de la base devolvía algo distinto de la implementación | **aplicado** (hueco de cadena, con su comentario) |
-| MEDIO | 13 stubs que nadie menciona · 16 cuerpos de base que no se ejecutan · el prólogo de venta copiado 10 veces | recomendado |
-| BAJO | `migrate()` lee dos claves antes de rellenarlas · `_pinta_menu()` 204 líneas | recomendado |
+| MEDIO | 13 stubs que nadie menciona · 16 cuerpos de base que no se ejecutan · el prólogo de venta copiado 10 veces | **aplicado** (0.78: el prólogo, en `_pide_lote` de `mundo.gd`; los stubs y los cuerpos ya no se reproducen: todos tienen implementación y toda hija llama a `super()`) |
+| BAJO | `migrate()` lee dos claves antes de rellenarlas · `_pinta_menu()` 204 líneas | **aplicado** (0.78: `S.deadline` y `S.rel` con guarda; `_pinta_menu` 92 líneas con `_pm_titulo`/`_pm_fila`/`_pm_desc`) |
 
 ## 2 · Arte y sprites
 
@@ -44,10 +44,10 @@ Línea base (llvmpipe, `--rend`), coste de GDScript en `capa0`: `home` 1,9 · `n
 | ALTO | `Atlas.frame_de` no memorizaba nada y se llama ~160 veces por fotograma (1,0–2,1 ms) | **aplicado** (`_fd_de`: claves, espejo, fps, bucle y celda por grupo+anim+dirección) |
 | MEDIO | `_suelo_base` y `_suelo_mira` rehacían el hash profundo de la rejilla en cada llamada (0,9 ms + 0,3) | **aplicado** (`_mapa_gh()`, una vez por fotograma) |
 | MEDIO | `_farolas` barría el mapa entero en cada fotograma de noche, por un valor por omisión de `get()` | **aplicado** (`_far_c`, con la rejilla y los objetos en la clave) |
-| ALTO | `_arte_obj` resuelve el sprite de cada objeto en cada fotograma (2,9 ms en `casco`) | recomendado (caché por objeto con generación) |
-| ALTO | el suelo animado (agua a 4 fps) se repinta 60 veces por segundo | recomendado (saltar si el fotograma no cambió) |
-| MEDIO | `Cultivo.huecos(S)` por planta y `Vista.geo` dos veces por fotograma · `_arte_edificios` sin recorte por cámara | recomendado |
-| BAJO | el cono de la policía con un `draw_rect` por casilla (hasta 242) · `tapa_obj` con claves `String` | recomendado (`_rects_lote`, como la lluvia) |
+| ALTO | `_arte_obj` resuelve el sprite de cada objeto en cada fotograma (2,9 ms en `casco`) | **aplicado** (0.78: `OBJ_CACHE` con `_obj_f`, clave por objeto, mapa y generación; prueba `tests/obj_cache.gd`) |
+| ALTO | el suelo animado (agua a 4 fps) se repinta 60 veces por segundo | **aplicado** (0.78: las casillas animadas en su propio trozo, `SD_ON`, `_sd_sello`) |
+| MEDIO | `Cultivo.huecos(S)` por planta y `Vista.geo` dos veces por fotograma · `_arte_edificios` sin recorte por cámara | **aplicado** (0.78: caché de `huecos()`, `geo` una vez por `pinta()` y recorte por cámara en `_arte_edificios`) |
+| BAJO | el cono de la policía con un `draw_rect` por casilla (hasta 242) · `tapa_obj` con claves `String` | **aplicado** (0.78: el cono con `_rects_lote` y las claves de `tapa_obj`, enteras) |
 
 ## 4 · Economía
 

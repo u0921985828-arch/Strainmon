@@ -203,10 +203,8 @@ func dejar_piso(k: String) -> void:
 	var cap: float = float(D.PISOS9.cap)
 	while true:
 		var lots := bud_lots(1)
-		var it := lots.map(venta_item)
-		it.append({"label": K("Nada")})
-		var i: int = await menu(it, {"cls": "right", "title": T("Al almacén · {a} de {b}", {"a": _kg(int(stock_piso(F))), "b": _kg(int(cap))})})
-		if i < 0 or i >= lots.size():
+		var i := await _pide_lote(lots, T("Al almacén · {a} de {b}", {"a": _kg(int(stock_piso(F))), "b": _kg(int(cap))}))   # R55
+		if i < 0:
 			return
 		var l: Array = lots[i]
 		var mx: int = mini(int(floor(l[1].g)), int(cap - stock_piso(F)))

@@ -50,7 +50,7 @@ func start_menu():
 			await say(K("Partida guardada.") if save() else K("No se ha podido guardar la partida."))
 		elif i == 6:
 			await opciones()
-			if get("relanza"):   # E10: la partida importada se abre al cerrar el menú
+			if relanza:   # E10: la partida importada se abre al cerrar el menú
 				return
 		i = i0
 
@@ -521,9 +521,7 @@ func ficha_variedad(lista: Array, i0: int) -> void:
 			_dlg_fijo(desc_ficha(FICHA_V), nom.call()))
 	await Motor.espera(pr)
 	FICHA_V = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
+	_vis_cierra()
 
 # la lámina (128 × 100): el papel, la hoja (Hoja.W × Hoja.H, la pinta pinta.gd en hoja_xy), el nombre y la franja del grupo
 func rects_ficha(V: Dictionary) -> Array:

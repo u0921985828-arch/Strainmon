@@ -1038,10 +1038,7 @@ func elegir_mesak(i0 := 0):
 		return gancho_mesak.call(i0)
 	var nm: int = D.KAIA_CULT.f2.mesas.size()
 	MESA_KV = {"i": clampi(i0, 0, nm - 1)}
-	if not oraculo:
-		hud.hide()   # la vista entera, sin el recuadro del HUD encima
-	_dlg_fijo(desc_mesak(MESA_KV), K("LAS MESAS"))
-	var pr := Motor.Prom.new()
+	var pr := _vis_abre(desc_mesak(MESA_KV), K("LAS MESAS"), true)
 	push(func(b: String):
 		if b == "B":
 			pop()
@@ -1060,10 +1057,7 @@ func elegir_mesak(i0 := 0):
 			_dlg_fijo(desc_mesak(MESA_KV), K("LAS MESAS")))
 	var e = await Motor.espera(pr)
 	MESA_KV = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
-		update_hud()
+	_vis_cierra(true)
 	return e
 
 var _mk_cache := {}
@@ -1588,7 +1582,7 @@ func kc_dia() -> void:
 			continue
 		var c := kc_cosecha(Me, w)
 		Me.h = {"g": c.g, "t": c.t, "d": S.day}
-		Me.p = float(D.RAREZAS.r.doble.vuelve) if mesa_rebrote(Me) else float(D.NAVE.clon)
+		Me.p = prog_rebrote() if mesa_rebrote(Me) else float(D.NAVE.clon)
 		Me.n = int(Me.get("n", 0)) + 1
 		Me.dn = 0
 		Me.am = 0
@@ -1741,8 +1735,7 @@ func vista_clima(s: String) -> bool:
 	elif float(C.t) < float(D.T_OK[0]):
 		est = K("hace frío")
 	var lz: String = T("luz por carpa, a 18/6 y a 12/12, {l}", {"l": K("encendida") if C.luz else K("apagada")}) if C.mix else T("luz a {a}/{b}, {l}", {"a": int(C.hz), "b": 24 - int(C.hz), "l": K("encendida") if C.luz else K("apagada")})
-	_dlg_fijo(T("{t} °C · {h} % · VPD {v} kPa · {z} · extracción al {c} %: {e}.\nA: el cuadro · B: cerrar.", {"t": ("%.1f" % float(C.t)).replace(".", ","), "h": roundi(float(C.hr)), "v": ("%.1f" % float(C.vpd)).replace(".", ","), "z": lz, "c": roundi(100 * float(C.cg)), "e": est}), nm)
-	var pr := Motor.Prom.new()
+	var pr := _vis_abre(T("{t} °C · {h} % · VPD {v} kPa · {z} · extracción al {c} %: {e}.\nA: el cuadro · B: cerrar.", {"t": ("%.1f" % float(C.t)).replace(".", ","), "h": roundi(float(C.hr)), "v": ("%.1f" % float(C.vpd)).replace(".", ","), "z": lz, "c": roundi(100 * float(C.cg)), "e": est}), nm)
 	push(func(b: String):
 		if b == "A" or b == "B":
 			pop()

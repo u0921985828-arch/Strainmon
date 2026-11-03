@@ -326,7 +326,7 @@ func migrate() -> void:
 		S.debt = 0 if S.ch >= 8 else int(tb.get(int(S.ch), 0) if tb.get(int(S.ch), 0) else D.DEUDA)
 		if S.get("due", 0) > 0:
 			S.due = int(D.PLAZOS[str(S.ch)]) if S.ch == 3 or S.ch == 5 else S.debt
-			S.deadline = maxi(S.deadline, S.day + (10 if S.ch == 5 else 7))
+			S.deadline = maxi(int(S.get("deadline", 0)), S.day + (10 if S.ch == 5 else 7))   # R56 (0.78): la partida vieja puede no traer deadline
 		if S.ch >= 8:
 			S.imp0 = S.sales
 			S.impN = 0
@@ -339,6 +339,8 @@ func migrate() -> void:
 	if S.get("setas") != null and S.setas.get("r") == null:
 		S.setas.r = S.day + D.RECIBO.dias
 	if not S.has("clubReg") and S.has("clubDia"):   # 1.34: en los clubs donde ya vendías, el encargado y el presidente ya se fían de ti
+		if not S.has("rel"):   # R56 (0.78): S.rel lo rellena new_state() más abajo
+			S.rel = {}
 		for k in D.PRESI:
 			if S.clubDia.has(k) or (S.get("clubEnc") and S.clubEnc.k == k):
 				for id in [k, "pres_" + k]:
@@ -557,8 +559,6 @@ static func limpia_import(v):
 
 # E9 (fase 3): sin leer el portapapeles al abrir (PEGAR en la caja). E10: en partida, no cambia S con los menús abiertos: se guarda
 # y, al cerrarse todo (run, lock 0), se carga como CONTINUAR (relanza)
-var relanza := false
-
 func importar(desde_titulo := false, nube = null) -> void:
 	var t = nube if nube != null else await pedir_partida(I18n.v("Pega aquí la partida exportada"))   # fase 6: o la de la nube
 	if t == null or t == "":

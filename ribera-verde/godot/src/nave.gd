@@ -299,10 +299,7 @@ func elegir_madres(i0 := 0):
 		return gancho_madres.call(i0)
 	var nmax: int = int(D.MADRES.max)
 	MADRES_V = {"i": clampi(i0, 0, nmax - 1)}
-	if not oraculo:
-		hud.hide()   # la vista entera, sin el recuadro del HUD encima
-	_dlg_fijo(desc_madres(MADRES_V), K("LAS MADRES"))
-	var pr := Motor.Prom.new()
+	var pr := _vis_abre(desc_madres(MADRES_V), K("LAS MADRES"), true)
 	push(func(b: String):
 		if b == "B":
 			pop()
@@ -319,10 +316,7 @@ func elegir_madres(i0 := 0):
 			_dlg_fijo(desc_madres(MADRES_V), K("LAS MADRES")))
 	var e = await Motor.espera(pr)
 	MADRES_V = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
-		update_hud()
+	_vis_cierra(true)
 	return e
 
 const ArteM = preload("res://src/arte.gd")
@@ -1048,10 +1042,8 @@ func almacen_club(id := "rv") -> void:
 			if lots.is_empty():
 				await say(K("No llevas nada encima."))
 				continue
-			var it := lots.map(venta_item)
-			it.append({"label": K("Nada")})
-			var i: int = await menu(it, {"cls": "right", "title": K("¿Qué guardas?")})
-			if i < 0 or i >= lots.size():
+			var i := await _pide_lote(lots, K("¿Qué guardas?"))   # R55
+			if i < 0:
 				continue
 			var lt: Array = lots[i]
 			var x := es_extr(lt)
@@ -1229,10 +1221,8 @@ func dispensario_aso() -> void:
 	if lots.is_empty():
 		await say(T("Déjame {a} g o más y los socios lo retiran, {d} g al día. El dinero, a tu buzón.", {"a": int(O.g[0]), "d": int(O.dia)}), N)
 		return
-	var it := lots.map(venta_item)
-	it.append({"label": K("Nada")})
-	var i: int = await menu(it, {"cls": "right", "title": K("¿Qué lote?")})
-	if i < 0 or i >= lots.size():
+	var i := await _pide_lote(lots, K("¿Qué lote?"))   # R55
+	if i < 0:
 		return
 	var l: Array = lots[i]
 	var x := es_extr(l)

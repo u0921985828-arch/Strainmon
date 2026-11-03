@@ -1772,6 +1772,39 @@ func _pinta_menu(rows: int) -> void:
 				ic_w = maxf(ic_w, Atlas.ic_px(it2.ic.get_width(), us) + 2 * us)
 			elif it2.get("sw"):
 				ic_w = maxf(ic_w, 10 * us)
+	_pm_titulo(o, ic_w)   # R57 (0.78): _pinta_menu eran 204 líneas; el título, cada fila y la descripción, en su función
+	if fl:
+		menu_col.add_child(_flecha("▲" if m_top > 0 else "", "up"))
+	var lista: Container = GridContainer.new() if g or nc > 0 else VBoxContainer.new()
+	if g or nc > 0:
+		lista.columns = 2 if g else nc
+	var celda := 0.0
+	if nc > 0:
+		for it in m_items:
+			celda = maxf(celda, letra.get_string_size(it.label, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(fs)).x)
+		celda = ceilf(celda + 10 * us)
+		lista.add_theme_constant_override("h_separation", roundi(3 * us))   # entre columnas, no después de la última
+	lista.add_theme_constant_override("separation", 0)
+	lista.add_theme_constant_override("h_separation", 0)
+	lista.add_theme_constant_override("v_separation", 0)
+	if full and not menu_box.get_meta("cabe"):
+		lista.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var maxw := (170 - 14 - 4) * us if cls == "right" else 1e9
+	if Datos.CAL and cls == "right":   # 1.50: el menú de la derecha se ensancha hasta casi toda la pantalla antes de cortar
+		maxw = maxf(maxw, ui_rect().size.x * .9 - 18 * us)
+	elif Datos.CAL and full:   # 1.50: a toda pantalla, la fila no la ensancha (el nombre entero va abajo, en la descripción)
+		maxw = ui_rect().size.x - 6 * us - 18 * us
+	for k in range(m_top, mini(m_items.size(), m_top + vis)):
+		lista.add_child(_pm_fila(m_items[k], k, lh, fs, ic_w, nc, celda, full, maxw, g))
+	menu_col.add_child(lista)
+	if fl:
+		menu_col.add_child(_flecha("▼" if m_top + vis < m_items.size() else "", "down"))
+	_pm_desc(o, fs, full, cls)
+	menu_box.set_meta("cls", cls)
+	_coloca.call_deferred()
+
+# el título del menú con su raya (R57)
+func _pm_titulo(o: Dictionary, ic_w: float) -> void:
 	if o.get("title"):
 		var t := HBoxContainer.new()
 		if Datos.CAL:   # 0.74: el título arranca en la misma columna que las etiquetas de la lista
@@ -1801,107 +1834,87 @@ func _pinta_menu(rows: int) -> void:
 		var hueco := Control.new()
 		hueco.custom_minimum_size = Vector2(0, 3 * us)
 		menu_col.add_child(hueco)
-	if fl:
-		menu_col.add_child(_flecha("▲" if m_top > 0 else "", "up"))
-	var lista: Container = GridContainer.new() if g or nc > 0 else VBoxContainer.new()
-	if g or nc > 0:
-		lista.columns = 2 if g else nc
-	var celda := 0.0
+
+# una fila de la lista: la marca, el icono o el color, la etiqueta y lo de la derecha (R57)
+func _pm_fila(it: Dictionary, k: int, lh: float, fs: float, ic_w: float, nc: int, celda: float, full: bool, maxw: float, g: bool) -> Control:
+	var f := HBoxContainer.new()
+	f.add_theme_constant_override("separation", 0)
+	f.custom_minimum_size = Vector2(0, lh)
+	var mk := Control.new()
+	mk.custom_minimum_size = Vector2(10 * us, lh)
+	if k == m_i:
+		mk.draw.connect(func():
+			mk.draw_colored_polygon(PackedVector2Array([Vector2(0, 3.5 * us), Vector2(5 * us, 7.5 * us), Vector2(0, 11.5 * us)]), Color("#404048")))
+	f.add_child(mk)
+	var ic = it.get("ic")
+	if ic:
+		var tr := TextureRect.new()
+		tr.texture = ic
+		tr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		var lado := Atlas.ic_px(ic.get_width(), us)
+		tr.custom_minimum_size = Vector2(lado, lado)
+		tr.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		f.add_child(tr)
+		var e := Control.new()
+		e.custom_minimum_size = Vector2(2 * us, 0)
+		f.add_child(e)
+	elif it.get("sw"):
+		var swc: String = it.sw
+		var sw_ := Control.new()
+		sw_.custom_minimum_size = Vector2(10 * us, lh)
+		sw_.draw.connect(func():
+			var y0 := (lh - 6 * us) / 2
+			sw_.draw_rect(Rect2(-.8 * us, y0 - .8 * us, 7.6 * us, 7.6 * us), Color("#404048"))
+			sw_.draw_rect(Rect2(0, y0, 6 * us, 6 * us), Color(swc)))
+		f.add_child(sw_)
+	elif ic_w > 0:
+		# la fila de una sección («▶ Semillas»): su flecha va en la columna del icono, no delante del texto
+		var e2 := Label.new()
+		e2.custom_minimum_size = Vector2(ic_w, lh)
+		e2.text = "▸" if String(it.label).begins_with("▸ ") else ""
+		e2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		e2.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		pon_letra(e2, letra, fs * .8, GRIS)
+		f.add_child(e2)
+	var l := Label.new()
+	l.text = String(it.label).substr(2) if Datos.CAL and ic_w > 0 and String(it.label).begins_with("▸ ") else it.label
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	pon_letra(l, letra, fs, DIS if it.get("disabled") else INK)
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var lw := letra.get_string_size(it.label, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(fs)).x + 2
+	var rw := 0.0
+	var r: Label = null
+	if it.get("right") != null:
+		r = Label.new()
+		r.text = str(it.right)
+		r.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		pon_letra(r, letra, fs, GRIS)
+		rw = letra.get_string_size(r.text, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(fs)).x + 2 + 10 * us
 	if nc > 0:
-		for it in m_items:
-			celda = maxf(celda, letra.get_string_size(it.label, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(fs)).x)
-		celda = ceilf(celda + 10 * us)
-		lista.add_theme_constant_override("h_separation", roundi(3 * us))   # entre columnas, no después de la última
-	lista.add_theme_constant_override("separation", 0)
-	lista.add_theme_constant_override("h_separation", 0)
-	lista.add_theme_constant_override("v_separation", 0)
-	if full and not menu_box.get_meta("cabe"):
-		lista.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	var maxw := (170 - 14 - 4) * us if cls == "right" else 1e9
-	if Datos.CAL and cls == "right":   # 1.50: el menú de la derecha se ensancha hasta casi toda la pantalla antes de cortar
-		maxw = maxf(maxw, ui_rect().size.x * .9 - 18 * us)
-	elif Datos.CAL and full:   # 1.50: a toda pantalla, la fila no la ensancha (el nombre entero va abajo, en la descripción)
-		maxw = ui_rect().size.x - 6 * us - 18 * us
-	for k in range(m_top, mini(m_items.size(), m_top + vis)):
-		var it: Dictionary = m_items[k]
-		var f := HBoxContainer.new()
-		f.add_theme_constant_override("separation", 0)
-		f.custom_minimum_size = Vector2(0, lh)
-		var mk := Control.new()
-		mk.custom_minimum_size = Vector2(10 * us, lh)
-		if k == m_i:
-			mk.draw.connect(func():
-				mk.draw_colored_polygon(PackedVector2Array([Vector2(0, 3.5 * us), Vector2(5 * us, 7.5 * us), Vector2(0, 11.5 * us)]), Color("#404048")))
-		f.add_child(mk)
-		var ic = it.get("ic")
-		if ic:
-			var tr := TextureRect.new()
-			tr.texture = ic
-			tr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			var lado := Atlas.ic_px(ic.get_width(), us)
-			tr.custom_minimum_size = Vector2(lado, lado)
-			tr.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-			f.add_child(tr)
-			var e := Control.new()
-			e.custom_minimum_size = Vector2(2 * us, 0)
-			f.add_child(e)
-		elif it.get("sw"):
-			var swc: String = it.sw
-			var sw_ := Control.new()
-			sw_.custom_minimum_size = Vector2(10 * us, lh)
-			sw_.draw.connect(func():
-				var y0 := (lh - 6 * us) / 2
-				sw_.draw_rect(Rect2(-.8 * us, y0 - .8 * us, 7.6 * us, 7.6 * us), Color("#404048"))
-				sw_.draw_rect(Rect2(0, y0, 6 * us, 6 * us), Color(swc)))
-			f.add_child(sw_)
-		elif ic_w > 0:
-			# la fila de una sección («▶ Semillas»): su flecha va en la columna del icono, no delante del texto
-			var e2 := Label.new()
-			e2.custom_minimum_size = Vector2(ic_w, lh)
-			e2.text = "▸" if String(it.label).begins_with("▸ ") else ""
-			e2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			e2.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			pon_letra(e2, letra, fs * .8, GRIS)
-			f.add_child(e2)
-		var l := Label.new()
-		l.text = String(it.label).substr(2) if Datos.CAL and ic_w > 0 and String(it.label).begins_with("▸ ") else it.label
-		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		pon_letra(l, letra, fs, DIS if it.get("disabled") else INK)
-		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var lw := letra.get_string_size(it.label, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(fs)).x + 2
-		var rw := 0.0
-		var r: Label = null
-		if it.get("right") != null:
-			r = Label.new()
-			r.text = str(it.right)
-			r.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			pon_letra(r, letra, fs, GRIS)
-			rw = letra.get_string_size(r.text, HORIZONTAL_ALIGNMENT_LEFT, -1, roundi(fs)).x + 2 + 10 * us
-		if nc > 0:
-			f.custom_minimum_size.x = celda
-		elif full or lw + rw + 22 * us > maxw:
-			l.clip_text = true
-			l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-			l.custom_minimum_size = Vector2(minf(lw, maxf(20 * us, maxw - rw - 22 * us - (12 * us if it.get("ic") or it.get("sw") else 0.0))), 0)
-		f.add_child(l)
-		if r:
-			var e := Control.new()
-			e.custom_minimum_size = Vector2(10 * us, 0)
-			f.add_child(e)
-			f.add_child(r)
-		if g:
-			f.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var idx := k
-		f.mouse_filter = Control.MOUSE_FILTER_STOP
-		f.gui_input.connect(func(e):
-			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and menu_box.has_meta("clic"):
-				menu_box.get_meta("clic").call(idx))
-		lista.add_child(f)
-	menu_col.add_child(lista)
-	if fl:
-		menu_col.add_child(_flecha("▼" if m_top + vis < m_items.size() else "", "down"))
+		f.custom_minimum_size.x = celda
+	elif full or lw + rw + 22 * us > maxw:
+		l.clip_text = true
+		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		l.custom_minimum_size = Vector2(minf(lw, maxf(20 * us, maxw - rw - 22 * us - (12 * us if it.get("ic") or it.get("sw") else 0.0))), 0)
+	f.add_child(l)
+	if r:
+		var e := Control.new()
+		e.custom_minimum_size = Vector2(10 * us, 0)
+		f.add_child(e)
+		f.add_child(r)
+	if g:
+		f.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var idx := k
+	f.mouse_filter = Control.MOUSE_FILTER_STOP
+	f.gui_input.connect(func(e):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and menu_box.has_meta("clic"):
+			menu_box.get_meta("clic").call(idx))
+	return f
+
+# la descripción de la fila elegida, debajo de la lista (R57)
+func _pm_desc(o: Dictionary, fs: float, full: bool, cls: String) -> void:
 	if o.get("desc") or ((full or cls == "right") and Datos.CAL and _desc_sel(fs) != ""):
 		var raya := ColorRect.new()
 		raya.color = LINEA2
@@ -1916,8 +1929,6 @@ func _pinta_menu(rows: int) -> void:
 		dl.custom_minimum_size = Vector2(0, desc_min() * us)
 		pon_letra(dl, letra, 8.5 * us, INK, 11.5 * us)
 		menu_col.add_child(dl)
-	menu_box.set_meta("cls", cls)
-	_coloca.call_deferred()
 
 # la descripción de la fila elegida; 1.50: si su nombre no cabe en la fila, entero delante
 func _desc_sel(fs: float) -> String:

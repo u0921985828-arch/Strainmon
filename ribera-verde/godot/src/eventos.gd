@@ -24,8 +24,7 @@ func elegir_cal() -> void:
 	var f := Datos.fecha(int(S.day))
 	CAL_V = {"y": int(f.y), "m": int(f.m)}
 	var mk := marcas_cal()
-	_dlg_fijo(Croquis.desc_cal(CAL_V, int(S.day), mk), T("CALENDARIO"))
-	var pr := Motor.Prom.new()
+	var pr := _vis_abre(Croquis.desc_cal(CAL_V, int(S.day), mk), T("CALENDARIO"))
 	push(func(b: String):
 		if b == "A" or b == "B":
 			pop()
@@ -36,17 +35,14 @@ func elegir_cal() -> void:
 			_dlg_fijo(Croquis.desc_cal(CAL_V, int(S.day), mk), T("CALENDARIO")))
 	await Motor.espera(pr)
 	CAL_V = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
+	_vis_cierra()
 
 func elegir_mapa() -> void:
 	var aqui := Croquis.pueblo_de(S.map)
 	if not Croquis.PUEBLOS.has(aqui):   # MAESTRO [9]: desde la ciudad, la comarca con la chincheta en Ibarbide
 		aqui = "ibarbide"
 	MAPA_V = {"i": Croquis.ORDEN.find(aqui)}
-	_dlg_fijo(Croquis.desc_mapa(D, int(S.ch), MAPA_V, aqui), "")   # 1.43: sin pestaña, que no pise el croquis
-	var pr := Motor.Prom.new()
+	var pr := _vis_abre(Croquis.desc_mapa(D, int(S.ch), MAPA_V, aqui), "")   # 1.43: sin pestaña, que no pise el croquis
 	push(func(b: String):
 		if b == "A" or b == "B":
 			pop()
@@ -57,9 +53,7 @@ func elegir_mapa() -> void:
 			_dlg_fijo(Croquis.desc_mapa(D, int(S.ch), MAPA_V, aqui), ""))   # 1.43: sin pestaña, que no pise el croquis
 	await Motor.espera(pr)
 	MAPA_V = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
+	_vis_cierra()
 
 func corta_bandeja(i: int, Me: Dictionary) -> void:
 	var N: Dictionary = S.nave
@@ -1146,10 +1140,8 @@ func alijo_franco() -> void:
 	var FR: Dictionary = D.FRANCO
 	while true:
 		var lots := bud_lots(1)
-		var it := lots.map(venta_item)
-		it.append({"label": K("Nada")})
-		var i: int = await menu(it, {"cls": "right", "title": T("Al alijo · {a} de {b}", {"a": _kg(int(stock_franco())), "b": _kg(int(FR.cap))})})
-		if i < 0 or i >= lots.size():
+		var i := await _pide_lote(lots, T("Al alijo · {a} de {b}", {"a": _kg(int(stock_franco())), "b": _kg(int(FR.cap))}))   # R55
+		if i < 0:
 			return
 		var l: Array = lots[i]
 		var mx: int = mini(int(floor(l[1].g)), int(FR.cap - stock_franco()))
@@ -1319,10 +1311,8 @@ func disp_llena(N: String, H: Dictionary, key: String, dia: float, f: float, gs:
 	if lots.is_empty():
 		await say(vacio, N)
 		return
-	var it := lots.map(venta_item)
-	it.append({"label": T("Nada")})
-	var i: int = await menu(it, {"cls": "right", "title": T("¿Qué lote?")})
-	if i < 0 or i >= lots.size():
+	var i := await _pide_lote(lots, T("¿Qué lote?"))   # R55
+	if i < 0:
 		return
 	var l: Array = lots[i]
 	var x := es_extr(l)
@@ -1487,10 +1477,8 @@ func vender_legal(N: String) -> void:
 	if lots.is_empty():
 		await say(T("{n} compra de 100 g para arriba, en cogollo curado o sin curar.", {"n": LG.n}), N)
 		return
-	var it := lots.map(venta_item)
-	it.append({"label": K("Nada")})
-	var i: int = await menu(it, {"cls": "right", "title": T("{n} · hoy, hasta {kg}", {"n": LG.n, "kg": _kg(resto)})})
-	if i < 0 or i >= lots.size():
+	var i := await _pide_lote(lots, T("{n} · hoy, hasta {kg}", {"n": LG.n, "kg": _kg(resto)}))   # R55
+	if i < 0:
 		return
 	var l: Array = lots[i]
 	var g = await cuanto(T("¿Cuánto de {n}?", {"n": lot_nombre(l[0])}), mini(int(floor(l[1].g)), resto), [100, 250, 500, 1000, 2000, 5000], func(v): return _kg(int(v)))

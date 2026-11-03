@@ -657,7 +657,7 @@ func world_press(b: String) -> void:
 		interact()
 	elif b == "START":
 		if not oraculo:   # E4 (fase 3): la pausa guarda antes de abrir el menú (al salir de la app con él abierto ya no se guarda)
-			call("save")
+			save()
 		run(start_menu)
 	elif b == "MOVIL":
 		run(movil_menu)
@@ -996,18 +996,33 @@ func object_action(x: int, y: int) -> void:
 		return
 	if await obj_local(x, y, o):   # los locales (1.30)
 		return
+	if await _oa_home(x, y, o):   # R53 (0.78): object_action era una cadena de 208 líneas con un if por mapa; cada mapa, en su función
+		return
+	if S.map == "camarote" and await _oa_camarote(o):
+		return
+	if S.map == "casa-ama" and await _oa_ama(o):
+		return
+	var txt := _oa_txt(x, y, o)
+	if txt:
+		await say(txt)
+		return
+	await _oa_general(x, y, o)
+
+# R53: lo de cada mapa de object_action, en su función; devuelven si ya lo han atendido
+func _oa_home(x: int, y: int, o) -> bool:
+	var m: Dictionary = MAPS[S.map]
 	if S.map == "home":
 		for t in m.get("carpas", []):
 			if x >= t.x0 and x <= t.x1 and y == t.y:
 				await abrir_carpa(t.ci)
-				return
+				return true
 		var sl := sitio_libre(x, y)
 		if sl >= 0:
 			await say((T("Hueco junto a la cama: aquí cabe una carpa de 120×120.") + (T(" Kiko las tendrá más adelante.") if S.ch < 5 else T(" Kiko las vende."))) if sl == 2 else K("Aquí cabe una carpa de cultivo. Kiko vende carpas de 100×100."))
-			return
+			return true
 		if mueble_de(o) != "":
 			await mueble_action(mueble_de(o))
-			return
+			return true
 		for k in D.MUEBLES:   # el sitio vacío de un mueble del salón
 			var mu: Dictionary = D.MUEBLES[k]
 			if mu.get("suelo") and k in muebles_ya():   # la alfombra puesta no es un objeto: nada (1.27)
@@ -1018,54 +1033,54 @@ func object_action(x: int, y: int) -> void:
 				if mu.get("grow") and not pd:   # el carro de esquejes (1.11): sin pedir, nada
 					break
 				await say(T("Aquí va {art}: llega mañana.", {"art": mu.art}) if pd else T("Aquí iría bien {art}. Se compra por internet: en el ordenador de la tía o con el móvil.", {"art": mu.art}))
-				return
+				return true
 		if o != null and D.MUEBLE_EXTR.has(o):   # 1.36: los muebles de las extracciones
 			await mueble_extr(o)
-			return
+			return true
 		match o:
 			"bedT", "bedB":   # i18n-no
 				await bed_action()
-				return
+				return true
 			"pc":
 				await pc_action()
-				return
+				return true
 			"lab", "lab2":
 				await lab_action()
-				return
+				return true
 			"trim":   # 1.36
 				await manicura_action()
-				return
+				return true
 			"table":
 				if not S.flags.get("letter"):
 					await letter_action()
-					return
+					return true
 				# (lo pidió el usuario): con la carta leída, la mesa redonda ordena la casa (12d-orden)
 				var j := await ask(K("La mesa redonda de la tía. Desde aquí se ve todo el piso."), [K("Ordenar la casa"), K("Leer la carta"), K("Nada")])
 				if j == 0:
 					await ordenar("home")
 				elif j == 1:
 					await letter_action()
-				return
+				return true
 			"fridge":
 				if S.flags.get("nevera"):
 					if extr_algo() or nevera_r() > 0 or total_rosin() > 0:   # 1.36: los extractos, en frío
 						await nevera_action()
 					else:
 						await say(K("La nevera: medio limón, leche y un táper de alubias que dejó la tía."))
-					return
+					return true
 				S.flags.nevera = S.day   # 1.25: el bote de la tía
 				await say(K("Detrás del táper de alubias hay un bote de cristal con una etiqueta: «Choco Thai. NO TOCAR»."))
 				await semillas_tia("choco", K("El frío las ha conservado: siguen buenas."), 3)
-				return
+				return true
 			"plantDeco":
 				await say(K("Una monstera. La tía Maite le hablaba cada mañana."))
-				return
+				return true
 			"iwin":
 				await say(K("Por la ventana se ve la ría. Huele a salitre."))
-				return
+				return true
 			"poster":
 				await diploma_action()
-				return
+				return true
 	if o == "escaleraC" and S.map == "home":   # 1.43.6: el camarote
 		sfx("door")
 		await fade(1)
@@ -1073,42 +1088,50 @@ func object_action(x: int, y: int) -> void:
 		update_hud()
 		await wait(80)
 		await fade(0)
-		return
-	if S.map == "camarote":
-		match o:
-			"estanteC":
-				await camarote_action()
-				return
-			"deshumC":
-				await say(K("El deshumidificador: deja el camarote entre el 58 y el 62 % de humedad, a 18 °C. Los sobres de dentro de los tarros hacen el resto."))
-				return
-			"crate":
-				await say(K("Cajas de la tía: revistas de jardinería, un ventilador viejo y los adornos de Navidad."))
-				return
-	if S.map == "casa-ama":   # el caserío de la familia, en Mendialde (1.10)
-		match o:
-			"table":
-				var nueva: bool = not S.flags.get("notaAma")
-				S.flags.notaAma = true
-				await say(K("Una nota de tu ama: «Te he dejado un táper de alubias en la nevera. Llama cuando llegues. Y no te metas en líos».") if nueva else K("La nota de ama: «...y no te metas en líos»."))
-				return
-			"fridge":
-				if S.flags.get("taper"):
-					await say(K("La nevera de casa. El táper ya va en la mochila."))
-					return
-				S.flags.taper = true
-				S.items.bocata += 1
-				await got(K("el táper de alubias de ama (1 × BOCATA)"))
-				return
-			"bedT", "bedB":   # si pierdes el último autobús · i18n-no
-				await bed_action(K("Tu cama de siempre, con la colcha de cuadros."))
-				return
-			"iwin":
-				await say(K("Por la ventana se ven el monte y la carretera de la comarca."))
-				return
-			"plantDeco":
-				await say(K("Los geranios de ama. Les sobra agua."))
-				return
+		return true
+	return false
+
+func _oa_camarote(o) -> bool:
+	match o:
+		"estanteC":
+			await camarote_action()
+			return true
+		"deshumC":
+			await say(K("El deshumidificador: deja el camarote entre el 58 y el 62 % de humedad, a 18 °C. Los sobres de dentro de los tarros hacen el resto."))
+			return true
+		"crate":
+			await say(K("Cajas de la tía: revistas de jardinería, un ventilador viejo y los adornos de Navidad."))
+			return true
+	return false
+
+func _oa_ama(o) -> bool:   # el caserío de la familia, en Mendialde (1.10)
+	match o:
+		"table":
+			var nueva: bool = not S.flags.get("notaAma")
+			S.flags.notaAma = true
+			await say(K("Una nota de tu ama: «Te he dejado un táper de alubias en la nevera. Llama cuando llegues. Y no te metas en líos».") if nueva else K("La nota de ama: «...y no te metas en líos»."))
+			return true
+		"fridge":
+			if S.flags.get("taper"):
+				await say(K("La nevera de casa. El táper ya va en la mochila."))
+				return true
+			S.flags.taper = true
+			S.items.bocata += 1
+			await got(K("el táper de alubias de ama (1 × BOCATA)"))
+			return true
+		"bedT", "bedB":   # si pierdes el último autobús · i18n-no
+			await bed_action(K("Tu cama de siempre, con la colcha de cuadros."))
+			return true
+		"iwin":
+			await say(K("Por la ventana se ven el monte y la carretera de la comarca."))
+			return true
+		"plantDeco":
+			await say(K("Los geranios de ama. Les sobra agua."))
+			return true
+	return false
+
+# el atrezo con texto: por mapa, luego ATREZO_TXT (1.51) y OBJ_MUDO (el repaso de coherencia: nada sin respuesta)
+func _oa_txt(x: int, y: int, o) -> String:
 	var txt := ""
 	if S.map == "txaro":
 		txt = {"bedT": K("Una cama con colcha de ganchillo."), "bedB": K("Una cama con colcha de ganchillo."), "table": K("Un bote de aceite con una etiqueta a mano: «Para dormir. 2 gotas»."),
@@ -1125,9 +1148,9 @@ func object_action(x: int, y: int) -> void:
 			for b in D.MAR.barcos:
 				if o == b.o or o == b.o + "2":
 					txt = T("{n}, amarrado al muelle. Se carga desde su noray.", {"n": mayus(I18n.v(String(b.n)))})
-	if txt:
-		await say(txt)
-		return
+	return txt
+
+func _oa_general(x: int, y: int, o) -> void:
 	match o:
 		"sign":
 			var st: String = "%s:%d,%d" % [S.map, x, y]
@@ -1179,6 +1202,7 @@ func object_action(x: int, y: int) -> void:
 
 # ---------- acciones y efectos del atlas (01b-arte accion, lanzarVfx) ----------
 func accion(nn: String, vf = null) -> void:
+
 	var g = grupo_pj()
 	if Datos.CAL and GESTO_DE.has(nn):   # 1.54: y el plano de detalle (gesto, trama.gd)
 		var na := "plantar" if nn == "sembrar" else nn   # 1.57.2: al sembrar, el protagonista hace lo de plantar

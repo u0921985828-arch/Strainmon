@@ -22,7 +22,16 @@ static func nuevo_estado() -> Dictionary:
 		"buds": {}, "custom": {}, "gen": {}, "fenos": {}, "fenoN": 0, "flags": {}, "banco": float(Datos.carga().CUENTA.inicial)}
 
 # plazas de todas las carpas, en orden: S.pots[i] y S.macetas[i] son las de la plaza i
+# R51 (0.78): se llamaba una vez por planta dentro de los bucles (factores, avanza) y creaba hasta 27 diccionarios cada vez.
+# Las plazas solo cambian si cambian las carpas, así que se guarda la lista por los tipos de carpa. Nadie la modifica: se lee
+static var _hu_k := ""
+static var _hu: Array = []
 static func huecos(S: Dictionary) -> Array:
+	var k := "%s|%s|" % [Datos.CAL, Datos.PLAY]   # las plazas pueden cambiar con CAL o con PLAY: van en la clave
+	for c in S.carpas:
+		k += ("-" if c == null else String(c.t)) + ","
+	if k == _hu_k:
+		return _hu
 	var D := Datos.carga()
 	var o := []
 	for ci in S.carpas.size():
@@ -31,6 +40,8 @@ static func huecos(S: Dictionary) -> Array:
 			continue
 		for j in int(D.CARPAS[c.t].plazas):
 			o.append({"c": ci, "j": j})
+	_hu_k = k
+	_hu = o
 	return o
 
 static func factores(S: Dictionary, i: int) -> Dictionary:
@@ -331,7 +342,11 @@ static func iv_linea(S: Dictionary, sid: String) -> Array:
 	if not S.has("iv"):
 		S.iv = {}
 	if not S.iv.has(sid):
-		var B: Array = Datos.carga().IVS.base
+		# (repaso 0.76, «5 · Genética»): con CAL, IVS.basec. IVS.base era [6, 18], media 12, por debajo del punto
+		# neutro de iv_f (16): cualquier línea nueva nacía con menos cosecha y menos THC que su propia ficha, y solo
+		# criándola volvía a lo normal. [10, 22] tiene media 16: la línea sale en su ficha y de ahí se mejora
+		var IV: Dictionary = Datos.carga().IVS
+		var B: Array = IV.basec if Datos.CAL and IV.has("basec") else IV.base
 		var l := []
 		for i in 4:
 			l.append(int(B[0]) + Datos.hash_str("iv%d|%s" % [i, sid]) % (int(B[1]) - int(B[0]) + 1))
@@ -398,6 +413,14 @@ static func ra_thc(fe) -> float:
 
 static func ra_ar(fe) -> float:
 	return 1.0 if ra_f(fe, "aroma") else 0.0
+
+# (repaso 0.76, «5 · Genética»): una línea feminizada (D.FEM, las de la tienda) solo da semillas si sale una flor
+# hermafrodita (SEMILLA_HERMA, 12 %), así que sus rarezas se fijaban unas ocho veces más despacio que las de una
+# regular. Un rasgo del fenotipo no se guarda con semillas, se guarda con esquejes de la madre: con CAL, la línea
+# feminizada aprende la rareza al cosechar la planta, aunque no haya dejado semilla (los IV, que son cría de
+# verdad, siguen pidiendo semillas: es el precio de la feminizada)
+static func ra_sin_semilla(sid: String) -> bool:
+	return Datos.CAL and sid in Datos.carga().FEM
 
 # la línea aprende las rarezas de la planta de la que salen sus semillas, que son la generación siguiente a la suya: un nivel
 # más que el que tenía su línea cuando nació (f.ral; 1 si le salió sola), hasta fijarlo. Sus hermanas, sus esquejes o la segunda

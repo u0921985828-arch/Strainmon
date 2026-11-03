@@ -106,7 +106,7 @@ func redibuja(t: float) -> void:
 		if g.vc:
 			modo = "carpaC"  # i18n-no
 			vc.visible = true
-			vc.pinta(J.S, J.VC, now, J.SW, SH)
+			vc.pinta(J.S, J.VC, now, J.SW, SH, g)
 	elif modo == "world":
 		cam = camara()
 		_suelo_mira()
@@ -180,7 +180,12 @@ func _capa(ci: CanvasItem, n: int) -> void:
 # pisa el protagonista (la animación de pisar, el detalle de la hierba que se esconde). Se vuelve a pintar si cambia el mapa o su suelo
 var SUELO_ON := true   # las pruebas lo apagan para comparar con el de antes
 var _suelo_k := ""
-var _suelo_din := {}   # tx + (ty << 12) de las casillas que se repintan cada fotograma
+var _suelo_din := {}   # tx + (ty << 12) de las casillas animadas, en su propio trozo (R48)
+var SD_ON := true      # la prueba lo apaga para comparar con el repintado de antes
+var OBJ_CACHE := true  # R47: la prueba lo apaga para comparar con resolver el sprite en cada fotograma
+var _sd_vp := []       # [SubViewport, Node2D] de los trozos con casillas animadas
+var _sd_kl := []       # las claves de suelo animadas del mapa, sin repetir
+var _sd_s := ""        # el sello de sus fotogramas: mientras no cambie, no se repintan
 
 # 0.74 (lo vio el usuario: «ahí en la iglesia también se ve como el sprite tiene un fondo negro»): las casillas de un edificio
 # (wall_, roofT_, roofB_, win_, door_) no tienen arte de suelo, así que donde el sprite de la fachada es transparente —el hueco
@@ -263,6 +268,43 @@ func _suelo_dinamica(m: Dictionary, k: String, tx: int, ty: int) -> bool:
 	var an = Atlas.sobre.get("tile:" + k)
 	return an != null and Atlas.anim_de(an[0][0], an[0][1]) != null and Atlas.anim_de(an[0][0], an[0][1]).get("bucle")
 
+# R48: las claves de suelo animadas del mapa (sin repetir) y los trozos que las llevan
+func _sd_claves(m: Dictionary) -> Array:
+	var ks := {}
+	for q in _suelo_din:
+		var tx: int = q & 4095
+		var ty: int = q >> 12
+		var k := String(m.g[ty][tx])
+		if k.begins_with("hito_"):
+			k = k.substr(5)
+		ks[k] = true
+	return ks.keys()
+
+func _sd_trozo(cx: int, cy: int, m: Dictionary) -> bool:
+	for ty in range(cy, mini(cy + SUELO_TROZO, int(m.h))):
+		for tx in range(cx, mini(cx + SUELO_TROZO, int(m.w))):
+			if _suelo_din.has(tx + (ty << 12)):
+				return true
+	return false
+
+# el fotograma en que va cada animación del suelo: mientras no cambie ninguno, el trozo pintado sirve
+func _sd_sello() -> String:
+	var s := []
+	for k in _sd_kl:
+		if k == "baile":   # la pista de GAUA, cada 0,6 s (1.30)
+			s.append(str(floori(now / 600)))
+			continue
+		if k == "arena" or k == "water":   # la ola de la playa, cada 0,52 s (_playa)
+			s.append(str(int(now / 520.0)))
+			continue
+		var an = Atlas.sobre.get("tile:" + k)
+		if an == null:
+			s.append(str(int(now / 250.0)))   # sin animación declarada: por si acaso, cuatro veces por segundo
+			continue
+		var f = Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true})
+		s.append(str(f.i) if f != null else "0")
+	return ",".join(s)
+
 func _suelo_mira() -> void:
 	if not SUELO_ON or not Atlas.ok or not J.S or not J.MAPS.has(J.S.map):
 		suelo.visible = false
@@ -283,27 +325,45 @@ func _suelo_mira() -> void:
 		for c in suelo.get_children():
 			suelo.remove_child(c)
 			c.queue_free()
-		for cy in range(0, int(m.h), SUELO_TROZO):
-			for cx in range(0, int(m.w), SUELO_TROZO):
-				var t := Node2D.new()
-				t.draw.connect(_suelo_pinta.bind(t, cx, cy))
-				var vp := SubViewport.new()
-				vp.size = Vector2i(mini(SUELO_TROZO, int(m.w) - cx), mini(SUELO_TROZO, int(m.h) - cy)) * 16
-				vp.transparent_bg = true
-				vp.disable_3d = true
-				vp.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
-				vp.render_target_update_mode = SubViewport.UPDATE_ONCE
-				vp.add_child(t)
-				suelo.add_child(vp)
-				var sp := Sprite2D.new()
-				sp.texture = vp.get_texture()
-				sp.centered = false
-				sp.position = Vector2(cx * 16, cy * 16)
-				suelo.add_child(sp)
+		# 0.78 (R48): dos pasadas. Primero los trozos del suelo quieto; encima, los trozos con casillas animadas (el agua, la
+		# pista de GAUA, la arena), en su propio SubViewport, que antes se repintaban en c0 60 veces por segundo aunque su
+		# animación vaya a 4. Se rehacen cuando cambia el fotograma de su animación, no cada fotograma
+		_sd_vp.clear()
+		_sd_kl = _sd_claves(m)
+		for din in [false, true]:
+			for cy in range(0, int(m.h), SUELO_TROZO):
+				for cx in range(0, int(m.w), SUELO_TROZO):
+					if din and not _sd_trozo(cx, cy, m):
+						continue
+					var t := Node2D.new()
+					t.draw.connect(_suelo_pinta.bind(t, cx, cy, din))
+					var vp := SubViewport.new()
+					vp.size = Vector2i(mini(SUELO_TROZO, int(m.w) - cx), mini(SUELO_TROZO, int(m.h) - cy)) * 16
+					vp.transparent_bg = true
+					vp.disable_3d = true
+					vp.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+					vp.render_target_update_mode = SubViewport.UPDATE_ONCE
+					vp.add_child(t)
+					suelo.add_child(vp)
+					var sp := Sprite2D.new()
+					sp.texture = vp.get_texture()
+					sp.centered = false
+					sp.position = Vector2(cx * 16, cy * 16)
+					suelo.add_child(sp)
+					if din:
+						_sd_vp.append([vp, t])
+		_sd_s = ""
 		suelo.queue_redraw()
 	if suelo.position != Vector2(-cam.x, -cam.y):
 		suelo.position = Vector2(-cam.x, -cam.y)
 		suelo.queue_redraw()   # el negro de fuera, solo un rectángulo
+	if SD_ON and not _sd_vp.is_empty():
+		var se := _sd_sello()
+		if se != _sd_s:
+			_sd_s = se
+			for v in _sd_vp:
+				v[1].queue_redraw()
+				v[0].render_target_update_mode = SubViewport.UPDATE_ONCE
 	suelo.visible = true
 
 const SUELO_TROZO := 16
@@ -311,7 +371,7 @@ const SUELO_TROZO := 16
 func _suelo_negro() -> void:   # lo de fuera del mapa, negro (la pantalla entera, se mueva como se mueva la cámara)
 	suelo.draw_rect(Rect2(-suelo.position - Vector2(64, 64), Vector2(2048, 2048)), Color.BLACK)
 
-func _suelo_pinta(t: Node2D, cx: int, cy: int) -> void:
+func _suelo_pinta(t: Node2D, cx: int, cy: int, din := false) -> void:
 	if not J or not J.S:
 		return
 	var sv = J.demo_entra(now) if modo == "demo" else null
@@ -323,7 +383,7 @@ func _suelo_pinta(t: Node2D, cx: int, cy: int) -> void:
 		alfa = 1.0
 		for ty in range(cy, mini(cy + SUELO_TROZO, int(m.h))):
 			for tx in range(cx, mini(cx + SUELO_TROZO, int(m.w))):
-				if not _suelo_din.has(tx + (ty << 12)):
+				if _suelo_din.has(tx + (ty << 12)) == din:
 					_suelo_casilla(m, tx, ty, (tx - cx) * 16, (ty - cy) * 16)
 		L = L0
 		alfa = a0
@@ -459,21 +519,21 @@ func _capt_tex(im: Image) -> ImageTexture:
 
 # las piezas seguidas de un mismo mueble en su fila (la barra, el mostrador, el banco largo), translúcidas juntas: si una tapa, todas
 # (lo vio el usuario: medio mostrador translúcido y el resto entero); de los árboles y el monte, solo las que le pisan el cuerpo
-var _tapa_reg := {}   # «tx,ty» → {o, c, x, y, pie, pl}, de cada objeto alto del fotograma (_arte_obj)
+var _tapa_reg := {}   # tx + (ty << 12) → {o, c, x, y, pie, pl}, de cada objeto alto del fotograma (_arte_obj). R50 (0.78): clave entera, no «tx,ty»
 var _tapa_res := {}
 var _tapa_mem := {}   # «mapa:tx,ty» → si estaba translúcido el fotograma de antes: se queda así mientras le pise el cuerpo, aunque sea
 					  # con menos de TAPA_PX píxeles (si no, al pasar por el canto de una copa se encendía y apagaba en 1-3 px: destellos)
-func _tapa_propia(k: String) -> bool:
+func _tapa_propia(k: int) -> bool:
 	if not _tapa_res.has(k):
 		var r: Dictionary = _tapa_reg[k]
-		var km: String = String(J.S.map) + ":" + k
+		var km: String = String(J.S.map) + ":" + str(k)
 		var u: int = 1 if Datos.CAL and _tapa_mem.get(km, false) else TAPA_PX
 		_tapa_res[k] = tapa_pj(r.c, r.x, r.y, r.pie, u) or (r.pl and tapa_encima(r.x, r.y, r.c.get_width(), r.pie))
 		_tapa_mem[km] = _tapa_res[k]
 	return _tapa_res[k]
 
 func tapa_obj(tx: int, ty: int) -> bool:
-	var k := "%d,%d" % [tx, ty]
+	var k: int = tx + (ty << 12)
 	if not _tapa_reg.has(k):
 		return false
 	if _tapa_propia(k):
@@ -486,11 +546,11 @@ func tapa_obj(tx: int, ty: int) -> bool:
 	for dx in [-1, 1]:
 		var a: Dictionary = r
 		var x: int = tx + int(dx)
-		while _tapa_reg.has("%d,%d" % [x, ty]):
-			var b: Dictionary = _tapa_reg["%d,%d" % [x, ty]]
+		while _tapa_reg.has(x + (ty << 12)):
+			var b: Dictionary = _tapa_reg[x + (ty << 12)]
 			if b.o != r.o or not Rect2i(a.x - 1, a.y, a.c.get_width() + 2, a.c.get_height()).intersects(Rect2i(b.x, b.y, b.c.get_width(), b.c.get_height())):
 				break
-			if _tapa_propia("%d,%d" % [x, ty]):
+			if _tapa_propia(x + (ty << 12)):
 				return true
 			a = b
 			x += dx
@@ -618,7 +678,7 @@ func _mundo() -> void:
 				continue
 			var sx: int = tx * 16 - cam.x
 			var sy: int = ty * 16 - cam.y
-			if not cs or _suelo_din.has(tx + (ty << 12)) or (tx == P.x and ty == P.y):   # con el suelo pintado, solo lo que se mueve y la casilla que se pisa
+			if not cs or (not SD_ON and _suelo_din.has(tx + (ty << 12))) or (tx == P.x and ty == P.y):   # con el suelo pintado, solo la casilla que se pisa (R48: las animadas, en su trozo)
 				_suelo_casilla(m, tx, ty, sx, sy)
 			var o = m.o[ty][tx]
 			if o and o != "carpa":
@@ -1499,20 +1559,8 @@ static func obj_pl(o: String):
 		return null
 	return {"c": im, "cel": {"ancla": [int(OBJ_PL_ANCLA[o]), im.get_height() - 1], "h": im.get_height(), "w": im.get_width()}}
 
-func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
-	var seca: bool = Datos.CAL and o.begins_with("hgs-")   # la planta muerta de la huerta (campo.gd): la de hg, parda
-	if seca:
-		o = "hg-" + o.substr(4)
-	var fpl = obj_pl(o)   # lo de KAIA del generador de sprites (kaia_pl.png), de frente
-	var gr = Atlas.cubre("obj:mesaN" if Datos.CAL and o == "mesaKP" else "obj:" + o)   # i18n-no
-	if not gr and fpl == null:
-		return
-	var an = null if fpl != null else Atlas.sobre.get("obj:" + o)
-	var d := desfase(o, tx, ty)
-	var md = J.mesa_de(o, tx, ty) if o == "mesaN" or o == "mesaKP" else null   # la mesa de la nave o de KAIA: {Me, fm, foco}  # i18n-no
-	var fm: int = int(md.fm) if md != null else 0
-	var pl = _plantas_mesa(gr if gr else Atlas.cubre("obj:mesaN"), md.Me, fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima  # i18n-no
-	var sp: String = ("mesaN-%d" % mini(fm, 1)) if md != null else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)  # i18n-no
+# R47 (0.78): el sprite de cada objeto se resolvia en cada fotograma. Resolverlo una vez, aqui
+func _obj_f(o: String, tx: int, ty: int, sp: String, d, an, gr, fpl):
 	var f = fpl if fpl != null else Atlas.frame_de(an[0][0], an[0][1], "unica", now, {"bucle": true}) if an else Atlas.frame_de(gr, sp, "unica", 0, {"i": 0, "esp": d.esp})
 	var ge = Atlas.cubre("obj:e-" + o) if Datos.CAL and not an and fpl == null else null   # 1.47: a escala con el protagonista (escala.py), solo con CAL
 	var fd = _detalle_obj(o, tx) if Datos.CAL and not an and fpl == null else null   # 1.48: con lo que trae encima (detalle.py)
@@ -1543,7 +1591,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 			nl += 1
 			q -= 1
 		if izq and nl % 2 == 1:
-			return
+			return null
 		if der:
 			var fw = Atlas.frame_de("ocio-ancho", "w-" + sp, "unica", 0, {"i": 0})
 			if fw == null:
@@ -1552,6 +1600,34 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 				f = fw
 	if f == null and not an and sp != o:
 		f = Atlas.frame_de(gr, o, "unica", 0, {"i": 0, "esp": d.esp})
+	return f
+
+func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
+	var seca: bool = Datos.CAL and o.begins_with("hgs-")   # la planta muerta de la huerta (campo.gd): la de hg, parda
+	if seca:
+		o = "hg-" + o.substr(4)
+	var fpl = obj_pl(o)   # lo de KAIA del generador de sprites (kaia_pl.png), de frente
+	var gr = Atlas.cubre("obj:mesaN" if Datos.CAL and o == "mesaKP" else "obj:" + o)   # i18n-no
+	if not gr and fpl == null:
+		return
+	var an = null if fpl != null else Atlas.sobre.get("obj:" + o)
+	var d := desfase(o, tx, ty)
+	var md = J.mesa_de(o, tx, ty) if o == "mesaN" or o == "mesaKP" else null   # la mesa de la nave o de KAIA: {Me, fm, foco}  # i18n-no
+	var fm: int = int(md.fm) if md != null else 0
+	var pl = _plantas_mesa(gr if gr else Atlas.cubre("obj:mesaN"), md.Me, fm) if fm else null   # 1.31: las plantas de la mesa de la nave, encima  # i18n-no
+	var sp: String = ("mesaN-%d" % mini(fm, 1)) if md != null else J.sprite_local(J.deco_sprite(o))   # 1.16: su tapizado o lámina; 1.30: la mesa de la nave, vacía o plantada; 1.34: lo de los locales (sprite_local)  # i18n-no
+	# R47 (0.78): el sprite de cada objeto se resolvia en cada fotograma (2,9 ms en casco). Lo que solo depende del
+	# objeto, su casilla, su sprite y la rejilla se guarda por generaciones; lo animado, las mesas, la huerta y la seca, no
+	var est: bool = OBJ_CACHE and an == null and md == null and not seca and not o.begins_with("hg-")
+	var f = null
+	if est:
+		var ck := "of|%s|%d|%d|%s|%s|%s|%s" % [o, tx, ty, sp, d.esp, J.S.map, _mapa_gh()]
+		if _ctiene(ck):
+			f = cache[ck]
+		else:
+			f = _cpon(ck, _obj_f(o, tx, ty, sp, d, an, gr, fpl))
+	else:
+		f = _obj_f(o, tx, ty, sp, d, an, gr, fpl)
 	if f == null:
 		return
 	if Datos.CAL and o.begins_with("hg-") and not seca:   # la de la huerta, con el tono de hoja y el cogollo de su variedad
@@ -1591,7 +1667,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		var mx0: int = Datos.jsround(xp - f.cel.ancla[0])
 		var my0: int = Datos.jsround(yp - f.cel.ancla[1])
 		var f0 = Atlas.frame_de(an[0][0], an[0][1], "unica", 0, {"i": 0}) if an else null   # lo animado (la fuente), por su 1.er fotograma: no parpadea
-		_tapa_reg["%d,%d" % [tx, ty]] = {"o": o, "c": f0.c if f0 != null else f.c, "x": mx0, "y": my0, "pie": pie, "pl": pl != null}
+		_tapa_reg[tx + (ty << 12)] = {"o": o, "c": f0.c if f0 != null else f.c, "x": mx0, "y": my0, "pie": pie, "pl": pl != null}
 		list.append([pie, func():
 			var mx: int = Datos.jsround(xp - f.cel.ancla[0])
 			var my: int = Datos.jsround(yp - f.cel.ancla[1])
@@ -1802,7 +1878,13 @@ func _arte_edificios(m: Dictionary) -> void:
 		var f = Atlas.frame_de(gr, "base", "unica", 0, {"i": 0})
 		if f == null:
 			continue
-		_img(f.c, b.x0 * 16 - cam.x, b.y0 * 16 - cam.y)
+		var bx: int = b.x0 * 16 - cam.x
+		var by: int = b.y0 * 16 - cam.y
+		# R51 (0.78): sin recorte por cámara se mandaba a dibujar la fachada de todos los edificios del mapa, también las de fuera
+		# de la pantalla (hasta 40 en el Casco Viejo). La puerta y el rótulo van dentro del edificio, así que con él fuera, nada
+		if bx > J.SW or by > SH or bx + f.c.get_width() < 0 or by + f.c.get_height() < 0:
+			continue
+		_img(f.c, bx, by)
 		var gp: String = "edificio-" + b.get("puerta", b.id)
 		if b.get("doorX") != null and Atlas.anim_de(gp, "puerta"):
 			var dy: int = b.y0 + b.h - 1
@@ -2464,8 +2546,10 @@ func _vistas() -> void:
 						continue
 					cs.append(Vector2i(x, y))
 			_vista_c[kc] = cs
+		var lote := PackedInt32Array()   # R49 (0.78): hasta 242 draw_rect por agente, ahora un solo dibujo (como la lluvia)
 		for q in cs:
-			_rect(q.x * 16 - cam.x, q.y * 16 - cam.y, 16, 16, col)
+			lote.append_array([q.x * 16 - cam.x, q.y * 16 - cam.y, 16, 16])
+		_rects_lote(lote, col)
 
 func _bocadillo(x: int, y: int, ch: String, col: Color) -> void:
 	_rect(x - 1, y - 1, 9, 10, css("#26262e"))

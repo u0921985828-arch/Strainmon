@@ -555,13 +555,13 @@ static func fila_sel(g_: Dictionary, sel: int) -> int:
 			return q.fila
 	return 0
 
-func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240, alto := 160) -> void:
+func pinta(S_: Dictionary, VC_: Dictionary, now_: float, ancho := 240, alto := 160, g_ = null) -> void:
 	S = S_
 	VC = VC_
 	now = now_
 	sw = ancho
 	sh = alto
-	g = geo(S, VC.ci)
+	g = g_ if g_ != null else geo(S, VC.ci)   # R51 (0.78): la geometría ya la saca pinta.gd; no se calculaba dos veces por fotograma
 	var ox := (sw - 240) >> 1
 	for n in [base, luz, encima]:
 		n.position = Vector2(ox, sh - 160)

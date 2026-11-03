@@ -2,6 +2,21 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Lo que quedaba del repaso, segunda vuelta (0.78, lo pidió el usuario: «Ahora vete cumpliendo cada mejora»)
+
+Los hallazgos que el repaso 0.76 dejaba en «recomendado» (`docs/REPASO-ESTRUCTURA.md`), aplicados por bloques. Estructura y rendimiento:
+
+- **Cada mapa, en su función.** `obj_local()` (308 líneas) y `object_action()` (208) eran dos cadenas de `if S.map == …`: ahora una función por mapa que dice si lo ha atendido (`_ol_pre`, `_ol_discovip`, `_ol_cuartot`, `_ol_naves`, `_ol_naveh`, `_ol_loc`, `_ol_alm`, `_ol_shop`, `_ol_club`, `_ol_nave`, `_ol_setas`, `_ol_conce`, `_ol_disco` en `venta.gd`; `_oa_home`, `_oa_camarote`, `_oa_ama`, `_oa_txt`, `_oa_general` en `calle.gd`), llamadas en el mismo orden de antes, así que lo que se ve no cambia.
+- **Un solo esqueleto para los visores «en vitrina».** Los nueve (caja fuerte, nevera, carro de esquejes, el bajo, el armario, las madres, las mesas de KAIA, la ficha de variedad, el móvil, el calendario y el mapa) repetían doce líneas de abrir el diálogo fijo y cerrarlo: `_vis_abre` y `_vis_cierra` (`setas.gd`).
+- **El prólogo de las ventas, una vez.** Las nueve ventas que ponen los lotes en un menú con «Nada» al final usan `_pide_lote(lots, título)` (`mundo.gd`), que devuelve el elegido o -1.
+- **Sin llamadas por cadena de texto.** `call("relanzar")` y `call("save")` y `get("relanza")` esquivaban el parser: `relanzar()`, `save()` y `relanza` quedan declarados en `mundo.gd`, como el resto de la cadena.
+- **`_pinta_menu`, de 204 líneas a 92.** El título con su raya, cada fila de la lista y la descripción de abajo, en `_pm_titulo`, `_pm_fila` y `_pm_desc` (`ui.gd`).
+- **`migrate()` ya no lee lo que aún no existe.** `S.deadline` y `S.rel` se leían antes de que `new_state()` los rellenara, en partidas muy viejas.
+- **El sprite de cada objeto, una vez.** `_arte_obj` lo resolvía en cada fotograma (2,9 ms en el Casco Viejo): `_obj_f` con caché por objeto, mapa y generación de la rejilla (`OBJ_CACHE`); lo animado, lo que se seca y la huerta siguen sin caché. Prueba `tests/obj_cache.gd` (184 comprobaciones: los 91 mapas, de día y de noche, iguales píxel a píxel con caché y sin ella, y la pantalla cambia al poner un mueble nuevo).
+- **El suelo animado, en su propio trozo.** El agua, la arena y el baile se pintan a 2-4 fps pero arrastraban los 60 repintados del suelo entero: ahora las casillas animadas van en trozos aparte que solo se rehacen cuando su fotograma cambia (`SD_ON`, `_sd_claves`, `_sd_trozo`, `_sd_sello` en `pinta.gd`); `tests/suelo_cache.gd` 364/0.
+- **Menos cuentas por fotograma.** `Cultivo.huecos(S)` con caché por las carpas que hay (se llamaba una vez por planta), `Vista.geo` una vez por `pinta()` en vez de dos, y `_arte_edificios` descarta el edificio que no toca la cámara.
+- **Dos dibujos en vez de cientos.** El cono de la policía pinta sus hasta 242 casillas en un solo lote (`_rects_lote`, como la lluvia) y `tapa_obj` deja las claves de texto por enteros (`tx + (ty << 12)`); `tests/tapa_mapas.gd` 187425/0.
+
 ### Lo que quedaba del repaso (0.77, lo pidió el usuario: «Pues cumple con lo pendiente al 100% y compila»)
 
 Los cuatro hallazgos de economía que el repaso 0.76 dejó en «recomendado», aplicados. Todos con claves nuevas que solo se leen con `Datos.CAL`, para que el oráculo del HTML (congelado en la 1.37) siga calcando cifra a cifra:

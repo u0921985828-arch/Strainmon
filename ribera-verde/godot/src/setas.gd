@@ -754,6 +754,22 @@ func _dlg_fijo(t: String, nombre: String) -> void:
 	dlg_txt.text = nm(t)
 	_coloca.call_deferred()
 
+# R54 (0.78): el esqueleto que repetían los nueve visores «en vitrina» (caja, nevera, carro, bajo, armario, madres, mesas, ficha,
+# móvil, calendario y mapa): abrir el diálogo fijo con su promesa y cerrarlo
+func _vis_abre(t: String, nombre: String, tapa_hud := false) -> Motor.Prom:
+	if tapa_hud and not oraculo:
+		hud.hide()   # la vista entera, sin el recuadro del HUD encima
+	_dlg_fijo(t, nombre)
+	return Motor.Prom.new()
+
+func _vis_cierra(vuelve_hud := false) -> void:
+	if oraculo:
+		return
+	dlg.hide()
+	dlg_nm.hide()
+	if vuelve_hud:
+		update_hud()
+
 # la vista: hasta que eliges (A) o cierras (B: null); i0, el que sale elegido. Las pruebas la cambian (gancho_almacen, ui.gd)
 func elegir_almacen(t: String, i0 := 0):
 	if gancho_almacen.is_valid():
@@ -769,8 +785,7 @@ func elegir_almacen(t: String, i0 := 0):
 	var nn := items_almacen(t).size()
 	ALMACEN = {"t": t, "i": maxi(0, mini(nn - 1, i0))}
 	var N := K("DISPENSARIO") if t == "disp" else K("CAJA FUERTE") if t == "caja" else K("CAMAROTE") if t == "cam" else K("CURADO DE LA NAVE") if t == "navc" else K("MALETERO") if t == "mal" else K("NEVERA")
-	_dlg_fijo(desc_almacen(ALMACEN), N)
-	var pr := Motor.Prom.new()
+	var pr := _vis_abre(desc_almacen(ALMACEN), N)
 	push(func(b: String):
 		if b == "B":
 			pop()
@@ -789,9 +804,7 @@ func elegir_almacen(t: String, i0 := 0):
 			_dlg_fijo(desc_almacen(ALMACEN), N))
 	var e = await Motor.espera(pr)
 	ALMACEN = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
+	_vis_cierra()
 	return e
 
 # un tarro de w × h en (x, y), a escala k: por dentro, lo que lleva (den: alm-cog-p/-s o alm-x-<tipo>, almacen.py) a su nivel,
@@ -1399,9 +1412,7 @@ func mover_pieza(mapa: String, k: String) -> bool:
 	var x: int = ORDEN.x
 	var y: int = ORDEN.y
 	ORDEN = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
+	_vis_cierra()
 	for j in int(m.h):
 		m.o[j] = O[j].duplicate()
 		m.g[j] = G[j].duplicate()
@@ -1482,10 +1493,7 @@ func elegir_carro(i0 := 0):
 		return gancho_carro.call()
 	var cap: int = D.CARRO.bandejas * D.CARRO.plazas
 	CARRO_V = {"i": clampi(i0, 0, cap - 1)}
-	if not oraculo:
-		hud.hide()   # la vista entera, sin el recuadro del HUD encima (como las madres y las mesas de KAIA)
-	_dlg_fijo(desc_carro(CARRO_V), K("CARRO DE ESQUEJES"))
-	var pr := Motor.Prom.new()
+	var pr := _vis_abre(desc_carro(CARRO_V), K("CARRO DE ESQUEJES"), true)
 	push(func(b: String):
 		if b == "B":
 			pop()
@@ -1500,10 +1508,7 @@ func elegir_carro(i0 := 0):
 			_dlg_fijo(desc_carro(CARRO_V), K("CARRO DE ESQUEJES")))
 	var e = await Motor.espera(pr)
 	CARRO_V = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
-		update_hud()
+	_vis_cierra(true)
 	return e
 
 func _esqueje(o: Array, cx: int, y: int, hj: String, k := 1, seco := false, bm: Array = CLON) -> void:
@@ -1658,10 +1663,7 @@ func elegir_bajo(i0 := 0):
 		return gancho_bajo.call(i0)
 	SETAS_V = {"i": clampi(i0, 0, 2 * n_baldas() - 1)}
 	var tit := K("EL SÓTANO") if es_sot() else K("EL BAJO")
-	if not oraculo:
-		hud.hide()
-	_dlg_fijo(desc_bajo(SETAS_V), tit)
-	var pr := Motor.Prom.new()
+	var pr := _vis_abre(desc_bajo(SETAS_V), tit, true)
 	push(func(b: String):
 		if b == "B":
 			pop()
@@ -1676,10 +1678,7 @@ func elegir_bajo(i0 := 0):
 			_dlg_fijo(desc_bajo(SETAS_V), tit))
 	var e = await Motor.espera(pr)
 	SETAS_V = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
-		update_hud()
+	_vis_cierra(true)
 	return e
 
 # la vista hasta B: con A sobre una bandeja, el menú de las bandejas (y se vuelve a las baldas); sobre un hueco, que las prepara Txomin
@@ -1954,17 +1953,14 @@ func vista_armario() -> void:
 		gancho_bajo.call(-1)
 		return
 	ARM_V = {}
-	_dlg_fijo(desc_armario(), K("EL ARMARIO"))
-	var pr := Motor.Prom.new()
+	var pr := _vis_abre(desc_armario(), K("EL ARMARIO"))
 	push(func(b: String):
 		if b == "A" or b == "B":
 			pop()
 			pr.res(null))
 	await Motor.espera(pr)
 	ARM_V = null
-	if not oraculo:
-		dlg.hide()
-		dlg_nm.hide()
+	_vis_cierra()
 
 # el armario por dentro: tres baldas de acero; arriba los botes de cristal (uno por cada 50 g), en medio las cajitas de las
 # microdosis y abajo las cajas de los comestibles (hasta lo que cabe a la vista)
