@@ -1,5 +1,5 @@
-# El seto de la huerta de PixelLab (lo pidió el usuario: «Los setos también habría que ajustarlos incluso hacer los sprites con pixel
-# lab también»). Entrada: tools/sprites/pixellab-setos/crudo/esquina-35.png, la esquina └ de 32 × 32 elegida entre 64 de
+# El seto de la huerta del generador de sprites (lo pidió el usuario: «Los setos también habría que ajustarlos incluso hacer los sprites con pixel
+# lab también»). Entrada: tools/sprites/sprgen-setos/crudo/esquina-35.png, la esquina └ de 32 × 32 elegida entre 64 de
 # create_image_pro (un seto recortado visto a 3/4 desde arriba, con contorno: el brazo de arriba, la tapa del seto; el de la derecha,
 # la tapa y la cara de delante). De ella salen las piezas por casilla, todas con la misma textura y paleta: el brazo de arriba da el
 # tramo vertical (bandas de su tapa repetidas) y su remate; la esquina, tal cual; el brazo de la derecha, el tramo horizontal y su
@@ -10,7 +10,7 @@ import os, sys
 from PIL import Image
 
 R = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
-E = Image.open(os.path.join(R, 'tools', 'sprites', 'pixellab-setos', 'crudo', 'esquina-35.png')).convert('RGBA')
+E = Image.open(os.path.join(R, 'tools', 'sprites', 'sprgen-setos', 'crudo', 'esquina-35.png')).convert('RGBA')
 
 def filas(x0, ys):
     """una pieza de 16 de ancho con las filas ys de la esquina (de la columna x0 a la x0 + 15)"""

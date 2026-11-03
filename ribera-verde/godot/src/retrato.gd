@@ -1,5 +1,5 @@
 # Ribera Verde (Godot) — MAESTRO [8] «Sistema de Diálogos HD»: el retrato de quien habla (PortraitRect), en la charla en vivo,
-# las llamadas y los SMS: el busto del muñeco que se ve en el mapa, más grande (busto, de PixelLab). Sin busto, se hace aquí,
+# las llamadas y los SMS: el busto del muñeco que se ve en el mapa, más grande (busto, del generador de sprites). Sin busto, se hace aquí,
 # píxel a píxel, con la identidad de la persona (su look de LOOKS o el de la calle: piel, pelo y peinado, gorra o capucha, barba,
 # gafas, camiseta; de chica o de chico, GENERO) y su gesto según el tono de lo que dice (expresion: 0 tranquilo, 1 contento,
 # 2 enfadado, 3 dudando). Cacheado por persona y gesto.
@@ -62,7 +62,7 @@ static func textura(look: Dictionary, mujer: bool, expr: int, boca := 0, ojos :=
 	cache[k] = t
 	return t
 
-# el busto de PixelLab del muñeco que se ve en el mapa (arte/retratos.png + retratos.json, de tools/retratos.py): el grupo del
+# el busto del generador de sprites del muñeco que se ve en el mapa (arte/retratos.png + retratos.json, de tools/retratos.py): el grupo del
 # atlas del look (Atlas.grupo_look, los de la calle por su hash); un cliente de la calle que no es de su sexo, uno que sí, por el
 # mismo hash. Sin busto, "" (y el dibujado de abajo)
 const CHICAS := ["cliente4", "cliente5", "cliente6"]

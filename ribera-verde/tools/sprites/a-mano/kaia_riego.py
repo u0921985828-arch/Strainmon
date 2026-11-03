@@ -7,7 +7,7 @@
 #  · tanqueKB, el tanque bajo, del tanque de la nave (tanqueN, locales-alto): la tapa azul con su boca y el canto blanco de arriba y,
 #    debajo, la mitad de abajo con el agua verde, la mirilla y el pie.
 #  · riegoKB, el programador en su mueble bajo, del de la nave (riegoN): las tres dosificadoras, la pantalla, los botones y el pie.
-#  · drenKB, el depósito de recogida bajo, del de la sala (o-drenKS, de PixelLab): el tubo de entrada arriba a la izquierda, la tapa,
+#  · drenKB, el depósito de recogida bajo, del de la sala (o-drenKS, del generador de sprites): el tubo de entrada arriba a la izquierda, la tapa,
 #    la mirilla y, abajo a la derecha, la bomba que lo devuelve al tanque; de dos casillas, la suya y media de la de su derecha.
 #  · depK y depKd, el depósito del goteo de cada carpa de la fase 1, fuera de ella, del bidón azul de la huerta (bidonA, huerta-mej)
 #    con una fila del cuerpo menos (de 16 filas: dos seguidos, uno encima de otro, no se montan) y el grifo hacia su carpa: depK,

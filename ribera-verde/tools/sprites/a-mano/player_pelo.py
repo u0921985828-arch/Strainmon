@@ -1,5 +1,5 @@
 # python3 -I tools/sprites/a-mano/player_pelo.py [carpeta]  (Python 3 + Pillow; no va en los scripts de npm)
-# El pelo del jugador con color propio (1.21, ropa y pelo): PixelLab pintó el pelo con dos marrones que también salen en la cara
+# El pelo del jugador con color propio (1.21, ropa y pelo): el generador de sprites pintó el pelo con dos marrones que también salen en la cara
 # (el de la sombra del cuello y el de la boca, la barbilla y las manos). Para poder cambiarle el color sin tocar la piel, los píxeles
 # del pelo pasan a dos colores que solo usa el pelo (`PELO`, a 1 de azul de los de antes: no se nota): el marrón oscuro por encima
 # de la fila del cuello (la de encima de la camiseta; en el cuello es sombra) y, de espaldas (north), también el marrón claro (de

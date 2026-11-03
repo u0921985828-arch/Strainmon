@@ -108,17 +108,17 @@ def pasajero(L, x, y, pelo, ropa):
     L.r(x - 1, y + 5, 7, 4, ropa)
 
 
-# ---------- el autobús de la comarca: de PixelLab, al estilo de los muebles (lo pidió el usuario: «el sprite del bus, más del
-# estilo del juego, muebles con PixelLab»). Blanco con la franja verde, sin rótulos; recortado y a 28 colores
-# (tools/sprites/pixellab-viaje/bus.png, 148 × 41; el 2.º de los cuatro candidatos, el que eligió el usuario). Aquí solo se sientan los pasajeros y el protagonista en las ventanas. ----------
-PIXELLAB = os.path.join(RAIZ, 'tools', 'sprites', 'pixellab-viaje')
+# ---------- el autobús de la comarca: del generador de sprites, al estilo de los muebles (lo pidió el usuario: «el sprite del bus, más del
+# estilo del juego, muebles con el generador de sprites»). Blanco con la franja verde, sin rótulos; recortado y a 28 colores
+# (tools/sprites/sprgen-viaje/bus.png, 148 × 41; el 2.º de los cuatro candidatos, el que eligió el usuario). Aquí solo se sientan los pasajeros y el protagonista en las ventanas. ----------
+SPRGEN = os.path.join(RAIZ, 'tools', 'sprites', 'sprgen-viaje')
 BUS_VENT = (7, 25, 43, 62, 80, 98)       # el primer píxel de cristal de cada ventana (de atrás adelante)
 BUS_Y = 12                                # la fila de arriba de las cabezas
 
 
 def autobus():
     L = Lienzo(1, 1)
-    L.im = Image.open(os.path.join(PIXELLAB, 'bus.png')).convert('RGBA')
+    L.im = Image.open(os.path.join(SPRGEN, 'bus.png')).convert('RGBA')
     L.d = ImageDraw.Draw(L.im)
     gente = [('#3a2a20', '#4a6aa0'), ('#9a9a9a', '#8a5a9a'), ('#1a1a1a', '#d8b040'), None, ('#7a4a2a', '#50a070')]
     for xw, g in zip(BUS_VENT, gente):
@@ -401,8 +401,8 @@ def main():
     for d in (10, 12, 14, 16):
         for f in range(4):
             piezas['rueda-%d-%d' % (d, f)] = rueda(d, f)
-    for k in ('nube-0', 'nube-1', 'nube-2', 'nube-3', 'sol', 'luna'):     # el cielo, de PixelLab
-        piezas[k] = Image.open(os.path.join(PIXELLAB, k + '.png')).convert('RGBA')
+    for k in ('nube-0', 'nube-1', 'nube-2', 'nube-3', 'sol', 'luna'):     # el cielo, del generador de sprites
+        piezas[k] = Image.open(os.path.join(SPRGEN, k + '.png')).convert('RGBA')
     piezas['monte'] = monte()
     marco = del_atlas()
     for t in PUEBLOS:

@@ -239,7 +239,7 @@ func _corre() -> void:
 	chk(J.SENT != null and J.SENT.get("k") == "silla" and J.SENT.d == "norte" and J.P.dir == "up", "usando el ordenador, sentado %s" % [J.SENT])
 	chk(J.sent_mesa(), "sentado al ordenador: las manos en la mesa")
 	# (lo pidió el usuario: «Has primero el Sprite del jugador con los brazos puestos y después lo sientas en la silla»): el
-	# fotograma «teclea» de PixelLab (SENT_MESA), con los codos abiertos (más ancho que el base), para el chico y la chica; sin
+	# fotograma «teclea» del generador de sprites (SENT_MESA), con los codos abiertos (más ancho que el base), para el chico y la chica; sin
 	# mesa, el base; con los colores de la ropa (ROPA) en la camiseta, la gorra y el pantalón
 	var At = load("res://src/atlas.gd")
 	for sx in ["m", "f"]:

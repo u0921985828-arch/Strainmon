@@ -1,8 +1,8 @@
 # Los combates, más realistas (lo pidió el usuario: «Habría que mejorar los sprites de los combates, que realmente sean más
-# realistas»): cada luchador sale de PixelLab con unas 6 cabezas de alto (create_image_pro de frente con la pose y el estilo del
+# realistas»): cada luchador sale del generador de sprites con unas 6 cabezas de alto (create_image_pro de frente con la pose y el estilo del
 # protagonista nuevo → create_character v3 → animate_character v3 con las mismas animaciones y fotogramas que el de siempre) y va en
 # su grupo «<grupo>-combate-r», que solo se usa con Datos.CAL (grupo_combate en policia.gd): el de siempre se queda para el oráculo.
-# Entrada: art/crudo/<grupo>-combate-r/<anim>/<dir>/<NN>.png, lo bajado de PixelLab tal cual. Aquí se pasa a la paleta del grupo (el
+# Entrada: art/crudo/<grupo>-combate-r/<anim>/<dir>/<NN>.png, lo bajado del generador de sprites tal cual. Aquí se pasa a la paleta del grupo (el
 # protagonista y la protagonista, a los 15 colores del player-combate, que son los que ROPA cambia; los demás, a 15 colores por
 # grupo), se quitan los píxeles sueltos y se encaja en la celda de combate (64 × 64, los pies en la fila 62 y el centro en la
 # columna 32; un desplazamiento por animación, el de su primer fotograma, como procesar.js) en art/procesado/<grupo>-combate-r.
@@ -32,14 +32,14 @@ def dist(a, b):   # «redmean»: lo bastante perceptual para elegir entre pocos 
     d = [a[i] - b[i] for i in range(3)]
     return (2 + r / 256) * d[0] ** 2 + 4 * d[1] ** 2 + (2 + (255 - r) / 256) * d[2] ** 2
 
-def material(c):   # de qué es un color de PixelLab, por su tono: así la camiseta no cae en la piel ni el vaquero en el pelo
+def material(c):   # de qué es un color del generador de sprites, por su tono: así la camiseta no cae en la piel ni el vaquero en el pelo
     h, s, v = colorsys.rgb_to_hsv(*[x / 255 for x in c])
     if v < .2:
         return 'contorno'
     if s < .16:
         return 'zapa'
     h *= 360
-    if (h < 14 or h > 260) and v < .3:   # el pelo oscuro de PixelLab tira a granate o a morado
+    if (h < 14 or h > 260) and v < .3:   # el pelo oscuro del generador de sprites tira a granate o a morado
         return 'pelo'
     if (h < 14 or h > 340) and s > .45:
         return 'camiseta'
@@ -53,7 +53,7 @@ def material(c):   # de qué es un color de PixelLab, por su tono: así la camis
 
 def a_pj(c, pal, pie=False):
     m = material(c)
-    if m == 'gorra' and pie:   # las suelas verdes (PixelLab las pinta del color de la gorra): zapatillas, que ROPA no cambia
+    if m == 'gorra' and pie:   # las suelas verdes (el generador de sprites las pinta del color de la gorra): zapatillas, que ROPA no cambia
         m = 'zapa'
     cand = [hx(x) for x in pal[m]] if m else [hx(x) for k in pal for x in pal[k] if not (pie and k == 'gorra')]
     return min(cand, key=lambda p: dist(p, c))

@@ -1642,7 +1642,7 @@ func rects_acceso(V: Dictionary, now: float) -> Array:
 			R.append([cx + q[0], py + q[1], q[2], q[3], "#f8e070"])
 	return R
 
-# 0.55 (lo pidió el usuario: «la llave… flotan»): la mano de PixelLab con la llave, la manga por el canto derecho del panel; entra
+# 0.55 (lo pidió el usuario: «la llave… flotan»): la mano del generador de sprites con la llave, la manga por el canto derecho del panel; entra
 # por el bombín (lo de dentro, recortado: cl empieza a la derecha del ojo de la cerradura) y gira (acc-llave-1, la muñeca de canto)
 func _llave_h(R: Array, t: float, T: Dictionary, cx: int, cy: int, cl: Rect2i, cer := "portal") -> void:
 	var kx: int = cx - 14 + Datos.jsround((1 - _suave(t / T.entra)) * 34)
@@ -1662,7 +1662,7 @@ func _llave_v(R: Array, t: float, T: Dictionary, cx: int, cy: int, cl: Rect2i, c
 	R.append(["@", "acc-llave-%s-v%d" % [cer, _llave_giro(t, T)], cx - 7, ky, cl])
 
 # cada cerradura (lo pidió el usuario: «personalizado para abrir una cerradura u otra, y el tipo de llave que concuerde con la
-# cerradura»): sus vueltas y su llave (acc-llave-<cerradura>-*, pixellab_gestos.py); la puerta y el escudo, en _puerta_llave
+# cerradura»): sus vueltas y su llave (acc-llave-<cerradura>-*, sprgen_gestos.py); la puerta y el escudo, en _puerta_llave
 const ACC_VUELTA := 300.0
 const CERRADURA := {
 	"portal": {"v": 1},   # el portal del piso: bombín de latón y llave de serreta
@@ -1730,7 +1730,7 @@ func _puerta_llave(R: Array, cer: String, x0: int, y0: int, cx: int, cy: int) ->
 			R.append([cx - 3, cy - 5, 6, 7, "#c8a048"])
 			R.append([cx - 3, cy - 2, 6, 2, "#101010"])
 
-# el dedo de PixelLab (acc-dedo: la yema en (2, 0), la manga por abajo a la derecha) en (x, y)
+# el dedo del generador de sprites (acc-dedo: la yema en (2, 0), la manga por abajo a la derecha) en (x, y)
 func _dedo(R: Array, x: float, y: float) -> void:
 	var x0: int = (SW - ACC_W) >> 1
 	var y0: int = (SH - ACC_H) >> 1
@@ -1887,7 +1887,7 @@ func _gsp(R: Array, n: String, x: float, y: float) -> void:
 		n = "gs-f-huerta"   # i18n-no
 	R.append(["@", n, _gs.position.x + Datos.jsround(x), _gs.position.y + Datos.jsround(y), _gs])
 
-# la mano de PixelLab, en primera persona, en (x, y), con su antebrazo (lo pidió el usuario: «desde que empieza el ángulo desde la
+# la mano del generador de sprites, en primera persona, en (x, y), con su antebrazo (lo pidió el usuario: «desde que empieza el ángulo desde la
 # muñeca, tiene que ir hasta el final y completarlo con un giro circular… que sea como un cilindro… que no tenga esos picos en la
 # manga»): la manga del sprite se quita desde el puño y en su lugar va un cilindro del ancho del puño, recto por la dirección de la
 # manga, con la raya negra a los dos lados y la punta en media luna, del mismo largo en todas las manos. Una sola imagen por mano
@@ -2004,7 +2004,7 @@ func _gs_cilindro(n: String, im: Image) -> Array:
 				manga[r] = true
 				cola.append(r)
 	# lo pidió el usuario («sigue esas dos líneas del brazo, del sprite original, y luego lo cierras; no tienes por qué abrir una nueva
-	# línea desde la muñeca»): la manga de PixelLab se queda entera y sus dos rayas siguen rectas hasta el largo del brazo
+	# línea desde la muñeca»): la manga del generador de sprites se queda entera y sus dos rayas siguen rectas hasta el largo del brazo
 	var gm := Vector2.ZERO
 	for q in manga:
 		gm += Vector2(q) + Vector2(0.5, 0.5)

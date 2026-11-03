@@ -13,7 +13,7 @@
 # Y los iconos del menú START que faltaban (celda icono, 16 × 16, como los aprobados: contorno #2a2a34, luz arriba a la izquierda):
 #  · movil (el móvil, con la pantalla encendida), guardar (la libreta de la tía), altavoz y salir (la puerta entornada y la flecha).
 #  · cogollo (la Genoteca): un cogollo fresco, verde, con los cálices apilados, pistilos naranjas y la escarcha de los tricomas
-#    (sustituye al de PixelLab, que parecía seco y marrón; icono() mira antes en iconos-menu).
+#    (sustituye al del generador de sprites, que parecía seco y marrón; icono() mira antes en iconos-menu).
 # Sale a art/crudo/<grupo>/<sprite>/unica/00.png, grupos salon e iconos-menu (después, node tools/sprites/procesar.js <grupo> --atlas)
 import os, sys, glob
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

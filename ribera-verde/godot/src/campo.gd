@@ -322,7 +322,7 @@ func mapa_huerta() -> Dictionary:
 			# monte no lo tape
 			var dentro: bool = x >= x0 - 1 and x <= x1 + 1 and y > y0
 			o[y].append(null if dentro else ("monte" if (x * 7 + y * 3) % 5 < 3 else "monte2"))   # i18n-no
-	# el seto de PixelLab por piezas (seto-huerta, pixellab_setos.py): los tramos de los lados con su remate arriba, las esquinas y el
+	# el seto del generador de sprites por piezas (seto-huerta, sprgen_setos.py): los tramos de los lados con su remate arriba, las esquinas y el
 	# tramo de abajo con sus remates junto al camino; dos variantes alternas para que no se vea la repetición
 	for y in range(y0 + 1, y1):
 		var v: String = "" if y == y0 + 1 else ("2" if y % 2 else "")   # i18n-no

@@ -1,4 +1,4 @@
-# Ribera Verde (Godot) — MAESTRO [8]: los retratos de diálogo son el muñeco del mapa en grande (bustos de PixelLab de
+# Ribera Verde (Godot) — MAESTRO [8]: los retratos de diálogo son el muñeco del mapa en grande (bustos del generador de sprites de
 # arte/retratos.png, uno por grupo de sprite del atlas): cada look tiene el suyo, el de la calle por su hash y de su sexo,
 # la boca al hablar, el parpadeo y los gestos (los estados, con CAL; sin ellos, el vaivén), la ficha dentro de la caja: el retrato enmarcado con el nombre en la cinta de su pie; sin busto, el dibujado.
 #   con xvfb (la caja se coloca con la ventana): $GODOT --path godot --rendering-driver opengl3 --audio-driver Dummy

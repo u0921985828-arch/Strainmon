@@ -119,7 +119,7 @@ static func pinta(P, V: Dictionary, now: float) -> void:
 	P._rect(20, sh - 6, int(bw * e / DUR), 3, Color("#8bd448"))
 
 # el cielo (lo pidió el usuario: «el fondo del cielo» al estilo de los muebles): el degradado en tonos tramados con Bayer 4 × 4,
-# cacheado por ancho y luz; las nubes, el sol y la luna de PixelLab (tools/sprites/pixellab-viaje); las nubes van a la deriva por
+# cacheado por ancho y luz; las nubes, el sol y la luna del generador de sprites (tools/sprites/sprgen-viaje); las nubes van a la deriva por
 # lo andado (corre), lentas
 const CIELO_TONOS := 6
 const BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]

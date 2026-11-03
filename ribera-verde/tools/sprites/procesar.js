@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-  Ribera Verde — procesa lo que devuelve PixelLab y lo deja listo para el juego.
+  Ribera Verde — procesa lo que devuelve el generador de sprites y lo deja listo para el juego.
 
   Entrada  art/crudo/<grupo>/<sprite>/<dir>/<NN>.png
            grupo  = id de un asset del manifiesto (o de uno de sus items)
@@ -76,7 +76,7 @@ function processGroup(id) {
   const identity = [...ident].map(rgb);
   const casiIguales = [];
   for (let i = 0; i < identity.length; i++) for (let j = i + 1; j < identity.length; j++) if (dist(identity[i], identity[j]) < 120) casiIguales.push(`${hex(identity[i])}≈${hex(identity[j])}`);
-  // 2º nivel: todos los colores que ya usa el juego (la maestra es un subconjunto: es la que se pasa a PixelLab)
+  // 2º nivel: todos los colores que ya usa el juego (la maestra es un subconjunto: es la que se pasa a el generador de sprites)
   const palette = [...new Set([...PAL.existentes, ...PAL.maestra, ...ident, ...Object.values(ramps).flatMap(r => r.rampa)])].map(rgb);
   const rampSet = new Set(Object.values(ramps).flatMap(r => r.rampa));
   const maxc = asset.max_colores || MAXC;   // un fondo entero puede declarar su propio tope

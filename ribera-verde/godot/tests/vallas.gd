@@ -102,7 +102,7 @@ func _corre() -> void:
 	Atlas.carga()
 	var D: Dictionary = Datos.carga()
 	var dir := arg("--pintar")
-	# 0. el seto de la calle, con el de PixelLab de la huerta (lo pidió el usuario: «el seto… hicimos otro ya»): cada seto de los
+	# 0. el seto de la calle, con el del generador de sprites de la huerta (lo pidió el usuario: «el seto… hicimos otro ya»): cada seto de los
 	# mapas sale con su pieza, el tramo alterno y el remate redondo en las puntas
 	var vs := 0
 	for k in D.MAPS:

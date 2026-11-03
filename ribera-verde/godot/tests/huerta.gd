@@ -166,7 +166,7 @@ func _corre() -> void:
 			if (x == int(H.seto[0]) - 1 or x == int(H.seto[2]) + 1) and y > int(H.seto[1]) and m.o[y][x] != null:
 				bordes += 1   # una casilla de hierba a cada lado del seto: el monte no lo tapa
 	chk(bordes == 0, "alrededor de la huerta, el monte (y hierba junto al seto), y debajo del seto nada que tape la última fila (%d casillas mal)" % bordes)
-	# el seto de PixelLab por piezas: los lados con su remate arriba, las esquinas y el tramo de abajo con sus remates junto al camino
+	# el seto del generador de sprites por piezas: los lados con su remate arriba, las esquinas y el tramo de abajo con sus remates junto al camino
 	var sx0: int = int(H.seto[0])
 	var sx1: int = int(H.seto[2])
 	var sy0: int = int(H.seto[1])

@@ -1,6 +1,6 @@
 ---
 name: sprites-a-mano
-description: Dibujar sprites y animaciones de pixel art por código, sin PixelLab ni ningún generador: Python 3 + Pillow, píxel a píxel, con paleta cerrada, contorno, luz fija, QA automático y hoja de sprites. Úsalo cuando se pida arte, sprites, tiles, iconos, muebles, personajes o animaciones y no haya PixelLab, no haya crédito, no haya red, o se pida expresamente hacerlo a mano o por código.
+description: Dibujar sprites y animaciones de pixel art por código, sin el generador de sprites ni ningún generador: Python 3 + Pillow, píxel a píxel, con paleta cerrada, contorno, luz fija, QA automático y hoja de sprites. Úsalo cuando se pida arte, sprites, tiles, iconos, muebles, personajes o animaciones y no haya el generador de sprites, no haya crédito, no haya red, o se pida expresamente hacerlo a mano o por código.
 argument-hint: "[nombre del sprite | tanda | revisar <png>]"
 allowed-tools:
   - Read
@@ -14,7 +14,7 @@ allowed-tools:
   - Bash(mkdir *)
 ---
 
-# Sprites a mano (sin PixelLab)
+# Sprites a mano (sin el generador de sprites)
 
 Aquí el que dibuja es el código, no un modelo. Cada píxel se pone a propósito, con un
 motivo que se puede leer en el script. Nada se escala, nada se suaviza, nada se genera

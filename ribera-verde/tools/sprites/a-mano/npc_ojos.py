@@ -1,5 +1,5 @@
 # python3 -I tools/sprites/a-mano/npc_ojos.py [carpeta]  (Python 3 + Pillow; no va en los scripts de npm)
-# Los ojos de la opción C en los personajes (1.21), como los del jugador (player_cara.py): PixelLab les dibujó a cada uno los ojos a
+# Los ojos de la opción C en los personajes (1.21), como los del jugador (player_cara.py): el generador de sprites les dibujó a cada uno los ojos a
 # su manera (de frente, 2 de ancho y 3 de alto, con la pupila de 2 filas; de lado, un borrón). Aquí, en la cabeza de cada dirección
 # (base/<dir>/00, la que npc_cara.py pega en cada paso), cada ojo se busca por su blanco (casi blanco, con piel a menos de 2 px) y
 # lo oscuro que lo toca (sin lo que toca el contorno de fuera); se borra a piel y se dibuja otra vez desde su fila de arriba:

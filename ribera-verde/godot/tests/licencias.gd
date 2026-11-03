@@ -45,7 +45,7 @@ func _corre() -> void:
 	var c: String = J.CREDITOS
 	for k in ["WOLFCADE", "BETA TESTERS", "Kerman, Ibai, Adrián, Urko, Josu, Ander, Bitxone y Edorta"]:
 		chk(c.find(k) >= 0, "CRÉDITOS nombra «%s»" % k)
-	for k in ["Godot", "PixelLab", "Press Start 2P", "Atkinson", "DejaVu"]:
+	for k in ["Godot", "el generador de sprites", "Press Start 2P", "Atkinson", "DejaVu"]:
 		chk(c.find(k) < 0, "CRÉDITOS no nombra a terceros: «%s» (va en LICENCIAS)" % k)
 	chk(c.find("LICENCIAS") >= 0, "CRÉDITOS remite a CRÉDITOS · LICENCIAS")
 	print("licencias: %d comprobaciones, %d fallos" % [n, fallos.size()])

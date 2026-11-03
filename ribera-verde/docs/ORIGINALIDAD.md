@@ -49,12 +49,12 @@ es derivado de material con copyright de terceros.
 
 ---
 
-## 3. Arte generado con PixelLab
+## 3. Arte generado con el generador de sprites
 
-Parte de los personajes, los muebles de los locales y algunos escenarios se generaron con **PixelLab**
-(`pixellab.ai`) desde este proyecto y después se revisaron y retocaron a mano.
+Parte de los personajes, los muebles de los locales y algunos escenarios se generaron con **el generador de sprites**
+(`el generador de sprites`) desde este proyecto y después se revisaron y retocaron a mano.
 
-- El uso está sujeto a los términos de servicio de PixelLab (`https://pixellab.ai/termsofservice`), que
+- El uso está sujeto a los términos de servicio del generador de sprites (`https://el generador de sprites/termsofservice`), que
   son los que rigen la titularidad de lo generado con una cuenta de pago.
 - **Antes de registrar la obra conviene imprimir o guardar en PDF la versión vigente de esos términos**,
   junto con el recibo de la suscripción, como prueba de que el arte se generó con licencia.
@@ -91,8 +91,8 @@ es, por sí solo, una prueba de diligencia.
 
 Regla permanente del proyecto (`CLAUDE.md`), aplicada desde el primer día:
 
-- **Nada de assets ni código de terceros con copyright**: ni sprites de Pokémon, ni código de
-  Habbo/Sulake, ni descompilaciones (por ejemplo `pret/pokefirered`), ni el wordmark «Nintendo/GAME BOY»,
+- **Nada de assets ni código de terceros con copyright**: ni sprites de franquicias comerciales, ni código de
+  Habbo/Sulake, ni descompilaciones de juegos comerciales, ni el los wordmarks de consolas comerciales,
   ni su lema comercial. **Modificar material con copyright crea una obra derivada, que sigue
   infringiendo**: por eso no se hizo en ningún caso.
 - Lo que sí hay es un **homenaje de forma**: el formato de consola portátil y el aire del pixel art de
@@ -186,7 +186,7 @@ independiente queda descartada por coste y complejidad; además, nada de este ju
 ### 7.6 Lo que hay que guardar junto al registro
 
 - Este documento.
-- Los **términos de PixelLab** y el recibo de la suscripción.
+- Los **términos del generador de sprites** y el recibo de la suscripción.
 - Las licencias de las tres fuentes de terceros (ya en `godot/fuentes/`).
 - El historial de git exportado (`git log`) como prueba de fechas, y el ZIP del fuente con su suma de
   verificación.

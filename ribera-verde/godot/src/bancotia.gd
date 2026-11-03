@@ -580,11 +580,11 @@ func epi_c(f):
 	o.c = _epi[k]
 	return o
 
-# con PixelLab (lo pidió el usuario: «quiero que lo hagas con Pixel Lab» y «tienen que ser de calidad»; tools/sprites/pixellab_epi.py
+# con el generador de sprites (lo pidió el usuario: «quiero que lo hagas con el generador de sprites» y «tienen que ser de calidad»; tools/sprites/sprgen_epi.py
 # → arte/epi_pl.png + .json): el protagonista de pie, parado y andando en las cuatro direcciones, cada fotograma por su clave del
 # atlas, y la protagonista igual (f-<dir>-<i>); lo demás (las acciones, sentado), por colores con epi_img. En el laboratorio
 # no se corre (_pj_frame en pinta.gd)
-static var EPI_PL := {}   # id de la imagen del atlas → la de PixelLab
+static var EPI_PL := {}   # id de la imagen del atlas → la del generador de sprites
 
 static func epi_pl(c: Image):
 	if EPI_PL.is_empty():

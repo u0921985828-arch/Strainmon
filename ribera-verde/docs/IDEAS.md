@@ -11,4 +11,4 @@ Clubs cannábicos, cata y analizador, vendedores a comisión, confianza con la g
 1. **Cierre de la tanda 1.52–1.54** (cuando el usuario la dé por cerrada): APK 0.46.0, plugin de WordPress 1.5.1 y el zip del código.
 2. ~~Siguiente tanda: las acciones con algo gráfico~~ hecho en la 1.54.
 
-OmniRoute no es del juego: es un enrutador local de modelos de IA para gastar menos tokens en el Claude Code de cada uno (con sus «mods»), y no se usa en las sesiones en la nube. Sin tarea en el juego.
+OmniRoute no es del juego: es un enrutador local de modelos de IA para gastar menos tokens en el el asistente de código de cada uno (con sus «mods»), y no se usa en las sesiones en la nube. Sin tarea en el juego.

@@ -997,7 +997,7 @@ func mesa_de(o: String, x: int, y: int):
 # ---------- cada mesa por dentro (lo pidió el usuario: «el visor de cada mesa (vista C): de fondo la pared de la carpa y delante la
 # mesa con sus plantas») ----------
 # De fondo la pared plateada de la carpa (carpa-c-pared, la de casa) y, delante, la mesa de flujo y reflujo de frente (o-mesaF, de
-# PixelLab) con sus cinco macetas de tela de 11 L dentro de la bandeja, como en la nave (3 delante y 2 detrás, a tresbolillo), y en
+# el generador de sprites) con sus cinco macetas de tela de 11 L dentro de la bandeja, como en la nave (3 delante y 2 detrás, a tresbolillo), y en
 # cada una su planta de la vista C en la fase de la mesa, con el tono de hoja y el cogollo de su variedad; encima, el «LED doble»: dos
 # LED de 720 W de casa (foco-c-led720-78) colgados de sus cuerdas, que suben a medida que crecen las plantas, a su temporizador (18/6
 # mientras crecen, 12/12 en flor), y arriba a la derecha las ocho mesas de la sala. ◀ ▶ cambian de mesa (▲ ▼, de fila); A, lo de la

@@ -1,6 +1,6 @@
 # Ribera Pixel · la fuente del juego, dibujada a mano y 100 % original.
 #   python3 -I tools/fuente/ribera_pixel.py [--salida <dir>]
-# Lo pidió el usuario: fuentes pixel «que no den problemas de copyright, de las típicas letras de Pokémon».
+# Lo pidió el usuario: fuentes pixel «que no den problemas de copyright, de las típicas letras de una franquicia comercial».
 # Ninguna fuente ajena se modifica ni se calca: las siete que mandó solo sirvieron para ver qué le gusta
 # (alto de caja, grosor, aire). Cada glifo está dibujado píxel a píxel en glifos_may/min/sig.py.
 #

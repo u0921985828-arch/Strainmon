@@ -1,6 +1,6 @@
 # Ribera Verde (Godot) — los combates, más realistas (lo pidió el usuario: «Habría que mejorar los sprites de los combates, que
-# realmente sean más realistas»; con Datos.CAL): cada luchador pelea con su grupo «<grupo>-combate-r» de PixelLab, a unas 6 cabezas
-# (tools/sprites/pixellab_combate.py), con las mismas animaciones que el de siempre; sin CAL, el de siempre (el oráculo).
+# realmente sean más realistas»; con Datos.CAL): cada luchador pelea con su grupo «<grupo>-combate-r» del generador de sprites, a unas 6 cabezas
+# (tools/sprites/sprgen_combate.py), con las mismas animaciones que el de siempre; sin CAL, el de siempre (el oráculo).
 #   $GODOT --headless --path godot --script res://tests/combate_r.gd   → «combate_r: N comprobaciones, 0 fallos»
 extends SceneTree
 
@@ -107,7 +107,7 @@ func _corre() -> void:
 		var h0 := caja(Atlas.frame_de(v, "base", dir, 0, {"i": 0}).c).size.y
 		var h1 := caja(Atlas.frame_de(v + "-r", "base", dir, 0, {"i": 0}).c).size.y
 		chk(h1 > h0, "%s-r: %d px de alto, no más que el de siempre (%d)" % [v, h1, h0])
-	# 3 · la ropa (ROPA, ropa_c) también viste al de PixelLab: la camiseta azul (#c83839 → #3a6ac8), sin un píxel del rojo de serie
+	# 3 · la ropa (ROPA, ropa_c) también viste al del generador de sprites: la camiseta azul (#c83839 → #3a6ac8), sin un píxel del rojo de serie
 	for g in ["player-combate-r", "player-f-combate-r"]:
 		var f = Atlas.frame_de(g, "idle", "north", 0, {"i": 0})
 		var rojo := Color("#c83839").to_html(false)

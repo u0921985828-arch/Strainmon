@@ -1,5 +1,5 @@
 # python3 -I tools/sprites/a-mano/player_cara.py [carpeta]  (Python 3 + Pillow; no va en los scripts de npm)
-# La cabeza del jugador igual en todos los fotogramas (1.11). PixelLab dibujó cada fotograma con su cara: en unos los ojos se juntan
+# La cabeza del jugador igual en todos los fotogramas (1.11). el generador de sprites dibujó cada fotograma con su cara: en unos los ojos se juntan
 # (bizco: los brillos por dentro), en otros se abre la boca, la gorra cambia de forma o un ojo se queda en un píxel. Aquí se toma una
 # cabeza por dirección, la del primer paso (walk/<dir>/00), y en la de frente se le dibuja a mano la cara (los ojos de `CARA`, a la
 # misma distancia del centro, la frente sin la sombra de la visera, que parecía una ceja, y la boca centrada); de lado,
@@ -9,7 +9,7 @@
 # En las acciones solo se pega donde la cabeza está derecha y sin nada delante: de frente, los fotogramas de DE_FRENTE (la mano en
 # la nariz, la regadera por encima de la cabeza o la cabeza hacia el móvil se quedan como están); de lado, donde la cabeza de antes casa con la nueva.
 # Los ojos (1.11, opción C): los mismos en todos los fotogramas. De frente, el párpado de 3 px y debajo blanco, iris y blanco (en
-# `CARA`); de lado, el párpado de 2 y debajo el blanco detrás y el iris delante. PixelLab los dibujó cada uno a su manera (de lado,
+# `CARA`); de lado, el párpado de 2 y debajo el blanco detrás y el iris delante. el generador de sprites los dibujó cada uno a su manera (de lado,
 # el blanco al lado de la pupila, saltones): `ojos` pasa a piel el blanco del ojo (dentro de lo ancho de la gorra y encima de la
 # camiseta, hasta que no quede; el brillo de la regadera, `BRILLO`, se queda), busca la pupila (lo oscuro con cara a los dos lados) y dibuja el ojo desde su píxel de arriba; si la pupila subía hasta
 # la gorra, ese píxel pasa a piel; el que mira abajo (el párpado de 2 × 1, con piel debajo) también se abre: de lado, el de más

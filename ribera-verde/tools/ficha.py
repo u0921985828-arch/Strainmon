@@ -5,7 +5,7 @@ import glob, os, re, sys
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOPE = [30, 80, 4000]
-MAL = re.compile(r'°C|µm|[Mm]icra|\bpH\b|\bpk-|[Pp]ok[eé]mon|Nintendo')
+MAL = re.compile(r'°C|µm|[Mm]icra|\bpH\b|\bpk-')   # unidades y cifras de cultivo que la versión de la tienda quita
 mal = 0
 for f in sorted(glob.glob(os.path.join(RAIZ, 'store/ficha-*.md'))):
     s = open(f, encoding='utf-8').read()

@@ -1,5 +1,5 @@
 # python3 -I tools/sprites/a-mano/mundo.py [sprite ...]   (Python 3 + Pillow; no va en los scripts de npm)
-# Arte a mano del mundo (1.10), sin PixelLab, a 16 px/m de alto como los personajes y con la paleta de lo aprobado:
+# Arte a mano del mundo (1.10), sin el generador de sprites, a 16 px/m de alto como los personajes y con la paleta de lo aprobado:
 #  · árbol alto (5 m, 80 px), para la calle, los parques y el monte;
 #  · fachadas por bioma: la comisaría del barrio alto (piedra), la nave del almacén de los astilleros, el caserío de los
 #    pueblos (Mendialde y Errotabarri), las casas marineras de Puerto Viejo, el bloque de ladrillo y la fábrica de Valdehierro;

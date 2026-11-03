@@ -1008,7 +1008,7 @@ func _arte_tile(k: String, tx: int, ty: int, sx: int, sy: int) -> bool:
 		return _arte_tile(md.g[ty][tx] if ty < md.g.size() and tx < md.g[ty].size() else "floorD", tx, ty, sx, sy)  # i18n-no
 	if k.begins_with("cv"):
 		return _curva(k, tx, ty, sx, sy)
-	if k == "iwT_kcs" or k == "iwB_kcs":   # la pared de la carpa de sala de KAIA, por dentro: la tela de PixelLab (o-pared, 16 × 32), la de arriba y la de abajo  # i18n-no
+	if k == "iwT_kcs" or k == "iwB_kcs":   # la pared de la carpa de sala de KAIA, por dentro: la tela del generador de sprites (o-pared, 16 × 32), la de arriba y la de abajo  # i18n-no
 		var pw: Image = Escena.pl("t-pared") if Datos.CAL else null
 		if pw == null:
 			return false
@@ -1443,7 +1443,7 @@ const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "mesaTb", "t
 const VALLAS := ["fence", "baranda"]
 
 # la pieza de una valla por las de su clase de al lado: N = 1, E = 2, S = 4, O = 8
-# la pieza del seto de PixelLab (pixellab_setos.py) para el seto de la calle: los setos de los mapas van en tramos de lado a lado; el
+# la pieza del seto del generador de sprites (sprgen_setos.py) para el seto de la calle: los setos de los mapas van en tramos de lado a lado; el
 # tramo, alterno (setoH, setoH2) y con su remate redondo en cada punta (setoHi a la izquierda, setoHd a la derecha); suelto, el tramo
 static func seto_pieza(mo: Array, tx: int, ty: int) -> String:
 	var w: bool = tx > 0 and mo[ty][tx - 1] == "seto"   # i18n-no
@@ -1458,7 +1458,7 @@ static func mascara_valla(mo: Array, o: String, tx: int, ty: int) -> int:
 	var es := func(x: int, y: int) -> bool: return y >= 0 and y < mo.size() and x >= 0 and x < mo[y].size() and mo[y][x] == o
 	return (1 if es.call(tx, ty - 1) else 0) | (2 if es.call(tx + 1, ty) else 0) | (4 if es.call(tx, ty + 1) else 0) | (8 if es.call(tx - 1, ty) else 0)
 
-# los objetos de KAIA hechos con PixelLab (lo pidió el usuario: «hazlo con Pixel Lab», «EN ISOMETRICO NO»): o-<objeto> de
+# los objetos de KAIA hechos con el generador de sprites (lo pidió el usuario: «hazlo con el generador de sprites», «EN ISOMETRICO NO»): o-<objeto> de
 # kaia_pl.png, de frente a 3/4; el pie en la fila de abajo y, a lo ancho, la casilla de la izquierda (OBJ_PL_ANCLA: x del ancla).
 # Las mesas de la sala, como las de la nave (lo pidió el usuario: «lo quiero como la nave»): la mesaN, con sus plantas en la bandeja
 const OBJ_PL_ANCLA := {"drenKS": 24}
@@ -1474,7 +1474,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 	var seca: bool = Datos.CAL and o.begins_with("hgs-")   # la planta muerta de la huerta (campo.gd): la de hg, parda
 	if seca:
 		o = "hg-" + o.substr(4)
-	var fpl = obj_pl(o)   # lo de KAIA de PixelLab (kaia_pl.png), de frente
+	var fpl = obj_pl(o)   # lo de KAIA del generador de sprites (kaia_pl.png), de frente
 	var gr = Atlas.cubre("obj:mesaN" if Datos.CAL and o == "mesaKP" else "obj:" + o)   # i18n-no
 	if not gr and fpl == null:
 		return
@@ -1500,7 +1500,7 @@ func _arte_obj(o: String, tx: int, ty: int, list: Array, sombras := []) -> void:
 		var fv = Atlas.frame_de("vallas", "%s-%d" % [o, mascara_valla(J.MAPS[J.S.map].o, o, tx, ty)], "unica", 0, {"i": 0})
 		if fv != null:
 			f = fv
-	if Datos.CAL and o == "seto":   # lo pidió el usuario («el seto… hicimos otro ya»): el de PixelLab de la huerta (seto-huerta), por tramos
+	if Datos.CAL and o == "seto":   # lo pidió el usuario («el seto… hicimos otro ya»): el del generador de sprites de la huerta (seto-huerta), por tramos
 		var fs = Atlas.frame_de("seto-huerta", seto_pieza(J.MAPS[J.S.map].o, tx, ty), "unica", 0, {"i": 0})
 		if fs != null:
 			f = fs
@@ -2208,7 +2208,7 @@ const SENT_PIERNAS := ["anooonaanooona", "anonnnaannnona", ".annna..annna.", ".a
 # la fila de los pies del fotograma; las zapatillas, en el reposapiés, y el culo, 6 filas más arriba, en el asiento
 # sentado al ordenador, de espaldas (lo pidió el usuario: «como coloca los brazos cuando usa el ordenador Gaming o el de la
 # tía» y «Has primero el Sprite del jugador con los brazos puestos y después lo sientas en la silla»): el fotograma «teclea» de
-# PixelLab (tools/sprites/pixellab_teclea.py), con los codos abiertos y los antebrazos hacia el teclado, en vez del base
+# el generador de sprites (tools/sprites/sprgen_teclea.py), con los codos abiertos y los antebrazos hacia el teclado, en vez del base
 const SENT_MESA := "teclea"   # i18n-no
 const SENT_TABURETE := [".akka....akka.", ".akka....akka.", ".akla....alka.", ".akka....akka.", ".akka....akka.", ".ahha....ahha.", ".aaaa....aaaa."]
 const TABURETE_SUBE := 5
@@ -2322,7 +2322,7 @@ func _pj_frame(e: Dictionary, gr, isP: bool, dur: float):
 			return f
 		e.act = null
 	if e.moving:
-		# en el laboratorio no se corre (sus normas): andando, con el EPI de PixelLab (epi_pl)
+		# en el laboratorio no se corre (sus normas): andando, con el EPI del generador de sprites (epi_pl)
 		var s = "run" if isP and dur < 200 and Atlas.anim_de(gr, "run") and not J.epi_puesto() else ("walk" if Atlas.anim_de(gr, "walk") else null)
 		if s:
 			var par: int = e.parity if isP else (int(e.x) + int(e.y)) & 1

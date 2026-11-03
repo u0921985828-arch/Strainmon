@@ -3,7 +3,7 @@
   Ribera Verde — build
   Une src/shell.html + src/styles.css + src/js/*.js (en orden alfabético) y genera:
     1. index.html                       → juego completo, offline, fuentes embebidas. Doble clic y a jugar.
-    2. dist/ribera-verde.artifact.html  → misma página en formato Artifact de Claude
+    2. dist/ribera-verde.artifact.html  → misma página en formato Artifact
                                           (sin <!doctype>/<head>/<body>, fuentes desde Google Fonts).
   Si existen assets/sprites/atlas.png y atlas.json (los genera tools/sprites/procesar.js --atlas),
   se incrustan como const ATLAS = { png, def }. Si no, const ATLAS = null y todo es procedural.

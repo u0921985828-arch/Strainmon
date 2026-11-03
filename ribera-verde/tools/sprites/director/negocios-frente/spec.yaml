@@ -10,7 +10,7 @@ luz: arriba-izquierda
 sombreado: 2-3 tonos por material, sin degradados ni anti-alias exterior
 estilo: el de los muebles a mano de escala.py
 pivote: base_centro (la base en la fila 47 de la celda)
-referencias: fotos del usuario (lavandería, lavadora industrial, cafetera de dos grupos); solo texto a PixelLab, sin marcas
+referencias: fotos del usuario (lavandería, lavadora industrial, cafetera de dos grupos); solo texto a el generador de sprites, sin marcas
 medidas:
   lavaN:  {m: "0,75 × 1,4", px: "12 × 22"}
   secaN:  {m: "0,8 × 1,9 (dos secadoras apiladas)", px: "13 × 30"}

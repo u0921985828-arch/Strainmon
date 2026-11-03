@@ -1,4 +1,4 @@
-# Ribera Verde (Godot) — el atlas entero de PixelLab (arte/atlas.png + atlas.json, copiados del HTML por tools/godot.js) y lo
+# Ribera Verde (Godot) — el atlas entero del generador de sprites (arte/atlas.png + atlas.json, copiados del HTML por tools/godot.js) y lo
 # que 01b-arte hace con él: animaciones por dirección (este ↔ oeste en espejo), fotograma por tiempo o fase, duración, cambio
 # de rampa (conRampa) e iconos de los menús. Todo static: se carga una vez
 extends RefCounted
@@ -228,7 +228,7 @@ static func icono(n: String):
 	if not ok:
 		return null
 	if not ico.has(n):
-		# los de la lámina de iconos-menu, dibujados a mano, primero: el cogollo fresco sustituye al de PixelLab
+		# los de la lámina de iconos-menu, dibujados a mano, primero: el cogollo fresco sustituye al del generador de sprites
 		var f = frame_de("iconos-menu", n, "unica", 0, {"i": 0})
 		if f == null:
 			f = frame_de("iconos", n, "unica", 0, {"i": 0})

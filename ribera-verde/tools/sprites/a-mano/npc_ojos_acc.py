@@ -1,6 +1,6 @@
 # python3 -I tools/sprites/a-mano/npc_ojos_acc.py [carpeta]  (Python 3 + Pillow y git; no va en los scripts de npm)
 # Los ojos de la opción C en las acciones de los NPC (1.25: fumar, el móvil, la pipa…), después de npc_ojos.py: npc_cara.py no las
-# toca porque la mano, el cigarro o el humo pasan por delante de la cara, y en cada fotograma PixelLab dibujó la cara a su manera.
+# toca porque la mano, el cigarro o el humo pasan por delante de la cara, y en cada fotograma el generador de sprites dibujó la cara a su manera.
 # · Por parecido: la cabeza de antes de los ojos nuevos (base/<dir>/00 en `ANTES`, de git) se busca en el fotograma (±4 px, por todo
 #   lo que no son los ojos); si casa (`CASA`) y los ojos están abiertos (con blanco donde estaban o, sin blanco, con la mitad de los
 #   píxeles de los ojos viejos en su sitio), la franja de la cara de la cabeza de ahora (de 3 filas por encima de los ojos a 1 por
@@ -17,7 +17,7 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = sys.argv[1] if len(sys.argv) > 1 else os.path.join(AQUI, '..', '..', '..', 'art', 'procesado')
 spec = importlib.util.spec_from_file_location('npc_ojos', os.path.join(AQUI, 'npc_ojos.py'))
 O = importlib.util.module_from_spec(spec); spec.loader.exec_module(O)
-ANTES = '5011fec^'   # la última versión con los ojos de PixelLab en base/<dir>/00
+ANTES = '5011fec^'   # la última versión con los ojos del generador de sprites en base/<dir>/00
 CASA = .55
 NO = {'cliente3/movil/south'}
 A = (24, 14, 30, 255)

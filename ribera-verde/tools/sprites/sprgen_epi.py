@@ -1,14 +1,14 @@
-# Landrace Hunters — el protagonista con el EPI del laboratorio (bata, gafas y guantes), hecho con PixelLab (lo pidió el usuario:
-# «quiero que lo hagas con Pixel Lab, no lo hagas tú con dibujos» y «tienen que ser de calidad»). Cada dirección, sus 4 fotogramas
-# de idle y sus 4 de walk del atlas pasados por transfer_outfit con la referencia de edit_image (pixellab-epi/ref/<dir>.png, la de
-# la protagonista f-<dir>.png); los crudos, en pixellab-epi/crudo/<dir>-<i>.png (0-3 idle, 4-7 walk; los de ella, f-<dir>-<i>.png).
+# Landrace Hunters — el protagonista con el EPI del laboratorio (bata, gafas y guantes), hecho con el generador de sprites (lo pidió el usuario:
+# «quiero que lo hagas con el generador de sprites, no lo hagas tú con dibujos» y «tienen que ser de calidad»). Cada dirección, sus 4 fotogramas
+# de idle y sus 4 de walk del atlas pasados por transfer_outfit con la referencia de edit_image (sprgen-epi/ref/<dir>.png, la de
+# la protagonista f-<dir>.png); los crudos, en sprgen-epi/crudo/<dir>-<i>.png (0-3 idle, 4-7 walk; los de ella, f-<dir>-<i>.png).
 # Junta en godot/arte/epi_pl.png (+ .json) cada uno con la clave del fotograma del atlas que sustituye (el de base, el primero de
 # idle). Lo único que se toca: fuera lo semitransparente.
 import json, os
 from PIL import Image
 
 R = os.path.dirname(os.path.abspath(__file__))
-CRUDO = os.path.join(R, "pixellab-epi", "crudo")
+CRUDO = os.path.join(R, "sprgen-epi", "crudo")
 SALE = os.path.join(R, "..", "..", "godot", "arte", "epi_pl")
 DIRS = ("south", "east", "north", "west")
 

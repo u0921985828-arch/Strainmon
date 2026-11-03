@@ -1,28 +1,28 @@
 <!-- kit-pro -->
-# Sprites y animaciones con PixelLab · guía pro
+# Sprites y animaciones con el generador de sprites · guía pro
 
-Esta guía y su kit sirven para que **Claude Code** cambie el arte procedural de Ribera Verde por sprites y animaciones de **PixelLab** sin perder la estética acordada (RPG de portátil de 16 bits, 240 × 160, casillas de 16 px). Está escrita para que la siga Claude Code con el comando `/sprites`, pero también se lee de corrido.
+Esta guía y su kit sirven para que **el asistente de código** cambie el arte procedural de Ribera Verde por sprites y animaciones de **el generador de sprites** sin perder la estética acordada (RPG de portátil de 16 bits, 240 × 160, casillas de 16 px). Está escrita para que la siga el asistente de código con el comando `/sprites`, pero también se lee de corrido.
 
-Los nombres de herramientas y los parámetros se comprobaron contra el MCP oficial (`https://api.pixellab.ai/mcp`, 98 herramientas) y la API v2 (`https://api.pixellab.ai/v2/openapi.json`) en octubre de 2026. Si PixelLab cambia algo, `npm run sprites:validar` lo detecta en cuanto el manifiesto use un valor que ya no existe.
+Los nombres de herramientas y los parámetros se comprobaron contra el MCP oficial (`https://<api-del-generador>/mcp`, 98 herramientas) y la API v2 (`https://<api-del-generador>/v2/openapi.json`) en octubre de 2026. Si el generador de sprites cambia algo, `npm run sprites:validar` lo detecta en cuanto el manifiesto use un valor que ya no existe.
 
 ## 1. Qué hay en el kit
 
 | Ruta | Para qué sirve |
 |---|---|
 | `art/manifest.json` | **La biblia.** 50 assets (+14 items) con familia de herramienta, herramienta, parámetros, prompt, entrada, celda, animaciones, ambiente, fase, dependencias, lotes compartidos y pasos previos. Cubre el 100 % de los gráficos actuales del juego. |
-| `docs/CATALOGO-SPRITES.md` · `art/catalogo.json` | **El catálogo:** cada sprite del juego con su familia de PixelLab, herramienta, lote, entrada, orden y coste. Lo genera `tools/sprites/catalogo.js` desde el manifiesto. |
+| `docs/CATALOGO-SPRITES.md` · `art/catalogo.json` | **El catálogo:** cada sprite del juego con su familia del generador de sprites, herramienta, lote, entrada, orden y coste. Lo genera `tools/sprites/catalogo.js` desde el manifiesto. |
 | `art/inventario.json` | Lista real de assets del juego: 42 tiles de suelo, 26 objetos, 23 personajes, fases de planta, combate y extras. Sale del propio juego. |
-| `art/referencias/` | El arte procedural actual exportado a PNG: personajes en 4 direcciones × 3 fotogramas, tiles, objetos, plantas, fondos y pantalla de título. `mapa/` son recortes del mapa con su máscara para `create_map_object` (si el build lleva atlas, salen con los tiles ya aprobados). `estilo/*_x2.png` son los personajes de frente al doble, para la revisión a ojo. `_hoja-*.png` son hojas de contacto a 4×. Las referencias sirven para revisar y para sacar los colores de identidad; a PixelLab solo se envía lo que el asset pone en `entrada`. |
-| `art/paleta/` | Paleta real del juego: `ribera.png` (121 colores, la que se pasa a PixelLab), `.hex`, `.gpl` (GIMP o Aseprite) y `ribera.json` (maestra, existentes, fondos y colores de identidad por personaje). |
+| `art/referencias/` | El arte procedural actual exportado a PNG: personajes en 4 direcciones × 3 fotogramas, tiles, objetos, plantas, fondos y pantalla de título. `mapa/` son recortes del mapa con su máscara para `create_map_object` (si el build lleva atlas, salen con los tiles ya aprobados). `estilo/*_x2.png` son los personajes de frente al doble, para la revisión a ojo. `_hoja-*.png` son hojas de contacto a 4×. Las referencias sirven para revisar y para sacar los colores de identidad; a el generador de sprites solo se envía lo que el asset pone en `entrada`. |
+| `art/paleta/` | Paleta real del juego: `ribera.png` (121 colores, la que se pasa a el generador de sprites), `.hex`, `.gpl` (GIMP o Aseprite) y `ribera.json` (maestra, existentes, fondos y colores de identidad por personaje). |
 | `tools/sprites/referencias.js` | Regenera inventario y referencias desde `index.html`. |
 | `tools/sprites/paleta.js` | Regenera la paleta desde las referencias. |
 | `tools/sprites/validar.js` | Valida el manifiesto: herramientas, límites, plantillas, referencias, reglas de contenido y cobertura. |
-| `tools/sprites/procesar.js` | Pasa la salida cruda de PixelLab a sprites listos (paleta, alfa, tope de colores, encaje en celda e informe) y monta el atlas. |
+| `tools/sprites/procesar.js` | Pasa la salida cruda del generador de sprites a sprites listos (paleta, alfa, tope de colores, encaje en celda e informe) y monta el atlas. |
 | `tools/sprites/catalogo.js` | Escribe el catálogo y falla si alguna clave del juego queda sin catalogar. |
 | `tools/sprites/calco.js` | Calca el arte procedural al formato de `art/crudo` (sin gastar créditos) para probar el motor de punta a punta. |
 | `tools/test-arte.js` | Prueba de la integración: calco → atlas → juego, y 16 comprobaciones (caminar, ambiente de fumadores con humo, menor que nunca fuma, combate, cogollos por variedad…). |
 | `src/js/01b-arte.js` | El motor de sprites del juego (F2, ya hecho): carga el atlas, anima y deja el procedural de reserva. |
-| `.claude/skills/sprites/SKILL.md` | El comando `/sprites` para Claude Code. |
+| `.claude/skills/sprites/SKILL.md` | El comando `/sprites` para el asistente de código. |
 | `.mcp.json.ejemplo` | Conexión del MCP con el token en una variable de entorno, en vez de escrito en el comando. |
 
 Comandos (todos en `package.json`):
@@ -86,16 +86,16 @@ no anti-aliasing, no gradients, no dithering, transparent background
 
 1. **Conectar el MCP.** Ya lo tienes con:
    ```
-   claude mcp add pixellab https://api.pixellab.ai/mcp -t http -H "Authorization: Bearer TU_TOKEN"
+   claude mcp add sprgen https://<api-del-generador>/mcp -t http -H "Authorization: Bearer TU_TOKEN"
    ```
-   La forma canónica de la documentación es `claude mcp add --transport http pixellab https://api.pixellab.ai/mcp --header "Authorization: Bearer TU_TOKEN"`. Compruébalo con `claude mcp get pixellab` o con `/mcp` dentro de Claude Code. El nombre **tiene que ser `pixellab`**, porque el comando `/sprites` llama a `mcp__pixellab__*`.
+   La forma canónica de la documentación es `claude mcp add --transport http sprgen https://<api-del-generador>/mcp --header "Authorization: Bearer TU_TOKEN"`. Compruébalo con `claude mcp get sprgen` o con `/mcp` dentro de el asistente de código. El nombre **tiene que ser `sprgen`**, porque el comando `/sprites` llama a `mcp__sprgen__*`.
 
    Alternativa sin el token en el historial de la consola:
-   - `setx PIXELLAB_TOKEN "tu-token"` en `cmd`;
+   - `setx SPRGEN_TOKEN "tu-token"` en `cmd`;
    - abre una consola nueva;
    - renombra `.mcp.json.ejemplo` a `.mcp.json`.
 
-   Si usas esta vía, quita el servidor añadido a mano (`claude mcp remove pixellab`) para no tener dos.
+   Si usas esta vía, quita el servidor añadido a mano (`claude mcp remove sprgen`) para no tener dos.
 2. **Dependencias:** `npm install` y `npx playwright install chromium`.
 3. **Referencias y paleta:** `npm run sprites:ref`. Vuelve a ejecutarlo si cambias el arte procedural o el manifiesto.
 4. **Validar:** `npm run sprites:validar` → `ERRORES: 0`, con cobertura del 100 % en personajes y resto.
@@ -111,14 +111,14 @@ Es lo que hace `/sprites` con cada entrada del manifiesto:
      - `style_images` en `create_tiles_pro` (`[{base64, width, height}]`) y en `create_1_direction_object` (`[{base64, format: "png"}]`, hasta 256 px; sin `size`, porque el tamaño lo fija la imagen más grande);
      - `init_image_base64` (la pantalla actual, img2img con `init_image_strength`) y `color_image_base64` (paleta) en `create_image_pixflux`;
      - `reference_image_base64` en `create_character` **solo con `mode: "v3"`**;
-     - `background_image` (recorte de `art/referencias/mapa/`) e `inpainting` = `{"type": "mask", "mask_image": "<base64 de *_mascara.png>"}` en `create_map_object`: PixelLab pinta el edificio o el prop **encima del suelo real** (blanco = genera, negro = se conserva) y casa luz, paleta y perspectiva. Sin `width`/`height`: salen del recorte.
+     - `background_image` (recorte de `art/referencias/mapa/`) e `inpainting` = `{"type": "mask", "mask_image": "<base64 de *_mascara.png>"}` en `create_map_object`: el generador de sprites pinta el edificio o el prop **encima del suelo real** (blanco = genera, negro = se conserva) y casa luz, paleta y perspectiva. Sin `width`/`height`: salen del recorte.
    - **`previo`:** algunos assets tienen un paso antes (los de combate: `create_image_pro` con el sprite aprobado como referencia, eliges uno de los 16 candidatos, lo guardas donde dice `guarda` y ese PNG es la entrada de `create_character` v3).
    - **`lote`:** los assets con el mismo `lote` van en **una sola llamada** de `create_1_direction_object` (se juntan sus `item_descriptions`); cada candidato elegido va después a la carpeta de su asset.
    - **`depende_de`:** no generes un asset antes de que esté aprobado aquello de lo que depende (las fachadas y los props de exterior, tras `tiles-exterior`; vuelve a lanzar `npm run sprites:ref` con el atlas puesto para que los recortes ya lleven los tiles nuevos).
    - Las herramientas sin entrada de imagen (`create_character` estándar, `create_building_kit`, `create_topdown_tileset`) no reciben ninguna: su coherencia sale de los parámetros, el prompt y la paleta.
    - Los PNG de 16-32 px van bien en base64. Con imágenes grandes, usa el parámetro `_url` (https) si la herramienta lo tiene: los clientes MCP recortan a veces el base64 largo.
 2. **Esperar** con `wait_for_jobs`, que es gratis y devuelve en cuanto termina algo. Después, el `get_*` correspondiente.
-3. **Elegir.** Con `create_1_direction_object` y `size ≤ 42`, PixelLab devuelve **64 candidatos** en estado de revisión (también en los lotes compartidos). Elige uno por item con `select_object_frames` y descarta el resto con `dismiss_review`.
+3. **Elegir.** Con `create_1_direction_object` y `size ≤ 42`, el generador de sprites devuelve **64 candidatos** en estado de revisión (también en los lotes compartidos). Elige uno por item con `select_object_frames` y descarta el resto con `dismiss_review`.
 4. **Animar** según `animaciones` (sección 6).
 5. **Descargar** a `art/crudo/<grupo>/<sprite>/<dir>/<NN>.png`:
    - `grupo` es el id del asset o del item;
@@ -129,14 +129,14 @@ Es lo que hace `/sprites` con cada entrada del manifiesto:
 8. **Atlas y juego:** `npm run sprites:procesar -- --todos --atlas`, después `npm run build`, `npm test` y `npm run capturas`.
 9. **Anotar** en el asset:
    - `estado: "aprobado"`;
-   - `pixellab` con los ids devueltos (`character_id`, `animation_group_id`, `object_id`…) y, si la herramienta la acepta, la `seed`;
+   - `sprgen` con los ids devueltos (`character_id`, `animation_group_id`, `object_id`…) y, si la herramienta la acepta, la `seed`;
    - `coste_real` (saldo antes − después).
 
 **Qué hace `procesar.js`** (probado con crudos sintéticos: devuelve el arte original exacto):
 - **Alfa binario:** opaco a partir de 128.
 - **Bloqueo de paleta:**
   - primero, los colores de identidad del asset (los declarados y los de sus PNG de referencia);
-  - si ninguno está cerca, el color más cercano de los 320 que ya usa el juego (`existentes` en `ribera.json`; la maestra de 121 es la que se pasa a PixelLab);
+  - si ninguno está cerca, el color más cercano de los 320 que ya usa el juego (`existentes` en `ribera.json`; la maestra de 121 es la que se pasa a el generador de sprites);
   - los cogollos van a su rampa clave.
 - **Tope de colores:** funde los colores menos usados hasta dejar 15. Personajes, combate y VFX comparten paleta en todo el grupo (como un sprite de la época); tiles, objetos, plantas, edificios y fondos cuentan por sprite.
 - **Limpieza:** quita los píxeles sueltos.
@@ -152,7 +152,7 @@ Es lo que hace `/sprites` con cada entrada del manifiesto:
 
 ## 4b. Catálogo: qué herramienta para cada sprite
 
-El detalle sprite a sprite está en **[CATALOGO-SPRITES.md](CATALOGO-SPRITES.md)** (`npm run sprites:catalogo`). En resumen, cada cosa va a la familia de PixelLab que mejor la resuelve:
+El detalle sprite a sprite está en **[CATALOGO-SPRITES.md](CATALOGO-SPRITES.md)** (`npm run sprites:catalogo`). En resumen, cada cosa va a la familia del generador de sprites que mejor la resuelve:
 
 | Familia | Qué | Herramientas | Por qué |
 |---|---|---|---|
@@ -189,7 +189,7 @@ outline "single color black outline", shading "basic shading", detail "medium de
 
 `create_character` no tiene `seed`: genéralo 2 o 3 veces y quédate con el mejor. Después vienen `animate_character` con `template_animation_id: "breathing-idle"` y `"walking-4-frames"` en las 4 direcciones. Los parámetros que apruebes son los de todos los demás personajes; así se mantiene la coherencia, porque `style_character_id` solo existe en el modo `pro`, que cuesta 20-40 generaciones.
 
-Si un personaje cambia de cara entre direcciones, **regenera con `mode: "v3"`, `reference_image_base64` = su rotación sur aprobada de PixelLab (32 × 32) y `size: 32`**. Ese modo rota tu sprite exacto a 8 direcciones. No uses los `_x2` procedurales como referencia: v3 los copiaría tal cual, a 32 × 40.
+Si un personaje cambia de cara entre direcciones, **regenera con `mode: "v3"`, `reference_image_base64` = su rotación sur aprobada del generador de sprites (32 × 32) y `size: 32`**. Ese modo rota tu sprite exacto a 8 direcciones. No uses los `_x2` procedurales como referencia: v3 los copiaría tal cual, a 32 × 40.
 
 ## 6. Animaciones
 
@@ -300,7 +300,7 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 - sin semitransparencias ni píxeles sueltos;
 - después del bloqueo, 100 % en paleta.
 
-**Visual** (Claude Code abre el PNG ampliado junto a su referencia):
+**Visual** (el asistente de código abre el PNG ampliado junto a su referencia):
 1. La silueta se lee a tamaño real (1×).
 2. El contorno es continuo y sin huecos; la luz viene de arriba a la izquierda.
 3. La proporción cabeza/cuerpo es la del protagonista aprobado.
@@ -311,18 +311,18 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 8. Las animaciones hacen bucle limpio, sin saltos del primer al último fotograma.
 9. Ningún menor fuma, vapea ni sale junto a drogas.
 
-**Herramientas de PixelLab para arreglar en vez de regenerar**:
+**Herramientas del generador de sprites para arreglar en vez de regenerar**:
 - `pixelart_workbench`: `lint <id>` para defectos, `score <id>` para la puntuación de disciplina 0-100 y `repair <id>` para limpiar. Gratis con suscripción.
 - `correct_pixelart` (0,1 generaciones) para bordes y píxeles sueltos, con todos los fotogramas en una sola llamada.
 - `reduce_colors` con `palette_image_base64` (o `palette_image_url`) = `art/paleta/ribera.png` (0,1 generaciones) para unificar la paleta de una animación entera.
 - `inpaint_image` para rehacer una zona.
-- `save_to_asset` para guardar el arreglo en el personaje u objeto de PixelLab.
+- `save_to_asset` para guardar el arreglo en el personaje u objeto del generador de sprites.
 
 **Global**: capturas antes/después de cada fase, `npm test` 38/38, `npm run build` y peso del HTML final.
 
 ## 9. Presupuesto
 
-**Costes documentados por PixelLab**
+**Costes documentados por el generador de sprites**
 - `create_character` estándar: 1 generación.
 - Animación con plantilla: 1 por dirección.
 - Animación `v3`: unas 1 por dirección a ≤ 64 px y 8 fotogramas.
@@ -355,7 +355,7 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 | Llega ampliado (píxeles de 2×2 o 4×4) | En celdas `exacto`, `procesar.js` lo reduce solo si el múltiplo es limpio. Si no, redúcelo en local por vecino más próximo o regenera al tamaño de la celda. `unzoom_image` no sirve para sprites: pide como mínimo 256 px y devuelve fondo opaco. |
 | Cara distinta en cada dirección | `create_character` con `mode: "v3"`, `reference_image_base64` de la rotación sur aprobada y `size: 32`. |
 | `select_object_frames` pendiente | Los objetos con `size ≤ 170` quedan en revisión hasta que eliges. |
-| Trabajo atascado | `list_jobs` y `cancel_job`. Según PixelLab, los tilesets fallidos no se cobran; en lo demás, mira el saldo antes y después. |
+| Trabajo atascado | `list_jobs` y `cancel_job`. Según el generador de sprites, los tilesets fallidos no se cobran; en lo demás, mira el saldo antes y después. |
 | Fuera de celda en `procesar.js` | El sprite es demasiado grande para su celda. Regenera con un `size` menor o pide «fits in a 32x32 tile». En combate, si solo un fotograma sube 1-2 px por encima (un bote del `idle`), bájalo lo justo en el crudo. |
 | `keyframe image is incomplete` / `did not decode` | El base64 se copió mal (no siempre es el cliente). Cuantiza el PNG en paleta (`convert in.png -colors 24 -define png:color-type=3 -strip out.png`, 300-1200 bytes), imprímelo en líneas de 80 caracteres y cópialo línea a línea. `-strip` quita el alfa: el fondo vuelve negro y hay que vaciarlo después. |
 | Casa estrecha con `create_map_object` o `create_image_pro` | Salen de ~76 px y no cubren una huella de 112. Usa `create_image_pixflux` img2img con la huella procedural (el edificio del calco) como `init_image` e `init_image_strength` 30: redibuja todo a lo ancho y deja la puerta en su columna (150/100 apenas cambia nada). |
@@ -364,14 +364,14 @@ Desde la 1.3 el juego ya sabe usar sprites: en cuanto exista `assets/sprites/atl
 | Descarga de un objeto sin animación no es un zip | `objects/<id>/download` devuelve el PNG directamente cuando el objeto no tiene animaciones. |
 | Un objeto trae lo que no es (gancho, bola de fuego) | La acción se lee literal: «hook punch» le dio un gancho en la mano. Quita la palabra y añade «empty hands, no effects». |
 
-## 11. Comando de Claude Code
+## 11. Comando de el asistente de código
 
 `/sprites F1`, `/sprites kiko`, `/sprites estado`… El comando (`.claude/skills/sprites/SKILL.md`) lee esta guía y el manifiesto, comprueba el saldo, recorre los assets pendientes de la fase con el bucle de la sección 4 y se para en las puertas (F1 la apruebas tú). Funciona igual en **modo absoluto**: trabaja en silencio y cierra con el bloque ✅ COMPLETADO.
 
 ## 12. Lista de cierre
 
 - [ ] `npm run sprites:validar` → 0 errores y `npm run sprites:catalogo` → todas las claves
-- [ ] Todos los assets de la fase en `aprobado`, con `pixellab` (y `seed` si la herramienta la acepta) y `coste_real`
+- [ ] Todos los assets de la fase en `aprobado`, con `sprgen` (y `seed` si la herramienta la acepta) y `coste_real`
 - [ ] `npm run sprites:procesar -- --todos --atlas` → `ATLAS OK`
 - [ ] `npm run build`, `npm test` 38/38 (con y sin atlas), `npm run test:arte` 22/22 y `npm run capturas` revisadas
 - [ ] `CHANGELOG.md` actualizado y capturas nuevas en `screenshots/`

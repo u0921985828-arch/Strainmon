@@ -2,7 +2,7 @@
 
 Decidido con el usuario: primero se cierra el plan de Google Play (F6 → F7 → F8 → AAB). Después, este documento por tandas,
 empezando por la base sistémica ([10] fuentes, [1] personaje, [3] vehículos y maletero, [5] IVs, shiny, saturación y curado),
-y luego negocios, NPC y endgame. Los sprites nuevos (protagonista femenina, retratos HD) se hacen con PixelLab.
+y luego negocios, NPC y endgame. Los sprites nuevos (protagonista femenina, retratos HD) se hacen con el generador de sprites.
 
 Al implementarlo se adapta a lo que ya existe y se usan sus nombres reales: la partida es `user://partida.json`; la Copa ya
 existe (`COPA_THC`); los fenotipos estrella (`p.f`, `S.fenos`), el curado (`CURADO`), el camarote, la caja fuerte, la nave,

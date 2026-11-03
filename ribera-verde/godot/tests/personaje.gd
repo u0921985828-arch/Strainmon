@@ -1,5 +1,5 @@
 # Landrace Hunters (Godot) — MAESTRO [1]: crear el personaje (chico o chica y el cumpleaños, S.sexo y S.cumple), el sprite de
-# PixelLab de la protagonista (mapa y combate), sin ventajas por sexo, el regalo del cumpleaños con sus tres
+# el sprite de la protagonista (mapa y combate), sin ventajas por sexo, el regalo del cumpleaños con sus tres
 # cartas (una vez al año, con el 29 de febrero) y la semilla estrella; sin Datos.CAL, nada de esto.
 #   $GODOT --headless --path godot --script res://tests/personaje.gd   → «personaje: N comprobaciones, 0 fallos»
 extends SceneTree
@@ -94,7 +94,7 @@ func _corre() -> void:
 	chk(J.vista_pat() == vis0 and J.vista_pat(true) == int(D.PAT.vista[0]) * 2 and absf(J.cap_mochila() - cap0) < 1e-9, "chica: todo igual")
 	J.S.sexo = "m"
 	chk(J.vista_pat() == vis0 and absf(J.cap_mochila() - cap0) < 1e-9, "chico: todo igual")
-	# 3 · su sprite de PixelLab: player-f en el mapa (todas las animaciones del player) y player-f-combate de espaldas;
+	# 3 · su sprite del generador de sprites: player-f en el mapa (todas las animaciones del player) y player-f-combate de espaldas;
 	# él, el de siempre; la ropa cambia las mismas piezas en los dos
 	var anims: Array = Atlas.d.anims.get("player", {}).keys()
 	J.S.sexo = "m"
@@ -105,7 +105,7 @@ func _corre() -> void:
 	var gf = J.grupo_pj()
 	var cf = J.grupo_combate("P")
 	J.B = null
-	chk(gm == "player" and cm == "player-combate-r" and gf == "player-f" and cf == "player-f-combate-r", "grupos %s %s %s %s" % [gm, cm, gf, cf])   # con CAL, los de PixelLab (combate_r.gd)
+	chk(gm == "player" and cm == "player-combate-r" and gf == "player-f" and cf == "player-f-combate-r", "grupos %s %s %s %s" % [gm, cm, gf, cf])   # con CAL, los del generador de sprites (combate_r.gd)
 	var faltan := []
 	for an in anims:
 		for d in Atlas.d.anims.player[an].dirs:

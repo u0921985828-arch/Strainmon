@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
   Ribera Verde — exporta el arte procedural actual como PNG de referencia y el inventario de assets.
-  Sirve para dos cosas: (1) pasar a PixelLab referencias de estilo reales del juego
+  Sirve para dos cosas: (1) pasar a el generador de sprites referencias de estilo reales del juego
   (no descripciones), y (2) saber qué assets hay que cubrir con sprites.
 
   Uso:  node tools/build.js && node tools/sprites/referencias.js
@@ -57,7 +57,7 @@ const OUT = path.join(ROOT, 'art', 'referencias');
     files['misc/bolsa.png'] = png(bagSprite);
     files['misc/hoja-titulo.png'] = png(titleArt);
     { renderTitle(0); const [c, x] = mkCanvas(240, SH); x.drawImage(ctx.canvas, -OX(), 0); files['misc/titulo.png'] = png(c); }   // los 240 px del centro (SW cambia con la ventana)   // pantalla de título entera (init_image de F7)
-    // mapa: recortes del suelo para create_map_object con estilo del mapa (inpainting; máscara BLANCA = lo que genera PixelLab)
+    // mapa: recortes del suelo para create_map_object con estilo del mapa (inpainting; máscara BLANCA = lo que genera el generador de sprites)
     const region = (mapN, x0, y0, w, h, quitar) => { const m = MAPS[mapN], [c, x] = mkCanvas(w * 16, h * 16);
       for (let ty = 0; ty < h; ty++) for (let tx = 0; tx < w; tx++) { const X = x0 + tx, Y = y0 + ty; if (X < 0 || Y < 0 || X >= m.w || Y >= m.h) continue;
         const k = m.g[Y][X], f = ARTE.ok && frameDe(ARTE.cubre['tile:' + k], k, 'unica', 0, { i: 0 });

@@ -1,11 +1,11 @@
 ---
 name: director-sprites
-description: Diseñar, generar (PixelLab o código), validar y exportar sprites pixel art para cualquier juego: personajes, objetos, tiles y animaciones con spec, QA automático y spritesheet.
+description: Diseñar, generar (el generador de sprites o código), validar y exportar sprites pixel art para cualquier juego: personajes, objetos, tiles y animaciones con spec, QA automático y spritesheet.
 ---
 
 # Director de sprites
 
-Claude actúa como director artístico, PixelLab dibuja y el código valida. Nunca entregues un sprite que no haya pasado el QA de este documento.
+Claude actúa como director artístico, el generador de sprites dibuja y el código valida. Nunca entregues un sprite que no haya pasado el QA de este documento.
 
 ## 1. Spec (antes de generar nada)
 
@@ -39,19 +39,19 @@ Reglas de diseño que debes aplicar:
 
 ## 2. Generación
 
-**Con PixelLab (preferido):**
-- Si hay herramientas MCP de PixelLab (`pixellab-mcp` u otro servidor), úsalas.
-- Si no, llama a su API con `PIXELLAB_API_TOKEN` desde un script. Consulta la documentación actual de la API antes de escribir llamadas; no inventes endpoints.
+**Con el generador de sprites (preferido):**
+- Si hay herramientas MCP del generador de sprites (`sprgen-mcp` u otro servidor), úsalas.
+- Si no, llama a su API con `SPRGEN_API_TOKEN` desde un script. Consulta la documentación actual de la API antes de escribir llamadas; no inventes endpoints.
 
 Orden obligatorio:
 1. **Sprite base:** genera 3-4 variantes. Elige la mejor tras el QA y la revisión visual. Fija la seed.
 2. **Direcciones y animaciones** derivadas siempre del base aprobado (como imagen de referencia o estilo), nunca desde cero.
 3. **Prompts en inglés, concretos:** sujeto, pose, vista, tamaño, "single color black outline", "limited palette", "no anti-aliasing", "transparent background", dirección de luz.
 
-**Sin PixelLab (solo ≤32 px, iconos, tiles, objetos simples):**
+**Sin el generador de sprites (solo ≤32 px, iconos, tiles, objetos simples):**
 - Dibuja como mapa de caracteres más un diccionario de paleta.
 - Renderiza con Pillow. Ejemplo: `.` = transparente, `k` = contorno.
-- No lo intentes con personajes animados grandes; dilo y propone PixelLab.
+- No lo intentes con personajes animados grandes; dilo y propone el generador de sprites.
 
 ## 3. QA automático
 
@@ -160,4 +160,4 @@ Informa solo de:
 - Assets entregados.
 - Resultado del QA (ok / avisos).
 - Desviaciones de la spec.
-- Créditos de PixelLab gastados, si la herramienta lo permite.
+- Créditos del generador de sprites gastados, si la herramienta lo permite.

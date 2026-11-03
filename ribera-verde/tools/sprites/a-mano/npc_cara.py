@@ -1,5 +1,5 @@
 # python3 -I tools/sprites/a-mano/npc_cara.py [carpeta]  (Python 3 + Pillow; no va en los scripts de npm)
-# Los personajes por partes (1.12), como el jugador (player_cara.py): PixelLab dibujó cada fotograma del idle y de andar con su
+# Los personajes por partes (1.12), como el jugador (player_cara.py): el generador de sprites dibujó cada fotograma del idle y de andar con su
 # cara (los ojos, la boca y el pelo cambiaban en cada uno: la cara «mutaba») y el idle de cada uno era otra postura (el «ictus»).
 # Aquí la cabeza de cada personaje sale de una sola pieza por dirección, la de base/<dir>/00 (de la coronilla a CUELLO de su alto),
 # y el cuerpo, de cada fotograma:

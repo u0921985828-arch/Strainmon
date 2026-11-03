@@ -75,10 +75,10 @@ func dentro1(e: Array) -> bool:
 func tiene(R: Array, col: String) -> bool:
 	return R.any(func(e): return typeof(e[0]) != TYPE_STRING and e[4] == col)
 
-# 0.55: la mano de PixelLab (un sprite que empieza por pre) llega al canto del panel: "der" o "aba"; nunca flota
+# 0.55: la mano del generador de sprites (un sprite que empieza por pre) llega al canto del panel: "der" o "aba"; nunca flota
 # el antebrazo (lo pidió el usuario: «hasta el final y completarlo con un giro circular… como un cilindro… que no tenga esos picos en la
 # manga»): del ancho del puño todo el largo, con la raya negra a los dos lados y la media luna negra en la punta, nada después, sin
-# semitransparencias y sin restos de la manga de PixelLab fuera del cilindro
+# semitransparencias y sin restos de la manga del generador de sprites fuera del cilindro
 func brazo_cilindro(im: Image, g: Dictionary) -> bool:
 	var c: Vector2 = g.c
 	var ax: Vector2 = g.ax
@@ -116,7 +116,7 @@ func brazo_cilindro(im: Image, g: Dictionary) -> bool:
 	for t in range(int(r) + 2, int(L - r)):   # desde donde ya no está la mano
 		var m := c + ax * (t + 0.5)
 		for lado in [-1.0, 1.0]:
-			if not borde.call(m, pe * lado, r - 2.0, r + 2.0):   # la raya del sprite de PixelLab, seguida: puede ir un píxel más allá
+			if not borde.call(m, pe * lado, r - 2.0, r + 2.0):   # la raya del sprite del generador de sprites, seguida: puede ir un píxel más allá
 				return false
 	return borde.call(c, ax, L - 2.0, L + 1.0)
 
@@ -231,7 +231,7 @@ func _corre() -> void:
 	chk(dentro(J.rects_acceso(V, 0)) and tiene(J.rects_acceso(V, T.fin), "#40e060"), "la rueda: dentro y abre")
 	V = {"k": "candado", "c": "", "ok": true, "t0": 0.0}
 	chk(dentro(J.rects_acceso(V, 0)) and J.rects_acceso(V, 0) != J.rects_acceso(V, 1000), "el candado: dentro y se abre")
-	# 3a · 0.55 (lo pidió el usuario: «la regadera y la mano flotan… la llave… hacerlas con sprites de PixelLab»): la mano entra por
+	# 3a · 0.55 (lo pidió el usuario: «la regadera y la mano flotan… la llave… hacerlas con sprites del generador»): la mano entra por
 	# el canto del panel en todos los momentos, y el agua de la regadera cae dentro de la maceta
 	var ax1: int = ((J.SW - J.ACC_W) >> 1) + J.ACC_W
 	var ay1: int = ((J.SH - J.ACC_H) >> 1) + J.ACC_H
@@ -245,7 +245,7 @@ func _corre() -> void:
 	V = {"k": "llave", "c": "", "ok": true, "t0": 0.0}
 	chk(J.rects_acceso(V, 300).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and e[1] == "acc-llave-portal-0") and J.rects_acceso(V, 900).any(func(e): return typeof(e[0]) == TYPE_STRING and typeof(e[1]) == TYPE_STRING and e[1] == "acc-llave-portal-1"), "la llave gira: la muñeca de canto")
 	# el puño dorado, entero en todas las manos (lo pidió el usuario: «en la animación de encender el porro, el dorado de la manga
-	# desaparece, en una mano como en otra»): lo dorado del sprite de PixelLab sigue en la mano con el brazo en cilindro
+	# desaparece, en una mano como en otra»): lo dorado del sprite del generador de sprites sigue en la mano con el brazo en cilindro
 	var sin_oro := []
 	for nm in ["gm-porro", "gm-mech1-ab", "gm-mech0-ab", "gm-pipa", "gm-vapo", "gm-regar", "gm-billete", "gm-semilla", "gm-pincel", "gm-tij-a"]:
 		var fo = Atlas.foto_misc(nm)
@@ -265,7 +265,7 @@ func _corre() -> void:
 			sin_oro.append("%s %d→%d" % [nm, antes_o, despues_o])
 	chk(sin_oro.is_empty(), "el puño dorado, entero: %s" % [sin_oro])
 	# la muñeca, la del sprite (lo pidió el usuario: «sigue esas dos líneas del brazo, del sprite original, y luego lo cierras; no tienes
-	# por qué abrir una nueva línea desde la muñeca»): nada del sprite de PixelLab cambia hasta la punta, solo se alarga
+	# por qué abrir una nueva línea desde la muñeca»): nada del sprite del generador de sprites cambia hasta la punta, solo se alarga
 	var tocadas := []
 	for nm in ["gm-abono", "gm-billete", "gm-billete-i", "gm-bolsita", "gm-bolsita-i", "gm-mech0-ab", "gm-mech1-ab", "gm-pincel", "gm-pipa", "gm-porro", "gm-regar", "gm-semilla", "gm-spray", "gm-tij-a", "gm-tij-c", "gm-vacia", "gm-vapo"]:
 		var fo = Atlas.foto_misc(nm)
@@ -319,7 +319,7 @@ func _corre() -> void:
 		abajo = maxi(abajo, g[1] + g[3] - gy)
 		en_maceta = en_maceta and g[0] - gx >= 44 and g[0] - gx <= 68
 	chk(en_maceta and abajo >= 60 and abajo <= 67, "regar: el agua cae en la tierra de la maceta (%d)" % abajo)
-	# 0.55: las manos de PixelLab de cada gesto llegan al canto (la tuya por la derecha; la del cliente, por la izquierda)
+	# 0.55: las manos del generador de sprites de cada gesto llegan al canto (la tuya por la derecha; la del cliente, por la izquierda)
 	for q in [["tratar", "gm-spray", 600.0], ["abonar", "gm-abono", 600.0], ["plantar", "gm-vacia", 900.0], ["sembrar", "gm-semilla", 300.0],
 			["sembrar", "gm-vacia", 1000.0], ["esqueje", "gm-tij", 300.0], ["cosechar", "gm-tij", 700.0], ["manicurar", "gm-tij", 600.0],
 			["polen", "gm-pincel", 600.0], ["vender", "gm-bolsita", 500.0], ["pagar", "gm-billete", 400.0], ["pagar", "gm-vacia", 1100.0]]:

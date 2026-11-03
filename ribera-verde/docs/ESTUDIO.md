@@ -43,8 +43,8 @@ Este estudio parte de lo que dijo el usuario desde que contó que el juego le ab
 | Juego | Qué funciona | Qué falla | Qué nos llevamos |
 |---|---|---|---|
 | **Schedule I** | Desbloquear cambia cómo juegas | Al final solo se reparte y no hay escalado ni final («no hay nada más que hacer» a las 25 h) | Desbloquear por **hitos**, no por dinero; nada de final de repartos |
-| **Stardew Valley** | Las estaciones dan el ritmo (cultivos, fiestas y recolección distintos), el descubrimiento es poco a poco y las colecciones del Centro Cívico dan metas largas | — | Que las estaciones manden fuera de la huerta, fiestas fijas y **colecciones que restauran algo** |
-| **Pokémon** (cría) | Encontrar en un sitio concreto, la rareza y criar hasta el ejemplar perfecto | — | **Rarezas** heredables y criar por generaciones |
+| **Un simulador de granja por estaciones** | Las estaciones dan el ritmo (cultivos, fiestas y recolección distintos), el descubrimiento es poco a poco y las colecciones del Centro Cívico dan metas largas | — | Que las estaciones manden fuera de la huerta, fiestas fijas y **colecciones que restauran algo** |
+| **Un juego de criar y coleccionar criaturas** | Encontrar en un sitio concreto, la rareza y criar hasta el ejemplar perfecto | — | **Rarezas** heredables y criar por generaciones |
 
 ## 5. Las mejoras (sobre lo que ya hay, sin duplicar)
 
@@ -113,6 +113,3 @@ Todo con `Datos.CAL`, como siempre; las partidas de antes se migran.
 - [Schedule I · debate en Steam (2)](https://steamcommunity.com/app/3164500/discussions/1/599650454957209648)
 - [Schedule I · debate en Steam (3)](https://steamcommunity.com/app/3164500/discussions/1/599649070605219080)
 - [Schedule I en OpenCritic](https://opencritic.com/game/19422/schedule-i)
-- [Stardew Valley · entrevista a Eric Barone (NPR/WBHM)](https://wbhm.org/npr-story/the-legacy-and-future-of-the-farming-game-stardew-valley)
-- [Stardew Valley · las estaciones como ritmo](https://finalboss.io/stardew-valley-why-this-cosy-farming-classic-is)
-- [Stardew Valley · el descubrimiento poco a poco](https://engineered.at/articles/happy-10th-birthday-stardew-valley)

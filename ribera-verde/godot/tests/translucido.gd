@@ -83,7 +83,7 @@ func _corre() -> void:
 		# el seto de la fila de abajo (lo vio el usuario: un cuadro translúcido bajo los pies): asoma 1-2 px sobre su casilla y solo
 		# roza los pies, no tapa; con el cuerpo detrás del árbol, sí
 		var fs = Atlas.frame_de("seto-huerta", "setoH", "unica", 0, {"i": 0})
-		chk(fs != null, "el seto de PixelLab")
+		chk(fs != null, "el seto del generador de sprites")
 		if fs:
 			for d in [0, 4, 8]:
 				P.px = 10 * 16 + d

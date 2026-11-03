@@ -40,15 +40,15 @@ En el PC también vale el teclado (flechas o WASD, Z/Espacio = A, X/Esc = B, M =
 ```
 index.html                    el juego completo (lo genera tools/build.js)
 src/                          código fuente: shell.html + styles.css + js/ (16 módulos)
-tools/                        build, test de la historia, generador de docs, capturas y tools/sprites (kit PixelLab)
+tools/                        build, test de la historia, generador de docs, capturas y tools/sprites (kit el generador de sprites)
 docs/                         diseño, guion, genética, mapa, plano de escala (PLANO.md + plano/) y prompts de sprites
-dist/ribera-verde.artifact.html   la misma página en formato Artifact de Claude
+dist/ribera-verde.artifact.html   la misma página en formato Artifact
 dist/ribera-verde.apk         el juego como app de Android (lo genera tools/build-apk.js)
 assets/fonts/                 Atkinson Hyperlegible y Press Start 2P (woff2 + licencia OFL)
 screenshots/                  14 capturas
-art/                          manifiesto de sprites, inventario, referencias PNG y paleta (kit PixelLab)
+art/                          manifiesto de sprites, inventario, referencias PNG y paleta (kit el generador de sprites)
 CONTEXTO.md                   qué se pidió, qué se decidió y en qué estado está
-CLAUDE.md                     notas para seguir el desarrollo con Claude Code
+CLAUDE.md                     notas para seguir el desarrollo con el asistente de código
 CHANGELOG.md                  versiones
 ```
 
@@ -64,11 +64,11 @@ npm test           # compila y recorre la historia completa (52 pasos) en Chromi
 npm run docs       # compila y regenera docs/GENETICA.md, MAPA.md y ECONOMIA.md desde los datos del juego
 npm run capturas   # compila y regenera screenshots/
 npm run plano      # compila y regenera docs/plano/ (mapas con rejilla, hoja de escala y vista de carpa B)
-npm run sprites:ref       # referencias PNG + paleta para PixelLab
+npm run sprites:ref       # referencias PNG + paleta para el generador de sprites
 npm run sprites:validar   # comprueba art/manifest.json
-npm run sprites:procesar -- <grupo> [--atlas]   # salida de PixelLab → sprites listos
-npm run sprites:catalogo  # catálogo de sprites por herramienta de PixelLab
-npm run sprites:huellas   # huellas procedurales de las láminas de la vista B (init_image para PixelLab)
+npm run sprites:procesar -- <grupo> [--atlas]   # salida del generador de sprites → sprites listos
+npm run sprites:catalogo  # catálogo de sprites por herramienta del generador de sprites
+npm run sprites:huellas   # huellas procedurales de las láminas de la vista B (init_image para el generador de sprites)
 npm run test:arte         # prueba el motor de sprites con un atlas de calco
 npm run apk               # compila y empaqueta dist/ribera-verde.apk (Java 17+; sin Android SDK)
 ```
@@ -83,9 +83,9 @@ Edita siempre en `src/` y después ejecuta `npm run build`. `index.html` y `dist
 - [docs/GENETICA.md](docs/GENETICA.md): las 41 variedades, su historia y el árbol de cruces.
 - [docs/MAPA.md](docs/MAPA.md): mapas con coordenadas, personajes, objetos y tienda.
 - [docs/ECONOMIA.md](docs/ECONOMIA.md): focos, carpas, macetas, montajes de ejemplo, precios de venta, semillas, la deuda y el imperio, con las cifras reales del juego.
-- [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md): plan de lo que falta. Recoge el catálogo de carpas, focos, macetas y extras con sus medidas reales, la escala de cada vista, las láminas que hay que pedir a PixelLab con su coste y su orden, la historia y los desbloqueos por capítulo y las decisiones pendientes.
-- [docs/PIXELLAB.md](docs/PIXELLAB.md): kit pro para cambiar todo el arte por sprites y animaciones de PixelLab con Claude Code (comando `/sprites`), sin salirse de la estética. El motor ya los usa en cuanto hay atlas.
-- [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md): cada sprite del juego con su herramienta de PixelLab (personajes, terreno, objetos sobre el mapa, lotes e imágenes), su orden y su coste.
+- [docs/PLAN-PRODUCCION.md](docs/PLAN-PRODUCCION.md): plan de lo que falta. Recoge el catálogo de carpas, focos, macetas y extras con sus medidas reales, la escala de cada vista, las láminas que hay que pedir a el generador de sprites con su coste y su orden, la historia y los desbloqueos por capítulo y las decisiones pendientes.
+- [docs/SPRITES-GEN.md](docs/SPRITES-GEN.md): kit pro para cambiar todo el arte por sprites y animaciones del generador de sprites con el asistente de código (comando `/sprites`), sin salirse de la estética. El motor ya los usa en cuanto hay atlas.
+- [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md): cada sprite del juego con su herramienta del generador de sprites (personajes, terreno, objetos sobre el mapa, lotes e imágenes), su orden y su coste.
 - [CLAUDE.md](CLAUDE.md): arquitectura y partes delicadas del código.
 
 ## Capturas
@@ -99,6 +99,6 @@ Edita siempre en `src/` y después ejecuta `npm run build`. `index.html` y `dist
 
 ## Créditos y licencias
 
-- El código y todo el arte son originales. El atlas de PixelLab (`assets/sprites/`) va incrustado en el HTML y sustituye al dibujo por código donde lo cubre; las plantas de la vista de carpa salen del arte de cepas del propio repositorio (`../assets/plants`). Sin atlas, todo se dibuja por código.
+- El código y todo el arte son originales. El atlas del generador de sprites (`assets/sprites/`) va incrustado en el HTML y sustituye al dibujo por código donde lo cubre; las plantas de la vista de carpa salen del arte de cepas del propio repositorio (`../assets/plants`). Sin atlas, todo se dibuja por código.
 - Las mecánicas se inspiran en *Weed Firm* y la estética en los RPG de portátil de 16 bits. No se usa ningún asset, personaje, nombre ni marca de esos juegos.
 - Fuentes: [Atkinson Hyperlegible](https://fonts.google.com/specimen/Atkinson+Hyperlegible) (diálogos, menús y HUD, pensada para leerse bien) y [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) (rótulos), ambas con licencia SIL Open Font License 1.1 (`assets/fonts/`).

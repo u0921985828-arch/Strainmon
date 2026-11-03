@@ -1100,7 +1100,7 @@ func montar_setas() -> void:
 # los negocios por dentro (1.45, lo pidió el usuario: «que tú puedas acceder a ese sitio y controlarlo desde ahí»; con Datos.CAL):
 # en la calle, la puerta del local (NEGOCIO.k[k]: x, puerta, ancha, dx, tile; gate «neg:k»); dentro (loc-<k>), lo que ponen las mejoras
 # compradas (S.loc[k].mj); sin Datos.CAL, la calle y el local como estaban (la copia _neg0)
-const NEG_ANCHO := ["elevT", "fosoT", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL", "hornoN", "recambT", "barraN", "botN", "estP", "mostrN", "doblaN", "mesaP", "barraTb", "botTb"]   # 1.47: los muebles de PixelLab de dos casillas   # i18n-no
+const NEG_ANCHO := ["elevT", "fosoT", "bancoT", "boxL", "cubaQ", "mostrQ", "hornoP", "mostrP", "doblaL", "hornoN", "recambT", "barraN", "botN", "estP", "mostrN", "doblaN", "mesaP", "barraTb", "botTb"]   # 1.47: los muebles del generador de sprites de dos casillas   # i18n-no
 
 # El elevador y el foso, a escala con los coches del concesionario (5 casillas, como la exposición); 1.47, el box de lavado
 const NEG_LARGO := {"elevT": 5, "fosoT": 5, "boxL": 5}
@@ -1423,7 +1423,7 @@ func ropa_c(f, g):
 	o.c = Atlas.con_rampa(f.c, r[0], "ropa|" + r[1], 0x5c3a28 if g == "player-f" else -1)   # i18n-no
 	return o
 
-# MAESTRO [1]: la protagonista tiene su sprite de PixelLab (player-f en el mapa, player-f-combate de espaldas en el combate)
+# MAESTRO [1]: la protagonista tiene su sprite del generador de sprites (player-f en el mapa, player-f-combate de espaldas en el combate)
 func grupo_pj():
 	var g = Atlas.cubre("look:player-f") if es_chica() else null
 	return g if g else Atlas.grupo_look(D.LOOKS.player)

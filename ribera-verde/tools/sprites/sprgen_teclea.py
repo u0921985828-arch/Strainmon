@@ -1,5 +1,5 @@
-# El protagonista de espaldas tecleando, de PixelLab (lo pidió el usuario: «Has primero el Sprite del jugador con los brazos puestos
-# y después lo sientas en la silla, pidiendo su Sprite por detrás»). Entrada: tools/sprites/pixellab-teclea/crudo/<grupo>-<n>.png,
+# El protagonista de espaldas tecleando, del generador de sprites (lo pidió el usuario: «Has primero el Sprite del jugador con los brazos puestos
+# y después lo sientas en la silla, pidiendo su Sprite por detrás»). Entrada: tools/sprites/sprgen-teclea/crudo/<grupo>-<n>.png,
 # el candidato elegido entre 64 de create_image_pro (referencias: su fotograma base de espaldas y la pose; paleta: la del base):
 # los codos abiertos a la altura de la cintura y los antebrazos hacia delante (en pantalla, hacia arriba y hacia dentro), con las
 # manos delante del pecho, en el teclado. Aquí solo se le ponen los colores exactos del base, para que la ropa (ROPA, ropa_c)
@@ -14,7 +14,7 @@ R = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 CRUDO = {'player': 'player-6.png', 'player-f': 'player-f-22.png'}
 CLARA, SOMBRA = (0xc8, 0x38, 0x39), (0xa0, 0x30, 0x31)       # la camiseta (ROPA.camiseta)
 VAQUERO, BRILLO = (0x36, 0x46, 0x6f), (0x6c, 0x74, 0x83)     # el pantalón (ROPA.pantalon)
-OSCURO, GRIS = (0x2c, 0x33, 0x3c), (0x53, 0x5b, 0x6b)        # como lo dibuja PixelLab
+OSCURO, GRIS = (0x2c, 0x33, 0x3c), (0x53, 0x5b, 0x6b)        # como lo dibuja el generador de sprites
 TONO = {(0x2a, 0x8a, 0x5a): (0x2a, 0x8a, 0x5b), (0x7a, 0x5a, 0x3a): (0x7a, 0x5a, 0x3b)}   # gorra y pelo, al tono del base
 
 def colores(im):
@@ -62,7 +62,7 @@ def encaja(im, base):
     return o
 
 for g, f in CRUDO.items():
-    im = colores(Image.open(os.path.join(R, 'tools', 'sprites', 'pixellab-teclea', 'crudo', f)).convert('RGBA'))
+    im = colores(Image.open(os.path.join(R, 'tools', 'sprites', 'sprgen-teclea', 'crudo', f)).convert('RGBA'))
     if g == 'player':
         im = pelo(im)
     for k in ('crudo', 'procesado'):

@@ -30,7 +30,7 @@ func foto(e: Dictionary, T, now: float) -> Image:
 	im.convert(Image.FORMAT_RGBA8)
 	return im
 
-# la escena animada (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): sus 4 fotogramas de PixelLab, distintos de
+# la escena animada (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): sus 4 fotogramas del generador de sprites, distintos de
 # la escena, y en pantalla, en el sitio de la escena, el fotograma que toca a cada hora
 func anima(e: Dictionary, T: Dictionary, k: String) -> String:
 	var Es = load("res://src/escena_extr.gd")
@@ -106,8 +106,8 @@ func _corre() -> void:
 				fallos.append("%s %d: no se pinta" % [t, i])
 			if a.get_data() == b.get_data():
 				fallos.append("%s %d: no se mueve" % [t, i])
-			if load("res://src/escena_extr.gd").pl("%s-%d" % [t, i]) == null:   # de PixelLab (lo pidió el usuario: «con esta calidad»)
-				fallos.append("%s %d: sin su escena de PixelLab" % [t, i])
+			if load("res://src/escena_extr.gd").pl("%s-%d" % [t, i]) == null:   # del generador de sprites (lo pidió el usuario: «con esta calidad»)
+				fallos.append("%s %d: sin su escena del generador de sprites" % [t, i])
 			else:
 				var m: String = await anima(e, T, "%s-%d" % [t, i])
 				if m != "":
@@ -128,14 +128,14 @@ func _corre() -> void:
 				fallos.append("lab %s %d: no se pinta" % [k, i])
 			if a.get_data() == b.get_data():
 				fallos.append("lab %s %d: no se mueve" % [k, i])
-			if load("res://src/escena_extr.gd").pl("l%s-%d" % [k, i]) == null:   # la escena es de PixelLab (lo pidió el usuario)
-				fallos.append("lab %s %d: sin su escena de PixelLab" % [k, i])
+			if load("res://src/escena_extr.gd").pl("l%s-%d" % [k, i]) == null:   # la escena es del generador de sprites (lo pidió el usuario)
+				fallos.append("lab %s %d: sin su escena del generador de sprites" % [k, i])
 			else:
 				var m: String = await anima(e, T, "l%s-%d" % [k, i])
 				if m != "":
 					fallos.append("lab %s %d: %s" % [k, i, m])
 			tot += 1
-	# el EPI a la vista: de PixelLab (pixellab_epi.py) parado y andando, con la bata, los guantes y las gafas y sin la gorra en las
+	# el EPI a la vista: del generador de sprites (sprgen_epi.py) parado y andando, con la bata, los guantes y las gafas y sin la gorra en las
 	# cuatro direcciones
 	J.TIRO = null
 	J.pintor.redibuja(now)   # el fotograma parado sale del reloj del pintor: siempre el mismo, no el de la última escena
@@ -148,7 +148,7 @@ func _corre() -> void:
 			continue
 		var pl = J.epi_pl(f.c)
 		if pl == null:
-			fallos.append("EPI %s: sin el de PixelLab" % d)
+			fallos.append("EPI %s: sin el del generador de sprites" % d)
 			continue
 		var bl := 0
 		var az := 0
@@ -165,7 +165,7 @@ func _corre() -> void:
 				if p.g8 > p.r8 + 40 and p.g8 > p.b8 + 30:
 					gorra += 1
 		if bl < (15 if d in ["left", "right"] else 20) or (d != "up" and az < 1) or gorra > 0:   # de lado se ve menos bata (16 px el peor parado)
-			fallos.append("EPI %s: de PixelLab, bata %d, guantes %d, gorra %d" % [d, bl, az, gorra])
+			fallos.append("EPI %s: del generador de sprites, bata %d, guantes %d, gorra %d" % [d, bl, az, gorra])
 		var gp: Image = pl.duplicate()
 		gp.resize(32 * 8, 32 * 8, Image.INTERPOLATE_NEAREST)
 		gp.save_png(dir.path_join("epi-pl-%s.png" % d))
@@ -193,7 +193,7 @@ func _corre() -> void:
 		gx.resize(o.get_width() * 8, o.get_height() * 8, Image.INTERPOLATE_NEAREST)
 		gx.save_png(dir.path_join("epi-%s.png" % d))
 		tot += 1
-	# la protagonista, también de PixelLab, y con el EPI puesto no se corre (las normas del laboratorio): andando
+	# la protagonista, también del generador de sprites, y con el EPI puesto no se corre (las normas del laboratorio): andando
 	var sx = J.S.get("sexo")
 	J.S.sexo = "f"
 	var gf = J.grupo_pj()
@@ -201,7 +201,7 @@ func _corre() -> void:
 		J.P.dir = d
 		var f = J.pintor._pj_frame(J.P, gf, true, 0.0)
 		if f == null or J.epi_pl(f.c) == null:
-			fallos.append("EPI de ella %s: sin el de PixelLab" % d)
+			fallos.append("EPI de ella %s: sin el del generador de sprites" % d)
 		else:
 			var gp: Image = J.epi_pl(f.c).duplicate()
 			gp.resize(32 * 8, 32 * 8, Image.INTERPOLATE_NEAREST)
@@ -217,7 +217,7 @@ func _corre() -> void:
 	J.P.dir = "down"
 	var fc = J.pintor._pj_frame(J.P, gr, true, 120.0)
 	if not J.epi_puesto() or fc == null or J.epi_pl(fc.c) == null:
-		fallos.append("EPI: con prisa en el laboratorio corre (sin el de PixelLab)")
+		fallos.append("EPI: con prisa en el laboratorio corre (sin el del generador de sprites)")
 	J.lab().e = false
 	var fs = J.pintor._pj_frame(J.P, gr, true, 120.0)
 	if fs == null or J.epi_pl(fs.c) != null:

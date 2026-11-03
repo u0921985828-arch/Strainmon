@@ -2,15 +2,15 @@
 
 ## La petición (5 de octubre de 2026)
 
-> **20:54** · «Buenas, quiero que hagas un juego que sea como el Weed Firm, o sea, las mecánicas del Weed Firm, de cultivo de cannabis y, y descubrir y, y hacer cruces de genéticas también, y luego pues venderlo y demás. En la calle, que te vengan los ladrones y la policía y tengas que sobornar y que luego haya una historia detrás, un guión de todo el juego, con los gráficos de Pokémon. De 8 bits, así de píxeles, ¿eh? Como el Esmeralda. Como el Pokémon Esmeralda, o así.»
+> **20:54** · «Buenas, quiero que hagas un juego que sea como el Weed Firm, o sea, las mecánicas del Weed Firm, de cultivo de cannabis y, y descubrir y, y hacer cruces de genéticas también, y luego pues venderlo y demás. En la calle, que te vengan los ladrones y la policía y tengas que sobornar y que luego haya una historia detrás, un guión de todo el juego, con los gráficos de una franquicia comercial. De 8 bits, así de píxeles, ¿eh? Como el Esmeralda. Como el las portátiles de 16 bits, o así.»
 >
-> **20:56** · «Inspirado en las mecánicas d juego de Weed Firm, con los gráficos de Pokémon Esmeralda»
+> **20:56** · «Inspirado en las mecánicas d juego de Weed Firm, con los gráficos de las portátiles de 16 bits»
 >
 > **21:31** · «Quiero que recojas todo esto en un Zip con contexto y todo»
 >
-> **22:24** · «Quiero que me des instrucciones para que en Claude Code con la API de Pixel Lab pueda mejorar mediante sprites todos los gráficos del juego, pero a nivel bastante pro, del palo de animaciones y, y eso, pues si hay alguien que, que sea fumador, pues igual que salga en algún momento fumando o lo que sea, o ese tipo de cosas. Pero que se guarde la estética que hemos acordado. Eso sí.»
+> **22:24** · «Quiero que me des instrucciones para que en el asistente de código con la API del generador de sprites pueda mejorar mediante sprites todos los gráficos del juego, pero a nivel bastante pro, del palo de animaciones y, y eso, pues si hay alguien que, que sea fumador, pues igual que salga en algún momento fumando o lo que sea, o ese tipo de cosas. Pero que se guarde la estética que hemos acordado. Eso sí.»
 >
-> **23:24** · «En la API de Pixel Lab tienes opciones de crear tanto mapas como personajes, como objetos y también creaciones simples. Entonces deberíamos de catalogar todos los sprites que necesitamos para poder optimizar las creaciones y aprovechar al máximo las herramientas.»
+> **23:24** · «En la API del generador de sprites tienes opciones de crear tanto mapas como personajes, como objetos y también creaciones simples. Entonces deberíamos de catalogar todos los sprites que necesitamos para poder optimizar las creaciones y aprovechar al máximo las herramientas.»
 
 ## Peticiones de la 1.10 (6 de octubre de 2026)
 
@@ -30,16 +30,16 @@
 | Ladrones y policía | Encuentros aleatorios al andar por el barrio con mercancía o dinero, y combates por turnos |
 | Sobornar | Opción SOBORNAR contra la policía y la «protección» del sargento Molina |
 | Historia con guion | 7 capítulos con objetivos, personajes y diálogos (deuda de 30.000 € en tres plazos) y, saldada la deuda, **tu imperio**: rangos por facturación que suben la carga al por mayor. Ver [docs/GUION.md](docs/GUION.md) |
-| Gráficos tipo Pokémon Esmeralda, pixel art | Resolución de portátil de 16 bits (160 px de alto; de 240 a 400 de ancho según el móvil, solo en horizontal), casillas de 16 px, contorno oscuro, cajas de diálogo con borde azul y flecha roja, combates con plataformas y barras de vida |
+| Gráficos tipo las portátiles de 16 bits, pixel art | Resolución de portátil de 16 bits (160 px de alto; de 240 a 400 de ancho según el móvil, solo en horizontal), casillas de 16 px, contorno oscuro, cajas de diálogo con borde azul y flecha roja, combates con plataformas y barras de vida |
 
 ## Decisiones
 
-- **Arte original, no copiado.** Pokémon (Nintendo/Game Freak) y Weed Firm son propiedad de sus autores. Se imitan el estilo y las mecánicas, pero no hay sprites, personajes, nombres, fuentes ni marcas de esos juegos. Todo el arte se dibuja por código (`src/js/01-tiles.js`, `02-sprites.js` y `14-render.js`).
-- **Un solo archivo web sin dependencias.** Se juega en el navegador o en el móvil, se puede publicar como Artifact de Claude y no necesita instalación.
+- **Arte original, no copiado.** Las franquicias comerciales del género y Weed Firm son propiedad de sus autores. Se imitan el estilo y las mecánicas, pero no hay sprites, personajes, nombres, fuentes ni marcas de esos juegos. Todo el arte se dibuja por código (`src/js/01-tiles.js`, `02-sprites.js` y `14-render.js`).
+- **Un solo archivo web sin dependencias.** Se juega en el navegador o en el móvil, se puede publicar como Artifact y no necesita instalación.
 - **Ambientación propia.** «Ribera Verde» es un barrio ficticio a orillas de una ría, con guiños vascos: txoko, kalimotxo, pintxos, «aupa», «eskerrik asko». Ningún personaje está basado en una persona real.
-- **«Genoteca» como Pokédex.** Es el álbum de variedades que da el objetivo de coleccionar.
+- **«Genoteca» como catálogo.** Es el álbum de variedades que da el objetivo de coleccionar.
 - **Combates de policía sin vida.** La barra enemiga mide la sospecha (el calor policial). Contra la policía se negocia o se huye; no se le pega.
-- **Sprites por familia de PixelLab (v1.3).** Cada sprite sale de la herramienta que mejor lo resuelve. Los personajes llevan rig y plantillas. El terreno va en tiles, kits de edificio y Wang. Lo que se apoya en el suelo se pinta con `create_map_object` sobre el propio mapa. Lo pequeño va en lotes compartidos y las pantallas en img2img. Detalle en [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md). En la 1.5 los kits de edificio se cambiaron por `create_tiles_pro` y las fachadas y la carpa por img2img sobre su huella: lo demás salía en perspectiva o estrecho.
+- **Sprites por familia del generador de sprites (v1.3).** Cada sprite sale de la herramienta que mejor lo resuelve. Los personajes llevan rig y plantillas. El terreno va en tiles, kits de edificio y Wang. Lo que se apoya en el suelo se pinta con `create_map_object` sobre el propio mapa. Lo pequeño va en lotes compartidos y las pantallas en img2img. Detalle en [docs/CATALOGO-SPRITES.md](docs/CATALOGO-SPRITES.md). En la 1.5 los kits de edificio se cambiaron por `create_tiles_pro` y las fachadas y la carpa por img2img sobre su huella: lo demás salía en perspectiva o estrecho.
 - **El motor de sprites va antes que los sprites (v1.3).** Se probó con un atlas «de calco» del arte actual: si las capturas salen iguales, las anclas cuadran y los créditos se gastan solo en arte.
 - **Ajustes tras la prueba automática (v1.1).** Los ladrones de los capítulos altos ganaban casi siempre, así que se suavizaron y ahora la VIDA máxima sube 2 puntos por cada ladrón vencido. Además se corrigieron tres fallos; están en [CHANGELOG.md](CHANGELOG.md).
 
@@ -52,9 +52,9 @@
 - **Genética (1.9.0):** las landraces y los híbridos clásicos de Strainmon (`../src/species.js`, sus textos, no sus sprites), con su historia; estabilizar F1 → F4 en la mesa y banco de semillas en el PC desde el capítulo 2.
 - **Plan de producción (cerrado en la 1.10.0):** D1–D6 aprobadas. P1 hecho: el armario 80, la carpa 120 en el sitio C, el LED 100 W y los extras (ventilador, filtro de carbón y goteo), con la regla del olor. P2 hecho: la vista de carpa B (3/4 a 48 px/m; desde la 1.10, a 60 px/m con las carpas plateadas de frente) con arte procedural, medida en [docs/PLANO.md](docs/PLANO.md). P3 en marcha: vista C (la carpa por dentro a toda la altura, desde la imagen A del tablero de estilos; la pared solo con la tela y la luz del foco en una capa aparte, delante de todo). Corte de prueba con sodio, macetas de 7 L e índicas en floración, aprobado. Lámina A (el CFL y la híbrida Skunk #1 de germinando a lista en el armario 60) hecha y aprobada (8 de octubre de 2026), y las carpas medias del mapa (p80 y m120) también; 26 de 53 generaciones. P3–P6 cerrados a mano, sin más generaciones: lámina B de la vista C (focos LED, CFL de las carpas de 200 cm, macetas de tela y de 18 L, la muerta y los extras con el goteo y las garrafas), láminas 12 (iconos del equipo) y 13 (nevera y cajas a escala), sombras de los muebles y la noche en el piso. Con el atlas la carpa se ve siempre por dentro (vista C).
 - **Sprites:**
-  - el kit PixelLab (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
+  - el kit el generador de sprites (guía, catálogo, manifiesto, referencias, paleta, herramientas y comando `/sprites`) está completo y validado;
   - el motor ya usa el atlas (F2) y `npm run test:arte` da 24/24;
-  - F1 generada con PixelLab Pro: el protagonista ya sale del atlas (`base`, `idle`, `walk`), aprobado;
+  - F1 generada con el generador de sprites Pro: el protagonista ya sale del atlas (`base`, `idle`, `walk`), aprobado;
   - F3 (personajes) con la misma receta: los 13 NPC y los 6 clientes salen del atlas con `idle`, `walk` (los que caminan) y sus acciones de ambiente;
   - F3-resto, F4, F5, F6 y F7 (1.5): humos y efectos, gaviotas y palomas, tiles, interiores, fachadas, objetos, carpa, plantas, combate, iconos, cogollos y título salen del atlas, y el protagonista ya tiene sus 8 acciones;
   - F4b (1.5): orillas del río, del camino de tierra y de la plaza con tres Wang encadenados y autotiling por esquinas;
@@ -63,7 +63,7 @@
 - **Godot (0.4.0, la app de Android):** el juego entero portado a Godot 4.3 (`godot/`) y comparado con el HTML: la historia 1 → 8 con el mismo piloto y el mismo azar (84 pasos, 0 diferencias), 29 pantallas píxel a píxel, la vista C (9 escenas, con LED, extras, garrafas y muertas) y el cultivo, y una partida jugada con los mandos desde el título. APK aparte: `dist/ribera-verde-godot.apk` (`com.riberaverde.godot`, 0.4.0, código 6; `npm run godot:apk`), con icono propio, aviso de edad, OPCIONES, CRÉDITOS y Atrás = pausa (`docs/NORMAS-MOVIL.md`, `docs/PLAY.md`),, firmado y verificado, sin probar en un móvil real.
 - `npm run build` es reproducible: dos pasadas dan archivos idénticos byte a byte.
 - **Android:** `dist/ribera-verde.apk` (1.10.0, código 11000, siempre en horizontal), generado con `npm run apk`. Probado: firma v2/v3 y zipalign verificados, manifiesto y assets decodificados con apktool, y el `index.html` del APK en Chromium móvil con el botón Atrás. No se ha probado en un dispositivo real.
-- **Versión publicada:** el Artifact de Claude (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está en la 1.10.0, con el atlas completo (1401 fotogramas). Es privado: se comparte desde su menú Compartir.
+- **Versión publicada:** el Artifact (https://claude.ai/artifact/Hj17b8QmVcuFHoHjDQe1Pb) está en la 1.10.0, con el atlas completo (1401 fotogramas). Es privado: se comparte desde su menú Compartir.
 
 ## Limitaciones conocidas
 
@@ -80,7 +80,7 @@
 
 0. Siguiente tanda de la 1.10 (ver el CLAUDE.md de la raíz): ropa y pelo, muebles y casa; después, el local clandestino de setas.
 1. Probar los dos APK en un móvil real (el de WebView y el de Godot, la vista de carpa incluida).
-2. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/PIXELLAB.md](docs/PIXELLAB.md); comando `/sprites`.
+2. Revisar el arte nuevo jugando y repetir lo que no convenza (cada asset del manifiesto guarda sus ids, semillas y descartes). Guía: [docs/SPRITES-GEN.md](docs/SPRITES-GEN.md); comando `/sprites`.
 3. Probar con jugadores y ajustar los números de [docs/GDD.md](docs/GDD.md): precios, calor y probabilidades.
 4. Añadir zonas: polígono industrial, monte con cultivo exterior por estaciones y puerto con contrabando.
 5. Añadir profundidad al estilo Weed Firm: secado y curado, clientes fijos con encargos y, en el imperio, empleados y un segundo local.

@@ -644,8 +644,8 @@ const COL := ["#f8f8f0", "#e8c040", "#3a62c8", "#e04040", "#7a4aa8", "#f08a30", 
 const PANO := "#2f7a46"
 const PANO_O := "#286a3c"
 
-# la mesa y el taco de PixelLab (lo pidió el usuario: «Hazlo con sprites de PixelLab mejor»): arte/billar.png + billar.json de
-# tools/sprites/pixellab_billar.py (la mesa con 11 px de banda alrededor del tapete y el taco en NT ángulos con su punta)
+# la mesa y el taco del generador de sprites (lo pidió el usuario: «Hazlo con sprites del generador mejor»): arte/billar.png + billar.json de
+# tools/sprites/sprgen_billar.py (la mesa con 11 px de banda alrededor del tapete y el taco en NT ángulos con su punta)
 static var ARTE := {}
 static var PUNTA := {}
 static var NT := 0

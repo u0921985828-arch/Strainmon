@@ -1,6 +1,6 @@
 # python3 -I tools/sprites/a-mano/kaia_carpa.py  (Python 3 + Pillow)
 # Las carpas de la sala de cultivo de KAIA, hechas como las de casa (lo pidió el usuario: «así no son las carpas, como te he dicho
-# que las haga, de como están hechas en casa»): salen de la carpa de 150 del piso (carpa-g150-mapa, de PixelLab, ya procesada) como
+# que las haga, de como están hechas en casa»): salen de la carpa de 150 del piso (carpa-g150-mapa, del generador de sprites, ya procesada) como
 # carpas.py saca la de 80 y la de 120, repitiendo solo columnas y filas que ya están en el sprite (misma paleta, mismo contorno):
 # negras y cerradas, el techo a medio fondo con su lado de luz a la izquierda y el de sombra a la derecha, la barra plateada del
 # armazón y la puerta con su cremallera. A 16 px/m como en casa: el frente, su alto real (2 m, 32 filas; la de sala, 2,5 m) y el

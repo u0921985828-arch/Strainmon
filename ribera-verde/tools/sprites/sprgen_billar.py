@@ -1,5 +1,5 @@
-# La mesa y el taco de la bola 8 de PixelLab (lo pidió el usuario: «Hazlo con sprites de PixelLab mejor»).
-# Entrada: tools/sprites/pixellab-billar/crudo/mesa-0.png (168 × 92, la elegida de 4 de create_image_pro: la mesa desde arriba con
+# La mesa y el taco de la bola 8 del generador de sprites (lo pidió el usuario: «Hazlo con sprites del generador mejor»).
+# Entrada: tools/sprites/sprgen-billar/crudo/mesa-0.png (168 × 92, la elegida de 4 de create_image_pro: la mesa desde arriba con
 # bandas de nogal, cantoneras de latón, diamantes, cojines y seis troneras) y taco-4.png (64 × 16, el elegido de 16: el taco en
 # horizontal con la punta a la derecha).
 # La mesa se rehace a la medida del juego por trozos (billar8.gd: el tapete W × H = 168 × 84 y 11 px de banda y cojín alrededor):
@@ -11,7 +11,7 @@ import os, json, math
 from PIL import Image
 
 R = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
-C = os.path.join(R, 'tools', 'sprites', 'pixellab-billar', 'crudo')
+C = os.path.join(R, 'tools', 'sprites', 'sprgen-billar', 'crudo')
 W, H, B = 168, 84, 11          # el tapete y la banda (madera 7 + cojín 4)
 NT = 64                        # ángulos del taco
 

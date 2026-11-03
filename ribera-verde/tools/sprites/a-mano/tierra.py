@@ -1,5 +1,5 @@
 # Landrace Hunters — el atrezo de la tierra (lo pidió el usuario: «le daría más atrezo a los suelos de la tierra… me parece muy plano.
-# Lo haría más imperfecto»), dibujado a mano, sin PixelLab, con la paleta del mosaico de tierra (mo-dirt de detalle.py):
+# Lo haría más imperfecto»), dibujado a mano, sin el generador de sprites, con la paleta del mosaico de tierra (mo-dirt de detalle.py):
 #  · tierra-detalles (tira_tierra, 128 × 16): ocho detalles de 16 × 16 que el juego reparte por las casillas de tierra y de pista con
 #    el hash de la casilla (pinta.gd, _detalle_tierra; solo con Datos.CAL): la piedra con su sombra, las huellas de unas botas, el
 #    matojo seco, el charco de barro, la grieta, la ramita con dos hojas, las piedrecitas y el terrón.

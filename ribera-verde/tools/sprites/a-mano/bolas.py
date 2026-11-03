@@ -1,5 +1,5 @@
 # Las bolas de la bola 8, a mano (lo pidió el usuario: «Las bolas también tienen que tener sprites, cuando se mueven y demás»).
-# A 5 px de diámetro (billar8.gd: R = 2,5) PixelLab no da nada que se lea; aquí cada bola se pinta como una esfera de verdad:
+# A 5 px de diámetro (billar8.gd: R = 2,5) el generador de sprites no da nada que se lea; aquí cada bola se pinta como una esfera de verdad:
 # por cada píxel del contorno de 5 × 5 (la misma silueta de siempre: 3 + 5 + 5 + 5 + 3) se miran 4 × 4 puntos de la esfera, se
 # giran a la bola y se ve qué toca de su dibujo: lisa (el color con el círculo blanco del número en los dos polos), rayada (blanca
 # con la franja de color y el círculo encima), la negra y la blanca. La luz, de arriba a la izquierda, en tres tonos por material,

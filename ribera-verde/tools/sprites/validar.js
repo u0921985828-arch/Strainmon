@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
   Ribera Verde — valida art/manifest.json:
-    · que cada asset use una herramienta real del MCP de PixelLab con parámetros dentro de sus límites,
+    · que cada asset use una herramienta real del MCP del generador de sprites con parámetros dentro de sus límites,
     · que las plantillas de animación existan y los fotogramas sean válidos,
     · que las referencias y la paleta existan,
     · reglas de contenido (ningún menor fuma; cada fumador tiene su VFX de humo),
@@ -17,7 +17,7 @@ const M = JSON.parse(fs.readFileSync(argi > 0 ? process.argv[argi + 1] : path.jo
 const RETIRADOS = M.assets.filter(a => a.estado === 'retirado').map(a => a.id); M.assets = M.assets.filter(a => a.estado !== 'retirado');
 const INV = JSON.parse(fs.readFileSync(path.join(ROOT, 'art', 'inventario.json'), 'utf8'));
 
-// Límites de las herramientas del MCP oficial de PixelLab (comprobados contra https://api.pixellab.ai/mcp, oct. 2026)
+// Límites de las herramientas del MCP oficial del generador de sprites (comprobados contra https://<api-del-generador>/mcp, oct. 2026)
 const TEMPLATES = ['backflip', 'breathing-idle', 'cross-punch', 'crouched-walking', 'crouching', 'drinking', 'falling-back-death', 'fight-stance-idle-8-frames',
   'fireball', 'flying-kick', 'front-flip', 'getting-up', 'high-kick', 'hurricane-kick', 'jumping-1', 'jumping-2', 'lead-jab', 'leg-sweep', 'picking-up',
   'pull-heavy-object', 'pushing', 'roundhouse-kick', 'running-4-frames', 'running-6-frames', 'running-8-frames', 'running-jump', 'running-slide', 'sad-walk',

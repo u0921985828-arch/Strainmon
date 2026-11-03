@@ -1,6 +1,6 @@
 {
  "version": 1,
- "descripcion": "Biblia de assets de Ribera Verde para generar sprites con PixelLab sin perder el estilo acordado. La lee Claude Code (comando /sprites) y la comprueba tools/sprites/validar.js.",
+ "descripcion": "Biblia de assets de Ribera Verde para generar sprites con el generador sin perder el estilo acordado. La lee el asistente de código (comando /sprites) y la comprueba tools/sprites/validar.js.",
  "estilo": {
   "pantalla": [
    240,
@@ -881,7 +881,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_acc_llave_0": {
    "w": 73,
@@ -891,7 +891,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_acc_llave_1": {
    "w": 71,
@@ -901,7 +901,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_acc_llave_v0": {
    "w": 27,
@@ -911,7 +911,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_acc_llave_v1": {
    "w": 28,
@@ -921,7 +921,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_acc_dedo": {
    "w": 54,
@@ -931,7 +931,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_spray": {
    "w": 46,
@@ -941,7 +941,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_abono": {
    "w": 46,
@@ -951,7 +951,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_tij_a": {
    "w": 57,
@@ -961,7 +961,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_tij_c": {
    "w": 57,
@@ -971,7 +971,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_semilla": {
    "w": 52,
@@ -981,7 +981,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_vacia": {
    "w": 48,
@@ -991,7 +991,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_porro": {
    "w": 54,
@@ -1001,7 +1001,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_pipa": {
    "w": 51,
@@ -1011,7 +1011,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_vapo": {
    "w": 48,
@@ -1021,7 +1021,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_billete": {
    "w": 60,
@@ -1031,7 +1031,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_bolsita": {
    "w": 49,
@@ -1041,7 +1041,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_pincel": {
    "w": 63,
@@ -1051,7 +1051,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_billete_i": {
    "w": 60,
@@ -1061,7 +1061,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_bolsita_i": {
    "w": 49,
@@ -1071,7 +1071,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_mech1_ab": {
    "w": 46,
@@ -1081,7 +1081,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_mech0_ab": {
    "w": 46,
@@ -1091,7 +1091,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_gm_regar": {
    "w": 52,
@@ -1101,7 +1101,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py)"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py)"
   },
   "pl_acc_llave_portal_0": {
    "w": 73,
@@ -1111,7 +1111,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_portal_1": {
    "w": 71,
@@ -1121,7 +1121,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_local_0": {
    "w": 73,
@@ -1131,7 +1131,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_local_1": {
    "w": 71,
@@ -1141,7 +1141,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_club_0": {
    "w": 73,
@@ -1151,7 +1151,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_club_1": {
    "w": 71,
@@ -1161,7 +1161,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_franco_0": {
    "w": 73,
@@ -1171,7 +1171,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_franco_1": {
    "w": 71,
@@ -1181,7 +1181,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_nave_v0": {
    "w": 27,
@@ -1191,7 +1191,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_nave_v1": {
    "w": 28,
@@ -1201,7 +1201,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_setas_v0": {
    "w": 27,
@@ -1211,7 +1211,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "pl_acc_llave_setas_v1": {
    "w": 28,
@@ -1221,7 +1221,7 @@
     0
    ],
    "ajuste": "exacto",
-   "nota": "gestos con mano de PixelLab (pixellab_gestos.py): cada cerradura, su llave"
+   "nota": "gestos con mano del generador de sprites (sprgen_gestos.py): cada cerradura, su llave"
   },
   "acc_fondo": {
    "w": 104,
@@ -1729,13 +1729,13 @@
      "frames": 1,
      "accion": "back view, sitting and typing on a keyboard on a desk in front: elbows bent and slightly out at waist height, forearms forward (on screen, up and inward), hands in front of the chest; references: base north frame + arm pose; palette of the base",
      "origen": "create_image_pro 40bfd74b, candidato 6",
-     "nota": "sentado al ordenador de la tía o al gaming (_pj_sentado, mesa); colores al base con tools/sprites/pixellab_teclea.py para que ROPA los cambie"
+     "nota": "sentado al ordenador de la tía o al gaming (_pj_sentado, mesa); colores al base con tools/sprites/sprgen_teclea.py para que ROPA los cambie"
     }
    ],
    "estado": "aprobado",
    "notas": "Ancla de estilo, aprobada por la persona entre 5 versiones (la 4). create_image_pro 32×32 → v3 con referencia → idle y walk v3 a medida; 27-28 px, 13 colores. coste_real incluye las versiones descartadas.",
    "familia": "personaje",
-   "pixellab": {
+   "sprgen": {
     "character_id": "e2d276ce-8b08-49d8-89c8-b20f77cb1a8c",
     "create_image_pro_job": "60afdb75-af23-4158-9fdd-74c0161e5b53",
     "animation_group_id": {
@@ -1925,7 +1925,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 4)",
     "guarda": "art/crudo/_ref/kiko.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "09896cec-3f39-4b07-a3c5-56cfbeb6569a",
     "create_image_pro_job": "d4abfdb2-e983-4afa-a6c4-61452d59a9dc",
     "animation_group_id": {
@@ -2038,7 +2038,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/josune.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "a15a975a-f00b-4dad-aa42-79467b9333c3",
     "create_image_pro_job": "b6383b24-28b2-4aa1-90ec-d2625a88c7fa",
     "animation_group_id": {
@@ -2161,7 +2161,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/baltasar.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "f081b9df-3f4e-4261-8369-125c69d2064e",
     "create_image_pro_job": "677f73bf-9094-42bc-811f-99b58da0f149",
     "animation_group_id": {
@@ -2284,7 +2284,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/tono.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "79a43454-44d2-4d77-a023-7ae282d1f960",
     "create_image_pro_job": "664456f1-f8f3-41d1-a6f2-cd6d32b90234",
     "animation_group_id": {
@@ -2398,7 +2398,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/begona.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "2bf24501-bb19-4132-9014-001a7cd67681",
     "create_image_pro_job": "20357a7d-0c6d-4652-ba2f-73cfc9cf1139",
     "animation_group_id": {
@@ -2513,7 +2513,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 17)",
     "guarda": "art/crudo/_ref/unai.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "7dbfe44a-b104-40d9-b2e7-0de9f8b1b39a",
     "create_image_pro_job": "96e3143a-2adb-4fa3-a8fb-6c5d5f053417",
     "animation_group_id": {
@@ -2616,7 +2616,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 16)",
     "guarda": "art/crudo/_ref/patxi.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "f8980934-993a-45fb-91f7-6fbd148f3b41",
     "create_image_pro_job": "aef3b11f-75bd-470c-ae2b-9a7f54dd2136",
     "animation_group_id": {
@@ -2713,7 +2713,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 4)",
     "guarda": "art/crudo/_ref/txaro.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "9fb775e3-5e14-4565-bd3f-d0702a8f6793",
     "create_image_pro_job": "1c8795d1-b758-4180-88b1-5951ba441a01",
     "animation_group_id": {
@@ -2834,7 +2834,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 20)",
     "guarda": "art/crudo/_ref/inaki.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "19d939ba-6847-4c02-89ee-81b3a17dfc26",
     "create_image_pro_job": "2323eedf-44fd-4458-89d0-2972aa6b7a71",
     "animation_group_id": {
@@ -2948,7 +2948,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/cop.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "2a3cc069-a412-4f9e-aa43-249b218ec67f",
     "create_image_pro_job": "819202a7-3498-4c6f-ae86-9aae0ca1e27b",
     "animation_group_id": {
@@ -3057,7 +3057,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/molina.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "dd962961-37e9-4e66-954c-c05b6d44fabc",
     "create_image_pro_job": "f6e0747b-8041-4351-83ee-0c710e14a825",
     "animation_group_id": {
@@ -3166,7 +3166,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 1)",
     "guarda": "art/crudo/_ref/darko.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "cb542372-a943-46ae-aae9-e2a26ba7f478",
     "create_image_pro_job": "39227d2e-2687-4f1a-9aef-9af676e51498",
     "animation_group_id": {
@@ -3264,7 +3264,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/jurado.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "d9285e6a-b9df-4ef7-85bd-13aece68fcb0",
     "create_image_pro_job": "faeff09a-4c1e-4b4e-81c5-3d2030e7b195",
     "animation_group_id": {
@@ -3382,7 +3382,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/cliente1.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "51ea77ef-2f48-4e4e-9d61-bb213a4da342",
     "create_image_pro_job": "fdaad482-da3c-4389-a512-934d56816813",
     "animation_group_id": {
@@ -3508,7 +3508,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/cliente2.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "9eb85a5c-690f-45d6-b956-b1412f1b5e49",
     "create_image_pro_job": "b2980113-35c6-4ea7-bf1f-326df37d2e2a",
     "animation_group_id": {
@@ -3624,7 +3624,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 2)",
     "guarda": "art/crudo/_ref/cliente3.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "5d07b967-fd14-4a34-bb43-5cfc6f34669f",
     "create_image_pro_job": "b1c99cdc-233a-4b3f-ba6a-568b87387b13",
     "animation_group_id": {
@@ -3739,7 +3739,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 16)",
     "guarda": "art/crudo/_ref/cliente4.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "880e9641-a0be-47e1-8947-475c71025930",
     "create_image_pro_job": "2e47f334-d8c5-4592-8763-969fcb1e6030",
     "animation_group_id": {
@@ -3863,7 +3863,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 0)",
     "guarda": "art/crudo/_ref/cliente5.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "5d7cfe60-706c-4d32-b781-1d36fb51facc",
     "create_image_pro_job": "75ddba10-065a-4cd3-8851-27f07afb3b61",
     "animation_group_id": {
@@ -4137,7 +4137,7 @@
     "elegir": "1 de los 64 candidatos (se eligió el 4)",
     "guarda": "art/crudo/_ref/cliente6.png"
    },
-   "pixellab": {
+   "sprgen": {
     "character_id": "3c65edf2-8782-404f-95e2-af46de2b2ef9",
     "create_image_pro_job": "5493b34e-0e17-4625-8be3-9a0ba1626b43",
     "animation_group_id": {
@@ -4293,7 +4293,7 @@
    "depende_de": [
     "player"
    ],
-   "pixellab": {
+   "sprgen": {
     "create_image_pro_job": "36b0d7f3-60e5-4fc5-af80-ee74b122484c",
     "character_id": "624ec064-aec5-449a-82b6-e3b534641acf",
     "animation_group_id": {
@@ -4315,7 +4315,7 @@
    "fase": "F6",
    "herramienta": "importado",
    "cubre": [],
-   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 8167d2cd-ff4b-49ec-b242-d9778ecc74de), pasado a la paleta del grupo y encajado en la celda de combate",
+   "origen": "tools/sprites/sprgen_combate.py: personaje del generador de sprites a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 8167d2cd-ff4b-49ec-b242-d9778ecc74de), pasado a la paleta del grupo y encajado en la celda de combate",
    "descripcion": "el protagonista de espaldas, a unas 6 cabezas: gorra verde, pelo oscuro, camiseta roja, vaqueros y zapatillas blancas",
    "celda": "combate",
    "animaciones": [
@@ -4407,7 +4407,7 @@
    "familia": "personaje",
    "paleta": "propia",
    "notas": "MAESTRO [1]: la protagonista. create_image_pro 32×32 (estilo del player) → create_character v3 con la elegida → animaciones v3 con las mismas acciones que el player. Fotogramas al color más cercano de la paleta del player (ROPA.src igual).",
-   "pixellab": {
+   "sprgen": {
     "character_id": "e8767a87-c179-4f92-b9d5-691ddf514e96"
    },
    "animaciones": [
@@ -4565,7 +4565,7 @@
      "frames": 1,
      "accion": "back view, sitting and typing on a keyboard on a desk in front: elbows bent and slightly out at waist height, forearms forward (on screen, up and inward), hands in front of the chest; references: base north frame + arm pose; palette of the base",
      "origen": "create_image_pro fda2b854, candidato 22",
-     "nota": "sentado al ordenador de la tía o al gaming (_pj_sentado, mesa); colores al base con tools/sprites/pixellab_teclea.py para que ROPA los cambie"
+     "nota": "sentado al ordenador de la tía o al gaming (_pj_sentado, mesa); colores al base con tools/sprites/sprgen_teclea.py para que ROPA los cambie"
     }
    ]
   },
@@ -4591,7 +4591,7 @@
     "player-f"
    ],
    "notas": "Se usa la dirección north (de espaldas). create_image_pro 64×64 con la protagonista y el previo del player-combate (16 candidatos, el 0) → create_character v3 → animaciones v3 con las acciones del player-combate. Fotogramas al color más cercano de la paleta del player-combate.",
-   "pixellab": {
+   "sprgen": {
     "create_image_pro_job": "766d71cb-f268-48f6-827b-c96a3d462b2a",
     "character_id": "65812796-2c69-4fc2-812a-7ad9cdb97c34"
    },
@@ -4688,7 +4688,7 @@
    "fase": "F6",
    "herramienta": "importado",
    "cubre": [],
-   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 6565e276-37be-458c-8e34-d2412322cbc9), pasado a la paleta del grupo y encajado en la celda de combate",
+   "origen": "tools/sprites/sprgen_combate.py: personaje del generador de sprites a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 6565e276-37be-458c-8e34-d2412322cbc9), pasado a la paleta del grupo y encajado en la celda de combate",
    "descripcion": "la protagonista de espaldas, a unas 6 cabezas, con la misma ropa que el protagonista (la cambia ROPA)",
    "celda": "combate",
    "animaciones": [
@@ -4856,7 +4856,7 @@
    "entrada": {
     "reference_image_base64": "art/crudo/_ref/ladron1-combate.png"
    },
-   "pixellab": {
+   "sprgen": {
     "create_image_pro_job": "47ca304b-2bcb-46fc-ba0b-44e21036b517",
     "character_id": "e1746633-5958-4374-9bff-970065aac5d2",
     "animation_group_id": {
@@ -4875,7 +4875,7 @@
    "fase": "F6",
    "herramienta": "importado",
    "cubre": [],
-   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, fae879e5-84db-4de3-81d4-dd3a840a6f38), pasado a la paleta del grupo y encajado en la celda de combate",
+   "origen": "tools/sprites/sprgen_combate.py: personaje del generador de sprites a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, fae879e5-84db-4de3-81d4-dd3a840a6f38), pasado a la paleta del grupo y encajado en la celda de combate",
    "descripcion": "ladrón con pasamontañas y sudadera gris, puños arriba",
    "celda": "combate",
    "animaciones": [
@@ -4981,7 +4981,7 @@
    "fase": "F6",
    "herramienta": "importado",
    "cubre": [],
-   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 9cefe390-67e4-4a5d-ab34-1b0c1ef1c8f4), pasado a la paleta del grupo y encajado en la celda de combate",
+   "origen": "tools/sprites/sprgen_combate.py: personaje del generador de sprites a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 9cefe390-67e4-4a5d-ab34-1b0c1ef1c8f4), pasado a la paleta del grupo y encajado en la celda de combate",
    "descripcion": "Darko: sudadera negra con capucha, pañuelo rojo y puños arriba",
    "celda": "combate",
    "animaciones": [
@@ -5121,7 +5121,7 @@
    "entrada": {
     "reference_image_base64": "art/crudo/_ref/ladron2-combate.png"
    },
-   "pixellab": {
+   "sprgen": {
     "create_image_pro_job": "9e60ced0-552f-4250-87e8-be8be0cb5078",
     "character_id": "67412c16-24fd-4d36-91b7-1c60991e324a",
     "animation_group_id": {
@@ -5140,7 +5140,7 @@
    "fase": "F6",
    "herramienta": "importado",
    "cubre": [],
-   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, de27028f-fe07-4824-937f-bea9d16ec1c8), pasado a la paleta del grupo y encajado en la celda de combate",
+   "origen": "tools/sprites/sprgen_combate.py: personaje del generador de sprites a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, de27028f-fe07-4824-937f-bea9d16ec1c8), pasado a la paleta del grupo y encajado en la celda de combate",
    "descripcion": "ladrón con capucha morada, puños arriba",
    "celda": "combate",
    "animaciones": [
@@ -5281,7 +5281,7 @@
    "entrada": {
     "reference_image_base64": "art/crudo/_ref/ladron3-combate.png"
    },
-   "pixellab": {
+   "sprgen": {
     "create_image_pro_job": "f6be4391-7259-499c-a7a0-0798636733c2",
     "character_id": "5e5ddab0-5e2b-4536-ac21-1df1860ee8a0",
     "animation_group_id": {
@@ -5300,7 +5300,7 @@
    "fase": "F6",
    "herramienta": "importado",
    "cubre": [],
-   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 08d2157f-5d73-41d0-a061-11b46808a10e), pasado a la paleta del grupo y encajado en la celda de combate",
+   "origen": "tools/sprites/sprgen_combate.py: personaje del generador de sprites a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, 08d2157f-5d73-41d0-a061-11b46808a10e), pasado a la paleta del grupo y encajado en la celda de combate",
    "descripcion": "ladrón con capucha verde y pañuelo, puños arriba",
    "celda": "combate",
    "animaciones": [
@@ -5455,7 +5455,7 @@
     "cop"
    ],
    "notas": "Dos pasos para no perder la identidad: create_image_pro con el sprite aprobado como referencia (16 candidatos a 64 px, con detalle real, no un ×2) y create_character v3 con el elegido, que lo rota a 8 direcciones y queda animable.",
-   "pixellab": {
+   "sprgen": {
     "create_image_pro_job": "6bef7fc7-a98f-4b11-9d31-b7e04fd25c11",
     "character_id": "c17a4648-c4f0-4d9f-9187-87d6f1c85956",
     "animation_group_id": {
@@ -5475,7 +5475,7 @@
    "fase": "F6",
    "herramienta": "importado",
    "cubre": [],
-   "origen": "tools/sprites/pixellab_combate.py: personaje de PixelLab a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, f27100a4-407a-4ea9-9511-70ac26c6cd93), pasado a la paleta del grupo y encajado en la celda de combate",
+   "origen": "tools/sprites/sprgen_combate.py: personaje del generador de sprites a unas 6 cabezas (create_image_pro → create_character v3 → animate_character v3, f27100a4-407a-4ea9-9511-70ac26c6cd93), pasado a la paleta del grupo y encajado en la celda de combate",
    "descripcion": "agente de uniforme azul con gorra de plato y libreta",
    "celda": "combate",
    "animaciones": [
@@ -5559,7 +5559,7 @@
    "estado": "aprobado",
    "familia": "imagen",
    "notas": "img2img: init_image = el fondo actual (mantiene horizonte y plataformas donde el motor pone a los luchadores); init_image_strength 150 deja redibujar con detalle sin mover la composición. Sin color_image: el procesado ya bloquea la paleta. La entrada se mandó cuantizada a 32 colores en paleta (~1,5 KB de base64).",
-   "pixellab": {
+   "sprgen": {
     "image_job": "dc43b457-c210-40a9-8808-02a964676e7a"
    },
    "descartado": {
@@ -5597,7 +5597,7 @@
    "estado": "aprobado",
    "familia": "imagen",
    "notas": "img2img: init_image = el fondo actual (mantiene horizonte y plataformas donde el motor pone a los luchadores); init_image_strength 150 deja redibujar con detalle sin mover la composición. Sin color_image: el procesado ya bloquea la paleta. La entrada se mandó cuantizada a 32 colores en paleta (~1,5 KB de base64).",
-   "pixellab": {
+   "sprgen": {
     "image_job": "2cc3534d-ea3c-48a2-b56b-d1663fe96aaa"
    },
    "coste_real": 1
@@ -5734,7 +5734,7 @@
     "bridgeB": "2.ª llamada, tile 2",
     "bridgeT": "2.ª llamada, tile 3"
    },
-   "pixellab": {
+   "sprgen": {
     "tiles_pro_id": [
      "73bdb899-4473-4f8e-91fe-620704e58cc3",
      "dadbfb00-a983-4607-8499-f9caab8114dc"
@@ -5858,7 +5858,7 @@
     "iwB_home": "tile 1",
     "floor": "tile 2"
    },
-   "pixellab": {
+   "sprgen": {
     "tiles_pro_id": "d356aa99-1baa-46a9-9ef6-0e2ef82c9087",
     "building_kit_descartado": "a0faa398-f027-434b-8ac2-29f23410d8e0"
    },
@@ -5909,7 +5909,7 @@
     "iwB_shop": "tile 4",
     "floorS": "tile 5"
    },
-   "pixellab": {
+   "sprgen": {
     "tiles_pro_id": "d356aa99-1baa-46a9-9ef6-0e2ef82c9087",
     "building_kit_descartado": "93f72f1c-bad4-43d4-99d3-579622261ccc"
    },
@@ -5960,7 +5960,7 @@
     "iwB_bar": "tile 7",
     "floorB": "tile 8"
    },
-   "pixellab": {
+   "sprgen": {
     "tiles_pro_id": "d356aa99-1baa-46a9-9ef6-0e2ef82c9087",
     "building_kit_descartado": "9beb41ae-a174-4853-b9a4-af2308d6d0aa"
    },
@@ -5997,7 +5997,7 @@
     "mat": "tile 0",
     "tent": "tile 1"
    },
-   "pixellab": {
+   "sprgen": {
     "tiles_pro_id": "4133a7c9-404f-4222-82f6-e5cfcba146a3"
    },
    "coste_real": 20,
@@ -6029,7 +6029,7 @@
     "init_image_base64": "art/crudo/_ref/huella-carpa-interior.png"
    },
    "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: tiles cp* de 01-tiles.js (pared del fondo y lateral izquierda de mylar, rieles de las paredes quitadas) + tent",
-   "pixellab": {
+   "sprgen": {
     "image_job": "19f3dd91-49ce-4595-947b-c4a9f971274d"
    },
    "coste_real": 1,
@@ -6072,7 +6072,7 @@
     "init_image_base64": "art/crudo/_ref/huella-carpa-exterior.png"
    },
    "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: carpaFuera(8) de 14-render.js (techo, frente negro, puerta de cremallera, rejilla)",
-   "pixellab": {
+   "sprgen": {
     "image_job": "8d0ac16c-8ef4-4a80-b68c-d27f1237ac7f"
    },
    "coste_real": 1,
@@ -6115,7 +6115,7 @@
     "init_image_base64": "art/crudo/_ref/huella-carpa-interior.png"
    },
    "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: tiles cp* de 01-tiles.js (pared del fondo y lateral izquierda de mylar, rieles de las paredes quitadas) + tent",
-   "pixellab": {
+   "sprgen": {
     "image_job": "19f3dd91-49ce-4595-947b-c4a9f971274d"
    },
    "coste_real": 0,
@@ -6152,7 +6152,7 @@
     "init_image_base64": "art/crudo/_ref/huella-carpa-exterior.png"
    },
    "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: carpaFuera(8) de 14-render.js (techo, frente negro, puerta de cremallera, rejilla)",
-   "pixellab": {
+   "sprgen": {
     "image_job": "8d0ac16c-8ef4-4a80-b68c-d27f1237ac7f"
    },
    "coste_real": 0,
@@ -6189,7 +6189,7 @@
     "init_image_base64": "art/crudo/_ref/huella-carpa-interior.png"
    },
    "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: tiles cp* de 01-tiles.js (pared del fondo y lateral izquierda de mylar, rieles de las paredes quitadas) + tent",
-   "pixellab": {
+   "sprgen": {
     "image_job": "19f3dd91-49ce-4595-947b-c4a9f971274d"
    },
    "coste_real": 0,
@@ -6226,7 +6226,7 @@
     "init_image_base64": "art/crudo/_ref/huella-carpa-exterior.png"
    },
    "entrada_origen": "huella procedural de la carpa de 150×100 (8×5 casillas) sobre el suelo del piso: carpaFuera(8) de 14-render.js (techo, frente negro, puerta de cremallera, rejilla)",
-   "pixellab": {
+   "sprgen": {
     "image_job": "8d0ac16c-8ef4-4a80-b68c-d27f1237ac7f"
    },
    "coste_real": 0,
@@ -6310,7 +6310,7 @@
    "celda": "planta",
    "estado": "retirado",
    "familia": "objeto-lote",
-   "pixellab": {
+   "sprgen": {
     "object_id": "568d3740-1373-4231-b229-8528302537ca",
     "reduce_colors_job": "87a02346-2d31-4ba0-9457-0d8e8fbf1b81"
    },
@@ -6409,7 +6409,7 @@
    "celda": "foco",
    "estado": "aprobado",
    "familia": "objeto-lote",
-   "pixellab": {
+   "sprgen": {
     "object_id": "41a55937-8922-4ca5-bbe9-5e5ffb487801",
     "reduce_colors_job": "fd3e2577-ba7c-49e8-9380-55e19d0ea3dc"
    },
@@ -6473,7 +6473,7 @@
    "celda": "objeto_1x1",
    "estado": "retirado",
    "familia": "objeto-lote",
-   "pixellab": {
+   "sprgen": {
     "object_id": "1c7ff1cb-6f4b-4d98-8d3d-df7fba0f26dc",
     "reduce_colors_job": "1000ca5c-c2a6-40ad-b9fa-d5965b794c91"
    },
@@ -6544,7 +6544,7 @@
     "tiles-exterior"
    ],
    "entrada_origen": "calco: el edificio montado con los tiles procedurales (tools/sprites/calco.js), 112×96",
-   "pixellab": {
+   "sprgen": {
     "image_job": "e739c7ac-8df5-4657-ac86-be7b7b35313b"
    },
    "descartados": {
@@ -6628,7 +6628,7 @@
     "tiles-exterior"
    ],
    "entrada_origen": "calco: el edificio montado con los tiles procedurales (tools/sprites/calco.js), 112×96",
-   "pixellab": {
+   "sprgen": {
     "image_job": "860b53b7-418e-405b-aa73-a8bcf9a706de"
    },
    "coste_real": 2
@@ -6691,7 +6691,7 @@
     "tiles-exterior"
    ],
    "entrada_origen": "calco: el edificio montado con los tiles procedurales (tools/sprites/calco.js), 112×96",
-   "pixellab": {
+   "sprgen": {
     "image_job": "f43b0083-61cf-48c6-bae1-93140a4373c5"
    },
    "coste_real": 2
@@ -6724,7 +6724,7 @@
    ],
    "descripcion": "two-storey old closed-down town house facade for a 16-bit handheld RPG town map, filling the whole image: grey slate tiled roof with tile rows and a dark eave across the full width, faded pink-beige plaster walls, windows with closed grey wooden shutters, no door, a small crack and a drainpipe, detailed crisp pixel art, clean dark outline, light from the top-left",
    "celda": "edificio_6x6",
-   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Sin puerta: PixelLab pintó una; se sustituyó por la ventana de la izquierda clonada (bloque 40×32 de x10,y64 a x50,y64). create_map_object y create_image_pro devuelven casas estrechas: img2img de pixflux con init_image_strength 30 sobre la huella redibuja con detalle a todo lo ancho y deja la puerta en su columna.",
+   "notas": "Se dibuja como un solo objeto encima de las casillas del edificio; las colisiones siguen siendo las del mapa. La puerta tiene que caer en la columna de la puerta del mapa. Sin puerta: el generador de sprites pintó una; se sustituyó por la ventana de la izquierda clonada (bloque 40×32 de x10,y64 a x50,y64). create_map_object y create_image_pro devuelven casas estrechas: img2img de pixflux con init_image_strength 30 sobre la huella redibuja con detalle a todo lo ancho y deja la puerta en su columna.",
    "estado": "aprobado",
    "familia": "mapa-objeto",
    "entrada": {
@@ -6734,7 +6734,7 @@
     "tiles-exterior"
    ],
    "entrada_origen": "calco: el edificio montado con los tiles procedurales (tools/sprites/calco.js), 96×96",
-   "pixellab": {
+   "sprgen": {
     "image_job": "c1b3849c-9e8f-4266-9a54-1b6566c921eb"
    },
    "coste_real": 1
@@ -7283,7 +7283,7 @@
      "object_id": "c626989e-a788-4f92-8c50-556f0e029407"
     }
    },
-   "pixellab": {
+   "sprgen": {
     "object_id": "9b59e169-9bd8-4def-a225-b7b080fdef22"
    },
    "coste_real": 21
@@ -7351,11 +7351,11 @@
     "background_image": "art/referencias/mapa/tree.png",
     "inpainting.mask_image": "art/referencias/mapa/tree_mascara.png"
    },
-   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta). 1.10: obj:tree pasa a prop-arbol-alto (5,8 m; este medía 1,5 m).",
+   "notas": " Con background_image (recorte del mapa) y máscara: el generador de sprites lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta). 1.10: obj:tree pasa a prop-arbol-alto (5,8 m; este medía 1,5 m).",
    "depende_de": [
     "tiles-exterior"
    ],
-   "pixellab": {
+   "sprgen": {
     "map_object_id": "15df7a0c-ef08-436b-a971-4e9652703f71"
    },
    "coste_real": 1
@@ -7453,11 +7453,11 @@
     "background_image": "art/referencias/mapa/lamp.png",
     "inpainting.mask_image": "art/referencias/mapa/lamp_mascara.png"
    },
-   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta).",
+   "notas": " Con background_image (recorte del mapa) y máscara: el generador de sprites lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta).",
    "depende_de": [
     "tiles-exterior"
    ],
-   "pixellab": {
+   "sprgen": {
     "map_object_id": "d2dccb60-6f91-443e-a722-a73560ec4097"
    },
    "coste_real": 1
@@ -7488,7 +7488,7 @@
     "background_image": "art/referencias/mapa/fountain.png",
     "inpainting.mask_image": "art/referencias/mapa/fountain_mascara.png"
    },
-   "notas": " Con background_image (recorte del mapa) y máscara: PixelLab lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta).",
+   "notas": " Con background_image (recorte del mapa) y máscara: el generador de sprites lo pinta encima del suelo real, con su luz y su paleta. Blanco de la máscara = lo que genera. Recorte y máscara en base64 (los PNG de art/referencias/mapa caben; si no, se cuantizan en paleta).",
    "depende_de": [
     "tiles-exterior"
    ],
@@ -7511,7 +7511,7 @@
      "notas": "La entrada viajó sin alfa (fondo negro): el negro pegado a los bordes se vuelve transparente al montar el crudo."
     }
    ],
-   "pixellab": {
+   "sprgen": {
     "map_object_id": "9dc1a027-cec4-46b3-92e8-d73ab59ea743"
    },
    "coste_real": 2
@@ -7669,7 +7669,7 @@
    },
    "entrada_origen": "carpaMapa() de 09b-carpa.js para p60, m100 y g150 a 16 px/m (10×31, 16×40, 24×40), en fila sobre transparente",
    "celda": "carpa_mapa",
-   "pixellab": {
+   "sprgen": {
     "image_job": "2620fb5b-7cd8-4dac-aec0-cb2e0cb85d14"
    },
    "montaje": "Lámina cortada por columnas vacías (scratchpad f11/cortar.py) en carpa-<t>-mapa.",
@@ -7704,7 +7704,7 @@
    },
    "entrada_origen": "carpaVista() de 09b-carpa.js a 64 px/m (42×104, 68×130, 100×130), PNG de 4 bits (16 colores) para que el base64 no se corte",
    "celda": "carpa_vista",
-   "pixellab": {
+   "sprgen": {
     "image_job": "1d59d0ce-9c48-485b-90d4-26231f375dd0"
    },
    "montaje": "Lámina cortada por columnas vacías (scratchpad f11/cortar.py) en carpa-<t>-vista.",
@@ -7726,7 +7726,7 @@
    "celda": "carpa_mapa",
    "origen": "tools/sprites/a-mano/carpas.py: el armario de 60 y la carpa de 100 aprobados de carpas-mapa, alargados por dentro (solo se repiten columnas y filas suyas: misma paleta y contorno) hasta 13 × 35 y 19 × 40 (16 px/m, como carpaMapa)",
    "descripcion": "armario de 80 y carpa de 120 cerrados en el piso",
-   "notas": "1.10: el armario de 80 (ampliación de A) y la carpa de 120 (C, junto a la cama) se pintaban procedurales con el atlas puesto. Hechos sin PixelLab; a la espera de que se aprueben."
+   "notas": "1.10: el armario de 80 (ampliación de A) y la carpa de 120 (C, junto a la cama) se pintaban procedurales con el atlas puesto. Hechos sin el generador de sprites; a la espera de que se aprueben."
   },
   {
    "tipo": "objeto",
@@ -7743,7 +7743,7 @@
    "celda": "carpa_vista",
    "origen": "tools/sprites/a-mano/carpas.py: el armario de 60 y la carpa de 100 aprobados de carpas-vista con un tramo del mylar repetido (13 columnas y 14 filas el de 80; 12 columnas la de 120), el que mejor casa consigo mismo",
    "descripcion": "armario de 80 y carpa de 120 abiertos de frente (vista de carpa)",
-   "notas": "1.10: completan carpas-vista; la vista B las pinta de frente (VB_PLATA). Hechos sin PixelLab; aprobados.",
+   "notas": "1.10: completan carpas-vista; la vista B las pinta de frente (VB_PLATA). Hechos sin el generador de sprites; aprobados.",
    "aprobado": "1.10: el armario de 80 y la carpa de 120, plateados con el armazón negro, aprobados por la persona (captura de la vista B de las 5 carpas)"
   },
   {
@@ -7776,7 +7776,7 @@
    },
    "entrada_origen": "macetaVista() de 09b-carpa.js a 64 px/m (7 L 14×12, 11 L 16×14, 18 L 19×16, 25 L 22×17)",
    "celda": "maceta_vista",
-   "pixellab": {
+   "sprgen": {
     "image_job": "fe509231-c912-4a5a-8cde-0f934b6e77d3"
    },
    "montaje": "Lámina cortada por columnas vacías (scratchpad f11/cortar.py).",
@@ -7808,7 +7808,7 @@
    },
    "entrada_origen": "fondoCuarto() de 09b-carpa.js (240×160 = 3,75 × 2,5 m a 64 px/m), PNG de 4 bits",
    "celda": "pantalla",
-   "pixellab": {
+   "sprgen": {
     "image_job": "7c49c363-2e37-4865-be80-cad50c2af94b"
    },
    "notas": "Fondo de la vista de carpa; en pantallas anchas se estira por fondoAncho como los fondos de combate."
@@ -8305,7 +8305,7 @@
    "estado": "aprobado",
    "familia": "imagen",
    "notas": "img2img sobre la pantalla de título actual: conserva el skyline, el río y el hueco central del logo. Sin color_image: el procesado ya bloquea la paleta. La entrada se mandó cuantizada a 32 colores en paleta (~1,5 KB de base64). El motor lo dibuja en la pantalla de título si está en el atlas (arteTitulo); sin atlas, el procedural.",
-   "pixellab": {
+   "sprgen": {
     "image_job": "eed483f2-665a-4a16-9b8f-2c3eb929d421"
    },
    "coste_real": 1
@@ -8356,7 +8356,7 @@
     "entrada": {
      "image_url": "art/crudo/_ref/imagen-a.png"
     },
-    "entrada_origen": "la imagen A tal cual (https://api.pixellab.ai/mcp/images/ce445b95-382f-4fab-9be1-6406775eb1a8/download)",
+    "entrada_origen": "la imagen A tal cual (https://<api-del-generador>/mcp/images/ce445b95-382f-4fab-9be1-6406775eb1a8/download)",
     "llamadas": [
      {
       "que": "imagen A sin plantas ni macetas; el foco y su luz se quedan",
@@ -8598,7 +8598,7 @@
     "planta-c-h1-18": "exacto",
     "planta-c-h0-8": "exacto"
    },
-   "origen": "dibujada a mano, sin PixelLab: sellos ASCII (tools/sprites/a-mano/piezas.txt) montados por nudos (planta.py); python3 -I tools/sprites/a-mano/exporta.py art/crudo/carpa-c-plantas-h escribe las 4 fases, floración y lista y vegetativo a cada alto",
+   "origen": "dibujada a mano, sin el generador de sprites: sellos ASCII (tools/sprites/a-mano/piezas.txt) montados por nudos (planta.py); python3 -I tools/sprites/a-mano/exporta.py art/crudo/carpa-c-plantas-h escribe las 4 fases, floración y lista y vegetativo a cada alto",
    "descripcion": "Híbrida (Skunk #1) dibujada a mano por nudos: abajo hojas de abanico grandes, en medio ramas con colitas a los dos lados, arriba cogollos pegados al tallo y la cola; pistilos naranjas en pelos de 2 px y borde oscuro abajo y a la derecha de los cogollos. Germinando, plántula (cotiledones, hojas de 1, 3 y 5-7 foliolos), vegetativo sin cogollos, y floración y lista.",
    "rampas_clave": {
     "cogollo": {
@@ -8684,7 +8684,7 @@
     "planta-c-h1-18": "exacto",
     "planta-c-h0-8": "exacto"
    },
-   "origen": "dibujada a mano, sin PixelLab: planta_a.py (corona, nudos y hojas), prim.py (hoja de abanico rasterizada), cola2.py (colas en racimos) y, para germinando y plántula, los sellos de planta.py; python3 -I tools/sprites/a-mano/exporta.py art/crudo/carpa-c-plantas-a",
+   "origen": "dibujada a mano, sin el generador de sprites: planta_a.py (corona, nudos y hojas), prim.py (hoja de abanico rasterizada), cola2.py (colas en racimos) y, para germinando y plántula, los sellos de planta.py; python3 -I tools/sprites/a-mano/exporta.py art/crudo/carpa-c-plantas-a",
    "descripcion": "Planta A, despuntada y en mainline: el tallo se abre abajo en una corona de 6 ramas en V. En floración y lista, cada rama pelada abajo (lollipop), con nudos de yemas en pares cruzados (a los lados con su hoja de abanico hacia fuera; el siguiente, girado 90°, delante y detrás), más pequeñas cuanto más abajo, y la cola en la punta; las 6 colas en zigzag (3 detrás más altas, 3 delante), con aire entre las puntas. Cogollos: racimos de cálices con pelos naranjas y tricomas; cada cogollito de la cola, ancho arriba y estrecho abajo (las puntas de los cálices hacia arriba y afuera), y las yemas de los nudos, dos cálices con una hoja de azúcar, anchas arriba y estrechas en el pie. En vegetativo, la misma corona sin cogollos: dos hojas de abanico grandes por rama (las de detrás en sombra) y un brote en cada punta. La genética da la forma: índica (ind ,9) hoja de 7 foliolos anchos, colas gordas y cortas, internudo corto; sativa (,1) 9 foliolos finos y largos, colas finas y largas (foxtail), internudo largo; híbrida (,5) en medio.",
    "rampas_clave": {
     "cogollo": {
@@ -8729,7 +8729,7 @@
     "foco-c-led200-24": "exacto",
     "foco-c-cfl-25": "exacto"
    },
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/equipo_c.py",
    "descripcion": "Focos de la vista C que faltaban: los LED de barras (1.10, como los de 720 W de 8 barras: delgadas, con aire entre ellas y unidas por el travesaño): LED 100 (3 barras) y LED 200 (4, con la fuente encima), de frente y algo desde abajo, colgados de sus cuerdas con trinquete y con la cara de diodos encendida (blanca, de espectro completo, con algún rosa); y el CFL de las carpas de 200 cm.",
    "notas": "1.10 P3. A su ancho real en cada carpa (FOCO_CM × Z): LED 100, 26 (armario 60) y 20 (80 y las de 200 cm, dentro del 25 %); LED 200, 30 y 24; LED 480, 47 (solo en las de 100 a 150, por vatios). Todos de barras (barras() en equipo_c.py): 3, 4, 6 y 8. Nombres con el modelo (foco-c-led100-NN): dos LED del mismo ancho no son el mismo foco. foco-c-cfl-25: la campana aprobada foco-c-cfl-36 sin 9 columnas ni 3 filas (repartidas, ni el contorno ni el tubo), sin colores nuevos; 25 px y no 27 para que el armario 80 (31) siga con la de 34. Paleta de la campana aprobada (metal #202e34 #304046 #3d4c4e #7a8584, contorno negro) y diodos #ffffff #f8d8ff (apagados, gris: vcApagado). Su luz (vcLuzLed): un haz por barra que se abre hasta las paredes de la carpa, con el suelo y los postes de carpa-c-luz-led, en el color del LED (LUZ_C).",
    "montaje": "tal cual (equipo_c.py), ya en la celda con la boca en la fila 15, centrada (ajuste exacto)",
@@ -8758,7 +8758,7 @@
     "foco-c-led720-75": "exacto",
     "foco-c-led720-36": "exacto"
    },
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/equipo_c.py",
    "descripcion": "LED 480 (6 barras: 47 px no caben en la celda de 48 sin tocar su borde) y LED 720 (8 barras) de la vista C, de barras como los de 720 W: barras delgadas de fondo a fondo con aire entre ellas; de frente, el travesaño, la fuente encima y la punta de cada barra con su cara de diodos encendida; el de 720 W también a 75 y a 36 px para las carpas de KAIA (dos a lo ancho de las de 2 m y cuatro de las de 4 m, un poco menos que su ancho para que se vean separados; tools/sprites/a-mano/kaia_vc.py los pega en el atlas de la vista C).",
    "notas": "1.10 P3. LED 480: 60 cm × 0,78 = 47 px. LED 720: 100 cm × 0,78 = 78 px (las de 120 y 150, las únicas con vatios para él). Misma paleta que carpa-c-focos-led.",
    "montaje": "tal cual (equipo_c.py), en la celda de 80 × 16 con la boca en la fila 15, centrada",
@@ -8789,7 +8789,7 @@
     "maceta-c-plastico18-26": "exacto",
     "maceta-c-plastico18-23": "exacto"
    },
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/equipo_c.py",
    "descripcion": "Macetas de la vista C que faltaban: tela de 11 L (gris) y de 25 L (beis), cilindros de lados rectos con el borde vuelto y cosido, asas a los lados, la trama de la tela y la tierra dentro; plástico de 18 L, la de 7 L aprobada más ancha y más alta.",
    "notas": "1.10 P3. A la escala de la de 7 L aprobada (22 × 27 px para 22 × 20 cm a Z 1,02): ancho = diámetro × Z y alto = alto × Z × 1,3. Tela 11 (Ø 25): 26 (armario 60) y 20 (80 y las de 200 cm); plástico 18 (Ø 30): 26 (80) y 23 (200 cm); tela 25 (Ø 35): 27 (200 cm). Cada carpa admite las de su tope por maceta (CARPAS[t].lmax). El motor elige por ancho (maceta-c-<tipo>-NN; la de 7 L sigue siendo maceta-c-NN).",
    "montaje": "tela: dibujada en código (equipo_c.py); plástico 18: maceta-c-22 aprobada con columnas y filas del cuerpo repetidas, sin colores nuevos. Base centrada en (16, 31) (ajuste exacto)",
@@ -8828,7 +8828,7 @@
     "extra-c-llave": "exacto",
     "extra-c-deposito": "exacto"
    },
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_c.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/equipo_c.py",
    "descripcion": "Extras de la vista C: ventilador de pinza (cabeza de frente con rejilla y 3 aspas, 4 fotogramas girando), filtro de carbón de chapa perforada colgado de 2 cintas con el extractor en línea y el tubo flexible al techo (2 largos), garrafa de riego translúcida con asa y tapón con gotero (4 altos), llave del microtubo del goteo y el depósito del goteo en pequeño con su mirilla.",
    "notas": "1.10 P3. Ventilador (Ø 15 cm): en el poste del fondo derecho, a 60 cm del suelo, girando más deprisa que la planta se mueve; filtro de 100 mm (Ø 17 × 30 cm: 28 px, armario 60 y 80) y de 150 (Ø 20 × 50: 39 px, las de 200 cm), colgado arriba a la izquierda, el extractor tiembla 1 px; garrafas de 5, 7, 12 y 16 L a su alto real × Z (de 20 a 29 px), detrás a la derecha de su maceta, con el agua (#9ab8cc) hasta su nivel pintada por el motor en los píxeles «dentro» (#e6eef2); goteo: la manguera entra por la pared derecha y corre por el suelo detrás de cada fila, cada maceta con su microtubo y su llave; el depósito, fuera de la carpa, en pequeño arriba a la derecha con el nivel en la mirilla (#16263a vacía, #8ec8f0 el agua).",
    "montaje": "tal cual (equipo_c.py), base centrada en (24, 47) (ajuste exacto)",
@@ -8846,7 +8846,7 @@
    "coste_real": 0,
    "cubre": [],
    "celda": "icono",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_p5.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/equipo_p5.py",
    "descripcion": "Lámina 12: iconos de 16 px del equipo nuevo: armario y carpa cerrados (tela negra, techo plateado y la puerta de cremallera), LED de barras visto desde abajo (4 barras encendidas con aire entre ellas, los travesaños y la fuente), ventilador de pinza, filtro de carbón con su extractor, garrafa de riego con el agua y riego por goteo (depósito con mirilla, bomba y goteros).",
    "notas": "1.10 P5. icono(nombre) los busca en «iconos» y, si no, aquí. Tienda, mochila, lista de plantas y menús de foco: armario (armarios de 60 y 80), carpa (100, 120 y 150), led (los 4 LED), ventilador, filtro, garrafa y goteo. Contorno #2a2a34 como los aprobados.",
    "montaje": "tal cual (equipo_p5.py), 16 × 16 (ajuste exacto)",
@@ -8871,7 +8871,7 @@
     "fridge": "exacto",
     "crate": "exacto"
    },
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/equipo_p5.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/equipo_p5.py",
    "descripcion": "Lámina 13: la nevera de 60 × 180 cm (frente de 10 × 29 px, tapa de 5, congelador abajo) y las cajas de madera de 40 cm (dos abajo y una encima, 7 × 7 de frente y 3 de tapa) a 16 px/m.",
    "notas": "1.10 P5. Sustituyen a fridge (props-32) y crate (props-16), que eran de una casilla entera: la nevera medía 16 × 30 y la caja 14 × 13. Como las carpas del piso: frente a su tamaño real y tapa a medio fondo. Dentro de la lista de profundidad (más altas que 16): tapan al jugador si pasa por detrás.",
    "montaje": "tal cual (equipo_p5.py), base en (16, 47) (ajuste exacto)",
@@ -8910,7 +8910,7 @@
     "silla": "exacto",
     "sillaG": "exacto"
    },
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/salon.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/salon.py",
    "descripcion": "Lámina 14: los muebles del salón, que se compran por internet, a 16 px/m: sofá de 2 plazas (180 cm) visto por detrás, tele de 43\" sobre un mueble bajo de 140 cm con la consola y mesa gaming de 140 cm con monitor de 27\", teclado, torre con ventiladores y tira de LED; y (1.11) el carro de esquejes de 100 cm con dos bandejas de propagación tapadas bajo tubos T5 y la mesita de 80 cm con la tabla de corte, el bisturí y la hormona. Y (1.16, personalizar la casa) el sofá en tres tapizados (azul, verde oliva y granate: sofa, sofa-1, sofa-2) y el sillón orejero de 80 cm visto por detrás con la lámpara de pie de 160 cm encendida, en mostaza, gris y verde botella (sillon, sillon-1, sillon-2). Y (1.27.1) las sillas de delante de los ordenadores, vistas por detrás: la de madera de la tía (silla), con su travesaño curvo, un listón y el asiento entre las patas, y la gaming que viene con el PC gaming (sillaG, centrada en sus 2 casillas), con orejas, reposacabezas, dos franjas magenta, los brazos, el pistón y la base de cinco radios.",
    "notas": "1.10 salón. Cada mueble ocupa 2 casillas (k en x y k + '2' en x + 1, que no se pinta). Como la nevera: frente a su tamaño real y tapa a medio fondo; dentro de la lista de profundidad.",
    "montaje": "tal cual (salon.py), base en (16, 47) (ajuste exacto)"
@@ -8939,7 +8939,7 @@
     "cartel-2": "exacto",
     "cartel-3": "exacto"
    },
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/salon.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/salon.py",
    "descripcion": "1.16, personalizar la casa: el cuadro del salón, colgado en la pared (ALZA), con marco de madera y una de tres láminas: la ría (cuadro), el caserío (cuadro-1) y la hoja (cuadro-2). 1.27: el póster enmarcado del dormitorio (cartel, cartel-1/-2/-3): el faro, la ola, la planta en flor y el mapa de la costa, con marco de aluminio.",
    "montaje": "tal cual (salon.py), 16 × 16 (ajuste exacto)"
   },
@@ -9013,7 +9013,7 @@
     "tile:iwT_home-3"
    ],
    "celda": "tile",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/casa.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/casa.py",
    "descripcion": "1.27, reformas del piso (REFORMA, 12c-salon): tarima de nogal, vinílico gris y baldosa hidráulica (floor-1/-2/-3); pintura verde salvia, azul grisáceo y ladrillo visto (iwT_home-1/-2/-3, iwB_home-1/-2/-3); y la alfombra del salón de 180 × 140 cm (alf<v><a-d>[-<suelo>]: bereber, persa y lisa sobre cada suelo).",
    "montaje": "tal cual (casa.py), 16 × 16"
   },
@@ -9127,7 +9127,7 @@
      "notas": "1.43: el deportivo del concesionario por la calle, de juguete (vehiculos.py, coche())"
     }
    ],
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/vehiculos.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/vehiculos.py",
    "descripcion": "Tanda 3 (1.13): el patinete (tabla de aluminio con lija, ruedas de 200 mm, barra y manillar) y la bici urbana de segunda mano (cuadro mostaza, ruedas de radios, sillín, manillar y pedal), a la escala del protagonista, en dos capas: lo que queda detrás de él y lo que le tapa. Y (1.43) la moto de 125 cc del concesionario: scooter negro con el escudo azul, en las mismas dos capas.",
    "notas": "1.13. dibujarPJ pinta <v>-atras, el protagonista subido VEHICULOS[v].sube px y <v>-delante, en la celda del personaje (pies en (16, 30)). Sur, este y norte; oeste en espejo.",
    "montaje": "tal cual (vehiculos.py), 32 × 32 (ajuste exacto)",
@@ -9159,7 +9159,7 @@
    "id": "iconos-menu",
    "cubre": [],
    "celda": "icono",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/salon.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/salon.py",
    "descripcion": "Iconos de 16 px del menú START que faltaban: el móvil con la pantalla encendida, la libreta (guardar) el altavoz (sonido) y la puerta con la flecha (salir).",
    "notas": "1.10. icono(nombre) los busca en «iconos», «iconos-equipo» y aquí. Contorno #2a2a34 como los aprobados.",
    "montaje": "tal cual (salon.py), 16 × 16 (ajuste exacto)"
@@ -9214,7 +9214,7 @@
     "misc:tierra"
    ],
    "celda": "tira_tierra",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/tierra.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/tierra.py",
    "descripcion": "atrezo de la tierra y la pista: piedra, huellas, matojo seco, charco de barro, grieta, ramita, piedrecitas y terrón, por el hash de la casilla; solo con Datos.CAL",
    "notas": "lo pidió el usuario: «le daría más atrezo a los suelos de la tierra… me parece muy plano. Lo haría más imperfecto»."
   },
@@ -9482,7 +9482,7 @@
     "tile:door_marinera2"
    ],
    "celda": "edificio_4x6",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.30: el club de Puerto Viejo (Itsaso) en la casa marinera azul, con la placa de latón «CLUB» sobre la puerta, la hoja en el cristal esmerilado y el farol",
    "puerta": {
     "x": 1,
@@ -9517,7 +9517,7 @@
     "tile:door_fabrica"
    ],
    "celda": "edificio_8x6",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.30: el club de Valdehierro en la fundición vieja: una puerta peatonal con ventanuco cortada en el portón de chapa y la placa «CLUB» con su aplique",
    "puerta": {
     "x": 3,
@@ -9552,7 +9552,7 @@
     "tile:door_casco"
    ],
    "celda": "edificio_4x6",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.30: el club del Casco Viejo de Ibarbide (Kalea): la lonja con el cristal esmerilado y la hoja, el portal de madera en la casilla 3 y la placa de latón en la piedra",
    "puerta": {
     "x": 3
@@ -9586,7 +9586,7 @@
     "tile:door_casco3"
    ],
    "celda": "edificio_5x7",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.32: la Asociación Cannábica Ribera Verde, en el barrio alto: la casa alta de almagre del Casco Viejo con la lonja tapiada, la ventana de cuarterones esmerilada con la hoja, la placa de latón «ASOCIACIÓN» y el portal verde en la casilla 4",
    "puerta": {
     "x": 4
@@ -9617,7 +9617,7 @@
    "id": "edificio-conce",
    "cubre": [],
    "celda": "edificio_8x6",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/concesionario.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/concesionario.py",
    "puerta": {
     "x": 3
    },
@@ -9649,7 +9649,7 @@
    "id": "edificio-garaje",
    "cubre": [],
    "celda": "edificio_2x3",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/garaje.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/garaje.py",
    "max_colores": 16,
    "descripcion": "El garaje de la tía, pegado a la derecha del piso (2 × 3 casillas): tejado y pared del piso y puerta seccional gris.",
    "notas": "MAESTRO [3], pedido por el usuario: «dibujado en el mapa junto al piso». Sale en Ribera Verde con Datos.CAL (montar_garaje, calle.gd).",
@@ -9666,7 +9666,7 @@
    "id": "edificio-aparcamiento",
    "cubre": [],
    "celda": "edificio_3x4",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/aparcamiento.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/aparcamiento.py",
    "max_colores": 16,
    "descripcion": "El aparcamiento de cada pueblo, junto a la parada (3 × 4 casillas, en el suelo): asfalto con bordillo, cuatro plazas de 2 × 1 con sus rayas y topes y el pasillo con la P azul pintada.",
    "notas": "MAESTRO [3], pedido por el usuario: «se queda estacionado en un aparcamiento». Sale en Puerto Viejo, Valdehierro, Mendialde, Errotabarri e Ibarbide con Datos.CAL (montar_aparcamiento, calle.gd).",
@@ -9686,7 +9686,7 @@
     "tile:door_casco3"
    ],
    "celda": "edificio_5x7",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.34: el bajo de las setas de Txomin, en la Kale Zaharra: la casa alta de almagre del Casco Viejo con la puerta de chapa gris en la casilla 2, la rejilla de ventilación encima y el cerrojo",
    "puerta": {
     "x": 2
@@ -9720,7 +9720,7 @@
     "tile:door_bloque2"
    ],
    "celda": "edificio_8x7",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.30: el club del Ensanche, en el bajo izquierdo del bloque gris: toldo verde con «CLUB», escaparate esmerilado con la hoja, puerta de cristal en la casilla 2 y el portero automático",
    "puerta": {
     "x": 2
@@ -9754,7 +9754,7 @@
     "tile:door_bloque"
    ],
    "celda": "edificio_8x7",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.30: la discoteca GAUA, en el bajo izquierdo del bloque crema: fachada negra, el neón rosa «GAUA» con la luna y la estrella azules, el marco de luz y la puerta doble acolchada",
    "puerta": {
     "x": 1,
@@ -9817,7 +9817,7 @@
     "tile:iwB_conce"
    ],
    "celda": "tile",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.30, los locales por dentro: el club (parqué de tablero de cuadros de 8 × 8, papel verde botella con la moldura y zócalo de cuarterones), la nave de cultivo (hormigón pulido en losas de 1 m y chapa grecada con la viga y el murete) y la discoteca (baldosa negra con brillo y paneles acolchados con la tira de LED rosa arriba y la azul abajo); 1.34: un suelo y una pared por club (floorC_/iwT_club_/iwB_club_<estilo>: kalea, baldosa hidráulica y piedra vista con la viga; itsaso, tarima de cubierta y machihembrado blanco con el zócalo marino; fundicion, chapa lagrimada y ladrillo visto con la viga de hierro; ensanche, espiga de roble claro y liso blanco con la franja verde), el bajo de las setas (hormigón húmedo, pared encalada con verdín y el zócalo de azulejo) y GROW IBARBIDE (baldosa gris, ladrillo blanco con la canaleta y el zócalo verde) 1.43: el concesionario (floorK, el porcelánico pulido; iwT_conce/iwB_conce, el falso techo con los downlights y la pared gris con la franja azul).",
    "estilo_ref": "las paredes y suelos de serie (interior-home, interior-bar)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca». 1.34, pedido por el usuario: «los decorados y distribución del local en casa asociación sea diferente, como también en cada grow» y «Aquí falta un espacio por crear no? Con sus sprites necesarios»."
@@ -9835,7 +9835,7 @@
     "tile:baile"
    ],
    "celda": "tile_tira",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.30: la pista de baile de GAUA, 2 × 2 paneles de colores por casilla en 4 variantes (tira de 64 × 16; el juego coge una por casilla con hashT)",
    "estilo_ref": "los firmes en tira (tiles-firmes)",
    "notas": "1.30, pedido por el usuario: «Espacios nuevos como la nave o los clubes asociaciones, deben ser habitaciones a las que entras como si fuese una casa… también que haya alguna discoteca»."
@@ -9888,7 +9888,7 @@
     "obj:catalogoK"
    ],
    "celda": "objeto_1x1",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.30: la vitrina del dispensario (mueble de madera con la urna y dos tarros), la balda de tarros, la pizarra de la variedad del día, las normas del club, el taquero con el triángulo, la mesa baja con cenicero, grinder y librillo, la barra acolchada de GAUA con su tira azul, el neón de la luna, la mesa del reservado con la cubitera y dos copas y el cordón de terciopelo (poste y cuerda; cordonF, el último poste); 1.33, el equipo de la nave: los focos de las mesas, aparte (focoN-<led|sodio|lec>-<0|1>, el LED de barras, la campana de sodio y los dos reflectores de cerámica (CMH), apagados y encendidos, con las asas en la fila 9 para las poleas), el extractor en línea de 250 mm (extrN) y el de 315 (extrG) con su tubo, el filtro de carbón colgado (filtroN) y el controlador de riego (ctrlN); 1.34: la mesita y la vitrina de cada club (mesita-<estilo>: la de nogal redonda con la vela, un baúl de marinero, un bidón con el tablero y la de cristal; vitrina-<estilo>: nogal, teca, acero y laca blanca), lo de sus paredes (la foto antigua del Casco Viejo, el ojo de buey, el timón, la red con los corchos, la diana, el piñón de la fundición, el aro de neón verde con la hoja y las copas de la tía), lo del bajo de las setas (el pulverizador, la tubería que suda y el cubo con el cepillo) y lo de los grows (los sacos de sustrato, las macetas de tela apiladas, la balda de botes de abono, el neón de la hoja y el propagador de esquejes); 1.35: el caballete de la acera de los locales, «se alquila» (rotuloL-0) y la pizarra del negocio abierto (rotuloL-1) 1.43: el concesionario: el cartel de la oferta (preciosK), los neumáticos (ruedasK) y el expositor de folletos (catalogoK).",
    "ajuste_por_sprite": {
     "vitrina": "exacto",
@@ -9968,7 +9968,7 @@
     "obj:banderaK"
    ],
    "celda": "objeto_alto",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.30: la estantería metálica de los abonos de la nave (100 × 180 cm, garrafas de MEATZA y ORTUA BIO y sacos de sustrato), el secadero de red de 4 pisos colgado con los cogollos tendidos y el altavoz de la pista (cajón de graves y caja con conos); 1.33: el tanque de 1.000 L de la nave (un IBC en su jaula, con la solución nutritiva, el palé, la llave, la bomba y la manguera) y la máquina de fertirrigación (el armario con la pantalla y las tres dosificadoras con sus botes); 1.34: la librería de la asociación (libros, las actas y una maceta encima) y el bajo de las setas: la estantería de rejilla con tres baldas (baldaS), sus bandejas aparte en cada fase y en cada balda (bandejaS-<colonizando|fructificando|lista|contaminada|seca>-<0 abajo|1 arriba>; tapadas, sin método) y el secadero de malla vacío y con setas (secaS-0, secaS-1); 1.35: el cajero de la calle (la columna de acero con la visera verde, la pantalla, el teclado, la ranura y la boca de los billetes; logo inventado) 1.43: la máquina de café del concesionario (cafeK) y la bandera de su entrada (banderaK).",
    "ajuste_por_sprite": {
     "estanteN": "exacto",
@@ -10015,7 +10015,7 @@
     "obj:staticM"
    ],
    "celda": "objeto_alto",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/extraccion.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/extraccion.py",
    "descripcion": "1.36: los muebles del piso para acabar y extraer: la mesa de manicurar (bandeja de rejilla, cogollos, tijeras y guantes), la prensa de rosin de palanca en su mesita, los tamices de seda apilados con el kief en el cristal, el cubo de 20 L con agua, hielo y las bolsas de malla, la lavadora de extracción de carga superior y la máquina de static con la placa cargada (sin marcas)",
    "ajuste_por_sprite": {
     "trim": "exacto",
@@ -10613,7 +10613,7 @@
      "celda": "alm_cog_xl"
     }
    ],
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/almacen.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/almacen.py",
    "descripcion": "1.36: los visores de la caja fuerte y la nevera, con el ancla arriba a la izquierda: la caja por dentro (el acero biselado con remaches, el fondo cepillado, el tabique, la bandeja de los billetes, el cajón y dos baldas de madera), la nevera por dentro (la luz, la fila de GUARDAR y siete baldas de cristal), la ventana del elegido (el visor y tres ranuras de barras), el cristal de los tarros de cogollos con la tapa de latón y la dorada del fenotipo estrella, el bote pequeño de los extractos, el tarro abierto con el más (GUARDAR en la caja), el botón «+ GUARDAR» de la nevera, el fajo de billetes, los iconos de las barras (tricoma, tarro, tijeras, pesa y moneda) y los tarros, el bote y el fajo al doble para la ventana; 1.36.1 (más realistas): tarros con hombros y culo redondos, culo grueso y tapa estriada, el bote bajo de boca ancha con la tapa negra, la nevera con su junta, el plafón, la rejilla y baldas de cristal con perfil, y lo de dentro de los tarros (los cogollos apilados con escarcha y pelos, la cima irregular y la etiqueta escrita); 1.36.2 (lo pidió el usuario: sprites realistas por tipo): lo de dentro por nivel (1-4, de un cuarto a lleno): cogollos pelados (alm-cog-p, manicurados, más escarcha) y sin pelar (alm-cog-s, con las hojitas de azúcar asomando), en el color de la variedad que pone el juego, y cada extracción en su bote (alm-x-<tipo>): rosin fresco ámbar y translúcido, rosin curado en frío cremoso (badder), dry sift en montón de arena rubia, ice en grumos rubios, charas en bolas oscuras amasadas a mano, hash en placas prensadas, moonrock como rocas verdes rebozadas en kief y static en polvo casi blanco",
    "ajuste_por_sprite": {
     "alm-caja": "exacto",
@@ -10683,7 +10683,7 @@
     "obj:mesaKC"
    ],
    "celda": "mueble_ancho",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/locales.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/locales.py",
    "descripcion": "1.30, muebles de 2 casillas a 16 px/m: la mesa de billar de 210 cm con el tapete a medio fondo, las troneras y las bolas, y la lámpara de tres pantallas verdes colgada encima; el sofá chester verde de frente (sofaF) y por detrás (sofaB), el de terciopelo morado del reservado (sofaV), la cabina del DJ con los platos, la mesa y el rótulo, la mesa de oficina de la nave con el portátil y la cajonera, y la mesa de cultivo de 240 × 120 cm vista desde arriba a medio fondo (1.32: la bandeja con su fondo acanalado, el canto, el larguero y tres patas, y cinco macetas de 11 L a tresbolillo, tres delante y dos al fondo) bajo dos LED de barras de 100 cm, como los de las carpas (1.31; mesaN-0 vacía y apagados, mesaN-1 plantada y encendidos); 1.31: sus plantas, aparte y encima, en los colores de la planta A (hojas, tallo, contorno y la rampa clave del cogollo, para que el juego les ponga el tono de hoja y el color de cogollo de cada variedad, como en la vista C): plantasN-1 recién plantadas y plantasN-<fase>-<porte> (2 creciendo, 3 en flor, 4 dando; 1.32: con copa, la corona y las puntas, no en forma de pino: i ancha y baja de hoja ancha y oscura y cogollos gordos, h entre medias, s alta y estrecha de hoja fina y clara y colas largas); 1.33: la foto de la tía Maite con Delroy de joven (de la 1.32, ahora de 2 casillas y con más detalle: el marco de 28 × 18 con la placa de latón, el paspartú y, en el campo, ella con la melena castaña y la blusa morada, él con las rastas negras y la camisa crema y una planta en flor entre los dos), en la asociación; la mesa sin los focos, que van aparte (locales-16); 1.34: los sofás y el billar de cada club (sofaF-/sofaB-/billar-<estilo>: terciopelo granate con nogal y tapete burdeos; cuero azul marino con teca, latón y tapete azul; cuero marrón con acero y tapete gris; sofás blancos de líneas rectas con el cojín verde y billar lacado con tapete turquesa), la carpa de las madres de la nave (120 × 120, plateada, abierta de frente, con el panel LED encendido y de 0 a 4 madres podadas: carpaM-<n>) y la de exposición de GROW IBARBIDE (carpaDemo) 1.43: el rótulo de la pared de AUTOS RIBERA (rotuloK), su mostrador (mesaK) y, en la nave, el estante de las bandejas de clones (clonN-0 apagado, 1 y 2 con una o las dos baldas llenas, bajo los tubos T5).",
    "ajuste_por_sprite": {
     "billar": "exacto",
@@ -10756,7 +10756,7 @@
     "expoMo": "exacto"
    },
    "max_colores": 48,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/concesionario.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/concesionario.py",
    "estilo_ref": "los muebles de los locales (locales-ancho)",
    "descripcion": "1.43: los vehículos de la exposición de AUTOS RIBERA, de perfil a 16 px/m y sin marcas: el utilitario de 5 puertas blanco (4 m), la berlina gris plomo (4,8 m), el deportivo rojo bajo en cuña con alerón sobre la plataforma giratoria (4,6 m) y la moto de 125 cc (scooter negro con el escudo azul, 2 m).",
    "notas": "1.43, pedido por el usuario («una moto, un coche sin más, uno de gama media y un super deportivo»).",
@@ -10769,7 +10769,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/camarote.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/camarote.py",
    "notas": "1.43.6, pedido por el usuario: «hacer una reforma con Pladur… para usarlo de almacén con botes más grandes de cristal con bóvedas de humedad… O sino… habilitar el camarote de arriba, el piso de arriba, como almacen».",
    "max_colores": 32,
    "tipo": "tiles",
@@ -10799,7 +10799,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/camarote.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/camarote.py",
    "notas": "1.43.6, pedido por el usuario: «hacer una reforma con Pladur… para usarlo de almacén con botes más grandes de cristal con bóvedas de humedad… O sino… habilitar el camarote de arriba, el piso de arriba, como almacen».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -10823,7 +10823,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/camarote.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/camarote.py",
    "notas": "1.43.6, pedido por el usuario: «hacer una reforma con Pladur… para usarlo de almacén con botes más grandes de cristal con bóvedas de humedad… O sino… habilitar el camarote de arriba, el piso de arriba, como almacen».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -10845,7 +10845,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/despacho.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/despacho.py",
    "notas": "MAESTRO [8] «Despacho Narco»: mobiliario de lujo, monitores de seguridad conectados a cámaras de locales, caja fuerte de alta capacidad.",
    "max_colores": 32,
    "tipo": "objeto",
@@ -10867,7 +10867,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/despacho.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/despacho.py",
    "notas": "MAESTRO [8] «Despacho Narco»: mobiliario de lujo, monitores de seguridad conectados a cámaras de locales, caja fuerte de alta capacidad.",
    "max_colores": 32,
    "tipo": "objeto",
@@ -10889,7 +10889,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bajo.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bajo.py",
    "notas": "1.44, pedido por el usuario: «los sprites y todo para crear el piso bajo, donde se cultivan, se secan, almacenan y se crean microdosis y comestibles».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -10942,7 +10942,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bajo.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bajo.py",
    "notas": "1.44, pedido por el usuario: «los sprites y todo para crear el piso bajo, donde se cultivan, se secan, almacenan y se crean microdosis y comestibles».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -10965,7 +10965,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/negocios.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/negocios.py",
    "notas": "1.45, pedido por el usuario: los negocios alquilados por dentro (el taller con el foso), el cuartucho para dormir y el almacén del club.",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11011,7 +11011,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/negocios.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/negocios.py",
    "notas": "1.45, pedido por el usuario: los negocios alquilados por dentro (el taller con el foso), el cuartucho para dormir y el almacén del club.",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11051,7 +11051,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/negocios.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/negocios.py",
    "notas": "1.45, pedido por el usuario: los negocios alquilados por dentro (el taller con el foso), el cuartucho para dormir y el almacén del club.",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11083,7 +11083,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/negocios.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/negocios.py",
    "notas": "1.46, pedido por el usuario: «usa esas medidas para crear los fosos con las máquinas de levantar… a escala».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11109,7 +11109,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "alargado del sprite ya procesado, sin PixelLab: python3 -I tools/sprites/a-mano/escala.py",
+   "origen": "alargado del sprite ya procesado, sin el generador de sprites: python3 -I tools/sprites/a-mano/escala.py",
    "notas": "1.47, pedido por el usuario: «el mobiliario debe de ser a escala realista para con el personaje, también en los clubs, casas y demás».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11175,7 +11175,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "alargado del sprite ya procesado, sin PixelLab: python3 -I tools/sprites/a-mano/escala.py",
+   "origen": "alargado del sprite ya procesado, sin el generador de sprites: python3 -I tools/sprites/a-mano/escala.py",
    "notas": "1.47, pedido por el usuario: «el mobiliario debe de ser a escala realista para con el personaje, también en los clubs, casas y demás».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11287,10 +11287,10 @@
    "tipo": "tiles",
    "id": "interior-negocios",
    "celda": "tile",
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/negocios2.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/negocios2.py",
    "descripcion": "1.47: el suelo y las paredes de cuatro locales alquilables según las fotos del usuario, genéricos y sin marcas: el taller (resina epoxi azul, pared blanca con el tubo del aire y la franja azul, blanca y roja), la panadería (baldosa gris clara, blanco con moldura y azulejo de metro), el bar (pizarra oscura, gris azulado y el machihembrado de pino) y la lavandería (laminado gris, azul con burbujas blancas y el zócalo blanco).",
    "estilo_ref": "las paredes y suelos de los locales (interior-locales)",
-   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API de PixelLab?».",
+   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API del generador de sprites?».",
    "cubre": [
     "tile:floorLv",
     "tile:floorPa",
@@ -11317,10 +11317,10 @@
    "id": "negocios-pl-alto",
    "celda": "mueble_escala",
    "max_colores": 32,
-   "origen": "PixelLab (create_1_direction_object, solo con texto; las fotos de referencia llevan marcas y no se subieron), guardado en tools/sprites/pixellab-negocios/ y ajustado a 16 px/m: python3 -I tools/sprites/a-mano/pixellab_negocios.py",
-   "descripcion": "1.47: los muebles de una casilla del taller, la panadería, el bar y la lavandería (lavadoras y secadoras industriales, la caja de pago, el carro de la ropa, el carro de bandejas, la recogedora de aceite, el carro de herramientas, las cajas, la cafetera, la mesa de pino con sillas y el taburete), de PixelLab y ajustados a 16 px/m; solo con Datos.CAL",
+   "origen": "el generador de sprites (create_1_direction_object, solo con texto; las fotos de referencia llevan marcas y no se subieron), guardado en tools/sprites/sprgen-negocios/ y ajustado a 16 px/m: python3 -I tools/sprites/a-mano/sprgen_negocios.py",
+   "descripcion": "1.47: los muebles de una casilla del taller, la panadería, el bar y la lavandería (lavadoras y secadoras industriales, la caja de pago, el carro de la ropa, el carro de bandejas, la recogedora de aceite, el carro de herramientas, las cajas, la cafetera, la mesa de pino con sillas y el taburete), del generador de sprites y ajustados a 16 px/m; solo con Datos.CAL",
    "estilo_ref": "los muebles a escala del piso (props-escala)",
-   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API de PixelLab?». 1.49 (lo pidió el usuario: «recuerda cómo deben ser los sprites», skill del director de sprites, fotos de la lavandería y de una cafetera): todos rehechos de frente (alzado recto / 3/4 de frente, nunca isométricos), a escala por su alto real; spec en tools/sprites/director/negocios-frente/spec.yaml.",
+   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API del generador de sprites?». 1.49 (lo pidió el usuario: «recuerda cómo deben ser los sprites», skill del director de sprites, fotos de la lavandería y de una cafetera): todos rehechos de frente (alzado recto / 3/4 de frente, nunca isométricos), a escala por su alto real; spec en tools/sprites/director/negocios-frente/spec.yaml.",
    "cubre": [
     "obj:aceiteT",
     "obj:cafeT",
@@ -11359,10 +11359,10 @@
    "id": "negocios-pl-ancho",
    "celda": "mueble_ancho",
    "max_colores": 32,
-   "origen": "PixelLab (create_1_direction_object, solo con texto; las fotos de referencia llevan marcas y no se subieron), guardado en tools/sprites/pixellab-negocios/ y ajustado a 16 px/m: python3 -I tools/sprites/a-mano/pixellab_negocios.py",
-   "descripcion": "1.47: los muebles de dos casillas (el horno de pisos, la estantería de recambios, la barra de pintxos, el botellero, el estante del pan, el mostrador de la panadería, la mesa de doblar y la mesa de acero con la masa), de PixelLab y ajustados a 16 px/m; solo con Datos.CAL",
+   "origen": "el generador de sprites (create_1_direction_object, solo con texto; las fotos de referencia llevan marcas y no se subieron), guardado en tools/sprites/sprgen-negocios/ y ajustado a 16 px/m: python3 -I tools/sprites/a-mano/sprgen_negocios.py",
+   "descripcion": "1.47: los muebles de dos casillas (el horno de pisos, la estantería de recambios, la barra de pintxos, el botellero, el estante del pan, el mostrador de la panadería, la mesa de doblar y la mesa de acero con la masa), del generador de sprites y ajustados a 16 px/m; solo con Datos.CAL",
    "estilo_ref": "los muebles a escala del piso (props-escala)",
-   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API de PixelLab?». 1.49 (lo pidió el usuario: «recuerda cómo deben ser los sprites», skill del director de sprites, fotos de la lavandería y de una cafetera): todos rehechos de frente (alzado recto / 3/4 de frente, nunca isométricos), a escala por su alto real; spec en tools/sprites/director/negocios-frente/spec.yaml.",
+   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API del generador de sprites?». 1.49 (lo pidió el usuario: «recuerda cómo deben ser los sprites», skill del director de sprites, fotos de la lavandería y de una cafetera): todos rehechos de frente (alzado recto / 3/4 de frente, nunca isométricos), a escala por su alto real; spec en tools/sprites/director/negocios-frente/spec.yaml.",
    "cubre": [
     "obj:barraN",
     "obj:botN",
@@ -11395,10 +11395,10 @@
    "id": "negocios-pl-coche",
    "celda": "vehiculo_expo",
    "max_colores": 32,
-   "origen": "recoloreado del sprite procesado: python3 -I tools/sprites/a-mano/pixellab_negocios.py",
+   "origen": "recoloreado del sprite procesado: python3 -I tools/sprites/a-mano/sprgen_negocios.py",
    "descripcion": "1.47: el elevador del taller con las columnas azules de la foto (recoloreado del de negocios.py, el coche igual); solo con Datos.CAL",
    "estilo_ref": "los muebles a escala del piso (props-escala)",
-   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API de PixelLab?».",
+   "notas": "1.47, pedido por el usuario con fotos de referencia: «Aquí van las imágenes de referencia para el taller, panaderia y bar», «Lavanderia» y «Porqué no estás usando la API del generador de sprites?».",
    "cubre": [
     "obj:e-elevT"
    ],
@@ -11417,7 +11417,7 @@
    "id": "iconos-fumar",
    "celda": "icono",
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/ocio.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/ocio.py",
    "descripcion": "1.47: Iconos de 16 px de lo de fumar: librillo, filtros, tabaco de liar y mechero (estanco); grinder, pipa de cristal, bong y vaporizador (grow). Genéricos, sin marcas.",
    "estilo_ref": "los muebles de los locales (locales-ancho) y los iconos del equipo",
    "notas": "1.47, lo pidió el usuario: «Tiene que haber estanco también, uno en cada pueblo, para comprar, tabaco, papel y eso. La demás parafernalias o pipas y demás para fumar, se comprar en el grow, hay exposición en vitrinas», «la discoteca tiene que ser más grande, el piso de arriba reservado» y «las mesas de los sofás de los clubs, que no están en la misma vista que los sofás o el billar». De frente a 3/4, nunca en isométrica.",
@@ -11434,7 +11434,7 @@
    "id": "interior-estanco",
    "celda": "tile",
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/ocio.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/ocio.py",
    "descripcion": "1.47: El estanco por dentro (terrazo crema, pared crema con la moldura granate, friso de madera) y la moqueta del reservado de GAUA.",
    "estilo_ref": "los muebles de los locales (locales-ancho) y los iconos del equipo",
    "notas": "1.47, lo pidió el usuario: «Tiene que haber estanco también, uno en cada pueblo, para comprar, tabaco, papel y eso. La demás parafernalias o pipas y demás para fumar, se comprar en el grow, hay exposición en vitrinas», «la discoteca tiene que ser más grande, el piso de arriba reservado» y «las mesas de los sofás de los clubs, que no están en la misma vista que los sofás o el billar». De frente a 3/4, nunca en isométrica.",
@@ -11456,7 +11456,7 @@
    "id": "ocio-ancho",
    "celda": "mueble_ancho",
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/ocio.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/ocio.py",
    "descripcion": "1.47: Muebles de dos casillas de frente a 3/4: la estantería de las cajetillas (colores lisos, sin marcas), el mostrador con la vitrina de los mecheros, la vitrina iluminada del grow, la mesa baja de los clubs en cada estilo y las escaleras de GAUA.",
    "estilo_ref": "los muebles de los locales (locales-ancho) y los iconos del equipo",
    "notas": "1.47, lo pidió el usuario: «Tiene que haber estanco también, uno en cada pueblo, para comprar, tabaco, papel y eso. La demás parafernalias o pipas y demás para fumar, se comprar en el grow, hay exposición en vitrinas», «la discoteca tiene que ser más grande, el piso de arriba reservado» y «las mesas de los sofás de los clubs, que no están en la misma vista que los sofás o el billar». De frente a 3/4, nunca en isométrica.",
@@ -11491,7 +11491,7 @@
    "id": "ocio-alto",
    "celda": "mueble_escala",
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/ocio.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/ocio.py",
    "descripcion": "1.47: El humidificador de puros y el expositor giratorio del papel del estanco.",
    "estilo_ref": "los muebles de los locales (locales-ancho) y los iconos del equipo",
    "notas": "1.47, lo pidió el usuario: «Tiene que haber estanco también, uno en cada pueblo, para comprar, tabaco, papel y eso. La demás parafernalias o pipas y demás para fumar, se comprar en el grow, hay exposición en vitrinas», «la discoteca tiene que ser más grande, el piso de arriba reservado» y «las mesas de los sofás de los clubs, que no están en la misma vista que los sofás o el billar». De frente a 3/4, nunca en isométrica.",
@@ -11515,7 +11515,7 @@
    "id": "ocio-16",
    "celda": "objeto_1x1",
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/ocio.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/ocio.py",
    "descripcion": "1.47: El rótulo del estanco: la placa granate con la T amarilla.",
    "estilo_ref": "los muebles de los locales (locales-ancho) y los iconos del equipo",
    "notas": "1.47, lo pidió el usuario: «Tiene que haber estanco también, uno en cada pueblo, para comprar, tabaco, papel y eso. La demás parafernalias o pipas y demás para fumar, se comprar en el grow, hay exposición en vitrinas», «la discoteca tiene que ser más grande, el piso de arriba reservado» y «las mesas de los sofás de los clubs, que no están en la misma vista que los sofás o el billar». De frente a 3/4, nunca en isométrica.",
@@ -11534,7 +11534,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/detalle.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/detalle.py",
    "notas": "1.48, lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más de RPG clásico» y «la calidad de los otros sprites también, que se note que es el sprite y lo que trae». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
    "estilo_ref": "los muebles a escala (escala-alto) y los firmes de mundo.py",
    "id": "exterior-mosaico",
@@ -11551,7 +11551,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/detalle.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/detalle.py",
    "notas": "1.48, lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más de RPG clásico» y «la calidad de los otros sprites también, que se note que es el sprite y lo que trae». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
    "estilo_ref": "los muebles a escala (escala-alto) y los firmes de mundo.py",
    "id": "detalle-alto",
@@ -11568,7 +11568,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/detalle.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/detalle.py",
    "notas": "1.48, lo pidió el usuario: «el mapa lo quiero más realista, no estilo Minecraft sino más de RPG clásico» y «la calidad de los otros sprites también, que se note que es el sprite y lo que trae». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
    "estilo_ref": "los muebles a escala (escala-alto) y los firmes de mundo.py",
    "id": "detalle-16",
@@ -11584,7 +11584,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/movil.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/movil.py",
    "notas": "1.51, pedido por el usuario: «cuando le das al móvil no aparece ningún icono… que fuese una pantalla de un móvil, con el diseño del juego».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11658,7 +11658,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/sotano.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/sotano.py",
    "notas": "1.51, pedido por el usuario: «habilitar el sótano de la casa… unas escaleras… una puerta en la casa, luego un mapa pequeño como un mini pasillito» y la misma puerta en el taller y en la nave.",
    "max_colores": 32,
    "tipo": "tiles",
@@ -11688,7 +11688,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/sotano.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/sotano.py",
    "notas": "1.51, pedido por el usuario: «habilitar el sótano de la casa… unas escaleras… una puerta en la casa, luego un mapa pequeño como un mini pasillito» y la misma puerta en el taller y en la nave.",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11714,7 +11714,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/puerto.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/puerto.py",
    "notas": "1.51, pedido por el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para hacer envíos… invertir en un barco, empezando por uno pequeño».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11736,7 +11736,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/puerto.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/puerto.py",
    "notas": "1.51, pedido por el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para hacer envíos… invertir en un barco, empezando por uno pequeño».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11758,7 +11758,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/puerto.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/puerto.py",
    "notas": "1.51, pedido por el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para hacer envíos… invertir en un barco, empezando por uno pequeño».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11780,7 +11780,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/puerto.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/puerto.py",
    "notas": "1.51, pedido por el usuario: «un mapa lateral en Puerto Viejo, un mini puerto para hacer envíos… invertir en un barco, empezando por uno pequeño».",
    "max_colores": 32,
    "tipo": "objeto",
@@ -11806,7 +11806,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
    "notas": "1.52, pedido por el usuario: «el barrio del puerto viejo… comenzar destartalado… ir reformándolo poco a poco, edificio por edificio… montar otro club ahí».",
    "max_colores": 32,
    "tipo": "edificio",
@@ -11823,7 +11823,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
    "notas": "1.52, pedido por el usuario: «el barrio del puerto viejo… comenzar destartalado… ir reformándolo poco a poco, edificio por edificio… montar otro club ahí».",
    "max_colores": 32,
    "tipo": "edificio",
@@ -11840,7 +11840,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
    "notas": "1.52, pedido por el usuario: «el barrio del puerto viejo… comenzar destartalado… ir reformándolo poco a poco, edificio por edificio… montar otro club ahí».",
    "max_colores": 32,
    "tipo": "edificio",
@@ -11857,7 +11857,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
    "notas": "1.52, pedido por el usuario: «el barrio del puerto viejo… comenzar destartalado… ir reformándolo poco a poco, edificio por edificio… montar otro club ahí».",
    "max_colores": 32,
    "tipo": "edificio",
@@ -11874,7 +11874,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
    "notas": "1.52, pedido por el usuario: «el barrio del puerto viejo… comenzar destartalado… ir reformándolo poco a poco, edificio por edificio… montar otro club ahí».",
    "max_colores": 32,
    "tipo": "edificio",
@@ -11891,7 +11891,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/muelle_obras.py (de las fachadas de mundo.py)",
    "notas": "1.52, pedido por el usuario: «el barrio del puerto viejo… comenzar destartalado… ir reformándolo poco a poco, edificio por edificio… montar otro club ahí».",
    "max_colores": 32,
    "tipo": "tiles",
@@ -11913,7 +11913,7 @@
    "familia": "importado",
    "paleta": "propia",
    "coste_real": 0,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/gestos.py (la planta, la maceta y la pared, de la vista C ya procesada)",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/gestos.py (la planta, la maceta y la pared, de la vista C ya procesada)",
    "notas": "1.54.1, pedido por el usuario: «eso no son sprites en condiciones en el mismo estilo que los muebles del juego».",
    "max_colores": 64,
    "tipo": "objeto",
@@ -12418,7 +12418,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/taller.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/taller.py",
    "estilo_ref": "el suelo y los muebles del taller (interior-negocios, negocios-pl-alto)",
    "notas": "1.57.2, lo pidió el usuario: «Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
    "id": "interior-taller",
@@ -12444,7 +12444,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/taller.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/taller.py",
    "estilo_ref": "el suelo y los muebles del taller (interior-negocios, negocios-pl-alto)",
    "notas": "1.57.2, lo pidió el usuario: «Ha desaparecido la puerta del taller, y aún así está muy vacío, molaría meterle otro tipo de suelo en diferentes zonas… el atrezzo deja que desear». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
    "id": "taller-alto",
@@ -12487,7 +12487,7 @@
    "coste_real": 0,
    "tipo": "objeto",
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/garaje_dentro.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/garaje_dentro.py",
    "notas": "Lo pidió el usuario: «un garage por dentro, grande como el taller, pero que estén aparcados ahí los vehículos». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
    "id": "garaje-coche",
    "celda": "vehiculo_expo",
@@ -12510,7 +12510,7 @@
    "coste_real": 0,
    "tipo": "objeto",
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/garaje_dentro.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/garaje_dentro.py",
    "notas": "Lo pidió el usuario: «un garage por dentro, grande como el taller, pero que estén aparcados ahí los vehículos». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
    "id": "garaje-alto",
    "celda": "mueble_escala",
@@ -12533,7 +12533,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/garaje_dentro.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/garaje_dentro.py",
    "estilo_ref": "el suelo del taller (interior-taller)",
    "notas": "Lo pidió el usuario: «si haces líneas de aparcamiento, que estén bien hechas». Solo con Datos.CAL.",
    "id": "garaje-suelo",
@@ -12552,7 +12552,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/huerto.py (la hoja de abanico de prim.py y la paleta de las plantas de la vista C)",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/huerto.py (la hoja de abanico de prim.py y la paleta de las plantas de la vista C)",
    "estilo_ref": "las plantas de la vista C (carpa-c-plantas-a) y el árbol y el seto de la calle",
    "notas": "1.57.2, lo pidió el usuario: «no tienen el contorno para cerrar el diseño. No son del mismo estilo que los sprites… de la carretera como la acera». Sustituyen a plantas-vista en el bancal de la carga y el título; a 16 px/m.",
    "id": "huerto-pl",
@@ -12602,7 +12602,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/huerta_mej.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/huerta_mej.py",
    "estilo_ref": "los muebles del taller (taller.py): el bidón de 200 L, el acero y el contorno #2a2a34",
    "notas": "Lo pidió el usuario: «Opción a comprar mejoras como tanques de agua de 1m3 o tanques azules de 100L dependiendo, también sistema de riego... Herramientas para trabajar la tierra o motoazada siguiente mejora... Habría que hacer los sprites y eso». De frente a 3/4 y de perfil la motoazada, a 16 px/m; solo con Datos.CAL.",
    "id": "huerta-mej",
@@ -12640,7 +12640,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/huerta_pl.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/huerta_pl.py",
    "estilo_ref": "las plantas de las mesas de la nave (planta_mesa): la mata desde arriba con la hoja de abanico, las colas y el tinte por variedad",
    "notas": "Lo pidió el usuario: «El cultivo tiene que ser igual que en la nave digamos, pero solo que no hay focos, está únicamente la luz del sol. No van por macetas sino que se plantan en el suelo pero se hacen más grandes cada planta y la distancia de una a otra es de una baldosa, en los bancales que has hecho en el mapa, bien centradas». Por porte (i índica, h híbrida, s sativa) y por fase (1 plantón, 2-3 crecimiento, 4 flor, 5 madura); el tinte por variedad sale de la rampa de la vista C en pinta.gd; solo con Datos.CAL.",
    "id": "huerta-pl",
@@ -12690,7 +12690,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/taberna.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/taberna.py",
    "estilo_ref": "los muebles del salón (salon.py): la madera de la silla de la tía y el contorno #2a2a34",
    "notas": "1.57.2, lo pidió el usuario: «en el bar este del Puerto Viejo… no están para nada acorde con el estilo… Una silla tiene que ser de verdad un mueble… crea todo como muebles». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
    "id": "taberna-alto",
@@ -12722,7 +12722,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/taberna.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/taberna.py",
    "estilo_ref": "los muebles del salón (salon.py): la madera de la silla de la tía y el contorno #2a2a34",
    "notas": "1.57.2, lo pidió el usuario: «en el bar este del Puerto Viejo… no están para nada acorde con el estilo… Una silla tiene que ser de verdad un mueble… crea todo como muebles». De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
    "id": "taberna-ancho",
@@ -12746,8 +12746,8 @@
    "paleta": "propia",
    "coste_real": 30,
    "max_colores": 32,
-   "origen": "PixelLab create_image_pro (job d6e1acbe, candidata 35 de 64: la esquina └ de 32 × 32) cortada en piezas por python3 -I tools/sprites/pixellab_setos.py",
-   "notas": "Lo pidió el usuario: «Los setos también habría que ajustarlos incluso hacer los sprites con pixel lab también». Las piezas salen de una sola esquina para que casen en textura y paleta; los del lado derecho, en espejo; solo con Datos.CAL (la huerta).",
+   "origen": "el generador de sprites create_image_pro (job d6e1acbe, candidata 35 de 64: la esquina └ de 32 × 32) cortada en piezas por python3 -I tools/sprites/sprgen_setos.py",
+   "notas": "Lo pidió el usuario: «Los setos también habría que ajustarlos incluso hacer los sprites con el generador también». Las piezas salen de una sola esquina para que casen en textura y paleta; los del lado derecho, en espejo; solo con Datos.CAL (la huerta).",
    "id": "seto-huerta",
    "tipo": "objeto",
    "celda": "objeto_alto",
@@ -12789,7 +12789,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "edificio-torreZ",
@@ -12811,7 +12811,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "edificio-torreZ2",
@@ -12833,7 +12833,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "edificio-ensB",
@@ -12855,7 +12855,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "edificio-ensB2",
@@ -12877,7 +12877,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "edificio-estacion",
@@ -12899,7 +12899,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-catedral",
@@ -12921,7 +12921,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "edificio-teatro",
@@ -12943,7 +12943,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "edificio-mercado",
@@ -12965,7 +12965,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "edificio-grua",
@@ -12987,7 +12987,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "tiles-bilbao",
@@ -13021,7 +13021,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "props-bilbao",
@@ -13047,7 +13047,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/vallas.py (los lados, del sprite aprobado)",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/vallas.py (los lados, del sprite aprobado)",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Las vallas tienen que ser tanto en dirección izquierda y derecha como alante a atrás». Solo con Datos.CAL (pinta.gd, _arte_obj).",
    "id": "vallas",
@@ -13098,7 +13098,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "props-bilbao-alto",
@@ -13122,7 +13122,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "props-bilbao-ancho",
@@ -13150,7 +13150,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "suelo-bilbao",
@@ -13167,7 +13167,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-sanNicolas",
@@ -13189,7 +13189,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-kiosko",
@@ -13211,7 +13211,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-plazaN",
@@ -13233,7 +13233,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-plazaS",
@@ -13255,7 +13255,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-plazaL",
@@ -13277,7 +13277,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-plazaR",
@@ -13299,7 +13299,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-cascoB",
@@ -13321,7 +13321,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-cascoB2",
@@ -13343,7 +13343,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-mercadoR",
@@ -13365,7 +13365,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-sanAnton",
@@ -13387,7 +13387,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-chavarri",
@@ -13409,7 +13409,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-carlton",
@@ -13431,7 +13431,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-diputacion",
@@ -13453,7 +13453,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-camposE",
@@ -13475,7 +13475,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-torreBBVA",
@@ -13497,7 +13497,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-abandoE",
@@ -13519,7 +13519,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-concordia",
@@ -13541,7 +13541,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-milagrosa",
@@ -13563,7 +13563,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-iglesiaZ",
@@ -13585,7 +13585,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-apeadero",
@@ -13607,7 +13607,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Edificio icónico (lo pidió el usuario: «además de tener edificios icónicos, para que sea una experiencia más realista»): homenaje de forma, sin rótulos, escudos ni letras reales; solo con Datos.CAL.",
    "id": "edificio-molino",
@@ -13629,7 +13629,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "edificio-bloqueZ",
@@ -13651,7 +13651,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/bilbao.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «Los mapas del juego hazlos los más parecidos y realistas a Bilbao centro y sus barrios, Zorroza no puede faltar». Genérico y propio, sin marcas ni rótulos reales; solo con Datos.CAL.",
    "id": "edificio-bloqueZ2",
@@ -13673,7 +13673,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/interiores_bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/interiores_bilbao.py",
    "estilo_ref": "los muebles de los locales (negocios2.py, taberna.py): de frente a 3/4 y el contorno #2a2a34",
    "notas": "Lo pidió el usuario: «el teatro, pues igual molaría hacer un mapa en el que se vea el teatro. También nos tendríamos que currar unos cuantos sprites… la iglesia también». Genérico, sin rótulos ni escudos; solo con Datos.CAL.",
    "id": "interior-bilbao",
@@ -13707,7 +13707,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/interiores_bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/interiores_bilbao.py",
    "estilo_ref": "los muebles de los locales (negocios2.py, taberna.py): de frente a 3/4 y el contorno #2a2a34",
    "notas": "Lo pidió el usuario: «el teatro, pues igual molaría hacer un mapa en el que se vea el teatro. También nos tendríamos que currar unos cuantos sprites… la iglesia también». Genérico, sin rótulos ni escudos; solo con Datos.CAL.",
    "id": "interior-bilbao-alto",
@@ -13756,7 +13756,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/interiores_bilbao.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/interiores_bilbao.py",
    "estilo_ref": "los muebles de los locales (negocios2.py, taberna.py): de frente a 3/4 y el contorno #2a2a34",
    "notas": "Lo pidió el usuario: «el teatro, pues igual molaría hacer un mapa en el que se vea el teatro. También nos tendríamos que currar unos cuantos sprites… la iglesia también». Genérico, sin rótulos ni escudos; solo con Datos.CAL.",
    "id": "interior-bilbao-ancho",
@@ -13812,7 +13812,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/pueblos.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/pueblos.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «toca también los otros para que sean de jugabilidad… que no sea todo el mismo esquema de pueblo» y «más natural, que no sea tan cuadrado. Pero que los píxeles sean perfectos». Hito del pueblo, genérico y propio; solo con Datos.CAL.",
    "id": "edificio-lavadero",
@@ -13829,7 +13829,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/pueblos.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/pueblos.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «toca también los otros para que sean de jugabilidad… que no sea todo el mismo esquema de pueblo» y «más natural, que no sea tan cuadrado. Pero que los píxeles sean perfectos». Hito del pueblo, genérico y propio; solo con Datos.CAL.",
    "id": "edificio-fronton",
@@ -13846,7 +13846,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/pueblos.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/pueblos.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «toca también los otros para que sean de jugabilidad… que no sea todo el mismo esquema de pueblo» y «más natural, que no sea tan cuadrado. Pero que los píxeles sean perfectos». Hito del pueblo, genérico y propio; solo con Datos.CAL.",
    "id": "edificio-ermita",
@@ -13863,7 +13863,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/pueblos.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/pueblos.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «toca también los otros para que sean de jugabilidad… que no sea todo el mismo esquema de pueblo» y «más natural, que no sea tan cuadrado. Pero que los píxeles sean perfectos». Hito del pueblo, genérico y propio; solo con Datos.CAL.",
    "id": "edificio-faro",
@@ -13880,7 +13880,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/pueblos.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/pueblos.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «toca también los otros para que sean de jugabilidad… que no sea todo el mismo esquema de pueblo» y «más natural, que no sea tan cuadrado. Pero que los píxeles sean perfectos». Hito del pueblo, genérico y propio; solo con Datos.CAL.",
    "id": "edificio-colmenas",
@@ -13897,7 +13897,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/pueblos.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/pueblos.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «toca también los otros para que sean de jugabilidad… que no sea todo el mismo esquema de pueblo» y «más natural, que no sea tan cuadrado. Pero que los píxeles sean perfectos». Hito del pueblo, genérico y propio; solo con Datos.CAL.",
    "id": "edificio-prensa",
@@ -13914,7 +13914,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/pueblos.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/pueblos.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «toca también los otros para que sean de jugabilidad… que no sea todo el mismo esquema de pueblo» y «más natural, que no sea tan cuadrado. Pero que los píxeles sean perfectos». Hito del pueblo, genérico y propio; solo con Datos.CAL.",
    "id": "edificio-reloj",
@@ -13931,7 +13931,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/pueblos.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/pueblos.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «toca también los otros para que sean de jugabilidad… que no sea todo el mismo esquema de pueblo» y «más natural, que no sea tan cuadrado. Pero que los píxeles sean perfectos». Hito del pueblo, genérico y propio; solo con Datos.CAL.",
    "id": "edificio-chimenea",
@@ -13948,7 +13948,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/pueblos.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/pueblos.py",
    "estilo_ref": "las fachadas aprobadas de mundo.py (bloque, casco, ladrillo)",
    "notas": "Lo pidió el usuario: «toca también los otros para que sean de jugabilidad… que no sea todo el mismo esquema de pueblo» y «más natural, que no sea tan cuadrado. Pero que los píxeles sean perfectos». Hito del pueblo, genérico y propio; solo con Datos.CAL.",
    "id": "edificio-gruaT",
@@ -13966,7 +13966,7 @@
    "coste_real": 0,
    "tipo": "objeto",
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/banco_tia.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/banco_tia.py",
    "notas": "ESTUDIO tanda 1 (lo pidió el usuario: «mete mano a las mejoras que hablamos»): el banco de semillas de la tía. De frente a 3/4, nunca en isométrica; solo con Datos.CAL.",
    "id": "banco-tia",
    "celda": "mueble_ancho",
@@ -14001,7 +14001,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/laboratorio.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/laboratorio.py",
    "notas": "Lo pidió el usuario: «El laboratorio debe parecer un laboratorio de verdad, no los materiales de labo y ya, las normas que tienes que tener en un laboratorio real». De frente a 3/4, nunca en isométrica; sin marcas ni letras; solo con Datos.CAL.",
    "id": "interior-lab",
    "tipo": "tiles",
@@ -14022,7 +14022,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/laboratorio.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/laboratorio.py",
    "notas": "Lo pidió el usuario: «El laboratorio debe parecer un laboratorio de verdad, no los materiales de labo y ya, las normas que tienes que tener en un laboratorio real». De frente a 3/4, nunca en isométrica; sin marcas ni letras; solo con Datos.CAL.",
    "id": "lab-alto",
    "tipo": "objeto",
@@ -14070,7 +14070,7 @@
    "paleta": "propia",
    "coste_real": 0,
    "max_colores": 32,
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/laboratorio.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/laboratorio.py",
    "notas": "Lo pidió el usuario: «El laboratorio debe parecer un laboratorio de verdad, no los materiales de labo y ya, las normas que tienes que tener en un laboratorio real». De frente a 3/4, nunca en isométrica; sin marcas ni letras; solo con Datos.CAL.",
    "id": "lab-ancho",
    "tipo": "objeto",
@@ -14108,7 +14108,7 @@
     "obj:carpaKM1",
     "obj:carpaKL0"
    ],
-   "origen": "la carpa de 150 del piso (carpa-g150-mapa, de PixelLab) alargada por columnas y filas suyas: python3 -I tools/sprites/a-mano/kaia_carpa.py",
+   "origen": "la carpa de 150 del piso (carpa-g150-mapa, del generador de sprites) alargada por columnas y filas suyas: python3 -I tools/sprites/a-mano/kaia_carpa.py",
    "estilo_ref": "las carpas del piso (carpas-mapa y carpas-medias-mapa)",
    "notas": "Lo pidió el usuario: «así no son las carpas, como te he dicho que las haga, de como están hechas en casa». Negras y cerradas, de frente con el techo a medio fondo, nunca en isométrica; solo con Datos.CAL.",
    "descripcion": "Las carpas de la sala de cultivo de KAIA por niveles (2 × 2, 4 × 2 y 4 × 4 m), hechas como las del piso: negras y cerradas, con el techo a medio fondo, la barra plateada del armazón y la puerta con su cremallera (dos en las de 4 m) (kcs, kcm, kcl), con la puerta lateral, la ventana de malla y el intractor en el lado del servicio, el que tiene más sitio libre al lado (kaiacult.gd kc_lado); con el servicio a la izquierda, kcsi, kcmi y kcli, con las puertas de entrar en el lado de sombra."
@@ -14127,7 +14127,7 @@
    "cubre": [
     "obj:carpaKX"
    ],
-   "origen": "la carpa de 150 del piso (carpa-g150-mapa, de PixelLab) alargada por columnas y filas suyas: python3 -I tools/sprites/a-mano/kaia_carpa.py",
+   "origen": "la carpa de 150 del piso (carpa-g150-mapa, del generador de sprites) alargada por columnas y filas suyas: python3 -I tools/sprites/a-mano/kaia_carpa.py",
    "estilo_ref": "las carpas del piso (carpas-mapa y carpas-medias-mapa)",
    "notas": "Lo pidió el usuario: «así no son las carpas, como te he dicho que las haga, de como están hechas en casa». Negras y cerradas, de frente con el techo a medio fondo, nunca en isométrica; solo con Datos.CAL.",
    "descripcion": "La carpa de sala de KAIA (1.300 × 700 × 250 cm), hecha como las del piso: negra y cerrada, el techo a medio fondo con sus travesaños, la barra plateada y la puerta para entrar andando en su casilla (kcx)."
@@ -14165,7 +14165,7 @@
     "depKl": "exacto",
     "depKld": "exacto"
    },
-   "origen": "el tanque y el programador de la nave (locales-alto) y el depósito de recogida de la sala (o-drenKS, de PixelLab), más bajos quitando filas suyas, y el bidón de la huerta (bidonA) para el depósito del goteo de cada carpa, y los de 200 y 400 L a mano en su estilo: python3 -I tools/sprites/a-mano/kaia_riego.py",
+   "origen": "el tanque y el programador de la nave (locales-alto) y el depósito de recogida de la sala (o-drenKS, del generador de sprites), más bajos quitando filas suyas, y el bidón de la huerta (bidonA) para el depósito del goteo de cada carpa, y los de 200 y 400 L a mano en su estilo: python3 -I tools/sprites/a-mano/kaia_riego.py",
    "estilo_ref": "el tanque y el programador de la nave (tanqueN, riegoN) y el depósito de recogida de KAIA (o-drenKS)",
    "notas": "Lo pidió el usuario: «que tampoco sea el depósito, por ejemplo, tendrá que estar fuera de las carpas y demás. Esas cosas hay que hacerlas con lógica». De una casilla de alto (1 m a 16 px/m), para no montarse en la carpa de sala; solo con Datos.CAL. Los depósitos, a su tamaño (lo pidió el usuario: «los depósitos se deben de dibujar de diferentes tamaños también»): de más de una casilla los de 200 y 400 L, sin pisar nada.",
    "descripcion": "El rincón del riego de la carpa de sala de KAIA, fuera de ella: el tanque bajo, el programador en su mueble bajo y el depósito de recogida con su bomba (tanqueKB, riegoKB, drenKB), y el depósito del goteo de cada carpa de la fase 1, a su lado, con el grifo hacia ella (depK a su izquierda, depKd a su derecha): el bidón de 100 L en las de 2 × 2, el de 200 L en las de 4 × 2 (depKm, depKmd) y el depósito de 400 L con tapa de rosca en la de 4 × 4 (depKl, depKld), a su tamaño real, sobre bloques y con el grifo a la misma altura."
@@ -14185,7 +14185,7 @@
     "obj:frioF",
     "obj:mesaF"
    ],
-   "origen": "dibujado a mano, sin PixelLab: python3 -I tools/sprites/a-mano/sala_fria.py",
+   "origen": "dibujado a mano, sin el generador de sprites: python3 -I tools/sprites/a-mano/sala_fria.py",
    "estilo_ref": "el controlador de riego (ctrlN de locales.py)",
    "notas": "Lo pidió el usuario: una habitación fría para las extracciones, en el sótano del piso. De frente; solo con Datos.CAL.",
    "descripcion": "El evaporador del equipo de frío de la sala fría del sótano (frioF) y la mesa de acero inoxidable (mesaF)."

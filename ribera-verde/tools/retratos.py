@@ -1,9 +1,9 @@
 # Landrace Hunters — MAESTRO [8]: los retratos de diálogo, uno por muñeco del mapa (el grupo del atlas: cubre «look:…»), sacados
-# con PixelLab (create_portrait_character, character_to_portrait, 64 × 64, 24 colores) del sprite de frente de cada uno.
+# con el generador de sprites (create_portrait_character, character_to_portrait, 64 × 64, 24 colores) del sprite de frente de cada uno.
 # Los originales están en tools/sprites/retratos/<grupo>.png; esto los junta en godot/arte/retratos.png + retratos.json
-# ({"w": 64, "grupos": {grupo: [x, y]}}), quita la línea clara que deja PixelLab en el canto de abajo de alguno y deja el
-# contorno de fuera en 1 píxel (PixelLab lo saca de 2 en el pelo y los hombros, y sobre el blanco de la caja queda grueso).
-# Los estados (tools/sprites/retratos/estados/<grupo>-<estado>.png, inpaint de PixelLab sobre cada busto: n1 hablando,
+# ({"w": 64, "grupos": {grupo: [x, y]}}), quita la línea clara que deja el generador de sprites en el canto de abajo de alguno y deja el
+# contorno de fuera en 1 píxel (el generador de sprites lo saca de 2 en el pelo y los hombros, y sobre el blanco de la caja queda grueso).
+# Los estados (tools/sprites/retratos/estados/<grupo>-<estado>.png, inpaint del generador de sprites sobre cada busto: n1 hablando,
 # p parpadeo, a0/e0/d0 contento, enfadado y dudando, a1/e1/d1 lo mismo hablando) van debajo, una fila por grupo, en
 # "estados": {grupo: {estado: [x, y]}}.
 # Uso: python3 -I tools/retratos.py

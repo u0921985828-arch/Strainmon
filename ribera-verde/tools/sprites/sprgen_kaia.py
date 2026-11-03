@@ -1,17 +1,17 @@
-# Landrace Hunters — lo de KAIA y del laboratorio hecho con PixelLab (lo pidió el usuario: «quiero que lo hagas con Pixel Lab,
+# Landrace Hunters — lo de KAIA y del laboratorio hecho con el generador de sprites (lo pidió el usuario: «quiero que lo hagas con el generador de sprites,
 # no lo hagas tú con dibujos»). Junta en godot/arte/kaia_pl.png (+ .json) los candidatos elegidos de
-# tools/sprites/pixellab-kaia/crudo: las escenas de cada paso del laboratorio (160 × 76), la mesa de cultivo, el LED y lo demás.
-# Lo único que se toca: los cantos rosas que deja PixelLab en la primera y la última columna (se copia la de al lado).
+# tools/sprites/sprgen-kaia/crudo: las escenas de cada paso del laboratorio (160 × 76), la mesa de cultivo, el LED y lo demás.
+# Lo único que se toca: los cantos rosas que deja el generador de sprites en la primera y la última columna (se copia la de al lado).
 import json, os
 from PIL import Image
 
 R = os.path.dirname(os.path.abspath(__file__))
-CRUDO = os.path.join(R, "pixellab-kaia", "crudo")
+CRUDO = os.path.join(R, "sprgen-kaia", "crudo")
 SALE = os.path.join(R, "..", "..", "godot", "arte", "kaia_pl")
 # las escenas animadas (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): de cada una, los fotogramas 1-4 de
-# animate_image (pixellab-kaia/anim/<clave>-<i>.png; el 0 es la escena tal cual) en kaia_pl_anim.png, 4 por fila, una fila por
+# animate_image (sprgen-kaia/anim/<clave>-<i>.png; el 0 es la escena tal cual) en kaia_pl_anim.png, 4 por fila, una fila por
 # escena (aparte: una sola hoja pasaría de los 16384 px de alto de una textura), con su modo de anim.json (vaiven o bucle)
-ANIM = os.path.join(R, "pixellab-kaia", "anim")
+ANIM = os.path.join(R, "sprgen-kaia", "anim")
 FOTOS = 4
 
 ELEGIDAS = {
@@ -52,7 +52,7 @@ def limpia(im):
 				px[x, y] = px[x2, y]
 	return im
 
-SIN_FONDO = set()   # los que PixelLab devolvió con el fondo pintado: fuera el color de la esquina (y lo que se le parece)
+SIN_FONDO = set()   # los que el generador de sprites devolvió con el fondo pintado: fuera el color de la esquina (y lo que se le parece)
 def quita_fondo(im):
 	px = im.load()
 	W, H = im.size

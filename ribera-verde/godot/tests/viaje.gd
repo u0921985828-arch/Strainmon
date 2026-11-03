@@ -98,7 +98,7 @@ func _corre() -> void:
 	for k in ["monte", "cerca", "carretera"]:
 		chk(EscViaje.R.has(k), "el fondo: %s" % k)
 	chk(EscViaje.clave("tractor") == "bus", "un vehículo sin dibujo, el autobús")
-	# el autobús y el cielo de PixelLab (lo pidió el usuario: «el sprite del bus, más del estilo del juego, muebles con PixelLab, como
+	# el autobús y el cielo del generador de sprites (lo pidió el usuario: «el sprite del bus, más del estilo del juego, muebles con el generador de sprites, como
 	# también el fondo del cielo»): cada rueda en su paso de rueda, el protagonista en una ventana; nubes, sol y luna; el cielo tramado
 	var bus: Image = EscViaje.R.bus
 	var by := bus.get_height() - 1

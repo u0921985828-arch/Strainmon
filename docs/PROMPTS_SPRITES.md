@@ -11,12 +11,12 @@ Copia el **BLOQUE DE ESTILO** al principio de cada prompt y añade el bloque con
 - **Paleta limitada** 16-bit tipo GBA (cálida, saturación media, sombras suaves).
 - **Contorno oscuro** de 1px en personajes y criaturas (color casi negro violáceo `#20161f`).
 - **Luz cenital** (desde arriba); sombra elíptica sutil bajo el objeto.
-- Estilo **original**, inspirado en RPG de Game Boy Advance. **No** imitar ninguna franquicia ni personaje existente.
+- Estilo **original**, inspirado en RPG de portátil de 16 bits. **No** imitar ninguna franquicia ni personaje existente.
 
 ### BLOQUE DE ESTILO (pégalo siempre primero)
 
 ```
-Pixel art 16-bit estilo Game Boy Advance, original. Fondo transparente,
+Pixel art 16-bit estilo portátil de 16 bits, original. Fondo transparente,
 sin antialias, píxeles nítidos, contorno oscuro de 1px (#20161f),
 sombreado suave con luz cenital, paleta cálida limitada. Vista cenital
 ligera (top-down). Sprite único centrado. Sin texto, sin marca de agua,

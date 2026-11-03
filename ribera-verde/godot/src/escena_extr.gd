@@ -51,7 +51,7 @@ static func pinta(pintor, T: Dictionary, now: float, x0: int, y0: int) -> void:
 	var i := int(T.get("paso", 0))
 	var n := int(T.get("n", 1))
 	P._rect(X - 2, Y - 2, W + 4, H + 10, Color("#26262e"))
-	var im := pl_t("%s-%d" % [String(T.esc), i], now)   # la escena de PixelLab de ese paso, animada (lo pidió el usuario: «con esta calidad»)
+	var im := pl_t("%s-%d" % [String(T.esc), i], now)   # la escena del generador de sprites de ese paso, animada (lo pidió el usuario: «con esta calidad»)
 	if im != null:
 		P._img(im, X, Y)
 	else:
@@ -883,8 +883,8 @@ static func mani(i: int, t: float, p: float) -> void:
 	var ty := cy - 4 + (6 * sin(t * 1.7) if i else -6.0)
 	tijeras(tx, ty, abre)
 
-# ── el laboratorio del banco de la tía (bancotia.gd lab_ver): cada paso, su escena de PixelLab (lo pidió el usuario: «quiero que lo
-# hagas con Pixel Lab, no lo hagas tú con dibujos»; tools/sprites/pixellab_kaia.py → arte/kaia_pl.png), con la barra debajo
+# ── el laboratorio del banco de la tía (bancotia.gd lab_ver): cada paso, su escena del generador de sprites (lo pidió el usuario: «quiero que lo
+# hagas con el generador de sprites, no lo hagas tú con dibujos»; tools/sprites/sprgen_kaia.py → arte/kaia_pl.png), con la barra debajo
 static var PL := {}
 static var PLA := {}   # las escenas animadas: clave → modo (vaiven o bucle); sus fotogramas, PL["<clave>/<1-4>"] (kaia_pl_anim.png)
 const PL_MS := 170   # lo que dura cada fotograma
@@ -910,7 +910,7 @@ static func carga_pl() -> bool:
 		PLA = j.get("anim", {})
 	return true
 
-static func pl(k: String) -> Image:   # una pieza de PixelLab, o null
+static func pl(k: String) -> Image:   # una pieza del generador de sprites, o null
 	return PL.get(k) if carga_pl() else null
 
 static func foto_pl(k: String, now: float) -> int:   # el fotograma de la escena k a la hora now (0 si no está animada)

@@ -10,9 +10,9 @@ const Datos = preload("res://src/datos.gd")
 const Juego = preload("res://src/juego.gd")
 const Atlas = preload("res://src/atlas.gd")
 
-# hacia dónde pega cada animación tal como salió de PixelLab (vista en tools/sprites/pixellab_combate.py → art/procesado), en el
+# hacia dónde pega cada animación tal como salió del generador de sprites (vista en tools/sprites/sprgen_combate.py → art/procesado), en el
 # fotograma del golpe: el protagonista de espaldas («north») y los enemigos de frente («south»)
-const PIXELLAB := [["m", "P", "golpe", "dch", 3], ["m", "P", "patada", "dch", 3], ["m", "P", "spray", "dch", 4],
+const SPRGEN := [["m", "P", "golpe", "dch", 3], ["m", "P", "patada", "dch", 3], ["m", "P", "spray", "dch", 4],
 	["f", "P", "golpe", "izq", 1], ["f", "P", "patada", "dch", 3], ["f", "P", "spray", "dch", 3],
 	["ladron1", "E", "ataque", "dch", 3], ["ladron2", "E", "ataque", "izq", 3], ["ladron3", "E", "ataque", "dch", 3], ["darko", "E", "ataque", "dch", 3]]
 
@@ -77,7 +77,7 @@ func _corre() -> void:
 			chk(xs == ([62.0, 176.0, 62.0] if cal else [178.0, 64.0, 178.0]), "%s: los efectos en x %s" % ["con CAL" if cal else "sin CAL", xs])
 			chk((J.vfx[2].get("esp") == true) == cal, "%s: el espray %sen espejo" % ["con CAL" if cal else "sin CAL", "no " if cal else ""])
 	# 3 · cada golpe que dibuja el juego, hacia el rival
-	for c in PIXELLAB:
+	for c in SPRGEN:
 		var quiero := "izq" if c[1] == "P" else "dch"
 		for cal in [true, false]:
 			Datos.CAL = cal

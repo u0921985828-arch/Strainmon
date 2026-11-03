@@ -1,6 +1,6 @@
 /* ============================================================
    STRAINMON — audio.js
-   Motor de sonido chiptune inspirado en la APU de la Game Boy:
+   Motor de sonido chiptune inspirado en la APU de las portátiles de 8 bits:
    canales de PULSO (onda cuadrada con duty), ONDA (periódica) y
    RUIDO. SFX + bucle de música. Web Audio, sin dependencias.
    Se inicializa en el primer gesto del usuario (política autoplay).

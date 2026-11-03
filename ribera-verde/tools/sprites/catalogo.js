@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
-  Ribera Verde — catálogo de sprites por familia de herramienta de PixelLab
+  Ribera Verde — catálogo de sprites por familia de herramienta del generador de sprites
   Lee art/manifest.json y art/inventario.json y escribe:
     docs/CATALOGO-SPRITES.md   qué sprite sale de qué herramienta, en qué lote, con qué entrada, en qué orden y cuánto cuesta
     art/catalogo.json          lo mismo, clave a clave (para scripts)
@@ -80,7 +80,7 @@ const faltan = want.filter(k => !cat[k]);
 // markdown
 const fams = Object.entries(M.familias);
 const L = [];
-L.push('# Catálogo de sprites por herramienta de PixelLab', '',
+L.push('# Catálogo de sprites por herramienta del generador de sprites', '',
   '> Generado por `node tools/sprites/catalogo.js` desde `art/manifest.json`. No lo edites a mano: cambia el manifiesto y vuelve a generarlo.', '',
   'Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: los personajes con rig, el terreno como tiles, lo que se apoya en el suelo pintado sobre el propio mapa, lo pequeño en lotes y las pantallas como imagen. Así se gastan menos generaciones y todo comparte estilo.', '');
 L.push('## Resumen', '', '| Familia | Claves del juego | Assets | Herramientas | Generaciones aprox. |', '|---|---|---|---|---|');
@@ -92,7 +92,7 @@ for (const [fid, f] of fams) {
   total += g;
   L.push(`| ${f.nombre} | ${claves} | ${as.length} | ${f.herramientas.join(' · ') || '—'} | ${g}${u ? ' + sin documentar' : ''} |`);
 }
-L.push('', `**Total documentado: ~${total} generaciones** (más ${[...sinCoste].join(', ')}, que PixelLab no publica: mira \`get_balance\` antes y después). Cobertura: ${want.length - faltan.length}/${want.length} claves.`, '');
+L.push('', `**Total documentado: ~${total} generaciones** (más ${[...sinCoste].join(', ')}, que el generador de sprites no publica: mira \`get_balance\` antes y después). Cobertura: ${want.length - faltan.length}/${want.length} claves.`, '');
 
 L.push('## Orden de creación', '', 'Las dependencias mandan: nada que use el estilo de otra cosa se genera antes de que esa otra esté aprobada.', '');
 const fases = M.fases.map(f => f.id);

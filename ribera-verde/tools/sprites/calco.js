@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
   Ribera Verde — atlas de calco (sin gastar créditos)
-  Calca el arte procedural (art/referencias, npm run sprites:ref) al formato de art/crudo que dejaría PixelLab:
+  Calca el arte procedural (art/referencias, npm run sprites:ref) al formato de art/crudo que dejaría el generador de sprites:
   mismas carpetas, mismos grupos, mismos nombres de animación y las celdas grandes del manifiesto.
   Las animaciones son de prueba (fotogramas de la referencia con un leve balanceo) y los VFX son formas simples.
 
@@ -40,7 +40,7 @@ const copy = (src, dst, ox, oy, sx = 0, sy = 0, w = src.width, h = src.height) =
   }
   return dst;
 };
-// lienzo más grande (como devuelve PixelLab) con el sprite apoyado abajo; dy sube el cuerpo (balanceo) sin mover los pies
+// lienzo más grande (como devuelve el generador de sprites) con el sprite apoyado abajo; dy sube el cuerpo (balanceo) sin mover los pies
 const lienzo = (src, W, H, dy = 0) => {
   const o = blank(W, H), ox = Math.floor((W - src.width) / 2), oy = H - 2 - src.height;
   if (!dy) return copy(src, o, ox, oy);

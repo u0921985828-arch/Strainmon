@@ -1,7 +1,7 @@
-# python3 -I tools/sprites/a-mano/pixellab_negocios.py  (Python 3 + Pillow; no va en los scripts de npm)
+# python3 -I tools/sprites/a-mano/sprgen_negocios.py  (Python 3 + Pillow; no va en los scripts de npm)
 # 1.47 (lo pidió el usuario, con fotos de referencia del taller, la panadería, el bar y la lavandería, y «¿por qué no estás usando
-# la API de PixelLab?»): los muebles de esos cuatro locales salen de PixelLab (create_1_direction_object, vista de arriba a 3/4,
-# solo con texto: las fotos no se subieron, llevan marcas), guardados tal cual en tools/sprites/pixellab-negocios/<nombre>.png.
+# la API del generador de sprites?»): los muebles de esos cuatro locales salen del generador de sprites (create_1_direction_object, vista de arriba a 3/4,
+# solo con texto: las fotos no se subieron, llevan marcas), guardados tal cual en tools/sprites/sprgen-negocios/<nombre>.png.
 # Aquí se ajustan a 16 px/m (el protagonista mide 27 px = 1,70 m): cada uno a su escala (vecino más próximo), con la base abajo y
 # centrado en su casilla (alto) o en sus dos casillas (ancho).
 #  · negocios-pl-alto (celda mueble_escala, 32 × 48): una casilla
@@ -14,12 +14,12 @@ import os, sys, glob
 from PIL import Image
 RAIZ = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..')
 P = lambda *a: os.path.join(RAIZ, *a)
-SRC = P('tools', 'sprites', 'pixellab-negocios')
+SRC = P('tools', 'sprites', 'sprgen-negocios')
 
 # 1.49 (lo pidió el usuario: «recuerda cómo deben ser los sprites», con la skill del director de sprites y fotos de la lavandería y de
-# una cafetera de dos grupos): todos rehechos en PixelLab de frente (alzado recto, vista sidescroller; los de dos casillas, 3/4 de frente),
+# una cafetera de dos grupos): todos rehechos en el generador de sprites de frente (alzado recto, vista sidescroller; los de dos casillas, 3/4 de frente),
 # nunca girados ni isométricos; spec en tools/sprites/director/negocios-frente/spec.yaml y QA con tools/sprite_qa.py.
-# nombre en el juego: (png de PixelLab, alto en px a 16 px/m, casillas de ancho, medida real, px que sube del suelo —colgado de la pared—)
+# nombre en el juego: (png del generador de sprites, alto en px a 16 px/m, casillas de ancho, medida real, px que sube del suelo —colgado de la pared—)
 PIEZAS = {
     'lavaN': ('lavaN', 22, 1, 'lavadora industrial de 14 kg, 1,4 m', 0),
     'secaN': ('secaN', 26, 1, 'secadora industrial de 18 kg, 1,6 m', 0),
@@ -47,7 +47,7 @@ ESTRECHA = {'rackP': 16}
 DETALLE = {
     'd-bench-loc-ibar': ('bench', 13, 'la bancada metálica de tres asientos, 80 cm'),
 }
-# la cafetera de dos grupos (50 cm) encima de su mueble bajo (90 cm): las dos de PixelLab, juntas aquí
+# la cafetera de dos grupos (50 cm) encima de su mueble bajo (90 cm): las dos del generador de sprites, juntas aquí
 CAFE = (('cafeT', 9), ('mueble', 14))
 PAPELERA = ('papelL', 10)   # la papelera de la foto, a la izquierda de la mesa alta (cestaL); a la derecha va la bancada
 

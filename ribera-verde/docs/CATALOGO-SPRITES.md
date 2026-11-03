@@ -1,4 +1,4 @@
-# Catálogo de sprites por herramienta de PixelLab
+# Catálogo de sprites por herramienta del generador de sprites
 
 > Generado por `node tools/sprites/catalogo.js` desde `art/manifest.json`. No lo edites a mano: cambia el manifiesto y vuelve a generarlo.
 
@@ -16,7 +16,7 @@ Cada sprite del juego sale de la familia de herramientas que mejor lo resuelve: 
 | Se queda procedural | 2 | 1 | — | 0 |
 | Importado | 219 | 52 | importado | 0 + sin documentar |
 
-**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que PixelLab no publica: mira `get_balance` antes y después). Cobertura: 375/375 claves.
+**Total documentado: ~1327 generaciones** (más create_tiles_pro, create_map_object, animate_object, edit_image_pixen, importado, que el generador de sprites no publica: mira `get_balance` antes y después). Cobertura: 375/375 claves.
 
 ## Orden de creación
 

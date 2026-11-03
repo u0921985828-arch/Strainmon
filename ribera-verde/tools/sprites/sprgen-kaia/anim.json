@@ -1,5 +1,5 @@
 {
- "_": "Las escenas animadas (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): animate_image de PixelLab sobre la escena elegida de cada paso (crudo/<ELEGIDAS>), 4 fotogramas, semilla 7 (11 en las rehechas: tercer campo). anim/<clave>-<i>.png: el 0 es la escena tal cual y del 1 al 4 los de PixelLab. modo: vaiven (0 1 2 3 4 3 2 1) o bucle (1 2 3 4, lo que gira).",
+ "_": "Las escenas animadas (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): animate_image del generador de sprites sobre la escena elegida de cada paso (crudo/<ELEGIDAS>), 4 fotogramas, semilla 7 (11 en las rehechas: tercer campo). anim/<clave>-<i>.png: el 0 es la escena tal cual y del 1 al 4 los del generador de sprites. modo: vaiven (0 1 2 3 4 3 2 1) o bucle (1 2 3 4, lo que gira).",
  "lmanos-0": [
   "hands rub together under the running tap water, soap foam bubbles, the water stream flows",
   "vaiven"

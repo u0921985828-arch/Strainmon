@@ -60,7 +60,7 @@ func corre(f: Callable) -> bool:
 func dicho(t: String) -> bool:
 	return LOG.any(func(l): return String(l).contains(t))
 
-# la escena animada (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): sus 4 fotogramas de PixelLab, distintos de
+# la escena animada (lo pidió el usuario: «rehaz las demás animaciones, con esta calidad»): sus 4 fotogramas del generador de sprites, distintos de
 # la escena, y en pantalla, en el sitio de la escena, el fotograma que toca a cada hora
 func anima(now: float, T: Dictionary, k: String) -> String:
 	var Es = load("res://src/escena_extr.gd")
@@ -136,7 +136,7 @@ func escenas(dir: String) -> void:
 		b.save_png(dir.path_join("mani-%d-b.png" % i))
 		chk(a.get_data() != base.get_data(), "paso %d: se pinta" % i)
 		chk(a.get_data() != b.get_data(), "paso %d: se mueve" % i)
-		chk(load("res://src/escena_extr.gd").pl("mani-%d" % i) != null, "paso %d: su escena de PixelLab" % i)
+		chk(load("res://src/escena_extr.gd").pl("mani-%d" % i) != null, "paso %d: su escena del generador de sprites" % i)
 		var m: String = await anima(now, T, "mani-%d" % i)
 		chk(m == "", "paso %d: animada (%s)" % [i, m])
 	print("manicura: %d comprobaciones, %d fallos" % [n, fallos.size()])

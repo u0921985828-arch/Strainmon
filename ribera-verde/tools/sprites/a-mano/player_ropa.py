@@ -1,5 +1,5 @@
 # python3 -I tools/sprites/a-mano/player_ropa.py [carpeta]  (Python 3 + Pillow; no va en los scripts de npm)
-# La ropa del jugador con colores propios (1.22, revisión de la 1.21): PixelLab pintó la gorra con los verdes de las zapatillas (y de la
+# La ropa del jugador con colores propios (1.22, revisión de la 1.21): el generador de sprites pintó la gorra con los verdes de las zapatillas (y de la
 # regadera y la planta de algunas acciones), la camiseta con el rojo de la regadera y, en el combate, el pelo con el oscuro de los
 # hombros y los pies. `ROPA` (12c-salon) cambia colores exactos, así que cada pieza pasa a sus propios tonos (`VARIANTE`: 1 de azul
 # más; no se nota), solo en sus píxeles: las manchas (8 vecinos) de sus colores que son la pieza:

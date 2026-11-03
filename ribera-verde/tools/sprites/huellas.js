@@ -2,7 +2,7 @@
 /*
   Ribera Verde — huellas de las láminas de la vista B (plan de producción, §5 y §5.1, láminas 1-9)
   Cada lámina sale del arte procedural del motor (09b-carpa.js), a la medida real y en su rejilla de celdas, para pasarla
-  a PixelLab como init_image. Como mucho 16 colores por lámina (si hay más, los raros pasan al más cercano); los
+  a el generador de sprites como init_image. Como mucho 16 colores por lámina (si hay más, los raros pasan al más cercano); los
   cogollos de las plantas, en la rampa magenta.
   No pisa las huellas de la 1.8 (huella-carpas-mapa.png y compañía): las nuevas llevan -34 o -5 en el nombre.
 

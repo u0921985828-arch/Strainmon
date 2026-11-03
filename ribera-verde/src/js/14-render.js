@@ -179,7 +179,7 @@ function renderDemo(now){
 }
 function renderTitle(now){
   if(mode==='title')return renderDemo(now);
-  const t=now/1000,ox=OX(),oy=OY(),art=arteTitulo();   // con atlas: el fondo de PixelLab (cielo, barrio, río y hoja); sin él, el procedural
+  const t=now/1000,ox=OX(),oy=OY(),art=arteTitulo();   // con atlas: el fondo del generador de sprites (cielo, barrio, río y hoja); sin él, el procedural
   ctx.save();ctx.translate(ox,oy);
   if(!art){
     const sky=['#0e1638','#162250','#20306a','#2c3e7c','#3a4a86'];

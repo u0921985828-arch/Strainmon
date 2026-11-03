@@ -1,6 +1,6 @@
 ---
 name: sprites
-description: Genera, procesa e integra sprites y animaciones de Ribera Verde con el MCP de PixelLab siguiendo art/manifest.json y docs/PIXELLAB.md, sin salirse de la estética acordada. Úsalo cuando se pida mejorar gráficos, sprites, animaciones o arte del juego.
+description: Genera, procesa e integra sprites y animaciones de Ribera Verde con el MCP del generador de sprites siguiendo art/manifest.json y docs/SPRGEN.md, sin salirse de la estética acordada. Úsalo cuando se pida mejorar gráficos, sprites, animaciones o arte del juego.
 argument-hint: "[F0..F8 | id-de-asset | estado]"
 allowed-tools:
   - Read
@@ -8,43 +8,43 @@ allowed-tools:
   - Write
   - Bash(npm run *)
   - Bash(node tools/*)
-  - mcp__pixellab__get_balance
-  - mcp__pixellab__list_jobs
-  - mcp__pixellab__wait_for_jobs
-  - mcp__pixellab__create_character
-  - mcp__pixellab__animate_character
-  - mcp__pixellab__get_character
-  - mcp__pixellab__create_tiles_pro
-  - mcp__pixellab__get_tiles_pro
-  - mcp__pixellab__create_building_kit
-  - mcp__pixellab__create_topdown_tileset
-  - mcp__pixellab__get_topdown_tileset
-  - mcp__pixellab__create_map_object
-  - mcp__pixellab__get_map_object
-  - mcp__pixellab__create_1_direction_object
-  - mcp__pixellab__get_object
-  - mcp__pixellab__select_object_frames
-  - mcp__pixellab__dismiss_review
-  - mcp__pixellab__animate_object
-  - mcp__pixellab__create_image_pixflux
-  - mcp__pixellab__create_image_pro
-  - mcp__pixellab__animate_image
-  - mcp__pixellab__get_image
-  - mcp__pixellab__reduce_colors
-  - mcp__pixellab__correct_pixelart
-  - mcp__pixellab__unzoom_image
-  - mcp__pixellab__pixelart_workbench
-  - mcp__pixellab__save_to_asset
+  - mcp__sprgen__get_balance
+  - mcp__sprgen__list_jobs
+  - mcp__sprgen__wait_for_jobs
+  - mcp__sprgen__create_character
+  - mcp__sprgen__animate_character
+  - mcp__sprgen__get_character
+  - mcp__sprgen__create_tiles_pro
+  - mcp__sprgen__get_tiles_pro
+  - mcp__sprgen__create_building_kit
+  - mcp__sprgen__create_topdown_tileset
+  - mcp__sprgen__get_topdown_tileset
+  - mcp__sprgen__create_map_object
+  - mcp__sprgen__get_map_object
+  - mcp__sprgen__create_1_direction_object
+  - mcp__sprgen__get_object
+  - mcp__sprgen__select_object_frames
+  - mcp__sprgen__dismiss_review
+  - mcp__sprgen__animate_object
+  - mcp__sprgen__create_image_pixflux
+  - mcp__sprgen__create_image_pro
+  - mcp__sprgen__animate_image
+  - mcp__sprgen__get_image
+  - mcp__sprgen__reduce_colors
+  - mcp__sprgen__correct_pixelart
+  - mcp__sprgen__unzoom_image
+  - mcp__sprgen__pixelart_workbench
+  - mcp__sprgen__save_to_asset
 ---
 
-# /sprites — arte de Ribera Verde con PixelLab
+# /sprites — arte de Ribera Verde con el generador de sprites
 
 Argumento: `$ARGUMENTS` (una fase `F0`…`F8`, el id de un asset del manifiesto, o `estado`).
 
 ## Antes de nada
 
-1. Lee `docs/PIXELLAB.md` (guía completa), `docs/CATALOGO-SPRITES.md` (qué herramienta, en qué lote y en qué orden) y `art/manifest.json` (parámetros exactos). No improvises parámetros ni herramientas: salen del manifiesto.
-2. Comprueba que el MCP responde con `mcp__pixellab__get_balance`. Si no hay herramientas `mcp__pixellab__*`, para y di cómo conectarlo (sección «Preparación» de la guía).
+1. Lee `docs/SPRGEN.md` (guía completa), `docs/CATALOGO-SPRITES.md` (qué herramienta, en qué lote y en qué orden) y `art/manifest.json` (parámetros exactos). No improvises parámetros ni herramientas: salen del manifiesto.
+2. Comprueba que el MCP responde con `mcp__sprgen__get_balance`. Si no hay herramientas `mcp__sprgen__*`, para y di cómo conectarlo (sección «Preparación» de la guía).
 3. Si no existen `art/referencias/` ni `art/paleta/`, ejecuta `npm run sprites:ref`. Ejecuta siempre `npm run sprites:validar`; con errores no se genera nada.
 
 ## Qué hacer según el argumento
@@ -77,13 +77,13 @@ Argumento: `$ARGUMENTS` (una fase `F0`…`F8`, el id de un asset del manifiesto,
 9. **Atlas y juego.** `npm run sprites:procesar -- --todos --atlas`, después `npm run build`, `npm test` (38/38), `npm run test:arte` (22/22) y `npm run capturas`. Mira las capturas.
 10. **Anotar** en el manifiesto:
     - `estado: "aprobado"`;
-    - `pixellab` con los ids devueltos (`character_id`, `animation_group_id`, `object_id`…) y la `seed` si la herramienta la acepta;
+    - `sprgen` con los ids devueltos (`character_id`, `animation_group_id`, `object_id`…) y la `seed` si la herramienta la acepta;
     - `coste_real` (saldo antes − después).
 
 ## Reglas que no se rompen
 
 - La estética acordada manda: 240×160, casillas de 16 px, vista 3/4, chibi, contorno oscuro de 1 px, 3 tonos, paleta de `art/paleta/` y como mucho 15 colores por sprite.
 - Ningún menor fuma, vapea ni aparece junto a drogas. El humo siempre es un VFX aparte.
-- No se borra nada de PixelLab sin permiso. Tampoco se usa `mode: "pro"`, `create_character_state` ni `confirm_cost: true` sin enseñar antes el coste.
-- `art/crudo/` no se edita a mano. Los arreglos se guardan en PixelLab (`save_to_asset`) y se vuelven a descargar.
+- No se borra nada del generador de sprites sin permiso. Tampoco se usa `mode: "pro"`, `create_character_state` ni `confirm_cost: true` sin enseñar antes el coste.
+- `art/crudo/` no se edita a mano. Los arreglos se guardan en el generador de sprites (`save_to_asset`) y se vuelven a descargar.
 - El juego tiene que seguir funcionando con arte procedural en lo que todavía no tenga sprite.

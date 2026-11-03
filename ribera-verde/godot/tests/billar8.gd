@@ -317,7 +317,7 @@ func _corre() -> void:
 		var bol := o.filter(func(x): return typeof(x[0]) == TYPE_STRING and x[1] == B8.BOLAS)
 		var som := o.filter(func(x): return typeof(x[0]) != TYPE_STRING and str(x[4]).begins_with("rgba(10,30,18"))
 		chk(o.size() > 40 and fuera.is_empty(), "%s: %d rectángulos, %d fuera" % [fase, o.size(), fuera.size()])
-		chk(spr.size() == (2 if fase in ["apunta", "carga", "ia"] else 1) and spr[0][1] == B8.ARTE.mesa, "%s: la mesa de PixelLab%s" % [fase, " y el taco" if spr.size() == 2 else ""])
+		chk(spr.size() == (2 if fase in ["apunta", "carga", "ia"] else 1) and spr[0][1] == B8.ARTE.mesa, "%s: la mesa del generador de sprites%s" % [fase, " y el taco" if spr.size() == 2 else ""])
 		# las 16 de la mesa y las 14 de debajo (7 + 7), de sprite; cada una con su sombra
 		chk(bol.size() == 30 and som.size() == 16 * 3, "%s: %d bolas de sprite (30) y %d trozos de sombra (48)" % [fase, bol.size(), som.size()])
 		if spr.size() == 2:   # la punta del taco, detrás de la blanca en la dirección contraria al tiro

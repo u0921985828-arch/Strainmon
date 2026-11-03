@@ -173,7 +173,7 @@ generaciones · C: ajuste dentro del estilo, 60–80 generaciones) se eligió y 
   carpas 120 y 150 de 2, en los sitios A (8,2), B (10,2) y C (2,2). Sprites `carpa-<t>-mapa` (celda `carpa_mapa` 32 × 48).
 - **Vista de carpa** (`src/js/09b-carpa.js`): A delante de una carpa la abre. La cruceta elige plaza o foco, A cuida
   (`potAction`) o cambia el foco y los extras (`carpaAction`) y B sale. El tiempo no corre mientras se mira.
-- **Arte (1.8):** 4 generaciones de PixelLab (pixflux img2img, strength 130, sobre huellas procedurales) para carpas del
+- **Arte (1.8):** 4 generaciones del generador de sprites (pixflux img2img, strength 130, sobre huellas procedurales) para carpas del
   mapa, carpas de la vista de frente, macetas y fondo; las plantas, importadas de Strainmon. Previsión inicial: 120–180.
 - **Retirado:** carpas de la 1.6/1.7 (`carpa-<t>`, `-fuera`), `mesa-cultivo`, `macetas` y `planta-fases`.
 

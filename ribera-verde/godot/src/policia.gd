@@ -26,11 +26,11 @@ func prompt(t: String) -> void:
 
 func grupo_combate(who: String):
 	var g = _grupo_combate(who)
-	return g + "-r" if g and Datos.CAL and Atlas.d.anims.has(g + "-r") else g   # los de PixelLab a unas 6 cabezas (pixellab_combate.py)
+	return g + "-r" if g and Datos.CAL and Atlas.d.anims.has(g + "-r") else g   # los del generador de sprites a unas 6 cabezas (sprgen_combate.py)
 
 # Con CAL, el combate en su lado (lo pidió el usuario: «a la izquierda arriba el enemigo, a la derecha abajo el personaje»): la escena
 # en espejo (lado_x), y cada golpe hacia el rival: el del protagonista hacia la izquierda y el del enemigo hacia la derecha. Las
-# animaciones de PixelLab que salieron hacia el otro lado van en espejo (COMB_ESPEJO; la caída, no: cae lejos del enemigo) y, al
+# animaciones del generador de sprites que salieron hacia el otro lado van en espejo (COMB_ESPEJO; la caída, no: cae lejos del enemigo) y, al
 # huir, el enemigo corre hacia la izquierda (su «east», en espejo)
 const COMB_ESPEJO := {"player-combate-r": ["base", "idle", "golpe", "patada", "spray", "herido", "comer"],
 	"player-f-combate-r": ["patada", "spray"], "ladron2-combate-r": ["base", "idle", "ataque", "herido"]}
@@ -47,7 +47,7 @@ func _grupo_combate(who: String):
 	if not Atlas.ok or B == null:
 		return null
 	if who == "P":
-		var g = Atlas.cubre("combate:espalda:player-f") if es_chica() else null   # MAESTRO [1]: la suya, de PixelLab
+		var g = Atlas.cubre("combate:espalda:player-f") if es_chica() else null   # MAESTRO [1]: la suya, del generador de sprites
 		return g if g else Atlas.cubre("combate:espalda:player")
 	if B.kind == "thief":
 		var g = Atlas.cubre("combate:frente:darko") if B.get("jefe") else Atlas.grupo_look(B.get("look"))   # sin look (como en grupoLook), el del ladrón; Darko (1.17): su personaje es de 32 px; pelea con el suyo de combate (1.21)

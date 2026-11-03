@@ -5,7 +5,7 @@
   Sale: art/paleta/ribera.json  colores de sprites y fondos + paleta de identidad por personaje
         art/paleta/ribera.hex   formato Lospec (un color por línea)
         art/paleta/ribera.gpl   paleta de GIMP/Aseprite
-        art/paleta/ribera.png   muestras 8×8 (para color_image / palette_image de PixelLab)
+        art/paleta/ribera.png   muestras 8×8 (para color_image / palette_image del generador de sprites)
 */
 const fs = require('fs');
 const path = require('path');

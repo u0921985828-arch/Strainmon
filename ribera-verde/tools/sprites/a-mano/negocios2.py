@@ -1,7 +1,7 @@
 # python3 -I tools/sprites/a-mano/negocios2.py  (Python 3 + Pillow; no va en los scripts de npm)
 # 1.47 (lo pidió el usuario, con fotos de referencia del taller, la panadería, el bar y la lavandería): el suelo y las paredes
 # de cuatro de los locales alquilables, a mano y genéricos (sin marcas ni rótulos de nadie); los muebles de esos locales salen de
-# PixelLab (tools/sprites/a-mano/pixellab_negocios.py, ajustados a 16 px/m).
+# el generador de sprites (tools/sprites/a-mano/sprgen_negocios.py, ajustados a 16 px/m).
 #  · interior-negocios (casillas de 16 × 16):
 #    taller: floorTa (resina epoxi azul con brillo), iwT_taller (pared blanca con el tubo azul del aire), iwB_taller (la franja
 #      azul, blanca y roja y el zócalo azul)

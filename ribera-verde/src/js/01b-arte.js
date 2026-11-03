@@ -1,5 +1,5 @@
 /* =========================================================
-   ARTE — sprites y animaciones de PixelLab desde el atlas
+   ARTE — sprites y animaciones del generador de sprites desde el atlas
    (assets/sprites/atlas.*, incrustado por tools/build.js como ATLAS).
    Todo lo que no esté en el atlas se dibuja con el procedural de siempre.
    ?arte=procedural en la URL fuerza el procedural para comparar.
@@ -180,7 +180,7 @@ function detalle(tx,ty,sx,sy){
 const DESF={tree:[6,3],tree2:[6,3],manzano:[5,3],monte:[4,2],monte2:[4,2]};
 function desfase(o,x,y){const r=DESF[o];if(!r)return {dx:0,dy:0,esp:0};const h=hashT(x,y),n=2*r[0]+1;
   return {dx:h%n-r[0],dy:Math.floor(h/n)%(2*r[1]+1)-r[1],esp:Math.floor(h/97)%2};}
-// orillas (F4b): sobre el agua, la tierra o la plaza que toca hierba, la transición Wang de PixelLab.
+// orillas (F4b): sobre el agua, la tierra o la plaza que toca hierba, la transición Wang del generador de sprites.
 // Cada esquina es «hierba» si alguna de las 3 casillas que la comparten es hierba; máscara NW=1 NE=2 SW=4 SE=8.
 // La superposición deja ver el tile de debajo (el agua sigue animada); rodeada del todo (15) no se pinta.
 const TRANS={water:'agua',dirt:'tierra',plaza:'plaza',pista:'tierra'},HIERBA=/^(grass|flowers|tallgrass)$/;
@@ -297,8 +297,8 @@ function arteRetrato(look,cx,fy,now,k=2){
   const f=(tieneDir(g,'idle','south')&&frameDe(g,'idle','south',now,{bucle:true}))||frameDe(g,'base','south',0,{i:0});if(!f)return false;
   ctx.drawImage(f.c,Math.round(cx-f.cel.ancla[0]*k),Math.round(fy-f.cel.ancla[1]*k),f.c.width*k,f.c.height*k);return true;
 }
-// iconos de PixelLab para los menús (DOM): data URL de un fotograma; el cogollo de la Genoteca con el color de la variedad
-// (los de la lámina de iconos-menu, dibujados a mano, primero: el cogollo fresco sustituye al de PixelLab)
+// iconos del generador de sprites para los menús (DOM): data URL de un fotograma; el cogollo de la Genoteca con el color de la variedad
+// (los de la lámina de iconos-menu, dibujados a mano, primero: el cogollo fresco sustituye al del generador de sprites)
 const ICO={},ICO_N={};
 // el icono, centrado en su celda por lo que pinta (sin el aire de arriba o de abajo que traiga): así queda a la altura del texto
 function icoCentrado(c){
