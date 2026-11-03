@@ -1,11 +1,11 @@
 === Landrace Hunters ===
-Version: 1.7.3
+Version: 1.7.4
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.7.3.zip → Activar.
-Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.7.3-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.7.4.zip → Activar.
+Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.7.4-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -14,6 +14,7 @@ Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
 Cambios
+1.7.4 — Landrace Hunters 0.79.0: el juego pinta la calle más rápido (el pueblo, de 24 a 41 fotogramas por segundo en un ordenador sin tarjeta gráfica; el piso, 52), con el suelo y los objetos de cada mapa guardados en su textura y las cachés del arte por generaciones, y los dibujos del juego recomprimidos sin perder un píxel (2,5 MB menos de descarga).
 1.7.3 — Landrace Hunters 0.73.0: los créditos al día. Los ocho beta testers (Kerman, Ibai, Adrián, Urko, Josu, Ander, Bitxone y Edorta), el arte tal y como está hecho hoy (lo del generador de sprites, revisado a mano, y todo lo dibujado píxel a píxel: carpas por dentro, plantas, equipo, extracciones, los planos de cerca, la calle, los pueblos, las zonas de ciudad, los interiores, los vehículos, los iconos y la interfaz), las canciones grabadas por zona y hora, la fuente DejaVu y la nota de ficción con Ibarbide, Hiriburu y las zonas de ciudad como homenaje de forma.
 1.7.2 — Landrace Hunters 0.72.0: repaso del maquetado de la interfaz. La pregunta con opciones ya no queda tapada por su propio menú; con el menú START o la tienda abiertos, el recuadro de arriba a la izquierda se esconde (la fecha y el dinero ya salen en la cabecera); los botones A, B, START, MÓVIL y SONIDO se leen sobre cualquier fondo; la marca de «sigue la lista» de los menús, más grande y más fácil de tocar; una fila más de lista en los menús largos y el borde izquierdo de las listas, recto.
 1.7.1 — Landrace Hunters 0.71.0: el letrero CLUB de los clubs de pueblo, entero; la luz del armario (el CFL se ve y, apagado, la carpa queda a oscuras con la luz verde de trabajo); las puertas y sus rótulos, sin nada delante; los aparcamientos, con entrada desde la calle.

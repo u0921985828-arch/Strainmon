@@ -2,10 +2,11 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
-### La medida de fluidez, cerrada (0.79, lo pidió el usuario: «Cumple con todo lo pendiente»)
+### La medida de fluidez, cerrada (0.79, lo pidió el usuario: «Cumple con todo lo pendiente»); plugin de WordPress 1.7.4 en `descargas/landrace-hunters-1.7.4.zip`
 
 - **El pintado, medido antes y después.** Lo único que el repaso 0.76 dejaba sin cerrar era repetir la medida `--rend` con la máquina tranquila. Con el coste de GDScript en `capa0` (llvmpipe, 1280 × 720): `home` 1,9 → **1,7** · `nave` 2,3 → **2,0** · `zorroza` 3,5 → **3,0** · `casco` 3,9 → **3,3** · `abando` 4,6 → **3,5** · `town` 6,6 → **4,0** ms, de 51,9 fps en el piso a 41,0 en el pueblo. Baja en los seis mapas de la línea base, y donde más donde hay más objetos y suelo animado (`town` −39 %, `abando` −24 %, `casco` −15 %): son la caché del sprite de cada objeto, los trozos aparte del suelo animado y los lotes de rectángulos de la tanda anterior. Las cifras, en `docs/REPASO-ESTRUCTURA.md` § 3.
 - **La medida se cierra sola.** La primera corrida dejaba el juego abierto después de «REND fin» y contaminaba la siguiente (un 25-30 % más de `capa0`): con `--rend-cierra`, `_rend()` llama a `get_tree().quit()` al acabar.
+- **El plugin, con esta versión** (`landrace-hunters` 1.7.4, `node tools/wordpress.js --cifrar`): el juego 0.79.0 con el `index.pck` cifrado (22,9 MB), el zip completo de 32,3 MB (1,6 MB menos que el 1.7.3, por los PNG recomprimidos del repaso) y el ligero de 32 KB para los servidores que cortan las subidas grandes. Zips en `descargas/landrace-hunters-1.7.4.zip` y `-ligero.zip`.
 
 
 ### Lo que quedaba del repaso, segunda vuelta (0.78, lo pidió el usuario: «Ahora vete cumpliendo cada mejora»)
