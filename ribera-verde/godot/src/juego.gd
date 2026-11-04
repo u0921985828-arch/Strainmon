@@ -2,7 +2,7 @@
 # la partida nueva, entrar en el juego, update (el jugador, los personajes, el reloj del juego y los eventos pendientes) y
 # el HUD. El dibujo de cada modo (mundo, carpa, combate, título) lo hace pinta.gd en el lienzo de SW × SH (180).
 # Cadena: ui → mundo → granja → trama → retencion → juego (este es el script de la escena).
-extends "res://src/retencion.gd"
+extends "res://src/tienda.gd"
 
 const Pinta = preload("res://src/pinta.gd")
 const Arte = preload("res://src/arte.gd")
@@ -755,7 +755,7 @@ Las licencias de los programas y las letras que usa el juego, en CRÉDITOS · LI
 Gracias por jugar.""")
 var PRIVACIDAD: String = I18n.K("""Landrace Hunters no vende, no alquila y no usa tus datos para anuncios.
 
-· Se juega sin conexión y sin anuncios. Los capítulos 1 a 3 son gratis; el juego completo es una compra única por Google Play: la tarjeta y el pago los gestiona Google, nosotros solo sabemos que está comprado.
+· Se juega sin conexión y sin anuncios. El juego entero viene con la aplicación. En LA TIENDA hay extras opcionales que se pagan con semillas doradas, la moneda que se gana jugando; los paquetes de semillas doradas se compran por Google Play: la tarjeta y el pago los gestiona Google, nosotros solo sabemos que la compra está hecha.
 · Play Games (si inicias sesión): los logros y la partida en la nube se guardan en tu cuenta de Google Play Juegos.
 · Informes de errores (OPCIONES · INFORMES DE ERRORES, apagados de serie): si los activas y el juego falla, se envía un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y lo que fallaba), sin tu nombre, cuenta ni partida. Se apagan en el mismo sitio.
 · Sin avisos: esta versión no manda notificaciones ni pide ese permiso.

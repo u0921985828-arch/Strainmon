@@ -9,7 +9,7 @@ vende ni comparte datos con fines publicitarios.
 
 | Qué | Cuándo | Quién lo trata | Datos |
 |---|---|---|---|
-| **Compra del juego completo** | Solo si compras el juego completo (los capítulos 1 a 3 son gratis) | Google Play (Facturación de Google Play) | El pago y la tarjeta los gestiona Google. El juego solo recibe que la compra está hecha |
+| **Compras de LA TIENDA** | Solo si compras un paquete de semillas doradas (el juego entero viene con la aplicación) | Google Play (Facturación de Google Play) | El pago y la tarjeta los gestiona Google. El juego solo recibe que la compra está hecha |
 | **Play Games** (logros y partida en la nube) | Solo si inicias sesión en Google Play Juegos | Google | Tu perfil de Play Juegos, los logros desbloqueados y la copia de la partida que guardas en la nube |
 | **Informes de errores** | Solo si los activas (OPCIONES · INFORMES DE ERRORES; apagados de serie) | Sentry (Functional Software, Inc.), como encargado | Cuando el juego falla: el modelo del móvil, la versión de Android y del juego, el error técnico y los últimos pasos de la partida (p. ej. «capítulo 2», «primera cosecha»). Sin nombre, cuenta, ubicación, partida ni identificadores publicitarios. Se borran a los 90 días |
 

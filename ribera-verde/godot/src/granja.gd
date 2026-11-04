@@ -982,6 +982,7 @@ func apunta_album(p: Dictionary) -> void:
 	if S.album.any(func(a): return int(a.id) == int(fe.get("id", -1))):
 		return
 	rev_nota("rara")
+	tn_gana("rareza")   # LA TIENDA (tienda.gd): semillas doradas por el fenotipo raro nuevo
 	S.album.append({"id": int(fe.get("id", 0)), "sid": p.sid, "ra": (fe.ra.duplicate() if fe.get("ra") is Array else []), "sh": fe.get("sh", ""), "d": int(S.day), "m": String(S.map)})   # el nombre, de S.fnom al enseñarlo (nom_planta)
 
 # estabilizar: la línea cruzada consigo misma sube una generación (F1 → F2 → F3 → estable)
@@ -1298,7 +1299,7 @@ func reformas() -> void:
 				var en: bool = j == v
 				var pd: bool = o != null and int(o.v) == j
 				ks.append([k, j])
-				items.append({"label": "%s: %s" % [I18n.v(String(R.n)), I18n.v(String(R.v[j][0]))] + (T(" · pedido") if pd else T(" · en casa") if en else ""), "right": Datos.eur(R.v[j][1]), "disabled": o != null or en,
+				items.append({"label": "%s: %s" % [I18n.v(String(R.n)), I18n.v(String(R.v[j][0]))] + (T(" · pedido") if pd else T(" · en casa") if en else ""), "right": K("PAGADO") if reforma_pagada() else Datos.eur(R.v[j][1]), "disabled": o != null or en,
 					"desc": I18n.v(String(R.v[j][2])) + (T("\n{q} viene mañana.", {"q": R.quien}) if pd else T("\nYa hay una obra pedida: viene mañana.") if o != null else "" if en else T("\n{q} viene mañana.", {"q": R.quien}))})
 		items.append({"label": K("Volver"), "desc": K("Pagas con lo que llevas y, si no llega, con la caja fuerte.")})
 		i = await menu(items, {"cls": "full", "title": K("REFORMAS"), "title2": T("Suelo y paredes · tienes {e}", {"e": Datos.eur(S.money + caja_e())}), "desc": true, "initial": i})
@@ -1307,8 +1308,8 @@ func reformas() -> void:
 		var k: String = ks[i][0]
 		var j: int = ks[i][1]
 		var R: Dictionary = D.REFORMA[k]
-		var p = R.v[j][1]
-		if not await tarjeta(p, K("Reforma") + " · " + String(R.n).to_lower()):   # 1.35: con tarjeta
+		var p = 0 if reforma_pagada() else R.v[j][1]   # LA TIENDA (tienda.gd): las obras ya pagadas
+		if p > 0 and not await tarjeta(p, K("Reforma") + " · " + String(R.n).to_lower()):   # 1.35: con tarjeta
 			continue
 		if not (S.get("obra") is Dictionary):
 			S.obra = {}

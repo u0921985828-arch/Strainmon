@@ -62,6 +62,7 @@ func _paga3() -> void:   # como el pago del plazo del capítulo 3 en trama.gd
 		return
 	await J.cap4_sigue()
 
+
 func planta(prog: float, agua: float, plaga: bool) -> Dictionary:
 	return {"sid": "ria", "prog": prog, "water": agua, "health": 80.0, "fert": false, "pest": plaga, "f": J.roll_feno("ria")}
 
@@ -188,53 +189,33 @@ func _corre() -> void:
 	chk(D2.f == "2026-10-20" and D2.ok.is_empty() and D2.c.is_empty() and D2.o != ids, "diarios: otro día, otros y a cero (%s)" % [D2.o])
 	chk(J.diarios_txt() == "0/3", "diarios: en OBJETIVO, 0/3 (%s)" % J.diarios_txt())
 
-	# 4 · la demo (capítulos 1-3) y la compra única: solo con la marca «tienda» (el AAB de Play); sin ella (APK, WordPress y aquí),
-	# apagada: no corta. Se enciende para probarla
-	chk(not OS.has_feature("tienda") and Retencion.DEMO == false, "sin la marca «tienda», sin el bloqueo de la demo")
-	chk(FileAccess.get_file_as_string("res://src/retencion.gd").contains("static var DEMO := OS.has_feature(\"tienda\")"), "la demo va por la marca «tienda»")
-	Retencion.DEMO = false
+	# 4 · ya no hay demo (lo pidió el usuario: «Quiero que el juego no sea demo»): el juego entero viene con la aplicación, el
+	# plazo del capítulo 3 pasa siempre al 4 y una partida que se quedó cortada sigue sola
+	chk(Retencion.DEMO == false, "la demo, fuera")
+	chk(FileAccess.get_file_as_string("res://src/retencion.gd").contains("static var DEMO := false"), "DEMO en duro a false")
+	chk(not FileAccess.get_file_as_string("res://src/retencion.gd").contains("FIN DE LA DEMO"), "sin la pantalla de fin de demo")
 	J.aj.completo = false
 	PL.comprado = false
-	chk(J.completo(), "sin el bloqueo de la demo, el juego entero")
-	Retencion.DEMO = true
-	J.S = S0.duplicate(true)
-	J.S.ch = 3
-	J.aj.completo = false
-	PL.comprado = false
-	Plataforma.PRUEBA_COMPRA = "cancelada"
+	chk(J.completo(), "el juego entero, sin comprar nada")
 	var res := {"v": null}
-	QUIERO = ["Comprar"]
+	J.S = S0.duplicate(true)
+	J.S.ch = 3
+	J.S.flags.demo4 = 1
 	corre(func(): res.v = await J.demo_corta())
-	chk(res.v == true and J.S.flags.get("demo4") and J.S.ch == 3, "demo: cancelada, se queda en el 3 con START · JUEGO COMPLETO")
-	chk(PL.enviados.has("compra:" + String(D.COMPLETO.producto)), "demo: pide %s" % D.COMPLETO.producto)
-	QUIERO = ["Más tarde"]
-	corre(func(): res.v = await J.demo_corta())
-	chk(res.v == true and not J.aj.completo, "demo: más tarde, sigue la demo")
-	Plataforma.PRUEBA_COMPRA = "ok"
-	QUIERO = ["Comprar"]
+	chk(res.v == false and not J.S.flags.get("demo4"), "la partida cortada de antes sigue sola")
 	corre(func(): res.v = await J.demo_menu())
-	chk(res.v == true and J.aj.completo and not J.S.flags.get("demo4"), "demo: comprada desde START, al capítulo 4")
-	corre(func(): res.v = await J.demo_corta())
-	chk(res.v == false, "demo: con el juego completo, no corta")
-	J.aj.completo = false
-	PL.comprado = true   # comprado en otro móvil (consultar)
-	chk(J.completo() and J.aj.completo, "demo: la compra de antes se recuerda")
-	# el pago del plazo del capítulo 3 de verdad: sin comprar, no pasa al 4
-	J.aj.completo = false
-	PL.comprado = false
-	Plataforma.PRUEBA_COMPRA = "cancelada"
+	chk(res.v == true, "demo_menu: siempre sigue")
+	chk(J.has_method("cap4_sigue"), "cap4_sigue")
+	# el pago del plazo del capítulo 3 pasa al 4 sin preguntar ni cobrar nada
 	J.S = S0.duplicate(true)
 	J.S.ch = 3
 	J.S.flags.erase("demo4")
-	chk(J.has_method("cap4_sigue"), "demo: cap4_sigue")
-	QUIERO = ["Más tarde"]
+	PL.enviados.clear()
 	corre(_paga3)
-	chk(J.S.ch == 3, "demo: el plazo pagado sin comprar se queda en el 3 (cap. %d)" % J.S.ch)
-	Plataforma.PRUEBA_COMPRA = "ok"
-	J.S.flags.erase("demo4")
-	QUIERO = ["Comprar"]
-	corre(_paga3)
-	chk(J.S.ch == 4, "demo: comprado, al 4 (cap. %d)" % J.S.ch)
+	chk(J.S.ch == 4, "el plazo pagado pasa al capítulo 4 (cap. %d)" % J.S.ch)
+	chk(not PL.enviados.any(func(e): return String(e).begins_with("compra:")), "el plazo no pide ninguna compra")
+	# START ya no lleva JUEGO COMPLETO
+	chk(not FileAccess.get_file_as_string("res://src/menus.gd").contains("JUEGO COMPLETO"), "START, sin JUEGO COMPLETO")
 
 	# 5 · Play Games: los 27 logros mapeados y el envío al conseguirlos
 	var pg: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(Plataforma.PG_JSON))
@@ -276,7 +257,7 @@ func _corre() -> void:
 	J.S = S0.duplicate(true)
 	J.S.pots[0] = planta(.4, 50.0, false)
 	var pp: float = J.S.pots[0].prog
-	chk(J.fuera_desde(Retencion.AHORA - 5 * 3600.0).is_empty() and J.S.pots[0].prog == pp and J.completo(), "sin PLAY: ni offline ni demo")
+	chk(J.fuera_desde(Retencion.AHORA - 5 * 3600.0).is_empty() and J.S.pots[0].prog == pp and J.completo(), "sin PLAY: ni offline ni corte")
 	Datos.PLAY = true
 
 	for f in fallos:

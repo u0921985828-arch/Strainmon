@@ -37,7 +37,7 @@ From the farmhouse in Mendialde to the shipyards, from the old town of Ibarbide 
 · Touch controls built for landscape play with your thumbs
 · In Spanish and English
 · Plays offline, no ads
-· Chapters 1 to 3 free; the full game is a single purchase (no pay-to-win)
+· The whole game, all eight chapters, comes with the app; the store extras are optional
 · Autosave and backup
 
 NOTICE: Landrace Hunters is a work of fiction for adults (18+). It is not a growing guide and does not encourage using or selling drugs: growing and selling cannabis is a crime in many countries. All characters, places, brands and strains in the game are fictional.

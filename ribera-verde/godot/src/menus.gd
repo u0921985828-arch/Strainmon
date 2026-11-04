@@ -20,15 +20,13 @@ func start_menu():
 			{"label": K("OPCIONES"), "ic": icono("altavoz")}, {"label": K("SALIR"), "ic": icono("salir")}]
 		if Datos.PLAY:   # U4: el registro de diálogo
 			it.insert(5, {"label": K("REGISTRO"), "right": str(registro.size()), "ic": icono("movil")})
-		if Datos.PLAY and S.flags.get("demo4"):   # U11: la demo, acabada
-			it.insert(0, {"label": K("JUEGO COMPLETO"), "right": T("cap. {n}", {"n": int(D.COMPLETO.ch)}), "ic": icono("trofeo")})
+		if tn_hay():   # LA TIENDA de extras (tienda.gd): el juego entero ya viene con la aplicación
+			it.insert(5, {"label": K("LA TIENDA"), "right": tn_txt(tn_sd()), "ic": icono("bolsa")})
 		i = await menu(it, {"cls": "start", "initial": i, "startCloses": true, "title": "%s · %s" % [Datos.fd_hud(S.day), reloj_txt()], "title2": Datos.eur(S.money)})
 		if i < 0 or it[i].label == "SALIR":
 			return
-		if it[i].label == "JUEGO COMPLETO":
-			if await demo_menu():
-				await cap4_sigue()
-				return
+		if it[i].label == "LA TIENDA":
+			await tienda_menu()
 			continue
 		if it[i].label == "REGISTRO":
 			await leer(K("REGISTRO"), "\n\n".join(PackedStringArray(_registro_inv())) if registro.size() else K("Todavía no has hablado con nadie."))

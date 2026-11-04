@@ -155,6 +155,8 @@ func cot_presenta(c: Dictionary, y: int) -> void:
 	rev_nota("copa", npo)
 	S.rep += 2 * (3 - pl)
 	cot().tro.append({"y": y, "k": k, "pl": pl + 1, "s": sid})
+	if pl == 0:
+		tn_gana("copa")   # LA TIENDA (tienda.gd): semillas doradas por el oro
 	sfx("get")
 	update_hud()
 	await got(T("{e} y el trofeo de {c}, {p}.º puesto", {"e": Datos.eur(e), "c": I18n.v(String(c.n)).to_lower(), "p": pl + 1}))
@@ -164,6 +166,7 @@ func cot_presenta(c: Dictionary, y: int) -> void:
 			oros += 1
 	if oros >= int(C.abs.n) and not (y in cot().abs):
 		cot().abs.append(y)
+		tn_gana("copaabs")   # LA TIENDA (tienda.gd)
 		S.money += int(C.abs.eur)
 		S.prest = int(S.get("prest", 0)) + int(C.abs.prest)
 		update_hud()

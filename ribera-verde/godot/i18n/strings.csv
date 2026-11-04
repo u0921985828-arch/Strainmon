@@ -1493,6 +1493,7 @@ s5d087e9e,Cambias {q} del {m}: {v}.,You change {q} of the {m}: {v}.
 sfbcb0797,Cambias {q} de {m}: {v}.,You change {q} of the {m}: {v}.
 sdde6ecee,Listo,Done
 s30b28fc8, · en casa, · at home
+sdd3289de,PAGADO,
 s0fe9a2c7,"
 {q} viene mañana.","
 {q} comes tomorrow."
@@ -1910,25 +1911,16 @@ Growing and selling cannabis is a crime in many countries. This game does not en
 The licences of the software and typefaces the game uses are under CREDITS · LICENCES.
 
 Thanks for playing."
-s80a81c0f,"Landrace Hunters no vende, no alquila y no usa tus datos para anuncios.
+sdd409df2,"Landrace Hunters no vende, no alquila y no usa tus datos para anuncios.
 
-· Se juega sin conexión y sin anuncios. Los capítulos 1 a 3 son gratis; el juego completo es una compra única por Google Play: la tarjeta y el pago los gestiona Google, nosotros solo sabemos que está comprado.
+· Se juega sin conexión y sin anuncios. El juego entero viene con la aplicación. En LA TIENDA hay extras opcionales que se pagan con semillas doradas, la moneda que se gana jugando; los paquetes de semillas doradas se compran por Google Play: la tarjeta y el pago los gestiona Google, nosotros solo sabemos que la compra está hecha.
 · Play Games (si inicias sesión): los logros y la partida en la nube se guardan en tu cuenta de Google Play Juegos.
 · Informes de errores (OPCIONES · INFORMES DE ERRORES, apagados de serie): si los activas y el juego falla, se envía un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y lo que fallaba), sin tu nombre, cuenta ni partida. Se apagan en el mismo sitio.
 · Sin avisos: esta versión no manda notificaciones ni pide ese permiso.
 · La partida y los ajustes se guardan en este móvil, en la carpeta privada de la app. Se borran al desinstalarla (o desde OPCIONES · BORRAR PARTIDA).
 · Si tienes activada la copia de seguridad de Android, el sistema la guarda en tu cuenta de Google (no pasa por nosotros).
 
-Si tienes dudas, escribe a la dirección de contacto de la ficha de la tienda.","Landrace Hunters does not sell, rent or use your data for ads.
-
-· It plays offline and without ads. Chapters 1 to 3 are free; the full game is a one-time purchase on Google Play: Google handles the card and the payment, we only know it has been bought.
-· Play Games (if you sign in): achievements and the cloud save are stored in your Google Play Games account.
-· Error reports (OPTIONS · ERROR REPORTS, off by default): if you turn them on and the game crashes, an anonymous technical report is sent (phone model, Android and game version, and what failed), without your name, account or save. Turn them off in the same place.
-· No alerts: this version sends no notifications and never asks for that permission.
-· Your save and settings are stored on this phone, in the app's private folder. They are deleted when you uninstall it (or from OPTIONS · DELETE SAVE).
-· If Android backup is on, the system stores it in your Google account (it does not go through us).
-
-If you have questions, write to the contact address on the store listing."
+Si tienes dudas, escribe a la dirección de contacto de la ficha de la tienda.",
 sc82210fe,LICENCIAS,LICENSES
 sa2e6b0b3,PRIVACIDAD,PRIVACY
 sfd6ac111,"Este juego usa Godot Engine, con licencia MIT:
@@ -2122,7 +2114,7 @@ s497d1d22,OBJETIVO,GOAL
 s4e08c0e3,cap. {n},ch. {n}
 s5f80d09d,GUARDAR,SAVE
 sff4f3417,REGISTRO,LOG
-sedc0b8d5,JUEGO COMPLETO,FULL GAME
+s75d99c49,LA TIENDA,THE STORE
 s7fd53b78,startCloses,
 sb228bc3e,Todavía no has hablado con nadie.,You haven't talked to anyone yet.
 sba049328,Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla.,Game copied to the clipboard. Paste it into a note or an email to keep it.
@@ -3288,16 +3280,6 @@ s7dc8005b,Tienes plantas listas para cosechar.,You have plants ready to harvest.
 sda654f78,<small>OBJETIVO DIARIO</small>{t} · +1 abono,<small>DAILY GOAL</small>{t} · +1 nutrient
 s8c70f118,Cada objetivo hecho da un abono. Cambian cada día (la fecha del móvil).,Each goal done gives you a nutrient. They change every day (by the phone date).
 sdcbd360e,OBJETIVOS DIARIOS,DAILY GOALS
-s3b64c1ca,"FIN DE LA DEMO
-Los capítulos {c} a 8 vienen con el juego completo: una compra única, sin anuncios ni pagos dentro. La partida te espera aquí.","END OF THE DEMO
-Chapters {c} to 8 come with the full game: a one-time purchase, no ads or in-app payments. Your save will be waiting here."
-s38968764,Comprar el juego completo,Buy the full game
-s51bba25a,Más tarde,Later
-se8170bcb,Cuando quieras: START · JUEGO COMPLETO.,Whenever you like: START · FULL GAME.
-s2ee6cac3,¡Gracias! Ya tienes el juego completo.,Thanks! You now have the full game.
-sbaa4da2f,"La compra está pendiente. Cuando se confirme, sigue desde START · JUEGO COMPLETO.","The purchase is pending. Once confirmed, carry on from START · FULL GAME."
-sad7ca9d6,Compra cancelada.,Purchase cancelled.
-sd5542ba8,No se ha podido hacer la compra. Inténtalo más tarde.,The purchase couldn't go through. Try again later.
 s528f9ff7,{m} de {y},
 s7675e213,de {a} a {b} °C de media,{a} to {b} °C on average
 s0343073e,de {a} a {b}° de media,{a} to {b}° on average
@@ -3611,6 +3593,33 @@ B: close."
 s6b3afe29,"Secándose, {g}.","Drying, {g}."
 sd2d810d5,EL ARMARIO,THE CUPBOARD
 sebed1a6d,MUS_ALIAS,
+s303e22b8,TIENDA,
+s846a24f6,<small>LA TIENDA</small>+{n},<small>THE STORE</small>+{n}
+s76f27714,"Compraste el juego completo cuando los capítulos del 4 al 8 iban aparte. Ya no: el juego entero viene con la aplicación. Por las molestias, {n} en LA TIENDA.",You bought the full game back when chapters 4 to 8 were sold separately. Not any more: the whole game comes with the app. Sorry for the trouble — here are {n} for THE STORE.
+scde538c7,una semilla de {s},one {s} seed
+s7457fb07,{n} sobres de humedad,{n} humidity packs
+s67b8a415,el arcón congelador,the chest freezer
+s6699465d,"las reformas de suelo y pared, pagadas","the floor and wall jobs, paid for"
+s601d27f0,"AUTOS RIBERA, abierto","AUTOS RIBERA, open"
+sa391e5e7,el camarote con sus estanterías y doce sobres,the attic with its shelving units and twelve humidity packs
+saf25f13d,el despacho de lujo,the fitted-out office
+s39855cfc,la huerta ampliada con todas sus mejoras,"the allotment, extended and fully kitted out"
+s0145ed03,"el banco de la tía, con sus seis colecciones entregadas","your aunt's seed bank, with its six collections handed in"
+s0e255839,el muelle reformado y KAIA abierto,the quay refurbished and KAIA open
+s2e58e0e0,Ya lo tienes.,You already have it.
+s96369ca7,Te faltan {n}.,You are {n} short.
+sa6dc0bc0,CÓMO SE GANAN,HOW TO EARN THEM
+sb3d197d6,De dónde salen las semillas doradas.,Where golden seeds come from.
+s9e041f7d,LAS SEMILLAS DORADAS,GOLDEN SEEDS
+s2b7b85e4,YA,
+sa5c5623b,Los paquetes solo se compran en la versión de Google Play. Aquí las semillas doradas se ganan jugando.,Packs are only on sale in the Google Play build. Here golden seeds are earned by playing.
+s08c64a86,{n} por {p}. Se paga por Google Play.,{n} for {p}. Paid through Google Play.
+s1a861e2d,¡Gracias! {n} en LA TIENDA.,Thanks! {n} in THE STORE.
+s69f2432d,"La compra está pendiente. Cuando se confirme, las tendrás aquí.","The purchase is pending. Once it clears, they will be here."
+sad7ca9d6,Compra cancelada.,Purchase cancelled.
+sd5542ba8,No se ha podido hacer la compra. Inténtalo más tarde.,The purchase couldn't go through. Try again later.
+s55e4b9cb,{n} por {p}.,{n} for {p}.
+sab183144,No hay nada que mandarte de esto ahora mismo. No se te cobra.,There is nothing to send you right now. You are not charged.
 s8612a385,1 semilla · {p},1 seed · {p}
 s49ef1b29,Bolsa de {n} · {p},Bag of {n} · {p}
 se87fac1f,Sobre de {n} · {p},Pack of {n} · {p}
@@ -7193,6 +7202,74 @@ s8ba7f346,"Toca recibo: luz, alquileres y seguros.","Bills are due: power, rents
 s964536b0,"Los siete primeros días del mes, ventana para comprar la nave a tocateja.",The first seven days of the month are the window to buy the unit outright.
 sb34870f2,"El próximo número, el día 1. Si estás suscrito, al buzón.","The next issue on the 1st. If you are subscribed, straight to your letterbox."
 sd8d5f93c,"Mes tranquilo: ni Copa, ni fiestas, ni plazos. Buen momento para montar un ciclo largo.","A quiet month: no Cup, no festivals, no instalments. A good time to set up a long cycle."
+sdce1a040,semillas doradas,golden seeds
+s507dd705,semilla dorada,golden seed
+saa2697af,"Las semillas doradas se ganan jugando: objetivos diarios, capítulos, la Copa, fenotipos raros, los números de EL ESQUEJE y los logros. En la tienda también se pueden comprar.","Golden seeds are earned by playing: daily goals, chapters, the Cup, rare phenotypes, issues of EL ESQUEJE and achievements. They can also be bought in the store."
+s0b75d67d,"El juego entero viene con la aplicación. Lo de aquí adelanta trabajo o da cosas: nada de esto abre capítulos ni historia, y todo se consigue jugando.","The whole game comes with the app. What is here saves you work or hands you things: none of it unlocks chapters or story, and all of it can be got by playing."
+s3926f1ca,Cada objetivo diario hecho,Each daily goal done
+seb5449fb,Cada capítulo nuevo,Each new chapter
+s35e0cc7b,Cada oro de la Copa de otoño,Each gold at the autumn Cup
+s8fa15490,La Copa absoluta,The overall Cup
+s6b626c36,Cada fenotipo raro nuevo del cuaderno,Each new rare phenotype in the notebook
+s71d449f6,Cada número nuevo de EL ESQUEJE,Each new issue of EL ESQUEJE
+s11c86a15,Cada logro,Each achievement
+s6dcdd331,Ganar la Copa de la asociación,Winning the club Cup
+s5145fdc8,SEMILLAS DORADAS,GOLDEN SEEDS
+s39685e73,Paquetes de semillas doradas.,Packs of golden seeds.
+sb1e71111,GENÉTICAS,
+sf4777726,Semillas de variedades que también salen jugando.,Seeds of strains you can also get by playing.
+s9a1f3778,"Abono, tarros, sobres, macetas y focos.","Nutrients, jars, humidity packs, pots and lights."
+sd663a257,EXTRAS,
+s4074b7d5,"Trabajo ya hecho: obras, locales y salas.","Work already done: building jobs, premises and rooms."
+s8c726eb1,Puñado de semillas doradas,Handful of golden seeds
+sf73dfb19,Ciento veinte semillas doradas.,One hundred and twenty golden seeds.
+s4012a748,Sobre de semillas doradas,Envelope of golden seeds
+s16dc2c83,Cuatrocientas semillas doradas. Un trece por ciento más por semilla que el puñado.,Four hundred golden seeds. Thirteen per cent better per seed than the handful.
+sf154027e,Bote de semillas doradas,Jar of golden seeds
+s0a0fc7d6,Mil semillas doradas. Un veinticinco por ciento más por semilla que el puñado.,A thousand golden seeds. Twenty-five per cent better per seed than the handful.
+sedbe647f,Caja de semillas doradas,Box of golden seeds
+se42c5960,Dos mil seiscientas semillas doradas. Un cuarenta y cinco por ciento más por semilla que el puñado.,Two thousand six hundred golden seeds. Forty-five per cent better per seed than the handful.
+sd8bd9901,Tres landraces,Three landraces
+s2fbf005c,"Tres semillas de landrace de las que te falten, una de cada variedad, con su ficha ya descubierta. Si ya las tienes todas, no hay nada que mandar.","Three landrace seeds you are missing, one of each strain, with their entry already unlocked. If you have them all, there is nothing to send."
+s5e1ec4b4,Cinco de receta,Five from a recipe
+sb620c21b,Cinco semillas de una variedad de receta que te falte. El recetario de la CannaDex sigue diciendo cómo se saca por tu cuenta.,Five seeds of a recipe strain you are missing. The CannaDex recipe list still tells you how to breed it yourself.
+sf1c03972,Cuatro autoflorecientes,Four autoflowerers
+sf27ca992,"Cuatro semillas autoflorecientes, una de cada variedad, de las que te falten.","Four autoflowering seeds you are missing, one of each strain."
+s8053a881,Cinco Haze del 98,Five '98 Haze
+s3814cd4f,"Cinco semillas de la Haze del 98, la de la lata del manzano del cuaderno azul de la tía.","Five seeds of the '98 Haze, the one from the tin under the apple tree in your aunt's blue notebook."
+s5fc42c58,Hace falta la lata del cuaderno azul de la tía.,You need the tin from your aunt's blue notebook.
+s22a22010,Abono para una temporada,A season's nutrients
+s61e09419,"Cien dosis de abono de crecimiento, cien de floración y doscientas de corrector, de la marca mineral, a casa.","A hundred doses of grow nutrient, a hundred of bloom and two hundred of corrector, the mineral brand, delivered home."
+s79940e31,Abono orgánico para una temporada,A season's organic nutrients
+sbc5e1e98,"Lo mismo de la marca orgánica: cien dosis de crecimiento, cien de floración y doscientas de corrector. El sustrato sigue vivo y frena las plagas.","The same from the organic brand: a hundred doses of grow, a hundred of bloom and two hundred of corrector. The substrate stays alive and holds pests back."
+s22f12471,Los tarros de curado,The curing jars
+s11a7c738,Los tarros de cristal de Kiko para la caja fuerte y la nevera: lo que guardas ahí se cura.,Kiko's glass jars for the safe and the fridge: whatever you keep in there cures.
+sd3154566,Nueve macetas de tela,Nine fabric pots
+sa840e2da,"Nueve macetas de tela de treinta y cinco litros, de las que entran en la carpa grande y en KAIA.","Nine thirty-five litre fabric pots, the ones that fit the big tent and KAIA."
+s17ed2a00,Dos LED de los grandes,Two of the big LEDs
+s3fe9e0ba,"Dos focos LED de setecientos veinte vatios, los de la carpa grande.","Two seven hundred and twenty watt LED lights, the big-tent ones."
+sfe3a09de,Doce sobres de humedad,Twelve humidity packs
+s8f36bf97,Doce sobres al sesenta y dos por ciento para los tarros de diez litros del camarote.,Twelve sixty-two per cent packs for the attic's ten litre jars.
+s82b805f4,Hace falta el camarote habilitado.,You need the attic fitted out.
+s7d44f41e,El arcón congelador,The chest freezer
+s48504a91,"El arcón congelador de cinco kilos puesto al lado de la nevera, desde hoy.","The five kilo chest freezer set up next to the fridge, from today."
+s4d996654,Suelos y paredes,Floors and walls
+sa392b59f,"Todas las reformas de suelo y de pared del piso, pagadas: se eligen en REFORMAS sin volver a pagarlas.","Every floor and wall job in the flat, paid for: pick them in REFURBISHMENT without paying again."
+s5bb56971,"El concesionario del barrio alto abierto desde hoy, sin esperar al capítulo cinco ni al patrimonio. Los vehículos se siguen pagando con tu dinero.","The uptown dealership open from today, without waiting for chapter five or the net worth. The vehicles are still paid for with your own money."
+s1645ab8a,"El camarote, listo","The attic, ready"
+s0371a120,"La obra del camarote hecha, sus cuatro estanterías de tarros de diez litros puestas y doce sobres de humedad dentro.","The attic work done, its four ten-litre-jar shelving units in place and twelve humidity packs inside."
+s89a18729,El despacho de lujo,The fitted-out office
+s930594f5,"El despacho de la nave con los monitores y la caja fuerte de alta capacidad, la que no encuentra la redada.","The warehouse office with the monitors and the high-capacity safe, the one a raid never finds."
+sa53e87ff,Hace falta la nave de Valdehierro.,You need the Valdehierro warehouse.
+sa736ebc4,"La huerta, al doble y con riego","The allotment, doubled and irrigated"
+sb757b976,"La huerta de la tía ampliada al doble, con los bidones, el depósito de mil litros, el goteo con bomba solar, las herramientas y la motoazada.","Your aunt's allotment doubled in size, with the drums, the thousand litre tank, solar-pumped drip irrigation, the tools and the rotavator."
+s5bba797e,"Hay que encontrar antes la huerta, detrás del garaje del barrio.","You have to find the allotment first, behind the neighbourhood garage."
+s038e83af,El laboratorio del banco,The seed bank's lab
+sa669e65c,"Las seis colecciones del banco de la tía dadas por entregadas: la cámara fría, el laboratorio, la sala de catas, el archivo, el mostrador de los socios y la placa, destapados de golpe.","All six collections of your aunt's seed bank counted as handed in: the cold room, the lab, the tasting room, the archive, the members' counter and the plaque, uncovered in one go."
+s0bb41950,"Hace falta la llave del cuarto de atrás, la de la lata del cuaderno azul.","You need the back room key, the one from the blue notebook's tin."
+s924b7a6a,"KAIA, con las obras hechas","KAIA, with the work done"
+s04460ff9,"La reforma del muelle pagada y KAIA abierto con su dispensario, sin esperar a la cuadrilla.","The quay refurbishment paid for and KAIA open with its dispensary, without waiting for the crew."
+s84f98330,"Hace falta el muelle de Puerto Viejo, del capítulo ocho.",
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -7224,6 +7301,34 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+s80a81c0f,"Landrace Hunters no vende, no alquila y no usa tus datos para anuncios.
+
+· Se juega sin conexión y sin anuncios. Los capítulos 1 a 3 son gratis; el juego completo es una compra única por Google Play: la tarjeta y el pago los gestiona Google, nosotros solo sabemos que está comprado.
+· Play Games (si inicias sesión): los logros y la partida en la nube se guardan en tu cuenta de Google Play Juegos.
+· Informes de errores (OPCIONES · INFORMES DE ERRORES, apagados de serie): si los activas y el juego falla, se envía un informe técnico anónimo (modelo del móvil, versión de Android y del juego, y lo que fallaba), sin tu nombre, cuenta ni partida. Se apagan en el mismo sitio.
+· Sin avisos: esta versión no manda notificaciones ni pide ese permiso.
+· La partida y los ajustes se guardan en este móvil, en la carpeta privada de la app. Se borran al desinstalarla (o desde OPCIONES · BORRAR PARTIDA).
+· Si tienes activada la copia de seguridad de Android, el sistema la guarda en tu cuenta de Google (no pasa por nosotros).
+
+Si tienes dudas, escribe a la dirección de contacto de la ficha de la tienda.","Landrace Hunters does not sell, rent or use your data for ads.
+
+· It plays offline and without ads. Chapters 1 to 3 are free; the full game is a one-time purchase on Google Play: Google handles the card and the payment, we only know it has been bought.
+· Play Games (if you sign in): achievements and the cloud save are stored in your Google Play Games account.
+· Error reports (OPTIONS · ERROR REPORTS, off by default): if you turn them on and the game crashes, an anonymous technical report is sent (phone model, Android and game version, and what failed), without your name, account or save. Turn them off in the same place.
+· No alerts: this version sends no notifications and never asks for that permission.
+· Your save and settings are stored on this phone, in the app's private folder. They are deleted when you uninstall it (or from OPTIONS · DELETE SAVE).
+· If Android backup is on, the system stores it in your Google account (it does not go through us).
+
+If you have questions, write to the contact address on the store listing."
+sedc0b8d5,JUEGO COMPLETO,FULL GAME
+s3b64c1ca,"FIN DE LA DEMO
+Los capítulos {c} a 8 vienen con el juego completo: una compra única, sin anuncios ni pagos dentro. La partida te espera aquí.","END OF THE DEMO
+Chapters {c} to 8 come with the full game: a one-time purchase, no ads or in-app payments. Your save will be waiting here."
+s38968764,Comprar el juego completo,Buy the full game
+s51bba25a,Más tarde,Later
+se8170bcb,Cuando quieras: START · JUEGO COMPLETO.,Whenever you like: START · FULL GAME.
+s2ee6cac3,¡Gracias! Ya tienes el juego completo.,Thanks! You now have the full game.
+sbaa4da2f,"La compra está pendiente. Cuando se confirme, sigue desde START · JUEGO COMPLETO.","The purchase is pending. Once confirmed, carry on from START · FULL GAME."
 s78adc8eb,sativa,sativa
 s64fdeccd,"El quiosco de prensa. El periódico, {e}.","The newsstand. The paper, {e}."
 s5a758610,"El cuadro de la sala: el temporizador de los LED, el goteo y el clima. Todo en automático: muchas horas de luz mientras crecen y menos en cuanto toca florecer. Carpas: {l}.","The room panel: the LED timer, the drip and the climate. All automatic: long light hours while they grow and fewer as soon as they flower. Tents: {l}."
@@ -7395,3 +7500,5 @@ sa66e2ad4,{p},{p}
 sfa36793c,Antes, espera a que llegue la carpa que tienes pedida.
 s3d36940f,{n} × {l} L,{n} × {l} L
 sa79d0bf3,¿Cartas de Maite? A ver… Sí, es su letra.
+sb0534c59,RELOJ,CLOCK
+s70257a5e,1 DÍA = {m} MIN,1 DAY = {m} MIN

@@ -36,7 +36,7 @@ Del caserío de Mendialde a los astilleros, del casco viejo de Ibarbide al puert
 · Mandos táctiles para jugar en horizontal con los pulgares
 · En castellano y en inglés
 · Se juega sin conexión y sin anuncios
-· Capítulos 1 a 3 gratis; el juego completo, con una sola compra (sin ventajas de pago)
+· El juego entero, los ocho capítulos, con la aplicación; los extras de la tienda son opcionales
 · Guardado automático y copia de seguridad
 
 AVISO: Landrace Hunters es una obra de ficción para mayores de 18 años. No es una guía de cultivo ni anima a consumir ni a vender: el cultivo y la venta de cannabis son delito en muchos países. Los personajes, lugares, marcas y variedades del juego son inventados.

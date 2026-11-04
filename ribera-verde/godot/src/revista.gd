@@ -338,6 +338,7 @@ func rev_guarda(n: int) -> void:
 	if not rev_tiene(n):
 		R.col.append(n)
 		R.col.sort()
+		tn_gana("revista")   # LA TIENDA (tienda.gd): semillas doradas por el número nuevo
 	revisa_logros()
 	await rev_lee(n)
 
@@ -364,6 +365,7 @@ func rev_dia() -> void:
 	R.sus = int(R.sus) - 1
 	R.col.append(n)
 	R.col.sort()
+	tn_gana("revista")   # LA TIENDA (tienda.gd)
 	revisa_logros()
 	var li := [T("Tienes en el buzón el número de {m}: «{t}».", {"m": rev_mes(n), "t": rev_titular(n)}),
 		T("Te quedan {q} números de la suscripción.", {"q": int(R.sus)}) if int(R.sus) > 0 else K("Era el último de la suscripción: se renueva en la tienda online.")]

@@ -1,7 +1,8 @@
 # Fase 6 (U7, U10, U11; solo con Datos.PLAY): el progreso mientras la app está cerrada (OFFLINE: las plantas crecen OFFLINE.min_h
 # minutos de juego por hora fuera, hasta OFFLINE.tope_h horas; el reloj, la deuda y los eventos no corren), el aviso de la cosecha,
-# los objetivos diarios (DIARIO, por la fecha del móvil), la demo (capítulos 1-3; el 4 pide la compra única DEMO.producto), los
-# logros y la nube de Play Games y el embudo del FTUE (Plataforma, solo con el opt-in de INFORMES DE ERRORES).
+# los objetivos diarios (DIARIO, por la fecha del móvil), los logros y la nube de Play Games y el embudo del FTUE (Plataforma,
+# solo con el opt-in de INFORMES DE ERRORES). La demo se quitó (lo pidió el usuario: «Quiero que el juego no sea demo»): los
+# ocho capítulos vienen con la aplicación y lo de pago son los extras de LA TIENDA (tienda.gd).
 # Cadena: ui → mundo → granja → trama → … → eventos → campo → gestion → vida → metro → copa → ciudad → hilo → bancotia → kaiacult → salafria → acto2 → caza → copaot → acto3 → retencion → juego.
 extends "res://src/revista.gd"
 
@@ -10,10 +11,12 @@ const Plataforma = preload("res://src/plataforma.gd")
 # 0.52 (lo pidió el usuario: «pierde el sentido… igual se te secan las plantas»): con la app cerrada no pasa nada, ni crecen las
 # plantas ni hay aviso de la cosecha; al volver, todo donde lo dejaste. El código se queda, apagado (las pruebas lo encienden)
 static var OFFLINE := false
-# La demo (corte del capítulo 4 y compra única) solo en el AAB de Google Play, que se exporta con la marca «tienda»
-# (tools/godot-aab.js); el APK y WordPress, iguales a Play pero sin el bloqueo (lo pidió el usuario). Una partida que ya se
-# quedó en la demo sigue desde START · JUEGO COMPLETO
-static var DEMO := OS.has_feature("tienda")
+# Ya no hay demo (lo pidió el usuario: «Quiero que el juego no sea demo pero que podamos elegir cosas para que sean como extras
+# o dlc»): el juego entero viene con la aplicación y lo de pago son los extras de LA TIENDA. La marca «tienda» del AAB de Google
+# Play (tools/godot-aab.js) ya solo dice si se puede pagar con dinero de verdad (TIENDA_REAL en tienda.gd). Una partida que se
+# quedó cortada en el capítulo 3 sigue sola (demo_corta, abajo), y a quien compró el juego completo se le regalan semillas
+# doradas (tienda.gd, tn_regalo)
+static var DEMO := false
 static var HOY := ""        # las pruebas fijan la fecha (AAAA-MM-DD); vacía, la del móvil
 static var AHORA := -1.0    # las pruebas fijan la hora unix; negativa, la del móvil
 var plat_n: Node = null
@@ -186,6 +189,7 @@ func diario_revisa() -> void:
 			Dd.ok.append(id)
 			S.items[D.DIARIOS.premio] = int(S.items.get(D.DIARIOS.premio, 0)) + 1
 			toast(T("<small>OBJETIVO DIARIO</small>{t} · +1 abono", {"t": x.t}), 2600)
+			tn_gana("diario")   # LA TIENDA (tienda.gd): semillas doradas por el objetivo
 
 func diarios_txt() -> String:
 	return "%d/%d" % [diario().ok.size(), diario().o.size()]
@@ -202,46 +206,19 @@ func diario_menu() -> void:
 	it.append({"label": K("Volver"), "desc": ""})
 	await menu(it, {"cls": "full", "title": K("OBJETIVOS DIARIOS"), "title2": Dd.f, "desc": true})
 
-# ---------- la demo y la compra única ----------
+# ---------- el juego, entero ----------
+# el juego entero viene con la aplicación: se queda por las partidas y los ajustes de cuando había demo
 func completo() -> bool:
-	if Datos.PLAY and plat().comprado and not aj.get("completo", false):   # comprado en otro móvil o antes de reinstalar
-		aj.completo = true
-		ajustes_guarda()
-	return not Datos.PLAY or not DEMO or aj.get("completo", false)
-
-# al pagar el plazo del capítulo 3: sin el juego completo, la pantalla de la demo; true si se queda en la demo
-func demo_corta() -> bool:
-	if completo():
-		return false
-	S.flags.demo4 = 1
-	save()
-	if await fin_demo():
-		S.flags.erase("demo4")
-		return false
 	return true
 
-func fin_demo() -> bool:
-	var c: int = await ask(T("FIN DE LA DEMO\nLos capítulos {c} a 8 vienen con el juego completo: una compra única, sin anuncios ni pagos dentro. La partida te espera aquí.", {"c": int(D.COMPLETO.ch)}),
-		[K("Comprar el juego completo"), K("Más tarde")])
-	if c != 0:
-		await say(K("Cuando quieras: START · JUEGO COMPLETO."))
-		return false
-	var e: String = await plat().comprar(String(D.COMPLETO.producto))
-	if e == "ok":
-		aj.completo = true
-		ajustes_guarda()
-		sfx("get")
-		await say(K("¡Gracias! Ya tienes el juego completo."))
-		return true
-	await say({"pendiente": K("La compra está pendiente. Cuando se confirme, sigue desde START · JUEGO COMPLETO."), "cancelada": K("Compra cancelada.")}.get(e, K("No se ha podido hacer la compra. Inténtalo más tarde.")))
+# al pagar el plazo del capítulo 3: nunca corta (antes pedía la compra única); una partida que se quedó cortada sigue sola
+func demo_corta() -> bool:
+	S.flags.erase("demo4")
 	return false
 
-# START · JUEGO COMPLETO (con S.flags.demo4): true si ya se puede seguir al capítulo 4
 func demo_menu() -> bool:
-	if completo() or await fin_demo():
-		S.flags.erase("demo4")
-		return true
-	return false
+	S.flags.erase("demo4")
+	return true
 
 # ---------- Play Games y el embudo ----------
 func logro_play(id: String) -> void:

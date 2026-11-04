@@ -1020,6 +1020,7 @@ func logro_play(_id: String) -> void:   # → retencion.gd
 func chapter(nn: int) -> void:
 	S.ch = nn
 	evento("cap_%d" % nn)
+	tn_gana("cap")   # LA TIENDA (tienda.gd): semillas doradas por el capítulo
 	sfx("get")
 	toast(T("<small>CAPÍTULO {n}</small>{t}", {"n": nn, "t": D.CH_TITLES[str(nn)]}), 2800)
 	cap_hasta = M.reloj + 2800
@@ -1120,6 +1121,7 @@ func mision_ok(id: String) -> bool:
 # ganada la Copa, las misiones que falten del capítulo 6, sin aviso ni regalo
 func cerrar_copa() -> void:
 	rev_nota("copa6")
+	tn_gana("copa98")   # LA TIENDA (tienda.gd): semillas doradas por ganar la Copa de la asociación
 	for m in D.MISIONES:
 		if int(m.ch) == 6 and not S.misiones.has(m.id):
 			S.misiones[m.id] = 0
@@ -1260,6 +1262,7 @@ func revisa_logros() -> void:
 			S.logros[l.id] = S.day
 			logro_aviso.append(l.id)
 			logro_play(l.id)
+			tn_gana("logro")   # LA TIENDA (tienda.gd): semillas doradas por el logro
 	if logro_aviso.size():
 		queue("logro", aviso_logro)
 

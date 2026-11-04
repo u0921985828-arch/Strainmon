@@ -1,15 +1,28 @@
-# Play Console · lo que configura Eddie para la fase 6
+# Play Console · lo que configura Eddie
 
-Nada de esto lo hace el código: son pasos en la consola. Sin ellos el juego funciona igual (sin compra, logros, nube ni
-informes: `plataforma.gd` lo detecta y no envía nada).
+Nada de esto lo hace el código: son pasos en la consola. Sin ellos el juego funciona igual y entero (sin los paquetes de
+semillas doradas, los logros, la nube ni los informes: `plataforma.gd` lo detecta y no envía nada).
 
-## 1. Producto de la compra única
-1. Monetizar → Productos → Productos de aplicación → Crear producto.
-2. ID del producto: **`juego_completo`** (tiene que ser exactamente ese: `COMPLETO.producto` en `datos.json`). No consumible.
-3. Nombre «Juego completo», descripción «Los capítulos 4 a 8 de Landrace Hunters», precio, y **Activar**.
-4. Configuración → Pruebas de licencia: añade tu cuenta de Gmail (y las de los testers) y responde «RESPOND_NORMALLY».
-5. Prueba: instala desde la pista de prueba interna con esa cuenta, juega hasta pagar el plazo del capítulo 3 → «Comprar el
-   juego completo» → la compra de prueba no cobra. Después, START → JUEGO COMPLETO no vuelve a salir y el capítulo 4 sigue.
+## 1. Los productos de LA TIENDA (paquetes de semillas doradas)
+
+El juego ya no es una demo: los ocho capítulos vienen con la aplicación. Lo de pago son los extras de LA TIENDA, que se compran
+con semillas doradas, la moneda que se gana jugando. Los paquetes de semillas doradas son lo único que se paga con dinero.
+
+1. Monetizar → Productos → Productos de aplicación → Crear producto, uno por fila. Los ID tienen que ser exactamente estos
+   (`TIENDA.it[].prod` en `datos.json`) y los cuatro son **consumibles** (se vuelven a comprar; el plugin los consume solo).
+
+| ID del producto | Nombre | Lo que da | Precio sugerido |
+|---|---|---|---|
+| `sd_120` | Puñado de semillas doradas | 120 semillas doradas | 2,99 € |
+| `sd_400` | Sobre de semillas doradas | 400 semillas doradas | 7,99 € |
+| `sd_1000` | Bote de semillas doradas | 1000 semillas doradas | 17,99 € |
+| `sd_2600` | Caja de semillas doradas | 2600 semillas doradas | 39,99 € |
+
+2. El producto viejo **`juego_completo`** (la compra única de cuando el juego era una demo) se **desactiva**, no se borra: a quien
+   la hizo se le regalan 300 semillas doradas la primera vez que abre (`tn_regalo`), y eso se mira por la compra que ya tiene.
+3. Configuración → Pruebas de licencia: añade tu cuenta de Gmail (y las de los testers) y responde «RESPOND_NORMALLY».
+4. Prueba: instala desde la pista de prueba interna con esa cuenta, START → LA TIENDA → SEMILLAS DORADAS → un paquete → la compra
+   de prueba no cobra y las semillas doradas entran. Al repetirla tiene que dejar comprar otra vez (es consumible).
 
 ## 2. Play Games (logros y nube)
 1. Crecimiento → Play Games Services → Configuración → «No, mi juego no usa API de Google» → crea el proyecto.

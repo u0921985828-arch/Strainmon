@@ -1,8 +1,8 @@
 # Formulario «Seguridad de los datos» (Play Console → Contenido de la app → Seguridad de los datos)
 
-Respuestas para la versión de la tienda (`Datos.PLAY = true`, paquete `com.landracehunters.game`) desde la fase 6: compra única
-(Facturación de Google Play), Play Games v2 (logros y nube) e informes de errores de Sentry **con consentimiento** (apagados de
-serie). Sin anuncios ni analítica.
+Respuestas para la versión de la tienda (`Datos.PLAY = true`, paquete `com.landracehunters.game`): el juego entero viene con la
+aplicación y lo de pago son los extras opcionales de LA TIENDA (Facturación de Google Play), Play Games v2 (logros y nube) e
+informes de errores de Sentry **con consentimiento** (apagados de serie). Sin anuncios ni analítica.
 
 ## 1. Recogida y compartición
 
@@ -33,6 +33,6 @@ Notas para la consola:
 |---|---|
 | Permisos | `INTERNET` (de las bibliotecas de Google y Sentry), `POST_NOTIFICATIONS` (la declara el plugin; esta versión no la pide nunca: el aviso de cosecha está apagado), `VIBRATE`, `com.android.vending.BILLING` |
 | Anuncios | No contiene anuncios |
-| Compras en la aplicación | Sí: una compra única, «Juego completo» (no consumible) |
-| Acceso a la app | Los capítulos 1 a 3 sin credenciales; el resto, tras la compra. Para la revisión: cuenta de tester de licencias (ver `play-console.md`) |
+| Compras en la aplicación | Sí: cuatro paquetes de semillas doradas (consumibles), la moneda de LA TIENDA, que también se gana jugando. Nada bloquea la historia |
+| Acceso a la app | Todo el juego, sin credenciales ni compras: los ocho capítulos vienen con la aplicación |
 | Política de privacidad (URL) | La URL pública de `store/privacy-policy.md` |

@@ -3210,6 +3210,28 @@ func rev_suscribe() -> void:   # → revista.gd
 func rev_nota(_k: String, _v := 0) -> void:   # el registro de sucesos   → revista.gd
 	pass
 
+# LA TIENDA de extras y las semillas doradas (tienda.gd)
+func tn_hay() -> bool:   # → tienda.gd
+	return false
+
+func tn_sd() -> int:   # → tienda.gd
+	return 0
+
+func tn_txt(_n: int) -> String:   # → tienda.gd
+	return ""
+
+func tienda_menu() -> void:   # → tienda.gd
+	pass
+
+func tn_gana(_k: String, _n := 1) -> void:   # las semillas doradas que se ganan jugando   → tienda.gd
+	pass
+
+func tn_regalo() -> void:   # → tienda.gd
+	pass
+
+func reforma_pagada() -> bool:   # las reformas del piso, pagadas en LA TIENDA   → tienda.gd
+	return false
+
 func copa_ot_hoy() -> bool:   # la Copa de otoño (copaot.gd)
 	return false
 

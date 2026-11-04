@@ -19,6 +19,7 @@ import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.PendingPurchasesParams;
 import com.android.billingclient.api.ProductDetails;
 import com.android.billingclient.api.Purchase;
@@ -47,13 +48,17 @@ import io.sentry.Sentry;
 import io.sentry.android.core.SentryAndroid;
 
 /**
- * Landrace Hunters · fase 6 (U7, U10, U11): la compra única (Play Billing), los logros y la nube (Play Games v2), el aviso local de la
- * cosecha y los informes de errores (Sentry, solo con el opt-in). Lo usa godot/src/plataforma.gd; las señales: compra(estado),
+ * Landrace Hunters · las compras de Play Billing, los logros y la nube (Play Games v2), el aviso local de la cosecha y los
+ * informes de errores (Sentry, solo con el opt-in). Lo usa godot/src/plataforma.gd; las señales: compra(estado),
  * comprado(producto), permiso(ok), nube(datos).
+ * Los paquetes de semillas doradas de LA TIENDA son consumibles: se consumen al reconocerlos para poder volver a comprarlos
+ * (CONSUMIBLE, por el prefijo del id del producto); lo demás se reconoce y se queda.
  */
 public class LandracePlay extends GodotPlugin implements PurchasesUpdatedListener {
     private static final String TAG = "LandracePlay";
     private static final int PIDE_AVISOS = 7301;
+    // los productos que se vuelven a comprar: los paquetes de semillas doradas de LA TIENDA (sd_120, sd_400, sd_1000, sd_2600)
+    private static final String CONSUMIBLE = "sd_";
     private BillingClient billing;
     private boolean games = false;
     private boolean sentry = false;
@@ -170,9 +175,18 @@ public class LandracePlay extends GodotPlugin implements PurchasesUpdatedListene
         }
     }
 
-    // una compra sin reconocer en 3 días se devuelve sola
+    // una compra sin reconocer en 3 días se devuelve sola; un consumible se consume y queda libre para volver a comprarlo
     private void reconoce(Purchase p) {
-        for (String id : p.getProducts()) emitSignal("comprado", id);
+        boolean consumible = false;
+        for (String id : p.getProducts()) {
+            emitSignal("comprado", id);
+            if (id != null && id.startsWith(CONSUMIBLE)) consumible = true;
+        }
+        if (consumible) {
+            billing.consumeAsync(ConsumeParams.newBuilder().setPurchaseToken(p.getPurchaseToken()).build(), (r, t) -> {
+            });
+            return;
+        }
         if (p.isAcknowledged()) return;
         billing.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(p.getPurchaseToken()).build(), r -> {
         });
