@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Landrace Hunters
  * Description: Hospeda el juego «Landrace Hunters» (Godot 4.3, versión web: la misma partida que la app de Android) dentro de WordPress: dirección propia a pantalla completa y atajo [landrace_hunters] para incrustarlo en cualquier página. Todo se sirve desde el propio plugin.
- * Version: 1.7.5
+ * Version: 1.7.6
  * Author: WOLFCADE
  * License: GPL-2.0-or-later
  * Text Domain: landrace-hunters
@@ -14,10 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Landrace_Hunters {
 
-	const VERSION   = '1.7.5';
+	const VERSION   = '1.7.6';
 	/** El plugin ligero (para servidores que no dejan subir más de unos MB) baja el resto del juego de aquí, en el propio servidor. */
 	const FULL_URL  = 'https://raw.githubusercontent.com/u0921985828-arch/Strainmon/claude/new-session-7quvtm/ribera-verde/descargas/landrace-hunters-%s.zip';
 	const PIEZAS    = array( 'index.js', 'index.wasm', 'index.pck', 'index.audio.worklet.js', 'index.audio.position.worklet.js' );
+	/**
+	 * Las piezas que se guardan también comprimidas (1.7.6, lo dijo el usuario: «la carga del juego en web tarda muchísimo»).
+	 * El motor (index.wasm) pasa de 36,7 MB a unos 9,3: el servidor sirve la copia .gz al navegador que la acepta
+	 * (game/.htaccess) y cada jugador se ahorra 27 MB la primera vez. El index.pck va cifrado y comprimido no baja nada.
+	 */
+	const GZ        = array( 'index.wasm', 'index.js' );
 	const OPTION    = 'landrace_hunters';
 	const QUERY_VAR = 'landrace_hunters';
 
@@ -100,6 +106,76 @@ final class Landrace_Hunters {
 	}
 
 	/**
+	 * Deja al lado de cada pieza su copia comprimida (1.7.6): index.wasm.gz e index.js.gz.
+	 *
+	 * Se hace aquí, una vez, y no en cada visita: comprimir 36 MB al vuelo le cuesta al servidor más que
+	 * servirlos. Se escribe en «.part» y se renombra al acabar, así nadie llega a ver una copia a medias;
+	 * si la pieza cambia (otra versión del juego), la copia vieja se rehace porque es más antigua que ella.
+	 * El servidor que no lea game/.htaccess (nginx) no las usa y el juego va igual, solo sin el ahorro.
+	 */
+	public static function comprime_piezas() {
+		if ( ! function_exists( 'gzopen' ) ) {
+			return array();
+		}
+		if ( function_exists( 'set_time_limit' ) ) {
+			@set_time_limit( 600 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		}
+		$hechas = array();
+		foreach ( self::GZ as $f ) {
+			$src = self::game_dir() . '/' . $f;
+			$gz  = $src . '.gz';
+			if ( ! is_readable( $src ) ) {
+				@unlink( $gz ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+				continue;
+			}
+			if ( is_readable( $gz ) && filemtime( $gz ) >= filemtime( $src ) ) {
+				$hechas[ $f ] = (int) filesize( $gz );
+				continue;
+			}
+			$in  = fopen( $src, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+			$out = $in ? gzopen( $gz . '.part', 'wb6' ) : false;
+			if ( ! $in || ! $out ) {
+				if ( $in ) {
+					fclose( $in ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+				}
+				continue;
+			}
+			$ok = true;
+			while ( ! feof( $in ) ) {
+				$b = fread( $in, 1048576 ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+				if ( false === $b ) {
+					$ok = false;
+					break;
+				}
+				if ( '' !== $b && ! gzwrite( $out, $b ) ) {
+					$ok = false;
+					break;
+				}
+			}
+			fclose( $in ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+			gzclose( $out );
+			if ( $ok && rename( $gz . '.part', $gz ) ) {
+				touch( $gz );
+				$hechas[ $f ] = (int) filesize( $gz );
+			} else {
+				@unlink( $gz . '.part' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			}
+		}
+		return $hechas;
+	}
+
+	/** Lo que pesa hoy cada copia comprimida, o 0 si falta o está vieja (1.7.6). */
+	public static function gz_estado() {
+		$out = array();
+		foreach ( self::GZ as $f ) {
+			$src = self::game_dir() . '/' . $f;
+			$gz  = $src . '.gz';
+			$out[ $f ] = ( is_readable( $src ) && is_readable( $gz ) && filemtime( $gz ) >= filemtime( $src ) ) ? (int) filesize( $gz ) : 0;
+		}
+		return $out;
+	}
+
+	/**
 	 * Descarga el zip entero de esta versión en el servidor y copia sus piezas a game/.
 	 * Así no hay que subir 30 MB por el navegador (nginx corta con «413 Request Entity Too Large»).
 	 */
@@ -143,7 +219,11 @@ final class Landrace_Hunters {
 		if ( $err ) {
 			return $err;
 		}
-		return self::game_ready() ? true : new WP_Error( 'lh_faltan', 'Faltan piezas del juego tras la descarga.' );
+		if ( ! self::game_ready() ) {
+			return new WP_Error( 'lh_faltan', 'Faltan piezas del juego tras la descarga.' );
+		}
+		self::comprime_piezas();   // 1.7.6: las copias comprimidas, de las piezas que acaban de llegar
+		return true;
 	}
 
 	/** El botón del panel y del aviso. */
@@ -166,6 +246,17 @@ final class Landrace_Hunters {
 			<button type="submit" class="<?php echo esc_attr( $clase ); ?>" onclick="this.disabled=true;this.textContent='Descargando… (hasta un par de minutos)';this.form.submit()">Descargar el juego (unos 30 MB)</button>
 		</form>
 		<?php
+	}
+
+	/** El botón «Comprimir el motor» del panel (1.7.6). */
+	public static function comprimir() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Sin permiso.', 'landrace-hunters' ) );
+		}
+		check_admin_referer( 'lh_comprimir' );
+		$h = self::comprime_piezas();
+		wp_safe_redirect( add_query_arg( array( 'lh' => $h ? 'gz' : 'gzno' ), admin_url( 'options-general.php?page=landrace-hunters' ) ) );
+		exit;
 	}
 
 	public static function aviso() {
@@ -201,6 +292,8 @@ final class Landrace_Hunters {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
 		add_action( 'admin_init', array( __CLASS__, 'settings' ) );
 		add_action( 'admin_post_lh_descargar', array( __CLASS__, 'descargar' ) );
+		add_action( 'admin_post_lh_comprimir', array( __CLASS__, 'comprimir' ) );
+		add_action( 'lh_comprimir', array( __CLASS__, 'comprime_piezas' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'aviso' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( __CLASS__, 'action_links' ) );
 	}
@@ -258,6 +351,11 @@ final class Landrace_Hunters {
 		}
 		update_option( self::OPTION . '_ver', self::VERSION, false );
 		do_action( 'kp_shield_purge' );
+		// 1.7.6: las copias comprimidas de la versión nueva, en segundo plano (comprimir 36 MB no puede
+		// colgarse de la visita de nadie); si no hay cron, el panel tiene su botón
+		if ( ! wp_next_scheduled( 'lh_comprimir' ) ) {
+			wp_schedule_single_event( time() + 30, 'lh_comprimir' );
+		}
 	}
 
 	public static function query_vars( $vars ) {
@@ -269,6 +367,7 @@ final class Landrace_Hunters {
 	public static function activate() {
 		self::rewrite();
 		flush_rewrite_rules();
+		self::comprime_piezas();   // 1.7.6
 	}
 
 	/** Al borrar el plugin no deja nada en la base de datos. */
@@ -278,6 +377,7 @@ final class Landrace_Hunters {
 	}
 
 	public static function deactivate() {
+		wp_clear_scheduled_hook( 'lh_comprimir' );
 		// flush_rewrite_rules() volvería a guardar la regla, que ya se registró en init:
 		// se borran y WordPress las rehace en la siguiente visita, ya sin el plugin.
 		delete_option( 'rewrite_rules' );
@@ -416,6 +516,11 @@ final class Landrace_Hunters {
 	 * Solo con enlaces permanentes: así el trabajador sale de «/<dirección>/sw.js» y manda nada más que en la
 	 * página del juego. Sin ellos la dirección es «/?landrace_hunters=1» y su ámbito sería el sitio entero, que
 	 * no hace falta para esto. El navegador que no sepa de trabajadores (o una página sin https) sigue igual.
+	 *
+	 * 1.7.6: el registro va en la cabecera, no al final, y deja en LH_SW la promesa de que el trabajador manda
+	 * ya en la página (index.html la espera antes de arrancar el motor). Así el index.wasm y el index.pck se
+	 * guardan de la misma descarga con la que arranca el juego, en vez de bajarse dos veces. Si el trabajador
+	 * no llega a mandar, la promesa se cumple igual a los cinco segundos y el juego arranca como siempre.
 	 */
 	private static function sw_tag( $html ) {
 		$slug = self::opt( 'slug' );
@@ -424,9 +529,13 @@ final class Landrace_Hunters {
 		}
 		$sw = esc_url( self::sw_url() );
 		$sc = esc_url( self::play_url() );
-		$js = '<script>if("serviceWorker" in navigator){addEventListener("load",function(){'
-			. 'navigator.serviceWorker.register("' . $sw . '",{scope:"' . $sc . '"}).catch(function(){})})}</script>' . "\n";
-		return preg_replace( '#</body>#i', $js . '</body>', $html, 1 );
+		$js = '<script>window.LH_SW=new Promise(function(f){'
+			. 'if(!("serviceWorker" in navigator)){f();return}'
+			. 'var n=navigator.serviceWorker,t=setTimeout(f,5000),d=function(){clearTimeout(t);f()};'
+			. 'if(n.controller){d();return}'
+			. 'n.addEventListener("controllerchange",d);'
+			. 'n.register("' . $sw . '",{scope:"' . $sc . '"}).catch(d)})</script>' . "\n";
+		return preg_replace( '#</head>#i', $js . '</head>', $html, 1 );
 	}
 
 	/**
@@ -586,6 +695,10 @@ final class Landrace_Hunters {
 				<div class="notice notice-success inline"><p>Juego descargado. Ya se puede jugar.</p></div>
 			<?php elseif ( 'error' === $lh ) : ?>
 				<div class="notice notice-error inline"><p>No se ha podido descargar: <?php echo esc_html( isset( $_GET['lh_msg'] ) ? rawurldecode( sanitize_text_field( wp_unslash( $_GET['lh_msg'] ) ) ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification ?></p></div>
+			<?php elseif ( 'gz' === $lh ) : ?>
+				<div class="notice notice-success inline"><p>Motor comprimido. La primera carga del juego baja mucho menos.</p></div>
+			<?php elseif ( 'gzno' === $lh ) : ?>
+				<div class="notice notice-warning inline"><p>No se han podido escribir las copias comprimidas (¿permisos de escritura en la carpeta del plugin, o PHP sin zlib?). El juego funciona igual, solo se baja más grande.</p></div>
 			<?php endif; ?>
 			<?php
 			$malas = self::piezas_malas();
@@ -608,7 +721,36 @@ final class Landrace_Hunters {
 				<div class="notice notice-warning inline"><p>Es el plugin ligero: el juego (unos 30 MB) se descarga directamente en el servidor, sin subirlo por el navegador.</p>
 					<p><?php self::boton_descargar(); ?></p></div>
 			<?php endif; ?>
-			<p>El juego está dentro del plugin (<?php echo esc_html( size_format( $size ) ); ?>; el navegador lo descarga comprimido la primera vez y luego lo guarda). Se juega aquí:</p>
+			<p>El juego está dentro del plugin (<?php echo esc_html( size_format( $size ) ); ?>; el navegador lo descarga la primera vez y luego lo guarda, así que solo se baja una vez por aparato). Se juega aquí:</p>
+			<?php
+			$gz    = self::gz_estado();
+			$falta = array();
+			foreach ( $gz as $f => $v ) {
+				if ( ! $v && is_readable( self::game_dir() . '/' . $f ) ) {
+					$falta[] = $f;
+				}
+			}
+			$txt = array();
+			foreach ( $gz as $f => $v ) {
+				if ( $v ) {
+					$txt[] = $f . ' ' . size_format( $v ) . ' (de ' . size_format( (int) filesize( self::game_dir() . '/' . $f ) ) . ')';
+				}
+			}
+			?>
+			<?php if ( $txt ) : ?>
+				<p>Comprimido para el navegador: <?php echo esc_html( implode( ' · ', $txt ) ); ?>.
+					<?php if ( $falta ) : ?>
+						<br>Falta por comprimir: <code><?php echo esc_html( implode( ', ', $falta ) ); ?></code>.
+					<?php endif; ?>
+				</p>
+			<?php endif; ?>
+			<?php if ( $falta ) : ?>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
+					<input type="hidden" name="action" value="lh_comprimir">
+					<?php wp_nonce_field( 'lh_comprimir' ); ?>
+					<p><button type="submit" class="button" onclick="this.disabled=true;this.textContent='Comprimiendo…';this.form.submit()">Comprimir el motor (baja la primera carga)</button></p>
+				</form>
+			<?php endif; ?>
 			<p><a class="button button-primary" href="<?php echo esc_url( $url ); ?>" target="_blank" rel="noopener">Jugar ahora</a>
 				&nbsp;<code><?php echo esc_html( $url ); ?></code></p>
 			<p>Para ponerlo dentro de una página o entrada, pega este atajo:</p>

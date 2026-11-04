@@ -1,11 +1,11 @@
 === Landrace Hunters ===
-Version: 1.7.5
+Version: 1.7.6
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.7.5.zip → Activar.
-Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.7.5-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.7.6.zip → Activar.
+Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.7.6-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -13,7 +13,13 @@ Se rehace con el juego de cada versión: node tools/wordpress.js en el repositor
 Si el servidor no deja subir un archivo tan grande, descomprímelo y súbelo por FTP a wp-content/plugins/landrace-hunters/.
 Fuentes: Atkinson Hyperlegible y Press Start 2P, licencia SIL OFL (game/OFL-*.txt).
 
+Servidores con nginx (la primera carga, más corta)
+El plugin deja en game/ la copia comprimida del motor (index.wasm.gz e index.js.gz) y game/.htaccess la sirve en Apache, con lo que la primera carga baja de 60 MB a unos 32. nginx no lee ese archivo: para que también la sirva, en el bloque del sitio basta con
+    location ~ ^/wp-content/plugins/landrace-hunters/game/(index\.wasm|index\.js)$ { gzip_static on; }
+(o «gzip_static on;» en el bloque del servidor). Sin eso el juego funciona igual, solo se baja más grande.
+
 Cambios
+1.7.6 — La primera carga, la mitad: el motor del juego (index.wasm, 36,7 MB) se guarda también comprimido en el servidor (9,3 MB) y se sirve así al navegador, y el juego ya no se descarga dos veces la primera vez (el trabajador que lo guarda en el aparato se queda con la misma descarga con la que arranca el juego, en vez de pedirlo todo otra vez). De 119,7 MB a 32,3 la primera visita; la segunda, cero: todo sale de lo guardado.
 1.7.5 — Instalación a medias, avisada: si una pieza del juego llega cortada (una subida por FTP que se corta, una descarga a medias), el plugin lo dice en Ajustes → Landrace Hunters con el tamaño que tiene y el que debe tener, y la dirección del juego responde con el mismo aviso en vez de dejar la pantalla en negro con «Failed loading file 'index.pck'»; y el juego guardado en el navegador no se queda con la pieza mala: solo guarda lo que llega entero, y mientras no esté entero no borra la copia buena de antes.
 1.7.4 — Landrace Hunters 0.79.0: el juego pinta la calle más rápido (el pueblo, de 24 a 41 fotogramas por segundo en un ordenador sin tarjeta gráfica; el piso, 52), con el suelo y los objetos de cada mapa guardados en su textura y las cachés del arte por generaciones, y los dibujos del juego recomprimidos sin perder un píxel (2,5 MB menos de descarga).
 1.7.3 — Landrace Hunters 0.73.0: los créditos al día. Los ocho beta testers (Kerman, Ibai, Adrián, Urko, Josu, Ander, Bitxone y Edorta), el arte tal y como está hecho hoy (lo del generador de sprites, revisado a mano, y todo lo dibujado píxel a píxel: carpas por dentro, plantas, equipo, extracciones, los planos de cerca, la calle, los pueblos, las zonas de ciudad, los interiores, los vehículos, los iconos y la interfaz), las canciones grabadas por zona y hora, la fuente DejaVu y la nota de ficción con Ibarbide, Hiriburu y las zonas de ciudad como homenaje de forma.

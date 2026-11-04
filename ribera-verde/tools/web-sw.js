@@ -33,6 +33,8 @@ const rotas = PIEZAS.filter((f) => {
 });
 
 const pedidos = [];
+let bytes = 0;            // bytes del juego servidos (la medida de lo que tarda en cargar; lo pidió el usuario)
+const porArch = {};
 const base = (p) => `http://localhost:${PUERTO}${p}`;
 
 const servidor = http.createServer((req, res) => {
@@ -41,8 +43,12 @@ const servidor = http.createServer((req, res) => {
   if (u === `/${SLUG}/` || u === `/${SLUG}`) {   // la página: index.html con <base> y el registro, como maybe_serve()
     let html = HTML
       .replace('<meta charset="utf-8">', `<meta charset="utf-8">\n\t\t<base href="${base('/game/')}">`)
-      .replace('</body>', `<script>if("serviceWorker" in navigator){addEventListener("load",function(){`
-        + `navigator.serviceWorker.register("${base(`/${SLUG}/sw.js`)}",{scope:"${base(`/${SLUG}/`)}"}).catch(function(){})})}</script>\n</body>`);
+      .replace('</head>', `<script>window.LH_SW=new Promise(function(f){`
+        + `if(!("serviceWorker" in navigator)){f();return}`
+        + `var n=navigator.serviceWorker,t=setTimeout(f,5000),d=function(){clearTimeout(t);f()};`
+        + `if(n.controller){d();return}`
+        + `n.addEventListener("controllerchange",d);`
+        + `n.register("${base(`/${SLUG}/sw.js`)}",{scope:"${base(`/${SLUG}/`)}"}).catch(d)})</script>\n</head>`);
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=600' });
     return res.end(html);
   }
@@ -59,8 +65,31 @@ const servidor = http.createServer((req, res) => {
   if (u.startsWith('/game/')) {
     const f = path.join(GAME, path.basename(u));
     if (!fs.existsSync(f)) { res.writeHead(404); return res.end(); }
-    res.writeHead(200, { 'Content-Type': TIPO[path.extname(f)] || 'application/octet-stream', 'Cache-Control': 'public, max-age=2592000' });
-    return res.end(fs.readFileSync(f));
+    const st = fs.statSync(f);
+    const n = path.basename(u);
+    // como un servidor de archivos de verdad: ETag y Last-Modified, y 304 si el navegador ya lo tiene
+    const etag = `"${st.size.toString(16)}-${st.mtimeMs.toString(16)}"`;
+    const cab = {
+      'Content-Type': TIPO[path.extname(f)] || 'application/octet-stream',
+      'Cache-Control': 'public, max-age=2592000',
+      ETag: etag,
+      'Last-Modified': st.mtime.toUTCString(),
+    };
+    if (req.headers['if-none-match'] === etag) { res.writeHead(304, cab); return res.end(); }
+    // 1.7.6: la copia comprimida que deja el plugin (comprime_piezas), como la sirve game/.htaccess
+    const gz = f + '.gz';
+    if (fs.existsSync(gz) && /gzip/.test(req.headers['accept-encoding'] || '')) {
+      const dz = fs.readFileSync(gz);
+      bytes += dz.length;
+      porArch[n] = (porArch[n] || 0) + dz.length;
+      res.writeHead(200, { ...cab, 'Content-Encoding': 'gzip', Vary: 'Accept-Encoding' });
+      return res.end(dz);
+    }
+    const d = fs.readFileSync(f);
+    bytes += d.length;
+    porArch[n] = (porArch[n] || 0) + d.length;
+    res.writeHead(200, cab);
+    return res.end(d);
   }
   res.writeHead(404);
   res.end();
@@ -103,19 +132,27 @@ const ok = (q, c) => { console.log((c ? 'ok   ' : 'FALLO') + ' ' + q); if (!c) f
   await p.waitForTimeout(25000);
   const uno = grandes(pedidos).length;
   ok(`1.ª visita: el servidor da el juego (${uno} archivos)`, uno >= 3);
+  const mb = (bytes / 1048576).toFixed(1);
+  console.log(`     bytes de la 1.ª visita: ${mb} MB` + Object.entries(porArch).filter(([n]) => /index\.(pck|wasm|js)$/.test(n))
+    .map(([n, v]) => ` · ${n} ${(v / 1048576).toFixed(1)} MB ×${(v / fs.statSync(path.join(GAME, n)).size).toFixed(1)}`).join(''));
+  const veces = Math.max(...PIEZAS.filter((f) => porArch[f]).map((f) => porArch[f] / fs.statSync(path.join(GAME, f)).size));
+  ok(`cada pieza se baja una sola vez (la peor, ${veces.toFixed(1)} veces)`, veces < 1.5);
   await p.waitForFunction(() => navigator.serviceWorker.controller != null, null, { timeout: 60000 }).catch(() => {});
-  const guardado = await p.evaluate(async () => {
-    const c = await caches.open(Object.keys(await caches.keys()).length ? (await caches.keys())[0] : 'x');
-    return (await c.keys()).length;
+  const claves = await p.evaluate(async () => {
+    const out = [];
+    for (const n of await caches.keys()) { const c = await caches.open(n); for (const k of await c.keys()) out.push(k.url.split('/').pop()); }
+    return out;
   });
-  ok(`el juego queda guardado en el navegador (${guardado} archivos)`, guardado >= 3);
+  ok(`el juego queda guardado en el navegador (${claves.length} archivos)`, claves.length >= 3);
+  const faltan = PIEZAS.filter((f) => fs.existsSync(path.join(GAME, f)) && !claves.includes(f));
+  ok(`no falta ninguna pieza por guardar${faltan.length ? ' (faltan ' + faltan.join(', ') + ')' : ''}`, faltan.length === 0);
 
   // 2 · la segunda visita: ni un archivo del juego al servidor
   pedidos.length = 0;
   await p.goto(base(`/${SLUG}/`));
   await p.waitForTimeout(20000);
   const dos = grandes(pedidos);
-  ok(`2.ª visita: el servidor no da ningún archivo del juego (${dos.length})`, dos.length === 0);
+  ok(`2.ª visita: el servidor no da ningún archivo del juego (${dos.length}${dos.length ? ': ' + dos.join(', ') : ''})`, dos.length === 0);
 
   // 3 · con el servidor apagado, el juego sigue abriendo
   await new Promise((r) => servidor.close(r));

@@ -176,7 +176,13 @@ const engine = new Engine(GODOT_CONFIG);
 		}
 	} else {
 		setStatusMode('progress');
-		engine.startGame({
+		// 1.7.6: con el plugin de WordPress, esperar a que el trabajador que guarda el juego mande en la página
+		// (LH_SW, unos milisegundos) para que el index.wasm y el index.pck se queden guardados de esta misma
+		// descarga; sin plugin, LH_SW no existe y arranca al momento
+		const listo = (typeof window.LH_SW === 'object' && window.LH_SW && typeof window.LH_SW.then === 'function')
+			? window.LH_SW
+			: Promise.resolve();
+		listo.then(() => engine.startGame({
 			'onProgress': function (current, total) {
 				if (current > 0 && total > 0) {
 					statusProgress.value = current;
@@ -186,7 +192,7 @@ const engine = new Engine(GODOT_CONFIG);
 					statusProgress.removeAttribute('max');
 				}
 			},
-		}).then(() => {
+		})).then(() => {
 			setStatusMode('hidden');
 		}, displayFailureNotice);
 	}
