@@ -1532,16 +1532,30 @@ const SOMBRA_OBJ := ["fridge", "crate", "table", "btable", "stool", "mesaTb", "t
 const VALLAS := ["fence", "baranda"]
 
 # la pieza de una valla por las de su clase de al lado: N = 1, E = 2, S = 4, O = 8
-# la pieza del seto del generador de sprites (sprgen_setos.py) para el seto de la calle: los setos de los mapas van en tramos de lado a lado; el
-# tramo, alterno (setoH, setoH2) y con su remate redondo en cada punta (setoHi a la izquierda, setoHd a la derecha); suelto, el tramo
+# la pieza del seto del generador de sprites (sprgen_setos.py) para el seto de la calle: el tramo de lado a lado, alterno (setoH, setoH2) y con
+# su remate redondo en cada punta (setoHi a la izquierda, setoHd a la derecha); en columna, el tramo vertical (setoV, setoV2), que lleva el
+# canto a los dos lados, con su remate redondo arriba (setoV0) y la cara de delante abajo (setoVb); suelto, la mata con canto a los dos
+# lados (setoU). Lo dijo el usuario: «Los setos no tienes borde derecho no izquierdo»: el tramo horizontal, puesto en columna o suelto, se
+# cortaba a los lados porque es el que pasa de largo
 static func seto_pieza(mo: Array, tx: int, ty: int) -> String:
-	var w: bool = tx > 0 and mo[ty][tx - 1] == "seto"   # i18n-no
-	var e: bool = tx + 1 < mo[ty].size() and mo[ty][tx + 1] == "seto"   # i18n-no
-	if w and not e:
-		return "setoHd"   # i18n-no
-	if e and not w:
-		return "setoHi"   # i18n-no
-	return "setoH2" if tx % 2 else "setoH"   # i18n-no
+	var hay := func(x: int, y: int) -> bool: return y >= 0 and y < mo.size() and x >= 0 and x < mo[y].size() and mo[y][x] == "seto"   # i18n-no
+	var w: bool = hay.call(tx - 1, ty)
+	var e: bool = hay.call(tx + 1, ty)
+	if w or e:
+		if w and not e:
+			return "setoHd"   # i18n-no
+		if e and not w:
+			return "setoHi"   # i18n-no
+		return "setoH2" if tx % 2 else "setoH"   # i18n-no
+	var n: bool = hay.call(tx, ty - 1)
+	var s: bool = hay.call(tx, ty + 1)
+	if n and s:
+		return "setoV2" if ty % 2 else "setoV"   # i18n-no
+	if s:
+		return "setoV0"   # i18n-no
+	if n:
+		return "setoVb"   # i18n-no
+	return "setoU"   # i18n-no
 
 static func mascara_valla(mo: Array, o: String, tx: int, ty: int) -> int:
 	var es := func(x: int, y: int) -> bool: return y >= 0 and y < mo.size() and x >= 0 and x < mo[y].size() and mo[y][x] == o

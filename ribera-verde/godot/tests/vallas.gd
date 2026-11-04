@@ -103,8 +103,13 @@ func _corre() -> void:
 	var D: Dictionary = Datos.carga()
 	var dir := arg("--pintar")
 	# 0. el seto de la calle, con el del generador de sprites de la huerta (lo pidió el usuario: «el seto… hicimos otro ya»): cada seto de los
-	# mapas sale con su pieza, el tramo alterno y el remate redondo en las puntas
+	# mapas sale con su pieza, el tramo alterno y el remate redondo en las puntas. Y, lo dijo el usuario («Los setos no tienes borde
+	# derecho no izquierdo»), el que no tiene seto a los lados va con una pieza con canto a izquierda y derecha: el tramo vertical
+	# (setoV/setoV2), su remate de arriba (setoV0), su pie (setoVb) o la mata suelta (setoU), nunca con el tramo horizontal
+	var HOR := ["setoH", "setoH2", "setoHi", "setoHd"]
+	var VER := ["setoV", "setoV2", "setoV0", "setoVb", "setoU"]
 	var vs := 0
+	var cuenta := {}
 	for k in D.MAPS:
 		var mo: Array = D.MAPS[k].o
 		for y in mo.size():
@@ -113,11 +118,72 @@ func _corre() -> void:
 					continue
 				vs += 1
 				var p: String = Pintor.seto_pieza(mo, x, y)
+				cuenta[p] = cuenta.get(p, 0) + 1
 				var w: bool = x > 0 and mo[y][x - 1] == "seto"
 				var e: bool = x + 1 < mo[y].size() and mo[y][x + 1] == "seto"
-				var bien: bool = (p == "setoHi") == (e and not w) and (p == "setoHd") == (w and not e)
+				var n: bool = y > 0 and x < mo[y - 1].size() and mo[y - 1][x] == "seto"
+				var su: bool = y + 1 < mo.size() and x < mo[y + 1].size() and mo[y + 1][x] == "seto"
+				var bien: bool
+				if w or e:
+					bien = p in HOR and (p == "setoHi") == (e and not w) and (p == "setoHd") == (w and not e)
+				else:
+					# sin vecino a los lados, el canto de los dos lados: la pieza dice si sigue arriba, abajo, las dos o ninguna
+					bien = p in VER and (p == "setoU") == (not n and not su) and (p == "setoV0") == (su and not n) and (p == "setoVb") == (n and not su)
 				chk(bien and Atlas.frame_de("seto-huerta", p, "unica", 0, {"i": 0}) != null, "%s (%d, %d): el seto con %s" % [k, x, y, p])
 	chk(vs > 200, "setos en los mapas: %d" % vs)
+	# y las piezas con canto se usan de verdad: hay setos sueltos o en columna en los mapas
+	var con_canto := 0
+	for q in VER:
+		con_canto += int(cuenta.get(q, 0))
+	chk(con_canto > 0, "setos con canto a los dos lados: %d de %d (%s)" % [con_canto, vs, cuenta])
+	# las piezas con canto a los dos lados, de verdad: el canto del seto es su contorno, mucho más oscuro que la mata, así que
+	# en la pieza que lo lleva el primer píxel (o el último) de cada fila es oscuro en todas. El tramo horizontal, al revés:
+	# pasa de largo y por eso se cortaba al ponerlo en columna o suelto
+	var canto := func(q: String) -> Array:
+		var f = Atlas.frame_de("seto-huerta", q, "unica", 0, {"i": 0})
+		if f == null:
+			return []
+		var im: Image = f.c
+		var su := 0.0
+		var nn := 0
+		for y in im.get_height():
+			for x in im.get_width():
+				var c: Color = im.get_pixel(x, y)
+				if c.a > 0.5:
+					su += c.get_luminance()
+					nn += 1
+		var um: float = su / maxf(1.0, nn) * 0.72
+		var fi := 0
+		var iz := 0
+		var de := 0
+		for y in im.get_height():
+			var x0 := -1
+			var x1 := -1
+			for x in im.get_width():
+				if im.get_pixel(x, y).a > 0.5:
+					if x0 < 0:
+						x0 = x
+					x1 = x
+			if x0 < 0:
+				continue
+			fi += 1
+			if im.get_pixel(x0, y).get_luminance() < um:
+				iz += 1
+			if im.get_pixel(x1, y).get_luminance() < um:
+				de += 1
+		return [iz, de, fi]
+	for q in VER:
+		var c: Array = canto.call(q)
+		chk(c.size() == 3, "%s en el atlas" % q)
+		if c.size() == 3:
+			chk(c[0] == c[2] and c[1] == c[2], "%s: canto a los dos lados (izq %d, der %d de %d)" % [q, c[0], c[1], c[2]])
+	for q in ["setoH", "setoH2"]:
+		var c: Array = canto.call(q)
+		chk(c.size() == 3 and c[0] < c[2] and c[1] < c[2], "%s: el tramo que pasa de largo, sin canto a los lados (%s)" % [q, c])
+	var ci: Array = canto.call("setoHi")
+	var cd: Array = canto.call("setoHd")
+	chk(ci.size() == 3 and ci[0] == ci[2] and ci[1] < ci[2], "setoHi: el remate, con canto solo por la izquierda (%s)" % [ci])
+	chk(cd.size() == 3 and cd[1] == cd[2] and cd[0] < cd[2], "setoHd: el remate, con canto solo por la derecha (%s)" % [cd])
 	# 1. las 32 piezas, de 16 × 16, cada una tocando el borde de cada lado que conecta
 	for o in Pintor.VALLAS:
 		for m in 16:

@@ -36,7 +36,24 @@ L = filas(0, range(14, 32))                                      # la esquina �
 H = columnas(list(range(18, 28)) + list(range(19, 25)), 14, 31)  # el tramo horizontal: tapa y cara de delante
 H2 = columnas(list(range(21, 28)) + list(range(18, 27)), 14, 31) # y otra (casillas impares)
 HD = columnas(list(range(20, 24)) + list(range(20, 32)), 14, 31) # su remate a la derecha (junto al camino)
+
+def junta(a, b):
+    """la mitad izquierda de a y la derecha de b, las dos de 16 de ancho y del mismo alto"""
+    im = Image.new('RGBA', (16, max(a.height, b.height)), (0, 0, 0, 0))
+    im.paste(a.crop((0, 0, 8, a.height)), (0, im.height - a.height))
+    im.paste(b.crop((8, 0, 16, b.height)), (8, im.height - b.height))
+    return im
+
+# Lo dijo el usuario: «Los setos no tienes borde derecho no izquierdo». El tramo horizontal pasa de largo, así que no
+# lleva canto a los lados: puesto en columna o suelto, el seto salía cortado. De ahí dos piezas más, las dos con el
+# canto a izquierda y derecha: el pie del tramo vertical (el canto izquierdo de la esquina y el derecho del remate,
+# los dos con la cara de delante) y la mata suelta (ese pie, con el remate redondo de arriba encima).
+VB = junta(L, HD)                                                # el pie del tramo vertical, con la cara de delante
+U = Image.new('RGBA', (16, VB.height), (0, 0, 0, 0))             # la mata suelta: remate redondo arriba y cara abajo
+U.paste(V0.crop((0, 0, 16, 6)), (0, 0))
+U.paste(VB.crop((0, 6, 16, VB.height)), (0, 6))
 PIEZAS = {'setoV': V, 'setoV2': V2, 'setoV0': V0, 'setoL': L, 'setoH': H, 'setoH2': H2, 'setoHd': HD,
+          'setoVb': VB, 'setoU': U,
           'setoVd': espejo(V), 'setoVd2': espejo(V2), 'setoV0d': espejo(V0), 'setoR': espejo(L), 'setoHi': espejo(HD)}
 
 def sale(nom, im, dest):
