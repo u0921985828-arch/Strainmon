@@ -631,16 +631,15 @@ func copia_seguridad(desde_titulo: bool) -> void:
 
 # OPCIONES (en el título y en el menú START): A cambia cada fila; se guardan al momento
 var IDIOMA_NOM := [I18n.K("SISTEMA"), I18n.K("ESPAÑOL"), I18n.K("ENGLISH")]
-# OPCIONES → RELOJ (lo pidió el usuario: «el tiempo debería pasar más lento»): lo que dura un día del juego, en minutos de verdad;
-# de serie, 8 (lo pidió el usuario: «un intermedio entre el realismo y la ficción»; antes 12, y antes 4: el ritmo del HTML, el de
-# las pruebas sin CAL). aj.rl es la fila de RELOJ_DIA; aj.reloj, la de antes ([4, 12, 24]): 24 sigue en 24 y las demás, a 8
+# El reloj del juego: lo que dura un día, en minutos de verdad. 8 (lo pidió el usuario: «un intermedio entre el realismo y la
+# ficción»; antes 12, y antes 4: el ritmo del HTML, el de las pruebas sin CAL). Fijo y el mismo para todos (lo pidió el usuario:
+# «la velocidad a la que va el juego no puede ser seleccionable… si no, el que juega puede ponerla más rápido y le da tiempo a
+# hacer más cosas durante el día»): ya no hay OPCIONES → RELOJ y los ajustes viejos (aj.rl, aj.reloj) se ignoran.
 const RELOJ_DIA := [4, 8, 12, 24]
 const RELOJ_SERIE := 1
 
 func reloj_i() -> int:
-	if aj.has("rl"):
-		return clampi(int(aj.rl), 0, RELOJ_DIA.size() - 1)
-	return 3 if int(aj.get("reloj", 1)) == 2 else RELOJ_SERIE
+	return RELOJ_SERIE
 
 func ms_por_min() -> float:
 	if not Datos.CAL:
@@ -661,7 +660,6 @@ func opciones(desde_titulo := false) -> void:
 		if Datos.CAL:
 			it.insert(4, {"label": K("VIBRACIÓN"), "right": K("SÍ") if aj.vibra else K("NO")})   # 1.57
 			it.insert(5, {"label": K("AHORRO"), "right": K("30 FPS") if aj.ahorro else K("NO")})   # R3
-			it.insert(6, {"label": K("RELOJ"), "right": T("1 DÍA = {m} MIN", {"m": RELOJ_DIA[reloj_i()]})})
 			it.append({"label": K("COPIA DE SEGURIDAD")})
 		if Datos.PLAY:   # U5: accesibilidad
 			var c := it.size() - (1 if Datos.CAL else 0)
@@ -706,8 +704,6 @@ func opciones(desde_titulo := false) -> void:
 				vibra()
 			"AHORRO":
 				aj.ahorro = not aj.ahorro
-			"RELOJ":
-				aj.rl = (reloj_i() + 1) % RELOJ_DIA.size()
 			"TAMAÑO DE TEXTO":
 				aj.tam = (int(aj.get("tam", 1)) + 1) % 3
 			"ZURDO":

@@ -2,6 +2,13 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El reloj, igual para todos (lo pidió el usuario: «la velocidad a la que va el juego no puede ser seleccionable, o sea, tiene que ser siempre la misma… porque si no, el que juega el juego puede ponerla más rápido, más lento y le da tiempo más a hacer cosas durante el día o menos»)
+
+- **Fuera OPCIONES → RELOJ.** La fila que dejaba elegir entre 4, 8, 12 y 24 minutos de verdad por día del juego ya no está en el menú, ni desde el título ni desde START, y con ella se van sus dos textos de `strings.csv`.
+- **8 minutos el día, siempre.** `reloj_i()` devuelve `RELOJ_SERIE` pase lo que pase, así que `ms_por_min()` da los mismos 333,3 ms el minuto para todo el mundo: el día del juego dura lo mismo en todas las partidas y nadie gana (ni pierde) horas para hacer cosas. Sin `Datos.CAL` sigue el ritmo del HTML (`D.MS_PER_MIN`), que es el de las pruebas contra el oráculo.
+- **Las partidas de antes, al ritmo común.** Los ajustes guardados (`aj.rl`, y el `aj.reloj` más viejo) se ignoran; quien tuviera puesto el de 24 pasa a 8 al abrir.
+- **Prueba.** `tests/reloj.gd` (17 comprobaciones): los 8 minutos medidos contando minutos del juego por tiempo real, que ningún valor de `aj.rl` ni de `aj.reloj` los cambie, que sin CAL siga el ritmo del HTML y que OPCIONES ya no traiga la fila RELOJ y sí las demás.
+
 ### La guía de genéticas, como recetario, y la revista con noticias del juego (0.81, lo pidió el usuario: «También hay cosas a mejorar, la guía para conseguir genéticas, igual más como recetario, en la revista del esqueje, realmente sea algo más del juego, donde haya noticias y demás»)
 
 - **RECETARIO: cómo se consigue cada variedad, por vía.** Entrada nueva de la CannaDex (entre POR GENERACIÓN y TODAS) con una fila por manera de conseguir semillas, sacada de los datos del juego y no de una lista a mano: el growshop (`D.SHOP`), el banco de semillas del PC (`D.BANCO`), de receta (`recetas()`), lo que escondió la tía (`D.REGALO`), de premio en una misión (`D.MISIONES`), la gente y las fiestas (`D.CAZA.l`), el banco de la tía (`D.BANCO_TIA.col`) y las autoflorecientes. Cada fila lleva su cuenta (`dex_cuenta`), su explicación y, debajo, las variedades de esa vía —las que no has descubierto, con `??????`—, y dentro abre la lista de siempre con su ficha, su receta y su cata. El título dice el n/total de toda la CannaDex (`dex_vias`, `dex_orden`, `dex_via_falta`, `dex_recetario` en `menus.gd`).

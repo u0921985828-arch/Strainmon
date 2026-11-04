@@ -339,7 +339,6 @@ func _corre() -> void:
 	Cultivo.pm = int(arg("--azar", "4242"))   # el azar del Park-Miller: la prueba sale siempre igual
 	J = load("res://juego.tscn").instantiate()
 	root.add_child(J)
-	J.aj.reloj = 0   # OPCIONES → RELOJ: el de antes (4 min el día), con el que el azar de esta partida sale como siempre
 	await espera(10)
 	await titulo_e_intro()
 	await prologo()
@@ -417,7 +416,7 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("OPCIONES"), 60)
 	await elige("OPCIONES")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
-	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "RELOJ", "TAMAÑO DE TEXTO", "ZURDO", "DALTÓNICO", "SIN DESTELLOS"] + (["INFORMES DE ERRORES", "IDIOMA"] if Datos.PLAY else []) + ["COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
+	check("OPCIONES: %s" % ", ".join(etiquetas()), etiquetas() == ["MÚSICA", "EFECTOS", "TEXTO", "SONIDO", "VIBRACIÓN", "AHORRO", "TAMAÑO DE TEXTO", "ZURDO", "DALTÓNICO", "SIN DESTELLOS"] + (["INFORMES DE ERRORES", "IDIOMA"] if Datos.PLAY else []) + ["COPIA DE SEGURIDAD", "VOLVER"] and J.m_items[0].right == "100 %")
 	await elige("MÚSICA")
 	await hasta(func(): return J.menu_box.visible, 60)
 	var so0 = J.sonido
