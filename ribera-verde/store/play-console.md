@@ -44,5 +44,16 @@ con semillas doradas, la moneda que se gana jugando. Los paquetes de semillas do
 - Seguridad de los datos: `store/data-safety.md` (ahora «Sí» recoge, solo registros de fallos y diagnóstico, opcionales).
 - Clasificación (IARC): `store/iarc.md` (compras digitales: sí).
 - Política de privacidad: publicar `store/privacy-policy.md` en una URL pública y pegarla.
-- Acceso a la app: «Toda la funcionalidad está disponible sin restricciones» no aplica; indica que los capítulos 4-8 requieren
-  la compra y que los revisores usan una cuenta de prueba de licencias.
+- Acceso a la app: «Toda la funcionalidad está disponible sin restricciones» **sí** aplica: ya no hay demo, los ocho capítulos
+  vienen con la aplicación y lo de pago son solo los extras opcionales de LA TIENDA.
+
+## 5. La firma y la partida de los testers (docs/MIGRACION-BETA.md)
+- Deja **Play App Signing** activado en la primera subida: desde entonces la clave de firma de la app la guarda Google y una
+  clave de carga perdida solo cuesta una solicitud de reinicio (Pruebas y versiones → Firma de apps → reiniciar la clave de
+  carga, con el `.pem` del certificado nuevo; unas 48 h hábiles).
+- El paquete `com.landracehunters.game` no se cambia nunca: con otro paquete o con otra firma, el móvil lo ve como otra app,
+  hay que desinstalar y al desinstalar se borra la partida.
+- Si cambia la firma, añade la huella SHA-1 nueva como credencial de Android del **mismo** proyecto de Play Games Services
+  (§ 2.2): así los guardados de la cuenta siguen viéndose.
+- Antes de repartir una versión con firma nueva fuera de Play, manda a los testers el guion de `docs/MIGRACION-BETA.md` § 2
+  (exportar la partida a un archivo **antes** de desinstalar).

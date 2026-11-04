@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 
@@ -37,6 +38,9 @@ import org.godotengine.godot.plugin.GodotPlugin;
 import org.godotengine.godot.plugin.SignalInfo;
 import org.godotengine.godot.plugin.UsedByGodot;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashSet;
@@ -53,15 +57,22 @@ import io.sentry.android.core.SentryAndroid;
  * comprado(producto), permiso(ok), nube(datos).
  * Los paquetes de semillas doradas de LA TIENDA son consumibles: se consumen al reconocerlos para poder volver a comprarlos
  * (CONSUMIBLE, por el prefijo del id del producto); lo demás se reconoce y se queda.
+ * La copia de seguridad a un archivo, por el selector del sistema y sin permisos de almacenamiento: compartir(), guardar_doc()
+ * y abrir_doc() (señales guardado(ok) y abierto(texto)); hace falta porque el directorio privado de la app se borra al
+ * desinstalarla, y una firma nueva obliga a desinstalar (docs/MIGRACION-BETA.md).
  */
 public class LandracePlay extends GodotPlugin implements PurchasesUpdatedListener {
     private static final String TAG = "LandracePlay";
     private static final int PIDE_AVISOS = 7301;
+    private static final int PIDE_GUARDAR = 7302;
+    private static final int PIDE_ABRIR = 7303;
     // los productos que se vuelven a comprar: los paquetes de semillas doradas de LA TIENDA (sd_120, sd_400, sd_1000, sd_2600)
     private static final String CONSUMIBLE = "sd_";
     private BillingClient billing;
     private boolean games = false;
     private boolean sentry = false;
+    // el texto pendiente de escribir en el archivo que elija el usuario (ACTION_CREATE_DOCUMENT es asíncrono)
+    private String porGuardar = null;
 
     public LandracePlay(Godot godot) {
         super(godot);
@@ -81,6 +92,8 @@ public class LandracePlay extends GodotPlugin implements PurchasesUpdatedListene
         s.add(new SignalInfo("comprado", String.class));
         s.add(new SignalInfo("permiso", Boolean.class));
         s.add(new SignalInfo("nube", String.class));
+        s.add(new SignalInfo("guardado", Boolean.class));
+        s.add(new SignalInfo("abierto", String.class));
         return s;
     }
 
@@ -288,6 +301,108 @@ public class LandracePlay extends GodotPlugin implements PurchasesUpdatedListene
         Context c = ctx();
         if (c == null) return;
         ((AlarmManager) c.getSystemService(Context.ALARM_SERVICE)).cancel(pi(c, "", ""));
+    }
+
+    // ---------- la copia de seguridad, a un archivo o a otra app ----------
+    // el texto de la partida (LH1.…) por el selector de compartir: mensajería, correo, Drive. Sin permisos.
+    @UsedByGodot
+    public void compartir(String texto, String asunto) {
+        Activity a = getActivity();
+        if (a == null) return;
+        try {
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType("text/plain");
+            i.putExtra(Intent.EXTRA_TEXT, texto);
+            if (asunto != null && !asunto.isEmpty()) i.putExtra(Intent.EXTRA_SUBJECT, asunto);
+            a.startActivity(Intent.createChooser(i, asunto));
+        } catch (Exception e) {
+            Log.w(TAG, "compartir", e);
+        }
+    }
+
+    // guardarlo donde diga el usuario (Descargas, Drive…): sobrevive a desinstalar el juego
+    @UsedByGodot
+    public void guardar_doc(String nombre, String texto) {
+        Activity a = getActivity();
+        if (a == null) {
+            emitSignal("guardado", false);
+            return;
+        }
+        porGuardar = texto;
+        try {
+            Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            i.addCategory(Intent.CATEGORY_OPENABLE);
+            i.setType("text/plain");
+            i.putExtra(Intent.EXTRA_TITLE, nombre);
+            a.startActivityForResult(i, PIDE_GUARDAR);
+        } catch (Exception e) {
+            porGuardar = null;
+            Log.w(TAG, "guardar_doc", e);
+            emitSignal("guardado", false);
+        }
+    }
+
+    @UsedByGodot
+    public void abrir_doc() {
+        Activity a = getActivity();
+        if (a == null) {
+            emitSignal("abierto", "");
+            return;
+        }
+        try {
+            Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            i.addCategory(Intent.CATEGORY_OPENABLE);
+            i.setType("*/*");
+            a.startActivityForResult(i, PIDE_ABRIR);
+        } catch (Exception e) {
+            Log.w(TAG, "abrir_doc", e);
+            emitSignal("abierto", "");
+        }
+    }
+
+    @Override
+    public void onMainActivityResult(int codigo, int resultado, Intent datos) {
+        if (codigo != PIDE_GUARDAR && codigo != PIDE_ABRIR) return;
+        Uri u = datos != null ? datos.getData() : null;
+        Activity a = getActivity();
+        if (resultado != Activity.RESULT_OK || u == null || a == null) {
+            if (codigo == PIDE_GUARDAR) {
+                porGuardar = null;
+                emitSignal("guardado", false);   // el usuario lo dejó: no es un error
+            } else {
+                emitSignal("abierto", "");
+            }
+            return;
+        }
+        if (codigo == PIDE_GUARDAR) {
+            boolean ok = false;
+            try (OutputStream o = a.getContentResolver().openOutputStream(u, "wt")) {
+                if (o != null && porGuardar != null) {
+                    o.write(porGuardar.getBytes(StandardCharsets.UTF_8));
+                    o.flush();
+                    ok = true;
+                }
+            } catch (Exception e) {
+                Log.w(TAG, "guardar_doc", e);
+            }
+            porGuardar = null;
+            emitSignal("guardado", ok);
+            return;
+        }
+        String txt = "";
+        // la partida exportada son unos 14 KB; se corta por si eligen un archivo cualquiera
+        try (InputStream in = a.getContentResolver().openInputStream(u)) {
+            if (in != null) {
+                ByteArrayOutputStream b = new ByteArrayOutputStream();
+                byte[] buf = new byte[8192];
+                int n;
+                while ((n = in.read(buf)) > 0 && b.size() < 4 << 20) b.write(buf, 0, n);
+                txt = new String(b.toByteArray(), StandardCharsets.UTF_8);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "abrir_doc", e);
+        }
+        emitSignal("abierto", txt);
     }
 
     // ---------- informes de errores (opt-in) ----------

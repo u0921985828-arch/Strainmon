@@ -3232,6 +3232,19 @@ func tn_regalo() -> void:   # → tienda.gd
 func reforma_pagada() -> bool:   # las reformas del piso, pagadas en LA TIENDA   → tienda.gd
 	return false
 
+# la copia de seguridad a un archivo o a otra app (retencion.gd, por el plugin; docs/MIGRACION-BETA.md)
+func doc_hay() -> bool:   # → retencion.gd
+	return false
+
+func doc_guarda(_nombre: String, _texto: String) -> bool:   # → retencion.gd
+	return false
+
+func doc_abre() -> String:   # → retencion.gd
+	return ""
+
+func doc_comparte(_texto: String, _asunto: String) -> void:   # → retencion.gd
+	pass
+
 func copa_ot_hoy() -> bool:   # la Copa de otoño (copaot.gd)
 	return false
 

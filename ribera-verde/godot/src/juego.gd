@@ -491,6 +491,8 @@ func _title_press() -> void:
 	while true:
 		var sv = load_save()
 		var ops := ([K("CONTINUAR")] if sv else []) + [K("NUEVA PARTIDA"), K("OPCIONES"), K("CRÉDITOS")]
+		if Datos.CAL and not sv:   # sin partida guardada, recuperarla a la vista (docs/MIGRACION-BETA.md), no dentro de OPCIONES
+			ops.insert(1, K("RECUPERAR PARTIDA"))
 		i = await menu(ops, {"cls": "titulo", "initial": maxi(0, ops.find(ult))})
 		if i < 0:
 			return
@@ -499,6 +501,8 @@ func _title_press() -> void:
 			await opciones(true)
 		elif ops[i] == "CRÉDITOS":
 			await creditos()
+		elif ops[i] == "RECUPERAR PARTIDA":
+			await importar(true)
 		elif ops[i] == "CONTINUAR":
 			S = sv
 			migrate()
@@ -560,7 +564,13 @@ static func limpia_import(v):
 # E9 (fase 3): sin leer el portapapeles al abrir (PEGAR en la caja). E10: en partida, no cambia S con los menús abiertos: se guarda
 # y, al cerrarse todo (run, lock 0), se carga como CONTINUAR (relanza)
 func importar(desde_titulo := false, nube = null) -> void:
-	var t = nube if nube != null else await pedir_partida(I18n.v("Pega aquí la partida exportada"))   # fase 6: o la de la nube
+	var t = nube   # fase 6: o la de la nube
+	if t == null and Datos.CAL and doc_hay():   # con el selector del sistema, de dónde viene (docs/MIGRACION-BETA.md)
+		t = await importa_de()
+		if t == null:
+			return
+	if t == null:
+		t = await pedir_partida(I18n.v("Pega aquí la partida exportada"))
 	if t == null or t == "":
 		if nube != null:
 			await say(K("No hay ninguna partida en la nube."))
@@ -599,6 +609,26 @@ func importar(desde_titulo := false, nube = null) -> void:
 	relanza = true
 	await say(K("Partida cargada. Se abre al cerrar el menú."))
 
+# de dónde viene la partida: pegada, de un archivo del móvil o de la nube de Play Games; null si lo deja
+func importa_de():
+	var it := [{"label": K("ABRIR UN ARCHIVO")}, {"label": K("PEGAR EL TEXTO")}]
+	if Datos.PLAY and plat().hay():
+		it.append({"label": K("CARGAR DE LA NUBE")})
+	it.append({"label": K("VOLVER")})
+	var i: int = await menu(it, {"cls": "start", "title": K("IMPORTAR PARTIDA")})
+	if i < 0 or it[i].label == "VOLVER":
+		return null
+	if it[i].label == "ABRIR UN ARCHIVO":
+		var a: String = await doc_abre()
+		return a if a != "" else null
+	if it[i].label == "CARGAR DE LA NUBE":
+		var c = await plat().nube_carga()
+		if c == null or c == "":
+			await say(K("No hay ninguna partida en la nube."))
+			return null
+		return c
+	return await pedir_partida(I18n.v("Pega aquí la partida exportada"))
+
 func relanzar() -> void:
 	relanza = false
 	var sv = load_save()
@@ -616,7 +646,7 @@ func copia_seguridad(desde_titulo: bool) -> void:
 	if not desde_titulo:
 		it.append({"label": K("EXPORTAR PARTIDA")})
 	it.append({"label": K("IMPORTAR PARTIDA")})
-	if Datos.PLAY and plat().hay():   # fase 6: Play Games (se sube sola al salir de la app)
+	if Datos.PLAY and plat().hay() and not doc_hay():   # fase 6: Play Games (se sube sola al salir de la app); con selector, en IMPORTAR
 		it.append({"label": K("CARGAR DE LA NUBE")})
 	it.append({"label": K("VOLVER")})
 	var i: int = await menu(it, {"cls": "start", "title": K("COPIA DE SEGURIDAD")})

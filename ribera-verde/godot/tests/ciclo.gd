@@ -378,7 +378,9 @@ func titulo_e_intro() -> void:
 	await hasta(func(): return J.menu_box.visible, 120)
 	await espera(3)
 	await foto("0-titulo")
-	check("sin partida guardada, el título: NUEVA PARTIDA, OPCIONES y CRÉDITOS (%s)" % ", ".join(etiquetas()), etiquetas() == ["NUEVA PARTIDA", "OPCIONES", "CRÉDITOS"])
+	# con CAL, RECUPERAR PARTIDA sale a la vista cuando no hay partida guardada (docs/MIGRACION-BETA.md)
+	var tit := ["NUEVA PARTIDA"] + (["RECUPERAR PARTIDA"] if Datos.CAL else []) + ["OPCIONES", "CRÉDITOS"]
+	check("sin partida guardada, el título: %s (%s)" % [", ".join(tit), ", ".join(etiquetas())], etiquetas() == tit)
 	# CRÉDITOS: los créditos, las licencias enteras (Godot y las fuentes) y la privacidad, en un texto con scroll
 	await elige("CRÉDITOS")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "CRÉDITOS", 60)
@@ -585,7 +587,8 @@ func menu_start() -> void:
 	await foto("3b-start")
 	var l := etiquetas()
 	var gen := "CANNADEX" if Datos.CAL else "GENOTECA"   # con CAL, la CannaDex única (Genoteca, diario y familias)
-	check("START abre el menú (%s)" % ", ".join(l), l == [gen, "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO", "REGISTRO", "GUARDAR", "OPCIONES", "SALIR"])
+	var esp := [gen, "MOCHILA", "MÓVIL", "PLANTAS", "OBJETIVO"] + (["LA TIENDA"] if Datos.CAL else []) + ["REGISTRO", "GUARDAR", "OPCIONES", "SALIR"]   # LA TIENDA de extras, con CAL
+	check("START abre el menú (%s)" % ", ".join(l), l == esp)
 	await elige(gen)
 	if Datos.CAL:
 		await elige("TODAS")
@@ -622,7 +625,7 @@ func menu_start() -> void:
 	await hasta(func(): return J.menu_box.visible and etiquetas().has("GUARDAR"), 60)
 	# OPCIONES · SONIDO apaga la música y los efectos (y lo dice el mando de arriba); otra vez, los enciende
 	await pasa(func(): return J.menu_box.visible)
-	var ini: bool = J.m_items.size() == (9 if Datos.PLAY else 8) and J.m_items.all(func(x): return x.get("ic") != null)
+	var ini: bool = J.m_items.size() == (9 if Datos.PLAY else 8) + (1 if Datos.CAL else 0) and J.m_items.all(func(x): return x.get("ic") != null)   # con CAL, LA TIENDA
 	await elige("OPCIONES")
 	await hasta(func(): return J.menu_box.visible and J.m_o.get("title") == "OPCIONES", 60)
 	var sin_borrar: bool = not etiquetas().has("BORRAR PARTIDA")

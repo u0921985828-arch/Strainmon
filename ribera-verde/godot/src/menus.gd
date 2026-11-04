@@ -94,8 +94,42 @@ func exportar() -> void:
 	exportado = JSON.stringify(S, "", false, true)
 	if Datos.CAL:   # sin CAL, el JSON de antes (historia.gd contra el HTML)
 		exportado = cierra_partida(exportado)
+	if Datos.CAL and doc_hay():   # con el selector del sistema, dónde se guarda (docs/MIGRACION-BETA.md)
+		await exporta_donde()
+		return
+	await exporta_texto()
+
+func exporta_texto() -> void:
 	DisplayServer.clipboard_set(exportado)
 	await say(K("Partida copiada al portapapeles. Pégala en una nota o en un correo para guardarla."))
+
+# el nombre del archivo de la copia: landrace-<nombre>-d<día>.txt, sin tildes ni espacios
+func copia_nombre() -> String:
+	var nm := ""
+	for ch in String(S.get("name", "")).to_lower():
+		nm += ch if ch in "abcdefghijklmnopqrstuvwxyz0123456789" else "-"   # i18n-no
+	while nm.contains("--"):
+		nm = nm.replace("--", "-")
+	nm = nm.strip_edges(true, true).lstrip("-").rstrip("-")
+	return "landrace-%s-d%d.txt" % [nm if nm != "" else "partida", int(S.get("day", 1))]   # i18n-no
+
+# a un archivo (el selector del sistema), a otra app o al portapapeles
+func exporta_donde() -> void:
+	var it := [{"label": K("GUARDAR EN UN ARCHIVO")}, {"label": K("MANDARLA A OTRA APP")}, {"label": K("COPIAR EL TEXTO")}, {"label": K("VOLVER")}]
+	var i: int = await menu(it, {"cls": "start", "title": K("EXPORTAR PARTIDA")})
+	if i < 0 or it[i].label == "VOLVER":
+		return
+	if it[i].label == "GUARDAR EN UN ARCHIVO":
+		if await doc_guarda(copia_nombre(), exportado):
+			sfx("coin")
+			await say(K("Partida guardada en el archivo. Sácala del móvil antes de desinstalar el juego: al desinstalarlo se borra la partida."))
+		else:
+			await say(K("No se ha guardado el archivo."))
+		return
+	if it[i].label == "MANDARLA A OTRA APP":
+		doc_comparte(exportado, K("Mi partida de Landrace Hunters"))
+		return
+	await exporta_texto()
 
 # recetario (1.11): cada variedad de receta con sus maneras de sacarla (RECIPES, en cualquier orden; RECETA_ORD, madre × padre)
 func recetas() -> Dictionary:

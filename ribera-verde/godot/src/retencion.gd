@@ -34,6 +34,21 @@ func plat() -> Node:
 		add_child(plat_n)
 	return plat_n
 
+# ---------- la copia de seguridad a un archivo o a otra app (docs/MIGRACION-BETA.md) ----------
+# el directorio privado de la app se borra al desinstalarla y una firma nueva obliga a desinstalar: la partida se saca con el
+# selector del sistema (sin permisos de almacenamiento) o se manda a otra app. Sin plugin, Plataforma.PRUEBA_DOC manda
+func doc_hay() -> bool:
+	return plat().doc_hay()
+
+func doc_guarda(nombre: String, texto: String) -> bool:
+	return await plat().guarda_doc(nombre, texto)
+
+func doc_abre() -> String:
+	return await plat().abre_doc()
+
+func doc_comparte(texto: String, asunto: String) -> void:
+	plat().comparte(texto, asunto)
+
 # ---------- progreso offline ----------
 # los minutos de juego que crecen las plantas por seg segundos fuera (tope OFFLINE.tope_h horas)
 func minutos_fuera(seg: float) -> int:

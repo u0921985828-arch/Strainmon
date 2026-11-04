@@ -24,7 +24,10 @@ versión no manda notificaciones ni pide ese permiso. Ni ubicación, ni contacto
 - **Copia de seguridad de Android**: si la tienes activada, el sistema copia esos archivos en tu cuenta de Google, cifrados;
   el autor no tiene acceso a ella.
 - Se borran al desinstalar la app. La partida también se puede borrar desde el título: OPCIONES · BORRAR PARTIDA.
-- Exportar la partida (OPCIONES · COPIA DE SEGURIDAD) la copia como texto en el portapapeles solo cuando lo pides tú.
+- Exportar la partida (OPCIONES · COPIA DE SEGURIDAD) la copia solo cuando lo pides tú, y tú eliges dónde: a un
+  archivo que guardas con el selector del sistema, a otra aplicación que elijas (mensajería, correo, Drive) o al
+  portapapeles. El juego no pide ningún permiso de almacenamiento: solo escribe o lee el archivo que señalas, y
+  no manda nada a ningún servidor nuestro.
 
 ## Tus derechos
 
