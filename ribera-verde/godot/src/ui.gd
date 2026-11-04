@@ -1282,31 +1282,45 @@ const DLG_LINEAS := 4
 const DLG_FS := 9.5     # el cuerpo de serie, en u
 const DLG_FS_MIN := 7.5
 const DLG_FS_PASO := .5
-func _cuerpo_dlg(_full: String, _con_nombre: bool) -> void:
+# (lo dijo el usuario: «los cuadros de texto no se adaptan al texto cuando es menor del máximo no?»): el
+# cuadro reserva las líneas que ocupa de verdad el texto de la página, de 1 a DLG_LINEAS, en vez de las
+# cuatro siempre; con el busto, la ficha sigue mandando su alto mínimo (no se encoge el retrato).
+func _cuerpo_dlg(full: String, con_nombre: bool) -> void:
 	_dlg_px = DLG_FS
-	_pon_dlg_txt(_dlg_px, true)
+	_dlg_full = full
+	var n: int = DLG_LINEAS
+	if Datos.CAL:
+		var w: float = _dlg_w if con_nombre else _dlg_w0
+		var ancho: float = w if w > 2 else _ancho_dlg(con_nombre) * .83
+		if ancho > 2:
+			n = clampi(_lineas_ts(full, ancho, DLG_FS), 1, DLG_LINEAS)
+	_pon_dlg_txt(_dlg_px, n)
 
 var _dlg_px := DLG_FS
-var _dlg_w := 0.0   # el ancho del texto del cuadro, medido al colocarlo
-func _pon_dlg_txt(px: float, alto_fijo: bool) -> void:
+var _dlg_n := DLG_LINEAS   # las líneas que tiene reservadas ahora el cuerpo (0 = sin tope, el texto manda)
+var _dlg_full := ""        # el texto entero de la página (el Label va enseñándolo letra a letra)
+var _dlg_w := 0.0   # el ancho del texto del cuadro con la ficha del retrato, medido al colocarlo
+var _dlg_w0 := 0.0  # y el ancho sin ella (el margen de la izquierda no es el mismo)
+func _pon_dlg_txt(px: float, lineas: int) -> void:
 	var ft := fs_txt(px * us)
 	pon_letra(dlg_txt, letra, ft, INK, (14.5 if Datos.CAL else 13.5) * us * ft / (10 * us))
 	dlg_txt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	dlg_txt.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	# el alto, el de DLG_LINEAS líneas: todas las cajas miden igual. Si ni al cuerpo más pequeño cabe, se
-	# quita el tope y la caja crece, que es mejor que cortar el texto.
+	# el alto, el de las líneas que pide el texto (hasta DLG_LINEAS). Si ni al cuerpo más pequeño cabe, se
+	# quita el tope (lineas = 0) y la caja crece, que es mejor que cortar el texto.
 	# el alto se redondea a un múltiplo de 4 u para que la caja mida un número par de u y la ficha caiga
 	# centrada al píxel (con 406 px de caja quedaban 40 arriba y 36 abajo; con 410, 40 y 40)
-	var h: float = ceilf(DLG_LINEAS * _alto_linea(ft) / (4.0 * us)) * 4.0 * us
-	dlg_txt.custom_minimum_size = Vector2(0, h if alto_fijo else 0.0)
+	_dlg_n = lineas
+	var h: float = ceilf(lineas * _alto_linea(ft) / (4.0 * us)) * 4.0 * us if lineas > 0 else 0.0
+	dlg_txt.custom_minimum_size = Vector2(0, h)
 
-# el alto que mide el cuadro con sus DLG_LINEAS líneas, en u (no depende del texto: el Label tiene ese alto
-# fijo), para saber de antemano el aire que le queda a la ficha del retrato
+# el alto que mide el cuadro con las líneas que tiene reservadas, en u (el Label las tiene de mínimo), para
+# saber de antemano el aire que le queda a la ficha del retrato
 func _alto_dlg_u(rw: float) -> float:
 	var sb := dlg.get_theme_stylebox("panel")
 	if sb == null:
 		return rw + 2 + 2 * RETRATO_M
-	var hl: float = ceilf(DLG_LINEAS * _alto_linea(fs_txt(_dlg_px * us)) / (4.0 * us)) * 4.0 * us
+	var hl: float = ceilf(maxi(_dlg_n, 1) * _alto_linea(fs_txt(_dlg_px * us)) / (4.0 * us)) * 4.0 * us
 	return maxf(rw + 2 + 2 * RETRATO_M, (sb.content_margin_top + sb.content_margin_bottom + hl) / us)
 
 # 0.74 (lo pidió el usuario: «desde el borde hasta el sprite tendría que haber la misma distancia que del
@@ -1352,6 +1366,25 @@ func _alto_linea(ft: float) -> float:
 	var fsz: int = maxi(5, roundi(ft))
 	return maxf(letra.get_height(fsz), roundf(14.5 * us * ft / (10 * us)))
 
+# las líneas que parte el Label, contadas con el mismo servidor de texto y el mismo ancho (no depende del
+# layout, así que vale ya en el fotograma en que se pone el texto)
+func _lineas_ts(txt: String, ancho: float, px: float) -> int:
+	if ancho <= 1:
+		return 1
+	var fsz: int = maxi(5, roundi(fs_txt(px * us)))
+	var lh: float = maxf(1.0, letra.get_height(fsz))
+	# las mismas banderas de corte que usa el Label con AUTOWRAP_WORD_SMART
+	const BRK := TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE | TextServer.BREAK_TRIM_EDGE_SPACES
+	# los saltos escritos se cuentan aparte: cada uno ocupa su línea aunque vaya vacío
+	var n := 0
+	for linea in txt.split("\n"):
+		var t: String = linea
+		if t.strip_edges() == "":
+			n += 1
+			continue
+		n += maxi(1, roundi(letra.get_multiline_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, ancho, fsz, -1, BRK).y / lh))
+	return maxi(1, n)
+
 func _lineas_dlg(txt: String, ancho: float, px: float) -> int:
 	# se cuentan las líneas como las parte el Label (por palabras): medir el alto del bloque no vale, porque
 	# el interlineado y el redondeo bailan
@@ -1384,18 +1417,22 @@ func _mide_dlg() -> void:
 		return
 	if retrato.visible:
 		_dlg_w = ancho
-	# el Label manda: su cuenta es la buena. El cálculo con la fuente sirve para probar cuerpos sin esperar
-	# un fotograma por cada uno; el desfase entre los dos se corrige con lo que dice el Label ahora.
-	var n: int = dlg_txt.get_line_count()
-	var ajuste: int = n - _lineas_dlg(dlg_txt.text, ancho, _dlg_px)
+	else:
+		_dlg_w0 = ancho
+	# las líneas se cuentan sobre el texto entero de la página, no sobre lo que lleva escrito: así el cuadro
+	# no cambia de alto mientras el texto va saliendo letra a letra
+	var txt: String = _dlg_full if _dlg_full != "" else String(dlg_txt.text)
 	var px: float = _dlg_px
+	var n: int = _lineas_ts(txt, ancho, px)
 	while n > DLG_LINEAS and px > DLG_FS_MIN + .01:
 		px = maxf(DLG_FS_MIN, px - DLG_FS_PASO)
-		n = _lineas_dlg(dlg_txt.text, ancho, px) + ajuste
-	if absf(px - _dlg_px) > .01 or (n > DLG_LINEAS) == (dlg_txt.custom_minimum_size.y > 0):
+		n = _lineas_ts(txt, ancho, px)
+	var res: int = 0 if n > DLG_LINEAS else clampi(n, 1, DLG_LINEAS)
+	if absf(px - _dlg_px) > .01 or res != _dlg_n:
 		_dlg_px = px
-		_pon_dlg_txt(px, n <= DLG_LINEAS)
+		_pon_dlg_txt(px, res)
 		_coloca.call_deferred()
+
 
 func type_text(text: String, name_ := "") -> void:
 	if gancho_texto.is_valid():
@@ -1692,13 +1729,20 @@ func _menu_titulo() -> void:
 				st.border_color = Color(156 / 255.0, 240 / 255.0, 168 / 255.0, .6)
 				st.set_border_width_all(roundi(maxf(1, us)))
 			st.draw(b.get_canvas_item(), r)
-			var tw := negrita.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-			var y := r.position.y + (r.size.y + negrita.get_ascent(fs) - negrita.get_descent(fs)) / 2
+			# (lo dijo el usuario: «los textos no están centrados»): el texto va centrado al píxel en el hueco
+			# que dejan las flechas de los lados, y si no cabe se le baja el cuerpo hasta que entre
+			var a := (2.5 if cal else 3.5) * us
+			var hx: float = r.size.x - 2 * (8 * us + a + 3 * us)
+			var fs2 := fs
+			var tw := negrita.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2).x
+			while tw > hx and fs2 > maxi(5, roundi(5 * us)):
+				fs2 -= 1
+				tw = negrita.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2).x
+			var y := roundf(r.position.y + (r.size.y + negrita.get_ascent(fs2) - negrita.get_descent(fs2)) / 2)
 			var col := Color("#10301c") if sel else Color("#e8f8ec")
-			b.draw_string(negrita, Vector2((r.size.x - tw) / 2, y), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, col)
+			b.draw_string(negrita, Vector2(roundf((r.size.x - tw) / 2), y), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs2, col)
 			if sel:
-				var cy := r.get_center().y
-				var a := (2.5 if cal else 3.5) * us
+				var cy := roundf(r.get_center().y)
 				b.draw_colored_polygon(PackedVector2Array([Vector2(8 * us, cy - a), Vector2(8 * us + a, cy), Vector2(8 * us, cy + a)]), col)
 				b.draw_colored_polygon(PackedVector2Array([Vector2(r.size.x - 8 * us, cy - a), Vector2(r.size.x - 8 * us - a, cy), Vector2(r.size.x - 8 * us, cy + a)]), col))
 		var idx := k
@@ -1977,7 +2021,9 @@ func _coloca() -> void:
 		# en una cinta del ancho del marco pegada a su pie; el texto, a su derecha. La caja crece hasta el alto de la ficha.
 		var rw := retrato_w()
 		var con := retrato.visible
-		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us, (rw + 2 + 2 * RETRATO_M if con else 44) * us)
+		# sin busto, el cuadro medía 44 u siempre; con el alto a la medida del texto, el mínimo lo pone el
+		# propio cuerpo (lo dijo el usuario: «los cuadros de texto no se adaptan al texto»)
+		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us, (rw + 2 + 2 * RETRATO_M if con else (24 if Datos.CAL else 44)) * us)
 		dlg.size = Vector2(R.size.x - 6 * us, 0)
 		# en el combate, el texto no pasa por debajo del menú de la derecha (118 de ancho): .dlg con padding-right 126 en el CSS
 		var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
@@ -2427,6 +2473,14 @@ func _tit_fin() -> float:
 func _pinta_titulo() -> void:
 	var c := titulo
 	var w := c.size.x
+	# (lo dijo el usuario: «la pantalla de inicio deja que desear»): un velo sobre la calle del fondo, más
+	# cerrado en la mitad de abajo, que es donde van las pastillas, para que todo se lea
+	if Datos.CAL:
+		var R: Rect2 = pantalla.get_global_rect()   # la pantalla del juego, en coordenadas de este nodo
+		var rl := Rect2(R.position - c.global_position, R.size)
+		c.draw_rect(rl, Color(0, 0, 0, .26))
+		var y0: float = rl.position.y + roundf(rl.size.y * .44)
+		c.draw_rect(Rect2(Vector2(rl.position.x, y0), Vector2(rl.size.x, rl.end.y - y0)), Color(0, 0, 0, .18))
 	var f := display
 	var s1 := roundi(17 * u)
 	var y := tt + f.get_ascent(s1) - 17 * u * 1.05

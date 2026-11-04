@@ -7,7 +7,7 @@ OUT=${1:-/tmp/lh-tests}; mkdir -p "$OUT"
 X=(xvfb-run -a -s "-screen 0 2600x1700x24")
 P=(--rendering-driver opengl3 --audio-driver Dummy --resolution 1560x720)
 export LIBGL_ALWAYS_SOFTWARE=1
-GRAF=" negro_render dialogo_lineas mandos_geo pixel ciclo extracciones pantallas prueba capas capturas capturas_ui perf ftue retratos raton luz_carpa suelo_cache lluvia_lote obj_cache "
+GRAF=" negro_render titulo_ui dialogo_lineas mandos_geo pixel ciclo extracciones pantallas prueba capas capturas capturas_ui perf ftue retratos raton luz_carpa suelo_cache lluvia_lote obj_cache "
 for f in tests/*.gd; do
   t=$(basename "$f" .gd)
   case "$GRAF" in *" $t "*) continue;; esac
@@ -31,6 +31,7 @@ timeout 1500 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/pantallas.gd
 echo "== ciclo"; timeout 1800 "${X[@]}" "$G" --path . "${P[@]}" --fixed-fps 60 --script res://tests/ciclo.gd -- --salida "$OUT/ciclo" 2>&1 | grep -E "^ciclo: |SCRIPT ERROR|Parse Error" | tail -3
 for L in es en; do echo "== capturas_ui $L"; timeout 900 "${X[@]}" "$G" --path . --rendering-driver opengl3 --audio-driver Dummy --resolution 2400x1080 --script res://tests/capturas_ui.gd -- --salida "$OUT/capui-$L" --idioma $L --dpi 420 2>&1 | grep -E "^capturas_ui: |SCRIPT ERROR|Parse Error" | tail -3; done
 echo "== dialogo_lineas"; timeout 900 "${X[@]}" "$G" --path . --rendering-driver opengl3 --audio-driver Dummy --resolution 2400x1080 --script res://tests/dialogo_lineas.gd 2>&1 | grep -E "^dialogo_lineas: |^FALLO|SCRIPT ERROR|Parse Error" | tail -5
+echo "== titulo_ui"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/titulo_ui.gd 2>&1 | grep -E "^titulo_ui: |^FALLO|SCRIPT ERROR|Parse Error" | tail -5
 echo "== ftue"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --fixed-fps 60 --script res://tests/ftue.gd 2>&1 | grep -E "^ftue: |^FALLO|SCRIPT ERROR|Parse Error" | tail -3
 echo "== png_opt"; (cd .. && python3 -I tools/png-opt.py --check godot/arte) 2>&1 | tail -3   # desde godot/, «..» ya es ribera-verde
 echo "== virtuales"; (cd .. && python3 -I tools/virtuales.py --check) 2>&1 | tail -3

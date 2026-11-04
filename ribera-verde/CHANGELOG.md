@@ -2,6 +2,14 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Los cuadros de texto a la medida y la pantalla de inicio (0.80, lo dijo el usuario: «los cuadros de texto no se adaptan al texto cuando es menor del máximo no?» y «la pantalla de inicio deja que desear además de que los textos no están centrados»)
+
+- **El cuadro, del alto del texto.** El cuerpo del diálogo reservaba siempre cuatro líneas (`DLG_LINEAS`), así que un «Vale.» salía en una caja con tres líneas de hueco. Ahora el cuadro reserva las que ocupa de verdad la página, de 1 a 4 (`_cuerpo_dlg` cuenta las líneas al poner el texto y `_pon_dlg_txt` recibe cuántas; `_alto_dlg_u` mide con las reservadas y el mínimo de la caja sin busto baja de 44 a 24 u). Con busto, la ficha del retrato sigue poniendo el suelo: el retrato no se encoge.
+- **Las líneas se cuentan sin esperar al layout.** El Label parte el texto en el dibujado, así que `get_line_count()` aún dice 1 en el fotograma en que se le pone: `_lineas_ts` se lo pregunta al servidor de texto (`get_multiline_string_size` con las mismas banderas que `AUTOWRAP_WORD_SMART`), contando cada salto escrito por su cuenta. Sobre el texto entero de la página, no sobre lo que lleva mecanografiado, para que la caja no cambie de alto mientras las letras van saliendo. Si ni con el cuerpo más pequeño caben cuatro líneas, se quita el tope y la caja crece, como antes.
+- **Los textos del título, centrados al píxel.** El texto de cada pastilla se centraba con decimales (medio píxel a un lado) y podía llegar hasta las flechas ◀ ▶ del botón elegido: ahora el ancho y la línea de base se redondean y, si el texto no cabe en el hueco que dejan las flechas, se le baja el cuerpo hasta que entre.
+- **El rótulo se lee sobre la calle.** La calle del fondo (0.77) dejaba el título y los botones sobre hierba y aceras claras: un velo sobre la pantalla, más cerrado en la mitad de abajo (donde van las pastillas).
+- **Probado.** `tests/dialogo_lineas.gd` 597 páginas, 0 fallos (mide el alto de la caja por líneas: 210 · 270 · 350 · 410 px sin busto, creciente, y comprueba que ninguna página se corta); `tests/titulo_ui.gd` (nueva, en la batería gráfica) mide en la imagen los píxeles del texto de los tres botones: centrados a ±2 px del centro de su pastilla y sin tocar las flechas.
+
 ### La primera carga, la mitad (plugin de WordPress 1.7.6, lo dijo el usuario: «la carga del juego en web con el plugin ligero tarda muchísimo… necesita un par de optimizaciones»)
 
 - **Qué pasaba, medido.** `tools/web-sw.js` cuenta ahora los bytes que el servidor entrega en la primera visita: **119,7 MB**, con cada pieza bajada **dos veces** (`index.wasm` ×2,0, `index.pck` ×2,0). El motor se bajaba el juego para arrancar y, aparte, el trabajador que lo guarda en el aparato (1.7.0) se lo volvía a bajar entero al instalarse. Encima, desde la 1.6.9 el `index.pck` va cifrado y no comprime, así que ya no tapaba lo que el `index.wasm` sin comprimir cuesta.
