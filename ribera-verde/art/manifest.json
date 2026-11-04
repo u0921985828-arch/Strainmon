@@ -12747,11 +12747,11 @@
    "coste_real": 30,
    "max_colores": 32,
    "origen": "el generador de sprites create_image_pro (job d6e1acbe, candidata 35 de 64: la esquina └ de 32 × 32) cortada en piezas por python3 -I tools/sprites/sprgen_setos.py",
-   "notas": "Lo pidió el usuario: «Los setos también habría que ajustarlos incluso hacer los sprites con el generador también». Las piezas salen de una sola esquina para que casen en textura y paleta; los del lado derecho, en espejo; solo con Datos.CAL (la huerta).",
+   "notas": "Lo pidió el usuario: «Los setos también habría que ajustarlos incluso hacer los sprites con el generador también». Las piezas salen de una sola esquina para que casen en textura y paleta; los del lado derecho, en espejo; solo con Datos.CAL (la huerta). Después, lo dijo el usuario («Los setos no tienes borde derecho no izquierdo»): dos piezas más con canto a izquierda y derecha, setoVb (el pie del tramo vertical, con la cara de delante) y setoU (la mata suelta), porque el tramo horizontal pasa de largo y no lo lleva.",
    "id": "seto-huerta",
    "tipo": "objeto",
    "celda": "objeto_alto",
-   "descripcion": "El seto recortado de la huerta de la tía a 3/4 desde arriba: tramos verticales (dos variantes) con su remate, las esquinas, el tramo de abajo (dos variantes) y sus remates junto al camino.",
+   "descripcion": "El seto recortado de la huerta de la tía a 3/4 desde arriba: tramos verticales (dos variantes) con su remate de arriba y su pie, las esquinas, el tramo de abajo (dos variantes) y sus remates junto al camino, y la mata suelta.",
    "cubre": [
     "obj:setoV",
     "obj:setoV2",
@@ -12760,6 +12760,8 @@
     "obj:setoH",
     "obj:setoH2",
     "obj:setoHd",
+    "obj:setoU",
+    "obj:setoVb",
     "obj:setoVd",
     "obj:setoVd2",
     "obj:setoV0d",
@@ -12778,7 +12780,9 @@
     "setoVd2": "exacto",
     "setoV0d": "exacto",
     "setoR": "exacto",
-    "setoHi": "exacto"
+    "setoHi": "exacto",
+    "setoVb": "exacto",
+    "setoU": "exacto"
    }
   },
   {
