@@ -1261,6 +1261,7 @@ func aso_dia() -> void:
 		if gana:
 			A.pres = true
 			confia("delroy", 10)
+			rev_nota("presi")
 		else:
 			A.otra = int(S.day) + int(O.espera)
 		var t: String = T("¡{v} votos de {t}! Eres el presidente de la asociación, sobrino. Como tu tía.", {"v": v, "t": int(O.votos)}) if gana else T("{v} votos de {t}: gana {r}. Gánate al barrio y preséntate otra vez desde el {f}.", {"v": v, "t": int(O.votos), "r": O.rival, "f": Datos.fd(int(A.otra), S.day)})

@@ -3207,6 +3207,9 @@ func rev_tiene(_n: int) -> bool:   # → revista.gd
 func rev_suscribe() -> void:   # → revista.gd
 	pass
 
+func rev_nota(_k: String, _v := 0) -> void:   # el registro de sucesos   → revista.gd
+	pass
+
 func copa_ot_hoy() -> bool:   # la Copa de otoño (copaot.gd)
 	return false
 

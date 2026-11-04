@@ -2,9 +2,12 @@
 # revista»; solo con Datos.CAL). REVISTA de tools/revista.py. Un número por mes del calendario (el n.º 1, el del mes en que
 # empieza la partida); se compra en el quiosco de prensa del Ensanche, en los dos growshops, en los estancos y en el mercado de
 # la Ribera, o llega al buzón el día 1 si estás suscrito (tienda online, doce números). Cada número se arma con el estado de la
-# partida: portada, la variedad del mes (con su pista si no la tienes), TALLER (una de las doce técnicas: la primera vez que se
-# lee se aprende y da su efecto, con tope), MERCADO con los precios de verdad, la Copa, los clasificados (el del mes deja algo:
-# descuento en la chatarrería, un club que paga más por una variedad), cartas y LEGAL. Los números se guardan (S.rev.col) y se
+# partida: portada, NOTICIAS DE LA COMARCA (lo que ha pasado de verdad en tu partida ese mes: rev_nota lo apunta cuando pasa y
+# el número lo cuenta como nota de prensa; si el mes viene tranquilo, noticias deducidas del estado), la variedad del mes (con su
+# pista si no la tienes), TALLER (una de las doce técnicas: la primera vez que se lee se aprende y da su efecto, con tope),
+# MERCADO con los precios de verdad, la Copa, LA AGENDA DEL MES (lo que viene por el calendario: la Copa, las fiestas, el plazo,
+# los recibos, la ventana de la nave), los clasificados (el del mes deja algo: descuento en la chatarrería, un club que paga más
+# por una variedad), cartas y LEGAL. Los números se guardan (S.rev.col) y se
 # releen desde la MOCHILA (la meta, los doce números distintos: REVISTA.cab.col).
 # Cadena: … → caza → copaot → acto3 → revista → retencion → juego.
 extends "res://src/acto3.gd"
@@ -13,13 +16,15 @@ const REV_COLOR := "#3c7a28"   # i18n-no
 
 func rev() -> Dictionary:
 	if not (S.get("rev") is Dictionary):
-		S.rev = {"col": [], "tec": [], "sus": 0}
+		S.rev = {"col": [], "tec": [], "sus": 0, "nw": []}
 	if not (S.rev.get("col") is Array):
 		S.rev.col = []
 	if not (S.rev.get("tec") is Array):
 		S.rev.tec = []
 	if S.rev.get("sus") == null:
 		S.rev.sus = 0
+	if not (S.rev.get("nw") is Array):   # el registro de sucesos: las partidas de antes no lo tienen
+		S.rev.nw = []
 	return S.rev
 
 func rev_hay() -> bool:
@@ -36,11 +41,8 @@ func rev_num(dia := -1) -> int:
 	return (int(f.y) - int(f0.y)) * 12 + int(f.m) - int(f0.m) + 1
 
 func rev_mes(n: int) -> String:   # «mayo de 2026» del número n
-	var f0: Dictionary = Datos.fecha(1)
-	var m := int(f0.m) + n - 1
-	var y := int(f0.y) + int(floor(float(m - 1) / 12.0))
-	m = ((m - 1) % 12) + 1
-	return T("{m} de {y}", {"m": I18n.v(String(D.MESES[m - 1])), "y": y})
+	var my := rev_my(n)
+	return T("{m} de {y}", {"m": I18n.v(String(D.MESES[int(my.m) - 1])), "y": int(my.y)})
 
 func rev_tiene(n: int) -> bool:
 	for v in rev().col:
@@ -71,9 +73,133 @@ func rev_bono(e: String) -> float:
 		return 0.0
 	return Cultivo.rev_bono(S, e)
 
+# ---------- el registro de sucesos: de aquí salen las noticias ----------
+const NW_TOPE := 60   # lo que se guarda del registro
+const NW_MAX := 3     # noticias por número
+
+# lo llama el juego cuando algo pasa (desde cualquier módulo: el stub está en mundo.gd). «v» es la cifra que lleve la noticia
+func rev_nota(k: String, v := 0) -> void:
+	if not rev_hay() or k == "":
+		return
+	var R := rev()
+	for w in R.nw:
+		if String(w.get("k", "")) == k and int(w.get("d", 0)) == int(S.day):
+			w.v = maxi(int(w.get("v", 0)), int(v))   # la misma noticia con más cifra (los podios de la Copa)
+			return
+	R.nw.append({"k": k, "d": int(S.day), "v": int(v)})
+	while R.nw.size() > NW_TOPE:
+		R.nw.pop_front()
+
+func nw_def(k: String) -> Dictionary:
+	for w in D.REVISTA.nw:
+		if String(w.k) == k:
+			return w
+	return {}
+
+# los sucesos que cuenta el número n: los de su mes y, si no llena, los del mes anterior; por prioridad y sin repetir clave
+func rev_nw_de(n: int) -> Array:
+	var o := []
+	var vis := {}
+	for mes in [n, n - 1]:
+		var l := []
+		for w in rev().nw:
+			var k := String(w.get("k", ""))
+			if vis.has(k) or rev_num(int(w.get("d", 1))) != mes:
+				continue
+			var df := nw_def(k)
+			if df.is_empty():
+				continue
+			vis[k] = 1
+			l.append({"d": int(w.get("d", 1)), "v": int(w.get("v", 0)), "df": df})
+		l.sort_custom(func(a, b): return int(a.df.p) > int(b.df.p) if int(a.df.p) != int(b.df.p) else int(a.d) > int(b.d))
+		o.append_array(l)
+		if o.size() >= NW_MAX:
+			break
+	return o.slice(0, NW_MAX)
+
+func rev_nw_txt(e: Dictionary) -> String:
+	return T(String(e.df.t), {"d": Datos.fd_corto(int(e.d)), "v": int(e.v)})
+
+# las noticias deducidas del estado: entran cuando el mes no trae sucesos suyos
+func rev_relleno(n: int) -> Array:
+	var o := []
+	for r in D.REVISTA.rel:
+		var k := String(r.k)
+		var a := {}
+		match k:
+			"clima":
+				var my := rev_my(n)
+				var d1 := Datos.dia_de(int(my.y), int(my.m), 1)
+				var t: Array = D.TIEMPO.t[int(my.m) - 1]
+				a = {"c": Datos.estacion(d1), "x": T("de {a} a {b} °C de media", {"a": int(t[1]), "b": int(t[0])})}
+			"poli":
+				var np := nivel_poli()
+				a = {"p": [K("tranquila"), K("con más patrullas de lo normal"), K("con una investigación abierta"), K("con una orden de registro firmada")][clampi(np, 0, 3)]}
+			"dex":
+				var nd: int = D.DEX.filter(func(x): return S.disc.get(x)).size()
+				if nd < 3:
+					continue
+				a = {"n": nd}
+			"obras":
+				if not (S.get("mar") is Dictionary) or not D.MAR.obras.any(func(ob): return not obra_ya(String(ob.k))):
+					continue
+			"clubs":
+				if not (S.get("aso") is Dictionary and S.aso.get("pres")) and not (S.get("mar") is Dictionary and S.mar.get("kaia")):
+					continue
+			_:
+				pass
+		o.append(T(String(r.t), a))
+	return o
+
+func rev_noticias(n: int) -> String:
+	var l := PackedStringArray()
+	for e in rev_nw_de(n):
+		l.append("· " + rev_nw_txt(e))
+	if l.size() < 2:
+		var rl := rev_relleno(n)
+		var i := 0
+		while l.size() < 2 and i < rl.size():
+			l.append("· " + String(rl[(Datos.hash_str("rev-rel|%d" % n) + i) % rl.size()]))
+			i += 1
+	return "\n".join(l)
+
+# ---------- la agenda del mes: lo que viene por el calendario ----------
+func rev_my(n: int) -> Dictionary:   # el mes y el año del número n
+	var f0: Dictionary = Datos.fecha(1)
+	var m := int(f0.m) + n - 1
+	var y := int(f0.y) + int(floor(float(m - 1) / 12.0))
+	return {"m": ((m - 1) % 12) + 1, "y": y}
+
+func rev_agenda(n: int) -> String:
+	var A: Dictionary = D.REVISTA.ag
+	var my := rev_my(n)
+	var m := int(my.m)
+	var y := int(my.y)
+	var l := PackedStringArray()
+	if int(S.ch) >= int(D.COPA_OT.ch) and m == int(D.COPA_OT.m):
+		l.append("· " + T(String(A.copa), {"d": Datos.fd_corto(Datos.dia_de(y, m, int(D.COPA_OT.d)))}))
+	for f in D.CAZA.fi:
+		if int(f.m) == m:
+			l.append("· " + T(String(A.fiesta), {"n": I18n.v(String(f.n)), "d": Datos.fd_corto(Datos.dia_de(y, m, int(f.d))), "q": int(f.dias)}))
+	if int(S.get("due", 0)) > 0 and int(S.get("deadline", 0)) > 0:
+		var fp: Dictionary = Datos.fecha(int(S.deadline))
+		if int(fp.m) == m and int(fp.y) == y:
+			l.append("· " + T(String(A.plazo), {"d": Datos.fd_corto(int(S.deadline))}))
+	if S.get("nave") is Dictionary and S.nave.get("op") != null and not S.nave.get("mia"):
+		l.append("· " + T(String(A.nave)))
+	if (S.get("nave") is Dictionary and S.nave.get("r") != null) or (S.get("loc") is Dictionary and not S.loc.is_empty()) or (S.get("setas") is Dictionary and S.setas != null):
+		l.append("· " + T(String(A.recibo)))
+	if l.is_empty():
+		l.append("· " + T(String(A.nada)))
+	l.append("· " + T(String(A.num)))
+	return "\n".join(l)
+
 # ---------- el texto del número ----------
 func rev_titular(n: int) -> String:
 	var R: Dictionary = D.REVISTA
+	var nw := rev_nw_de(n)
+	if nw.size():   # la noticia gorda del mes manda en la portada
+		return I18n.v(String(nw[0].df.ti))
 	if n <= 1:
 		return I18n.v(String(R.tit.tia[0]))
 	if S.get("mar") is Dictionary and S.mar.get("lic"):
@@ -98,6 +224,8 @@ func rev_texto(n: int) -> String:
 	# portada
 	o.append("%s · %s" % [I18n.v(String(R.cab.sub)).to_upper(), rev_mes(n).to_upper()])
 	o.append(rev_titular(n))
+	# las noticias de la comarca
+	o.append("%s\n%s" % [I18n.v(String(SE.nw)), rev_noticias(n)])
 	# la variedad del mes
 	var sid := rev_var(n)
 	var s: Dictionary = strain(sid)
@@ -117,6 +245,8 @@ func rev_texto(n: int) -> String:
 	o.append("%s\n%s" % [I18n.v(String(SE.merc)), rev_mercado()])
 	# la Copa
 	o.append("%s\n%s" % [I18n.v(String(SE.copa)), rev_copa(n)])
+	# la agenda del mes
+	o.append("%s\n%s" % [I18n.v(String(SE.ag)), rev_agenda(n)])
 	# los clasificados
 	var cl := rev_cls(n)
 	o.append("%s\n%s — %s" % [I18n.v(String(SE.cls)), I18n.v(String(cl.n)), I18n.v(String(cl.t))])

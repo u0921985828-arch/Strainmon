@@ -88,6 +88,9 @@ func bt_guardadas() -> Array:
 
 # ---------- el cuarto ----------
 func bt_entra(mapa: String) -> void:
+	if bt_abierto() and not bt().get("vis"):   # el cuarto, visto por primera vez: noticia para la revista
+		bt().vis = int(S.day)
+		rev_nota("banco")
 	if not Datos.CAL or not D.has("BANCO_TIA") or mapa != String(D.BANCO_TIA.mapa) or not MAPS.has(mapa):
 		return
 	var m: Dictionary = MAPS[mapa]
@@ -194,6 +197,7 @@ func bt_entrega(c: Dictionary) -> void:
 func bt_fin() -> void:
 	var B: Dictionary = D.BANCO_TIA
 	bt().fin = int(S.day)
+	rev_nota("bancofin")
 	S.rep = float(S.rep) + int(B.rep)
 	S.prest = int(S.get("prest", 0)) + int(B.prest)
 	await talk(K("EL BANCO DE SEMILLAS"), [K("El último cajón, el de la Haze del 98. Cierras el fichero y el cuarto está entero."),

@@ -637,6 +637,7 @@ func huerta_obj(x: int, y: int, o) -> bool:
 				await fade(1)
 				advance_time(int(HUERTA.desbroce))
 				huerta_s().l = S.day
+				rev_nota("huerta")
 				MAPS[HUERTA.mapa] = mapa_huerta()
 				await fade(0)
 				sfx("get")

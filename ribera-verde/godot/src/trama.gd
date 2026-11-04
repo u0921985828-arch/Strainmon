@@ -961,7 +961,7 @@ func talk_baltasar():
 	var paid = S.due
 	S.due = 0
 	if Datos.CAL:   # 0.78: desde aquí se cuenta lo facturado para el plazo siguiente (plazo_due)
-		S.plazoS = S.get("sales", 0)
+		S.plazoS = S.get("sales", 0)   # i18n-no
 	sfx("coin")
 	toast(T("Pagado: {e}", {"e": Datos.eur(paid)}), 1500)
 	if S.ch == 3:
@@ -1119,6 +1119,7 @@ func mision_ok(id: String) -> bool:
 
 # ganada la Copa, las misiones que falten del capítulo 6, sin aviso ni regalo
 func cerrar_copa() -> void:
+	rev_nota("copa6")
 	for m in D.MISIONES:
 		if int(m.ch) == 6 and not S.misiones.has(m.id):
 			S.misiones[m.id] = 0
@@ -1713,9 +1714,9 @@ func check_story():
 # ventana.
 func plazo_due(ch: int) -> int:
 	var base: int = int(D.PLAZOS[str(ch)])
-	if not Datos.CAL or not D.has("PLAZO_PCT") or not S.has("plazoS"):
+	if not Datos.CAL or not D.has("PLAZO_PCT") or not S.has("plazoS"):   # i18n-no
 		return base   # sin la marca del plazo anterior (partida migrada, tutorial saltado) no hay ventana que contar: lo pactado
-	var fact: float = maxf(0, float(S.get("sales", 0)) - float(S.get("plazoS", 0)))
+	var fact: float = maxf(0, float(S.get("sales", 0)) - float(S.get("plazoS", 0)))   # i18n-no
 	return int(maxf(float(base), Datos.jsround(fact * float(D.PLAZO_PCT))))
 
 func dias_plazo(ch: int) -> int:
@@ -1799,6 +1800,7 @@ func embargo_aplica() -> Dictionary:   # E5: lo que se lleva, antes de decirlo
 func embargo(em = null) -> void:
 	if em == null:
 		em = embargo_aplica()
+	rev_nota("embargo")
 	await talk(K("TOÑO"), [K("Tres plazos tarde. Don Baltasar se cobra en especie.")])
 	sfx("bad")
 	if em.has("nc"):
@@ -1809,6 +1811,7 @@ func embargo(em = null) -> void:
 # el aviso de la orden de registro (1.11): un día antes de la redada
 func aviso_orden():
 	sfx("bad")
+	rev_nota("orden")
 	var L := [K("Me dice uno de la comisaría que mañana entran en tu piso con orden de registro."), K("Esta noche, el dinero y los cogollos a la caja o fuera de casa. Las plantas no se pueden esconder.")]
 	if S.ch >= 5:
 		L.append(K("O paga a Molina, que aún estás a tiempo."))
@@ -1818,6 +1821,7 @@ func aviso_orden():
 # llega, de la caja. Lo de encima, solo si estás en casa (1.13)
 func raid_event():
 	S.orden = 0
+	rev_nota("redada")   # la revista lo cuenta el mes que viene
 	if S.protect:
 		S.heat = 75 if Datos.CAL else 50   # 0.77: parada la orden, el calor no se queda en la mitad: la siguiente llega antes
 		await talk(K("SMS · MOLINA"), [K("Esta noche había orden de entrada en tu piso. La he parado."), K("Baja el ritmo.")])

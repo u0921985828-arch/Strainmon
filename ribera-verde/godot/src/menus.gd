@@ -290,6 +290,8 @@ func cannadex() -> void:
 		var items := [{"label": K("POR FAMILIAS"), "right": "%d/%d" % [fc[0], fc[1]], "ic": icono("cogollo"), "q": "fam",
 				"desc": K("Las variedades por su zona de origen y por sus líneas de cruces. Cosecha todas las de una familia y te quedas su bono para siempre.")},
 			{"label": K("POR GENERACIÓN"), "right": dex_cuenta(D.DEX), "ic": icono("cogollo"), "q": "gen", "desc": K("Las landraces y los cruces de 1.ª a 4.ª generación, las autoflorecientes y las demás.")},
+			{"label": K("RECETARIO"), "right": dex_cuenta(D.DEX), "ic": icono("guardar"), "q": "rec",
+				"desc": K("Cómo se consigue cada una, por vía: el growshop, el banco del PC, las recetas, lo que escondió la tía, la gente y las fiestas, las misiones y el banco de la tía.")},
 			{"label": K("TODAS"), "right": dex_cuenta(D.DEX), "ic": icono("cogollo"), "q": "todas", "desc": K("Todas las variedades, en su orden.")}]
 		if cust.size():
 			items.append({"label": K("TUS CRUCES"), "right": str(cust.size()), "ic": icono("cogollo"), "q": "cust", "desc": K("Las variedades que has sacado tú en la mesa de cruces.")})
@@ -317,6 +319,8 @@ func cannadex() -> void:
 					if j < 0 or j >= G.size():
 						break
 					await dex_lista(G[j][1], String(G[j][0]).to_upper())
+			"rec":
+				await dex_recetario()
 			"todas":
 				await dex_lista(D.DEX, K("TODAS"))
 			"cust":
@@ -378,6 +382,93 @@ func dex_familias() -> void:
 			return
 		var F: Dictionary = D.FAMILIAS[ks[i]]
 		await dex_lista(F.s.filter(func(sid): return D.STRAINS.has(sid)), I18n.v(String(F.n)).to_upper(), fam_bono_txt(F))
+
+# El recetario: cómo se consigue cada variedad, ordenado por vía de obtención (lo pidió el usuario: «la guía para conseguir
+# genéticas, igual más como recetario»). Cada vía con las que llevas de ella y, dentro, la lista de siempre: la hoja, lo que
+# entra y lo apuntado. Con «solo las que me faltan», cada vía enseña únicamente lo que te queda por conseguir de ella.
+func dex_orden(ks: Array) -> Array:   # siempre en el orden de la CannaDex, sin repetir
+	var o := []
+	for k in D.DEX:
+		if ks.has(k) and not o.has(k):
+			o.append(k)
+	return o
+
+func dex_vias() -> Array:
+	var R := recetas()
+	var v := []
+	var sh := []
+	for it in D.SHOP:
+		if it.get("sid") != null and D.STRAINS.has(String(it.sid)):
+			sh.append(String(it.sid))
+	v.append({"k": "kiko", "n": K("EN EL GROWSHOP"), "d": K("Las que vende Kiko en su growshop, cada una desde su capítulo."), "ks": dex_orden(sh)})
+	var bk := []
+	for b in D.BANCO:
+		if D.STRAINS.has(String(b[0])):
+			bk.append(String(b[0]))
+	v.append({"k": "banco", "n": K("BANCO DE SEMILLAS DEL PC"), "d": K("Las landraces que se piden por el ordenador de la tía y llegan al día siguiente."), "ks": dex_orden(bk)})
+	v.append({"k": "receta", "n": K("DE RECETA"), "d": K("Las que salen de cruzar en la mesa. Dentro, cada una dice lo que entra."), "ks": dex_orden(R.keys())})
+	var tia := []
+	for k in D.REGALO:
+		if D.STRAINS.has(String(k)):
+			tia.append(String(k))
+	if tia.size():
+		v.append({"k": "tia", "n": K("LO QUE ESCONDIÓ LA TÍA"), "d": K("Sobres repartidos por la comarca: la nevera, la caja fuerte, cuatro arbustos y quien la conoció."), "ks": dex_orden(tia)})
+	var mis := []
+	for m in D.MISIONES:
+		if m.get("s") is Dictionary:
+			for k in m.s:
+				if D.STRAINS.has(String(k)):
+					mis.append(String(k))
+	if mis.size():
+		v.append({"k": "mision", "n": K("DE PREMIO EN UNA MISIÓN"), "d": K("Las que llegan con el SMS de una misión cumplida."), "ks": dex_orden(mis)})
+	if Datos.CAL:
+		var cz := []
+		for e in D.CAZA.l:
+			if D.STRAINS.has(String(e.k)):
+				cz.append(String(e.k))
+		if cz.size():
+			v.append({"k": "caza", "n": K("LA GENTE Y LAS FIESTAS"), "d": K("Una por persona y por partida: hay que pillarla en su estación, con su tiempo o en su fiesta, y con confianza."), "ks": dex_orden(cz)})
+		if D.has("BANCO_TIA"):
+			var bt := []
+			for c in D.BANCO_TIA.col:
+				for k in c.s:
+					if D.STRAINS.has(String(k)):
+						bt.append(String(k))
+			if bt.size():
+				v.append({"k": "bancotia", "n": K("EL BANCO DE LA TÍA"), "d": K("Las colecciones del cuarto de atrás de la asociación: se entregan, no se consiguen ahí."), "ks": dex_orden(bt)})
+		var au: Array = D.DEX.filter(func(k): return D.STRAINS[k].get("auto"))
+		if au.size():
+			v.append({"k": "auto", "n": K("AUTOFLORECIENTES"), "d": K("Florecen por edad: ni madres ni esquejes. Se cruzan con la Ruderalis."), "ks": dex_orden(au)})
+	return v
+
+func dex_via_falta(ks: Array) -> Array:
+	return ks.filter(func(k): return not S.disc.get(k))
+
+func dex_recetario() -> void:
+	var i := 0
+	var falt := false
+	while true:
+		var V := dex_vias()
+		var items := []
+		for e in V:
+			var ks: Array = dex_via_falta(e.ks) if falt else e.ks
+			var nf: int = dex_via_falta(e.ks).size()
+			items.append({"label": I18n.v(String(e.n)), "right": T("faltan {n}", {"n": nf}) if falt else dex_cuenta(e.ks), "ic": icono("cogollo"),
+				"disabled": ks.is_empty(), "ks": ks,
+				"desc": I18n.v(String(e.d)) + "\n" + (K("De esta vía ya las tienes todas.") if nf == 0 else ", ".join(PackedStringArray(ks.map(func(k): return D.STRAINS[k].n if dex_ver(k) else "??????"))))})
+		items.append({"label": K("Solo las que me faltan"), "right": K("sí") if falt else K("no"), "q": "falt",
+			"desc": K("Enseña en cada vía solo las variedades que todavía no has descubierto.")})
+		items.append({"label": K("Volver"), "desc": K("Lo que das en el molino de Errotabarri vuelve a salir en su trueque, ya descubierto.")})
+		var nd: int = D.DEX.filter(func(k): return S.disc.get(k)).size()
+		i = await menu(items, {"cls": "full", "title": K("RECETARIO"), "title2": "%d/%d" % [nd, D.DEX.size()], "desc": true, "initial": i})
+		if i < 0 or i >= items.size():
+			return
+		if items[i].get("q") == "falt":
+			falt = not falt
+			continue
+		if not items[i].has("ks") or items[i].ks.is_empty():
+			return
+		await dex_lista(items[i].ks, I18n.v(String(V[i].n)), T("faltan {n}", {"n": items[i].ks.size()}) if falt else "")
 
 # una lista de variedades: A abre la hoja (descubierta), lo que entra (con receta) o todo lo apuntado
 func dex_lista(ks: Array, titulo: String, t2 := "") -> void:

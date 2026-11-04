@@ -157,6 +157,7 @@ func a2_ayudante() -> bool:
 	var k: String = SOSPECHOSOS[c]
 	a2().acu = k
 	a2_paso(3)
+	rev_nota("acusa")
 	if k == CULPABLE:
 		await talk(N, [K("Garro. Quería la Haze y la tía se la negó. Sabía cuándo estaría el piso vacío y mintió con el teatro."),
 			K("Lo llamamos juntos. Al tercer tono, cuelga. A la hora, un mensajero trae un sobre sin remite."),

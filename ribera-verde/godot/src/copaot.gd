@@ -148,6 +148,11 @@ func cot_presenta(c: Dictionary, y: int) -> void:
 	var e: int = int(C.premio[pl])
 	S.money += e
 	S.prest = int(S.get("prest", 0)) + int(C.prest[pl])
+	var npo := 0   # categorías de este año en el podio: la cifra de la noticia
+	for kk in cot_ano(y):
+		if int(cot_ano(y)[kk]) <= C.premio.size():
+			npo += 1
+	rev_nota("copa", npo)
 	S.rep += 2 * (3 - pl)
 	cot().tro.append({"y": y, "k": k, "pl": pl + 1, "s": sid})
 	sfx("get")

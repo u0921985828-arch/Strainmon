@@ -2161,6 +2161,8 @@ s632c1c71,POR FAMILIAS,BY FAMILY
 sea204f5f,Las variedades por su zona de origen y por sus líneas de cruces. Cosecha todas las de una familia y te quedas su bono para siempre.,
 s1eada0aa,POR GENERACIÓN,BY GENERATION
 s8e009714,"Las landraces y los cruces de 1.ª a 4.ª generación, las autoflorecientes y las demás.","Landraces and 1st to 4th generation crosses, autoflowers and the rest."
+sb77d412c,RECETARIO,RECIPE BOOK
+sbf00acff,"Cómo se consigue cada una, por vía: el growshop, el banco del PC, las recetas, lo que escondió la tía, la gente y las fiestas, las misiones y el banco de la tía.","How each one is obtained, route by route: the growshop, the PC seed bank, the recipes, what your aunt hid, people and festivals, the missions and your aunt's bank."
 sa4558d6b,TODAS,ALL
 s34150029,"Todas las variedades, en su orden.","Every strain, in order."
 s45d814aa,TUS CRUCES,YOUR CROSSES
@@ -2177,6 +2179,28 @@ s21bd20c8,en la nave,in the warehouse
 s108e3c2b,en la huerta,in the vegetable garden
 sa4a4169b,en la sala de KAIA,in the KAIA grow room
 sc988c682,en {m},in {m}
+sb207909a,EN EL GROWSHOP,AT THE GROWSHOP
+sd1341702,"Las que vende Kiko en su growshop, cada una desde su capítulo.","The ones Kiko sells at his growshop, each from its own chapter."
+s1c0ac2ab,BANCO DE SEMILLAS DEL PC,PC SEED BANK
+sa6df7e83,Las landraces que se piden por el ordenador de la tía y llegan al día siguiente.,The landraces you order on your aunt's computer; they arrive the next day.
+s3a1e9cdb,DE RECETA,FROM A RECIPE
+s09dbadd6,"Las que salen de cruzar en la mesa. Dentro, cada una dice lo que entra.","The ones that come out of crossing at the table. Inside, each one lists what goes into it."
+s2fcdea32,LO QUE ESCONDIÓ LA TÍA,WHAT YOUR AUNT HID
+sb940669e,"Sobres repartidos por la comarca: la nevera, la caja fuerte, cuatro arbustos y quien la conoció.","Packets scattered around the county: the fridge, the safe, four bushes and the people who knew her."
+s9b11404c,DE PREMIO EN UNA MISIÓN,AS A MISSION REWARD
+s6726a48e,Las que llegan con el SMS de una misión cumplida.,The ones that arrive with the text message of a mission completed.
+s242ee1ce,LA GENTE Y LAS FIESTAS,PEOPLE AND FESTIVALS
+s4c0d720d,"Una por persona y por partida: hay que pillarla en su estación, con su tiempo o en su fiesta, y con confianza.","One per person per save: you have to catch it in its season, in its weather or at its festival, and with trust."
+sc7c9a187,"Las colecciones del cuarto de atrás de la asociación: se entregan, no se consiguen ahí.","The collections in the back room of the association: you hand them in, you do not get them there."
+s8638e7e6,AUTOFLORECIENTES,AUTOFLOWERING
+s292cf244,Florecen por edad: ni madres ni esquejes. Se cruzan con la Ruderalis.,"They flower by age: no mother plants, no cuttings. They are crossed with Ruderalis."
+s23febe9e,faltan {n},{n} missing
+se42fc180,De esta vía ya las tienes todas.,You already have every one from this route.
+s3ef6b79a,Solo las que me faltan,Only the ones I am missing
+se14654c3,sí,yes
+s67aa281f,no,no
+s450a8e37,Enseña en cada vía solo las variedades que todavía no has descubierto.,Shows only the strains you have not discovered yet in each route.
+sbfd34ea0,"Lo que das en el molino de Errotabarri vuelve a salir en su trueque, ya descubierto.","Whatever you give at the Errotabarri mill comes back in its barter, already discovered."
 sbda0b4c2,Ver la hoja,See the leaf
 se1e8811d,Lo que entra,What goes in
 s77a57a50,Leerlo todo,Read it all
@@ -3277,6 +3301,12 @@ sbaa4da2f,"La compra está pendiente. Cuando se confirme, sigue desde START · J
 sad7ca9d6,Compra cancelada.,Purchase cancelled.
 sd5542ba8,No se ha podido hacer la compra. Inténtalo más tarde.,The purchase couldn't go through. Try again later.
 s528f9ff7,{m} de {y},
+s7675e213,de {a} a {b} °C de media,{a} to {b} °C on average
+s0343073e,de {a} a {b}° de media,{a} to {b}° on average
+s96a425fa,tranquila,quiet
+se526baf7,con más patrullas de lo normal,with more patrols than usual
+s2fb59d1a,con una investigación abierta,with an investigation open
+s3586512d,con una orden de registro firmada,with a search warrant signed
 se76c1fbf,Dónde conseguirla: {p}.,
 s087ed473,De esta no dicen de dónde sale. Alguien de la comarca la tendrá.,
 sf09c72fa,Esta ya la tienes en la GENOTECA.,
@@ -4111,6 +4141,7 @@ s4374da3b,"La puerta del bajo de Txomin, con un candado. La llave te la da él, 
 sd3654415,"Cerrado. En el cristal, el cartel de SE TRASPASA.",Closed. A BUSINESS FOR SALE sign hangs in the window.
 sa8adefc7,{n} abre de 23:00 a 6:00.,{n} opens from 23:00 to 6:00.
 s42cd9c20,"¿Qué? Con una limpieza y las mesas, queda como nueva.",
+se97a94bd,"El camastro de la nave, detrás de las mesas: se oyen los extractores toda la noche.","The warehouse cot, behind the tables: the extractors hum all night."
 s210335de,Neumáticos viejos y bidones vacíos.,Old tyres and empty drums.
 s56a40d26,Sacos rotos de algo que ya no se sabe qué era.,
 sf2a6cfcb,"Cajas con polvo del último inquilino. Si la alquilas, Arrieta las saca.",
@@ -4140,7 +4171,6 @@ s1d325743,"El plano de la nave, con las mesas, las tomas de agua y la luz.","The
 s56002453,"Cajas de archivo: facturas de la luz, del agua y del sustrato.","Filing boxes: power, water and soil bills."
 sdde6734d,cajaL,cajaL
 s4391b1a3,Lo de {n}.,{n} stuff.
-se97a94bd,"El camastro de la nave, detrás de las mesas: se oyen los extractores toda la noche.","The warehouse cot, behind the tables: the extractors hum all night."
 s142e75f2,"La mesa de pesar: la báscula de precisión, los tarros vacíos y las etiquetas del dispensario.","The weighing table: the precision scale, empty jars and the dispensary labels."
 s5fd3fde7,"Cajas de tarros nuevos, todavía con el cartón.","Boxes of new jars, still in their cardboard."
 sbbd26a9f,"En la pizarra de Kiko, a tiza: «{t}».","On Kiko's chalkboard: ""{t}""."
@@ -7100,13 +7130,71 @@ s36001cfa,"«Guardo las semillas en un tarro, en la nevera, con un sobre de los 
 s8692e69f,«Dejad de perseguir el veinticinco por ciento. Preguntad a quién le gusta lo que cultiváis.» — Un catador,“Stop chasing twenty-five per cent. Ask who likes what you grow.” — A taster
 sef0576c9,«Las landraces no son una moda: son lo que había antes de que todo oliera igual.» — Un lector del barrio alto,“Landraces are not a fad: they are what there was before everything smelled the same.” — A reader from the upper neighbourhood
 sa29d96de,PORTADA,FRONT PAGE
+sfd34a5e1,NOTICIAS DE LA COMARCA,NEWS FROM THE COUNTY
 s08efd72d,LA VARIEDAD DEL MES,STRAIN OF THE MONTH
 se3678202,TALLER,WORKSHOP
 s2f790a97,MERCADO,MARKET
 s02b1a252,LA COPA Y LAS CATAS,THE CUP AND THE TASTINGS
+s4bd47106,LA AGENDA DEL MES,THIS MONTH'S DIARY
 s2d689012,CLASIFICADOS,CLASSIFIEDS
 s4c2c97d7,CARTAS,LETTERS
 s143602e0,LEGAL,LEGAL
+s2dcccce1,Un registro en el barrio se salda con plantas y material incautados,A search in the neighbourhood ends with plants and gear seized
+s46dba41b,"Agentes entraron el {d} en un piso del barrio con una orden del juzgado y se llevaron las plantas y el equipo que había montado. La asociación recuerda que un registro acaba casi siempre en multa y en la pérdida de todo el ciclo, y que el calor no se baja de un día para otro.","Officers entered a flat in the neighbourhood on {d} with a court warrant and took away the plants and the gear that was set up. The association points out that a search almost always ends in a fine and the loss of the whole cycle, and that heat does not cool down overnight."
+sb90af50b,Un juzgado de la comarca autoriza un registro domiciliario,A county court authorises a home search
+sfe95a0bd,"Hay una orden firmada el {d} y no se sabe para cuándo. Desde los clubs piden calma y sentido común: menos movimiento en la calle, nada a la vista y esperar a que el asunto se enfríe.","There is a warrant signed on {d} and nobody knows for when. The clubs are asking for calm and common sense: less moving about on the street, nothing on show, and wait for the matter to cool down."
+s8ac0a63e,La Copa de otoño reparte premios en la plaza,The autumn Cup hands out its prizes in the square
+s63661970,"El jurado de la plaza falló el {d} sus cinco categorías. Entre los premiados, un cultivador del barrio que subió al podio en {v} categoría(s). Las muestras se cataron a ciegas, como manda la Copa.","The panel in the square announced its five categories on {d}. Among the winners, a grower from the neighbourhood who made the podium in {v} category/categories. The samples were tasted blind, as the Cup requires."
+se9cfa052,Una muestra del barrio pasa la marca de la Copa,A sample from the neighbourhood beats the Cup record
+sed531fac,"El jurado dio por buena el {d} una muestra que pasa la marca que llevaba años sin moverse. En la mesa de catas se habló de foco, de abono y de paciencia, en ese orden.","On {d} the panel confirmed a sample that beats a record which had stood for years. At the tasting table they talked about lamps, feed and patience, in that order."
+s0aa2254a,Abre KAIA en el muelle: un club con dispensario para socios,KAIA opens on the dock: a club with a dispensary for members
+scee79215,"El local del muelle abrió el {d} después de la obra. Tiene dispensario para socios y cocina pequeña, y en el barrio del puerto lo cuentan como la primera cosa nueva en años. A los treinta días de abrir, la ley permite pedir la licencia de distribuidora.","The place on the dock opened on {d} once the building work was done. It has a dispensary for members and a small kitchen, and around the harbour they call it the first new thing in years. Thirty days after opening, the law allows you to apply for the distributor licence."
+se604ebb6,La comarca tiene su primera distribuidora legal,The county has its first legal distributor
+s306519a6,"La licencia salió el {d}: hasta cinco kilos al día con papeles, trazabilidad y control de lo que entra y lo que sale. Es el primer permiso de este tipo en la comarca y en los clubs se lee como el principio de algo.","The licence came through on {d}: up to five kilos a day with paperwork, traceability and control of everything coming in and going out. It is the first permit of its kind in the county and the clubs read it as the start of something."
+s3502ebe7,La asociación del barrio alto elige presidencia,The uptown association elects a president
+se27c44d9,"La asamblea del {d} salió con un nombre nuevo al frente de la asociación que fundó, hace años, una vecina del barrio. Entre los acuerdos, dispensario para socios y las cuentas a la vista.",The meeting on {d} ended with a new name at the head of the association founded years ago by a woman from the neighbourhood. Among the decisions: a dispensary for members and the books out in the open.
+s35a39745,Aparece un banco de semillas en el cuarto de atrás de la asociación,A seed bank turns up in the association's back room
+s2917225e,Detrás de una puerta que llevaba años cerrada había un banco de semillas con variedades locales de media comarca y de más lejos. La asociación lo abrió el {d} y busca completar las colecciones que faltan.,Behind a door that had been shut for years there was a seed bank with local strains from half the county and from further afield. The association opened it on {d} and is looking to complete the collections that are missing.
+sd2a33de1,"El banco de semillas del barrio, completo",The neighbourhood seed bank is complete
+s66a6a3dc,"Las seis colecciones quedaron entregadas el {d}. Con la cámara fría, el laboratorio y la sala de catas en marcha, el barrio tiene un sitio donde una variedad no se pierde porque se muera quien la guardaba.","The six collections were all handed in on {d}. With the cold room, the lab and the tasting room running, the neighbourhood has a place where a strain is not lost just because whoever kept it dies."
+scb009eba,Una nave de Valdehierro cambia de manos,A unit in Valdehierro changes hands
+sb87b57af,La nave del polígono se escrituró el {d} después de un alquiler con opción a compra. En el polígono dicen que es la primera vez en mucho tiempo que una de esas naves se compra para trabajar y no para dejarla cerrada.,The unit on the industrial estate was signed over on {d} after a rent-to-buy agreement. On the estate they say it is the first time in a long while that one of those units has been bought to work in rather than to leave locked up.
+sb8879e71,Un concesionario abre en el barrio alto,A car dealership opens uptown
+s2affa21f,"Abrió el {d} con cuatro modelos en el escaparate, entrega en el día y seguro domiciliado. El barrio alto gana un negocio y pierde un solar, que es como se cuentan aquí estas cosas.","It opened on {d} with four models in the window, same-day delivery and insurance by direct debit. Uptown gains a business and loses a vacant lot, which is how these things are counted around here."
+s9db8cbab,La feria de semillas llena el mercado de la Ribera,The seed fair fills the Ribera market
+s71141ff0,"Tres días de puestos, intercambios y cosas que no se ven en ningún banco. Quien llevó algo de su tierra se fue con algo de otra, que es de lo que va la feria desde que se hace.","Three days of stalls, swaps and things you will not find in any bank. Anyone who brought something from their own land left with something from somewhere else, which is what the fair has always been about."
+s776efe2d,"Las fiestas del barrio, cinco días de calle",The neighbourhood festival: five days on the street
+s1f218847,"Txosnas, partidos y la gente mayor contando lo de siempre. En una esquina, los de la asociación con una mesa y un cartel: «esto no es un negocio, es un vecindario».","Food and drink stands, matches and the old folk telling the same stories. On one corner, the association with a table and a sign: «this is not a business, it is a neighbourhood»."
+s06d8afe4,Romería en la ermita del monte,A pilgrimage at the hermitage on the hill
+sa9d5a214,"Un día de monte, de bocadillo y de hablar con quien no ves el resto del año. La serora abrió la ermita y hubo quien se quedó un rato dentro, sentado, sin decir nada.","A day on the hill, a sandwich and a word with the people you do not see the rest of the year. The caretaker opened the hermitage and some stayed a while inside, sitting, saying nothing."
+s553908d9,"Un fenotipo raro, cosechado en la comarca",A rare phenotype harvested in the county
+sef1b6ca2,"Una planta salió distinta a sus hermanas: porte, olor o resina fuera de lo normal. Lo que se hace en estos casos es guardar sus semillas y repetir la línea hasta que el rasgo se fije, que es la única manera de que no se pierda.","One plant came out unlike its sisters: shape, smell or resin out of the ordinary. What you do in these cases is keep its seeds and repeat the line until the trait is fixed, which is the only way not to lose it."
+s4cb6e5cf,Un robo en un piso del barrio acaba con un nombre encima de la mesa,A break-in at a flat in the neighbourhood ends with a name on the table
+s505abf36,"Lo que entró a buscar quien forzó la caja no era dinero. Después de semanas de preguntas por la comarca, el {d} se puso un nombre a la cosa. Lo que pase ahora ya no es asunto de esta revista.","What whoever forced the safe came looking for was not money. After weeks of questions around the county, on {d} a name was put to it. What happens now is no longer this magazine's business."
+s532c0752,Un banco de semillas quiere registrar variedades de la comarca,A seed bank wants to register strains from the county
+s59d1cc58,"La solicitud entró y hay oposición presentada. Si pasa, el nombre de unas cuantas variedades que aquí se cultivan desde siempre quedaría en manos de una empresa. En la asociación lo tienen claro: lo que es de todos no se registra.","The application went in and an opposition has been filed. If it goes through, the names of a fair few strains that have always been grown here would end up in the hands of a company. The association is clear about it: what belongs to everyone is not registered."
+sa96ae842,Vuelve a salir carga del muelle de Puerto Viejo,Cargo leaves the Puerto Viejo dock again
+sd80cd65e,Un pesquero amarrado en el muelle viejo zarpó el {d} con la bodega hecha. Los del muelle no dicen nada y la conservera tampoco. Hace años que no se veía movimiento ahí.,A fishing boat moored at the old dock set sail on {d} with its hold full. The dock hands say nothing and neither does the cannery. There had been no movement there for years.
+se279971a,Un embargo se lleva el equipo de un cultivo del barrio,A seizure takes the gear from a grow in the neighbourhood
+sac41b5d6,"Vino con papel y se fue con la carpa grande. La asociación insiste en lo de siempre: los plazos se pagan antes de ampliar, y quien presta a este tipo de interés no está haciendo un favor a nadie.","He came with paperwork and left with the big tent. The association insists on the same thing as always: you pay the instalments before you expand, and anyone lending at that kind of interest is doing nobody a favour."
+sf4019e5f,Vuelve a trabajarse una huerta abandonada detrás del garaje,An abandoned vegetable plot behind the garage is worked again
+sf0b1eea4,"Llevaba años con la cancilla cerrada y la hierba por la cintura. Ahora tiene bancales hechos y plantas al aire libre, que es como se cultivaba aquí antes de que todo fuera de interior.","For years the gate was shut and the grass was waist high. Now it has beds made and plants out in the open, which is how people grew here before everything moved indoors."
+sfa4f1baa,La ciudad de la autopista mira a la comarca,The city down the motorway looks at the county
+scadfbada,"Clubs grandes, dinero y gente con tarjeta. De la comarca sale género para allí y de allí vienen preguntas que aquí no se hacían. Cada uno que saque sus cuentas.","Big clubs, money and people with cards. Produce leaves the county for there and from there come questions nobody used to ask here. Let everyone do their own sums."
+s0565cb97,"El mes viene {c}: {x}. Los de las carpas, ojo a la humedad; los de fuera, a lo que caiga.","The month comes in {c}: {x}. Those with tents, watch the humidity; those outdoors, watch whatever falls."
+se522ebac,"La calle, {p}. Esta revista no da consejos legales, pero sí recuerda que el género encima pesa más de lo que parece.","The street is {p}. This magazine gives no legal advice, but it does point out that produce in your pocket weighs more than it looks."
+sc5d09709,En la comarca hay {n} variedades registradas con nombre y linaje. Cada una que se apunta es una que no se pierde.,There are {n} strains recorded in the county with a name and a lineage. Every one written down is one that is not lost.
+s13b871f4,"Siguen las obras del muelle viejo: pantalán, dique y los bajos de las casas. Quien tenga algo que mover por mar, que espere a que acaben.","Work continues on the old dock: jetty, breakwater and the ground floors of the houses. Anyone with something to move by sea should wait until it is finished."
+seb5584af,"Los clubs de la comarca mantienen el dispensario abierto para socios, con lo que entra de los cultivos de cada uno. Nada de calle.","The county's clubs keep the dispensary open for members, with whatever comes in from each one's own grow. Nothing off the street."
+sa2b61470,"La lonja de Puerto Viejo sigue comprando flor y extracción al por mayor. Lotes grandes y pago en el día, como siempre.","The Puerto Viejo market still buys flower and extracts wholesale. Big lots and same-day payment, as always."
+s7197c5f6,El puesto de semillas del mercado de la Ribera cambia el género cada semana. Merece la pena pasarse aunque no se compre.,The seed stall at the Ribera market changes its stock every week. Worth dropping by even if you buy nothing.
+s417b4e33,"Copa de otoño: el {d}, en la plaza, con sus cinco categorías.","Autumn Cup: on {d}, in the square, with its five categories."
+s87cd1352,"{n}: del {d}, {q} día(s).","{n}: from {d}, {q} day(s)."
+s62ea0d6f,Vence un plazo de la deuda el {d}.,A debt instalment falls due on {d}.
+s8ba7f346,"Toca recibo: luz, alquileres y seguros.","Bills are due: power, rents and insurance."
+s964536b0,"Los siete primeros días del mes, ventana para comprar la nave a tocateja.",The first seven days of the month are the window to buy the unit outright.
+sb34870f2,"El próximo número, el día 1. Si estás suscrito, al buzón.","The next issue on the 1st. If you are subscribed, straight to your letterbox."
+sd8d5f93c,"Mes tranquilo: ni Copa, ni fiestas, ni plazos. Buen momento para montar un ciclo largo.","A quiet month: no Cup, no festivals, no instalments. A good time to set up a long cycle."
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.

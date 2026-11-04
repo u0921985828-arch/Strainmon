@@ -264,6 +264,7 @@ func conce_dia() -> void:
 	var C: Dictionary = D.CONCE
 	if S.flags.get("conce") == null and int(S.ch) >= int(C.ch) and float(S.money) + float(S.banco) >= float(C.patri):
 		S.flags.conce = S.day
+		rev_nota("conce")
 		if S.map == "alto":
 			montar_alto()
 		queue("conce", func(): await talk(K("SMS · ") + C.n, [C.txt.abre]))
@@ -1006,6 +1007,7 @@ func cargar_envio(B: Dictionary) -> void:
 	await say(T("Sueltas amarras. {b} sale hacia {r} con {kg}: llega el {d}.", {"b": may1(B.n), "r": rt.n, "kg": _kg(tot), "d": Datos.fd(S.day + int(B.dias) + int(rt.d), S.day)}) + (T(" Es el pedido de la semana.") if ped else "") + (T(" El último trabajo de Koldo.") if gr else ""))
 	if Datos.CAL and D.has("PISOS9") and int(S.mar.get("exp", 0)) < 1:   # MAESTRO [9]: con la exportación, la red de pisos
 		S.mar.exp = 1
+		rev_nota("mar")
 		queue("pisos9", func(): await talk(K("SMS · IÑAKI"), [K("Me dicen que ya sacas género por mar. Con ese volumen, monta pisos de venta por los pueblos, con alguien de tu plantilla al frente: MÓVIL → PISOS.")]))
 
 func mar_dia() -> void:
@@ -1253,6 +1255,8 @@ func obras_dia() -> void:
 		if obra_ya(O.k) and not M_.oba.has(O.k):
 			M_.oba[O.k] = int(S.day)
 			nueva = true
+			if O.k == "club":
+				rev_nota("kaia")
 			if O.k == "casas":
 				M_.alq = int(S.day) + 7
 			var t: String = T("Terminada {o}. {t}", {"o": O.n, "t": O.txt})
@@ -1280,6 +1284,7 @@ func obras_dia() -> void:
 	var LG: Dictionary = R.legal
 	if M_.oba.has("club") and not M_.get("ley") and int(S.day) >= int(M_.oba.club) + int(LG.dias):
 		M_.ley = int(S.day)
+		rev_nota("ley")
 		queue("ley", func(): await talk(K("SMS · KOLDO"), [LG.txt, T("Ya es otra película, sobrino: con la licencia, {n} te compra hasta {kg} al día, sin patrulleras y por el banco. Ven a verme.", {"n": LG.n, "kg": _kg(int(LG.dia))})]))
 
 func kaia_dia() -> float:

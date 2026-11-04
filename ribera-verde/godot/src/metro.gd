@@ -367,6 +367,7 @@ func metro_dia() -> void:
 		if patrimonio() >= float(MT.umbral):
 			S.metro = {"d": S.day}
 			metro_d()
+			rev_nota("metro")
 			var tx := [T("Tu nombre ya suena en Hiriburu. Con un patrimonio así, la ciudad se abre: la autopista sale de la parada, con tu vehículo ({p} de peaje).", {"p": Datos.eur(MT.peaje)}), K("Allí hay clubs para gente con dinero, un concejal que sabe mirar a otro lado y dos bandas que no te esperan con flores.")]
 			queue("metro", func(): await talk(K("SMS · IÑAKI"), tx))
 		return

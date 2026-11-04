@@ -31,10 +31,12 @@ func _menu(items: Array, o: Dictionary) -> Dictionary:
 	o = o.duplicate()
 	var ls := []
 	var ds := []
+	var rs := []
 	for it in items:
 		ls.append(str(it.label) if it is Dictionary else str(it))
 		ds.append(str(it.get("desc", "")) if it is Dictionary else "")
-	MENUS.append([str(o.get("title", "")), ls, ds])
+		rs.append(str(it.get("right", "")) if it is Dictionary else "")
+	MENUS.append([str(o.get("title", "")), ls, ds, rs])
 	var i := ls.size() - 1
 	if PILOTO.size():
 		var p: String = PILOTO.pop_front()
@@ -104,7 +106,7 @@ func _corre() -> void:
 	chk(MENUS.size() > 0 and MENUS[0][1][0] == "CANNADEX", "START: la primera fila es CANNADEX (%s)" % [MENUS[0][1][0] if MENUS.size() else "-"])
 	var m := menu_de("CANNADEX")
 	chk(m.size() > 0, "START → CANNADEX abre la CannaDex")
-	chk(m.size() > 0 and m[1].slice(0, 3) == ["POR FAMILIAS", "POR GENERACIÓN", "TODAS"], "la CannaDex: por familias, por generación y todas (%s)" % [m[1] if m.size() else "-"])
+	chk(m.size() > 0 and m[1].slice(0, 4) == ["POR FAMILIAS", "POR GENERACIÓN", "RECETARIO", "TODAS"], "la CannaDex: por familias, por generación, el recetario y todas (%s)" % [m[1] if m.size() else "-"])
 	chk(m.size() > 0 and not m[1].has("TUS CRUCES") and not m[1].has("LA ÚLTIMA PÁGINA"), "sin cruces propios ni la página, no salen")
 	chk(menu_de("GENOTECA").is_empty() and menu_de("DIARIO DE LA TÍA MAITE").is_empty(), "ya no hay Genoteca ni diario aparte")
 
@@ -206,6 +208,67 @@ func _corre() -> void:
 	chk(m.size() > 0 and m[1].has("TUS CRUCES") and m[1].has("LA ÚLTIMA PÁGINA"), "con cruces propios y la página, salen (%s)" % [m[1] if m.size() else "-"])
 	m = menu_de("TUS CRUCES")
 	chk(m.size() > 0 and m[1][0] == "★ Prueba Corta", "tus cruces: la propia")
+
+	# 6b · el RECETARIO: una vía por manera de conseguir semillas, con su cuenta, y «solo las que me faltan»
+	var V: Array = J.dex_vias()
+	chk(V.size() >= 6, "el recetario: al menos 6 vías (%d)" % V.size())
+	var vk: Array = V.map(func(x): return String(x.k))
+	chk(vk.has("kiko") and vk.has("banco") and vk.has("receta") and vk.has("tia") and vk.has("caza") and vk.has("bancotia"),
+		"las vías: growshop, banco del PC, receta, la tía, la gente y el banco de la tía (%s)" % [vk])
+	var sueltas := 0   # cada vía, variedades de verdad y en el orden de la CannaDex
+	for vv in V:
+		var prev := -1
+		for k in vv.ks:
+			if not D.STRAINS.has(k) or not (k in DEX):
+				sueltas += 1
+				continue
+			var q: int = DEX.find(k)
+			if q <= prev:
+				sueltas += 1
+			prev = q
+		if vv.ks.is_empty():
+			sueltas += 1
+	chk(sueltas == 0, "las vías: variedades de DEX, en su orden y sin repetir (%d mal)" % sueltas)
+	var tap := {}   # entre todas, cubren cada variedad que se consigue
+	for vv in V:
+		for k in vv.ks:
+			tap[k] = 1
+	chk(tap.size() >= DEX.size() - 2, "las vías cubren casi toda la CannaDex (%d de %d)" % [tap.size(), DEX.size()])
+	PILOTO = ["RECETARIO", String(V[0].n), "Volver", "Volver", "Volver"]
+	MENUS.clear()
+	chk(corre(J.genoteca), "el recetario termina")
+	m = menu_de("RECETARIO")
+	chk(m.size() > 0 and m[1].size() == V.size() + 2, "el recetario: %d vías, el filtro y Volver (%d)" % [V.size(), m[1].size() if m.size() else 0])
+	chk(m.size() > 0 and m[1][V.size()] == "Solo las que me faltan", "el filtro, la penúltima fila (%s)" % [m[1][V.size()] if m.size() else "-"])
+	m = menu_de(String(V[0].n))
+	chk(m.size() > 0 and m[1].size() == V[0].ks.size() + 1, "la vía %s abre sus %d variedades" % [V[0].n, V[0].ks.size()])
+	# el filtro deja solo lo que falta: con una vía entera descubierta, su fila queda a 0
+	var vh := {}   # una vía a la que de verdad le faltan variedades
+	for vv in V:
+		if J.dex_via_falta(vv.ks).size() > 0:
+			vh = vv
+			break
+	chk(not vh.is_empty(), "alguna vía con variedades sin descubrir")
+	if not vh.is_empty():
+		var fal0: int = J.dex_via_falta(vh.ks).size()
+		for k in vh.ks:
+			S.disc[k] = true
+		chk(J.dex_via_falta(vh.ks).is_empty(), "descubierta la vía %s entera, no le falta ninguna (antes %d)" % [vh.k, fal0])
+	PILOTO = ["RECETARIO", "Solo las que me faltan", "Volver", "Volver"]
+	MENUS.clear()
+	chk(corre(J.genoteca), "el filtro termina")
+	var mf := []
+	for q in MENUS:
+		if q[0] == "RECETARIO":
+			mf.append(q)
+	chk(mf.size() == 2, "el filtro vuelve al recetario (%d pantallas)" % mf.size())
+	if mf.size() == 2:
+		chk(String(mf[0][3][V.size()]) == "no" and String(mf[1][3][V.size()]) == "sí", "el filtro se marca (%s → %s)" % [mf[0][3][V.size()], mf[1][3][V.size()]])
+		var bien := 0   # con el filtro, cada vía dice lo que le falta
+		for j in V.size():
+			if String(mf[1][3][j]).begins_with("faltan"):
+				bien += 1
+		chk(bien == V.size(), "con el filtro, cada vía dice «faltan N» (%d de %d)" % [bien, V.size()])
 
 	# 7 · el ordenador: CannaDex
 	PILOTO = ["CannaDex", "Volver"]

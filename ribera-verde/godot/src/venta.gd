@@ -694,6 +694,7 @@ func comprar_nave() -> void:
 		return
 	S.nave.mia = true
 	S.nave.op.pag = int(S.nave.op.p)
+	rev_nota("nave")
 	S.money += int(D.NAVE.fianza)
 	sfx("get")
 	update_hud()

@@ -158,3 +158,27 @@ LISTA,READY
 CULTIVO,GROW
 Luz {e}/día,Power {e}/day
 Luz apagada,Lights off
+RECETARIO,RECIPE BOOK
+"Cómo se consigue cada una, por vía: el growshop, el banco del PC, las recetas, lo que escondió la tía, la gente y las fiestas, las misiones y el banco de la tía.","How each one is obtained, route by route: the growshop, the PC seed bank, the recipes, what your aunt hid, people and festivals, the missions and your aunt's bank."
+EN EL GROWSHOP,AT THE GROWSHOP
+"Las que vende Kiko en su growshop, cada una desde su capítulo.","The ones Kiko sells at his growshop, each from its own chapter."
+BANCO DE SEMILLAS DEL PC,PC SEED BANK
+Las landraces que se piden por el ordenador de la tía y llegan al día siguiente.,The landraces you order on your aunt's computer; they arrive the next day.
+DE RECETA,FROM A RECIPE
+"Las que salen de cruzar en la mesa. Dentro, cada una dice lo que entra.","The ones that come out of crossing at the table. Inside, each one lists what goes into it."
+LO QUE ESCONDIÓ LA TÍA,WHAT YOUR AUNT HID
+"Sobres repartidos por la comarca: la nevera, la caja fuerte, cuatro arbustos y quien la conoció.","Packets scattered around the county: the fridge, the safe, four bushes and the people who knew her."
+DE PREMIO EN UNA MISIÓN,AS A MISSION REWARD
+Las que llegan con el SMS de una misión cumplida.,The ones that arrive with the text message of a mission completed.
+LA GENTE Y LAS FIESTAS,PEOPLE AND FESTIVALS
+"Una por persona y por partida: hay que pillarla en su estación, con su tiempo o en su fiesta, y con confianza.","One per person per save: you have to catch it in its season, in its weather or at its festival, and with trust."
+"Las colecciones del cuarto de atrás de la asociación: se entregan, no se consiguen ahí.","The collections in the back room of the association: you hand them in, you do not get them there."
+AUTOFLORECIENTES,AUTOFLOWERING
+Florecen por edad: ni madres ni esquejes. Se cruzan con la Ruderalis.,"They flower by age: no mother plants, no cuttings. They are crossed with Ruderalis."
+faltan {n},{n} missing
+De esta vía ya las tienes todas.,You already have every one from this route.
+Solo las que me faltan,Only the ones I am missing
+sí,yes
+no,no
+Enseña en cada vía solo las variedades que todavía no has descubierto.,Shows only the strains you have not discovered yet in each route.
+"Lo que das en el molino de Errotabarri vuelve a salir en su trueque, ya descubierto.","Whatever you give at the Errotabarri mill comes back in its barter, already discovered."

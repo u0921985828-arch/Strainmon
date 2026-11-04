@@ -6,6 +6,9 @@
 #  · tit: los titulares de portada por el nivel de la policía (0-3) y los de la ley y la Copa;
 #  · cls: los clasificados: uno por número, con lo que deja de verdad (descuento en la chatarrería, un club que paga más por una
 #    variedad ese mes, semillas de la feria);
+#  · nw: el catálogo de noticias de la comarca, una por suceso de la partida (lo que apunta rev_nota), con su titular;
+#  · rel: las noticias de relleno, deducidas del estado, para que el número nunca salga sin noticias;
+#  · ag: los textos de la agenda del mes (lo que viene: la Copa, las fiestas, el plazo, los recibos, el tiempo);
 #  · car: la sección de cartas, cada una propia, sin personas ni marcas reales;
 #  · don: dónde se vende (quiosco del Ensanche, los dos growshops, los estancos y el mercado de la Ribera).
 # python3 -I tools/revista.py (desde ribera-verde/)
@@ -95,16 +98,89 @@ CAR = [
 
 SEC = {   # los títulos de las secciones, en orden
 	"port": "PORTADA",
+	"nw": "NOTICIAS DE LA COMARCA",
 	"vari": "LA VARIEDAD DEL MES",
 	"tec": "TALLER",
 	"merc": "MERCADO",
 	"copa": "LA COPA Y LAS CATAS",
+	"ag": "LA AGENDA DEL MES",
 	"cls": "CLASIFICADOS",
 	"car": "CARTAS",
 	"leg": "LEGAL",
 }
 
 DON = ["prensa", "kiko", "ane", "est", "mercado"]   # quiosco, growshop de Kiko, GROW IBARBIDE, estancos, mercado de la Ribera
+
+# Las noticias de la comarca. Cada una va con la clave del suceso que la trae (lo apunta rev_nota al pasar en la partida) y se
+# cuenta en el número del mes en que pasó o del siguiente. «t» es el cuerpo y «ti» el titular de portada si es la noticia gorda
+# del mes. Nada de nombres reales ni de personas de verdad: la revista habla del barrio y de lo que se ve en la calle.
+# {v} es la cifra que apuntó el suceso y {d} el día en que pasó.
+NW = [
+	{"k": "redada", "p": 9, "ti": "Un registro en el barrio se salda con plantas y material incautados",
+		"t": "Agentes entraron el {d} en un piso del barrio con una orden del juzgado y se llevaron las plantas y el equipo que había montado. La asociación recuerda que un registro acaba casi siempre en multa y en la pérdida de todo el ciclo, y que el calor no se baja de un día para otro."},
+	{"k": "orden", "p": 8, "ti": "Un juzgado de la comarca autoriza un registro domiciliario",
+		"t": "Hay una orden firmada el {d} y no se sabe para cuándo. Desde los clubs piden calma y sentido común: menos movimiento en la calle, nada a la vista y esperar a que el asunto se enfríe."},
+	{"k": "copa", "p": 9, "ti": "La Copa de otoño reparte premios en la plaza",
+		"t": "El jurado de la plaza falló el {d} sus cinco categorías. Entre los premiados, un cultivador del barrio que subió al podio en {v} categoría(s). Las muestras se cataron a ciegas, como manda la Copa."},
+	{"k": "copa6", "p": 8, "ti": "Una muestra del barrio pasa la marca de la Copa",
+		"t": "El jurado dio por buena el {d} una muestra que pasa la marca que llevaba años sin moverse. En la mesa de catas se habló de foco, de abono y de paciencia, en ese orden."},
+	{"k": "kaia", "p": 9, "ti": "Abre KAIA en el muelle: un club con dispensario para socios",
+		"t": "El local del muelle abrió el {d} después de la obra. Tiene dispensario para socios y cocina pequeña, y en el barrio del puerto lo cuentan como la primera cosa nueva en años. A los treinta días de abrir, la ley permite pedir la licencia de distribuidora."},
+	{"k": "ley", "p": 10, "ti": "La comarca tiene su primera distribuidora legal",
+		"t": "La licencia salió el {d}: hasta cinco kilos al día con papeles, trazabilidad y control de lo que entra y lo que sale. Es el primer permiso de este tipo en la comarca y en los clubs se lee como el principio de algo."},
+	{"k": "presi", "p": 7, "ti": "La asociación del barrio alto elige presidencia",
+		"t": "La asamblea del {d} salió con un nombre nuevo al frente de la asociación que fundó, hace años, una vecina del barrio. Entre los acuerdos, dispensario para socios y las cuentas a la vista."},
+	{"k": "banco", "p": 9, "ti": "Aparece un banco de semillas en el cuarto de atrás de la asociación",
+		"t": "Detrás de una puerta que llevaba años cerrada había un banco de semillas con variedades locales de media comarca y de más lejos. La asociación lo abrió el {d} y busca completar las colecciones que faltan."},
+	{"k": "bancofin", "p": 10, "ti": "El banco de semillas del barrio, completo",
+		"t": "Las seis colecciones quedaron entregadas el {d}. Con la cámara fría, el laboratorio y la sala de catas en marcha, el barrio tiene un sitio donde una variedad no se pierde porque se muera quien la guardaba."},
+	{"k": "nave", "p": 7, "ti": "Una nave de Valdehierro cambia de manos",
+		"t": "La nave del polígono se escrituró el {d} después de un alquiler con opción a compra. En el polígono dicen que es la primera vez en mucho tiempo que una de esas naves se compra para trabajar y no para dejarla cerrada."},
+	{"k": "conce", "p": 5, "ti": "Un concesionario abre en el barrio alto",
+		"t": "Abrió el {d} con cuatro modelos en el escaparate, entrega en el día y seguro domiciliado. El barrio alto gana un negocio y pierde un solar, que es como se cuentan aquí estas cosas."},
+	{"k": "fi-feria", "p": 6, "ti": "La feria de semillas llena el mercado de la Ribera",
+		"t": "Tres días de puestos, intercambios y cosas que no se ven en ningún banco. Quien llevó algo de su tierra se fue con algo de otra, que es de lo que va la feria desde que se hace."},
+	{"k": "fi-barrio", "p": 5, "ti": "Las fiestas del barrio, cinco días de calle",
+		"t": "Txosnas, partidos y la gente mayor contando lo de siempre. En una esquina, los de la asociación con una mesa y un cartel: «esto no es un negocio, es un vecindario»."},
+	{"k": "fi-romeria", "p": 5, "ti": "Romería en la ermita del monte",
+		"t": "Un día de monte, de bocadillo y de hablar con quien no ves el resto del año. La serora abrió la ermita y hubo quien se quedó un rato dentro, sentado, sin decir nada."},
+	{"k": "rara", "p": 6, "ti": "Un fenotipo raro, cosechado en la comarca",
+		"t": "Una planta salió distinta a sus hermanas: porte, olor o resina fuera de lo normal. Lo que se hace en estos casos es guardar sus semillas y repetir la línea hasta que el rasgo se fije, que es la única manera de que no se pierda."},
+	{"k": "acusa", "p": 8, "ti": "Un robo en un piso del barrio acaba con un nombre encima de la mesa",
+		"t": "Lo que entró a buscar quien forzó la caja no era dinero. Después de semanas de preguntas por la comarca, el {d} se puso un nombre a la cosa. Lo que pase ahora ya no es asunto de esta revista."},
+	{"k": "patente", "p": 10, "ti": "Un banco de semillas quiere registrar variedades de la comarca",
+		"t": "La solicitud entró y hay oposición presentada. Si pasa, el nombre de unas cuantas variedades que aquí se cultivan desde siempre quedaría en manos de una empresa. En la asociación lo tienen claro: lo que es de todos no se registra."},
+	{"k": "mar", "p": 7, "ti": "Vuelve a salir carga del muelle de Puerto Viejo",
+		"t": "Un pesquero amarrado en el muelle viejo zarpó el {d} con la bodega hecha. Los del muelle no dicen nada y la conservera tampoco. Hace años que no se veía movimiento ahí."},
+	{"k": "embargo", "p": 7, "ti": "Un embargo se lleva el equipo de un cultivo del barrio",
+		"t": "Vino con papel y se fue con la carpa grande. La asociación insiste en lo de siempre: los plazos se pagan antes de ampliar, y quien presta a este tipo de interés no está haciendo un favor a nadie."},
+	{"k": "huerta", "p": 5, "ti": "Vuelve a trabajarse una huerta abandonada detrás del garaje",
+		"t": "Llevaba años con la cancilla cerrada y la hierba por la cintura. Ahora tiene bancales hechos y plantas al aire libre, que es como se cultivaba aquí antes de que todo fuera de interior."},
+	{"k": "metro", "p": 6, "ti": "La ciudad de la autopista mira a la comarca",
+		"t": "Clubs grandes, dinero y gente con tarjeta. De la comarca sale género para allí y de allí vienen preguntas que aquí no se hacían. Cada uno que saque sus cuentas."},
+]
+
+# Las noticias de relleno: se deducen del estado de la partida y entran si el mes no trae suceso. «k» la mira rev_relleno.
+REL = [
+	{"k": "clima", "t": "El mes viene {c}: {x}. Los de las carpas, ojo a la humedad; los de fuera, a lo que caiga."},
+	{"k": "poli", "t": "La calle, {p}. Esta revista no da consejos legales, pero sí recuerda que el género encima pesa más de lo que parece."},
+	{"k": "dex", "t": "En la comarca hay {n} variedades registradas con nombre y linaje. Cada una que se apunta es una que no se pierde."},
+	{"k": "obras", "t": "Siguen las obras del muelle viejo: pantalán, dique y los bajos de las casas. Quien tenga algo que mover por mar, que espere a que acaben."},
+	{"k": "clubs", "t": "Los clubs de la comarca mantienen el dispensario abierto para socios, con lo que entra de los cultivos de cada uno. Nada de calle."},
+	{"k": "lonja", "t": "La lonja de Puerto Viejo sigue comprando flor y extracción al por mayor. Lotes grandes y pago en el día, como siempre."},
+	{"k": "mercado", "t": "El puesto de semillas del mercado de la Ribera cambia el género cada semana. Merece la pena pasarse aunque no se compre."},
+]
+
+# La agenda del mes: lo que viene, por el calendario. Los huecos los rellena rev_agenda.
+AG = {
+	"copa": "Copa de otoño: el {d}, en la plaza, con sus cinco categorías.",
+	"fiesta": "{n}: del {d}, {q} día(s).",
+	"plazo": "Vence un plazo de la deuda el {d}.",
+	"recibo": "Toca recibo: luz, alquileres y seguros.",
+	"nave": "Los siete primeros días del mes, ventana para comprar la nave a tocateja.",
+	"num": "El próximo número, el día 1. Si estás suscrito, al buzón.",
+	"nada": "Mes tranquilo: ni Copa, ni fiestas, ni plazos. Buen momento para montar un ciclo largo.",
+}
 
 TOPE = {"rend": 0.15, "cal": 0.12, "thc": 0.02, "moho": 0.25, "clon": 0.18}
 
@@ -119,11 +195,17 @@ def main():
 		assert round(sum(t["v"] for t in TEC if t["e"] == e), 6) <= tp + 1e-9, e
 	assert len(set(c["k"] for c in CLS)) == len(CLS)
 	assert len(CAR) >= 6
-	D["REVISTA"] = {"cab": CAB, "tec": TEC, "tit": TIT, "cls": CLS, "car": CAR, "sec": SEC, "don": DON, "tope": TOPE}
+	nk = [w["k"] for w in NW]
+	assert len(set(nk)) == len(nk), nk
+	assert all(len(w["t"]) > 120 and w["ti"] for w in NW), "noticia corta"
+	assert len(set(r["k"] for r in REL)) == len(REL)
+	assert len(REL) >= 5 and len(NW) >= 18
+	D["REVISTA"] = {"cab": CAB, "tec": TEC, "tit": TIT, "cls": CLS, "car": CAR, "sec": SEC, "don": DON, "tope": TOPE,
+		"nw": NW, "rel": REL, "ag": AG}
 	t = json.dumps(D, ensure_ascii=False, separators=(',', ':'))
 	if t != s:
 		open(DATOS, 'w', encoding='utf8').write(t)
-	print("revista: %s · %d técnicas · %d clasificados · %d cartas · %d sitios donde se vende" % (CAB["n"], len(TEC), len(CLS), len(CAR), len(DON)))
+	print("revista: %s · %d técnicas · %d noticias · %d de relleno · %d clasificados · %d cartas · %d sitios donde se vende" % (CAB["n"], len(TEC), len(NW), len(REL), len(CLS), len(CAR), len(DON)))
 
 
 main()

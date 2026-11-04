@@ -110,6 +110,7 @@ func hilo_entra(mapa: String) -> void:
 	if f.is_empty() or String(f.mapa) != mapa or int(S.get("fiv", -1)) == int(S.day) or not fiesta_pend(f):
 		return
 	S.fiv = int(S.day)
+	rev_nota("fi-" + String(f.k))
 	toast(T("Hoy: {f}", {"f": I18n.v(f.n)}), 2200)
 
 # las fiestas, en el calendario (este año y el que viene): una marca, el primer día, con los días que dura (que no tape los plazos)

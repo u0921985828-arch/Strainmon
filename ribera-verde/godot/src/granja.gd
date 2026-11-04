@@ -981,6 +981,7 @@ func apunta_album(p: Dictionary) -> void:
 		S.album = []
 	if S.album.any(func(a): return int(a.id) == int(fe.get("id", -1))):
 		return
+	rev_nota("rara")
 	S.album.append({"id": int(fe.get("id", 0)), "sid": p.sid, "ra": (fe.ra.duplicate() if fe.get("ra") is Array else []), "sh": fe.get("sh", ""), "d": int(S.day), "m": String(S.map)})   # el nombre, de S.fnom al enseñarlo (nom_planta)
 
 # estabilizar: la línea cruzada consigo misma sube una generación (F1 → F2 → F3 → estable)

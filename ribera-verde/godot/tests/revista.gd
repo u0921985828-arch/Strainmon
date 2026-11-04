@@ -10,6 +10,7 @@ const Datos = preload("res://src/datos.gd")
 const Juego = preload("res://src/juego.gd")
 const Motor = preload("res://src/motor.gd")
 const Cultivo = preload("res://src/cultivo.gd")
+const I18n = preload("res://src/i18n.gd")
 
 var J
 var M
@@ -123,6 +124,105 @@ func _corre() -> void:
 	J.S.calor = 95
 	chk(J.rev_titular(6) != "" , "titular vacío")
 	J.S.calor = 0
+
+	# 3b · NOTICIAS DE LA COMARCA: el registro de sucesos, el titular que sale de él y el relleno
+	J.S.rev = {"col": [], "tec": [], "sus": 0, "nw": []}
+	J.S.day = 1
+	J.rev_nota("redada")
+	chk(J.S.rev.nw.size() == 1 and String(J.S.rev.nw[0].k) == "redada", "rev_nota no apunta: %s" % [J.S.rev.nw])
+	J.rev_nota("redada")
+	chk(J.S.rev.nw.size() == 1, "la misma noticia del mismo día, dos veces: %s" % [J.S.rev.nw])
+	J.rev_nota("copa", 2)
+	J.rev_nota("copa", 5)
+	J.rev_nota("copa", 3)
+	var wc := {}
+	for w in J.S.rev.nw:
+		if String(w.k) == "copa":
+			wc = w
+	chk(int(wc.get("v", 0)) == 5, "la cifra de la Copa no se queda con la mayor: %s" % [wc])
+	J.rev_nota("", 0)
+	chk(J.S.rev.nw.size() == 2, "una clave vacía entra en el registro: %s" % [J.S.rev.nw])
+	var nw1: Array = J.rev_nw_de(1)
+	chk(nw1.size() == 2, "las noticias del n.º 1: %d" % nw1.size())
+	var pr := true   # por prioridad, de más a menos
+	for i in range(1, nw1.size()):
+		if int(nw1[i - 1].df.p) < int(nw1[i].df.p):
+			pr = false
+	chk(pr, "las noticias no van por prioridad: %s" % [nw1.map(func(x): return [x.df.k, x.df.p])])
+	var nt: String = J.rev_nw_txt(nw1[0])
+	chk(nt.length() > 40 and not nt.contains("{"), "el cuerpo de la noticia: " + nt)
+	chk(J.rev_titular(1) == J.T(String(nw1[0].df.ti)) or J.rev_titular(1) == String(nw1[0].df.ti), "el titular no sale de la noticia gorda: %s" % J.rev_titular(1))
+	var nx: String = J.rev_noticias(1)
+	chk(nx.contains(nt) and nx.count("· ") == nw1.size(), "la sección de noticias: " + nx)
+	var tx1: String = J.rev_texto(1)
+	chk(tx1.contains(String(R.sec.nw)) and tx1.contains(nt), "el número no trae sus noticias")
+	# las del mes anterior rellenan el número siguiente si el mes no trae tres
+	var d2 := 1
+	while J.rev_num(d2) < 2:
+		d2 += 1
+	J.S.day = d2
+	J.rev_nota("kaia")
+	var nw2: Array = J.rev_nw_de(2)
+	chk(nw2.size() >= 1 and String(nw2[0].df.k) == "kaia", "el suceso del mes nuevo no abre su número: %s" % [nw2.map(func(x): return x.df.k)])
+	chk(nw2.size() == 3, "el n.º 2 no se completa con el mes anterior: %d" % nw2.size())
+	# sin sucesos, el relleno deducido del estado: nunca menos de dos líneas
+	J.S.rev = {"col": [], "tec": [], "sus": 0, "nw": []}
+	J.S.day = 1
+	chk(J.rev_nw_de(1).is_empty(), "sucesos sin registro")
+	chk(J.rev_relleno(1).size() >= 2, "relleno corto: %d" % J.rev_relleno(1).size())
+	var nr: String = J.rev_noticias(1)
+	chk(nr.count("· ") >= 2 and not nr.contains("{"), "el relleno del n.º 1: " + nr)
+	chk(J.rev_titular(1) != "", "sin titular sin sucesos")
+	# el registro tiene tope
+	for i in range(0, 80):
+		J.S.day = 1 + i
+		J.rev_nota("redada")
+	chk(J.S.rev.nw.size() == J.NW_TOPE, "el registro no tiene tope: %d" % J.S.rev.nw.size())
+	J.S.day = 1
+
+	# 3c · LA AGENDA DEL MES: la Copa, las fiestas, el plazo y el número que viene
+	J.S.rev = {"col": [], "tec": [], "sus": 0, "nw": []}
+	var A: Dictionary = R.ag
+	var ag1: String = J.rev_agenda(1)
+	chk(ag1.ends_with(J.T(String(A.num))), "la agenda no acaba con el número que viene: " + ag1)
+	chk(not ag1.contains("{"), "la agenda sin sustituir: " + ag1)
+	var ncopa := 0   # el número del mes de la Copa de otoño
+	for i in range(1, 25):
+		if int(J.rev_my(i).m) == int(J.D.COPA_OT.m):
+			ncopa = i
+			break
+	chk(ncopa > 0, "sin mes de la Copa")
+	J.S.ch = int(J.D.COPA_OT.ch)
+	chk(J.rev_agenda(ncopa).contains(J.T(String(A.copa), {"d": Datos.fd_corto(Datos.dia_de(int(J.rev_my(ncopa).y), int(J.D.COPA_OT.m), int(J.D.COPA_OT.d)))})),
+		"la agenda del mes de la Copa: " + J.rev_agenda(ncopa))
+	J.S.ch = 1
+	chk(not J.rev_agenda(ncopa).contains(J.T(String(A.copa), {"d": Datos.fd_corto(Datos.dia_de(int(J.rev_my(ncopa).y), int(J.D.COPA_OT.m), int(J.D.COPA_OT.d)))})),
+		"la Copa en la agenda antes de su capítulo")
+	var nfi := 0   # un número con fiesta
+	for i in range(1, 25):
+		for f in J.D.CAZA.fi:
+			if int(f.m) == int(J.rev_my(i).m):
+				nfi = i
+				break
+		if nfi > 0:
+			break
+	chk(nfi > 0, "sin fiestas en el calendario")
+	if nfi > 0:
+		var agf: String = J.rev_agenda(nfi)
+		var hay := false
+		for f in J.D.CAZA.fi:
+			if int(f.m) == int(J.rev_my(nfi).m) and agf.contains(I18n.v(String(f.n))):
+				hay = true
+		chk(hay, "la fiesta del mes no sale en la agenda: " + agf)
+	# el plazo de la deuda, en el mes en que vence
+	J.S.due = 5000
+	J.S.deadline = 20
+	var agp: String = J.rev_agenda(J.rev_num(20))
+	chk(agp.contains(J.T(String(A.plazo), {"d": Datos.fd_corto(20)})), "el plazo no sale en su mes: " + agp)
+	J.S.due = 0
+	J.S.deadline = 0
+	var tx2: String = J.rev_texto(1)
+	chk(tx2.contains(String(R.sec.ag)) and tx2.contains(J.T(String(A.num))), "el número no trae su agenda")
 
 	# 4 · leer un número: la técnica se aprende una vez y da su efecto
 	J.S.rev = {"col": [], "tec": [], "sus": 0}

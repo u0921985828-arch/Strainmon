@@ -116,6 +116,7 @@ func a3_oposicion() -> void:
 		return
 	a3().pr = pr
 	a3_paso(2)
+	rev_nota("patente")
 	sfx("coin")
 	await got(T("la oposición, presentada con {n} pruebas: la resolución, el {f}", {"n": pr.size(), "f": Datos.fd(a3_dia(2) + int(A3.dias), S.day)}))
 
