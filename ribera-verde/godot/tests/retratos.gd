@@ -225,11 +225,22 @@ func _corre() -> void:
 	chk(absf(R.size.x - 64 * us) < 0.5 and absf(R.size.y - 64 * us) < 0.5, "a 1:1 en u (%s, us %s)" % [R.size, us])
 	var M: Rect2 = J.retrato_marco.get_rect()
 	var C: Rect2 = Rect2(J.dlg.position, J.dlg.size)
-	chk(C.grow(-3 * us).encloses(M), "la ficha, entera dentro de la caja (%s / %s)" % [M, C])
-	chk(absf((M.position.y - C.position.y) - (C.end.y - M.end.y)) <= 2 * us + 0.5, "centrada en alto (%s / %s)" % [M.position.y - C.position.y, C.end.y - M.end.y])
-	# el aire de la izquierda, el mismo que el de arriba y el de abajo (lo pidió el usuario)
-	chk(absf((M.position.x - C.position.x) - (M.position.y - C.position.y)) <= us + 0.5 \
-		and M.end.x < C.position.x + C.size.x * 0.5, "a la izquierda, con el mismo aire (%s / %s)" % [M.position.x - C.position.x, M.position.y - C.position.y])
+	# Lo dijo el usuario («el cuadro de texto es siempre igual y se adapta el texto al cuadro. Pero
+	# tiene que ser quid pro quo»): el cuadro mide lo que pide el texto y la ficha se ancla a su pie, con el
+	# mismo margen por la izquierda; el busto que no cabe asoma por arriba
+	var mg: float = J.RETRATO_M * us
+	chk(absf((C.end.y - M.end.y) - mg) <= 0.5, "la ficha, anclada al pie (%.1f u)" % ((C.end.y - M.end.y) / us))
+	chk(absf((M.position.x - C.position.x) - mg) <= 0.5 and M.end.x < C.position.x + C.size.x * 0.5, "a la izquierda, con el mismo aire (%.1f u)" % ((M.position.x - C.position.x) / us))
+	chk(C.size.y < M.size.y and M.position.y < C.position.y, "el cuadro, a la medida del texto: el busto asoma (%.1f u de caja)" % (C.size.y / us))
+	# y el contorno sube a rodearlo (lo pidió el usuario: «que haga como el contorno por encima y por el lado
+	# izquierdo y derecho de la foto»): el saliente, pegado al lado izquierdo del cuadro, con el mismo canto
+	# por los tres lados y el pie metido en el cuadro
+	var S: Rect2 = J.dlg_sal.get_rect()
+	var cn: float = (J.SAL_AIRE + J.SAL_CANTO) * us
+	chk(J.dlg_sal.visible and absf(S.position.x - C.position.x) <= 0.5, "el saliente, a la vista y en el lado izquierdo del cuadro (%s)" % S)
+	chk(absf((M.position.x - S.position.x) - cn) <= 0.5 and absf((S.end.x - M.end.x) - cn) <= 0.5 and absf((M.position.y - S.position.y) - cn) <= 0.5, "rodea la ficha por arriba y por los dos lados (%s / %s)" % [S, M])
+	chk(S.end.y > C.position.y + 2 * us and S.end.y < C.position.y + 6 * us, "y su pie, dentro del cuadro (%.1f u)" % ((S.end.y - C.position.y) / us))
+	chk(J.dlg_sal.get_index() > J.dlg.get_index() and J.dlg_sal.get_index() < J.retrato_marco.get_index(), "detrás de la ficha y delante del cuadro")
 	var ml: float = J.dlg.get_theme_stylebox("panel").content_margin_left
 	chk(C.position.x + ml >= M.end.x + 4 * us, "el texto, a su derecha (%s)" % ml)
 	var N: Rect2 = J.dlg_nm.get_rect()
@@ -271,6 +282,18 @@ func _corre() -> void:
 	chk(J.retrato_e == Retrato.ALEGRE and R.texture.get_image().get_data() == celda.call("unai", "a0"), "contento al acabar")
 	if dir != "":
 		await pinta(dir, "unai-contento")
+	# 6c · con la página llena, el busto cabe en el cuadro y el saliente se esconde (el contorno, de una pieza)
+	chk(corre(func(): await J.type_text("Lo primero es el agua: la del grifo hay que corregirla, que si no la planta no come bien y se te queda pálida en nada.", "UNAI")), "type_text bloqueado (página llena)")
+	for q in 3:
+		await process_frame
+	J._coloca()
+	var C2: Rect2 = Rect2(J.dlg.position, J.dlg.size)
+	var M2: Rect2 = J.retrato_marco.get_rect()
+	chk(C2.size.y > C.size.y + 8 * us, "el cuadro crece con el texto (%.1f → %.1f u)" % [C.size.y / us, C2.size.y / us])
+	chk(M2.position.y >= C2.position.y - 0.5 and not J.dlg_sal.visible, "el busto, dentro del cuadro: sin saliente (%.1f u)" % ((M2.position.y - C2.position.y) / us))
+	chk(absf((C2.end.y - M2.end.y) - mg) <= 0.5, "y la ficha, en el pie como siempre (%.1f u)" % ((C2.end.y - M2.end.y) / us))
+	if dir != "":
+		await pinta(dir, "unai-lleno")
 	J.habla_look = null
 	chk(corre(func(): await J.type_text("Me debes 3.000 €. Último aviso.", "SMS · TOÑO")), "type_text bloqueado (SMS)")
 	chk(R.visible and Retrato.grupo(J.retrato_l[0], J.retrato_l[1]) == "tono", "Toño en el SMS")

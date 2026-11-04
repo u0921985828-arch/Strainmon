@@ -167,18 +167,23 @@ func _mira_maquetado(p: String) -> void:
 		var cy_tx: float = lb.get_global_rect().get_center().y
 		if absf(cy_ic - cy_tx) > 1.0 * J.us:
 			cortes.append("%s: el icono de «%s» a %.1f u de su texto" % [p, lb.text, (cy_ic - cy_tx) / J.us])
-	# la ficha del diálogo (marco + cinta del nombre), centrada en alto dentro de la caja. Se probó a bajarla
-	# media cinta para que el eje del busto fuera el del texto y a la vista quedaba peor (la cinta se pegaba
-	# al borde de abajo), así que el usuario dijo «tal y como estaba antes estaba bien».
+	# La ficha del diálogo (marco + cinta del nombre), anclada al pie de la caja y con el mismo margen
+	# por la izquierda; el busto que no cabe asoma por arriba y el saliente sube a rodearlo (lo pidió el usuario)
 	if J.dlg.visible and J.retrato.visible:
 		var rf: Rect2 = J.retrato_marco.get_global_rect()
 		if J.dlg_nm.visible:
 			rf = rf.merge(J.dlg_nm.get_global_rect())
 		var rc: Rect2 = J.dlg.get_global_rect()
-		var arr: float = rf.position.y - rc.position.y
 		var aba: float = rc.end.y - rf.end.y
-		if absf(arr - aba) > 1.5 * J.us:
-			cortes.append("%s: la ficha, a %.1f u de centrada (%.1f arriba, %.1f abajo)" % [p, (arr - aba) / J.us, arr / J.us, aba / J.us])
+		var izq: float = rf.position.x - rc.position.x
+		if absf(aba - izq) > 1.5 * J.us:
+			cortes.append("%s: la ficha, a %.1f u del pie y a %.1f de la izquierda" % [p, aba / J.us, izq / J.us])
+		if rf.position.y < rc.position.y - 0.5 and not J.dlg_sal.visible:
+			cortes.append("%s: el busto asoma %.1f u del cuadro sin el saliente del contorno" % [p, (rc.position.y - rf.position.y) / J.us])
+		if J.dlg_sal.visible:
+			var sg: Rect2 = J.dlg_sal.get_global_rect()
+			if sg.position.x > rc.position.x + 0.5 or sg.position.y > rf.position.y - 2 * J.us or sg.end.x < rf.end.x + 2 * J.us:
+				cortes.append("%s: el saliente no rodea la ficha (%s / %s)" % [p, sg, rf])
 	# la cabecera de un menú con dos textos (la fecha y el dinero del START): nunca pegados
 	for c in J.menu_col.get_children():
 		if not (c is HBoxContainer) or c.get_child_count() != 2:

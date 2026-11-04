@@ -75,6 +75,7 @@ var dlg_nm := PanelContainer.new()
 var dlg_nm_txt := Label.new()
 var retrato := TextureRect.new()   # MAESTRO [8]: el retrato de quien habla (PortraitRect), dentro de la caja, a la izquierda
 var retrato_marco := Panel.new()   # su cuadro: el fondo y el canto de la caja de diálogo
+var dlg_sal := Panel.new()         # el saliente por el que el contorno del cuadro sube a rodear el busto que asoma
 var retrato_l = null               # [look, mujer] de quien habla ahora
 var retrato_e := 0                 # su gesto (Retrato.expresion)
 var retrato_hab := false           # escribiéndose (la boca se mueve; no parpadea)
@@ -220,12 +221,18 @@ func _ready() -> void:
 	retrato.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	retrato.stretch_mode = TextureRect.STRETCH_SCALE
 	retrato.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	dlg_sal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dlg_sal.hide()
+	add_child(dlg_sal)   # después del cuadro (le tapa la línea de arriba) y antes de la ficha (el busto, delante)
 	retrato_marco.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	retrato_marco.hide()
 	add_child(retrato_marco)
 	add_child(retrato)
 	move_child(dlg_nm, retrato.get_index())   # la pestaña del nombre, encima del hombro del busto
-	retrato.visibility_changed.connect(func(): retrato_marco.visible = retrato.visible)
+	retrato.visibility_changed.connect(func():
+		retrato_marco.visible = retrato.visible
+		if not retrato.visible:
+			dlg_sal.hide())
 	dlg_nm.visibility_changed.connect(func():
 		if not dlg_nm.visible:
 			retrato.hide())
@@ -610,6 +617,8 @@ func alto_libre() -> int:
 	var arriba: float = dlg_nm.position.y if dlg_nm.visible else dlg.position.y
 	if retrato.visible:
 		arriba = minf(arriba, retrato_marco.position.y)
+	if dlg_sal.visible:
+		arriba = minf(arriba, dlg_sal.position.y)
 	return clampi(int(floor((arriba - scr.position.y) / u)) - 1, 40, SH)
 
 func ui_rect() -> Rect2:
@@ -631,6 +640,28 @@ class Caja extends StyleBox:
 	func _draw(to_canvas_item: RID, rect: Rect2) -> void:
 		for c in capas:
 			c[0].draw(to_canvas_item, rect.grow(-c[1]))
+
+# Lo pidió el usuario («que haga como el contorno por encima y por el lado izquierdo y derecho de la
+# foto, del sprite de la persona también»): el saliente por el que el contorno sube a rodear el busto que
+# asoma del cuadro. Las tres capas de la caja, sin canto de abajo, y cada una acaba donde empieza su igual
+# del canto de arriba del cuadro, que sigue de largo: la línea y el filete, a 2 u del pie (ahí doblan a la
+# derecha por el canto del cuadro); el fondo, al pie del rect (3,5 u), que es lo que tapa ese canto por
+# dentro del hueco. Así cada vertical se junta con su horizontal y el ángulo sale de 90°, sin muesca ni
+# entrante (lo dijo el usuario: «la esquina y el ángulo tiene que ser de 90 grados… no como la mini entrada esa»).
+class Saliente extends StyleBox:
+	var capas := []
+	func _init(k: float) -> void:
+		# esquinas de 90° y sin suavizado: el redondeo y el antialias dejaban medios tonos y una muesca en
+		# la unión con el cuadro (lo dijo el usuario: «la esquina y el ángulo tiene que ser de 90 grados»)
+		for c in [[LINEA, 0.0, 1.5], [LINEA2, 2.0, 1.5], [BOX, 3.5, 0.0]]:
+			var b := StyleBoxFlat.new()
+			b.bg_color = c[0]
+			b.anti_aliasing = false
+			capas.append([b, c[1] * k, c[2] * k])
+	func _draw(to_canvas_item: RID, rect: Rect2) -> void:
+		for c in capas:
+			var g: float = c[1]
+			c[0].draw(to_canvas_item, Rect2(rect.position + Vector2(g, g), Vector2(rect.size.x - 2 * g, rect.size.y - g - c[2])))
 
 func caja(k: float, py: float, px: float) -> StyleBox:
 	var b := Caja.new(k)
@@ -670,6 +701,7 @@ func _estilos() -> void:
 	# 0.74: el texto, centrado en la caja (su alto lo manda el busto, y se apoyaba arriba)
 	dlg_txt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER if Datos.CAL else VERTICAL_ALIGNMENT_TOP
 	dlg_txt.size_flags_vertical = Control.SIZE_EXPAND_FILL if Datos.CAL else Control.SIZE_FILL
+	dlg_sal.add_theme_stylebox_override("panel", Saliente.new(us))
 	dlg_nm.add_theme_stylebox_override("panel", plana(LINEA, 3 * us, 2.5 * us, 5 * us))
 	pon_letra(dlg_nm_txt, negrita, 8 * us, Color.WHITE, 0, false)
 	caja_menu = caja(us, 5, 7)
@@ -1314,29 +1346,13 @@ func _pon_dlg_txt(px: float, lineas: int) -> void:
 	var h: float = ceilf(lineas * _alto_linea(ft) / (4.0 * us)) * 4.0 * us if lineas > 0 else 0.0
 	dlg_txt.custom_minimum_size = Vector2(0, h)
 
-# el alto que mide el cuadro con las líneas que tiene reservadas, en u (el Label las tiene de mínimo), para
-# saber de antemano el aire que le queda a la ficha del retrato
-func _alto_dlg_u(rw: float) -> float:
-	var sb := dlg.get_theme_stylebox("panel")
-	if sb == null:
-		return rw + 2 + 2 * RETRATO_M
-	var hl: float = ceilf(maxi(_dlg_n, 1) * _alto_linea(fs_txt(_dlg_px * us)) / (4.0 * us)) * 4.0 * us
-	return maxf(rw + 2 + 2 * RETRATO_M, (sb.content_margin_top + sb.content_margin_bottom + hl) / us)
-
-# 0.74 (lo pidió el usuario: «desde el borde hasta el sprite tendría que haber la misma distancia que del
-# sprite arriba y del sprite abajo… visualmente tiene que quedar centrado»): el aire de la izquierda no es
-# una constante, es el mismo que le queda a la ficha por arriba y por abajo, que lo manda el alto del cuadro
-func _aire_ficha(rw: float, alto_u := 0.0) -> float:
-	var h: float = alto_u if alto_u > 1 else _alto_dlg_u(rw)
-	return maxf(RETRATO_M, roundf((h - rw) / 2.0) - 1.0)
-
 # el ancho que le queda al texto en el cuadro (lo mismo que reparte _coloca)
 func _ancho_dlg(con_nombre: bool) -> float:
 	var rw := retrato_w()
 	var con: bool = con_nombre and rw > 0
 	var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
 	return ui_rect().size.x - 6 * us - ((126 if bt else 10) + 2) * us \
-		- ((_aire_ficha(rw) + rw + 2 + 7) if con else (10 + 2)) * us
+		- ((RETRATO_M + rw + 2 + 7) if con else (10 + 2)) * us
 
 # 0.74 (lo pidió el usuario: «que el cuadro de texto únicamente pueda tener máximo 4 líneas»): el texto se
 # parte en páginas de DLG_LINEAS líneas como mucho, por frases y, si una no cabe, por palabras. Cada página
@@ -1494,14 +1510,20 @@ func type_text(text: String, name_ := "") -> void:
 # MAESTRO [8]: el retrato (con Datos.CAL, fuera de las pruebas contra el HTML): quien habla por su nombre o con quien hablas en
 # vivo (retrato_de, en mundo.gd), con el gesto por el tono de lo que dice (Retrato.expresion)
 const RETRATO_W := 32
-# El margen de la ficha del retrato al canto de la caja (u). 8 u = los mismos 40 px que le quedan por
-# arriba y por abajo con la caja de 4 líneas, para que el busto se vea centrado también a la izquierda
-# (lo dijo el usuario: «desde el borde hasta el sprite tendría que haber la misma distancia»).
-const RETRATO_M := 8
+# El canto de la caja (2 u de línea y 1,5 de filete) y el aire que deja al marco de la ficha: de los dos
+# sale el margen de la ficha al borde del cuadro, el mismo por la izquierda, por arriba y por abajo, y así
+# el lado izquierdo del saliente cae justo en el lado izquierdo del cuadro y el contorno queda de una pieza.
+const SAL_CANTO := 3.5
+const SAL_AIRE := 2.0
+const RETRATO_M := SAL_CANTO + SAL_AIRE
 
 # el ancho del retrato en u: el del busto (64) o RETRATO_W el dibujado
 func retrato_w() -> int:
 	return retrato.texture.get_width() if retrato.texture else RETRATO_W
+
+# y su alto (el busto es cuadrado, pero el saliente y el anclaje al pie van por el alto de verdad)
+func retrato_h() -> int:
+	return retrato.texture.get_height() if retrato.texture else RETRATO_W
 
 func retrato_de(_n: String):   # → mundo.gd
 	return null
@@ -2021,14 +2043,14 @@ func _coloca() -> void:
 		# en una cinta del ancho del marco pegada a su pie; el texto, a su derecha. La caja crece hasta el alto de la ficha.
 		var rw := retrato_w()
 		var con := retrato.visible
-		# sin busto, el cuadro medía 44 u siempre; con el alto a la medida del texto, el mínimo lo pone el
-		# propio cuerpo (lo dijo el usuario: «los cuadros de texto no se adaptan al texto»)
-		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us, (rw + 2 + 2 * RETRATO_M if con else (24 if Datos.CAL else 44)) * us)
+		# el cuadro mide lo que pide el texto, con busto o sin él (lo dijo el usuario: «me da la sensación que
+		# el cuadro de texto es siempre igual y que se adapta el texto al cuadro. Pero tiene que ser quid pro quo»)
+		dlg.custom_minimum_size = Vector2(R.size.x - 6 * us, (24 if Datos.CAL else 44) * us)
 		dlg.size = Vector2(R.size.x - 6 * us, 0)
 		# en el combate, el texto no pasa por debajo del menú de la derecha (118 de ancho): .dlg con padding-right 126 en el CSS
 		var bt: bool = menu_box.visible and menu_box.get_meta("cls", "right") == "battle"
 		dlg.get_theme_stylebox("panel").content_margin_right = ((126 if bt else 10) + 2) * us
-		dlg.get_theme_stylebox("panel").content_margin_left = ((_aire_ficha(rw) + rw + 2 + 7) if con else (10 + 2)) * us
+		dlg.get_theme_stylebox("panel").content_margin_left = ((RETRATO_M + rw + 2 + 7) if con else (10 + 2)) * us
 		dlg.reset_size()
 		dlg.size.x = R.size.x - 6 * us
 		dlg.position = Vector2(R.position.x + 3 * us, R.end.y - 3 * us - dlg.size.y)
@@ -2038,13 +2060,11 @@ func _coloca() -> void:
 		dlg_nm.reset_size()
 		dlg_nm.position = dlg.position + Vector2(6 * us, -12 * us)
 		if con:
-			retrato.size = Vector2(rw, rw) * us
-			# 0.74 (lo dijo el usuario: «la línea que pasa por en medio del sprite y por en medio del texto no
-			# está en el mismo punto»): se probó a bajar la ficha media cinta para que el eje del busto fuera el
-			# del texto, y a la vista quedaba peor (la cinta se pegaba al borde de abajo), así que el usuario
-			# dijo «tal y como estaba antes estaba bien»: la ficha entera, marco y cinta, va centrada en la caja
-			var aire: float = _aire_ficha(rw, dlg.size.y / us)
-			retrato.position = dlg.position + Vector2(aire + 1, aire + 1) * us
+			var rh := retrato_h()
+			retrato.size = Vector2(rw, rh) * us
+			# la ficha se ancla al pie del cuadro, a RETRATO_M del canto por la izquierda y por abajo; si el
+			# busto no cabe en lo que mide el cuadro, asoma por arriba y el saliente sube a rodearlo
+			retrato.position = Vector2(dlg.position.x + (RETRATO_M + 1) * us, dlg.position.y + dlg.size.y - (RETRATO_M + 1 + rh) * us)
 			var sm := StyleBoxFlat.new()
 			sm.bg_color = Retrato.FONDO
 			sm.border_color = LINEA
@@ -2054,6 +2074,17 @@ func _coloca() -> void:
 			retrato_marco.size = retrato.size + Vector2(2 * us, 2 * us)
 			dlg_nm.size.x = retrato_marco.size.x
 			dlg_nm.position = retrato_marco.position + Vector2(0, retrato_marco.size.y - dlg_nm.size.y)
+			# el saliente: por arriba y por los dos lados de la ficha, con el lado izquierdo en el del cuadro y
+			# el pie justo donde acaba el canto de arriba del cuadro, para que cada capa se junte con la suya
+			var y0: float = retrato_marco.position.y - (SAL_AIRE + SAL_CANTO) * us
+			if y0 < dlg.position.y - 0.5:
+				dlg_sal.position = Vector2(dlg.position.x, y0)
+				dlg_sal.size = Vector2(retrato_marco.size.x + 2 * (SAL_AIRE + SAL_CANTO) * us, dlg.position.y + SAL_CANTO * us - y0)
+				dlg_sal.show()
+			else:
+				dlg_sal.hide()
+		else:
+			dlg_sal.hide()
 		dlg_more.position = dlg.position + dlg.size - Vector2(8 * us + 8 * us, 4 * us + 5 * us)
 		_mide_dlg()
 		dlg_more.size = Vector2(8 * us, 7 * us)
