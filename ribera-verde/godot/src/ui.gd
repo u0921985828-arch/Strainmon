@@ -652,8 +652,11 @@ class Saliente extends StyleBox:
 	var capas := []
 	func _init(k: float) -> void:
 		# esquinas de 90° y sin suavizado: el redondeo y el antialias dejaban medios tonos y una muesca en
-		# la unión con el cuadro (lo dijo el usuario: «la esquina y el ángulo tiene que ser de 90 grados»)
-		for c in [[LINEA, 0.0, 1.5], [LINEA2, 2.0, 1.5], [BOX, 3.5, 0.0]]:
+		# la unión con el cuadro (lo dijo el usuario: «la esquina y el ángulo tiene que ser de 90 grados»).
+		# Cada capa baja hasta pasada la curva de su igual en el cuadro (LINEA y LINEA2 tienen radio 4 y 2
+		# con grow 2, o sea curva hasta 4 u; el fondo, hasta 4,5), así que el saliente la tapa entera y la
+		# unión queda recta: con el pie a SAL_PIE, LINEA y LINEA2 acaban a 4 u y el fondo llega al pie
+		for c in [[LINEA, 0.0, SAL_PIE - 4.0], [LINEA2, 2.0, SAL_PIE - 4.0], [BOX, 3.5, 0.0]]:
 			var b := StyleBoxFlat.new()
 			b.bg_color = c[0]
 			b.anti_aliasing = false
@@ -1515,6 +1518,9 @@ const RETRATO_W := 32
 # el lado izquierdo del saliente cae justo en el lado izquierdo del cuadro y el contorno queda de una pieza.
 const SAL_CANTO := 3.5
 const SAL_AIRE := 2.0
+# lo que el saliente se mete en el cuadro: pasada la curva de la esquina (radio 4 de la línea, 4,5 del
+# fondo), para que no asome ni medio píxel de ella y el ángulo quede de 90°
+const SAL_PIE := 5.0
 const RETRATO_M := SAL_CANTO + SAL_AIRE
 
 # el ancho del retrato en u: el del busto (64) o RETRATO_W el dibujado
@@ -2079,7 +2085,7 @@ func _coloca() -> void:
 			var y0: float = retrato_marco.position.y - (SAL_AIRE + SAL_CANTO) * us
 			if y0 < dlg.position.y - 0.5:
 				dlg_sal.position = Vector2(dlg.position.x, y0)
-				dlg_sal.size = Vector2(retrato_marco.size.x + 2 * (SAL_AIRE + SAL_CANTO) * us, dlg.position.y + SAL_CANTO * us - y0)
+				dlg_sal.size = Vector2(retrato_marco.size.x + 2 * (SAL_AIRE + SAL_CANTO) * us, dlg.position.y + SAL_PIE * us - y0)
 				dlg_sal.show()
 			else:
 				dlg_sal.hide()
