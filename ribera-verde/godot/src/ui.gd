@@ -636,7 +636,15 @@ class Caja extends StyleBox:
 			var b := StyleBoxFlat.new()
 			b.bg_color = c[0]
 			b.set_corner_radius_all(roundi(c[2] * k))
-			capas.append([b, c[1] * k])
+			b.anti_aliasing = false
+			capas.append([b, c[1] * k, roundi(c[2] * k)])
+	# la esquina de arriba a la izquierda, cuadrada: solo esa, y solo donde el saliente del busto empalma con
+	# el cuadro (lo dijo el usuario: «únicamente esa esquina… el reborde del Sprite no lo quites»). El redondeo
+	# de las otras tres, y el de todas las demás cajas, se queda como estaba. Sin el suavizado de serie, que
+	# corría medio píxel el canto del redondeo y metía medios tonos: de ahí la muesca de la unión
+	func esq_recta(si: bool) -> void:
+		for c in capas:
+			c[0].set_corner_radius(CORNER_TOP_LEFT, 0 if si else int(c[2]))
 	func _draw(to_canvas_item: RID, rect: Rect2) -> void:
 		for c in capas:
 			c[0].draw(to_canvas_item, rect.grow(-c[1]))
@@ -653,10 +661,10 @@ class Saliente extends StyleBox:
 	func _init(k: float) -> void:
 		# esquinas de 90° y sin suavizado: el redondeo y el antialias dejaban medios tonos y una muesca en
 		# la unión con el cuadro (lo dijo el usuario: «la esquina y el ángulo tiene que ser de 90 grados»).
-		# Cada capa baja hasta pasada la curva de su igual en el cuadro (LINEA y LINEA2 tienen radio 4 y 2
-		# con grow 2, o sea curva hasta 4 u; el fondo, hasta 4,5), así que el saliente la tapa entera y la
-		# unión queda recta: con el pie a SAL_PIE, LINEA y LINEA2 acaban a 4 u y el fondo llega al pie
-		for c in [[LINEA, 0.0, SAL_PIE - 4.0], [LINEA2, 2.0, SAL_PIE - 4.0], [BOX, 3.5, 0.0]]:
+		# Cada capa acaba en la fila de su igual del canto de arriba del cuadro, que sigue de largo: la línea
+		# a 2 u del pie (donde empieza el filete), el filete y el fondo al pie del rect. Así cada vertical
+		# empalma con su horizontal y el ángulo sale de 90°, sin muesca ni entrante
+		for c in [[LINEA, 0.0, SAL_PIE - 2.0], [LINEA2, 2.0, 0.0], [BOX, 3.5, 0.0]]:
 			var b := StyleBoxFlat.new()
 			b.bg_color = c[0]
 			b.anti_aliasing = false
@@ -1518,9 +1526,9 @@ const RETRATO_W := 32
 # el lado izquierdo del saliente cae justo en el lado izquierdo del cuadro y el contorno queda de una pieza.
 const SAL_CANTO := 3.5
 const SAL_AIRE := 2.0
-# lo que el saliente se mete en el cuadro: pasada la curva de la esquina (radio 4 de la línea, 4,5 del
-# fondo), para que no asome ni medio píxel de ella y el ángulo quede de 90°
-const SAL_PIE := 5.0
+# lo que el saliente se mete en el cuadro: justo el canto de arriba (2 u de línea y 1,5 de filete), para
+# que cada capa del saliente acabe en la fila de su igual del cuadro y la unión quede de 90°, sin escalón
+const SAL_PIE := 3.5
 const RETRATO_M := SAL_CANTO + SAL_AIRE
 
 # el ancho del retrato en u: el del busto (64) o RETRATO_W el dibujado
@@ -2040,6 +2048,13 @@ func _flecha(t: String, b := "") -> Label:
 	return a
 
 # coloca diálogo, menú y aviso en el escenario .ui (en el HTML, el CSS)
+# la esquina de arriba a la izquierda del cuadro, recta solo mientras el saliente del busto empalma ahí
+# (lo dijo el usuario: «únicamente esa esquina… el reborde del Sprite no lo quites»)
+func _esq_dlg(si: bool) -> void:
+	var sb := dlg.get_theme_stylebox("panel")
+	if sb is Caja:
+		(sb as Caja).esq_recta(si)
+
 func _coloca() -> void:
 	if oraculo:
 		return
@@ -2087,10 +2102,13 @@ func _coloca() -> void:
 				dlg_sal.position = Vector2(dlg.position.x, y0)
 				dlg_sal.size = Vector2(retrato_marco.size.x + 2 * (SAL_AIRE + SAL_CANTO) * us, dlg.position.y + SAL_PIE * us - y0)
 				dlg_sal.show()
+				_esq_dlg(true)
 			else:
 				dlg_sal.hide()
+				_esq_dlg(false)
 		else:
 			dlg_sal.hide()
+			_esq_dlg(false)
 		dlg_more.position = dlg.position + dlg.size - Vector2(8 * us + 8 * us, 4 * us + 5 * us)
 		_mide_dlg()
 		dlg_more.size = Vector2(8 * us, 7 * us)

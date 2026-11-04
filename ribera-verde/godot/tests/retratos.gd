@@ -41,6 +41,14 @@ func corre(f: Callable) -> bool:
 			return false
 	return true
 
+func foto() -> Image:
+	await process_frame
+	await process_frame
+	J.pintor.redibuja(0.0)
+	for q in 4:
+		await RenderingServer.frame_post_draw
+	return root.get_texture().get_image()
+
 func pinta(dir: String, k: String) -> void:
 	await process_frame
 	await process_frame
@@ -241,6 +249,20 @@ func _corre() -> void:
 	chk(absf((M.position.x - S.position.x) - cn) <= 0.5 and absf((S.end.x - M.end.x) - cn) <= 0.5 and absf((M.position.y - S.position.y) - cn) <= 0.5, "rodea la ficha por arriba y por los dos lados (%s / %s)" % [S, M])
 	chk(S.end.y > C.position.y + 2 * us and S.end.y < C.position.y + 6 * us, "y su pie, dentro del cuadro (%.1f u)" % ((S.end.y - C.position.y) / us))
 	chk(J.dlg_sal.get_index() > J.dlg.get_index() and J.dlg_sal.get_index() < J.retrato_marco.get_index(), "detrás de la ficha y delante del cuadro")
+	# la esquina de arriba a la izquierda, de 90°: ahí empalma el saliente, y el píxel del vértice es la línea
+	# del contorno. Lo dijo el usuario: «esa esquina no puede ser así, tiene que ser 90 grados lo que haga la
+	# linea y el contorno por dentro»
+	var im: Image = await foto()
+	var lin: Color = J.LINEA
+	var CG: Rect2i = Rect2i(Vector2i(C.position.round()), Vector2i(C.size.round()))
+	chk(im.get_pixel(CG.position.x, CG.position.y) == lin, "la esquina de arriba a la izquierda, de 90° (%s)" % im.get_pixel(CG.position.x, CG.position.y))
+	# el reborde redondeado se queda en las otras tres esquinas (lo dijo el usuario: «únicamente esa esquina…
+	# el reborde del Sprite no lo quites»): su píxel de esquina no es la línea, porque la curva lo deja fuera
+	var red := 0
+	for q in [Vector2i(CG.end.x - 1, CG.position.y), Vector2i(CG.position.x, CG.end.y - 1), Vector2i(CG.end.x - 1, CG.end.y - 1)]:
+		if im.get_pixel(q.x, q.y) != lin:
+			red += 1
+	chk(red == 3, "el reborde redondeado, en las otras tres esquinas (%d de 3)" % red)
 	var ml: float = J.dlg.get_theme_stylebox("panel").content_margin_left
 	chk(C.position.x + ml >= M.end.x + 4 * us, "el texto, a su derecha (%s)" % ml)
 	var N: Rect2 = J.dlg_nm.get_rect()
