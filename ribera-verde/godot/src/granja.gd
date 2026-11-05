@@ -957,7 +957,7 @@ func harvest(i: int, hu = null) -> void:
 
 # al aire libre, al cosechar se elige si la planta se arranca o se queda revegetando (campo.gd lo sobrescribe en la huerta de la
 # tía; en las carpas y las mesas no hay revegetación: el fotoperiodo lo pones tú)
-func reveg(_p: Dictionary, _hu, _i := -1) -> bool:
+func reveg(_p: Dictionary, _hu, _i := -1) -> bool:   # → campo.gd
 	return false
 
 # ESTUDIO, tanda 2: la doble cosecha vuelve a vegetativo una vez, sin lo que le acortó la primera (true: sigue en su sitio)
