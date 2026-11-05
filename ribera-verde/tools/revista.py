@@ -10,7 +10,9 @@
 #  · rel: las noticias de relleno, deducidas del estado, para que el número nunca salga sin noticias;
 #  · ag: los textos de la agenda del mes (lo que viene: la Copa, las fiestas, el plazo, los recibos, el tiempo);
 #  · car: la sección de cartas, cada una propia, sin personas ni marcas reales;
-#  · don: dónde se vende (quiosco del Ensanche, los dos growshops, los estancos y el mercado de la Ribera).
+#  · don: dónde se vende (quiosco del Ensanche, los dos growshops, los estancos y el mercado de la Ribera);
+#  · fal, ent, con, tst/tstp, hor, err, anu y pst: la parodia del género (los reclamos de la portada, la entrevista, el
+#    consultorio, el banco de pruebas con su publirreportaje, el horóscopo, la fe de errores, los anuncios y el póster central).
 # python3 -I tools/revista.py (desde ribera-verde/)
 import json, os
 
@@ -20,7 +22,8 @@ DATOS = os.path.join(RAIZ, 'godot', 'datos', 'datos.json')
 CAB = {
 	"n": "EL ESQUEJE",
 	"sub": "revista mensual de cultivo",
-	"pie": "Edita la Federación de Clubs de la Comarca · Redacción en el Ensanche",
+	"lema": "Desde el 98 · Más páginas de anuncios que de cultivo, y aún así la mejor de la comarca",
+	"pie": "Edita la Federación de Clubs de la Comarca · Redacción en el Ensanche · Tirada: la que sale · Esta revista la pagan los anuncios de las páginas de al lado · Firma quien quiere y responde quien puede · No se devuelven los originales, entre otras cosas porque nadie los manda",
 	"p": 4.5,            # el número, en el quiosco y en los estancos
 	"sus": 45.0,         # suscripción de doce números, en la tienda online; llega al buzón el día 1
 	"susn": 12,
@@ -106,13 +109,19 @@ CAR = [
 SEC = {   # los títulos de las secciones, en orden
 	"port": "PORTADA",
 	"nw": "NOTICIAS DE LA COMARCA",
+	"ent": "LA ENTREVISTA",
 	"vari": "LA VARIEDAD DEL MES",
 	"tec": "TALLER",
+	"pst": "PÓSTER CENTRAL",
+	"con": "EL CONSULTORIO",
+	"tst": "BANCO DE PRUEBAS",
 	"merc": "MERCADO",
 	"copa": "LA COPA Y LAS CATAS",
 	"ag": "LA AGENDA DEL MES",
 	"cls": "CLASIFICADOS",
 	"car": "CARTAS",
+	"hor": "EL HORÓSCOPO DEL CULTIVADOR",
+	"err": "FE DE ERRORES",
 	"leg": "LEGAL",
 }
 
@@ -189,6 +198,139 @@ AG = {
 	"nada": "Mes tranquilo: ni Copa, ni fiestas, ni plazos. Buen momento para montar un ciclo largo.",
 }
 
+# ---------- la parodia del género: lo que trae cualquier revista de cultivo de quiosco ----------
+# (lo pidió el usuario: que EL ESQUEJE sea una parodia de las revistas de cultivo). Todo propio: ni cabeceras, ni lemas, ni
+# nombres de publicaciones de verdad; los anunciantes son los negocios del juego y los entrevistados, su gente. Se parodia el
+# género —el faldón de portada que promete de todo, la entrevista al que se cree una leyenda, el consultorio que acaba
+# recomendando lo que vende el anunciante, el banco de pruebas donde nada baja del nueve, el póster central, el horóscopo y la
+# fe de errores— y nunca a nadie en concreto.
+
+# el reclamo de la portada: uno por número, debajo del titular (el hueco de la portada da para uno, y en el género tampoco
+# dicen mucho más)
+FAL = [
+	"REGALO: PÓSTER CENTRAL",
+	"ENTREVISTA: «YO YA CULTIVABA»",
+	"EL CONSULTORIO, EN SU SITIO",
+	"BANCO DE PRUEBAS: NOTA 9,4",
+	"MÁS PÁGINAS QUE EL MES PASADO",
+	"EL HORÓSCOPO DEL CULTIVADOR",
+	"SORTEO* (*letra pequeña)",
+	"LA FE DE ERRORES DE SIEMPRE",
+]
+
+# la entrevista del mes: el entrevistado, su oficio y tres preguntas. El tono, el del género: la pregunta grandilocuente y la
+# respuesta a ras de suelo.
+ENT = [
+	{"n": "Kiko", "o": "growshop del barrio", "q": [
+		["¿Qué ha cambiado en treinta años detrás del mostrador?", "Los focos. Lo demás lo sigue preguntando la misma gente: si riego poco o riego mucho. Riegas mucho."],
+		["Se habla de usted como de una institución.", "Se habla de mí porque llevo la tienda que hay. Si hubiera dos, hablarían de la otra."],
+		["Un consejo para quien empieza.", "Una planta. Una. Y la cosechas antes de comprar la segunda carpa."]]},
+	{"n": "Delroy", "o": "socio fundador de la asociación", "q": [
+		["Usted estuvo en los años en los que aquí no había nada.", "Había gente. Lo que no había era local, ni papeles, ni esta revista. Lo demás es lo mismo: semillas que alguien guarda y alguien pierde."],
+		["¿Se cultivaba mejor antes?", "Se cultivaba peor y se disfrutaba igual. El que diga lo contrario no estaba."],
+		["¿Y la genética de entonces?", "La que se guardó, está. La que no, no vuelve. Por eso se guarda."]]},
+	{"n": "Bixente", "o": "chatarrería de Valdehierro", "q": [
+		["¿Qué es lo que más le llega?", "Carpas de dos metros montadas una vez. La gente compra el equipo de su tercera cosecha antes de la primera."],
+		["¿Se puede cultivar con material de segunda mano?", "Se puede cultivar con medio material de segunda mano. El extractor y el foco, nuevos; lo demás me lo compras a mí."],
+		["¿La pieza más rara que ha pasado por aquí?", "Un filtro de carbón con la tierra dentro. Alguien lo usó de maceta."]]},
+	{"n": "Begoña", "o": "jardinera, veinte años de oficio", "q": [
+		["¿Las plantas de interior son jardinería?", "Son jardinería con la luz pagada. Lo que cambia es la factura, no la planta."],
+		["Se le pide mucho el riego automático.", "Porque nadie quiere levantar la maceta. Levanta la maceta."],
+		["¿El error que más ve?", "El abono como premio. La planta no se porta mejor porque le des más de comer."]]},
+	{"n": "Arrieta", "o": "naves del polígono", "q": [
+		["¿Por qué se alquilan tan baratas?", "Porque llevan diez años cerradas y el tejado se cae solo. Barato es lo que cuesta antes de la obra."],
+		["¿Y la opción a compra?", "Es la única forma de que alguien haga la obra. Nadie arregla lo que no va a ser suyo."],
+		["¿Qué pide a un inquilino?", "Que pague y que no me traiga a nadie que haga ruido. En ese orden."]]},
+	{"n": "Andoni", "o": "molino de Errotabarri", "q": [
+		["Aquí se cambia una cosa por otra.", "Aquí se cambia lo que sobra por lo que falta, que es lo que se hacía antes del dinero y lo que se hará después."],
+		["¿Qué le traen?", "Semillas de gente que se va. Las guardo y las vuelvo a dar. No es un banco: es un cajón."],
+		["¿Nunca se queda nada?", "Lo que no reclaman en dos años. Y eso también lo acabo dando."]]},
+	{"n": "Iñaki", "o": "extracciones, al por mayor", "q": [
+		["¿Cuánta flor hace falta para que salga a cuenta?", "Más de la que la gente cree. El que extrae su única planta se queda sin planta y sin extracción."],
+		["¿Se nota el material de partida?", "Se nota todo. Lo malo, extraído, sigue siendo malo y además concentrado."],
+		["¿La máquina lo arregla?", "La máquina no arregla nada. Ordena lo que ya había."]]},
+	{"n": "La serora", "o": "ermita del monte", "q": [
+		["No es lo habitual entrevistar a una serora en una revista de cultivo.", "Ni a mí me lo habían pedido. Aquí sube gente a sentarse y a no decir nada. Eso también es cuidar algo."],
+		["¿Qué le cuentan?", "Lo que no cuentan en el bar. Y no se lo voy a contar yo a ustedes."],
+		["¿Qué pide a quien suba?", "Que cierre la puerta al salir. Lo demás, cada uno."]]},
+]
+
+# el consultorio: la pregunta del lector y la respuesta del técnico, con el remate del género (el consejo bueno y, de paso, el
+# producto del anunciante de la página de al lado)
+CON = [
+	{"p": "«Tengo las puntas amarillas desde la segunda semana. ¿Le falta hierro?»",
+		"r": "Le sobra abono. Baja la mitad y riega dos veces con agua sola. Si en una semana no mejora, mira el pH antes de comprar nada. Medidores, en la página de al lado."},
+	{"p": "«Mi carpa huele a tres calles de distancia. ¿Un ambientador?»",
+		"r": "Un filtro de carbón del tamaño del extractor, y el extractor sacando aire, no metiéndolo. El ambientador tapa el olor a planta con olor a ambientador y planta. Filtros, en la página de al lado."},
+	{"p": "«Me han regalado un esqueje sin nombre. ¿Puedo saber qué es?»",
+		"r": "No. Puedes saber cómo se porta en tu carpa, que es lo que importa. Apúntale un nombre tuyo y la fecha, y así en la tercera cosecha sabrás más que el que te lo dio."},
+	{"p": "«¿Cuántos días de floración tiene mi planta?»",
+		"r": "Los que diga la planta. El calendario lo pone el que vende la semilla; el punto de corte, la lupa. Lupas, en la página de al lado."},
+	{"p": "«Se me han quedado los cogollos con sabor raro, como a abono.»",
+		"r": "Falta de lavado y prisa al secar. El año que viene, agua sola los últimos días y la habitación fresca. No hay nada que comprar para arreglar esto, y mira que lo hemos buscado."},
+	{"p": "«Mi vecino dice que mi cultivo le va a subir la luz.»",
+		"r": "No funciona así, pero tampoco hace falta discutirlo con él. Lo que sí le llega es el olor y el ruido: arregla eso y el vecino se le olvida el resto."},
+	{"p": "«¿Merece la pena la hidroponía en casa?»",
+		"r": "Si se te muere una planta en tierra, no. La hidroponía no perdona el despiste; la tierra sí, y encima te aguanta un fin de semana fuera."},
+	{"p": "«Llevo cuatro cosechas y cada vez saco menos.»",
+		"r": "Limpia la carpa entre ciclos, cambia el sustrato y mira los años que tiene el foco. Lo que no se ve gastándose es lo que te está comiendo la cosecha."},
+]
+
+# el banco de pruebas: nunca baja del nueve, y el pie lo explica. Aparatos del juego, sin marcas de verdad.
+TST = [
+	{"n": "Extractor de 125 con filtro", "no": "9,4", "t": "Mueve el aire de una carpa de uno veinte sin despeinarse y, con el filtro puesto, el pasillo no huele a nada. Ruido, el justo para que tu vecino no pregunte. Lo probamos tres semanas y seguimos sin tener nada malo que decir."},
+	{"n": "Foco LED de 480 W", "no": "9,6", "t": "Llena un metro cuadrado de luz hasta las esquinas y la carpa sube dos grados, no ocho. Lo colgamos de dos poleas, lo subimos con la planta y no nos dio ni un disgusto. Caro, eso sí: lo pone hasta el fabricante."},
+	{"n": "Medidor de pH y EC", "no": "9,2", "t": "Dos botones y una pantalla. Si lo calibras cuando toca, te ahorra tres cosechas de discusiones de bar sobre si el agua de aquí es dura. Nos lo mandaron y nos lo quedamos."},
+	{"n": "Maceta de tela de 35 litros", "no": "9,5", "t": "Respira, no encharca y la raíz no da vueltas en el fondo. Se dobla y se guarda, que para quien tiene tres carpas y un armario es media mudanza menos. Lavar, a mano."},
+	{"n": "Propagador con calor de fondo", "no": "9,3", "t": "El taco templado y la hoja fresca, que es como enraíza un esqueje. Nos sacó adelante dos bandejas de las que no esperábamos nada. El termostato, justo pero suficiente."},
+	{"n": "Prensa de rosin de mano", "no": "9,1", "t": "Dos placas, un volante y el papel de cocina. Hace lo que promete con lo que le pongas, y lo que le pongas es exactamente lo que vas a probar: no hay máquina que arregle una flor mala."},
+]
+TST_PIE = "Publirreportaje: el aparato lo manda quien lo vende y aquí no lo devolvemos. Si alguna vez leen un cinco en esta sección, será que ese mes nadie se anunció."
+
+# el horóscopo del cultivador: uno por mes del calendario, en el tono de siempre
+HOR = [
+	"Enero: el frío te va a enseñar dónde entra el aire en tu carpa. Marte está en el radiador y el radiador está apagado.",
+	"Febrero: mes de decisiones. La tuya será comprar algo que no te hace falta. Evita los catálogos y a los amigos con opinión.",
+	"Marzo: buen momento para sembrar y malo para contárselo a nadie. Las estrellas no hablan; tú tampoco.",
+	"Abril: la humedad te acecha. Si abres la carpa y huele a bodega, no es nostalgia, es moho.",
+	"Mayo: te cruzarás con alguien que tiene semillas de un sitio con nombre impronunciable. Acepta el intercambio.",
+	"Junio: Venus en la terraza. Las plantas de fuera van a crecer más que tu paciencia.",
+	"Julio: calor. Mucho calor. Las estrellas recomiendan un ventilador y bajar el foco de potencia, no de altura.",
+	"Agosto: alguien te va a pedir «un poquito». Las estrellas no se pronuncian, pero nosotros sí: pésalo.",
+	"Septiembre: mes de cosecha y de vecinos de vuelta. Revisa el filtro antes que el calendario.",
+	"Octubre: Júpiter entra en la Copa. Presenta algo, aunque no ganes: en la mesa de catas se aprende más que en seis números de esta revista.",
+	"Noviembre: los tarros te llaman. Ábrelos un rato al día y no mires más, que el curado no se mira, se espera.",
+	"Diciembre: balance. Saldrán las cuentas o no, pero saldrá el año. Apunta lo que funcionó, que en marzo no te vas a acordar.",
+]
+
+# la fe de errores del número anterior: el chiste que toda revista del género tiene y nunca aprende
+ERR = [
+	"En el número anterior, donde decíamos «cuatro semanas de floración» debía decir «catorce». Pedimos perdón a quien cortó.",
+	"En el número anterior publicamos el teléfono de la redacción en el anuncio de la chatarrería. Gracias a los doce lectores que llamaron preguntando por un extractor.",
+	"En el número anterior, la foto del taller no era de un trasplante, era de alguien sacando una planta muerta. El pie era correcto igualmente.",
+	"En el número anterior dijimos que la variedad del mes era de la comarca. Es de un sitio a nueve mil kilómetros. Lo sentimos, y la planta también.",
+	"En el número anterior se colaron dos veces las mismas cartas. Nos las volvieron a mandar y nos hizo gracia la coincidencia.",
+	"En el número anterior, el horóscopo de agosto salió en la página de legal. Hubo quien lo leyó como una sentencia y, visto lo visto, acertó.",
+]
+
+# los anuncios: el faldón del pie de plana, con la letra pequeña. Negocios del juego, nada de marcas de verdad.
+ANU = [
+	{"n": "GROWSHOP DE KIKO", "t": "«Todo para tu cultivo y, si hace falta, una charla gratis»", "pie": "Barrio de siempre. Abierto desde antes de que esto se llamara así."},
+	{"n": "GROW IBARBIDE", "t": "«Lo último, un mes antes que nadie. Y un diez por ciento menos»", "pie": "Ensanche. No preguntes por el callejón de detrás."},
+	{"n": "CHATARRERÍA DE VALDEHIERRO", "t": "«Tu equipo de segunda mano. Tu equipo de hace dos años»", "pie": "Lo que entra esta semana, a mitad. Pregunta por Bixente."},
+	{"n": "LONJA DE PUERTO VIEJO", "t": "«Compramos al por mayor. Pago en el día»", "pie": "Lotes grandes. No bajamos al muelle a mirar cien gramos."},
+	{"n": "MOLINO DE ERROTABARRI", "t": "«Trae lo que te sobra. Llévate lo que te falta»", "pie": "Sin dinero por medio. Sin excepciones."},
+	{"n": "ESTANCOS DE LA COMARCA", "t": "«Papel, mechero y esta revista»", "pie": "Mira el rótulo de la T. Si no hay T, no hay revista."},
+	{"n": "AUTOS RIBERA", "t": "«Del scooter al deportivo. Entrega en el día»", "pie": "Financiación, seguro y la primera revisión. Barrio alto."},
+	{"n": "FEDERACIÓN DE CLUBS DE LA COMARCA", "t": "«Hazte socio de tu club. Lo que cultivas, entre los que lo cultivan»", "pie": "Esta revista la edita quien se anuncia aquí. Tampoco lo vamos a esconder."},
+]
+
+# el póster central: la plana de la grapa, con la variedad del mes a toda página
+PST = {
+	"cab": "PÓSTER CENTRAL · PARA LA PUERTA DE LA CARPA",
+	"pie": "Arranca por la grapa con cuidado. Si lo rompes, el mes que viene hay otro.",
+}
+
 TOPE = {"rend": 0.15, "cal": 0.12, "thc": 0.02, "moho": 0.25, "clon": 0.18}
 
 
@@ -207,12 +349,22 @@ def main():
 	assert all(len(w["t"]) > 120 and w["ti"] for w in NW), "noticia corta"
 	assert len(set(r["k"] for r in REL)) == len(REL)
 	assert len(REL) >= 5 and len(NW) >= 18
+	assert len(HOR) == 12, "un horóscopo por mes"
+	assert len(set(e["n"] for e in ENT)) == len(ENT) >= 6
+	assert all(len(e["q"]) == 3 and all(len(x) == 2 for x in e["q"]) for e in ENT), "tres preguntas por entrevista"
+	assert len(CON) >= 6 and all(c["p"].startswith("«") and c["r"] for c in CON)
+	assert len(TST) >= 5 and all(t["no"][0] == "9" for t in TST), "en el banco de pruebas nada baja del nueve"
+	assert len(ERR) >= 5 and len(FAL) >= 6 and len(ANU) >= 6
+	assert all(len(f) <= 30 for f in FAL), "el reclamo de la portada tiene que caber en una línea"
+	assert len(set(a["n"] for a in ANU)) == len(ANU)
 	D["REVISTA"] = {"cab": CAB, "tec": TEC, "tit": TIT, "cls": CLS, "car": CAR, "sec": SEC, "don": DON, "tope": TOPE,
-		"nw": NW, "rel": REL, "ag": AG}
+		"nw": NW, "rel": REL, "ag": AG,
+		"fal": FAL, "ent": ENT, "con": CON, "tst": TST, "tstp": TST_PIE, "hor": HOR, "err": ERR, "anu": ANU, "pst": PST}
 	t = json.dumps(D, ensure_ascii=False, separators=(',', ':'))
 	if t != s:
 		open(DATOS, 'w', encoding='utf8').write(t)
 	print("revista: %s · %d técnicas · %d noticias · %d de relleno · %d clasificados · %d cartas · %d sitios donde se vende" % (CAB["n"], len(TEC), len(NW), len(REL), len(CLS), len(CAR), len(DON)))
+	print("  parodia: %d entrevistas · %d consultorios · %d pruebas · %d horóscopos · %d erratas · %d anuncios · %d reclamos" % (len(ENT), len(CON), len(TST), len(HOR), len(ERR), len(ANU), len(FAL)))
 
 
 main()

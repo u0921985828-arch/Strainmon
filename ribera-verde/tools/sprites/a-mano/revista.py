@@ -7,7 +7,9 @@
 #  · filete (32 × 5) y filete2 (32 × 3): las cenefas de la cabecera y de los pies, tileables;
 #  · pt-<k> (104 × 72): las ocho ilustraciones de portada, según de qué vaya el titular del mes (planta, carpa, copa, barco, nave,
 #    club, redada y feria);
-#  · vg-<k> (36 × 32): las nueve viñetas de sección (noticias, variedad, taller, mercado, Copa, agenda, clasificados, cartas, legal);
+#  · vg-<k> (36 × 32): las dieciséis viñetas de sección (noticias, entrevista, variedad, taller, anuncio, consultorio, banco de
+#    pruebas, póster, mercado, Copa, agenda, clasificados, cartas, horóscopo, fe de errores y legal);
+#  · cinta (24 × 24): la cinta de reclamo de la esquina de la portada; sello (24 × 24): el sello de la nota del banco de pruebas;
 #  · grapa (6 × 12): las dos grapas del lomo; dobl (8 × 64): la sombra del doblez junto al lomo.
 # Sale a godot/arte/revista.png + revista.json ({r: nombre → [x, y, w, h]}), que carga src/revista.gd (como arte/billar.png).
 import os, sys, json, math
@@ -290,8 +292,137 @@ def vg_leg():   # legal: el mazo con la maza en su mango y el taco debajo
     L.hl(9, 26, 28, K1)
     return L
 
+# ---------- las viñetas de la parodia del género (lo pidió el usuario) ----------
+def vg_ent():   # la entrevista: el micrófono de mano con su cable
+    L = _vg()
+    elipse(L, 18, 10, 6, 7, K1)
+    elipse(L, 18, 9, 5, 5, K2)
+    for j in range(5, 14, 2):      # la rejilla
+        L.hl(13, 23, j, K0)
+    L.r(15, 16, 7, 12, K1)         # el mango
+    L.vl(16, 17, 27, K2)
+    L.hl(14, 23, 16, K0)
+    linea(L, 18, 28, 12, 31, K0)   # el cable
+    linea(L, 12, 31, 25, 30, K0)
+    L.contorno(K0)
+    return L
+
+def vg_con():   # el consultorio: la lupa sobre la carta del lector
+    L = _vg()
+    L.caja(2, 7, 24, 21, P2, K0)
+    for y in range(11, 26, 3):
+        L.hl(5, 22, y, K2)
+    elipse(L, 23, 13, 8, 8, K0)
+    elipse(L, 23, 13, 6, 6, P0)
+    trama(L, 18, 9, 11, 9, P2, 2)
+    linea(L, 28, 19, 34, 28, K0)   # el mango
+    linea(L, 29, 18, 35, 27, K1)
+    return L
+
+def vg_tst():   # el banco de pruebas: el aparato con su pantalla y su dial
+    L = _vg()
+    L.caja(4, 7, 27, 21, K1, K0)
+    L.caja(7, 10, 14, 9, V1, K0)   # la pantalla
+    for x in range(9, 20, 3):
+        L.vl(x, 12, 17, V0)
+    elipse(L, 26, 14, 3, 3, P1)    # el dial
+    L.p(26, 12, K0)
+    for i in range(3):             # los botones
+        L.r(7 + i * 5, 22, 3, 3, P1)
+    L.r(23, 22, 5, 3, R0)
+    L.hl(5, 30, 28, K2)
+    return L
+
+def vg_hor():   # el horóscopo: la luna y sus estrellas
+    L = _vg()
+    for j in range(-9, 10):
+        for i in range(-9, 10):
+            if (i / 9.) ** 2 + (j / 9.) ** 2 <= 1 and ((i - 7) / 9.) ** 2 + (j / 9.) ** 2 > 1:
+                L.p(15 + i, 14 + j, V1 if (i + j) % 3 else V0)
+    L.contorno(K0)
+    for sx, sy, r in ((29, 5, 2), (32, 15, 1), (27, 25, 2), (6, 29, 1)):
+        for d in range(-r, r + 1):
+            L.p(sx + d, sy, V2)
+            L.p(sx, sy + d, V2)
+    return L
+
+def vg_err():   # la fe de errores: la plana del mes pasado con su tachón y el lápiz
+    L = _vg()
+    L.caja(3, 4, 23, 24, P2, K0)
+    for y in range(8, 26, 3):
+        L.hl(6, 23, y, K2)
+    for dy in (0, 1):              # el tachón
+        linea(L, 6, 10 + dy, 23, 20 + dy, R0)
+        linea(L, 23, 10 + dy, 6, 20 + dy, R0)
+    linea(L, 33, 5, 24, 25, K1)    # el lápiz
+    linea(L, 34, 6, 25, 26, R0)
+    linea(L, 35, 7, 26, 27, K1)
+    L.p(24, 26, K0); L.p(25, 27, K0)
+    return L
+
+def vg_anu():   # el anuncio: el megáfono y sus ondas
+    L = _vg()
+    for i in range(13):            # la bocina
+        h = 3 + i
+        L.vl(9 + i, 15 - h, 15 + h, V1 if i % 3 else V0)
+    L.r(4, 12, 6, 7, K1)           # el cuerpo
+    L.hl(4, 9, 11, K0)
+    linea(L, 10, 25, 14, 30, K1)   # el asa
+    for r in (4, 7, 10):           # las ondas
+        for j in range(-r, r + 1):
+            x = 23 + int(round((r * r - j * j) ** .5))
+            if 0 <= x < 36 and 0 <= 15 + j < 32:
+                L.p(x, 15 + j, V2)
+    L.contorno(K0)
+    return L
+
+def vg_pst():   # el póster central: la lámina clavada con su chincheta
+    L = _vg()
+    L.caja(7, 5, 21, 25, P2, K0)
+    L.r(9, 8, 17, 15, P1)
+    elipse(L, 17, 15, 4, 6, V1)    # la matita de la lámina
+    elipse(L, 17, 11, 2, 3, V2)
+    L.vl(17, 18, 22, K1)
+    for dx in (-1, 1):
+        linea(L, 17, 19, 17 + dx * 4, 16, V0)
+    for y in range(25, 29, 2):     # el pie de la lámina
+        L.hl(10, 24, y, K2)
+    elipse(L, 17, 5, 3, 3, R0)     # la chincheta
+    L.p(17, 4, P2)
+    return L
+
+def cinta():   # la cinta de reclamo de la esquina de la portada (sin letras: tres rayas que las sugieren)
+    L = Lienzo(24, 24)
+    for j in range(24):
+        for i in range(24):
+            d = i - j
+            if 9 <= d <= 18:
+                L.p(i, j, R0 if 10 <= d <= 17 else K0)
+    for k in range(3):             # las rayas
+        x = 12 + k * 3
+        y = x - 14
+        for i in range(4):
+            if 0 <= y + i < 24 and 0 <= x + i < 24:
+                L.p(x + i, y + i, P2)
+    return L
+
+def sello():   # el sello de la nota del banco de pruebas
+    L = Lienzo(24, 24)
+    for j in range(24):
+        for i in range(24):
+            dx, dy = i - 11.5, j - 11.5
+            r = (dx * dx + dy * dy) ** .5
+            lim = 10.0 + 1.3 * math.cos(math.atan2(dy, dx) * 12)
+            if r <= lim:
+                L.p(i, j, R0 if r > lim - 2.5 else P2)
+    L.hl(7, 16, 10, R0)
+    L.hl(7, 16, 13, R0)
+    L.contorno(K0)
+    return L
+
 VG = {'nw': vg_nw, 'var': vg_var, 'tec': vg_tec, 'merc': vg_merc, 'copa': vg_copa,
-      'ag': vg_ag, 'cls': vg_cls, 'car': vg_car, 'leg': vg_leg}
+      'ag': vg_ag, 'cls': vg_cls, 'car': vg_car, 'leg': vg_leg,
+      'ent': vg_ent, 'con': vg_con, 'tst': vg_tst, 'hor': vg_hor, 'err': vg_err, 'anu': vg_anu, 'pst': vg_pst}
 
 # ---------- las ocho ilustraciones de portada (104 × 72) ----------
 # el grabado de la portada: tinta y verde sobre el papel, con el marco de filete y la trama de los medios tonos
@@ -452,6 +583,8 @@ def arte():
     sale('filete2', filete(False))
     sale('grapa', grapa())
     sale('dobl', doblez())
+    sale('cinta', cinta())
+    sale('sello', sello())
     for k, f in VG.items():
         sale('vg-' + k, f())
     for k, f in PT.items():

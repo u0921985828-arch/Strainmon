@@ -56,6 +56,7 @@ func _corre() -> void:
 	await espera(5)
 	_atlas()
 	_planas()
+	_parodia()
 	await _render(dir)
 	print("revista_vista: %d comprobaciones, %d fallos%s" % [n, fallos.size(), (": " + "; ".join(fallos)) if fallos.size() else ""])
 	quit(1 if fallos.size() else 0)
@@ -64,7 +65,7 @@ func _corre() -> void:
 func _atlas() -> void:
 	check("el atlas de la revista carga (arte/revista.png)", J.rev_art())
 	var A: Dictionary = J.REV_ART
-	for k in ["papel", "mancheta", "mancheta-en", "filete", "filete2", "grapa", "dobl"]:
+	for k in ["papel", "mancheta", "mancheta-en", "filete", "filete2", "grapa", "dobl", "cinta", "sello"]:
 		check("el atlas trae %s" % k, A.has(k))
 	for k in J.REV_VG.values():
 		check("el atlas trae la viñeta vg-%s" % k, A.has("vg-" + k))
@@ -92,7 +93,8 @@ func _planas() -> void:
 		check("n.º %d: la portada lleva su ilustración (%s)" % [num, rv.ilu], J.REV_ART.has("pt-" + String(rv.ilu)))
 		var falta := []
 		for i in range(1, pags.size()):
-			if String(pags[i]).strip_edges() == "" or String(tit[i]) == "" or not J.REV_ART.has("vg-" + String(vg[i])):
+			var suelta: bool = String(vg[i]) == "anu" or String(vg[i]) == "pst"   # el anuncio y el póster van a toda página, sin cabecera
+			if String(pags[i]).strip_edges() == "" or (String(tit[i]) == "" and not suelta) or not J.REV_ART.has("vg-" + String(vg[i])):
 				falta.append(i)
 		check("n.º %d: ninguna plana vacía ni sin viñeta (%s)" % [num, falta], falta.is_empty())
 		# el texto de las planas dice lo mismo que el número de siempre (nada se pierde por el camino)
@@ -137,6 +139,41 @@ func _planas() -> void:
 		J.lector_rev = {}
 		J.lector_i = 0
 
+# ---------- la parodia del género: lo que trae cada número ----------
+# (lo pidió el usuario: que EL ESQUEJE sea una parodia de las revistas de cultivo). La entrevista, el consultorio, el banco de
+# pruebas, el póster central en la grapa, dos planas de anuncios de los negocios del juego, el horóscopo del mes y la fe de
+# errores del número anterior.
+func _parodia() -> void:
+	var R: Dictionary = J.D.REVISTA
+	for num in [1, 3, 7, 12, 25]:
+		var rv: Dictionary = J.rev_paginas(num)
+		var vg: Array = rv.vg
+		for k in ["ent", "con", "tst", "hor", "err", "pst"]:
+			check("n.º %d: el número trae la plana %s" % [num, k], vg.has(k))
+		var anu := []
+		for i in vg.size():
+			if String(vg[i]) == "anu":
+				anu.append(i)
+		check("n.º %d: dos planas de anuncios (%s)" % [num, anu], anu.size() == 2)
+		check("n.º %d: los dos anuncios son distintos" % num, J.rev_anu(num, 0) != J.rev_anu(num, 1))
+		var ip: int = vg.find("pst")
+		check("n.º %d: el póster, en la grapa de la revista (%d de %d)" % [num, ip, vg.size()], ip > 0 and absi(ip - (vg.size() >> 1)) <= 3)
+		var fal: String = J.rev_faldon(num)
+		check("n.º %d: la portada lleva su reclamo («%s»)" % [num, fal], fal != "" and String(rv.pags[0]).contains(fal))
+		var mes: int = int(J.rev_my(num).m)
+		check("n.º %d: el horóscopo es el del mes %d" % [num, mes], J.rev_hor(num) == J.I18n.v(String(R.hor[mes - 1])))
+		check("n.º %d: la entrevista, con sus tres preguntas" % num, J.rev_ent(num).split("\n").size() == 7)
+		var ap: Dictionary = R.tst[Datos.hash_str("rev-tst|%d" % num) % R.tst.size()]
+		var tt: String = J.rev_tst(num)
+		check("n.º %d: el banco de pruebas, con su aparato y su publirreportaje" % num, tt.contains(J.I18n.v(String(ap.n))) and tt.contains(J.I18n.v(String(R.tstp))))
+		check("n.º %d: el consultorio, dos preguntas con su respuesta" % num, J.rev_con(num).split("\n").size() == 4)
+	check("el n.º 1 no tiene número anterior que corregir", J.rev_err(1) != J.rev_err(2))
+	check("doce horóscopos, uno por mes", R.hor.size() == 12)
+	var nom := []
+	for a in R.anu:
+		nom.append(String(a.n))
+	check("los anuncios son de los negocios del juego (%d)" % nom.size(), nom.size() >= 6 and nom.size() == nom.reduce(func(c, x): return c, nom).size())
+
 # ---------- la imagen de verdad ----------
 func _render(dir: String) -> void:
 	var num := 3
@@ -168,6 +205,21 @@ func _render(dir: String) -> void:
 		img.save_png(dir.path_join("revista-seccion.png"))
 	check("el papel se pinta también en la plana de la sección", _papel(img, pl))
 	check("el HUD no se queda encima de la revista", not J.hud.visible)
+	# las planas de la parodia: el anuncio a toda página y el póster central
+	for k in ["anu", "pst"]:
+		var ip: int = rv.vg.find(k)
+		while J.lector_i < ip:
+			J.press("right")
+			await espera(6)
+		await espera(10)
+		check("la plana de %s (%d) va dentro del papel" % [k, ip], pl.grow(1).encloses(J.lector.get_global_rect()))
+		await RenderingServer.frame_post_draw
+		img = root.get_texture().get_image()
+		if dir != "":
+			img.save_png(dir.path_join("revista-%s.png" % k))
+		check("el papel se pinta en la plana de %s" % k, _papel(img, pl))
+		check("la plana de %s no deja negro dentro" % k, not _negro(img, pl))
+		check("el texto de %s no se desliza" % k, J.lector_sc.get_v_scroll_bar().max_value <= J.lector_sc.size.y + 1)
 	J.press("B")
 	await espera(10)
 	check("B cierra la revista y deja el lector como estaba", not J.lector.visible and J.lector_rev.is_empty())
@@ -195,6 +247,7 @@ func _letra() -> void:
 # el titular más largo de todos cabe en el hueco de la portada sin tener que deslizar
 func _titular() -> void:
 	var largo := ""
+	var fal := ""
 	for v in J.D.REVISTA.tit.values():
 		for t in v:
 			var x: String = J.I18n.v(String(t))
@@ -206,12 +259,16 @@ func _titular() -> void:
 			if x.length() > largo.length():
 				largo = x
 	var rv: Dictionary = J.rev_paginas(3)
+	for f in J.D.REVISTA.fal:   # la portada lleva, debajo del titular, el reclamo del número
+		var x: String = J.I18n.v(String(f))
+		if x.length() > fal.length():
+			fal = x
 	var cab := String(rv.pags[0]).split("\n")[0]
-	rv.pags[0] = "%s\n%s" % [cab, largo]
+	rv.pags[0] = "%s\n%s\n%s" % [cab, largo, fal]
 	J.leer("EL ESQUEJE", J.rev_texto(3), rv)
 	await espera(30)
 	var sb: ScrollBar = J.lector_sc.get_v_scroll_bar()
-	check("el titular más largo (%d letras) cabe en la portada sin deslizar" % largo.length(), sb.max_value <= J.lector_sc.size.y + 1)
+	check("el titular y el reclamo más largos (%d letras) caben en la portada sin deslizar" % (largo.length() + fal.length()), sb.max_value <= J.lector_sc.size.y + 1)
 	J.press("B")
 	await espera(10)
 

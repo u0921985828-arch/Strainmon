@@ -3304,7 +3304,8 @@ s96a425fa,tranquila,quiet
 se526baf7,con más patrullas de lo normal,with more patrols than usual
 s2fb59d1a,con una investigación abierta,with an investigation open
 s3586512d,con una orden de registro firmada,with a search warrant signed
-s944d765f,otoño,autumn
+sd6b2175a,{n} · nota {q},{n} · score {q}
+s38a89d31,"No hay número anterior, así que esta vez no hemos podido equivocarnos. El mes que viene, sin falta.","There is no previous issue, so this time we could not get anything wrong. Next month, without fail."
 se76c1fbf,Dónde conseguirla: {p}.,
 s087ed473,De esta no dicen de dónde sale. Alguien de la comarca la tendrá.,
 sf09c72fa,Esta ya la tienes en la GENOTECA.,
@@ -6561,6 +6562,7 @@ s178d3494,Lluvia,Rain
 sa4e4b299,Niebla,
 sd1af0d48,Tormenta,
 s6d6eebd0,Nieve,Snow
+s944d765f,otoño,autumn
 s6a3d0ee6,"Un sofá de lona de vela, cosido a mano, con cojines de red.","A sailcloth sofa, hand-stitched, with net cushions."
 sea74d281,"Una mesa baja de tablón de barco, con un cenicero de concha.","A low table of ship plank, with a shell ashtray."
 sc4b3fab1,"Salidas de 7:00 a 21:00, en la parada de la calle Ribera.","Departures 7:00 to 21:00, at the Ribera street stop."
@@ -7101,7 +7103,8 @@ sade66c52,Semillas Ondarea,Semillas Ondarea
 s9315d584,"La ruta de la tía (tools/ruta_tia.py): los recados de D.SECUNDARIAS con «tia»; min, los testimonios que hacen una prueba del Acto III; todos, el aviso de Delroy.","La ruta de la tía (tools/ruta_tia.py): los recados de D.SECUNDARIAS con «tia»; min, los testimonios que hacen una prueba del Acto III; todos, el aviso de Delroy."
 s45315200,EL ESQUEJE,THE CUTTING
 s079046ea,revista mensual de cultivo,monthly growing magazine
-s8e81deb6,Edita la Federación de Clubs de la Comarca · Redacción en el Ensanche,Published by the Federation of Clubs of the County · Newsroom in the Ensanche
+s82622676,"Desde el 98 · Más páginas de anuncios que de cultivo, y aún así la mejor de la comarca","Since '98 · More pages of ads than of growing, and still the best in the county"
+scad9ea2d,"Edita la Federación de Clubs de la Comarca · Redacción en el Ensanche · Tirada: la que sale · Esta revista la pagan los anuncios de las páginas de al lado · Firma quien quiere y responde quien puede · No se devuelven los originales, entre otras cosas porque nadie los manda","Published by the County Federation of Clubs · Newsroom in the Ensanche · Print run: whatever comes out · This magazine is paid for by the ads on the facing pages · Anyone may sign and whoever can will answer · Unsolicited material is not returned, among other reasons because nobody sends any"
 s73390572,La poda apical,Topping
 s4e3f933d,"Cortar la punta del tallo principal cuando la planta tiene cuatro o cinco pisos de hojas. La planta deja de tirar hacia arriba y reparte la fuerza entre las ramas de abajo: en vez de una cola grande y seis pequeñas, salen cuatro o seis colas parecidas. Se hace en crecimiento y nunca en floración. Con el mismo foco y la misma maceta, se llena más superficie: de aquí sale el cuatro por ciento más de cosecha que verás en tus próximos cortes.","Cut the tip of the main stem when the plant has four or five sets of leaves. The plant stops reaching upwards and spreads its strength among the lower branches: instead of one big cola and six small ones, you get four or six similar colas. It is done in growth, never in flower. With the same lamp and the same pot you fill more surface: that is where the four per cent more harvest you will see in your next cuts comes from."
 s9466d045,El lavado de raíces,Root flushing
@@ -7160,13 +7163,19 @@ s8692e69f,«Dejad de perseguir el veinticinco por ciento. Preguntad a quién le 
 sef0576c9,«Las landraces no son una moda: son lo que había antes de que todo oliera igual.» — Un lector del barrio alto,“Landraces are not a fad: they are what there was before everything smelled the same.” — A reader from the upper neighbourhood
 sa29d96de,PORTADA,FRONT PAGE
 sfd34a5e1,NOTICIAS DE LA COMARCA,NEWS FROM THE COUNTY
+sb1d0c4f5,LA ENTREVISTA,THE INTERVIEW
 s08efd72d,LA VARIEDAD DEL MES,STRAIN OF THE MONTH
 se3678202,TALLER,WORKSHOP
+s606fd7c1,PÓSTER CENTRAL,CENTRE POSTER
+s69366374,EL CONSULTORIO,THE CLINIC
+sd4fdcc84,BANCO DE PRUEBAS,TEST BENCH
 s2f790a97,MERCADO,MARKET
 s02b1a252,LA COPA Y LAS CATAS,THE CUP AND THE TASTINGS
 s4bd47106,LA AGENDA DEL MES,THIS MONTH'S DIARY
 s2d689012,CLASIFICADOS,CLASSIFIEDS
 s4c2c97d7,CARTAS,LETTERS
+s4defd6be,EL HORÓSCOPO DEL CULTIVADOR,THE GROWER'S HOROSCOPE
+s00e7a235,FE DE ERRORES,CORRECTIONS
 s143602e0,LEGAL,LEGAL
 s2dcccce1,Un registro en el barrio se salda con plantas y material incautados,A search in the neighbourhood ends with plants and gear seized
 s46dba41b,"Agentes entraron el {d} en un piso del barrio con una orden del juzgado y se llevaron las plantas y el equipo que había montado. La asociación recuerda que un registro acaba casi siempre en multa y en la pérdida de todo el ciclo, y que el calor no se baja de un día para otro.","Officers entered a flat in the neighbourhood on {d} with a court warrant and took away the plants and the gear that was set up. The association points out that a search almost always ends in a fine and the loss of the whole cycle, and that heat does not cool down overnight."
@@ -7224,6 +7233,142 @@ s8ba7f346,"Toca recibo: luz, alquileres y seguros.","Bills are due: power, rents
 s964536b0,"Los siete primeros días del mes, ventana para comprar la nave a tocateja.",The first seven days of the month are the window to buy the unit outright.
 sb34870f2,"El próximo número, el día 1. Si estás suscrito, al buzón.","The next issue on the 1st. If you are subscribed, straight to your letterbox."
 sd8d5f93c,"Mes tranquilo: ni Copa, ni fiestas, ni plazos. Buen momento para montar un ciclo largo.","A quiet month: no Cup, no festivals, no instalments. A good time to set up a long cycle."
+s9dbe1fed,REGALO: PÓSTER CENTRAL,FREE: CENTRE POSTER
+s14f80a5b,ENTREVISTA: «YO YA CULTIVABA»,INTERVIEW: “I WAS GROWING BEFORE YOU”
+scb9ad2e8,"EL CONSULTORIO, EN SU SITIO","THE CLINIC, WHERE IT BELONGS"
+s7b8087a3,"BANCO DE PRUEBAS: NOTA 9,4",TEST BENCH: SCORE 9.4
+s4ea481db,MÁS PÁGINAS QUE EL MES PASADO,MORE PAGES THAN LAST MONTH
+se49ebb2f,SORTEO* (*letra pequeña),PRIZE DRAW* (*small print)
+sb74c3660,LA FE DE ERRORES DE SIEMPRE,THE USUAL CORRECTIONS
+s1b104ccd,growshop del barrio,neighbourhood growshop
+s6e3fdbc7,¿Qué ha cambiado en treinta años detrás del mostrador?,What has changed in thirty years behind the counter?
+sb8c32d91,Los focos. Lo demás lo sigue preguntando la misma gente: si riego poco o riego mucho. Riegas mucho.,"The lamps. Everything else, the same people keep asking: am I watering too little or too much. Too much."
+s41dabdc0,Se habla de usted como de una institución.,People talk about you as an institution.
+s75a6fe09,"Se habla de mí porque llevo la tienda que hay. Si hubiera dos, hablarían de la otra.","People talk about me because mine is the only shop there is. If there were two, they would talk about the other one."
+s66e7d329,Un consejo para quien empieza.,One piece of advice for a beginner.
+s3eb973c4,Una planta. Una. Y la cosechas antes de comprar la segunda carpa.,One plant. One. And you harvest it before you buy the second tent.
+s4de9f472,socio fundador de la asociación,founding member of the association
+sb7e9ef48,Usted estuvo en los años en los que aquí no había nada.,You were around in the years when there was nothing here.
+s999dda48,"Había gente. Lo que no había era local, ni papeles, ni esta revista. Lo demás es lo mismo: semillas que alguien guarda y alguien pierde.","There were people. What there wasn't was a place, or papers, or this magazine. The rest is the same: seeds somebody keeps and somebody loses."
+s5bd4f984,¿Se cultivaba mejor antes?,Was growing better back then?
+s34e98dfa,Se cultivaba peor y se disfrutaba igual. El que diga lo contrario no estaba.,It was worse and we enjoyed it just as much. Anyone who says otherwise wasn't there.
+sf6d64e1f,¿Y la genética de entonces?,And the genetics of those days?
+s8ce1fb01,"La que se guardó, está. La que no, no vuelve. Por eso se guarda.",What was kept is still here. What wasn't does not come back. That is why you keep it.
+sdf61eb0c,chatarrería de Valdehierro,Valdehierro scrapyard
+s4d7ad916,¿Qué es lo que más le llega?,What comes in the most?
+sd32f57bd,Carpas de dos metros montadas una vez. La gente compra el equipo de su tercera cosecha antes de la primera.,Two-metre tents put up once. People buy the gear for their third harvest before the first one.
+s15ccbdae,¿Se puede cultivar con material de segunda mano?,Can you grow with second-hand gear?
+s3852e828,"Se puede cultivar con medio material de segunda mano. El extractor y el foco, nuevos; lo demás me lo compras a mí.","You can grow with half of it second-hand. The fan and the lamp, new; the rest you buy off me."
+s029d2468,¿La pieza más rara que ha pasado por aquí?,The strangest thing that ever came through here?
+scfe81399,Un filtro de carbón con la tierra dentro. Alguien lo usó de maceta.,A carbon filter with soil inside. Somebody used it as a pot.
+s216ad077,"jardinera, veinte años de oficio","gardener, twenty years at it"
+s4d45d1bf,¿Las plantas de interior son jardinería?,Are indoor plants gardening?
+s39afedfe,"Son jardinería con la luz pagada. Lo que cambia es la factura, no la planta.","They are gardening with the light on the bill. What changes is the invoice, not the plant."
+s39d33328,Se le pide mucho el riego automático.,People ask you for automatic watering a lot.
+s6029a3c0,Porque nadie quiere levantar la maceta. Levanta la maceta.,Because nobody wants to lift the pot. Lift the pot.
+sc49be84a,¿El error que más ve?,The mistake you see most?
+s50709f3d,El abono como premio. La planta no se porta mejor porque le des más de comer.,Fertiliser as a reward. The plant does not behave better because you feed it more.
+sc33ce2a8,Arrieta,Arrieta
+s75296f45,naves del polígono,industrial estate units
+s244d5047,¿Por qué se alquilan tan baratas?,Why are they rented out so cheap?
+s7c85a7cf,Porque llevan diez años cerradas y el tejado se cae solo. Barato es lo que cuesta antes de la obra.,Because they have been shut for ten years and the roof falls in on its own. Cheap is what it costs before the building work.
+sbb0daa8a,¿Y la opción a compra?,And the option to buy?
+s07c244b8,Es la única forma de que alguien haga la obra. Nadie arregla lo que no va a ser suyo.,It is the only way anyone does the work. Nobody fixes what is not going to be theirs.
+s1afda1a2,¿Qué pide a un inquilino?,What do you ask of a tenant?
+s8247be53,Que pague y que no me traiga a nadie que haga ruido. En ese orden.,That they pay and that they bring me nobody who makes noise. In that order.
+s99116b61,molino de Errotabarri,Errotabarri mill
+sa1dd2f9c,Aquí se cambia una cosa por otra.,Here one thing is swapped for another.
+s8eb4e596,"Aquí se cambia lo que sobra por lo que falta, que es lo que se hacía antes del dinero y lo que se hará después.","Here what you have spare is swapped for what you lack, which is what was done before money and what will be done after."
+s4e66647c,¿Qué le traen?,What do they bring you?
+s62a0584c,Semillas de gente que se va. Las guardo y las vuelvo a dar. No es un banco: es un cajón.,Seeds from people who are leaving. I keep them and I hand them out again. It is not a bank: it is a drawer.
+sf0b08e93,¿Nunca se queda nada?,Do you never keep anything?
+sbf41dbf7,Lo que no reclaman en dos años. Y eso también lo acabo dando.,Whatever nobody claims in two years. And I end up giving that away too.
+seef71cea,"extracciones, al por mayor","extractions, wholesale"
+s26ca71de,¿Cuánta flor hace falta para que salga a cuenta?,How much flower does it take to be worth it?
+s4be7cefd,Más de la que la gente cree. El que extrae su única planta se queda sin planta y sin extracción.,More than people think. Whoever extracts their only plant ends up with no plant and no extraction.
+s9e160701,¿Se nota el material de partida?,Does the starting material show?
+s20a357cc,"Se nota todo. Lo malo, extraído, sigue siendo malo y además concentrado.","Everything shows. Bad material, extracted, is still bad and now concentrated."
+s2d5607b9,¿La máquina lo arregla?,Does the machine fix it?
+s4ab9d0e7,La máquina no arregla nada. Ordena lo que ya había.,The machine fixes nothing. It sorts out what was already there.
+s743654e6,La serora,The serora
+sae6869e8,ermita del monte,hermitage on the hill
+sc0338cc8,No es lo habitual entrevistar a una serora en una revista de cultivo.,It is not usual to interview a serora in a growing magazine.
+sf1223fef,Ni a mí me lo habían pedido. Aquí sube gente a sentarse y a no decir nada. Eso también es cuidar algo.,Nobody had ever asked me either. People come up here to sit and say nothing. That is also looking after something.
+sc38a65cc,¿Qué le cuentan?,What do they tell you?
+s0ac1f4e1,Lo que no cuentan en el bar. Y no se lo voy a contar yo a ustedes.,What they do not tell in the bar. And I am not going to tell you.
+sd4024a4a,¿Qué pide a quien suba?,What do you ask of whoever comes up?
+s114620b7,"Que cierre la puerta al salir. Lo demás, cada uno.",That they shut the door on the way out. The rest is up to each of them.
+sf8972c21,«Tengo las puntas amarillas desde la segunda semana. ¿Le falta hierro?»,“My tips have been yellow since the second week. Is it short of iron?”
+s4db043fc,"Le sobra abono. Baja la mitad y riega dos veces con agua sola. Si en una semana no mejora, mira el pH antes de comprar nada. Medidores, en la página de al lado.","It has too much fertiliser. Halve it and water twice with plain water. If it has not improved in a week, check the pH before you buy anything. Meters, on the facing page."
+s9a3ec719,"Le sobra abono. Baja la mitad y riega dos veces con agua sola. Si en una semana no mejora, mira la acidez antes de comprar nada. Medidores, en la página de al lado.","It has too much fertiliser. Halve it and water twice with plain water. If it has not improved in a week, check the acidity before you buy anything. Meters, on the facing page."
+se1afb2cf,«Mi carpa huele a tres calles de distancia. ¿Un ambientador?»,“My tent smells three streets away. An air freshener?”
+sd078ac8f,"Un filtro de carbón del tamaño del extractor, y el extractor sacando aire, no metiéndolo. El ambientador tapa el olor a planta con olor a ambientador y planta. Filtros, en la página de al lado.","A carbon filter the size of the fan, and the fan pulling air out, not in. An air freshener covers the smell of plant with the smell of air freshener and plant. Filters, on the facing page."
+sd21a5a88,«Me han regalado un esqueje sin nombre. ¿Puedo saber qué es?»,“I was given an unnamed cutting. Can I find out what it is?”
+sd13de497,"No. Puedes saber cómo se porta en tu carpa, que es lo que importa. Apúntale un nombre tuyo y la fecha, y así en la tercera cosecha sabrás más que el que te lo dio.","No. You can find out how it behaves in your tent, which is what matters. Write a name of your own on it and the date, and by the third harvest you will know more than whoever gave it to you."
+s9a39d622,«¿Cuántos días de floración tiene mi planta?»,“How many days of flowering does my plant have?”
+s699679fb,"Los que diga la planta. El calendario lo pone el que vende la semilla; el punto de corte, la lupa. Lupas, en la página de al lado.","As many as the plant says. The calendar is set by whoever sells the seed; the cutting point, by the loupe. Loupes, on the facing page."
+sde5a49b3,"«Se me han quedado los cogollos con sabor raro, como a abono.»","“My buds have ended up tasting odd, like fertiliser.”"
+s1ae81513,"Falta de lavado y prisa al secar. El año que viene, agua sola los últimos días y la habitación fresca. No hay nada que comprar para arreglar esto, y mira que lo hemos buscado.","Not enough flushing and too much hurry drying. Next year, plain water for the last few days and a cool room. There is nothing you can buy to fix this, and believe us, we looked."
+s453229d6,«Mi vecino dice que mi cultivo le va a subir la luz.»,“My neighbour says my grow is going to put his electricity bill up.”
+s528de145,"No funciona así, pero tampoco hace falta discutirlo con él. Lo que sí le llega es el olor y el ruido: arregla eso y el vecino se le olvida el resto.","It does not work like that, but there is no need to argue it with him either. What does reach him is the smell and the noise: sort that out and he forgets the rest."
+sa1dcc881,«¿Merece la pena la hidroponía en casa?»,“Is hydroponics worth it at home?”
+sce044958,"Si se te muere una planta en tierra, no. La hidroponía no perdona el despiste; la tierra sí, y encima te aguanta un fin de semana fuera.","If a plant dies on you in soil, no. Hydroponics does not forgive a slip; soil does, and it will even see you through a weekend away."
+s50107436,«Llevo cuatro cosechas y cada vez saco menos.»,“Four harvests in and I get less every time.”
+sab489445,"Limpia la carpa entre ciclos, cambia el sustrato y mira los años que tiene el foco. Lo que no se ve gastándose es lo que te está comiendo la cosecha.","Clean the tent between cycles, change the substrate and look at how old the lamp is. What you cannot see wearing out is what is eating your harvest."
+s817a647d,Extractor de 125 con filtro,125 fan with filter
+s4e350539,"Mueve el aire de una carpa de uno veinte sin despeinarse y, con el filtro puesto, el pasillo no huele a nada. Ruido, el justo para que tu vecino no pregunte. Lo probamos tres semanas y seguimos sin tener nada malo que decir.","It moves the air of a 1.2 m tent without breaking sweat and, with the filter on, the hallway smells of nothing. Noise, just enough for your neighbour not to ask. We ran it for three weeks and we still have nothing bad to say."
+s96c9ffb1,Foco LED de 480 W,480 W LED lamp
+sbdb6f492,"Llena un metro cuadrado de luz hasta las esquinas y la carpa sube dos grados, no ocho. Lo colgamos de dos poleas, lo subimos con la planta y no nos dio ni un disgusto. Caro, eso sí: lo pone hasta el fabricante.","It fills a square metre of light right into the corners and the tent goes up two degrees, not eight. We hung it from two pulleys, raised it with the plant and it never gave us a moment's trouble. Pricey, mind: even the maker says so."
+s0974e7a5,"Dos botones y una pantalla. Si lo calibras cuando toca, te ahorra tres cosechas de discusiones de bar sobre si el agua de aquí es dura. Nos lo mandaron y nos lo quedamos.",Two buttons and a screen. Calibrate it when you should and it saves you three harvests' worth of bar arguments about whether the water round here is hard. They sent it to us and we kept it.
+sa8ea44bc,Maceta de tela de 35 litros,35-litre fabric pot
+sf135da0d,"Respira, no encharca y la raíz no da vueltas en el fondo. Se dobla y se guarda, que para quien tiene tres carpas y un armario es media mudanza menos. Lavar, a mano.","It breathes, it does not waterlog and the root does not circle at the bottom. It folds away, which for anyone with three tents and one cupboard is half a house move saved. Wash it by hand."
+s6b36df25,Propagador con calor de fondo,Propagator with bottom heat
+sd44fe707,"El taco templado y la hoja fresca, que es como enraíza un esqueje. Nos sacó adelante dos bandejas de las que no esperábamos nada. El termostato, justo pero suficiente.","A warm plug and a cool leaf, which is how a cutting roots. It pulled through two trays we expected nothing from. The thermostat is basic but it does the job."
+s20378043,Prensa de rosin de mano,Hand rosin press
+s1b6e4bf3,"Dos placas, un volante y el papel de cocina. Hace lo que promete con lo que le pongas, y lo que le pongas es exactamente lo que vas a probar: no hay máquina que arregle una flor mala.","Two plates, a wheel and some kitchen paper. It does what it promises with whatever you put in, and whatever you put in is exactly what you are going to taste: no machine fixes a bad flower."
+s4c4910b6,"Publirreportaje: el aparato lo manda quien lo vende y aquí no lo devolvemos. Si alguna vez leen un cinco en esta sección, será que ese mes nadie se anunció.","Advertorial: the gear is sent in by whoever sells it and we do not send it back. If you ever read a five in this section, it will mean nobody advertised that month."
+s0087a45c,Enero: el frío te va a enseñar dónde entra el aire en tu carpa. Marte está en el radiador y el radiador está apagado.,January: the cold will show you where the air gets into your tent. Mars is in the radiator and the radiator is off.
+sd6db4d44,Febrero: mes de decisiones. La tuya será comprar algo que no te hace falta. Evita los catálogos y a los amigos con opinión.,February: a month for decisions. Yours will be to buy something you do not need. Avoid catalogues and friends with opinions.
+sa74b3464,Marzo: buen momento para sembrar y malo para contárselo a nadie. Las estrellas no hablan; tú tampoco.,March: a good time to sow and a bad one to tell anyone. The stars do not talk; neither do you.
+s887ef768,"Abril: la humedad te acecha. Si abres la carpa y huele a bodega, no es nostalgia, es moho.","April: humidity is stalking you. If you open the tent and it smells like a cellar, that is not nostalgia, it is mould."
+s29510e0f,Mayo: te cruzarás con alguien que tiene semillas de un sitio con nombre impronunciable. Acepta el intercambio.,May: you will run into someone with seeds from a place with an unpronounceable name. Take the swap.
+s9643f2b5,Junio: Venus en la terraza. Las plantas de fuera van a crecer más que tu paciencia.,June: Venus on the balcony. The plants outside are going to grow faster than your patience.
+sd50f6362,"Julio: calor. Mucho calor. Las estrellas recomiendan un ventilador y bajar el foco de potencia, no de altura.","July: heat. Plenty of heat. The stars recommend a fan and turning the lamp down in power, not in height."
+s6ad19fdc,"Agosto: alguien te va a pedir «un poquito». Las estrellas no se pronuncian, pero nosotros sí: pésalo.","August: someone is going to ask you for “just a little bit”. The stars take no position, but we do: weigh it."
+s9ab8ea20,Septiembre: mes de cosecha y de vecinos de vuelta. Revisa el filtro antes que el calendario.,"September: harvest month, and the neighbours are back. Check the filter before the calendar."
+s475b44e3,"Octubre: Júpiter entra en la Copa. Presenta algo, aunque no ganes: en la mesa de catas se aprende más que en seis números de esta revista.","October: Jupiter enters the Cup. Enter something, even if you do not win: you learn more at the tasting table than in six issues of this magazine."
+s111d6305,"Noviembre: los tarros te llaman. Ábrelos un rato al día y no mires más, que el curado no se mira, se espera.","November: the jars are calling you. Open them for a while each day and leave it at that, because curing is not watched, it is waited out."
+s0f53cecd,"Diciembre: balance. Saldrán las cuentas o no, pero saldrá el año. Apunta lo que funcionó, que en marzo no te vas a acordar.","December: taking stock. The books may balance or not, but the year will end. Write down what worked, because come March you will not remember."
+s324347c3,"En el número anterior, donde decíamos «cuatro semanas de floración» debía decir «catorce». Pedimos perdón a quien cortó.","In the previous issue, where we said “four weeks of flowering” it should have said “fourteen”. Our apologies to anyone who cut."
+s20ef2b3f,En el número anterior publicamos el teléfono de la redacción en el anuncio de la chatarrería. Gracias a los doce lectores que llamaron preguntando por un extractor.,In the previous issue we printed the newsroom phone number in the scrapyard advert. Thanks to the twelve readers who rang asking about a fan.
+s60aef5f1,"En el número anterior, la foto del taller no era de un trasplante, era de alguien sacando una planta muerta. El pie era correcto igualmente.","In the previous issue, the workshop photo was not of a transplant, it was of someone pulling out a dead plant. The caption was right all the same."
+se0dca817,"En el número anterior dijimos que la variedad del mes era de la comarca. Es de un sitio a nueve mil kilómetros. Lo sentimos, y la planta también.","In the previous issue we said the strain of the month was from the county. It is from a place nine thousand kilometres away. We are sorry, and so is the plant."
+s52103068,En el número anterior se colaron dos veces las mismas cartas. Nos las volvieron a mandar y nos hizo gracia la coincidencia.,In the previous issue the same letters went in twice. They sent them to us again and we enjoyed the coincidence.
+sdf2190d3,"En el número anterior, el horóscopo de agosto salió en la página de legal. Hubo quien lo leyó como una sentencia y, visto lo visto, acertó.","In the previous issue, the August horoscope ran on the legal page. Some read it as a sentence and, all things considered, they were right."
+s51ac2b01,GROWSHOP DE KIKO,KIKO'S GROWSHOP
+se3410a30,"«Todo para tu cultivo y, si hace falta, una charla gratis»","“Everything for your grow and, if you need it, a free chat”"
+se9adff7e,Barrio de siempre. Abierto desde antes de que esto se llamara así.,Same neighbourhood as always. Open since before this place had a name.
+s53f3face,"«Lo último, un mes antes que nadie. Y un diez por ciento menos»","“The latest, a month before anyone else. And ten per cent off”"
+sb9472c51,Ensanche. No preguntes por el callejón de detrás.,Ensanche. Do not ask about the alley round the back.
+scf7647b8,CHATARRERÍA DE VALDEHIERRO,VALDEHIERRO SCRAPYARD
+sff11de84,«Tu equipo de segunda mano. Tu equipo de hace dos años»,“Your second-hand gear. Your gear from two years ago”
+se3a46432,"Lo que entra esta semana, a mitad. Pregunta por Bixente.","Whatever comes in this week, half price. Ask for Bixente."
+sff05e9f1,LONJA DE PUERTO VIEJO,PUERTO VIEJO FISH MARKET
+s4675afbe,«Compramos al por mayor. Pago en el día»,“We buy wholesale. Paid the same day”
+s885d5495,Lotes grandes. No bajamos al muelle a mirar cien gramos.,Big lots. We do not come down to the dock to look at a hundred grams.
+s23feb703,MOLINO DE ERROTABARRI,ERROTABARRI MILL
+sb7066256,«Trae lo que te sobra. Llévate lo que te falta»,“Bring what you have spare. Take what you lack”
+s0f1cb9f1,Sin dinero por medio. Sin excepciones.,No money involved. No exceptions.
+se944ca1c,ESTANCOS DE LA COMARCA,COUNTY TOBACCONISTS
+sbf1d8477,"«Papel, mechero y esta revista»","“Papers, a lighter and this magazine”"
+s8690df4e,"Mira el rótulo de la T. Si no hay T, no hay revista.","Look for the T sign. No T, no magazine."
+s259d7a60,«Del scooter al deportivo. Entrega en el día»,“From scooter to sports car. Same-day delivery”
+s02684752,"Financiación, seguro y la primera revisión. Barrio alto.","Finance, insurance and the first service. Barrio alto."
+s2ae6e117,FEDERACIÓN DE CLUBS DE LA COMARCA,COUNTY FEDERATION OF CLUBS
+se72ecf03,"«Hazte socio de tu club. Lo que cultivas, entre los que lo cultivan»","“Join your club. What you grow, among those who grow it”"
+sc84072d7,Esta revista la edita quien se anuncia aquí. Tampoco lo vamos a esconder.,This magazine is published by whoever advertises here. We are not going to hide that either.
+se768b657,PÓSTER CENTRAL · PARA LA PUERTA DE LA CARPA,CENTRE POSTER · FOR THE TENT DOOR
+se6a6bedb,"Arranca por la grapa con cuidado. Si lo rompes, el mes que viene hay otro.","Tear it out carefully along the staple. If you rip it, there is another one next month."
 sdce1a040,semillas doradas,golden seeds
 s507dd705,semilla dorada,golden seed
 saa2697af,"Las semillas doradas se ganan jugando: objetivos diarios, capítulos, la Copa, fenotipos raros, los números de EL ESQUEJE y los logros. En la tienda también se pueden comprar.","Golden seeds are earned by playing: daily goals, chapters, the Cup, rare phenotypes, issues of EL ESQUEJE and achievements. They can also be bought in the store."
@@ -7323,6 +7468,12 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+s5bb3d660,ENTREVISTA: «YO YA CULTIVABA ANTES»,INTERVIEW: “I WAS GROWING BEFORE YOU WERE”
+sb9d050aa,SORTEO* (*lo explica la letra pequeña),PRIZE DRAW* (*see the small print)
+s322900ee,CON LA FE DE ERRORES DE SIEMPRE,WITH THE USUAL CORRECTIONS
+s39aa3d83,ENTREVISTA · «YO YA CULTIVABA ANTES»,INTERVIEW · “I WAS GROWING BEFORE YOU WERE”
+s6231f387,SORTEO* · *lo explica la letra pequeña,PRIZE DRAW* · *see the small print
+s8e81deb6,Edita la Federación de Clubs de la Comarca · Redacción en el Ensanche,Published by the Federation of Clubs of the County · Newsroom in the Ensanche
 s80a81c0f,"Landrace Hunters no vende, no alquila y no usa tus datos para anuncios.
 
 · Se juega sin conexión y sin anuncios. Los capítulos 1 a 3 son gratis; el juego completo es una compra única por Google Play: la tarjeta y el pago los gestiona Google, nosotros solo sabemos que está comprado.
