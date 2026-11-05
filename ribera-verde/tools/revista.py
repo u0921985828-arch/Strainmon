@@ -31,12 +31,13 @@ CAB = {
 }
 
 # El sobre de semillas grapado a la hoja (lo pidió el usuario: «molaría también que en cada revista regalen una semilla o algo
-# así… como un sobre con una semilla dentro y como un paquetillo de regalo»): cada número trae tres semillas de su variedad del
-# mes, una sola vez por número. El texto de la plana, con el reclamo de siempre de las revistas de quiosco.
+# así… como un sobre con una semilla dentro y como un paquetillo de regalo»): cada número trae REG["n"] semillas de una variedad
+# del catálogo del banco del PC (nunca de las que se cazan, de receta, de la tía o autoflorecientes: el sobre no abre vías),
+# una sola vez por número. El texto de la plana, con el reclamo de siempre de las revistas de quiosco.
 REG = {
 	"n": 3,
 	"t": [
-		"Grapado a esta página, como siempre, el sobre del mes: tres semillas de la variedad de la que habla la página de al lado.",
+		"Grapado a esta página, como siempre, el sobre del mes. Va una variedad del catálogo, de las que cualquiera puede pedir por correo: no regalamos lo que no se encuentra, que para eso ya está el resto de la revista.",
 		"Cortesía de los anunciantes, que para eso pagan. Despega el sobre con cuidado, que el año pasado alguien lo abrió con los dientes y se quedó sin regalo y sin muela.",
 		"Un número, un sobre. Quien compre dos ejemplares del mismo mes que no nos escriba: ya nos ha escrito, y le contestamos lo mismo.",
 	],

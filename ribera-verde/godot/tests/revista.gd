@@ -347,6 +347,55 @@ func _corre() -> void:
 	chk(hay_mun, "la sección del mundo no sale en el número")
 	chk(J.REV_ART.has("vg-mun") if J.rev_art() else true, "la viñeta del mundo no está en la hoja de arte")
 
+	# 10b · la estación pesa de verdad en las noticias del mundo: con el número de una estación, las de otra solo salen si no
+	# hay bastantes de la suya y de las de cualquiera
+	var fuera := 0
+	var total := 0
+	for num in range(1, 25):
+		var est: int = J.rev_est(num) + 1
+		for m in J.rev_mun_de(num):
+			total += 1
+			if int(m.e) != 0 and int(m.e) != est:
+				fuera += 1
+	chk(fuera * 4 < total, "noticias del mundo fuera de estación: %d de %d" % [fuera, total])
+	var hay0 := 0
+	for m in J.D.REVISTA.mun:
+		if int(m.e) == 0:
+			hay0 += 1
+	chk(hay0 >= 3, "sin noticias de cualquier estación no hay con qué rellenar: %d" % hay0)
+
+	# 10c · el sobre del mes: la variedad es del catálogo del banco del PC (nunca de las que se cazan, de receta, del banco de
+	# la tía ni autoflorecientes: el sobre no abre ninguna vía), se despega una sola vez y solo al ver su plana
+	var cat := {}
+	for b in J.D.BANCO:
+		cat[String(b[0])] = 1
+	var au := {}
+	for b in J.D.get("AUTO", {}).get("banco", []):
+		au[String(b[0])] = 1
+	var mal := []
+	for num in range(1, 37):
+		var k: String = J.rev_reg_var(num)
+		if k == "" or not cat.has(k) or au.has(k):
+			mal.append("%d:%s" % [num, k])
+	chk(mal.is_empty(), "el sobre regala fuera del catálogo: %s" % [mal])
+	J.S.rev.reg = []
+	J.S.seeds = {}
+	var g: Dictionary = J.rev_regalo(5)
+	J.rev_reg_cobra(5)
+	chk(int(J.S.seeds.get(String(g.sid), 0)) == int(g.n), "el sobre no dio sus semillas: %s" % [J.S.seeds])
+	J.rev_reg_cobra(5)
+	chk(int(J.S.seeds.get(String(g.sid), 0)) == int(g.n), "el sobre del mismo número se cobró dos veces")
+	chk(not J.rev_reg_hay(5) and J.rev_sobre(5) == I18n.v(String(J.D.REVISTA.reg.ya)), "el sobre despegado sigue diciendo que está")
+	# sin haber visto la plana del sobre, no se cobra
+	var rv: Dictionary = J.rev_paginas(6)
+	chk(rv.get("kk") is Array and (rv.kk as Array).has("reg"), "las planas no dicen de qué sección son")
+	J.lector_vis = {0: true}
+	chk(not J.rev_reg_visto(rv), "el sobre se despega sin llegar a su plana")
+	var ireg: int = (rv.kk as Array).find("reg")
+	J.lector_vis = {ireg: true}
+	chk(J.rev_reg_visto(rv), "el sobre no se despega ni viendo su plana")
+	J.lector_vis = {}
+
 	# 11 · guardada y cargada, sigue
 	var S2 = JSON.parse_string(JSON.stringify(J.S))
 	J.S = S2

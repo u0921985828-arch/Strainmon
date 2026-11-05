@@ -26,7 +26,7 @@ RAREZAS = {
 }
 
 # La tetraploidia en el laboratorio (lo pidió el usuario: «molaría implantar la tetraploidia en el laboratorio pero de alguna
-# forma no tan complicada de explicar supongo, con la colchicina»). El juego nombra el reactivo y dice lo que se juega, nunca
+# forma no tan complicada de explicar supongo»). El juego dice lo que se juega, nunca
 # cómo se hace: ni concentración, ni tiempos, ni método. Todo pasa dentro del laboratorio del banco de la tía, con las normas
 # puestas (EPI, cabina y residuos), y lo que sale es una línea nueva, marcada, que se hereda como cualquier otra rareza.
 #  · frasco: lo que cuesta el frasco del reactivo en el pedido del laboratorio, y para cuántos intentos da;

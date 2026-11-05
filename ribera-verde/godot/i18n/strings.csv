@@ -204,15 +204,25 @@ s28beae68,Nada,Nothing
 sb0476a3d,LA CÁMARA FRÍA,THE COLD ROOM
 sf166b2da,"1 semilla de {s}, de la cámara fría","1 {s} seed, from the cold room"
 s4598fea5,TETRA,
+sd4c5d263,"El laboratorio, por hoy, ya está. Vuelve mañana.",The lab is done for today. Come back tomorrow.
 s3fb379b5,Fijar una línea,Fix a line
 s44344f6e,"Una semilla, el microscopio y la cabina: la línea sube una generación.","One seed, the microscope and the hood: the line goes up a generation."
 sb871f1bb,Doblar los cromosomas,Double the chromosomes
 sa03fe5ec,Con el reactivo del armario de tóxicos. Te quedan {n} usos del frasco.,With the reagent from the toxics cabinet. You have {n} uses left in the bottle.
 s501e5d21,EL LABORATORIO,THE LAB
-sd4c5d263,"El laboratorio, por hoy, ya está. Vuelve mañana.",The lab is done for today. Come back tomorrow.
 se3a3dbbc,En el laboratorio se fija una línea con una sola semilla. Ahora no tienes ninguna sin fijar.,In the lab a line is fixed with a single seed. Right now you have none that isn't fixed.
 sb8f50fdc,Cada generación es una cosecha: cultiva la línea y vuelve con lo cosechado.,Each generation is a harvest: grow the line and come back with what you harvested.
 sf3272e36,{n} semillas,{n} seeds
+s02ff4a90,{n} sem.,{n} seeds
+sbc85109c,Se tira la semilla tetraploide de esta línea y vuelve a ser normal.,The tetraploid seed of this line is thrown away and it goes back to normal.
+s8575391e,DESCARTAR UNA LÍNEA,DROP A LINE
+s406737a1,¿Descartar la línea tetraploide de {s}? Se tiran sus {n} semillas y la línea vuelve a la normal.,Drop the tetraploid line of {s}? Its {n} seeds are thrown away and the line goes back to normal.
+s5aede3a8,Descartar,Drop it
+s8c454102,Cancelar,Cancel
+sdbedd5d3,Fuera la etiqueta y fuera la semilla. {s} vuelve a ser la de siempre: cruza con cualquiera.,"Label off, seed out. {s} is the usual one again: it crosses with anything."
+scf95e318,Tratar una línea nueva.,Treat a new line.
+s2c266351,Descartar una línea,Drop a line
+sb56a6f21,Volver una línea tetraploide a la normal.,Take a tetraploid line back to normal.
 sf571243d,"El frasco del reactivo se pide al proveedor del banco: {e} € a la cuenta, para {n} intentos. Es tóxico y va al armario cerrado, con su etiqueta.","The bottle of reagent is ordered from the bank's supplier: {e} € charged to the account, for {n} attempts. It's toxic and goes in the locked cabinet, labelled."
 s8f2c2578,Pedirlo,Order it
 s1ba1e201,Laboratorio,Lab
@@ -221,12 +231,10 @@ s7aa37886,No hay saldo en la cuenta.,There's no money in the account.
 sb5fbac83,"El frasco, en el armario de tóxicos, con la ficha de seguridad al lado. Con él puesto encima de la mesa no se come, no se bebe y no se sale del laboratorio.","The bottle, in the toxics cabinet, with its safety sheet beside it. While it's out on the bench nobody eats, nobody drinks and nobody leaves the lab."
 s01ed2c77,Hay una bandeja en la estufa esperando. De una en una.,There's already a tray waiting in the incubator. One at a time.
 sae915558,Hacen falta 2 semillas de una línea que no sea ya tetraploide: la mitad se queda por el camino.,You need 2 seeds from a line that isn't tetraploid already: half of them don't make it.
-s02ff4a90,{n} sem.,{n} seeds
 sa9765aad,THC {t} %,THC {t} %
 s8d67d3f9,DOBLAR LOS CROMOSOMAS,DOUBLE THE CHROMOSOMES
-s2be5c85d,"¿Tratar {s}? Gastas 2 semillas y un uso del frasco. Si cuaja, la línea pasa a tetraploide: más THC y menos cosecha, y ya no cruza con una normal.","Treat {s}? You use 2 seeds and one use of the bottle. If it takes, the line turns tetraploid: more THC and less yield, and it no longer crosses with a normal one."
+s028c1a02,"¿Tratar {s}? Gastas 2 semillas y un uso del frasco. Si cuaja, la línea entera pasa a tetraploide, también la semilla de esa variedad que consigas después: más THC, menos cosecha y ya no cruza con una normal. Se deshace aquí mismo, descartando la línea.","Treat {s}? You use 2 seeds and one use of the bottle. If it takes, the whole line turns tetraploid, including seed of that strain you get later: more THC, less yield and it no longer crosses with a normal one. You can undo it right here by dropping the line."
 sb74042f1,Tratar,Treat it
-s8c454102,Cancelar,Cancel
 sf0899d2a,"La bandeja, a la estufa, etiquetada con la línea y la fecha. En {d} días se verá cuál tira y cuál no.","The tray goes into the incubator, labelled with the line and the date. In {d} days you'll see which ones take."
 s1f93485c,"La bandeja de {s} tiró: hoja gruesa y tallo macizo. Es tetraploide. Dos semillas de la línea nueva, etiquetadas.","The {s} tray took: thick leaves and a solid stem. It's tetraploid. Two seeds of the new line, labelled."
 sdf4590a3,La bandeja de {s} no tiró: lo tratado se quedó por el camino. Al contenedor amarillo.,The {s} tray didn't take: what was treated didn't make it. Into the yellow bin.
@@ -7210,7 +7218,7 @@ s4c2c97d7,CARTAS,LETTERS
 s4defd6be,EL HORÓSCOPO DEL CULTIVADOR,THE GROWER'S HOROSCOPE
 s00e7a235,FE DE ERRORES,CORRECTIONS
 s143602e0,LEGAL,LEGAL
-s0ac9a299,"Grapado a esta página, como siempre, el sobre del mes: tres semillas de la variedad de la que habla la página de al lado.","Stapled to this page, as always, the envelope of the month: three seeds of the strain the facing page is about."
+scb9d8958,"Grapado a esta página, como siempre, el sobre del mes. Va una variedad del catálogo, de las que cualquiera puede pedir por correo: no regalamos lo que no se encuentra, que para eso ya está el resto de la revista.","Stapled to this page, as always, the envelope of the month. It carries a catalogue strain, one anyone can order by post: we do not give away what cannot be found, that is what the rest of the magazine is for."
 sa0b64737,"Cortesía de los anunciantes, que para eso pagan. Despega el sobre con cuidado, que el año pasado alguien lo abrió con los dientes y se quedó sin regalo y sin muela.","Courtesy of our advertisers, which is what they pay for. Peel the envelope off carefully: last year somebody opened one with their teeth and ended up with no gift and no tooth."
 sd3430f09,"Un número, un sobre. Quien compre dos ejemplares del mismo mes que no nos escriba: ya nos ha escrito, y le contestamos lo mismo.","One issue, one envelope. Anyone buying two copies of the same month needn't write in: they already did, and we told them the same thing."
 s8ef314fa,El sobre de este número ya lo despegaste. Queda la marca de la grapa y poco más.,You already peeled this issue's envelope off. All that's left is the staple mark.
@@ -7541,6 +7549,8 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+s2be5c85d,"¿Tratar {s}? Gastas 2 semillas y un uso del frasco. Si cuaja, la línea pasa a tetraploide: más THC y menos cosecha, y ya no cruza con una normal.","Treat {s}? You use 2 seeds and one use of the bottle. If it takes, the line turns tetraploid: more THC and less yield, and it no longer crosses with a normal one."
+s0ac9a299,"Grapado a esta página, como siempre, el sobre del mes: tres semillas de la variedad de la que habla la página de al lado.","Stapled to this page, as always, the envelope of the month: three seeds of the strain the facing page is about."
 s8e81deb6,Edita la Federación de Clubs de la Comarca · Redacción en el Ensanche,Published by the Federation of Clubs of the County · Newsroom in the Ensanche
 s80a81c0f,"Landrace Hunters no vende, no alquila y no usa tus datos para anuncios.
 

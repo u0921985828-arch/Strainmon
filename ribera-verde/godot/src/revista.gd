@@ -70,13 +70,34 @@ func rev_var(n: int) -> String:   # la variedad del mes: una de STRAINS, fija po
 	return String(ks[Datos.hash_str("rev-var|%d" % n) % ks.size()])
 
 # ---------- el sobre del mes (lo pidió el usuario: «que en cada revista regalen una semilla… como un paquetillo de regalo») ----------
-# Cada número trae grapado su sobre, con REVISTA.reg.n semillas de la variedad del mes; se despega una sola vez por número, al
-# acabar de leerlo (rev_lee), y queda apuntado en S.rev.reg.
+# Cada número trae grapado su sobre, con REVISTA.reg.n semillas de una variedad de catálogo; se despega una sola vez por número,
+# al llegar a su plana y cerrar el número (rev_lee), y queda apuntado en S.rev.reg.
+# La variedad del sobre NO es la del mes: la del mes puede ser una que se caza, que escondió la tía, de receta, del banco de la
+# tía o autofloreciente, y el sobre de una revista de quiosco no puede saltarse esas vías. Va de las del catálogo del banco del
+# PC (las que ya se compran con dinero, sin las autoflorecientes): el sobre solo ahorra el sobre, nunca abre una vía.
+func rev_reg_ks() -> Array:
+	var au := {}
+	for b in D.get("AUTO", {}).get("banco", []):   # i18n-no
+		au[String(b[0])] = 1
+	var ks := []
+	for b in D.BANCO:
+		var k := String(b[0])
+		if not au.has(k) and D.STRAINS.has(k):
+			ks.append(k)
+	ks.sort()
+	return ks
+
+func rev_reg_var(n: int) -> String:
+	var ks := rev_reg_ks()
+	if ks.is_empty():
+		return ""
+	return String(ks[Datos.hash_str("rev-reg-var|%d" % n) % ks.size()])
+
 func rev_regalo(n: int) -> Dictionary:
-	return {"sid": rev_var(n), "n": int(D.REVISTA.get("reg", {}).get("n", 3))}
+	return {"sid": rev_reg_var(n), "n": int(D.REVISTA.get("reg", {}).get("n", 3))}
 
 func rev_reg_hay(n: int) -> bool:
-	return rev_hay() and D.REVISTA.has("reg") and not rev().reg.has(n)
+	return rev_hay() and D.REVISTA.has("reg") and rev_reg_var(n) != "" and not rev().reg.has(n)
 
 func rev_sobre(n: int) -> String:
 	var R: Dictionary = D.REVISTA.reg
@@ -88,6 +109,14 @@ func rev_sobre(n: int) -> String:
 	o.append(T("Dentro: {q} semillas de {s}.", {"q": int(g.n), "s": I18n.v(String(strain(String(g.sid)).n))}))
 	o.append(K("Despégalo al acabar el número."))
 	return "\n\n".join(o)
+
+# ¿se ha llegado a ver la plana del sobre en esta lectura? (lector_vis, de ui.gd)
+func rev_reg_visto(rv: Dictionary) -> bool:
+	var ks: Array = rv.get("kk", [])
+	for i in lector_vis.keys():
+		if int(i) >= 0 and int(i) < ks.size() and String(ks[int(i)]) == "reg":
+			return true
+	return false
 
 # al cerrar el número, el sobre se despega: las semillas, a la GENOTECA
 func rev_reg_cobra(n: int) -> void:
@@ -205,18 +234,19 @@ const REV_MUN_N := 3
 func rev_mun_de(n: int) -> Array:
 	var M: Array = rev_hoy(D.REVISTA.mun)
 	var e := rev_est(n) + 1
-	var pri := []     # las de esta estación primero; detrás, las de cualquiera
-	var res := []
+	var pri := []     # las de esta estación
+	var res := []     # las de cualquier estación (e == 0)
+	var otr := []     # las de otra estación: solo si no hay bastantes de las de arriba
 	for m in M:
 		if int(m.e) == e:
 			pri.append(m)
 		elif int(m.e) == 0:
 			res.append(m)
 		else:
-			res.append(m)
+			otr.append(m)
 	var o := []
 	var vistas := {}
-	for l in [pri, res]:
+	for l in [pri, res, otr]:
 		if l.is_empty():
 			continue
 		var i: int = Datos.hash_str("rev-mun|%d" % n) % l.size()
@@ -560,7 +590,10 @@ func rev_lee(n: int) -> void:
 	# está (una partida vieja del HTML, sin CAL), el lector de siempre
 	var rv := rev_paginas(n) if Datos.CAL and rev_art() else {}
 	await leer("%s · %s" % [I18n.v(String(D.REVISTA.cab.n)), rev_mes(n)], rev_texto(n), rv)
-	rev_reg_cobra(n)   # el sobre grapado del mes, al cerrar el número
+	# el sobre grapado del mes, al cerrar el número: solo si se ha llegado a su plana (quien cierra el número en la portada no
+	# se lleva las semillas; el sobre sigue grapado para la próxima vez)
+	if rv.is_empty() or rev_reg_visto(rv):
+		rev_reg_cobra(n)
 	if nuevo:
 		rev().tec.append(String(tc.k))
 		sfx("get")
@@ -727,6 +760,7 @@ func rev_paginas(n: int) -> Dictionary:
 	var pags: Array[String] = []
 	var tit: Array[String] = []
 	var vg: Array[String] = []
+	var kk: Array[String] = []    # la clave de la sección de cada plana (para saber si se ha visto, p. ej. la del sobre)
 	var ban: Array[String] = []   # el banner de la plana: solo las de anuncio lo llevan
 	var secs := rev_secciones(n)
 	var pie := ""
@@ -739,6 +773,7 @@ func rev_paginas(n: int) -> Dictionary:
 			pags.append("%s\n\n%s" % [String(q.cab), txt])   # la cabecera, el titular y el reclamo: tres párrafos con su aire
 			tit.append("")
 			vg.append("")
+			kk.append(String(q.k))
 			ban.append("")
 			continue
 		if i == secs.size() - 1 and pie != "":   # el pie de la revista cierra la última plana
@@ -748,8 +783,9 @@ func rev_paginas(n: int) -> Dictionary:
 			pags.append(String(trozos[t]))
 			tit.append(String(q.tit) if t == 0 else "%s (%d)" % [String(q.tit), t + 1])
 			vg.append(String(REV_VG.get(String(q.k), "")))
+			kk.append(String(q.k))
 			ban.append(rev_anu_ban(n, 1 if String(q.k) == "anu2" else 0) if String(q.k).begins_with("anu") else "")
-	return {"n": n, "pags": pags, "tit": tit, "vg": vg, "ban": ban, "ilu": rev_ilu(n), "pst": rev_pst_pl(n)}
+	return {"n": n, "pags": pags, "tit": tit, "vg": vg, "kk": kk, "ban": ban, "ilu": rev_ilu(n), "pst": rev_pst_pl(n)}
 
 # la clave de la plana que se está viendo (la de su viñeta: «anu» el anuncio, «pst» el póster central)
 func rev_vg_i() -> String:
@@ -893,8 +929,11 @@ func rects_revista() -> Array:
 			o.append_array(_rev_pie("filete", cd.position.x, cd.end.y, cd.size.x, dclip))
 		else:
 			# la ilustración: el sobre grapado en la plana del regalo, y en las demás la lámina de la sección
-			var sob: bool = vk == "reg" and REV_ART.has("regalo")
-			var fo: Image = REV_ART["regalo"] if sob else rev_anc(REV_ART.get("pt-" + String(REV_FOTO.get(vk, "planta")), REV_ART["pt-planta"]), ci.size.x)
+			# la plana del regalo: mientras el sobre sigue grapado se ve cerrado, con su solapa; una vez despegado, el
+			# sobrecito de semillas que llevaba dentro
+			var sob: bool = vk == "reg" and REV_ART.has("regalo") and REV_ART.has("sobre")
+			var cerrado: bool = sob and rev_reg_hay(int(lector_rev.get("n", 0)))
+			var fo: Image = (REV_ART["sobre"] if cerrado else REV_ART["regalo"]) if sob else rev_anc(REV_ART.get("pt-" + String(REV_FOTO.get(vk, "planta")), REV_ART["pt-planta"]), ci.size.x)
 			var fx: int = ci.position.x + ((ci.size.x - fo.get_width()) >> 1)
 			var fy: int = ci.position.y + 6
 			var fh: int = fo.get_height() if sob else mini(fo.get_height(), REV_FOTO_H)   # apaisada: le deja la mitad de abajo al despiece

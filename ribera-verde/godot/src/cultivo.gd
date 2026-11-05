@@ -378,7 +378,10 @@ static func rarezas_de(S: Dictionary, sid: String, f: Dictionary) -> void:
 	var o := []
 	var nl := {}   # el nivel de su línea al nacer (0: le salió sola): sus semillas serán la generación siguiente (hereda_ra)
 	for k in R.orden:
-		if L.has(k) and Datos.hash_str("ra|%s|%d|%s|%d" % [k, int(f.id), sid, int(S.day)]) % 100000 < float(R.niv[clampi(int(L[k]), 0, int(R.fija))]) * 100000:
+		# la tetraploide no se expresa a medias: la línea tratada en el laboratorio lo es entera, y por eso no cruza con una
+		# normal (triploide). Las demás rarezas salen con la probabilidad de su nivel, que sube al fijarlas hasta la F4
+		var seg: bool = k == "tetra"
+		if L.has(k) and (seg or Datos.hash_str("ra|%s|%d|%s|%d" % [k, int(f.id), sid, int(S.day)]) % 100000 < float(R.niv[clampi(int(L[k]), 0, int(R.fija))]) * 100000):
 			o.append(k)
 			nl[k] = int(L[k])
 	# la que sale sola, de entre las que pueden salir solas: la tetraploide no está (solo sale del laboratorio)

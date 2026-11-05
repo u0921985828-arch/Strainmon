@@ -293,8 +293,52 @@ func bt_tt() -> Dictionary:
 		bt().tt.p = {}
 	return bt().tt
 
+# las líneas que ya son tetraploides
+func bt_tetra_ls() -> Array:
+	var o := []
+	for sid in S.get("ra", {}).keys():
+		if Cultivo.tetra_linea(S, String(sid)):
+			o.append(String(sid))
+	o.sort()
+	return o
+
+# descartar la línea tratada: se tira la semilla etiquetada y se vuelve a partir de semilla normal del catálogo. Sin esto, una
+# línea tratada no cruzaría nunca más con una normal y las recetas que la llevan se quedarían sin hacer
+func bt_tetra_tira() -> void:
+	var l := bt_tetra_ls()
+	if l.is_empty():
+		return
+	var it: Array = l.map(func(sid): return {"label": strain(sid).n, "right": T("{n} sem.", {"n": int(S.get("seeds", {}).get(sid, 0))}),
+		"desc": K("Se tira la semilla tetraploide de esta línea y vuelve a ser normal.")})
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("DESCARTAR UNA LÍNEA"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var sid: String = l[i]
+	var n := int(S.get("seeds", {}).get(sid, 0))
+	if await ask(T("¿Descartar la línea tetraploide de {s}? Se tiran sus {n} semillas y la línea vuelve a la normal.", {"s": strain(sid).n, "n": n}), [K("Descartar"), K("Cancelar")]) != 0:
+		return
+	if S.get("seeds") is Dictionary:
+		S.seeds.erase(sid)
+	if S.get("ra") is Dictionary and S.ra.get(sid) is Dictionary:
+		S.ra[sid].erase("tetra")
+		if S.ra[sid].is_empty():
+			S.ra.erase(sid)
+	lab().r = true   # lo tirado, al contenedor amarillo
+	sfx("back")   # i18n-no
+	await say(T("Fuera la etiqueta y fuera la semilla. {s} vuelve a ser la de siempre: cruza con cualquiera.", {"s": strain(sid).n}))
+
 func bt_tetra() -> void:
 	var T9: Dictionary = D.TETRA
+	if bt_tetra_ls().size():
+		var q: int = await menu([{"label": K("Doblar los cromosomas"), "desc": K("Tratar una línea nueva.")},
+			{"label": K("Descartar una línea"), "desc": K("Volver una línea tetraploide a la normal.")},
+			{"label": K("Nada"), "desc": ""}], {"cls": "full", "title": K("EL LABORATORIO"), "desc": true})
+		if q == 1:
+			await bt_tetra_tira()
+			return
+		if q != 0:
+			return
 	if int(bt_tt().get("f", 0)) <= 0:
 		var e := int(T9.frasco.e)
 		if await ask(T("El frasco del reactivo se pide al proveedor del banco: {e} € a la cuenta, para {n} intentos. Es tóxico y va al armario cerrado, con su etiqueta.", {"e": Datos.miles(e), "n": int(T9.frasco.n)}), [K("Pedirlo"), K("Nada")]) != 0:
@@ -319,7 +363,7 @@ func bt_tetra() -> void:
 	if i < 0 or i >= l.size():
 		return
 	var sid: String = l[i]
-	if await ask(T("¿Tratar {s}? Gastas 2 semillas y un uso del frasco. Si cuaja, la línea pasa a tetraploide: más THC y menos cosecha, y ya no cruza con una normal.", {"s": strain(sid).n}), [K("Tratar"), K("Cancelar")]) != 0:
+	if await ask(T("¿Tratar {s}? Gastas 2 semillas y un uso del frasco. Si cuaja, la línea entera pasa a tetraploide, también la semilla de esa variedad que consigas después: más THC, menos cosecha y ya no cruza con una normal. Se deshace aquí mismo, descartando la línea.", {"s": strain(sid).n}), [K("Tratar"), K("Cancelar")]) != 0:
 		return
 	S.seeds[sid] = int(S.seeds[sid]) - 2
 	if int(S.seeds[sid]) <= 0:

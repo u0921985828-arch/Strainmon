@@ -1,5 +1,5 @@
 # Ribera Verde (Godot) — la tetraploidia en el laboratorio del banco de la tía (lo pidió el usuario: «molaría implantar la
-# tetraploidia en el laboratorio pero de alguna forma no tan complicada de explicar supongo, con la colchicina»; con CAL):
+# tetraploidia en el laboratorio pero de alguna forma no tan complicada de explicar supongo»; con CAL):
 # la rareza «tetra» no sale sola, solo del laboratorio; el frasco del reactivo se pide a la cuenta y da para varios intentos;
 # cada intento gasta 2 semillas y un uso, y a los TETRA.dias se ve si cuajó (cuaja, se queda por el camino o sale normal);
 # la línea tetraploide da más THC, menos cosecha y va más lenta, y no cruza con una normal (triploide); el juego no cuenta
@@ -105,13 +105,16 @@ func _corre() -> void:
 	var rt: Dictionary = D.RAREZAS.r.tetra
 	chk(float(rt.thc) > 0 and float(rt.g) < 0 and float(rt.crec) < 0, "más THC, menos cosecha y más lenta: %s" % [rt])
 	# el juego no cuenta ni dosis ni método: ni porcentajes del reactivo ni tiempos de exposición
-	var src := FileAccess.get_file_as_string("res://src/bancotia.gd")
-	var prohibido := ["colchicin", "%  de colchi", "ppm", "mg/l", "mg/ml"]
+	var prohibido := ["colchicin", "ppm", "mg/l", "mg/ml", "mg/kg"]
 	var mal := []
-	for p in prohibido:
-		if src.to_lower().contains(p):
-			mal.append(p)
-	chk(mal.is_empty(), "el código nombra dosis o el reactivo por su nombre: %s" % [mal])
+	# el código del laboratorio, los datos, los textos traducidos y todo lo que toca la tetraploidia
+	for f in ["res://src/bancotia.gd", "res://src/cultivo.gd", "res://src/granja.gd", "res://src/escena_extr.gd",
+			"res://datos/datos.json", "res://i18n/strings.csv"]:
+		var src := FileAccess.get_file_as_string(f).to_lower()
+		for p in prohibido:
+			if src.contains(p):
+				mal.append("%s: %s" % [f.get_file(), p])
+	chk(mal.is_empty(), "nombra dosis o el reactivo por su nombre: %s" % [mal])
 
 	# 2 · nadie saca la tetraploide por azar, ni con la línea a tope
 	J.S.ra = {"ria": {"tetra": 4}}
@@ -137,6 +140,7 @@ func _corre() -> void:
 	chk(not Cultivo.triploide(J.S, "thai", "ria2"), "2n × 2n cruza como siempre")
 
 	# 5 · el frasco: se pide a la cuenta y da para TETRA.frasco.n intentos
+	J.S.ra = {}   # sin líneas tetraploides: el laboratorio va derecho al tratamiento
 	J.S.ch = int(T9.ch)
 	J.S.erase("bt")
 	J.S.banco = 100000
@@ -211,6 +215,32 @@ func _corre() -> void:
 		chk(ch.size() >= 0, "se hereda como las demás")
 	else:
 		chk(true, "esta bandeja no cuajó")
+
+	# 8b · la línea tratada lo es entera: la tetraploidia no se expresa a medias como las demás rarezas (con el nivel 1, una
+	# rareza normal sale en una de cada cuatro plantas; la tetraploide, en todas, que por eso no cruza con una normal)
+	J.S.ra = {"ria": {"tetra": 1}}
+	var todas := 0
+	for i in 200:
+		var f2: Dictionary = Cultivo.roll_feno(J.S, "ria")
+		if f2.get("ra") is Array and f2.ra.has("tetra"):
+			todas += 1
+	chk(todas == 200, "la línea tetraploide no se expresa entera: %d de 200" % todas)
+
+	# 8c · y se deshace: descartar la línea tira su semilla y la vuelve normal (si no, una receta que lleve esa variedad se
+	# quedaría sin poder cruzarse nunca más)
+	J.S.ra = {"ria": {"tetra": 1}}
+	J.S.seeds = {"ria": 4}
+	J.lab().m = true          # las normas, al día: lo que se prueba aquí es el descarte
+	J.lab().e = true
+	J.lab().at = int(J.S.day)
+	J.lab().r = false
+	LOG = []
+	MENUS = []
+	QUIERO = ["Doblar los cromosomas", "Descartar una línea", "Skunk", "Descartar"]
+	chk(corre(func(): await J.bt_lab()), "el descarte se queda colgado")
+	chk(not Cultivo.tetra_linea(J.S, "ria"), "la línea sigue tetraploide tras descartarla: %s" % [J.S.get("ra")])
+	chk(int(J.S.seeds.get("ria", 0)) == 0, "la semilla tetraploide no se tiró: %s" % [J.S.seeds])
+	chk(not Cultivo.triploide(J.S, "ria", "thai"), "descartada, la línea vuelve a cruzar con una normal")
 
 	# 9 · sin CAL, no hay tetraploidia
 	Datos.CAL = false

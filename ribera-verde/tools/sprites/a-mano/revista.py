@@ -226,18 +226,44 @@ def vg_nw():   # noticias: el periódico doblado con sus columnas
     L.vl(31, 6, 28, K1)
     return L
 
-def vg_var():   # la variedad del mes: un cogollo con su hoja
+def _foliolo(nx, ny, ang, largo, ancho):
+    """los píxeles de un foliolo lanceolado y serrado desde el nudo: {(x, y): color}"""
+    ca, sa = math.cos(ang), math.sin(ang)
+    o = {}
+    for s in range(largo + 1):
+        t = s / largo
+        # el perfil: estrecho en el nudo, ancho al tercio y en punta; los dientes, la ondulación de 4 en 4
+        w = ancho * math.sin(math.pi * min(1.0, t ** .72)) * (1.0 - .25 * t)
+        if s % 4 == 3:
+            w *= .80
+        w = int(round(w))
+        px, py = nx + ca * s, ny + sa * s
+        for q in range(-w, w + 1):
+            x = int(round(px - sa * q))
+            y = int(round(py + ca * q))
+            o[(x, y)] = V0 if abs(q) >= w else (V2 if q < 0 else V1)
+        o[(int(round(px)), int(round(py)))] = V0   # el nervio
+    return o
+
+def vg_var():   # la variedad del mes: la hoja palmeada de cinco foliolos (lo dijo el usuario del cogollo de antes: «parece un
+    # kebab de hierba»), con su peciolo, que se lee a cualquier tamaño
     L = _vg()
-    for i in range(7):
-        w = 9 - i
-        y = 6 + i * 3
-        elipse(L, 18, y, w, 3, V1)
-        elipse(L, 18 - w // 2, y + 1, 3, 2, V0)
-        elipse(L, 18 + w // 2, y + 1, 3, 2, V2)
-    linea(L, 18, 26, 18, 31, K1)
-    for dx in (-1, 1):
-        linea(L, 18, 28, 18 + dx * 6, 24, V0)
-        linea(L, 18, 28, 18 + dx * 5, 26, V1)
+    nx, ny = 18, 26   # el nudo: de donde salen los cinco foliolos
+    linea(L, nx, ny, nx, 30, K1)          # el peciolo
+    linea(L, nx + 1, ny, nx + 1, 30, K0)
+    puesto = {}
+    for ang, largo, ancho in [(-math.pi / 2, 21, 3.6),
+                              (-math.pi / 2 - 0.80, 17, 3.1), (-math.pi / 2 + 0.80, 17, 3.1),
+                              (-math.pi / 2 - 1.46, 12, 2.5), (-math.pi / 2 + 1.46, 12, 2.5)]:
+        fo = _foliolo(nx, ny, ang, largo, ancho)
+        for (x, y), c in fo.items():
+            # cada foliolo deja un surco de un píxel con los de al lado: si no, la hoja sale en un bloque y parece un abeto
+            if any(puesto.get((x + i, y + j)) for i in (-1, 0, 1) for j in (-1, 0, 1)):
+                continue
+            L.p(x, y, c)
+            fo[(x, y)] = c
+        for k, c in fo.items():
+            puesto[k] = c
     L.contorno(K0)
     return L
 

@@ -104,6 +104,7 @@ var lector_i := 0
 # EL ESQUEJE a la vista (0.82, lo pidió el usuario: «que los números se vean como revista, con portada y páginas dibujadas»): con
 # la revista abierta, el lector va sin caja y en tinta sobre la plana que dibuja pinta.gd. Lo pone revista.gd al llamar a leer()
 var lector_rev := {}
+var lector_vis := {}   # las planas que se han llegado a ver en esta lectura (el sobre del mes solo se despega si se ve su plana)
 var lector_h := Callable()   # el manejador de teclas del lector, para reponerlo si otro flujo hace pop() del de arriba
 var lector_par := VBoxContainer.new()   # la columna de texto: un Label por párrafo
 var lector_ps: Array[Label] = []   # los párrafos de la plana de revista
@@ -485,10 +486,15 @@ func ajusta() -> void:
 	var so: Rect2 = G.sonido
 	if so.position.x < ux + uiw and so.end.y > y:
 		ut = roundf(so.end.y - y + kp * 1.5)
-	# el rótulo del título (LANDRACE / HUNTERS en dos líneas: 144 u de ancho con la sombra) baja si SONIDO le pisa la esquina (--tt en el HTML), desde ye: la escena
-	# de 240 × 160, abajo
+	# el rótulo del título (LANDRACE HUNTERS en dos líneas, el sprite de 164 u con su sombra; al doble, 328) baja si SONIDO le
+	# pisa la esquina (--tt en el HTML), desde ye: la escena de 240 × 160, abajo. El medio ancho sale del rótulo de verdad, con
+	# su escala: con 73 u, SONIDO se le metía en la esquina
 	var ye := y + ch - 160 * s
-	tt = maxf(4 * s, roundf(so.end.y - ye + kp * 1.5)) if so.position.x < x + cw / 2 + 73 * s and so.end.y > ye + 4 * s else 4 * s
+	var lw := 82.0
+	var lg := _tit_logo()
+	if lg[0] != null:
+		lw = (lg[0] as Texture2D).get_width() * int(lg[1]) * .5
+	tt = maxf(4 * s, roundf(so.end.y - ye + kp * 1.5)) if so.position.x < x + cw / 2 + lw * s and so.end.y > ye + 4 * s else 4 * s
 	# caja de vida del jugador en el combate (bP, abajo a la derecha de la escena, ~46 u de alto): a la izquierda de A, B y START
 	# si le caen encima (--bpr en el HTML)
 	var er := x + cw / 2 + 120 * s
@@ -1394,6 +1400,7 @@ func leer(t: String, texto: String, rev := {}) -> void:
 		return
 	t = I18n.v(t)
 	lector_rev = rev if (Datos.CAL and rev is Dictionary and not rev.is_empty()) else {}
+	lector_vis = {}
 	var tits: Array = lector_rev.get("tit", [])
 	if lector_rev.is_empty():
 		lector_pags = paginas(I18n.v(texto))
@@ -1404,6 +1411,7 @@ func leer(t: String, texto: String, rev := {}) -> void:
 	_lector_estilo()
 	var ver := func(i: int):
 		lector_i = clampi(i, 0, lector_pags.size() - 1)
+		lector_vis[lector_i] = true
 		if not lector_rev.is_empty():   # la revista: su cabecera es la de la sección y el folio va dibujado
 			lector_ttl.text = String(tits[lector_i]) if lector_i < tits.size() else ""
 			lector_ttl.visible = lector_ttl.text != ""

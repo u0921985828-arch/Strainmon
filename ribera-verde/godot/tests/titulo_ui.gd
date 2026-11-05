@@ -146,7 +146,7 @@ func _corre() -> void:
 	check("el rótulo del juego está dibujado", lg != null)
 	check("y su variante con placa, para la publicidad", pl != null)
 	if lg != null:
-		var e: int = 2 if J.titulo.size.x >= (lg.get_width() * 2 + 16) * J.us else 1
+		var e: int = 2 if J.titulo.size.x >= (lg.get_width() * 2 + 16) * J.u else 1   # como _tit_logo(): en píxeles del lienzo
 		# el oro de la cara del rótulo (#e8c24a) no sale en ningún otro sitio de la pantalla
 		var tr: Rect2 = J.titulo.get_global_rect()
 		var b0: Rect2 = (J.menu_col.get_child(0).get_child(0) as Control).get_global_rect()

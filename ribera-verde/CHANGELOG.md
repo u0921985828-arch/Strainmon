@@ -12,12 +12,23 @@
   ferias, museos, cooperativas, congresos, la factura de la luz, reglamentos, analíticas, patentes, robos de bancos de
   semillas, copas y censos), uno por número, que no dependen de la partida y conviven con NOTICIAS DE LA COMARCA, que sí
   (`MUN` en `tools/revista.py`).
-- **EL SOBRE DEL MES.** Grapado a su plana, el sobre de papel con tres semillas de la variedad del mes, dibujado a mano
-  (`regalo` en `tools/sprites/a-mano/revista.py`): se despega al cerrar el número y las semillas van al banco
-  (`REG`, `rev_sobre`, `rev_regalo`, `rev_reg_hay`, `rev_reg_cobra`, `S.rev.reg`). Uno por número, no por ejemplar.
+- **EL SOBRE DEL MES.** Grapado a su plana, el sobre de papel con `REG.n` semillas, dibujado a mano (`sobre` cerrado y
+  `regalo`, el sobrecito de semillas, en `tools/sprites/a-mano/revista.py`): se despega al cerrar el número, y solo si se
+  ha llegado a su plana, y las semillas van al banco (`REG`, `rev_sobre`, `rev_regalo`, `rev_reg_hay`, `rev_reg_visto`,
+  `rev_reg_cobra`, `S.rev.reg`). Uno por número, no por ejemplar. La variedad del sobre **no** es la del mes: sale del
+  catálogo del banco del PC (`rev_reg_ks`, `rev_reg_var`), nunca de las que se cazan, de receta, del banco de la tía ni
+  autoflorecientes, para que el sobre ahorre el sobre y no se salte ninguna vía.
 - **El despiece, rehecho** (lo dijo el usuario: «hay como pues que parece un kebab de hierba… No sé lo que quieres hacer con
   eso»): debajo de la ilustración, un recuadro de papel al sol con su pleca verde, la viñeta a su tamaño y los renglones del
-  texto, en vez del bulto de antes (`rects_revista` en `src/revista.gd`).
+  texto, en vez del bulto de antes (`rects_revista` en `src/revista.gd`); y la viñeta de la variedad del mes, que era ese
+  bulto, se redibuja como la hoja palmeada de cinco foliolos con su surco (`vg_var`, `_foliolo`).
+- **Repasado por ataque.** De la revisión salieron, arreglados: la estación de EL MUNDO DEL CANNABIS, que no pesaba (las dos
+  ramas del filtro eran la misma: ahora las de otra estación solo entran si faltan, `rev_mun_de`); la tetraploidia, que
+  marcaba la línea para siempre y podía dejar una receta sin poder cruzarse (ahora se deshace en el laboratorio,
+  `bt_tetra_ls`/`bt_tetra_tira`, y el aviso dice que afecta a toda la línea, también a la semilla que consigas después); la
+  línea tratada, que solo se expresaba en una de cada cuatro plantas mientras el cruce la bloqueaba al 100 % (la tetraploide
+  ya no va por la probabilidad del nivel: la línea lo es entera, `rarezas_de`); y la guarda del rótulo del título, que
+  medía 144 u cuando el sprite mide 164 (ahora sale del rótulo de verdad con su escala, `ajusta` en `src/ui.gd`).
 - **La mancheta nueva.** EL ESQUEJE se rotula con letras dibujadas por código (`tools/sprites/a-mano/rotulos.py`: barras de
   4 px en caja de 14 × 20, bisel con la luz arriba a la izquierda, contorno y sombra proyectada), con la cinta del artículo
   arriba, los filetes y el esqueje al lado; cabe en la caja de composición de la portada (100 × 36).
