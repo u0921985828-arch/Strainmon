@@ -463,125 +463,210 @@ def _planta(L, cx, base, alto, ancho, c0=V0, c1=V1, c2=V2):
     elipse(L, cx, base - alto - 2, 3, 5, c1)   # la cola
     elipse(L, cx - 1, base - alto - 3, 2, 3, c2)
 
-def pt_planta():   # una planta en su maceta bajo el foco
-    L = _pt()
-    _suelo(L, 62)
-    L.r(38, 10, 28, 5, K0)      # el foco
-    L.r(44, 15, 16, 3, K1)
-    L.vl(52, 2, 10, K2)
-    for dx in range(-3, 4):      # la luz
-        linea(L, 52 + dx * 4, 19, 52 + dx * 11, 34, '#f2e2a8')
-    L.r(36, 50, 32, 12, K1)     # la maceta
-    L.r(34, 48, 36, 3, K0)
-    for x in range(38, 68, 4):
-        L.vl(x, 51, 61, K2)
-    _planta(L, 52, 50, 26, 18)
+# ---------- el arte del juego ----------
+# Las ilustraciones de la revista no se vuelven a dibujar: se montan con los sprites que ya tiene el juego (godot/arte/atlas.png +
+# atlas.json), recortados y puestos sobre el papel (lo pidió el usuario: «lo lógico sería utilizar los sprites que ya tenemos
+# disponibles en el repositorio del juego para hacer la revista»). Nada se escala: solo se recorta, se centra y se pega.
+_AT = [None, None]
+
+def atlas():
+    if _AT[0] is None:
+        from PIL import Image as _I
+        _AT[0] = json.load(open(P('godot', 'arte', 'atlas.json')))
+        _AT[1] = _I.open(P('godot', 'arte', 'atlas.png')).convert('RGBA')
+    return _AT[0]
+
+def cel(k, x=0, y=0, w=None, h=None):
+    """un recorte del atlas del juego, como Lienzo (x, y, w, h dentro del fotograma)"""
+    f = atlas()['frames'][k]
+    w = f['w'] - x if w is None else w
+    h = f['h'] - y if h is None else h
+    L = Lienzo(w, h)
+    L.im.paste(_AT[1].crop((f['x'] + x, f['y'] + y, f['x'] + x + w, f['y'] + y + h)), (0, 0))
+    L.px = L.im.load()
     return L
 
-def pt_carpa():   # la carpa plateada abierta, con las plantas dentro
-    L = _pt()
-    _suelo(L, 66)
-    L.caja(14, 10, 76, 56, '#4a4e54', K0)
-    L.r(16, 12, 72, 52, '#5a5f66')
-    L.r(20, 14, 64, 6, '#6e747c')        # la capota
-    L.caja(26, 20, 52, 44, '#2a2e34', K0)   # la puerta abierta
-    for x in (26, 78):
-        L.vl(x, 20, 63, '#8a9098')
-    for i, cx in enumerate((38, 52, 66)):
-        _planta(L, cx, 60, 14 + i % 2 * 4, 9)
-    L.r(34, 22, 36, 3, '#d8e0a0')        # el LED
-    L.hl(34, 69, 25, K1)
+def ajusta(L):
+    """el sprite sin el aire de alrededor"""
+    b = L.im.getbbox()
+    return L.recorta(b[0], b[1], b[2] - b[0], b[3] - b[1]) if b else L
+
+def _fondo(w=104, h=72, c=P2):
+    L = Lienzo(w, h)
+    L.r(0, 0, w, h, c)
     return L
 
-def pt_copa():   # el podio de la Copa con el trofeo
-    L = _pt()
-    _suelo(L, 66)
-    for i, (x, w, h) in enumerate(((10, 26, 14), (39, 26, 22), (68, 26, 10))):
-        L.caja(x, 66 - h, w, h, P1, K0)
-        trama(L, x + 1, 67 - h, w - 2, h - 2, K2, 3)
-    vg = vg_copa()
-    L.pega(vg, 34, 10)
-    for dx in (-1, 1):   # las ramas de laurel
-        for i in range(5):
-            elipse(L, 52 + dx * (16 + i * 3), 24 + i * 6, 3, 2, V1)
+def _pon(L, o, y, dx=0):
+    """centra el sprite a lo ancho de la ilustración"""
+    L.pega(o, (L.w - o.w) // 2 + dx, y)
+    return o
+
+def _cielo(L, hasta, c='#bcd4e2'):
+    L.r(0, 0, L.w, hasta, c)
+    for x in range(0, L.w, 5):          # las nubes de la trama
+        L.p(x + (x // 5) % 3, 6, '#d8e8f2')
+
+# Las plantas de las carpas son las de la vista C (celda carpa-c-plantas-a: planta-c-<porte>-<ancho>, el 2 en el nombre es
+# vegetativo), no las vistas desde arriba de las mesas de la nave (lo dijo el usuario: «en el cultivo en las carpas, las plantas
+# no son así»). Sus cogollos van en la rampa clave magenta, que el motor tiñe con el color de la variedad: aquí lo mismo.
+COG_RAMPA = ('#ff5cff', '#d020c8', '#80107a')
+COG_MES = '#a8d055'          # el verde claro de la variedad del mes
+
+def _hex(c):
+    c = c.lstrip('#')
+    return tuple(int(c[i:i + 2], 16) for i in (0, 2, 4))
+
+def _mez(a, b, t):
+    A, B = _hex(a), _hex(b)
+    return '#%02x%02x%02x' % tuple(int(A[i] + (B[i] - A[i]) * t) for i in range(3))
+
+def impreso(L, c=K0):
+    """el arte del juego, impreso: el negro de los sprites pasa a la tinta de la revista (en el papel no hay negro puro)"""
+    t = _hex(c)
+    for y in range(L.h):
+        for x in range(L.w):
+            q = L.px[x, y]
+            if q[3] and q[0] + q[1] + q[2] <= 60:
+                L.px[x, y] = t + (255,)
     return L
 
-def pt_barco():   # el pesquero en el muelle
-    L = _pt()
-    for y in range(52, 72):   # la ría
-        c = '#2e5a6a' if (y // 2) % 2 else '#27505e'
-        L.hl(0, 103, y, c)
-    for x in range(0, 104, 7):
-        L.p(x + (x // 7) % 3, 56, '#6a9aa8')
-        L.p(x + 2, 62, '#6a9aa8')
-    L.r(18, 42, 62, 10, K0)      # el casco
-    L.r(20, 44, 58, 6, K1)
-    linea(L, 18, 42, 12, 52, K0); linea(L, 80, 42, 86, 52, K0)
-    L.r(34, 28, 24, 14, P1)      # la caseta
-    L.caja(34, 28, 24, 14, P1, K0)
-    L.r(38, 32, 6, 5, '#2e5a6a'); L.r(48, 32, 6, 5, '#2e5a6a')
-    L.vl(66, 16, 42, K0)         # el palo
-    linea(L, 66, 16, 58, 28, K2)
-    L.r(62, 14, 9, 3, R0)
+def tinte_cog(L, c=COG_MES):
+    """pasa la rampa clave del cogollo al color de la variedad (clara, media y oscura)"""
+    d = {_hex(COG_RAMPA[0]): _hex(_mez(c, '#ffffff', .45)),
+         _hex(COG_RAMPA[1]): _hex(c),
+         _hex(COG_RAMPA[2]): _hex(_mez(c, '#102014', .5))}
+    for y in range(L.h):
+        for x in range(L.w):
+            q = L.px[x, y]
+            if q[3] and q[:3] in d:
+                L.px[x, y] = d[q[:3]] + (255,)
     return L
 
-def pt_nave():   # la nave por dentro: las mesas en fila con sus focos
-    L = _pt()
-    L.r(0, 0, 104, 54, P1)
-    L.hl(0, 103, 54, K0)
-    trama(L, 0, 55, 104, 17, K2, 4)
-    for i, (x, y, w) in enumerate(((8, 44, 36), (56, 44, 36), (20, 30, 28), (58, 30, 28))):
-        L.caja(x, y, w, 7, K1, K0)         # la mesa
-        for j in range(3):
-            _planta(L, x + 8 + j * 10, y, 8, 5)
-        L.r(x + 4, y - 16, w - 8, 3, '#d8e0a0')   # el LED
-        L.vl(x + 8, y - 22, y - 16, K2)
-        L.vl(x + w - 8, y - 22, y - 16, K2)
+def planta_c(porte='i', ancho=38, i=0, veg=False, c=COG_MES):
+    """la planta de la vista de carpa: su porte (i índica, h híbrida, s sativa), su fotograma de alto y su color"""
+    k = 'carpa-c-plantas-a/planta-c-%s%s-%d/unica/%02d' % (porte, '2' if veg else '', ancho, i)
+    L = ajusta(cel(k))
+    return L if veg else tinte_cog(L, c)
+
+def planta_cabe(porte, ancho, hmax, veg=False, c=COG_MES):
+    """la planta más alta de ese porte que cabe en hmax (los fotogramas bajan de 2 en 2 filas)"""
+    ult = None
+    for i in range(15):
+        k = 'carpa-c-plantas-a/planta-c-%s%s-%d/unica/%02d' % (porte, '2' if veg else '', ancho, i)
+        if k not in atlas()['frames']:
+            break
+        L = planta_c(porte, ancho, i, veg, c)
+        ult = L
+        if L.h <= hmax:
+            return L
+    return ult
+
+def pt_planta():   # la carpa por dentro: la pared plateada, las macetas y las plantas bajo el foco
+    L = _fondo()
+    pa = cel('carpa-c-fondo/carpa-c-pared/unica/00')
+    L.pega(pa.recorta((pa.w - 104) // 2, pa.h - 72, 104, 72), 0, 0)   # el centro de la pared, con su suelo
+    fo = ajusta(cel('carpa-c-focos-led-ancho/foco-c-led720-75/unica/00'))
+    _pon(L, fo.recorta(0, 6, fo.w, 10), 0)                            # la campana del LED, asomando por arriba
+    mc = ajusta(cel('carpa-c-macetas-b/maceta-c-tela25-27/unica/00'))
+    for dx, py, pl in ((-34, 58, planta_cabe('i', 32, 26, True)),     # dos en vegetativo, detrás
+                       (34, 58, planta_cabe('i', 32, 26, True)),
+                       (0, 71, planta_cabe('i', 38, 42))):            # y la del mes, en flor, delante
+        L.pega(mc, (104 - mc.w) // 2 + dx, py - mc.h)
+        L.pega(pl, (104 - pl.w) // 2 + dx, py - mc.h - pl.h + 8)
     return L
 
-def pt_club():   # el club: la vitrina del dispensario con sus botes
-    L = _pt()
-    L.r(0, 0, 104, 72, P1)
-    L.caja(10, 8, 84, 54, P2, K0)
-    L.hl(11, 92, 30, K0)
-    L.hl(11, 92, 46, K0)
-    for fila, y in ((0, 28), (1, 44)):
-        for i in range(6):
-            x = 15 + i * 13
-            L.caja(x, y - 11, 9, 11, P0, K1)      # el bote
-            L.r(x + 1, y - 7, 7, 6, V1 if (i + fila) % 2 else V0)
-            L.r(x + 2, y - 12, 5, 2, K1)
-    L.r(10, 62, 84, 4, K1)
-    L.r(40, 2, 24, 5, V0)
+def pt_carpa():   # el taller: el equipo de la carpa (filtro, ventilador, depósito y garrafa) con una madre
+    L = _fondo()
+    pa = cel('carpa-c-fondo/carpa-c-pared/unica/00')
+    L.pega(pa.recorta((pa.w - 104) // 2, pa.h - 72, 104, 72), 0, 0)
+    fi = ajusta(cel('carpa-c-extras/extra-c-filtro-39/unica/00'))
+    ve = ajusta(cel('carpa-c-extras/extra-c-vent/unica/00'))
+    dp = ajusta(cel('carpa-c-extras/extra-c-deposito/unica/00'))
+    ga = ajusta(cel('carpa-c-extras/extra-c-garrafa-29/unica/00'))
+    L.pega(fi, 2, 3)                      # el filtro de carbón, colgado
+    L.pega(ve, 104 - ve.w - 3, 4)         # el ventilador de pinza
+    L.pega(dp, 104 - dp.w - 2, 70 - dp.h) # el depósito del goteo
+    L.pega(ga, 4, 70 - ga.h)              # y la garrafa
+    mc = ajusta(cel('carpa-c-macetas-b/maceta-c-tela11-20/unica/00'))
+    pl = planta_cabe('h', 32, 30, True)   # la madre, en vegetativo
+    _pon(L, mc, 70 - mc.h)
+    _pon(L, pl, 70 - mc.h - pl.h + 6)
     return L
 
-def pt_redada():   # la redada: la puerta forzada y la luz azul
-    L = _pt()
-    L.r(0, 0, 104, 72, '#1c2330')
-    for i in range(5):   # la luz azul girando
-        elipse(L, 52, 14, 30 - i * 5, 12 - i * 2, ['#3a5a8a', '#4a6ea8', '#5a86c8', '#7aa6e0', '#a8caf0'][i])
-    L.caja(34, 28, 36, 44, '#3a3a42', K0)   # la puerta
-    linea(L, 34, 40, 70, 34, K0)
-    linea(L, 34, 41, 70, 35, '#6a6a72')
-    for i in range(6):
-        L.p(36 + i * 6, 42 + (i % 3), '#8a8a92')
-    elipse(L, 64, 50, 2, 2, '#d8d8a0')
-    L.r(0, 68, 104, 4, '#2a3240')
+def pt_copa():   # la Copa: el jurado delante del podio, con el cogollo premiado
+    L = _fondo()
+    _suelo(L, 68)
+    for i, (x, w, h) in enumerate(((10, 26, 12), (39, 26, 20), (68, 26, 8))):
+        L.caja(x, 68 - h, w, h, P1, K0)
+        trama(L, x + 1, 69 - h, w - 2, h - 2, K2, 3)
+    cg = tinte_cog(ajusta(cel('cogollos-genoteca/legendario/unica/00')), '#b088d8')
+    _pon(L, cg, 48 - cg.h - 20 + 20, 0)
+    ju = ajusta(cel('jurado/base/south/00'))
+    for dx in (-30, 30):
+        L.pega(ju, (L.w - ju.w) // 2 + dx, 68 - ju.h)
     return L
 
-def pt_feria():   # la feria de semillas: el puesto con los sobres
-    L = _pt()
-    _suelo(L, 64)
-    for i in range(7):   # el toldo a rayas
-        L.r(8 + i * 13, 8, 13, 10, R0 if i % 2 else P2)
-    L.hl(8, 98, 18, K0)
-    L.caja(14, 44, 76, 20, P1, K0)    # el mostrador
-    for i in range(5):
-        x = 20 + i * 14
-        L.caja(x, 36, 10, 8, P2, K0)   # los sobres
-        L.r(x + 2, 38, 6, 2, V1 if i % 2 else V0)
-    L.vl(10, 18, 64, K1); L.vl(94, 18, 64, K1)
-    trama(L, 16, 46, 72, 16, K2, 3)
+def pt_barco():   # el pesquero del muelle, en la ría
+    L = _fondo()
+    _cielo(L, 56)
+    ba = ajusta(cel('puerto-barcoP/barcoP/unica/00'))
+    ba = ba.recorta(ba.w - 104, 0, 104, min(46, ba.h))   # la superestructura: caseta, puente y cubierta
+    L.pega(ba, 0, 58 - ba.h)
+    for yy in range(58, 72):                          # la ría
+        L.hl(0, L.w - 1, yy, '#2e5a6a' if (yy // 2) % 2 else '#27505e')
+    for x in range(0, L.w, 7):
+        L.p(x + (x // 7) % 3, 62, '#6a9aa8')
+        L.p(x + 2, 68, '#6a9aa8')
+    return L
+
+def pt_nave():   # la nave de Valdehierro, por fuera
+    L = _fondo()
+    _cielo(L, 34)
+    nv = ajusta(cel('edificio-nave/base/unica/00'))
+    if nv.h > 66:
+        nv = nv.recorta(0, nv.h - 66, nv.w, 66)
+    _pon(L, nv, 72 - 4 - nv.h)
+    _suelo(L, 71)
+    return L
+
+def pt_club():   # el club de la Kale Zaharra, con su socio en la puerta
+    L = _fondo()
+    _cielo(L, 30)
+    cb = ajusta(cel('edificio-club-kalea/base/unica/00'))
+    if cb.h > 64:
+        cb = cb.recorta(0, cb.h - 64, cb.w, 64)
+    _pon(L, cb, 72 - 6 - cb.h)
+    pj = ajusta(cel('cliente1/base/south/00')) if 'cliente1/base/south/00' in atlas()['frames'] else None
+    if pj:
+        L.pega(pj, 70, 72 - 4 - pj.h)
+    _suelo(L, 71)
+    return L
+
+def pt_redada():   # la redada: la comisaría y los municipales en la puerta
+    L = _fondo()
+    _cielo(L, 26)
+    cm = ajusta(cel('edificio-comisaria/base/unica/00'))
+    if cm.h > 62:
+        cm = cm.recorta(0, cm.h - 62, cm.w, 62)
+    _pon(L, cm, 72 - 8 - cm.h)
+    po = ajusta(cel('cop/base/south/00'))
+    for dx in (-26, 24):
+        L.pega(po, (L.w - po.w) // 2 + dx, 72 - 5 - po.h)
+    _suelo(L, 71)
+    return L
+
+def pt_feria():   # la feria de semillas: el mercado de la Ribera
+    L = _fondo()
+    _cielo(L, 20)
+    mr = cel('edificio-mercadoR/base/unica/00')
+    b = mr.im.getbbox()
+    mr = mr.recorta(b[0] + ((b[2] - b[0]) - 104) // 2, b[1], 104, min(64, b[3] - b[1]))
+    L.pega(mr, 0, 72 - 8 - mr.h)
+    cl = ajusta(cel('cliente3/base/south/00')) if 'cliente3/base/south/00' in atlas()['frames'] else None
+    if cl:
+        for dx in (-34, 30):
+            L.pega(cl, (L.w - cl.w) // 2 + dx, 72 - 5 - cl.h)
+    _suelo(L, 71)
     return L
 
 PT = {'planta': pt_planta, 'carpa': pt_carpa, 'copa': pt_copa, 'barco': pt_barco,
@@ -601,37 +686,35 @@ def arte():
     for k, f in VG.items():
         sale('vg-' + k, f())
     for k, f in PT.items():
-        sale('pt-' + k, f())
+        sale('pt-' + k, impreso(f()))
     for k, f in PS.items():
-        sale('ps-' + k, f())
+        sale('ps-' + k, impreso(f()))
     return SAL
 
 # ---------- las tres láminas del póster central (104 × 56) ----------
 # La variedad del mes a toda plana, con su porte: la índica compacta y ancha, la sativa espigada y el híbrido en medio (ataque de
 # la revisión: el póster repetía la lámina de la portada). La elige rev_pst_pl() por el % índica de la variedad.
-def _ps(alto, ancho, mac):
-    L = Lienzo(104, 56)
-    for dx in range(-4, 5):      # los rayos del foco, en abanico y en tono claro
-        linea(L, 52, 1, 52 + dx * 13, 46, '#f2e2a8')
-    L.r(36, 0, 32, 4, K0)        # el foco, arriba del todo
-    L.r(42, 4, 20, 2, K1)
-    _suelo(L, 50)
-    L.r(52 - mac, 42, mac * 2, 8, K1)    # la maceta, a la medida de la mata
-    L.r(52 - mac - 2, 40, mac * 2 + 4, 3, K0)
-    for x in range(52 - mac + 2, 52 + mac - 1, 4):
-        L.vl(x, 43, 49, K2)
-    _planta(L, 52, 40, alto, ancho)
+def _ps(porte, ancho=38, hmax=60):
+    """la lámina del póster: la planta de la vista de carpa con ese porte, en su maceta y con la pared de la carpa"""
+    L = _fondo(104, 80)
+    pa = cel('carpa-c-fondo/carpa-c-pared/unica/00')
+    L.pega(pa.recorta((pa.w - 104) // 2, pa.h - 80, 104, 80), 0, 0)
+    mc = ajusta(cel('carpa-c-macetas-b/maceta-c-tela25-27/unica/00'))
+    pl = planta_cabe(porte, ancho, hmax)
+    _pon(L, mc, 79 - mc.h)
+    ph = min(pl.h, 60)
+    _pon(L, pl.recorta(0, max(0, pl.h - ph), pl.w, ph), 79 - mc.h - ph + 8)
     L.contorno(K2)
     return L
 
 def ps_ind():    # índica: baja, ancha y de cola gorda
-    return _ps(23, 24, 20)
+    return _ps('i', 38, 44)
 
-def ps_sat():    # sativa: alta, estrecha y espigada
-    return _ps(34, 13, 13)
+def ps_sat():    # sativa: alta y espigada
+    return _ps('s', 32, 60)
 
 def ps_hib():    # el híbrido, en medio
-    return _ps(28, 18, 16)
+    return _ps('h', 38, 52)
 
 PS = {'ind': ps_ind, 'sat': ps_sat, 'hib': ps_hib}
 

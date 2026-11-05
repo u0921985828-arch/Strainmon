@@ -2,6 +2,62 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### EL ESQUEJE, el maquetado a punto (lo dijo el usuario: «el maquetado de la revista debe de ser perfecto o casi, interlineado, entre párrafos, límites, margen y demás»; solo Godot, con `Datos.CAL`)
+
+- **La rejilla de márgenes.** Cada hoja tiene su caja de composición: lomo 7 u, corte 9 u, cabeza 8 u y pie 12 u
+  (`REV_M_INT`, `REV_M_EXT`, `REV_M_CAB`, `REV_M_PIE`, `rev_cols(der)`), y de ahí salen el texto, los filetes, las grapas y el
+  arte. El margen de dentro es más estrecho que el de fuera, como en un pliego de verdad; en la portada, los dos iguales.
+- **El interlineado, en la rejilla del lienzo.** El avance de línea es 1,30 cuerpos redondeado a un entero de píxeles del
+  lienzo (`REV_LINEA`, `_rev_av`), así que todas las líneas de la plana caen en la misma rejilla y ninguna queda a medio píxel.
+- **El aire entre párrafos, media línea.** El texto de la plana se parte en un `Label` por párrafo (`_rev_pon`,
+  `lector_par`) y entre ellos va media línea (`REV_PARR`), no una entera en blanco: con una entera la plana se desarmaba.
+- **En bandera, no justificado.** La columna de una plana es de unos treinta caracteres: justificada abría calles de
+  espacios, y un bloque con saltos propios se estiraba hasta el canto en cada salto.
+- **Los espacios que no se parten** (`_rev_nbsp`, en la presentación, no en los datos): entre la cifra y su unidad
+  (10 %, 720 W, 25 L), antes del punto medio y detrás de las palabras de una o dos sílabas (de, el, la, con, por…), que ya no
+  se quedan colgando al final de la línea.
+- **El cuerpo, el mayor que cabe de verdad.** El ajuste se medía sobre `lector.size`, que crece con su contenido y no es el
+  hueco de la plana: con el texto largo medía de más y la plana salía con la letra mínima y el pie con ▲▼ aunque sobrara
+  media hoja. Ahora el hueco sale de la zona de la plana (`z.size.y * u`), la medida se repite los primeros fotogramas
+  (`REV_FIT_N`, hasta que el reparto da su ancho a los párrafos) y `_coloca` corre mientras la revista está abierta.
+  Las veinte planas del número pasan de 4,67 u a 5,7–7 u y ninguna hay que deslizarla.
+- **Nada encima de la plana.** Con la revista abierta se esconde también el aviso (el del itinerario se quedaba encima del
+  póster), no solo el HUD.
+- **La variedad del mes, en dos bloques:** la ficha (nombre, mezcla y origen) y, con el aire de un párrafo, el comentario.
+- Prueba `tests/revista_vista.gd`: 392 comprobaciones (218 antes), con `_maqueta()` — la caja en la hoja, cabeza y pie, el
+  texto dentro de la caja, los dos márgenes, que cabe sin deslizar, el interlineado entero, el aire entre párrafos, el pie sin
+  ▲▼, que el aviso no se pone encima y que con medio cuerpo más el texto ya no cabría.
+
+### EL ESQUEJE, con el arte del juego
+
+- Lo pidió el usuario: «lo lógico sería utilizar los sprites que ya tenemos disponibles en el repositorio del juego para hacer
+  la revista». Las once ilustraciones de la revista (ocho de portada y de sección, `pt-*`, y las tres láminas del póster, `ps-*`)
+  ya no se dibujan a mano: se montan con los sprites que el juego tiene en `godot/arte/atlas.png` + `atlas.json`, recortados y
+  puestos sobre el papel, sin escalar (`atlas()`, `cel()`, `ajusta()` en `tools/sprites/a-mano/revista.py`).
+- Y, como dijo el usuario («en el cultivo en las carpas, las plantas no son así»), las plantas son las de la **vista C de las
+  carpas** (celda `carpa-c-plantas-a`: `planta-c-<porte>-<ancho>`, con el `2` para el vegetativo), no las de arriba de las mesas
+  de la nave: `planta_c()` recorta su fotograma de alto y `tinte_cog()` pasa la rampa clave magenta de los cogollos al color de
+  la variedad, como hace el motor; `planta_cabe()` elige el fotograma más alto que entra en el hueco.
+- El reparto: la portada y la variedad del mes, la carpa por dentro (pared plateada, LED de 720 W, tres macetas de tela de 25 L y
+  sus plantas); el taller, el equipo de la carpa (filtro de carbón, extractor, ventilador de pinza, depósito del goteo, garrafa)
+  con una madre en vegetativo; la Copa, el cogollo premiado sobre el podio con dos del jurado; el mar, la caseta del pesquero
+  sobre la ría; y la nave, el club, la comisaría y el mercado de la Ribera, con su gente. El póster, la planta a toda plana con
+  su porte (índica baja y ancha, híbrida en medio, sativa espigada), de 104 × 80.
+- `impreso()` pasa el negro de los sprites a la tinta de la revista (`#2b2a26`): en el papel no hay negro puro, y la prueba que
+  busca huecos sin pintar sigue valiendo.
+- La portada enseña los 62 px de abajo de la ilustración (`REV_POR_H`), que es donde están las plantas y el suelo, y el filete y
+  el texto suben con ella: el titular y el reclamo más largos caben sin deslizar.
+- Pruebas: `revista_vista` 218/0, `revista` 153/0, `paleta` 50/0, `fuentes` 39/0.
+
+### EL ESQUEJE, con forma de A4: la hoja de pie, la doble página y el texto al hueco (lo dijo el usuario: «la revista no tiene forma de A4 ni de magazine… no me parece todavía una revista en condiciones»; solo Godot, con `Datos.CAL`)
+
+- **La hoja, un A4 de pie.** La plana deja de ser un cuadro ancho: cada hoja mide 118 × 168 u (`REV_PW`, `REV_PH`), la proporción de un A4 puesto de pie, y `rev_pw()` la encoge solo lo justo si el lienzo no da para dos hojas (nunca por debajo de 84 u). `REV_Y` la baja 6 u del canto de arriba.
+- **La portada, una hoja sola; el resto, la doble página abierta.** `rev_portada()` y `rev_caja()`: en la portada se ve una hoja centrada, como quien tiene la revista cerrada en la mano; a partir de la primera sección, las dos hojas con el **lomo** de 4 u entre ellas (`REV_LOMO`), sus dos grapas y el doblez. `rev_hoja(der)` dice cuál es cada una.
+- **El arte a la izquierda, el texto a la derecha.** En la doble página, la hoja de la izquierda lleva la ilustración de la sección recortada a `REV_FOTO_H` con su marco y, debajo, el despiece con la viñeta de la sección **al doble** (`rev_x2`, que cachea la ampliación en `REV_ART`); la de la derecha, el texto entre filetes. El anuncio a toda página pone el megáfono en la izquierda y el recuadro del anuncio en la derecha; el póster central, la lámina a toda hoja.
+- **El texto se ajusta al hueco, no al revés.** Una plana de revista se lee de un vistazo, así que el cuerpo de la letra baja de 7 u hasta 4,5 u hasta que el texto cabe en el hueco de su plana (`REV_CUERPO`, `REV_CUERPO_MIN`, `_rev_cuerpo` en `ui.gd`), con el interlineado bajando con él y **sin barra de deslizar** cuando cabe (la barra le robaba ancho al texto y le sumaba líneas). Se mide una vez por plana, hueco, tamaño de texto y escala, no en cada fotograma.
+- Arreglado por el camino: `rev_hay` estaba dos veces (la de la maqueta pasa a `rev_existe`), el recuadro del despiece se salía de la hoja, el recuadro del anuncio se quedaba corto para el anuncio más largo con el texto grande (de 34..146 a 24..152) y la prueba medía la caja una sola vez y el alto del lector por el widget (en modo sin ventana la escala es minúscula y nunca baja de su alto mínimo: ahora, por dónde arranca y por su ancho).
+- Prueba `tests/revista_vista.gd`, 218 comprobaciones, 0 fallos: la caja de cada plana dentro del lienzo, el hueco del texto dentro de la hoja de la derecha, el papel sin negros, que ninguna plana se desliza (ni la portada con el titular y el reclamo más largos, ni el anuncio y el póster más largos con el texto grande) y que el cuerpo va en píxeles del lienzo y no encoge cuando la interfaz es más pequeña que él. **Hay que lanzarla con ventana** (`xvfb-run` + `opengl3`, como la batería): con `--headless` el driver pasa a dummy y `RenderingServer.frame_post_draw` no se emite nunca.
+
 ### EL ESQUEJE, parodia del género: la entrevista, el consultorio, el banco de pruebas, el póster central, los anuncios, el horóscopo y la fe de errores (lo pidió el usuario: «Quiero que la revista de El Esqueje sea como una parodia a SoftSecrets»; solo Godot, con `Datos.CAL`)
 
 - **Se parodia el género, no una revista en concreto.** EL ESQUEJE pasa a leerse como una revista de cultivo de quiosco de las de siempre: ocho secciones nuevas con sus tics (la entrevista al veterano que ya cultivaba antes, el consultorio que acaba vendiendo lo de la página de al lado, el banco de pruebas donde nada baja del nueve, el póster central de regalo, las páginas de anuncios, el horóscopo del cultivador y la fe de errores del número pasado). Nombre, lema, textos y arte, **100 % propios**: ni el nombre, ni el logotipo, ni los lemas, ni la identidad visual de ninguna publicación real, aquí ni en el código, que lo deja dicho en un comentario.

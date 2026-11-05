@@ -104,6 +104,9 @@ var lector_i := 0
 # EL ESQUEJE a la vista (0.82, lo pidió el usuario: «que los números se vean como revista, con portada y páginas dibujadas»): con
 # la revista abierta, el lector va sin caja y en tinta sobre la plana que dibuja pinta.gd. Lo pone revista.gd al llamar a leer()
 var lector_rev := {}
+var lector_h := Callable()   # el manejador de teclas del lector, para reponerlo si otro flujo hace pop() del de arriba
+var lector_par := VBoxContainer.new()   # la columna de texto: un Label por párrafo
+var lector_ps: Array[Label] = []   # los párrafos de la plana de revista
 const REV_TINTA := Color("#2b2a26")   # i18n-no (la tinta de la revista; revista.py)
 const REV_VERDE := Color("#27551a")   # i18n-no
 var endcard := ColorRect.new()
@@ -299,7 +302,12 @@ func _ready() -> void:
 	lc.add_child(lector_sc)
 	lector_sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	lector_sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	lector_sc.add_child(lector_txt)
+	# 0.82: el texto va en una columna de párrafos. Fuera de la revista la columna lleva un solo Label (lector_txt) y se comporta
+	# como antes; en la revista, uno por párrafo, para que el aire entre párrafos sea media línea y no una línea entera en blanco
+	lector_sc.add_child(lector_par)
+	lector_par.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lector_par.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	lector_par.add_child(lector_txt)
 	lector_txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lector_txt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lector.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -1126,6 +1134,10 @@ func pop(fn := Callable()) -> void:
 
 func press(b: String) -> void:
 	audio_init()
+	# si un flujo de fuera hizo pop() mientras el lector estaba abierto, se llevó por delante su manejador y ni B lo cerraría: se
+	# repone antes de repartir la tecla (con la revista abierta, que se dibuja encima de todo, el juego se quedaría sin salida)
+	if lector.visible and lector_h.is_valid() and not handlers.has(lector_h):
+		handlers.append(lector_h)
 	if handlers.size():
 		handlers[-1].call(b)
 		return
@@ -1236,8 +1248,14 @@ func _lector_estilo() -> void:
 	pon_letra(lector_ttl, negrita, (7 if rev else 9) * uu, REV_VERDE if rev else LINEA, 0, false)
 	pon_letra(lector_pie, letra, (6 if rev else 7) * uu, REV_TINTA if rev else GRIS, 0, false)
 	_rev_fit = []   # la letra base: en modo revista _rev_cuerpo la vuelve a ajustar al hueco de la plana (al pie de esta funcion)
-	var fl := fs_txt((7 if rev else 9) * uu)
-	pon_letra(lector_txt, letra, fl, REV_TINTA if rev else INK, ((10.0 if rev else 11.0) if Datos.CAL else 12.5) * uu * fl / ((7 if rev else 9) * uu), false)   # 0.52: interlineado de 11 (4-9 u de hueco)
+	var fl := fs_txt((REV_CUERPO if rev else 9.0) * uu)
+	lector_txt.visible = not rev
+	lector_par.alignment = BoxContainer.ALIGNMENT_BEGIN
+	if rev:
+		_rev_letra(fl)
+	else:
+		lector_par.add_theme_constant_override("separation", 0)
+		pon_letra(lector_txt, letra, fl, INK, (11.0 if Datos.CAL else 12.5) * uu * fl / (9 * uu), false)   # 0.52: interlineado de 11 (4-9 u de hueco)
 	if rev and lector.visible:   # con la plana ya en pantalla, el cuerpo se vuelve a ajustar a su hueco
 		_coloca()
 
@@ -1245,26 +1263,108 @@ func _lector_estilo() -> void:
 # REV_CUERPO_MIN). Una plana de revista se lee de un vistazo, no deslizando, asi que es el texto el que se ajusta al hueco
 const REV_CUERPO := 7.0
 const REV_CUERPO_MIN := 4.5
+const REV_LINEA := 1.30     # el interlineado de la revista, en cuerpos (se redondea a un entero de píxeles del lienzo)
+const REV_PARR := 0.5       # el aire entre párrafos, en líneas (media línea; una entera en blanco deja la plana desarmada)
+
+# el avance de línea de la revista: entero en píxeles del lienzo, para que todas las líneas caigan en la misma rejilla
+func _rev_av(fl: float) -> float:
+	return maxf(1.0, roundf(fl * REV_LINEA / u)) * u
+
+# la letra de los párrafos de una plana: el mismo cuerpo y el mismo avance en todos, justificados a los dos lados (la última línea
+# de cada párrafo, no), y el aire entre párrafos en el contenedor
+func _rev_letra(fl: float) -> void:
+	var av := _rev_av(fl)
+	pon_letra(lector_txt, letra, fl, REV_TINTA, av, false)
+	for l in lector_ps:
+		pon_letra(l, letra, fl, REV_TINTA, av, false)
+		# en bandera, no justificado: la columna de la plana es de unos treinta caracteres y justificarla abre calles de espacios
+		# entre las palabras (y un bloque con saltos propios se estiraría hasta el canto en cada salto)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	lector_par.add_theme_constant_override("separation", maxi(1, roundi(av * REV_PARR)))
+
+# lo que mide la columna de párrafos a ese ancho. Se suma a mano: dentro del contenedor, un Label con autowrap no sabe su alto
+# hasta que el reparto le da el ancho, y aquí hace falta la medida ya, para ajustar el cuerpo
+func _rev_alto(w: float) -> float:
+	var alto := 0.0
+	var n := 0
+	for l in lector_ps:
+		if not l.visible:
+			continue
+		l.size = Vector2(w, 0)
+		alto += l.get_combined_minimum_size().y
+		n += 1
+	return alto + maxf(0.0, n - 1.0) * lector_par.get_theme_constant("separation")
+
+# los espacios que no se parten: entre la cifra y su unidad (10 %, 720 W, 25 L), antes del punto medio y detrás de las palabras de
+# una o dos sílabas que no deben quedar colgando al final de una línea (de, el, la, con, por…). Es lo primero que se ve mal en una
+# columna estrecha: el símbolo o el artículo empezando la línea de abajo
+static var _RE_UD: RegEx
+static var _RE_PR: RegEx
+static func _rev_nbsp(t: String) -> String:
+	if _RE_UD == null:
+		_RE_UD = RegEx.new()
+		_RE_UD.compile("(\\d)\\s(%|€|W|kg|g|L|ml|cm|mm|m|h|d)(?![\\wáéíóúñÁÉÍÓÚÑ])")   # i18n-no
+	t = _RE_UD.sub(t, "$1\u00A0$2", true).replace(" ·", "\u00A0·")
+	if _RE_PR == null:
+		_RE_PR = RegEx.new()
+		_RE_PR.compile("(?i)(^|\\s|«)(de|del|en|el|la|lo|los|las|un|una|al|su|sus|y|o|a|con|por|que)\\s")   # i18n-no
+	return _RE_PR.sub(t, "$1$2\u00A0", true)
+
+# el texto de una plana, repartido en párrafos (los bloques separados por una línea en blanco)
+func _rev_pon(t: String) -> void:
+	var ps := []
+	for b in t.split("\n\n", false):
+		var x := b.strip_edges()
+		if x != "":
+			ps.append(x)
+	while lector_ps.size() < ps.size():
+		var l := Label.new()
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		lector_par.add_child(l)
+		lector_ps.append(l)
+	for i in lector_ps.size():
+		lector_ps[i].visible = i < ps.size()
+		if i < ps.size():
+			lector_ps[i].text = _rev_nbsp(String(ps[i]))
 var _rev_fit := []   # [plana, hueco, tamano de texto, u] de lo ultimo medido, para no volver a medirlo en cada fotograma
+var rev_hueco := 0.0   # el hueco de la plana de la ultima medida (lo lee la prueba del maquetado)
+var _rev_fn := 0     # fotogramas medidos con ese sello: los primeros no valen (el reparto aun no ha dado su ancho a los parrafos)
+const REV_FIT_N := 12
 func _rev_cuerpo(z: Rect2i) -> void:
 	var sello := [lector_i, z, int(aj.get("tam", 1)), roundi(u * 100), lector_txt.text.length()]
-	if sello == _rev_fit:
+	if sello != _rev_fit:
+		_rev_fit = sello
+		_rev_fn = 0
+	elif _rev_fn >= REV_FIT_N:
 		return
-	_rev_fit = sello
+	_rev_fn += 1
 	var lc: VBoxContainer = lector.get_child(0)
 	var sep: float = lc.get_theme_constant("separation")
 	var resto: float = (lc.get_child(0) as Control).get_combined_minimum_size().y + lector_pie.get_combined_minimum_size().y + 2.0 * sep
-	var hueco: float = lector.size.y - resto
+	# el hueco sale de la zona de la plana, no de lector.size: el contenedor crece con su contenido y, con un texto largo, mide
+	# mas que la plana (midiendo sobre el, el cuerpo salia mal y la plana se quedaba con la letra minima y el pie con ▲▼)
+	var hueco: float = z.size.y * u - resto
+	rev_hueco = hueco
 	var cuerpo := REV_CUERPO
 	while true:
 		var fl := fs_txt(cuerpo * u)
-		# el interlineado baja con el cuerpo (el denominador se queda en REV_CUERPO): si no, bajar el cuerpo no bajaria el alto
-		pon_letra(lector_txt, letra, fl, REV_TINTA, (10.0 if Datos.CAL else 12.5) * fl / REV_CUERPO, false)
-		lector_txt.size = Vector2(lector.size.x, 0)
-		var cabe: bool = lector_txt.get_combined_minimum_size().y <= hueco - 2.0 * u
+		# el interlineado baja con el cuerpo, siempre entero en píxeles del lienzo (_rev_av)
+		_rev_letra(fl)
+		var cabe: bool = _rev_alto(z.size.x * u) <= hueco - u
 		if cabe or cuerpo <= REV_CUERPO_MIN:
 			# si cabe, sin barra de deslizar: la barra le quitaria ancho al texto y le sumaria lineas (y la plana no se desliza)
 			lector_sc.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if cabe else ScrollContainer.SCROLL_MODE_AUTO
+			# el anuncio y el póster llevan poco texto en una plana entera: su bloque, centrado en el hueco
+			var vgs: Array = lector_rev.get("vg", [])
+			var vk: String = String(vgs[lector_i]) if lector_i >= 0 and lector_i < vgs.size() else ""
+			var centra: bool = cabe and vk in ["anu", "pst"]
+			lector_par.alignment = BoxContainer.ALIGNMENT_CENTER if centra else BoxContainer.ALIGNMENT_BEGIN
+			# para centrarlo, la columna tiene que ocupar el hueco entero (si no, el contenedor se queda a su alto mínimo)
+			lector_par.custom_minimum_size.y = maxf(0.0, hueco - u) if centra else 0.0
+			# el pie de la plana solo anuncia ▲▼ si de verdad hay que deslizar
+			if lector_pags.size() > 1:
+				lector_pie.text = I18n.v("◀▶ PÁGINA · B CERRAR") if cabe else I18n.v("◀▶ PÁGINA · ▲▼ · B CERRAR")
 			return
 		cuerpo -= .5
 
@@ -1292,6 +1392,8 @@ func leer(t: String, texto: String, rev := {}) -> void:
 			lector_ttl.text = t if lector_pags.size() == 1 else "%s · %d/%d" % [t, lector_i + 1, lector_pags.size()]
 			lector_pie.text = I18n.v("▲▼ · B VOLVER") if lector_pags.size() == 1 else I18n.v("▲▼ ◀▶ · B VOLVER")
 		lector_txt.text = lector_pags[lector_i]
+		if not lector_rev.is_empty():
+			_rev_pon(lector_txt.text)
 		lector_sc.scroll_vertical = 0
 		if lector.visible:
 			_coloca()
@@ -1301,9 +1403,12 @@ func leer(t: String, texto: String, rev := {}) -> void:
 	_coloca()
 	_coloca.call_deferred()   # 0.52: otra vez, con el texto ya a su ancho
 	if not lector_rev.is_empty() and not get_tree().process_frame.is_connected(_coloca):
-		get_tree().process_frame.connect(_coloca, CONNECT_ONE_SHOT)   # la revista esconde el HUD, así que detrás no viene ningún otro _coloca: la plana se coloca en el fotograma siguiente, con el texto ya medido
+		# la revista esconde el HUD, así que detrás no viene ningún otro _coloca: mientras está abierta se coloca en cada
+		# fotograma (el cuerpo de la letra se mide en varios, y así el aviso tampoco se queda encima de la plana)
+		get_tree().process_frame.connect(_coloca)
 	var p := Motor.Prom.new()
-	push(func(b: String):
+	var mio := [Callable()]   # el manejador se quita a sí mismo (pop() sin él se llevaría el de otro si se abriera encima)
+	lector_h = func(b: String):
 		if b == "up" or b == "down":
 			lector_sc.scroll_vertical += roundi(25 * (u if not lector_rev.is_empty() else us)) * (-1 if b == "up" else 1)
 		elif b == "left" or b == "right":
@@ -1313,17 +1418,26 @@ func leer(t: String, texto: String, rev := {}) -> void:
 				ver.call(i)
 		elif b == "A" or b == "B" or b == "START":
 			sfx("back")
-			pop()
+			pop(mio[0])
 			lector.hide()
 			lector_txt.text = ""
+			for l in lector_ps:
+				l.visible = false
+				l.text = ""
+			lector_par.custom_minimum_size.y = 0.0
 			lector_pags = []
 			lector_ttl.visible = true
 			if not lector_rev.is_empty():
 				lector_rev = {}
+				if get_tree().process_frame.is_connected(_coloca):
+					get_tree().process_frame.disconnect(_coloca)
 				_lector_estilo()
 			update_hud()
-			p.res())
+			p.res()
+	mio[0] = lector_h
+	push(lector_h)
 	await Motor.espera(p)
+	lector_h = Callable()
 
 # parte un texto en páginas por los párrafos (y por las líneas si un párrafo no cabe)
 static func paginas(texto: String, tope := 3500) -> Array[String]:
@@ -2223,6 +2337,7 @@ func _coloca() -> void:
 					tope = minf(tope, dlg.position.y - 3 * us)
 				menu_box.position = Vector2(R.end.x - 3 * us - menu_box.size.x, maxf(R.position.y + 3 * us, tope - menu_box.size.y))
 	if lector.visible and not lector_rev.is_empty():   # la revista: el texto, en el hueco que le deja la plana dibujada
+		toast_box.hide()   # con la revista abierta, nada encima de la plana (el HUD ya se esconde en update_hud)
 		var z: Rect2i = rev_zona()
 		lector.custom_minimum_size = Vector2.ZERO
 		lector_sc.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO

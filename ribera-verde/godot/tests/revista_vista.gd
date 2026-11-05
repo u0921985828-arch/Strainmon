@@ -224,6 +224,7 @@ func _parodia() -> void:
 func _render(dir: String) -> void:
 	var num := 3
 	var rv: Dictionary = J.rev_paginas(num)
+	J.handlers.clear()   # la partida de la prueba deja un flujo a medias en la pila; el suyo haría pop() del de la revista
 	J.leer("EL ESQUEJE", J.rev_texto(num), rv)
 	await espera(30)
 	check("la revista abre el lector en modo revista", J.lector.visible and not J.lector_rev.is_empty())
@@ -272,12 +273,66 @@ func _render(dir: String) -> void:
 	check("B cierra la revista y deja el lector como estaba", not J.lector.visible and J.lector_rev.is_empty())
 	await _letra()
 	await _titular()
+	await _maqueta()
 	await _peor()
+
+# el maquetado (lo pidió el usuario: «el maquetado de la revista debe de ser perfecto o casi, interlineado, entre párrafos,
+# límites, margen y demás»): la rejilla de márgenes, el texto dentro de su caja, el interlineado entero en píxeles del lienzo, el
+# aire entre párrafos (media línea, no una entera) y los espacios que no se parten
+func _maqueta() -> void:
+	var rv: Dictionary = J.rev_paginas(3)
+	J.handlers.clear()   # la partida de la prueba deja un flujo a medias en la pila; el suyo haría pop() del de la revista
+	J.leer("EL ESQUEJE", J.rev_texto(3), rv)
+	await espera(30)
+	for der in [false, true]:
+		var h: Rect2i = J.rev_hoja(der)
+		var cj: Rect2i = J.rev_cols(der)
+		check("la caja de composición cabe en la hoja (%s)" % der, h.encloses(cj))
+		check("la cabeza mide %d y el pie %d (%s)" % [J.REV_M_CAB, J.REV_M_PIE, der],
+			cj.position.y - h.position.y == J.REV_M_CAB and h.end.y - cj.end.y == J.REV_M_PIE)
+	for i in rv.pags.size():
+		while J.lector_i < i:
+			J.press("right")
+			await espera(4)
+		await espera(8)
+		var z: Rect2i = J.rev_zona()
+		var cj: Rect2i = J.rev_cols(true)
+		var hd: Rect2i = J.rev_hoja(true)
+		check("la plana %d: el texto cae dentro de la caja de composición (%s en %s)" % [i, z, cj], cj.encloses(z))
+		if i > 0:   # abierta, los márgenes de la hoja de la derecha: el del lomo más estrecho que el de corte
+			check("la plana %d: margen de lomo %d y de corte %d" % [i, J.REV_M_INT, J.REV_M_EXT],
+				cj.position.x - hd.position.x == J.REV_M_INT and hd.end.x - cj.end.x == J.REV_M_EXT)
+		check("la plana %d cabe sin deslizar" % i, J.lector_sc.get_v_scroll_bar().max_value <= J.lector_sc.size.y + 1)
+		var av: float = J._rev_av(J.lector_txt.get_theme_font_size("font_size"))
+		check("la plana %d: el interlineado, entero en píxeles del lienzo (%s de %s)" % [i, av, J.u], is_zero_approx(fmod(av, J.u)))
+		var sep: float = J.lector_par.get_theme_constant("separation")
+		check("la plana %d: el aire entre párrafos, menos de una línea (%s de %s)" % [i, sep, av], sep > 0 and sep < av)
+		for l in J.lector_ps:
+			if not l.visible:
+				continue
+			check("la plana %d: ni el símbolo ni el separador empiezan línea" % i, not l.text.contains(" %") and not l.text.contains(" ·"))
+		# el pie solo anuncia ▲▼ cuando de verdad hay que deslizar, y aquí no lo hay
+		check("la plana %d: el pie, sin ▲▼" % i, not J.lector_pie.text.contains("▲"))
+		# con la revista abierta nada se le pone encima (ni el HUD ni el aviso del itinerario)
+		check("la plana %d: el aviso no se pone encima de la plana" % i, not J.toast_box.visible)
+		# el cuerpo es el mayor que cabe: con medio cuerpo más, el texto ya no cabría en el hueco
+		var cu: float = J.lector_txt.get_theme_font_size("font_size") / J.u
+		if cu < J.REV_CUERPO - .01:
+			var hu: float = J.rev_hueco
+			J._rev_letra(J.fs_txt((cu + .5) * J.u))
+			var mas: float = J._rev_alto(z.size.x * J.u)
+			check("la plana %d: el cuerpo es el mayor que cabe (%.1f u, con %.1f sobra el hueco)" % [i, cu, cu + .5], mas > hu - J.u)
+			J._rev_fit = []
+			J._rev_cuerpo(z)
+			await espera(4)
+	J.press("B")
+	await espera(10)
 
 # la letra de la plana se mide en píxeles del lienzo (u), no en los de la interfaz (us): en un móvil us es más pequeño que u y,
 # midiéndola así, el texto encogía y la plana quedaba tres cuartos vacía
 func _letra() -> void:
 	var rv: Dictionary = J.rev_paginas(3)
+	J.handlers.clear()   # la partida de la prueba deja un flujo a medias en la pila; el suyo haría pop() del de la revista
 	J.leer("EL ESQUEJE", J.rev_texto(3), rv)
 	await espera(20)
 	# el cuerpo: 7 u si el texto cabe en el hueco de la plana y, si no, el mayor que quepa (nunca por debajo de REV_CUERPO_MIN)
@@ -315,6 +370,7 @@ func _titular() -> void:
 			fal = x
 	var cab := String(rv.pags[0]).split("\n")[0]
 	rv.pags[0] = "%s\n%s\n%s" % [cab, largo, fal]
+	J.handlers.clear()   # la partida de la prueba deja un flujo a medias en la pila; el suyo haría pop() del de la revista
 	J.leer("EL ESQUEJE", J.rev_texto(3), rv)
 	await espera(30)
 	var sb: ScrollBar = J.lector_sc.get_v_scroll_bar()
@@ -375,6 +431,7 @@ func _peor() -> void:
 		var i: int = rv.vg.find(k)
 		if i >= 0:
 			rv.pags[i] = String(peor[k])
+	J.handlers.clear()   # la partida de la prueba deja un flujo a medias en la pila; el suyo haría pop() del de la revista
 	J.leer("EL ESQUEJE", J.rev_texto(3), rv)
 	await espera(20)
 	for k in ["anu", "pst"]:

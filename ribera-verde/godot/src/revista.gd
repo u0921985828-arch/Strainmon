@@ -322,7 +322,7 @@ func rev_secciones(n: int) -> Array:
 	var o := []
 	# portada
 	o.append({"k": "port", "tit": "", "cab": "%s · %s" % [I18n.v(String(R.cab.sub)).to_upper(), rev_mes(n).to_upper()],
-		"txt": "%s\n%s" % [rev_titular(n), rev_faldon(n)]})
+		"txt": "%s\n\n%s" % [rev_titular(n), rev_faldon(n)]})
 	# las noticias de la comarca
 	o.append({"k": "nw", "tit": I18n.v(String(SE.nw)), "txt": rev_noticias(n)})
 	# la entrevista del mes
@@ -338,7 +338,8 @@ func rev_secciones(n: int) -> Array:
 		li.append(T("Dónde conseguirla: {p}.", {"p": p}) if p != "" else K("De esta no dicen de dónde sale. Alguien de la comarca la tendrá."))
 	else:
 		li.append(K("Esta ya la tienes en la GENOTECA."))
-	o.append({"k": "vari", "tit": I18n.v(String(SE.vari)), "txt": "\n".join(li)})
+	# la ficha (nombre, mezcla y origen) y, con el aire de un párrafo, el comentario: la plana se lee en dos bloques
+	o.append({"k": "vari", "tit": I18n.v(String(SE.vari)), "txt": "%s\n%s\n\n%s" % [li[0], li[1], li[2]]})
 	# el taller: la técnica
 	var tc := rev_tec(n)
 	o.append({"k": "tec", "tit": "%s · %s" % [I18n.v(String(SE.tec)), I18n.v(String(tc.n))], "txt": I18n.v(String(tc.t))})
@@ -546,10 +547,13 @@ func rev_ficha() -> String:
 # arte y el titular en la hoja de la izquierda y el texto en la de la derecha, como cualquier revista (lo dijo el usuario: «la
 # revista no tiene forma de A4 ni de magazine… no me parece todavía una revista en condiciones»)
 const REV_PW := 118         # la hoja, en píxeles del lienzo
-const REV_PH := 168
+const REV_PH := 167         # 167 / 118 = 1,4153: el A4 (1 : √2) al píxel más cercano
+const REV_A4 := 1.41421
 const REV_Y := 6
 const REV_LOMO := 4         # el lomo entre las dos hojas
-const REV_FOTO_H := 52      # lo que se ve de la ilustración en la hoja de la izquierda
+const REV_POR_Y := 43      # la ilustración de la portada: debajo de la mancheta y su filete
+const REV_POR_H := 42      # su alto: deja sitio al titular y al reclamo debajo
+const REV_FOTO_H := 72      # la ilustración de la hoja izquierda, entera (las pt-* miden 104 × 72: recortada se comía un tercio del dibujo)
 # la foto grande de la hoja izquierda, por sección (de las ocho ilustraciones del atlas)
 const REV_FOTO := {"nw": "redada", "ent": "club", "var": "planta", "tec": "carpa", "con": "planta", "tst": "nave",
 	"merc": "feria", "copa": "copa", "ag": "carpa", "cls": "feria", "car": "club", "hor": "planta", "err": "redada",
@@ -580,13 +584,17 @@ static func rev_art() -> bool:
 func rev_pw() -> int:
 	return clampi((SW - 6 - REV_LOMO) >> 1, 84, REV_PW)
 
+# el alto de la hoja: A4 sobre el ancho que haya (con el lienzo justo, rev_pw() encoge la hoja y el alto encoge con ella)
+func rev_ph() -> int:
+	return mini(REV_PH, roundi(rev_pw() * REV_A4))
+
 func rev_portada() -> bool:
 	return lector_rev.is_empty() or lector_i == 0
 
 func rev_caja() -> Rect2i:   # la revista: la portada sola o la doble página, centrada en el lienzo
 	var pw := rev_pw()
 	var w: int = pw if rev_portada() else pw * 2 + REV_LOMO
-	return Rect2i((SW - w) >> 1, REV_Y, w, REV_PH)
+	return Rect2i((SW - w) >> 1, REV_Y, w, rev_ph())
 
 func rev_hoja(der: bool) -> Rect2i:   # una de las dos hojas (con la portada, la hoja es la revista entera)
 	var c := rev_caja()
@@ -639,7 +647,7 @@ func rev_paginas(n: int) -> Dictionary:
 		var q: Dictionary = secs[i]
 		var txt := String(q.txt)
 		if String(q.k) == "port":
-			pags.append("%s\n%s" % [String(q.cab), txt])   # la cabecera y el titular, seguidos: la portada tiene el hueco justo
+			pags.append("%s\n\n%s" % [String(q.cab), txt])   # la cabecera, el titular y el reclamo: tres párrafos con su aire
 			tit.append("")
 			vg.append("")
 			continue
@@ -657,15 +665,38 @@ func rev_vg_i() -> String:
 	var vgs: Array = lector_rev.get("vg", [])
 	return String(vgs[lector_i]) if lector_i >= 0 and lector_i < vgs.size() else ""
 
-# el hueco que le queda al texto: en la portada, debajo de la mancheta y la foto; abierta, la hoja de la derecha entera (el arte
-# y la foto se quedan en la de la izquierda). En píxeles del lienzo; ui.gd coloca ahí el lector
+# la rejilla de la revista: los márgenes de la caja de composición. Los de una revista de verdad: el del lomo más estrecho que el
+# de corte, la cabeza más corta que el pie. Todo lo que se compone (filetes, foto, despiece, texto) cae dentro de esta caja
+const REV_M_EXT := 9    # el margen de corte (el lado de fuera de la hoja)
+const REV_M_INT := 7    # el margen del lomo
+const REV_M_CAB := 8    # la cabeza
+const REV_M_PIE := 12   # el pie (los puntos de las planas van debajo, ya fuera de la hoja)
+
+# la caja de composición de una hoja, dentro de sus márgenes
+func rev_cols(der: bool) -> Rect2i:
+	var h := rev_hoja(der)
+	var por := rev_portada()
+	var mi: int = REV_M_EXT if (por or der == false) else REV_M_INT
+	var md: int = REV_M_EXT if (por or der) else REV_M_INT
+	return Rect2i(h.position.x + mi, h.position.y + REV_M_CAB, h.size.x - mi - md, h.size.y - REV_M_CAB - REV_M_PIE)
+
+# una imagen al ancho de la caja de composición: si es más ancha, recortada por igual a los dos lados (las ilustraciones miden 104
+# y la caja 97-99: así respetan los márgenes en vez de salirse por los dos cantos)
+static func rev_anc(im: Image, w: int) -> Image:
+	if im.get_width() <= w:
+		return im
+	return im.get_region(Rect2i((im.get_width() - w) >> 1, 0, w, im.get_height()))
+
+# el hueco que le queda al texto: en la portada, debajo del filete de la ilustración; abierta, la caja de la hoja de la derecha (el
+# arte se queda en la de la izquierda). En píxeles del lienzo; ui.gd coloca ahí el lector
 func rev_zona() -> Rect2i:
-	var h := rev_hoja(true)
-	if rev_portada():
-		return Rect2i(h.position.x + 8, h.position.y + 102, h.size.x - 16, h.size.y - 112)
+	var cj := rev_cols(true)
+	if rev_portada():   # debajo del filete de abajo de la ilustración, hasta el pie
+		var y: int = rev_hoja(true).position.y + REV_POR_Y + REV_POR_H + 10
+		return Rect2i(cj.position.x, y, cj.size.x, cj.end.y - y)
 	if rev_vg_i() == "anu":   # el anuncio ocupa la hoja: el texto, dentro de su recuadro
-		return Rect2i(h.position.x + 13, h.position.y + 34, h.size.x - 26, h.size.y - 56)
-	return Rect2i(h.position.x + 8, h.position.y + 9, h.size.x - 16, h.size.y - 24)
+		return Rect2i(cj.position.x + 5, cj.position.y + 8, cj.size.x - 10, cj.size.y - 20)
+	return Rect2i(cj.position.x, cj.position.y + 6, cj.size.x, cj.size.y - 12)   # entre el filete de la cabecera y el del pie
 
 # el papel de una hoja, tileado y con sus cantos
 func _rev_papel(h: Rect2i) -> Array:
@@ -685,9 +716,14 @@ func _rev_papel(h: Rect2i) -> Array:
 	o.append([h.end.x, h.position.y, 1, h.size.y, "#8a8372"])
 	return o
 
+# el marco de una ilustración, en la caja de composición
+func _rev_marco(x: int, y: int, w: int, h: int) -> Array:
+	return [[x - 1, y - 1, w + 2, 1, "#2b2a26"], [x - 1, y + h, w + 2, 1, "#2b2a26"],
+		[x - 1, y, 1, h, "#2b2a26"], [x + w, y, 1, h, "#2b2a26"]]
+
 # la revista dibujada: la sombra sobre la mesa, las hojas con su papel, el lomo con las grapas, y encima lo de cada plana (la
-# portada con su mancheta y su ilustración; abierta, el arte en la hoja izquierda y los filetes del texto en la derecha). Lo pinta
-# _encima() de pinta.gd
+# portada con su mancheta y su ilustración; abierta, el arte en la hoja izquierda y los filetes del texto en la derecha). Todo
+# cuadrado con la caja de composición de rev_cols(). Lo pinta _encima() de pinta.gd
 func rects_revista() -> Array:
 	var o := []
 	if lector_rev.is_empty() or not rev_art():
@@ -695,9 +731,11 @@ func rects_revista() -> Array:
 	var c := rev_caja()
 	var por := rev_portada()
 	var vk := rev_vg_i()
-	o.append([c.position.x + 3, c.position.y + 4, c.size.x, c.size.y, "#1c1a1655"])   # la sombra de la revista en la mesa
+	o.append([c.position.x + 3, c.position.y + 4, c.size.x, c.size.y, "rgba(28,26,22,0.33)"])   # la sombra de la revista en la mesa (en rgba: Pintor.col solo lee 6 dígitos y el alfa se perdía)
 	var hi := rev_hoja(false)
 	var hd := rev_hoja(true)
+	var ci := rev_cols(false)
+	var cd := rev_cols(true)
 	o.append_array(_rev_papel(hi))
 	if not por:
 		o.append_array(_rev_papel(hd))
@@ -707,77 +745,71 @@ func rects_revista() -> Array:
 		o.append([lx + REV_LOMO - 1, c.position.y, 1, c.size.y, "#8a8372"])
 		var gr: Image = REV_ART["grapa"]
 		var gclip := Rect2i(c.position.x, c.position.y, c.size.x, c.size.y)
-		for g in [c.position.y + 38, c.end.y - 50]:   # las dos grapas del lomo
+		for g in [ci.position.y + 10, ci.end.y - 10 - gr.get_height()]:   # las dos grapas del lomo, a la altura de la caja
 			o.append(["@", gr, lx + ((REV_LOMO - gr.get_width()) >> 1), g, gclip])
 	if por:   # la portada: mancheta, filete, la ilustración del mes y la cinta del reclamo
 		var clip := Rect2i(hi.position.x, hi.position.y, hi.size.x, hi.size.y)
 		var mc: Image = REV_ART[rev_mancheta()]
 		o.append(["@", mc, hi.position.x + ((hi.size.x - mc.get_width()) >> 1), hi.position.y + 4, clip])
-		o.append_array(_rev_filete("filete", hi.position.x + 8, hi.position.y + 42, hi.size.x - 16, clip))
-		var il: Image = REV_ART.get("pt-" + String(lector_rev.get("ilu", "planta")), REV_ART["pt-planta"])
-		var ix: int = hi.position.x + ((hi.size.x - il.get_width()) >> 1)
-		var iy: int = hi.position.y + 48
-		o.append(["@", il, ix, iy, Rect2i(ix, iy, il.get_width(), 48).intersection(clip)])
-		o.append([ix - 1, iy - 1, il.get_width() + 2, 1, "#2b2a26"])   # el marco de la foto
-		o.append([ix - 1, iy + 48, il.get_width() + 2, 1, "#2b2a26"])
-		o.append([ix - 1, iy, 1, 48, "#2b2a26"])
-		o.append([ix + il.get_width(), iy, 1, 48, "#2b2a26"])
-		o.append_array(_rev_filete("filete", hi.position.x + 8, hi.position.y + 98, hi.size.x - 16, clip))
-		o.append(["@", REV_ART["cinta"], hi.end.x - 28, iy + 2, clip])   # la cinta del reclamo, en la esquina de la foto
+		o.append_array(_rev_filete("filete", cd.position.x, hi.position.y + REV_POR_Y - 5, cd.size.x, clip))
+		var il: Image = rev_anc(REV_ART.get("pt-" + String(lector_rev.get("ilu", "planta")), REV_ART["pt-planta"]), cd.size.x)
+		var ih: int = mini(il.get_height(), REV_POR_H)
+		var ix: int = cd.position.x + ((cd.size.x - il.get_width()) >> 1)
+		var iy: int = hi.position.y + REV_POR_Y
+		# la portada enseña la mitad de abajo de la ilustración (las plantas y el suelo), recortando por arriba
+		o.append(["@", il, ix, iy - (il.get_height() - ih), Rect2i(ix, iy, il.get_width(), ih).intersection(clip)])
+		o.append_array(_rev_marco(ix, iy, il.get_width(), ih))
+		o.append_array(_rev_filete("filete", cd.position.x, iy + ih + 4, cd.size.x, clip))
+		o.append(["@", REV_ART["cinta"], cd.end.x - 26, iy + 2, clip])   # la cinta del reclamo, en la esquina de la foto
 	else:
 		var clip := Rect2i(hi.position.x, hi.position.y, hi.size.x, hi.size.y)
 		# la hoja de la izquierda: el cintillo de la sección, la foto grande con su marco y, debajo, el despiece
-		o.append_array(_rev_filete("filete", hi.position.x + 8, hi.position.y + 8, hi.size.x - 16, clip))
+		o.append_array(_rev_filete("filete", ci.position.x, ci.position.y, ci.size.x, clip))
 		if vk == "pst":   # el póster central: la lámina a toda hoja
-			var pl: Image = REV_ART.get(String(lector_rev.get("pst", "ps-hib")), REV_ART["ps-hib"])
-			var px: int = hi.position.x + ((hi.size.x - pl.get_width()) >> 1)
-			o.append(["@", pl, px, hi.position.y + 50, clip])
-			o.append([px - 1, hi.position.y + 49, pl.get_width() + 2, 1, "#2b2a26"])
-			o.append([px - 1, hi.position.y + 50 + pl.get_height(), pl.get_width() + 2, 1, "#2b2a26"])
-			o.append(["@", rev_x2("vg-pst"), hi.position.x + ((hi.size.x - 48) >> 1), hi.position.y + 16, clip])
+			var pl: Image = rev_anc(REV_ART.get(String(lector_rev.get("pst", "ps-hib")), REV_ART["ps-hib"]), ci.size.x)
+			var px: int = ci.position.x + ((ci.size.x - pl.get_width()) >> 1)
+			var vp: Image = REV_ART["vg-pst"]   # la viñeta a su tamaño y encima de la lámina: al doble se le comía la cabeza
+			var py: int = ci.end.y - pl.get_height()
+			o.append(["@", vp, ci.position.x + ((ci.size.x - vp.get_width()) >> 1), ci.position.y + ((py - ci.position.y - vp.get_height()) >> 1) + 3, clip])
+			o.append(["@", pl, px, py, clip])
+			o.append_array(_rev_marco(px, py, pl.get_width(), pl.get_height()))
 		elif vk == "anu":   # el anuncio: el megáfono grande a la izquierda y el recuadro en la hoja del texto
-			o.append(["@", rev_x2("vg-anu"), hi.position.x + ((hi.size.x - 48) >> 1), hi.position.y + 46, clip])
-			o.append_array(_rev_filete("filete", hi.position.x + 8, hi.position.y + 104, hi.size.x - 16, clip))
-			var ax: int = hd.position.x + 8
-			var aw: int = hd.size.x - 16
-			var ay: int = hd.position.y + 24
-			var ah: int = hd.size.y - 40
-			o.append([ax, ay, aw, ah, "#f7f2e2"])
-			o.append([ax, ay, 2, ah, "#2b2a26"])
-			o.append([ax + aw - 2, ay, 2, ah, "#2b2a26"])
+			var va: Image = rev_x2("vg-anu")
+			o.append(["@", va, ci.position.x + ((ci.size.x - va.get_width()) >> 1), ci.get_center().y - (va.get_height() >> 1), clip])
+			o.append_array(_rev_filete("filete", ci.position.x, ci.end.y - 3, ci.size.x, clip))
 			var dclip := Rect2i(hd.position.x, hd.position.y, hd.size.x, hd.size.y)
-			o.append_array(_rev_filete("filete", ax, ay, aw, dclip))
-			o.append_array(_rev_filete("filete", ax, ay + ah - 5, aw, dclip))
+			o.append([cd.position.x, cd.position.y, cd.size.x, cd.size.y, "#f7f2e2"])
+			o.append([cd.position.x, cd.position.y, 2, cd.size.y, "#2b2a26"])
+			o.append([cd.end.x - 2, cd.position.y, 2, cd.size.y, "#2b2a26"])
+			o.append_array(_rev_filete("filete", cd.position.x, cd.position.y, cd.size.x, dclip))
+			o.append_array(_rev_filete("filete", cd.position.x, cd.end.y - 5, cd.size.x, dclip))
 		else:
-			var fo: Image = REV_ART.get("pt-" + String(REV_FOTO.get(vk, "planta")), REV_ART["pt-planta"])
-			var fx: int = hi.position.x + ((hi.size.x - fo.get_width()) >> 1)
-			var fy: int = hi.position.y + 16
+			var fo: Image = rev_anc(REV_ART.get("pt-" + String(REV_FOTO.get(vk, "planta")), REV_ART["pt-planta"]), ci.size.x)
+			var fx: int = ci.position.x + ((ci.size.x - fo.get_width()) >> 1)
+			var fy: int = ci.position.y + 6
 			var fh: int = mini(fo.get_height(), REV_FOTO_H)   # la foto, apaisada: le deja la mitad de abajo de la hoja al despiece
 			o.append(["@", fo, fx, fy, Rect2i(fx, fy, fo.get_width(), fh).intersection(clip)])
-			o.append([fx - 1, fy - 1, fo.get_width() + 2, 1, "#2b2a26"])
-			o.append([fx - 1, fy + fh, fo.get_width() + 2, 1, "#2b2a26"])
-			o.append([fx - 1, fy, 1, fh, "#2b2a26"])
-			o.append([fx + fo.get_width(), fy, 1, fh, "#2b2a26"])
-			o.append_array(_rev_filete("filete2", hi.position.x + 8, fy + fh + 6, hi.size.x - 16, clip))
-			# el despiece: la viñeta de la sección al doble, en su recuadro (si no cabe en la hoja, a su tamaño)
+			o.append_array(_rev_marco(fx, fy, fo.get_width(), fh))
+			o.append_array(_rev_filete("filete2", ci.position.x, fy + fh + 6, ci.size.x, clip))
+			# el despiece: la viñeta de la sección al doble, en su recuadro, centrado en lo que queda de hoja
 			if vk != "" and REV_ART.has("vg-" + vk):
 				var vi: Image = rev_x2("vg-" + vk)
-				var vy: int = fy + fh + 20
-				if vy + vi.get_height() + 8 > hi.end.y:
+				var y0: int = fy + fh + 12
+				if y0 + vi.get_height() + 12 > ci.end.y:
 					vi = REV_ART["vg-" + vk]
-					vy = fy + fh + 16
-				var vx: int = hi.position.x + ((hi.size.x - vi.get_width()) >> 1)
+				var vy: int = y0 + ((ci.end.y - y0 - vi.get_height()) >> 1)
+				var vx: int = ci.position.x + ((ci.size.x - vi.get_width()) >> 1)
 				o.append([vx - 6, vy - 6, vi.get_width() + 12, vi.get_height() + 12, "#f7f2e2"])
 				o.append(["@", vi, vx, vy, clip])
 				o.append([vx - 6, vy - 6, vi.get_width() + 12, 1, "#8a8372"])
 				o.append([vx - 6, vy + vi.get_height() + 5, vi.get_width() + 12, 1, "#8a8372"])
 			if vk == "tst":   # el banco de pruebas, con el sello de la nota
-				o.append(["@", REV_ART["sello"], hi.end.x - 30, hi.position.y + 12, clip])
+				o.append(["@", REV_ART["sello"], ci.end.x - 28, ci.position.y + 6, clip])
 		# la hoja de la derecha: los filetes de la cabecera y del pie del texto
 		var dclip2 := Rect2i(hd.position.x, hd.position.y, hd.size.x, hd.size.y)
 		if vk != "anu":
-			o.append_array(_rev_filete("filete2", hd.position.x + 8, hd.position.y + 26, hd.size.x - 16, dclip2))
-			o.append_array(_rev_filete("filete2", hd.position.x + 8, hd.end.y - 16, hd.size.x - 16, dclip2))
+			o.append_array(_rev_filete("filete2", cd.position.x, cd.position.y, cd.size.x, dclip2))
+			o.append_array(_rev_filete("filete2", cd.position.x, cd.end.y - 2, cd.size.x, dclip2))
 	var np: int = lector_rev.pags.size()   # el pie: un punto por plana, el de esta relleno
 	if np > 1:
 		var ax: int = c.position.x + ((c.size.x - (np * 5 - 2)) >> 1)
