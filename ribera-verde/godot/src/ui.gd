@@ -1235,8 +1235,38 @@ func _lector_estilo() -> void:
 	lc.add_theme_constant_override("separation", roundi((1 if rev else (2 if Datos.CAL else 4)) * uu))
 	pon_letra(lector_ttl, negrita, (7 if rev else 9) * uu, REV_VERDE if rev else LINEA, 0, false)
 	pon_letra(lector_pie, letra, (6 if rev else 7) * uu, REV_TINTA if rev else GRIS, 0, false)
+	_rev_fit = []   # la letra base: en modo revista _rev_cuerpo la vuelve a ajustar al hueco de la plana (al pie de esta funcion)
 	var fl := fs_txt((7 if rev else 9) * uu)
 	pon_letra(lector_txt, letra, fl, REV_TINTA if rev else INK, ((10.0 if rev else 11.0) if Datos.CAL else 12.5) * uu * fl / ((7 if rev else 9) * uu), false)   # 0.52: interlineado de 11 (4-9 u de hueco)
+	if rev and lector.visible:   # con la plana ya en pantalla, el cuerpo se vuelve a ajustar a su hueco
+		_coloca()
+
+# el cuerpo de la letra de una plana de revista: 7 u si el texto cabe en el hueco de la plana y, si no, el mayor que quepa (hasta
+# REV_CUERPO_MIN). Una plana de revista se lee de un vistazo, no deslizando, asi que es el texto el que se ajusta al hueco
+const REV_CUERPO := 7.0
+const REV_CUERPO_MIN := 4.5
+var _rev_fit := []   # [plana, hueco, tamano de texto, u] de lo ultimo medido, para no volver a medirlo en cada fotograma
+func _rev_cuerpo(z: Rect2i) -> void:
+	var sello := [lector_i, z, int(aj.get("tam", 1)), roundi(u * 100), lector_txt.text.length()]
+	if sello == _rev_fit:
+		return
+	_rev_fit = sello
+	var lc: VBoxContainer = lector.get_child(0)
+	var sep: float = lc.get_theme_constant("separation")
+	var resto: float = (lc.get_child(0) as Control).get_combined_minimum_size().y + lector_pie.get_combined_minimum_size().y + 2.0 * sep
+	var hueco: float = lector.size.y - resto
+	var cuerpo := REV_CUERPO
+	while true:
+		var fl := fs_txt(cuerpo * u)
+		# el interlineado baja con el cuerpo (el denominador se queda en REV_CUERPO): si no, bajar el cuerpo no bajaria el alto
+		pon_letra(lector_txt, letra, fl, REV_TINTA, (10.0 if Datos.CAL else 12.5) * fl / REV_CUERPO, false)
+		lector_txt.size = Vector2(lector.size.x, 0)
+		var cabe: bool = lector_txt.get_combined_minimum_size().y <= hueco - 2.0 * u
+		if cabe or cuerpo <= REV_CUERPO_MIN:
+			# si cabe, sin barra de deslizar: la barra le quitaria ancho al texto y le sumaria lineas (y la plana no se desliza)
+			lector_sc.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED if cabe else ScrollContainer.SCROLL_MODE_AUTO
+			return
+		cuerpo -= .5
 
 func leer(t: String, texto: String, rev := {}) -> void:
 	if oraculo:
@@ -2198,6 +2228,7 @@ func _coloca() -> void:
 		lector_sc.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 		lector.size = Vector2(z.size.x * u, z.size.y * u)
 		lector.position = (scr.position + Vector2(z.position.x * u, z.position.y * u)).round()
+		_rev_cuerpo(z)
 	elif lector.visible:   # como un menú a toda altura
 		lector.custom_minimum_size = R.size - Vector2(6 * us, 6 * us)
 		lector.size = lector.custom_minimum_size

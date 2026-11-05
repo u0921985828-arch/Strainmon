@@ -664,7 +664,7 @@ func rev_zona() -> Rect2i:
 	if rev_portada():
 		return Rect2i(h.position.x + 8, h.position.y + 102, h.size.x - 16, h.size.y - 112)
 	if rev_vg_i() == "anu":   # el anuncio ocupa la hoja: el texto, dentro de su recuadro
-		return Rect2i(h.position.x + 13, h.position.y + 44, h.size.x - 26, h.size.y - 74)
+		return Rect2i(h.position.x + 13, h.position.y + 34, h.size.x - 26, h.size.y - 56)
 	return Rect2i(h.position.x + 8, h.position.y + 9, h.size.x - 16, h.size.y - 24)
 
 # el papel de una hoja, tileado y con sus cantos
@@ -740,8 +740,8 @@ func rects_revista() -> Array:
 			o.append_array(_rev_filete("filete", hi.position.x + 8, hi.position.y + 104, hi.size.x - 16, clip))
 			var ax: int = hd.position.x + 8
 			var aw: int = hd.size.x - 16
-			var ay: int = hd.position.y + 34
-			var ah: int = hd.size.y - 56
+			var ay: int = hd.position.y + 24
+			var ah: int = hd.size.y - 40
 			o.append([ax, ay, aw, ah, "#f7f2e2"])
 			o.append([ax, ay, 2, ah, "#2b2a26"])
 			o.append([ax + aw - 2, ay, 2, ah, "#2b2a26"])

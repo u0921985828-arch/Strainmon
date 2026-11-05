@@ -280,8 +280,10 @@ func _letra() -> void:
 	var rv: Dictionary = J.rev_paginas(3)
 	J.leer("EL ESQUEJE", J.rev_texto(3), rv)
 	await espera(20)
-	var esp: float = J.fs_txt(7 * J.u)
-	check("la letra de la plana va en píxeles del lienzo (%d)" % int(esp), is_equal_approx(J.lector_txt.get_theme_font_size("font_size"), esp))
+	# el cuerpo: 7 u si el texto cabe en el hueco de la plana y, si no, el mayor que quepa (nunca por debajo de REV_CUERPO_MIN)
+	var esp: float = J.lector_txt.get_theme_font_size("font_size")
+	check("la letra de la plana va en píxeles del lienzo (%d)" % int(esp),
+		esp >= J.fs_txt(J.REV_CUERPO_MIN * J.u) - .5 and esp <= J.fs_txt(J.REV_CUERPO * J.u) + .5)
 	var us0: float = J.us
 	J.us = maxf(1.0, J.u * .6)   # el móvil: la interfaz, a menos de la escala del lienzo
 	J._lector_estilo()
