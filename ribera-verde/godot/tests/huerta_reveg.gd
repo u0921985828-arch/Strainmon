@@ -1,7 +1,7 @@
 # Landrace Hunters (Godot) — al cosechar en la huerta, arrancar la planta o dejarla revegetar (lo pidió el usuario: «Se corta vaya o
 # se deja que revegete»), con Datos.CAL: la pregunta al cosechar, la poda (vuelve a vegetativo, el estrés y la mata pequeña), el
-# reposo del invierno con el fotoperiodo corto, el frío y la cura en reposo, la temporada siguiente con más cosecha, el tope de años
-# y que dentro de casa no se pregunta.
+# reposo hasta la primavera del año siguiente (también en días largos), el frío del invierno entero sin curarse, el abono a cero, la
+# temporada siguiente con más cosecha y más tope, el tope de años, las autoflorecientes y que dentro de casa no se pregunta.
 #   $GODOT --headless --path godot --script res://tests/huerta_reveg.gd   → «huerta_reveg: N comprobaciones, 0 fallos»
 extends SceneTree
 
@@ -88,6 +88,21 @@ func temporada(d1: int) -> void:
 		S.day += 1
 		S.min = 0
 
+# el invierno de una revegetada podada ese día, día a día con huerta_dia y sin tocarle la salud: lo que le queda o si se seca
+func invierno(p: Dictionary, poda: int) -> Dictionary:
+	var S: Dictionary = J.S
+	p.rev = 1
+	p.rvd = poda
+	p.prog = float(J.HUERTA.rev.prog)
+	p.health = 100.0 - float(J.HUERTA.rev.estres)
+	p.erase("dead")
+	p.erase("bot")
+	for d in range(poda + 1, J.huerta_prim(poda) + 1):
+		S.day = d
+		S.min = 360
+		J.huerta_dia()
+	return {"salud": float(p.health), "seca": true if p.get("dead") else false}
+
 # planta en el sitio i el día d0 y la lleva hasta la cosecha del 20 de septiembre de ese año
 func hasta_cosecha(i: int, sid: String, d0: int) -> void:
 	var S: Dictionary = J.S
@@ -161,16 +176,36 @@ func _corre() -> void:
 	chk(J.huerta_t(0) == 2, "la tierra sigue labrada (%d)" % J.huerta_t(0))
 	chk(String(J.MAPS.huerta.o[s0[1]][s0[0]]) == "hg-%s-2" % Datos.porte_planta(S, p0), "se ve la mata podada: %s" % J.MAPS.huerta.o[s0[1]][s0[0]])
 	chk(dicho("Revegeta"), "lo dice: %s" % [LOG])
-	# 2 · el reposo: con el fotoperiodo corto no tira
+	# 2 · el reposo: no tira hasta la primavera del año siguiente a la poda, y el abono vuelve a cero
+	chk(int(p0.get("rvd", 0)) > 0, "apunta el día de la poda (rvd %s)" % p0.get("rvd"))
+	chk(J.huerta_prim(int(p0.rvd)) == Datos.dia_de(2027, 4, 20), "vuelve a tirar el 20 de abril de 2027 (%s)" % Datos.fd(J.huerta_prim(int(p0.rvd))))
+	chk(not p0.has("fq") and not p0.has("fo") and p0.get("fert") == false and J._fv(p0) == 0.0, "el abono, a cero: hay que volver a abonarla (%s)" % [p0])
+	S.items["fertv"] = 1
+	MENUS.clear()
+	QUIERO = ["Salir"]
+	chk(corre(func(): await J.object_action(s0[0], s0[1])), "abrir la ficha de la revegetada")
+	chk(ofrecido("Abonar"), "ABONAR se vuelve a ofrecer tras la poda: %s" % [MENUS])
 	S.day = Datos.dia_de(2026, 11, 10)
 	S.min = 600
-	chk(not J.huerta_veg(S.day), "el 10 de noviembre, días cortos")
+	chk(not J.huerta_veg(S.day) and J.huerta_reposa(p0), "el 10 de noviembre, días cortos y en reposo")
 	var pr: float = float(p0.prog)
 	for h in 24 * 20:
 		S.min = (h % 24) * 60
 		J.huerta_avanza(60)
 	chk(is_equal_approx(float(p0.prog), pr), "en reposo no crece en 20 días (%s → %s)" % [pr, p0.prog])
-	# 3 · el frío de la revegetada y la cura en reposo
+	# el mismo año no vuelve a dar: podada en días largos, sigue parada hasta la primavera siguiente
+	var rvd0: int = int(p0.rvd)
+	p0.rvd = Datos.dia_de(2026, 7, 1)
+	S.day = Datos.dia_de(2026, 7, 10)
+	chk(J.huerta_veg(S.day) and J.huerta_reposa(p0), "podada en julio: con días largos sigue en reposo")
+	pr = float(p0.prog)
+	for h in 24 * 30:
+		S.min = (h % 24) * 60
+		J.huerta_avanza(60)
+	chk(is_equal_approx(float(p0.prog), pr), "y no vuelve a crecer ese mismo año (%s → %s)" % [pr, p0.prog])
+	p0.rvd = rvd0
+	# 3 · el frío de la revegetada, que no se cura sola
+	S.day = Datos.dia_de(2026, 11, 10)
 	var dh := dia_que(Datos.dia_de(2026, 11, 1), func(t): return int(t.min) <= 0 and t.k != "nieve")
 	chk(dh > 0, "hay un día de helada")
 	S.day = dh + 1
@@ -178,11 +213,20 @@ func _corre() -> void:
 	J.huerta_dia()
 	chk(is_equal_approx(float(p0.health), 100.0 - float(H.helada) * float(R.frio)), "la helada le quita menos siendo leñosa: %s" % p0.health)
 	var dt := dia_que(Datos.dia_de(2026, 12, 1), func(t): return int(t.min) > 0 and t.k != "nieve")
-	if dt > 0:
-		S.day = dt + 1
-		p0.health = 50.0
-		J.huerta_dia()
-		chk(is_equal_approx(float(p0.health), 50.0 + float(R.cura)), "sin frío, en reposo se repone: %s" % p0.health)
+	chk(dt > 0, "hay un día sin helada")
+	S.day = dt + 1
+	p0.health = 50.0
+	J.huerta_dia()
+	chk(is_equal_approx(float(p0.health), 50.0), "en reposo no se repone sola: %s" % p0.health)
+	# 3 bis · el invierno entero, sin forzarle la salud: uno flojo la deja tocada, uno duro se la lleva (tools/invierno.py)
+	var i26: Dictionary = invierno(p0, Datos.dia_de(2026, 9, 21))
+	chk(not i26.seca and float(i26.salud) < 60.0, "el invierno de 2026 la deja tocada: salud %.1f" % i26.salud)
+	var i28: Dictionary = invierno(p0, Datos.dia_de(2028, 9, 21))
+	chk(i28.seca, "el invierno de 2028, el duro, se la lleva (salud %.1f)" % i28.salud)
+	print("  huerta_reveg: invierno 2026 → %.1f de salud, 2028 → %s" % [i26.salud, "seca" if i28.seca else "%.1f" % i28.salud])
+	p0.erase("dead")
+	p0.health = 100.0
+	p0.rvd = rvd0
 	# 4 · la temporada siguiente: con la raíz hecha, más cosecha
 	S.day = Datos.dia_de(2027, 4, 25)
 	S.min = 480
@@ -192,6 +236,17 @@ func _corre() -> void:
 	temporada(Datos.dia_de(2027, 9, 20))
 	chk(float(p0.prog) >= 1, "lista otra vez a primeros de septiembre (%s)" % p0.prog)
 	var g2: int = Cultivo.gramos_planta(S, p0, J.huerta_f(p0, 0))
+	chk(is_equal_approx(float(J.huerta_f(p0, 0).cap), float(H.cap) * (1 + float(R.g) * int(p0.rev))), "el tope sube con el bono: %s" % J.huerta_f(p0, 0).cap)
+	# con una variedad a tope de vegetativo y abonada, el tope ya no se come el bono
+	var pg: Dictionary = Cultivo.nueva_planta(S, sid)
+	pg.prog = 1.0
+	pg.vd = float(H.veg_dias)
+	pg.fert = true
+	pg.fq = 1.0
+	var gs: int = Cultivo.gramos_planta(S, pg, J.huerta_f(pg, 0))
+	pg.rev = 1
+	var gr: int = Cultivo.gramos_planta(S, pg, J.huerta_f(pg, 0))
+	chk(gr >= int(gs * (1 + float(R.g)) * .95), "abonada y a tope de vegetativo, la revegetada da el +%d %%: %d g de %d" % [roundi(float(R.g) * 100), gr, gs])
 	chk(g2 > g1, "la revegetada da más: %d g frente a %d g" % [g2, g1])
 	chk(g2 >= int(g1 * (1 + float(R.g)) * .85), "y es por la raíz hecha (+%d %%): %d g de %d esperados" % [roundi(float(R.g) * 100), g2, roundi(g1 * (1 + float(R.g)))])
 	print("  huerta_reveg: 1.er año %d g, revegetada %d g" % [g1, g2])
@@ -224,6 +279,27 @@ func _corre() -> void:
 	chk(not ofrecido("Dejarla revegetar"), "la de doble cosecha no pregunta: %s" % [MENUS])
 	p2 = J.huerta_s().p[2]
 	chk(p2 is Dictionary and int(p2.get("rb", 0)) == 1 and int(p2.get("rev", 0)) == 0, "rebrota sola, sin revegetar (%s)" % [p2])
+	# 6 ter · las autoflorecientes no revegetan: florecen por la edad, no por la luz
+	var sa_auto := ""
+	for k in Datos.carga().STRAINS:
+		if Datos.carga().STRAINS[k].get("auto"):
+			sa_auto = String(k)
+			break
+	if sa_auto != "":
+		var pa: Dictionary = Cultivo.nueva_planta(S, sa_auto)
+		pa.prog = 1.0
+		LOG.clear()
+		MENUS.clear()
+		var au := {"fin": false, "r": true}
+		var co3 := func():
+			au.r = await J.reveg(pa, {"huerta": true, "l": [pa]}, 0)
+			au.fin = true
+		co3.call()
+		var ta: float = M.reloj
+		while not au.fin and M.reloj - ta < 20000:
+			M.paso()
+		chk(au.fin and au.r == false and not ofrecido("Dejarla revegetar"), "la auto no se ofrece revegetar (%s, %s)" % [au, MENUS])
+		chk(dicho("autofloreciente"), "y lo dice: %s" % [LOG])
 	# 7 · dentro de casa no se revegeta (el fotoperiodo lo pones tú)
 	var pc: Dictionary = Cultivo.nueva_planta(S, sid)
 	pc.prog = 1.0

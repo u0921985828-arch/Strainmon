@@ -193,19 +193,19 @@ func escondite() -> void:
 # p: las plantas de los sitios}
 # Al cosechar, lo que se hace con la planta (lo pidió el usuario: «Se corta vaya o se deja que revegete»; reveg, HUERTA.rev): como al
 # aire libre de verdad, o se arranca —el sitio queda libre y la tierra, sin trabajar— o se poda a dos yemas por rama y se deja en la
-# tierra para que revegete (p.rev, los años que lleva). La revegetada vuelve a vegetativo (rev.prog) con el estrés de la poda
-# (−rev.estres de salud) y, como el fotoperiodo ya es corto, se queda parada todo el invierno (reposo en huerta_avanza: no crece ni
+# tierra para que revegete (p.rev, los años que lleva; p.rvd, el día de la poda). La revegetada vuelve a vegetativo (rev.prog) con el
+# estrés de la poda (−rev.estres de salud) y el abono a cero, y se queda parada hasta la primavera del año siguiente a la poda
+# (huerta_prim, el 20 de abril: así da una cosecha al año, la que promete el aviso, y no dos; reposo en huerta_avanza: no crece ni
 # bebe, y en el dibujo es la mata pequeña de la fase 2). Al volver los días largos tira otra vez con la raíz y el armazón hechos:
-# rev.g más de cosecha por año revegetado, hasta rev.max años. Pasar el invierno fuera no es gratis: la helada y la nieve le siguen
-# quitando salud (rev.frio de lo que le harían, que ya es leñosa) y, si no hiela, se repone rev.cura al día; a 0, se queda seca.
-# El reposo se mide por los días que lleva en vegetativo (p.vd, 0 al podarla): en cuanto vuelve a crecer en primavera deja de
-# reposar, así que en agosto florece como cualquiera aunque haya llegado al tope de vegetativo.
+# rev.g más de cosecha y de tope por año revegetado, hasta rev.max años. Pasar el invierno fuera no es gratis y no se cura sola: la
+# helada y la nieve le van quitando salud (rev.frio de lo que le harían, que ya es leñosa) y, a 0, se queda seca. Con rev.frio .15 y
+# el tiempo real del juego, un invierno flojo le deja la mitad de la salud y uno duro se la lleva (tools/invierno.py lo mide).
 const HUERTA := {"mapa": "huerta", "w": 30, "h": 16, "seto": [5, 1, 24, 14], "camino": 14, "puerta": [9, 1], "senda": [[9, 0], [9, 2]], "llega": [15, 13], "sale": [9, 2],   # i18n-no
 	"sitios": [[8, 6], [11, 6], [17, 6], [20, 6], [8, 11], [11, 11], [17, 11], [20, 11]], "bancales": [[7, 4, 13, 7], [16, 4, 22, 7], [7, 9, 13, 12], [16, 9, 22, 12]],
 	"atrezo": [[8, 3, "bidonT"], [8, 13, "cuboS"], [21, 3, "manzano"], [21, 13, "crate"], [20, 13, "sacos"]],   # i18n-no
 	"desbroce": 240, "riego": 30, "veg": [420, 805], "g": 250, "cap": 500, "veg_dias": 60,
 	"agua": [.2, .2, .3, .35, .45, .6, .7, .7, .5, .35, .25, .2], "plaga": 1.2, "helada": 25, "nieve": 50,
-	"rev": {"prog": .40, "estres": 20, "min": 45, "g": .5, "max": 2, "frio": .35, "cura": 3, "poda": 40}}
+	"rev": {"prog": .40, "estres": 20, "min": 45, "g": .5, "max": 2, "frio": .15, "poda": 40}}
 var _town19 = null   # lo que había en town en la cancilla y la senda, para dejarlo como estaba sin CAL
 # las mejoras (lo pidió el usuario: «Opción a comprar mejoras como tanques de agua de 1m3 o tanques azules de 100L dependiendo, también
 # sistema de riego... Herramientas para trabajar la tierra o motoazada siguiente mejora... Habría que hacer los sprites»): en la
@@ -425,6 +425,16 @@ func huerta_objs(m = null) -> void:
 			m.o[int(s[1])][int(s[0])] = sp
 	huerta_mejoras(m)
 
+# el día en que vuelve a tirar una podada ese día: el 20 de abril (HUERTA.veg[0]) del año siguiente, así que una cosecha al año
+func huerta_prim(dia: int) -> int:
+	return Datos.dia_de(int(Datos.fecha(dia).y) + 1, int(HUERTA.veg[0]) / 100, int(HUERTA.veg[0]) % 100)
+
+# ¿podada y todavía parada? (el reposo va por la fecha de la poda, no por el fotoperiodo del día)
+func huerta_reposa(p) -> bool:
+	if not (Datos.CAL and p is Dictionary and int(p.get("rev", 0)) > 0 and int(p.get("rvd", 0)) > 0):
+		return false
+	return S.day < huerta_prim(int(p.rvd))
+
 func huerta_veg(dia: int) -> bool:   # ¿días largos? (dentro de HUERTA.veg, mes × 100 + día)
 	var f := Datos.fecha(dia)
 	var md: int = int(f.m) * 100 + int(f.d)
@@ -437,7 +447,7 @@ func huerta_f(p, i := -1) -> Dictionary:
 	var tg: int = huerta_t(i) if Datos.CAL else 0   # la tierra trabajada
 	var mas: float = 0.0 if tg == 0 else float(HUERTA_MEJ.herr.g if tg == 1 else HUERTA_MEJ.moto.g)
 	var rv: int = mini(int(p.get("rev", 0)) if p is Dictionary else 0, int(HUERTA.rev.max))   # la revegetada, con la raíz hecha
-	return {"g": float(HUERTA.g) * clampf(vd / float(HUERTA.veg_dias), .25, 1.0) * (1 + mas) * (1 + float(HUERTA.rev.g) * rv), "cap": float(HUERTA.cap), "crec": Cultivo.f_clima({"t": t, "hr": 50.0}), "thc": 0.0,
+	return {"g": float(HUERTA.g) * clampf(vd / float(HUERTA.veg_dias), .25, 1.0) * (1 + mas) * (1 + float(HUERTA.rev.g) * rv), "cap": float(HUERTA.cap) * (1 + float(HUERTA.rev.g) * rv), "crec": Cultivo.f_clima({"t": t, "hr": 50.0}), "thc": 0.0,
 		"agua": float(HUERTA.agua[int(Datos.fecha(S.day).m) - 1]), "plaga": float(HUERTA.plaga), "hr": 50.0, "moho": 1.0, "ciclo": "veg" if huerta_veg(S.day) else "flor"}   # i18n-no
 
 func huerta_hu(i: int) -> Dictionary:
@@ -447,10 +457,13 @@ func huerta_hu(i: int) -> Dictionary:
 
 # lo pidió el usuario («Se corta vaya o se deja que revegete»): al cosechar en la huerta, arrancarla o podarla y dejarla revegetar
 # (granja.gd la llama desde harvest, con el hu de la huerta). Las de dentro no revegetan: ahí el fotoperiodo lo pones tú
-func reveg(p: Dictionary, hu, dob := false) -> bool:
-	if dob or not (Datos.CAL and hu is Dictionary and hu.get("huerta") and p is Dictionary):
-		return dob   # la de doble cosecha rebrota sola, y dentro de casa no se revegeta
+func reveg(p: Dictionary, hu, i := -1) -> bool:
+	if not (Datos.CAL and hu is Dictionary and hu.get("huerta") and p is Dictionary):
+		return false   # dentro de casa no se revegeta: ahí el fotoperiodo lo pones tú
 	var R: Dictionary = HUERTA.rev
+	if Datos.strain(S, p.sid).get("auto"):   # 1.52: la auto florece por la edad, no por el fotoperiodo: podarla no la devuelve a vegetativo
+		await say(K("Es una autofloreciente: florece por la edad, no por la luz. Por mucho que la podes no vuelve a crecer, así que la arrancas."))
+		return false
 	var n: int = int(p.get("rev", 0)) + 1
 	if n > int(R.max):
 		await say(T("La planta lleva {n} años en la tierra y ya no da para más: la arrancas de raíz.", {"n": int(R.max) + 1}))
@@ -458,18 +471,25 @@ func reveg(p: Dictionary, hu, dob := false) -> bool:
 	if await ask(T("La planta sigue en la tierra, con las ramas bajas intactas. Puedes arrancarla o podarla a dos yemas por rama y dejar que revegete: pasa el invierno parada y el año que viene, con la raíz hecha, da un {p} % más.", {"p": roundi(float(R.g) * n * 100)}), [K("Dejarla revegetar"), K("Arrancarla")]) != 0:
 		return false
 	await fade(1)
-	advance_time(int(R.poda))
 	p.rev = n
+	p.rvd = S.day
 	p.prog = float(R.prog)
 	p.vd = 0.0
 	p.water = 100.0
 	p.pest = false
+	p.fert = false   # el abono del año pasado se fue con las lluvias: hay que volver a abonarla
 	p.health = maxf(float(R.min), float(p.health) - float(R.estres))
-	for x in ["bot", "corta", "prev"]:   # i18n-no
+	for x in ["bot", "corta", "prev", "fq", "fo", "fv", "fvo", "dead"]:   # i18n-no
 		p.erase(x)
+	if i >= 0 and hu.get("l") is Array:
+		hu.l[i] = p   # vuelve al sitio: harvest la había quitado al cosechar
 	huerta_objs()
+	advance_time(int(R.poda))
 	await fade(0)
 	sfx("get")
+	if p.get("dead"):
+		await say(K("La podas a dos yemas por rama, pero viene tan tocada que no aguanta el corte: se queda seca en la tierra."))
+		return true
 	await say(T("La podas a dos yemas por rama y la dejas en la tierra. Revegeta: parada hasta la primavera y, el año que viene, un {p} % más de cosecha. Si el invierno es duro, se puede quedar en el camino.", {"p": roundi(float(R.g) * n * 100)}))
 	return true
 
@@ -492,8 +512,8 @@ func huerta_avanza(mn: int) -> void:
 		var a = sprite_huerta(p)
 		if llueve:
 			p.water = 100.0
-		if Datos.CAL and int(p.get("rev", 0)) > 0 and p.prog < .65 and float(p.get("vd", 0)) < 1.0 and not huerta_veg(S.day):
-			continue   # reposo: recién podada y con el fotoperiodo corto, no tira hasta la primavera (ni crece ni bebe)
+		if huerta_reposa(p):
+			continue   # reposo: podada, no tira hasta la primavera del año siguiente (ni crece ni bebe)
 		if p.prog >= .12 and p.prog < .65:
 			p.vd = float(p.get("vd", 0)) + mn / 1440.0
 		Cultivo.plant_step(S, p, mn / 60.0, huerta_f(p, i))
@@ -641,15 +661,12 @@ func huerta_dia() -> void:
 			var pr: float = float(B.lluvia) * (1 - float(D.IVS.res) * Cultivo.iv_f(p.get("f"), 3)) * (1 - Cultivo.fam(S, "res"))
 			if Datos.hash_str("hbot%d_%d_%s" % [S.day, i, p.sid]) % 1000 < int(pr * 1000):
 				p.bot = S.day
-		var rv: bool = Datos.CAL and int(p.get("rev", 0)) > 0 and p.prog < .65 and float(p.get("vd", 0)) < 1.0
-		if rv:
-			dano *= float(HUERTA.rev.frio)   # revegetada: ya es leñosa y aguanta mejor el frío
+		if huerta_reposa(p):
+			dano *= float(HUERTA.rev.frio)   # revegetada: ya es leñosa y aguanta mejor el frío, pero el invierno se le va sumando
 		if dano > 0:
 			p.health = maxf(0, float(p.health) - dano)
 			if p.health <= 0:
 				p.dead = true
-		elif rv:
-			p.health = minf(100.0, float(p.health) + float(HUERTA.rev.cura))   # en reposo, sin frío, se repone
 	huerta_objs()
 
 # A en la huerta o en la cancilla del pueblo

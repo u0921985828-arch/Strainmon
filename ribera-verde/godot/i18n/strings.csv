@@ -477,10 +477,12 @@ s4b05791e,El arcón está vacío.,The chest is empty.
 scb82bcdd,Lo sacas todo del arcón y lo guardas en la mochila.,You take everything out of the chest and put it in your backpack.
 s71bbe511,MAPS,
 sf1068a24,IN,
+s38acbbcc,"Es una autofloreciente: florece por la edad, no por la luz. Por mucho que la podes no vuelve a crecer, así que la arrancas.","It's an autoflower: it blooms with age, not with light. No matter how hard you prune it, it won't grow back, so you pull it up."
 s0a5140a3,La planta lleva {n} años en la tierra y ya no da para más: la arrancas de raíz.,The plant has spent {n} years in this soil and has nothing left to give: you pull it up by the roots.
 s4074c3b5,"La planta sigue en la tierra, con las ramas bajas intactas. Puedes arrancarla o podarla a dos yemas por rama y dejar que revegete: pasa el invierno parada y el año que viene, con la raíz hecha, da un {p} % más.","The plant is still in the ground, its lower branches untouched. You can pull it up, or cut it back to two buds per branch and let it reveg: it sits out the winter and next year, with the root system already there, it gives {p} % more."
 s9e8d0fb1,Dejarla revegetar,Let it reveg
 s446d048d,Arrancarla,Pull it up
+s7d906a05,"La podas a dos yemas por rama, pero viene tan tocada que no aguanta el corte: se queda seca en la tierra.","You prune it back to two buds per branch, but it comes in so battered that it can't take the cut: it dries out in the soil."
 se899470e,"La podas a dos yemas por rama y la dejas en la tierra. Revegeta: parada hasta la primavera y, el año que viene, un {p} % más de cosecha. Si el invierno es duro, se puede quedar en el camino.","You cut it back to two buds per branch and leave it in the ground. It revegs: dormant until spring and, next year, {p} % more harvest. If the winter is hard, it may not make it."
 s290dfee7,Te dejan en la huerta lo que pediste: {l}.,They leave what you ordered at the vegetable garden: {l}.
 s0830061a,Bidón azul de 100 L,Blue 100 L drum
