@@ -203,14 +203,36 @@ s2e5069d5,"Una semilla de esa variedad, del banco.","One seed of that strain, fr
 s28beae68,Nada,Nothing
 sb0476a3d,LA CÁMARA FRÍA,THE COLD ROOM
 sf166b2da,"1 semilla de {s}, de la cámara fría","1 {s} seed, from the cold room"
+s4598fea5,TETRA,
+s3fb379b5,Fijar una línea,Fix a line
+s44344f6e,"Una semilla, el microscopio y la cabina: la línea sube una generación.","One seed, the microscope and the hood: the line goes up a generation."
+sb871f1bb,Doblar los cromosomas,Double the chromosomes
+sa03fe5ec,Con el reactivo del armario de tóxicos. Te quedan {n} usos del frasco.,With the reagent from the toxics cabinet. You have {n} uses left in the bottle.
+s501e5d21,EL LABORATORIO,THE LAB
 sd4c5d263,"El laboratorio, por hoy, ya está. Vuelve mañana.",The lab is done for today. Come back tomorrow.
 se3a3dbbc,En el laboratorio se fija una línea con una sola semilla. Ahora no tienes ninguna sin fijar.,In the lab a line is fixed with a single seed. Right now you have none that isn't fixed.
 sb8f50fdc,Cada generación es una cosecha: cultiva la línea y vuelve con lo cosechado.,Each generation is a harvest: grow the line and come back with what you harvested.
 sf3272e36,{n} semillas,{n} seeds
-s501e5d21,EL LABORATORIO,THE LAB
+sf571243d,"El frasco del reactivo se pide al proveedor del banco: {e} € a la cuenta, para {n} intentos. Es tóxico y va al armario cerrado, con su etiqueta.","The bottle of reagent is ordered from the bank's supplier: {e} € charged to the account, for {n} attempts. It's toxic and goes in the locked cabinet, labelled."
+s8f2c2578,Pedirlo,Order it
+s1ba1e201,Laboratorio,Lab
+sb1a6fc2f,Reactivo,Reagent
+s7aa37886,No hay saldo en la cuenta.,There's no money in the account.
+sb5fbac83,"El frasco, en el armario de tóxicos, con la ficha de seguridad al lado. Con él puesto encima de la mesa no se come, no se bebe y no se sale del laboratorio.","The bottle, in the toxics cabinet, with its safety sheet beside it. While it's out on the bench nobody eats, nobody drinks and nobody leaves the lab."
+s01ed2c77,Hay una bandeja en la estufa esperando. De una en una.,There's already a tray waiting in the incubator. One at a time.
+sae915558,Hacen falta 2 semillas de una línea que no sea ya tetraploide: la mitad se queda por el camino.,You need 2 seeds from a line that isn't tetraploid already: half of them don't make it.
+s02ff4a90,{n} sem.,{n} seeds
+sa9765aad,THC {t} %,THC {t} %
+s8d67d3f9,DOBLAR LOS CROMOSOMAS,DOUBLE THE CHROMOSOMES
+s2be5c85d,"¿Tratar {s}? Gastas 2 semillas y un uso del frasco. Si cuaja, la línea pasa a tetraploide: más THC y menos cosecha, y ya no cruza con una normal.","Treat {s}? You use 2 seeds and one use of the bottle. If it takes, the line turns tetraploid: more THC and less yield, and it no longer crosses with a normal one."
+sb74042f1,Tratar,Treat it
+s8c454102,Cancelar,Cancel
+sf0899d2a,"La bandeja, a la estufa, etiquetada con la línea y la fecha. En {d} días se verá cuál tira y cuál no.","The tray goes into the incubator, labelled with the line and the date. In {d} days you'll see which ones take."
+s1f93485c,"La bandeja de {s} tiró: hoja gruesa y tallo macizo. Es tetraploide. Dos semillas de la línea nueva, etiquetadas.","The {s} tray took: thick leaves and a solid stem. It's tetraploid. Two seeds of the new line, labelled."
+sdf4590a3,La bandeja de {s} no tiró: lo tratado se quedó por el camino. Al contenedor amarillo.,The {s} tray didn't take: what was treated didn't make it. Into the yellow bin.
+s0d57151f,"La bandeja de {s} salió adelante, pero igual que su madre: no cuajó el doblado. Queda una semilla.","The {s} tray came through, but just like its mother: the doubling didn't take. One seed left."
 saefafc62,"La sala de catas, por hoy, ya está. Vuelve mañana.",The tasting room is done for today. Come back tomorrow.
 sa2cb5067,En la sala de catas se analiza un lote al día. No llevas ninguno sin analizar.,The tasting room analyses one batch a day. You have none that hasn't been analysed.
-sa9765aad,THC {t} %,THC {t} %
 s1bd80547,LA SALA DE CATAS,THE TASTING ROOM
 s4b6ba5c2,"Analizado: {l} · THC {t} % · CBD {c} % · terpeno principal, {p}. Lo que va con análisis se vende mejor.","Tested: {l} · THC {t} % · CBD {c} % · main terpene, {p}. Tested stuff sells better."
 s643c29ab,"Ya has leído lo de hoy en los cuadernos de la tía. Mañana, más.",You've read today's bit of your aunt's notebooks. More tomorrow.
@@ -298,6 +320,10 @@ sa8113064,El papel en el plato y la tara a cero.,Paper on the pan and tare to ze
 scbec3079,"Las semillas, hasta que la cifra se quede quieta.","The seeds, until the reading settles."
 s4dff2742,"Lo usado, al contenedor amarillo; lo que corta, al rojo.",Used items in the yellow bin; sharps in the red one.
 sea1a4c37,"La mesa, limpia con alcohol de dentro afuera.",Wipe the bench with alcohol from the inside out.
+sbd8f13a3,"El frasco, del armario de tóxicos a la cabina, sin sacarlo del laboratorio.","The bottle, from the toxics cabinet to the hood, without taking it out of the lab."
+s5dc1098f,Guantes dobles y la ficha de seguridad a la vista.,Double gloves and the safety sheet in plain sight.
+sd63ded72,"Las plántulas marcadas, tratadas en la cabina.","The marked seedlings, treated in the hood."
+s6cf8b200,"La bandeja, a la estufa con su etiqueta; lo gastado, al contenedor amarillo.","The tray into the incubator with its label; what's used up, into the yellow bin."
 s103eff3e,LABORATORIO,LAB
 s72d67d11,"En el laboratorio no se come, no se bebe y no se fuma. Es la segunda norma del cartel.","No eating, drinking or smoking in the lab. It's the second rule on the sign."
 sbe658eaa,escZ,
@@ -429,7 +455,6 @@ sb9c3a961,{g} g de {nom}. ¿Cuánto le pides?,{g} g of {nom}. How much do you as
 s7fc6468d,Rebaja · {p} €,Cheap · {p} €
 sa2039d8c,Justo · {p} €,Fair · {p} €
 s8ac2cbd7,Caro · {p} €,Steep · {p} €
-s8c454102,Cancelar,Cancel
 s9e3f33a2,Entonces me voy.,Then I'm off.
 s536bf7ea,Trato hecho.,Deal.
 s90151b06,Gracias. Nos vemos.,Thanks. See you.
@@ -1619,6 +1644,7 @@ En la F{g} la variedad queda fijada: todas sus plantas salen iguales.","You cros
 At F{g} the strain is fixed: all its plants come out the same."
 s7d85f2fc,Para cruzar {s} necesitas semillas de otra variedad.,To cross {s} you need seeds of another strain.
 sac4b5e76,CRUCE · PADRE,CROSS · FATHER
+sb62b6ee8,{a} y {b} no tienen los mismos juegos de cromosomas: lo que salga de ahí no cuaja semilla. Una tetraploide solo cruza con otra tetraploide.,{a} and {b} don't have the same sets of chromosomes: nothing out of that will set seed. A tetraploid only crosses with another tetraploid.
 s82bdee73,¿Cruzar {a} × {b}? Gastas 1 semilla de cada.,Cross {a} × {b}? You use 1 seed of each.
 s7c769d10,Cruzar,Cross
 s05fbc5aa,Nueva variedad: {s}.,New strain: {s}.
@@ -1714,7 +1740,6 @@ s1232c2a6,¿Dejas {n}? Te devuelven la fianza a la cuenta; las mejoras se quedan
 sd14f7097,¿Dejas {n}? Te devuelven la fianza a la cuenta; las mejoras se quedan.,Give up {n}? The deposit goes back to your account; the upgrades stay.
 s271068ae,Has dejado {n}. Devuelves las llaves al salir.,You've given up {n}. You hand back the keys on the way out.
 s37410a5c,"Género ({g}): queda para {s} días. Sin género vende un {p} % de lo normal. ¿Pides para {d} días por {e}, con tarjeta?","Stock ({g}): enough for {s} days. Without stock it sells {p} % of normal. Order {d} days' worth for {e}, by card?"
-s8f2c2578,Pedirlo,Order it
 sa36aeb32,Género,Stock
 saf5d2af0,Género para {d} días,Stock for {d} days
 s5f4e7968,El local {c} ({p} %). ¿Lo friegas y lo ordenas? Es una hora.,The premises are {c} ({p} %). Mop and tidy up? It takes an hour.
@@ -3298,6 +3323,9 @@ sda654f78,<small>OBJETIVO DIARIO</small>{t} · +1 abono,<small>DAILY GOAL</small
 s8c70f118,Cada objetivo hecho da un abono. Cambian cada día (la fecha del móvil).,Each goal done gives you a nutrient. They change every day (by the phone date).
 sdcbd360e,OBJETIVOS DIARIOS,DAILY GOALS
 s528f9ff7,{m} de {y},
+s1d4613fb,Dentro: {q} semillas de {s}.,Inside: {q} {s} seeds.
+s18362af9,Despégalo al acabar el número.,Peel it off when you finish the issue.
+s60d7e2d4,Del sobre del mes: {q} semillas de {s},From the envelope of the month: {q} {s} seeds
 s7675e213,de {a} a {b} °C de media,{a} to {b} °C on average
 s0343073e,de {a} a {b}° de media,{a} to {b}° on average
 s96a425fa,tranquila,quiet
@@ -7038,6 +7066,8 @@ sea483ee8,Aroma único,Unique aroma
 se3963e00,Un olor que no tiene otra: su hierba se paga un 25 % más.,A smell no other has: its weed sells for 25 % more.
 s14ee5515,Resinosa,Resinous
 sa0563766,"Cubierta de tricomas: 1,5 puntos más de THC.",Covered in trichomes: 1.5 more THC points.
+sb53f2818,Tetraploide,Tetraploid
+sb134ef7c,"Le salió el doble de juegos de cromosomas: hoja gruesa, porte macizo, 2 puntos más de THC, un 15 % menos de cosecha y un 20 % más lenta. Cruzada con una normal no cuaja semilla.","It came out with double the sets of chromosomes: thick leaves, solid build, 2 points more THC, 15 % less yield and 20 % slower. Crossed with a normal one it sets no seed."
 s8d0761cf,Feria de semillas de primavera,Spring seed fair
 sd6b4c0f5,"Mañana empieza la feria de semillas en el mercado de la Ribera, en Bilbao. Tres días. Los de los puestos traen cosas que no verás en ningún banco.","The seed fair starts tomorrow at the Ribera market, in Bilbao. Three days. The stallholders bring things you won't see in any seed bank."
 sf870b742,Fiestas del barrio,Neighbourhood fiestas
@@ -7164,8 +7194,10 @@ s8692e69f,«Dejad de perseguir el veinticinco por ciento. Preguntad a quién le 
 sef0576c9,«Las landraces no son una moda: son lo que había antes de que todo oliera igual.» — Un lector del barrio alto,“Landraces are not a fad: they are what there was before everything smelled the same.” — A reader from the upper neighbourhood
 sa29d96de,PORTADA,FRONT PAGE
 sfd34a5e1,NOTICIAS DE LA COMARCA,NEWS FROM THE COUNTY
+s63a6a529,EL MUNDO DEL CANNABIS,THE CANNABIS WORLD
 sb1d0c4f5,LA ENTREVISTA,THE INTERVIEW
 s08efd72d,LA VARIEDAD DEL MES,STRAIN OF THE MONTH
+s87391edd,EL SOBRE DEL MES,THE ENVELOPE OF THE MONTH
 se3678202,TALLER,WORKSHOP
 s606fd7c1,PÓSTER CENTRAL,CENTRE POSTER
 s69366374,EL CONSULTORIO,THE CLINIC
@@ -7178,6 +7210,10 @@ s4c2c97d7,CARTAS,LETTERS
 s4defd6be,EL HORÓSCOPO DEL CULTIVADOR,THE GROWER'S HOROSCOPE
 s00e7a235,FE DE ERRORES,CORRECTIONS
 s143602e0,LEGAL,LEGAL
+s0ac9a299,"Grapado a esta página, como siempre, el sobre del mes: tres semillas de la variedad de la que habla la página de al lado.","Stapled to this page, as always, the envelope of the month: three seeds of the strain the facing page is about."
+sa0b64737,"Cortesía de los anunciantes, que para eso pagan. Despega el sobre con cuidado, que el año pasado alguien lo abrió con los dientes y se quedó sin regalo y sin muela.","Courtesy of our advertisers, which is what they pay for. Peel the envelope off carefully: last year somebody opened one with their teeth and ended up with no gift and no tooth."
+sd3430f09,"Un número, un sobre. Quien compre dos ejemplares del mismo mes que no nos escriba: ya nos ha escrito, y le contestamos lo mismo.","One issue, one envelope. Anyone buying two copies of the same month needn't write in: they already did, and we told them the same thing."
+s8ef314fa,El sobre de este número ya lo despegaste. Queda la marca de la grapa y poco más.,You already peeled this issue's envelope off. All that's left is the staple mark.
 s2dcccce1,Un registro en el barrio se salda con plantas y material incautados,A search in the neighbourhood ends with plants and gear seized
 s46dba41b,"Agentes entraron el {d} en un piso del barrio con una orden del juzgado y se llevaron las plantas y el equipo que había montado. La asociación recuerda que un registro acaba casi siempre en multa y en la pérdida de todo el ciclo, y que el calor no se baja de un día para otro.","Officers entered a flat in the neighbourhood on {d} with a court warrant and took away the plants and the gear that was set up. The association points out that a search almost always ends in a fine and the loss of the whole cycle, and that heat does not cool down overnight."
 sb90af50b,Un juzgado de la comarca autoriza un registro domiciliario,A county court authorises a home search
@@ -7220,6 +7256,38 @@ sf4019e5f,Vuelve a trabajarse una huerta abandonada detrás del garaje,An abando
 sf0b1eea4,"Llevaba años con la cancilla cerrada y la hierba por la cintura. Ahora tiene bancales hechos y plantas al aire libre, que es como se cultivaba aquí antes de que todo fuera de interior.","For years the gate was shut and the grass was waist high. Now it has beds made and plants out in the open, which is how people grew here before everything moved indoors."
 sfa4f1baa,La ciudad de la autopista mira a la comarca,The city down the motorway looks at the county
 scadfbada,"Clubs grandes, dinero y gente con tarjeta. De la comarca sale género para allí y de allí vienen preguntas que aquí no se hacían. Cada uno que saque sus cuentas.","Big clubs, money and people with cards. Produce leaves the county for there and from there come questions nobody used to ask here. Let everyone do their own sums."
+safd52ed3,Una aduana del sur devuelve un envío de semillas por un papel mal puesto,A southern customs post sends back a seed shipment over one misfiled form
+sb2a7462f,"Mil sobres parados tres semanas por una casilla sin rellenar. El envío volvió entero y nadie perdió nada salvo la temporada, que es lo único que no se recupera. Desde la cooperativa que lo mandaba dicen que el formulario cambió en enero y que no se enteró nadie.","A thousand envelopes held up for three weeks over one unticked box. The shipment came back intact and nobody lost anything except the season, which is the one thing you can't get back. The co-op that sent it says the form changed in January and nobody was told."
+s84e0699f,La feria del norte cierra con más visitas que nunca y menos puestos,The northern fair closes with record visitors and fewer stalls
+s73c8a137,"Tres pabellones llenos y la mitad de los expositores de hace cinco años. Los que quedan son los de siempre: viveros pequeños, gente que vende macetas y dos cooperativas que traen semilla de su tierra. Lo nuevo este año eran las charlas, que se llenaron antes que los puestos.","Three full halls and half the exhibitors of five years ago. The ones left are the usual: small nurseries, people selling pots and two co-ops bringing seed from their own valleys. The new thing this year was the talks, which filled up before the stalls did."
+sb7fa7696,Un museo del cultivo abre en una fábrica vieja,A growing museum opens in an old factory
+sf1f7eeb9,"Herramienta de hace ochenta años, carteles de propaganda y una sala con las variedades que se cultivaban en el valle antes de que se dejara. Lo monta una asociación de vecinos y lo que se recauda va a mantener el edificio, que se caía.","Eighty-year-old tools, propaganda posters and a room with the strains grown in the valley before it was given up. A neighbours' association put it together and the takings go to keeping the building standing, which it barely was."
+sdff16b4e,Una cooperativa de montaña recupera una variedad que se daba por perdida,A mountain co-op brings back a strain everyone had written off
+s05bee897,"La tenían tres familias, cada una con su línea, y ninguna sabía de las otras. Juntaron lo que quedaba, lo sembraron el mismo año y salió una planta que se parece bastante a la de las fotos viejas. Ahora buscan quién la cultive para que no dependa de un arcón.","Three families had it, each with their own line, and none knew about the others. They pooled what was left, sowed it the same year and got a plant much like the one in the old photographs. Now they're looking for growers so it doesn't depend on one freezer."
+sb5fe5f91,El congreso de genética del otoño se centra en las landraces,The autumn genetics conference turns to landraces
+seffa8cbf,"Dos días de ponencias sobre lo mismo: que las variedades de origen se están perdiendo más rápido de lo que se catalogan. La conclusión, la de siempre, es que hace falta más gente guardando semilla y menos gente guardándosela.","Two days of papers on the same thing: strains of origin are being lost faster than they can be catalogued. The conclusion, as always, is that we need more people keeping seed and fewer people keeping it to themselves."
+s2c69feed,El precio del kilovatio aprieta a los cultivos de interior de media Europa,The price of a kilowatt squeezes indoor growers across half of Europe
+s5dba5328,"Donde se cultiva con luz, la factura ya pesa más que el abono y el agua juntos. Los cultivos grandes se pasan a focos de menos consumo; los pequeños, directamente, a cultivar fuera cuando el clima deja.","Wherever people grow under lights, the bill now weighs more than feed and water put together. The big grows are switching to lower-draw lamps; the small ones are simply going outdoors whenever the weather allows."
+s367db154,Las asociaciones de otra comarca pactan un reglamento común,The associations of another county agree on a common set of rules
+s6f101579,"Catorce clubs firman lo mismo: carné, libro de socios, nada de calle y las cuentas a la vista una vez al año. No es ley ni lo pretende, pero en la práctica es lo más parecido que hay a una.","Fourteen clubs sign the same text: membership cards, a members' book, nothing sold on the street and the books open once a year. It isn't law and doesn't claim to be, but in practice it's the closest thing there is to one."
+s776cbff2,Un laboratorio independiente publica su tabla de analíticas del año,An independent lab publishes its table of the year's analyses
+s37d086a0,"Mil doscientas muestras analizadas y una conclusión incómoda: una de cada cinco no se parecía a lo que ponía en la etiqueta. El laboratorio no da nombres; dice que el problema no es quien miente, sino que casi nadie comprueba.","Twelve hundred samples analysed and one uncomfortable conclusion: one in five looked nothing like its label. The lab names no names; it says the problem isn't who lies, it's that hardly anyone checks."
+sc36a9ba1,Una conservera del litoral se mete a distribuidora con licencia,A coastal cannery turns licensed distributor
+sbaa8efc6,"Mismo almacén, mismo frío y la mitad del camión para lo de siempre. Con el permiso en la mano, lo que antes iba de noche va de día y con albarán. En el puerto lo cuentan como una rareza; fuera, como lo que viene.","Same warehouse, same cold store and half the lorry still for the old trade. With the permit in hand, what used to move at night moves by day and with a delivery note. In the harbour they tell it as an oddity; outside, as what's coming."
+s7655238a,Un banco de semillas del este abre su catálogo al público,An eastern seed bank opens its catalogue to the public
+s2d048020,"Cuatrocientas entradas con su ficha, su origen y quién la depositó, consultables por cualquiera. No venden: prestan a quien se compromete a devolver semilla de la cosecha. En seis meses han salido ochenta y han vuelto setenta y seis.","Four hundred entries with their notes, their origin and who deposited them, open to anyone. They don't sell: they lend to whoever undertakes to return seed from the harvest. In six months eighty went out and seventy-six came back."
+se713f6ab,Una copa internacional cambia las reglas tras años de quejas,An international cup changes its rules after years of complaints
+s356b1417,"A partir de este año, cata a ciegas de verdad, muestras recogidas por el jurado y nota del laboratorio aparte de la del paladar. Media sala aplaudió y la otra media se fue a mirar el reglamento.","From this year on, a genuinely blind tasting, samples collected by the jury and a lab score kept apart from the palate score. Half the room applauded and the other half went off to read the rulebook."
+s077b1010,Un país del norte regula el autocultivo asociado y deja fuera la venta,A northern country regulates collective home growing and leaves selling out of it
+sfd37bf6e,"Plantas contadas por persona, asociaciones con registro y nada de mostrador. Las cooperativas lo leen como un primer paso; los clubs, como un techo. Lo único claro es que ya hay un papel donde antes no había nada.","Plants counted per person, associations on a register and no counter sales. The co-ops read it as a first step; the clubs, as a ceiling. The only clear thing is that there's a piece of paper where before there was nothing."
+s3d96c245,Roban un banco de semillas y se llevan lo que no se puede reponer,A seed bank is robbed of the one thing that can't be replaced
+s3f1be14a,"Entraron por el tejado y se llevaron los arcones de una colección de cuarenta años. El seguro cubre el frigorífico. Lo de dentro, no: no hay precio para una semilla de la que no queda otra.",They came in through the roof and took the freezers of a forty-year collection. The insurance covers the refrigeration. Not what was inside: there's no price for a seed when there's no other one left.
+s9592bab2,Una empresa retira su solicitud de patente sobre una variedad de origen,A company withdraws its patent application on a strain of origin
+sfe3d637e,"La oposición la presentaron tres cooperativas con papeles de hace treinta años. La empresa retiró la solicitud sin dar explicaciones. En el sector se lee como un aviso: lo que no está documentado, alguien lo registra.","The opposition was filed by three co-ops with paperwork thirty years old. The company withdrew the application without explaining itself. The trade reads it as a warning: whatever isn't documented, somebody will register."
+s5fae3cf3,Un estudio del sur pone cifras a lo que se pierde en el secado,A southern study puts numbers on what gets lost in the drying
+s5ebd50b6,Midieron cien lotes del mismo cultivo secados de ocho maneras. La diferencia entre el mejor y el peor era de un tercio del valor final. La conclusión del que lo firma: «la cosecha no se acaba cuando se corta».,They measured a hundred batches from the same grow dried eight different ways. The gap between the best and the worst was a third of the final value. The conclusion of the man who signs it: «the harvest doesn't end when you cut».
+sda984989,Una red de cultivadoras publica su primer censo,A network of women growers publishes its first count
+s740a6add,"Trescientas socias en once comarcas, la mitad con cultivo propio y un tercio al frente de una asociación. El censo se hizo porque, cuando preguntaron, nadie tenía el dato.","Three hundred members across eleven counties, half of them growing their own and a third running an association. The count was made because, when they asked, nobody had the figure."
 s0565cb97,"El mes viene {c}: {x}. Los de las carpas, ojo a la humedad; los de fuera, a lo que caiga.","The month comes in {c}: {x}. Those with tents, watch the humidity; those outdoors, watch whatever falls."
 se522ebac,"La calle, {p}. Esta revista no da consejos legales, pero sí recuerda que el género encima pesa más de lo que parece.","The street is {p}. This magazine gives no legal advice, but it does point out that produce in your pocket weighs more than it looks."
 sc5d09709,En la comarca hay {n} variedades registradas con nombre y linaje. Cada una que se apunta es una que no se pierde.,There are {n} strains recorded in the county with a name and a lineage. Every one written down is one that is not lost.
@@ -7368,6 +7436,10 @@ s02684752,"Financiación, seguro y la primera revisión. Barrio alto.","Finance,
 sa3b6524d,FEDERACIÓN DE CLUBS,FEDERATION OF CLUBS
 s5c011ef6,«Hazte socio de tu club»,“Join your local club”
 s238f0731,Esta revista la edita quien se anuncia aquí.,This magazine is published by the people advertising in it.
+sa31aa267,"«Socios desde el 94. Sofá, billar y dispensario»","«Members since '94. Sofa, pool table and dispensary»"
+sa44183af,Puerto Viejo. Carné en la puerta y el encargado te enseña la casa.,Puerto Viejo. Card at the door and the manager shows you round.
+se8cc7d9e,"«De once a seis. El reservado, para quien lo pida»","«Eleven till six. The back room, for whoever asks»"
+sd138feee,Ensanche. Entrada por noche. Lo de dentro no sale en la revista.,Ensanche. Cover charge per night. What goes on inside doesn't make the magazine.
 se768b657,PÓSTER CENTRAL · PARA LA PUERTA DE LA CARPA,CENTRE POSTER · FOR THE TENT DOOR
 se6a6bedb,"Arranca por la grapa con cuidado. Si lo rompes, el mes que viene hay otro.","Tear it out carefully along the staple. If you rip it, there is another one next month."
 sdce1a040,semillas doradas,golden seeds

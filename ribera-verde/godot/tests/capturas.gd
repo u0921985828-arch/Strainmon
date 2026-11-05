@@ -85,6 +85,21 @@ func rotulo(im: Image) -> Image:
 	var ui = J
 	c.draw.connect(func():
 		c.draw_rect(Rect2(0, 0, c.size.x, c.size.y), Color(0, 0, 0, .35))
+		var lg: Texture2D = ui.tit_art("logo-placa")   # el logotipo del juego (arte/titulo.png), a escala entera
+		if lg != null:
+			var e: int = maxi(1, floori(c.size.x * .86 / lg.get_width()))
+			var lw := lg.get_width() * e
+			var lh := lg.get_height() * e
+			c.draw_texture_rect(lg, Rect2(roundf((c.size.x - lw) / 2), roundf(c.size.y * .5 - lh * .74), lw, lh), false)
+			var n2: Font = ui.negrita
+			var l2: String = ui.LEMA
+			var k2 := c.size.x / 1024.0
+			var s3 := roundi(30 * k2)
+			var y3: float = c.size.y * .5 - lh * .74 + lh + 26 * k2 + n2.get_ascent(s3)
+			var x3: float = (c.size.x - n2.get_string_size(l2, HORIZONTAL_ALIGNMENT_LEFT, -1, s3).x) / 2
+			c.draw_string(n2, Vector2(x3 + 3 * k2, y3 + 3 * k2), l2, HORIZONTAL_ALIGNMENT_LEFT, -1, s3, Color("#10301c"))
+			c.draw_string(n2, Vector2(x3, y3), l2, HORIZONTAL_ALIGNMENT_LEFT, -1, s3, Color("#9cf0a8"))
+			return
 		var f: Font = ui.display
 		var k := c.size.x / 1024.0   # medido en el destacado (1024 × 500) y a escala en las capturas
 		var s1 := roundi(64 * k)

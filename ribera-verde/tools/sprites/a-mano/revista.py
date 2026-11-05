@@ -15,6 +15,7 @@
 import os, sys, json, math
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lienzo import Lienzo, P, azar
+import rotulos
 
 # la paleta, cerrada: dos tintas sobre papel
 K0 = '#2b2a26'   # tinta
@@ -55,7 +56,21 @@ def trama(L, x, y, w, h, c, paso=2):
             if (i + j) % paso == 0:
                 L.p(x + i, y + j, c)
 
-# ---------- el papel ----------
+# ---------- las piezas del generador de sprites ----------
+# El papel, el sobre del regalo y los diez banners de publicidad salen de tools/sprites/sprgen_revista.py, que procesa los
+# crudos del generador y los deja ya cuantizados a esta misma paleta en tools/sprites/sprgen-revista/piezas/.
+def pieza(n):
+    """una pieza ya procesada del generador de sprites, como Lienzo"""
+    from PIL import Image as _Im
+    im = _Im.open(P('tools', 'sprites', 'sprgen-revista', 'piezas', n + '.png')).convert('RGBA')
+    L = Lienzo(im.width, im.height)
+    L.im.paste(im, (0, 0))
+    L.px = L.im.load()
+    return L
+
+BAN = ['kiko', 'ibar', 'chatarra', 'lonja', 'molino', 'estanco', 'autos', 'feder', 'club', 'gaua']
+
+# ---------- el papel (a mano; de reserva: el que se usa es el del generador de sprites, pieza('papel')) ----------
 def papel(oscuro=False):
     L = Lienzo(64, 64)
     r = azar(7 if not oscuro else 11)
@@ -114,20 +129,25 @@ GL = {
        'XXX.....XXX', 'XXX.....XXX', '.XXXXXXXXX.', '..XXXXXXX..'],
 }
 
-def rotulo(txt, c=V0, som=K1):
+def rotulo(txt, cara=V1, luz=V2, som=V0, borde=K0, proy=K2):
+    """el nombre de la revista con las letras de arriba, biseladas como las de los rótulos del juego (la luz arriba y a la
+    izquierda), con su contorno y la sombra proyectada: es la mancheta, y tiene que pesar en la portada."""
     w = 0
     for ch in txt:
         w += 4 if ch == ' ' else 12
-    L = Lienzo(w + 1, 18)
-    x = 0
+    W, H = w + 1, 20
+    M = [[False] * H for _ in range(W)]
+    x = 1
     for ch in txt:
         if ch == ' ':
             x += 4
             continue
-        dib(L, GL[ch], {'X': som}, x + 1, 2)   # la sombra de la letra, 1 px abajo a la derecha
-        dib(L, GL[ch], {'X': c}, x, 1)
+        for j, fila in enumerate(GL[ch]):
+            for i, k in enumerate(fila):
+                if k != '.' and x + i < W:
+                    M[x + i][2 + j] = True
         x += 12
-    return L
+    return rotulos.bisel(M, W, H, cara, luz, som, borde, proy)
 
 def _esqueje(L, x, y):
     """el esqueje de remate: el tallo cortado en diagonal con dos hojas y un brote"""
@@ -141,20 +161,25 @@ def _esqueje(L, x, y):
     L.p(x + 3, y - 2, P2)
 
 def mancheta(txt='EL ESQUEJE'):
-    """la cabecera, a dos líneas como la de cualquier revista de quiosco: el artículo encima y el nombre grande debajo, con el
-    esqueje de remate a su izquierda. A una sola línea no cabe en una hoja A4 del lienzo (115 px)."""
+    """la cabecera, a dos líneas como la de cualquier revista de quiosco: arriba, el artículo en blanco sobre su cinta de tinta,
+    y debajo el nombre grande en relieve, con el esqueje de remate a su izquierda. A una sola línea no cabe en la hoja A4 del
+    lienzo (115 px)."""
     pa = txt.split(' ')
-    r1 = rotulo(pa[0]) if len(pa) > 1 else None
+    r1 = rotulo(pa[0], P0, P2, P1, None, None) if len(pa) > 1 else None
     r2 = rotulo(pa[-1])
-    L = Lienzo(r2.w + 15, 36 if r1 else 20)
+    mx = 13                                     # lo que se le deja al esqueje por la izquierda
+    L = Lienzo(r2.w + mx, 36 if r1 else 22)
     if r1:
-        L.pega(r1, 15, 0)
-        L.hl(15 + r1.w + 2, r2.w + 13, 9, K2)   # el filete que acompaña al artículo
-        L.pega(r2, 15, 17)
-        _esqueje(L, 4, 23)
+        L.r(mx, 0, r1.w + 2, 16, K0)            # la cinta del artículo
+        L.hl(mx, mx + r1.w + 1, 16, K1)         # su canto de abajo
+        L.pega(r1, mx + 1, -2)                  # las letras, sin el aire del contorno
+        L.hl(mx + r1.w + 6, r2.w + mx - 2, 7, K1)   # el filete que la acompaña hasta el corte
+        L.hl(mx + r1.w + 6, r2.w + mx - 2, 9, K2)
+        L.pega(r2, mx, 14)
+        _esqueje(L, 3, 21)
     else:
-        L.pega(r2, 15, 0)
-        _esqueje(L, 4, 6)
+        L.pega(r2, mx, 0)
+        _esqueje(L, 3, 7)
     return L
 
 def filete(doble=True):
@@ -433,7 +458,26 @@ def sello():   # el sello de la nota del banco de pruebas
     L.contorno(K0)
     return L
 
-VG = {'nw': vg_nw, 'var': vg_var, 'tec': vg_tec, 'merc': vg_merc, 'copa': vg_copa,
+def vg_mun():   # el mundo del cannabis: el globo con sus paralelos y una hoja de bandera clavada
+    L = _vg()
+    cx, cy, r = 16, 18, 12
+    elipse(L, cx, cy, r, r, P2)
+    elipse(L, cx, cy, r, r, K0, False)
+    for dy in (-7, 0, 7):                       # los paralelos
+        w = int((r * r - dy * dy) ** .5) - 1
+        L.hl(cx - w, cx + w, cy + dy, K2)
+    for dx in (-6, 0, 6):                       # los meridianos
+        for j in range(-r + 1, r):
+            w = (1 - (j / r) ** 2) ** .5
+            L.p(cx + round(dx * w), cy + j, K2)
+    for m in ((-8, -4, 4, 3), (-2, 2, 5, 4), (5, -6, 4, 3), (3, 7, 3, 2)):   # las manchas de tierra
+        elipse(L, cx + m[0], cy + m[1], m[2], m[3], V1)
+    linea(L, 27, 4, 27, 20, K1)                 # el mástil
+    dib(L, ['.XXXXX..', 'XXXXXXX.', 'XXXXXXXX', '.XXXXXX.', '..XXXX..', '...XX...'], {'X': V0}, 28, 4)
+    L.p(27, 3, K0)
+    return L
+
+VG = {'nw': vg_nw, 'mun': vg_mun, 'var': vg_var, 'tec': vg_tec, 'merc': vg_merc, 'copa': vg_copa,
       'ag': vg_ag, 'cls': vg_cls, 'car': vg_car, 'leg': vg_leg,
       'ent': vg_ent, 'con': vg_con, 'tst': vg_tst, 'hor': vg_hor, 'err': vg_err, 'anu': vg_anu, 'pst': vg_pst}
 
@@ -673,8 +717,52 @@ PT = {'planta': pt_planta, 'carpa': pt_carpa, 'copa': pt_copa, 'barco': pt_barco
       'nave': pt_nave, 'club': pt_club, 'redada': pt_redada, 'feria': pt_feria}
 
 # ---------- la hoja ----------
+def regalo():
+    """el sobre de semillas grapado a la hoja (lo pidió el usuario: «molaría que hubiese como un sobre con una semilla dentro y
+    como un paquetillo de regalo»): el sobre de papel con su solapa abierta, la etiqueta con sus renglones, la semilla asomando
+    y la grapa de la esquina. 64 × 76."""
+    W, H = 64, 76
+    L = Lienzo(W, H)
+    x0, y0, w, h = 4, 10, 52, 60
+    L.r(x0, y0, w, h, P1)                       # el papel del sobre
+    L.r(x0, y0, w, 2, P2)
+    L.vl(x0, y0, y0 + h - 1, P2)
+    L.hl(x0, x0 + w - 1, y0 + h - 1, K2)
+    L.vl(x0 + w - 1, y0, y0 + h - 1, K2)
+    for j in range(14):                         # la solapa abierta, hacia arriba
+        L.hl(x0 + j, x0 + w - 1 - j, y0 - 1 - j, P2 if j < 12 else K2)
+    for j in range(14):
+        L.p(x0 + j, y0 - 1 - j, K1)
+        L.p(x0 + w - 1 - j, y0 - 1 - j, K1)
+    ex, ey, ew, eh = x0 + 6, y0 + 16, w - 12, 26
+    L.caja(ex, ey, ew, eh, P2, K1)              # la etiqueta
+    for j in range(4):                          # sus renglones
+        n = ew - 8 if j < 3 else (ew - 8) // 2
+        L.r(ex + 4, ey + 5 + j * 5, n, 2, K2 if j else V0)
+    sx, sy = x0 + w // 2, y0 + 5                # la semilla, asomando por la solapa
+    for j in range(-5, 6):
+        for i in range(-4, 5):
+            if (i / 4.0) ** 2 + (j / 5.5) ** 2 <= 1.0:
+                c = K1
+                if i <= -1 and j <= 0:
+                    c = K2
+                if abs(i) <= 1 and -3 < j < 3:
+                    c = V0
+                L.p(sx + i, sy + j, c)
+    L.contorno(K0)
+    for j in range(8):                          # la grapa de la esquina, por encima de todo
+        L.p(x0 + 3 + j, y0 + 3, K2 if j in (0, 7) else K1)
+    L.p(x0 + 3, y0 + 4, K1)
+    L.p(x0 + 10, y0 + 4, K1)
+    return L
+
+
 def arte():
-    sale('papel', papel())
+    sale('papel', pieza('papel'))
+    sale('sobre', pieza('sobre'))
+    sale('regalo', regalo())
+    for k in BAN:
+        sale('ban-' + k, pieza('ban-' + k))
     sale('mancheta', mancheta())
     sale('mancheta-en', mancheta('THE CUTTING'))
     sale('filete', filete())

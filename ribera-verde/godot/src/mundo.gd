@@ -3176,6 +3176,10 @@ func hilo_talk(_id: String) -> bool:   # → hilo.gd
 func hilo_dia() -> void:   # → hilo.gd
 	pass
 
+# la bandeja del laboratorio del banco de la tía que cumple su plazo (la tetraploidia)
+func tetra_dia() -> void:   # → bancotia.gd
+	pass
+
 # EL ESQUEJE, la revista mensual (revista.gd)
 func rev_dia() -> void:   # → revista.gd
 	pass

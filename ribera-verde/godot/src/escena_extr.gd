@@ -65,7 +65,7 @@ static func pinta(pintor, T: Dictionary, now: float, x0: int, y0: int) -> void:
 			"moon": moon(i, t, p)
 			"stat": stat(i, t, p)
 			"mani": mani(i, t, p)
-			"lmanos", "lepi", "lauto", "lflujo", "lmicro", "lbal", "lres": lab_pl(String(T.esc), i, now)
+			"lmanos", "lepi", "lauto", "lflujo", "lmicro", "lbal", "lres", "ltetra": lab_pl(String(T.esc), i, now)
 			_: r(0, 0, W, H, Color("#2b2f3a"))
 	for k in n:   # los pasos: hechos, el de ahora y los que quedan
 		P._rect(X + W - 6 * n + 6 * k, Y + H + 3, 4, 3, Color("#58d080") if k == i else Color("#a0a0a8") if k < i else Color("#4a4a54"))
@@ -923,7 +923,15 @@ static func pl_t(k: String, now: float) -> Image:   # la escena k con su fotogra
 	var f := foto_pl(k, now)
 	return pl(k) if f == 0 else PL.get("%s/%d" % [k, f], pl(k))
 
+# la tetraploidia (bancotia.gd lab_pasos("tetra")) usa las escenas que ya hay del laboratorio, una por paso: el armario y lo
+# que se saca, los guantes, la cabina y el contenedor. Nada de arte nuevo para una receta que el juego no cuenta
+const LAB_TETRA := [["lres", 1], ["lepi", 2], ["lflujo", 2], ["lres", 0]]
+
 static func lab_pl(k: String, i: int, now := 0.0) -> void:
+	if k == "ltetra":
+		var p: Array = LAB_TETRA[clampi(i, 0, LAB_TETRA.size() - 1)]
+		k = String(p[0])
+		i = int(p[1])
 	var im := pl_t("%s-%d" % [k, i], now)
 	if im == null:
 		r(0, 0, W, H, Color("#2b2f3a"))

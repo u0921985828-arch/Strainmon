@@ -138,5 +138,41 @@ func _corre() -> void:
 		var a: float = 2.5 * J.us + 8 * J.us
 		check("botón %d: el texto no llega a las flechas (%d .. %d en %d .. %d)" % [n, izq, der, x0, x1], izq > r.position.x + a - 1 and der < r.end.x - a + 1)
 	check("el título tiene sus botones (%d)" % n, n >= 3)
+
+	# 2 · el rótulo del juego, el sprite dibujado (lo pidió el usuario: «molaría hacer un sprite del título
+	# del juego… Tiene que ser un título visual para poder utilizarlo en las fotos de publicidad»)
+	var lg: Texture2D = J.tit_art("logo")
+	var pl: Texture2D = J.tit_art("logo-placa")
+	check("el rótulo del juego está dibujado", lg != null)
+	check("y su variante con placa, para la publicidad", pl != null)
+	if lg != null:
+		var e: int = 2 if J.titulo.size.x >= (lg.get_width() * 2 + 16) * J.us else 1
+		# el oro de la cara del rótulo (#e8c24a) no sale en ningún otro sitio de la pantalla
+		var tr: Rect2 = J.titulo.get_global_rect()
+		var b0: Rect2 = (J.menu_col.get_child(0).get_child(0) as Control).get_global_rect()
+		var gx0 := int(img.get_width())
+		var gx1 := -1
+		var gy0 := int(img.get_height())
+		var gy1 := -1
+		var oro := 0
+		for y in img.get_height():
+			for x in img.get_width():
+				var c: Color = img.get_pixel(x, y)
+				if absf(c.r - 232.0 / 255.0) < .02 and absf(c.g - 194.0 / 255.0) < .02 and absf(c.b - 74.0 / 255.0) < .02:
+					oro += 1
+					gx0 = mini(gx0, x)
+					gx1 = maxi(gx1, x)
+					gy0 = mini(gy0, y)
+					gy1 = maxi(gy1, y)
+		check("el rótulo se ve en la pantalla (%d píxeles de oro)" % oro, oro > 200)
+		if oro > 200:
+			var cx := (gx0 + gx1) / 2.0
+			check("el rótulo, centrado (rótulo %.1f, pantalla %.1f)" % [cx, tr.get_center().x], absf(cx - tr.get_center().x) <= 2.0)
+			var anc := float(gx1 - gx0 + 1)
+			var esp: float = lg.get_width() * e * J.u
+			check("el rótulo a escala entera ×%d (ancho %.0f de %.0f)" % [e, anc, esp], anc <= esp + 1 and anc >= esp * .6)
+			check("el rótulo no pisa las pastillas (abajo %d, primera %.0f)" % [gy1, b0.position.y], float(gy1) < b0.position.y)
+			check("el rótulo, dentro de la pantalla", float(gy0) >= tr.position.y - 1 and float(gx0) >= tr.position.x - 1)
+
 	print("titulo_ui: %d botones, %d fallos" % [n, fallos.size()])
 	quit(1 if fallos.size() > 0 else 0)

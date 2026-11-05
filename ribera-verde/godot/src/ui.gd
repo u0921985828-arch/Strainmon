@@ -2737,11 +2737,43 @@ const TIT_WV := 84.0   # 1.57.1: la pastilla, más pequeña
 const TIT_HV := 12.0
 var caja_menu: StyleBox = null
 
+# el logotipo del juego (arte/titulo.png, de tools/sprites/a-mano/titulo.py; lo pidió el usuario: «molaría hacer un sprite del
+# título del juego… Tiene que ser un título visual»): la pieza y la escala entera a la que cabe. Sin el arte, [null, 1] y el
+# nombre se escribe con la letra de siempre.
+static var TIT_ART := {}
+
+static func tit_art(k: String) -> Texture2D:
+	if TIT_ART.is_empty():
+		TIT_ART["."] = true
+		var im := Image.new()
+		if im.load_png_from_buffer(FileAccess.get_file_as_bytes("res://arte/titulo.png")) != OK:
+			return null
+		var j = JSON.parse_string(FileAccess.get_file_as_string("res://arte/titulo.json"))
+		if typeof(j) != TYPE_DICTIONARY or not (j.get("r") is Dictionary):
+			return null
+		for n in j.r:
+			var q: Array = j.r[n]
+			TIT_ART[String(n)] = ImageTexture.create_from_image(im.get_region(Rect2i(int(q[0]), int(q[1]), int(q[2]), int(q[3]))))
+	return TIT_ART.get(k)
+
+func _tit_logo() -> Array:
+	var t := tit_art("logo")
+	if t == null:
+		return [null, 1]
+	return [t, 2 if titulo.size.x >= (t.get_width() * 2 + 16) * u else 1]
+
+# lo que ocupa el nombre del juego por debajo de tt, en píxeles de pantalla
+func _tit_alto() -> float:
+	var lo := _tit_logo()
+	if lo[0] != null:
+		return (lo[0] as Texture2D).get_height() * int(lo[1]) * u
+	var s1 := roundi(17 * u)
+	return display.get_ascent(s1) + 17 * u * 1.05 + 17 * u * .05
+
 # dónde acaba el lema, en la pantalla (los botones no suben de ahí)
 func _tit_fin() -> float:
-	var s1 := roundi(17 * u)
 	var s2 := roundi(8.5 * u)
-	return titulo.get_global_rect().position.y + tt + display.get_ascent(s1) + 17 * u * 1.05 + 17 * u * .05 + 6 * u + negrita.get_height(s2) + 2 * u
+	return titulo.get_global_rect().position.y + tt + _tit_alto() + 6 * u + negrita.get_height(s2) + 2 * u
 
 func _pinta_titulo() -> void:
 	var c := titulo
@@ -2756,16 +2788,24 @@ func _pinta_titulo() -> void:
 		c.draw_rect(Rect2(Vector2(rl.position.x, y0), Vector2(rl.size.x, rl.end.y - y0)), Color(0, 0, 0, .18))
 	var f := display
 	var s1 := roundi(17 * u)
-	var y := tt + f.get_ascent(s1) - 17 * u * 1.05
 	var x := 0.0
-	for t1 in ["LANDRACE", "HUNTERS"]:   # dos líneas (<br> en el HTML); el nombre del juego, igual en inglés · i18n-no
-		y += 17 * u * 1.05
-		x = (w - f.get_string_size(t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1).x) / 2
-		c.draw_string(f, Vector2(x + 3 * u, y + 3 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#10301c"))
-		c.draw_string(f, Vector2(x + 1.5 * u, y + 1.5 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#2a7a40"))
-		c.draw_string(f, Vector2(x, y), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#ffe680"))
+	var lo := _tit_logo()
+	if lo[0] != null:   # el logotipo dibujado, centrado y a escala entera
+		var lt: Texture2D = lo[0]
+		var e: int = lo[1]
+		var tw := lt.get_width() * e * u
+		var th := lt.get_height() * e * u
+		c.draw_texture_rect(lt, Rect2(roundf((w - tw) / 2), roundf(tt), tw, th), false)
+	else:
+		var y0 := tt + f.get_ascent(s1) - 17 * u * 1.05
+		for t1 in ["LANDRACE", "HUNTERS"]:   # dos líneas (<br> en el HTML); el nombre del juego, igual en inglés · i18n-no
+			y0 += 17 * u * 1.05
+			x = (w - f.get_string_size(t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1).x) / 2
+			c.draw_string(f, Vector2(x + 3 * u, y0 + 3 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#10301c"))
+			c.draw_string(f, Vector2(x + 1.5 * u, y0 + 1.5 * u), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#2a7a40"))
+			c.draw_string(f, Vector2(x, y0), t1, HORIZONTAL_ALIGNMENT_LEFT, -1, s1, Color("#ffe680"))
 	var s2 := roundi(8.5 * u)
-	y += 17 * u * .05 + 6 * u + negrita.get_ascent(s2)
+	var y := tt + _tit_alto() + 6 * u + negrita.get_ascent(s2)
 	x = (w - negrita.get_string_size(LEMA, HORIZONTAL_ALIGNMENT_LEFT, -1, s2).x) / 2
 	c.draw_string(negrita, Vector2(x + u, y + u), LEMA, HORIZONTAL_ALIGNMENT_LEFT, -1, s2, Color("#10301c"))
 	c.draw_string(negrita, Vector2(x, y), LEMA, HORIZONTAL_ALIGNMENT_LEFT, -1, s2, Color("#9cf0a8"))

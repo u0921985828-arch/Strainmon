@@ -2,6 +2,42 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### EL ESQUEJE con publicidad, noticias y sobre de regalo, la tetraploidia en el laboratorio y los dos rótulos dibujados (0.83, lo pidió el usuario: «molaría hacer banners de publicidad, no que sean solo texto, publicidad de Kiko por ejemplo, de algún Club, de la discoteca Gaua también por ejemplo, comercios locales .. también noticias del cannabis» · «Molaría implantar la tetraploidia en el laboratorio pero de alguna forma no tan complicada de explicar supongo» · «molaría que hubiese como un OpenDoc con una semilla dentro y como un paquetillo de regalo» · «Molaría hacer un sprite del título de la revista, como también molaría hacer un sprite del título del juego… Tiene que ser un título visual para poder utilizarlo en las fotos de publicidad»; solo Godot, con `Datos.CAL`)
+
+- **Los anuncios, dibujados.** Las dos planas de anuncios de cada número ya no son texto suelto: cada anunciante del juego
+  lleva su banner a mano (el growshop de Kiko, GROW IBARBIDE, los clubs, la discoteca GAUA, la lonja, la chatarrería, el
+  molino y los comercios del barrio), con su recuadro, su reclamo y su letra pequeña (`ANU` en `tools/revista.py`, `rev_anu`
+  en `src/revista.gd`, arte en `tools/sprites/a-mano/revista.py`). Rótulos y lemas, propios.
+- **EL MUNDO DEL CANNABIS.** Una sección más con noticias de fuera de la comarca: dieciséis sucesos propios (aduanas,
+  ferias, museos, cooperativas, congresos, la factura de la luz, reglamentos, analíticas, patentes, robos de bancos de
+  semillas, copas y censos), uno por número, que no dependen de la partida y conviven con NOTICIAS DE LA COMARCA, que sí
+  (`MUN` en `tools/revista.py`).
+- **EL SOBRE DEL MES.** Grapado a su plana, el sobre de papel con tres semillas de la variedad del mes, dibujado a mano
+  (`regalo` en `tools/sprites/a-mano/revista.py`): se despega al cerrar el número y las semillas van al banco
+  (`REG`, `rev_sobre`, `rev_regalo`, `rev_reg_hay`, `rev_reg_cobra`, `S.rev.reg`). Uno por número, no por ejemplar.
+- **El despiece, rehecho** (lo dijo el usuario: «hay como pues que parece un kebab de hierba… No sé lo que quieres hacer con
+  eso»): debajo de la ilustración, un recuadro de papel al sol con su pleca verde, la viñeta a su tamaño y los renglones del
+  texto, en vez del bulto de antes (`rects_revista` en `src/revista.gd`).
+- **La mancheta nueva.** EL ESQUEJE se rotula con letras dibujadas por código (`tools/sprites/a-mano/rotulos.py`: barras de
+  4 px en caja de 14 × 20, bisel con la luz arriba a la izquierda, contorno y sombra proyectada), con la cinta del artículo
+  arriba, los filetes y el esqueje al lado; cabe en la caja de composición de la portada (100 × 36).
+- **El rótulo del juego.** `tools/sprites/a-mano/titulo.py` dibuja el logotipo con esas mismas letras: LANDRACE HUNTERS en
+  dos líneas doradas biseladas, con contorno, sombra proyectada y una hojita de siete foliolos a cada lado de la de abajo.
+  Dos piezas en `godot/arte/titulo.png` + `titulo.json`: `logo` (164 × 46), que `_pinta_titulo` pinta centrado y a escala
+  entera sobre la calle del fondo de la pantalla de inicio (`tit_art`, `_tit_logo`, `_tit_alto`, `_tit_fin` en `src/ui.gd`),
+  y `logo-placa` (176 × 58), el mismo sobre su placa verde, para el gráfico destacado de la ficha de la tienda
+  (`tests/capturas.gd`). Se centra el cuerpo de las letras, no el lienzo: contando la sombra proyectada el rótulo quedaba
+  1 px escorado.
+- **La tetraploidia en el laboratorio** (con CAL): la rareza `tetra` no sale sola, solo del laboratorio del banco de la tía.
+  El frasco del reactivo se pide a la cuenta y da para varios intentos; cada intento gasta 2 semillas y un uso, la bandeja va
+  a la estufa y a los días se ve si cuajó (cuaja, se queda por el camino o sale normal). La línea tetraploide da más THC,
+  menos cosecha y va más lenta, y cruzada con una normal no cuaja semilla. **El juego no cuenta en ningún sitio ni el nombre
+  del reactivo, ni concentración, ni tiempos, ni método**: solo el manejo seguro (armario de tóxicos, ficha de seguridad,
+  guantes dobles, cabina, contenedor amarillo y etiquetas), y la prueba lo comprueba sobre el código (`TETRA` en
+  `tools/revista.py`→`datos.json`, `src/bancotia.gd`, `Cultivo.tetra_linea`/`triploide`, `S.bt.tt`).
+- Pruebas: `tests/tetra.gd` (nueva, 33 comprobaciones), `tests/titulo_ui.gd` (el rótulo cargado, centrado, a escala entera y
+  sin pisar las pastillas), `tests/revista_vista.gd` 651 y `tests/revista.gd` 160.
+
 ### EL ESQUEJE, el maquetado a punto (lo dijo el usuario: «el maquetado de la revista debe de ser perfecto o casi, interlineado, entre párrafos, límites, margen y demás»; solo Godot, con `Datos.CAL`)
 
 - **La rejilla de márgenes.** Cada hoja tiene su caja de composición: lomo 7 u, corte 9 u, cabeza 8 u y pie 12 u

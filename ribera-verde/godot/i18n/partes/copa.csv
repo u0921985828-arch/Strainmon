@@ -1048,3 +1048,29 @@ Sin semillas de la Haze del 98 no hay nada que venderle.,Without seeds of the Ha
 "Semillas Ondarea quiere registrar como suyas la Haze del 98 y landraces del banco de la tía. Oponte desde su ordenador antes del {f}, con {m} pruebas y la Haze fijada entre ellas. Tienes {n}.","Semillas Ondarea wants to register the Haze of '98 and landraces from your aunt's bank as theirs. Object from her computer before {f}, with {m} pieces of evidence and the stabilised Haze among them. You have {n}."
 Sin la Haze fijada.,Without the stabilised Haze.
 "La partida ha llegado cortada o cambiada. Cópiala entera, desde LH1. hasta el final.","The save arrived cut off or changed. Copy all of it, from LH1. to the end."
+Fijar una línea,Fix a line
+"Una semilla, el microscopio y la cabina: la línea sube una generación.","One seed, the microscope and the hood: the line goes up a generation."
+Doblar los cromosomas,Double the chromosomes
+Con el reactivo del armario de tóxicos. Te quedan {n} usos del frasco.,With the reagent from the toxics cabinet. You have {n} uses left in the bottle.
+"El frasco del reactivo se pide al proveedor del banco: {e} € a la cuenta, para {n} intentos. Es tóxico y va al armario cerrado, con su etiqueta.","The bottle of reagent is ordered from the bank's supplier: {e} € charged to the account, for {n} attempts. It's toxic and goes in the locked cabinet, labelled."
+Laboratorio,Lab
+Reactivo,Reagent
+No hay saldo en la cuenta.,There's no money in the account.
+"El frasco, en el armario de tóxicos, con la ficha de seguridad al lado. Con él puesto encima de la mesa no se come, no se bebe y no se sale del laboratorio.","The bottle, in the toxics cabinet, with its safety sheet beside it. While it's out on the bench nobody eats, nobody drinks and nobody leaves the lab."
+Hay una bandeja en la estufa esperando. De una en una.,There's already a tray waiting in the incubator. One at a time.
+Hacen falta 2 semillas de una línea que no sea ya tetraploide: la mitad se queda por el camino.,You need 2 seeds from a line that isn't tetraploid already: half of them don't make it.
+{n} sem.,{n} seeds
+DOBLAR LOS CROMOSOMAS,DOUBLE THE CHROMOSOMES
+"¿Tratar {s}? Gastas 2 semillas y un uso del frasco. Si cuaja, la línea pasa a tetraploide: más THC y menos cosecha, y ya no cruza con una normal.","Treat {s}? You use 2 seeds and one use of the bottle. If it takes, the line turns tetraploid: more THC and less yield, and it no longer crosses with a normal one."
+Tratar,Treat it
+"La bandeja, a la estufa, etiquetada con la línea y la fecha. En {d} días se verá cuál tira y cuál no.","The tray goes into the incubator, labelled with the line and the date. In {d} days you'll see which ones take."
+"La bandeja de {s} tiró: hoja gruesa y tallo macizo. Es tetraploide. Dos semillas de la línea nueva, etiquetadas.","The {s} tray took: thick leaves and a solid stem. It's tetraploid. Two seeds of the new line, labelled."
+La bandeja de {s} no tiró: lo tratado se quedó por el camino. Al contenedor amarillo.,The {s} tray didn't take: what was treated didn't make it. Into the yellow bin.
+"La bandeja de {s} salió adelante, pero igual que su madre: no cuajó el doblado. Queda una semilla.","The {s} tray came through, but just like its mother: the doubling didn't take. One seed left."
+"El frasco, del armario de tóxicos a la cabina, sin sacarlo del laboratorio.","The bottle, from the toxics cabinet to the hood, without taking it out of the lab."
+Guantes dobles y la ficha de seguridad a la vista.,Double gloves and the safety sheet in plain sight.
+"Las plántulas marcadas, tratadas en la cabina.","The marked seedlings, treated in the hood."
+"La bandeja, a la estufa con su etiqueta; lo gastado, al contenedor amarillo.","The tray into the incubator with its label; what's used up, into the yellow bin."
+{a} y {b} no tienen los mismos juegos de cromosomas: lo que salga de ahí no cuaja semilla. Una tetraploide solo cruza con otra tetraploide.,{a} and {b} don't have the same sets of chromosomes: nothing out of that will set seed. A tetraploid only crosses with another tetraploid.
+Tetraploide,Tetraploid
+"Le salió el doble de juegos de cromosomas: hoja gruesa, porte macizo, 2 puntos más de THC, un 15 % menos de cosecha y un 20 % más lenta. Cruzada con una normal no cuaja semilla.","It came out with double the sets of chromosomes: thick leaves, solid build, 2 points more THC, 15 % less yield and 20 % slower. Crossed with a normal one it sets no seed."

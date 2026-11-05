@@ -169,6 +169,7 @@ func new_day() -> void:
 	vencer_encargo_club()
 	hilo_dia()   # con CAL, el cuaderno azul de la tía (hilo.gd)
 	rev_dia()   # EL ESQUEJE: el número del mes al buzón si estás suscrito (revista.gd)
+	tetra_dia()   # la bandeja del laboratorio que cumple su plazo (bancotia.gd)
 	if S.due > 0 and S.day > S.deadline:   # 1.10: también sin haber visto a Baltasar (el plazo corre desde Toño)
 		queue("penalty", penalty_event)
 	elif S.due > 0 and (S.deadline - S.day == 3 or S.deadline == S.day):   # 1.11: a 3 días y el último
@@ -1839,6 +1840,10 @@ func lab_action():
 		await estabilizar(A)
 		return
 	var Bk: String = l2[b - (it2.size() - l2.size())][0]
+	# la tetraploide con una normal da triploide, que no cuaja semilla (lo pidió el usuario con la tetraploidia)
+	if Cultivo.triploide(S, A, Bk):
+		await say(T("{a} y {b} no tienen los mismos juegos de cromosomas: lo que salga de ahí no cuaja semilla. Una tetraploide solo cruza con otra tetraploide.", {"a": strain(A).n, "b": strain(Bk).n}))
+		return
 	if await ask(T("¿Cruzar {a} × {b}? Gastas 1 semilla de cada.", {"a": strain(A).n, "b": strain(Bk).n}), [K("Cruzar"), K("Cancelar")]) != 0:
 		return
 	S.seeds[A] -= 1

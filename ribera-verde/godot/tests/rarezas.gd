@@ -113,7 +113,8 @@ func _corre() -> void:
 	J.S.erase("ra")
 	J.S.erase("album")
 	# 1 · los datos
-	chk(R.orden == ["enana", "doble", "aroma", "resina"] and R.orden.all(func(k): return R.r.has(k) and R.r[k].has("n") and R.r[k].has("d")), "los cuatro rasgos, con su nombre y lo que hacen")
+	chk(R.espontaneo == ["enana", "doble", "aroma", "resina"] and R.orden.all(func(k): return R.r.has(k) and R.r[k].has("n") and R.r[k].has("d")), "los cuatro rasgos que salen solos, con su nombre y lo que hacen")
+	chk(R.orden.has("tetra") and not R.espontaneo.has("tetra"), "la tetraploide está, pero no sale sola")
 	chk(R.niv.size() == int(R.fija) + 1 and float(R.niv[-1]) == 1.0 and is_equal_approx(float(R.p), 0.02), "1 de cada 50 y, fijado, todas")
 	# 2 · la tirada: 1 de cada 50 sin la línea; con ella, la de su nivel
 	var N := 5000

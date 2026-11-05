@@ -30,6 +30,19 @@ CAB = {
 	"col": 12,           # números distintos para el logro
 }
 
+# El sobre de semillas grapado a la hoja (lo pidió el usuario: «molaría también que en cada revista regalen una semilla o algo
+# así… como un sobre con una semilla dentro y como un paquetillo de regalo»): cada número trae tres semillas de su variedad del
+# mes, una sola vez por número. El texto de la plana, con el reclamo de siempre de las revistas de quiosco.
+REG = {
+	"n": 3,
+	"t": [
+		"Grapado a esta página, como siempre, el sobre del mes: tres semillas de la variedad de la que habla la página de al lado.",
+		"Cortesía de los anunciantes, que para eso pagan. Despega el sobre con cuidado, que el año pasado alguien lo abrió con los dientes y se quedó sin regalo y sin muela.",
+		"Un número, un sobre. Quien compre dos ejemplares del mismo mes que no nos escriba: ya nos ha escrito, y le contestamos lo mismo.",
+	],
+	"ya": "El sobre de este número ya lo despegaste. Queda la marca de la grapa y poco más.",
+}
+
 # Las doce técnicas: nombre, qué hace en el juego (clave y tanto por uno) y el texto de la sección TALLER.
 # Topes en revista.gd: rend .15, cal .12, thc .02, moho .25, clon .18.
 TEC = [
@@ -109,8 +122,10 @@ CAR = [
 SEC = {   # los títulos de las secciones, en orden
 	"port": "PORTADA",
 	"nw": "NOTICIAS DE LA COMARCA",
+	"mun": "EL MUNDO DEL CANNABIS",
 	"ent": "LA ENTREVISTA",
 	"vari": "LA VARIEDAD DEL MES",
+	"reg": "EL SOBRE DEL MES",
 	"tec": "TALLER",
 	"pst": "PÓSTER CENTRAL",
 	"con": "EL CONSULTORIO",
@@ -126,6 +141,46 @@ SEC = {   # los títulos de las secciones, en orden
 }
 
 DON = ["prensa", "kiko", "ane", "est", "mercado"]   # quiosco, growshop de Kiko, GROW IBARBIDE, estancos, mercado de la Ribera
+
+# Las noticias del cannabis (lo pidió el usuario: «también noticias del cannabis»): la plana de fuera de la comarca, con tres
+# breves por número. Todo es ficción del mundo del juego —congresos, ferias, aduanas, cooperativas, museos y bancos de
+# semillas inventados—, contada como la cuenta una revista de quiosco. Nada de publicaciones, marcas, bancos, criadores,
+# empresas, países con su ley de verdad ni personas reales; nada de método ni de dosis. «e», la estación en que encaja (0 =
+# cualquiera, 1 primavera, 2 verano, 3 otoño, 4 invierno); «ch», el capítulo desde el que puede salir.
+MUN = [
+	{"k": "aduana", "e": 0, "ch": 1, "t": "Una aduana del sur devuelve un envío de semillas por un papel mal puesto",
+		"c": "Mil sobres parados tres semanas por una casilla sin rellenar. El envío volvió entero y nadie perdió nada salvo la temporada, que es lo único que no se recupera. Desde la cooperativa que lo mandaba dicen que el formulario cambió en enero y que no se enteró nadie."},
+	{"k": "feriaint", "e": 1, "ch": 1, "t": "La feria del norte cierra con más visitas que nunca y menos puestos",
+		"c": "Tres pabellones llenos y la mitad de los expositores de hace cinco años. Los que quedan son los de siempre: viveros pequeños, gente que vende macetas y dos cooperativas que traen semilla de su tierra. Lo nuevo este año eran las charlas, que se llenaron antes que los puestos."},
+	{"k": "museo", "e": 4, "ch": 2, "t": "Un museo del cultivo abre en una fábrica vieja",
+		"c": "Herramienta de hace ochenta años, carteles de propaganda y una sala con las variedades que se cultivaban en el valle antes de que se dejara. Lo monta una asociación de vecinos y lo que se recauda va a mantener el edificio, que se caía."},
+	{"k": "coop", "e": 3, "ch": 2, "t": "Una cooperativa de montaña recupera una variedad que se daba por perdida",
+		"c": "La tenían tres familias, cada una con su línea, y ninguna sabía de las otras. Juntaron lo que quedaba, lo sembraron el mismo año y salió una planta que se parece bastante a la de las fotos viejas. Ahora buscan quién la cultive para que no dependa de un arcón."},
+	{"k": "cong", "e": 3, "ch": 3, "t": "El congreso de genética del otoño se centra en las landraces",
+		"c": "Dos días de ponencias sobre lo mismo: que las variedades de origen se están perdiendo más rápido de lo que se catalogan. La conclusión, la de siempre, es que hace falta más gente guardando semilla y menos gente guardándosela."},
+	{"k": "precio", "e": 0, "ch": 3, "t": "El precio del kilovatio aprieta a los cultivos de interior de media Europa",
+		"c": "Donde se cultiva con luz, la factura ya pesa más que el abono y el agua juntos. Los cultivos grandes se pasan a focos de menos consumo; los pequeños, directamente, a cultivar fuera cuando el clima deja."},
+	{"k": "club", "e": 0, "ch": 4, "t": "Las asociaciones de otra comarca pactan un reglamento común",
+		"c": "Catorce clubs firman lo mismo: carné, libro de socios, nada de calle y las cuentas a la vista una vez al año. No es ley ni lo pretende, pero en la práctica es lo más parecido que hay a una."},
+	{"k": "lab", "e": 0, "ch": 4, "t": "Un laboratorio independiente publica su tabla de analíticas del año",
+		"c": "Mil doscientas muestras analizadas y una conclusión incómoda: una de cada cinco no se parecía a lo que ponía en la etiqueta. El laboratorio no da nombres; dice que el problema no es quien miente, sino que casi nadie comprueba."},
+	{"k": "mar", "e": 2, "ch": 5, "t": "Una conservera del litoral se mete a distribuidora con licencia",
+		"c": "Mismo almacén, mismo frío y la mitad del camión para lo de siempre. Con el permiso en la mano, lo que antes iba de noche va de día y con albarán. En el puerto lo cuentan como una rareza; fuera, como lo que viene."},
+	{"k": "semillas", "e": 1, "ch": 5, "t": "Un banco de semillas del este abre su catálogo al público",
+		"c": "Cuatrocientas entradas con su ficha, su origen y quién la depositó, consultables por cualquiera. No venden: prestan a quien se compromete a devolver semilla de la cosecha. En seis meses han salido ochenta y han vuelto setenta y seis."},
+	{"k": "copa", "e": 3, "ch": 6, "t": "Una copa internacional cambia las reglas tras años de quejas",
+		"c": "A partir de este año, cata a ciegas de verdad, muestras recogidas por el jurado y nota del laboratorio aparte de la del paladar. Media sala aplaudió y la otra media se fue a mirar el reglamento."},
+	{"k": "ley", "e": 0, "ch": 6, "t": "Un país del norte regula el autocultivo asociado y deja fuera la venta",
+		"c": "Plantas contadas por persona, asociaciones con registro y nada de mostrador. Las cooperativas lo leen como un primer paso; los clubs, como un techo. Lo único claro es que ya hay un papel donde antes no había nada."},
+	{"k": "robo", "e": 4, "ch": 7, "t": "Roban un banco de semillas y se llevan lo que no se puede reponer",
+		"c": "Entraron por el tejado y se llevaron los arcones de una colección de cuarenta años. El seguro cubre el frigorífico. Lo de dentro, no: no hay precio para una semilla de la que no queda otra."},
+	{"k": "patente", "e": 0, "ch": 7, "t": "Una empresa retira su solicitud de patente sobre una variedad de origen",
+		"c": "La oposición la presentaron tres cooperativas con papeles de hace treinta años. La empresa retiró la solicitud sin dar explicaciones. En el sector se lee como un aviso: lo que no está documentado, alguien lo registra."},
+	{"k": "secado", "e": 0, "ch": 8, "t": "Un estudio del sur pone cifras a lo que se pierde en el secado",
+		"c": "Midieron cien lotes del mismo cultivo secados de ocho maneras. La diferencia entre el mejor y el peor era de un tercio del valor final. La conclusión del que lo firma: «la cosecha no se acaba cuando se corta»."},
+	{"k": "mujeres", "e": 1, "ch": 8, "t": "Una red de cultivadoras publica su primer censo",
+		"c": "Trescientas socias en once comarcas, la mitad con cultivo propio y un tercio al frente de una asociación. El censo se hizo porque, cuando preguntaron, nadie tenía el dato."},
+]
 
 # Las noticias de la comarca. Cada una va con la clave del suceso que la trae (lo apunta rev_nota al pasar en la partida) y se
 # cuenta en el número del mes en que pasó o del siguiente. «t» es el cuerpo y «ti» el titular de portada si es la noticia gorda
@@ -313,16 +368,22 @@ ERR = [
 	"En el número anterior, el horóscopo de agosto salió en la página de legal. Hubo quien lo leyó como una sentencia y, visto lo visto, acertó.",
 ]
 
-# los anuncios: el faldón del pie de plana, con la letra pequeña. Negocios del juego, nada de marcas de verdad.
+# los anuncios: el faldón del pie de plana. Negocios del juego, nada de marcas de verdad. Lo pidió el usuario: «molaría hacer
+# banners de publicidad, no que sean solo texto, publicidad de Kiko por ejemplo, de algún Club, de la discoteca Gaua también
+# por ejemplo, comercios locales» → cada anunciante lleva su banner dibujado, «b», que es la pieza ban-<b> de arte/revista.png
+# (104 × 56, del generador de sprites por tools/sprites/sprgen_revista.py). Sin una sola letra en el dibujo: el texto lo pone
+# el juego debajo, en el idioma que toque.
 ANU = [
-	{"n": "GROWSHOP DE KIKO", "t": "«Todo para tu cultivo y una charla gratis»", "pie": "Barrio de siempre. Abierto desde antes de que esto se llamara así."},
-	{"n": "GROW IBARBIDE", "t": "«Lo último, y un diez por ciento menos»", "pie": "Ensanche. No preguntes por el callejón de detrás."},
-	{"n": "CHATARRERÍA DE VALDEHIERRO", "t": "«Tu equipo de hace dos años»", "pie": "Lo que entra esta semana, a mitad. Pregunta por Bixente."},
-	{"n": "LONJA DE PUERTO VIEJO", "t": "«Compramos al por mayor. Pago en el día»", "pie": "Lotes grandes. No bajamos al muelle a mirar cien gramos."},
-	{"n": "MOLINO DE ERROTABARRI", "t": "«Trae lo que te sobra. Llévate lo que te falta»", "pie": "Sin dinero por medio. Sin excepciones."},
-	{"n": "ESTANCOS DE LA COMARCA", "t": "«Papel, mechero y esta revista»", "pie": "Mira el rótulo de la T. Si no hay T, no hay revista."},
-	{"n": "AUTOS RIBERA", "t": "«Del scooter al deportivo. Entrega en el día»", "pie": "Financiación, seguro y la primera revisión. Barrio alto."},
-	{"n": "FEDERACIÓN DE CLUBS", "t": "«Hazte socio de tu club»", "pie": "Esta revista la edita quien se anuncia aquí."},
+	{"n": "GROWSHOP DE KIKO", "b": "kiko", "t": "«Todo para tu cultivo y una charla gratis»", "pie": "Barrio de siempre. Abierto desde antes de que esto se llamara así."},
+	{"n": "GROW IBARBIDE", "b": "ibar", "t": "«Lo último, y un diez por ciento menos»", "pie": "Ensanche. No preguntes por el callejón de detrás."},
+	{"n": "CHATARRERÍA DE VALDEHIERRO", "b": "chatarra", "t": "«Tu equipo de hace dos años»", "pie": "Lo que entra esta semana, a mitad. Pregunta por Bixente."},
+	{"n": "LONJA DE PUERTO VIEJO", "b": "lonja", "t": "«Compramos al por mayor. Pago en el día»", "pie": "Lotes grandes. No bajamos al muelle a mirar cien gramos."},
+	{"n": "MOLINO DE ERROTABARRI", "b": "molino", "t": "«Trae lo que te sobra. Llévate lo que te falta»", "pie": "Sin dinero por medio. Sin excepciones."},
+	{"n": "ESTANCOS DE LA COMARCA", "b": "estanco", "t": "«Papel, mechero y esta revista»", "pie": "Mira el rótulo de la T. Si no hay T, no hay revista."},
+	{"n": "AUTOS RIBERA", "b": "autos", "t": "«Del scooter al deportivo. Entrega en el día»", "pie": "Financiación, seguro y la primera revisión. Barrio alto."},
+	{"n": "FEDERACIÓN DE CLUBS", "b": "feder", "t": "«Hazte socio de tu club»", "pie": "Esta revista la edita quien se anuncia aquí."},
+	{"n": "CLUB ITSASO", "b": "club", "t": "«Socios desde el 94. Sofá, billar y dispensario»", "pie": "Puerto Viejo. Carné en la puerta y el encargado te enseña la casa."},
+	{"n": "GAUA", "b": "gaua", "t": "«De once a seis. El reservado, para quien lo pida»", "pie": "Ensanche. Entrada por noche. Lo de dentro no sale en la revista."},
 ]
 
 # El capítulo desde el que cada uno existe en la partida (ataque de la revisión: el número 1 no puede entrevistar a quien aún no
@@ -334,6 +395,7 @@ ANU_CH = {
 	"GROWSHOP DE KIKO": (1, ""), "GROW IBARBIDE": (4, ""), "CHATARRERÍA DE VALDEHIERRO": (2, ""),
 	"LONJA DE PUERTO VIEJO": (2, ""), "MOLINO DE ERROTABARRI": (3, ""), "ESTANCOS DE LA COMARCA": (1, ""),
 	"AUTOS RIBERA": (5, "conce"), "FEDERACIÓN DE CLUBS": (1, ""),
+	"CLUB ITSASO": (2, ""), "GAUA": (4, ""),
 }
 for _e in ENT:
 	_e["ch"] = ENT_CH[_e["n"]]
@@ -376,13 +438,20 @@ def main():
 	assert all(1 <= e["ch"] <= 8 for e in ENT) and any(e["ch"] == 1 for e in ENT)
 	assert all(1 <= a["ch"] <= 8 for a in ANU) and sum(1 for a in ANU if a["ch"] == 1 and not a["f"]) >= 2
 	assert all(len(a["n"]) + len(a["t"]) + len(a["pie"]) <= 150 for a in ANU), "el anuncio va a toda plana: tiene que caber"
-	D["REVISTA"] = {"cab": CAB, "tec": TEC, "tit": TIT, "cls": CLS, "car": CAR, "sec": SEC, "don": DON, "tope": TOPE,
-		"nw": NW, "rel": REL, "ag": AG,
+	assert all(a.get("b") for a in ANU) and len(set(a["b"] for a in ANU)) == len(ANU), "cada anunciante, con su banner"
+	# las noticias del cannabis: tres por número desde el primero, así que tiene que haber de sobra del capítulo 1
+	assert len(MUN) >= 12 and len(set(m["k"] for m in MUN)) == len(MUN)
+	assert all(1 <= m["ch"] <= 8 and 0 <= m["e"] <= 4 and m["t"] and m["c"] for m in MUN)
+	assert sum(1 for m in MUN if m["ch"] == 1) >= 2
+	assert REG["n"] >= 1 and len(REG["t"]) >= 2 and REG["ya"] and "reg" in SEC
+	D["REVISTA"] = {"cab": CAB, "tec": TEC, "tit": TIT, "cls": CLS, "car": CAR, "sec": SEC, "don": DON, "tope": TOPE, "reg": REG,
+		"nw": NW, "mun": MUN, "rel": REL, "ag": AG,
 		"fal": FAL, "ent": ENT, "con": CON, "tst": TST, "tstp": TST_PIE, "hor": HOR, "err": ERR, "anu": ANU, "pst": PST}
 	t = json.dumps(D, ensure_ascii=False, separators=(',', ':'))
 	if t != s:
 		open(DATOS, 'w', encoding='utf8').write(t)
 	print("revista: %s · %d técnicas · %d noticias · %d de relleno · %d clasificados · %d cartas · %d sitios donde se vende" % (CAB["n"], len(TEC), len(NW), len(REL), len(CLS), len(CAR), len(DON)))
+	print("  mundo: %d noticias del cannabis" % len(MUN))
 	print("  parodia: %d entrevistas · %d consultorios · %d pruebas · %d horóscopos · %d erratas · %d anuncios · %d reclamos" % (len(ENT), len(CON), len(TST), len(HOR), len(ERR), len(ANU), len(FAL)))
 
 

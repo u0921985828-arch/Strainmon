@@ -25,6 +25,8 @@ func rev() -> Dictionary:
 		S.rev.sus = 0
 	if not (S.rev.get("nw") is Array):   # el registro de sucesos: las partidas de antes no lo tienen
 		S.rev.nw = []
+	if not (S.rev.get("reg") is Array):   # los sobres del mes ya despegados, por número
+		S.rev.reg = []
 	return S.rev
 
 func rev_hay() -> bool:
@@ -66,6 +68,36 @@ func rev_var(n: int) -> String:   # la variedad del mes: una de STRAINS, fija po
 	var ks: Array = D.STRAINS.keys()
 	ks.sort()
 	return String(ks[Datos.hash_str("rev-var|%d" % n) % ks.size()])
+
+# ---------- el sobre del mes (lo pidió el usuario: «que en cada revista regalen una semilla… como un paquetillo de regalo») ----------
+# Cada número trae grapado su sobre, con REVISTA.reg.n semillas de la variedad del mes; se despega una sola vez por número, al
+# acabar de leerlo (rev_lee), y queda apuntado en S.rev.reg.
+func rev_regalo(n: int) -> Dictionary:
+	return {"sid": rev_var(n), "n": int(D.REVISTA.get("reg", {}).get("n", 3))}
+
+func rev_reg_hay(n: int) -> bool:
+	return rev_hay() and D.REVISTA.has("reg") and not rev().reg.has(n)
+
+func rev_sobre(n: int) -> String:
+	var R: Dictionary = D.REVISTA.reg
+	var g := rev_regalo(n)
+	if not rev_reg_hay(n):
+		return I18n.v(String(R.ya))
+	var o := PackedStringArray()
+	o.append(I18n.v(String(R.t[Datos.hash_str("rev-reg|%d" % n) % R.t.size()])))
+	o.append(T("Dentro: {q} semillas de {s}.", {"q": int(g.n), "s": I18n.v(String(strain(String(g.sid)).n))}))
+	o.append(K("Despégalo al acabar el número."))
+	return "\n\n".join(o)
+
+# al cerrar el número, el sobre se despega: las semillas, a la GENOTECA
+func rev_reg_cobra(n: int) -> void:
+	if not rev_reg_hay(n):
+		return
+	var g := rev_regalo(n)
+	rev().reg.append(n)
+	add_seeds(String(g.sid), int(g.n))
+	sfx("get")
+	toast(T("Del sobre del mes: {q} semillas de {s}", {"q": int(g.n), "s": I18n.v(String(strain(String(g.sid)).n))}), 2400)
 
 # ---------- lo que dejan las técnicas aprendidas ----------
 func rev_bono(e: String) -> float:
@@ -162,6 +194,47 @@ func rev_noticias(n: int) -> String:
 			l.append("· " + String(rl[(Datos.hash_str("rev-rel|%d" % n) + i) % rl.size()]))
 			i += 1
 	return "\n".join(l)
+
+# ---------- las noticias del cannabis: la plana de fuera de la comarca ----------
+# (lo pidió el usuario: «también noticias del cannabis»). Tres breves por número, de lo que pasa en el mundo del cultivo fuera
+# del barrio. Todo ficción del juego: congresos, ferias, aduanas, cooperativas y bancos de semillas inventados. Nada de
+# publicaciones, marcas, empresas ni personas de verdad, y nada de método ni de dosis. Pesa la estación del número, de modo
+# que la feria de primavera no cae en enero, y el capítulo, para no contar lo que aún no toca.
+const REV_MUN_N := 3
+
+func rev_mun_de(n: int) -> Array:
+	var M: Array = rev_hoy(D.REVISTA.mun)
+	var e := rev_est(n) + 1
+	var pri := []     # las de esta estación primero; detrás, las de cualquiera
+	var res := []
+	for m in M:
+		if int(m.e) == e:
+			pri.append(m)
+		elif int(m.e) == 0:
+			res.append(m)
+		else:
+			res.append(m)
+	var o := []
+	var vistas := {}
+	for l in [pri, res]:
+		if l.is_empty():
+			continue
+		var i: int = Datos.hash_str("rev-mun|%d" % n) % l.size()
+		for k in l.size():
+			if o.size() >= REV_MUN_N:
+				break
+			var m: Dictionary = l[(i + k) % l.size()]
+			if vistas.has(String(m.k)):
+				continue
+			vistas[String(m.k)] = 1
+			o.append(m)
+	return o
+
+func rev_mundo(n: int) -> String:
+	var l := PackedStringArray()
+	for m in rev_mun_de(n):
+		l.append("%s\n%s" % [I18n.v(String(m.t)), I18n.v(String(m.c))])
+	return "\n\n".join(l)
 
 # ---------- la agenda del mes: lo que viene por el calendario ----------
 func rev_my(n: int) -> Dictionary:   # el mes y el año del número n
@@ -296,11 +369,20 @@ func rev_err(n: int) -> String:
 	return I18n.v(String(E[Datos.hash_str("rev-err|%d" % n) % E.size()]))
 
 # los anuncios a toda página: dos por número, distintos entre sí
-func rev_anu(n: int, k: int) -> String:
+func rev_anu_de(n: int, k: int) -> Dictionary:
 	var A: Array = rev_hoy(D.REVISTA.anu)
 	var i := (Datos.hash_str("rev-anu|%d" % n) + (k * 3 + k if A.size() > 1 else 0)) % A.size()
-	var a: Dictionary = A[i]
+	return A[i]
+
+func rev_anu(n: int, k: int) -> String:
+	var a := rev_anu_de(n, k)
 	return "%s\n%s\n\n%s" % [I18n.v(String(a.n)), I18n.v(String(a.t)), I18n.v(String(a.pie))]
+
+# el banner del anunciante de esa plana: la pieza ban-<b> de arte/revista.png, dibujada y sin letras (lo pidió el usuario:
+# «banners de publicidad, no que sean solo texto»). Vacío si el anunciante no tiene banner
+func rev_anu_ban(n: int, k: int) -> String:
+	var b := String(rev_anu_de(n, k).get("b", ""))
+	return b if b != "" and REV_ART.has("ban-" + b) else ""
 
 # la lámina del póster: el porte de la variedad del mes por su % índica (la índica, baja y ancha; la sativa, espigada)
 func rev_pst_pl(n: int) -> String:
@@ -325,6 +407,8 @@ func rev_secciones(n: int) -> Array:
 		"txt": "%s\n\n%s" % [rev_titular(n), rev_faldon(n)]})
 	# las noticias de la comarca
 	o.append({"k": "nw", "tit": I18n.v(String(SE.nw)), "txt": rev_noticias(n)})
+	# las noticias del cannabis, de fuera de la comarca
+	o.append({"k": "mun", "tit": I18n.v(String(SE.mun)), "txt": rev_mundo(n)})
 	# la entrevista del mes
 	o.append({"k": "ent", "tit": I18n.v(String(SE.ent)), "txt": rev_ent(n)})
 	# la variedad del mes
@@ -340,6 +424,9 @@ func rev_secciones(n: int) -> Array:
 		li.append(K("Esta ya la tienes en la GENOTECA."))
 	# la ficha (nombre, mezcla y origen) y, con el aire de un párrafo, el comentario: la plana se lee en dos bloques
 	o.append({"k": "vari", "tit": I18n.v(String(SE.vari)), "txt": "%s\n%s\n\n%s" % [li[0], li[1], li[2]]})
+	# el sobre del mes, grapado a la hoja de al lado
+	if D.REVISTA.has("reg"):
+		o.append({"k": "reg", "tit": I18n.v(String(SE.reg)), "txt": rev_sobre(n)})
 	# el taller: la técnica
 	var tc := rev_tec(n)
 	o.append({"k": "tec", "tit": "%s · %s" % [I18n.v(String(SE.tec)), I18n.v(String(tc.n))], "txt": I18n.v(String(tc.t))})
@@ -473,6 +560,7 @@ func rev_lee(n: int) -> void:
 	# está (una partida vieja del HTML, sin CAL), el lector de siempre
 	var rv := rev_paginas(n) if Datos.CAL and rev_art() else {}
 	await leer("%s · %s" % [I18n.v(String(D.REVISTA.cab.n)), rev_mes(n)], rev_texto(n), rv)
+	rev_reg_cobra(n)   # el sobre grapado del mes, al cerrar el número
 	if nuevo:
 		rev().tec.append(String(tc.k))
 		sfx("get")
@@ -555,10 +643,10 @@ const REV_POR_Y := 43      # la ilustración de la portada: debajo de la manchet
 const REV_POR_H := 42      # su alto: deja sitio al titular y al reclamo debajo
 const REV_FOTO_H := 72      # la ilustración de la hoja izquierda, entera (las pt-* miden 104 × 72: recortada se comía un tercio del dibujo)
 # la foto grande de la hoja izquierda, por sección (de las ocho ilustraciones del atlas)
-const REV_FOTO := {"nw": "redada", "ent": "club", "var": "planta", "tec": "carpa", "con": "planta", "tst": "nave",
+const REV_FOTO := {"nw": "redada", "mun": "feria", "ent": "club", "var": "planta", "tec": "carpa", "con": "planta", "tst": "nave",
 	"merc": "feria", "copa": "copa", "ag": "carpa", "cls": "feria", "car": "club", "hor": "planta", "err": "redada",
 	"leg": "redada"}   # i18n-no
-const REV_VG := {"nw": "nw", "ent": "ent", "vari": "var", "tec": "tec", "anu": "anu", "con": "con", "tst": "tst", "pst": "pst", "merc": "merc", "anu2": "anu", "copa": "copa", "ag": "ag", "cls": "cls", "car": "car", "hor": "hor", "err": "err", "leg": "leg"}   # i18n-no
+const REV_VG := {"nw": "nw", "mun": "mun", "ent": "ent", "vari": "var", "reg": "var", "tec": "tec", "anu": "anu", "con": "con", "tst": "tst", "pst": "pst", "merc": "merc", "anu2": "anu", "copa": "copa", "ag": "ag", "cls": "cls", "car": "car", "hor": "hor", "err": "err", "leg": "leg"}   # i18n-no
 # de qué va la portada según el suceso que manda en el titular
 const REV_ILU := {"redada": "redada", "orden": "redada", "acusa": "redada", "embargo": "redada", "copa": "copa", "copa6": "copa",
 	"kaia": "club", "ley": "club", "presi": "club", "metro": "club", "banco": "planta", "bancofin": "planta", "patente": "planta",
@@ -639,6 +727,7 @@ func rev_paginas(n: int) -> Dictionary:
 	var pags: Array[String] = []
 	var tit: Array[String] = []
 	var vg: Array[String] = []
+	var ban: Array[String] = []   # el banner de la plana: solo las de anuncio lo llevan
 	var secs := rev_secciones(n)
 	var pie := ""
 	if not secs.is_empty() and String(secs[-1].k) == "pie":
@@ -650,6 +739,7 @@ func rev_paginas(n: int) -> Dictionary:
 			pags.append("%s\n\n%s" % [String(q.cab), txt])   # la cabecera, el titular y el reclamo: tres párrafos con su aire
 			tit.append("")
 			vg.append("")
+			ban.append("")
 			continue
 		if i == secs.size() - 1 and pie != "":   # el pie de la revista cierra la última plana
 			txt += "\n\n" + pie
@@ -658,12 +748,18 @@ func rev_paginas(n: int) -> Dictionary:
 			pags.append(String(trozos[t]))
 			tit.append(String(q.tit) if t == 0 else "%s (%d)" % [String(q.tit), t + 1])
 			vg.append(String(REV_VG.get(String(q.k), "")))
-	return {"n": n, "pags": pags, "tit": tit, "vg": vg, "ilu": rev_ilu(n), "pst": rev_pst_pl(n)}
+			ban.append(rev_anu_ban(n, 1 if String(q.k) == "anu2" else 0) if String(q.k).begins_with("anu") else "")
+	return {"n": n, "pags": pags, "tit": tit, "vg": vg, "ban": ban, "ilu": rev_ilu(n), "pst": rev_pst_pl(n)}
 
 # la clave de la plana que se está viendo (la de su viñeta: «anu» el anuncio, «pst» el póster central)
 func rev_vg_i() -> String:
 	var vgs: Array = lector_rev.get("vg", [])
 	return String(vgs[lector_i]) if lector_i >= 0 and lector_i < vgs.size() else ""
+
+# el banner de la plana que se está viendo («» si no es una plana de anuncio)
+func rev_ban_i() -> String:
+	var bs: Array = lector_rev.get("ban", [])
+	return String(bs[lector_i]) if lector_i >= 0 and lector_i < bs.size() else ""
 
 # la rejilla de la revista: los márgenes de la caja de composición. Los de una revista de verdad: el del lomo más estrecho que el
 # de corte, la cabeza más corta que el pie. Todo lo que se compone (filetes, foto, despiece, texto) cae dentro de esta caja
@@ -775,9 +871,19 @@ func rects_revista() -> Array:
 			o.append(["@", vp, ci.position.x + ((ci.size.x - vp.get_width()) >> 1), ci.position.y + ((py - ci.position.y - vp.get_height()) >> 1) + 3, clip])
 			o.append(["@", pl, px, py, clip])
 			o.append_array(_rev_marco(px, py, pl.get_width(), pl.get_height()))
-		elif vk == "anu":   # el anuncio: el megáfono grande a la izquierda y el recuadro en la hoja del texto
-			var va: Image = rev_x2("vg-anu")
-			o.append(["@", va, ci.position.x + ((ci.size.x - va.get_width()) >> 1), ci.get_center().y - (va.get_height() >> 1), clip])
+		elif vk == "anu":   # el anuncio: el banner del anunciante a la izquierda y el recuadro en la hoja del texto
+			var bk := rev_ban_i()
+			if bk != "":   # el banner dibujado, centrado en la hoja con su marco, y el megáfono de sello en la esquina
+				var bn: Image = rev_anc(REV_ART["ban-" + bk], ci.size.x)
+				var by: int = ci.position.y + ((ci.size.y - bn.get_height()) >> 1)
+				var bx: int = ci.position.x + ((ci.size.x - bn.get_width()) >> 1)
+				o.append(["@", bn, bx, by, clip])
+				o.append_array(_rev_marco(bx, by, bn.get_width(), bn.get_height()))
+				o.append_array(_rev_filete("filete2", ci.position.x, by + bn.get_height() + 8, ci.size.x, clip))
+				o.append(["@", REV_ART["vg-anu"], ci.end.x - 38, ci.position.y + 6, clip])
+			else:
+				var va: Image = rev_x2("vg-anu")
+				o.append(["@", va, ci.position.x + ((ci.size.x - va.get_width()) >> 1), ci.get_center().y - (va.get_height() >> 1), clip])
 			o.append_array(_rev_pie("filete", ci.position.x, ci.end.y, ci.size.x, clip))
 			var dclip := Rect2i(hd.position.x, hd.position.y, hd.size.x, hd.size.y)
 			o.append([cd.position.x, cd.position.y, cd.size.x, cd.size.y, "#f7f2e2"])
@@ -786,25 +892,38 @@ func rects_revista() -> Array:
 			o.append_array(_rev_filete("filete", cd.position.x, cd.position.y, cd.size.x, dclip))
 			o.append_array(_rev_pie("filete", cd.position.x, cd.end.y, cd.size.x, dclip))
 		else:
-			var fo: Image = rev_anc(REV_ART.get("pt-" + String(REV_FOTO.get(vk, "planta")), REV_ART["pt-planta"]), ci.size.x)
+			# la ilustración: el sobre grapado en la plana del regalo, y en las demás la lámina de la sección
+			var sob: bool = vk == "reg" and REV_ART.has("regalo")
+			var fo: Image = REV_ART["regalo"] if sob else rev_anc(REV_ART.get("pt-" + String(REV_FOTO.get(vk, "planta")), REV_ART["pt-planta"]), ci.size.x)
 			var fx: int = ci.position.x + ((ci.size.x - fo.get_width()) >> 1)
 			var fy: int = ci.position.y + 6
-			var fh: int = mini(fo.get_height(), REV_FOTO_H)   # la foto, apaisada: le deja la mitad de abajo de la hoja al despiece
+			var fh: int = fo.get_height() if sob else mini(fo.get_height(), REV_FOTO_H)   # apaisada: le deja la mitad de abajo al despiece
 			o.append(["@", fo, fx, fy, Rect2i(fx, fy, fo.get_width(), fh).intersection(clip)])
 			o.append_array(_rev_marco(fx, fy, fo.get_width(), fh))
 			o.append_array(_rev_filete("filete2", ci.position.x, fy + fh + 6, ci.size.x, clip))
-			# el despiece: la viñeta de la sección al doble, en su recuadro, centrado en lo que queda de hoja
+			# el despiece, rehecho (lo dijo el usuario: la viñeta al doble no se entendía): su recuadro de papel al sol con la pleca
+			# verde a la izquierda, la viñeta de la sección a su tamaño y, al lado, los renglones del texto, el primero de ladillo
 			if vk != "" and REV_ART.has("vg-" + vk):
-				var vi: Image = rev_x2("vg-" + vk)
-				var y0: int = fy + fh + 12
-				if y0 + vi.get_height() + 12 > ci.end.y:
-					vi = REV_ART["vg-" + vk]
-				var vy: int = y0 + ((ci.end.y - y0 - vi.get_height()) >> 1)
-				var vx: int = ci.position.x + ((ci.size.x - vi.get_width()) >> 1)
-				o.append([vx - 6, vy - 6, vi.get_width() + 12, vi.get_height() + 12, "#f7f2e2"])
-				o.append(["@", vi, vx, vy, clip])
-				o.append([vx - 6, vy - 6, vi.get_width() + 12, 1, "#8a8372"])
-				o.append([vx - 6, vy + vi.get_height() + 5, vi.get_width() + 12, 1, "#8a8372"])
+				var vi: Image = REV_ART["vg-" + vk]
+				var dy: int = fy + fh + 12
+				var dh: int = mini(vi.get_height() + 12, ci.end.y - dy - 4)
+				if dh >= 20:
+					var dx: int = ci.position.x
+					var dw: int = ci.size.x
+					o.append([dx, dy, dw, dh, "#f7f2e2"])
+					o.append([dx, dy, 2, dh, "#27551a"])
+					o.append([dx, dy, dw, 1, "#8a8372"])
+					o.append([dx, dy + dh - 1, dw, 1, "#8a8372"])
+					o.append(["@", vi, dx + 7, dy + ((dh - vi.get_height()) >> 1), clip])
+					var tx: int = dx + 14 + vi.get_width()
+					var tw: int = dx + dw - 5 - tx
+					var ry: int = dy + 6
+					var k := 0
+					while ry + 2 <= dy + dh - 6 and k < 7 and tw > 8:
+						var ln: int = tw if k % 3 != 2 else (tw * 2) / 3
+						o.append([tx, ry, maxi(6, ln), 2, "#4a4840" if k == 0 else "#8a8372"])
+						ry += 5
+						k += 1
 			if vk == "tst":   # el banco de pruebas, con el sello de la nota
 				o.append(["@", REV_ART["sello"], ci.end.x - 28, ci.position.y + 6, clip])
 		# la hoja de la derecha: los filetes de la cabecera y del pie del texto

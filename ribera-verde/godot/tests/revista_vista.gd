@@ -219,6 +219,23 @@ func _parodia() -> void:
 	for a in R.anu:
 		nom.append(String(a.n))
 	check("los anuncios son de los negocios del juego (%d)" % nom.size(), nom.size() >= 6 and nom.size() == nom.reduce(func(c, x): return c, nom).size())
+	# los banners: cada anunciante lleva el suyo dibujado y su pieza está en la hoja de arte (lo pidió el usuario: «banners de
+	# publicidad, no que sean solo texto»). Y ninguno repite banner con otro
+	var sin_ban := []
+	var bs := {}
+	for a in R.anu:
+		var b: String = String(a.get("b", ""))
+		if b == "" or not J.REV_ART.has("ban-" + b):
+			sin_ban.append(String(a.n))
+		bs[b] = 1
+	check("cada anunciante lleva su banner dibujado (%s)" % str(sin_ban), sin_ban.is_empty())
+	check("no hay dos anunciantes con el mismo banner (%d/%d)" % [bs.size(), R.anu.size()], bs.size() == R.anu.size())
+	for k in ["club", "gaua"]:   # el club y la discoteca, que los pidió el usuario por su nombre
+		check("se anuncia %s" % k, R.anu.any(func(a): return String(a.get("b", "")) == k))
+	for nn in [1, 7, 13]:   # la plana de anuncio sabe qué banner le toca
+		var rr: Dictionary = J.rev_paginas(nn)
+		var ib: int = rr.vg.find("anu")
+		check("el n.º %d sabe el banner de su plana de anuncio (%s)" % [nn, String(rr.ban[ib])], String(rr.ban[ib]) != "")
 
 # ---------- la imagen de verdad ----------
 func _render(dir: String) -> void:

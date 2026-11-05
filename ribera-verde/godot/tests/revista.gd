@@ -317,6 +317,36 @@ func _corre() -> void:
 	chk(corre(func(): await J.rev_menu()), "menú de la revista bloqueado")
 	chk(MENUS.size() and MENUS[0].size() == 3 and String(MENUS[0][0]).begins_with("N.º 2"), "la pila: %s" % [MENUS])
 
+	# 10b · las noticias del cannabis: tres breves por número, de fuera de la comarca y sin repetirse en el mismo número
+	# (lo pidió el usuario: «también noticias del cannabis»)
+	J.S.ch = 8
+	var sinm := []
+	for num in range(1, 25):
+		var ms: Array = J.rev_mun_de(num)
+		var kms := {}
+		for m in ms:
+			kms[String(m.k)] = 1
+		if ms.size() != 3 or kms.size() != 3:
+			sinm.append(num)
+	chk(sinm.is_empty(), "números con menos de tres noticias del mundo o con repetidas: %s" % [sinm])
+	J.S.ch = 1
+	var m1: Array = J.rev_mun_de(1)
+	var tarde := []
+	for m in m1:
+		if int(m.ch) > 1:
+			tarde.append(String(m.k))
+	chk(m1.size() >= 1 and tarde.is_empty(), "el n.º 1 cuenta lo que aún no toca: %s" % [tarde])
+	J.S.ch = 8
+	var mx: String = J.rev_mundo(3)
+	chk(mx.length() > 300 and mx.split("\n\n").size() == 3, "la plana del mundo: %d caracteres" % mx.length())
+	var sec: Array = J.rev_secciones(3)
+	var hay_mun := false
+	for q in sec:
+		if String(q.k) == "mun":
+			hay_mun = true
+	chk(hay_mun, "la sección del mundo no sale en el número")
+	chk(J.REV_ART.has("vg-mun") if J.rev_art() else true, "la viñeta del mundo no está en la hoja de arte")
+
 	# 11 · guardada y cargada, sigue
 	var S2 = JSON.parse_string(JSON.stringify(J.S))
 	J.S = S2

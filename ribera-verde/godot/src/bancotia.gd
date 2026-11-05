@@ -231,12 +231,32 @@ func bt_camara() -> void:
 	await got(T("1 semilla de {s}, de la cámara fría", {"s": strain(l[i]).n}))
 
 func bt_lab() -> void:
-	if bt_espera("lab", 1) > 0:
+	# dos trabajos en la cabina: fijar una línea (lo de siempre) y, desde el capítulo TETRA.ch, doblar los cromosomas.
+	# Sin el segundo, el trabajo del día es uno: si ya está hecho, no hay nada que hacer dentro y se dice antes que las
+	# normas (es lo que hacía el laboratorio antes de la tetraploidia); con los dos, manda la norma, que vale para ambos.
+	var dos: bool = Datos.CAL and D.has("TETRA") and int(S.get("ch", 1)) >= int(D.TETRA.ch)
+	if not dos and bt_espera("lab", 1) > 0:
 		await say(K("El laboratorio, por hoy, ya está. Vuelve mañana."))
 		return
 	var no := lab_norma(true)
 	if no != "":
 		await say(no)
+		return
+	if dos:
+		var it0 := [{"label": K("Fijar una línea"), "desc": K("Una semilla, el microscopio y la cabina: la línea sube una generación.")},
+			{"label": K("Doblar los cromosomas"), "desc": T("Con el reactivo del armario de tóxicos. Te quedan {n} usos del frasco.", {"n": bt_tt().get("f", 0)})},
+			{"label": K("Nada"), "desc": ""}]
+		var q: int = await menu(it0, {"cls": "full", "title": K("EL LABORATORIO"), "desc": true})
+		if q == 1:
+			await bt_tetra()
+			return
+		if q != 0:
+			return
+	await bt_fijar()
+
+func bt_fijar() -> void:
+	if bt_espera("lab", 1) > 0:
+		await say(K("El laboratorio, por hoy, ya está. Vuelve mañana."))
 		return
 	var l: Array = S.seeds.keys().filter(func(sid): return int(S.seeds[sid]) >= 1 and Cultivo.gen_de(S, sid) < int(D.GEN_ESTABLE))
 	if l.is_empty():
@@ -258,6 +278,87 @@ func bt_lab() -> void:
 		if not bt().has("lc"):
 			bt().lc = {}
 		bt().lc[l[i]] = cn
+
+# ---------- la tetraploidia (lo pidió el usuario: «molaría implantar la tetraploidia en el laboratorio pero de alguna forma no
+# tan complicada de explicar supongo») ----------
+# El juego dice lo que se juega, nunca cómo se hace: el reactivo es «el frasco», y ni su nombre, ni concentración, ni tiempos,
+# ni método salen en ningún sitio. Se trabaja en
+# la cabina con las normas puestas, el frasco vive en el armario de tóxicos y lo gastado va al contenedor amarillo. Lo que sale
+# es la rareza «tetra» en la línea (RAREZAS), que se hereda como las demás y que no cruza con una línea normal (triploide).
+# S.bt.tt = {f: usos que quedan del frasco, p: {sid: día en que se ve si cuajó}}
+func bt_tt() -> Dictionary:
+	if not (bt().get("tt") is Dictionary):
+		bt().tt = {"f": 0, "p": {}}
+	if not (bt().tt.get("p") is Dictionary):
+		bt().tt.p = {}
+	return bt().tt
+
+func bt_tetra() -> void:
+	var T9: Dictionary = D.TETRA
+	if int(bt_tt().get("f", 0)) <= 0:
+		var e := int(T9.frasco.e)
+		if await ask(T("El frasco del reactivo se pide al proveedor del banco: {e} € a la cuenta, para {n} intentos. Es tóxico y va al armario cerrado, con su etiqueta.", {"e": Datos.miles(e), "n": int(T9.frasco.n)}), [K("Pedirlo"), K("Nada")]) != 0:
+			return
+		if not cobro_banco(e, K("Laboratorio") + " · " + K("Reactivo")):
+			await say(K("No hay saldo en la cuenta."))
+			return
+		bt_tt().f = int(T9.frasco.n)
+		sfx("get")   # i18n-no
+		await say(K("El frasco, en el armario de tóxicos, con la ficha de seguridad al lado. Con él puesto encima de la mesa no se come, no se bebe y no se sale del laboratorio."))
+		return
+	if bt_tt().p.size():
+		await say(K("Hay una bandeja en la estufa esperando. De una en una."))
+		return
+	var l: Array = S.seeds.keys().filter(func(sid): return int(S.seeds[sid]) >= 2 and not Cultivo.tetra_linea(S, sid))
+	if l.is_empty():
+		await say(K("Hacen falta 2 semillas de una línea que no sea ya tetraploide: la mitad se queda por el camino."))
+		return
+	var it: Array = l.map(func(sid): return {"label": strain(sid).n, "right": T("{n} sem.", {"n": int(S.seeds[sid])}), "desc": T("THC {t} %", {"t": Datos.pct(strain(sid).thc)})})
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("DOBLAR LOS CROMOSOMAS"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var sid: String = l[i]
+	if await ask(T("¿Tratar {s}? Gastas 2 semillas y un uso del frasco. Si cuaja, la línea pasa a tetraploide: más THC y menos cosecha, y ya no cruza con una normal.", {"s": strain(sid).n}), [K("Tratar"), K("Cancelar")]) != 0:
+		return
+	S.seeds[sid] = int(S.seeds[sid]) - 2
+	if int(S.seeds[sid]) <= 0:
+		S.seeds.erase(sid)
+	bt_tt().f = int(bt_tt().f) - 1
+	lab().r = true   # lo usado, al contenedor amarillo
+	await lab_ver("tetra")
+	bt_tt().p[sid] = int(S.day) + int(T9.dias)
+	sfx("enc")   # i18n-no
+	await say(T("La bandeja, a la estufa, etiquetada con la línea y la fecha. En {d} días se verá cuál tira y cuál no.", {"d": int(T9.dias)}))
+
+# al amanecer: la bandeja que cumple su plazo. Cuaja (TETRA.p), se queda por el camino (mata) o sale normal
+func tetra_dia() -> void:
+	if not Datos.CAL or not D.has("TETRA") or not (bt().get("tt") is Dictionary):
+		return
+	var T9: Dictionary = D.TETRA
+	for sid in bt_tt().p.keys():
+		if int(S.day) < int(bt_tt().p[sid]):
+			continue
+		var dv := int(bt_tt().p[sid])
+		bt_tt().p.erase(sid)
+		var h: int = Datos.hash_str("tetra|%s|%d" % [sid, dv]) % 100000
+		var nm := String(strain(sid).n)
+		if h < float(T9.p) * 100000:
+			if not (S.get("ra") is Dictionary):
+				S.ra = {}
+			if not (S.ra.get(sid) is Dictionary):
+				S.ra[sid] = {}
+			S.ra[sid]["tetra"] = maxi(1, int(S.ra[sid].get("tetra", 0)))
+			add_seeds(sid, 2)
+			var t1: String = T("La bandeja de {s} tiró: hoja gruesa y tallo macizo. Es tetraploide. Dos semillas de la línea nueva, etiquetadas.", {"s": nm})
+			queue("tetra" + sid, func(): await talk(K("EL LABORATORIO"), [t1]), [[K("EL LABORATORIO"), [t1]]])
+		elif h < (float(T9.p) + float(T9.mata)) * 100000:
+			var t2: String = T("La bandeja de {s} no tiró: lo tratado se quedó por el camino. Al contenedor amarillo.", {"s": nm})
+			queue("tetra" + sid, func(): await talk(K("EL LABORATORIO"), [t2]), [[K("EL LABORATORIO"), [t2]]])
+		else:
+			add_seeds(sid, 1)
+			var t3: String = T("La bandeja de {s} salió adelante, pero igual que su madre: no cuajó el doblado. Queda una semilla.", {"s": nm})
+			queue("tetra" + sid, func(): await talk(K("EL LABORATORIO"), [t3]), [[K("EL LABORATORIO"), [t3]]])
 
 # las cosechas de cada línea (cult_apunta, desde harvest y la nave) y la última que usó el laboratorio
 func bt_cos(sid: String) -> int:
@@ -528,6 +629,8 @@ func lab_pasos(k: String) -> Array:
 			return [[K("El papel en el plato y la tara a cero."), .14], [K("Las semillas, hasta que la cifra se quede quieta."), .12]]
 		"res":
 			return [[K("Lo usado, al contenedor amarillo; lo que corta, al rojo."), .14], [K("La mesa, limpia con alcohol de dentro afuera."), .12]]
+		"tetra":   # el reactivo: lo que se ve es el manejo, nunca la receta
+			return [[K("El frasco, del armario de tóxicos a la cabina, sin sacarlo del laboratorio."), .14], [K("Guantes dobles y la ficha de seguridad a la vista."), .12], [K("Las plántulas marcadas, tratadas en la cabina."), .1], [K("La bandeja, a la estufa con su etiqueta; lo gastado, al contenedor amarillo."), .12]]
 	return []
 
 func lab_ver(k: String) -> int:

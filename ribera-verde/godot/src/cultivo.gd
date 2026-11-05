@@ -381,8 +381,10 @@ static func rarezas_de(S: Dictionary, sid: String, f: Dictionary) -> void:
 		if L.has(k) and Datos.hash_str("ra|%s|%d|%s|%d" % [k, int(f.id), sid, int(S.day)]) % 100000 < float(R.niv[clampi(int(L[k]), 0, int(R.fija))]) * 100000:
 			o.append(k)
 			nl[k] = int(L[k])
-	if Datos.hash_str("ra0|%d|%s|%d" % [int(f.id), sid, int(S.day)]) % 100000 < float(R.p) * 100000:
-		var k: String = R.orden[Datos.hash_str("rak|%d" % int(f.id)) % R.orden.size()]
+	# la que sale sola, de entre las que pueden salir solas: la tetraploide no está (solo sale del laboratorio)
+	var esp: Array = R.get("espontaneo", R.orden)
+	if esp.size() and Datos.hash_str("ra0|%d|%s|%d" % [int(f.id), sid, int(S.day)]) % 100000 < float(R.p) * 100000:
+		var k: String = esp[Datos.hash_str("rak|%d" % int(f.id)) % esp.size()]
 		if not o.has(k):
 			o.append(k)
 			nl[k] = 0
@@ -401,15 +403,37 @@ static func ra_g_mesa(fe, rb := false) -> float:
 	var x := 1.0
 	if ra_f(fe, "enana"):
 		x *= 1 + float(Datos.carga().RAREZAS.r.enana.g)
+	if ra_f(fe, "tetra"):
+		x *= 1 + float(Datos.carga().RAREZAS.r.tetra.g)
 	if rb:   # la segunda cosecha de la doble, en una mesa de la nave o de KAIA: su parte, como en casa (ra_g)
 		x *= float(Datos.carga().RAREZAS.r.doble.g2)
 	return x
 
 static func ra_crec(fe) -> float:
-	return 1 + float(Datos.carga().RAREZAS.r.enana.crec) if ra_f(fe, "enana") else 1.0
+	var x := 1.0
+	if ra_f(fe, "enana"):
+		x *= 1 + float(Datos.carga().RAREZAS.r.enana.crec)
+	if ra_f(fe, "tetra"):   # la tetraploide va más despacio
+		x *= 1 + float(Datos.carga().RAREZAS.r.tetra.crec)
+	return x
 
 static func ra_thc(fe) -> float:
-	return float(Datos.carga().RAREZAS.r.resina.thc) if ra_f(fe, "resina") else 0.0
+	var x := 0.0
+	if ra_f(fe, "resina"):
+		x += float(Datos.carga().RAREZAS.r.resina.thc)
+	if ra_f(fe, "tetra"):
+		x += float(Datos.carga().RAREZAS.r.tetra.thc)
+	return x
+
+# el cruce de una tetraploide con una normal da triploide: no cuaja semilla (lo pidió el usuario con la tetraploidia). Dos
+# tetraploides entre sí, sí: la línea sigue
+static func tetra_linea(S: Dictionary, sid: String) -> bool:
+	return Datos.CAL and S.get("ra") is Dictionary and int(S.ra.get(sid, {}).get("tetra", 0)) > 0
+
+static func triploide(S: Dictionary, a: String, b: String) -> bool:
+	if not Datos.CAL:
+		return false
+	return tetra_linea(S, a) != tetra_linea(S, b)
 
 static func ra_ar(fe) -> float:
 	return 1.0 if ra_f(fe, "aroma") else 0.0
