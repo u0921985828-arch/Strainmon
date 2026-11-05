@@ -101,6 +101,11 @@ var lector_sc := ScrollContainer.new()
 var lector_txt := Label.new()
 var lector_pags: Array[String] = []   # el texto entero, en páginas de ~3.500 letras (◀ ▶)
 var lector_i := 0
+# EL ESQUEJE a la vista (0.82, lo pidió el usuario: «que los números se vean como revista, con portada y páginas dibujadas»): con
+# la revista abierta, el lector va sin caja y en tinta sobre la plana que dibuja pinta.gd. Lo pone revista.gd al llamar a leer()
+var lector_rev := {}
+const REV_TINTA := Color("#2b2a26")   # i18n-no (la tinta de la revista; revista.py)
+const REV_VERDE := Color("#27551a")   # i18n-no
 var endcard := ColorRect.new()
 var endcard_col := VBoxContainer.new()
 var fade_el := ColorRect.new()
@@ -747,12 +752,7 @@ func _estilos() -> void:
 	pon_letra(import_pegar, letra, 8 * us, INK, 0, false)
 	import_pegar.custom_minimum_size = Vector2(48 * us, 16 * us)
 	pon_letra(import_small, letra, 7 * us, GRIS, 0, false)
-	lector.add_theme_stylebox_override("panel", caja(us, 1, 2) if Datos.CAL else caja(us, 5, 7))   # 0.52 (medido en píxeles: 6 u de aire): el margen justo
-	lector.get_child(0).add_theme_constant_override("separation", roundi((2 if Datos.CAL else 4) * us))
-	pon_letra(lector_ttl, negrita, 9 * us, LINEA, 0, false)
-	pon_letra(lector_pie, letra, 7 * us, GRIS, 0, false)
-	var fl := fs_txt(9 * us)
-	pon_letra(lector_txt, letra, fl, INK, (11.0 if Datos.CAL else 12.5) * us * fl / (9 * us), false)   # 0.52: interlineado de 11 (4-9 u de hueco)
+	_lector_estilo()
 	if endcard.visible:
 		_pinta_endcard()
 	if vc_info.visible:
@@ -1215,15 +1215,51 @@ func opciones(_desde_titulo := false) -> void:   # → juego.gd
 func evento(_k: String) -> void:   # → retencion.gd
 	pass
 
-func leer(t: String, texto: String) -> void:
+# el lector con su caja de siempre o, con la revista abierta, sin caja y en tinta sobre el papel de la plana
+func _lector_estilo() -> void:
+	var rev := not lector_rev.is_empty()
+	var lc: VBoxContainer = lector.get_child(0)
+	var lt: HBoxContainer = lc.get_child(0)
+	# con la revista, el pie («◀▶ · B CERRAR») baja al pie de la plana: en la fila del título le robaría el ancho a la plana y la caja
+	# se saldría del papel. Los dos, con reparto de líneas: así el título de la sección no fuerza el ancho
+	if rev and lector_pie.get_parent() == lt:
+		lt.remove_child(lector_pie)
+		lc.add_child(lector_pie)
+	elif not rev and lector_pie.get_parent() != lt:
+		lector_pie.get_parent().remove_child(lector_pie)
+		lt.add_child(lector_pie)
+	lector_ttl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if rev else TextServer.AUTOWRAP_OFF
+	lector_pie.autowrap_mode = lector_ttl.autowrap_mode
+	lector.add_theme_stylebox_override("panel", StyleBoxEmpty.new() if rev else (caja(us, 1, 2) if Datos.CAL else caja(us, 5, 7)))   # 0.52 (medido en píxeles: 6 u de aire): el margen justo
+	lc.add_theme_constant_override("separation", roundi((1 if rev else (2 if Datos.CAL else 4)) * us))
+	pon_letra(lector_ttl, negrita, (7 if rev else 9) * us, REV_VERDE if rev else LINEA, 0, false)
+	pon_letra(lector_pie, letra, (6 if rev else 7) * us, REV_TINTA if rev else GRIS, 0, false)
+	var fl := fs_txt((7 if rev else 9) * us)
+	pon_letra(lector_txt, letra, fl, REV_TINTA if rev else INK, ((10.0 if rev else 11.0) if Datos.CAL else 12.5) * us * fl / ((7 if rev else 9) * us), false)   # 0.52: interlineado de 11 (4-9 u de hueco)
+
+func leer(t: String, texto: String, rev := {}) -> void:
 	if oraculo:
 		return
 	t = I18n.v(t)
-	lector_pags = paginas(I18n.v(texto))
+	lector_rev = rev if (Datos.CAL and rev is Dictionary and not rev.is_empty()) else {}
+	var tits: Array = lector_rev.get("tit", [])
+	if lector_rev.is_empty():
+		lector_pags = paginas(I18n.v(texto))
+	else:
+		lector_pags = []
+		for q in lector_rev.pags:
+			lector_pags.append(String(q))
+	_lector_estilo()
 	var ver := func(i: int):
 		lector_i = clampi(i, 0, lector_pags.size() - 1)
-		lector_ttl.text = t if lector_pags.size() == 1 else "%s · %d/%d" % [t, lector_i + 1, lector_pags.size()]
-		lector_pie.text = I18n.v("▲▼ · B VOLVER") if lector_pags.size() == 1 else I18n.v("▲▼ ◀▶ · B VOLVER")
+		if not lector_rev.is_empty():   # la revista: su cabecera es la de la sección y el folio va dibujado
+			lector_ttl.text = String(tits[lector_i]) if lector_i < tits.size() else ""
+			lector_ttl.visible = lector_ttl.text != ""
+			lector_pie.text = I18n.v("◀▶ PÁGINA · ▲▼ · B CERRAR") if lector_pags.size() > 1 else I18n.v("B CERRAR")
+		else:
+			lector_ttl.visible = true
+			lector_ttl.text = t if lector_pags.size() == 1 else "%s · %d/%d" % [t, lector_i + 1, lector_pags.size()]
+			lector_pie.text = I18n.v("▲▼ · B VOLVER") if lector_pags.size() == 1 else I18n.v("▲▼ ◀▶ · B VOLVER")
 		lector_txt.text = lector_pags[lector_i]
 		lector_sc.scroll_vertical = 0
 		if lector.visible:
@@ -1248,6 +1284,10 @@ func leer(t: String, texto: String) -> void:
 			lector.hide()
 			lector_txt.text = ""
 			lector_pags = []
+			lector_ttl.visible = true
+			if not lector_rev.is_empty():
+				lector_rev = {}
+				_lector_estilo()
 			update_hud()
 			p.res())
 	await Motor.espera(p)
@@ -1288,6 +1328,9 @@ static func paginas(texto: String, tope := 3500) -> Array[String]:
 # ---------- virtuales (las definen mundo, granja, trama y juego) ----------
 func world_press(_b: String) -> void:   # → calle.gd
 	pass
+
+func rev_zona() -> Rect2i:   # → revista.gd
+	return Rect2i()
 
 func update_hud() -> void:   # → juego.gd
 	pass
@@ -2146,7 +2189,13 @@ func _coloca() -> void:
 				if Datos.CAL and dlg.visible:
 					tope = minf(tope, dlg.position.y - 3 * us)
 				menu_box.position = Vector2(R.end.x - 3 * us - menu_box.size.x, maxf(R.position.y + 3 * us, tope - menu_box.size.y))
-	if lector.visible:   # como un menú a toda altura
+	if lector.visible and not lector_rev.is_empty():   # la revista: el texto, en el hueco que le deja la plana dibujada
+		var z: Rect2i = rev_zona()
+		lector.custom_minimum_size = Vector2.ZERO
+		lector_sc.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+		lector.size = Vector2(z.size.x * u, z.size.y * u)
+		lector.position = (scr.position + Vector2(z.position.x * u, z.position.y * u)).round()
+	elif lector.visible:   # como un menú a toda altura
 		lector.custom_minimum_size = R.size - Vector2(6 * us, 6 * us)
 		lector.size = lector.custom_minimum_size
 		lector.position = R.position + Vector2(3 * us, 3 * us)

@@ -217,15 +217,16 @@ func rev_titular(n: int) -> String:
 		return I18n.v(String(R.tit.poli[nivel_poli()]))
 	return I18n.v(String(R.tit.poli[0]))
 
-func rev_texto(n: int) -> String:
+# las secciones del número, en orden: cada una {k, tit, txt} (la portada lleva además «cab», la línea de arriba). De aquí salen el
+# texto corrido (rev_texto) y las planas de la revista a la vista (rev_paginas)
+func rev_secciones(n: int) -> Array:
 	var R: Dictionary = D.REVISTA
 	var SE: Dictionary = R.sec
-	var o := PackedStringArray()
+	var o := []
 	# portada
-	o.append("%s · %s" % [I18n.v(String(R.cab.sub)).to_upper(), rev_mes(n).to_upper()])
-	o.append(rev_titular(n))
+	o.append({"k": "port", "tit": "", "cab": "%s · %s" % [I18n.v(String(R.cab.sub)).to_upper(), rev_mes(n).to_upper()], "txt": rev_titular(n)})
 	# las noticias de la comarca
-	o.append("%s\n%s" % [I18n.v(String(SE.nw)), rev_noticias(n)])
+	o.append({"k": "nw", "tit": I18n.v(String(SE.nw)), "txt": rev_noticias(n)})
 	# la variedad del mes
 	var sid := rev_var(n)
 	var s: Dictionary = strain(sid)
@@ -237,24 +238,33 @@ func rev_texto(n: int) -> String:
 		li.append(T("Dónde conseguirla: {p}.", {"p": p}) if p != "" else K("De esta no dicen de dónde sale. Alguien de la comarca la tendrá."))
 	else:
 		li.append(K("Esta ya la tienes en la GENOTECA."))
-	o.append("%s\n%s" % [I18n.v(String(SE.vari)), "\n".join(li)])
+	o.append({"k": "vari", "tit": I18n.v(String(SE.vari)), "txt": "\n".join(li)})
 	# el taller: la técnica
 	var tc := rev_tec(n)
-	o.append("%s · %s\n%s" % [I18n.v(String(SE.tec)), I18n.v(String(tc.n)), I18n.v(String(tc.t))])
+	o.append({"k": "tec", "tit": "%s · %s" % [I18n.v(String(SE.tec)), I18n.v(String(tc.n))], "txt": I18n.v(String(tc.t))})
 	# el mercado
-	o.append("%s\n%s" % [I18n.v(String(SE.merc)), rev_mercado()])
+	o.append({"k": "merc", "tit": I18n.v(String(SE.merc)), "txt": rev_mercado()})
 	# la Copa
-	o.append("%s\n%s" % [I18n.v(String(SE.copa)), rev_copa(n)])
+	o.append({"k": "copa", "tit": I18n.v(String(SE.copa)), "txt": rev_copa(n)})
 	# la agenda del mes
-	o.append("%s\n%s" % [I18n.v(String(SE.ag)), rev_agenda(n)])
+	o.append({"k": "ag", "tit": I18n.v(String(SE.ag)), "txt": rev_agenda(n)})
 	# los clasificados
 	var cl := rev_cls(n)
-	o.append("%s\n%s — %s" % [I18n.v(String(SE.cls)), I18n.v(String(cl.n)), I18n.v(String(cl.t))])
+	o.append({"k": "cls", "tit": I18n.v(String(SE.cls)), "txt": "%s — %s" % [I18n.v(String(cl.n)), I18n.v(String(cl.t))]})
 	# cartas
-	o.append("%s\n%s" % [I18n.v(String(SE.car)), rev_car(n)])
+	o.append({"k": "car", "tit": I18n.v(String(SE.car)), "txt": rev_car(n)})
 	# legal
-	o.append("%s\n%s" % [I18n.v(String(SE.leg)), rev_legal()])
-	o.append(I18n.v(String(R.cab.pie)))
+	o.append({"k": "leg", "tit": I18n.v(String(SE.leg)), "txt": rev_legal()})
+	# el pie de la revista, al final de la última plana
+	o.append({"k": "pie", "tit": "", "txt": I18n.v(String(R.cab.pie))})
+	return o
+
+func rev_texto(n: int) -> String:
+	var o := PackedStringArray()
+	for q in rev_secciones(n):
+		if q.has("cab"):
+			o.append(String(q.cab))
+		o.append("%s\n%s" % [String(q.tit), String(q.txt)] if String(q.tit) != "" else String(q.txt))
 	return "\n\n".join(o)
 
 func rev_pista(sid: String) -> String:   # de CAZA (la gente y las fiestas) o de REGALO (lo que escondió la tía)
@@ -346,7 +356,10 @@ func rev_lee(n: int) -> void:
 	var tc := rev_tec(n)
 	var nuevo: bool = not rev().tec.has(String(tc.k))
 	await gesto("revista")
-	await leer("%s · %s" % [I18n.v(String(D.REVISTA.cab.n)), rev_mes(n)], rev_texto(n))
+	# con el arte de la revista, el número se lee como una revista: portada y planas dibujadas (rects_revista); si el atlas no
+	# está (una partida vieja del HTML, sin CAL), el lector de siempre
+	var rv := rev_paginas(n) if Datos.CAL and rev_art() else {}
+	await leer("%s · %s" % [I18n.v(String(D.REVISTA.cab.n)), rev_mes(n)], rev_texto(n), rv)
 	if nuevo:
 		rev().tec.append(String(tc.k))
 		sfx("get")
@@ -409,3 +422,152 @@ func rev_ficha() -> String:
 		l.append(", ".join(b) + ".")
 	l.append(T("Pulsa A para releer cualquier número."))
 	return "\n".join(l)
+
+# ---------- EL ESQUEJE a la vista: la plana dibujada (0.82) ----------
+# (lo pidió el usuario: «que los números se vean como revista, con portada y páginas dibujadas»): un número ya no es una lista de
+# texto, es una revista. La portada lleva su mancheta, la ilustración que toca por lo que cuenta el titular y el titular debajo; cada
+# sección, su plana, con la viñeta de la sección, los filetes y, al pie, un punto por plana con el de la suya relleno. El papel, la
+# mancheta, los filetes, las nueve viñetas y las ocho ilustraciones son arte a mano (tools/sprites/a-mano/revista.py →
+# arte/revista.png + revista.json, como arte/billar.png); el texto lo pone encima el lector de ui.gd en modo revista (lector_rev),
+# que va sin caja y en tinta, y se desliza con ▲▼ si una sección no cabe.
+const REV_W := 200          # la plana: ancho máximo y alto, en píxeles del lienzo
+const REV_H := 170
+const REV_Y := 5
+const REV_VG := {"nw": "nw", "vari": "var", "tec": "tec", "merc": "merc", "copa": "copa", "ag": "ag", "cls": "cls", "car": "car", "leg": "leg"}   # i18n-no
+# de qué va la portada según el suceso que manda en el titular
+const REV_ILU := {"redada": "redada", "orden": "redada", "acusa": "redada", "embargo": "redada", "copa": "copa", "copa6": "copa",
+	"kaia": "club", "ley": "club", "presi": "club", "metro": "club", "banco": "planta", "bancofin": "planta", "patente": "planta",
+	"rara": "planta", "huerta": "planta", "nave": "nave", "conce": "nave", "mar": "barco", "fi-feria": "feria",
+	"fi-barrio": "feria", "fi-romeria": "feria"}   # i18n-no
+static var REV_ART := {}   # el atlas: nombre → Image
+
+static func rev_art() -> bool:
+	if REV_ART.size():
+		return true
+	var im := Image.new()
+	if im.load_png_from_buffer(FileAccess.get_file_as_bytes("res://arte/revista.png")) != OK:
+		return false
+	var j = JSON.parse_string(FileAccess.get_file_as_string("res://arte/revista.json"))
+	if typeof(j) != TYPE_DICTIONARY or not (j.get("r") is Dictionary):
+		return false
+	for k in j.r:
+		var q: Array = j.r[k]
+		REV_ART[String(k)] = im.get_region(Rect2i(int(q[0]), int(q[1]), int(q[2]), int(q[3])))
+	return true
+
+func rev_caja() -> Rect2i:   # la plana, centrada en el lienzo
+	var w: int = clampi(SW - 16, 180, REV_W)
+	return Rect2i((SW - w) >> 1, REV_Y, w, REV_H)
+
+# la ilustración de la portada del número n
+func rev_ilu(n: int) -> String:
+	for e in rev_nw_de(n):
+		var k := String(e.df.k)
+		if REV_ILU.has(k):
+			return String(REV_ILU[k])
+	if S.get("mar") is Dictionary and (S.mar.get("lic") or (S.mar.get("b") is Array and S.mar.b.size() > 1)):
+		return "barco"
+	var mes := int(Datos.fecha(int(S.day)).m)
+	if mes == 10 or mes == 11:
+		return "copa"
+	if mes == 5:
+		return "feria"
+	if S.get("nave") is Dictionary and S.nave.get("r") != null:
+		return "nave"
+	if S.get("aso") is Dictionary and S.aso.get("pres"):
+		return "club"
+	if S.get("carpas") is Array and not S.carpas.is_empty():
+		return "carpa"
+	return "planta"
+
+# las planas del número: una por sección (las largas, partidas), con su viñeta y su título
+func rev_paginas(n: int) -> Dictionary:
+	var pags: Array[String] = []
+	var tit: Array[String] = []
+	var vg: Array[String] = []
+	var secs := rev_secciones(n)
+	var pie := ""
+	if not secs.is_empty() and String(secs[-1].k) == "pie":
+		pie = String(secs.pop_back().txt)
+	for i in secs.size():
+		var q: Dictionary = secs[i]
+		var txt := String(q.txt)
+		if String(q.k) == "port":
+			pags.append("%s\n%s" % [String(q.cab), txt])   # la cabecera y el titular, seguidos: la portada tiene el hueco justo
+			tit.append("")
+			vg.append("")
+			continue
+		if i == secs.size() - 1 and pie != "":   # el pie de la revista cierra la última plana
+			txt += "\n\n" + pie
+		var trozos := paginas(txt, 380)   # lo que cabe en una plana sin apretar; si se pasa, se desliza con ▲▼
+		for t in trozos.size():
+			pags.append(String(trozos[t]))
+			tit.append(String(q.tit) if t == 0 else "%s (%d)" % [String(q.tit), t + 1])
+			vg.append(String(REV_VG.get(String(q.k), "")))
+	return {"n": n, "pags": pags, "tit": tit, "vg": vg, "ilu": rev_ilu(n)}
+
+# el hueco que la plana le deja al texto (ui.gd lo usa para colocar el lector); en píxeles del lienzo
+func rev_zona() -> Rect2i:
+	var c := rev_caja()
+	if lector_rev.is_empty() or lector_i == 0:   # la portada: debajo de la ilustración
+		return Rect2i(c.position.x + 14, c.position.y + 111, c.size.x - 26, c.size.y - 131)
+	return Rect2i(c.position.x + 14, c.position.y + 46, c.size.x - 26, c.size.y - 66)
+
+# la plana dibujada: papel, doblez y grapas del lomo, cabecera (mancheta e ilustración en la portada, viñeta de la sección en las
+# demás), filetes y, al pie, un punto por plana. Lo pinta _encima() de pinta.gd
+func rects_revista() -> Array:
+	var o := []
+	if lector_rev.is_empty() or not rev_art():
+		return o
+	var c := rev_caja()
+	var clip := Rect2i(c.position.x, c.position.y, c.size.x, c.size.y)
+	var pap: Image = REV_ART["papel"]
+	var y := c.position.y
+	while y < c.end.y:   # el papel, tileado y recortado a la plana
+		var x := c.position.x
+		while x < c.end.x:
+			o.append(["@", pap, x, y, clip])
+			x += pap.get_width()
+		y += pap.get_height()
+	o.append([c.position.x, c.position.y - 1, c.size.x, 1, "#8a8372"])   # el canto de la hoja
+	o.append([c.position.x, c.end.y, c.size.x, 1, "#8a8372"])
+	var dob: Image = REV_ART["dobl"]
+	y = c.position.y
+	while y < c.end.y:
+		o.append(["@", dob, c.position.x, y, clip])
+		y += dob.get_height()
+	for g in [c.position.y + 30, c.end.y - 42]:   # las dos grapas del lomo
+		o.append(["@", REV_ART["grapa"], c.position.x + 1, g, clip])
+	var portada: bool = lector_i == 0
+	if portada:
+		var mc: Image = REV_ART["mancheta"]
+		o.append(["@", mc, c.position.x + ((c.size.x - mc.get_width()) >> 1), c.position.y + 4, clip])
+		o.append_array(_rev_filete("filete", c.position.x + 12, c.position.y + 25, c.size.x - 24, clip))
+		var il: Image = REV_ART.get("pt-" + String(lector_rev.get("ilu", "planta")), REV_ART["pt-planta"])
+		o.append(["@", il, c.position.x + ((c.size.x - il.get_width()) >> 1), c.position.y + 31, clip])
+		o.append_array(_rev_filete("filete", c.position.x + 12, c.position.y + 104, c.size.x - 24, clip))
+		o.append_array(_rev_filete("filete2", c.position.x + 12, c.end.y - 18, c.size.x - 24, clip))
+	else:
+		var vgs: Array = lector_rev.get("vg", [])
+		var k: String = String(vgs[lector_i]) if lector_i < vgs.size() else ""
+		if k != "" and REV_ART.has("vg-" + k):
+			var vi: Image = REV_ART["vg-" + k]
+			o.append(["@", vi, c.position.x + ((c.size.x - vi.get_width()) >> 1), c.position.y + 8, clip])
+		o.append_array(_rev_filete("filete2", c.position.x + 12, c.position.y + 42, c.size.x - 24, clip))
+		o.append_array(_rev_filete("filete2", c.position.x + 12, c.end.y - 18, c.size.x - 24, clip))
+	var np: int = lector_rev.pags.size()   # el pie: un punto por plana, el de esta relleno
+	if np > 1:
+		var ax: int = c.position.x + ((c.size.x - (np * 5 - 2)) >> 1)
+		for i in np:
+			o.append([ax + i * 5, c.end.y - 8, 3, 3, "#27551a" if i == lector_i else "#9a9382"])
+	return o
+
+func _rev_filete(k: String, x: int, y: int, w: int, clip: Rect2i) -> Array:
+	var o := []
+	var im: Image = REV_ART[k]
+	var c := Rect2i(x, y, w, im.get_height()).intersection(clip)
+	var i := x
+	while i < x + w:
+		o.append(["@", im, i, y, c])
+		i += im.get_width()
+	return o

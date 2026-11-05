@@ -418,3 +418,46 @@ def pt_feria():   # la feria de semillas: el puesto con los sobres
 
 PT = {'planta': pt_planta, 'carpa': pt_carpa, 'copa': pt_copa, 'barco': pt_barco,
       'nave': pt_nave, 'club': pt_club, 'redada': pt_redada, 'feria': pt_feria}
+
+# ---------- la hoja ----------
+def arte():
+    sale('papel', papel())
+    sale('papel2', papel(True))
+    sale('mancheta', mancheta())
+    sale('filete', filete())
+    sale('filete2', filete(False))
+    sale('grapa', grapa())
+    sale('dobl', doblez())
+    for k, f in VG.items():
+        sale('vg-' + k, f())
+    for k, f in PT.items():
+        sale('pt-' + k, f())
+    return SAL
+
+def main():
+    A = arte()
+    ns = sorted(A, key=lambda n: (-A[n].h, n))   # las más altas primero: filas compactas
+    ANCHO = 256
+    sitio, x, y, fila = {}, 0, 0, 0
+    for n in ns:
+        L = A[n]
+        if x and x + L.w > ANCHO:
+            x, y, fila = 0, y + fila, 0
+        sitio[n] = [x, y, L.w, L.h]
+        x += L.w
+        fila = max(fila, L.h)
+    alto = y + fila
+    hoja = Lienzo(ANCHO, alto)
+    for n in ns:
+        hoja.pega(A[n], sitio[n][0], sitio[n][1])
+    f = hoja.guarda('godot', 'arte', 'revista.png')
+    with open(P('godot', 'arte', 'revista.json'), 'w') as o:
+        json.dump({'r': {n: sitio[n] for n in sorted(sitio)}}, o, indent=0, sort_keys=True)
+    print('revista.png %d × %d · %d piezas' % (ANCHO, alto, len(sitio)))
+    if len(sys.argv) > 1:   # vista previa a 4× para revisarla
+        hoja.im.resize((ANCHO * 4, alto * 4), 0).save(sys.argv[1])
+        print(sys.argv[1])
+    return f
+
+if __name__ == '__main__':
+    main()

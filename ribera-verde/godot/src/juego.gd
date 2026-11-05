@@ -172,6 +172,8 @@ func lienzo_quieto() -> bool:
 	for v in [ACCESO_V, VIAJE_V, TIRO, MESA_B, MESA8, ORDEN, ALMACEN, CARRO_V, SETAS_V, MADRES_V, MESA_KV, ARM_V, CAL_V, MAPA_V, FICHA_V, MOVIL_V]:
 		if v != null:
 			return false
+	if not lector_rev.is_empty():   # 0.82: la revista se dibuja en el lienzo (rects_revista), así que al pasar de plana hay que repintar
+		return false
 	return wipe_t0 < 0 and not P.moving
 
 func fade_tw_vivo() -> bool:

@@ -1042,6 +1042,13 @@ func _encima() -> void:
 			_cpon(hk, Hoja.imagen(Hoja.params(J.D, J.S, J.FICHA_V.l[J.FICHA_V.i])))
 		var hp: Vector2i = J.hoja_xy()
 		_img(cache[hk], hp.x, hp.y)
+	if not J.lector_rev.is_empty() and J.lector.visible:   # 0.82: EL ESQUEJE, la plana de la revista (revista.gd rects_revista)
+		for e in J.rects_revista():
+			if typeof(e[0]) == TYPE_STRING:   # ['@', imagen, x, y, recorte]
+				var im: Image = e[1]
+				_img_clip(im, int(e[2]), int(e[3]), Rect2i(0, 0, im.get_width(), im.get_height()), e[4], Color.WHITE)
+				continue
+			_rect(e[0], e[1], e[2], e[3], css(e[4]))
 	if J.ALMACEN != null or J.MOVIL_V != null:   # la caja fuerte y la nevera por dentro (1.36); 1.51, el móvil
 		for e in (J.rects_almacen(J.ALMACEN) if J.ALMACEN != null else J.rects_movil(J.MOVIL_V)):
 			if typeof(e[0]) == TYPE_STRING:   # ['@', sprite, x, y]: un sprite de misc por su esquina
