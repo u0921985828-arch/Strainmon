@@ -48,12 +48,16 @@ con semillas doradas, la moneda que se gana jugando. Los paquetes de semillas do
   vienen con la aplicación y lo de pago son solo los extras opcionales de LA TIENDA.
 
 ## 5. La firma y la partida de los testers (docs/MIGRACION-BETA.md)
-- Deja **Play App Signing** activado en la primera subida: desde entonces la clave de firma de la app la guarda Google y una
-  clave de carga perdida solo cuesta una solicitud de reinicio (Pruebas y versiones → Firma de apps → reiniciar la clave de
-  carga, con el `.pem` del certificado nuevo; unas 48 h hábiles).
+El juego **todavía no está en Play** (lo dijo el usuario el 5-11-2026): la beta se repartió como APK a mano y la clave con la
+que se firmó se perdió. Así que la primera subida va con una clave nueva (`tools/clave-firma.sh`, guardada fuera del
+contenedor) y, antes de repartir el APK con esa firma, hay que avisar a los testers.
+- **Antes de repartir el APK nuevo**, manda a los testers el aviso de `docs/MIGRACION-BETA.md` § 4 y espera a que confirmen:
+  exportar la partida a un archivo **antes** de desinstalar; quien desinstale sin hacerlo pierde su progreso.
 - El paquete `com.landracehunters.game` no se cambia nunca: con otro paquete o con otra firma, el móvil lo ve como otra app,
   hay que desinstalar y al desinstalar se borra la partida.
-- Si cambia la firma, añade la huella SHA-1 nueva como credencial de Android del **mismo** proyecto de Play Games Services
+- Deja **Play App Signing** activado en la primera subida: desde entonces la clave de firma de la app la guarda Google y una
+  clave de carga perdida solo cuesta una solicitud de reinicio (Pruebas y versiones → Firma de apps → reiniciar la clave de
+  carga, con el `.pem` del certificado nuevo; unas 48 h hábiles). Eso es lo que evita que esto se repita.
+- Guarda el `.jks` y su contraseña en dos sitios propios, fuera de cualquier contenedor: la clave no se regenera.
+- Añade la huella SHA-1 de la clave nueva como credencial de Android del **mismo** proyecto de Play Games Services
   (§ 2.2): así los guardados de la cuenta siguen viéndose.
-- Antes de repartir una versión con firma nueva fuera de Play, manda a los testers el guion de `docs/MIGRACION-BETA.md` § 2
-  (exportar la partida a un archivo **antes** de desinstalar).
