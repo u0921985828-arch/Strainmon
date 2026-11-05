@@ -589,7 +589,38 @@ def arte():
         sale('vg-' + k, f())
     for k, f in PT.items():
         sale('pt-' + k, f())
+    for k, f in PS.items():
+        sale('ps-' + k, f())
     return SAL
+
+# ---------- las tres láminas del póster central (104 × 56) ----------
+# La variedad del mes a toda plana, con su porte: la índica compacta y ancha, la sativa espigada y el híbrido en medio (ataque de
+# la revisión: el póster repetía la lámina de la portada). La elige rev_pst_pl() por el % índica de la variedad.
+def _ps(alto, ancho, mac):
+    L = Lienzo(104, 56)
+    for dx in range(-4, 5):      # los rayos del foco, en abanico y en tono claro
+        linea(L, 52, 1, 52 + dx * 13, 46, '#f2e2a8')
+    L.r(36, 0, 32, 4, K0)        # el foco, arriba del todo
+    L.r(42, 4, 20, 2, K1)
+    _suelo(L, 50)
+    L.r(52 - mac, 42, mac * 2, 8, K1)    # la maceta, a la medida de la mata
+    L.r(52 - mac - 2, 40, mac * 2 + 4, 3, K0)
+    for x in range(52 - mac + 2, 52 + mac - 1, 4):
+        L.vl(x, 43, 49, K2)
+    _planta(L, 52, 40, alto, ancho)
+    L.contorno(K2)
+    return L
+
+def ps_ind():    # índica: baja, ancha y de cola gorda
+    return _ps(23, 24, 20)
+
+def ps_sat():    # sativa: alta, estrecha y espigada
+    return _ps(34, 13, 13)
+
+def ps_hib():    # el híbrido, en medio
+    return _ps(28, 18, 16)
+
+PS = {'ind': ps_ind, 'sat': ps_sat, 'hib': ps_hib}
 
 def main():
     A = arte()

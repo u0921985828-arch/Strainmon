@@ -235,9 +235,25 @@ func rev_faldon(n: int) -> String:
 	var F: Array = D.REVISTA.fal
 	return I18n.v(String(F[Datos.hash_str("rev-fal|%d" % n) % F.size()]))
 
+# ¿existe ya en la partida? (el capítulo y, si lo pide, su aviso de S.flags). La revista no entrevista a quien no has visto ni
+# anuncia un negocio que no ha abierto (ataque de la revisión: el n.º 1 anunciaba AUTOS RIBERA, del capítulo 5)
+func rev_hay(x: Dictionary) -> bool:
+	if int(S.get("ch", 1)) < int(x.get("ch", 1)):
+		return false
+	var f := String(x.get("f", ""))
+	return f == "" or bool(S.flags.get(f, 0))
+
+# los que ya existen, en el orden de la lista (nunca vacío: Kiko, los estancos y la Federación están desde el capítulo 1)
+func rev_hoy(l: Array) -> Array:
+	var o := []
+	for x in l:
+		if rev_hay(x):
+			o.append(x)
+	return o if o.size() else [l[0]]
+
 # la entrevista del mes: quién, de qué y sus tres preguntas
 func rev_ent(n: int) -> String:
-	var E: Array = D.REVISTA.ent
+	var E: Array = rev_hoy(D.REVISTA.ent)
 	var e: Dictionary = E[Datos.hash_str("rev-ent|%d" % n) % E.size()]
 	var l := PackedStringArray()
 	l.append("%s · %s" % [I18n.v(String(e.n)), I18n.v(String(e.o))])
@@ -261,7 +277,11 @@ func rev_con(n: int) -> String:
 func rev_tst(n: int) -> String:
 	var A: Array = D.REVISTA.tst
 	var t: Dictionary = A[Datos.hash_str("rev-tst|%d" % n) % A.size()]
-	return "%s\n%s\n\n%s" % [T("{n} · nota {q}", {"n": I18n.v(String(t.n)), "q": I18n.v(String(t.no))}), I18n.v(String(t.t)), I18n.v(String(D.REVISTA.tstp))]
+	return "%s\n%s\n\n%s" % [T("{n} · nota {q}", {"n": I18n.v(String(t.n)), "q": rev_dec(String(t.no))}), I18n.v(String(t.t)), I18n.v(String(D.REVISTA.tstp))]
+
+# la nota del banco de pruebas, con el separador decimal del idioma (en inglés, «9.4»; no se traduce sola porque no lleva letras)
+func rev_dec(x: String) -> String:
+	return x.replace(",", ".") if I18n.en() else x   # i18n-no
 
 # el horóscopo del cultivador: el del mes del número
 func rev_hor(n: int) -> String:
@@ -277,10 +297,15 @@ func rev_err(n: int) -> String:
 
 # los anuncios a toda página: dos por número, distintos entre sí
 func rev_anu(n: int, k: int) -> String:
-	var A: Array = D.REVISTA.anu
-	var i := (Datos.hash_str("rev-anu|%d" % n) + k * 3 + k) % A.size()
+	var A: Array = rev_hoy(D.REVISTA.anu)
+	var i := (Datos.hash_str("rev-anu|%d" % n) + (k * 3 + k if A.size() > 1 else 0)) % A.size()
 	var a: Dictionary = A[i]
 	return "%s\n%s\n\n%s" % [I18n.v(String(a.n)), I18n.v(String(a.t)), I18n.v(String(a.pie))]
+
+# la lámina del póster: el porte de la variedad del mes por su % índica (la índica, baja y ancha; la sativa, espigada)
+func rev_pst_pl(n: int) -> String:
+	var i := Datos.ind_de(S, rev_var(n))
+	return "ps-ind" if i >= 65 else ("ps-sat" if i <= 35 else "ps-hib")   # i18n-no
 
 # el póster central: la variedad del mes a toda página
 func rev_pst(n: int) -> String:
@@ -343,7 +368,7 @@ func rev_secciones(n: int) -> Array:
 	# legal
 	o.append({"k": "leg", "tit": I18n.v(String(SE.leg)), "txt": rev_legal()})
 	# el pie de la revista, al final de la última plana
-	o.append({"k": "pie", "tit": "", "txt": I18n.v(String(R.cab.pie))})
+	o.append({"k": "pie", "tit": "", "txt": "%s\n\n%s" % [I18n.v(String(R.cab.lema)), I18n.v(String(R.cab.pie))]})
 	return o
 
 func rev_texto(n: int) -> String:
@@ -591,7 +616,7 @@ func rev_paginas(n: int) -> Dictionary:
 			pags.append(String(trozos[t]))
 			tit.append(String(q.tit) if t == 0 else "%s (%d)" % [String(q.tit), t + 1])
 			vg.append(String(REV_VG.get(String(q.k), "")))
-	return {"n": n, "pags": pags, "tit": tit, "vg": vg, "ilu": rev_ilu(n)}
+	return {"n": n, "pags": pags, "tit": tit, "vg": vg, "ilu": rev_ilu(n), "pst": rev_pst_pl(n)}
 
 # la clave de la plana que se está viendo (la de su viñeta: «anu» el anuncio, «pst» el póster central)
 func rev_vg_i() -> String:
@@ -605,9 +630,9 @@ func rev_zona() -> Rect2i:
 		return Rect2i(c.position.x + 14, c.position.y + 98, c.size.x - 26, c.size.y - 116)
 	match rev_vg_i():
 		"pst":   # el póster central: debajo de la lámina, como la portada
-			return Rect2i(c.position.x + 14, c.position.y + 102, c.size.x - 26, c.size.y - 120)
+			return Rect2i(c.position.x + 14, c.position.y + 86, c.size.x - 26, c.size.y - 104)
 		"anu":   # el anuncio a toda página: dentro de su recuadro, con aire
-			return Rect2i(c.position.x + 24, c.position.y + 66, c.size.x - 46, c.size.y - 104)
+			return Rect2i(c.position.x + 24, c.position.y + 52, c.size.x - 46, c.size.y - 92)
 	return Rect2i(c.position.x + 14, c.position.y + 46, c.size.x - 26, c.size.y - 66)
 
 # la plana dibujada: papel, doblez y grapas del lomo, cabecera (mancheta e ilustración en la portada, viñeta de la sección en las
@@ -639,22 +664,22 @@ func rects_revista() -> Array:
 	var vk := rev_vg_i()
 	if not portada and vk == "pst":   # el póster central: la lámina a toda plana, con su chincheta
 		o.append_array(_rev_filete("filete", c.position.x + 12, c.position.y + 8, c.size.x - 24, clip))
-		var pl: Image = REV_ART["pt-planta"]
+		var pl: Image = REV_ART.get(String(lector_rev.get("pst", "ps-hib")), REV_ART["ps-hib"])
 		o.append(["@", pl, c.position.x + ((c.size.x - pl.get_width()) >> 1), c.position.y + 18, clip])
-		o.append_array(_rev_filete("filete", c.position.x + 12, c.position.y + 94, c.size.x - 24, clip))
+		o.append_array(_rev_filete("filete", c.position.x + 12, c.position.y + 78, c.size.x - 24, clip))
 		o.append(["@", REV_ART["vg-pst"], c.position.x + 10, c.position.y + 10, clip])
 	elif not portada and vk == "anu":   # el anuncio: su recuadro y el megáfono
 		var ax: int = c.position.x + 14
 		var aw: int = c.size.x - 28
-		var ay: int = c.position.y + 30
-		var ah: int = c.size.y - 64
+		var ay: int = c.position.y + 20
+		var ah: int = c.size.y - 56
 		o.append([ax, ay, aw, ah, "#f7f2e2"])
 		o.append([ax, ay, 2, ah, "#2b2a26"])
 		o.append([ax + aw - 2, ay, 2, ah, "#2b2a26"])
 		o.append_array(_rev_filete("filete", ax, ay, aw, clip))
 		o.append_array(_rev_filete("filete", ax, ay + ah - 5, aw, clip))
 		var mg: Image = REV_ART["vg-anu"]
-		o.append(["@", mg, c.position.x + ((c.size.x - mg.get_width()) >> 1), ay + 4, clip])
+		o.append(["@", mg, c.position.x + ((c.size.x - mg.get_width()) >> 1), ay + 6, clip])   # +6: la cenefa mide 5 px y el megáfono pinta en su fila 0
 	elif portada:
 		var mc: Image = REV_ART[rev_mancheta()]
 		o.append(["@", mc, c.position.x + ((c.size.x - mc.get_width()) >> 1), c.position.y + 2, clip])

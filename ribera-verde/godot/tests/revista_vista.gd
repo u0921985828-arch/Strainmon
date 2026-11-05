@@ -169,6 +169,46 @@ func _parodia() -> void:
 		check("n.º %d: el consultorio, dos preguntas con su respuesta" % num, J.rev_con(num).split("\n").size() == 4)
 	check("el n.º 1 no tiene número anterior que corregir", J.rev_err(1) != J.rev_err(2))
 	check("doce horóscopos, uno por mes", R.hor.size() == 12)
+	# la revista no entrevista a quien no has visto ni anuncia un negocio que no ha abierto
+	var ch0 = J.S.ch
+	var cf = J.S.flags.get("conce", 0)
+	J.S.ch = 1
+	J.S.flags["conce"] = 0
+	for num in [1, 2, 3, 5]:
+		var e: String = J.rev_ent(num)
+		var mal := []
+		for x in R.ent:
+			if int(x.ch) > 1 and e.begins_with(J.I18n.v(String(x.n)) + " ·"):
+				mal.append(String(x.n))
+		check("n.º %d, capítulo 1: la entrevista es de alguien que ya conoces (%s)" % [num, mal], mal.is_empty())
+		for k in 2:
+			var a: String = J.rev_anu(num, k)
+			var mal_a := []
+			for x in R.anu:
+				if (int(x.ch) > 1 or String(x.f) != "") and a.begins_with(J.I18n.v(String(x.n)) + "\n"):
+					mal_a.append(String(x.n))
+			check("n.º %d, capítulo 1: el anuncio %d es de un negocio abierto (%s)" % [num, k, mal_a], mal_a.is_empty())
+		check("n.º %d, capítulo 1: los dos anuncios siguen siendo distintos" % num, J.rev_anu(num, 0) != J.rev_anu(num, 1))
+	J.S.ch = 8
+	J.S.flags["conce"] = 1
+	var vistos := {}
+	for num in range(1, 40):
+		vistos[J.rev_ent(num).split(" ·")[0]] = 1
+		for k in 2:
+			vistos[J.rev_anu(num, k).split("\n")[0]] = 1
+	check("en el capítulo 8 salen todos los entrevistados y anunciantes (%d)" % vistos.size(), vistos.size() >= R.ent.size() + R.anu.size() - 1)
+	J.S.ch = ch0
+	J.S.flags["conce"] = cf
+	# la lámina del póster, por el porte de la variedad del mes
+	for num in [1, 3, 7, 12, 25]:
+		var pl: String = J.rev_pst_pl(num)
+		var ind: int = Datos.ind_de(J.S, J.rev_var(num))
+		check("n.º %d: la lámina del póster va con el porte (%d %% índica → %s)" % [num, ind, pl],
+			pl == ("ps-ind" if ind >= 65 else ("ps-sat" if ind <= 35 else "ps-hib")) and J.REV_ART.has(pl))
+	# el lema de la cabecera, que es media parodia, tiene que leerse en el número
+	check("el lema de la cabecera sale en la revista", J.rev_texto(3).contains(J.I18n.v(String(R.cab.lema))))
+	# la nota del banco de pruebas, con el separador decimal de cada idioma
+	check("la nota, con coma en castellano y punto en inglés", J.rev_dec("9,4") == "9,4")
 	var nom := []
 	for a in R.anu:
 		nom.append(String(a.n))
@@ -225,6 +265,7 @@ func _render(dir: String) -> void:
 	check("B cierra la revista y deja el lector como estaba", not J.lector.visible and J.lector_rev.is_empty())
 	await _letra()
 	await _titular()
+	await _peor()
 
 # la letra de la plana se mide en píxeles del lienzo (u), no en los de la interfaz (us): en un móvil us es más pequeño que u y,
 # midiéndola así, el texto encogía y la plana quedaba tres cuartos vacía
@@ -294,3 +335,49 @@ func _negro(img: Image, r: Rect2) -> bool:
 			y += 7
 		x += 7
 	return false
+
+# el anuncio y el póster van a toda plana: el más largo de los ocho tiene que caber sin deslizar, también con el texto grande de
+# OPCIONES (en la app publicada, PLAY, TAMAÑO DE TEXTO L multiplica la letra por 1,25) y en el idioma que gaste más letras
+func _peor() -> void:
+	var R: Dictionary = J.D.REVISTA
+	var play := Datos.PLAY
+	var tam = J.aj.get("tam", 1)
+	var lang: String = J.I18n.LANG
+	var peor := {"anu": "", "pst": ""}
+	for idi in ["es", "en"]:
+		J.I18n.LANG = idi
+		for a in R.anu:
+			var t := "%s\n%s\n\n%s" % [J.I18n.v(String(a.n)), J.I18n.v(String(a.t)), J.I18n.v(String(a.pie))]
+			if t.length() > peor.anu.length():
+				peor.anu = t
+		var nl := ""
+		for k in J.D.STRAINS:
+			var x: String = J.I18n.v(String(J.D.STRAINS[k].n))
+			if x.length() > nl.length():
+				nl = x
+		var ps := "%s\n%s · %s\n%s" % [J.I18n.v(String(R.pst.cab)), nl, J.linea_ind(J.rev_var(3)), J.I18n.v(String(R.pst.pie))]
+		if ps.length() > peor.pst.length():
+			peor.pst = ps
+	J.I18n.LANG = lang
+	Datos.PLAY = true
+	J.aj["tam"] = 2
+	var rv: Dictionary = J.rev_paginas(3)
+	for k in ["anu", "pst"]:
+		var i: int = rv.vg.find(k)
+		if i >= 0:
+			rv.pags[i] = String(peor[k])
+	J.leer("EL ESQUEJE", J.rev_texto(3), rv)
+	await espera(20)
+	for k in ["anu", "pst"]:
+		var i: int = rv.vg.find(k)
+		while J.lector_i < i:
+			J.press("right")
+			await espera(6)
+		await espera(12)
+		check("el %s más largo (%d letras) cabe con el texto grande" % [k, String(peor[k]).length()],
+			J.lector_sc.get_v_scroll_bar().max_value <= J.lector_sc.size.y + 1)
+	J.press("B")
+	await espera(10)
+	Datos.PLAY = play
+	J.aj["tam"] = tam
+	J._lector_estilo()

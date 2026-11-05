@@ -209,7 +209,7 @@ AG = {
 # dicen mucho más)
 FAL = [
 	"REGALO: PÓSTER CENTRAL",
-	"ENTREVISTA: «YO YA CULTIVABA»",
+	"LA ENTREVISTA DEL MES",
 	"EL CONSULTORIO, EN SU SITIO",
 	"BANCO DE PRUEBAS: NOTA 9,4",
 	"MÁS PÁGINAS QUE EL MES PASADO",
@@ -315,15 +315,30 @@ ERR = [
 
 # los anuncios: el faldón del pie de plana, con la letra pequeña. Negocios del juego, nada de marcas de verdad.
 ANU = [
-	{"n": "GROWSHOP DE KIKO", "t": "«Todo para tu cultivo y, si hace falta, una charla gratis»", "pie": "Barrio de siempre. Abierto desde antes de que esto se llamara así."},
-	{"n": "GROW IBARBIDE", "t": "«Lo último, un mes antes que nadie. Y un diez por ciento menos»", "pie": "Ensanche. No preguntes por el callejón de detrás."},
-	{"n": "CHATARRERÍA DE VALDEHIERRO", "t": "«Tu equipo de segunda mano. Tu equipo de hace dos años»", "pie": "Lo que entra esta semana, a mitad. Pregunta por Bixente."},
+	{"n": "GROWSHOP DE KIKO", "t": "«Todo para tu cultivo y una charla gratis»", "pie": "Barrio de siempre. Abierto desde antes de que esto se llamara así."},
+	{"n": "GROW IBARBIDE", "t": "«Lo último, y un diez por ciento menos»", "pie": "Ensanche. No preguntes por el callejón de detrás."},
+	{"n": "CHATARRERÍA DE VALDEHIERRO", "t": "«Tu equipo de hace dos años»", "pie": "Lo que entra esta semana, a mitad. Pregunta por Bixente."},
 	{"n": "LONJA DE PUERTO VIEJO", "t": "«Compramos al por mayor. Pago en el día»", "pie": "Lotes grandes. No bajamos al muelle a mirar cien gramos."},
 	{"n": "MOLINO DE ERROTABARRI", "t": "«Trae lo que te sobra. Llévate lo que te falta»", "pie": "Sin dinero por medio. Sin excepciones."},
 	{"n": "ESTANCOS DE LA COMARCA", "t": "«Papel, mechero y esta revista»", "pie": "Mira el rótulo de la T. Si no hay T, no hay revista."},
 	{"n": "AUTOS RIBERA", "t": "«Del scooter al deportivo. Entrega en el día»", "pie": "Financiación, seguro y la primera revisión. Barrio alto."},
-	{"n": "FEDERACIÓN DE CLUBS DE LA COMARCA", "t": "«Hazte socio de tu club. Lo que cultivas, entre los que lo cultivan»", "pie": "Esta revista la edita quien se anuncia aquí. Tampoco lo vamos a esconder."},
+	{"n": "FEDERACIÓN DE CLUBS", "t": "«Hazte socio de tu club»", "pie": "Esta revista la edita quien se anuncia aquí."},
 ]
+
+# El capítulo desde el que cada uno existe en la partida (ataque de la revisión: el número 1 no puede entrevistar a quien aún no
+# has visto ni anunciar un negocio que abre en el capítulo 5). «f», además, el aviso de S.flags que tiene que estar puesto.
+# Lo filtra rev_ent/rev_anu con el estado; Kiko, los estancos y la Federación están desde el principio, así que nunca se queda
+# el número sin entrevista ni sin anuncios.
+ENT_CH = {"Kiko": 1, "Delroy": 4, "Bixente": 2, "Begoña": 3, "Arrieta": 3, "Andoni": 3, "Iñaki": 2, "La serora": 2}
+ANU_CH = {
+	"GROWSHOP DE KIKO": (1, ""), "GROW IBARBIDE": (4, ""), "CHATARRERÍA DE VALDEHIERRO": (2, ""),
+	"LONJA DE PUERTO VIEJO": (2, ""), "MOLINO DE ERROTABARRI": (3, ""), "ESTANCOS DE LA COMARCA": (1, ""),
+	"AUTOS RIBERA": (5, "conce"), "FEDERACIÓN DE CLUBS": (1, ""),
+}
+for _e in ENT:
+	_e["ch"] = ENT_CH[_e["n"]]
+for _a in ANU:
+	_a["ch"], _a["f"] = ANU_CH[_a["n"]]
 
 # el póster central: la plana de la grapa, con la variedad del mes a toda página
 PST = {
@@ -357,6 +372,10 @@ def main():
 	assert len(ERR) >= 5 and len(FAL) >= 6 and len(ANU) >= 6
 	assert all(len(f) <= 30 for f in FAL), "el reclamo de la portada tiene que caber en una línea"
 	assert len(set(a["n"] for a in ANU)) == len(ANU)
+	# desde el primer número tiene que haber entrevista y dos anuncios distintos (rev_ent/rev_anu filtran por capítulo)
+	assert all(1 <= e["ch"] <= 8 for e in ENT) and any(e["ch"] == 1 for e in ENT)
+	assert all(1 <= a["ch"] <= 8 for a in ANU) and sum(1 for a in ANU if a["ch"] == 1 and not a["f"]) >= 2
+	assert all(len(a["n"]) + len(a["t"]) + len(a["pie"]) <= 150 for a in ANU), "el anuncio va a toda plana: tiene que caber"
 	D["REVISTA"] = {"cab": CAB, "tec": TEC, "tit": TIT, "cls": CLS, "car": CAR, "sec": SEC, "don": DON, "tope": TOPE,
 		"nw": NW, "rel": REL, "ag": AG,
 		"fal": FAL, "ent": ENT, "con": CON, "tst": TST, "tstp": TST_PIE, "hor": HOR, "err": ERR, "anu": ANU, "pst": PST}
