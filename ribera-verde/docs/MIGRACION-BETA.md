@@ -39,8 +39,15 @@ keytool -genkeypair -v -keystore upload.jks -storetype PKCS12 \
         -dname "CN=WOLFCADE, O=WOLFCADE, C=ES"
 ```
 
-Y luego, para compilar, las tres variables en los **ajustes del entorno** (nunca en el repositorio ni en el
-chat): `LH_KEYSTORE` (la ruta del `.jks`), `LH_KEYSTORE_USER` (el alias, `upload`) y `LH_KEYSTORE_PASS`.
+Y luego, para compilar, en los **ajustes del entorno** (nunca en el repositorio): `LH_KEYSTORE_USER` (el
+alias, `upload`), `LH_KEYSTORE_PASS` y la clave, de una de estas dos formas:
+
+- `LH_KEYSTORE_B64`, el `.jks` entero en base64 (`base64 -w0 upload.jks`, unos 5,7 KB). **Es la que vale en
+  una sesión que corre en un contenedor efímero**, porque la variable del entorno sobrevive y un archivo en
+  el disco del contenedor no: así se perdió la primera clave. `tools/godot-aab.js` la escribe en un temporal
+  de permisos 0600 fuera del repositorio y lo borra al terminar.
+- `LH_KEYSTORE`, la ruta del `.jks`, cuando la máquina es propia y el archivo se queda ahí.
+
 Mientras no estén, `tools/godot-aab.js` avisa y el AAB sale **sin firmar** (Play no lo acepta) y el APK con la
 clave de depuración.
 
@@ -151,7 +158,7 @@ keytool -list -v -keystore upload.jks -alias upload | grep SHA1
 | # | Qué | Quién | Cuándo |
 |---|-----|-------|--------|
 | 1 | Generar la clave de firma nueva (`tools/clave-firma.sh`) y guardarla fuera del contenedor, con su contraseña | el usuario | antes de compilar |
-| 2 | Poner `LH_KEYSTORE`, `LH_KEYSTORE_USER` y `LH_KEYSTORE_PASS` en los ajustes del entorno (nunca en el repo ni en el chat) | el usuario | antes de compilar |
+| 2 | Poner `LH_KEYSTORE_USER`, `LH_KEYSTORE_PASS` y `LH_KEYSTORE_B64` (o `LH_KEYSTORE`) en los ajustes del entorno, nunca en el repositorio | el usuario | antes de compilar |
 | 3 | Mandar a los testers el aviso del § 4 y esperar a que confirmen que tienen la copia | el usuario | antes de repartir el APK |
 | 4 | RECUPERAR PARTIDA en el título, la copia a archivo y la nube al arrancar | el juego | hecho en esta tanda |
 | 5 | Repartir el APK nuevo | el usuario | cuando confirmen |

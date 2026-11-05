@@ -40,10 +40,15 @@ echo
 echo "Huella SHA-1 (hace falta en Play Games Services, ver docs/MIGRACION-BETA.md § 5):"
 keytool -list -v -keystore "$DEST" -alias "$ALIAS" | grep -i 'SHA1\|SHA-1' || true
 echo
-echo "Para compilar, en los ajustes del entorno (nunca en el repositorio ni en el chat):"
-echo "  LH_KEYSTORE=$DEST"
+echo "Para compilar, en los ajustes del entorno (nunca en el repositorio):"
 echo "  LH_KEYSTORE_USER=$ALIAS"
 echo "  LH_KEYSTORE_PASS=<la contraseña que acabas de poner>"
+echo "y la clave, de una de las dos formas:"
+echo "  LH_KEYSTORE=$DEST                 (la ruta; solo si el disco sobrevive)"
+echo "  LH_KEYSTORE_B64=<el .jks en base64>  (lo que sobrevive en un contenedor efímero)"
+echo
+echo "El base64 para esa variable:"
+echo "  base64 -w0 $DEST"
 echo
 echo "Y para Play, el certificado de carga:"
 echo "  keytool -export -rfc -alias $ALIAS -keystore $DEST -file upload_certificate.pem"

@@ -58,6 +58,6 @@ contenedor) y, antes de repartir el APK con esa firma, hay que avisar a los test
 - Deja **Play App Signing** activado en la primera subida: desde entonces la clave de firma de la app la guarda Google y una
   clave de carga perdida solo cuesta una solicitud de reinicio (Pruebas y versiones → Firma de apps → reiniciar la clave de
   carga, con el `.pem` del certificado nuevo; unas 48 h hábiles). Eso es lo que evita que esto se repita.
-- Guarda el `.jks` y su contraseña en dos sitios propios, fuera de cualquier contenedor: la clave no se regenera.
+- Guarda el `.jks` y su contraseña en dos sitios propios, fuera de cualquier contenedor: la clave no se regenera. Para compilar, `LH_KEYSTORE_B64` (el `.jks` en base64) en los ajustes del entorno aguanta lo que un archivo en disco no.
 - Añade la huella SHA-1 de la clave nueva como credencial de Android del **mismo** proyecto de Play Games Services
   (§ 2.2): así los guardados de la cuenta siguen viéndose.

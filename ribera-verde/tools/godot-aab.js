@@ -8,8 +8,10 @@
        platforms;android-36 y build-tools;36.1.0) y lo apunta en los ajustes del editor de 4.7. La plantilla Gradle se instala
        en godot/android la primera vez (no va al repo).
     2. Godot reescala los iconos con un filtro suave: se vuelven a escribir en el AAB (webp sin pérdida) por vecino más próximo.
-    3. Firma con la upload key: LH_KEYSTORE, LH_KEYSTORE_USER y LH_KEYSTORE_PASS (o LH_ENV=archivo con esas tres líneas). La
-       keystore nunca va al repo. Sin ellas, sale el AAB sin firmar y el APK con la clave de depuración de Godot.
+    3. Firma con la upload key: LH_KEYSTORE_USER, LH_KEYSTORE_PASS y, o bien LH_KEYSTORE (la ruta del .jks), o bien
+       LH_KEYSTORE_B64 (el .jks entero en base64, que es lo que sobrevive en un contenedor efímero); también vale
+       LH_ENV=archivo con esas líneas. La keystore nunca va al repo. Sin ellas, sale el AAB sin firmar y el APK con la
+       clave de depuración de Godot.
     4. bundletool (BUNDLETOOL=…jar) saca el APK universal; se comprueba la alineación de 16 KB (zipalign -c -P 16 y los LOAD de
        cada .so) y targetSdkVersion 36 con aapt2 dump badging.
   Sale: dist/landrace-hunters.aab (Play, con la marca «tienda»: la demo) y dist/landrace-hunters.apk (sin ella, sin el bloqueo).   Uso: node tools/godot-aab.js
@@ -38,7 +40,17 @@ falta(BUNDLETOOL, 'bundletool (BUNDLETOOL=…)');
 // la firma: variables o un archivo .env fuera del repo
 const FIRMA = {};
 if (process.env.LH_ENV) for (const l of fs.readFileSync(process.env.LH_ENV, 'utf8').split('\n')) { const m = l.match(/^(\w+)=(.*)$/); if (m) FIRMA[m[1]] = m[2]; }
-for (const k of ['LH_KEYSTORE', 'LH_KEYSTORE_USER', 'LH_KEYSTORE_PASS']) if (process.env[k]) FIRMA[k] = process.env[k];
+for (const k of ['LH_KEYSTORE', 'LH_KEYSTORE_B64', 'LH_KEYSTORE_USER', 'LH_KEYSTORE_PASS']) if (process.env[k]) FIRMA[k] = process.env[k];
+// la keystore, en los ajustes del entorno: en una sesión que corre en un contenedor efímero, un archivo en disco no sobrevive
+// (así se perdió la primera clave). LH_KEYSTORE_B64 es el .jks en base64; se escribe en un temporal de 0600 fuera del repo.
+if (FIRMA.LH_KEYSTORE_B64 && !FIRMA.LH_KEYSTORE) {
+  const b = Buffer.from(FIRMA.LH_KEYSTORE_B64.replace(/\s+/g, ''), 'base64');
+  if (b.length < 1000) throw new Error('LH_KEYSTORE_B64 no parece una keystore (' + b.length + ' bytes)');
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'lh-firma-'));
+  FIRMA.LH_KEYSTORE = path.join(d, 'upload.jks');
+  fs.writeFileSync(FIRMA.LH_KEYSTORE, b, { mode: 0o600 });
+  process.on('exit', () => { try { fs.rmSync(d, { recursive: true, force: true }); } catch {} });
+}
 const firmado = !!(FIRMA.LH_KEYSTORE && FIRMA.LH_KEYSTORE_USER && FIRMA.LH_KEYSTORE_PASS);
 if (firmado && path.resolve(FIRMA.LH_KEYSTORE).startsWith(path.resolve(ROOT, '..') + path.sep)) throw new Error('la keystore no puede estar dentro del repo');
 
