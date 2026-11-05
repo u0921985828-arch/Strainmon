@@ -10,8 +10,10 @@
     2. Godot reescala los iconos con un filtro suave: se vuelven a escribir en el AAB (webp sin pérdida) por vecino más próximo.
     3. Firma con la upload key: LH_KEYSTORE_USER, LH_KEYSTORE_PASS y, o bien LH_KEYSTORE (la ruta del .jks), o bien
        LH_KEYSTORE_B64 (el .jks entero en base64, que es lo que sobrevive en un contenedor efímero); también vale
-       LH_ENV=archivo con esas líneas. La keystore nunca va al repo. Sin ellas, sale el AAB sin firmar y el APK con la
-       clave de depuración de Godot.
+       LH_ENV=archivo con esas líneas. La keystore nunca va al repo. Sin ellas, sale el AAB sin firmar y el APK firmado
+       con la clave de depuración fija de uber-apk-signer (pública, la misma en cada sesión: así una versión nueva se
+       instala encima de la anterior y nadie pierde la partida). Un APK sin firmar Android lo rechaza («paquete no
+       válido»), así que al final se comprueba siempre con apksigner que verifica.
     4. bundletool (BUNDLETOOL=…jar) saca el APK universal; se comprueba la alineación de 16 KB (zipalign -c -P 16 y los LOAD de
        cada .so) y targetSdkVersion 36 con aapt2 dump badging.
   Sale: dist/landrace-hunters.aab (Play, con la marca «tienda»: la demo) y dist/landrace-hunters.apk (sin ella, sin el bloqueo).   Uso: node tools/godot-aab.js
@@ -154,8 +156,29 @@ for (const so of sos) {
   const loads = run('readelf', ['-lW', path.join(LIBS, so)]).split('\n').filter(l => /^\s*LOAD/.test(l));
   for (const l of loads) if (parseInt(l.trim().split(/\s+/).pop(), 16) < 0x4000) throw new Error(so + ': LOAD alineado a menos de 16 KB: ' + l);
 }
+// la firma del APK: bundletool sin --ks no firma nada, y un APK sin firmar Android lo rechaza («paquete no válido»).
+// Sin upload key se firma con la clave de depuración fija de uber-apk-signer (pública y siempre la misma, así la versión
+// nueva se instala encima de la anterior); el zipalign de 16 KB se vuelve a comprobar después, porque el firmador realinea
+if (!firmado) {
+  const SIGNER = path.join(SAL, 'apk-cache', 'uber-apk-signer-1.3.0.jar');
+  const SIGNER_URL = 'https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar';
+  const SIGNER_SHA = 'e1299fd6fcf4da527dd53735b56127e8ea922a321128123b9c32d619bba1d835';
+  if (!fs.existsSync(SIGNER)) {
+    fs.mkdirSync(path.dirname(SIGNER), { recursive: true });
+    run('curl', ['-sS', '-L', '-o', SIGNER, SIGNER_URL]);
+  }
+  const h = require('crypto').createHash('sha256').update(fs.readFileSync(SIGNER)).digest('hex');
+  if (h !== SIGNER_SHA) throw new Error('uber-apk-signer con otra huella: ' + h);
+  run('java', ['-jar', SIGNER, '-a', APK, '--allowResign', '--overwrite'], { env });
+  const za2 = run(path.join(BT, 'zipalign'), ['-c', '-P', '16', '-v', '4', APK]);
+  if (!/Verification succesful|Verification successful/.test(za2)) throw new Error('zipalign -P 16 falla tras firmar:\n' + za2.slice(-3000));
+}
+const vf = run(path.join(BT, 'apksigner'), ['verify', '--print-certs', APK], { env });
+if (!/certificate SHA-256 digest/.test(vf)) throw new Error('el APK no verifica (Android lo daría por no válido):\n' + vf.slice(-2000));
+const firmaSha = (vf.match(/certificate SHA-1 digest: (\S+)/) || [])[1] || '?';
+
 const badge = run(path.join(BT, 'aapt2'), ['dump', 'badging', APK]);
 const tgt = (badge.match(/targetSdkVersion:'(\d+)'/) || [])[1], pkg = (badge.match(/package: name='([^']+)'/) || [])[1];
 if (tgt !== '36') throw new Error('targetSdkVersion ' + tgt + ' (se espera 36)');
 const mb = f => (fs.statSync(f).size / 1048576).toFixed(2) + ' MB';
-console.log(`AAB ${firmado ? 'firmado' : 'SIN FIRMAR'}: ${AAB} (${mb(AAB)})\nAPK universal: ${APK} (${mb(APK)})\n${pkg} · targetSdk ${tgt} · 16 KB OK en ${sos.length} .so`);
+console.log(`AAB ${firmado ? 'firmado' : 'SIN FIRMAR'}: ${AAB} (${mb(AAB)})\nAPK universal ${firmado ? 'firmado con la upload key' : 'firmado con la clave de depuración'}: ${APK} (${mb(APK)})\n${pkg} · targetSdk ${tgt} · 16 KB OK en ${sos.length} .so · firma SHA-1 ${firmaSha}`);
