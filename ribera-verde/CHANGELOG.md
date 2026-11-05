@@ -29,6 +29,11 @@
   línea tratada, que solo se expresaba en una de cada cuatro plantas mientras el cruce la bloqueaba al 100 % (la tetraploide
   ya no va por la probabilidad del nivel: la línea lo es entera, `rarezas_de`); y la guarda del rótulo del título, que
   medía 144 u cuando el sprite mide 164 (ahora sale del rótulo de verdad con su escala, `ajusta` en `src/ui.gd`).
+- **El lector, a la medida de su texto.** Un texto corto dejaba la caja del lector con aire o a media pantalla la primera
+  vez que se abría, y al segundo abrirlo salía bien (venía de antes de esta tanda). La columna de párrafos ya no estira la
+  caja (`SIZE_FILL` en vez de `SIZE_EXPAND_FILL`) y, mientras el lector está abierto, se recoloca en cada fotograma, como
+  ya hacía la revista: dentro del contenedor, un texto con corte de línea no sabe su alto hasta que el reparto le da su
+  ancho, así que la primera medida salía mayor (`leer` en `src/ui.gd`; prueba `tests/pixel.gd`, 180 comprobaciones).
 - **La mancheta nueva.** EL ESQUEJE se rotula con letras dibujadas por código (`tools/sprites/a-mano/rotulos.py`: barras de
   4 px en caja de 14 × 20, bisel con la luz arriba a la izquierda, contorno y sombra proyectada), con la cinta del artículo
   arriba, los filetes y el esqueje al lado; cabe en la caja de composición de la portada (100 × 36).

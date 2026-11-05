@@ -307,7 +307,9 @@ func _ready() -> void:
 	# como antes; en la revista, uno por párrafo, para que el aire entre párrafos sea media línea y no una línea entera en blanco
 	lector_sc.add_child(lector_par)
 	lector_par.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	lector_par.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	# a su alto, no al del hueco: con EXPAND, la columna de párrafos estiraba el lector corto hasta llenar la pantalla
+	# (tests/pixel.gd, «el lector corto, sin aire»). Para centrar una plana de revista ya está custom_minimum_size.y
+	lector_par.size_flags_vertical = Control.SIZE_FILL
 	lector_par.add_child(lector_txt)
 	lector_txt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	lector_txt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1431,9 +1433,11 @@ func leer(t: String, texto: String, rev := {}) -> void:
 	hud.hide()
 	_coloca()
 	_coloca.call_deferred()   # 0.52: otra vez, con el texto ya a su ancho
-	if not lector_rev.is_empty() and not get_tree().process_frame.is_connected(_coloca):
-		# la revista esconde el HUD, así que detrás no viene ningún otro _coloca: mientras está abierta se coloca en cada
-		# fotograma (el cuerpo de la letra se mide en varios, y así el aviso tampoco se queda encima de la plana)
+	if not get_tree().process_frame.is_connected(_coloca):
+		# el lector esconde el HUD, así que detrás no viene ningún otro _coloca: mientras está abierto se coloca en cada
+		# fotograma. Con la revista, porque el cuerpo de la letra se mide en varios (y así el aviso tampoco se queda encima de
+		# la plana); sin ella, porque el alto de un texto con corte de línea no se sabe hasta que el reparto le da su ancho al
+		# Label: la primera medida salía mayor y la caja quedaba con aire (tests/pixel.gd, «el corto otra vez, igual»)
 		get_tree().process_frame.connect(_coloca)
 	var p := Motor.Prom.new()
 	var mio := [Callable()]   # el manejador se quita a sí mismo (pop() sin él se llevaría el de otro si se abriera encima)
@@ -1456,10 +1460,10 @@ func leer(t: String, texto: String, rev := {}) -> void:
 			lector_par.custom_minimum_size.y = 0.0
 			lector_pags = []
 			lector_ttl.visible = true
+			if get_tree().process_frame.is_connected(_coloca):
+				get_tree().process_frame.disconnect(_coloca)
 			if not lector_rev.is_empty():
 				lector_rev = {}
-				if get_tree().process_frame.is_connected(_coloca):
-					get_tree().process_frame.disconnect(_coloca)
 				_lector_estilo()
 			update_hud()
 			p.res()
