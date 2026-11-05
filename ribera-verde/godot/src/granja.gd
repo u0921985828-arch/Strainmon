@@ -897,13 +897,17 @@ func harvest(i: int, hu = null) -> void:
 		mover_lote(S.buds, S.caja.buds, lk, a_caja)
 	if p.get("f") and p.f.get("id"):
 		S.fenos[str(int(p.f.id))] = cl
-	var rebrota := rebrote(p)
-	if not rebrota:
-		L[i] = null
+	var dob := rebrote(p)   # ESTUDIO, tanda 2: la doble cosecha rebrota sola
 	sfx("get")
 	if S.rec.get(p.sid) == 1:   # una variedad de receta sacada en la mesa, cosechada (capítulo 4)
 		S.rec[p.sid] = 2
 	await say(T("Cosechas {g} g de {s}. THC: {t}%.", {"g": g, "s": s.n, "t": Datos.pct(thc)}))
+	# en la huerta se elige qué hacer con la planta (la de doble cosecha rebrota sola). Lo que decide si el sitio queda libre es el
+	# estado de la planta, no lo que devuelve la llamada: tras un await, el valor no llega siempre a la línea de después
+	var rev0 := int(p.get("rev", 0))
+	await reveg(p, hu, dob)
+	if not dob and int(p.get("rev", 0)) == rev0:
+		L[i] = null
 	if sobra >= 1:
 		var hm := {"m": I18n.v(String(D.MOCHILAS[int(S.items.get("bolsa", 0))].n)).to_lower(), "c": a_caja, "e": sobra - a_caja}
 		if a_caja >= 1:
@@ -930,7 +934,7 @@ func harvest(i: int, hu = null) -> void:
 			await say(T("Sus semillas lo llevan: de la {s}, {p} de cada 100 saldrán {n}. Fijado en la línea.", {"s": s.n, "p": pc, "n": I18n.v(D.RAREZAS.r[c[0]].n).to_lower()}) if int(c[1]) >= int(D.RAREZAS.fija) else T("Sus semillas lo llevan: de la {s}, {p} de cada 100 saldrán {n}. Cultívalas y cosecha semillas de las que lo saquen para fijarlo.", {"s": s.n, "p": pc, "n": I18n.v(D.RAREZAS.r[c[0]].n).to_lower()}))
 		if fe.ra.size() and not nn:
 			await say(K("Sin semillas de esta planta, el rasgo no pasa a la línea: sus esquejes sí son ella."))
-	if rebrota:
+	if dob:
 		await say(K("Doble cosecha: la planta rebrota. Vuelve a vegetativo y dará una segunda cosecha más pequeña."))
 	if nn:
 		var hs := {"n": nn, "s": s.n}
@@ -949,6 +953,11 @@ func harvest(i: int, hu = null) -> void:
 			await say(T("Sale sin curar. Con unos tarros de curado (los vende Kiko), en la caja fuerte se cura en {d} días: algo más de THC y se vende más cara. Sin curar no pierde nada.", {"d": int(D.CURADO.dias)}))   # 1.36: ya no pierde THC; curando, sube
 	S.flags.harvest1 = true
 	await check_story()
+
+# al aire libre, al cosechar se elige si la planta se arranca o se queda revegetando (campo.gd lo sobrescribe en la huerta de la
+# tía; en las carpas y las mesas no hay revegetación: el fotoperiodo lo pones tú)
+func reveg(_p: Dictionary, _hu, dob := false) -> bool:
+	return dob
 
 # ESTUDIO, tanda 2: la doble cosecha vuelve a vegetativo una vez, sin lo que le acortó la primera (true: sigue en su sitio)
 func rebrote(p: Dictionary) -> bool:
@@ -970,6 +979,8 @@ func ra_txt(p: Dictionary) -> String:
 		t = "\n" + T("Rasgo raro: {n}", {"n": y_lista(l)})
 	if Datos.CAL and p.get("rb"):
 		t += "\n" + K("Rebrotada: segunda cosecha")
+	if Datos.CAL and int(p.get("rev", 0)) > 0:
+		t += "\n" + T("Revegetada: {n}.º año", {"n": int(p.rev) + 1})
 	return t
 
 # ESTUDIO, tanda 2: el cuaderno de fenotipos (S.album): cada planta rara o con rasgos, con su variedad, el día y el sitio, una vez
