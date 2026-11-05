@@ -29,6 +29,7 @@ ELEGIDAS = {   # nombre en el atlas: (archivo, canto de la manga, giro en grados
 	'gm-billete': ('pv-billete-0.png', 'pov', 0),
 	'gm-bolsita': ('pv-bolsita-0.png', 'pov', 0),
 	'gm-pincel': ('pv-pincel-0.png', 'pov', 0),
+	# 0.84: las manos de la revista se dibujan a mano (gestos.py, gs-rev-mano): el pulgar recto contra el canto de la hoja
 	# la mano del cliente, enfrente: la misma girada media vuelta, desde la esquina de arriba a la izquierda, con la manga azul
 	'gm-billete-i': ('pv-billete-0.png', 'pov-i', 'vuelta'),
 	'gm-bolsita-i': ('pv-bolsita-0.png', 'pov-i', 'vuelta'),
@@ -114,7 +115,7 @@ def sale(n, f, canto, giro):
 	if n.startswith('gm-') and giro not in ('espejo', 'vuelta'):
 		im = manga(im, MANGA)
 	im = im.crop(caja if giro == 'apaga' else im.getbbox())
-	if n.startswith('gm-mech'):   # la mano izquierda: el puño a la izquierda del mechero, sin tapar la del porro
+	if n.startswith('gm-mech'):   # la mano izquierda: el puño a la izquierda (con tu manga, no la del cliente)
 		im = im.transpose(Image.FLIP_LEFT_RIGHT)
 	if n == 'gm-mech1-ab':   # lo pidió el usuario («a la hora de encender el mechero, desaparece el dedo gordo»): el pulgar, encima de la rueda
 		im = pulgar(im)
@@ -229,7 +230,8 @@ def llaves():
 			if t in LLAVES_V:
 				im = im.rotate(-90, expand=True)
 				n = 'acc-llave-%s-v%d' % (t, i)
-			d = os.path.join(R, 'art', 'crudo', 'gestos', n, 'unica')   # sin recortar: la mano, donde la de serie; os.makedirs(d, exist_ok=True)
+			d = os.path.join(R, 'art', 'crudo', 'gestos', n, 'unica')   # sin recortar: la mano, donde la de serie
+			os.makedirs(d, exist_ok=True)
 			im.save(os.path.join(d, '00.png'))
 			yield n, im.size
 

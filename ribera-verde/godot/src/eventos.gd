@@ -2389,12 +2389,41 @@ func _gesto_rects(R: Array, V: Dictionary, t: float) -> void:
 			if t > 1000:   # empuja el montón y se va por la esquina
 				var e: float = _mv(0, 70, (t - 1000) / 200.0)
 				_gsm(R, "gm-vacia", 84 + e, 34 + e)
-		"revista":   # EL ESQUEJE (revista.gd): la portada del número sube a la mesa y las manos la sostienen por los lados
+		"revista":   # EL ESQUEJE (revista.gd): coges el número con las dos manos, lo subes a la vista y lo dejas
 			_gsp(R, "gs-f-cuarto", 0, 0)
-			var e: float = _mv(96, 0, t / 300.0) if t < 1000 else _mv(0, 24, (t - 1000) / 200.0)
+			# lo pidió el usuario («la animación de coger la revista como las manos que deberían de aparecer al agarrar»):
+			# el número está en la mesa y las dos manos llegan a él ya a la vista, desde fuera y desde abajo, hasta pinzarlo
+			# por sus dos cantos; lo suben con un rebote corto al asentarlo, respira en la mano y al final lo devuelven a la mesa
+			var e: float = 46.0       # lo que la revista está por debajo de su sitio (46 = en la mesa)
+			var ab: float = 0.0       # lo que las manos siguen por fuera del canto: aún no lo han pinzado
+			var ey: float = 0.0       # lo que las manos están por debajo de su sitio: llegando desde abajo
+			if t < 300:               # en la mesa; las manos llegan por fuera y por abajo y se cierran sobre el canto
+				var f: float = _suave(t / 300.0)
+				ab = 1.0 - f
+				ey = (1.0 - f) * 14.0
+			elif t < 700:             # pinzada: sube con las manos
+				e = _mv(46, -4, (t - 300) / 400.0)
+			elif t < 820:             # el rebote al asentarla
+				e = _mv(-4, 0, (t - 700) / 120.0)
+			elif t < 1040:            # en la mano, respirando (vale 0 en los dos extremos: no salta al empezar a bajar)
+				e = sin((t - 820) / 220.0 * PI) * 0.8
+			else:                     # y la devuelve a la mesa
+				e = _mv(0, 46, (t - 1040) / 160.0)
+			# 0.84 (lo pidió el usuario: «No usaste la imagen que te mandé» · «La de la mano, tal y como quería los sprites»):
+			# las manos son el sprite que mandó él (gestos.py, `fuentes/mano_revista.png`, 40 × 49), una en cada canto de la hoja
+			# (x 14 y 127) con el pulgar sobre el papel y el dorso y la manga por fuera. El fondo de la revista es opaco y ocupa
+			# el plano entero, así que la mano no se puede pintar debajo: va encima, recortada a lo que queda fuera del canto
+			# —que es lo mismo, lo que cae en el papel queda tapado, «lo negro que pinté de la mano»— y el pulgar entero encima,
+			# con su corte recto justo en el canto de la hoja
+			var mx: float = 18 * ab
+			var my: float = 26 + e + ey
 			_gsp(R, "gs-f-revista", 0, e)
-			_gsm(R, "gm-vacia", 4, 56 + e)
-			_gsm(R, "gm-vacia", 112, 56 + e)
+			var fi := Rect2i(_gs.position.x, _gs.position.y, 14, int(_gs.size.y))
+			var fd := Rect2i(_gs.position.x + 128, _gs.position.y, int(_gs.size.x) - 128, int(_gs.size.y))
+			R.append(["@", "gs-rev-mano-i", _gs.position.x + Datos.jsround(-16 - mx), _gs.position.y + Datos.jsround(my), fi])
+			R.append(["@", "gs-rev-mano", _gs.position.x + Datos.jsround(118 + mx), _gs.position.y + Datos.jsround(my), fd])
+			_gsp(R, "gs-rev-pulgar-i", -16 - mx, my)               # la izquierda: el pulgar en x 14-23
+			_gsp(R, "gs-rev-pulgar", 118 + mx, my)                 # la derecha: el pulgar en x 118-127
 		"dormir":   # en la cama, de noche (o la siesta, de día); respira y suben las zetas
 			_gsp(R, "gs-f-cama-d" if c == "siesta" else "gs-f-cama-n", 0, 0)
 			_gsp(R, "gs-dormido-%d" % (1 if fmod(t, 1000) > 500 else 0), 16, 30)   # 1.55.1: de lado, tapado, el pecho sube y baja

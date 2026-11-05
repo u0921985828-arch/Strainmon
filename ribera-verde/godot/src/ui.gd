@@ -1752,6 +1752,7 @@ const SAL_AIRE := 2.0
 # lo que el saliente se mete en el cuadro: justo el canto de arriba (2 u de línea y 1,5 de filete), para
 # que cada capa del saliente acabe en la fila de su igual del cuadro y la unión quede de 90°, sin escalón
 const SAL_PIE := 3.5
+const SAL_SUBE := 8.0   # lo que el cuadro se estira para que el busto quepa entero, en vez de asomar en un escalón
 const RETRATO_M := SAL_CANTO + SAL_AIRE
 
 # el ancho del retrato en u: el del busto (64) o RETRATO_W el dibujado
@@ -2297,6 +2298,14 @@ func _coloca() -> void:
 		dlg.get_theme_stylebox("panel").content_margin_left = ((RETRATO_M + rw + 2 + 7) if con else (10 + 2)) * us
 		dlg.reset_size()
 		dlg.size.x = R.size.x - 6 * us
+		# si al busto le falta poco para caber, el cuadro da esos pocos u en vez de dejarlo asomar en un escalón de
+		# dos píxeles: el saliente se reserva para cuando el busto asoma de verdad (lo dijo el usuario, con el aire)
+		if con:
+			# el hueco por encima y por debajo de la ficha, par, para que al centrarla salga el mismo aire arriba
+			# y abajo y no asome el escalón de medio u (RETRATO_M es 5,5)
+			var h_f: float = (retrato_h() + 2 + 2 * ceilf(RETRATO_M)) * us
+			if dlg.size.y < h_f and h_f - dlg.size.y <= SAL_SUBE * us:
+				dlg.size.y = h_f
 		dlg.position = Vector2(R.position.x + 3 * us, R.end.y - 3 * us - dlg.size.y)
 		dlg_nm_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER if con else HORIZONTAL_ALIGNMENT_LEFT
 		dlg_nm.add_theme_stylebox_override("panel", plana(LINEA, 0, 0, 5 * us) if con else plana(LINEA, 3 * us, 2.5 * us, 5 * us))
@@ -2307,8 +2316,18 @@ func _coloca() -> void:
 			var rh := retrato_h()
 			retrato.size = Vector2(rw, rh) * us
 			# la ficha se ancla al pie del cuadro, a RETRATO_M del canto por la izquierda y por abajo; si el
-			# busto no cabe en lo que mide el cuadro, asoma por arriba y el saliente sube a rodearlo
-			retrato.position = Vector2(dlg.position.x + (RETRATO_M + 1) * us, dlg.position.y + dlg.size.y - (RETRATO_M + 1 + rh) * us)
+			# busto no cabe en lo que mide el cuadro, asoma por arriba y el saliente sube a rodearlo.
+			# Y cuando el cuadro da de sí más que la ficha, la ficha se centra en vez de quedarse abajo
+			# (lo dijo el usuario: «ese aire encima del Sprite del personaje queda mal»): el aire sobrante se
+			# reparte arriba y abajo en lugar de amontonarse encima del busto. Las dos reglas empalman: en el
+			# límite el centro cae en el pie, así que el min() pasa de una a otra sin salto
+			var y_pie: float = dlg.position.y + dlg.size.y - (RETRATO_M + 1 + rh) * us
+			var y_cen: float = dlg.position.y + (dlg.size.y - (rh + 2) * us) * 0.5 + us   # el marco, no el busto: un u más
+			# anclada al pie, redondeando como siempre; centrada, con floorf, para que el u que sobra de un hueco
+			# impar caiga debajo del busto y no encima (lo dijo el usuario: el aire de encima es lo que queda mal)
+			var y_r: float = (y_pie - dlg.position.y) / us
+			y_r = roundf(y_r) if y_pie <= y_cen else floorf((y_cen - dlg.position.y) / us)
+			retrato.position = Vector2(dlg.position.x + (RETRATO_M + 1) * us, dlg.position.y + y_r * us)
 			var sm := StyleBoxFlat.new()
 			sm.bg_color = Retrato.FONDO
 			sm.border_color = LINEA

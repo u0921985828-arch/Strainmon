@@ -480,6 +480,38 @@ def semilla():
     return con(L)
 
 
+MANO_REV = ('tools', 'sprites', 'a-mano', 'fuentes', 'mano_revista.png')
+REV_CORTE = (10, 15, 22)   # el corte del pulgar: columna, primera fila y la de después
+
+
+def _mano_rev(pulgar):
+    """0.84 (lo pidió el usuario: «No usaste la imagen que te mandé» · «La de la mano, tal y como quería los sprites»):
+    la mano que coge EL ESQUEJE es el sprite que mandó él (40 × 49, `fuentes/mano_revista.png`), tal cual, sin redibujar:
+    mano derecha de perfil con el pulgar hacia la izquierda, el dorso subiendo en diagonal y la manga saliendo por abajo a
+    la derecha. Sale en dos piezas del mismo lienzo, para que casen al píxel colocadas en el mismo sitio: el pulgar
+    (columnas 0-9 de las filas 15-21), que va **encima** de la hoja, y todo lo demás, que va **detrás** y se recorta por el
+    canto del papel (lo dijo el usuario: «lo negro que pinté de la mano es lo que debe estar tapado por la revista, y el
+    dedo gordo por encima»). El corte es recto y cae justo en el canto de la hoja («según sigues el dedo gordo para arriba,
+    ya debería ser recto, para que coincida con el corte de la hoja»). La otra mano, en espejo"""
+    im = Image.open(P(*MANO_REV)).convert('RGBA')
+    L = lz(im.width, im.height)
+    cx, y0, y1 = REV_CORTE
+    for y in range(im.height):
+        for x in range(im.width):
+            c = im.getpixel((x, y))
+            if not c[3]:
+                continue
+            if (x < cx and y0 <= y < y1) == pulgar:
+                L.p(x, y, c)
+    return L
+
+
+def mano_revista(): return _mano_rev(False)
+
+
+def pulgar_revista(): return _mano_rev(True)
+
+
 def mano_pinza(abierta):
     """la mano que coge la semilla con el índice y el pulgar, desde arriba (24 × 24); abierta, los dedos se separan y la suelta"""
     L = lz(24, 24)
@@ -1027,6 +1059,8 @@ sale('gs-esqueje', esqueje()); sale('gs-vaso', vaso()); sale('gs-cola', cola());
 sale('gs-pincel', pincel()); sale('gs-mechero-0', mechero(0)); sale('gs-mechero-1', mechero(1))
 for n in range(3): sale('gs-humo-%d' % n, humo(n)); sale('gs-bruma-%d' % n, bruma(n))
 sale('gs-billete', billete()); sale('gs-fajo', billete(4)); sale('gs-mano', mano_abierta())
+sale('gs-rev-mano', mano_revista()); sale('gs-rev-mano-i', mano_revista().espejo())
+sale('gs-rev-pulgar', pulgar_revista()); sale('gs-rev-pulgar-i', pulgar_revista().espejo())
 sale('gs-semilla', semilla()); sale('gs-pinza-0', mano_pinza(0)); sale('gs-pinza-1', mano_pinza(1))
 sale('gs-gota', gota()); sale('gs-hojita', hojita()); sale('gs-bicho', bicho()); sale('gs-burbuja', burbuja()); sale('gs-z', zeta())
 

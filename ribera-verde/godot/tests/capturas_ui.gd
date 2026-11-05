@@ -175,9 +175,13 @@ func _mira_maquetado(p: String) -> void:
 			rf = rf.merge(J.dlg_nm.get_global_rect())
 		var rc: Rect2 = J.dlg.get_global_rect()
 		var aba: float = rc.end.y - rf.end.y
+		var arr: float = rf.position.y - rc.position.y
 		var izq: float = rf.position.x - rc.position.x
-		if absf(aba - izq) > 1.5 * J.us:
-			cortes.append("%s: la ficha, a %.1f u del pie y a %.1f de la izquierda" % [p, aba / J.us, izq / J.us])
+		# 0.84 (lo dijo el usuario: «ese aire encima del Sprite del personaje queda mal»): con el cuadro justo la ficha
+		# sigue al pie, con el mismo margen que por la izquierda; cuando el cuadro da de sí más que ella, se centra y el
+		# aire se reparte arriba y abajo en vez de amontonarse encima del busto
+		if absf(aba - izq) > 1.5 * J.us and absf(arr - aba) > 1.5 * J.us:
+			cortes.append("%s: la ficha, a %.1f u del techo, %.1f del pie y %.1f de la izquierda" % [p, arr / J.us, aba / J.us, izq / J.us])
 		if rf.position.y < rc.position.y - 0.5 and not J.dlg_sal.visible:
 			cortes.append("%s: el busto asoma %.1f u del cuadro sin el saliente del contorno" % [p, (rc.position.y - rf.position.y) / J.us])
 		if J.dlg_sal.visible:

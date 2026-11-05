@@ -833,6 +833,16 @@
    "ajuste": "exacto",
    "nota": "1.54.1: el plano de cerca de cada acción (gestos.py)"
   },
+  "gs_rev_mano": {
+   "w": 40,
+   "h": 49,
+   "ancla": [
+    0,
+    0
+   ],
+   "ajuste": "exacto",
+   "nota": "0.84: la mano que pinza el canto de la revista (gestos.py)"
+  },
   "gs_s": {
    "w": 8,
    "h": 8,
@@ -12121,6 +12131,22 @@
      "celda": "gs_s"
     },
     {
+     "nombre": "gs-rev-mano",
+     "celda": "gs_rev_mano"
+    },
+    {
+     "nombre": "gs-rev-mano-i",
+     "celda": "gs_rev_mano"
+    },
+    {
+     "nombre": "gs-rev-pulgar",
+     "celda": "gs_rev_mano"
+    },
+    {
+     "nombre": "gs-rev-pulgar-i",
+     "celda": "gs_rev_mano"
+    },
+    {
      "nombre": "gs-pinza-0",
      "celda": "gs_m"
     },
@@ -12360,6 +12386,10 @@
     "misc:gs-vaso",
     "misc:gs-z",
     "misc:gs-semilla",
+    "misc:gs-rev-mano",
+    "misc:gs-rev-mano-i",
+    "misc:gs-rev-pulgar",
+    "misc:gs-rev-pulgar-i",
     "misc:gs-pinza-0",
     "misc:gs-pinza-1",
     "misc:gs-regar",

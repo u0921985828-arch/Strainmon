@@ -2,6 +2,45 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El cuadro con busto sin aire y las manos que cogen la revista (0.84, lo dijo el usuario: «se va demasiado arriba el texto y ese aire encima del Sprite del personaje queda mal» y «la animación de coger la revista como las manos que deberían de aparecer al agarrar deben estar hechas correctamente, no están bien»; solo Godot, con `Datos.CAL`)
+
+- **La ficha, centrada cuando el cuadro da de sí.** Con busto, la ficha se anclaba siempre al pie del cuadro, así que
+  en cuanto el texto pedía tres o cuatro líneas quedaba un palmo de aire muerto encima del retrato mientras el texto
+  empezaba arriba del todo. Ahora el sitio de la ficha es el menor de los dos: el pie de siempre o el centro del cuadro
+  (`y_pie`/`y_cen` en `_coloca`, `src/ui.gd`), de modo que el aire sobrante se reparte arriba y abajo. Las dos reglas
+  empalman sin salto: en el límite el centro cae justo en el pie, y con el cuadro corto el busto sigue asomando por
+  arriba con su saliente.
+- **Sin escalones de dos píxeles.** Cuando al busto le faltaban unos pocos u para caber, el saliente dibujaba un
+  escaloncito ridículo sobre el canto del cuadro. Ahora el cuadro da esos u de sí (`SAL_SUBE`, 8 u) y el busto cabe
+  entero; el saliente se reserva para cuando asoma de verdad. El estirón deja hueco **par** por arriba y por abajo
+  (`ceilf(RETRATO_M)`) y, cuando el hueco sale impar, el u que sobra cae **debajo** del busto y nunca encima, que es
+  justo lo que queda mal. Pruebas `tests/retratos.gd` (488, con el caso de media página: sin escalón, el cuadro da lo
+  justo y no más de `SAL_SUBE`, y el aire de arriba nunca mayor que el de abajo) y `tests/capturas_ui.gd` (12
+  pantallas, 0 cortes: la ficha, al pie con el margen de la izquierda o centrada con el mismo aire arriba y abajo).
+- **Las manos que cogen EL ESQUEJE, las del usuario.** El gesto de la revista ponía dos `gm-vacia` —los puños de
+  pellizcar un billete— flotando sobre el papel, sin agarrar nada. Ahora la mano es **el sprite que mandó el usuario**
+  (lo dijo él: «No usaste la imagen que te mandé» · «La de la mano, tal y como quería los sprites»), guardado tal cual
+  en `tools/sprites/a-mano/fuentes/mano_revista.png` (40 × 49, celda `gs_rev_mano`): mano derecha de perfil con el
+  pulgar hacia la izquierda, el dorso subiendo en diagonal y la manga granate saliendo por abajo a la derecha. Sale en
+  dos piezas del mismo lienzo, para que casen al píxel colocadas en el mismo sitio (`_mano_rev` en
+  `tools/sprites/a-mano/gestos.py` → `gs-rev-mano`, `gs-rev-mano-i`, `gs-rev-pulgar`, `gs-rev-pulgar-i`): el pulgar
+  (columnas 0-9 de las filas 15-21), que va **encima** de la hoja, y todo lo demás, que va **detrás**. Como el fondo de
+  la revista es opaco y ocupa el plano entero, la mano no se puede pintar debajo: se pinta encima **recortada** a lo
+  que queda fuera del canto de la hoja (x < 14 y x ≥ 128), que da el mismo resultado —lo que cae en el papel queda
+  tapado, «lo negro que pinté de la mano»— y el pulgar entero encima, con su corte recto justo en el canto («según
+  sigues el dedo gordo para arriba, ya debería ser recto, para que coincida con el corte de la hoja»). Una mano en cada
+  canto del número, lo más separadas que da la revista. Las del generador (`gm-rev`, `gm-rev-ab`, `pv-rev-0.png`) salen
+  de `sprgen_gestos.py` y del manifiesto.
+- **Y la animación, en su orden.** El número está en la mesa y las dos manos llegan a él **ya a la vista**, desde fuera
+  y desde abajo, hasta pinzarlo por sus dos cantos; lo suben con un rebote corto al asentarlo, respira en la mano (una
+  onda que vale cero en los dos extremos, sin salto al empezar a bajar) y al final lo **devuelven a la mesa**, de donde
+  salió (`"revista"` en `_gesto_rects`, `src/eventos.gd`); antes la revista subía sola, las manos aparecían ya puestas
+  y el número se quedaba a medio camino.
+- **Un apaño de taller.** `llaves()` creaba sus carpetas en una línea comentada, así que `sprgen_gestos.py` solo
+  escribía las llaves por tipo si ya existían de antes: al rehacer el atlas en un contenedor limpio se perdían las doce
+  (`os.makedirs` descomentado). Con el atlas reempaquetado, los 46 rectángulos de `godot/arte/carpa.json` se reapuntaron
+  por la huella de sus píxeles antes de volver a pasar `tools/carpa_hoja.py`.
+
 ### EL ESQUEJE con publicidad, noticias y sobre de regalo, la tetraploidia en el laboratorio y los dos rótulos dibujados (0.83, lo pidió el usuario: «molaría hacer banners de publicidad, no que sean solo texto, publicidad de Kiko por ejemplo, de algún Club, de la discoteca Gaua también por ejemplo, comercios locales .. también noticias del cannabis» · «Molaría implantar la tetraploidia en el laboratorio pero de alguna forma no tan complicada de explicar supongo» · «molaría que hubiese como un OpenDoc con una semilla dentro y como un paquetillo de regalo» · «Molaría hacer un sprite del título de la revista, como también molaría hacer un sprite del título del juego… Tiene que ser un título visual para poder utilizarlo en las fotos de publicidad»; solo Godot, con `Datos.CAL`)
 
 - **Los anuncios, dibujados.** Las dos planas de anuncios de cada número ya no son texto suelto: cada anunciante del juego

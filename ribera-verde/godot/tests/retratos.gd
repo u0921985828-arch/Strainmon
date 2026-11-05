@@ -42,10 +42,11 @@ func corre(f: Callable) -> bool:
 	return true
 
 func foto() -> Image:
-	await process_frame
-	await process_frame
+	for q in 3:
+		await process_frame
+	J._coloca()   # el cuadro, ya colocado, antes de leer el fotograma (si no, se lee el de antes del diálogo)
 	J.pintor.redibuja(0.0)
-	for q in 4:
+	for q in 8:
 		await RenderingServer.frame_post_draw
 	return root.get_texture().get_image()
 
@@ -237,7 +238,9 @@ func _corre() -> void:
 	# tiene que ser quid pro quo»): el cuadro mide lo que pide el texto y la ficha se ancla a su pie, con el
 	# mismo margen por la izquierda; el busto que no cabe asoma por arriba
 	var mg: float = J.RETRATO_M * us
-	chk(absf((C.end.y - M.end.y) - mg) <= 0.5, "la ficha, anclada al pie (%.1f u)" % ((C.end.y - M.end.y) / us))
+	# 0.84 (lo dijo el usuario: «ese aire encima del Sprite del personaje queda mal»): con el cuadro corto la ficha
+	# sigue anclada al pie, y cuando el cuadro da de sí más que ella se centra, de modo que el aire se reparte
+	chk(C.end.y - M.end.y >= mg - 0.5 and C.end.y - M.end.y <= mg + us + 0.5, "la ficha, anclada al pie (%.1f u)" % ((C.end.y - M.end.y) / us))
 	chk(absf((M.position.x - C.position.x) - mg) <= 0.5 and M.end.x < C.position.x + C.size.x * 0.5, "a la izquierda, con el mismo aire (%.1f u)" % ((M.position.x - C.position.x) / us))
 	chk(C.size.y < M.size.y and M.position.y < C.position.y, "el cuadro, a la medida del texto: el busto asoma (%.1f u de caja)" % (C.size.y / us))
 	# y el contorno sube a rodearlo (lo pidió el usuario: «que haga como el contorno por encima y por el lado
@@ -253,9 +256,11 @@ func _corre() -> void:
 	# del contorno. Lo dijo el usuario: «esa esquina no puede ser así, tiene que ser 90 grados lo que haga la
 	# linea y el contorno por dentro»
 	var im: Image = await foto()
-	var lin: Color = J.LINEA
 	var CG: Rect2i = Rect2i(Vector2i(C.position.round()), Vector2i(C.size.round()))
-	chk(im.get_pixel(CG.position.x, CG.position.y) == lin, "la esquina de arriba a la izquierda, de 90° (%s)" % im.get_pixel(CG.position.x, CG.position.y))
+	# la referencia es el mismo contorno de arriba del cuadro, más a la derecha (fuera del saliente): así la
+	# comprobación no depende del fundido de entrada ni de la penumbra de la escena, solo de que la esquina es línea
+	var lin: Color = im.get_pixel(CG.position.x + int(S.size.x) + 20, CG.position.y)
+	chk(im.get_pixel(CG.position.x, CG.position.y) == lin, "la esquina de arriba a la izquierda, de 90° (%s, línea %s)" % [im.get_pixel(CG.position.x, CG.position.y), lin])
 	# el reborde redondeado se queda en las otras tres esquinas (lo dijo el usuario: «únicamente esa esquina…
 	# el reborde del Sprite no lo quites»): su píxel de esquina no es la línea, porque la curva lo deja fuera
 	var red := 0
@@ -313,9 +318,25 @@ func _corre() -> void:
 	var M2: Rect2 = J.retrato_marco.get_rect()
 	chk(C2.size.y > C.size.y + 8 * us, "el cuadro crece con el texto (%.1f → %.1f u)" % [C.size.y / us, C2.size.y / us])
 	chk(M2.position.y >= C2.position.y - 0.5 and not J.dlg_sal.visible, "el busto, dentro del cuadro: sin saliente (%.1f u)" % ((M2.position.y - C2.position.y) / us))
-	chk(absf((C2.end.y - M2.end.y) - mg) <= 0.5, "y la ficha, en el pie como siempre (%.1f u)" % ((C2.end.y - M2.end.y) / us))
+	var ar: float = M2.position.y - C2.position.y
+	var ab: float = C2.end.y - M2.end.y
+	# centrada, y el u que sobra de un hueco impar cae debajo del busto, nunca encima (lo dijo el usuario)
+	chk(ar <= ab + 0.5 and ab - ar <= us + 0.5 and ab >= mg - 0.5, "y la ficha, centrada: %.1f u de aire arriba y %.1f abajo" % [ar / us, ab / us])
 	if dir != "":
 		await pinta(dir, "unai-lleno")
+	# 6d · 0.84: la página a medias (lo dijo el usuario: «se va demasiado arriba el texto y ese aire encima del Sprite
+	# del personaje queda mal»). Al busto le falta poco para caber: el cuadro da esos pocos u y no sale el escalón
+	chk(corre(func(): await J.type_text("Eh, ¿tienes algo para mí? Te traigo lo de siempre, si quieres.", "UNAI")), "type_text bloqueado (media página)")
+	for q in 3:
+		await process_frame
+	J._coloca()
+	var C3: Rect2 = Rect2(J.dlg.position, J.dlg.size)
+	var M3: Rect2 = J.retrato_marco.get_rect()
+	chk(not J.dlg_sal.visible and M3.position.y >= C3.position.y - 0.5, "media página: el busto cabe, sin escalón (%.1f u)" % ((M3.position.y - C3.position.y) / us))
+	chk(C3.size.y >= M3.size.y + 2 * mg - 0.5, "y el cuadro da de sí lo justo (%.1f u de cuadro, %.1f de ficha)" % [C3.size.y / us, M3.size.y / us])
+	chk(C3.size.y - M3.size.y <= (2 * J.RETRATO_M + J.SAL_SUBE) * us + 0.5, "sin pasarse: como mucho SAL_SUBE (%.1f u)" % ((C3.size.y - M3.size.y) / us))
+	if dir != "":
+		await pinta(dir, "unai-media")
 	J.habla_look = null
 	chk(corre(func(): await J.type_text("Me debes 3.000 €. Último aviso.", "SMS · TOÑO")), "type_text bloqueado (SMS)")
 	chk(R.visible and Retrato.grupo(J.retrato_l[0], J.retrato_l[1]) == "tono", "Toño en el SMS")
