@@ -57,6 +57,13 @@ TEC = [
 ]
 
 TIT = {
+	# el titular de los meses tranquilos, por la estación del número (si no, en junio salía «Un otoño tranquilo»)
+	"calma": [
+		"«Una primavera tranquila»: la comarca, sin sustos",
+		"«Un verano tranquilo»: la comarca, sin sustos",
+		"«Un otoño tranquilo»: la comarca, sin sustos",
+		"«Un invierno tranquilo»: la comarca, sin sustos",
+	],
 	"poli": [
 		"«Un otoño tranquilo»: la comarca, sin sustos",
 		"La policía refuerza las patrullas en los barrios",

@@ -2,8 +2,8 @@
 # EL ESQUEJE a la vista (lo pidió el usuario: «que los números se vean como revista, con portada y páginas dibujadas»): el arte de
 # la revista, dibujado a mano, píxel a píxel, con el papel y la tinta de una revista de quiosco impresa a dos colores (tinta y
 # verde). Nada se escala ni se suaviza. Todo con el ancla arriba a la izquierda.
-#  · papel (64 × 64): la hoja, tileable, con su grano y sus fibras; papel2, la plana de la derecha, un tono más apagada;
-#  · mancheta (112 × 20): el rótulo EL ESQUEJE con letras de bloque dibujadas una por una, con su esqueje de remate;
+#  · papel (64 × 64): la hoja, tileable, con su grano y sus fibras;
+#  · mancheta / mancheta-en (unos 112-140 × 20): el nombre de la revista en cada idioma con letras de bloque dibujadas una por una, con su esqueje de remate;
 #  · filete (32 × 5) y filete2 (32 × 3): las cenefas de la cabecera y de los pies, tileables;
 #  · pt-<k> (104 × 72): las ocho ilustraciones de portada, según de qué vaya el titular del mes (planta, carpa, copa, barco, nave,
 #    club, redada y feria);
@@ -71,7 +71,7 @@ def papel(oscuro=False):
             L.p((x + i) % 64, (y + (i >> 1)) % 64, som)
     return L
 
-# ---------- la mancheta: EL ESQUEJE ----------
+# ---------- la mancheta: el nombre de la revista, letra a letra ----------
 # cada letra, 11 × 16 con trazo de 3 px y serifa; solo las seis que hacen falta
 GL = {
  'E': ['XXXXXXXXXXX', 'XXXXXXXXXXX', 'XXX........', 'XXX........', 'XXX........', 'XXX........',
@@ -92,6 +92,24 @@ GL = {
  'J': ['....XXXXXXX', '....XXXXXXX', '........XXX', '........XXX', '........XXX', '........XXX',
        '........XXX', '........XXX', '........XXX', '........XXX', '........XXX', 'XX......XXX',
        'XXX....XXX.', 'XXXX..XXXX.', '.XXXXXXXX..', '..XXXXXX...'],
+ 'T': ['XXXXXXXXXXX', 'XXXXXXXXXXX', '....XXX....', '....XXX....', '....XXX....', '....XXX....',
+       '....XXX....', '....XXX....', '....XXX....', '....XXX....', '....XXX....', '....XXX....',
+       '....XXX....', '....XXX....', '....XXX....', '....XXX....'],
+ 'H': ['XXX.....XXX', 'XXX.....XXX', 'XXX.....XXX', 'XXX.....XXX', 'XXX.....XXX', 'XXX.....XXX',
+       'XXXXXXXXXXX', 'XXXXXXXXXXX', 'XXX.....XXX', 'XXX.....XXX', 'XXX.....XXX', 'XXX.....XXX',
+       'XXX.....XXX', 'XXX.....XXX', 'XXX.....XXX', 'XXX.....XXX'],
+ 'C': ['..XXXXXXX..', '.XXXXXXXXX.', 'XXX.....XXX', 'XXX........', 'XXX........', 'XXX........',
+       'XXX........', 'XXX........', 'XXX........', 'XXX........', 'XXX........', 'XXX........',
+       'XXX.....XXX', 'XXX.....XXX', '.XXXXXXXXX.', '..XXXXXXX..'],
+ 'I': ['XXXXXXXXXXX', 'XXXXXXXXXXX', '....XXX....', '....XXX....', '....XXX....', '....XXX....',
+       '....XXX....', '....XXX....', '....XXX....', '....XXX....', '....XXX....', '....XXX....',
+       '....XXX....', '....XXX....', 'XXXXXXXXXXX', 'XXXXXXXXXXX'],
+ 'N': ['XXXX....XXX', 'XXXX....XXX', 'XXXXX...XXX', 'XXXXX...XXX', 'XXXXXX..XXX', 'XXXXXX..XXX',
+       'XXX.XXX.XXX', 'XXX.XXX.XXX', 'XXX..XXXXXX', 'XXX..XXXXXX', 'XXX...XXXXX', 'XXX...XXXXX',
+       'XXX....XXXX', 'XXX....XXXX', 'XXX.....XXX', 'XXX.....XXX'],
+ 'G': ['..XXXXXXX..', '.XXXXXXXXX.', 'XXX.....XXX', 'XXX........', 'XXX........', 'XXX........',
+       'XXX..XXXXXX', 'XXX..XXXXXX', 'XXX.....XXX', 'XXX.....XXX', 'XXX.....XXX', 'XXX.....XXX',
+       'XXX.....XXX', 'XXX.....XXX', '.XXXXXXXXX.', '..XXXXXXX..'],
 }
 
 def rotulo(txt, c=V0, som=K1):
@@ -109,8 +127,8 @@ def rotulo(txt, c=V0, som=K1):
         x += 12
     return L
 
-def mancheta():
-    rt = rotulo('EL ESQUEJE')
+def mancheta(txt='EL ESQUEJE'):
+    rt = rotulo(txt)
     L = Lienzo(rt.w + 14, 20)
     L.pega(rt, 13, 0)
     # el esqueje de remate: el tallo cortado en diagonal con dos hojas y un brote
@@ -183,14 +201,18 @@ def vg_var():   # la variedad del mes: un cogollo con su hoja
     L.contorno(K0)
     return L
 
-def vg_tec():   # el taller: las tijeras de podar
+def vg_tec():   # el taller: las tijeras de podar, cruzadas en el remache
     L = _vg()
-    linea(L, 7, 25, 20, 9, K0); linea(L, 8, 25, 21, 9, K1)
-    linea(L, 13, 25, 26, 9, K0); linea(L, 14, 25, 27, 9, K1)
-    elipse(L, 9, 26, 4, 3, K1, False)
-    elipse(L, 17, 26, 4, 3, K1, False)
-    L.p(19, 10, P2); L.p(25, 10, P2)
-    elipse(L, 23, 17, 2, 2, V1)
+    rx, ry = 18, 17   # el remache, donde se cruzan las dos hojas
+    for dx in (-1, 1):
+        linea(L, rx, ry, rx + dx * 7, 4, K0)          # la hoja, hacia arriba
+        linea(L, rx + dx, ry, rx + dx * 8, 4, K1)     # su filo
+        L.p(rx + dx * 7, 4, P2); L.p(rx + dx * 7, 5, P2)
+        linea(L, rx, ry, rx - dx * 5, 24, K0)         # el brazo del mango, hacia abajo
+        linea(L, rx + dx, ry, rx - dx * 4, 24, K1)
+        elipse(L, rx - dx * 6, 26, 5, 4, K0, False)   # el anillo del mango
+        elipse(L, rx - dx * 6, 26, 4, 3, K1, False)
+    L.r(rx - 1, ry - 1, 3, 3, K0); L.p(rx, ry, K2)
     return L
 
 def vg_merc():   # el mercado: la balanza con los dos platos
@@ -255,15 +277,17 @@ def vg_car():   # cartas: el sobre abierto
     L.p(26, 21, P2)
     return L
 
-def vg_leg():   # legal: el mazo y el taco
+def vg_leg():   # legal: el mazo con la maza en su mango y el taco debajo
     L = _vg()
-    linea(L, 10, 22, 24, 10, K0)
-    linea(L, 11, 23, 25, 11, K1)
-    L.r(5, 6, 10, 7, K0)
-    L.r(6, 7, 8, 5, K1)
-    L.r(10, 24, 16, 4, K0)
-    L.r(11, 25, 14, 2, K2)
-    elipse(L, 27, 17, 3, 3, V1)
+    linea(L, 14, 17, 27, 7, K0)     # el mango, de la maza hacia arriba a la derecha
+    linea(L, 15, 18, 28, 8, K1)
+    linea(L, 15, 19, 28, 9, K0)
+    L.caja(6, 10, 13, 10, K1, K0)   # la maza, encajada en el arranque del mango
+    L.hl(8, 16, 12, K2); L.hl(8, 16, 17, K0)
+    L.vl(12, 11, 18, K0)
+    L.r(8, 24, 20, 5, K0)           # el taco
+    L.hl(10, 25, 25, K2)
+    L.hl(9, 26, 28, K1)
     return L
 
 VG = {'nw': vg_nw, 'var': vg_var, 'tec': vg_tec, 'merc': vg_merc, 'copa': vg_copa,
@@ -422,8 +446,8 @@ PT = {'planta': pt_planta, 'carpa': pt_carpa, 'copa': pt_copa, 'barco': pt_barco
 # ---------- la hoja ----------
 def arte():
     sale('papel', papel())
-    sale('papel2', papel(True))
     sale('mancheta', mancheta())
+    sale('mancheta-en', mancheta('THE CUTTING'))
     sale('filete', filete())
     sale('filete2', filete(False))
     sale('grapa', grapa())

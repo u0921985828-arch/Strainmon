@@ -215,7 +215,14 @@ func rev_titular(n: int) -> String:
 		return I18n.v(String(R.tit.tia[1]))
 	if nivel_poli() > 0:
 		return I18n.v(String(R.tit.poli[nivel_poli()]))
-	return I18n.v(String(R.tit.poli[0]))
+	return I18n.v(String(R.tit.calma[rev_est(n)]))   # el mes tranquilo: su estación (si no, en junio salía «Un otoño tranquilo»)
+
+# la estación del número n, en el orden de REVISTA.tit.calma (primavera, verano, otoño, invierno)
+func rev_est(n: int) -> int:
+	var my := rev_my(n)
+	var e := Datos.estacion(Datos.dia_de(int(my.y), int(my.m), 15))
+	var i: int = ["primavera", "verano", "otoño", "invierno"].find(e)
+	return i if i >= 0 else 0
 
 # las secciones del número, en orden: cada una {k, tit, txt} (la portada lleva además «cab», la línea de arriba). De aquí salen el
 # texto corrido (rev_texto) y las planas de la revista a la vista (rev_paginas)
@@ -510,7 +517,7 @@ func rev_paginas(n: int) -> Dictionary:
 func rev_zona() -> Rect2i:
 	var c := rev_caja()
 	if lector_rev.is_empty() or lector_i == 0:   # la portada: debajo de la ilustración
-		return Rect2i(c.position.x + 14, c.position.y + 111, c.size.x - 26, c.size.y - 131)
+		return Rect2i(c.position.x + 14, c.position.y + 108, c.size.x - 26, c.size.y - 126)
 	return Rect2i(c.position.x + 14, c.position.y + 46, c.size.x - 26, c.size.y - 66)
 
 # la plana dibujada: papel, doblez y grapas del lomo, cabecera (mancheta e ilustración en la portada, viñeta de la sección en las
@@ -540,12 +547,12 @@ func rects_revista() -> Array:
 		o.append(["@", REV_ART["grapa"], c.position.x + 1, g, clip])
 	var portada: bool = lector_i == 0
 	if portada:
-		var mc: Image = REV_ART["mancheta"]
-		o.append(["@", mc, c.position.x + ((c.size.x - mc.get_width()) >> 1), c.position.y + 4, clip])
-		o.append_array(_rev_filete("filete", c.position.x + 12, c.position.y + 25, c.size.x - 24, clip))
+		var mc: Image = REV_ART[rev_mancheta()]
+		o.append(["@", mc, c.position.x + ((c.size.x - mc.get_width()) >> 1), c.position.y + 2, clip])
+		o.append_array(_rev_filete("filete", c.position.x + 12, c.position.y + 23, c.size.x - 24, clip))
 		var il: Image = REV_ART.get("pt-" + String(lector_rev.get("ilu", "planta")), REV_ART["pt-planta"])
-		o.append(["@", il, c.position.x + ((c.size.x - il.get_width()) >> 1), c.position.y + 31, clip])
-		o.append_array(_rev_filete("filete", c.position.x + 12, c.position.y + 104, c.size.x - 24, clip))
+		o.append(["@", il, c.position.x + ((c.size.x - il.get_width()) >> 1), c.position.y + 28, clip])
+		o.append_array(_rev_filete("filete", c.position.x + 12, c.position.y + 101, c.size.x - 24, clip))
 		o.append_array(_rev_filete("filete2", c.position.x + 12, c.end.y - 18, c.size.x - 24, clip))
 	else:
 		var vgs: Array = lector_rev.get("vg", [])
@@ -561,6 +568,14 @@ func rects_revista() -> Array:
 		for i in np:
 			o.append([ax + i * 5, c.end.y - 8, 3, 3, "#27551a" if i == lector_i else "#9a9382"])
 	return o
+
+# la cabecera dibujada, en el idioma del juego: el nombre de la revista es texto traducido (EL ESQUEJE / THE CUTTING), así que
+# la mancheta en español solo vale mientras el nombre no cambie
+func rev_mancheta() -> String:
+	var nom := String(D.REVISTA.cab.n)
+	if I18n.v(nom).to_upper() != nom.to_upper() and REV_ART.has("mancheta-en"):
+		return "mancheta-en"
+	return "mancheta"
 
 func _rev_filete(k: String, x: int, y: int, w: int, clip: Rect2i) -> Array:
 	var o := []

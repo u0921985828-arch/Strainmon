@@ -2,6 +2,16 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### EL ESQUEJE, a la vista: repaso tras la revisión por ataque (solo Godot, con `Datos.CAL`)
+
+- La letra de la plana se mide en píxeles del lienzo (`u`), no en los de la interfaz (`us`): en un móvil `us` es más pequeño y el texto encogía, dejando la plana tres cuartos vacía (`_lector_estilo`, `uu`; también el deslizamiento con ▲▼).
+- La cabecera dibujada, en el idioma del juego: el nombre de la revista está traducido, así que el atlas trae `mancheta` y `mancheta-en` («THE CUTTING»), con seis glifos más (T, H, C, I, N, G) y `rev_mancheta()` eligiendo (`tools/sprites/a-mano/revista.py`).
+- La paleta de `arte/revista.png` (33 colores), declarada en `art/paleta/ribera.json`; `tests/paleta.gd` pasa de 46/1 a 50/0.
+- La portada, con sitio para un titular de cuatro líneas (la cabecera y la ilustración, 3 px más arriba) y el titular de los meses tranquilos por la estación del número: en junio salía «Un otoño tranquilo» (`REVISTA.tit.calma`, `rev_est`).
+- El HUD ya no se queda encima de la revista (`update_hud`), y con él escondido la plana se coloca en el fotograma siguiente, con el texto ya medido (`leer`).
+- Las tijeras del taller y el mazo de la sección legal, redibujados: antes eran dos rayas y una maza suelta. Fuera `papel2`, que no usaba nadie.
+- Prueba `tests/revista_vista.gd` de 95 a 101: las dos cabeceras, la letra con `us` menor que `u`, el titular más largo sin deslizar y el HUD escondido. Y los `.uid` que faltaban (`revista_vista`, `huerta_reveg`).
+
 ### EL ESQUEJE, a la vista: portada y páginas dibujadas (lo pidió el usuario: «que los números se vean como revista, con portada y páginas dibujadas»; solo Godot, con `Datos.CAL`)
 
 - **El número ya no es un texto corrido: es una revista.** Al leer un número (de la MOCHILA, del buzón o recién comprado) se abre la plana de la revista, centrada en la pantalla: el papel con su grano, el doblez y las dos grapas del lomo, la cabecera y, al pie, un punto por plana con el de la suya relleno. La **portada** lleva la mancheta EL ESQUEJE con su esqueje de remate, un filete doble, la ilustración del mes y debajo la línea de cabecera y el titular; cada **sección**, su plana, con la viñeta de la sección arriba, el nombre en verde y su texto entre filetes. ◀ ▶ pasa de plana, ▲▼ desliza si una sección no cabe y B cierra.

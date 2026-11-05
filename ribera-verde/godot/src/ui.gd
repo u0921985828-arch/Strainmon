@@ -1230,12 +1230,13 @@ func _lector_estilo() -> void:
 		lt.add_child(lector_pie)
 	lector_ttl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART if rev else TextServer.AUTOWRAP_OFF
 	lector_pie.autowrap_mode = lector_ttl.autowrap_mode
+	var uu := u if rev else us   # la revista va dibujada en el lienzo: su letra se mide en sus píxeles (u), no en los de la interfaz (us), que en el móvil son más pequeños
 	lector.add_theme_stylebox_override("panel", StyleBoxEmpty.new() if rev else (caja(us, 1, 2) if Datos.CAL else caja(us, 5, 7)))   # 0.52 (medido en píxeles: 6 u de aire): el margen justo
-	lc.add_theme_constant_override("separation", roundi((1 if rev else (2 if Datos.CAL else 4)) * us))
-	pon_letra(lector_ttl, negrita, (7 if rev else 9) * us, REV_VERDE if rev else LINEA, 0, false)
-	pon_letra(lector_pie, letra, (6 if rev else 7) * us, REV_TINTA if rev else GRIS, 0, false)
-	var fl := fs_txt((7 if rev else 9) * us)
-	pon_letra(lector_txt, letra, fl, REV_TINTA if rev else INK, ((10.0 if rev else 11.0) if Datos.CAL else 12.5) * us * fl / ((7 if rev else 9) * us), false)   # 0.52: interlineado de 11 (4-9 u de hueco)
+	lc.add_theme_constant_override("separation", roundi((1 if rev else (2 if Datos.CAL else 4)) * uu))
+	pon_letra(lector_ttl, negrita, (7 if rev else 9) * uu, REV_VERDE if rev else LINEA, 0, false)
+	pon_letra(lector_pie, letra, (6 if rev else 7) * uu, REV_TINTA if rev else GRIS, 0, false)
+	var fl := fs_txt((7 if rev else 9) * uu)
+	pon_letra(lector_txt, letra, fl, REV_TINTA if rev else INK, ((10.0 if rev else 11.0) if Datos.CAL else 12.5) * uu * fl / ((7 if rev else 9) * uu), false)   # 0.52: interlineado de 11 (4-9 u de hueco)
 
 func leer(t: String, texto: String, rev := {}) -> void:
 	if oraculo:
@@ -1269,10 +1270,12 @@ func leer(t: String, texto: String, rev := {}) -> void:
 	hud.hide()
 	_coloca()
 	_coloca.call_deferred()   # 0.52: otra vez, con el texto ya a su ancho
+	if not lector_rev.is_empty() and not get_tree().process_frame.is_connected(_coloca):
+		get_tree().process_frame.connect(_coloca, CONNECT_ONE_SHOT)   # la revista esconde el HUD, así que detrás no viene ningún otro _coloca: la plana se coloca en el fotograma siguiente, con el texto ya medido
 	var p := Motor.Prom.new()
 	push(func(b: String):
 		if b == "up" or b == "down":
-			lector_sc.scroll_vertical += roundi(25 * us) * (-1 if b == "up" else 1)
+			lector_sc.scroll_vertical += roundi(25 * (u if not lector_rev.is_empty() else us)) * (-1 if b == "up" else 1)
 		elif b == "left" or b == "right":
 			var i := lector_i + (-1 if b == "left" else 1)
 			if i >= 0 and i < lector_pags.size():

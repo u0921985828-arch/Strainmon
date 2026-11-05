@@ -1093,7 +1093,7 @@ func hud_fisio() -> Array:
 func update_hud() -> void:
 	if oraculo:
 		return
-	if mode != "world" or S == null or MESA_KV != null or MADRES_V != null:   # las vistas enteras (mesas de KAIA, madres), sin él encima
+	if mode != "world" or S == null or MESA_KV != null or MADRES_V != null or not lector_rev.is_empty():   # las vistas enteras (mesas de KAIA, madres, la revista), sin él encima
 		hud.hide()
 		return
 	var hh :="%02d" % int(floor(S.min / 60.0))

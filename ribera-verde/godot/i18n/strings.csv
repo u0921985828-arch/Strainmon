@@ -3304,6 +3304,7 @@ s96a425fa,tranquila,quiet
 se526baf7,con más patrullas de lo normal,with more patrols than usual
 s2fb59d1a,con una investigación abierta,with an investigation open
 s3586512d,con una orden de registro firmada,with a search warrant signed
+s944d765f,otoño,autumn
 se76c1fbf,Dónde conseguirla: {p}.,
 s087ed473,De esta no dicen de dónde sale. Alguien de la comarca la tendrá.,
 sf09c72fa,Esta ya la tienes en la GENOTECA.,
@@ -6560,7 +6561,6 @@ s178d3494,Lluvia,Rain
 sa4e4b299,Niebla,
 sd1af0d48,Tormenta,
 s6d6eebd0,Nieve,Snow
-s944d765f,otoño,autumn
 s6a3d0ee6,"Un sofá de lona de vela, cosido a mano, con cojines de red.","A sailcloth sofa, hand-stitched, with net cushions."
 sea74d281,"Una mesa baja de tablón de barco, con un cenicero de concha.","A low table of ship plank, with a shell ashtray."
 sc4b3fab1,"Salidas de 7:00 a 21:00, en la parada de la calle Ribera.","Departures 7:00 to 21:00, at the Ribera street stop."
@@ -7126,7 +7126,10 @@ s3353b284,La limpieza entre ciclos,Cleaning between cycles
 sa026ce4d,"Entre cosecha y cosecha, la carpa se vacía y se limpia: paredes, bandeja, ventiladores, los filos de la cremallera. Las esporas y los bichos del ciclo anterior están ahí esperando a las plantas nuevas, que son las más blandas. Media hora de trapo ahorra un ciclo entero perdido por moho.","Between one harvest and the next, the tent is emptied and cleaned: walls, tray, fans, the edges of the zip. The spores and bugs from the previous cycle are in there waiting for the new plants, which are the softest. Half an hour with a cloth saves a whole cycle lost to mould."
 s82f928ad,El curado en tarro,Curing in the jar
 s974607bd,"El tarro se llena a tres cuartos, se cierra y se abre un rato cada día los primeros días. Lo que queda de humedad dentro del cogollo se reparte y sale, y lo que olía a verde se convierte en olor a variedad. Es el paso que más cambia el precio y el que más gente se salta por tener prisa.","Fill the jar three quarters full, close it and open it for a while each day during the first days. What moisture is left inside the bud spreads out and leaves, and what smelled green turns into the smell of the strain. It is the step that changes the price the most and the one most people skip out of impatience."
+sc2930d49,"«Una primavera tranquila»: la comarca, sin sustos","“A quiet spring”: the county, with no scares"
+s56905b12,"«Un verano tranquilo»: la comarca, sin sustos","“A quiet summer”: the county, with no scares"
 s101bf585,"«Un otoño tranquilo»: la comarca, sin sustos","“A quiet autumn”: the county, with no scares"
+s649df43c,"«Un invierno tranquilo»: la comarca, sin sustos","“A quiet winter”: the county, with no scares"
 sa6b0eac1,La policía refuerza las patrullas en los barrios,Police step up patrols in the neighbourhoods
 se35d4ad7,Investigación abierta por venta de marihuana en la comarca,Investigation opened over marijuana sales in the county
 sc43308d6,Un juzgado autoriza registros: qué dice la ley y qué no,A court authorises searches: what the law says and what it does not

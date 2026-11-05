@@ -64,16 +64,18 @@ func _corre() -> void:
 func _atlas() -> void:
 	check("el atlas de la revista carga (arte/revista.png)", J.rev_art())
 	var A: Dictionary = J.REV_ART
-	for k in ["papel", "papel2", "mancheta", "filete", "filete2", "grapa", "dobl"]:
+	for k in ["papel", "mancheta", "mancheta-en", "filete", "filete2", "grapa", "dobl"]:
 		check("el atlas trae %s" % k, A.has(k))
 	for k in J.REV_VG.values():
 		check("el atlas trae la viñeta vg-%s" % k, A.has("vg-" + k))
 	for k in J.REV_ILU.values():
 		check("el atlas trae la ilustración pt-%s" % k, A.has("pt-" + k))
 	check("el atlas trae pt-planta y pt-carpa (los de reserva)", A.has("pt-planta") and A.has("pt-carpa"))
-	if A.has("mancheta"):
-		var mc: Image = A["mancheta"]
-		check("la mancheta cabe en la plana (%d px)" % mc.get_width(), mc.get_width() <= J.rev_caja().size.x - 12)
+	for k in ["mancheta", "mancheta-en"]:   # la cabecera de cada idioma, dentro de la plana
+		if A.has(k):
+			var mc: Image = A[k]
+			check("%s cabe en la plana (%d px)" % [k, mc.get_width()], mc.get_width() <= J.rev_caja().size.x - 12)
+	check("sin idioma cambiado, la cabecera es la de siempre", J.rev_mancheta() == "mancheta")
 	if A.has("papel"):
 		check("el papel es tileable (64 × 64)", A["papel"].get_width() == 64 and A["papel"].get_height() == 64)
 
@@ -165,9 +167,53 @@ func _render(dir: String) -> void:
 	if dir != "":
 		img.save_png(dir.path_join("revista-seccion.png"))
 	check("el papel se pinta también en la plana de la sección", _papel(img, pl))
+	check("el HUD no se queda encima de la revista", not J.hud.visible)
 	J.press("B")
 	await espera(10)
 	check("B cierra la revista y deja el lector como estaba", not J.lector.visible and J.lector_rev.is_empty())
+	await _letra()
+	await _titular()
+
+# la letra de la plana se mide en píxeles del lienzo (u), no en los de la interfaz (us): en un móvil us es más pequeño que u y,
+# midiéndola así, el texto encogía y la plana quedaba tres cuartos vacía
+func _letra() -> void:
+	var rv: Dictionary = J.rev_paginas(3)
+	J.leer("EL ESQUEJE", J.rev_texto(3), rv)
+	await espera(20)
+	var esp: float = J.fs_txt(7 * J.u)
+	check("la letra de la plana va en píxeles del lienzo (%d)" % int(esp), is_equal_approx(J.lector_txt.get_theme_font_size("font_size"), esp))
+	var us0: float = J.us
+	J.us = maxf(1.0, J.u * .6)   # el móvil: la interfaz, a menos de la escala del lienzo
+	J._lector_estilo()
+	await espera(6)
+	check("con us menor que u la letra de la plana no encoge", is_equal_approx(J.lector_txt.get_theme_font_size("font_size"), esp))
+	J.us = us0
+	J._lector_estilo()
+	J.press("B")
+	await espera(10)
+
+# el titular más largo de todos cabe en el hueco de la portada sin tener que deslizar
+func _titular() -> void:
+	var largo := ""
+	for v in J.D.REVISTA.tit.values():
+		for t in v:
+			var x: String = J.I18n.v(String(t))
+			if x.length() > largo.length():
+				largo = x
+	for nw in J.D.REVISTA.nw:
+		if nw.has("ti"):
+			var x: String = J.I18n.v(String(nw.ti))
+			if x.length() > largo.length():
+				largo = x
+	var rv: Dictionary = J.rev_paginas(3)
+	var cab := String(rv.pags[0]).split("\n")[0]
+	rv.pags[0] = "%s\n%s" % [cab, largo]
+	J.leer("EL ESQUEJE", J.rev_texto(3), rv)
+	await espera(30)
+	var sb: ScrollBar = J.lector_sc.get_v_scroll_bar()
+	check("el titular más largo (%d letras) cabe en la portada sin deslizar" % largo.length(), sb.max_value <= J.lector_sc.size.y + 1)
+	J.press("B")
+	await espera(10)
 
 # las cuatro esquinas de dentro de la plana, en papel (claro y cálido)
 func _papel(img: Image, r: Rect2) -> bool:
