@@ -129,19 +129,32 @@ def rotulo(txt, c=V0, som=K1):
         x += 12
     return L
 
-def mancheta(txt='EL ESQUEJE'):
-    rt = rotulo(txt)
-    L = Lienzo(rt.w + 14, 20)
-    L.pega(rt, 13, 0)
-    # el esqueje de remate: el tallo cortado en diagonal con dos hojas y un brote
-    linea(L, 5, 17, 7, 6, V0)
-    linea(L, 6, 17, 8, 6, V1)
-    for s, (dx, dy) in enumerate(((-1, -1), (1, -1))):
-        bx, by = 7 + dx, 11 + dy * 2
+def _esqueje(L, x, y):
+    """el esqueje de remate: el tallo cortado en diagonal con dos hojas y un brote"""
+    linea(L, x, y + 11, x + 2, y, V0)
+    linea(L, x + 1, y + 11, x + 3, y, V1)
+    for dx, dy in ((-1, -1), (1, -1)):
+        bx, by = x + 2 + dx, y + 5 + dy * 2
         for i in range(4):
             linea(L, bx, by, bx + dx * (3 + i), by - 2 - (i >> 1), V1 if i % 2 else V0)
-    elipse(L, 8, 5, 2, 3, V2)
-    L.p(8, 4, P2)
+    elipse(L, x + 3, y - 1, 2, 3, V2)
+    L.p(x + 3, y - 2, P2)
+
+def mancheta(txt='EL ESQUEJE'):
+    """la cabecera, a dos líneas como la de cualquier revista de quiosco: el artículo encima y el nombre grande debajo, con el
+    esqueje de remate a su izquierda. A una sola línea no cabe en una hoja A4 del lienzo (115 px)."""
+    pa = txt.split(' ')
+    r1 = rotulo(pa[0]) if len(pa) > 1 else None
+    r2 = rotulo(pa[-1])
+    L = Lienzo(r2.w + 15, 36 if r1 else 20)
+    if r1:
+        L.pega(r1, 15, 0)
+        L.hl(15 + r1.w + 2, r2.w + 13, 9, K2)   # el filete que acompaña al artículo
+        L.pega(r2, 15, 17)
+        _esqueje(L, 4, 23)
+    else:
+        L.pega(r2, 15, 0)
+        _esqueje(L, 4, 6)
     return L
 
 def filete(doble=True):

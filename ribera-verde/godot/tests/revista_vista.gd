@@ -107,21 +107,27 @@ func _planas() -> void:
 			if t != "" and not pags.any(func(x): return String(x).contains(String(q.txt).split("\n")[0])) and not tit.any(func(x): return String(x).begins_with(t)):
 				fuera.append(t)
 		check("n.º %d: las planas traen todas las secciones (%s)" % [num, fuera], fuera.is_empty())
-		# el hueco del texto, dentro del papel y de la pantalla
-		var c: Rect2i = J.rev_caja()
-		check("n.º %d: la plana cabe en el lienzo (%s)" % [num, c], c.position.x >= 0 and c.end.x <= J.SW and c.position.y >= 0 and c.end.y <= J.SH)
+		# el hueco del texto, dentro del papel y de la pantalla. La portada es una hoja sola y, abierta, la doble página: la caja
+		# se mide plana a plana, y el texto va en la hoja de la derecha (el arte, en la de la izquierda)
 		J.lector_rev = rv
 		var malas := []
+		var grande := []
 		for i in pags.size():
 			J.lector_i = i
+			var c: Rect2i = J.rev_caja()
+			if c.position.x < 0 or c.end.x > J.SW or c.position.y < 0 or c.end.y > J.SH:
+				grande.append(i)
 			var z: Rect2i = J.rev_zona()
-			if not c.encloses(z) or z.size.x < 60 or z.size.y < 30:
+			if not J.rev_hoja(true).encloses(z) or z.size.x < 60 or z.size.y < 30:
 				malas.append(i)
+		check("n.º %d: la plana cabe en el lienzo (%s)" % [num, grande], grande.is_empty())
 		check("n.º %d: el hueco del texto, dentro del papel (%s)" % [num, malas], malas.is_empty())
-		# lo dibujado, dentro de la plana
+		# lo dibujado, dentro de la plana (la sombra sobre la mesa y los cantos del papel asoman unos píxeles)
 		var fuera_r := []
 		for i in pags.size():
 			J.lector_i = i
+			var c: Rect2i = J.rev_caja()
+			var lim := c.grow(6)
 			var l: Array = J.rects_revista()
 			if l.is_empty():
 				fuera_r.append(i)
@@ -132,7 +138,7 @@ func _planas() -> void:
 						fuera_r.append(i)
 						break
 					continue
-				if not c.encloses(Rect2i(int(e[0]), int(e[1]), int(e[2]), int(e[3]))) and int(e[1]) != c.position.y - 1 and int(e[1]) != c.end.y:
+				if not lim.encloses(Rect2i(int(e[0]), int(e[1]), int(e[2]), int(e[3]))):
 					fuera_r.append(i)
 					break
 		check("n.º %d: nada dibujado fuera de la plana (%s)" % [num, fuera_r], fuera_r.is_empty())
@@ -221,9 +227,8 @@ func _render(dir: String) -> void:
 	J.leer("EL ESQUEJE", J.rev_texto(num), rv)
 	await espera(30)
 	check("la revista abre el lector en modo revista", J.lector.visible and not J.lector_rev.is_empty())
-	var c: Rect2i = J.rev_caja()
-	var pl := Rect2(J.scr.position + Vector2(c.position.x * J.u, c.position.y * J.u), Vector2(c.size.x * J.u, c.size.y * J.u))
-	check("el texto de la portada va dentro del papel", pl.grow(1).encloses(J.lector.get_global_rect()))
+	var pl := _pl()
+	check("el texto de la portada arranca en su hueco (%s en %s)" % [J.lector.get_global_rect(), pl], _en_hueco(pl))
 	await RenderingServer.frame_post_draw
 	var img: Image = root.get_texture().get_image()
 	if dir != "":
@@ -238,7 +243,8 @@ func _render(dir: String) -> void:
 	check("◀ ▶ pasa de plana (%d)" % J.lector_i, J.lector_i == 3)
 	check("la plana 3 lleva su viñeta (%s)" % String(rv.vg[3]), String(rv.vg[3]) != "")
 	await espera(10)
-	check("el texto de la sección va dentro del papel", pl.grow(1).encloses(J.lector.get_global_rect()))
+	pl = _pl()
+	check("el texto de la sección arranca en su hueco", _en_hueco(pl))
 	await RenderingServer.frame_post_draw
 	img = root.get_texture().get_image()
 	if dir != "":
@@ -252,7 +258,8 @@ func _render(dir: String) -> void:
 			J.press("right")
 			await espera(6)
 		await espera(10)
-		check("la plana de %s (%d) va dentro del papel" % [k, ip], pl.grow(1).encloses(J.lector.get_global_rect()))
+		pl = _pl()
+		check("la plana de %s (%d) arranca en su hueco" % [k, ip], _en_hueco(pl))
 		await RenderingServer.frame_post_draw
 		img = root.get_texture().get_image()
 		if dir != "":
@@ -381,3 +388,16 @@ func _peor() -> void:
 	Datos.PLAY = play
 	J.aj["tam"] = tam
 	J._lector_estilo()
+
+# la caja de la plana que está abierta, en píxeles de pantalla (la portada es una hoja; abierta, la doble página)
+func _pl() -> Rect2:
+	var c: Rect2i = J.rev_caja()
+	return Rect2(J.scr.position + Vector2(c.position.x * J.u, c.position.y * J.u), Vector2(c.size.x * J.u, c.size.y * J.u))
+
+# el texto del lector, en el hueco que le deja la plana: arranca donde dice rev_zona() y no se sale del papel a lo ancho. El alto
+# no se mide con el widget: en modo sin ventana la escala es minúscula y el lector nunca baja de su alto mínimo
+func _en_hueco(pl: Rect2) -> bool:
+	var z: Rect2i = J.rev_zona()
+	var r: Rect2 = J.lector.get_global_rect()
+	var q: Vector2 = (J.scr.position + Vector2(z.position.x * J.u, z.position.y * J.u)).round()
+	return r.position.distance_to(q) <= 1.5 and r.size.x <= pl.size.x + 1 and pl.grow(1).has_point(r.position)
