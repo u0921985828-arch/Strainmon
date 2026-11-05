@@ -28,6 +28,16 @@
   texto dentro de la caja, los dos márgenes, que cabe sin deslizar, el interlineado entero, el aire entre párrafos, el pie sin
   ▲▼, que el aviso no se pone encima y que con medio cuerpo más el texto ya no cabría.
 
+Los siete ataques de la revisión, arreglados: el cuerpo de la revista ya no pasa por el suelo de la interfaz
+(`fs_rev`, que respeta TAMAÑO DE TEXTO y el suelo propio `REV_CUERPO_MIN`; con el de `fs_txt`, en el móvil 7 u y
+4,5 u daban lo mismo y la plana se quedaba con ▲▼); la medida del cuerpo converge (`REV_FIT_N`, `_rev_cu`, con
+`Datos.PLAY` en el sello) y `_coloca` ya no fuerza la barra de deslizar; los espacios que no se parten, en dos
+pasadas (`de la casa` dejaba suelto el «la»); el marco de las ilustraciones, por dentro de la caja; la cabeza de
+la portada, `REV_M_CAB_POR` 4 u, que es donde sangra la mancheta; los filetes del pie, anclados por su propio
+alto (`_rev_pie`: la última fila cae en la última de la caja, antes se salían 1 y 2 px); y la prueba mide el
+avance de línea que de verdad se aplica (`rev_av`/`rev_fl` en `ui.gd`: el cuerpo que se pide no es el tamaño de
+letra redondeado, y con 6,5 u a escala 3 salían 24 y 27).
+
 ### EL ESQUEJE, con el arte del juego
 
 - Lo pidió el usuario: «lo lógico sería utilizar los sprites que ya tenemos disponibles en el repositorio del juego para hacer

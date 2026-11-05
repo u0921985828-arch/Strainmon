@@ -284,29 +284,59 @@ func _maqueta() -> void:
 	J.handlers.clear()   # la partida de la prueba deja un flujo a medias en la pila; el suyo haría pop() del de la revista
 	J.leer("EL ESQUEJE", J.rev_texto(3), rv)
 	await espera(30)
-	for der in [false, true]:
-		var h: Rect2i = J.rev_hoja(der)
-		var cj: Rect2i = J.rev_cols(der)
-		check("la caja de composición cabe en la hoja (%s)" % der, h.encloses(cj))
-		check("la cabeza mide %d y el pie %d (%s)" % [J.REV_M_CAB, J.REV_M_PIE, der],
-			cj.position.y - h.position.y == J.REV_M_CAB and h.end.y - cj.end.y == J.REV_M_PIE)
+	# el espacio duro de _rev_nbsp tiene que medir lo mismo que el normal con la letra del juego (RiberaPixel no trae el glifo
+	# U+00A0: si el servidor de texto lo mandara a la fuente de reserva, un tercio de los espacios de la plana saldría de otro ancho)
+	var f: Font = J.letra
+	var fs: float = J.lector_txt.get_theme_font_size("font_size")
+	check("el espacio duro mide lo mismo que el normal (%s)" % fs,
+		is_equal_approx(f.get_string_size("a a", HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x,
+			f.get_string_size("a\u00A0a", HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x))
+	# el cuerpo de la revista no pasa por el suelo de la interfaz: en la app (Datos.PLAY) fs_txt devolvía lo mismo para 7 u que
+	# para 4,5 u y la escalera no hacía nada
+	var play0: bool = Datos.PLAY
+	for pl in [false, true]:
+		Datos.PLAY = pl
+		check("con PLAY %s el cuerpo de la revista sigue bajando (%s > %s)" % [pl, J.fs_rev(J.REV_CUERPO), J.fs_rev(J.REV_CUERPO_MIN)],
+			J.fs_rev(J.REV_CUERPO) > J.fs_rev(J.REV_CUERPO_MIN))
+	Datos.PLAY = play0
 	for i in rv.pags.size():
 		while J.lector_i < i:
 			J.press("right")
 			await espera(4)
 		await espera(8)
+		var por: bool = J.rev_portada()
 		var z: Rect2i = J.rev_zona()
-		var cj: Rect2i = J.rev_cols(true)
-		var hd: Rect2i = J.rev_hoja(true)
-		check("la plana %d: el texto cae dentro de la caja de composición (%s en %s)" % [i, z, cj], cj.encloses(z))
-		if i > 0:   # abierta, los márgenes de la hoja de la derecha: el del lomo más estrecho que el de corte
-			check("la plana %d: margen de lomo %d y de corte %d" % [i, J.REV_M_INT, J.REV_M_EXT],
-				cj.position.x - hd.position.x == J.REV_M_INT and hd.end.x - cj.end.x == J.REV_M_EXT)
+		# las dos hojas: la caja dentro de la hoja, la cabeza y el pie, y los márgenes de lomo y de corte
+		for der in [false, true]:
+			if por and not der:
+				continue
+			var h: Rect2i = J.rev_hoja(der)
+			var cj: Rect2i = J.rev_cols(der)
+			check("la plana %d (%s): la caja de composición cabe en la hoja" % [i, der], h.encloses(cj))
+			var cb: int = J.REV_M_CAB_POR if por else J.REV_M_CAB
+			check("la plana %d (%s): la cabeza mide %d y el pie %d" % [i, der, cb, J.REV_M_PIE],
+				cj.position.y - h.position.y == cb and h.end.y - cj.end.y == J.REV_M_PIE)
+			var mi: int = J.REV_M_EXT if (por or not der) else J.REV_M_INT
+			var md: int = J.REV_M_EXT if (por or der) else J.REV_M_INT
+			check("la plana %d (%s): margen de %d a la izquierda y de %d a la derecha" % [i, der, mi, md],
+				cj.position.x - h.position.x == mi and h.end.x - cj.end.x == md)
+		check("la plana %d: el texto cae dentro de la caja de composición (%s)" % [i, z], J.rev_cols(true).encloses(z))
+		# nada de lo que se compone (filetes, marcos, ilustraciones, despiece) se sale de la caja de su hoja
+		check("la plana %d: lo compuesto, dentro de la caja" % i, _dentro_caja(por))
 		check("la plana %d cabe sin deslizar" % i, J.lector_sc.get_v_scroll_bar().max_value <= J.lector_sc.size.y + 1)
-		var av: float = J._rev_av(J.lector_txt.get_theme_font_size("font_size"))
+		check("la plana %d: sin barra de deslizar" % i, J.lector_sc.vertical_scroll_mode == ScrollContainer.SCROLL_MODE_DISABLED)
+		# el interlineado que de verdad se aplica (lo que pon_letra deja en line_spacing, más el alto de la letra)
+		var fp: Font = J.letra
+		var px: int = J.lector_ps[0].get_theme_font_size("font_size")
+		var av: float = J.rev_av   # el avance aplicado de verdad, no el deducido del tamaño ya redondeado
+		# lo que deja pon_letra: el alto de la letra puesta más su line_spacing, que es el avance redondeado al píxel
+		var real: float = fp.get_height(px) + J.lector_ps[0].get_theme_constant("line_spacing")
+		check("la plana %d: el interlineado aplicado es el pedido (%s de %s)" % [i, real, av], absf(real - av) <= .51)
 		check("la plana %d: el interlineado, entero en píxeles del lienzo (%s de %s)" % [i, av, J.u], is_zero_approx(fmod(av, J.u)))
+		check("la plana %d: el interlineado, 1,30 cuerpos (%s de %s)" % [i, av, J.rev_fl],
+			absf(av - J.rev_fl * J.REV_LINEA) <= J.u * .5 + .01)
 		var sep: float = J.lector_par.get_theme_constant("separation")
-		check("la plana %d: el aire entre párrafos, menos de una línea (%s de %s)" % [i, sep, av], sep > 0 and sep < av)
+		check("la plana %d: el aire entre párrafos, media línea (%s de %s)" % [i, sep, av], sep == maxi(1, roundi(av * J.REV_PARR)))
 		for l in J.lector_ps:
 			if not l.visible:
 				continue
@@ -316,10 +346,10 @@ func _maqueta() -> void:
 		# con la revista abierta nada se le pone encima (ni el HUD ni el aviso del itinerario)
 		check("la plana %d: el aviso no se pone encima de la plana" % i, not J.toast_box.visible)
 		# el cuerpo es el mayor que cabe: con medio cuerpo más, el texto ya no cabría en el hueco
-		var cu: float = J.lector_txt.get_theme_font_size("font_size") / J.u
+		var cu: float = px / J.u
 		if cu < J.REV_CUERPO - .01:
 			var hu: float = J.rev_hueco
-			J._rev_letra(J.fs_txt((cu + .5) * J.u))
+			J._rev_letra(J.fs_rev(cu + .5))
 			var mas: float = J._rev_alto(z.size.x * J.u)
 			check("la plana %d: el cuerpo es el mayor que cabe (%.1f u, con %.1f sobra el hueco)" % [i, cu, cu + .5], mas > hu - J.u)
 			J._rev_fit = []
@@ -327,6 +357,37 @@ func _maqueta() -> void:
 			await espera(4)
 	J.press("B")
 	await espera(10)
+
+# todo lo que rects_revista() compone (filetes, marcos, ilustraciones, viñetas, recuadros) cae dentro de la caja de su hoja. Se
+# dejan fuera el papel, el lomo con sus grapas y su doblez, la sombra de la mesa y los puntos de las planas, que son la hoja
+func _dentro_caja(por: bool) -> bool:
+	var cajas := [J.rev_cols(true)] if por else [J.rev_cols(false), J.rev_cols(true)]
+	var fuera := [J.REV_ART.get("papel"), J.REV_ART.get("grapa"), J.REV_ART.get("dobl")]
+	var mal := []
+	for e in J.rects_revista():
+		var r: Rect2i
+		if typeof(e[0]) == TYPE_STRING and String(e[0]) == "@":
+			var im: Image = e[1]
+			if fuera.has(im):
+				continue
+			r = Rect2i(int(e[2]), int(e[3]), im.get_width(), im.get_height())
+			if e.size() > 4 and e[4] is Rect2i:
+				r = r.intersection(e[4])
+		elif e.size() >= 5 and String(e[4]) == "#2b2a26":   # la tinta: marcos, filetes y recuadros
+			r = Rect2i(int(e[0]), int(e[1]), int(e[2]), int(e[3]))
+		else:
+			continue
+		if r.size.x <= 0 or r.size.y <= 0:
+			continue
+		var ok := false
+		for c in cajas:
+			if c.encloses(r):
+				ok = true
+		if not ok:
+			mal.append(r)
+	if mal.size():
+		print("   fuera de la caja: %s (cajas %s)" % [mal, cajas])
+	return mal.is_empty()
 
 # la letra de la plana se mide en píxeles del lienzo (u), no en los de la interfaz (us): en un móvil us es más pequeño que u y,
 # midiéndola así, el texto encogía y la plana quedaba tres cuartos vacía
@@ -338,7 +399,7 @@ func _letra() -> void:
 	# el cuerpo: 7 u si el texto cabe en el hueco de la plana y, si no, el mayor que quepa (nunca por debajo de REV_CUERPO_MIN)
 	var esp: float = J.lector_txt.get_theme_font_size("font_size")
 	check("la letra de la plana va en píxeles del lienzo (%d)" % int(esp),
-		esp >= J.fs_txt(J.REV_CUERPO_MIN * J.u) - .5 and esp <= J.fs_txt(J.REV_CUERPO * J.u) + .5)
+		esp >= J.fs_rev(J.REV_CUERPO_MIN) - .5 and esp <= J.fs_rev(J.REV_CUERPO) + .5)
 	var us0: float = J.us
 	J.us = maxf(1.0, J.u * .6)   # el móvil: la interfaz, a menos de la escala del lienzo
 	J._lector_estilo()

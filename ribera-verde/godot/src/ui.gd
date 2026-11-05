@@ -1248,7 +1248,7 @@ func _lector_estilo() -> void:
 	pon_letra(lector_ttl, negrita, (7 if rev else 9) * uu, REV_VERDE if rev else LINEA, 0, false)
 	pon_letra(lector_pie, letra, (6 if rev else 7) * uu, REV_TINTA if rev else GRIS, 0, false)
 	_rev_fit = []   # la letra base: en modo revista _rev_cuerpo la vuelve a ajustar al hueco de la plana (al pie de esta funcion)
-	var fl := fs_txt((REV_CUERPO if rev else 9.0) * uu)
+	var fl: float = fs_rev(REV_CUERPO) if rev else fs_txt(9.0 * uu)
 	lector_txt.visible = not rev
 	lector_par.alignment = BoxContainer.ALIGNMENT_BEGIN
 	if rev:
@@ -1263,8 +1263,18 @@ func _lector_estilo() -> void:
 # REV_CUERPO_MIN). Una plana de revista se lee de un vistazo, no deslizando, asi que es el texto el que se ajusta al hueco
 const REV_CUERPO := 7.0
 const REV_CUERPO_MIN := 4.5
+# el cuerpo de la revista NO pasa por el suelo de la interfaz (TXT_MIN · _dp de fs_txt): la plana es una página impresa y su
+# letra se mide en píxeles del lienzo. Con el suelo, en el móvil fs_txt devolvía lo mismo para 7 u que para 4,5 u, la escalera
+# no hacía nada y la plana se quedaba con ▲▼. Se respeta el TAMAÑO DE TEXTO del jugador y el suelo propio, REV_CUERPO_MIN
+func fs_rev(cuerpo: float) -> float:
+	var m: float = TAM_TXT[clampi(int(aj.get("tam", 1)), 0, 2)] if Datos.PLAY else 1.0
+	return maxf(cuerpo * m, REV_CUERPO_MIN) * u
+
 const REV_LINEA := 1.30     # el interlineado de la revista, en cuerpos (se redondea a un entero de píxeles del lienzo)
 const REV_PARR := 0.5       # el aire entre párrafos, en líneas (media línea; una entera en blanco deja la plana desarmada)
+
+var rev_av := 0.0   # el avance de linea aplicado de verdad en la plana (lo lee la prueba del maquetado)
+var rev_fl := 0.0   # y el cuerpo con el que se calculo, sin redondear al tamano de letra
 
 # el avance de línea de la revista: entero en píxeles del lienzo, para que todas las líneas caigan en la misma rejilla
 func _rev_av(fl: float) -> float:
@@ -1274,6 +1284,10 @@ func _rev_av(fl: float) -> float:
 # de cada párrafo, no), y el aire entre párrafos en el contenedor
 func _rev_letra(fl: float) -> void:
 	var av := _rev_av(fl)
+	# el cuerpo que se pide (fl) no es el tamaño de letra que acaba puesto (maxi(5, roundi(fl))): el avance sale del primero, así
+	# que la prueba del maquetado tiene que leerlo de aquí y no deducirlo del tamaño redondeado (con 6,5 u a escala 3 salían 24 y 27)
+	rev_av = av
+	rev_fl = fl
 	pon_letra(lector_txt, letra, fl, REV_TINTA, av, false)
 	for l in lector_ps:
 		pon_letra(l, letra, fl, REV_TINTA, av, false)
@@ -1308,7 +1322,9 @@ static func _rev_nbsp(t: String) -> String:
 	if _RE_PR == null:
 		_RE_PR = RegEx.new()
 		_RE_PR.compile("(?i)(^|\\s|«)(de|del|en|el|la|lo|los|las|un|una|al|su|sus|y|o|a|con|por|que)\\s")   # i18n-no
-	return _RE_PR.sub(t, "$1$2\u00A0", true)
+	# dos pasadas: sub() no solapa y el espacio que consume el patrón deja la palabra siguiente sin su «^|\s|«» delante
+	# («de la casa» protegía «de» y dejaba «la» suelta)
+	return _RE_PR.sub(_RE_PR.sub(t, "$1$2\u00A0", true), "$1$2\u00A0", true)
 
 # el texto de una plana, repartido en párrafos (los bloques separados por una línea en blanco)
 func _rev_pon(t: String) -> void:
@@ -1329,16 +1345,17 @@ func _rev_pon(t: String) -> void:
 			lector_ps[i].text = _rev_nbsp(String(ps[i]))
 var _rev_fit := []   # [plana, hueco, tamano de texto, u] de lo ultimo medido, para no volver a medirlo en cada fotograma
 var rev_hueco := 0.0   # el hueco de la plana de la ultima medida (lo lee la prueba del maquetado)
-var _rev_fn := 0     # fotogramas medidos con ese sello: los primeros no valen (el reparto aun no ha dado su ancho a los parrafos)
-const REV_FIT_N := 12
+var _rev_fn := 0     # medidas seguidas con el mismo resultado: las primeras no valen (el reparto aun no ha dado su ancho a los parrafos)
+var _rev_cu := 0.0   # el cuerpo de la ultima medida, para saber cuando ha convergido
+const REV_FIT_N := 3
 func _rev_cuerpo(z: Rect2i) -> void:
-	var sello := [lector_i, z, int(aj.get("tam", 1)), roundi(u * 100), lector_txt.text.length()]
+	var sello := [lector_i, z, int(aj.get("tam", 1)), roundi(u * 100), lector_txt.text.length(), Datos.PLAY]
 	if sello != _rev_fit:
 		_rev_fit = sello
 		_rev_fn = 0
+		_rev_cu = 0.0
 	elif _rev_fn >= REV_FIT_N:
 		return
-	_rev_fn += 1
 	var lc: VBoxContainer = lector.get_child(0)
 	var sep: float = lc.get_theme_constant("separation")
 	var resto: float = (lc.get_child(0) as Control).get_combined_minimum_size().y + lector_pie.get_combined_minimum_size().y + 2.0 * sep
@@ -1348,7 +1365,7 @@ func _rev_cuerpo(z: Rect2i) -> void:
 	rev_hueco = hueco
 	var cuerpo := REV_CUERPO
 	while true:
-		var fl := fs_txt(cuerpo * u)
+		var fl := fs_rev(cuerpo)
 		# el interlineado baja con el cuerpo, siempre entero en píxeles del lienzo (_rev_av)
 		_rev_letra(fl)
 		var cabe: bool = _rev_alto(z.size.x * u) <= hueco - u
@@ -1365,6 +1382,10 @@ func _rev_cuerpo(z: Rect2i) -> void:
 			# el pie de la plana solo anuncia ▲▼ si de verdad hay que deslizar
 			if lector_pags.size() > 1:
 				lector_pie.text = I18n.v("◀▶ PÁGINA · B CERRAR") if cabe else I18n.v("◀▶ PÁGINA · ▲▼ · B CERRAR")
+			# ha convergido cuando dos medidas seguidas dan el mismo cuerpo (si no, se vuelve a medir al fotograma siguiente,
+			# cuando el reparto ya le ha dado su ancho a los párrafos)
+			_rev_fn = _rev_fn + 1 if is_equal_approx(cuerpo, _rev_cu) else 0
+			_rev_cu = cuerpo
 			return
 		cuerpo -= .5
 
@@ -2340,7 +2361,6 @@ func _coloca() -> void:
 		toast_box.hide()   # con la revista abierta, nada encima de la plana (el HUD ya se esconde en update_hud)
 		var z: Rect2i = rev_zona()
 		lector.custom_minimum_size = Vector2.ZERO
-		lector_sc.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 		lector.size = Vector2(z.size.x * u, z.size.y * u)
 		lector.position = (scr.position + Vector2(z.position.x * u, z.position.y * u)).round()
 		_rev_cuerpo(z)
