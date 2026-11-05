@@ -9,6 +9,8 @@ const Datos = preload("res://src/datos.gd")
 const Juego = preload("res://src/juego.gd")
 const Menus = preload("res://src/menus.gd")
 const MaxCultivo = preload("res://tests/max/cultivo.gd")
+const MaxHistoria = preload("res://tests/max/historia.gd")
+const MaxNegocios = preload("res://tests/max/negocios.gd")
 const MaxMundo = preload("res://tests/max/mundo.gd")
 
 var J
@@ -82,6 +84,7 @@ func _corre() -> void:
 
 	J.migrate()
 	chk(J.partida_valida(J.S), "partida_valida dice que no")
+	_mira(J.S)
 	J.enter_game()
 	chk(J.mode == "world", "no entra al mundo: %s" % J.mode)
 
@@ -100,6 +103,17 @@ func _corre() -> void:
 	g.store_string(js)
 	g.close()
 
+	# y se carga de verdad, como el juego la lee del disco al seguir una partida
+	Juego.escribe_partida(js)
+	var cargada = J.load_save()
+	chk(cargada != null, "load_save la da por no válida")
+	if cargada != null:
+		_mira(cargada)
+		J.S = cargada
+		J.migrate()
+		J.enter_game()
+		chk(J.mode == "world", "la cargada no entra al mundo: %s" % J.mode)
+
 	print("maxima: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for x in fallos:
 		print("  - " + x)
@@ -112,89 +126,34 @@ func _cultivo(_J) -> void:
 	MaxCultivo.pon(J)
 
 func _historia(_J) -> void:
-	var S = J.S
-	var D = Datos.D
-	# el último capítulo, la deuda pagada y la carta, el diario y la lata leídos
-	S.ch = 8
-	S.day = 420
-	S.debt = 0
-	S.due = 0
-	S.vencidos = 0
-	S.eco = 2
-	S.rep = 100
-	S.heat = 0
-	S.hpMax = 60
-	S.hp = 60
-	S.sales = 400
-	for k in ["letter", "diario", "pagina", "cajaSem", "kiko1", "julen1", "harvest1", "tono", "inaki", "ane",
-			"molina1", "darko1", "darkoFin", "miren", "txaro", "txaro2", "robo", "rescate", "conce", "copa",
-			"cupVip", "lab", "nevera", "curado", "taper", "tarros", "setasSms", "koldoSms", "rutaTia", "naveVer",
-			"gVeg", "gFlor", "gRiego", "metB", "barras", "rastroP", "regBeg", "notaAma", "llegada"]:
-		S.flags[k] = 1
-	# toda la genética descubierta y fijada en F4, con semillas de sobra
-	for sid in D.STRAINS.keys():
-		S.seeds[sid] = 99
-		S.disc[sid] = true
-		S.gen[sid] = int(D.GEN_ESTABLE)
-	# el hilo del cuaderno azul, los actos y las copas
-	S.hilo = {"p": 9, "tr": {"miren": 1, "serora": 1, "txaro": 1}, "cor": 1, "el": 0, "d": {}}
-	S.a2 = {"p": 9, "pi": {"pc": 1, "catedral": 1, "teatro": 1, "hacienda": 1, "muelle": 1}, "acu": "garro", "d": {}}
-	S.a3 = {"p": 9, "d": {}, "pr": ["cuaderno", "haze", "banco", "correo", "asamblea"], "gan": 1, "fin": "banco"}
-	S.cot = {"y": {}, "tro": ["potencia", "sabor", "landrace", "cruce", "extraccion"], "abs": [2026]}
-	S.bt = {"c": {}, "tt": []}
-	for c in D.BANCO_TIA.col:
-		S.bt.c[String(c.id)] = 1
-	# las misiones, el itinerario y los logros al completo
-	for m in D.MISIONES:
-		S.misiones[String(m.id)] = 1
-	for l in D.LOGROS:
-		S.logros[String(l.id)] = 1
-	# la revista: la suscripción, todas las técnicas y la colección
-	S.rev = {"col": [], "tec": [], "sus": 12, "nw": []}
-	for i in 12:
-		S.rev.col.append(i + 1)
-	for t in D.REVISTA.tec:
-		S.rev.tec.append(String(t.k))
-	# LA TIENDA: las semillas doradas y los extras
-	S.tn = {"sd": 9999, "c": {}, "g": {}, "r": 1}
-	for it in D.TIENDA.it:
-		if it.get("k") != null and String(it.get("cat", "")) != "sd":
-			S.tn.c[String(it.k)] = 1
+	MaxHistoria.pon(J)
 
 func _negocios(_J) -> void:
-	var S = J.S
-	var D = Datos.D
-	# la nave, comprada y con el mejor equipo en las mesas
-	S.nave = J.nave_nueva()
-	S.nave.ex = D.EXTR_NAVE.size() - 1
-	S.nave.rg = D.RIEGO_NAVE.size() - 1
-	S.nave.ab = {"m": 99.0, "o": 99.0}
-	S.nave.op = 1
-	S.nave.mia = true
-	S.nave.cur = 1
-	S.nave.bc = []
-	# la presidencia de la asociación y la confianza con todos los clubs
-	S.aso = {"v": 9, "d": 1, "tio": true, "asam": 1, "otra": 0, "pres": true, "votos": 40, "lote": null, "al": {}}
-	for k in D.CLUBS.keys():
-		S.clubs[k] = 20
-	# los seis locales y los negocios, con sus mejoras
-	for k in D.LOCALES.keys():
-		S.loc[k] = {"caja": 0.0, "lim": 1.0, "mej": {}, "g": {}}
-	# el mar: los tres barcos, la reputación y la ley
-	S.mar = {"b": ["txalupa", "pesquero", "atunero"], "rep": 100, "kg": 0.0, "env": [], "ped": null,
-			"pd": 0, "paso": 0, "fin": 0, "n": 9, "obras": 9, "lic": 1, "legal": 1, "bod": {}}
-	# el piso franco, los pisos de venta y la ciudad
-	S.franco = {"r": S.day + 30, "buds": {}, "caja": 0, "cal": 0.0, "niv": 2, "v": 1}
-	S.pisos = {}
-	# la plantilla: la gente del barrio con los números al tope
-	S.plantilla = []
-	for i in 6:
-		S.plantilla.append({"n": "", "labia": 5, "cuidado": 5, "lealtad": 5, "rol": "vend", "d": S.day})
-	S.plN = 6
-	# la sala de cultivo de KAIA, en el nivel más alto
-	S.kc = {"niv": int(D.KAIA_CULT.niv.size()) - 1, "kits": [], "p": [], "pat": {}}
-	# el despacho de lujo
-	S.desp = {"d": int(S.day), "money": 0, "buds": {}, "niv": 2}
+	MaxNegocios.pon(J)
 
 func _mundo(_J) -> void:
 	MaxMundo.pon(J)
+
+# — lo que tiene que estar al máximo, comprobado en el estado —
+func _mira(S) -> void:
+	var D = Datos.D
+	chk(int(S.ch) == 8, "capítulo %s" % S.ch)
+	chk(int(S.debt) == 0, "deuda %s" % S.debt)
+	chk(int(S.money) > 100000 and int(S.banco) > 1000000, "dinero %s / %s" % [S.money, S.banco])
+	chk(S.disc.size() >= D.STRAINS.size(), "descubiertas %d de %d" % [S.disc.size(), D.STRAINS.size()])
+	chk(S.seeds.size() >= D.STRAINS.size(), "semillas %d" % S.seeds.size())
+	chk(S.logros.size() >= D.LOGROS.size(), "logros %d de %d" % [S.logros.size(), D.LOGROS.size()])
+	chk(S.carpas.size() == 3, "carpas %d" % S.carpas.size())
+	chk(S.macetas.size() >= 12, "plazas %d" % S.macetas.size())
+	chk(S.get("nave") != null, "sin nave")
+	chk(S.get("kc") != null, "sin la sala de KAIA")
+	chk(S.get("mar") != null and S.mar.b.size() == 3, "los barcos")
+	chk(bool(S.aso.pres), "sin presidencia")
+	chk(S.loc.size() >= 6, "locales %d" % S.loc.size())
+	chk(S.coches.size() >= 4, "coches %d" % S.coches.size())
+	chk(S.get("huerta") != null and int(S.huerta.m.amp) > 0, "la huerta sin ampliar")
+	chk(S.get("cam") != null, "sin camarote")
+	chk(S.bt.c.size() >= D.BANCO_TIA.col.size(), "el banco de la tía %d" % S.bt.c.size())
+	chk(int(S.tn.sd) > 0, "sin semillas doradas")
+	chk(S.rev.tec.size() >= D.REVISTA.tec.size(), "técnicas %d" % S.rev.tec.size())
+	chk(S.rel.size() >= D.GENTE.size(), "gente %d" % S.rel.size())
