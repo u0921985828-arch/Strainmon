@@ -2,6 +2,10 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### WordPress 1.7.7
+
+- El plugin `landrace-hunters` rehecho con el juego de esta tanda (las 130 variedades): `descargas/landrace-hunters-1.7.7.zip` (30,8 MB; `index.pck` 23,4 MB) y el ligero de 37 KB.
+
 ### Genéticas actuales: 130 variedades (lo pidió el usuario: «me refería a genéticas más actuales»)
 
 - **Quince variedades modernas más** (`tools/catalogo3.py`, al final de `STRAINS`), en cadena para que cada una

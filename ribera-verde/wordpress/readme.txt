@@ -1,5 +1,5 @@
 === Landrace Hunters ===
-Version: 1.7.6
+Version: 1.7.7
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
