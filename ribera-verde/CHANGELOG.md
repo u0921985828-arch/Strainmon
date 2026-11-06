@@ -2,6 +2,22 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El esquema de genealogía, con líneas a 90° (lo pidió el usuario: «todo el esquema bien hecho y sin líneas engorrosas? Un esquema con líneas a ángulos de 90°»)
+
+- **Trazado ortogonal.** Las aristas de `docs/plano/genealogia/arbol.svg` ya no son curvas de Bézier: cada una sale
+  del canto de su padre, dobla en ángulo recto por su canal y entra por el canto del hijo (`M … H … V … H …`).
+- **Nodos de paso.** Las 61 aristas que saltan de generación ya no cruzan por encima de las fichas: se parten en
+  carriles propios de 18 px en cada columna intermedia (`CAD`, `E`, `CAP_E` en `tools/genealogia_svg.py`), que entran
+  en el reparto de filas como una ficha más.
+- **Un canal por destino, en el orden de la columna.** El pasillo entre columnas se ensancha según cuántas líneas
+  tiene que llevar (`PAS`, `PASO_C`), de modo que ninguna vertical se solapa con otra ni se cruzan de más.
+- **Menos cruces.** El orden dentro de cada capa sale del baricentro por mediana con 16 pasadas alternas y las
+  variedades que no cruzan con nadie bajan al fondo de su columna; los nodos de paso se alinean luego con sus vecinos
+  para que las líneas salgan lo más rectas que deja su carril.
+- **Un tono por padre** (`tono()`), dentro de la gama del plano, para seguir con la vista de quién sale cada línea.
+- **Comprobado en el propio script**: 154 aristas en 638 tramos, todos horizontales o verticales y ninguno por encima
+  de una ficha; si alguno lo estuviera, `python3 -I tools/genealogia_svg.py` falla.
+
 ### Más descendencias, no más landraces (lo pidió el usuario: «más que más landraces me refería a meter más descendencias no más landraces»; solo Godot, con `Datos.CAL`)
 
 - **Cinco vías nuevas, ningún nombre de fuera.** El catálogo sigue en 104 variedades: lo que se amplía son las maneras

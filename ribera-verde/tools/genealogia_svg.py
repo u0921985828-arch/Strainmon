@@ -77,25 +77,112 @@ CAPAS = {}
 for k in TODAS:
     CAPAS.setdefault(capa[k], []).append(k)
 
-# ── el orden dentro de cada capa: el baricentro de los padres, tres pasadas ──
-pos = {}
+# ── el grafo por capas, con nodos de paso: ninguna arista salta por encima de una ficha ──
+# (lo pidió el usuario: «todo el esquema bien hecho y sin líneas engorrosas… con líneas a ángulos de 90°»)
+NW, NH, GY, GD, M = 206, 46, 54, 18, 30
+CAB, PIE = 56, 44
+
+E, CAP_E, CAD = {}, {}, {}           # elementos por capa · capa de cada elemento · cadena de cada arista
+for c in sorted(CAPAS):
+    E[c] = ["v:" + k for k in CAPAS[c]]
+    for e in E[c]: CAP_E[e] = c
+_dn = 0
+for k in TODAS:
+    for p in padres.get(k, []):
+        if p not in capa or k not in capa or capa[k] <= capa[p]: continue
+        cad = ["v:" + p]
+        for c in range(capa[p] + 1, capa[k]):
+            _dn += 1
+            d = "d:%d" % _dn
+            E[c].append(d); CAP_E[d] = c
+            cad.append(d)
+        cad.append("v:" + k)
+        CAD[(p, k)] = cad
+
+pred, succ = {}, {}
+for cad in CAD.values():
+    for a, b in zip(cad, cad[1:]):
+        pred.setdefault(b, []).append(a)
+        succ.setdefault(a, []).append(b)
+
+# ── el orden dentro de cada capa: baricentro, pasadas alternas hacia delante y hacia atrás ──
+idx = {}
+def _reindex():
+    for c in E:
+        for i, e in enumerate(E[c]): idx[e] = i
 for c in sorted(CAPAS):
     CAPAS[c].sort(key=lambda k: (S[k]["ind"] if c == 0 else 0, nom(k)))
-for _ in range(3):
-    for c in sorted(CAPAS):
-        if c == 0: continue
-        CAPAS[c].sort(key=lambda k: sum(CAPAS[capa[p]].index(p) / max(1, len(CAPAS[capa[p]]))
-                                        for p in padres.get(k, [])) / max(1, len(padres.get(k, []))))
+    E[c] = ["v:" + k for k in CAPAS[c]] + [e for e in E[c] if e.startswith("d:")]
+_reindex()
+CMAX = max(E)
+def _mediana(v):
+    v = sorted(v); n = len(v)
+    return v[n // 2] if n % 2 else (v[n // 2 - 1] + v[n // 2]) / 2
+for it in range(16):
+    ida = it % 2 == 0
+    rel = pred if ida else succ
+    for c in (sorted(E) if ida else sorted(E, reverse=True)):
+        if (ida and c == 0) or (not ida and c == CMAX): continue
+        n = max(1, len(E[c]) - 1)
+        cl = {}
+        for e in E[c]:
+            vs = [idx[x] / max(1, len(E[CAP_E[x]]) - 1) for x in rel.get(e, [])]
+            # lo que no tira de ningún lado se va al fondo de su columna y deja sitio a las líneas
+            cl[e] = _mediana(vs) if vs else (9.0 if not (pred.get(e) or succ.get(e)) else idx[e] / n)
+        E[c].sort(key=lambda e: cl[e])
+        _reindex()
+for c in sorted(E):
+    CAPAS[c] = [e[2:] for e in E[c] if e.startswith("v:")]
 
-# ───────────────────────── el árbol ─────────────────────────
-NW, NH, GX, GY, M = 206, 46, 300, 54, 30
-ALTO = max(len(v) for v in CAPAS.values()) * GY + 2 * M + 76
-ANCHO = (max(CAPAS) + 1) * GX + NW + 2 * M
+# ── las columnas: cada pasillo, lo ancho que piden sus canales ──
+PASO_C, PAS_MIN = 7, 76
+ndest = {}
+for cad in CAD.values():
+    for a, b in zip(cad, cad[1:]):
+        ndest.setdefault(CAP_E[a], set()).add(b)
+PAS = {c: max(PAS_MIN, PASO_C * (len(ndest.get(c, ())) + 1)) for c in range(CMAX)}
+X = {0: M}
+for c in range(CMAX): X[c + 1] = X[c] + NW + PAS[c]
+ANCHO = X[CMAX] + NW + M
 
-for c in sorted(CAPAS):
-    sitio = (ALTO - 76 - len(CAPAS[c]) * GY) / 2 + 52
-    for i, k in enumerate(CAPAS[c]):
-        pos[k] = (M + c * GX, sitio + i * GY)
+# ── las filas: fichas y nodos de paso en carriles propios, cada columna centrada ──
+ah = {e: (NH if e.startswith("v:") else 1) for c in E for e in E[c]}
+sl = {e: (GY if e.startswith("v:") else GD) for c in E for e in E[c]}
+alto_c = {c: sum(sl[e] for e in E[c]) for c in E}
+LIBRE = max(alto_c.values())
+ALTO = LIBRE + CAB + PIE
+cy = {}
+for c in sorted(E):
+    y = CAB + (LIBRE - alto_c[c]) / 2
+    for e in E[c]:
+        cy[e] = y + sl[e] / 2
+        y += sl[e]
+
+# ── los nodos de paso, a la altura que deja la línea más recta, sin salirse de su carril ──
+for _ in range(6):
+    for c in sorted(E):
+        for i, e in enumerate(E[c]):
+            if not e.startswith("d:"): continue
+            vs = [cy[x] for x in pred.get(e, []) + succ.get(e, [])]
+            if not vs: continue
+            obj = sum(vs) / len(vs)
+            lo = CAB + 4 + ah[e] / 2
+            hi = ALTO - PIE - 4 - ah[e] / 2
+            if i: lo = max(lo, cy[E[c][i - 1]] + ah[E[c][i - 1]] / 2 + 5 + ah[e] / 2)
+            if i + 1 < len(E[c]): hi = min(hi, cy[E[c][i + 1]] - ah[E[c][i + 1]] / 2 - 5 - ah[e] / 2)
+            cy[e] = min(max(obj, lo), min(max(hi, lo), hi)) if hi >= lo else lo
+
+pos = {}
+for c in sorted(E):
+    for e in E[c]:
+        if e.startswith("v:"): pos[e[2:]] = (X[c], cy[e] - NH / 2)
+
+# ── un canal vertical por destino en cada pasillo, en el mismo orden que la columna ──
+canal = {}
+for c, dd in ndest.items():
+    ds = sorted(dd, key=lambda e: idx[e])
+    for j, e in enumerate(ds):
+        canal[(c, e)] = X[c] + NW + PAS[c] * (j + 1) / (len(ds) + 1)
 
 L = []
 A = L.append
@@ -105,7 +192,8 @@ A('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="%d" height
 A('<title id="t">Landrace Hunters · árbol genealógico de las %d variedades</title>' % len(TODAS))
 A('<desc id="a">De izquierda a derecha, por generaciones: en la primera columna lo que no tiene receta '
   '(las landraces y las variedades de partida) y cada cruce a la derecha de sus padres. Cada variedad sale '
-  'en su ficha del recetario, con la hoja de abanico que le toca por genética.</desc>')
+  'en su ficha del recetario, con la hoja de abanico que le toca por genética. Las líneas van en ángulos de '
+  '90°, cada una por su canal, y las que saltan una generación pasan por los carriles libres entre fichas.</desc>')
 A('''<style>
  .bg{fill:#12170f}
  text{font-family:"DejaVu Sans",sans-serif}
@@ -117,8 +205,7 @@ A('''<style>
  .f .gr{font-size:8px;font-weight:700;letter-spacing:.06em}
  .land .p0{fill:#d8c070}
  .auto .p0{fill:#5f8fb4}
- .e{fill:none;stroke:#6f8c57;stroke-width:1.1;opacity:.5}
- .e.land{stroke:#b9a75e;opacity:.65}
+ .e{fill:none;stroke-width:1.2;stroke-linecap:square;stroke-linejoin:miter;opacity:.62}
  .leg text{font-size:11px;fill:#b7cf95}
  .leg rect{stroke:#0a0d08}
 </style>''')
@@ -128,19 +215,47 @@ L.extend(defs_hojas(TODAS))
 A('<g class="capas">')
 for c in sorted(CAPAS):
     t = "ORIGEN · sin receta" if c == 0 else "%d.ª generación" % c
-    A('  <text class="cap" x="%d" y="%d">%s · %d</text>' % (M + c * GX, 36, esc(t), len(CAPAS[c])))
+    A('  <text class="cap" x="%d" y="%d">%s · %d</text>' % (X[c], 38, esc(t), len(CAPAS[c])))
 A('</g>')
 
+def tono(p):
+    """Cada padre, su tono dentro de la gama del plano: así se sigue con la vista de quién sale cada línea."""
+    h = 0
+    for ch in p: h = (h * 131 + ord(ch)) & 0xFFFF
+    return "hsl(%d,%d%%,%d%%)" % (36 + h % 92, 30 + (h >> 7) % 26, 48 + (h >> 11) % 18)
+
 A('<g class="aristas" aria-hidden="true">')
-for k in TODAS:
-    for p in padres.get(k, []):
-        if p not in pos or k not in pos: continue
-        x1, y1 = pos[p][0] + NW, pos[p][1] + NH / 2
-        x2, y2 = pos[k][0], pos[k][1] + NH / 2
-        mx = (x1 + x2) / 2
-        A('  <path class="e%s" data-de="%s" data-a="%s" d="M%.1f %.1f C%.1f %.1f %.1f %.1f %.1f %.1f"/>'
-          % (" land" if p in LAND else "", esc(p), esc(k), x1, y1, mx, y1, mx, y2, x2, y2))
+for (p, k), cad in sorted(CAD.items()):
+    d = ["M%.1f %.1f" % (X[CAP_E[cad[0]]] + NW, cy[cad[0]])]
+    for a, b in zip(cad, cad[1:]):
+        c = CAP_E[a]
+        xc = canal[(c, b)]
+        d.append("H%.1f" % xc)
+        if abs(cy[b] - cy[a]) > 0.05: d.append("V%.1f" % cy[b])
+        if b.startswith("v:"): d.append("H%.1f" % X[CAP_E[b]])
+    A('  <path class="e%s" data-de="%s" data-a="%s" stroke="%s" d="%s"/>'
+      % (" land" if p in LAND else "", esc(p), esc(k), tono(p), " ".join(d)))
 A('</g>')
+
+# ── comprobación: todo en ángulos de 90° y ninguna línea por encima de una ficha ──
+def _tramos(pts):
+    return list(zip(pts, pts[1:]))
+_cajas = [(X[CAP_E["v:" + k]], cy["v:" + k] - NH / 2, NW, NH) for k in TODAS]
+_n = 0
+for (p, k), cad in CAD.items():
+    pts = [(X[CAP_E[cad[0]]] + NW, cy[cad[0]])]
+    for a2, b2 in zip(cad, cad[1:]):
+        xc = canal[(CAP_E[a2], b2)]
+        pts.append((xc, pts[-1][1]))
+        pts.append((xc, cy[b2]))
+        if b2.startswith("v:"): pts.append((X[CAP_E[b2]], cy[b2]))
+    for (x1, y1), (x2, y2) in _tramos(pts):
+        assert abs(x1 - x2) < 0.05 or abs(y1 - y2) < 0.05, "tramo torcido %s→%s" % (p, k)
+        _n += 1
+        for bx, by, bw, bh in _cajas:
+            if min(x1, x2) < bx + bw - 0.5 and max(x1, x2) > bx + 0.5 \
+               and min(y1, y2) < by + bh - 0.5 and max(y1, y2) > by + 0.5:
+                raise AssertionError("la línea %s→%s pisa una ficha en (%.0f, %.0f)" % (p, k, bx, by))
 
 def ficha(o, k, x, y, w, h, grande=False):
     """La ficha del recetario: el papel de cuatro capas, la franja del grupo, la hoja y el texto."""
@@ -250,5 +365,5 @@ b('<text class="pie" x="%d" y="%d">La ficha es la del recetario del juego: la fr
   'la hoja de abanico sale de la genética de cada variedad.</text>' % (M2, H2 - 24))
 b('</svg>')
 open(os.path.join(DST, "landraces.svg"), "w", encoding="utf-8").write("\n".join(B) + "\n")
-print("genealogia_svg: arbol %d fichas en %d capas (%d×%d) · landraces %d (%d×%d) · %s"
-      % (len(TODAS), len(CAPAS), ANCHO, ALTO, len(LAND), W2, H2, DST))
+print("genealogia_svg: arbol %d fichas en %d capas (%d×%d) · %d aristas en %d tramos, todos a 90° y sin pisar ficha · landraces %d (%d×%d) · %s"
+      % (len(TODAS), len(CAPAS), ANCHO, ALTO, len(CAD), _n, len(LAND), W2, H2, DST))
