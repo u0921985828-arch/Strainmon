@@ -170,6 +170,8 @@ func cuida_madres():
 	return null
 
 func madre_txt(M: Dictionary) -> String:
+	if String(M.get("ct", "")) != "":   # descendencias: la madre de un corte guardado va con su nombre propio
+		return String(M.ct)
 	return strain(lot_sid(M.k)).n + etiq(M.get("f"))
 
 func carpa_madres() -> void:
@@ -202,6 +204,14 @@ func carpa_madres() -> void:
 func madre_meter() -> void:
 	var N: Dictionary = S.nave
 	var c = cuida_madres()
+	# descendencias: si tienes cortes guardados, la madre puede salir de uno de ellos, con su fenotipo exacto
+	if Desc.hay() and not Desc.cortes(S).is_empty():
+		var q: int = await ask(K("¿De dónde sale la madre?"), [K("De un corte guardado"), K("De una planta tuya"), K("Nada")])
+		if q == 0:
+			await madre_de_corte()
+			return
+		if q != 1:
+			return
 	var p = await elegir_planta(K("¿QUÉ MADRE METES?"), false)
 	if p == null:
 		return
@@ -211,6 +221,28 @@ func madre_meter() -> void:
 	N.ma.append({"k": p.sid + ("*" if Cultivo.clase_feno(p.f) == "estrella" else ""), "f": p.f, "v": 100, "e": 0})
 	sfx("sel")
 	await say(T("La {nom}{et}, a la carpa de las madres: a 18/6, siempre en crecimiento.", {"nom": strain(p.sid).n, "et": etiq(p.f)}) + " " + (T("{n} se encarga.", {"n": c.n}) if c != null else K("Sin nadie que la cuide, se va apagando: pon a alguien de tu plantilla en las madres.")))
+
+# descendencias: mete en la carpa la madre de un corte guardado. El corte no se gasta: el fenotipo queda apuntado y cada
+# madre que salga de él es la misma planta, con los mismos números. Pero no sale hecha: entra a DESC.corte.v de vigor y
+# hay que criarla, y de un corte sale una madre al día, para que el corte no sea un repuesto gratis de la carpa
+func madre_de_corte() -> void:
+	if int(S.nave.get("ctd", 0)) == int(S.day):
+		await say(K("Un corte al día: el esqueje que has sacado hoy todavía está enraizando. Mañana."))
+		return
+	var l := Desc.cortes(S)
+	var it: Array = l.map(func(c): return {"label": String(c.n), "right": strain(lot_sid(String(c.k))).n,
+		"sw": strain(lot_sid(String(c.k))).c, "ic": ic_cog(lot_sid(String(c.k))), "desc": Desc.corte_desc(S, c)})
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("LOS CORTES"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var C: Dictionary = l[i]
+	var v0 := Desc.corte_vigor()
+	S.nave.ma.append({"k": String(C.k), "f": C.get("f"), "v": v0, "e": 0, "ct": String(C.n)})
+	S.nave.ctd = int(S.day)
+	sfx("sel")
+	await say(T("{n}, a la carpa de las madres: el mismo corte de siempre, los mismos números.", {"n": String(C.n)}))
+	await say(T("Entra recién enraizada, a {v} % de vigor: hay que criarla antes de sacarle esquejes.", {"v": v0}))
 
 # los esquejes van al propagador (S.esquejes, con su tope); devuelve los que caben de q
 func _al_propagador(M: Dictionary, q: int) -> int:
@@ -232,6 +264,9 @@ func madre_ops(i: int) -> void:
 	var cor := Datos.CAL and int(M.get("cd", -1)) != int(S.day) and int(M.v) >= int(D.MADRES.get("corte_v", 40))
 	if cor:
 		ops.append(K("Cortarle esquejes"))
+	var gc := Desc.hay() and String(M.get("ct", "")) == "" and Desc.cortes(S).size() < Desc.corte_tope()
+	if gc:   # descendencias: guardar el corte de esta madre, con nombre propio
+		ops.append(K("Guardar este corte"))
 	ops.append_array([K("Quitarla"), K("Nada")])
 	var oi: int = await ask(T("Madre {j}: {m} · vigor {v} %.", {"j": i + 1, "m": madre_txt(M), "v": int(M.v)}) + ("" if M.e else (" " + (T("{n} le saca esquejes cada mañana.", {"n": c.n}) if c != null else K("Nadie le saca esquejes.")))), ops)
 	var op: String = ops[oi] if oi >= 0 and oi < ops.size() else ""
@@ -257,6 +292,18 @@ func madre_ops(i: int) -> void:
 		sfx("get")
 		var fq := Datos.fd(int(S.day) + esq_dias() + 1, S.day)
 		await say(T("Le cortas {q} esquejes a la {m}, al propagador. Plántalos antes del {f}. Mañana, más.", {"q": q, "m": madre_txt(M), "f": fq}) if q > 1 else T("Le cortas un esqueje a la {m}, al propagador. Plántalo antes del {f}. Mañana, más.", {"m": madre_txt(M), "f": fq}))
+		return
+	if gc and op == K("Guardar este corte"):
+		var sid := lot_sid(M.k)
+		var nm := Desc.corte_nombre(S, sid)
+		var j := Desc.corte_pon(S, M.k, M.get("f"), nm)
+		if j < 0:
+			await say(T("No caben más cortes: llevas {n}. Tira uno antes.", {"n": Desc.corte_tope()}))
+			return
+		M.ct = nm
+		sfx("get")
+		await say(T("Apuntas el corte: «{n}». Sus esquejes saldrán siempre así, con estos mismos números.", {"n": nm}))
+		await say(Desc.corte_desc(S, Desc.cortes(S)[j]))
 		return
 	if op == K("Quitarla"):
 		if await ask(T("¿Quitas la madre de {m}? Se tira.", {"m": madre_txt(M)}), [K("Quitarla"), K("No")]) != 0:

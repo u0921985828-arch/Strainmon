@@ -1,0 +1,78 @@
+es,en
+Trabajar una línea tuya,Work on a line of your own
+"Autofecundarla, retrocruzarla con su madre o fijarla a conciencia.","Self it, backcross it to its mother or fix it for good."
+Autofecundar (S1),Self the line (S1)
+Una línea consigo misma: sube sus genes y fija lo raro que tenga. Gastas 1 semilla y salen {n}.,A line crossed with itself: its genes go up and whatever it carries gets fixed. Costs 1 seed and gives {n}.
+Retrocruzar con la madre (BX),Backcross to the mother (BX)
+"Un híbrido tuyo con una de sus dos parentales: lo que sale tira a esa madre. Variedad nueva, con su número de retrocruce.","One of your hybrids with one of its two parents: what comes out leans to that mother. A new strain, with its backcross number."
+Fijar la línea (IBL),Fix the line (IBL)
+Seleccionar {n} veces seguidas una línea ya fijada: deja de variar de planta a planta.,Select an already stable line {n} times in a row: it stops varying from plant to plant.
+"Aquí se trabaja sobre lo tuyo: hacen falta semillas de una línea tuya, o un híbrido propio con una de sus parentales.","This bench works on your own stuff: you need seeds of a line of yours, or one of your hybrids plus one of its parents."
+UNA LÍNEA TUYA,A LINE OF YOUR OWN
+AUTOFECUNDAR (S1),SELF THE LINE (S1)
+¿Autofecundar la {s}? Gastas 1 semilla.,Self the {s}? Costs 1 seed.
+Autofecundar,Self it
+"{n} semillas S1 de {s}. La línea no sube de generación: es la misma, más fijada.","{n} S1 seeds of {s}. The line gains no generation: it is the same line, better fixed."
+de {s},from {s}
+"Retrocruzas {h} con {m}, una de sus dos parentales: lo que sale tira a {m}.","You backcross {h} to {m}, one of its two parents: what comes out leans to {m}."
+RETROCRUZAR (BX),BACKCROSS (BX)
+{a} y {b} no tienen los mismos juegos de cromosomas: lo que salga de ahí no cuaja semilla.,{a} and {b} do not have the same sets of chromosomes: nothing out of that cross will set seed.
+¿Retrocruzar {h} con {m}? Gastas 1 semilla de cada.,Backcross {h} to {m}? Costs 1 seed of each.
+Retrocruzar,Backcross
+Sale {s}: un {m} % de {ma}. {n} semillas.,Out comes {s}: {m} % {ma}. {n} seeds.
+FIJAR LA LÍNEA (IBL),FIX THE LINE (IBL)
+¿Seleccionar la {s}? Gastas 1 semilla y te quedan {n} selecciones para fijarla.,Select the {s}? Costs 1 seed and you have {n} selections left to fix it.
+Seleccionar,Select
+"{s} queda fijada: línea IBL. De aquí en adelante, ni una planta se sale de la madre.","{s} is fixed now: an IBL line. From here on, not one plant strays from the mother."
+{n} semillas seleccionadas de {s}. Te queda {f} selección para fijarla.,{n} selected seeds of {s}. You have {f} selection left to fix it.
+Corte de {s} · THC {t} % · {i} % índica.,{s} cut · THC {t} % · {i} % indica.
+Lleva: {l}.,It carries: {l}.
+Cada esqueje sale igual.,Every cutting comes out the same.
+{a} × {b} · retrocruce propio,{a} × {b} · your own backcross
+Taco vacío. ¿Qué haces?,Empty plug. What do you do?
+Pinchar esquejes del propagador,Stick cuttings from the propagator
+Polinizar entre clones,Pollinate between clones
+ENTRE CLONES · MADRE,BETWEEN CLONES · MOTHER
+Para polinizar entre clones te hacen falta dos esquejes de variedades distintas.,To pollinate between clones you need two cuttings of different strains.
+ENTRE CLONES · PADRE,BETWEEN CLONES · FATHER
+¿Polinizar el clon de {a} con el polen del clon de {b}? Las dos madres siguen en el armario: la línea no se pierde.,Pollinate the {a} clone with pollen from the {b} clone? Both mothers stay in the cabinet: neither line is lost.
+Polinizar,Pollinate
+"{n} semillas de {s}, de madre y padre clonados: puedes repetir el cruce cuando quieras.","{n} seeds of {s}, from a cloned mother and father: you can repeat the cross whenever you like."
+tuya,yours
+¿De dónde sale la madre?,Where does the mother come from?
+De un corte guardado,From a saved cut
+De una planta tuya,From a plant of yours
+LOS CORTES,THE CUTS
+"{n}, a la carpa de las madres: el mismo corte de siempre, los mismos números.","{n}, into the mother tent: the same old cut, the same numbers."
+Guardar este corte,Save this cut
+No caben más cortes: llevas {n}. Tira uno antes.,No room for more cuts: you keep {n}. Drop one first.
+"Apuntas el corte: «{n}». Sus esquejes saldrán siempre así, con estos mismos números.","You write the cut down: “{n}”. Its cuttings will always come out like this, with these same numbers."
+Línea fijada (IBL),Fixed line (IBL)
+fijada a conciencia: dos selecciones seguidas y ni una planta se sale de la madre,fixed for good: two selections in a row and not one plant strays from the mother
+Corte de madre,Mother cut
+Guardas esta planta como madre con nombre propio: cada esqueje suyo sale exactamente igual que ella.,You keep this plant as a mother with a name of its own: every cutting off it comes out exactly like her.
+{s} · corte {n},{s} · cut {n}
+Corte de una madre tuya,A cut off a mother of yours
+Cruce entre clones,Cross between clones
+Autofecundación (S1),Selfing (S1)
+La línea consigo misma: no entra nada de fuera. Sale más parecida a la madre y con sus rasgos más fijados.,The line with itself: nothing comes in from outside. What comes out is closer to the mother and its traits better fixed.
+Retrocruce (BX),Backcross (BX)
+"Cruzas el hijo con su propia madre: lo que salga se parece mucho más a ella, y a la segunda vuelta, casi del todo.","You cross the offspring back to its own mother: what comes out looks far more like her, and on the second round, almost exactly."
+BX{n},BX{n}
+Dos selecciones seguidas de la misma línea estable: queda fijada del todo y todas sus plantas salen iguales.,Two selections in a row of the same stable line: it ends up fully fixed and all its plants come out alike.
+IBL,IBL
+"Una línea consigo misma: sube sus genes y fija lo raro que tenga. Gastas {g} semillas y salen {n}; {t} por línea, y el laboratorio queda {d} días.","A line with itself: it raises its genes and locks in whatever is rare about it. You spend {g} seeds and get {n}; {t} per line, and the lab is busy for {d} days."
+"Un híbrido tuyo con una de sus dos parentales: lo que sale tira a esa madre. Variedad nueva, con su número de retrocruce; el laboratorio queda {d} días.","One of your hybrids with one of its two parents: what comes out leans to that mother. A new strain, with its backcross number; the lab is busy for {d} days."
+Seleccionar {n} veces seguidas una línea ya fijada: deja de variar de planta a planta. Cada selección deja el laboratorio {d} días.,Select an already stable line {n} times running: it stops varying from plant to plant. Each selection keeps the lab busy for {d} days.
+¿Autofecundar la {s}? Gastas {g} semillas y salen {n}.,Self the {s}? You spend {g} seeds and get {n}.
+Te queda {n} autofecundación de esta línea.,You have {n} selfing left on this line.
+Te quedan {n} de esta línea.,You have {n} left on this line.
+"De esta línea, ya no saca más el S1.",S1 gets nothing more out of this line.
+¿Retrocruzar {h} con {m}? Gastas {g} semilla de cada.,Backcross {h} with {m}? You spend {g} seed of each.
+¿Seleccionar la {s}? Gastas {g} semilla y te quedan {n} selecciones para fijarla.,Select the {s}? You spend {g} seed and need {n} more selections to fix it.
+El polen de la última polinización todavía está cuajando: vuelve el {d}.,The pollen from the last cross is still setting: come back on {d}.
+"¿Polinizar el clon de {a} con el polen del clon de {b}? Gastas los dos esquejes; las madres siguen en el armario, así que la línea no se pierde.","Pollinate the {a} clone with pollen from the {b} clone? You spend both cuttings; the mothers stay in the tent, so neither line is lost."
+"{n} semillas de {s}, de madre y padre clonados. Los dos esquejes se han quedado en el cruce; el siguiente, el {d}.","{n} seeds of {s}, from a cloned mother and father. Both cuttings went into the cross; the next one, on {d}."
+Un corte al día: el esqueje que has sacado hoy todavía está enraizando. Mañana.,One cutting a day: the one you took today is still rooting. Tomorrow.
+"Entra recién enraizada, a {v} % de vigor: hay que criarla antes de sacarle esquejes.","She comes in freshly rooted, at {v} % vigour: you have to grow her out before taking cuttings."
+Dos esquejes pinchados en el carro: uno da el polen y el otro la semilla. Gastas los dos y las madres siguen vivas.,"Two cuttings stuck in the cart: one gives the pollen, the other the seed. You spend both and the mothers stay alive."

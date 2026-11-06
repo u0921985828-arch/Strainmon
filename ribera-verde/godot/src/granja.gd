@@ -2,6 +2,7 @@
 # factura y su olor, plantar, cuidar, sacar esquejes, cosechar, la cama, el PC (Genoteca y banco de semillas), la carta, la
 # mesa de genética y la vista de carpa (VC: elegir plaza o foco y cuidar). Los números salen de Cultivo (src/cultivo.gd).
 extends "res://src/calle.gd"
+const Desc = preload("res://src/descend.gd")
 
 const Vista = preload("res://src/vista.gd")
 const EscViaje = preload("res://src/escena_viaje.gd")
@@ -1613,6 +1614,13 @@ func carro_action() -> void:
 			await esqueje_accion(S.bandejas[sel], S.bandejas)
 			sel = mini(sel, maxi(0, S.bandejas.size()))
 			continue
+		if Desc.hay() and clones_ya():   # descendencias: la mesa de cruces del carro, con dos esquejes pinchados
+			var o: int = await ask(K("Taco vacío. ¿Qué haces?"), [K("Pinchar esquejes del propagador"), K("Polinizar entre clones"), K("Nada")])
+			if o != 0:   # «Nada» no pincha nada: solo la primera opción sigue al propagador
+				if o == 1:
+					await clones_cruce()
+				sel = mini(S.bandejas.size(), cap - 1)
+				continue
 		if S.esquejes.is_empty():
 			await say(K("Taco vacío. Saca esquejes de una madre en vegetativo y pínchalos aquí."))
 			continue
@@ -1627,6 +1635,78 @@ func carro_action() -> void:
 		if r:
 			await say(T("No caben {n}: se quedan en el propagador.", {"n": r}) if r > 1 else K("No cabe 1: se queda en el propagador."))
 		sel = mini(S.bandejas.size(), cap - 1)
+
+# ---------- polinizar entre clones (descendencias, lo pidió el usuario) ----------
+# Dos esquejes pinchados en el carro, de líneas distintas: uno hace de madre y el otro de padre. Lo bueno de hacerlo así es que
+# ninguna de las dos líneas se pierde al cosechar, porque las madres siguen vivas en el armario. Salen DESC.clon.sem semillas F1
+func clones_ya() -> bool:
+	var ks := []
+	for e in S.bandejas:
+		var k := lot_sid(String(e.sid))
+		if not ks.has(k):
+			ks.append(k)
+	return ks.size() >= 2
+
+func _clon_it(l: Array) -> Array:
+	return l.map(func(e): return {"label": strain(lot_sid(String(e.sid))).n, "right": etiq(e.get("f")).strip_edges(),
+		"sw": strain(lot_sid(String(e.sid))).c, "ic": ic_cog(lot_sid(String(e.sid))), "desc": strain_line(lot_sid(String(e.sid)))})
+
+# cuántos días faltan para poder volver a polinizar en el carro (S.clonx: el día del último cruce)
+func clones_espera() -> int:
+	var d0: int = int(S.get("clonx", 0))
+	if d0 <= 0:
+		return 0
+	return maxi(0, d0 + Desc.dias("clon") - int(S.day))
+
+func clones_cruce() -> void:
+	var fl := clones_espera()
+	if fl > 0:
+		await say(T("El polen de la última polinización todavía está cuajando: vuelve el {d}.", {"d": Datos.fd(int(S.clonx) + Desc.dias("clon"), S.day)}))
+		return
+	var l: Array = S.bandejas.duplicate()
+	var ia: int = await menu(_clon_it(l) + [{"label": K("Nada"), "desc": ""}], {"cls": "full", "title": K("ENTRE CLONES · MADRE"), "desc": true})
+	if ia < 0 or ia >= l.size():
+		return
+	var A: String = lot_sid(String(l[ia].sid))
+	var l2: Array = l.filter(func(e): return lot_sid(String(e.sid)) != A)
+	if l2.is_empty():
+		await say(K("Para polinizar entre clones te hacen falta dos esquejes de variedades distintas."))
+		return
+	var ib: int = await menu(_clon_it(l2) + [{"label": K("Nada"), "desc": ""}], {"cls": "full", "title": K("ENTRE CLONES · PADRE"), "title2": strain(A).n, "desc": true})
+	if ib < 0 or ib >= l2.size():
+		return
+	var Bk: String = lot_sid(String(l2[ib].sid))
+	if Cultivo.triploide(S, A, Bk):
+		await say(T("{a} y {b} no tienen los mismos juegos de cromosomas: lo que salga de ahí no cuaja semilla.", {"a": strain(A).n, "b": strain(Bk).n}))
+		return
+	if await ask(T("¿Polinizar el clon de {a} con el polen del clon de {b}? Gastas los dos esquejes; las madres siguen en el armario, así que la línea no se pierde.", {"a": strain(A).n, "b": strain(Bk).n}), [K("Polinizar"), K("Cancelar")]) != 0:
+		return
+	# los dos esquejes se quedan en la polinización: el padre suelta el polen y la madre se corta con la semilla
+	var ea = l[ia]
+	var eb = l2[ib]
+	for e in [ea, eb]:
+		var j: int = S.bandejas.find(e)
+		if j >= 0:
+			S.bandejas.remove_at(j)
+	S.clonx = int(S.day)
+	var r := Desc.clones(S, A, Bk)
+	Cultivo.cruza_iv(S, A, Bk, r)
+	Cultivo.cruza_ra(S, A, Bk, r)
+	var is_new: bool = not S.disc.get(r)
+	if is_new and not D.SHOP.any(func(it): return it.get("sid") == r):
+		S.gen[r] = 1
+	if Datos.receta_de(S, A, Bk) and not S.rec.get(r):
+		S.rec[r] = 1
+	gesto_sid = A
+	await accion("cruzar")
+	sfx("enc")
+	add_seeds(r, Desc.clon_sem())
+	var s2 = strain(r)
+	if is_new:
+		sfx("get")
+		await say(T("Nueva variedad: {s}.", {"s": s2.n}))
+	await say(T("{n} semillas de {s}, de madre y padre clonados. Los dos esquejes se han quedado en el cruce; el siguiente, el {d}.", {"n": Desc.clon_sem(), "s": s2.n, "d": Datos.fd(int(S.day) + Desc.dias("clon"), S.day)}))
+	await check_story()
 
 # la vista del carro (en trama.gd): el taco elegido (0-23: la bandeja de arriba, 0-11, y la de abajo, 12-23) o null
 func elegir_carro(_i0 := 0):   # → setas.gd

@@ -471,6 +471,13 @@ func dex_vias() -> Array:
 		var au: Array = D.DEX.filter(func(k): return D.STRAINS[k].get("auto"))
 		if au.size():
 			v.append({"k": "auto", "n": K("AUTOFLORECIENTES"), "d": K("Florecen por edad: ni madres ni esquejes. Se cruzan con la Ruderalis."), "ks": dex_orden(au)})
+		# descendencias (lo pidió el usuario: «más que más landraces me refería a meter más descendencias»): las vías que no
+		# salen de ninguna lista, porque las fabricas tú con lo que ya cultivas. No llevan variedades del catálogo: lo que dan
+		# son cortes con nombre propio, S1, retrocruces y líneas fijadas de tus propias plantas
+		if D.has("DESC"):   # i18n-no
+			for k in ["corte", "clon", "s1", "bx", "ibl"]:
+				var E: Dictionary = D.DESC[k]
+				v.append({"k": "d-" + k, "n": String(E.via).to_upper(), "d": String(E.d), "ks": [], "mio": true})
 	return v
 
 func dex_via_falta(ks: Array) -> Array:
@@ -483,6 +490,10 @@ func dex_recetario() -> void:
 		var V := dex_vias()
 		var items := []
 		for e in V:
+			if e.get("mio"):   # descendencias: la vía no lista variedades, explica cómo se saca
+				items.append({"label": I18n.v(String(e.n)), "right": K("tuya"), "ic": icono("cogollo"), "disabled": true, "ks": [],
+					"desc": I18n.v(String(e.d))})
+				continue
 			var ks: Array = dex_via_falta(e.ks) if falt else e.ks
 			var nf: int = dex_via_falta(e.ks).size()
 			items.append({"label": I18n.v(String(e.n)), "right": T("faltan {n}", {"n": nf}) if falt else dex_cuenta(e.ks), "ic": icono("cogollo"),

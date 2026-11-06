@@ -242,17 +242,140 @@ func bt_lab() -> void:
 	if no != "":
 		await say(no)
 		return
-	if dos:
-		var it0 := [{"label": K("Fijar una línea"), "desc": K("Una semilla, el microscopio y la cabina: la línea sube una generación.")},
-			{"label": K("Doblar los cromosomas"), "desc": T("Con el reactivo del armario de tóxicos. Te quedan {n} usos del frasco.", {"n": bt_tt().get("f", 0)})},
-			{"label": K("Nada"), "desc": ""}]
+	var des: bool = Desc.algo(S)   # descendencias: el menú de más, solo si hay de verdad algo que trabajar
+	if dos or des:
+		var it0 := [{"label": K("Fijar una línea"), "desc": K("Una semilla, el microscopio y la cabina: la línea sube una generación.")}]
+		if dos:
+			it0.append({"label": K("Doblar los cromosomas"), "desc": T("Con el reactivo del armario de tóxicos. Te quedan {n} usos del frasco.", {"n": bt_tt().get("f", 0)})})
+		if des:   # descendencias: sacar línea de lo que ya cultivas (S1, retrocruce, línea fijada)
+			it0.append({"label": K("Trabajar una línea tuya"), "desc": K("Autofecundarla, retrocruzarla con su madre o fijarla a conciencia.")})
+		it0.append({"label": K("Nada"), "desc": ""})
 		var q: int = await menu(it0, {"cls": "full", "title": K("EL LABORATORIO"), "desc": true})
-		if q == 1:
+		if q < 0 or q >= it0.size() - 1:
+			return
+		var et: String = String(it0[q].label)
+		if et == K("Doblar los cromosomas"):
 			await bt_tetra()
 			return
-		if q != 0:
+		if et == K("Trabajar una línea tuya"):
+			await bt_desc()
 			return
 	await bt_fijar()
+
+# ---------- descendencias en el laboratorio (lo pidió el usuario: «más que más landraces me refería a meter más
+# descendencias no más landraces») ----------
+# Tres trabajos sobre tus propias líneas, cada uno con sus días de laboratorio (DESC.<vía>.dias). Ninguno gana generación:
+# son la misma línea, más fijada. El retrocruce sí da variedad nueva, porque lo que sale se parece a la madre y no al híbrido.
+# Nada de método: se dice lo que se juega, no cómo se hace
+func bt_desc() -> void:
+	if bt_espera("lab", 1) > 0:
+		await say(K("El laboratorio, por hoy, ya está. Vuelve mañana."))
+		return
+	var s1: Array = S.get("seeds", {}).keys().filter(func(sid): return Desc.s1_ok(S, String(sid)))
+	var bxl: Array = Desc.bx_ls(S)
+	var ibll: Array = S.get("seeds", {}).keys().filter(func(sid): return Desc.ibl_ok(S, String(sid)))
+	var it := []
+	var vs := []
+	if s1.size():
+		it.append({"label": K("Autofecundar (S1)"), "desc": T("Una línea consigo misma: sube sus genes y fija lo raro que tenga. Gastas {g} semillas y salen {n}; {t} por línea, y el laboratorio queda {d} días.", {"g": Desc.s1_gasta(), "n": int(Desc.d().s1.sem), "t": Desc.s1_tope(), "d": Desc.dias("s1")})})
+		vs.append("s1")
+	if bxl.size():
+		it.append({"label": K("Retrocruzar con la madre (BX)"), "desc": T("Un híbrido tuyo con una de sus dos parentales: lo que sale tira a esa madre. Variedad nueva, con su número de retrocruce; el laboratorio queda {d} días.", {"d": Desc.dias("bx")})})
+		vs.append("bx")
+	if ibll.size():
+		it.append({"label": K("Fijar la línea (IBL)"), "desc": T("Seleccionar {n} veces seguidas una línea ya fijada: deja de variar de planta a planta. Cada selección deja el laboratorio {d} días.", {"n": int(Desc.d().ibl.sel), "d": Desc.dias("ibl")})})
+		vs.append("ibl")
+	if it.is_empty():
+		await say(K("Aquí se trabaja sobre lo tuyo: hacen falta semillas de una línea tuya, o un híbrido propio con una de sus parentales."))
+		return
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("UNA LÍNEA TUYA"), "desc": true})
+	if i < 0 or i >= vs.size():
+		return
+	if vs[i] == "s1":
+		await bt_s1(s1)
+	elif vs[i] == "bx":
+		await bt_bx(bxl)
+	else:
+		await bt_ibl(ibll)
+
+func _bt_dia(v: String) -> void:
+	bt().lab = int(S.get("day", 1)) + Desc.dias(v) - 1
+	lab().r = true   # lo usado, al contenedor amarillo
+
+func _bt_it(l: Array) -> Array:
+	return l.map(func(sid): return {"label": strain(String(sid)).n, "right": Cultivo.tipo_gen(S, String(sid)), "sw": strain(String(sid)).c,
+		"ic": ic_cog(String(sid)), "desc": strain_line(String(sid))}) + [{"label": K("Nada"), "desc": ""}]
+
+func bt_s1(l: Array) -> void:
+	var i: int = await menu(_bt_it(l), {"cls": "full", "title": K("AUTOFECUNDAR (S1)"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var sid: String = String(l[i])
+	if await ask(T("¿Autofecundar la {s}? Gastas {g} semillas y salen {n}.", {"s": strain(sid).n, "g": Desc.s1_gasta(), "n": int(Desc.d().s1.sem)}), [K("Autofecundar"), K("Cancelar")]) != 0:
+		return
+	var q := Desc.s1(S, sid)
+	if q < 1:
+		return
+	_bt_dia("s1")
+	add_seeds(sid, q)
+	sfx("get")
+	await say(T("{n} semillas S1 de {s}. La línea no sube de generación: es la misma, más fijada.", {"n": q, "s": strain(sid).n}))
+	var fa := Desc.s1_tope() - Desc.s1_n(S, sid)
+	await say(T("Te queda {n} autofecundación de esta línea.", {"n": fa}) if fa == 1 else (T("Te quedan {n} de esta línea.", {"n": fa}) if fa > 0 else K("De esta línea, ya no saca más el S1.")))
+	await say(genes_txt(Cultivo.iv_linea(S, sid)))
+
+func bt_bx(l: Array) -> void:
+	var it: Array = l.map(func(e): return {"label": strain(String(e[1])).n, "right": T("de {s}", {"s": strain(String(e[0])).n}),
+		"sw": strain(String(e[1])).c, "ic": ic_cog(String(e[1])),
+		"desc": T("Retrocruzas {h} con {m}, una de sus dos parentales: lo que sale tira a {m}.", {"h": strain(String(e[0])).n, "m": strain(String(e[1])).n})})
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("RETROCRUZAR (BX)"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var hijo: String = String(l[i][0])
+	var madre: String = String(l[i][1])
+	if Cultivo.triploide(S, hijo, madre):
+		await say(T("{a} y {b} no tienen los mismos juegos de cromosomas: lo que salga de ahí no cuaja semilla.", {"a": strain(hijo).n, "b": strain(madre).n}))
+		return
+	if await ask(T("¿Retrocruzar {h} con {m}? Gastas {g} semilla de cada.", {"h": strain(hijo).n, "m": strain(madre).n, "g": Desc.bx_gasta()}), [K("Retrocruzar"), K("Cancelar")]) != 0:
+		return
+	for k in [hijo, madre]:
+		S.seeds[k] = int(S.seeds[k]) - Desc.bx_gasta()
+		if int(S.seeds[k]) <= 0:
+			S.seeds.erase(k)
+	var r := Desc.bx(S, hijo, madre)
+	Cultivo.cruza_iv(S, hijo, madre, r)
+	Cultivo.cruza_ra(S, hijo, madre, r)
+	var is_new: bool = not S.disc.get(r)
+	if is_new:
+		S.gen[r] = 1
+	_bt_dia("bx")
+	add_seeds(r, Desc.bx_sem())
+	sfx("get")
+	var s2 = strain(r)
+	await say(T("Sale {s}: un {m} % de {ma}. {n} semillas.", {"s": s2.n, "m": int(S.custom[r].m), "ma": strain(madre).n, "n": Desc.bx_sem()}))
+	await check_story()
+
+func bt_ibl(l: Array) -> void:
+	var i: int = await menu(_bt_it(l), {"cls": "full", "title": K("FIJAR LA LÍNEA (IBL)"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var sid: String = String(l[i])
+	var fl := Desc.ibl_falta(S, sid)
+	if await ask(T("¿Seleccionar la {s}? Gastas {g} semilla y te quedan {n} selecciones para fijarla.", {"s": strain(sid).n, "n": fl, "g": int(Desc.d().ibl.get("gasta", 1))}), [K("Seleccionar"), K("Cancelar")]) != 0:
+		return
+	var q := Desc.ibl(S, sid)
+	if q < 1:
+		return
+	_bt_dia("ibl")
+	add_seeds(sid, q)
+	sfx("get")
+	if Desc.es_ibl(S, sid):
+		await say(T("{s} queda fijada: línea IBL. De aquí en adelante, ni una planta se sale de la madre.", {"s": strain(sid).n}))
+		await say(genes_txt(Cultivo.iv_linea(S, sid)))
+	else:
+		await say(T("{n} semillas seleccionadas de {s}. Te queda {f} selección para fijarla.", {"n": q, "s": strain(sid).n, "f": Desc.ibl_falta(S, sid)}))
 
 func bt_fijar() -> void:
 	if bt_espera("lab", 1) > 0:

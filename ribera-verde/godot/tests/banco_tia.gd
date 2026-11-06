@@ -5,6 +5,7 @@
 extends SceneTree
 
 const Datos = preload("res://src/datos.gd")
+const I18n = preload("res://src/i18n.gd")
 const Juego = preload("res://src/juego.gd")
 const Cultivo = preload("res://src/cultivo.gd")
 
@@ -31,6 +32,12 @@ func _menu(items: Array, o: Dictionary) -> Dictionary:
 	for it in items:
 		labels.append(it if it is String else str(it.get("label", "")))
 	var k := labels.size() - 1
+	# descendencias: con una línea tuya que se pueda trabajar, el laboratorio pregunta primero qué se hace. Ese menú no se
+	# pilota desde las listas de abajo: aquí siempre se va a fijar la línea, que es lo que mira esta prueba
+	if labels.size() and labels[0].begins_with(I18n.K("Fijar una línea")):
+		var o0: Dictionary = o.duplicate()
+		o0.initial = 0
+		return o0
 	var q: String = QUIERO.pop_front() if QUIERO.size() else ""
 	for i in labels.size():
 		if q != "" and labels[i].begins_with(q):

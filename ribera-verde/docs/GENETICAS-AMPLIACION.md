@@ -1,103 +1,57 @@
-# Ampliar el catálogo de genéticas — propuesta
+# Ampliar el catálogo de genéticas — lo hecho
 
-Hoy hay **104** variedades (`STRAINS` de `datos/datos.json`): 31 landraces, 56 cruces, 17 autoflorecientes
+El catálogo tiene **104** variedades (`STRAINS` de `datos/datos.json`): 31 landraces, 56 cruces, 17 autoflorecientes
 (16 + la Ruderalis). Todas reales: nada inventado, sin criadores ni bancos nombrados.
 
-Lo que pidió el usuario: que la ampliación vaya **con descendencias, selección de madres y cruces de esquejes**,
-no solo más nombres en una lista. Así que la propuesta son dos cosas a la vez: **46 variedades nuevas** (→ 150) y
-**tres formas nuevas de sacar variedad de lo que ya cultivas**.
+Lo que pidió el usuario, textual: «más que más landraces me refería a meter **más descendencias**, no más landraces».
+Así que la ampliación no mete ni un nombre de fuera: mete **cinco maneras nuevas de sacar variedad de lo que ya
+cultivas**. El catálogo lo fabrica quien juega.
 
-## 1. Las tres mecánicas nuevas (el corazón de la ampliación)
+## 1. Las cinco vías (`DESC` de `tools/descendencia.py`)
 
-| Mecánica | Qué es | Cómo se juega | De dónde sale |
+| Vía | Qué es | Dónde se juega | Qué sale |
 |---|---|---|---|
-| **Selección de madre (corte)** | De una planta tuya que haya salido buena, guardas la madre: ese *corte* queda con nombre propio y repite siempre lo mismo. | En el armario de las madres, SELECCIONAR ESTE CORTE: se apunta el fenotipo exacto (% índica, THC, porte, rareza) y cada esqueje sale idéntico. Hasta 4 cortes guardados. | `S.nave.ma` / el armario de casa; nuevo `S.cortes` |
-| **Cruce de esquejes (madre × padre clonados)** | Polinizar el clon de una madre con el polen del clon de otra: la línea no se pierde al cosechar. | En la mesa de cruces, con dos esquejes pinchados en el carro, POLINIZAR ENTRE CLONES: semillas F1 de las dos madres guardadas, repetible. | `CARRO` + `mesa de cruces` |
-| **Descendencia: F1 → S1, BX, IBL** | Lo que sale de tu propia línea: autopolinización (S1), retrocruce con la madre (BX1/BX2) y línea fijada (IBL en F5). | En el laboratorio del banco de la tía: S1 de una madre seleccionada; BX con la madre del corte; a la F5 la línea pasa a IBL y deja de variar. | `src/bancotia.gd`, `Cultivo.gen_de` |
+| **Corte de madre** | De una madre que te ha salido buena guardas el corte con nombre propio. El fenotipo queda congelado tal cual. | Armario de las madres → GUARDAR ESTE CORTE. Hasta `DESC.corte.tope` (4) a la vez. Para meter madre: DE UN CORTE GUARDADO, una al día. | Cada esqueje sale idéntico: mismo THC, mismo porte, mismas rarezas. El corte no se gasta, pero la madre entra a `DESC.corte.v` (55) % de vigor: hay que criarla. |
+| **Polinizar entre clones** | Dos esquejes pinchados, uno de madre y otro de padre. | Carro de esquejes, en un taco vacío → POLINIZAR ENTRE CLONES. Uno cada `DESC.clon.dias` (1). | `DESC.clon.sem` (3) semillas F1. Gasta los dos esquejes, pero las dos líneas siguen vivas en el armario: no se pierde ninguna. |
+| **Autofecundación (S1)** | Una línea consigo misma. | Laboratorio del banco de la tía → TRABAJAR UNA LÍNEA TUYA → AUTOFECUNDAR (S1). `DESC.s1.tope` (2) por línea. | Gasta `DESC.s1.gasta` (2) semillas y da `DESC.s1.sem` (2): no multiplica. +`DESC.s1.iv` (2) en los cuatro genes y un nivel más de fijación en sus rarezas. No gana generación: es la misma línea, más fijada. |
+| **Retrocruce (BX)** | Un híbrido tuyo cruzado con una de sus dos parentales. | Laboratorio → RETROCRUZAR CON LA MADRE (BX). Gasta `DESC.bx.gasta` (1) semilla de cada. | Variedad nueva, con su clave propia y nombre «<madre> BX1», «BX2»…, que tira a esa madre un `DESC.bx.m` (75-88) %. El número va por madre, así que ningún nombre se repite. |
+| **Línea fijada (IBL)** | `DESC.ibl.sel` (2) selecciones seguidas de una línea ya fijada en F4. | Laboratorio → FIJAR LA LÍNEA (IBL). | La línea pasa al tipo genético `ibl` (`GENETICA.ibl`, sigma 0,03: la más baja de las ocho) y deja de variar de planta a planta. Sus genes no bajan de `DESC.ibl.iv` (26). |
 
-Con esto, cada partida acaba con **variedades propias con nombre** que no están en la lista de nadie: el jugador
-fabrica catálogo. La lista de abajo es el material de partida.
+Cada trabajo del laboratorio ocupa sus días (`DESC.<vía>.dias`: 3 el S1, 2 el BX y el IBL) y pasa por las siete normas de
+`LAB` como la tetraploidia. Ninguna vía es gratis ni se repite sin fin: ese fue el resultado de la revisión por ataque. Nada de método, dosis ni reactivos: el juego dice lo que se juega, nunca cómo se hace.
 
-## 2. Landraces que faltan (18)
+## 2. Landraces: ninguna más
 
-| id | Nombre | Zona | % índica aprox. | Cómo se consigue |
-|---|---|---|---|---|
-| `mazar` | Mazar-i-Sharif | Afganistán (Balj) | 100 | banco del PC |
-| `balkh` | Balkhi | Afganistán (Balj) | 100 | la caza, invierno |
-| `uzbek` | Uzbek | Asia central | 95 | banco del PC |
-| `tashkurgan` | Tashkurgan | Afganistán | 100 | la caza, Koldo |
-| `parvati` | Parvati | India (Himachal) | 70 | banco del PC |
-| `idukki` | Idukki | India (Kerala) | 10 | banco del PC |
-| `mysore` | Mysore | India (Karnataka) | 10 | la caza, feria de mayo |
-| `sinaloa` | Sinaloa | México | 0 | banco del PC |
-| `guerrero` | Guerrero | México | 0 | la caza, Txomin |
-| `sanblas` | San Blas | Panamá | 0 | banco del PC |
-| `santamarta` | Santa Marta Gold | Colombia | 0 | banco del PC |
-| `pernambuco` | Pernambuco | Brasil | 0 | la caza, romería |
-| `aceh` | Aceh | Sumatra | 20 | banco del PC |
-| `cambodian` | Cambodian | Camboya | 0 | banco del PC |
-| `burmese` | Burmese | Birmania | 20 | la caza, Delroy |
-| `sierraleona` | Sierra Leone | África occidental | 0 | banco del PC |
-| `kilimanjaro` | Kilimanjaro | Tanzania | 0 | la caza, fiestas de agosto |
-| `transkei` | Transkei | Sudáfrica | 0 | banco del PC |
+Lo dijo el usuario. Las 31 landraces se quedan como están y la ampliación va entera por descendencia. Tampoco se
+añaden cruces comerciales nuevos: su linaje publicado no se pudo comprobar en fuentes desde esta sesión (los dominios
+de consulta no están permitidos) y el proyecto prohíbe inventar genética, así que no se mete ninguno a ciegas.
 
-## 3. Cortes reales con nombre propio (10) — se *seleccionan*, no se compran
+## 3. Qué se tocó
 
-Son fenotipos concretos de variedades que ya están en el juego: salen al seleccionar una madre buena de esa
-variedad, con su nombre y sus números fijos. Ninguna se vende en tienda.
+- `tools/descendencia.py` → `DESC` y `GENETICA.ibl` en `godot/datos/datos.json`, sin mover ni un número de los 104.
+- `godot/src/descend.gd` (nuevo): toda la lógica, estática y sin estado propio (`cortes`, `corte_pon`, `corte_desc`,
+  `clones`, `s1`, `bx`, `ibl`, `es_ibl`).
+- `godot/src/cultivo.gd`: `tipo_gen` devuelve `ibl` para la línea fijada a conciencia.
+- `godot/src/nave.gd`: `madre_ops` guarda el corte, `madre_de_corte` mete la madre desde uno guardado y `madre_txt`
+  la llama por su nombre propio.
+- `godot/src/granja.gd`: `clones_ya` y `clones_cruce`, con el gesto de polinizar, en el carro.
+- `godot/src/bancotia.gd`: `bt_desc`, `bt_s1`, `bt_bx` y `bt_ibl` como tercer trabajo del laboratorio.
+- `godot/src/menus.gd`: cinco vías más en el RECETARIO de la CannaDex, que no listan variedades porque las fabricas tú.
+- Pruebas: `tests/descendencia.gd` (57, nueva), `tests/cortes.gd` (33, nueva) y `tests/cannadex.gd` (56, con las vías).
 
-| id | Nombre | De qué variedad sale | Qué fija |
-|---|---|---|---|
-| `chem91` | Chemdawg '91 | `chemdawg` | THC alto, olor a gasolina, porte largo |
-| `chemd` | Chemdawg D | `chemdawg` | más rendimiento, menos olor |
-| `sourecsd` | Sour Diesel (corte del este) | `dragon` | floración larga, sativa |
-| `exoduscheese` | Cheese (corte Exodus) | `cheese` | aroma único, +resina |
-| `hazea` | Haze A | `haze` | 16 semanas, sativa pura |
-| `hazec` | Haze C | `haze` | más corta, más resinosa |
-| `blueberrydj` | Blueberry (selección del criador) | `niebla` | tono morado, dulce |
-| `ghostog` | Ghost OG | `afkush` | resinosa, sensible al moho |
-| `sfvog` | SFV OG | `afkush` | compacta, potente |
-| `skunkrk` | Skunk #1 (selección olorosa) | `ria` | olor máximo, calor de calle ×1,5 |
+## 4. Estado en la partida
 
-## 4. Cruces clásicos con linaje publicado (18)
+- `S.cortes` = `[{k: variedad, f: fenotipo, n: nombre, dia}]`, hasta 4.
+- `S.ibl` = `{variedad: selecciones hechas}`; es IBL con `DESC.ibl.sel`.
+- `S.s1` = `{variedad: autofecundaciones}`, con tope `DESC.s1.tope`; `S.clonx` = el día del último cruce en el carro;
+  `S.nave.ctd` = el día de la última madre metida desde un corte.
+- El BX vive en `S.custom` como cualquier híbrido propio, con `bx` (su número) y `bxh` (de qué híbrido salió), y clave
+  `"b" + b36(hash)` para no pisar la del cruce normal de los mismos dos.
+- Una madre metida desde un corte lleva `ct` con su nombre.
+- Nada de esto necesita migración: las partidas viejas entran sin cortes y sin líneas IBL.
 
-| id | Nombre | Linaje | % índica |
-|---|---|---|---|
-| `ogkush` | OG Kush | Chemdawg × (Hindu Kush × Lemon Thai) | 55 |
-| `bubba` | Bubba Kush | OG Kush × Afghani ≈ | 85 |
-| `girlscout` | Cookies | OG Kush × Durban Poison | 60 |
-| `sunset` | Sunset Sherbet | Cookies × Pink Panties ≈ | 70 |
-| `gelato` | Gelato | Sunset Sherbet × Thin Mint Cookies | 65 |
-| `wedding` | Wedding Cake | Cherry Pie × Cookies | 70 |
-| `zkittlez` | Zkittlez | Grape Ape × Grapefruit | 65 |
-| `gg4` | Original Glue | Chem's Sister × Sour Dubb × Chocolate Diesel | 55 |
-| `bruce` | Bruce Banner | OG Kush × Strawberry Diesel | 40 |
-| `strawberry` | Strawberry Cough | Strawberry Fields × Haze | 20 |
-| `granddaddy` | Granddaddy Purple | Purple Urkle × Big Bud | 85 |
-| `cherrypie` | Cherry Pie | Granddaddy Purple × Durban Poison | 55 |
-| `durbthai` | Durban × Thai | `durban` × `thai` | 0 |
-| `mazarnl` | Mazar × Northern Lights | `mazar` × `nl` | 95 |
-| `kerahaze` | Kerala × Haze | `kerala` × `haze` | 10 |
-| `transkush` | Transkei × Hindu Kush | `transkei` × `hindu` | 50 |
-| `swazihaze` | Swazi × Haze | `swazi` × `haze` | 10 |
-| `acapulcoskunk` | Acapulco × Skunk | `acapulco` × `ria` | 35 |
+## 5. Lo que no se hace
 
-Los seis últimos son **recetas** que se hacen con las landraces nuevas: dan motivo para cazarlas.
-
-## 5. Dónde toca
-
-- `tools/strains_mas.py` → al final de `STRAINS`, `LANDRACES`, `RECIPES`, `DEX` y `FAMILIAS`, **sin mover ni un
-  número de los 104 de ahora** (los guardados viejos siguen valiendo).
-- `src/cultivo.gd`: `S.cortes`, `corte_pon`/`corte_de`, el S1, el BX y el paso a IBL en la F5.
-- `src/granja.gd`: POLINIZAR ENTRE CLONES en la mesa de cruces con dos esquejes.
-- `src/bancotia.gd`: el laboratorio hace el S1 y el BX.
-- `src/menus.gd`: el RECETARIO de la CannaDex, con las vías nuevas (corte, S1, BX, IBL).
-- `tools/caza.py`: las ocho landraces que se cazan.
-- Pruebas: `tests/cannadex.gd` (150 y el árbol coherente), `tests/cortes.gd` (nueva), `tests/descendencia.gd`
-  (nueva: S1, BX1, BX2, IBL), `tests/caza.gd`.
-
-## 6. Lo que no se hace
-
-- Ni un nombre inventado, ni criadores, ni bancos, ni lemas: los cortes se llaman por lo que son.
-- Nada de método, dosis, concentraciones ni reactivos: el laboratorio sigue sin explicar cómo.
+- Ni un nombre inventado, ni criadores, ni bancos, ni lemas.
+- Nada de método, dosis, concentraciones ni reactivos.
 - El árbol de generaciones no gana una generación nueva por el S1 ni por el BX: son la misma línea, más fijada.

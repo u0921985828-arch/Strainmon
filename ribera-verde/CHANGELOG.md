@@ -2,6 +2,41 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Más descendencias, no más landraces (lo pidió el usuario: «más que más landraces me refería a meter más descendencias no más landraces»; solo Godot, con `Datos.CAL`)
+
+- **Cinco vías nuevas, ningún nombre de fuera.** El catálogo sigue en 104 variedades: lo que se amplía son las maneras
+  de sacar variedad de lo que ya cultivas, de modo que cada partida acaba con genética propia que no está en ninguna
+  lista. `tools/descendencia.py` → `DESC` y `GENETICA.ibl` en `datos/datos.json`, sin mover ni un número de los 104;
+  toda la lógica en `godot/src/descend.gd`, estática y sin estado propio.
+- **Corte de madre.** En el armario de las madres, GUARDAR ESTE CORTE apunta el fenotipo exacto de esa madre con nombre
+  propio («Skunk #1 · corte 1») y la madre pasa a llamarse así en la vista. De ahí en adelante se mete madre DE UN CORTE
+  GUARDADO, el corte no se gasta y cada esqueje sale idéntico: mismo THC, mismo porte, mismas rarezas. Hasta
+  `DESC.corte.tope` (4) cortes a la vez (`S.cortes`, `corte_pon`, `corte_desc`, `madre_de_corte`). La madre que entra de
+  un corte no sale hecha: viene a `DESC.corte.v` (55) % de vigor y solo una al día (`S.nave.ctd`), para que el corte no
+  sea un repuesto gratis de la carpa de las madres.
+- **Polinizar entre clones.** En un taco vacío del carro de esquejes, con dos esquejes pinchados de variedades
+  distintas, uno hace de madre y otro de padre: `DESC.clon.sem` (3) semillas F1 y las dos líneas siguen vivas en el
+  armario, así que no se pierde ninguna al cosechar. El cruce gasta los dos esquejes y solo cuaja uno cada
+  `DESC.clon.dias` (1 día, `S.clonx`, `clones_espera`), de modo que no sale más barato que la mesa de cruces. Pasa por el
+  filtro de la triploide como la mesa (`clones_ya`, `clones_cruce` en `granja.gd`).
+- **S1, BX e IBL en el laboratorio de la tía.** Tercer trabajo de la cabina, TRABAJAR UNA LÍNEA TUYA, con las siete
+  normas de siempre y sus días de ocupación (`DESC.<vía>.dias`: 3 el S1, 2 el BX y el IBL): **autofecundar** (gasta 2
+  semillas y da 2, así que no multiplica; tope `DESC.s1.tope` de 2 por línea, `S.s1`; +2 en los cuatro genes de la
+  línea y un nivel más de fijación en sus rarezas; no gana generación, es la misma línea más fijada), **retrocruzar con
+  la madre** (variedad nueva con clave propia `"b" + b36(hash)` para no pisar la del cruce normal, nombre «<madre> BX1»,
+  «BX2»…, numerado por madre para que ningún nombre se repita, y un 75-88 % de esa madre) y **fijar la línea** (dos selecciones seguidas de una línea ya en F4: pasa al tipo
+  genético `ibl`, la sigma más baja de las ocho, y sus genes no bajan de 26). `bt_desc`, `bt_s1`, `bt_bx`, `bt_ibl`.
+- **El recetario de la CannaDex**, con cinco vías más que no listan variedades porque las fabricas tú: el corte, el
+  cruce entre clones, el S1, el BX y la IBL, cada una con lo que hay que hacer para sacarla (`dex_vias`, clave `mio`).
+- **Ni landraces ni cruces comerciales nuevos.** Lo dijo el usuario para las landraces; los cruces con linaje publicado
+  se quedan fuera porque su linaje no se pudo comprobar en fuentes desde esta sesión y el proyecto prohíbe inventar
+  genética. Nada de método, dosis ni reactivos, como en la tetraploidia. Estudio en `docs/GENETICAS-AMPLIACION.md`.
+- **Revisión por ataque**, con lo que salió de ella arreglado: el cruce entre clones ya no es gratis ni ilimitado, el S1
+  no multiplica semillas ni lleva una línea al tope sin coste, la madre de un corte no repone la carpa de balde, el
+  nombre de un BX no se repite, «Nada» en el taco vacío ya no pincha los esquejes igual y los días del laboratorio se
+  leen de `dias` y no del campo de las semillas (`DESC.lab`, que no se usaba, fuera).
+- Pruebas: `tests/descendencia.gd` (57, nueva), `tests/cortes.gd` (33, nueva), `tests/cannadex.gd` (56, con las vías).
+
 ### Una partida con todo al máximo (lo pidió el usuario: «mandame una partida actualizada con todo al máximo todo comprado y todo lo mejor»; solo Godot, con `Datos.CAL`)
 
 - **La APK, firmada.** `bundletool build-apks --mode=universal` sin `--ks` no firma nada, así que el APK universal de

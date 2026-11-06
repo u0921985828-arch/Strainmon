@@ -321,6 +321,10 @@ static func tipo_gen(S: Dictionary, sid: String) -> String:
 	var g := gen_de(S, sid)
 	if g < D.GEN_ESTABLE:
 		return "F%d" % g
+	# descendencias: la línea fijada a conciencia (IBL, src/descend.gd) deja de variar de planta a planta (GENETICA.ibl).
+	# Se lee aquí a mano, sin preload, porque descend.gd ya depende de este archivo
+	if Datos.CAL and D.has("DESC") and D.GENETICA.has("ibl") and int(S.get("ibl", {}).get(sid, 0)) >= int(D.DESC.ibl.sel):   # i18n-no
+		return "ibl"
 	if D.STRAINS.has(sid):
 		return D.STRAINS[sid].tipo
 	return "estable"

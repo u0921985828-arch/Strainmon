@@ -209,7 +209,37 @@ s3fb379b5,Fijar una línea,Fix a line
 s44344f6e,"Una semilla, el microscopio y la cabina: la línea sube una generación.","One seed, the microscope and the hood: the line goes up a generation."
 sb871f1bb,Doblar los cromosomas,Double the chromosomes
 sa03fe5ec,Con el reactivo del armario de tóxicos. Te quedan {n} usos del frasco.,With the reagent from the toxics cabinet. You have {n} uses left in the bottle.
+s50b6a27b,Trabajar una línea tuya,Work on a line of your own
+s79d5c073,"Autofecundarla, retrocruzarla con su madre o fijarla a conciencia.","Self it, backcross it to its mother or fix it for good."
 s501e5d21,EL LABORATORIO,THE LAB
+sc291ad65,Autofecundar (S1),Self the line (S1)
+se87d3df7,"Una línea consigo misma: sube sus genes y fija lo raro que tenga. Gastas {g} semillas y salen {n}; {t} por línea, y el laboratorio queda {d} días.","A line with itself: it raises its genes and locks in whatever is rare about it. You spend {g} seeds and get {n}; {t} per line, and the lab is busy for {d} days."
+scf5c7482,Retrocruzar con la madre (BX),Backcross to the mother (BX)
+sf3b24ff6,"Un híbrido tuyo con una de sus dos parentales: lo que sale tira a esa madre. Variedad nueva, con su número de retrocruce; el laboratorio queda {d} días.","One of your hybrids with one of its two parents: what comes out leans to that mother. A new strain, with its backcross number; the lab is busy for {d} days."
+s9d0f6d66,Fijar la línea (IBL),Fix the line (IBL)
+s781ecf8d,Seleccionar {n} veces seguidas una línea ya fijada: deja de variar de planta a planta. Cada selección deja el laboratorio {d} días.,Select an already stable line {n} times running: it stops varying from plant to plant. Each selection keeps the lab busy for {d} days.
+s0506e426,"Aquí se trabaja sobre lo tuyo: hacen falta semillas de una línea tuya, o un híbrido propio con una de sus parentales.","This bench works on your own stuff: you need seeds of a line of yours, or one of your hybrids plus one of its parents."
+s2b5e2e12,UNA LÍNEA TUYA,A LINE OF YOUR OWN
+s4117500b,AUTOFECUNDAR (S1),SELF THE LINE (S1)
+s1c722f07,¿Autofecundar la {s}? Gastas {g} semillas y salen {n}.,Self the {s}? You spend {g} seeds and get {n}.
+s058cd9d9,Autofecundar,Self it
+s8c454102,Cancelar,Cancel
+safa395f7,"{n} semillas S1 de {s}. La línea no sube de generación: es la misma, más fijada.","{n} S1 seeds of {s}. The line gains no generation: it is the same line, better fixed."
+sc5372ce5,Te queda {n} autofecundación de esta línea.,You have {n} selfing left on this line.
+s4d8e4936,Te quedan {n} de esta línea.,You have {n} left on this line.
+sc70a967c,"De esta línea, ya no saca más el S1.",S1 gets nothing more out of this line.
+sa1451be9,de {s},from {s}
+sf023f4c6,"Retrocruzas {h} con {m}, una de sus dos parentales: lo que sale tira a {m}.","You backcross {h} to {m}, one of its two parents: what comes out leans to {m}."
+s0563264f,RETROCRUZAR (BX),BACKCROSS (BX)
+sea6c38cc,{a} y {b} no tienen los mismos juegos de cromosomas: lo que salga de ahí no cuaja semilla.,{a} and {b} do not have the same sets of chromosomes: nothing out of that cross will set seed.
+se1fd2380,¿Retrocruzar {h} con {m}? Gastas {g} semilla de cada.,Backcross {h} with {m}? You spend {g} seed of each.
+s88471b80,Retrocruzar,Backcross
+se8e82fdb,Sale {s}: un {m} % de {ma}. {n} semillas.,Out comes {s}: {m} % {ma}. {n} seeds.
+s746586b4,FIJAR LA LÍNEA (IBL),FIX THE LINE (IBL)
+sdf723ac5,¿Seleccionar la {s}? Gastas {g} semilla y te quedan {n} selecciones para fijarla.,Select the {s}? You spend {g} seed and need {n} more selections to fix it.
+sdcb46cab,Seleccionar,Select
+s1df17a04,"{s} queda fijada: línea IBL. De aquí en adelante, ni una planta se sale de la madre.","{s} is fixed now: an IBL line. From here on, not one plant strays from the mother."
+s607978fa,{n} semillas seleccionadas de {s}. Te queda {f} selección para fijarla.,{n} selected seeds of {s}. You have {f} selection left to fix it.
 se3a3dbbc,En el laboratorio se fija una línea con una sola semilla. Ahora no tienes ninguna sin fijar.,In the lab a line is fixed with a single seed. Right now you have none that isn't fixed.
 sb8f50fdc,Cada generación es una cosecha: cultiva la línea y vuelve con lo cosechado.,Each generation is a harvest: grow the line and come back with what you harvested.
 sf3272e36,{n} semillas,{n} seeds
@@ -218,7 +248,6 @@ sbc85109c,Se tira la semilla tetraploide de esta línea y vuelve a ser normal.,T
 s8575391e,DESCARTAR UNA LÍNEA,DROP A LINE
 s406737a1,¿Descartar la línea tetraploide de {s}? Se tiran sus {n} semillas y la línea vuelve a la normal.,Drop the tetraploid line of {s}? Its {n} seeds are thrown away and the line goes back to normal.
 s5aede3a8,Descartar,Drop it
-s8c454102,Cancelar,Cancel
 sdbedd5d3,Fuera la etiqueta y fuera la semilla. {s} vuelve a ser la de siempre: cruza con cualquiera.,"Label off, seed out. {s} is the usual one again: it crosses with anything."
 scf95e318,Tratar una línea nueva.,Treat a new line.
 s2c266351,Descartar una línea,Drop a line
@@ -897,6 +926,10 @@ sdfe183b0,DÍA {n},DAY {n}
 s3025a282,"{s}, {d} de {m} de {y}","{s}, {m} {d}, {y}"
 s3975ba9b,Cruce,Cross
 s73b5d253,{a} × {b} · híbrido propio,{a} × {b} · own hybrid
+sed0d9b7e,Corte de {s} · THC {t} % · {i} % índica.,{s} cut · THC {t} % · {i} % indica.
+sf290d1f5,Lleva: {l}.,It carries: {l}.
+s1ddc45d8,Cada esqueje sale igual.,Every cutting comes out the same.
+s8edc6701,{a} × {b} · retrocruce propio,{a} × {b} · your own backcross
 s2810388d,{n} MIN,{n} MIN
 s0fb757dd,plazo de Don Baltasar ({e}),Don Baltasar's deadline ({e})
 sdae1bf29,recibo de {n},{n} bill
@@ -1607,12 +1640,23 @@ s7559672f,"Llega el mensajero con {l}. En la calle vas montado; con B, aún más
 s68333ecd,Llega el mensajero con {l}: te lo dejan montado en casa.,The courier brings {l}: they leave it set up in the flat.
 sbd6768e3,Llega el mensajero con {l}: te lo dejan montado en el salón.,The courier brings {l}: they leave it set up in the living room.
 s843dd04a,Kiko te sube {l} y te lo deja montado delante de las carpas.,Kiko brings up {l} and sets it up in front of the tents.
+sbb775950,Taco vacío. ¿Qué haces?,Empty plug. What do you do?
+s22c304b4,Pinchar esquejes del propagador,Stick cuttings from the propagator
+scfb1f128,Polinizar entre clones,Pollinate between clones
 se8331c4e,Taco vacío. Saca esquejes de una madre en vegetativo y pínchalos aquí.,Empty plug. Take cuttings from a mother in veg and stick them here.
 s231daa79,"En la tabla de corte, corte en bisel y hormona: pinchas {n} esquejes.","On the cutting board, a bevel cut and hormone: you stick {n} cuttings."
 se0559159,"En la tabla de corte, corte en bisel y hormona: pinchas 1 esqueje.","On the cutting board, a bevel cut and hormone: you stick 1 cutting."
 s56ecf810,En las bandejas aguantan hasta el {d}: plántalos cuando haya hueco.,In the trays they last until {d}: plant them when there's room.
 sdf228ef3,No caben {n}: se quedan en el propagador.,{n} don't fit: they stay in the propagator.
 s4e66a2bd,No cabe 1: se queda en el propagador.,1 doesn't fit: it stays in the propagator.
+s1debdae2,El polen de la última polinización todavía está cuajando: vuelve el {d}.,The pollen from the last cross is still setting: come back on {d}.
+sa8ffeeda,ENTRE CLONES · MADRE,BETWEEN CLONES · MOTHER
+s6bdb19cf,Para polinizar entre clones te hacen falta dos esquejes de variedades distintas.,To pollinate between clones you need two cuttings of different strains.
+s308fbde9,ENTRE CLONES · PADRE,BETWEEN CLONES · FATHER
+sfc61567e,"¿Polinizar el clon de {a} con el polen del clon de {b}? Gastas los dos esquejes; las madres siguen en el armario, así que la línea no se pierde.","Pollinate the {a} clone with pollen from the {b} clone? You spend both cuttings; the mothers stay in the tent, so neither line is lost."
+s05da4919,Polinizar,Pollinate
+s05fbc5aa,Nueva variedad: {s}.,New strain: {s}.
+sdd4187c0,"{n} semillas de {s}, de madre y padre clonados. Los dos esquejes se han quedado en el cruce; el siguiente, el {d}.","{n} seeds of {s}, from a cloned mother and father. Both cuttings went into the cross; the next one, on {d}."
 sbbfe3c20, · pedida, · ordered
 sd5627c68,Los pedidos llegan mañana por la mañana.,Orders arrive tomorrow morning.
 s5c1109d1,BANCO DE SEMILLAS,SEED BANK
@@ -1655,7 +1699,6 @@ sac4b5e76,CRUCE · PADRE,CROSS · FATHER
 sb62b6ee8,{a} y {b} no tienen los mismos juegos de cromosomas: lo que salga de ahí no cuaja semilla. Una tetraploide solo cruza con otra tetraploide.,{a} and {b} don't have the same sets of chromosomes: nothing out of that will set seed. A tetraploid only crosses with another tetraploid.
 s82bdee73,¿Cruzar {a} × {b}? Gastas 1 semilla de cada.,Cross {a} × {b}? You use 1 seed of each.
 s7c769d10,Cruzar,Cross
-s05fbc5aa,Nueva variedad: {s}.,New strain: {s}.
 s483ebe0d,"THC {t}% · ~{g} g/m² · {d} días.
 Obtienes 2 semillas F1: la línea aún no es estable.","THC {t}% · ~{g} g/m² · {d} days.
 You get 2 F1 seeds: the line isn't stable yet."
@@ -2234,6 +2277,7 @@ s4c0d720d,"Una por persona y por partida: hay que pillarla en su estación, con 
 sc7c9a187,"Las colecciones del cuarto de atrás de la asociación: se entregan, no se consiguen ahí.","The collections in the back room of the association: you hand them in, you do not get them there."
 s8638e7e6,AUTOFLORECIENTES,AUTOFLOWERING
 s292cf244,Florecen por edad: ni madres ni esquejes. Se cruzan con la Ruderalis.,"They flower by age: no mother plants, no cuttings. They are crossed with Ruderalis."
+s536bd11d,tuya,yours
 s23febe9e,faltan {n},{n} missing
 se42fc180,De esta vía ya las tienes todas.,You already have every one from this route.
 s3ef6b79a,Solo las que me faltan,Only the ones I am missing
@@ -2924,14 +2968,22 @@ s8175cf60,Con una semilla o un esqueje: la madre de una genética que quieras gu
 s6886b354,LAS MADRES,THE MOTHERS
 s363222a2,Las cuida {n},{n} tends them
 s768d9eaf,Nadie las cuida,Nobody tends them
+s5b309990,¿De dónde sale la madre?,Where does the mother come from?
+s921fe47a,De un corte guardado,From a saved cut
+s2c6256d8,De una planta tuya,From a plant of yours
 scc9bb486,¿QUÉ MADRE METES?,WHICH MOTHER?
 s104f8132,La {nom} es autofloreciente: florece por la edad y no se queda de madre. Sus esquejes florecerían enanos.,{nom} is an autoflower: it blooms by age and won't stay a mother. Its cuttings would flower as dwarfs.
 scdd66c2d,"La {nom}{et}, a la carpa de las madres: a 18/6, siempre en crecimiento.","{nom}{et} goes into the mother tent: 18/6, always in veg."
 s3a05438e,{n} se encarga.,{n} takes care of it.
 sd589b982,"Sin nadie que la cuide, se va apagando: pon a alguien de tu plantilla en las madres.","With nobody tending it, it fades: put someone from your crew on the mothers."
+s152ead24,Un corte al día: el esqueje que has sacado hoy todavía está enraizando. Mañana.,One cutting a day: the one you took today is still rooting. Tomorrow.
+s5481c326,LOS CORTES,THE CUTS
+sf9a692a2,"{n}, a la carpa de las madres: el mismo corte de siempre, los mismos números.","{n}, into the mother tent: the same old cut, the same numbers."
+s58eec4fa,"Entra recién enraizada, a {v} % de vigor: hay que criarla antes de sacarle esquejes.","She comes in freshly rooted, at {v} % vigour: you have to grow her out before taking cuttings."
 s0ab20584,Recoger {n} esquejes,Take {n} cuttings
 sbdc1d3db,Recoger {n} esqueje,Take {n} cutting
 sf59d04da,Cortarle esquejes,Take cuttings from her
+s0959c521,Guardar este corte,Save this cut
 s4645921d,Quitarla,Remove it
 s87ea97ed,Madre {j}: {m} · vigor {v} %.,Mother {j}: {m} · vigour {v} %.
 s5a0beafd,{n} le saca esquejes cada mañana.,{n} takes cuttings every morning.
@@ -2941,6 +2993,8 @@ sf87e2ca4,"{q} esquejes de la {m}, al propagador. Plántalos antes del {f}.",{q}
 s7d7625b1,"Un esqueje de la {m}, al propagador. Plántalos antes del {f}.",One cutting of {m} into the propagator. Plant it before {f}.
 s2b4d9ada,"Le cortas {q} esquejes a la {m}, al propagador. Plántalos antes del {f}. Mañana, más.","You take {q} cuttings from the {m}, into the propagator. Plant them before {f}. More tomorrow."
 s90806ff2,"Le cortas un esqueje a la {m}, al propagador. Plántalo antes del {f}. Mañana, más.","You take a cutting from the {m}, into the propagator. Plant it before {f}. More tomorrow."
+s174b1352,No caben más cortes: llevas {n}. Tira uno antes.,No room for more cuts: you keep {n}. Drop one first.
+s6a8b45e7,"Apuntas el corte: «{n}». Sus esquejes saldrán siempre así, con estos mismos números.","You write the cut down: “{n}”. Its cuttings will always come out like this, with these same numbers."
 s0ae5ac8e,¿Quitas la madre de {m}? Se tira.,Remove the {m} mother? It gets binned.
 s363a12a4,Las cuida {n}.,{n} looks after them.
 s48cbd1a5,Nadie las cuida.,Nobody looks after them.
@@ -4786,6 +4840,8 @@ s4776cdea,"línea inestable, ya seleccionada. Estabilízala en la mesa","unstabl
 s2753cd1c,población silvestre de su región: plantas variadas,wild population from its region: varied plants
 s5dbe7f4b,Polihíbrido,Polyhybrid
 s7e16e974,cruce de cruces: cada planta sale distinta,cross of crosses: every plant comes out different
+sa0c4bfd9,Línea fijada (IBL),Fixed line (IBL)
+s90928535,fijada a conciencia: dos selecciones seguidas y ni una planta se sale de la madre,fixed for good: two selections in a row and not one plant strays from the mother
 s746b7932,Armario 60×60,Cabinet 60×60
 sd0e235cc,Armario 80×80,Cabinet 80×80
 s02eb3bb1,Carpa 100×100,Tent 100×100
@@ -7518,6 +7574,19 @@ s0bb41950,"Hace falta la llave del cuarto de atrás, la de la lata del cuaderno 
 s924b7a6a,"KAIA, con las obras hechas","KAIA, with the work done"
 s04460ff9,"La reforma del muelle pagada y KAIA abierto con su dispensario, sin esperar a la cuadrilla.","The quay refurbishment paid for and KAIA open with its dispensary, without waiting for the crew."
 s84f98330,"Hace falta el muelle de Puerto Viejo, del capítulo ocho.",
+sf1e1d1fb,Corte de madre,Mother cut
+sb9f7ab51,Guardas esta planta como madre con nombre propio: cada esqueje suyo sale exactamente igual que ella.,You keep this plant as a mother with a name of its own: every cutting off it comes out exactly like her.
+see51df29,{s} · corte {n},{s} · cut {n}
+s15a0b952,Corte de una madre tuya,A cut off a mother of yours
+s5e0cf691,Dos esquejes pinchados en el carro: uno da el polen y el otro la semilla. Gastas los dos y las madres siguen vivas.,"Two cuttings stuck in the cart: one gives the pollen, the other the seed. You spend both and the mothers stay alive."
+s2cde71a8,Cruce entre clones,Cross between clones
+sf9309ec6,Autofecundación (S1),Selfing (S1)
+s80d0cbea,La línea consigo misma: no entra nada de fuera. Sale más parecida a la madre y con sus rasgos más fijados.,The line with itself: nothing comes in from outside. What comes out is closer to the mother and its traits better fixed.
+s8d796189,Retrocruce (BX),Backcross (BX)
+sd01e9a48,"Cruzas el hijo con su propia madre: lo que salga se parece mucho más a ella, y a la segunda vuelta, casi del todo.","You cross the offspring back to its own mother: what comes out looks far more like her, and on the second round, almost exactly."
+s67c61760,BX{n},BX{n}
+sb4c59846,Dos selecciones seguidas de la misma línea estable: queda fijada del todo y todas sus plantas salen iguales.,Two selections in a row of the same stable line: it ends up fully fixed and all its plants come out alike.
+s3d2f4f61,IBL,IBL
 sc9a9aa06,"La prensa: calor y presión sobre la flor, entre papel de horno.","The press: heat and pressure on the flower, between baking paper."
 s4da4f5d2,"Los tamices, del más grueso al más fino: la flor seca se sacude con suavidad.","The screens, coarsest to finest: dry flower, shaken gently."
 s75a3df0a,El tamiz grueso: fuera el polvo verde y los trozos.,The coarse screen: out with the green dust and bits.
@@ -7549,6 +7618,15 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+sbb5dd7a5,Una línea consigo misma: sube sus genes y fija lo raro que tenga. Gastas 1 semilla y salen {n}.,A line crossed with itself: its genes go up and whatever it carries gets fixed. Costs 1 seed and gives {n}.
+s13612e61,"Un híbrido tuyo con una de sus dos parentales: lo que sale tira a esa madre. Variedad nueva, con su número de retrocruce.","One of your hybrids with one of its two parents: what comes out leans to that mother. A new strain, with its backcross number."
+sb9912629,Seleccionar {n} veces seguidas una línea ya fijada: deja de variar de planta a planta.,Select an already stable line {n} times in a row: it stops varying from plant to plant.
+scdf3b527,¿Autofecundar la {s}? Gastas 1 semilla.,Self the {s}? Costs 1 seed.
+s8ea5f3bb,¿Retrocruzar {h} con {m}? Gastas 1 semilla de cada.,Backcross {h} to {m}? Costs 1 seed of each.
+scdc740e3,¿Seleccionar la {s}? Gastas 1 semilla y te quedan {n} selecciones para fijarla.,Select the {s}? Costs 1 seed and you have {n} selections left to fix it.
+s1318c2fd,¿Polinizar el clon de {a} con el polen del clon de {b}? Las dos madres siguen en el armario: la línea no se pierde.,Pollinate the {a} clone with pollen from the {b} clone? Both mothers stay in the cabinet: neither line is lost.
+s89d2a45e,"{n} semillas de {s}, de madre y padre clonados: puedes repetir el cruce cuando quieras.","{n} seeds of {s}, from a cloned mother and father: you can repeat the cross whenever you like."
+sf34396f9,Dos esquejes pinchados en el carro: uno da el polen y el otro la semilla. Las dos madres siguen vivas.,Two cuttings stuck in the cart: one gives the pollen and the other the seed. Both mothers stay alive.
 s2be5c85d,"¿Tratar {s}? Gastas 2 semillas y un uso del frasco. Si cuaja, la línea pasa a tetraploide: más THC y menos cosecha, y ya no cruza con una normal.","Treat {s}? You use 2 seeds and one use of the bottle. If it takes, the line turns tetraploid: more THC and less yield, and it no longer crosses with a normal one."
 s0ac9a299,"Grapado a esta página, como siempre, el sobre del mes: tres semillas de la variedad de la que habla la página de al lado.","Stapled to this page, as always, the envelope of the month: three seeds of the strain the facing page is about."
 s8e81deb6,Edita la Federación de Clubs de la Comarca · Redacción en el Ensanche,Published by the Federation of Clubs of the County · Newsroom in the Ensanche

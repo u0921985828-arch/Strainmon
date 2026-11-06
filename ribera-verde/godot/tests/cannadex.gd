@@ -215,8 +215,17 @@ func _corre() -> void:
 	var vk: Array = V.map(func(x): return String(x.k))
 	chk(vk.has("kiko") and vk.has("banco") and vk.has("receta") and vk.has("tia") and vk.has("caza") and vk.has("bancotia"),
 		"las vías: growshop, banco del PC, receta, la tía, la gente y el banco de la tía (%s)" % [vk])
+	# descendencias (lo pidió el usuario): cinco vías más que no listan variedades, porque las fabricas con tus plantas
+	chk(vk.has("d-corte") and vk.has("d-clon") and vk.has("d-s1") and vk.has("d-bx") and vk.has("d-ibl"),
+		"las vías de descendencia: corte, entre clones, S1, BX e IBL (%s)" % [vk])
+	for vv in V:
+		if vv.get("mio"):
+			chk(vv.ks.is_empty() and String(vv.n) == String(vv.n).to_upper(), "la vía %s no lista variedades" % vv.k)
+			chk(String(vv.d).length() > 20, "la vía %s explica cómo se saca" % vv.k)
 	var sueltas := 0   # cada vía, variedades de verdad y en el orden de la CannaDex
 	for vv in V:
+		if vv.get("mio"):
+			continue
 		var prev := -1
 		for k in vv.ks:
 			if not D.STRAINS.has(k) or not (k in DEX):
@@ -231,6 +240,8 @@ func _corre() -> void:
 	chk(sueltas == 0, "las vías: variedades de DEX, en su orden y sin repetir (%d mal)" % sueltas)
 	var tap := {}   # entre todas, cubren cada variedad que se consigue
 	for vv in V:
+		if vv.get("mio"):
+			continue
 		for k in vv.ks:
 			tap[k] = 1
 	chk(tap.size() >= DEX.size() - 2, "las vías cubren casi toda la CannaDex (%d de %d)" % [tap.size(), DEX.size()])
@@ -264,11 +275,15 @@ func _corre() -> void:
 	chk(mf.size() == 2, "el filtro vuelve al recetario (%d pantallas)" % mf.size())
 	if mf.size() == 2:
 		chk(String(mf[0][3][V.size()]) == "no" and String(mf[1][3][V.size()]) == "sí", "el filtro se marca (%s → %s)" % [mf[0][3][V.size()], mf[1][3][V.size()]])
-		var bien := 0   # con el filtro, cada vía dice lo que le falta
+		var bien := 0   # con el filtro, cada vía dice lo que le falta (las de descendencia no cuentan variedades)
+		var cuenta := 0
 		for j in V.size():
+			if V[j].get("mio"):
+				continue
+			cuenta += 1
 			if String(mf[1][3][j]).begins_with("faltan"):
 				bien += 1
-		chk(bien == V.size(), "con el filtro, cada vía dice «faltan N» (%d de %d)" % [bien, V.size()])
+		chk(bien == cuenta, "con el filtro, cada vía dice «faltan N» (%d de %d)" % [bien, cuenta])
 
 	# 7 · el ordenador: CannaDex
 	PILOTO = ["CannaDex", "Volver"]
