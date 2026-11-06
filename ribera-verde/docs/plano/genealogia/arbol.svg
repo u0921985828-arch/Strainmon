@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1578 1418" width="1578" height="1418" role="img" aria-labelledby="t a">
+<title id="t">Landrace Hunters · árbol genealógico de las 104 variedades</title>
+<desc id="a">De izquierda a derecha, por generaciones: las landraces en la primera columna y cada cruce a la derecha de sus padres. El color dice el porte: verde claro sativa, medio híbrida, oscuro índica.</desc>
+<style>
+ .bg{fill:#12170f}
+ text{font-family:"DejaVu Sans",sans-serif;fill:#eaf3e0}
+ .cap{font-size:13px;font-weight:700;fill:#9fbf78;letter-spacing:.08em}
+ .n text{font-size:11px;dominant-baseline:middle}
+ .n rect{stroke:#0a0d08;stroke-width:1;rx:5;ry:5}
+ .ind-s rect{fill:#4e7a2e} .ind-h rect{fill:#3c6b3a} .ind-i rect{fill:#2d4a33}
+ .land rect{stroke:#d8c070;stroke-width:1.6}
+ .auto rect{stroke:#7fb4d8;stroke-width:1.6;stroke-dasharray:4 2}
+ .e{fill:none;stroke:#6f8c57;stroke-width:1.1;opacity:.55}
+ .e.land{stroke:#b9a75e;opacity:.7}
+ .leg text{font-size:11px;fill:#b7cf95}
+ .leg rect{rx:4;ry:4;stroke:#0a0d08}
+ .leg .land rect{fill:#3c6b3a;stroke:#d8c070;stroke-width:1.6}
+ .leg .auto rect{fill:#3c6b3a;stroke:#7fb4d8;stroke-width:1.6;stroke-dasharray:3 2}
+</style>
+<rect class="bg" width="100%" height="100%"/>
+<g class="capas">
+  <text class="cap" x="28" y="34">ORIGEN · sin receta · 38</text>
+  <text class="cap" x="296" y="34">1.ª generación · 16</text>
+  <text class="cap" x="564" y="34">2.ª generación · 21</text>
+  <text class="cap" x="832" y="34">3.ª generación · 19</text>
+  <text class="cap" x="1100" y="34">4.ª generación · 10</text>
+</g>
+<g class="aristas" aria-hidden="true">
+  <path class="e land" data-de="acapulco" data-a="ria" d="M210.0 89.0 C253.0 89.0 253.0 599.0 296.0 599.0"/>
+  <path class="e land" data-de="colgold" data-a="ria" d="M210.0 157.0 C253.0 157.0 253.0 599.0 296.0 599.0"/>
+  <path class="e land" data-de="rif" data-a="ria" d="M210.0 1279.0 C253.0 1279.0 253.0 599.0 296.0 599.0"/>
+  <path class="e" data-de="citrus" data-a="limon" d="M210.0 871.0 C521.0 871.0 521.0 854.0 832.0 854.0"/>
+  <path class="e" data-de="silver" data-a="limon" d="M746.0 718.0 C789.0 718.0 789.0 854.0 832.0 854.0"/>
+  <path class="e" data-de="ria" data-a="txoko" d="M478.0 599.0 C521.0 599.0 521.0 888.0 564.0 888.0"/>
+  <path class="e land" data-de="rif" data-a="txoko" d="M210.0 1279.0 C387.0 1279.0 387.0 888.0 564.0 888.0"/>
+  <path class="e" data-de="amanecer" data-a="niebla" d="M478.0 463.0 C521.0 463.0 521.0 582.0 564.0 582.0"/>
+  <path class="e land" data-de="hthai" data-a="niebla" d="M210.0 633.0 C387.0 633.0 387.0 582.0 564.0 582.0"/>
+  <path class="e land" data-de="rif" data-a="niebla" d="M210.0 1279.0 C387.0 1279.0 387.0 582.0 564.0 582.0"/>
+  <path class="e land" data-de="punto" data-a="haze" d="M210.0 463.0 C253.0 463.0 253.0 633.0 296.0 633.0"/>
+  <path class="e land" data-de="thai" data-a="haze" d="M210.0 497.0 C253.0 497.0 253.0 633.0 296.0 633.0"/>
+  <path class="e land" data-de="mich" data-a="haze" d="M210.0 395.0 C253.0 395.0 253.0 633.0 296.0 633.0"/>
+  <path class="e land" data-de="kerala" data-a="haze" d="M210.0 701.0 C253.0 701.0 253.0 633.0 296.0 633.0"/>
+  <path class="e land" data-de="rif" data-a="nl" d="M210.0 1279.0 C253.0 1279.0 253.0 837.0 296.0 837.0"/>
+  <path class="e land" data-de="thai" data-a="nl" d="M210.0 497.0 C253.0 497.0 253.0 837.0 296.0 837.0"/>
+  <path class="e land" data-de="choco" data-a="amanecer" d="M210.0 123.0 C253.0 123.0 253.0 463.0 296.0 463.0"/>
+  <path class="e land" data-de="oaxaca" data-a="amanecer" d="M210.0 259.0 C253.0 259.0 253.0 463.0 296.0 463.0"/>
+  <path class="e land" data-de="mich" data-a="sollimon" d="M210.0 395.0 C253.0 395.0 253.0 769.0 296.0 769.0"/>
+  <path class="e land" data-de="rif" data-a="sollimon" d="M210.0 1279.0 C253.0 1279.0 253.0 769.0 296.0 769.0"/>
+  <path class="e land" data-de="thai" data-a="sollimon" d="M210.0 497.0 C253.0 497.0 253.0 769.0 296.0 769.0"/>
+  <path class="e land" data-de="colgold" data-a="ak47" d="M210.0 157.0 C253.0 157.0 253.0 667.0 296.0 667.0"/>
+  <path class="e land" data-de="mich" data-a="ak47" d="M210.0 395.0 C253.0 395.0 253.0 667.0 296.0 667.0"/>
+  <path class="e land" data-de="rif" data-a="ak47" d="M210.0 1279.0 C253.0 1279.0 253.0 667.0 296.0 667.0"/>
+  <path class="e land" data-de="thai" data-a="ak47" d="M210.0 497.0 C253.0 497.0 253.0 667.0 296.0 667.0"/>
+  <path class="e land" data-de="lamb" data-a="buddha" d="M210.0 293.0 C253.0 293.0 253.0 531.0 296.0 531.0"/>
+  <path class="e land" data-de="thai" data-a="buddha" d="M210.0 497.0 C253.0 497.0 253.0 531.0 296.0 531.0"/>
+  <path class="e" data-de="haze" data-a="cannalope" d="M478.0 633.0 C521.0 633.0 521.0 412.0 564.0 412.0"/>
+  <path class="e land" data-de="mich" data-a="cannalope" d="M210.0 395.0 C387.0 395.0 387.0 412.0 564.0 412.0"/>
+  <path class="e land" data-de="chitral" data-a="afkush" d="M210.0 1313.0 C253.0 1313.0 253.0 973.0 296.0 973.0"/>
+  <path class="e land" data-de="hindu" data-a="afkush" d="M210.0 1347.0 C253.0 1347.0 253.0 973.0 296.0 973.0"/>
+  <path class="e land" data-de="hindu" data-a="purpurah" d="M210.0 1347.0 C253.0 1347.0 253.0 939.0 296.0 939.0"/>
+  <path class="e land" data-de="purpura" data-a="purpurah" d="M210.0 1245.0 C253.0 1245.0 253.0 939.0 296.0 939.0"/>
+  <path class="e land" data-de="congo" data-a="congopan" d="M210.0 191.0 C253.0 191.0 253.0 497.0 296.0 497.0"/>
+  <path class="e land" data-de="panama" data-a="congopan" d="M210.0 429.0 C253.0 429.0 253.0 497.0 296.0 497.0"/>
+  <path class="e land" data-de="malawi" data-a="malapan" d="M210.0 361.0 C253.0 361.0 253.0 565.0 296.0 565.0"/>
+  <path class="e land" data-de="panama" data-a="malapan" d="M210.0 429.0 C253.0 429.0 253.0 565.0 296.0 565.0"/>
+  <path class="e land" data-de="chitral" data-a="malapck" d="M210.0 1313.0 C253.0 1313.0 253.0 803.0 296.0 803.0"/>
+  <path class="e land" data-de="malawi" data-a="malapck" d="M210.0 361.0 C253.0 361.0 253.0 803.0 296.0 803.0"/>
+  <path class="e land" data-de="rif" data-a="kushrif" d="M210.0 1279.0 C387.0 1279.0 387.0 854.0 564.0 854.0"/>
+  <path class="e" data-de="ria" data-a="kushrif" d="M478.0 599.0 C521.0 599.0 521.0 854.0 564.0 854.0"/>
+  <path class="e" data-de="nl" data-a="shiva" d="M478.0 837.0 C521.0 837.0 521.0 650.0 564.0 650.0"/>
+  <path class="e" data-de="ria" data-a="shiva" d="M478.0 599.0 C521.0 599.0 521.0 650.0 564.0 650.0"/>
+  <path class="e" data-de="nl" data-a="nlhaze" d="M478.0 837.0 C521.0 837.0 521.0 684.0 564.0 684.0"/>
+  <path class="e" data-de="haze" data-a="nlhaze" d="M478.0 633.0 C521.0 633.0 521.0 684.0 564.0 684.0"/>
+  <path class="e" data-de="haze" data-a="neville" d="M478.0 633.0 C655.0 633.0 655.0 480.0 832.0 480.0"/>
+  <path class="e" data-de="nlhaze" data-a="neville" d="M746.0 684.0 C789.0 684.0 789.0 480.0 832.0 480.0"/>
+  <path class="e" data-de="haze" data-a="silver" d="M478.0 633.0 C521.0 633.0 521.0 718.0 564.0 718.0"/>
+  <path class="e" data-de="nl" data-a="silver" d="M478.0 837.0 C521.0 837.0 521.0 718.0 564.0 718.0"/>
+  <path class="e" data-de="cannalope" data-a="chocolope" d="M746.0 412.0 C789.0 412.0 789.0 412.0 832.0 412.0"/>
+  <path class="e land" data-de="choco" data-a="chocolope" d="M210.0 123.0 C521.0 123.0 521.0 412.0 832.0 412.0"/>
+  <path class="e land" data-de="hawai" data-a="orotrop" d="M210.0 769.0 C387.0 769.0 387.0 820.0 564.0 820.0"/>
+  <path class="e" data-de="sollimon" data-a="orotrop" d="M478.0 769.0 C521.0 769.0 521.0 820.0 564.0 820.0"/>
+  <path class="e" data-de="calorange" data-a="brumaog" d="M210.0 837.0 C387.0 837.0 387.0 480.0 564.0 480.0"/>
+  <path class="e" data-de="ria" data-a="brumaog" d="M478.0 599.0 C521.0 599.0 521.0 480.0 564.0 480.0"/>
+  <path class="e" data-de="haze" data-a="tormenta" d="M478.0 633.0 C521.0 633.0 521.0 514.0 564.0 514.0"/>
+  <path class="e land" data-de="lamb" data-a="tormenta" d="M210.0 293.0 C387.0 293.0 387.0 514.0 564.0 514.0"/>
+  <path class="e land" data-de="lao" data-a="tormenta" d="M210.0 327.0 C387.0 327.0 387.0 514.0 564.0 514.0"/>
+  <path class="e land" data-de="rif" data-a="tormenta" d="M210.0 1279.0 C387.0 1279.0 387.0 514.0 564.0 514.0"/>
+  <path class="e land" data-de="hawai" data-a="tormenta" d="M210.0 769.0 C387.0 769.0 387.0 514.0 564.0 514.0"/>
+  <path class="e" data-de="haze" data-a="leyenda" d="M478.0 633.0 C655.0 633.0 655.0 650.0 832.0 650.0"/>
+  <path class="e" data-de="nl" data-a="leyenda" d="M478.0 837.0 C655.0 837.0 655.0 650.0 832.0 650.0"/>
+  <path class="e" data-de="shiva" data-a="leyenda" d="M746.0 650.0 C789.0 650.0 789.0 650.0 832.0 650.0"/>
+  <path class="e" data-de="haze" data-a="ssh" d="M478.0 633.0 C655.0 633.0 655.0 582.0 832.0 582.0"/>
+  <path class="e" data-de="nl" data-a="ssh" d="M478.0 837.0 C655.0 837.0 655.0 582.0 832.0 582.0"/>
+  <path class="e" data-de="ria" data-a="ssh" d="M478.0 599.0 C655.0 599.0 655.0 582.0 832.0 582.0"/>
+  <path class="e" data-de="silver" data-a="ssh" d="M746.0 718.0 C789.0 718.0 789.0 582.0 832.0 582.0"/>
+  <path class="e" data-de="haze" data-a="nieblamor" d="M478.0 633.0 C655.0 633.0 655.0 446.0 832.0 446.0"/>
+  <path class="e" data-de="niebla" data-a="nieblamor" d="M746.0 582.0 C789.0 582.0 789.0 446.0 832.0 446.0"/>
+  <path class="e" data-de="cheese" data-a="bluetx" d="M210.0 1007.0 C521.0 1007.0 521.0 752.0 832.0 752.0"/>
+  <path class="e" data-de="niebla" data-a="bluetx" d="M746.0 582.0 C789.0 582.0 789.0 752.0 832.0 752.0"/>
+  <path class="e" data-de="chemdawg" data-a="dragon" d="M210.0 905.0 C521.0 905.0 521.0 956.0 832.0 956.0"/>
+  <path class="e" data-de="txoko" data-a="dragon" d="M746.0 888.0 C789.0 888.0 789.0 956.0 832.0 956.0"/>
+  <path class="e" data-de="ak47" data-a="kali47" d="M478.0 667.0 C521.0 667.0 521.0 446.0 564.0 446.0"/>
+  <path class="e" data-de="kali" data-a="kali47" d="M210.0 667.0 C387.0 667.0 387.0 446.0 564.0 446.0"/>
+  <path class="e" data-de="kali" data-a="reina" d="M210.0 667.0 C521.0 667.0 521.0 888.0 832.0 888.0"/>
+  <path class="e" data-de="kushrif" data-a="reina" d="M746.0 854.0 C789.0 854.0 789.0 888.0 832.0 888.0"/>
+  <path class="e land" data-de="kerala" data-a="ww" d="M210.0 701.0 C253.0 701.0 253.0 735.0 296.0 735.0"/>
+  <path class="e land" data-de="mangarosa" data-a="ww" d="M210.0 565.0 C253.0 565.0 253.0 735.0 296.0 735.0"/>
+  <path class="e" data-de="amanecer" data-a="purplehaze" d="M478.0 463.0 C521.0 463.0 521.0 378.0 564.0 378.0"/>
+  <path class="e" data-de="haze" data-a="purplehaze" d="M478.0 633.0 C521.0 633.0 521.0 378.0 564.0 378.0"/>
+  <path class="e" data-de="ak47" data-a="whiterussian" d="M478.0 667.0 C521.0 667.0 521.0 548.0 564.0 548.0"/>
+  <path class="e" data-de="ww" data-a="whiterussian" d="M478.0 735.0 C521.0 735.0 521.0 548.0 564.0 548.0"/>
+  <path class="e" data-de="niebla" data-a="bluewidow" d="M746.0 582.0 C789.0 582.0 789.0 514.0 832.0 514.0"/>
+  <path class="e" data-de="ww" data-a="bluewidow" d="M478.0 735.0 C655.0 735.0 655.0 514.0 832.0 514.0"/>
+  <path class="e" data-de="citrus" data-a="superlemon" d="M210.0 871.0 C655.0 871.0 655.0 667.0 1100.0 667.0"/>
+  <path class="e" data-de="ssh" data-a="superlemon" d="M1014.0 582.0 C1057.0 582.0 1057.0 667.0 1100.0 667.0"/>
+  <path class="e" data-de="ak47" data-a="chronic" d="M478.0 667.0 C655.0 667.0 655.0 548.0 832.0 548.0"/>
+  <path class="e" data-de="nl" data-a="chronic" d="M478.0 837.0 C655.0 837.0 655.0 548.0 832.0 548.0"/>
+  <path class="e" data-de="ria" data-a="chronic" d="M478.0 599.0 C655.0 599.0 655.0 548.0 832.0 548.0"/>
+  <path class="e" data-de="shiva" data-a="chronic" d="M746.0 650.0 C789.0 650.0 789.0 548.0 832.0 548.0"/>
+  <path class="e land" data-de="rif" data-a="whiterhino" d="M210.0 1279.0 C387.0 1279.0 387.0 990.0 564.0 990.0"/>
+  <path class="e" data-de="ww" data-a="whiterhino" d="M478.0 735.0 C521.0 735.0 521.0 990.0 564.0 990.0"/>
+  <path class="e" data-de="txoko" data-a="whiteshark" d="M746.0 888.0 C789.0 888.0 789.0 786.0 832.0 786.0"/>
+  <path class="e" data-de="ww" data-a="whiteshark" d="M478.0 735.0 C655.0 735.0 655.0 786.0 832.0 786.0"/>
+  <path class="e land" data-de="kerala" data-a="whiteshark" d="M210.0 701.0 C521.0 701.0 521.0 786.0 832.0 786.0"/>
+  <path class="e land" data-de="mangarosa" data-a="whiteshark" d="M210.0 565.0 C521.0 565.0 521.0 786.0 832.0 786.0"/>
+  <path class="e land" data-de="hawai" data-a="hawaisnow" d="M210.0 769.0 C655.0 769.0 655.0 565.0 1100.0 565.0"/>
+  <path class="e" data-de="haze" data-a="hawaisnow" d="M478.0 633.0 C789.0 633.0 789.0 565.0 1100.0 565.0"/>
+  <path class="e" data-de="neville" data-a="hawaisnow" d="M1014.0 480.0 C1057.0 480.0 1057.0 565.0 1100.0 565.0"/>
+  <path class="e" data-de="haze" data-a="jackflash" d="M478.0 633.0 C789.0 633.0 789.0 701.0 1100.0 701.0"/>
+  <path class="e" data-de="leyenda" data-a="jackflash" d="M1014.0 650.0 C1057.0 650.0 1057.0 701.0 1100.0 701.0"/>
+  <path class="e" data-de="txoko" data-a="jackflash" d="M746.0 888.0 C923.0 888.0 923.0 701.0 1100.0 701.0"/>
+  <path class="e" data-de="ak47" data-a="jack47" d="M478.0 667.0 C789.0 667.0 789.0 633.0 1100.0 633.0"/>
+  <path class="e" data-de="leyenda" data-a="jack47" d="M1014.0 650.0 C1057.0 650.0 1057.0 633.0 1100.0 633.0"/>
+  <path class="e" data-de="brumaog" data-a="sourtangie" d="M746.0 480.0 C923.0 480.0 923.0 769.0 1100.0 769.0"/>
+  <path class="e" data-de="dragon" data-a="sourtangie" d="M1014.0 956.0 C1057.0 956.0 1057.0 769.0 1100.0 769.0"/>
+  <path class="e" data-de="nl" data-a="ice" d="M478.0 837.0 C655.0 837.0 655.0 922.0 832.0 922.0"/>
+  <path class="e" data-de="ria" data-a="ice" d="M478.0 599.0 C655.0 599.0 655.0 922.0 832.0 922.0"/>
+  <path class="e land" data-de="rif" data-a="ice" d="M210.0 1279.0 C521.0 1279.0 521.0 922.0 832.0 922.0"/>
+  <path class="e" data-de="shiva" data-a="ice" d="M746.0 650.0 C789.0 650.0 789.0 922.0 832.0 922.0"/>
+  <path class="e" data-de="mango" data-a="nlbigbud" d="M210.0 1143.0 C387.0 1143.0 387.0 1024.0 564.0 1024.0"/>
+  <path class="e" data-de="nl" data-a="nlbigbud" d="M478.0 837.0 C521.0 837.0 521.0 1024.0 564.0 1024.0"/>
+  <path class="e" data-de="kushrif" data-a="criticaljack" d="M746.0 854.0 C923.0 854.0 923.0 803.0 1100.0 803.0"/>
+  <path class="e" data-de="leyenda" data-a="criticaljack" d="M1014.0 650.0 C1057.0 650.0 1057.0 803.0 1100.0 803.0"/>
+  <path class="e" data-de="ak47" data-a="critical47" d="M478.0 667.0 C655.0 667.0 655.0 820.0 832.0 820.0"/>
+  <path class="e" data-de="kushrif" data-a="critical47" d="M746.0 854.0 C789.0 854.0 789.0 820.0 832.0 820.0"/>
+  <path class="e" data-de="cheese" data-a="criticalcheese" d="M210.0 1007.0 C521.0 1007.0 521.0 990.0 832.0 990.0"/>
+  <path class="e" data-de="kushrif" data-a="criticalcheese" d="M746.0 854.0 C789.0 854.0 789.0 990.0 832.0 990.0"/>
+  <path class="e" data-de="niebla" data-a="nlblue" d="M746.0 582.0 C789.0 582.0 789.0 718.0 832.0 718.0"/>
+  <path class="e" data-de="nl" data-a="nlblue" d="M478.0 837.0 C655.0 837.0 655.0 718.0 832.0 718.0"/>
+  <path class="e land" data-de="mich" data-a="lowryder" d="M210.0 395.0 C387.0 395.0 387.0 786.0 564.0 786.0"/>
+  <path class="e" data-de="nl" data-a="lowryder" d="M478.0 837.0 C521.0 837.0 521.0 786.0 564.0 786.0"/>
+  <path class="e" data-de="ruderalis" data-a="lowryder" d="M210.0 973.0 C387.0 973.0 387.0 786.0 564.0 786.0"/>
+  <path class="e" data-de="nl" data-a="nlauto" d="M478.0 837.0 C521.0 837.0 521.0 956.0 564.0 956.0"/>
+  <path class="e" data-de="ruderalis" data-a="nlauto" d="M210.0 973.0 C387.0 973.0 387.0 956.0 564.0 956.0"/>
+  <path class="e" data-de="ruderalis" data-a="wwauto" d="M210.0 973.0 C387.0 973.0 387.0 922.0 564.0 922.0"/>
+  <path class="e" data-de="ww" data-a="wwauto" d="M478.0 735.0 C521.0 735.0 521.0 922.0 564.0 922.0"/>
+  <path class="e" data-de="ruderalis" data-a="amnesiaauto" d="M210.0 973.0 C521.0 973.0 521.0 616.0 832.0 616.0"/>
+  <path class="e" data-de="tormenta" data-a="amnesiaauto" d="M746.0 514.0 C789.0 514.0 789.0 616.0 832.0 616.0"/>
+  <path class="e" data-de="niebla" data-a="blueberryauto" d="M746.0 582.0 C789.0 582.0 789.0 684.0 832.0 684.0"/>
+  <path class="e" data-de="ruderalis" data-a="blueberryauto" d="M210.0 973.0 C521.0 973.0 521.0 684.0 832.0 684.0"/>
+  <path class="e" data-de="ak47" data-a="ak47auto" d="M478.0 667.0 C521.0 667.0 521.0 752.0 564.0 752.0"/>
+  <path class="e" data-de="ruderalis" data-a="ak47auto" d="M210.0 973.0 C387.0 973.0 387.0 752.0 564.0 752.0"/>
+  <path class="e" data-de="leyenda" data-a="jackauto" d="M1014.0 650.0 C1057.0 650.0 1057.0 837.0 1100.0 837.0"/>
+  <path class="e" data-de="ruderalis" data-a="jackauto" d="M210.0 973.0 C655.0 973.0 655.0 837.0 1100.0 837.0"/>
+  <path class="e" data-de="ria" data-a="skunkauto" d="M478.0 599.0 C521.0 599.0 521.0 616.0 564.0 616.0"/>
+  <path class="e" data-de="ruderalis" data-a="skunkauto" d="M210.0 973.0 C387.0 973.0 387.0 616.0 564.0 616.0"/>
+  <path class="e" data-de="mango" data-a="bigbudauto" d="M210.0 1143.0 C253.0 1143.0 253.0 905.0 296.0 905.0"/>
+  <path class="e" data-de="ruderalis" data-a="bigbudauto" d="M210.0 973.0 C253.0 973.0 253.0 905.0 296.0 905.0"/>
+  <path class="e" data-de="ruderalis" data-a="superskunkauto" d="M210.0 973.0 C521.0 973.0 521.0 1024.0 832.0 1024.0"/>
+  <path class="e" data-de="txoko" data-a="superskunkauto" d="M746.0 888.0 C789.0 888.0 789.0 1024.0 832.0 1024.0"/>
+  <path class="e" data-de="cheese" data-a="cheeseauto" d="M210.0 1007.0 C253.0 1007.0 253.0 871.0 296.0 871.0"/>
+  <path class="e" data-de="ruderalis" data-a="cheeseauto" d="M210.0 973.0 C253.0 973.0 253.0 871.0 296.0 871.0"/>
+  <path class="e" data-de="nieblamor" data-a="bluedreamauto" d="M1014.0 446.0 C1057.0 446.0 1057.0 599.0 1100.0 599.0"/>
+  <path class="e" data-de="ruderalis" data-a="bluedreamauto" d="M210.0 973.0 C655.0 973.0 655.0 599.0 1100.0 599.0"/>
+  <path class="e" data-de="dragon" data-a="sourauto" d="M1014.0 956.0 C1057.0 956.0 1057.0 871.0 1100.0 871.0"/>
+  <path class="e" data-de="ruderalis" data-a="sourauto" d="M210.0 973.0 C655.0 973.0 655.0 871.0 1100.0 871.0"/>
+  <path class="e" data-de="ruderalis" data-a="sshauto" d="M210.0 973.0 C655.0 973.0 655.0 735.0 1100.0 735.0"/>
+  <path class="e" data-de="ssh" data-a="sshauto" d="M1014.0 582.0 C1057.0 582.0 1057.0 735.0 1100.0 735.0"/>
+  <path class="e" data-de="purpurah" data-a="purplekushauto" d="M478.0 939.0 C521.0 939.0 521.0 1058.0 564.0 1058.0"/>
+  <path class="e" data-de="ruderalis" data-a="purplekushauto" d="M210.0 973.0 C387.0 973.0 387.0 1058.0 564.0 1058.0"/>
+  <path class="e land" data-de="durban" data-a="durbanauto" d="M210.0 225.0 C253.0 225.0 253.0 701.0 296.0 701.0"/>
+  <path class="e" data-de="ruderalis" data-a="durbanauto" d="M210.0 973.0 C253.0 973.0 253.0 701.0 296.0 701.0"/>
+</g>
+<g class="nodos">
+  <g class="capa c0" id="capa-0">
+    <g class="n ind-s land" id="v-acapulco">
+      <title>Acapulco Gold · 0 % índica · THC 19 % · flor 4,5 semanas</title>
+      <desc>Landrace · costa de Guerrero, México</desc>
+      <rect x="28" y="76.0" width="182" height="26"/>
+      <text x="37" y="89.0">Acapulco Gold</text>
+    </g>
+    <g class="n ind-s land" id="v-choco">
+      <title>Chocolate Thai · 0 % índica · THC 16 % · flor 5 semanas</title>
+      <desc>Landrace · Tailandia</desc>
+      <rect x="28" y="110.0" width="182" height="26"/>
+      <text x="37" y="123.0">Chocolate Thai</text>
+    </g>
+    <g class="n ind-s land" id="v-colgold">
+      <title>Colombian Gold · 0 % índica · THC 16 % · flor 4,5 semanas</title>
+      <desc>Landrace · sierra de Santa Marta, Colombia</desc>
+      <rect x="28" y="144.0" width="182" height="26"/>
+      <text x="37" y="157.0">Colombian Gold</text>
+    </g>
+    <g class="n ind-s land" id="v-congo">
+      <title>Congolese · 0 % índica · THC 16 % · flor 3,5 semanas</title>
+      <desc>Landrace · cuenca del Congo</desc>
+      <rect x="28" y="178.0" width="182" height="26"/>
+      <text x="37" y="191.0">Congolese</text>
+    </g>
+    <g class="n ind-s land" id="v-durban">
+      <title>Durban Poison · 0 % índica · THC 18 % · flor 3,5 semanas</title>
+      <desc>Landrace · puerto de Durban, Sudáfrica</desc>
+      <rect x="28" y="212.0" width="182" height="26"/>
+      <text x="37" y="225.0">Durban Poison</text>
+    </g>
+    <g class="n ind-s land" id="v-oaxaca">
+      <title>Highland Oaxacan Gold · 0 % índica · THC 15 % · flor 4 semanas</title>
+      <desc>Landrace · sierra de Oaxaca, México</desc>
+      <rect x="28" y="246.0" width="182" height="26"/>
+      <text x="37" y="259.0">Highland Oaxacan Gold</text>
+    </g>
+    <g class="n ind-s land" id="v-lamb">
+      <title>Lamb&#x27;s Bread · 0 % índica · THC 16 % · flor 4 semanas</title>
+      <desc>Landrace · costa de Jamaica</desc>
+      <rect x="28" y="280.0" width="182" height="26"/>
+      <text x="37" y="293.0">Lamb&#x27;s Bread</text>
+    </g>
+    <g class="n ind-s land" id="v-lao">
+      <title>Luang Prabang · 0 % índica · THC 15 % · flor 4,5 semanas</title>
+      <desc>Landrace · montes del norte de Laos</desc>
+      <rect x="28" y="314.0" width="182" height="26"/>
+      <text x="37" y="327.0">Luang Prabang</text>
+    </g>
+    <g class="n ind-s land" id="v-malawi">
+      <title>Malawi Gold · 0 % índica · THC 20 % · flor 5 semanas</title>
+      <desc>Landrace · sativa de África oriental, floración muy larga</desc>
+      <rect x="28" y="348.0" width="182" height="26"/>
+      <text x="37" y="361.0">Malawi Gold</text>
+    </g>
+    <g class="n ind-s land" id="v-mich">
+      <title>Michoacán · 0 % índica · THC 15 % · flor 4 semanas</title>
+      <desc>Landrace · altiplano de Michoacán, México</desc>
+      <rect x="28" y="382.0" width="182" height="26"/>
+      <text x="37" y="395.0">Michoacán</text>
+    </g>
+    <g class="n ind-s land" id="v-panama">
+      <title>Panama Red · 0 % índica · THC 17 % · flor 4,5 semanas</title>
+      <desc>Landrace · istmo de Panamá</desc>
+      <rect x="28" y="416.0" width="182" height="26"/>
+      <text x="37" y="429.0">Panama Red</text>
+    </g>
+    <g class="n ind-s land" id="v-punto">
+      <title>Punto Rojo · 0 % índica · THC 16 % · flor 4,5 semanas</title>
+      <desc>Landrace · cordillera de Colombia</desc>
+      <rect x="28" y="450.0" width="182" height="26"/>
+      <text x="37" y="463.0">Punto Rojo</text>
+    </g>
+    <g class="n ind-s land" id="v-thai">
+      <title>Thai · 0 % índica · THC 17 % · flor 5 semanas</title>
+      <desc>Landrace · selvas del norte de Tailandia</desc>
+      <rect x="28" y="484.0" width="182" height="26"/>
+      <text x="37" y="497.0">Thai</text>
+    </g>
+    <g class="n ind-s land" id="v-zamal">
+      <title>Zamal · 0 % índica · THC 15 % · flor 5 semanas</title>
+      <desc>Landrace · isla de la Reunión</desc>
+      <rect x="28" y="518.0" width="182" height="26"/>
+      <text x="37" y="531.0">Zamal</text>
+    </g>
+    <g class="n ind-s land" id="v-mangarosa">
+      <title>Manga Rosa · 5 % índica · THC 15 % · flor 4,5 semanas</title>
+      <desc>Landrace · nordeste de Brasil</desc>
+      <rect x="28" y="552.0" width="182" height="26"/>
+      <text x="37" y="565.0">Manga Rosa</text>
+    </g>
+    <g class="n ind-s land" id="v-etiopia">
+      <title>Ethiopian Highland · 10 % índica · THC 14 % · flor 4 semanas</title>
+      <desc>Landrace · tierras altas de Etiopía</desc>
+      <rect x="28" y="586.0" width="182" height="26"/>
+      <text x="37" y="599.0">Ethiopian Highland</text>
+    </g>
+    <g class="n ind-s land" id="v-hthai">
+      <title>Highland Thai · 10 % índica · THC 15 % · flor 4,5 semanas</title>
+      <desc>Landrace · montañas del norte de Tailandia</desc>
+      <rect x="28" y="620.0" width="182" height="26"/>
+      <text x="37" y="633.0">Highland Thai</text>
+    </g>
+    <g class="n ind-s" id="v-kali">
+      <title>Kali Mist · 10 % índica · THC 18 % · flor 4 semanas</title>
+      <desc>sativa asiática · ≈ origen incierto (padres sin publicar)</desc>
+      <rect x="28" y="654.0" width="182" height="26"/>
+      <text x="37" y="667.0">Kali Mist</text>
+    </g>
+    <g class="n ind-s land" id="v-kerala">
+      <title>Kerala · 10 % índica · THC 16 % · flor 5 semanas</title>
+      <desc>Landrace · sierras de Kerala, India del Sur</desc>
+      <rect x="28" y="688.0" width="182" height="26"/>
+      <text x="37" y="701.0">Kerala</text>
+    </g>
+    <g class="n ind-s land" id="v-swazi">
+      <title>Swazi Gold · 10 % índica · THC 16 % · flor 4 semanas</title>
+      <desc>Landrace · montes de Esuatini (Suazilandia)</desc>
+      <rect x="28" y="722.0" width="182" height="26"/>
+      <text x="37" y="735.0">Swazi Gold</text>
+    </g>
+    <g class="n ind-s land" id="v-hawai">
+      <title>Hawaiian · 20 % índica · THC 15 % · flor 4 semanas</title>
+      <desc>Landrace · islas de Hawái</desc>
+      <rect x="28" y="756.0" width="182" height="26"/>
+      <text x="37" y="769.0">Hawaiian</text>
+    </g>
+    <g class="n ind-s land" id="v-vietblack">
+      <title>Vietnamese Black · 20 % índica · THC 15 % · flor 5 semanas</title>
+      <desc>Landrace · montes de Vietnam</desc>
+      <rect x="28" y="790.0" width="182" height="26"/>
+      <text x="37" y="803.0">Vietnamese Black</text>
+    </g>
+    <g class="n ind-h" id="v-calorange">
+      <title>California Orange · 40 % índica · THC 16 % · flor 3 semanas</title>
+      <desc>Híbrido de California de los setenta</desc>
+      <rect x="28" y="824.0" width="182" height="26"/>
+      <text x="37" y="837.0">California Orange</text>
+    </g>
+    <g class="n ind-h" id="v-citrus">
+      <title>Lemon Skunk · 40 % índica · THC 18 % · flor 3 semanas</title>
+      <desc>Selección cítrica de Skunk #1</desc>
+      <rect x="28" y="858.0" width="182" height="26"/>
+      <text x="37" y="871.0">Lemon Skunk</text>
+    </g>
+    <g class="n ind-h" id="v-chemdawg">
+      <title>Chemdawg · 45 % índica · THC 22 % · flor 3,5 semanas</title>
+      <desc>Híbrido de los noventa · ≈ origen incierto</desc>
+      <rect x="28" y="892.0" width="182" height="26"/>
+      <text x="37" y="905.0">Chemdawg</text>
+    </g>
+    <g class="n ind-h land" id="v-nepal">
+      <title>Nepalese · 50 % índica · THC 16 % · flor 3,5 semanas</title>
+      <desc>Landrace · colinas del Himalaya, Nepal</desc>
+      <rect x="28" y="926.0" width="182" height="26"/>
+      <text x="37" y="939.0">Nepalese</text>
+    </g>
+    <g class="n ind-h auto" id="v-ruderalis">
+      <title>Ruderalis · 50 % índica · THC 4 % · flor 1,5 semanas</title>
+      <desc>Landrace · Rusia y Asia central, silvestre</desc>
+      <rect x="28" y="960.0" width="182" height="26"/>
+      <text x="37" y="973.0">Ruderalis</text>
+    </g>
+    <g class="n ind-h" id="v-cheese">
+      <title>Cheese · 60 % índica · THC 17 % · flor 2,5 semanas</title>
+      <desc>Fenotipo de Skunk #1 (Reino Unido)</desc>
+      <rect x="28" y="994.0" width="182" height="26"/>
+      <text x="37" y="1007.0">Cheese</text>
+    </g>
+    <g class="n ind-h land" id="v-malana">
+      <title>Malana · 70 % índica · THC 17 % · flor 3,5 semanas</title>
+      <desc>Landrace · valle de Parvati, Himachal Pradesh, India</desc>
+      <rect x="28" y="1028.0" width="182" height="26"/>
+      <text x="37" y="1041.0">Malana</text>
+    </g>
+    <g class="n ind-i land" id="v-beldia">
+      <title>Beldia · 80 % índica · THC 12 % · flor 3 semanas</title>
+      <desc>Landrace · Ketama, en el Rif</desc>
+      <rect x="28" y="1062.0" width="182" height="26"/>
+      <text x="37" y="1075.0">Beldia</text>
+    </g>
+    <g class="n ind-i land" id="v-kif">
+      <title>Kif · 80 % índica · THC 13 % · flor 3 semanas</title>
+      <desc>Landrace · montañas del Rif, Marruecos</desc>
+      <rect x="28" y="1096.0" width="182" height="26"/>
+      <text x="37" y="1109.0">Kif</text>
+    </g>
+    <g class="n ind-i" id="v-mango">
+      <title>Big Bud · 85 % índica · THC 17 % · flor 3 semanas</title>
+      <desc>base Afghani · ≈ origen incierto</desc>
+      <rect x="28" y="1130.0" width="182" height="26"/>
+      <text x="37" y="1143.0">Big Bud</text>
+    </g>
+    <g class="n ind-i land" id="v-kashmir">
+      <title>Kashmiri · 85 % índica · THC 15 % · flor 3 semanas</title>
+      <desc>Landrace · valle de Cachemira</desc>
+      <rect x="28" y="1164.0" width="182" height="26"/>
+      <text x="37" y="1177.0">Kashmiri</text>
+    </g>
+    <g class="n ind-i land" id="v-libano">
+      <title>Lebanese · 85 % índica · THC 14 % · flor 3 semanas</title>
+      <desc>Landrace · valle de la Bekaa, Líbano</desc>
+      <rect x="28" y="1198.0" width="182" height="26"/>
+      <text x="37" y="1211.0">Lebanese</text>
+    </g>
+    <g class="n ind-i land" id="v-purpura">
+      <title>Purple Afghani · 95 % índica · THC 18 % · flor 4 semanas</title>
+      <desc>Landrace · Afganistán, selección morada</desc>
+      <rect x="28" y="1232.0" width="182" height="26"/>
+      <text x="37" y="1245.0">Purple Afghani</text>
+    </g>
+    <g class="n ind-i land" id="v-rif">
+      <title>Afghani · 100 % índica · THC 16 % · flor 3 semanas</title>
+      <desc>Landrace · montañas del norte de Afganistán</desc>
+      <rect x="28" y="1266.0" width="182" height="26"/>
+      <text x="37" y="1279.0">Afghani</text>
+    </g>
+    <g class="n ind-i land" id="v-chitral">
+      <title>Chitral Kush · 100 % índica · THC 17 % · flor 3 semanas</title>
+      <desc>Landrace · valle de Chitral, Pakistán</desc>
+      <rect x="28" y="1300.0" width="182" height="26"/>
+      <text x="37" y="1313.0">Chitral Kush</text>
+    </g>
+    <g class="n ind-i land" id="v-hindu">
+      <title>Hindu Kush · 100 % índica · THC 18 % · flor 3 semanas</title>
+      <desc>Landrace · cordillera del Hindu Kush, entre Afganistán y Pakistán</desc>
+      <rect x="28" y="1334.0" width="182" height="26"/>
+      <text x="37" y="1347.0">Hindu Kush</text>
+    </g>
+  </g>
+  <g class="capa c1" id="capa-1">
+    <g class="n ind-s" id="v-amanecer">
+      <title>Purple Thai · 10 % índica · THC 18 % · flor 4,5 semanas</title>
+      <desc>Chocolate Thai × Highland Oaxacan Gold</desc>
+      <rect x="296" y="450.0" width="182" height="26"/>
+      <text x="305" y="463.0">Purple Thai</text>
+    </g>
+    <g class="n ind-s" id="v-congopan">
+      <title>Congo × Panama · 0 % índica · THC 18 % · flor 4,5 semanas</title>
+      <desc>Congolese × Panama Red</desc>
+      <rect x="296" y="484.0" width="182" height="26"/>
+      <text x="305" y="497.0">Congo × Panama</text>
+    </g>
+    <g class="n ind-s" id="v-buddha">
+      <title>Laughing Buddha · 20 % índica · THC 19 % · flor 4 semanas</title>
+      <desc>Thai × Jamaicana</desc>
+      <rect x="296" y="518.0" width="182" height="26"/>
+      <text x="305" y="531.0">Laughing Buddha</text>
+    </g>
+    <g class="n ind-s" id="v-malapan">
+      <title>Malawi × Panama · 0 % índica · THC 20 % · flor 5 semanas</title>
+      <desc>Malawi Gold × Panama Red</desc>
+      <rect x="296" y="552.0" width="182" height="26"/>
+      <text x="305" y="565.0">Malawi × Panama</text>
+    </g>
+    <g class="n ind-h" id="v-ria">
+      <title>Skunk #1 · 65 % índica · THC 12 % · flor 2,5 semanas</title>
+      <desc>Afghani × Colombian Gold × Acapulco Gold</desc>
+      <rect x="296" y="586.0" width="182" height="26"/>
+      <text x="305" y="599.0">Skunk #1</text>
+    </g>
+    <g class="n ind-s" id="v-haze">
+      <title>Haze · 10 % índica · THC 20 % · flor 5 semanas</title>
+      <desc>Colombia × México × Tailandia (quizá India del Sur) · ≈ origen incierto</desc>
+      <rect x="296" y="620.0" width="182" height="26"/>
+      <text x="305" y="633.0">Haze</text>
+    </g>
+    <g class="n ind-h" id="v-ak47">
+      <title>AK-47 · 35 % índica · THC 20 % · flor 3 semanas</title>
+      <desc>Colombiana × mexicana × thai × afgana (1992)</desc>
+      <rect x="296" y="654.0" width="182" height="26"/>
+      <text x="305" y="667.0">AK-47</text>
+    </g>
+    <g class="n ind-s auto" id="v-durbanauto">
+      <title>Durban Poison Auto · 0 % índica · THC 15 % · flor 2,5 semanas</title>
+      <desc>Durban Poison × Ruderalis</desc>
+      <rect x="296" y="688.0" width="182" height="26"/>
+      <text x="305" y="701.0">Durban Poison Auto</text>
+    </g>
+    <g class="n ind-h" id="v-ww">
+      <title>White Widow · 60 % índica · THC 20 % · flor 3,5 semanas</title>
+      <desc>sativa de Brasil × planta resinosa del sur de la India · ≈ origen incierto</desc>
+      <rect x="296" y="722.0" width="182" height="26"/>
+      <text x="305" y="735.0">White Widow</text>
+    </g>
+    <g class="n ind-h" id="v-sollimon">
+      <title>Trainwreck · 35 % índica · THC 21 % · flor 4 semanas</title>
+      <desc>Mexicana × Thai × Afghani · ≈ origen incierto</desc>
+      <rect x="296" y="756.0" width="182" height="26"/>
+      <text x="305" y="769.0">Trainwreck</text>
+    </g>
+    <g class="n ind-h" id="v-malapck">
+      <title>Malawi × PCK · 40 % índica · THC 19 % · flor 4 semanas</title>
+      <desc>Malawi Gold × Chitral Kush (PCK)</desc>
+      <rect x="296" y="790.0" width="182" height="26"/>
+      <text x="305" y="803.0">Malawi × PCK</text>
+    </g>
+    <g class="n ind-i" id="v-nl">
+      <title>Northern Lights · 90 % índica · THC 18 % · flor 3 semanas</title>
+      <desc>Afghani, con algo de Thai · ≈ origen incierto</desc>
+      <rect x="296" y="824.0" width="182" height="26"/>
+      <text x="305" y="837.0">Northern Lights</text>
+    </g>
+    <g class="n ind-h auto" id="v-cheeseauto">
+      <title>Cheese Auto · 60 % índica · THC 14 % · flor 2,0 semanas</title>
+      <desc>Cheese × Ruderalis</desc>
+      <rect x="296" y="858.0" width="182" height="26"/>
+      <text x="305" y="871.0">Cheese Auto</text>
+    </g>
+    <g class="n ind-i auto" id="v-bigbudauto">
+      <title>Big Bud Auto · 85 % índica · THC 14 % · flor 2,0 semanas</title>
+      <desc>Big Bud × Ruderalis</desc>
+      <rect x="296" y="892.0" width="182" height="26"/>
+      <text x="305" y="905.0">Big Bud Auto</text>
+    </g>
+    <g class="n ind-i" id="v-purpurah">
+      <title>Purple Kush · 100 % índica · THC 22 % · flor 3,5 semanas</title>
+      <desc>Hindu Kush × Purple Afghani · ≈ origen incierto</desc>
+      <rect x="296" y="926.0" width="182" height="26"/>
+      <text x="305" y="939.0">Purple Kush</text>
+    </g>
+    <g class="n ind-i" id="v-afkush">
+      <title>Master Kush · 100 % índica · THC 20 % · flor 3 semanas</title>
+      <desc>dos landraces del Hindu Kush · ≈ origen incierto</desc>
+      <rect x="296" y="960.0" width="182" height="26"/>
+      <text x="305" y="973.0">Master Kush</text>
+    </g>
+  </g>
+  <g class="capa c2" id="capa-2">
+    <g class="n ind-s" id="v-purplehaze">
+      <title>Purple Haze · 15 % índica · THC 19 % · flor 4,5 semanas</title>
+      <desc>Purple Thai × Haze · ≈ origen incierto</desc>
+      <rect x="564" y="365.0" width="182" height="26"/>
+      <text x="573" y="378.0">Purple Haze</text>
+    </g>
+    <g class="n ind-s" id="v-cannalope">
+      <title>Cannalope Haze · 10 % índica · THC 20 % · flor 3,5 semanas</title>
+      <desc>Haze × Michoacán</desc>
+      <rect x="564" y="399.0" width="182" height="26"/>
+      <text x="573" y="412.0">Cannalope Haze</text>
+    </g>
+    <g class="n ind-h" id="v-kali47">
+      <title>Kali 47 · 30 % índica · THC 21 % · flor 3,5 semanas</title>
+      <desc>Kali Mist × AK-47</desc>
+      <rect x="564" y="433.0" width="182" height="26"/>
+      <text x="573" y="446.0">Kali 47</text>
+    </g>
+    <g class="n ind-h" id="v-brumaog">
+      <title>Tangie · 30 % índica · THC 20 % · flor 3,5 semanas</title>
+      <desc>California Orange × Skunk #1</desc>
+      <rect x="564" y="467.0" width="182" height="26"/>
+      <text x="573" y="480.0">Tangie</text>
+    </g>
+    <g class="n ind-s" id="v-tormenta">
+      <title>Amnesia Haze · 20 % índica · THC 26 % · flor 4,5 semanas</title>
+      <desc>Haze + jamaicana + afgana o hawaiana + Laos · ≈ origen incierto</desc>
+      <rect x="564" y="501.0" width="182" height="26"/>
+      <text x="573" y="514.0">Amnesia Haze</text>
+    </g>
+    <g class="n ind-h" id="v-whiterussian">
+      <title>White Russian · 60 % índica · THC 22 % · flor 3,5 semanas</title>
+      <desc>White Widow × AK-47</desc>
+      <rect x="564" y="535.0" width="182" height="26"/>
+      <text x="573" y="548.0">White Russian</text>
+    </g>
+    <g class="n ind-i" id="v-niebla">
+      <title>Blueberry · 80 % índica · THC 17 % · flor 3,5 semanas</title>
+      <desc>Purple Thai × Highland Thai × Afghani</desc>
+      <rect x="564" y="569.0" width="182" height="26"/>
+      <text x="573" y="582.0">Blueberry</text>
+    </g>
+    <g class="n ind-h auto" id="v-skunkauto">
+      <title>Skunk #1 Auto · 65 % índica · THC 10 % · flor 2,0 semanas</title>
+      <desc>Skunk #1 × Ruderalis</desc>
+      <rect x="564" y="603.0" width="182" height="26"/>
+      <text x="573" y="616.0">Skunk #1 Auto</text>
+    </g>
+    <g class="n ind-i" id="v-shiva">
+      <title>Shiva Skunk · 80 % índica · THC 19 % · flor 3 semanas</title>
+      <desc>Skunk #1 × Northern Lights</desc>
+      <rect x="564" y="637.0" width="182" height="26"/>
+      <text x="573" y="650.0">Shiva Skunk</text>
+    </g>
+    <g class="n ind-h" id="v-nlhaze">
+      <title>NL5 × Haze · 40 % índica · THC 21 % · flor 4 semanas</title>
+      <desc>Northern Lights × Haze</desc>
+      <rect x="564" y="671.0" width="182" height="26"/>
+      <text x="573" y="684.0">NL5 × Haze</text>
+    </g>
+    <g class="n ind-h" id="v-silver">
+      <title>Silver Haze · 35 % índica · THC 21 % · flor 4,5 semanas</title>
+      <desc>Haze × Northern Lights · ≈ origen incierto</desc>
+      <rect x="564" y="705.0" width="182" height="26"/>
+      <text x="573" y="718.0">Silver Haze</text>
+    </g>
+    <g class="n ind-h auto" id="v-ak47auto">
+      <title>AK-47 Auto · 35 % índica · THC 17 % · flor 2,0 semanas</title>
+      <desc>AK-47 × Ruderalis</desc>
+      <rect x="564" y="739.0" width="182" height="26"/>
+      <text x="573" y="752.0">AK-47 Auto</text>
+    </g>
+    <g class="n ind-h auto" id="v-lowryder">
+      <title>Lowryder · 55 % índica · THC 12 % · flor 1,5 semanas</title>
+      <desc>Northern Lights × ruderalis mexicana · ≈ origen incierto</desc>
+      <rect x="564" y="773.0" width="182" height="26"/>
+      <text x="573" y="786.0">Lowryder</text>
+    </g>
+    <g class="n ind-h" id="v-orotrop">
+      <title>Pineapple Express · 40 % índica · THC 21 % · flor 3,5 semanas</title>
+      <desc>Trainwreck × Hawaiian · ≈ origen incierto</desc>
+      <rect x="564" y="807.0" width="182" height="26"/>
+      <text x="573" y="820.0">Pineapple Express</text>
+    </g>
+    <g class="n ind-i" id="v-kushrif">
+      <title>Critical Mass · 80 % índica · THC 21 % · flor 3 semanas</title>
+      <desc>Afghani × Skunk #1</desc>
+      <rect x="564" y="841.0" width="182" height="26"/>
+      <text x="573" y="854.0">Critical Mass</text>
+    </g>
+    <g class="n ind-i" id="v-txoko">
+      <title>Super Skunk · 80 % índica · THC 19 % · flor 2,5 semanas</title>
+      <desc>Skunk #1 × Afghani</desc>
+      <rect x="564" y="875.0" width="182" height="26"/>
+      <text x="573" y="888.0">Super Skunk</text>
+    </g>
+    <g class="n ind-h auto" id="v-wwauto">
+      <title>White Widow Auto · 60 % índica · THC 17 % · flor 2,5 semanas</title>
+      <desc>White Widow × Ruderalis</desc>
+      <rect x="564" y="909.0" width="182" height="26"/>
+      <text x="573" y="922.0">White Widow Auto</text>
+    </g>
+    <g class="n ind-i auto" id="v-nlauto">
+      <title>Northern Lights Auto · 90 % índica · THC 15 % · flor 2,0 semanas</title>
+      <desc>Northern Lights × Ruderalis</desc>
+      <rect x="564" y="943.0" width="182" height="26"/>
+      <text x="573" y="956.0">Northern Lights Auto</text>
+    </g>
+    <g class="n ind-i" id="v-whiterhino">
+      <title>White Rhino · 80 % índica · THC 20 % · flor 3,5 semanas</title>
+      <desc>White Widow × índica norteamericana · ≈ origen incierto</desc>
+      <rect x="564" y="977.0" width="182" height="26"/>
+      <text x="573" y="990.0">White Rhino</text>
+    </g>
+    <g class="n ind-i" id="v-nlbigbud">
+      <title>NL × Big Bud · 85 % índica · THC 18 % · flor 3 semanas</title>
+      <desc>Northern Lights × Big Bud</desc>
+      <rect x="564" y="1011.0" width="182" height="26"/>
+      <text x="573" y="1024.0">NL × Big Bud</text>
+    </g>
+    <g class="n ind-i auto" id="v-purplekushauto">
+      <title>Purple Kush Auto · 100 % índica · THC 19 % · flor 2,5 semanas</title>
+      <desc>Purple Kush × Ruderalis</desc>
+      <rect x="564" y="1045.0" width="182" height="26"/>
+      <text x="573" y="1058.0">Purple Kush Auto</text>
+    </g>
+  </g>
+  <g class="capa c3" id="capa-3">
+    <g class="n ind-s" id="v-chocolope">
+      <title>Chocolope · 10 % índica · THC 21 % · flor 4 semanas</title>
+      <desc>Chocolate Thai × Cannalope Haze</desc>
+      <rect x="832" y="399.0" width="182" height="26"/>
+      <text x="841" y="412.0">Chocolope</text>
+    </g>
+    <g class="n ind-h" id="v-nieblamor">
+      <title>Blue Dream · 40 % índica · THC 22 % · flor 4 semanas</title>
+      <desc>Blueberry × Haze</desc>
+      <rect x="832" y="433.0" width="182" height="26"/>
+      <text x="841" y="446.0">Blue Dream</text>
+    </g>
+    <g class="n ind-s" id="v-neville">
+      <title>Neville&#x27;s Haze · 10 % índica · THC 22 % · flor 4,5 semanas</title>
+      <desc>Haze × (NL5 × Haze)</desc>
+      <rect x="832" y="467.0" width="182" height="26"/>
+      <text x="841" y="480.0">Neville&#x27;s Haze</text>
+    </g>
+    <g class="n ind-h" id="v-bluewidow">
+      <title>Blue Widow · 65 % índica · THC 19 % · flor 3,5 semanas</title>
+      <desc>Blueberry × White Widow</desc>
+      <rect x="832" y="501.0" width="182" height="26"/>
+      <text x="841" y="514.0">Blue Widow</text>
+    </g>
+    <g class="n ind-h" id="v-chronic">
+      <title>Chronic · 70 % índica · THC 20 % · flor 3,5 semanas</title>
+      <desc>Skunk #1 × Northern Lights × AK-47</desc>
+      <rect x="832" y="535.0" width="182" height="26"/>
+      <text x="841" y="548.0">Chronic</text>
+    </g>
+    <g class="n ind-s" id="v-ssh">
+      <title>Super Silver Haze · 20 % índica · THC 23 % · flor 4 semanas</title>
+      <desc>Skunk #1 × Northern Lights × Haze</desc>
+      <rect x="832" y="569.0" width="182" height="26"/>
+      <text x="841" y="582.0">Super Silver Haze</text>
+    </g>
+    <g class="n ind-s auto" id="v-amnesiaauto">
+      <title>Amnesia Haze Auto · 20 % índica · THC 23 % · flor 3,5 semanas</title>
+      <desc>Amnesia Haze × Ruderalis</desc>
+      <rect x="832" y="603.0" width="182" height="26"/>
+      <text x="841" y="616.0">Amnesia Haze Auto</text>
+    </g>
+    <g class="n ind-h" id="v-leyenda">
+      <title>Jack Herer · 45 % índica · THC 28 % · flor 3,5 semanas</title>
+      <desc>Haze × (NL5 × Shiva Skunk) · LEGENDARIA</desc>
+      <rect x="832" y="637.0" width="182" height="26"/>
+      <text x="841" y="650.0">Jack Herer</text>
+    </g>
+    <g class="n ind-i auto" id="v-blueberryauto">
+      <title>Blueberry Auto · 80 % índica · THC 14 % · flor 2,5 semanas</title>
+      <desc>Blueberry × Ruderalis</desc>
+      <rect x="832" y="671.0" width="182" height="26"/>
+      <text x="841" y="684.0">Blueberry Auto</text>
+    </g>
+    <g class="n ind-i" id="v-nlblue">
+      <title>Northern Light Blue · 85 % índica · THC 19 % · flor 3 semanas</title>
+      <desc>Northern Lights × Blueberry</desc>
+      <rect x="832" y="705.0" width="182" height="26"/>
+      <text x="841" y="718.0">Northern Light Blue</text>
+    </g>
+    <g class="n ind-i" id="v-bluetx">
+      <title>Blue Cheese · 75 % índica · THC 19 % · flor 3 semanas</title>
+      <desc>Blueberry × Cheese</desc>
+      <rect x="832" y="739.0" width="182" height="26"/>
+      <text x="841" y="752.0">Blue Cheese</text>
+    </g>
+    <g class="n ind-i" id="v-whiteshark">
+      <title>White Shark · 75 % índica · THC 19 % · flor 3,5 semanas</title>
+      <desc>Super Skunk × brasileña × India del Sur</desc>
+      <rect x="832" y="773.0" width="182" height="26"/>
+      <text x="841" y="786.0">White Shark</text>
+    </g>
+    <g class="n ind-h" id="v-critical47">
+      <title>Critical 47 · 55 % índica · THC 20 % · flor 3 semanas</title>
+      <desc>Critical × AK-47 · ≈ origen incierto</desc>
+      <rect x="832" y="807.0" width="182" height="26"/>
+      <text x="841" y="820.0">Critical 47</text>
+    </g>
+    <g class="n ind-s" id="v-limon">
+      <title>Lemon Haze · 20 % índica · THC 15 % · flor 3,5 semanas</title>
+      <desc>Lemon Skunk × Silver Haze · ≈ origen incierto</desc>
+      <rect x="832" y="841.0" width="182" height="26"/>
+      <text x="841" y="854.0">Lemon Haze</text>
+    </g>
+    <g class="n ind-h" id="v-reina">
+      <title>Critical Kali Mist · 45 % índica · THC 21 % · flor 3,5 semanas</title>
+      <desc>Critical Mass × Kali Mist</desc>
+      <rect x="832" y="875.0" width="182" height="26"/>
+      <text x="841" y="888.0">Critical Kali Mist</text>
+    </g>
+    <g class="n ind-i" id="v-ice">
+      <title>Ice · 80 % índica · THC 20 % · flor 3,5 semanas</title>
+      <desc>Afghani × Northern Lights × Shiva Skunk</desc>
+      <rect x="832" y="909.0" width="182" height="26"/>
+      <text x="841" y="922.0">Ice</text>
+    </g>
+    <g class="n ind-h" id="v-dragon">
+      <title>Sour Diesel · 30 % índica · THC 27 % · flor 4 semanas</title>
+      <desc>Chemdawg × Super Skunk · ≈ origen incierto</desc>
+      <rect x="832" y="943.0" width="182" height="26"/>
+      <text x="841" y="956.0">Sour Diesel</text>
+    </g>
+    <g class="n ind-h" id="v-criticalcheese">
+      <title>Critical Cheese · 70 % índica · THC 19 % · flor 3 semanas</title>
+      <desc>Critical × Cheese · ≈ origen incierto</desc>
+      <rect x="832" y="977.0" width="182" height="26"/>
+      <text x="841" y="990.0">Critical Cheese</text>
+    </g>
+    <g class="n ind-i auto" id="v-superskunkauto">
+      <title>Super Skunk Auto · 80 % índica · THC 16 % · flor 2,0 semanas</title>
+      <desc>Super Skunk × Ruderalis</desc>
+      <rect x="832" y="1011.0" width="182" height="26"/>
+      <text x="841" y="1024.0">Super Skunk Auto</text>
+    </g>
+  </g>
+  <g class="capa c4" id="capa-4">
+    <g class="n ind-s" id="v-hawaisnow">
+      <title>Hawaiian Snow · 10 % índica · THC 22 % · flor 5 semanas</title>
+      <desc>Hawaiian Haze × Neville&#x27;s Haze × Haze</desc>
+      <rect x="1100" y="552.0" width="182" height="26"/>
+      <text x="1109" y="565.0">Hawaiian Snow</text>
+    </g>
+    <g class="n ind-h auto" id="v-bluedreamauto">
+      <title>Blue Dream Auto · 40 % índica · THC 19 % · flor 3,0 semanas</title>
+      <desc>Blue Dream × Ruderalis</desc>
+      <rect x="1100" y="586.0" width="182" height="26"/>
+      <text x="1109" y="599.0">Blue Dream Auto</text>
+    </g>
+    <g class="n ind-h" id="v-jack47">
+      <title>Jack 47 · 40 % índica · THC 21 % · flor 3,5 semanas</title>
+      <desc>Jack Herer × AK-47</desc>
+      <rect x="1100" y="620.0" width="182" height="26"/>
+      <text x="1109" y="633.0">Jack 47</text>
+    </g>
+    <g class="n ind-h" id="v-superlemon">
+      <title>Super Lemon Haze · 30 % índica · THC 23 % · flor 4 semanas</title>
+      <desc>Lemon Skunk × Super Silver Haze</desc>
+      <rect x="1100" y="654.0" width="182" height="26"/>
+      <text x="1109" y="667.0">Super Lemon Haze</text>
+    </g>
+    <g class="n ind-h" id="v-jackflash">
+      <title>Jack Flash · 45 % índica · THC 21 % · flor 3,5 semanas</title>
+      <desc>Jack Herer × Super Skunk × Haze</desc>
+      <rect x="1100" y="688.0" width="182" height="26"/>
+      <text x="1109" y="701.0">Jack Flash</text>
+    </g>
+    <g class="n ind-s auto" id="v-sshauto">
+      <title>Super Silver Haze Auto · 20 % índica · THC 20 % · flor 3,0 semanas</title>
+      <desc>Super Silver Haze × Ruderalis</desc>
+      <rect x="1100" y="722.0" width="182" height="26"/>
+      <text x="1109" y="735.0">Super Silver Haze Auto</text>
+    </g>
+    <g class="n ind-s" id="v-sourtangie">
+      <title>Sour Tangie · 20 % índica · THC 23 % · flor 4 semanas</title>
+      <desc>Sour Diesel × Tangie</desc>
+      <rect x="1100" y="756.0" width="182" height="26"/>
+      <text x="1109" y="769.0">Sour Tangie</text>
+    </g>
+    <g class="n ind-h" id="v-criticaljack">
+      <title>Critical Jack · 40 % índica · THC 21 % · flor 3,5 semanas</title>
+      <desc>Critical × Jack Herer · ≈ origen incierto</desc>
+      <rect x="1100" y="790.0" width="182" height="26"/>
+      <text x="1109" y="803.0">Critical Jack</text>
+    </g>
+    <g class="n ind-h auto" id="v-jackauto">
+      <title>Jack Herer Auto · 45 % índica · THC 25 % · flor 2,5 semanas</title>
+      <desc>Jack Herer × Ruderalis</desc>
+      <rect x="1100" y="824.0" width="182" height="26"/>
+      <text x="1109" y="837.0">Jack Herer Auto</text>
+    </g>
+    <g class="n ind-h auto" id="v-sourauto">
+      <title>Sour Diesel Auto · 30 % índica · THC 24 % · flor 3,0 semanas</title>
+      <desc>Sour Diesel × Ruderalis</desc>
+      <rect x="1100" y="858.0" width="182" height="26"/>
+      <text x="1109" y="871.0">Sour Diesel Auto</text>
+    </g>
+  </g>
+</g>
+<g class="leg" transform="translate(28,1392)">
+  <g class="ind-s" transform="translate(0,0)"><rect width="14" height="14" y="-11"/><text x="20" y="0">sativa (ind ≤ 25)</text></g>
+  <g class="ind-h" transform="translate(210,0)"><rect width="14" height="14" y="-11"/><text x="20" y="0">híbrida</text></g>
+  <g class="ind-i" transform="translate(420,0)"><rect width="14" height="14" y="-11"/><text x="20" y="0">índica (ind ≥ 75)</text></g>
+  <g class="land" transform="translate(630,0)"><rect width="14" height="14" y="-11"/><text x="20" y="0">landrace: borde dorado</text></g>
+  <g class="auto" transform="translate(840,0)"><rect width="14" height="14" y="-11"/><text x="20" y="0">autofloreciente: borde azul</text></g>
+</g>
+</svg>
