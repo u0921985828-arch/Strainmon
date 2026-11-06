@@ -2,6 +2,22 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Más descendencias en el catálogo: 115 variedades (lo pidió el usuario: «Ampliarlo»)
+
+- **Once variedades reales más** (`tools/catalogo2.py`, al final de `STRAINS` para no mover los números de antes):
+  seis cruces clásicos con su linaje publicado —Skunk Kush, Sour Cheese, Chocolate Haze, Critical Super Silver Haze,
+  Amnesia Lemon y Sour Jack— y cinco autoflorecientes —Critical Mass Auto, Super Lemon Haze Auto, Pineapple Express
+  Auto, Tangie Auto y White Russian Auto—. Nada inventado y sin criadores, bancos ni personas: todos los padres ya
+  estaban en el juego.
+- **Los números salen de los padres, no a ojo**: el THC de un cruce es la media de sus padres con tope 24, la cosecha,
+  los días, la resistencia y el % índica también por media (los días a cuartos, el índica a múltiplos de 5), y el color
+  y la hoja se mezclan; una autofloreciente baja 3 puntos de THC, rinde el 55 % y florece un día antes que su padre.
+- **Enganchadas a todo lo que ya había**: receta por conjunto de hojas (`RECIPES`, `AUTO.recipes`), ficha en la
+  CannaDex (`DEX`, `AUTO.dex`), nota en el diario de la tía (`DIARIO`) y familia en el RECETARIO (`FAMILIAS`), de modo
+  que ninguna se queda sin motivo para cultivarla.
+- **Contadores**: 115 variedades en total, 93 sin contar las autoflorecientes y 22 autoflorecientes.
+- Textos nuevos traducidos (`godot/i18n/partes/catalogo2.csv`, 33 filas).
+
 ### El esquema de genealogía, con líneas a 90° (lo pidió el usuario: «todo el esquema bien hecho y sin líneas engorrosas? Un esquema con líneas a ángulos de 90°»)
 
 - **Trazado ortogonal.** Las aristas de `docs/plano/genealogia/arbol.svg` ya no son curvas de Bézier: cada una sale
