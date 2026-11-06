@@ -4,25 +4,25 @@
 
 ### WordPress 1.7.7
 
-- El plugin `landrace-hunters` rehecho con el juego de esta tanda (las 130 variedades): `descargas/landrace-hunters-1.7.7.zip` (30,8 MB; `index.pck` 23,4 MB) y el ligero de 37 KB.
+- El plugin `landrace-hunters` rehecho con el juego de esta tanda (las 116 variedades): `descargas/landrace-hunters-1.7.7.zip` y el ligero.
 
-### Genéticas actuales: 130 variedades (lo pidió el usuario: «me refería a genéticas más actuales»)
+### Genéticas actuales (lo pidió el usuario: «me refería a genéticas más actuales»; y después: «Si el linaje no está claro, no quiero genéticas inventadas ni nada»)
 
-- **Quince variedades modernas más** (`tools/catalogo3.py`, al final de `STRAINS`), en cadena para que cada una
-  salga de padres que ya están en el juego: OG Kush, GSC, Granddaddy Purple, Cherry Pie, Wedding Cake, Sunset
-  Sherbet, Gelato, Do-Si-Dos, Original Glue, Lemon Tree, Purple Punch y Forbidden Fruit, y las autoflorecientes
-  GSC Auto, Gelato Auto y Wedding Cake Auto.
-- **Marcas y alusiones.** El nombre de una variedad no es obra con derechos de autor, pero sí puede ser marca
-  registrada: fuera las que están o estuvieron en litigio de marca (de ahí «GSC» y «Original Glue», como en la
-  industria) y fuera cualquier nombre que aluda a una franquicia o a una persona. Sin criadores ni bancos, como
-  siempre, y «≈» donde el linaje publicado no está claro (OG Kush, Granddaddy Purple, Sunset Sherbet, Do-Si-Dos,
-  Original Glue, Purple Punch).
-- **Familia nueva en el RECETARIO y en la CannaDex**: «Las de ahora» (`FAMILIAS.modernas`), con las doce de
-  fotoperiodo; las tres autos, a la familia de las autoflorecientes.
-- **Los números siguen saliendo de los padres**, con la misma regla que la tanda anterior, y las recetas se
-  comprueban contra las que ya había para que ninguna choque.
-- **Contadores**: 130 variedades, 105 sin contar las autoflorecientes y 25 autoflorecientes.
-- Textos nuevos traducidos (`godot/i18n/partes/catalogo3.csv`, 46 filas).
+- **Una variedad moderna más** (`tools/catalogo3.py`, al final de `STRAINS`): la Lemon Tree (Lemon Skunk ×
+  Sour Diesel), la única del grupo cuyo linaje está publicado sin discusión y cuyos dos padres ya están en
+  el juego, así que la receta del juego es el linaje de verdad.
+- **Catorce descartadas, y por qué.** La regla que puso el usuario manda: si el linaje no está claro, fuera.
+  OG Kush (≈ Chemdawg × Hindu Kush), Granddaddy Purple (≈ Purple Urkle × Big Bud), Sunset Sherbet (≈ GSC ×
+  Pink Panties), Do-Si-Dos (≈ GSC × Face Off OG), Original Glue (≈ Chem Sister × Sour Dubb × Chocolate
+  Diesel) y Purple Punch (≈ Larry OG × GDP) tienen el linaje discutido o un padre que no está en el juego:
+  meterlas habría sido inventarles la receta. GSC, Cherry Pie, Wedding Cake, Gelato y Forbidden Fruit sí
+  tienen el linaje claro, pero cuelgan de una de esas, así que caen con ella; y las autoflorecientes GSC
+  Auto, Gelato Auto y Wedding Cake Auto se quedan sin su padre de fotoperiodo.
+- **Sin familia nueva**: con una sola variedad, la Lemon Tree va a la familia `skunk`, como sus padres.
+- **Los números siguen saliendo de los padres**, con la misma regla que la tanda anterior, y la receta se
+  comprueba contra las que ya había para que ninguna choque.
+- **Contadores**: 116 variedades, 94 sin contar las autoflorecientes y 22 autoflorecientes.
+- Textos nuevos traducidos (`godot/i18n/partes/catalogo3.csv`).
 
 ### Más descendencias en el catálogo: 115 variedades (lo pidió el usuario: «Ampliarlo»)
 
