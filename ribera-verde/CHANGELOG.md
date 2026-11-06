@@ -2,6 +2,30 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Una partida con todo al máximo (lo pidió el usuario: «mandame una partida actualizada con todo al máximo todo comprado y todo lo mejor»; solo Godot, con `Datos.CAL`)
+
+- **La APK, firmada.** `bundletool build-apks --mode=universal` sin `--ks` no firma nada, así que el APK universal de
+  la 0.84 salió **sin firma** y Android lo daba por «paquete no válido» al instalarlo. `tools/godot-aab.js` lo firma
+  ahora cuando no hay upload key, con la clave de depuración fija de uber-apk-signer 1.3.0 (pública y la misma en cada
+  sesión, de modo que una versión nueva se instala encima de la anterior y nadie pierde la partida), comprueba otra vez
+  el `zipalign -P 16` y exige que `apksigner verify --print-certs` dé el certificado, o falla. Firma SHA-1
+  `5d08264b44e0e53fbccc70b4f016474cc6c5ab5c`.
+- **El generador de la partida al máximo.** `godot/tests/maxima.gd` no es una prueba: es la herramienta que la fabrica.
+  Parte de `new_state()`, la rellena por áreas con las funciones del juego (`tests/max/cultivo.gd`, `historia.gd`,
+  `negocios.gd` y `mundo.gd`), la pasa por `migrate()` y `partida_valida()`, comprueba 21 cosas al máximo (`_mira`), la
+  escribe al disco y la vuelve a leer con `load_save()`, la carga de verdad con `enter_game()` y la deja exportada en el
+  formato de COPIA DE SEGURIDAD (`cierra_partida`: `LH1.` + gzip, XOR y base64 con su suma) y en JSON:
+  `descargas/partida-maxima.txt` y `.json`. 46 comprobaciones, 0 fallos · JSON 47.365 B · código LH1 12.837 B.
+- **Qué lleva al máximo.** Cultivo: las tres carpas más grandes que caben en cada sitio con su mejor foco (15 plazas al
+  tope de litros), extracción, intractor, goteo, el inventario entero, la caja empotrada, el arcón, el camarote y el
+  salón. Historia: capítulo 8, deuda a 0, las 104 variedades descubiertas y fijadas en F4, los actos II a IV, las copas,
+  los 27 logros, la revista con sus doce técnicas y la suscripción, el banco de la tía con sus seis colecciones y 9.999
+  semillas doradas. Negocios: la nave comprada y equipada con sus cuatro mesas y las madres, la fase 2 de KAIA con ocho
+  mesas, el muelle con sus cinco obras y los tres barcos, los seis locales con todas las mejoras, la presidencia, el
+  bajo de las setas, Hiriburu y la plantilla. Mundo: 500.000 € en efectivo y 5.000.000 en la cuenta, los cuatro
+  vehículos del concesionario en el garaje con seguro, impuesto y depósito lleno, la huerta ampliada con todas sus
+  mejoras, confianza con toda la gente y los recados hechos.
+
 ### El cuadro con busto sin aire y las manos que cogen la revista (0.84, lo dijo el usuario: «se va demasiado arriba el texto y ese aire encima del Sprite del personaje queda mal» y «la animación de coger la revista como las manos que deberían de aparecer al agarrar deben estar hechas correctamente, no están bien»; solo Godot, con `Datos.CAL`)
 
 - **La ficha, centrada cuando el cuadro da de sí.** Con busto, la ficha se anclaba siempre al pie del cuadro, así que
