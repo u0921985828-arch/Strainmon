@@ -450,6 +450,22 @@ func migrate() -> void:
 		for l in D.LOGROS:
 			if logro_ok(l.id):
 				S.logros[l.id] = 0
+	if Datos.PLAY:   # en Play no hay setas: una partida traída de la versión entera dejaba el bajo cobrando sin poder entrar
+		_play_sin_setas()
+
+# una partida de la versión entera (Datos.PLAY = false) puede traer el bajo de la Kale Zaharra alquilado y bandejas en el sótano.
+# Con PLAY, Txomin no está en el mapa y la puerta no es tuya, pero el recibo se seguía cobrando cada RECIBO.dias (lo vio el usuario).
+# Se devuelve la fianza al efectivo, se suelta el bajo y el sótano se queda sin nada de setas (la sala fría lo sigue usando).
+func _play_sin_setas() -> void:
+	if S.get("setas") is Dictionary:
+		S.money += float(D.SETAS.fianza)
+		S.setas = null
+	if S.get("sot") is Dictionary:
+		S.sot.bandejas = []
+		S.sot.fr = []
+		S.sot.g = 0.0
+		for k in ["gv", "panes", "cd", "dh", "enc", "mol", "mc", "cc", "ay"]:
+			S.sot.erase(k)
 
 # ---------- título y partida nueva ----------
 func show_title() -> void:

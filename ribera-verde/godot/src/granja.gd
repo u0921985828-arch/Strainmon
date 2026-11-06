@@ -2246,7 +2246,7 @@ func recibos() -> Array:
 	var r := []
 	if S.get("nave") != null and not S.nave.get("mia"):
 		r.append([K("Nave de Valdehierro"), S.nave.r, recibo_nave(), "efectivo", r.size()])
-	if S.get("setas") != null:
+	if S.get("setas") != null and not Datos.PLAY:   # en Play el bajo no existe: no se lista ni se cobra
 		r.append([K("Bajo de la Kale Zaharra"), S.setas.r, recibo_setas(), "efectivo", r.size()])
 	for k in S.loc:
 		r.append([D.LOCALES[k].n, S.loc[k].r, D.LOCALES[k].sem, "cuenta", r.size()])

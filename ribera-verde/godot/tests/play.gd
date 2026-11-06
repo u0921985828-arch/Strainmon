@@ -190,6 +190,22 @@ func _corre() -> void:
 	LOG = []
 	chk(corre(func(): await J.entra_local(J.MAPS.callejon.doors["19,7"])), "puerta del bajo bloqueada")
 	chk(S.map == "callejon" and not " ".join(LOG).contains("Txomin"), "la puerta del bajo: %s en %s" % [LOG, S.map])
+	# 6b · una partida traída de la versión entera (lo vio el usuario: el bajo seguía cobrando los 400 sin poder entrar ni ver a Txomin):
+	# migrate suelta el bajo, devuelve la fianza y deja el sótano sin nada de setas; y el recibo ya no se lista ni se cobra
+	S.setas = {"bandejas": [{"k": "txuria", "d": S.day, "hum": 80}], "g": 120.0, "r": S.day, "fr": [], "panes": 3}
+	S.sot = {"d": S.day - 1, "bandejas": [{"k": "txuria", "d": S.day, "hum": 80}], "g": 90.0, "fr": [{"g": 10.0, "d": S.day}], "panes": 2, "ay": S.day}
+	var m_antes: float = S.money
+	J.migrate()
+	chk(S.get("setas") == null, "el bajo sigue alquilado con PLAY: %s" % [S.get("setas")])
+	chk(is_equal_approx(S.money, m_antes + float(D.SETAS.fianza)), "la fianza no vuelve: %s → %s" % [m_antes, S.money])
+	chk(S.sot.bandejas.is_empty() and S.sot.fr.is_empty() and float(S.sot.g) == 0.0 and not S.sot.has("panes") and not S.sot.has("ay"), "el sótano con setas: %s" % [S.sot])
+	chk(J.recibos().filter(func(x): return String(x[0]).contains("Kale Zaharra")).is_empty(), "el bajo, en los recibos")
+	S.setas = {"bandejas": [], "g": 0.0, "r": S.day - 1, "fr": []}
+	var m2: float = S.money
+	chk(corre(func(): J.setas_dia()), "setas_dia bloqueado")
+	chk(is_equal_approx(S.money, m2), "setas_dia cobra con PLAY: %s → %s" % [m2, S.money])
+	S.erase("setas")
+	S.erase("sot")
 	# el billar: «Una partida» o «Nada», sin euros
 	MENUS = []
 	QUIERO = ["Nada"]

@@ -2,6 +2,17 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El bajo de Txomin, sin cobrar en Play (lo vio el usuario: «no se puede contactar en persona con él y tener acceso al bajo, pero te sigue cobrando los 400»)
+
+- Una partida de la versión entera (`Datos.PLAY = false`, como la copia al máximo) podía traer el bajo de la
+  Kale Zaharra alquilado. En la aplicación de Play no hay setas: Txomin no sale en el mapa (`npc_cond`) y la
+  puerta no es tuya (`entra_local`), pero `setas_dia` seguía cobrando el recibo cada `RECIBO.dias`.
+- **Al cargar la partida** (`_play_sin_setas`, al final de `migrate`): se suelta el bajo, la fianza vuelve al
+  efectivo y el sótano se queda sin nada de setas (bandejas, lo tendido, lo seco, los panes y el ayudante);
+  la sala fría sigue usando el sótano como antes.
+- **Y por si acaso**: `setas_dia` no hace nada con `Datos.PLAY` y `recibos()` ya no lista el bajo.
+- Prueba: `tests/play.gd` § 6b (siete comprobaciones; sin el arreglo, tres fallos).
+
 ### WordPress 1.7.7
 
 - El plugin `landrace-hunters` rehecho con el juego de esta tanda (las 116 variedades): `descargas/landrace-hunters-1.7.7.zip` y el ligero.

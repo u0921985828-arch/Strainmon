@@ -208,6 +208,8 @@ func cuaderno_setas() -> void:
 		await say(T("{n} · {f} · {g}.ª generación. {d} {de} Rinde ×{r} y se paga ×{p}.", {"n": c.n, "f": D.CEPAS.fam[c.f], "g": int(c.gen), "d": c.d if cepa_ya(L, k) else K("Aún no la has tenido."), "de": de, "r": str(c.g), "p": str(c.p)}))
 
 func setas_dia() -> void:
+	if Datos.PLAY:   # en Play no hay setas: ni bajo, ni recibo, ni bandejas en el sótano (migrate las quita al cargar)
+		return
 	if Datos.CAL and sot_ya():   # 1.51: el sótano de casa, sin recibo ni redada propia (la de casa se lo lleva)
 		secar_setas(S.sot)
 		_setas_bandejas(S.sot, K("SMS · TXOMIN"))
