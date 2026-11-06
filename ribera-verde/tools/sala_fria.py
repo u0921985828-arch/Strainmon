@@ -25,6 +25,10 @@ FRIA = {
 	# las máquinas, en fila contra la pared de arriba; la de serie de la lavadora, al lado de la puerta
 	"pos": {"lavadora": [1, 5], "mallas": [3, 5], "staticM": [5, 5], "prensaM": [7, 5], "tamizM": [9, 5]},   # contra la pared de abajo, con una casilla entre las dos (si no, se montan)
 	"o": [[6, 1, "frioF"], [5, 3, "mesaF"]],
+	# el sótano de Play, su propia habitación (lo dijo el usuario: «te dije que copiaras la sala, pero que una fuese una cosa y la otra
+	# fuese otra»): sin setas, la misma sala es el trastero de delante de la sala fría, con su atrezo (cajas, la bajante y el cubo), y
+	# ni una balda, ni humidificador, ni malla, ni armario de setas. Todo sprites que ya están en el atlas.
+	"sot": [[7, 1, "tuboS"], [0, 2, "cajasT"], [2, 2, "crate"], [6, 2, "cajasT"], [9, 2, "crate"], [9, 5, "cuboS"]],
 	"n": "La sala fría del sótano",
 }
 FRIA["p"] = sum(x[1] for x in FRIA["l"])
@@ -54,9 +58,17 @@ def main():
 		assert 0 < x < W and y == H - 1 and [x, y] != [VUELTA[0], VUELTA[1] + 1], k
 	assert len({tuple(v) for v in FRIA["pos"].values()}) == len(FRIA["pos"])
 	assert set(FRIA["rend"]) == set(D["EXTR"]), "un rendimiento por extracción"
+	# el trastero de Play: dentro del sótano, nada en la puerta de la sala fría ni en su llegada, nada en la escalera y sin repetir casilla
+	esc = {(x, y) for y in range(len(s["g"])) for x in range(int(s["w"])) if str(s["g"][y][x]).startswith("escS")}
+	ocup = set()
+	for x, y, k in FRIA["sot"]:
+		assert 0 <= x < int(s["w"]) and 2 <= y + 1 <= int(s["h"]), (x, y, k)
+		assert [x, y] != PUERTA and [x, y] != [PUERTA[0], PUERTA[1] + 1], "atrezo en la puerta de la sala fría: %s" % k
+		assert (x, y) not in esc and (x, y) not in ocup, "atrezo en la escalera o repetido: %s" % k
+		ocup.add((x, y))
 	with open(DJ, "w", encoding="utf-8") as fh:
 		json.dump(D, fh, ensure_ascii=False, separators=(",", ":"))
-	print("sala_fria: %d € (Play %d €), %d máquinas, mapa %s %d × %d" % (FRIA["p"], FRIA["p_play"], len(FRIA["pos"]), MAPA, W, H))
+	print("sala_fria: %d € (Play %d €), %d máquinas, mapa %s %d × %d, trastero de Play %d piezas" % (FRIA["p"], FRIA["p_play"], len(FRIA["pos"]), MAPA, W, H, len(FRIA["sot"])))
 
 if __name__ == "__main__":
 	main()

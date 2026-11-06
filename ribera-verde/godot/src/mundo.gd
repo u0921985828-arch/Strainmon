@@ -2320,6 +2320,8 @@ func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 		montar_secadero()
 	if name_ == "setas":
 		montar_setas()
+	if name_ == "sotano":
+		montar_sotano()   # el sótano, una habitación para cada cosa: las setas o el trastero de la sala fría (salafria.gd)
 	montar_locales(name_)   # 1.45: la puerta de los negocios y sus mejoras
 	montar_estancos(name_)   # 1.47: el estanco de cada pueblo
 	pueblos_mapa(name_)   # después de los montajes que parten de una copia del mapa (montar_locales, montar_alto)
@@ -3286,6 +3288,12 @@ func kc_cerrada() -> bool:   # → kaiacult.gd
 
 # la sala fría del sótano (salafria.gd)
 func fria_cerrada() -> bool:   # → salafria.gd
+	return false
+
+func montar_sotano() -> void:   # → salafria.gd
+	pass
+
+func sot_play() -> bool:   # → salafria.gd
 	return false
 
 func fria_ya() -> bool:   # → salafria.gd

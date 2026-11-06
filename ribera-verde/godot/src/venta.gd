@@ -1173,6 +1173,8 @@ func _ol_nave(x: int, y: int, o) -> bool:
 # setas: lo suyo de obj_local (R53)
 func _ol_setas(x: int, o) -> bool:
 	var txt := ""
+	if sot_play() and S.map == "sotano":   # en Play el sótano no es de setas: es el trastero de la sala fría (salafria.gd)
+		return false
 	if S.map == "setas" or S.map == "sotano":   # 1.34: el bajo de las setas por dentro (1.51: y el sótano de casa)
 		if SL() == null:
 			await say(K("El sótano está a medio hacer: mañana acaban los obreros.") if S.map == "sotano" else K("El bajo ya no es tuyo. Txomin cambiará la cerradura."))

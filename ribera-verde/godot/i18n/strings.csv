@@ -3442,7 +3442,13 @@ sd5676676,"La sala fría, a medio hacer: mañana acaban los obreros.","The cold 
 s14c62e67,"El evaporador del equipo de frío: {t} °C, sin escarcha. En frío los tricomas se quiebran y se sueltan mejor: el hielo, el tamiz, la lavadora y la static rinden más, y la prensa saca un rosin más limpio.","The cooling unit evaporator: {t} °C, no frost. In the cold the trichomes snap and come off better: the ice, the sieve, the washer and the static yield more, and the press gives a cleaner rosin."
 s291d27dd,"El evaporador del equipo de frío: {t}°, sin escarcha. En frío los tricomas se quiebran y se sueltan mejor: el hielo, el tamiz, la lavadora y la static rinden más, y la prensa saca un rosin más limpio.","The cooling unit evaporator: {t}°, no frost. In the cold the trichomes snap and come off better: the ice, the sieve, the washer and the static yield more, and the press gives a cleaner rosin."
 s07ce41c7,La mesa de acero inoxidable: aquí se enfría el material antes de cada extracción y se recoge lo que sale.,The stainless steel table: the material is chilled here before each extraction and what comes out is collected.
-s59ea83d1,"Estanterías de rejilla y trastos del sótano. La sala fría, por la puerta de la pared.",Wire shelves and basement clutter. The cold room is through the door in the wall.
+sf345d944,"La bajante del edificio, que suda. Por eso aquí abajo siempre hace fresco.",The building's downpipe
+see6a8b02,cajasT,cajasT
+sf105bcaf,"Cajas de la mudanza de la tía, precintadas y con el polvo de años.",Boxes from your aunt's move
+s404ecd6f,"Un cajón de madera con herramienta vieja. Abajo, latas de pintura secas.",A wooden crate of old tools. Underneath
+s1f05c246,cuboS,cuboS
+s09223d44,"Un cubo y una fregona. Lo que se escurre de la sala fría, aquí.",A bucket and a mop. Whatever drips out of the cold room ends up here.
+sa112222a,"Trastos del sótano. La sala fría, por la puerta de la pared.",Basement clutter. The cold room is through the door in the wall.
 sf4222ba2,"Panes de micelio, cada uno de su cepa. Con uno, te preparo una bandeja de esa cepa; juntando dos en la mesa, sale otra si está en el cuaderno.","Mycelium blocks, each its own strain. With one I'll set you a tray of that strain; join two at the table and you get another, if it's in the notebook."
 s4e0363f7,Sin {e} no hay pan.,"No {e}, no block."
 s3d84c814,Un pan de {n}: {d},A {n} block: {d}
@@ -4326,7 +4332,6 @@ sd79ae6e0,armS,
 s734bcf71,mesaS,
 s3fe6bc39,Una tubería vieja que suda. Por eso aquí la humedad nunca baja.,An old sweating pipe. That's why the humidity never drops here.
 sfaf75a10,"Cajas de bandejas vacías de Txomin, apiladas.","Txomin's boxes of empty trays, stacked."
-s1f05c246,cuboS,cuboS
 s2bc9df1a,"Un cubo y un cepillo. Lo que se echa a perder, fuera.","A bucket and a brush. Whatever goes bad, out."
 s10d133a7,"AUTOS RIBERA. Debajo, más pequeño: «Concesionario · Taller · Financiación».","AUTOS RIBERA. Below, smaller: ""Dealer · Garage · Finance""."
 sd4979a36,preciosK,preciosK
@@ -5062,7 +5067,6 @@ s83d0b406,carroT,carroT
 s9868d9d5,recambT,recambT
 secf4f08f,recambT2,recambT2
 s78c3a9bd,compT,compT
-see6a8b02,cajasT,cajasT
 sffbd7f05,elevT2,elevT2
 s580ce7c7,fosoT2,fosoT2
 sc3b650c0,prodL,prodL
@@ -7654,6 +7658,7 @@ s06eb1f5f,Corrector con cada abono. Siempre,Corrector with every feed. Always
 saee59701,"Lo primero, el agua. La del grifo hay que corregirla: si no, la planta no aprovecha el abono.",Water first. Tap water needs correcting: otherwise the plant can't use the nutrients.
 s414d437a,"La escalera baja al sótano de la tía: oscuro, húmedo y lleno de trastos.","The stairs go down to Auntie's basement: dark, damp and full of junk."
 s7e2e8d80,ICE HASH,
+s59ea83d1,"Estanterías de rejilla y trastos del sótano. La sala fría, por la puerta de la pared.",Wire shelves and basement clutter. The cold room is through the door in the wall.
 sbb5dd7a5,Una línea consigo misma: sube sus genes y fija lo raro que tenga. Gastas 1 semilla y salen {n}.,A line crossed with itself: its genes go up and whatever it carries gets fixed. Costs 1 seed and gives {n}.
 s13612e61,"Un híbrido tuyo con una de sus dos parentales: lo que sale tira a esa madre. Variedad nueva, con su número de retrocruce.","One of your hybrids with one of its two parents: what comes out leans to that mother. A new strain, with its backcross number."
 sb9912629,Seleccionar {n} veces seguidas una línea ya fijada: deja de variar de planta a planta.,Select an already stable line {n} times in a row: it stops varying from plant to plant.

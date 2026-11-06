@@ -206,6 +206,36 @@ func _corre() -> void:
 	chk(is_equal_approx(S.money, m2), "setas_dia cobra con PLAY: %s → %s" % [m2, S.money])
 	S.erase("setas")
 	S.erase("sot")
+	# 6c · el sótano, una habitación para cada cosa (lo dijo el usuario: «la misma habitación para poner tanto unos como otros… te dije
+	# que copiaras la sala, pero que una fuese una cosa y la otra fuese otra»): en Play es el trastero de delante de la sala fría,
+	# sin una sola balda, humidificador ni malla de setas, con su atrezo y con sus textos
+	S.sot = {"d": S.day - 1, "bandejas": [], "g": 0.0, "fr": []}
+	S.fria = {"d": S.day - 1}
+	J.enter_map("sotano", 4, 5, "up")
+	J.mode = "world"
+	var ms: Dictionary = J.MAPS.sotano
+	var osot := []
+	for yy in int(ms.h):
+		for xx in int(ms.w):
+			if ms.o[yy][xx] is String:
+				osot.append(String(ms.o[yy][xx]))
+	chk(J.sot_play(), "sot_play con PLAY")
+	chk(osot.filter(func(k): return k in J.SOT_SETAS).is_empty(), "muebles de setas en el sótano de Play: %s" % [osot])
+	for q in D.FRIA.sot:
+		chk(ms.o[int(q[1])][int(q[0])] == String(q[2]), "el atrezo del trastero en (%d, %d): %s" % [int(q[0]), int(q[1]), ms.o[int(q[1])][int(q[0])]])
+	LOG = []
+	chk(corre(func(): await J.object_action(2, 2)), "el cajón bloqueado")
+	chk(" ".join(LOG).contains("cajón de madera"), "el cajón del trastero: %s" % [LOG])
+	LOG = []
+	chk(corre(func(): await J.object_action(0, 2)), "las cajas bloqueadas")
+	chk(" ".join(LOG).contains("mudanza"), "las cajas del trastero: %s" % [LOG])
+	# nada encima de nada: tests/solapes.gd corre con PLAY = false, así que el atrezo del trastero se mide aquí
+	var sol: Array = J.solapes_de(J.cajas_obj("sotano", ms.o))
+	chk(sol.is_empty(), "solapes en el trastero de Play: %s" % [sol])
+	S.erase("fria")
+	S.erase("sot")
+	J.enter_map("home", 5, 5, "up")
+	J.mode = "world"
 	# el billar: «Una partida» o «Nada», sin euros
 	MENUS = []
 	QUIERO = ["Nada"]

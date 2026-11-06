@@ -208,6 +208,25 @@ func _corre() -> void:
 	S.erase("fria")
 	S.erase("sot")
 	chk(not J.fria_venta(), "fuera de Play, sin sótano no se vende")
+	# 5b · el sótano, una habitación para cada cosa (lo dijo el usuario: «te dije que copiaras la sala, pero que una fuese una cosa y la
+	# otra fuese otra»): fuera de Play la sala es el cultivo de setas, con sus baldas, el humidificador y la malla, y sin el atrezo del
+	# trastero que lleva en Play
+	S.sot = {"d": S.day - 1, "bandejas": [], "g": 0, "fr": []}
+	J.enter_map("sotano", 4, 5, "up")
+	J.mode = "world"
+	var ms: Dictionary = J.MAPS.sotano
+	var osot := []
+	for yy in int(ms.h):
+		for xx in int(ms.w):
+			if ms.o[yy][xx] is String:
+				osot.append(String(ms.o[yy][xx]))
+	chk(not J.sot_play(), "sot_play fuera de Play")
+	chk(osot.count("baldaS") >= 3 and "humidS" in osot and "secaS" in osot, "el sótano de las setas: %s" % [osot])
+	chk(not ("cajasT" in osot), "el atrezo de Play en el sótano de las setas: %s" % [osot])
+	chk(J.n_baldas() >= 3, "las baldas del sótano: %d" % J.n_baldas())
+	S.erase("sot")
+	J.enter_map("home", 5, 5, "up")
+	J.mode = "world"
 	# 6 · sin CAL, nada
 	Datos.CAL = false
 	S.fria = {"d": 0}

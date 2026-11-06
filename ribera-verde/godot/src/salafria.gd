@@ -8,6 +8,35 @@ extends "res://src/kaiacult.gd"
 
 var _fria_t := ""   # la extracción que se está haciendo en la sala fría (para sale_extr)
 
+# el sótano, una habitación para cada cosa (lo dijo el usuario: «usamos el mismo mapa, o sea, la misma habitación para poner tanto unos
+# como otros… te dije que copiaras la sala, pero que una fuese una cosa y la otra fuese otra. Lo lógico y normal»): el mapa «sotano» que
+# viene en los datos es el del cultivo de setas (la obra de SOTANO, fuera de Play), con sus baldas, el humidificador y la malla. En Play
+# no hay setas y la misma sala es el trastero de delante de la sala fría: montar_sotano le quita todo lo de setas y le pone su atrezo
+# (FRIA.sot), de modo que ninguna de las dos habitaciones mezcla los dos usos.
+const SOT_SETAS := ["baldaS", "humidS", "secaS", "deshidS", "armS", "mesaS"]   # i18n-no
+
+var _sot0 = null
+
+func sot_play() -> bool:
+	return Datos.PLAY and fria_hay()
+
+func montar_sotano() -> void:
+	var m = MAPS.get("sotano")
+	if m == null:
+		return
+	if _sot0 == null:
+		_sot0 = m.o.duplicate(true)
+	for y in int(m.h):
+		m.o[y] = _sot0[y].duplicate()   # siempre desde la copia: sin Play, el sótano de las setas tal cual
+	if not sot_play():
+		return
+	for y in int(m.h):
+		for x in int(m.w):
+			if m.o[y][x] is String and String(m.o[y][x]) in SOT_SETAS:
+				m.o[y][x] = null
+	for e in D.FRIA.get("sot", []):
+		m.o[int(e[1])][int(e[0])] = String(e[2])
+
 func fria_hay() -> bool:
 	return Datos.CAL and S != null and D.has("FRIA")
 
@@ -87,9 +116,23 @@ func bt_obj(x: int, y: int, o) -> bool:
 			"mesaF":   # i18n-no
 				await say(K("La mesa de acero inoxidable: aquí se enfría el material antes de cada extracción y se recoge lo que sale."))
 				return true
-	if fria_hay() and Datos.PLAY and S.map == "sotano" and o is String and o in ["baldaS", "humidS", "secaS", "deshidS", "armS", "tuboS", "cuboS", "mesaS"]:   # en Play, el sótano sin setas · i18n-no
-		await say(K("Estanterías de rejilla y trastos del sótano. La sala fría, por la puerta de la pared."))
-		return true
+	if sot_play() and S.map == "sotano" and o is String:   # el trastero de delante de la sala fría, con lo suyo · i18n-no
+		match o:
+			"tuboS":
+				await say(K("La bajante del edificio, que suda. Por eso aquí abajo siempre hace fresco."))
+				return true
+			"cajasT":
+				await say(K("Cajas de la mudanza de la tía, precintadas y con el polvo de años."))
+				return true
+			"crate":
+				await say(K("Un cajón de madera con herramienta vieja. Abajo, latas de pintura secas."))
+				return true
+			"cuboS":
+				await say(K("Un cubo y una fregona. Lo que se escurre de la sala fría, aquí."))
+				return true
+			"baldaS", "humidS", "secaS", "deshidS", "armS", "mesaS":   # i18n-no
+				await say(K("Trastos del sótano. La sala fría, por la puerta de la pared."))
+				return true
 	return await super(x, y, o)
 
 # con la sala fría, las máquinas están abajo: fuera de ella (la mesa de la tía), solo lo que se hace a mano (el charas)

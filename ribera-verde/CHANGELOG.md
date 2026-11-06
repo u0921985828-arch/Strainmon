@@ -2,6 +2,22 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El sótano, una habitación para cada cosa (lo dijo el usuario: «usamos el mismo mapa, o sea, la misma habitación para poner tanto unos como otros… te dije que copiaras la sala, pero que una fuese una cosa y la otra fuese otra. Lo lógico y normal»)
+
+- El mapa `sotano` servía a la vez para dos cosas: el cultivo de setas (la obra de `SOTANO`, fuera de Play) y
+  la antesala de la sala fría. En Play, donde no hay setas, la habitación salía igual con sus baldas, el
+  humidificador y la malla, y un solo texto para todo.
+- **Ahora cada uso tiene su habitación** (`montar_sotano` en `src/salafria.gd`, llamada desde `enter_map`): el
+  mapa de los datos es el sótano de las setas tal cual; con `Datos.PLAY` y la sala fría, la misma sala se monta
+  como el trastero de delante de la sala fría: fuera `baldaS`, `humidS`, `secaS`, `deshidS`, `armS` y `mesaS`
+  (`SOT_SETAS`), y dentro su atrezo (`FRIA.sot` de `tools/sala_fria.py`: la bajante, las cajas de la mudanza de
+  la tía, dos cajones y el cubo con la fregona), todo con sprites que ya estaban en el atlas.
+- Textos propios por objeto en `bt_obj`, y el menú de las bandejas del bajo (`_ol_setas`) ya no salta en el
+  sótano de Play (`sot_play`).
+- Pruebas: `tests/play.gd` § 6c (el atrezo en su sitio, ni un mueble de setas, los textos y cero solapes, que
+  `tests/solapes.gd` no mide porque corre con `Datos.PLAY = false`) y `tests/sala_fria.gd` § 5b (sin Play, el
+  sótano de las setas intacto).
+
 ### El bajo de Txomin, sin cobrar en Play (lo vio el usuario: «no se puede contactar en persona con él y tener acceso al bajo, pero te sigue cobrando los 400»)
 
 - Una partida de la versión entera (`Datos.PLAY = false`, como la copia al máximo) podía traer el bajo de la
