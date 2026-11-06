@@ -1,0 +1,19 @@
+{
+  "grupo": "carpa-c-macetas-b",
+  "celda": [
+    32,
+    32
+  ],
+  "tope_colores": 15,
+  "secuencias": 5,
+  "fotogramas": 5,
+  "semitransparentes": 0,
+  "en_paleta_antes": 56.7,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

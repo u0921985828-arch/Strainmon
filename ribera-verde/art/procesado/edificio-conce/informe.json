@@ -1,0 +1,21 @@
+{
+  "grupo": "edificio-conce",
+  "celda": [
+    128,
+    96
+  ],
+  "tope_colores": 40,
+  "secuencias": 2,
+  "fotogramas": 5,
+  "semitransparentes": 0,
+  "en_paleta_antes": 13.5,
+  "distancia_media": 0,
+  "colores_finales": 25,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "puerta/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

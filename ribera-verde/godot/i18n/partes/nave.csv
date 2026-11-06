@@ -1,0 +1,211 @@
+es,en
+Arrancar y plantar,Uproot and plant
+Plantar,Plant
+Abono,Nutrients
+Focos,Lights
+Nada,Nothing
+vacía,empty
+"Mesa {i} · {que} · {foco}
+{cuida}","Table {i} · {que} · {foco}
+{cuida}"
+La cuida {n}.,{n} looks after it.
+Nadie la cuida: pon a alguien de tu plantilla en la nave.,Nobody tends it: put someone from your crew in the warehouse.
+Lo de esta mesa aún se está secando en el secadero: espera a descolgarlo.,This table's crop is still drying: wait to take it down.
+"Antes, descuelga del secadero lo de esta mesa.","First, take this table's crop down from the drying room."
+¿Qué abono le echa cada día? En la estantería: MEATZA ×{m} · ORTUA BIO ×{o}.,What nutrients each day? On the shelf: MEATZA ×{m} · ORTUA BIO ×{o}.
+Sin abono,No nutrients
+MEATZA Floración,MEATZA Bloom
+ORTUA BIO Floración,ORTUA BIO Bloom
+No llevas semillas ni esquejes.,You've got no seeds or cuttings.
+Madre {j}: {nom}{et},Mother {j}: {nom}{et}
+clon,clone
+Un clon de la carpa de las madres: no se gasta nada.,A clone from the mother tent: it doesn't use anything up.
+Bandeja: {nom}{et},Tray: {nom}{et}
+{n} clones,{n} clones
+Los clones enraizados del carro de bandejas: una mesa entera.,The rooted clones from the tray cart: a whole table.
+Esqueje {nom}{et},Cutting {nom}{et}
+bandeja,tray
+esqueje,cutting
+Clon enraizado: sale con su fenotipo.,Rooted clone: keeps its phenotype.
+Cancelar,Cancel
+¿QUÉ PLANTAS EN LA MESA?,WHAT GOES ON THE TABLE?
+"Mesa {i}: {nom}{et}. De la madre salen los clones para toda la mesa: enraízan, crecen a 18/6 y florecen a 12/12. Se cosecha entera en unos {d} días y vuelve a empezar.","Table {i}: {nom}{et}. The mother gives clones for the whole table: they root, grow at 18/6 and bloom at 12/12. The whole table is harvested in about {d} days and it starts again."
+Madre {j} · {nom},Mother {j} · {nom}
+{n} esq.,{n} cut.
+{m}. Vigor {v} % · {e} esquejes listos.,{m}. Vigour {v} % · {e} cuttings ready.
+{m}. Vigor {v} %.,{m}. Vigour {v} %.
+Meter una madre,Add a mother
+{a} de {b},{a} of {b}
+Con una semilla o un esqueje: la madre de una genética que quieras guardar. De ella salen los esquejes y los clones de las mesas.,From a seed or a cutting: the mother of a strain you want to keep. She gives the cuttings and the clones for the tables.
+Volver,Back
+LAS MADRES,THE MOTHERS
+Las cuida {n},{n} tends them
+Nadie las cuida,Nobody tends them
+¿QUÉ MADRE METES?,WHICH MOTHER?
+La {nom} es autofloreciente: florece por la edad y no se queda de madre. Sus esquejes florecerían enanos.,{nom} is an autoflower: it blooms by age and won't stay a mother. Its cuttings would flower as dwarfs.
+"La {nom}{et}, a la carpa de las madres: a 18/6, siempre en crecimiento.","{nom}{et} goes into the mother tent: 18/6, always in veg."
+{n} se encarga.,{n} takes care of it.
+"Sin nadie que la cuide, se va apagando: pon a alguien de tu plantilla en las madres.","With nobody tending it, it fades: put someone from your crew on the mothers."
+Recoger {n} esquejes,Take {n} cuttings
+Recoger {n} esqueje,Take {n} cutting
+Quitarla,Remove it
+Madre {j}: {m} · vigor {v} %.,Mother {j}: {m} · vigour {v} %.
+{n} le saca esquejes cada mañana.,{n} takes cuttings every morning.
+Nadie le saca esquejes.,Nobody takes cuttings.
+El propagador está lleno: {n} esquejes. Planta alguno antes.,The propagator is full: {n} cuttings. Plant some first.
+"{q} esquejes de la {m}, al propagador. Plántalos antes del {f}.",{q} cuttings of {m} into the propagator. Plant them before {f}.
+"Un esqueje de la {m}, al propagador. Plántalos antes del {f}.",One cutting of {m} into the propagator. Plant it before {f}.
+¿Quitas la madre de {m}? Se tira.,Remove the {m} mother? It gets binned.
+No,No
+"La carpa está vacía. Tráeme una madre, una semilla o un esqueje de lo que quieras guardar, y te la cuido.","The tent's empty. Bring me a mother, a seed or a cutting of whatever you want to keep, and I'll look after it."
+"{n} madres, a 18/6 y bien regadas. Cada mañana les saco dos esquejes; los tienes en la carpa.","{n} mothers, at 18/6 and well watered. Every morning I take two cuttings; they're in the tent."
+"{n} madres, a 18/6 y bien regadas. Cada mañana les saco un esqueje; los tienes en la carpa.","{n} mothers, at 18/6 and well watered. Every morning I take a cutting; they're in the tent."
+"Una madre, a 18/6 y bien regadas. Cada mañana les saco dos esquejes; los tienes en la carpa.","One mother, at 18/6 and well watered. Every morning I take two cuttings; they're in the tent."
+"Una madre, a 18/6 y bien regadas. Cada mañana les saco un esqueje; los tienes en la carpa.","One mother, at 18/6 and well watered. Every morning I take a cutting; they're in the tent."
+"Mesa {i}: {n}. {d}
+¿Los cambias? Los de ahora se los queda Arrieta.","Table {i}: {n}. {d}
+Swap them? Arrieta keeps the old ones."
+No te llega.,You can't afford it.
+Arrieta cuelga los {n} en la mesa {i}. {d},Arrieta hangs the {n} over table {i}. {d}
+"Con tanto foco, la nave se calienta: hará falta más extracción.",With all those lights the warehouse heats up: it'll need more extraction.
+a tope,maxed
+Siguiente: {n}. {d},Next: {n}. {d}
+Extracción,Extraction
+Riego,Watering
+MEJORAS DE LA NAVE,WAREHOUSE UPGRADES
+Nave {n},Warehouse {n}
+"{n}: {d} {p}, montado hoy mismo.","{n}: {d} {p}, fitted today."
+Comprar,Buy
+Arrieta y los suyos montan {a}. La nave ya es una nave {n}.,Arrieta and his lot fit {a}. The warehouse is now a {n} one.
+Dejar MEATZA ×{n},Leave MEATZA ×{n}
+Dejar ORTUA BIO ×{n},Leave ORTUA BIO ×{n}
+Ordenar la nave,Arrange the warehouse
+La estantería de los abonos: MEATZA FLORACIÓN ×{m} · ORTUA BIO FLORACIÓN ×{o}. Cada mesa con abono gasta menos de una dosis al día.,The nutrient shelf: MEATZA BLOOM ×{m} · ORTUA BIO BLOOM ×{o}. Each fed table uses under one dose a day.
+La estantería de los abonos: MEATZA FLORACIÓN ×{m} · ORTUA BIO FLORACIÓN ×{o}. Cada mesa con abono gasta una dosis al día.,The nutrient shelf: MEATZA BLOOM ×{m} · ORTUA BIO BLOOM ×{o}. Each fed table uses one dose a day.
+En el secadero cuelgan {g} secándose: mañana se pueden descolgar.,{g} hanging in the drying room: you can take it down tomorrow.
+El secadero está vacío. Cada mesa se cosecha entera al final de su ciclo y se seca aquí un día.,The drying room is empty. Each table is harvested whole at the end of its cycle and dries here for a day.
+El secadero está vacío. Cada mesa se cosecha entera al final de su ciclo y se seca aquí {n} días.,The drying room is empty. Each table is harvested whole at the end of its cycle and dries here for {n} days.
+No te cabe nada más en la mochila.,Your backpack can't fit any more.
+Descuelgas {g} del secadero.,You take {g} down from the drying room.
+Quedan {g}: no te caben.,{g} left: they don't fit.
+"Siguen colgados {g}, secándose.","{g} still hanging, drying."
+"{ab} · {co} · ciclo {c} · en el secadero, {g} y {h} secándose.","{ab} · {co} · cycle {c} · drying room: {g}, plus {h} drying."
+"{ab} · {co} · ciclo {c} · en el secadero, {g}.",{ab} · {co} · cycle {c} · drying room: {g}.
+Mesa {i} · {n},Table {i} · {n}
+Nadie la cuida.,Nobody tends it.
+Estantería,Shelf
+{m} + {o} dosis,{m} + {o} doses
+MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: menos de una dosis al día por mesa con abono.,MEATZA BLOOM and ORTUA BIO BLOOM: under one dose a day per fed table.
+MEATZA FLORACIÓN y ORTUA BIO FLORACIÓN: una dosis al día por mesa con abono.,MEATZA BLOOM and ORTUA BIO BLOOM: one dose a day per fed table.
+Clima,Climate
+El calor de los focos encendidos y lo que saca la extracción ({n}).,Heat from the lights on and what the extraction pulls out ({n}).
+Hace demasiado calor: las mesas dan un {p} % menos.,It's too hot: the tables yield {p} % less.
+Mover las mesas y el tanque del riego: la manguera va del tanque a cada mesa por el suelo libre. Pulsa A.,Move the tables and the water tank: the hose runs from the tank to each table over free floor. Press A.
+La gente,The crew
+{n} aquí,{n} here
+"Quién cuida cada mesa y las madres: cambiarlos de mesa, una prima o un curso. Pulsa A.","Who tends each table and the mothers: switch tables, a bonus or a course. Press A."
+Mejoras,Upgrades
+Extracción: {e}. Riego: {r}. Pulsa A para mejorarlas.,Extraction: {e}. Watering: {r}. Press A to upgrade.
+LA NAVE,THE WAREHOUSE
+{e} al día,{e} a day
+En la nave no trabaja nadie. Pon a tu gente desde el móvil: MÓVIL → PLANTILLA.,Nobody works in the warehouse. Assign your people from the phone: PHONE → CREW.
+madres,mothers
+mesa {n},table {n}
+LA GENTE DE LA NAVE,THE WAREHOUSE CREW
+{n} trabajando,{n} working
+Cambiar de mesa,Switch table
+Prima · {e},Bonus · {e}
+Curso · {e},Course · {e}
+las madres,the mothers
+la mesa {n},table {n}
+Mesa {n} · con {o},Table {n} · with {o}
+Mesa {n},Table {n}
+¿A qué mesa pasa {n}?,Which table does {n} move to?
+"{a} pasa a la mesa {i} y {b}, a la {j}.",{a} moves to table {i} and {b} to {j}.
+{a} pasa a la mesa {i}.,{a} moves to table {i}.
+Mi mesa está vacía. Plántame algo y la saco adelante.,My table's empty. Plant me something and I'll bring it on.
+"La {nom} va bien: {f}, {c}. Cuando acaba la flor la corto entera, la cuelgo en el secadero y vuelvo a empezar con los esquejes que saqué antes de pasarla a 12/12.","The {nom} is doing fine: {f}, {c}. When the bloom's done I cut it all, hang it in the drying room and start over with the cuttings I took before switching to 12/12."
+Se ha acabado el abono de la estantería.,The shelf's out of nutrients.
+Y aquí dentro hace un calor que no veas: hace falta más extracción.,And it's boiling in here: we need more extraction.
+PORTERO,BOUNCER
+"La entrada, {e}. Se paga una vez por noche.","Entry, {e}. You pay once a night."
+Pagar,Pay
+Sin entrada no se pasa.,"No ticket, no entry."
+Las seis. Se encienden las luces y el portero echa a todo el mundo.,Six a.m. The lights come on and the bouncer throws everyone out.
+Abrimos a las once de la noche. Hasta las seis.,We open at eleven at night. Until six.
+Ya has pagado esta noche. Pasa.,You've paid tonight. Go in.
+"La entrada, {e}. En la puerta.","Entry, {e}. At the door."
+CAMARERA,BARTENDER
+¿Qué te pongo?,What can I get you?
+Una copa · {e},A drink · {e}
+Invitar a una ronda · {e},Buy a round · {e}
+"Por hoy ya vale. Agua, si quieres.","That's enough for today. Water, if you want."
+Sin dinero no hay copa.,"No money, no drink."
+Un gin-tonic con mucho hielo.,A gin and tonic with lots of ice.
+Otra. La música sube.,Another. The music gets louder.
+La tercera. Mejor que sea la última.,The third. Better make it the last.
+"Ya has invitado esta noche. Con una, ya te conocen.","You've already bought a round tonight. One's enough, they know you now."
+No te llega para la ronda.,You can't afford the round.
+Invitas a la barra entera. Medio local brinda por ti.,You buy the whole bar a round. Half the club toasts you.
+¿Qué tal suena?,How does it sound?
+Esta noche se llena.,It'll be packed tonight.
+Bailar,Dance
+Pedir una canción,Request a song
+DJ,DJ
+Te la pongo después de esta.,I'll play it after this one.
+"¿Esa? Hace años que no la pincho. Venga, va.","That one? Haven't spun it in years. Go on, then."
+Esa no la tengo. Te pongo algo parecido.,Don't have that one. I'll play something like it.
+Ya has bailado esta noche. Las piernas no dan para más.,You've danced enough tonight. Your legs can't take more.
+"Bailas media hora sin parar. {n} te pide el número: «Si tienes de lo bueno, llámame».","You dance for half an hour straight. {n} asks for your number: ""If you've got the good stuff, call me."""
+Bailas media hora sin parar. Sales de la pista con la camiseta empapada.,You dance for half an hour straight. You leave the floor with your shirt soaked.
+RRPP,PROMOTER
+"Disfruta del reservado. Si conoces a alguien que merezca la pena, me lo presentas.","Enjoy the VIP area. If you meet anyone worthwhile, introduce me."
+"Tu agenda ya está llena. Cuando tengas sitio para alguien que importa, vuelve.",Your contacts are full. Come back when you have room for someone who matters.
+"El reservado: sofá, mesa y botella, {e} la noche. Ahí se sienta la gente que importa.","The VIP area: sofa, table and bottle, {e} a night. That's where the people who matter sit."
+Reservar,Book
+Para el reservado hace falta dinero. Otra noche.,The VIP area takes money. Another night.
+Una hora en el reservado. La RRPP te presenta a {n}: «Me han dicho que lo tuyo es de lo mejor. Llámame». Apuntas su número.,"An hour in the VIP area. The promoter introduces you to {n}: ""I hear your stuff is top-notch. Call me."" You save the number."
+GENTE,PEOPLE
+{x} de {n},{n} {x}
+Hoy ya está todo repartido. Mañana entra más.,It's all gone for today. More comes in tomorrow.
+"{n}: {g} g a {t} % de THC, a {p} el gramo.","{n}: {g} g at {t} % THC, {p} a gram."
+No comprar nada hoy.,Don't buy anything today.
+Hoy tenemos,Today's stock
+"{n}, al {t} % de THC. ¿Cuánto te llevas?","{n}, at {t} % THC. How much do you want?"
+Sin dinero no hay trato.,"No money, no deal."
+No te cabe en la bolsa.,It won't fit in your bag.
+Comprado: {g} g de {n},Bought: {g} g of {n}
+"El almacén del club, con llave. La tiene el presidente.","The club's storeroom, locked. The president has the key."
+Guardar,Store
+Sacar,Take out
+"EL ALMACÉN DEL CLUB · {a} de {b} ocupados. Lo de aquí lo retiran los socios del dispensario, {d} g al día; en total, {t}.","THE CLUB STOREROOM · {a} of {b} used. Members collect from here at the dispensary, {d} g a day; total so far, {t}."
+No llevas nada encima.,You're not carrying anything.
+¿Qué guardas?,Store what?
+Las estanterías están llenas.,The shelves are full.
+Al almacén: {g},Stored: {g}
+El almacén está vacío.,The storeroom is empty.
+¿Qué sacas?,Take out what?
+Sacado: {g},Taken: {g}
+"Junto a la foto de la tía Maite, un hombre mayor con las rastas y la barba canas no te quita ojo.","By Aunt Maite's photo, an older man with grey dreads and beard can't take his eyes off you."
+"¿Qué tal, presidente?","How are things, president?"
+"Dime, sobrino.","Go on, nephew."
+Charlar,Chat
+El dispensario,The dispensary
+La presidencia,The presidency
+"La asamblea es el {f}, por la mañana. Habla con la gente del barrio: cada amigo trae votos. O la refundas ya, por {e}.","The assembly is on {f}, in the morning. Talk to the neighbourhood: every friend brings votes. Or refound it now, for {e}."
+Refundarla,Refound it
+Hacen falta {m} votos de {v}. Hoy tendrías {h}. O pagas {e} de deudas y registro y la refundas tú.,You need {m} votes out of {v}. Today you'd get {h}. Or pay {e} in debts and registration and refound it yourself.
+Presentarme,Run for it
+Hasta el {f} no hay otra asamblea. Gánate al barrio mientras.,No assembly until {f}. Win the neighbourhood over meanwhile.
+"Apuntado. La asamblea, el {f}. {r} también se presenta.",You're in. The assembly is on {f}. {r} is running too.
+Sin los {e} no hay refundación.,No refounding without the {e}.
+"Pagas las deudas de la gestora y el registro. La asociación vuelve a nacer, con tus estatutos. Maite estaría orgullosa.","You pay off the debts and the registration. The association is reborn, with your bylaws. Maite would be proud."
+"En el dispensario quedan {g} de {n}, a {p} € el gramo. Llevas {t}.","The dispensary has {g} of {n} left, at {p} € a gram. Earned so far: {t}."
+"Déjame {a} g o más y los socios lo retiran, {d} g al día. El dinero, a tu buzón.","Leave me {a} g or more and members collect it, {d} g a day. The money goes to your mailbox."
+¿Qué lote?,Which batch?
+{n} a {p} € el gramo para los socios. ¿Cuánto dejas?,{n} at {p} € a gram for members. How much do you leave?
+"Al dispensario. Cada mañana, {g} para los socios.","Into the dispensary. Every morning, {g} for the members."
+"¡{v} votos de {t}! Eres el presidente de la asociación, sobrino. Como tu tía.","{v} votes out of {t}! You're the association's president, nephew. Like your aunt."
+{v} votos de {t}: gana {r}. Gánate al barrio y preséntate otra vez desde el {f}.,{v} votes out of {t}: {r} wins. Win the neighbourhood over and run again from {f}.
+SMS · DELROY,SMS · DELROY
+"Se acabó lo del dispensario: {e} en total, en tu buzón.","The dispensary batch is done: {e} in total, in your mailbox."

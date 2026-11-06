@@ -1,0 +1,223 @@
+es,en
+Llamar,Call
+Pedir a Kiko,Order from Kiko
+Mensajes,Messages
+Gente,People
+Plantilla,Crew
+Banca,Banking
+Tienda online,Online shop
+Calendario,Calendar
+Mapa,Map
+Colgar,Hang up
+"MÓVIL · {d}, {h} · {n} mensajes","PHONE · {d}, {h} · {n} messages"
+"MÓVIL · {d}, {h} · {n} mensaje","PHONE · {d}, {h} · {n} message"
+"MÓVIL · {d}, {h}","PHONE · {d}, {h}"
+"La agenda: Kiko, Toño, Iñaki y los clientes que te han comprado.","Contacts: Kiko, Toño, Iñaki and the customers who've bought from you."
+"Lo del growshop, a casa mañana por la mañana (+{n} %).","Growshop gear, delivered home tomorrow morning (+{n} %)."
+{n} mensajes.,{n} messages.
+{n} mensaje.,{n} message.
+No hay mensajes.,No messages.
+La confianza con cada persona.,How much each person trusts you.
+"Tu gente: la calle, la casa y la nave.","Your people: the street, the flat and the warehouse."
+"En la cuenta, {e}. Movimientos y recibos.",In the account: {e}. Transactions and bills.
+Con tarjeta; llega al día siguiente.,Pay by card; arrives the next day.
+"El mes, con los días señalados.","The month, with key dates marked."
+La comarca y las líneas de autobús.,The county and the bus lines.
+"{op} · {f}, {h}
+{d} · Fuera: {n}, {t} °C (máx. {mx}, mín. {mn}), {e}.
+A: abrir · B: colgar.","{op} · {f}, {h}
+{d} · Outside: {n}, {t}° (high {mx}, low {mn}), {e}.
+A: open · B: hang up."
+"{op} · {f}, {h}
+{d} · A: abrir · B: colgar.","{op} · {f}, {h}
+{d} · A: open · B: hang up."
+MÓVIL,PHONE
+Kiko,Kiko
+growshop,growshop
+"Consejos de cultivo. Los pedidos, desde «Pedir a Kiko».","Growing tips. For orders, use ""Order from Kiko""."
+Toño,Toño
+Don Baltasar,Don Baltasar
+Lo que debes y hasta cuándo.,What you owe and by when.
+Iñaki,Iñaki
+muelle,docks
+Compra al por mayor.,Buys wholesale.
+Ya ha venido hoy.,Already came today.
+"Te compró en la calle. Si estás fuera, viene a buscarte.","Bought from you on the street. If you're out, they come to you."
+La agenda está vacía.,Your contacts are empty.
+Nada,Nothing
+LLAMAR,CALL
+KIKO,KIKO
+TOÑO,TOÑO
+Te quedan {e} hasta el {f}. Don Baltasar no espera.,"You still owe {e}, due {f}. Don Baltasar doesn't wait."
+Ahora mismo no debes nada. Que siga así.,You don't owe a thing right now. Keep it that way.
+IÑAKI,IÑAKI
+Ahora estoy en la mar. A la vuelta hablamos.,I'm out at sea. We'll talk when I'm back.
+Hoy ya he cargado. Mañana sale otro barco.,I've already loaded today. Another boat leaves tomorrow.
+"Al por mayor, de 100 g para arriba y hasta {kg} por carga. Pásate por el muelle.","Wholesale: 100 g and up, max {kg} per load. Come by the docks."
+{n} ya ha venido hoy.,{n} already came today.
+{n}: «¿Dónde estás? Quedamos en la calle».,"{n}: ""Where are you? Let's meet on the street."""
+{n}: «¿Con la policía detrás? Ni de broma».,"{n}: ""With the cops on your tail? No way."""
+"{n}: «Vale, voy para allá».","{n}: ""OK, on my way."""
+{l} · ×{n},{l} · ×{n}
+Salir,Exit
+Lo pedido llega mañana por la mañana a casa.,Orders reach your place tomorrow morning.
+PEDIR A KIKO,ORDER FROM KIKO
+Envío a casa +{n} % · tienes {e},Home delivery +{n} % · you have {e}
+No te llega el dinero.,You can't afford it.
+Pedido: {l} · llega mañana,Ordered: {l} · arrives tomorrow
+Te he dejado el paquete en casa: {t}.,Left the package at your place: {t}.
+SMS · KIKO,SMS · KIKO
+No tienes mensajes.,You have no messages.
+MENSAJES,MESSAGES
+{a} de {b},{a} of {b}
+"Sin cobrar no vuelvo, majo. Cuando tengas el dinero, hablamos.","No pay, no work, love. When you've got the money, we'll talk."
+SMS · BEGOÑA,SMS · BEGOÑA
+SMS · {n},SMS · {n}
+Me ha parado la policía. Se han quedado con {g} de {l}. Lo siento.,The cops stopped me. They kept {g} of {l}. Sorry.
+{n} no contesta al móvil. Se ha largado con {g} de {l}.,{n} isn't answering the phone. Ran off with {g} of {l}.
+"Vendidos los últimos {g} g: {e} en tu buzón. Si quieres que siga, déjame más.",Sold the last {g} g: {e} in your mailbox. Want me to keep going? Leave me more.
+Vendidos {g} g: {e} en tu buzón. Me quedan {q}.,Sold {g} g: {e} in your mailbox. {q} left.
+Que venga,Come over
+Regalarle {n} g,Gift {n} g
+Cómo va la venta,How are sales?
+Que venda para mí,Sell for me
+{n} · {t} · confianza {c} ({v}),{n} · {t} · trust {c} ({v})
+"{n}: «¿Otra vez? Gracias, pero hoy ya me has invitado».","{n}: ""Again? Thanks, but you already treated me today."""
+¿Qué le regalas?,What do you give them?
+{n}: «¡Gracias! Se lo cuento a todo el mundo».,"{n}: ""Thanks! I'll tell everyone."""
+{n}: «Me quedan {g} de {l}. Cada día vendo lo que puedo y te dejo el {p} % en el buzón».,"{n}: ""I've got {g} of {l} left. I sell what I can each day and leave you {p} % in the mailbox."""
+"{n}: «Cuando tengas {g} g o más, hablamos».","{n}: ""When you've got {g} g or more, we'll talk."""
+¿Qué lote le dejas?,Which batch do you leave?
+{n} vende a precio de calle y se queda el {p} %. ¿Cuánto le dejas?,{n} sells at street price and keeps {p} %. How much do you leave?
+{n}: «Hecho. Cada día te dejo lo vendido en el buzón».,"{n}: ""Deal. I'll leave the takings in your mailbox every day."""
+{r} · {t},{r} · {t}
+jardinera,gardener
+Hablar cada día suma confianza.,Talking every day builds trust.
+el encargado,the manager
+" Para que te compren, {c} con {e} y con el {t}.", To buy from you: {c} with {e} and with the {t}.
+" Para que te compren, {c} con {e} y con la {t}.", To buy from you: {c} with {e} and with the {t}.
+" Para que te compren, {c} con {e} y con {a} {t}.", To buy from you: {c} with {e} and with {a} {t}.
+Eres socio. Vender y cumplir los encargos suma.,You're a member. Selling and filling orders builds trust.
+Hazte socio para vender y comprar.,Become a member to buy and sell.
+El {t} de {c}. Hablar e invitarle suma.{no},The {t} of {c}. Chatting and treating them builds trust.{no}
+La {t} de {c}. Hablar e invitarle suma.{no},The {t} of {c}. Chatting and treating them builds trust.{no}
+vende para ti,sells for you
+Le dejaste {l}: le quedan {g}.,You left them {l}: {g} to go.
+Cliente de la agenda. Buen precio y regalos suman; con {n} vende para ti.,Regular customer. Fair prices and gifts help; at {n} they sell for you.
+Todavía no conoces a nadie.,You don't know anyone yet.
+GENTE,PEOPLE
+{n} personas,{n} people
+{n} persona,{n} person
+BEGOÑA,BEGOÑA
+"¿Qué tal las plantas, majo? Paso cada mañana: {e} al día.","How are the plants, love? I come by every morning: {e} a day."
+Charlar,Chat
+Que lo deje,Let her go
+"Como quieras. Si me necesitas, aquí estoy.","As you like. If you need me, I'm here."
+Contratarla,Hire her
+"Tu tía me dejaba cuidarle las plantas cuando se iba. Con confianza, se habla de todo.","Your aunt let me mind her plants when she was away. With trust, we can talk about anything."
+"Hola, majo. ¿Cómo van esas plantas?","Hi, love. How are those plants doing?"
+"Hoy ya me has dado, majo. Mañana más.","You already gave me some today, love. More tomorrow."
+¿Qué le das?,What do you give her?
+"Ay, gracias. Para dormir, como hacía tu tía.","Oh, thanks. For sleeping, like your aunt did."
+"Te riego, relleno las garrafas y el depósito y, si tienes insecticida, trato las plagas. {e} al día, cada mañana. ¿Hecho?","I'll water, refill the jugs and the tank and, if you've got insecticide, treat the pests. {e} a day, every morning. Deal?"
+Hecho,Deal
+Ahora no,Not now
+Mañana empiezo. Ya sé dónde dejaba la llave tu tía.,I start tomorrow. I know where your aunt left the key.
+{c}. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son {q}. ¿Te haces socio?,{c}. Nothing's sold inside: your stuff comes in the back door. Membership is {q}. Want to join?
+"{c}, asociación de consumidores. Dentro no se vende nada: lo tuyo entra por la puerta de atrás. La cuota son {q}. ¿Te haces socio?","{c}, a consumers' association. Nothing's sold inside: your stuff comes in the back door. Membership is {q}. Want to join?"
+Hacerme socio,Join
+No,No
+Sin la cuota no hay carné.,"No fee, no card."
+el carné de {c},the {c} card
+Comprar,Buy
+Comprar {n} g,Buy {n} g
+Invitar a {n} g,Treat to {n} g
+Vender al club,Sell to the club
+Entregar las semillas,Hand over the seeds
+Encargo de semillas,Seed order
+¿Qué te trae?,What brings you here?
+"Aquí no compramos a cualquiera. Antes te tienes que ganar mi confianza y la de {p}, el {t}.","We don't buy from just anyone. First you have to earn my trust and that of {p}, the {t}."
+"Aquí no compramos a cualquiera. Antes te tienes que ganar mi confianza y la de {p}, la {t}.","We don't buy from just anyone. First you have to earn my trust and that of {p}, the {t}."
+"Aquí no compramos a cualquiera. Antes te tienes que ganar mi confianza y la de {p}, {a} {t}.","We don't buy from just anyone. First you have to earn my trust and that of {p}, {a} {t}."
+Aquí no compramos a cualquiera. Antes te tienes que ganar mi confianza.,We don't buy from just anyone. First you have to earn my trust.
+"Aquí no compramos a cualquiera. Antes te tienes que ganar la confianza de {p}, el {t}.","We don't buy from just anyone. First you have to earn the trust of {p}, the {t}."
+"Aquí no compramos a cualquiera. Antes te tienes que ganar la confianza de {p}, la {t}.","We don't buy from just anyone. First you have to earn the trust of {p}, the {t}."
+"Aquí no compramos a cualquiera. Antes te tienes que ganar la confianza de {p}, {a} {t}.","We don't buy from just anyone. First you have to earn the trust of {p}, {a} {t}."
+Hoy ya me has invitado. Otro día.,You already treated me today. Another day.
+¿Qué le das a probar?,What do you give them to try?
+Mm. Esto no es de cualquiera. Gracias.,Mm. This isn't just anyone's stuff. Thanks.
+"Desde hoy, {c} te compra. Lo tuyo, por la puerta de atrás.","From today, {c} buys from you. Your stuff goes in the back door."
+"Soy {p}, el {t} del club. A ti todavía no te conozco.","I'm {p}, the club's {t}. I don't know you yet."
+"Soy {p}, la {t} del club. A ti todavía no te conozco.","I'm {p}, the club's {t}. I don't know you yet."
+"Soy {p}, {a} {t} del club. A ti todavía no te conozco.","I'm {p}, {a} {t} of the club. I don't know you yet."
+"Hombre, {N}. Lo tuyo tiene buena fama entre los socios.","Hey, {N}. Your stuff has a good name among the members."
+Hoy ya hemos cerrado caja. Mañana.,We've closed the till for today. Tomorrow.
+"De {g} g para arriba, entre {a} y {b} € el gramo según el THC. Una entrega al día.","{g} g and up, {a} to {b} € a gram depending on THC. One delivery a day."
+" Extracciones, de {g} g para arriba."," Extracts, {g} g and up."
+¿Qué lote?,Which batch?
+"Hoy ya no nos cabe tanto. Algo más pequeño, o mañana.","We can't take that much today. Something smaller, or tomorrow."
+{l} a {p} € el gramo (analizado). ¿Cuánto?,{l} at {p} € a gram (tested). How much?
+{l} a {p} € el gramo. ¿Cuánto?,{l} at {p} € a gram. How much?
++{e} · {g} g de {x} al club,+{e} · {g} g of {x} to the club
++{e} · {g} g al club,+{e} · {g} g to the club
+"Por la puerta de atrás, como siempre. Gracias.","Through the back door, as always. Thanks."
+Lo de hoy ya está repartido. Mañana hay más.,Today's share is gone. More tomorrow.
+Hoy tenemos {s} ({t} %): {g} g por {e}. ¿Te los llevas?,Today we have {s} ({t} %): {g} g for {e}. Want it?
+Sin dinero no hay reparto.,"No money, no share."
+No te caben en la bolsa.,They won't fit in your bag.
+Comprado: {g} g de {s},Bought: {g} g of {s}
+Ya tienes un encargo pendiente en {c}. Cumple ese primero.,You already have an order pending at {c}. Finish that first.
+Nos faltan {n} semillas de {s}. Hasta el {f}.,We're still missing {n} {s} seeds. Due {f}.
++{e} · {n} semillas de {s},+{e} · {n} {s} seeds
+Las sembramos para los socios. Buen trabajo.,We'll sow them for the members. Good job.
+Hoy ya no hay más encargos. Mañana.,No more orders today. Tomorrow.
+"Los socios quieren {n} semillas de {s}. Pagamos {e}, en {d} días. ¿Te encargas?","The members want {n} {s} seeds. We pay {e}, within {d} days. Will you do it?"
+Aceptar,Accept
+"Si cambias de idea, aquí estamos.","If you change your mind, we're here."
+"Hasta el {f}. Las semillas, aquí.",Due {f}. Bring the seeds here.
+Se acabó el plazo de las semillas. Los socios no se olvidan.,The seed deadline's passed. The members won't forget.
+relaja y pesa,relaxing and heavy
+sube y despeja,uplifting and clear
+equilibrado,balanced
+{t} % de THC,{t} % THC
+floja,weak
+media,medium
+fuerte,strong
+muy fuerte,very strong
+Aroma {a} ({tp}) · {e} · {p},{a} aroma ({tp}) · {e} · {p}
+Aroma {a} · {e} · {p},{a} aroma · {e} · {p}
+Catas {l}: {n}.,You sample {l}: {n}.
+Catas {g} g de {l}: {n}.,You sample {g} g of {l}: {n}.
+ Bien curada: suave y con todo el aroma.," Well cured: smooth, with all its aroma."
+ Sin curar del todo: rasca y huele a verde., Not fully cured: harsh and smells green.
+ Te deja tocado un buen rato., It leaves you buzzed for a good while.
+ Demasiado: te quedas un buen rato mirando a la pared., Too much: you spend a good while staring at the wall.
+"¿Cuánto catas? (de una vez, {g} g como mucho)",How much do you sample? (max {g} g at once)
+Catas {g} g de {x}: {n}.,You sample {g} g of {x}: {n}.
+Catar…,Sample…
+Tirar,Throw away
+{x}: {g} g · {t} % · catado,{x}: {g} g · {t} % · sampled
+{x}: {g} g · {t} %,{x}: {g} g · {t} %
+"Analizado: {l} · THC {t} % · CBD {c} % · terpeno principal, {p}. Lo que va con análisis se vende mejor.","Tested: {l} · THC {t} % · CBD {c} % · main terpene, {p}. Tested stuff sells better."
+Catar {g} g,Sample {g} g
+Analizar,Test
+{l}: {g} g · {t} %{c} · catado · analizado,{l}: {g} g · {t} %{c} · sampled · tested
+{l}: {g} g · {t} %{c} · catado,{l}: {g} g · {t} %{c} · sampled
+{l}: {g} g · {t} %{c} · analizado,{l}: {g} g · {t} %{c} · tested
+{l}: {g} g · {t} %{c},{l}: {g} g · {t} %{c}
+Tirar {x}: ¿cuánto?,Throw away {x}: how much?
+Tiras {g} g de {x}.,You throw away {g} g of {x}.
+Tiras {g} de {x}.,You throw away {g} of {x}.
+Darko,Darko
+DARKO,DARKO
+"Eh, tú. Llevas {n} ventas en {s}.","Hey, you. That's {n} sales in {s}."
+O me pagas {e} o lo arreglamos aquí.,Pay me {e} or we settle it right here.
+¿Qué haces?,What do you do?
+Pelear,Fight
+Pagarle {e},Pay {e}
+Irte,Leave
+"{n} no volverá por {s} en {d} días. Mientras, sus clientes te pagan un {p} % más.","{n} won't show up in {s} for {d} days. Meanwhile, their customers pay you {p} % more."
+{n}: «Vale. Pero no te quiero ver tanto por aquí.»,"{n}: ""Fine. But I don't want to see you around here so much."""
+{n} se guarda el dinero. «Así me gusta. Hasta la próxima.»,"{n} pockets the money. ""That's how I like it. Until next time."""
+No llevas tanto dinero encima.,You're not carrying that much cash.
+Te apartas. {n} se queda mirándote.,You back off. {n} keeps staring at you.

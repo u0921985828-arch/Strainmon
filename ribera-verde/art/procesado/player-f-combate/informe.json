@@ -1,0 +1,27 @@
+{
+  "grupo": "player-f-combate",
+  "celda": [
+    64,
+    64
+  ],
+  "tope_colores": 15,
+  "secuencias": 8,
+  "fotogramas": 41,
+  "semitransparentes": 0,
+  "en_paleta_antes": 32.2,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [],
+  "huerfanos_quitados": 10,
+  "deriva_pies": {
+    "comer/north": 0,
+    "desmayo/north": 0,
+    "golpe/north": 0,
+    "herido/north": 0,
+    "idle/north": 2,
+    "patada/north": 1,
+    "spray/north": 0
+  },
+  "errores": [],
+  "avisos": []
+}

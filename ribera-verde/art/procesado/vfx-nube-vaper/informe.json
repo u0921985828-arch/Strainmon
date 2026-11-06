@@ -1,0 +1,20 @@
+{
+  "grupo": "vfx-nube-vaper",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 1,
+  "fotogramas": 8,
+  "semitransparentes": 0,
+  "en_paleta_antes": 52.3,
+  "distancia_media": 10.06,
+  "colores_finales": 12,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "efecto/unica": 6
+  },
+  "errores": [],
+  "avisos": []
+}

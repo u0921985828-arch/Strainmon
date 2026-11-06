@@ -1,0 +1,35 @@
+{
+  "grupo": "edificio-bar",
+  "celda": [
+    112,
+    96
+  ],
+  "secuencias": 2,
+  "fotogramas": 5,
+  "semitransparentes": 0,
+  "en_paleta_antes": 4.6,
+  "distancia_media": 24.55,
+  "colores_finales": 15,
+  "fundidos": [
+    "base: #e8e05a→#b8aa48",
+    "base: #382848→#1e2a5a",
+    "base: #70b4f0→#7aa6e0",
+    "base: #5a5048→#5a3a24",
+    "base: #3a2a20→#5a3a24",
+    "base: #4a72c2→#3474c4",
+    "base: #6088d8→#6a8ac0",
+    "base: #b8aa48→#86502e",
+    "base: #86502e→#5a3a24",
+    "base: #d8f0ff→#e8eef4",
+    "base: #5a3a24→#24345c",
+    "base: #fff4b0→#f6e8c8",
+    "base: #e8eef4→#f8f8f8",
+    "puerta: #7aa6e0→#8ab0e0"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "puerta/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

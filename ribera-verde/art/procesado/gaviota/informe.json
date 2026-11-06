@@ -1,0 +1,36 @@
+{
+  "grupo": "gaviota",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 1,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 21.4,
+  "distancia_media": 12.2,
+  "colores_finales": 15,
+  "fundidos": [
+    "#f0f0f8→#f2f4f8",
+    "#7e8694→#5a6070",
+    "#5a3a20→#4a3220",
+    "#e8e05a→#a6ba92",
+    "#684828→#483e36",
+    "#2a1a10→#202024",
+    "#303038→#2c333c",
+    "#9a8252→#5a6070",
+    "#4a4a52→#4c5560",
+    "#3a2a20→#2e2a2a",
+    "#483e36→#3a3a3a",
+    "#2c333c→#3a3a3a",
+    "#b2b8c4→#acb3c0",
+    "#a6ba92→#acb3c0",
+    "#5a6070→#4c5560"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "idle/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

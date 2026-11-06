@@ -1,0 +1,19 @@
+{
+  "grupo": "edificio-plazaR",
+  "celda": [
+    32,
+    96
+  ],
+  "tope_colores": 32,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 10.8,
+  "distancia_media": 0,
+  "colores_finales": 6,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

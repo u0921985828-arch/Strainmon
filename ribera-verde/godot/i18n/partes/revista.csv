@@ -1,0 +1,208 @@
+es,en
+El periódico ({e}),The newspaper ({e})
+"El quiosco de prensa. Periódicos, revistas y cromos.","The newsstand. Newspapers, magazines and trading cards."
+REVISTA,MAGAZINE
+{r}: suscripción,{r}: subscription
+ · te quedan {q}, · {q} left
+"{n} números de {r}, {s}. Llega al buzón el día 1 de cada mes.","{n} issues of {r}, {s}. It lands in your mailbox on the 1st of each month."
+Suscrito a {r}: {n} números,Subscribed to {r}: {n} issues
+En los clubs: {e} el gramo al {t} %.,At the clubs: {e} a gram at {t} %.
+"Extracción, a los catadores: {e} el gramo al {t} %.","Extraction, to the tasters: {e} a gram at {t} %."
+"Precios de referencia: lo curado y lo manicurado sube, y lo verde baja.","Reference prices: cured and trimmed goes up, green goes down."
+El jurado de la plaza prepara la Copa de otoño. Se abrirá a quien tenga algo que presentar.,The panel in the square is getting the autumn Cup ready. It will open to anyone with something to enter.
+"Copa de otoño: el {d} de {m}, en la plaza. Cinco categorías.","Autumn Cup: {d} {m}, in the square. Five categories."
+{c}: {p}º puesto.,{c}: place {p}.
+Este año aún no se ha presentado nada a tu nombre.,Nothing has been entered in your name this year yet.
+"Con la licencia del muelle, la distribuidora puede mover género legal cada día. La revista recuerda que lo que sale de ahí va con papeles.","With the dock licence, the distributor can move legal product every day. The magazine reminds you that whatever leaves there goes with paperwork."
+"KAIA abre en el muelle con dispensario para socios. A los treinta días de abrir, la ley permite pedir licencia de distribuidora.","KAIA opens at the dock with a members' dispensary. Thirty days after opening, the law allows applying for a distributor licence."
+"Las asociaciones con presidencia al día pueden tener dispensario para socios. Fuera de eso, nada de vender a quien no es socio.","Associations with their chair in order may run a members' dispensary. Beyond that, no selling to non-members."
+"Las asociaciones piden una ley clara: cultivo compartido, dispensario para socios y nada de venta a la calle.","The associations are asking for a clear law: shared growing, a members' dispensary and no street sales."
+"{r}, el número de {m}. Ese ya lo tienes.","{r}, the {m} issue. You already have that one."
+Comprarla ({e}),Buy it ({e})
+"{r}, {s}. El número de {m}: «{t}».","{r}, {s}. The {m} issue: “{t}”."
+Aprendes una técnica: {n},You learn a technique: {n}
+Tienes en el buzón el número de {m}: «{t}».,The {m} issue is in your mailbox: “{t}”.
+Te quedan {q} números de la suscripción.,You have {q} issues left on the subscription.
+Era el último de la suscripción: se renueva en la tienda online.,That was the last one of the subscription: renew it in the online shop.
+{n} de {t} números,{n} of {t} issues
+{n} números guardados · {t} técnicas aprendidas.,{n} issues kept · {t} techniques learned.
+cosecha +{p} %,harvest +{p} %
+calidad +{p} %,quality +{p} %
+THC +{p} %,THC +{p} %
+menos moho ({p} %),less mould ({p} %)
+esquejes más resistentes,hardier cuttings
+Pulsa A para releer cualquier número.,Press A to read any issue again.
+{s}. El número de {m}.,{s}. The {m} issue.
+EL ESQUEJE,THE CUTTING
+revista mensual de cultivo,monthly growing magazine
+Edita la Federación de Clubs de la Comarca · Redacción en el Ensanche,Published by the Federation of Clubs of the County · Newsroom in the Ensanche
+La poda apical,Topping
+"Cortar la punta del tallo principal cuando la planta tiene cuatro o cinco pisos de hojas. La planta deja de tirar hacia arriba y reparte la fuerza entre las ramas de abajo: en vez de una cola grande y seis pequeñas, salen cuatro o seis colas parecidas. Se hace en crecimiento y nunca en floración. Con el mismo foco y la misma maceta, se llena más superficie: de aquí sale el cuatro por ciento más de cosecha que verás en tus próximos cortes.","Cut the tip of the main stem when the plant has four or five sets of leaves. The plant stops reaching upwards and spreads its strength among the lower branches: instead of one big cola and six small ones, you get four or six similar colas. It is done in growth, never in flower. With the same lamp and the same pot you fill more surface: that is where the four per cent more harvest you will see in your next cuts comes from."
+El lavado de raíces,Root flushing
+"Los últimos días antes de cortar, solo agua. La planta tira de lo que tiene guardado en las hojas y el cogollo sale limpio: ni sabor a abono ni ceniza negra. Se nota en la cata y en lo que te pagan por el lote, no en el peso. Si has abonado fuerte, alarga el lavado; si has llevado la planta justa de comida, con menos días basta.","Water only for the last days before cutting. The plant draws on what it has stored in the leaves and the bud comes out clean: no fertiliser taste, no black ash. It shows in the tasting and in what you are paid for the batch, not in the weight. If you have fed heavily, flush for longer; if you kept the plant lean, fewer days will do."
+El defoliado justo,Just enough defoliation
+"Quitar las hojas grandes que tapan los cogollos de dentro, y solo esas. Entra aire y entra luz donde antes había sombra y humedad parada: es ahí donde empieza el moho. Dos manos como mucho, una al entrar en floración y otra a mitad, y nunca a una planta tocada o recién trasplantada. No es poda estética: es ventilación.","Take off the big leaves that cover the inner buds, and only those. Air and light get in where there was shade and still damp before: that is where mould starts. Two passes at most, one going into flower and one halfway, and never on a stressed or freshly transplanted plant. This is not pruning for looks: it is ventilation."
+El trasplante a tiempo,Transplanting on time
+"La raíz que da la vuelta al fondo de la maceta y se queda dando vueltas no vuelve a crecer igual. Se trasplanta cuando las raíces llegan al borde del cepellón y antes de que lo aten: la planta no se para ni un día. Trasplantar tarde cuesta una semana de crecimiento; trasplantar pronto, a una maceta enorme, encharca el sustrato.",A root that turns at the bottom of the pot and keeps circling never grows the same again. Transplant when the roots reach the edge of the root ball and before they bind it: the plant does not stop for a single day. Transplanting late costs a week of growth; transplanting early into a huge pot waterlogs the substrate.
+La malla horizontal,The horizontal net
+"Una malla a un palmo y medio de la maceta, y las ramas se van metiendo por los cuadros a medida que crecen. Todas las puntas quedan a la misma altura, y a la misma altura del foco: no hay colas quemadas arriba ni cogollos de aire abajo. Se monta en crecimiento, antes de cambiar la luz; después ya no se mueve nada.","A net a hand and a half above the pot, and the branches are tucked through the squares as they grow. Every tip ends up at the same height, and at the same distance from the lamp: no burnt colas up top and no airy buds below. Set it up in growth, before you switch the light; after that nothing moves."
+Riego por peso,Watering by weight
+"Coge la maceta por el borde y levántala. Si pesa como un ladrillo mojado, no toca; si vuela, toca. Se riega por peso, no por días. Con el peso aprendes cuánta agua pide cada planta, y las raíces se hacen a buscar el agua en vez de nadar en ella. La maceta siempre mojada acaba con la raíz ahogada y la planta amarilla.","Take the pot by the rim and lift it. If it weighs like a wet brick, not yet; if it flies up, now. You water by weight, not by days. With the weight you learn how much water each plant asks for, and the roots get used to looking for water instead of swimming in it. A pot that is always wet ends with drowned roots and a yellow plant."
+Los tricomas al corte,Trichomes at harvest
+"El punto de corte no se mira en el calendario, se mira con una lupa en la resina de los cogollos de arriba: cuando las cabezas pasan de transparentes a blancas lechosas, es el día. Antes, el cogollo pesa menos y pega menos; mucho después, se vuelve pesado y tumba. Dos días de diferencia cambian el efecto de toda la cosecha.","You do not read the harvest point off the calendar, you read it with a loupe in the resin of the top buds: when the heads turn from clear to milky white, that is the day. Earlier, the bud weighs less and hits less; much later, it turns heavy and knocks you out. Two days of difference change the effect of the whole harvest."
+El secado lento,Slow drying
+"El cogollo se seca en una habitación fresca, a oscuras y con el aire moviéndose despacio, nunca con un calefactor ni al sol. Rápido por fuera y verde por dentro es lo que huele a heno. Lento, el cogollo se dobla y el tallo cruje: ese es el que después cura bien en el tarro.","Bud dries in a cool room, in the dark, with the air moving slowly, never with a heater or in the sun. Fast outside and green inside is what smells of hay. Slowly, the bud bends and the stem snaps: that is the one that later cures well in the jar."
+Las madres por turnos,Mothers in turns
+"Una madre a la que le quitas todos los esquejes el mismo día tarda semanas en volver. Se corta por turnos, de una rama cada vez, y la madre no se para: siempre hay una parte de la planta creciendo mientras la otra se recupera. Y el esqueje se coge de las ramas de abajo, que enraízan antes que las puntas.","A mother you take every cutting from on the same day takes weeks to come back. Cut in turns, one branch at a time, and the mother never stops: part of the plant is always growing while the rest recovers. And take the cutting from the lower branches, which root sooner than the tips."
+Calor de fondo para los esquejes,Bottom heat for cuttings
+"El esqueje no enraíza con calor en las hojas, enraíza con calor en el taco. El propagador templado por abajo y el aire de la habitación fresco: la raíz tira y la hoja no se gasta. Si se ponen mustios el primer día es normal; si se ponen amarillos, les sobra luz. Nada de abono hasta que haya raíz.","A cutting does not root from heat on the leaves, it roots from heat in the plug. The propagator warm underneath and the room air cool: the root pushes and the leaf is not spent. Drooping on the first day is normal; turning yellow means too much light. No fertiliser until there are roots."
+La limpieza entre ciclos,Cleaning between cycles
+"Entre cosecha y cosecha, la carpa se vacía y se limpia: paredes, bandeja, ventiladores, los filos de la cremallera. Las esporas y los bichos del ciclo anterior están ahí esperando a las plantas nuevas, que son las más blandas. Media hora de trapo ahorra un ciclo entero perdido por moho.","Between one harvest and the next, the tent is emptied and cleaned: walls, tray, fans, the edges of the zip. The spores and bugs from the previous cycle are in there waiting for the new plants, which are the softest. Half an hour with a cloth saves a whole cycle lost to mould."
+El curado en tarro,Curing in the jar
+"El tarro se llena a tres cuartos, se cierra y se abre un rato cada día los primeros días. Lo que queda de humedad dentro del cogollo se reparte y sale, y lo que olía a verde se convierte en olor a variedad. Es el paso que más cambia el precio y el que más gente se salta por tener prisa.","Fill the jar three quarters full, close it and open it for a while each day during the first days. What moisture is left inside the bud spreads out and leaves, and what smelled green turns into the smell of the strain. It is the step that changes the price the most and the one most people skip out of impatience."
+"«Un otoño tranquilo»: la comarca, sin sustos","“A quiet autumn”: the county, with no scares"
+La policía refuerza las patrullas en los barrios,Police step up patrols in the neighbourhoods
+Investigación abierta por venta de marihuana en la comarca,Investigation opened over marijuana sales in the county
+Un juzgado autoriza registros: qué dice la ley y qué no,A court authorises searches: what the law says and what it does not
+Los clubs piden una ley que ponga orden,The clubs call for a law that sets things straight
+KAIA abre en el muelle: un club con dispensario,KAIA opens at the dock: a club with a dispensary
+Licencia para el muelle: la primera distribuidora legal de la comarca,Licence for the dock: the county's first legal distributor
+Se acerca la Copa de otoño: cinco categorías y un jurado nuevo,The autumn Cup is coming: five categories and a new panel
+"La Copa de otoño, al detalle: quién ganó y con qué",The autumn Cup in detail: who won and with what
+"Hace años, en esta comarca, una mujer guardaba semillas","Years ago, in this county, a woman kept seeds"
+El cuaderno azul: la memoria genética de un barrio,The blue notebook: a neighbourhood's genetic memory
+Chatarrería de Valdehierro,Valdehierro scrapyard
+"«Material de cultivo de segunda mano. Lo que entra esta semana, a mitad. Pregunta por Bixente.»","“Second-hand growing gear. Whatever comes in this week, half price. Ask for Bixente.”"
+Clubs de la comarca,Clubs of the county
+«Se busca género de una variedad concreta para el dispensario del mes. Se paga por encima del precio de siempre.»,“Looking for a particular strain for this month's dispensary. Paying above the usual price.”
+Tablón de la feria,Fair noticeboard
+"«Intercambio de semillas de colección. Quien traiga algo de su tierra, se va con algo de otra.»","“Collector seed swap. Bring something from your land, leave with something from another.”"
+Se busca,Wanted
+"«Hacen falta manos para manicurar. Por días, pagado al terminar. Preguntar en los clubs.»","“Hands needed for trimming. By the day, paid when you finish. Ask at the clubs.”"
+Lonja de Puerto Viejo,Puerto Viejo fish market
+"«Compra de flor y de extracción al por mayor. Lotes grandes, pago en el día.»","“Buying flower and extraction wholesale. Big batches, paid same day.”"
+Growshop,Growshop
+«Liquidación de focos de la temporada pasada. Mientras queden.»,“Clearing out last season's lamps. While they last.”
+«Llevo tres cosechas con las puntas quemadas y le echaba la culpa al foco. Era el abono. Menos es más.» — Un socio de Mendialde,“Three harvests with burnt tips and I blamed the lamp. It was the fertiliser. Less is more.” — A member from Mendialde
+«Mi vecina me denunció por el olor. Puse un filtro de carbón como es debido y se acabó el problema. No es ilegal oler a nada.» — Un lector del Ensanche,“My neighbour reported me over the smell. I fitted a carbon filter properly and that was the end of it. Smelling of nothing is not illegal.” — A reader from the Ensanche
+"«Después de veinte años, lo mejor que he fumado era una planta de semilla regalada, sin nombre y sin papeles.» — Un jubilado de Errotabarri","“After twenty years, the best I ever smoked was a plant from a seed someone gave me, with no name and no paperwork.” — A pensioner from Errotabarri"
+"«Guardo las semillas en un tarro, en la nevera, con un sobre de los que vienen en las zapatillas. Me han germinado de hace doce años.» — Una socia de Puerto Viejo","“I keep my seeds in a jar, in the fridge, with one of those sachets that come in shoeboxes. I have germinated twelve-year-old ones.” — A member from Puerto Viejo"
+«Dejad de perseguir el veinticinco por ciento. Preguntad a quién le gusta lo que cultiváis.» — Un catador,“Stop chasing twenty-five per cent. Ask who likes what you grow.” — A taster
+«Las landraces no son una moda: son lo que había antes de que todo oliera igual.» — Un lector del barrio alto,“Landraces are not a fad: they are what there was before everything smelled the same.” — A reader from the upper neighbourhood
+PORTADA,FRONT PAGE
+LA VARIEDAD DEL MES,STRAIN OF THE MONTH
+TALLER,WORKSHOP
+MERCADO,MARKET
+LA COPA Y LAS CATAS,THE CUP AND THE TASTINGS
+CLASIFICADOS,CLASSIFIEDS
+CARTAS,LETTERS
+LEGAL,LEGAL
+de {a} a {b} °C de media,{a} to {b} °C on average
+de {a} a {b}° de media,{a} to {b}° on average
+tranquila,quiet
+con más patrullas de lo normal,with more patrols than usual
+con una investigación abierta,with an investigation open
+con una orden de registro firmada,with a search warrant signed
+NOTICIAS DE LA COMARCA,NEWS FROM THE COUNTY
+LA AGENDA DEL MES,THIS MONTH'S DIARY
+Un registro en el barrio se salda con plantas y material incautados,A search in the neighbourhood ends with plants and gear seized
+"Agentes entraron el {d} en un piso del barrio con una orden del juzgado y se llevaron las plantas y el equipo que había montado. La asociación recuerda que un registro acaba casi siempre en multa y en la pérdida de todo el ciclo, y que el calor no se baja de un día para otro.","Officers entered a flat in the neighbourhood on {d} with a court warrant and took away the plants and the gear that was set up. The association points out that a search almost always ends in a fine and the loss of the whole cycle, and that heat does not cool down overnight."
+Un juzgado de la comarca autoriza un registro domiciliario,A county court authorises a home search
+"Hay una orden firmada el {d} y no se sabe para cuándo. Desde los clubs piden calma y sentido común: menos movimiento en la calle, nada a la vista y esperar a que el asunto se enfríe.","There is a warrant signed on {d} and nobody knows for when. The clubs are asking for calm and common sense: less moving about on the street, nothing on show, and wait for the matter to cool down."
+La Copa de otoño reparte premios en la plaza,The autumn Cup hands out its prizes in the square
+"El jurado de la plaza falló el {d} sus cinco categorías. Entre los premiados, un cultivador del barrio que subió al podio en {v} categoría(s). Las muestras se cataron a ciegas, como manda la Copa.","The panel in the square announced its five categories on {d}. Among the winners, a grower from the neighbourhood who made the podium in {v} category/categories. The samples were tasted blind, as the Cup requires."
+Una muestra del barrio pasa la marca de la Copa,A sample from the neighbourhood beats the Cup record
+"El jurado dio por buena el {d} una muestra que pasa la marca que llevaba años sin moverse. En la mesa de catas se habló de foco, de abono y de paciencia, en ese orden.","On {d} the panel confirmed a sample that beats a record which had stood for years. At the tasting table they talked about lamps, feed and patience, in that order."
+Abre KAIA en el muelle: un club con dispensario para socios,KAIA opens on the dock: a club with a dispensary for members
+"El local del muelle abrió el {d} después de la obra. Tiene dispensario para socios y cocina pequeña, y en el barrio del puerto lo cuentan como la primera cosa nueva en años. A los treinta días de abrir, la ley permite pedir la licencia de distribuidora.","The place on the dock opened on {d} once the building work was done. It has a dispensary for members and a small kitchen, and around the harbour they call it the first new thing in years. Thirty days after opening, the law allows you to apply for the distributor licence."
+La comarca tiene su primera distribuidora legal,The county has its first legal distributor
+"La licencia salió el {d}: hasta cinco kilos al día con papeles, trazabilidad y control de lo que entra y lo que sale. Es el primer permiso de este tipo en la comarca y en los clubs se lee como el principio de algo.","The licence came through on {d}: up to five kilos a day with paperwork, traceability and control of everything coming in and going out. It is the first permit of its kind in the county and the clubs read it as the start of something."
+La asociación del barrio alto elige presidencia,The uptown association elects a president
+"La asamblea del {d} salió con un nombre nuevo al frente de la asociación que fundó, hace años, una vecina del barrio. Entre los acuerdos, dispensario para socios y las cuentas a la vista.",The meeting on {d} ended with a new name at the head of the association founded years ago by a woman from the neighbourhood. Among the decisions: a dispensary for members and the books out in the open.
+Aparece un banco de semillas en el cuarto de atrás de la asociación,A seed bank turns up in the association's back room
+Detrás de una puerta que llevaba años cerrada había un banco de semillas con variedades locales de media comarca y de más lejos. La asociación lo abrió el {d} y busca completar las colecciones que faltan.,Behind a door that had been shut for years there was a seed bank with local strains from half the county and from further afield. The association opened it on {d} and is looking to complete the collections that are missing.
+"El banco de semillas del barrio, completo",The neighbourhood seed bank is complete
+"Las seis colecciones quedaron entregadas el {d}. Con la cámara fría, el laboratorio y la sala de catas en marcha, el barrio tiene un sitio donde una variedad no se pierde porque se muera quien la guardaba.","The six collections were all handed in on {d}. With the cold room, the lab and the tasting room running, the neighbourhood has a place where a strain is not lost just because whoever kept it dies."
+Una nave de Valdehierro cambia de manos,A unit in Valdehierro changes hands
+La nave del polígono se escrituró el {d} después de un alquiler con opción a compra. En el polígono dicen que es la primera vez en mucho tiempo que una de esas naves se compra para trabajar y no para dejarla cerrada.,The unit on the industrial estate was signed over on {d} after a rent-to-buy agreement. On the estate they say it is the first time in a long while that one of those units has been bought to work in rather than to leave locked up.
+Un concesionario abre en el barrio alto,A car dealership opens uptown
+"Abrió el {d} con cuatro modelos en el escaparate, entrega en el día y seguro domiciliado. El barrio alto gana un negocio y pierde un solar, que es como se cuentan aquí estas cosas.","It opened on {d} with four models in the window, same-day delivery and insurance by direct debit. Uptown gains a business and loses a vacant lot, which is how these things are counted around here."
+La feria de semillas llena el mercado de la Ribera,The seed fair fills the Ribera market
+"Tres días de puestos, intercambios y cosas que no se ven en ningún banco. Quien llevó algo de su tierra se fue con algo de otra, que es de lo que va la feria desde que se hace.","Three days of stalls, swaps and things you will not find in any bank. Anyone who brought something from their own land left with something from somewhere else, which is what the fair has always been about."
+"Las fiestas del barrio, cinco días de calle",The neighbourhood festival: five days on the street
+"Txosnas, partidos y la gente mayor contando lo de siempre. En una esquina, los de la asociación con una mesa y un cartel: «esto no es un negocio, es un vecindario».","Food and drink stands, matches and the old folk telling the same stories. On one corner, the association with a table and a sign: «this is not a business, it is a neighbourhood»."
+Romería en la ermita del monte,A pilgrimage at the hermitage on the hill
+"Un día de monte, de bocadillo y de hablar con quien no ves el resto del año. La serora abrió la ermita y hubo quien se quedó un rato dentro, sentado, sin decir nada.","A day on the hill, a sandwich and a word with the people you do not see the rest of the year. The caretaker opened the hermitage and some stayed a while inside, sitting, saying nothing."
+"Un fenotipo raro, cosechado en la comarca",A rare phenotype harvested in the county
+"Una planta salió distinta a sus hermanas: porte, olor o resina fuera de lo normal. Lo que se hace en estos casos es guardar sus semillas y repetir la línea hasta que el rasgo se fije, que es la única manera de que no se pierda.","One plant came out unlike its sisters: shape, smell or resin out of the ordinary. What you do in these cases is keep its seeds and repeat the line until the trait is fixed, which is the only way not to lose it."
+Un robo en un piso del barrio acaba con un nombre encima de la mesa,A break-in at a flat in the neighbourhood ends with a name on the table
+"Lo que entró a buscar quien forzó la caja no era dinero. Después de semanas de preguntas por la comarca, el {d} se puso un nombre a la cosa. Lo que pase ahora ya no es asunto de esta revista.","What whoever forced the safe came looking for was not money. After weeks of questions around the county, on {d} a name was put to it. What happens now is no longer this magazine's business."
+Un banco de semillas quiere registrar variedades de la comarca,A seed bank wants to register strains from the county
+"La solicitud entró y hay oposición presentada. Si pasa, el nombre de unas cuantas variedades que aquí se cultivan desde siempre quedaría en manos de una empresa. En la asociación lo tienen claro: lo que es de todos no se registra.","The application went in and an opposition has been filed. If it goes through, the names of a fair few strains that have always been grown here would end up in the hands of a company. The association is clear about it: what belongs to everyone is not registered."
+Vuelve a salir carga del muelle de Puerto Viejo,Cargo leaves the Puerto Viejo dock again
+Un pesquero amarrado en el muelle viejo zarpó el {d} con la bodega hecha. Los del muelle no dicen nada y la conservera tampoco. Hace años que no se veía movimiento ahí.,A fishing boat moored at the old dock set sail on {d} with its hold full. The dock hands say nothing and neither does the cannery. There had been no movement there for years.
+Un embargo se lleva el equipo de un cultivo del barrio,A seizure takes the gear from a grow in the neighbourhood
+"Vino con papel y se fue con la carpa grande. La asociación insiste en lo de siempre: los plazos se pagan antes de ampliar, y quien presta a este tipo de interés no está haciendo un favor a nadie.","He came with paperwork and left with the big tent. The association insists on the same thing as always: you pay the instalments before you expand, and anyone lending at that kind of interest is doing nobody a favour."
+Vuelve a trabajarse una huerta abandonada detrás del garaje,An abandoned vegetable plot behind the garage is worked again
+"Llevaba años con la cancilla cerrada y la hierba por la cintura. Ahora tiene bancales hechos y plantas al aire libre, que es como se cultivaba aquí antes de que todo fuera de interior.","For years the gate was shut and the grass was waist high. Now it has beds made and plants out in the open, which is how people grew here before everything moved indoors."
+La ciudad de la autopista mira a la comarca,The city down the motorway looks at the county
+"Clubs grandes, dinero y gente con tarjeta. De la comarca sale género para allí y de allí vienen preguntas que aquí no se hacían. Cada uno que saque sus cuentas.","Big clubs, money and people with cards. Produce leaves the county for there and from there come questions nobody used to ask here. Let everyone do their own sums."
+"El mes viene {c}: {x}. Los de las carpas, ojo a la humedad; los de fuera, a lo que caiga.","The month comes in {c}: {x}. Those with tents, watch the humidity; those outdoors, watch whatever falls."
+"La calle, {p}. Esta revista no da consejos legales, pero sí recuerda que el género encima pesa más de lo que parece.","The street is {p}. This magazine gives no legal advice, but it does point out that produce in your pocket weighs more than it looks."
+En la comarca hay {n} variedades registradas con nombre y linaje. Cada una que se apunta es una que no se pierde.,There are {n} strains recorded in the county with a name and a lineage. Every one written down is one that is not lost.
+"Siguen las obras del muelle viejo: pantalán, dique y los bajos de las casas. Quien tenga algo que mover por mar, que espere a que acaben.","Work continues on the old dock: jetty, breakwater and the ground floors of the houses. Anyone with something to move by sea should wait until it is finished."
+"Los clubs de la comarca mantienen el dispensario abierto para socios, con lo que entra de los cultivos de cada uno. Nada de calle.","The county's clubs keep the dispensary open for members, with whatever comes in from each one's own grow. Nothing off the street."
+El puesto de semillas del mercado de la Ribera cambia el género cada semana. Merece la pena pasarse aunque no se compre.,The seed stall at the Ribera market changes its stock every week. Worth dropping by even if you buy nothing.
+"Copa de otoño: el {d}, en la plaza, con sus cinco categorías.","Autumn Cup: on {d}, in the square, with its five categories."
+"{n}: del {d}, {q} día(s).","{n}: from {d}, {q} day(s)."
+Vence un plazo de la deuda el {d}.,A debt instalment falls due on {d}.
+"Toca recibo: luz, alquileres y seguros.","Bills are due: power, rents and insurance."
+"Los siete primeros días del mes, ventana para comprar la nave a tocateja.",The first seven days of the month are the window to buy the unit outright.
+"El próximo número, el día 1. Si estás suscrito, al buzón.","The next issue on the 1st. If you are subscribed, straight to your letterbox."
+"Mes tranquilo: ni Copa, ni fiestas, ni plazos. Buen momento para montar un ciclo largo.","A quiet month: no Cup, no festivals, no instalments. A good time to set up a long cycle."
+"La lonja de Puerto Viejo sigue comprando flor y extracción al por mayor. Lotes grandes y pago en el día, como siempre.","The Puerto Viejo market still buys flower and extracts wholesale. Big lots and same-day payment, as always."
+Dentro: {q} semillas de {s}.,Inside: {q} {s} seeds.
+Despégalo al acabar el número.,Peel it off when you finish the issue.
+Del sobre del mes: {q} semillas de {s},From the envelope of the month: {q} {s} seeds
+EL MUNDO DEL CANNABIS,THE CANNABIS WORLD
+EL SOBRE DEL MES,THE ENVELOPE OF THE MONTH
+"Grapado a esta página, como siempre, el sobre del mes: tres semillas de la variedad de la que habla la página de al lado.","Stapled to this page, as always, the envelope of the month: three seeds of the strain the facing page is about."
+"Cortesía de los anunciantes, que para eso pagan. Despega el sobre con cuidado, que el año pasado alguien lo abrió con los dientes y se quedó sin regalo y sin muela.","Courtesy of our advertisers, which is what they pay for. Peel the envelope off carefully: last year somebody opened one with their teeth and ended up with no gift and no tooth."
+"Un número, un sobre. Quien compre dos ejemplares del mismo mes que no nos escriba: ya nos ha escrito, y le contestamos lo mismo.","One issue, one envelope. Anyone buying two copies of the same month needn't write in: they already did, and we told them the same thing."
+El sobre de este número ya lo despegaste. Queda la marca de la grapa y poco más.,You already peeled this issue's envelope off. All that's left is the staple mark.
+Una aduana del sur devuelve un envío de semillas por un papel mal puesto,A southern customs post sends back a seed shipment over one misfiled form
+"Mil sobres parados tres semanas por una casilla sin rellenar. El envío volvió entero y nadie perdió nada salvo la temporada, que es lo único que no se recupera. Desde la cooperativa que lo mandaba dicen que el formulario cambió en enero y que no se enteró nadie.","A thousand envelopes held up for three weeks over one unticked box. The shipment came back intact and nobody lost anything except the season, which is the one thing you can't get back. The co-op that sent it says the form changed in January and nobody was told."
+La feria del norte cierra con más visitas que nunca y menos puestos,The northern fair closes with record visitors and fewer stalls
+"Tres pabellones llenos y la mitad de los expositores de hace cinco años. Los que quedan son los de siempre: viveros pequeños, gente que vende macetas y dos cooperativas que traen semilla de su tierra. Lo nuevo este año eran las charlas, que se llenaron antes que los puestos.","Three full halls and half the exhibitors of five years ago. The ones left are the usual: small nurseries, people selling pots and two co-ops bringing seed from their own valleys. The new thing this year was the talks, which filled up before the stalls did."
+Un museo del cultivo abre en una fábrica vieja,A growing museum opens in an old factory
+"Herramienta de hace ochenta años, carteles de propaganda y una sala con las variedades que se cultivaban en el valle antes de que se dejara. Lo monta una asociación de vecinos y lo que se recauda va a mantener el edificio, que se caía.","Eighty-year-old tools, propaganda posters and a room with the strains grown in the valley before it was given up. A neighbours' association put it together and the takings go to keeping the building standing, which it barely was."
+Una cooperativa de montaña recupera una variedad que se daba por perdida,A mountain co-op brings back a strain everyone had written off
+"La tenían tres familias, cada una con su línea, y ninguna sabía de las otras. Juntaron lo que quedaba, lo sembraron el mismo año y salió una planta que se parece bastante a la de las fotos viejas. Ahora buscan quién la cultive para que no dependa de un arcón.","Three families had it, each with their own line, and none knew about the others. They pooled what was left, sowed it the same year and got a plant much like the one in the old photographs. Now they're looking for growers so it doesn't depend on one freezer."
+El congreso de genética del otoño se centra en las landraces,The autumn genetics conference turns to landraces
+"Dos días de ponencias sobre lo mismo: que las variedades de origen se están perdiendo más rápido de lo que se catalogan. La conclusión, la de siempre, es que hace falta más gente guardando semilla y menos gente guardándosela.","Two days of papers on the same thing: strains of origin are being lost faster than they can be catalogued. The conclusion, as always, is that we need more people keeping seed and fewer people keeping it to themselves."
+El precio del kilovatio aprieta a los cultivos de interior de media Europa,The price of a kilowatt squeezes indoor growers across half of Europe
+"Donde se cultiva con luz, la factura ya pesa más que el abono y el agua juntos. Los cultivos grandes se pasan a focos de menos consumo; los pequeños, directamente, a cultivar fuera cuando el clima deja.","Wherever people grow under lights, the bill now weighs more than feed and water put together. The big grows are switching to lower-draw lamps; the small ones are simply going outdoors whenever the weather allows."
+Las asociaciones de otra comarca pactan un reglamento común,The associations of another county agree on a common set of rules
+"Catorce clubs firman lo mismo: carné, libro de socios, nada de calle y las cuentas a la vista una vez al año. No es ley ni lo pretende, pero en la práctica es lo más parecido que hay a una.","Fourteen clubs sign the same text: membership cards, a members' book, nothing sold on the street and the books open once a year. It isn't law and doesn't claim to be, but in practice it's the closest thing there is to one."
+Un laboratorio independiente publica su tabla de analíticas del año,An independent lab publishes its table of the year's analyses
+"Mil doscientas muestras analizadas y una conclusión incómoda: una de cada cinco no se parecía a lo que ponía en la etiqueta. El laboratorio no da nombres; dice que el problema no es quien miente, sino que casi nadie comprueba.","Twelve hundred samples analysed and one uncomfortable conclusion: one in five looked nothing like its label. The lab names no names; it says the problem isn't who lies, it's that hardly anyone checks."
+Una conservera del litoral se mete a distribuidora con licencia,A coastal cannery turns licensed distributor
+"Mismo almacén, mismo frío y la mitad del camión para lo de siempre. Con el permiso en la mano, lo que antes iba de noche va de día y con albarán. En el puerto lo cuentan como una rareza; fuera, como lo que viene.","Same warehouse, same cold store and half the lorry still for the old trade. With the permit in hand, what used to move at night moves by day and with a delivery note. In the harbour they tell it as an oddity; outside, as what's coming."
+Un banco de semillas del este abre su catálogo al público,An eastern seed bank opens its catalogue to the public
+"Cuatrocientas entradas con su ficha, su origen y quién la depositó, consultables por cualquiera. No venden: prestan a quien se compromete a devolver semilla de la cosecha. En seis meses han salido ochenta y han vuelto setenta y seis.","Four hundred entries with their notes, their origin and who deposited them, open to anyone. They don't sell: they lend to whoever undertakes to return seed from the harvest. In six months eighty went out and seventy-six came back."
+Una copa internacional cambia las reglas tras años de quejas,An international cup changes its rules after years of complaints
+"A partir de este año, cata a ciegas de verdad, muestras recogidas por el jurado y nota del laboratorio aparte de la del paladar. Media sala aplaudió y la otra media se fue a mirar el reglamento.","From this year on, a genuinely blind tasting, samples collected by the jury and a lab score kept apart from the palate score. Half the room applauded and the other half went off to read the rulebook."
+Un país del norte regula el autocultivo asociado y deja fuera la venta,A northern country regulates collective home growing and leaves selling out of it
+"Plantas contadas por persona, asociaciones con registro y nada de mostrador. Las cooperativas lo leen como un primer paso; los clubs, como un techo. Lo único claro es que ya hay un papel donde antes no había nada.","Plants counted per person, associations on a register and no counter sales. The co-ops read it as a first step; the clubs, as a ceiling. The only clear thing is that there's a piece of paper where before there was nothing."
+Roban un banco de semillas y se llevan lo que no se puede reponer,A seed bank is robbed of the one thing that can't be replaced
+"Entraron por el tejado y se llevaron los arcones de una colección de cuarenta años. El seguro cubre el frigorífico. Lo de dentro, no: no hay precio para una semilla de la que no queda otra.",They came in through the roof and took the freezers of a forty-year collection. The insurance covers the refrigeration. Not what was inside: there's no price for a seed when there's no other one left.
+Una empresa retira su solicitud de patente sobre una variedad de origen,A company withdraws its patent application on a strain of origin
+"La oposición la presentaron tres cooperativas con papeles de hace treinta años. La empresa retiró la solicitud sin dar explicaciones. En el sector se lee como un aviso: lo que no está documentado, alguien lo registra.","The opposition was filed by three co-ops with paperwork thirty years old. The company withdrew the application without explaining itself. The trade reads it as a warning: whatever isn't documented, somebody will register."
+Un estudio del sur pone cifras a lo que se pierde en el secado,A southern study puts numbers on what gets lost in the drying
+Midieron cien lotes del mismo cultivo secados de ocho maneras. La diferencia entre el mejor y el peor era de un tercio del valor final. La conclusión del que lo firma: «la cosecha no se acaba cuando se corta».,They measured a hundred batches from the same grow dried eight different ways. The gap between the best and the worst was a third of the final value. The conclusion of the man who signs it: «the harvest doesn't end when you cut».
+Una red de cultivadoras publica su primer censo,A network of women growers publishes its first count
+"Trescientas socias en once comarcas, la mitad con cultivo propio y un tercio al frente de una asociación. El censo se hizo porque, cuando preguntaron, nadie tenía el dato.","Three hundred members across eleven counties, half of them growing their own and a third running an association. The count was made because, when they asked, nobody had the figure."
+"«Socios desde el 94. Sofá, billar y dispensario»","«Members since '94. Sofa, pool table and dispensary»"
+Puerto Viejo. Carné en la puerta y el encargado te enseña la casa.,Puerto Viejo. Card at the door and the manager shows you round.
+"«De once a seis. El reservado, para quien lo pida»","«Eleven till six. The back room, for whoever asks»"
+Ensanche. Entrada por noche. Lo de dentro no sale en la revista.,Ensanche. Cover charge per night. What goes on inside doesn't make the magazine.

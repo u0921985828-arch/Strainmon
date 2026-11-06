@@ -1,0 +1,159 @@
+# Landrace Hunters — una partida con todo al máximo (lo pidió el usuario: «una partida actualizada con todo al máximo, todo
+# comprado y todo lo mejor»). No es una prueba: es la herramienta que la fabrica. Parte de `new_state()`, la rellena por áreas
+# con las funciones del juego, la pasa por `migrate()` y `partida_valida()`, la carga de verdad (`enter_game`) y la deja
+# exportada en el formato de COPIA DE SEGURIDAD (`cierra_partida`: LH1.…) y en JSON.
+#   $GODOT --headless --path godot --script res://tests/maxima.gd -- --salida <dir>
+extends SceneTree
+
+const Datos = preload("res://src/datos.gd")
+const Juego = preload("res://src/juego.gd")
+const Menus = preload("res://src/menus.gd")
+const MaxCultivo = preload("res://tests/max/cultivo.gd")
+const MaxHistoria = preload("res://tests/max/historia.gd")
+const MaxNegocios = preload("res://tests/max/negocios.gd")
+const MaxMundo = preload("res://tests/max/mundo.gd")
+
+var J
+var M
+var LOG := []
+var MENUS := []
+var QUIERO := ""
+var fallos := []
+var n := 0
+
+func _initialize() -> void:
+	Datos.PLAY = false   # la versión entera: así existe todo (setas, apuestas, cifras reales)
+	_corre.call_deferred()
+
+func chk(c: bool, txt: String) -> void:
+	n += 1
+	if not c:
+		fallos.append(txt)
+
+func _menu(items: Array, o: Dictionary) -> Dictionary:
+	var labels := []
+	for it in items:
+		labels.append(it if it is String else str(it.get("label", "")))
+	MENUS.append(labels)
+	var k := labels.size() - 1
+	for i in labels.size():
+		if QUIERO != "" and labels[i].begins_with(QUIERO):
+			k = i
+	QUIERO = ""
+	o = o.duplicate()
+	o.initial = k
+	return o
+
+func corre(f: Callable) -> bool:
+	var st := {"fin": false}
+	var co := func():
+		await J.run(f)
+		st.fin = true
+	co.call()
+	var t0: float = M.reloj
+	while not st.fin or not J.is_free() or not J.pending.is_empty():
+		if M.reloj - t0 > 60000 or not M.paso():
+			return false
+	return true
+
+func _salida() -> String:
+	var a := OS.get_cmdline_user_args()
+	for i in a.size():
+		if a[i] == "--salida" and i + 1 < a.size():
+			return a[i + 1]
+	return "/tmp"
+
+func _corre() -> void:
+	Juego.GUARDADO = "user://prueba-maxima.json"
+	Juego.AJUSTES = "user://prueba-maxima-ajustes.json"
+	J = Juego.new()
+	J.oraculo = true   # sin animaciones ni esperas
+	root.add_child(J)
+	M = J.M
+	J.show_title()
+	J.S = J.new_state()
+	J.gancho_menu = _menu
+	J.gancho_texto = func(t, _nm): LOG.append(t)
+	J.gancho_toast = func(_h, _ms): pass
+
+	# el estado al máximo, por áreas
+	_cultivo(J)
+	_historia(J)
+	_negocios(J)
+	_mundo(J)
+
+	J.migrate()
+	chk(J.partida_valida(J.S), "partida_valida dice que no")
+	_mira(J.S)
+	J.enter_game()
+	chk(J.mode == "world", "no entra al mundo: %s" % J.mode)
+
+	var js := JSON.stringify(J.S, "", false, true)
+	var lh := Menus.cierra_partida(js)
+	chk(Menus.abre_partida(lh) == js, "la exportada no se vuelve a abrir igual")
+	var s2 = JSON.parse_string(Menus.abre_partida(lh))
+	chk(J.partida_valida(s2), "la exportada no es válida")
+
+	var dir := _salida()
+	DirAccess.make_dir_recursive_absolute(dir)
+	var f := FileAccess.open(dir + "/partida-maxima.txt", FileAccess.WRITE)
+	f.store_string(lh)
+	f.close()
+	var g := FileAccess.open(dir + "/partida-maxima.json", FileAccess.WRITE)
+	g.store_string(js)
+	g.close()
+
+	# y se carga de verdad, como el juego la lee del disco al seguir una partida
+	Juego.escribe_partida(js)
+	var cargada = J.load_save()
+	chk(cargada != null, "load_save la da por no válida")
+	if cargada != null:
+		_mira(cargada)
+		J.S = cargada
+		J.migrate()
+		J.enter_game()
+		chk(J.mode == "world", "la cargada no entra al mundo: %s" % J.mode)
+
+	print("maxima: %d comprobaciones, %d fallos" % [n, fallos.size()])
+	for x in fallos:
+		print("  - " + x)
+	print("  JSON %d B · LH1 %d B · %s" % [js.length(), lh.length(), dir])
+	quit(1 if fallos.size() else 0)
+
+# — los cuatro bloques: el estado al máximo por áreas, con las tablas del juego como catálogo —
+
+func _cultivo(_J) -> void:
+	MaxCultivo.pon(J)
+
+func _historia(_J) -> void:
+	MaxHistoria.pon(J)
+
+func _negocios(_J) -> void:
+	MaxNegocios.pon(J)
+
+func _mundo(_J) -> void:
+	MaxMundo.pon(J)
+
+# — lo que tiene que estar al máximo, comprobado en el estado —
+func _mira(S) -> void:
+	var D = Datos.D
+	chk(int(S.ch) == 8, "capítulo %s" % S.ch)
+	chk(int(S.debt) == 0, "deuda %s" % S.debt)
+	chk(int(S.money) > 100000 and int(S.banco) > 1000000, "dinero %s / %s" % [S.money, S.banco])
+	chk(S.disc.size() >= D.STRAINS.size(), "descubiertas %d de %d" % [S.disc.size(), D.STRAINS.size()])
+	chk(S.seeds.size() >= D.STRAINS.size(), "semillas %d" % S.seeds.size())
+	chk(S.logros.size() >= D.LOGROS.size(), "logros %d de %d" % [S.logros.size(), D.LOGROS.size()])
+	chk(S.carpas.size() == 3, "carpas %d" % S.carpas.size())
+	chk(S.macetas.size() >= 12, "plazas %d" % S.macetas.size())
+	chk(S.get("nave") != null, "sin nave")
+	chk(S.get("kc") != null, "sin la sala de KAIA")
+	chk(S.get("mar") != null and S.mar.b.size() == 3, "los barcos")
+	chk(bool(S.aso.pres), "sin presidencia")
+	chk(S.loc.size() >= 6, "locales %d" % S.loc.size())
+	chk(S.coches.size() >= 4, "coches %d" % S.coches.size())
+	chk(S.get("huerta") != null and int(S.huerta.m.amp) > 0, "la huerta sin ampliar")
+	chk(S.get("cam") != null, "sin camarote")
+	chk(S.bt.c.size() >= D.BANCO_TIA.col.size(), "el banco de la tía %d" % S.bt.c.size())
+	chk(int(S.tn.sd) > 0, "sin semillas doradas")
+	chk(S.rev.tec.size() >= D.REVISTA.tec.size(), "técnicas %d" % S.rev.tec.size())
+	chk(S.rel.size() >= D.GENTE.size(), "gente %d" % S.rel.size())

@@ -186,7 +186,7 @@
   /* ------------------------- ESTADO ------------------------- */
   const game = {
     mode: 'boot', canvas: null, ctx: null, scale: 3,
-    W: 480, H: 432,                 // 10:9 (proporción fiel a la Game Boy 160x144)
+    W: 480, H: 432,                 // 10:9 (proporción de portátil clásica 160x144)
     dmg: false, _dmg: null,          // modo DMG (4 tonos, 160x144)
     moving: false, from: null, to: null, moveT: 0, moveDur: 170, frame: 0, animT: 0,
     keys: {}, tapLatch: null, lastSave: 0, cam: { x: 0, y: 0 }, cop: null, contrast: 1,
@@ -305,7 +305,7 @@
     PH.ui.toast(game.dmg ? '🟩 Modo DMG (4 tonos)' : '🌈 Modo color', '');
   }
 
-  // Rueda de CONTRASTE (como el potenciómetro físico de la Game Boy): ajusta
+  // Rueda de CONTRASTE (como el potenciómetro físico de las portátiles clásicas): ajusta
   // el filtro de la LCD por niveles y gira el mando para dar realimentación.
   const CONTRAST_LEVELS = [
     { f: 'contrast(.9) brightness(.96) saturate(.95)', deg: -60 },

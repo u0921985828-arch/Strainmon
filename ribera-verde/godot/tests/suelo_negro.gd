@@ -1,0 +1,117 @@
+# Landrace Hunters (Godot) — ningún agujero negro en el suelo (lo vio el usuario: «¿Y ese pedazo de error en el mapa?», una franja
+# negra en la calle): en todos los mapas montados, cada casilla de g o tiene arte de suelo o la tapa el sprite de un edificio. Si no,
+# _arte_tile no pinta nada y se ve el negro de debajo (el carril de entrada del aparcamiento era «road», que no existe en el atlas).
+#   $GODOT --headless --path godot --script res://tests/suelo_negro.gd   → «suelo_negro: N comprobaciones, 0 fallos»
+extends SceneTree
+
+const Datos = preload("res://src/datos.gd")
+const Juego = preload("res://src/juego.gd")
+const Pinta = preload("res://src/pinta.gd")
+const Atlas = preload("res://src/atlas.gd")
+
+var J
+# los que no están en datos.json: se crean al montarlos (campo.gd, mundo.gd)
+const EXTRA := ["huerta", "camarote", "nave-s", "sotano", "alm-rv", "alm-muelle", "lab-rv", "banco-rv", "cult-sala", "fria"]
+
+func _initialize() -> void:
+	Datos.PLAY = false
+	_corre.call_deferred()
+
+func res_(k: String) -> bool:
+	if k == "" or k == "<null>":
+		return false
+	if k == "cristalV" or k.begins_with("cv") or k == "iwT_kcs" or k == "iwB_kcs" or k == "arena" or k == "surco" or k == "surcoV":
+		return true
+	if k.begins_with("hito_"):
+		return res_(k.substr(5))
+	if Atlas.sobre.has("tile:" + k):
+		return true
+	if Pinta.MOSAICO_TILE.has(k):
+		return true
+	return Atlas.frame_de(Atlas.cubre("tile:" + k), k, "unica", 0, {"i": 0}) != null
+
+# lo mismo que _suelo_base de pinta.gd: el suelo de la casilla pisable más cercana, hacia abajo primero
+func _base(m: Dictionary, tx: int, ty: int) -> String:
+	for d in range(1, 13):
+		for q in [Vector2i(tx, ty + d), Vector2i(tx, ty - d), Vector2i(tx - d, ty), Vector2i(tx + d, ty)]:
+			if q.x < 0 or q.y < 0 or q.x >= int(m.w) or q.y >= int(m.h):
+				continue
+			if res_(String(m.g[q.y][q.x])):
+				return String(m.g[q.y][q.x])
+	return ""
+
+func rects(m: Dictionary) -> Array:
+	var r := []
+	for b in m.get("blds", []):
+		var f = Atlas.frame_de("edificio-" + String(b.get("fachada", b.id)), "base", "unica", 0, {"i": 0})
+		if f:
+			r.append([int(b.x0) * 16, int(b.y0) * 16, f.c.get_width(), f.c.get_height()])
+		if b.get("doorX") != null:
+			var p = Atlas.frame_de("edificio-" + String(b.get("puerta", b.id)), "puerta", "unica", 0, {"i": 0})
+			if p:
+				var dy: int = int(b.y0) + int(b.h) - 1
+				r.append([int(b.doorX) * 16 - 8 + int(b.get("dx", 0)), (dy + 1) * 16 - 32, p.c.get_width(), p.c.get_height()])
+	return r
+
+func _corre() -> void:
+	Juego.GUARDADO = "user://prueba-tiles.json"
+	Juego.AJUSTES = "user://prueba-tiles-ajustes.json"
+	Datos.CAL = true
+	var O = JSON.parse_string(FileAccess.get_file_as_string("res://tests/pantallas.json"))
+	var e: Dictionary = {}
+	for x in O:
+		if x.k == "nave2":
+			e = Datos.enteros(x)
+	J = Juego.new()
+	root.add_child(J)
+	J.S = e.S
+	J.oraculo = true
+	J.S.ch = 8
+	J.S.min = 12 * 60
+	J.S.flags.conce = true
+	Atlas.carga()
+	var tot := 0
+	var n := 0
+	var fallos := []
+	var vistos := {}
+	var cola: Array = J.D.MAPS.keys()
+	cola.append_array(EXTRA)
+	var i := 0
+	while i < cola.size():
+		var k = cola[i]
+		i += 1
+		if vistos.has(k) or not J.MAPS.has(k):
+			continue
+		vistos[k] = true
+		var md = J.MAPS[k]
+		if not md is Dictionary or not md.has("g"):
+			continue
+		J.enter_map(String(k), 1, 1, "right")
+		for q in J.MAPS.keys():   # los mapas que se montan al entrar (la huerta, las salas) también
+			if not vistos.has(q) and not cola.has(q):
+				cola.append(q)
+		var m: Dictionary = J.MAPS[String(k)]
+		var rr := rects(m)
+		var hue := []
+		for y in m.g.size():
+			for x in m.g[y].size():
+				var t := String(m.g[y][x])
+				if res_(t):
+					continue
+				var px: int = int(x) * 16
+				var py: int = int(y) * 16
+				var ok := false
+				for r in rr:
+					if px >= r[0] and py >= r[1] and px + 16 <= r[0] + r[2] and py + 16 <= r[1] + r[3]:
+						ok = true
+						break
+				if not ok and _base(m, x, y) == "":   # ni sprite que la tape ni suelo de alrededor que pintar debajo (_suelo_base de pinta.gd)
+					hue.append("%s(%d,%d)" % [t, x, y])
+		n += 1
+		if hue.size():
+			tot += hue.size()
+			fallos.append("%s: %d casillas negras (%s)" % [k, hue.size(), ", ".join(hue.slice(0, 8))])
+	for f in fallos:
+		print("  ", f)
+	print("suelo_negro: %d comprobaciones, %d fallos (%d casillas)" % [n, fallos.size(), tot])
+	quit(1 if fallos.size() else 0)

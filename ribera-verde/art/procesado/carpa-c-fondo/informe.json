@@ -1,0 +1,19 @@
+{
+  "grupo": "carpa-c-fondo",
+  "celda": [
+    240,
+    160
+  ],
+  "tope_colores": 32,
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 65.8,
+  "distancia_media": 0,
+  "colores_finales": 11,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

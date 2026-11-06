@@ -1,0 +1,23 @@
+{
+  "grupo": "extraccion-piso",
+  "celda": [
+    32,
+    32
+  ],
+  "tope_colores": 15,
+  "secuencias": 6,
+  "fotogramas": 6,
+  "semitransparentes": 0,
+  "en_paleta_antes": 33.1,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [
+    "prensaM: #f05030→#e05a44",
+    "staticM: #e04040→#8a5a32",
+    "staticM: #7ab65a→#c8935a"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

@@ -1,0 +1,80 @@
+# Línea base antes de las fases del plan de Google Play (2026-10-17)
+## Godot 4.3 (antes, batería vieja: mandos_geo sin --resolution/--sin-arranque)
+acceso: 59 comprobaciones, 0 fallos
+atrezo: 54 comprobaciones, 0 fallos
+autos: 61 comprobaciones, 0 fallos
+bajo: 45 comprobaciones, 0 fallos
+calendario: 35 comprobaciones, 0 fallos
+camarote: 70 comprobaciones, 0 fallos
+carpas_casa: 88 comprobaciones, 0 fallos
+carro: 24 comprobaciones, 0 fallos
+cepas: 68 comprobaciones, 0 fallos
+compra: 26 comprobaciones, 0 fallos
+concesionario: 94 comprobaciones, 0 fallos
+copia: 9 comprobaciones, 0 fallos
+detalle: 63 comprobaciones, 0 fallos
+escala: 85 comprobaciones, 0 fallos
+extr_venta: 27 comprobaciones, 0 fallos
+generos: 419 comprobaciones, 0 fallos
+historia: 120 pasos (120 OK) · semilla 4242 · 0 diferencias con el HTML · 12.2 s
+hojas: 212 comprobaciones, 0 fallos
+movil: 20 comprobaciones, 0 fallos
+muelle: 96 comprobaciones, 0 fallos
+nave: 32 comprobaciones, 0 fallos
+negocios: 340 comprobaciones, 0 fallos
+nevera: 23 comprobaciones, 0 fallos
+obras: 54 comprobaciones, 0 fallos
+ocio: 67 comprobaciones, 0 fallos
+orden_sala: 25 comprobaciones, 0 fallos
+recados: 66 comprobaciones, 0 fallos
+setas_sitio: 23 comprobaciones, 0 fallos
+setas_vista: 26 comprobaciones, 0 fallos
+sotano: 93 comprobaciones, 0 fallos
+tiempo: 46 comprobaciones, 0 fallos
+viaje: 107 comprobaciones, 0 fallos
+mandos_geo: 242 comprobaciones, 12 fallos
+capas: 48181 comprobaciones, 0 fallos
+extracciones: 28 escenas, 0 fallos
+ciclo: 0 fallos
+C1: 8712 comprobaciones, 0 diferencias
+C2 pantallas: 62 escenas, 0 diferencias
+
+## Godot 4.7 (fase 1, tools/tests.sh con las banderas buenas)
+acceso: 59 comprobaciones, 0 fallos
+atrezo: 54 comprobaciones, 0 fallos
+autos: 61 comprobaciones, 0 fallos
+bajo: 45 comprobaciones, 0 fallos
+calendario: 35 comprobaciones, 0 fallos
+camarote: 70 comprobaciones, 0 fallos
+carpas_casa: 88 comprobaciones, 0 fallos
+carro: 24 comprobaciones, 0 fallos
+cepas: 68 comprobaciones, 0 fallos
+compra: 26 comprobaciones, 0 fallos
+concesionario: 94 comprobaciones, 0 fallos
+copia: 9 comprobaciones, 0 fallos
+detalle: 63 comprobaciones, 0 fallos
+escala: 85 comprobaciones, 0 fallos
+extr_venta: 27 comprobaciones, 0 fallos
+generos: 419 comprobaciones, 0 fallos
+historia: 120 pasos (120 OK) · semilla 4242 · 0 diferencias con el HTML · 9.8 s
+hojas: 212 comprobaciones, 0 fallos
+movil: 20 comprobaciones, 0 fallos
+muelle: 96 comprobaciones, 0 fallos
+nave: 32 comprobaciones, 0 fallos
+negocios: 340 comprobaciones, 0 fallos
+nevera: 23 comprobaciones, 0 fallos
+obras: 54 comprobaciones, 0 fallos
+ocio: 67 comprobaciones, 0 fallos
+orden_sala: 25 comprobaciones, 0 fallos
+recados: 66 comprobaciones, 0 fallos
+setas_sitio: 23 comprobaciones, 0 fallos
+setas_vista: 26 comprobaciones, 0 fallos
+sotano: 93 comprobaciones, 0 fallos
+tiempo: 46 comprobaciones, 0 fallos
+viaje: 107 comprobaciones, 0 fallos
+capas: 48181 comprobaciones, 0 fallos
+extracciones: 28 escenas, 0 fallos
+mandos_geo: 242 comprobaciones, 0 fallos
+C1: 8712 comprobaciones, 0 diferencias
+C2 pantallas: 62 escenas, 0 diferencias
+ciclo: 0 fallos

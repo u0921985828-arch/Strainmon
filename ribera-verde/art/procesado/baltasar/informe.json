@@ -1,0 +1,26 @@
+{
+  "grupo": "baltasar",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 9,
+  "fotogramas": 34,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 22.29,
+  "colores_finales": 15,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "contar/south": 0,
+    "idle/east": 0,
+    "idle/north": 0,
+    "idle/south": 0,
+    "puro/south": 0
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #26262e≈#2a2a30"
+  ]
+}

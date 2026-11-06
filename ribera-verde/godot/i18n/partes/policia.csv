@@ -1,0 +1,193 @@
+es,en
+VIDA,HP
+SOSP.,SUSP.
+Darko se quita la sudadera y la tira al suelo.,Darko pulls off his hoodie and throws it down.
+«Ni Iñaki ni mi tío. Tú y yo.»,"«Not Iñaki, not my uncle. Just you and me.»"
+{r} se te planta delante.,{r} steps right up to you.
+«Te lo he dicho por las buenas.»,«I asked you nicely.»
+«Aquí se vende lo mío.»,"«Round here, they sell my stuff.»"
+«Vamos a arreglarlo.»,«Let's sort this out.»
+Un {n} te corta el paso.,A {n} blocks your way.
+«La mochila. Dámela y no pasa nada.»,"«The backpack. Hand it over, no trouble.»"
+"«Eh, tú. Sé lo que llevas encima.»","«Hey, you. I know what you're carrying.»"
+«Quieto. El dinero y lo que lleves.»,«Freeze. Your cash and whatever you've got.»
+{n} te da el alto.,{n} tells you to stop.
+«Control rutinario. ¿Llevas algo encima?»,«Routine check. Carrying anything?»
+«Documentación. Y vacía los bolsillos.»,«ID. And empty your pockets.»
+«Aquí huele a marihuana. ¿Es tuya?»,«Smells like weed here. Is it yours?»
+Te despiertas en casa con la cabeza vendada. Un vecino te encontró en el portal.,You wake up at home with your head bandaged. A neighbour found you in the doorway.
+El {n},The {n}
+{b} coge una barra de hierro del suelo. El próximo golpe va a doler.,{b} grabs an iron bar off the ground. The next hit is going to hurt.
+{b} baja la barra y te apartas a tiempo.,{b} swings the bar down and you dodge in time.
+{b} se lanza y te apartas a tiempo.,{b} lunges and you dodge in time.
+No te apartas a tiempo.,You don't dodge in time.
+{b} te da con la barra.,{b} hits you with the bar.
+{b} te golpea.,{b} hits you.
+{b} te empuja contra un portal.,{b} shoves you into a doorway.
+{b} te da una patada.,{b} kicks you.
+{b} te tira al suelo.,{b} knocks you down.
+Te cubres: el golpe duele la mitad.,You cover up: the hit hurts half as much.
+Pierdes el conocimiento.,You pass out.
+"Te roba {g} g, {r} y {e}.","They steal {g} g, {r} and {e}."
+Te roba {g} g y {e}.,They steal {g} g and {e}.
+¿Qué haces?,What do you do?
+LUCHAR,FIGHT
+MOCHILA,BAG
+HABLAR,TALK
+HUIR,RUN
+Elige un golpe.,Pick a move.
+PUÑETAZO,PUNCH
+PATADA,KICK
+CUBRIRSE,COVER
+ESQUIVAR,DODGE
+Te pones en guardia: el próximo golpe no fallará.,You raise your guard: your next hit won't miss.
+Te quedas atento para apartarte.,You get ready to dodge.
+Le das una patada.,You kick them.
+Le das un puñetazo.,You punch them.
+Le pillas abierto.,You catch them wide open.
+Le has hecho daño de verdad.,That really hurt them.
+Fallas.,You miss.
+¿Qué usas?,Use what?
+SPRAY ×{n},SPRAY ×{n}
+BOCATA ×{n},SANDWICH ×{n}
+No te queda SPRAY.,You're out of SPRAY.
+Le echas SPRAY DE PIMIENTA a la cara.,You blast PEPPER SPRAY in their face.
+No puede abrir los ojos.,They can't open their eyes.
+No te quedan BOCATAS.,You're out of SANDWICHES.
+Te comes un BOCATA. Recuperas vida.,You eat a SANDWICH. You get some HP back.
+¿Qué le dices?,What do you say?
+CALMAR,CALM
+AMENAZAR,THREATEN
+{n}: «Tranquilo. Somos del mismo barrio.»,{n}: «Easy. We're from the same barrio.»
+«Vale... Tú eres el de Maite. Olvídalo.»,«Fine... You're Maite's kid. Forget it.»
+«Aquí ya no hay nada que hablar.»,«There's nothing left to talk about.»
+«No me cuentes historias.»,«Don't give me that.»
+{n}: «Lárgate ahora que puedes.»,{n}: «Get lost while you still can.»
+{b} se lo piensa mejor.,{b} thinks better of it.
+{b} se lo piensa mejor y se va.,{b} thinks better of it and leaves.
+«A mí no me amenaza nadie.»,«Nobody threatens me.»
+«¿A mí? Ahora vas a ver.»,«Me? Now you'll see.»
+Consigues escapar.,You get away.
+Te corta el paso. No puedes escapar.,They block your way. You can't escape.
+"{b} cae al suelo, sin aire.","{b} hits the ground, winded."
+{b} sale corriendo.,{b} runs off.
+Aguantas más. VIDA máxima: {n}.,You're tougher. Max HP: {n}.
+Al huir se le cae la cartera: +{e}.,They drop their wallet as they run: +{e}.
+Subes a nivel {n} de pelea.,You reach fight level {n}.
+¿Qué entrenas?,Train what?
+Fuerza,Strength
+Reflejos,Reflexes
+FUERZA {f}: cada golpe hace {f} más.,STRENGTH {f}: every hit does {f} more.
+"REFLEJOS {r}: aciertas, esquivas y escapas mejor.","REFLEXES {r}: you hit, dodge and escape better."
+"Fuerza {f} · reflejos {r} · {x} de experiencia.
+Sube ganando peleas: un ladrón da {t}, un rival {v}.","Strength {f} · reflexes {r} · {x} XP.
+Win fights to level up: a mugger gives {t}, a rival {v}."
+"Fuerza {f} · reflejos {r} · {x} de experiencia (nivel {nv} con {c}).
+Sube ganando peleas: un ladrón da {t}, un rival {v}.","Strength {f} · reflexes {r} · {x} XP (level {nv} at {c}).
+Win fights to level up: a mugger gives {t}, a rival {v}."
+SOBORNAR,BRIBE
+ENTREGAR,HAND OVER
+¿Ofrecerle {e} con disimulo?,Slip them {e} on the quiet?
+Sí,Yes
+No,No
+No llevas tanto dinero encima.,You don't have that much cash on you.
+{n}: «¿Me intentas sobornar a mí? Esto me lo quedo.»,{n}: «Trying to bribe me? I'll keep this.»
+Te requisan {x} y te multan con {e}.,They seize {x} and fine you {e}.
+{n} se guarda el sobre. «Aquí no ha pasado nada.»,{n} pockets the envelope. «Nothing happened here.»
+"{n}: «Solo estaba dando un paseo, agente.»","{n}: «Just out for a walk, officer.»"
+{n}: «Bien. Circula.»,{n}: «Fine. Move along.»
+{n}: «No. Vacía los bolsillos.»,{n}: «No. Empty your pockets.»
+Sales corriendo entre los coches y lo pierdes.,You run off between the cars and lose them.
+{n} te alcanza y te reduce en el suelo.,{n} catches you and pins you down.
+"Le entregas {x}. «Buena decisión. Por esta vez, sin multa.»","You hand over {x}. «Smart move. No fine, this time.»"
+Un diploma enmarcado: «COPA DE RIBERA 1998 · 2º PREMIO: MAITE».,A framed diploma: «RIBERA CUP 1998 · 2ND PRIZE: MAITE».
+Mirar detrás,Look behind
+Dejarlo,Leave it
+Detrás del marco hay una caja fuerte empotrada en la pared. Tiene una rueda de cuatro cifras.,Behind the frame there's a safe set into the wall. It has a four-digit dial.
+¿Qué combinación pruebas?,Which combination?
+Clac. No se abre.,Clack. It won't open.
+Clic. La caja se abre.,Click. The safe opens.
+"Dentro hay {e} y una nota de la tía: «Para ti, {N}. Lo que guardes aquí no te lo quita nadie en la calle».","Inside are {e} and a note from your aunt: «For you, {N}. What you keep here, nobody on the street can take»."
+Caben {e} y {g}. Lo que está dentro no lo llevas encima.,It holds {e} and {g}. What's inside isn't on you.
+"Al fondo de la caja hay un sobre de papel de estraza: «Oaxaca, 1979».","At the back of the safe there's a brown paper envelope: «Oaxaca, 1979»."
+Bien secas y a oscuras: siguen buenas.,Kept dry and dark: they're still good.
+Nada,Nothing
+No te cabe nada más encima.,You can't carry any more.
+Sacas {g} de {l}.,You take out {g} of {l}.
+Guardar todo,Store all
+Guardar dinero,Store cash
+Guardar cogollos,Store buds
+Sacar dinero,Take cash
+Sacar cogollos,Take buds
+Sacar todo,Take all
+Cerrar,Close
+"{c}: {d} (caben {e} y {g}).
+Encima: {m}.","{c}: {d} (holds {e} and {g}).
+On you: {m}."
+Guardas {x}. No cabe todo: el resto se queda fuera.,You store {x}. Not everything fits: the rest stays out.
+Guardas {x}.,You store {x}.
+Sacas {x}. No te cabe todo encima: el resto se queda en la caja.,You take out {x}. You can't carry it all: the rest stays in the safe.
+Sacas {x}.,You take out {x}.
+No llevas dinero encima.,You have no cash on you.
+No cabe más dinero.,No room for more cash.
+La caja no tiene dinero.,The safe has no cash.
+¿Cuánto guardas?,Store how much?
+¿Cuánto sacas?,Take how much?
+No llevas cogollos encima.,You have no buds on you.
+La caja no tiene cogollos.,The safe has no buds.
+No caben más cogollos.,No room for more buds.
+¿Qué guardas?,Store what?
+¿Qué sacas?,Take what?
+{l}: ¿cuánto?,{l}: how much?
+NOTAS DE LA TÍA,AUNT'S NOTES
+"«Veinte años de cultivos, apuntados día a día.»","«Twenty years of grows, logged day by day.»"
+"«Lo que no quiero llevar a la calle lo guardo detrás de mi premio. La combinación, el año en que lo gané.»","«What I don't want on the street, I keep behind my prize. The combination is the year I won it.»"
+"Caja empotrada: {e} y {g}. Kiko la instala mañana detrás del diploma, con lo que ya tengas dentro. {p}.","Built-in safe: {e} and {g}. Kiko fits it behind the diploma tomorrow, with what's already inside. {p}."
+Pedirla,Order it
+No te llega el dinero.,You can't afford it.
+Pedida: caja empotrada · llega mañana,Ordered: built-in safe · arrives tomorrow
+SMS · KIKO,SMS · KIKO
+"Ya está: la caja empotrada, detrás del diploma. Lo de la vieja lo tienes dentro.","Done: the built-in safe, behind the diploma. What was in the old one is inside."
+Caben {e} y {g}.,It holds {e} and {g}.
+"Te despierta un portazo. La cerradura está forzada y el piso, revuelto.",A slamming door wakes you. The lock's been forced and the flat's been turned over.
+Se han llevado {x}. La caja de detrás del diploma sigue cerrada.,They took {x}. The safe behind the diploma is still locked.
+Se han llevado {x}.,They took {x}.
+SMS · DARKO,SMS · DARKO
+Te dije que esto no se acababa ahí.,Told you this wasn't over.
+"Si la tía guardaba sus cosas en algún sitio, ahora te vendría bien saber dónde.","If your aunt kept her things somewhere, now would be a good time to know where."
+"Toño te espera en el almacén de los astilleros, de noche, con {g}. Hasta el {f}.","Toño's waiting at the shipyard warehouse, at night, for {g}. Until {f}."
+"Me fallaste, {N}. Vuelve el {f}.","You let me down, {N}. Come back on {f}."
+"Ya no me debes nada, {N}. Pero tengo trabajo, si lo quieres.","You don't owe me a thing now, {N}. But I've got work, if you want it."
+"{g} en el almacén de los astilleros, de noche. Toño los recoge.","{g} at the shipyard warehouse, at night. Toño picks it up."
+Pago {p} € el gramo: {e}. Tienes {d} días.,I pay {p} € a gram: {e}. You've got {d} days.
+No te caben en la {a}. Hazte con una {b} y vuelve.,It won't fit in your {a}. Get a {b} and come back.
+¿Aceptas el encargo?,Take the job?
+Aceptar,Accept
+Tú sabrás. La oferta sigue en pie.,Your call. The offer stands.
+Toño estará allí cada noche hasta el {f}. No le hagas esperar.,Toño will be there every night until {f}. Don't keep him waiting.
+TOÑO,TOÑO
+El plazo se acabó. Don Baltasar ya te escribirá.,Time's up. Don Baltasar will be in touch.
+"¿De día? ¿Tú estás loco? Vuelve de noche, a partir de las nueve.","In daylight? Are you crazy? Come back at night, after nine."
+Don Baltasar dijo {g}. Llevas {l}. Vuelve con todo.,Don Baltasar said {g}. You've got {l}. Come back with all of it.
+¿Entregas {g}? Toño se lleva primero los lotes más flojos.,Hand over {g}? Toño takes the weakest batches first.
+Entregar,Hand over
+Todavía no,Not yet
++{e} · encargo de Don Baltasar,+{e} · Don Baltasar's job
+Contado. Don Baltasar estará contento.,All counted. Don Baltasar will be pleased.
+No apareciste. Don Baltasar no se olvida.,You didn't show. Don Baltasar doesn't forget.
+Reputación −10. Nada de encargos hasta el {f}.,Reputation −10. No jobs until {f}.
+SMS · TOÑO,SMS · TOÑO
+frío,cold
+calor,hot
+seco,dry
+húmedo,humid
+ninguno,none
+"{m} · de día {d}{dm} · de noche {n}{nm}
+Bien: {t0}-{t1} °C y {h0}-{h1} %. Aparatos: {ap} · {f} al día.","{m} · day {d}{dm} · night {n}{nm}
+Good: {t0}-{t1}° and {h0}-{h1} %. Devices: {ap} · {f} a day."
+"{m} · de día {d}{dm} · de noche {n}{nm}
+Bien: {t0}-{t1} °C y {h0}-{h1} %. Aparatos: {ap}.","{m} · day {d}{dm} · night {n}{nm}
+Good: {t0}-{t1}° and {h0}-{h1} %. Devices: {ap}."
+{a} y {b},{a} and {b}
+"{a}, {b} y {c}","{a}, {b} and {c}"
+{g} g y {r},{g} g and {r}

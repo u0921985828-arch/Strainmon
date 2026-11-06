@@ -1,0 +1,19 @@
+{
+  "grupo": "interior-locales",
+  "celda": [
+    16,
+    16
+  ],
+  "tope_colores": 15,
+  "secuencias": 30,
+  "fotogramas": 30,
+  "semitransparentes": 0,
+  "en_paleta_antes": 1.8,
+  "distancia_media": 0,
+  "colores_finales": 9,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

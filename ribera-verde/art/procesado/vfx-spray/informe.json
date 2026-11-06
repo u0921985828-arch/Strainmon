@@ -1,0 +1,20 @@
+{
+  "grupo": "vfx-spray",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 1,
+  "fotogramas": 6,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 49.58,
+  "colores_finales": 3,
+  "fundidos": [],
+  "huerfanos_quitados": 2,
+  "deriva_pies": {
+    "efecto/unica": 3
+  },
+  "errores": [],
+  "avisos": []
+}

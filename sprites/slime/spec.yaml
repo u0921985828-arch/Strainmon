@@ -1,0 +1,27 @@
+nombre: slime
+uso: prueba de humo de la skill director-sprites (enemigo genérico, plataformas lateral)
+tamano: 32x32            # el slime ocupa ~70 % del ancho
+vista: lateral
+direcciones: 1           # lateral, se espeja
+paleta:                  # 8 colores
+  - "#1a1c2c"            # contorno
+  - "#2a5a3a"            # verde sombra
+  - "#3e8a4a"            # verde medio
+  - "#6cc05a"            # verde luz
+  - "#b4f08c"            # brillo
+  - "#f4f4f4"            # blanco de ojos / reflejo
+  - "#26262e"            # pupila
+  - "#3a6a8a"            # sombra en el suelo
+contorno: negro
+luz: arriba-izquierda
+sombreado: 3 tonos de verde + brillo, sin degradados ni anti-alias exterior
+estilo: "16-bit, gota de gelatina con dos ojos"
+pivote: pies_centro      # base del slime en (16, 27); pies en y = 27 en los 4 frames
+seed: 4242
+animaciones:
+  idle: {frames: 4, fps: 6, loop: true}
+resultado:
+  base: semilla 4242, la mejor de 4 variantes (4242-4245, QA 4/4 ok)
+  idle: animate_image con el último frame fijado al base (el loop cierra sin salto); respira y parpadea
+  qa: 4/4 frames ok tras cuantizar a la paleta (fix); 0 semitransparencias, 0 huérfanos, pivote estable
+  coste: 6 generaciones (4 variantes + 2 intentos de idle)

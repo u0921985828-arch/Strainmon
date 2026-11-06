@@ -1,0 +1,19 @@
+{
+  "grupo": "bajo-alto",
+  "celda": [
+    32,
+    32
+  ],
+  "tope_colores": 32,
+  "secuencias": 31,
+  "fotogramas": 31,
+  "semitransparentes": 0,
+  "en_paleta_antes": 47,
+  "distancia_media": 0,
+  "colores_finales": 17,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

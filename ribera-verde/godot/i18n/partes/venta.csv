@@ -1,0 +1,248 @@
+es,en
+"A {n} ya le diste una prima el {d}. Hasta el {h}, no.",You already gave {n} a bonus on {d}. Not until {h}.
+{n} ya te es leal del todo: una prima no le cambia nada.,{n} is already fully loyal: a bonus won't change a thing.
+No te llega.,You can't afford it.
+"{n}: «Gracias, jefe. Aquí me tienes». Lealtad {l}.","{n}: ""Thanks, boss. I'm all yours."" Loyalty {l}."
+{n} ya tiene labia 5: no hay curso que le enseñe más.,{n} already has charm 5: no course can teach them more.
+{n} ya tiene cuidado 5: no hay curso que le enseñe más.,{n} already has care 5: no course can teach them more.
+"{n} hizo un curso el {d}. Hasta el {h}, no.",{n} took a course on {d}. Not until {h}.
+{n} hace un curso de venta: a tratar con la gente. Labia {v}.,{n} takes a sales course: how to deal with people. Charm {v}.
+"{n} hace un curso de cultivo: riego, plagas y poda. Cuidado {v}.","{n} takes a growing course: watering, pests and pruning. Care {v}."
+calle · {g},street · {g}
+gerente,manager
+nave,warehouse
+madres,mothers
+sin trabajo,no job
+Vende {l} en la calle: le quedan {g}.,Sells {l} on the street: {g} left.
+Cuida el piso y cosecha a la caja fuerte por {e} al día.,Tends the flat and harvests into the safe for {e} a day.
+"Cultiva la mesa {m} de la nave por {e} al día: con su cuidado, la cosecha da un {p} %.","Grows table {m} in the warehouse for {e} a day: with their care, the harvest yields {p} %."
+Cuida las madres de la nave por {e} al día y les saca esquejes.,Tends the warehouse mothers for {e} a day and takes cuttings.
+"Dale trabajo: calle, gerente, nave o las madres.","Give them a job: street, manager, warehouse or the mothers."
+Pedir gente a Patxi,Ask Patxi for people
+Patxi te manda a alguien del barrio que quiere currar. No sabes a quién hasta que llega.,Patxi sends you someone from the hood who wants work. You won't know who until they show up.
+{a} de {b} · nave {g},{a} of {b} · warehouse {g}
+{a} de {b},{a} of {b}
+PLANTILLA,CREW
+Patxi cobra {e} por el sobre. No te llega.,Patxi charges {e} for the envelope. You can't afford it.
+Patxi ya no conoce a nadie más que quiera currar.,Patxi doesn't know anyone else who wants work.
+SMS · PATXI,SMS · PATXI
+Te mando a {n}. {s},I'm sending you {n}. {s}
+Vale oro.,Worth their weight in gold.
+"No es gran cosa, pero quiere currar.","Not much to look at, but wants to work."
+Gente normal del barrio.,Regular folk from the hood.
+{n}: {f}. ¿Le contratas?,{n}: {f}. Hire them?
+Contratar,Hire
+No,No
+{n} se va por donde ha venido. El sobre ya es de Patxi.,{n} goes back the way they came. The envelope is Patxi's now.
+{n} entra en tu plantilla. Dale trabajo desde aquí.,{n} joins your crew. Give them a job from here.
+Para la calle hace falta un lote de {g} g o más encima.,For the street you need a batch of {g} g or more on you.
+Nada,Nothing
+¿Qué lote le das?,Which batch?
+{n} vende a precio de calle y se queda el {p} %. ¿Cuánto le das?,{n} sells at street price and keeps {p} %. How much?
+A la calle,To the street
+De gerente,As manager
+A la nave,To the warehouse
+A las madres,To the mothers
+Dejarlo libre,Free them up
+Prima · {e},Bonus · {e}
+Curso · {e},Course · {e}
+Despedir,Fire
+{n}: «Hecho. Cada día te dejo lo vendido en el buzón».,"{n}: ""Done. Every day I'll leave the takings in your mailbox."""
+"{n}: «Cada mañana me paso por el piso: riego, trato las plagas y lo que esté listo lo cosecho y lo dejo en la caja fuerte. {e} al día».","{n}: ""Every morning I'll drop by the flat: water, treat pests, and whatever's ready I harvest and leave in the safe. {e} a day."""
+{n}: «Mañana empiezo en la mesa {m} de la nave. {e} al día».,"{n}: ""I start tomorrow on table {m} in the warehouse. {e} a day."""
+"{n}: «Mañana empiezo con las madres de la nave: riego, poda y esquejes. {e} al día».","{n}: ""I start tomorrow with the warehouse mothers: watering, pruning and cuttings. {e} a day."""
+{n} te deja lo que le quedaba en la caja fuerte: {g}.,{n} leaves what they had left in the safe: {g}.
+{n} se queda sin trabajo.,{n} is out of a job.
+¿Despides a {n}?,Fire {n}?
+"{n} se va. Lo que le quedaba, {g}, está en la caja fuerte.","{n} leaves. What they had left, {g}, is in the safe."
+{n} se va.,{n} leaves.
+SMS · ,SMS · 
+He cosechado {g} g. Está en la caja fuerte.,I harvested {g} g. It's in the safe.
+"Sin cobrar no curro. Cuando tengas el dinero, me llamas.","No pay, no work. Call me when you've got the money."
+Me ha parado la policía. Se han quedado con {g} de {l}. Lo siento.,The cops stopped me. They took {g} of {l}. Sorry.
+Me han atracado en un portal. Se han llevado {g} de {l}. Me quedan {q}.,Got mugged in a doorway. They took {g} of {l}. I've got {q} left.
+Me han atracado en un portal. Se han llevado {g} de {l}.,Got mugged in a doorway. They took {g} of {l}.
+{n} no contesta al móvil. Se ha largado con {g} de {l}.,{n} isn't answering. They ran off with {g} of {l}.
+Me han pagado {g} g con billetes falsos. No me he dado cuenta hasta el banco.,Got paid for {g} g in fake notes. Didn't notice till the bank.
+Vendidos {g} g: {e} en tu buzón. Me quedan {q}.,Sold {g} g: {e} in your mailbox. I've got {q} left.
+Vendidos los últimos {g} g: {e} en tu buzón. Dame más cuando quieras.,Sold the last {g} g: {e} in your mailbox. Give me more whenever.
+ARRIETA,ARRIETA
+la nave,the warehouse
+"Este mes puedes comprar la nave, hasta el {d}: quedan {r} y {g} de gastos. Por transferencia, en el notario.","This month you can buy the warehouse, until {d}: {r} left plus {g} in fees. By bank transfer, at the notary."
+SMS · ARRIETA,SMS · ARRIETA
+"Me han dicho que ahora presides la asociación del barrio. Si quieres, la nave te la alquilo con opción a compra: pásate y lo hablamos.","I hear you're president of the local association now. If you want, I'll rent you the warehouse with an option to buy: drop by and we'll talk."
+No me has pagado la nave. Cambio la cerradura y me quedo la fianza.,You haven't paid for the warehouse. I'm changing the lock and keeping the deposit.
+{a} y {b},{a} and {b}
+"La policía ha entrado en la nave de Valdehierro. Se lleva las plantas, {g} y a {q}.","The police raided the Valdehierro warehouse. They took the plants, {g} and {q}."
+La policía ha entrado en la nave de Valdehierro. Se lleva las plantas y a {q}.,The police raided the Valdehierro warehouse. They took the plants and {q}.
+cosecha mañana,harvest tomorrow
+cosecha en {d} días,harvest in {d} days
+"Sin nadie que las cuide, se han muerto {n} madres de la nave.","With nobody tending them, {n} warehouse mothers have died."
+"Sin nadie que la cuide, se ha muerto una madre de la nave.","With nobody tending it, a warehouse mother has died."
+"La nave no se alquila. Ahora mismo, no.",The warehouse isn't for rent. Not right now.
+"La nave está vacía: {f} de fianza y {r} cada {d} días, en efectivo; el primero, ahora. Paso a cobrar y te aviso antes. Sin preguntas.","The warehouse is empty: {f} deposit and {r} every {d} days, cash; the first one now. I come round to collect and warn you first. No questions."
+Alquilarla,Rent it
+Sin {e} no hay llave.,"No {e}, no key."
+la llave de la nave,the warehouse key
+"Dentro hay {n} mesas de cultivo, una por persona. Pon a tu gente desde el móvil y planta tú lo que quieras.","Inside there are {n} grow tables, one per person. Assign your crew from the phone and plant whatever you like."
+Dejar la nave,Give up the warehouse
+La nave es tuya.,The warehouse is yours.
+Comprarla,Buy it
+Opción a compra: llevas {a} de {b}.,Option to buy: {a} of {b} paid.
+Opción a compra,Option to buy
+"La nave: {a} de {b} mesas plantadas · {c} de {d} trabajando. Lo demás, dentro.","The warehouse: {a} of {b} tables planted · {c} of {d} working. The rest, inside."
+"¿Dejas la nave? Te devuelvo la fianza; lo que no recojas se queda aquí; la opción a compra se pierde, y lo pagado para ella.","Giving up the warehouse? I'll return the deposit; whatever you don't collect stays here; the option to buy is lost, and what you paid toward it."
+"¿Dejas la nave? Te devuelvo la fianza; la opción a compra se pierde, y lo pagado para ella.","Giving up the warehouse? I'll return the deposit; the option to buy is lost, and what you paid toward it."
+¿Dejas la nave? Te devuelvo la fianza; lo que no recojas se queda aquí.,Giving up the warehouse? I'll return the deposit; whatever you don't collect stays here.
+¿Dejas la nave? Te devuelvo la fianza.,Giving up the warehouse? I'll return the deposit.
+Dejarla,Give it up
+"Trato hecho. Si la quieres otra vez, ya sabes dónde estoy.","Deal. If you want it again, you know where I am."
+"Te la vendo por {p} ({m} m², a unos {pm} el metro). Firmamos la opción: {pr} de prima, que se descuentan, y la mitad de cada alquiler va a la compra. El precio no se mueve. Los primeros {d} días de cada mes, si quieres, la compras a tocateja con lo que falte, más los gastos ({g}), en el notario y por transferencia.","I'll sell it for {p} ({m} m², about {pm} per metre). We sign the option: {pr} up front, which is deducted, and half of each rent goes toward the purchase. The price stays put. In the first {d} days of each month, if you want, you buy it outright with what's left, plus fees ({g}), at the notary and by bank transfer."
+Firmar la opción,Sign the option
+Prima de la opción · nave,Option fee · warehouse
+"La prima, por transferencia: en tu cuenta no hay {e}.",The option fee goes by transfer: your account doesn't have {e}.
+"Firmado. Quedan {e}; la mitad de cada alquiler, a cuenta. El primer día de cada mes te mando un mensaje con lo que falta.",Signed. {e} to go; half of each rent counts toward it. On the first of every month I'll text you what's left.
+"La compra, los primeros {n} días de mes. El próximo, desde el {d}.","Purchases only in the first {n} days of the month. Next one, from {d}."
+"Quedan {r} y {g} de gastos: {t}, por transferencia. Te devuelvo la fianza de {f}. ¿La compras?","{r} left plus {g} in fees: {t}, by transfer. I'll return the {f} deposit. Buying it?"
+Compra de la nave de Valdehierro,Purchase of the Valdehierro warehouse
+"En tu cuenta hay {b} y hacen falta {t}. El mes que viene, otra vez.",Your account has {b} and you need {t}. Try again next month.
+las escrituras de la nave,the warehouse deeds
+Firmado en el notario. La nave es tuya: ni alquiler ni cerradura que cambiar. Suerte.,"Signed at the notary. The warehouse is yours: no rent, no locks to change. Good luck."
+"Una puerta sin rótulo, con un timbre. No abre nadie.",An unmarked door with a buzzer. Nobody answers.
+"La persiana está echada con un candado. La llave la tiene Arrieta, el dueño.","The shutter is down and padlocked. Arrieta, the owner, has the key."
+Un portal con el timbre sin nombre. No abre nadie.,A doorway with a nameless buzzer. Nobody answers.
+Una puerta gris con un candado. No es la tuya.,A grey door with a padlock. It isn't yours.
+"La puerta del bajo de Txomin, con un candado. La llave te la da él, si lo alquilas.","The door to Txomin's basement, padlocked. He gives you the key if you rent it."
+"Cerrado. En el cristal, el cartel de SE TRASPASA.",Closed. A BUSINESS FOR SALE sign hangs in the window.
+{n} abre de 23:00 a 6:00.,{n} opens from 23:00 to 6:00.
+"Redes de la cofradía, remendadas mil veces.","The fishermen's guild nets, mended a thousand times."
+"Nasas para el bogavante, apiladas a secar.","Lobster pots, stacked to dry."
+"Arriba está el reservado, con la cristalera encima de la pista. Sin mesa, no se sube: la RRPP te la vende.","Upstairs is the VIP area, glass wall over the dance floor. No table, no entry: the promoter sells you one."
+RRPP,PROMOTER
+"Las botellas buenas, las del reservado.","The good bottles, the VIP ones."
+La barra del reservado. Pídele a la camarera.,The VIP bar. Order from the bartender.
+"El neón de {n}, también arriba.","The {n} neon, up here too."
+Un altavoz: aquí arriba la música llega más limpia.,A speaker: up here the music sounds cleaner.
+"Tu mesa: sofá de terciopelo, cubitera y botella. Desde aquí se ve toda la pista por el cristal.","Your table: velvet sofa, ice bucket and bottle. From here you see the whole floor through the glass."
+Ya no es tuyo: devuelve las llaves al salir.,It's not yours anymore: hand back the keys on the way out.
+"La cama del cuartucho: un somier de 90, una manta de cuadros y la radio en la mesilla.","The back-room bed: a narrow single, a checked blanket and the radio on the nightstand."
+Cambiarte de ropa,Change clothes
+Una mesa de camping con un hornillo y una cafetera italiana.,A camping table with a stove and a moka pot.
+"La mesilla: la radio, un despertador y una revista de coches.","The nightstand: the radio, an alarm clock and a car magazine."
+"Un calendario de un taller de neumáticos, de hace años.","A tyre shop calendar, years old."
+La nave ya no es tuya.,The warehouse isn't yours anymore.
+La cama de la habitación de la nave: se oyen los extractores al otro lado de la pared.,The bed in the warehouse room: you can hear the extractors through the wall.
+Un armario con ropa de faena y una muda limpia.,A wardrobe with work clothes and a clean change.
+"La mesilla, con un flexo y el cargador del móvil.","The nightstand, with a desk lamp and the phone charger."
+La percha: un mono de trabajo y un chubasquero.,The coat rack: overalls and a raincoat.
+"El plano de la nave, con las mesas, las tomas de agua y la luz.","The warehouse plan, with the tables, water points and power."
+"Cajas de archivo: facturas de la luz, del agua y del sustrato.","Filing boxes: power, water and soil bills."
+Lo de {n}.,{n} stuff.
+"El camastro de la nave, detrás de las mesas: se oyen los extractores toda la noche.","The warehouse cot, behind the tables: the extractors hum all night."
+"En la pizarra de Kiko, a tiza: «{t}».","On Kiko's chalkboard: ""{t}""."
+"Sacos de 50 litros: fibra de coco, perlita y tierra abonada.","50-litre bags: coco coir, perlite and enriched soil."
+"Macetas de tela apiladas, de 11, 18 y 25 litros.","Stacked fabric pots: 11, 18 and 25 litres."
+"Botes de abono por litros: MEATZA en azul, ORTUA BIO en verde.","Nutrient bottles by the litre: MEATZA in blue, ORTUA BIO in green."
+Un neón verde: una hoja de siete puntas y GROW IBARBIDE debajo.,A green neon: a seven-point leaf with GROW IBARBIDE below.
+Un propagador con tapa: bandejas de alveolos con esquejes de muestra y su manta térmica.,A lidded propagator: cell trays with sample cuttings and a heat mat.
+"La carpa de exposición: 120 × 120, con el LED de barras encendido y plantas de plástico dentro.","The display tent: 120 × 120, bar LED on and plastic plants inside."
+Ordenar el local,Arrange the venue
+Tarros de cristal con la etiqueta de cada variedad que ha pasado por el club.,Glass jars labelled with every strain that has passed through the club.
+"En la pizarra, a tiza: «Hoy, {n}».","On the chalkboard: ""Today, {n}""."
+"NORMAS DE {n}
+Solo socios mayores de edad, con el carné a la vista. Lo que se retira, se consume dentro.","{n} RULES
+Adult members only, card on show. What you take out is consumed inside."
+"El taquero: seis tacos, la tiza y el triángulo.","The cue rack: six cues, the chalk and the triangle."
+La vitrina del dispensario: tarros con muestras y una báscula de precisión.,The dispensary case: sample jars and a precision scale.
+"La mesa de billar, con el tapete recién cepillado. {n} echa partidas.","The pool table, cloth freshly brushed. {n} plays here."
+"La mesa de billar, con el tapete recién cepillado. {n} juega con apuesta.","The pool table, cloth freshly brushed. {n} plays for money."
+Un cartel antiguo de una feria del cáñamo.,An old poster from a hemp fair.
+"La tía Maite y Delroy, de jóvenes, en un campo. En la placa: «Maite, presidenta fundadora».","Aunt Maite and Delroy, young, in a field. The plaque reads: ""Maite, founding president""."
+"La tía Maite, joven, con un hombre de rastas negras, en un campo. En la placa: «Maite, presidenta fundadora».","Aunt Maite, young, with a man with black dreadlocks, in a field. The plaque reads: ""Maite, founding president""."
+Una kentia en una maceta de barro.,A kentia palm in a clay pot.
+La nave está vacía.,The warehouse is empty.
+El riego de la nave: {n}.,The warehouse watering: {n}.
+Ordenar la nave,Arrange the warehouse
+Sacos de sustrato y macetas apiladas.,Bags of substrate and stacked pots.
+El sótano está a medio hacer: mañana acaban los obreros.,The basement is half done: the builders finish tomorrow.
+El bajo ya no es tuyo. Txomin cambiará la cerradura.,The basement isn't yours anymore. Txomin will change the lock.
+El pulverizador de mochila de Txomin. Con él se tienen húmedas las bandejas.,Txomin's backpack sprayer. It keeps the trays moist.
+"En el secadero, {g} de setas secas. Txomin te las compra en la puerta.","In the drying rack, {g} of dried mushrooms. Txomin buys them at the door."
+El secadero está vacío. Lo que recojas se seca aquí.,The drying rack is empty. Whatever you pick dries here.
+Una tubería vieja que suda. Por eso aquí la humedad nunca baja.,An old sweating pipe. That's why the humidity never drops here.
+"Cajas de bandejas vacías de Txomin, apiladas.","Txomin's boxes of empty trays, stacked."
+"Un cubo y un cepillo. Lo que se echa a perder, fuera.","A bucket and a brush. Whatever goes bad, out."
+"AUTOS RIBERA. Debajo, más pequeño: «Concesionario · Taller · Financiación».","AUTOS RIBERA. Below, smaller: ""Dealer · Garage · Finance""."
+"Precios con IVA. Aparte, la matriculación (el impuesto, según las emisiones) y {e} de gestoría y placas.","Prices incl. VAT. Registration extra (tax by emissions), plus {e} for paperwork and plates."
+"Catálogos con las fichas técnicas: potencia, consumo, emisiones y la etiqueta medioambiental.","Catalogues with spec sheets: power, consumption, emissions and the eco label."
+Una cafetera de cápsulas y vasitos para los clientes. Huele a café y a coche nuevo.,A capsule coffee machine and little cups for customers. Smells of coffee and new car.
+"Neumáticos de invierno, apilados. Con el coche se monta un juego en el taller.",Stacked winter tyres. A set gets fitted in the garage with the car.
+"La mesa de Arantxa, con el ordenador y los contratos. Habla con ella.","Arantxa's desk, with the computer and the contracts. Talk to her."
+Una planta de plástico con polvo.,A dusty plastic plant.
+"Botellas de ginebra, ron y vodka, iluminadas desde abajo.","Bottles of gin, rum and vodka, lit from below."
+El neón de {n}: la luna rosa.,The {n} neon: the pink moon.
+El altavoz retumba en el pecho.,The speaker thumps in your chest.
+La cabina del DJ: dos platos y la mesa de mezclas.,The DJ booth: two decks and the mixer.
+El reservado: sofá de terciopelo y una cubitera en la mesa.,The VIP area: velvet sofa and an ice bucket on the table.
+El cordón del reservado. Lo abre la RRPP.,The VIP rope. The promoter lets you through.
+SOCIA,MEMBER
+SOCIO,MEMBER
+"¿Qué tal? Siéntate, hay sitio.","How's it going? Sit down, there's room."
+"Aquí se está tranquilo, ¿eh?","Nice and quiet here, eh?"
+Charlar,Chat
+Compartir uno,Share one
+"Hoy ya hemos compartido. Mañana, más.",We already shared today. More tomorrow.
+"Cuando tengas algo encima, lo compartimos. Con {g} vale.","When you've got something on you, we'll share. {g} will do."
+¿Qué compartes?,Share what?
+Compartes {l} en el sofá. {n}: «Esto es otra liga. Se lo cuento a los del club.»,"You share {l} on the sofa. {n}: ""This is another league. I'll tell the club."""
+"Compartes {l} en el sofá. {n}: «Suave, de los de charlar. Gracias.»","You share {l} on the sofa. {n}: ""Smooth, good for chatting. Thanks."""
+BILLAR,POOL
+"{n}: necesitas 1 g de kief, del tamiz o del Ice-o-lator, como mínimo.","{n}: you need at least 1 g of kief, from the sieve or the ice bags."
+{n}: necesitas 5 g de cogollos como mínimo.,{n}: you need at least 5 g of buds.
+MOONROCK: necesitas rosin para bañar el cogollo y kief para rebozarlo.,MOONROCK: you need rosin to coat the bud and kief to roll it in.
+{n}: ¿de qué?,{n}: from what?
+MOONROCK: no te llega el rosin o el kief para un gramo.,MOONROCK: not enough rosin or kief for one gram.
+{g} g → {r} g de {e},{g} g → {r} g of {e}
+{l}: {g} g. ¿Cuánto usas?,{l}: {g} g. How much do you use?
+Te sale perfecto. {e} de {l}: {r} g con un {t} % de THC.,It comes out perfect. {e} of {l}: {r} g at {t} % THC.
+"Te sale bien, con algo de pérdida. {e} de {l}: {r} g con un {t} % de THC.","It comes out fine, with some loss. {e} of {l}: {r} g at {t} % THC."
+Te sale regular: pierdes bastante. {e} de {l}: {r} g con un {t} % de THC.,It comes out so-so: you lose quite a bit. {e} of {l}: {r} g at {t} % THC.
+Por hoy ya está bien. Mañana te doy la revancha.,That's enough for today. Rematch tomorrow.
+Una partida,A game
+A {e},For {e}
+"¿Una a la bola 8? {n} lisas para ti, {n} rayadas para mí y la negra al final: quien la meta, gana.","Game of 8-ball? {n} solids for you, {n} stripes for me and the black last: whoever sinks it wins."
+"¿Una a la bola 8? {n} lisas para ti, {n} rayadas para mí y la negra al final: quien la meta se lleva la apuesta.","Game of 8-ball? {n} solids for you, {n} stripes for me and the black last: whoever sinks it takes the bet."
+Sin dinero encima no se juega.,"No cash on you, no game."
+"Sacas tú. Las tuyas, las lisas.",You break. You're solids.
+Bola en mano: la colocas donde quieras.,Ball in hand: place it wherever you like.
+La blanca ha quedado bien.,The cue ball is well placed.
+"Tu turno · te quedan {y}; a {nb}, {el}.","Your turn · you have {y} left; {nb}, {el}."
+"Tu turno · te quedan {y}; a {nb}, la negra.","Your turn · you have {y} left; {nb}, the black."
+"Tu turno · te queda la negra; a {nb}, {el}.","Your turn · you have the black left; {nb}, {el}."
+"Tu turno · te queda la negra; a {nb}, la negra.","Your turn · you have the black left; {nb}, the black."
+"Escondes la blanca detrás de sus bolas. Le toca, y no lo tiene fácil.","You hide the cue ball behind their balls. Their turn, and it won't be easy."
+{t}: para la barra en el verde para apuntar.,{t}: stop the bar on the green to aim.
+"Ahora la fuerza: en el verde, dentro; pasada, se cuela la blanca.","Now the power: on the green, it drops; too much, the cue ball goes in."
+La negra entra... y la blanca detrás. Falta sobre la negra: pierdes.,The black goes in... and the cue ball after it. Foul on the black: you lose.
+Demasiado fuerte: la blanca se cuela. Falta: {nb} juega con bola en mano.,Too hard: the cue ball drops. Foul: {nb} plays with ball in hand.
+"¡La negra, dentro!","The black, in!"
+¡Dentro! Te quedan {n}. Sigues tú.,In! {n} left. Still your shot.
+¡Dentro! Te queda {n}. Sigues tú.,In! {n} left. Still your shot.
+¡Dentro! Ya solo te queda la negra. Sigues tú.,In! Only the black left. Still your shot.
+No entra. Le toca a {nb}.,Doesn't drop. {nb}'s turn.
+{nb} mete una y tira a la negra: dentro.,{nb} sinks one and goes for the black: in.
+{nb} mete {m} y tira a la negra: dentro.,{nb} sinks {m} and goes for the black: in.
+{nb} tira a la negra: dentro.,{nb} goes for the black: in.
+{nb} tira a la negra y se le cuela la blanca. Falta sobre la negra: pierde.,{nb} goes for the black and the cue ball drops. Foul on the black: they lose.
+{nb} mete una y se le cuela la blanca: bola en mano para ti.,{nb} sinks one and the cue ball drops: ball in hand for you.
+{nb} mete una y falla.,{nb} sinks one and misses.
+{nb} mete {m} y se le cuela la blanca: bola en mano para ti.,{nb} sinks {m} and the cue ball drops: ball in hand for you.
+{nb} mete {m} y falla.,{nb} sinks {m} and misses.
+{nb} cuela la blanca: bola en mano para ti.,{nb} scratches: ball in hand for you.
+{nb} falla.,{nb} misses.
+"Ganas tú. {nb}: «La próxima, la revancha».","You win. {nb}: ""Next time, a rematch."""
+Gana {nb}.,{nb} wins.
+Se hace tarde y lo dejáis en tablas.,It's getting late and you call it a draw.
+"Ganas tú. {nb} te paga {e}: «La próxima, la revancha».","You win. {nb} pays you {e}: ""Next time, a rematch."""
+Gana {nb}. Le pagas {e}.,{nb} wins. You pay {e}.
+Se hace tarde y lo dejáis en tablas. Nadie paga.,It's getting late and you call it a draw. Nobody pays.

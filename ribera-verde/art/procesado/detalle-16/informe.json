@@ -1,0 +1,19 @@
+{
+  "grupo": "detalle-16",
+  "celda": [
+    16,
+    16
+  ],
+  "tope_colores": 32,
+  "secuencias": 6,
+  "fotogramas": 6,
+  "semitransparentes": 0,
+  "en_paleta_antes": 33.5,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

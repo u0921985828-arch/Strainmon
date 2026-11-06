@@ -1,0 +1,30 @@
+{
+  "grupo": "vfx-acaros",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 1,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 33.61,
+  "colores_finales": 15,
+  "fundidos": [
+    "#e04040→#e65040",
+    "#483e36→#3a3a44",
+    "#282836→#2a2a34",
+    "#c44a4a→#e65040",
+    "#18181c→#1a1a1a",
+    "#f0a048→#e65040",
+    "#3c444e→#3a3a44",
+    "#3a3a44→#2c333c",
+    "#181822→#1a1a1a"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "efecto/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

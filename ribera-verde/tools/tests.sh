@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Todas las suites de godot/tests. Uso: G=/ruta/godot tools/tests.sh [salida]
+# Las que pintan (mandos_geo, ciclo, extracciones, retratos, pantallas, prueba, capas) van con xvfb y opengl3.
+cd "$(dirname "$0")/../godot" || exit 1
+G=${G:-/home/user/godot-bin/Godot_v4.7-stable_linux.x86_64}
+OUT=${1:-/tmp/lh-tests}; mkdir -p "$OUT"
+X=(xvfb-run -a -s "-screen 0 2600x1700x24")
+P=(--rendering-driver opengl3 --audio-driver Dummy --resolution 1560x720)
+export LIBGL_ALWAYS_SOFTWARE=1
+GRAF=" negro_render titulo_ui revista_vista dialogo_lineas mandos_geo pixel ciclo extracciones pantallas prueba capas capturas capturas_ui perf ftue retratos raton luz_carpa suelo_cache lluvia_lote obj_cache "
+for f in tests/*.gd; do
+  t=$(basename "$f" .gd)
+  case "$GRAF" in *" $t "*) continue;; esac
+  echo "== $t"; timeout 900 "$G" --headless --path . --script "res://tests/$t.gd" 2>&1 | grep -E "^$t: |SCRIPT ERROR|Parse Error" | tail -3
+done
+echo "== mandos_geo"; timeout 1200 "${X[@]}" "$G" --path . --rendering-driver opengl3 --audio-driver Dummy --resolution 2600x1700 --script res://tests/mandos_geo.gd -- --sin-arranque 2>&1 | grep -E "^mandos_geo: |SCRIPT ERROR|Parse Error" | tail -3
+echo "== raton"; timeout 600 "$G" --headless --audio-driver Dummy --path . --script res://tests/raton.gd -- --sin-arranque 2>&1 | grep -E "^raton: |FALLO|SCRIPT ERROR|Parse Error" | tail -5
+echo "== pixel"; timeout 900 "${X[@]}" "$G" --path . --rendering-driver opengl3 --audio-driver Dummy --resolution 2600x1700 --script res://tests/pixel.gd 2>&1 | grep -E "^pixel: |FALLO|SCRIPT ERROR|Parse Error" | tail -5
+for t in prueba capas; do
+  echo "== $t"; timeout 1200 "${X[@]}" "$G" --path . "${P[@]}" --script "res://tests/$t.gd" 2>&1 | grep -E "^(C1|C2|capas): |SCRIPT ERROR|Parse Error" | tail -3
+done
+echo "== extracciones"; timeout 1200 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/extracciones.gd -- --sin-arranque --salida "$OUT/ex" 2>&1 | grep -E "^extracciones: |SCRIPT ERROR|Parse Error" | tail -3
+echo "== luz_carpa"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/luz_carpa.gd -- --sin-arranque 2>&1 | grep -E "^luz_carpa: |FALLO|SCRIPT ERROR|Parse Error" | tail -5
+echo "== suelo_cache"; timeout 1500 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/suelo_cache.gd -- --sin-arranque 2>&1 | grep -E "^suelo_cache: |FALLO|SCRIPT ERROR|Parse Error" | tail -5
+echo "== lluvia_lote"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/lluvia_lote.gd -- --sin-arranque 2>&1 | grep -E "^lluvia_lote: |FALLO|SCRIPT ERROR|Parse Error" | tail -5
+echo "== obj_cache"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/obj_cache.gd -- --sin-arranque 2>&1 | grep -E "^obj_cache: |FALLO|SCRIPT ERROR|Parse Error" | tail -5
+echo "== negro_render"; timeout 1800 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/negro_render.gd -- --sin-arranque 2>&1 | grep -E "^negro_render: |cuadros negros|SCRIPT ERROR|Parse Error" | tail -5
+echo "== retratos"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/retratos.gd -- --sin-arranque 2>&1 | grep -E "^retratos: |SCRIPT ERROR|Parse Error" | tail -3
+echo "== pantallas"; mkdir -p "$OUT/pp"; cp ../tools/ref/pantallas/html-p-*.png "$OUT/pp/"
+timeout 1500 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/pantallas.gd -- --sin-arranque --pintar "$OUT/pp" 2>&1 | grep -E "^C2 pantallas: |SCRIPT ERROR|Parse Error" | tail -3
+echo "== ciclo"; timeout 1800 "${X[@]}" "$G" --path . "${P[@]}" --fixed-fps 60 --script res://tests/ciclo.gd -- --salida "$OUT/ciclo" 2>&1 | grep -E "^ciclo: |SCRIPT ERROR|Parse Error" | tail -3
+for L in es en; do echo "== capturas_ui $L"; timeout 900 "${X[@]}" "$G" --path . --rendering-driver opengl3 --audio-driver Dummy --resolution 2400x1080 --script res://tests/capturas_ui.gd -- --salida "$OUT/capui-$L" --idioma $L --dpi 420 2>&1 | grep -E "^capturas_ui: |SCRIPT ERROR|Parse Error" | tail -3; done
+echo "== dialogo_lineas"; timeout 900 "${X[@]}" "$G" --path . --rendering-driver opengl3 --audio-driver Dummy --resolution 2400x1080 --script res://tests/dialogo_lineas.gd 2>&1 | grep -E "^dialogo_lineas: |^FALLO|SCRIPT ERROR|Parse Error" | tail -5
+echo "== revista_vista"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/revista_vista.gd 2>&1 | grep -E "^revista_vista: |^FALLO|SCRIPT ERROR|Parse Error" | tail -5
+echo "== titulo_ui"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --script res://tests/titulo_ui.gd 2>&1 | grep -E "^titulo_ui: |^FALLO|SCRIPT ERROR|Parse Error" | tail -5
+echo "== ftue"; timeout 900 "${X[@]}" "$G" --path . "${P[@]}" --fixed-fps 60 --script res://tests/ftue.gd 2>&1 | grep -E "^ftue: |^FALLO|SCRIPT ERROR|Parse Error" | tail -3
+echo "== png_opt"; (cd .. && python3 -I tools/png-opt.py --check godot/arte) 2>&1 | tail -3   # desde godot/, «..» ya es ribera-verde
+echo "== virtuales"; (cd .. && python3 -I tools/virtuales.py --check) 2>&1 | tail -3
+echo FIN_BATERIA

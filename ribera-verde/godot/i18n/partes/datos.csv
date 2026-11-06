@@ -1,0 +1,27 @@
+es,en
+día {n},day {n}
+{d} de {m} de {y},"{m} {d}, {y}"
+{d} de {m},{m} {d}
+DÍA {n},DAY {n}
+"{s}, {d} de {m} de {y}","{s}, {m} {d}, {y}"
+Cruce,Cross
+{a} × {b} · híbrido propio,{a} × {b} · own hybrid
+lunes,Monday
+martes,Tuesday
+miércoles,Wednesday
+jueves,Thursday
+viernes,Friday
+sábado,Saturday
+domingo,Sunday
+enero,January
+febrero,February
+marzo,March
+abril,April
+mayo,May
+junio,June
+julio,July
+agosto,August
+septiembre,September
+octubre,October
+noviembre,November
+diciembre,December

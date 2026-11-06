@@ -1,0 +1,55 @@
+# Landrace Hunters — cómo sirve el servidor las piezas del juego (1.7.6).
+#
+# El motor (index.wasm) pesa 36,7 MB en crudo y 9,3 comprimido: si el servidor no lo comprime, cada
+# jugador se baja 27 MB de más la primera vez. Aquí se sirve la copia ya comprimida que deja el plugin
+# (index.wasm.gz, Ajustes → Landrace Hunters) y, si no está, se comprime al vuelo. El paquete del juego
+# (index.pck) va cifrado: comprimido no baja nada, así que se deja como está.
+#
+# Todo va dentro de <IfModule>: en un servidor sin esos módulos (o con nginx, que no lee este archivo)
+# el juego se sirve igual que antes, solo sin el ahorro.
+
+<IfModule mod_mime.c>
+	AddType application/wasm .wasm
+</IfModule>
+
+# La copia comprimida, si el navegador la acepta y existe
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteCond %{HTTP:Accept-Encoding} gzip
+	RewriteCond %{REQUEST_FILENAME}.gz -s
+	RewriteRule ^(index\.wasm|index\.js)$ $1.gz [QSA,L]
+</IfModule>
+
+<FilesMatch "\.wasm\.gz$">
+	<IfModule mod_headers.c>
+		Header set Content-Encoding gzip
+		Header append Vary Accept-Encoding
+	</IfModule>
+	<IfModule mod_mime.c>
+		ForceType application/wasm
+	</IfModule>
+</FilesMatch>
+
+<FilesMatch "\.js\.gz$">
+	<IfModule mod_headers.c>
+		Header set Content-Encoding gzip
+		Header append Vary Accept-Encoding
+	</IfModule>
+	<IfModule mod_mime.c>
+		ForceType application/javascript
+	</IfModule>
+</FilesMatch>
+
+# Sin la copia comprimida (o sin mod_rewrite), que lo comprima el servidor al vuelo
+<IfModule mod_deflate.c>
+	AddOutputFilterByType DEFLATE application/wasm application/javascript text/javascript text/html
+</IfModule>
+
+# Las piezas no cambian de nombre: que el navegador las guarde un año y no las vuelva a pedir
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresByType application/wasm "access plus 1 year"
+	ExpiresByType application/javascript "access plus 1 year"
+	ExpiresByType application/octet-stream "access plus 1 year"
+	ExpiresByType image/png "access plus 1 year"
+</IfModule>

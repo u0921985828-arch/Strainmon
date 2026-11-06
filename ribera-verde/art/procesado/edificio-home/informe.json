@@ -1,0 +1,35 @@
+{
+  "grupo": "edificio-home",
+  "celda": [
+    112,
+    96
+  ],
+  "secuencias": 2,
+  "fotogramas": 5,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0.8,
+  "distancia_media": 29.35,
+  "colores_finales": 15,
+  "fundidos": [
+    "base: #a06010→#b03424",
+    "base: #d2aa1a→#9a8252",
+    "base: #5a3a24→#6a421c",
+    "base: #646c7c→#4c5560",
+    "base: #483e36→#3a3a3a",
+    "base: #6a3018→#6a421c",
+    "base: #ac9a76→#c0ae8a",
+    "base: #4a4a4a→#5a5048",
+    "base: #5a5048→#4c5560",
+    "base: #e8d6b0→#e0ceaa",
+    "base: #202024→#2a1a10",
+    "base: #0e1a12→#2a1a10",
+    "base: #3a3a3a→#3a2414",
+    "puerta: #4a4a4a→#5a5048"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "puerta/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

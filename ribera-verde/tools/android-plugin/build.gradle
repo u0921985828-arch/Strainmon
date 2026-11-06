@@ -1,0 +1,30 @@
+plugins {
+    id 'com.android.library' version '8.6.1'
+}
+
+// las versiones van también en godot/addons/landrace_play/export_plugin.gd (DEPENDENCIAS): si cambias una, cambia la otra
+ext.dep = [
+    billing: 'com.android.billingclient:billing:7.1.1',
+    games  : 'com.google.android.gms:play-services-games-v2:20.1.2',
+    sentry : 'io.sentry:sentry-android:7.22.6',
+    core   : 'androidx.core:core:1.13.1',
+]
+
+android {
+    namespace 'com.landracehunters.play'
+    compileSdk 36
+    defaultConfig { minSdk 24 }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildTypes { release { minifyEnabled false } }
+}
+
+dependencies {
+    compileOnly files('libs/godot-lib.template_release.aar')
+    implementation dep.billing
+    implementation dep.games
+    implementation dep.sentry
+    implementation dep.core
+}

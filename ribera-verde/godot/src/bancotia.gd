@@ -1,0 +1,925 @@
+# El banco de semillas de la tía (ESTUDIO tanda 1; lo pidió el usuario: «mete mano a las mejoras que hablamos»; solo con Datos.CAL):
+# el final del juego es la genética, no el tráfico. La lata del manzano (hilo.gd) trae la llave del cuarto de atrás de la
+# asociación del barrio alto (banco-rv, por la puerta de al lado de la foto de la tía), el banco de semillas del barrio que ella
+# empezó y no terminó. Se restaura como el Centro Cívico: en su fichero se entregan colecciones de semillas (BANCO_TIA.col, de
+# tools/banco_tia.py) y cada una destapa un mueble del cuarto, que abre lo suyo: la cámara fría (una semilla de lo guardado cada
+# saca días), el laboratorio (estabilizar con una semilla, una vez al día), la sala de catas (un análisis al día), el archivo de la
+# tía (una receta al día), el mostrador de los socios (un sobre de una landrace cada socios días) y, con la Haze del 98 fijada, la
+# placa: el banco, abierto. Eso es la meta del capítulo 8; IMPERIO, los barcos y los pisos quedan de rama aparte.
+# S.bt = {c: {colección: día}, saca, lab, cata, arch, so: días de lo último, v: visto el cuarto, fin: día del final}.
+# Cadena: … → ciudad → hilo → bancotia → retencion → juego.
+extends "res://src/hilo.gd"
+
+func bt() -> Dictionary:
+	if not (S.get("bt") is Dictionary):
+		S.bt = {"c": {}}
+	if not (S.bt.get("c") is Dictionary):
+		S.bt.c = {}
+	return S.bt
+
+# la llave, con la lata (hilo paso 5): en las partidas de antes con la lata ya abierta, también
+func bt_abierto() -> bool:
+	return Datos.CAL and S != null and D.has("BANCO_TIA") and hilo_p() >= 5
+
+func bt_col(id: String) -> Dictionary:
+	for c in D.BANCO_TIA.col:
+		if c.id == id:
+			return c
+	return {}
+
+func bt_hecha(id: String) -> bool:
+	return bt().c.has(id)
+
+func bt_zona(z: String) -> bool:
+	for c in D.BANCO_TIA.col:
+		if c.z == z and bt_hecha(c.id):
+			return true
+	return false
+
+func bt_n() -> int:
+	return D.BANCO_TIA.col.filter(func(c): return bt_hecha(c.id)).size()
+
+func bt_k(c: Dictionary) -> int:
+	return int(c.get("k", D.BANCO_TIA.k))
+
+# lo que falta de cada variedad: [sid, las que tienes, las que pide, fijada]
+func bt_falta(c: Dictionary) -> Array:
+	var r := []
+	for sid in c.s:
+		var fija: bool = not c.get("fija") or Cultivo.gen_de(S, sid) >= int(D.GEN_ESTABLE)
+		r.append([sid, int(S.seeds.get(sid, 0)), bt_k(c), fija])
+	return r
+
+func bt_ultima(c: Dictionary) -> bool:   # la Haze del 98 va en el último cajón: antes, las otras
+	return c.get("fija", false) == true and bt_n() < D.BANCO_TIA.col.size() - 1
+
+func bt_puede(c: Dictionary) -> bool:
+	return not bt_hecha(c.id) and not bt_ultima(c) and bt_falta(c).all(func(f): return f[1] >= f[2] and f[3])
+
+func bt_lista(c: Dictionary) -> String:
+	var l := []
+	for f in bt_falta(c):
+		var nom: String = strain(f[0]).n if S.disc.get(f[0]) else "??????"
+		l.append(("✓ " if bt_hecha(c.id) or (f[1] >= f[2] and f[3]) else "· ") + nom + ("" if bt_hecha(c.id) else " %d/%d" % [mini(f[1], f[2]), f[2]]) + ("" if f[3] or bt_hecha(c.id) else T(" (sin fijar)")))
+	return ", ".join(l)
+
+func bt_premio(z: String) -> String:
+	var B: Dictionary = D.BANCO_TIA
+	match z:
+		"camara":
+			return T("Abre la cámara fría: una semilla de lo que hayas guardado cada {d} días.", {"d": int(B.saca)})
+		"lab":
+			return K("Abre el laboratorio, la puerta de al lado de la placa: estabilizar con una semilla en vez de dos, una vez al día y una vez por cosecha de cada línea, con las normas de un laboratorio de verdad.")
+		"cata":
+			return K("Abre la sala de catas: un lote analizado al día, sin analizador.")
+		"archivo":
+			return K("Abre el archivo de la tía: cada día, una receta de sus cuadernos.")
+		"socios":
+			return T("Abre el mostrador de los socios: cada {d} días te dejan un sobre con semillas de una landrace.", {"d": int(B.socios)})
+	return K("Cuelga la placa de la tía: el banco de semillas, abierto.")
+
+# las variedades guardadas en el banco (de las colecciones entregadas)
+func bt_guardadas() -> Array:
+	var l := []
+	for c in D.BANCO_TIA.col:
+		if bt_hecha(c.id):
+			l.append_array(c.s)
+	return l
+
+# ---------- el cuarto ----------
+func bt_entra(mapa: String) -> void:
+	if bt_abierto() and not bt().get("vis"):   # el cuarto, visto por primera vez: noticia para la revista
+		bt().vis = int(S.day)
+		rev_nota("banco")
+	if not Datos.CAL or not D.has("BANCO_TIA") or mapa != String(D.BANCO_TIA.mapa) or not MAPS.has(mapa):
+		return
+	var m: Dictionary = MAPS[mapa]
+	for k in D.BANCO_TIA.zonas:
+		var z: Dictionary = D.BANCO_TIA.zonas[k]
+		var x := int(z.x)
+		var y := int(z.y)
+		if z.get("puerta"):   # el laboratorio, una sala aparte: la puerta precintada hasta que se restaura
+			m.o[y][x] = z.o if bt_zona(k) else "puertaLabP"   # i18n-no
+		elif k == "placa":
+			m.o[y][x] = z.o if bt_zona(k) else null
+			m.o[y][x + 1] = (z.o + "2") if bt_zona(k) else null
+		else:
+			m.o[y][x] = z.o if bt_zona(k) else "btTapado"   # i18n-no
+			m.o[y][x + 1] = (z.o + "2") if bt_zona(k) else "btTapado2"   # i18n-no
+	if not bt().get("v"):
+		bt().v = int(S.day)
+		queue("btVisto", func(): await bt_intro())   # i18n-no
+
+func bt_intro() -> void:
+	await talk(K("EL CUARTO DE ATRÁS"), [K("Huele a cerrado y a papel viejo. Todo está tapado con sábanas, menos un fichero de madera."),
+		K("En cada cajoncito, una etiqueta con la letra de la tía: Kush, costa, África, sierra, Asia... y uno solo: «Haze 98»."),
+		K("Era su banco de semillas. Lo empezó para que las variedades del barrio no se perdieran, y lo dejó a medias."),
+		T("Si llenas los cajones, el cuarto vuelve a la vida. Entrega las colecciones en el fichero (dos semillas de cada variedad).")])
+
+# A en un mueble del cuarto (calle.gd, object_action)
+func bt_obj(x: int, y: int, o) -> bool:
+	if not Datos.CAL or not D.has("BANCO_TIA") or not (o is String):
+		return false
+	if en_lab():
+		return await lab_obj(x, y, o)
+	if S.map != String(D.BANCO_TIA.mapa):
+		return false
+	var b: String = o.trim_suffix("2")
+	if b == "puertaLabP":
+		await say(T("La puerta del laboratorio, precintada con cinta. Se abre al entregar «{c}» en el fichero.", {"c": I18n.v(String(bt_col_z("lab").get("n", "")))}))
+		return true
+	if b == "btFichero":
+		await bt_menu(false)
+		return true
+	if b == "btTapado":
+		await say(K("Un mueble tapado con una sábana llena de polvo. Se destapa al entregar su colección en el fichero."))
+		return true
+	match b:
+		"btCamara":
+			await bt_camara()
+		"btCata":
+			await bt_cata()
+		"btArchivo":
+			await bt_archivo()
+		"btMostrador":
+			await bt_socios()
+		"btPlaca":
+			await say(K("La placa de la tía, de madera y latón, con una hoja grabada. Debajo, alguien ha dejado un ramo de flores del monte."))
+		_:
+			return false
+	return true
+
+# el fichero: las colecciones; desde OBJETIVO, solo se miran (ver)
+func bt_menu(ver := true) -> void:
+	var i := 0
+	var cs: Array = D.BANCO_TIA.col
+	while true:
+		var it := []
+		for c in cs:
+			var f := bt_falta(c)
+			var tengo: int = f.filter(func(q): return q[1] >= q[2] and q[3]).size()
+			var hecha := bt_hecha(c.id)
+			it.append({"label": ("★ " if hecha else "") + I18n.v(String(c.n)), "right": K("HECHA") if hecha else ("%d/%d" % [tengo, f.size()]),
+				"desc": bt_premio(String(c.z)) + "\n" + bt_lista(c)})
+		it.append({"label": K("Volver"), "desc": K("Cada colección, dos semillas de cada variedad (la Haze del 98, cinco, y fijada en F4).")})
+		i = await menu(it, {"cls": "full", "title": K("EL BANCO DE LA TÍA"), "title2": "%d/%d" % [bt_n(), cs.size()], "desc": true, "initial": i})
+		if i < 0 or i >= cs.size():
+			return
+		if ver:
+			continue
+		var c: Dictionary = cs[i]
+		if bt_hecha(c.id):
+			await say(K("Esa ya está en su cajón."))
+		elif bt_ultima(c):
+			await say(K("La Haze del 98 va en el último cajón: antes, las otras cinco colecciones."))
+		elif not bt_puede(c):
+			await say(K("Te faltan semillas para esa colección. Mira la lista: cada variedad, en su cajón."))
+		elif await ask(T("¿Entregar «{n}»? Las semillas se quedan en el banco.", {"n": I18n.v(String(c.n))}), [K("Entregar"), K("Todavía no")]) == 0:
+			await bt_entrega(c)
+
+func bt_entrega(c: Dictionary) -> void:
+	for sid in c.s:
+		S.seeds[sid] = int(S.seeds.get(sid, 0)) - bt_k(c)
+		if S.seeds[sid] <= 0:
+			S.seeds.erase(sid)
+	bt().c[c.id] = int(S.day)
+	S.rep = float(S.rep) + 2
+	sfx("get")
+	await fade(1, true)
+	bt_entra(String(D.BANCO_TIA.mapa))
+	await wait(300)
+	await fade(0, true)
+	var z: Dictionary = D.BANCO_TIA.zonas[c.z]
+	await say(T("«{c}», en su cajón. {z}: destapado.\n{p}", {"c": I18n.v(String(c.n)), "z": I18n.v(String(z.n)), "p": bt_premio(String(c.z))}))
+	if bt_n() >= D.BANCO_TIA.col.size():
+		await bt_fin()
+
+func bt_fin() -> void:
+	var B: Dictionary = D.BANCO_TIA
+	bt().fin = int(S.day)
+	rev_nota("bancofin")
+	S.rep = float(S.rep) + int(B.rep)
+	S.prest = int(S.get("prest", 0)) + int(B.prest)
+	await talk(K("EL BANCO DE SEMILLAS"), [K("El último cajón, el de la Haze del 98. Cierras el fichero y el cuarto está entero."),
+		K("Delroy cuelga la placa de la tía en la pared. Kiko ha traído a medio barrio, Miren ha bajado del monte y la abuela Txaro se ha sentado en primera fila."),
+		K("Nadie dice nada un rato. Luego Delroy abre la puerta del cuarto a los socios: desde hoy, el banco es del barrio.")])
+	await talk(K("DELROY"), [K("Treinta años diciendo que esto había que terminarlo. Lo has hecho tú."), K("Ahora cualquiera del barrio puede pedir una semilla y devolver dos. Como quería ella.")])
+	await got(T("{r} de reputación y {p} de prestigio: el banco de semillas de la tía, abierto", {"r": int(B.rep), "p": int(B.prest)}))
+	var L := [K("Me han contado lo del banco. Tu tía estaría orgullosa. Yo lo estoy."), K("Lo demás ya es cosa tuya: cultivar, cruzar y que no se pierda nada.")]
+	queue("btFin", func(): await talk(K("SMS · KIKO"), L), [[K("SMS · KIKO"), L]])   # i18n-no
+
+# ---------- lo que abre cada mueble ----------
+func bt_espera(k: String, dias: int) -> int:   # los días que faltan para volver a usarlo (0: ya)
+	if not bt().has(k):
+		return 0
+	return maxi(0, int(bt()[k]) + dias - int(S.day))
+
+func bt_camara() -> void:
+	var w := bt_espera("saca", int(D.BANCO_TIA.saca))
+	if w > 0:
+		await say(T("La cámara fría solo suelta un sobre cada {d} días. El próximo, el {f}.", {"d": int(D.BANCO_TIA.saca), "f": Datos.fd(int(S.day) + w, S.day)}))
+		return
+	var l := bt_guardadas()
+	var it: Array = l.map(func(sid): return {"label": strain(sid).n, "right": "%d" % int(S.seeds.get(sid, 0)), "desc": K("Una semilla de esa variedad, del banco.")})
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("LA CÁMARA FRÍA"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	add_seeds(l[i], 1)
+	bt().saca = int(S.day)
+	sfx("get")
+	await got(T("1 semilla de {s}, de la cámara fría", {"s": strain(l[i]).n}))
+
+func bt_lab() -> void:
+	# dos trabajos en la cabina: fijar una línea (lo de siempre) y, desde el capítulo TETRA.ch, doblar los cromosomas.
+	# Sin el segundo, el trabajo del día es uno: si ya está hecho, no hay nada que hacer dentro y se dice antes que las
+	# normas (es lo que hacía el laboratorio antes de la tetraploidia); con los dos, manda la norma, que vale para ambos.
+	var dos: bool = Datos.CAL and D.has("TETRA") and int(S.get("ch", 1)) >= int(D.TETRA.ch)
+	if not dos and bt_espera("lab", 1) > 0:
+		await say(K("El laboratorio, por hoy, ya está. Vuelve mañana."))
+		return
+	var no := lab_norma(true)
+	if no != "":
+		await say(no)
+		return
+	var des: bool = Desc.algo(S)   # descendencias: el menú de más, solo si hay de verdad algo que trabajar
+	if dos or des:
+		var it0 := [{"label": K("Fijar una línea"), "desc": K("Una semilla, el microscopio y la cabina: la línea sube una generación.")}]
+		if dos:
+			it0.append({"label": K("Doblar los cromosomas"), "desc": T("Con el reactivo del armario de tóxicos. Te quedan {n} usos del frasco.", {"n": bt_tt().get("f", 0)})})
+		if des:   # descendencias: sacar línea de lo que ya cultivas (S1, retrocruce, línea fijada)
+			it0.append({"label": K("Trabajar una línea tuya"), "desc": K("Autofecundarla, retrocruzarla con su madre o fijarla a conciencia.")})
+		it0.append({"label": K("Nada"), "desc": ""})
+		var q: int = await menu(it0, {"cls": "full", "title": K("EL LABORATORIO"), "desc": true})
+		if q < 0 or q >= it0.size() - 1:
+			return
+		var et: String = String(it0[q].label)
+		if et == K("Doblar los cromosomas"):
+			await bt_tetra()
+			return
+		if et == K("Trabajar una línea tuya"):
+			await bt_desc()
+			return
+	await bt_fijar()
+
+# ---------- descendencias en el laboratorio (lo pidió el usuario: «más que más landraces me refería a meter más
+# descendencias no más landraces») ----------
+# Tres trabajos sobre tus propias líneas, cada uno con sus días de laboratorio (DESC.<vía>.dias). Ninguno gana generación:
+# son la misma línea, más fijada. El retrocruce sí da variedad nueva, porque lo que sale se parece a la madre y no al híbrido.
+# Nada de método: se dice lo que se juega, no cómo se hace
+func bt_desc() -> void:
+	if bt_espera("lab", 1) > 0:
+		await say(K("El laboratorio, por hoy, ya está. Vuelve mañana."))
+		return
+	var s1: Array = S.get("seeds", {}).keys().filter(func(sid): return Desc.s1_ok(S, String(sid)))
+	var bxl: Array = Desc.bx_ls(S)
+	var ibll: Array = S.get("seeds", {}).keys().filter(func(sid): return Desc.ibl_ok(S, String(sid)))
+	var it := []
+	var vs := []
+	if s1.size():
+		it.append({"label": K("Autofecundar (S1)"), "desc": T("Una línea consigo misma: sube sus genes y fija lo raro que tenga. Gastas {g} semillas y salen {n}; {t} por línea, y el laboratorio queda {d} días.", {"g": Desc.s1_gasta(), "n": int(Desc.d().s1.sem), "t": Desc.s1_tope(), "d": Desc.dias("s1")})})
+		vs.append("s1")
+	if bxl.size():
+		it.append({"label": K("Retrocruzar con la madre (BX)"), "desc": T("Un híbrido tuyo con una de sus dos parentales: lo que sale tira a esa madre. Variedad nueva, con su número de retrocruce; el laboratorio queda {d} días.", {"d": Desc.dias("bx")})})
+		vs.append("bx")
+	if ibll.size():
+		it.append({"label": K("Fijar la línea (IBL)"), "desc": T("Seleccionar {n} veces seguidas una línea ya fijada: deja de variar de planta a planta. Cada selección deja el laboratorio {d} días.", {"n": int(Desc.d().ibl.sel), "d": Desc.dias("ibl")})})
+		vs.append("ibl")
+	if it.is_empty():
+		await say(K("Aquí se trabaja sobre lo tuyo: hacen falta semillas de una línea tuya, o un híbrido propio con una de sus parentales."))
+		return
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("UNA LÍNEA TUYA"), "desc": true})
+	if i < 0 or i >= vs.size():
+		return
+	if vs[i] == "s1":
+		await bt_s1(s1)
+	elif vs[i] == "bx":
+		await bt_bx(bxl)
+	else:
+		await bt_ibl(ibll)
+
+func _bt_dia(v: String) -> void:
+	bt().lab = int(S.get("day", 1)) + Desc.dias(v) - 1
+	lab().r = true   # lo usado, al contenedor amarillo
+
+func _bt_it(l: Array) -> Array:
+	return l.map(func(sid): return {"label": strain(String(sid)).n, "right": Cultivo.tipo_gen(S, String(sid)), "sw": strain(String(sid)).c,
+		"ic": ic_cog(String(sid)), "desc": strain_line(String(sid))}) + [{"label": K("Nada"), "desc": ""}]
+
+func bt_s1(l: Array) -> void:
+	var i: int = await menu(_bt_it(l), {"cls": "full", "title": K("AUTOFECUNDAR (S1)"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var sid: String = String(l[i])
+	if await ask(T("¿Autofecundar la {s}? Gastas {g} semillas y salen {n}.", {"s": strain(sid).n, "g": Desc.s1_gasta(), "n": int(Desc.d().s1.sem)}), [K("Autofecundar"), K("Cancelar")]) != 0:
+		return
+	var q := Desc.s1(S, sid)
+	if q < 1:
+		return
+	_bt_dia("s1")
+	add_seeds(sid, q)
+	sfx("get")
+	await say(T("{n} semillas S1 de {s}. La línea no sube de generación: es la misma, más fijada.", {"n": q, "s": strain(sid).n}))
+	var fa := Desc.s1_tope() - Desc.s1_n(S, sid)
+	await say(T("Te queda {n} autofecundación de esta línea.", {"n": fa}) if fa == 1 else (T("Te quedan {n} de esta línea.", {"n": fa}) if fa > 0 else K("De esta línea, ya no saca más el S1.")))
+	await say(genes_txt(Cultivo.iv_linea(S, sid)))
+
+func bt_bx(l: Array) -> void:
+	var it: Array = l.map(func(e): return {"label": strain(String(e[1])).n, "right": T("de {s}", {"s": strain(String(e[0])).n}),
+		"sw": strain(String(e[1])).c, "ic": ic_cog(String(e[1])),
+		"desc": T("Retrocruzas {h} con {m}, una de sus dos parentales: lo que sale tira a {m}.", {"h": strain(String(e[0])).n, "m": strain(String(e[1])).n})})
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("RETROCRUZAR (BX)"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var hijo: String = String(l[i][0])
+	var madre: String = String(l[i][1])
+	if Cultivo.triploide(S, hijo, madre):
+		await say(T("{a} y {b} no tienen los mismos juegos de cromosomas: lo que salga de ahí no cuaja semilla.", {"a": strain(hijo).n, "b": strain(madre).n}))
+		return
+	if await ask(T("¿Retrocruzar {h} con {m}? Gastas {g} semilla de cada.", {"h": strain(hijo).n, "m": strain(madre).n, "g": Desc.bx_gasta()}), [K("Retrocruzar"), K("Cancelar")]) != 0:
+		return
+	for k in [hijo, madre]:
+		S.seeds[k] = int(S.seeds[k]) - Desc.bx_gasta()
+		if int(S.seeds[k]) <= 0:
+			S.seeds.erase(k)
+	var r := Desc.bx(S, hijo, madre)
+	Cultivo.cruza_iv(S, hijo, madre, r)
+	Cultivo.cruza_ra(S, hijo, madre, r)
+	var is_new: bool = not S.disc.get(r)
+	if is_new:
+		S.gen[r] = 1
+	_bt_dia("bx")
+	add_seeds(r, Desc.bx_sem())
+	sfx("get")
+	var s2 = strain(r)
+	await say(T("Sale {s}: un {m} % de {ma}. {n} semillas.", {"s": s2.n, "m": int(S.custom[r].m), "ma": strain(madre).n, "n": Desc.bx_sem()}))
+	await check_story()
+
+func bt_ibl(l: Array) -> void:
+	var i: int = await menu(_bt_it(l), {"cls": "full", "title": K("FIJAR LA LÍNEA (IBL)"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var sid: String = String(l[i])
+	var fl := Desc.ibl_falta(S, sid)
+	if await ask(T("¿Seleccionar la {s}? Gastas {g} semilla y te quedan {n} selecciones para fijarla.", {"s": strain(sid).n, "n": fl, "g": int(Desc.d().ibl.get("gasta", 1))}), [K("Seleccionar"), K("Cancelar")]) != 0:
+		return
+	var q := Desc.ibl(S, sid)
+	if q < 1:
+		return
+	_bt_dia("ibl")
+	add_seeds(sid, q)
+	sfx("get")
+	if Desc.es_ibl(S, sid):
+		await say(T("{s} queda fijada: línea IBL. De aquí en adelante, ni una planta se sale de la madre.", {"s": strain(sid).n}))
+		await say(genes_txt(Cultivo.iv_linea(S, sid)))
+	else:
+		await say(T("{n} semillas seleccionadas de {s}. Te queda {f} selección para fijarla.", {"n": q, "s": strain(sid).n, "f": Desc.ibl_falta(S, sid)}))
+
+func bt_fijar() -> void:
+	if bt_espera("lab", 1) > 0:
+		await say(K("El laboratorio, por hoy, ya está. Vuelve mañana."))
+		return
+	var l: Array = S.seeds.keys().filter(func(sid): return int(S.seeds[sid]) >= 1 and Cultivo.gen_de(S, sid) < int(D.GEN_ESTABLE))
+	if l.is_empty():
+		await say(K("En el laboratorio se fija una línea con una sola semilla. Ahora no tienes ninguna sin fijar."))
+		return
+	l = l.filter(func(sid): return bt_lab_ok(sid))
+	if l.is_empty():
+		await say(K("Cada generación es una cosecha: cultiva la línea y vuelve con lo cosechado."))
+		return
+	var it: Array = l.map(func(sid): return {"label": strain(sid).n, "right": "F%d" % Cultivo.gen_de(S, sid), "desc": T("{n} semillas", {"n": int(S.seeds[sid])})})   # i18n-no
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("EL LABORATORIO"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var cn := bt_cos(l[i])
+	if await estabilizar(l[i], 1):
+		bt().lab = int(S.day)
+		lab().r = true   # lo usado, al contenedor amarillo
+		if not bt().has("lc"):
+			bt().lc = {}
+		bt().lc[l[i]] = cn
+
+# ---------- la tetraploidia (lo pidió el usuario: «molaría implantar la tetraploidia en el laboratorio pero de alguna forma no
+# tan complicada de explicar supongo») ----------
+# El juego dice lo que se juega, nunca cómo se hace: el reactivo es «el frasco», y ni su nombre, ni concentración, ni tiempos,
+# ni método salen en ningún sitio. Se trabaja en
+# la cabina con las normas puestas, el frasco vive en el armario de tóxicos y lo gastado va al contenedor amarillo. Lo que sale
+# es la rareza «tetra» en la línea (RAREZAS), que se hereda como las demás y que no cruza con una línea normal (triploide).
+# S.bt.tt = {f: usos que quedan del frasco, p: {sid: día en que se ve si cuajó}}
+func bt_tt() -> Dictionary:
+	if not (bt().get("tt") is Dictionary):
+		bt().tt = {"f": 0, "p": {}}
+	if not (bt().tt.get("p") is Dictionary):
+		bt().tt.p = {}
+	return bt().tt
+
+# las líneas que ya son tetraploides
+func bt_tetra_ls() -> Array:
+	var o := []
+	for sid in S.get("ra", {}).keys():
+		if Cultivo.tetra_linea(S, String(sid)):
+			o.append(String(sid))
+	o.sort()
+	return o
+
+# descartar la línea tratada: se tira la semilla etiquetada y se vuelve a partir de semilla normal del catálogo. Sin esto, una
+# línea tratada no cruzaría nunca más con una normal y las recetas que la llevan se quedarían sin hacer
+func bt_tetra_tira() -> void:
+	var l := bt_tetra_ls()
+	if l.is_empty():
+		return
+	var it: Array = l.map(func(sid): return {"label": strain(sid).n, "right": T("{n} sem.", {"n": int(S.get("seeds", {}).get(sid, 0))}),
+		"desc": K("Se tira la semilla tetraploide de esta línea y vuelve a ser normal.")})
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("DESCARTAR UNA LÍNEA"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var sid: String = l[i]
+	var n := int(S.get("seeds", {}).get(sid, 0))
+	if await ask(T("¿Descartar la línea tetraploide de {s}? Se tiran sus {n} semillas y la línea vuelve a la normal.", {"s": strain(sid).n, "n": n}), [K("Descartar"), K("Cancelar")]) != 0:
+		return
+	if S.get("seeds") is Dictionary:
+		S.seeds.erase(sid)
+	if S.get("ra") is Dictionary and S.ra.get(sid) is Dictionary:
+		S.ra[sid].erase("tetra")
+		if S.ra[sid].is_empty():
+			S.ra.erase(sid)
+	lab().r = true   # lo tirado, al contenedor amarillo
+	sfx("back")   # i18n-no
+	await say(T("Fuera la etiqueta y fuera la semilla. {s} vuelve a ser la de siempre: cruza con cualquiera.", {"s": strain(sid).n}))
+
+func bt_tetra() -> void:
+	var T9: Dictionary = D.TETRA
+	if bt_tetra_ls().size():
+		var q: int = await menu([{"label": K("Doblar los cromosomas"), "desc": K("Tratar una línea nueva.")},
+			{"label": K("Descartar una línea"), "desc": K("Volver una línea tetraploide a la normal.")},
+			{"label": K("Nada"), "desc": ""}], {"cls": "full", "title": K("EL LABORATORIO"), "desc": true})
+		if q == 1:
+			await bt_tetra_tira()
+			return
+		if q != 0:
+			return
+	if int(bt_tt().get("f", 0)) <= 0:
+		var e := int(T9.frasco.e)
+		if await ask(T("El frasco del reactivo se pide al proveedor del banco: {e} € a la cuenta, para {n} intentos. Es tóxico y va al armario cerrado, con su etiqueta.", {"e": Datos.miles(e), "n": int(T9.frasco.n)}), [K("Pedirlo"), K("Nada")]) != 0:
+			return
+		if not cobro_banco(e, K("Laboratorio") + " · " + K("Reactivo")):
+			await say(K("No hay saldo en la cuenta."))
+			return
+		bt_tt().f = int(T9.frasco.n)
+		sfx("get")   # i18n-no
+		await say(K("El frasco, en el armario de tóxicos, con la ficha de seguridad al lado. Con él puesto encima de la mesa no se come, no se bebe y no se sale del laboratorio."))
+		return
+	if bt_tt().p.size():
+		await say(K("Hay una bandeja en la estufa esperando. De una en una."))
+		return
+	var l: Array = S.seeds.keys().filter(func(sid): return int(S.seeds[sid]) >= 2 and not Cultivo.tetra_linea(S, sid))
+	if l.is_empty():
+		await say(K("Hacen falta 2 semillas de una línea que no sea ya tetraploide: la mitad se queda por el camino."))
+		return
+	var it: Array = l.map(func(sid): return {"label": strain(sid).n, "right": T("{n} sem.", {"n": int(S.seeds[sid])}), "desc": T("THC {t} %", {"t": Datos.pct(strain(sid).thc)})})
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("DOBLAR LOS CROMOSOMAS"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var sid: String = l[i]
+	if await ask(T("¿Tratar {s}? Gastas 2 semillas y un uso del frasco. Si cuaja, la línea entera pasa a tetraploide, también la semilla de esa variedad que consigas después: más THC, menos cosecha y ya no cruza con una normal. Se deshace aquí mismo, descartando la línea.", {"s": strain(sid).n}), [K("Tratar"), K("Cancelar")]) != 0:
+		return
+	S.seeds[sid] = int(S.seeds[sid]) - 2
+	if int(S.seeds[sid]) <= 0:
+		S.seeds.erase(sid)
+	bt_tt().f = int(bt_tt().f) - 1
+	lab().r = true   # lo usado, al contenedor amarillo
+	await lab_ver("tetra")
+	bt_tt().p[sid] = int(S.day) + int(T9.dias)
+	sfx("enc")   # i18n-no
+	await say(T("La bandeja, a la estufa, etiquetada con la línea y la fecha. En {d} días se verá cuál tira y cuál no.", {"d": int(T9.dias)}))
+
+# al amanecer: la bandeja que cumple su plazo. Cuaja (TETRA.p), se queda por el camino (mata) o sale normal
+func tetra_dia() -> void:
+	if not Datos.CAL or not D.has("TETRA") or not (bt().get("tt") is Dictionary):
+		return
+	var T9: Dictionary = D.TETRA
+	for sid in bt_tt().p.keys():
+		if int(S.day) < int(bt_tt().p[sid]):
+			continue
+		var dv := int(bt_tt().p[sid])
+		bt_tt().p.erase(sid)
+		var h: int = Datos.hash_str("tetra|%s|%d" % [sid, dv]) % 100000
+		var nm := String(strain(sid).n)
+		if h < float(T9.p) * 100000:
+			if not (S.get("ra") is Dictionary):
+				S.ra = {}
+			if not (S.ra.get(sid) is Dictionary):
+				S.ra[sid] = {}
+			S.ra[sid]["tetra"] = maxi(1, int(S.ra[sid].get("tetra", 0)))
+			add_seeds(sid, 2)
+			var t1: String = T("La bandeja de {s} tiró: hoja gruesa y tallo macizo. Es tetraploide. Dos semillas de la línea nueva, etiquetadas.", {"s": nm})
+			queue("tetra" + sid, func(): await talk(K("EL LABORATORIO"), [t1]), [[K("EL LABORATORIO"), [t1]]])
+		elif h < (float(T9.p) + float(T9.mata)) * 100000:
+			var t2: String = T("La bandeja de {s} no tiró: lo tratado se quedó por el camino. Al contenedor amarillo.", {"s": nm})
+			queue("tetra" + sid, func(): await talk(K("EL LABORATORIO"), [t2]), [[K("EL LABORATORIO"), [t2]]])
+		else:
+			add_seeds(sid, 1)
+			var t3: String = T("La bandeja de {s} salió adelante, pero igual que su madre: no cuajó el doblado. Queda una semilla.", {"s": nm})
+			queue("tetra" + sid, func(): await talk(K("EL LABORATORIO"), [t3]), [[K("EL LABORATORIO"), [t3]]])
+
+# las cosechas de cada línea (cult_apunta, desde harvest y la nave) y la última que usó el laboratorio
+func bt_cos(sid: String) -> int:
+	return int(bt().get("cn", {}).get(sid, 0))
+
+func bt_lab_ok(sid: String) -> bool:
+	return bt_cos(sid) > int(bt().get("lc", {}).get(sid, 0))
+
+func cult_apunta(sid: String) -> void:
+	super(sid)
+	if not Datos.CAL or not D.has("BANCO_TIA"):
+		return
+	if not bt().has("cn"):
+		bt().cn = {}
+	bt().cn[sid] = bt_cos(sid) + 1
+
+func bt_cata() -> void:
+	if bt_espera("cata", 1) > 0:
+		await say(K("La sala de catas, por hoy, ya está. Vuelve mañana."))
+		return
+	var l: Array = S.buds.keys().filter(func(k): return not S.buds[k].get("ana"))
+	if l.is_empty():
+		await say(K("En la sala de catas se analiza un lote al día. No llevas ninguno sin analizar."))
+		return
+	var it: Array = l.map(func(k): return {"label": lot_nombre(k), "right": "%d g" % int(floor(S.buds[k].g)), "desc": T("THC {t} %", {"t": Datos.pct(S.buds[k].thc)})})   # i18n-no
+	it.append({"label": K("Nada"), "desc": ""})
+	var i: int = await menu(it, {"cls": "full", "title": K("LA SALA DE CATAS"), "desc": true})
+	if i < 0 or i >= l.size():
+		return
+	var k: String = l[i]
+	var b: Dictionary = S.buds[k]
+	b.ana = true
+	bt().cata = int(S.day)
+	sfx("get")
+	var sid := lot_sid(k)
+	await say(T("Analizado: {l} · THC {t} % · CBD {c} % · terpeno principal, {p}. Lo que va con análisis se vende mejor.", {"l": lot_nombre(k), "t": Datos.pct(b.thc), "c": Datos.pct(cbd_de(sid)), "p": D.TERPENOS[aroma_de(sid)]}))
+
+func bt_archivo() -> void:
+	if bt_espera("arch", 1) > 0:
+		await say(K("Ya has leído lo de hoy en los cuadernos de la tía. Mañana, más."))
+		return
+	var ks: Array = D.RECIPES.keys()
+	ks.sort()
+	var r := ""
+	for k in ks:
+		if not S.disc.get(String(D.RECIPES[k])):
+			r = k
+			break
+	if r == "":
+		await say(K("Ya conoces todo lo que la tía apuntó en sus cuadernos."))
+		return
+	bt().arch = int(S.day)
+	var nom: Array = Array(r.split("+")).map(func(sid): return strain(sid).n)
+	await say(T("En un cuaderno del archivo, con la letra de la tía: «{a}: de ahí sale la {r}».", {"a": " × ".join(nom), "r": strain(String(D.RECIPES[r])).n}))
+
+func bt_socios() -> void:
+	var w := bt_espera("so", int(D.BANCO_TIA.socios))
+	if w > 0:
+		await say(T("El mostrador está vacío. Los socios dejan un sobre cada {d} días: el próximo, el {f}.", {"d": int(D.BANCO_TIA.socios), "f": Datos.fd(int(S.day) + w, S.day)}))
+		return
+	var l: Array = D.LANDRACES.filter(func(sid): return not S.disc.get(sid) and not D.REGALO.has(sid))   # primero, las que aún no has encontrado (no las que escondió la tía)
+	if l.is_empty():
+		l = bt_guardadas()
+	var sid: String = l[int(S.day) % l.size()]
+	bt().so = int(S.day)
+	add_seeds(sid, 2)
+	sfx("get")
+	await say(K("En el mostrador, un sobre de papel con una nota: «Para el banco de Maite. Eran de mi padre»."))
+	await got(T("2 semillas de {s}", {"s": strain(sid).n}))
+
+# ---------- OBJETIVO ----------
+func bt_objetivo() -> String:
+	if not Datos.CAL or not D.has("BANCO_TIA"):
+		return ""
+	if not bt_abierto():
+		return K("Sigue el cuaderno azul de la tía: OBJETIVO → LA TÍA MAITE.") if hilo_visible() else ""
+	var tot: int = D.BANCO_TIA.col.size()
+	if bt().has("fin"):
+		return K("El banco de semillas de la tía, abierto. Cultiva, cruza y que no se pierda ninguna variedad.")
+	var sig := {}
+	var mejor := -1.0
+	for c in D.BANCO_TIA.col:
+		if bt_hecha(c.id):
+			continue
+		var f := bt_falta(c)
+		var p: float = f.filter(func(q): return q[1] >= q[2] and q[3]).size() / float(f.size())
+		if p > mejor:
+			mejor = p
+			sig = c
+	return T("Restaura el banco de semillas de la tía, en el cuarto de atrás de la asociación: {a}/{b} colecciones. La más cerca: «{n}».", {"a": bt_n(), "b": tot, "n": I18n.v(String(sig.n))})
+
+func bt_derecha() -> String:
+	return "%d/%d" % [bt_n(), D.BANCO_TIA.col.size()]
+
+# ---------- el laboratorio (lo pidió el usuario: «El laboratorio debe parecer un laboratorio de verdad, no los materiales de labo y
+# ya, las normas que tienes que tener en un laboratorio real»): lab-rv (LAB, de tools/banco_tia.py), por la puerta de al lado de la
+# placa. La antesala, hasta la línea amarilla (LAB.linea): el lavamanos, la percha con la bata, las gafas y los guantes, el cartel de
+# las normas y el botiquín; la zona de trabajo, detrás. Las normas, de verdad: no se pasa la línea sin las manos lavadas y el EPI
+# puesto (linea_lab, desde try_move), las manos antes que los guantes, nada de comer, beber ni fumar (catar), nadie trabaja colocado
+# ni borracho, el instrumental esterilizado en el autoclave ese día, lo usado al contenedor amarillo antes de volver a empezar y el
+# EPI se deja en la antesala al salir (cruzar_puerta). S.bt.ld = {m: manos, e: EPI, at: el día del autoclave, r: lo usado sin tirar,
+# v: el día que lo viste}
+func lab() -> Dictionary:
+	if not (bt().get("ld") is Dictionary):
+		bt().ld = {}
+	return bt().ld
+
+func en_lab() -> bool:
+	return Datos.CAL and S != null and D.has("LAB") and S.map == String(D.LAB.mapa)
+
+func bt_col_z(z: String) -> Dictionary:
+	for c in D.BANCO_TIA.col:
+		if c.z == z:
+			return c
+	return {}
+
+func lab_sereno() -> bool:
+	return colo() < float(D.FISIO.efecto) and borr() < float(D.FISIO.efecto)
+
+# '' si se puede trabajar; si no, por qué (con el puesto: el autoclave de hoy y lo de ayer tirado)
+func lab_norma(puesto := false) -> String:
+	if not lab_sereno():
+		return K("Así no se trabaja en un laboratorio: nadie toca nada colocado ni bebido. Vuelve cuando se te pase.")
+	if not lab().get("m") or not lab().get("e"):
+		return K("Sin las manos lavadas y la bata, las gafas y los guantes, aquí no se toca nada. Está todo en la antesala.")
+	if puesto and lab().get("r"):
+		return K("El puesto, sin recoger: primero, lo usado al contenedor amarillo y la cabina limpia con alcohol.")
+	if puesto and int(lab().get("at", -1)) != int(S.day):
+		return K("El instrumental, sin esterilizar: las pinzas, el bisturí y las placas pasan antes por el autoclave, cada día.")
+	return ""
+
+# la línea amarilla: de la antesala a la zona de trabajo, solo con las manos lavadas y el EPI
+func linea_lab(nx: int, _ny: int) -> bool:
+	if not en_lab():
+		return false
+	var li := int(D.LAB.linea)
+	return int(P.x) <= li and nx > li and not (lab().get("m") and lab().get("e"))
+
+func aviso_linea() -> void:
+	if not lab().get("m"):
+		await say(K("La línea amarilla no se pasa sin lavarte las manos y ponerte la bata, las gafas y los guantes. El lavamanos y la percha, en la antesala."))
+	else:
+		await say(K("Las manos, ya. Ahora la bata, las gafas y los guantes, en la percha: sin el EPI no se pasa la línea amarilla."))
+
+func cruzar_puerta(e: Dictionary) -> void:
+	if Datos.CAL and D.has("LAB"):
+		if String(e.get("to", "")) == String(D.LAB.mapa):   # se entra con las manos sin lavar y sin nada puesto
+			lab().m = false
+			lab().e = false
+		elif en_lab() and lab().get("e"):
+			lab().e = false
+			lab().m = false
+			await say(K("Antes de salir, en la antesala: los guantes al cubo, la bata a su percha con las gafas y las manos, otra vez al lavabo. El EPI no sale del laboratorio."))
+	await super(e)
+	if en_lab() and not lab().has("v"):
+		lab().v = int(S.day)
+		await lab_intro()
+
+func lab_intro() -> void:
+	await talk(K("EL LABORATORIO"), [K("Azulejo blanco, el suelo sin juntas y una línea amarilla que parte la sala en dos. Huele a alcohol y a lejía."),
+		K("Antes de la línea, la antesala: el lavamanos de pedal, la percha con las batas, las gafas y los guantes, y un cartel con las normas."),
+		K("Debajo del cartel, con la letra de la tía: «Aquí se trabaja como en un laboratorio de verdad, o no se trabaja».")])
+
+func lab_normas() -> void:
+	await talk(K("LAS NORMAS DEL LABORATORIO"), [K("1. Antes de pasar la línea amarilla: las manos lavadas, la bata abrochada, las gafas y los guantes."),
+		K("2. Aquí dentro no se come, no se bebe y no se fuma. Y en la nevera de las muestras, nada de comida."),
+		K("3. Nadie trabaja colocado ni bebido."),
+		K("4. El instrumental se esteriliza en el autoclave antes de usarlo, cada día."),
+		K("5. Todo lo que toca las muestras va al contenedor amarillo, y el puesto se deja limpio. Cada placa y cada sobre, con su etiqueta: qué es, de quién y la fecha."),
+		K("6. Antes de necesitarlos, se sabe dónde están la ducha, el lavaojos, el extintor y el botiquín."),
+		K("7. El EPI no sale del laboratorio: se deja en la antesala y las manos se lavan otra vez al salir."),
+		K("Firmado, con una hoja dibujada: M.")])
+
+func lab_obj(_x: int, _y: int, o) -> bool:
+	var b: String = String(o).trim_suffix("2")
+	match b:
+		"labNormas":
+			await lab_normas()
+		"labPila":
+			if lab().get("e"):
+				await say(K("Con los guantes puestos, no: las manos se lavan antes de ponértelos y después de quitártelos."))
+			elif lab().get("m"):
+				await say(K("Ya te has lavado las manos. Ahora, la percha."))
+			else:
+				await lab_ver("manos")
+				lab().m = true
+				sfx("agua")   # i18n-no
+				await say(K("Te lavas las manos con jabón, entre los dedos y hasta las muñecas, y te las secas con papel. El grifo, con el pedal."))
+		"labPercha":
+			if lab().get("e"):
+				await say(K("Ya llevas la bata abrochada, las gafas y los guantes."))
+			elif not lab().get("m"):
+				await say(K("Antes de los guantes, las manos: el lavamanos está al lado."))
+			else:
+				await lab_ver("epi")
+				lab().e = true
+				sfx("get")   # i18n-no
+				await say(K("Te pones la bata y te la abrochas, las gafas y los guantes de nitrilo por encima de los puños. Ya puedes pasar la línea amarilla."))
+		"labFlujo":
+			if lab_norma(true) == "":
+				await lab_ver("flujo")
+			await bt_lab()
+		"labAutoclave":
+			var no := lab_norma()
+			if no != "":
+				await say(no)
+			elif int(lab().get("at", -1)) == int(S.day):
+				await say(K("El instrumental de hoy ya está esterilizado, en sus botes con la cinta que cambia de color."))
+			elif await ask(K("El autoclave: el instrumental, a presión y con vapor, para que no lleve nada de fuera a las semillas. ¿Esterilizarlo ahora? Es media hora."), [K("Esterilizar"), K("Nada")]) == 0:
+				await lab_ver("auto")
+				advance_time(int(D.LAB.esteril))
+				lab().at = int(S.day)
+				sfx("get")   # i18n-no
+				update_hud()
+				await say(K("El instrumental, esterilizado: la cinta de los botes ha cambiado de color. Ya se puede trabajar en la cabina."))
+		"labResiduos":
+			if lab().get("r") and lab_norma() == "":
+				await lab_ver("res")
+				lab().r = false
+				sfx("get")   # i18n-no
+				await say(K("Las placas, las puntas y lo que ha tocado las muestras, al contenedor amarillo. La cabina, limpia con alcohol. El puesto, listo."))
+			else:
+				await say(K("El contenedor amarillo, para lo que toca las muestras, y el rojo, para lo que corta. Se los lleva un gestor autorizado: nada de eso va a la basura de casa."))
+		"labMicro":
+			var no := lab_norma()
+			var bien := await lab_ver("micro") if no == "" else 0
+			if no == "" and bien < 2:
+				await say(K("Te cuesta enfocar: las vetas se ven a ratos."))
+			await say(no if no != "" else K("Al microscopio, una semilla de cada línea: la cubierta, las vetas, si está madura. Lo que no se ve a simple vista se apunta en el cuaderno, con la fecha."))
+		"labBalanza":
+			var no := lab_norma()
+			if no == "":
+				await lab_ver("bal")
+			await say(no if no != "" else K("La balanza de precisión, con su urna para que el aire no la mueva. Cada lote de semillas se pesa y se apunta: las vanas no llegan al peso."))
+		"labEstufa":
+			await say(K("La estufa de germinación: las semillas, en placas a oscuras y a temperatura fija. Cada placa, con su etiqueta."))
+		"labNevera":
+			await say(K("La nevera de las muestras: tubos y sobres, todos etiquetados. Ni comida ni bebida: es una de las normas."))
+		"labDucha":
+			await say(K("La ducha de emergencia: si te cae algo encima, se tira del triángulo y uno se queda debajo hasta quitárselo todo. Se prueba cada semana."))
+		"labLavaojos":
+			await say(K("El lavaojos: si salpica algo a los ojos, se empuja la palanca y se lavan abiertos, sin frotar, un buen rato. Luego, al médico."))
+		"labExtintor":
+			await say(K("El extintor de dióxido de carbono, el de los aparatos eléctricos, con la revisión al día en su etiqueta."))
+		"labBotiquin":
+			await say(K("El botiquín: gasas, vendas, tiritas, suero y guantes. Al lado, con la letra de la tía, el teléfono de urgencias."))
+		"labTaburete":
+			await say(K("Un taburete de laboratorio, regulable y con ruedas."))
+		_:
+			return false
+	return true
+
+# cada cosa del laboratorio, a la vista (lo pidió el usuario: «los minijuegos o visuales de cómo funcionan las máquinas del labo»):
+# sus pasos de verdad, con su barra y la escena encima (escena_extr.gd, l<k>); devuelve los pasos en el verde
+func lab_pasos(k: String) -> Array:
+	match k:
+		"manos":
+			return [[K("Agua templada y jabón: palmas, dorsos y entre los dedos."), .14], [K("Las uñas y las muñecas, veinte segundos frotando."), .12], [K("Aclara con el pedal y sécate con papel."), .14]]
+		"epi":
+			return [[K("La bata, abrochada hasta arriba."), .14], [K("Las gafas, bien ajustadas."), .14], [K("Los guantes de nitrilo, por encima de los puños de la bata."), .12]]
+		"auto":
+			return [[K("Las pinzas, el bisturí y las placas, a la cesta, con su cinta."), .14], [K("La tapa cerrada: sube a 121 °C con vapor."), .12], [K("Veinte minutos a 1 bar; luego, que baje la presión antes de abrir."), .12]]
+		"flujo":
+			return [[K("La cabina encendida: diez minutos de aire antes de empezar."), .14], [K("Alcohol al 70 % en la mesa y en los guantes."), .12], [K("En el centro, lejos del borde y sin tapar la rejilla."), .1]]
+		"micro":
+			return [[K("La semilla, en el portaobjetos, a la platina."), .14], [K("Enfoca con el tornillo hasta ver las vetas."), .1]]
+		"bal":
+			return [[K("El papel en el plato y la tara a cero."), .14], [K("Las semillas, hasta que la cifra se quede quieta."), .12]]
+		"res":
+			return [[K("Lo usado, al contenedor amarillo; lo que corta, al rojo."), .14], [K("La mesa, limpia con alcohol de dentro afuera."), .12]]
+		"tetra":   # el reactivo: lo que se ve es el manejo, nunca la receta
+			return [[K("El frasco, del armario de tóxicos a la cabina, sin sacarlo del laboratorio."), .14], [K("Guantes dobles y la ficha de seguridad a la vista."), .12], [K("Las plántulas marcadas, tratadas en la cabina."), .1], [K("La bandeja, a la estufa con su etiqueta; lo gastado, al contenedor amarillo."), .12]]
+	return []
+
+func lab_ver(k: String) -> int:
+	if not Datos.CAL:
+		return 0
+	var ok := 0
+	var Pa := lab_pasos(k)
+	for ip in Pa.size():
+		var d: float = await tiro_billar(String(Pa[ip][0]), "dir", float(Pa[ip][1]), float(D.MANICURA.per), K("LABORATORIO"), {"esc": "l" + k, "paso": ip, "n": Pa.size()})
+		if absf(d - float(D.BILLAR.centro)) <= float(Pa[ip][1]):
+			ok += 1
+	return ok
+
+# las normas: en el laboratorio no se come, no se bebe y no se fuma
+func catar(k: String, g := -1.0) -> void:
+	if en_lab():
+		await say(K("En el laboratorio no se come, no se bebe y no se fuma. Es la segunda norma del cartel."))
+		return
+	await super(k, g)
+
+func catar_extr(k: String, g: float) -> void:
+	if en_lab():
+		await say(K("En el laboratorio no se come, no se bebe y no se fuma. Es la segunda norma del cartel."))
+		return
+	await super(k, g)
+
+# El EPI, a la vista (lo pidió el usuario: «que el personaje de verdad se pusiera una bata, unas gafas y demás»): en el laboratorio,
+# con lab().e, el fotograma del protagonista con la bata blanca hasta medio muslo (la camiseta, las mangas y el pantalón de arriba),
+# los guantes de nitrilo azules en las manos y las gafas en la fila de los ojos (de espaldas, la goma por el pelo). Por colores del
+# sprite: vale para todos los fotogramas, de las cuatro direcciones y de los dos protagonistas
+const EPI_CAMISA := [0xc83839, 0xa03031]
+const EPI_PIEL := [0xe8b894, 0x7a5a3a, 0x7a5a3b]
+const EPI_PANT := [0x6c7483, 0x36466f, 0x535b6b, 0x2c333c]
+const EPI_BLANCO := 0xf4f4f4
+const EPI_RAYA := 0x180e1e
+const EPI_COL := {"bata": Color8(232, 236, 240), "bata2": Color8(184, 192, 204), "guante": Color8(106, 176, 232), "guante2": Color8(58, 128, 192), "cristal": Color8(168, 224, 240), "cristal2": Color8(90, 160, 192), "montura": Color8(58, 68, 80)}
+var _epi := {}
+
+func epi_puesto() -> bool:
+	return en_lab() and lab().get("e", false) == true
+
+func epi_c(f):
+	if f == null or not epi_puesto():
+		return f
+	var c: Image = f.c
+	var k := c.get_instance_id()
+	if not _epi.has(k):
+		var q = epi_pl(c)
+		_epi[k] = q if q != null else epi_img(c)
+	var o: Dictionary = f.duplicate()
+	o.c = _epi[k]
+	return o
+
+# con el generador de sprites (lo pidió el usuario: «quiero que lo hagas con el generador de sprites» y «tienen que ser de calidad»; tools/sprites/sprgen_epi.py
+# → arte/epi_pl.png + .json): el protagonista de pie, parado y andando en las cuatro direcciones, cada fotograma por su clave del
+# atlas, y la protagonista igual (f-<dir>-<i>); lo demás (las acciones, sentado), por colores con epi_img. En el laboratorio
+# no se corre (_pj_frame en pinta.gd)
+static var EPI_PL := {}   # id de la imagen del atlas → la del generador de sprites
+
+static func epi_pl(c: Image):
+	if EPI_PL.is_empty():
+		EPI_PL[0] = null   # ya mirado, aunque no esté
+		var j = JSON.parse_string(FileAccess.get_file_as_string("res://arte/epi_pl.json")) if FileAccess.file_exists("res://arte/epi_pl.json") else null
+		var im := Image.new()
+		if j is Dictionary and Atlas.carga() and im.load_png_from_buffer(FileAccess.get_file_as_bytes("res://arte/epi_pl.png")) == OK:
+			for k in j.frames:
+				if Atlas.d.frames.has(k):
+					var q: Dictionary = j.frames[k]
+					EPI_PL[Atlas.frame(k).get_instance_id()] = im.get_region(Rect2i(int(q.x), int(q.y), int(q.w), int(q.h)))
+	return EPI_PL.get(c.get_instance_id()) if c != null else null
+
+static func _rgb(p: Color) -> int:
+	return (p.r8 << 16) | (p.g8 << 8) | p.b8
+
+static func epi_img(c: Image) -> Image:
+	var o: Image = c.duplicate()
+	var W := o.get_width()
+	var H := o.get_height()
+	var t := -1   # la primera fila de la camiseta: el pecho
+	for y in H:
+		for x in W:
+			var p := c.get_pixel(x, y)
+			if p.a8 > 0 and _rgb(p) in EPI_CAMISA:
+				t = y
+				break
+		if t >= 0:
+			break
+	if t < 0:
+		return o
+	var ojo := -1   # la fila de los ojos (el blanco de los ojos, encima del pecho); de espaldas, 6 filas por encima
+	for y in range(maxi(0, t - 10), t):
+		for x in W:
+			var p := c.get_pixel(x, y)
+			if p.a8 > 0 and _rgb(p) == EPI_BLANCO:
+				ojo = y
+		if ojo >= 0:
+			break
+	var espalda := ojo < 0
+	if espalda:
+		ojo = t - 6
+	for y in H:
+		for x in W:
+			var p := c.get_pixel(x, y)
+			if p.a8 == 0:
+				continue
+			var n := _rgb(p)
+			var cl = null
+			if y == ojo and n != EPI_RAYA:
+				if espalda:
+					cl = EPI_COL.montura
+				elif n == EPI_BLANCO:
+					cl = EPI_COL.cristal
+				elif n in EPI_PIEL and _rgb(c.get_pixel(clampi(x - 1, 0, W - 1), y)) != EPI_BLANCO and _rgb(c.get_pixel(clampi(x + 1, 0, W - 1), y)) != EPI_BLANCO:
+					cl = EPI_COL.montura
+				else:
+					cl = EPI_COL.cristal2
+			elif y >= t and n in EPI_CAMISA:
+				cl = EPI_COL.bata if n == EPI_CAMISA[0] else EPI_COL.bata2
+			elif y >= t and n in EPI_PIEL:
+				cl = (EPI_COL.guante if n == EPI_PIEL[0] else EPI_COL.guante2) if y >= t + 3 else EPI_COL.bata
+			elif y >= t and y <= t + 7 and (n in EPI_PANT or n == EPI_BLANCO):
+				cl = EPI_COL.bata2 if n == EPI_PANT[1] or n == EPI_PANT[3] else EPI_COL.bata
+			if cl != null:
+				o.set_pixel(x, y, Color(cl, p.a))
+	return o

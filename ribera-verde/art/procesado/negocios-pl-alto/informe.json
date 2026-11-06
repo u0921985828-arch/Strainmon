@@ -1,0 +1,38 @@
+{
+  "grupo": "negocios-pl-alto",
+  "celda": [
+    32,
+    48
+  ],
+  "tope_colores": 32,
+  "secuencias": 11,
+  "fotogramas": 11,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0.2,
+  "distancia_media": 0,
+  "colores_finales": 32,
+  "fundidos": [
+    "cafeT: #eef3f5→#e8ebea",
+    "cafeT: #515351→#4f5259",
+    "cafeT: #383a41→#3f4148",
+    "rackP: #cbcbca→#d5d6d9",
+    "rackP: #57493f→#4a494c",
+    "rackP: #bb7d3b→#ba7429",
+    "rackP: #745f4f→#64574f",
+    "rackP: #946842→#9a6733",
+    "rackP: #666671→#6a6d71",
+    "rackP: #ba7429→#b16a26",
+    "secaN: #434543→#3f4148",
+    "secaN: #d3d7cd→#cdd0cf",
+    "secaN: #848b8f→#7a8186",
+    "secaN: #1d1c1d→#171b28",
+    "secaN: #30425b→#2f3652",
+    "secaN: #76797f→#7d7f78",
+    "secaN: #6b7076→#606f79",
+    "secaN: #5b5f65→#63676d"
+  ],
+  "huerfanos_quitados": 2,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

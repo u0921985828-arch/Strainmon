@@ -1,0 +1,19 @@
+{
+  "grupo": "garaje-coche",
+  "celda": [
+    80,
+    48
+  ],
+  "tope_colores": 32,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 17.3,
+  "distancia_media": 0,
+  "colores_finales": 16,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

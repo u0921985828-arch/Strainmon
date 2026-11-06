@@ -1,0 +1,32 @@
+{
+  "grupo": "props-32",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 20.2,
+  "distancia_media": 8.85,
+  "colores_finales": 15,
+  "fundidos": [
+    "bedB: #26262e→#2c2c30",
+    "bedB: #1a1a22→#2c2c30",
+    "bedT: #c48a52→#b07a4a",
+    "bedT: #2a2030→#2c2c30",
+    "bedT: #2c2c30→#4a2a2a",
+    "bedT: #5a5a66→#535b6b",
+    "bedT: #24345c→#4a4a5a",
+    "bedT: #986240→#b07a4a",
+    "bedT: #646c7c→#6c7482",
+    "bedT: #535b6b→#4a4a5a",
+    "bedT: #4a4a5a→#6c4632"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #1f4f2a≈#22522c, #a46e40≈#a26c3e, #e8eef4≈#e8eaf0, #88c8f0≈#8cc8f0, #3a3a48≈#3c3c44, #e8eaf0≈#e8e8f0"
+  ]
+}

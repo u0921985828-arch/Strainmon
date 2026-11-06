@@ -1,0 +1,19 @@
+{
+  "grupo": "sotano-alto",
+  "celda": [
+    32,
+    32
+  ],
+  "tope_colores": 32,
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 61.6,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

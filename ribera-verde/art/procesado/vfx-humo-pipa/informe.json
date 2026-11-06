@@ -1,0 +1,25 @@
+{
+  "grupo": "vfx-humo-pipa",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 1,
+  "fotogramas": 6,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 9.87,
+  "colores_finales": 15,
+  "fundidos": [
+    "#5a6070→#6c7482",
+    "#303038→#2c2c30"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "efecto/unica": 2
+  },
+  "errores": [],
+  "avisos": [
+    "efecto/unica: encuadrado con la caja de todos los fotogramas (el primero no basta)"
+  ]
+}

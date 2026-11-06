@@ -1,0 +1,212 @@
+es,en
+plazo de Don Baltasar ({e}),Don Baltasar's deadline ({e})
+recibo de {n},{n} bill
+encargo de Toño,Toño's order
+encargo del club,club order
+se puede comprar la nave,the warehouse can be bought
+asamblea de la asociación,association assembly
+CALENDARIO,CALENDAR
+"El carro de las bandejas de clones: dos baldas con sus tubos T5 y sus tapas. Vacío. Antes de pasar cada mesa a 12/12, quien la cuida le corta {n} esquejes y aquí echan raíces en un día; con ellos, la mesa vuelve a empezar.","The clone tray cart: two shelves with T5 tubes and lids. Empty. Before a table goes to 12/12, whoever tends it cuts {n} clones and they root here in one day; with them, the table starts over."
+"El carro de las bandejas de clones: dos baldas con sus tubos T5 y sus tapas. Vacío. Antes de pasar cada mesa a 12/12, quien la cuida le corta {n} esquejes y aquí echan raíces en {d} días; con ellos, la mesa vuelve a empezar.","The clone tray cart: two shelves with T5 tubes and lids. Empty. Before a table goes to 12/12, whoever tends it cuts {n} clones and they root here in {d} days; with them, the table starts over."
+Mesa {m} · {n},Table {m} · {n}
+enraizada,rooted
+"{n} esquejes de {v}{f}, cortados el {d}, en tacos de turba con su tapa. {r}","{n} clones of {v}{f}, cut on {d}, in peat plugs under a lid. {r}"
+Ya tienen raíces: la mesa {m} vuelve a empezar con ellos al cosecharse.,Rooted: table {m} starts over with them after harvest.
+Les faltan un día para echar raíces.,One more day until they root.
+Les faltan {d} días para echar raíces.,{d} more days until they root.
+Volver,Back
+BANDEJAS DE CLONES,CLONE TRAYS
+{a} de {b},{a} of {b}
+"{d}
+{l} l/100 km · {co2} g CO2/km. Total {tot} (matriculación {ie}, gastos {g}). Entrega en {ent} días.
+Al año: seguro {seg} e impuesto de circulación {iv}. Revisión cada {rk} km ({r}) y neumáticos cada {nk} km ({ne}). Sin billete de autobús: solo la gasolina.","{d}
+{l} l/100 km · {co2} g CO2/km. Total {tot} (registration {ie}, fees {g}). Delivery in {ent} days.
+Yearly: insurance {seg} and road tax {iv}. Service every {rk} km ({r}) and tyres every {nk} km ({ne}). No bus ticket: just fuel."
+exenta,exempt
+"{A}, como {a} tuya.",{A}: you already own {a}.
+"{A}, como {a} tuyo.",{A}: you already own {a}.
+Hablar con Arantxa,Talk to Arantxa
+Nada,Nothing
+{n} · tuya,{n} · yours
+{n} · tuyo,{n} · yours
+{n} · pedida,{n} · ordered
+{n} · pedido,{n} · ordered
+Vender,Sell
+"Te lo recompran: pierde un {ya} % al salir del concesionario y un {mes} % cada mes, hasta el {min} % de lo que valía.","They buy it back: it loses {ya} % when it leaves the lot and {mes} % each month, down to {min} % of what it cost."
+Asegurar,Insure
+"Sin seguro no se puede circular: la multa es de {e} y el vehículo, a la grúa.","No insurance, no driving: the fine is {e} and it gets towed."
+"Precios con IVA. Aparte, la matriculación por emisiones y {g} de gestoría y placas.",Prices incl. VAT. Plus the emissions registration tax and {g} for paperwork and plates.
+Cuenta {b} · efectivo {e},Account {b} · cash {e}
+"Cualquier cosa, aquí estamos. Y ojo con la ITV.","Anything you need, we're here. And mind the MOT."
+ARANTXA,ARANTXA
+{A} ya es tuya.,{A} is already yours.
+{A} ya es tuyo.,{A} is already yours.
+{A} está en camino: te aviso por SMS.,{A} is on its way: I'll text you.
+"{n}: {tot} en total. {efe} en efectivo, que más no deja la ley, y {tr} por transferencia; el seguro, {sm} al año, domiciliado. ¿Lo firmas?","{n}: {tot} in total. {efe} in cash, the legal limit, and {tr} by transfer; insurance, {sm} a year, direct debit. Sign?"
+Firmar,Sign
+No,No
+"Con la transferencia y el primer año del seguro hacen falta {e} en tu cuenta, y hay {b}. Lo dejamos reservado si quieres.","With the transfer and the first year of insurance you need {e} in your account, and there's {b}. We can hold it for you."
+Seguro · {n},Insurance · {n}
+ Lo traen bajo pedido de fábrica., It's made to order at the factory.
+"Firmado. {A}, a tu nombre: en {d} días está matriculada y te aviso por SMS.{x}","Signed. {A}, in your name: registered in {d} days, I'll text you.{x}"
+"Firmado. {A}, a tu nombre: en {d} días está matriculado y te aviso por SMS.{x}","Signed. {A}, in your name: registered in {d} days, I'll text you.{x}"
+"Pagaste {p} y lleva {km} km. Te damos {v}, por transferencia.","You paid {p} and it has {km} km. We give you {v}, by transfer."
+VENDER,SELL
+Por {a} te damos {v}. ¿Trato hecho?,For {a} we'll give you {v}. Deal?
+{n} · venta,{n} · sale
+Hecho: {v} en tu cuenta. El seguro se da de baja hoy.,Done: {v} in your account. The insurance is cancelled today.
+"El año de póliza son {e}, de la cuenta, y no hay.","A year's policy is {e} from your account, and it isn't there."
+"Póliza en vigor: {e} al año, domiciliado. Y te saco {a} del depósito de la grúa.","Policy active: {e} a year, direct debit. And I'll get {a} out of the tow pound."
+SMS · ,SMS · 
+" Y en la calle, montado."," And on the street, you ride it."
+" Y en la calle, al volante."," And on the street, behind the wheel."
+"{A} ya está matriculada y con el seguro en vigor. Desde cualquier parada de autobús puedes ir en ella, a la hora que quieras.{x}","{A} is registered and insured. From any bus stop you can take it, any time you like.{x}"
+"{A} ya está matriculado y con el seguro en vigor. Desde cualquier parada de autobús puedes ir en él, a la hora que quieras.{x}","{A} is registered and insured. From any bus stop you can take it, any time you like.{x}"
+ASEGURADORA,INSURER
+seguro de {a},insurance for {a}
+Póliza anulada por impago: {a} ya no tiene seguro. Sin seguro no se puede circular.,"Policy cancelled for non-payment: {a} is uninsured. No insurance, no driving."
+SMS · ASEGURADORA,SMS · INSURER
+AYUNTAMIENTO,TOWN HALL
+impuesto de circulación de {a},road tax for {a}
+Apremio · IVTM · {n},Enforcement · road tax · {n}
+"Providencia de apremio: el impuesto de circulación de {a}, con un {r} % de recargo, {e}, cobrado de lo que tienes.","Enforcement notice: road tax for {a}, with a {r} % surcharge, {e}, taken from what you have."
+SMS · AYUNTAMIENTO,SMS · TOWN HALL
+{m} min · {e},{m} min · {e}
+¿A dónde vas?,Where to?
+Gasolinera,Petrol station
+Para la gasolina hacen falta {e} y no te llega.,Fuel costs {e} and you're short.
+SMS · TALLER,SMS · GARAGE
+la revisión de {km} km (aceite y filtros),the {km} km service (oil and filters)
+neumáticos nuevos a los {km} km,new tyres at {km} km
+Taller · {n},Garage · {n}
+{q}: {e} (te quedan a deber {f}),{q}: {e} (you still owe {f})
+{q}: {e},{q}: {e}
+"{a}, en el taller. {tx}.","{a}, at the garage. {tx}."
+"Control de tráfico a la entrada. «Buenas. Carné, permiso de circulación y el seguro de {a}.»","Traffic stop on the way in. “Evening. Licence, registration and insurance for {a}.”"
+AGENTE,OFFICER
+Multa · sin seguro,Fine · no insurance
+"Sin seguro en vigor: denuncia de {e} (te faltan {f}) y {a}, a la grúa hasta que lo asegures.",No valid insurance: a {e} fine (you owe {f}) and {a} gets towed until insured.
+"Sin seguro en vigor: denuncia de {e} y {a}, a la grúa hasta que lo asegures.",No valid insurance: a {e} fine and {a} gets towed until insured.
+«Todo en orden. Circule.»,“All in order. Move along.”
+Te mira un rato. «Circule.»,He stares at you a while. “Move along.”
+«¿Y este olor?» Te registran {a}: te requisan {r} y te multan con {e}.,“What’s that smell?” They search {a}: they seize {r} and fine you {e}.
+"{kg} a {r}, de {thc} % de THC o más, antes del {d}","{kg} to {r}, {thc} % THC or more, before {d}"
+KOLDO,KOLDO
+Tú eres el sobrino de Maite. Tienes su cara cuando se reía de los guardias.,You're Maite's nephew. You've got her face when she laughed at the cops.
+"En los ochenta, tu tía y yo traíamos semillas de fuera en mi txalupa. Las primeras landraces de la comarca llegaron por este muelle.","In the eighties, your aunt and I brought seeds from abroad in my txalupa. The first landraces in the district came in through this dock."
+"La txalupa sigue ahí, en el primer noray. Se llama Maite: se la puse yo. Ahora es tuya.","The txalupa's still there, at the first bollard. She's called Maite: I named her. Now she's yours."
+"Cargas en el noray, eliges la ruta y zarpas. A la vuelta, te pagan por transferencia de una conservera, {e}: limpio.","Load at the bollard, pick a route and sail. When you get back, a cannery pays you by transfer, {e}: clean."
+"Pequeño al principio: {a} como mucho. Y no menos de {b} por viaje, que el gasoil no es gratis.","Small at first: {a} at most. And no less than {b} a trip, diesel isn't free."
+Los envíos en el mar,Shipments at sea
+El pedido de la semana,This week's order
+Las rutas,The routes
+Comprar un barco,Buy a boat
+Las obras del muelle,Dock works
+La distribuidora,The distributor
+La licencia,The licence
+El último trabajo,The last job
+{r} · {kg} exportados · reputación {rep}.,{r} · {kg} exported · reputation {rep}.
+Ondo ibili. Que el mar te sea leve.,Ondo ibili. May the sea go easy on you.
+Ahora mismo no tienes nada en el mar. Se carga en el noray de cada barco.,You've nothing at sea right now. You load at each boat's bollard.
+"{b}, a {r} con {kg}: llega el {d}.","{b}, to {r} with {kg}: arrives {d}."
+"Esta semana piden {p}. Si lo cumples, pagan un {b} % más.",This week they want {p}. Deliver and they pay {b} % more.
+"Primero, un viaje que salga bien. Luego te presento a la gente de fuera.","First, one trip that goes right. Then I'll introduce you to the people abroad."
+Esta semana no hay pedido. Los lunes suelen llamar.,No order this week. They usually call on Mondays.
+"{r}: {d} día más de viaje, pagan ×{px}.","{r}: {d} more day at sea, pays ×{px}."
+"{r}: {d} días más de viaje, pagan ×{px}.","{r}: {d} more days at sea, pays ×{px}."
+{r}: con reputación {rep}.,{r}: at reputation {rep}.
+"Un armador de {r} quiere {kg} en un solo viaje, y lo paga como nadie. Es el trabajo que tu tía y yo nunca nos atrevimos a hacer. Si sale, el muelle es tuyo.","A shipowner in {r} wants {kg} in a single trip, and pays like no one else. It's the job your aunt and I never dared. Pull it off and the dock is yours."
+Ya tienes la flota entera. Ni la cofradía tiene tantos.,You've got the whole fleet. Not even the guild has that many.
+Barcos de segunda mano de la cofradía. Se pagan por transferencia.,Second-hand boats from the fishermen's guild. Paid by transfer.
+"{b} no cabe en el muelle tal como está. Antes, {o}: {t}","{b} won't fit in the dock as it is. First, {o}: {t}"
+"{b}: {p}, carga hasta {kg}, {d} días de viaje. ¿Lo compras?","{b}: {p}, carries up to {kg}, {d} days per trip. Buy it?"
+Compra · {n},Purchase · {n}
+En la cuenta no llega. Con el banco no se discute.,Your account won't cover it. No arguing with the bank.
+Hecho. Lo amarro en su noray esta misma tarde.,Done. I'll moor her at her bollard this afternoon.
+Sí,Yes
+"Un noray de hierro, gastado por los cabos.","An iron bollard, worn down by the ropes."
+"Un noray de la cofradía. Koldo, el viejo de la acera, sabe de quién es cada amarre.","A guild bollard. Koldo, the old man on the pavement, knows whose every berth is."
+Amarre libre. Aquí cabe {b}: Koldo lo vende por {p}.,Free berth. {b} fits here: Koldo sells it for {p}.
+"{b} está en el mar, camino de {r}. Vuelve el {d}.","{b} is at sea, heading to {r}. Back on {d}."
+{d} días de viaje con {b}.,{d} days at sea with {b}.
+¿A dónde?,Where to?
+Zarpar ({kg}),Set sail ({kg})
+La carga · {a} de {b},Cargo · {a} of {b}
+¿Cuánto de {n}?,How much {n}?
+La bodega va llena.,The hold is full.
+Sueltas amarras. {b} sale hacia {r} con {kg}: llega el {d}.,You cast off. {b} heads for {r} with {kg}: arrives {d}.
+ Es el pedido de la semana., It's this week's order.
+ El último trabajo de Koldo., Koldo's last job.
+SMS · KOLDO,SMS · KOLDO
+Malas noticias: la patrullera paró a {b} antes de {r}. Se han quedado la carga; el barco lo saco yo con la cofradía. Tranquilo unos días.,Bad news: the patrol boat stopped {b} before {r}. They kept the cargo; I'll get the boat back through the guild. Lie low a few days.
+Transferencia · {n},Transfer · {n}
+{b} ha llegado a {r}. {e} ha transferido {x}.,{b} has reached {r}. {e} has transferred {x}.
+ Con la prima del pedido., With the order bonus.
+"Ya tienes nombre fuera. Mi sobrino Gorka mueve cantidad por tierra: tiene un piso franco en el muelle, la puerta de la casa amarilla. Pásate.","You've got a name abroad now. My nephew Gorka moves volume by land: he's got a safe house on the dock, the yellow house's door. Drop by."
+Prima · {n},Bonus · {n}
+"Lo has hecho. Treinta años soñándolo y lo has hecho tú. Me retiro: el muelle es tuyo, y la cofradía ya lo sabe.","You did it. Thirty years dreaming of it and you pulled it off. I'm retiring: the dock is yours, and the guild knows it."
+Maite estaría orgullosa. Y un poco celosa.,Maite would be proud. And a bit jealous.
+Pedido de la semana: {p}. Pagan un {b} % más.,This week's order: {p}. They pay {b} % more.
+GORKA,GORKA
+Así que tú eres el de la txalupa. Koldo dice que eres de fiar.,So you're the txalupa guy. Koldo says you can be trusted.
+"El piso es {alq} al mes, en efectivo. Lo que me dejes en las cajas, lo reparto yo por tierra, al por mayor: {kg} al día, y me quedo el {c} %.","The flat is {alq} a month, cash. Whatever you leave in the crates, I move by land, wholesale: {kg} a day, and I keep {c} %."
+Alquilar el piso,Rent the flat
+"Sin el primer mes por delante, nada.","No first month up front, no deal."
+Trato. Las cajas de la izquierda son el alijo: deja ahí el género y pasa a por la caja cuando quieras.,Deal. The crates on the left are the stash: leave the goods there and come for the cash whenever.
+Recoger la caja ({e}),Collect the cash ({e})
+Cómo va,How's it going
+Dejar el piso,Leave the flat
+Reparto hasta {a} al día. En el alijo hay {b}.,I move up to {a} a day. There's {b} in the stash.
+"Ayer moví {kg}. La calle está tranquila. El alquiler, el {d}.",Moved {kg} yesterday. The street's quiet. Rent's due {d}.
+"Ayer moví {kg}. La calle está caliente. El alquiler, el {d}.",Moved {kg} yesterday. The street's hot. Rent's due {d}.
+"Ayer moví {kg}. La calle está que arde: afloja o nos cae una. El alquiler, el {d}.",Moved {kg} yesterday. The street's on fire: ease off or we get raided. Rent's due {d}.
+Hoy no hay nada que recoger.,Nothing to collect today.
+"Aquí tienes: {e}, contados.","Here you go: {e}, counted."
+¿Dejas el piso franco? Lo que haya en el alijo y en la caja te lo llevas tú.,Leaving the safe house? You take whatever's in the stash and the cash box.
+"Tú sabrás. Si vuelves, aquí estoy.","Your call. If you come back, I'm here."
+"Eso va en efectivo, y no lo llevas.","That's cash only, and you don't have it."
+Hecho. {d},Done. {d}
+"Cajas de fruta vacías. Aquí se guarda el género, si alquilas el piso: habla con Gorka.",Empty fruit crates. The goods go here if you rent the flat: talk to Gorka.
+Al alijo · {a} de {b},To the stash · {a} of {b}
+El alijo está lleno.,The stash is full.
+¿Cuánto de {n} dejas?,How much {n} do you leave?
+el piso franco,the safe house
+SMS · GORKA,SMS · GORKA
+"Sin alquiler no hay piso. Lo del alijo cubre lo que debes. Si vuelves con dinero, hablamos.","No rent, no flat. The stash covers what you owe. Come back with money and we'll talk."
+Han entrado en el piso. Yo estaba fuera. Se han llevado {kg} y {e} de la caja. Habrá que aflojar.,They raided the flat. I was out. They took {kg} and {e} from the cash box. Time to ease off.
+hecha,done
+en obras,in progress
+" Antes, {o}."," First, {o}."
+{o} ya está como nueva.,{o} is good as new.
+Los de la obra acaban {o} el {d}.,The builders finish {o} on {d}.
+"Primero {o}. Sin eso, aquí no entra ni el camión.","First {o}. Without it, not even the lorry gets in."
+"{o}: {p} por transferencia, {d} días de obra. ¿Adelante?","{o}: {p} by transfer, {d} days of work. Go ahead?"
+Obra · {n},Works · {n}
+En la cuenta no llega. Los de la obra cobran por adelantado.,Your account won't cover it. Builders get paid up front.
+Mañana mismo empiezan con {o}. Acaban el {d}.,They start on {o} tomorrow. Done by {d}.
+Terminada {o}. {t},Finished: {o}. {t}
+Alquileres · muelle,Rents · dock
+KAIA · dispensario,KAIA · dispensary
+SMS · KAIA,SMS · KAIA
+Se acabó lo del dispensario: {e} en total.,The dispensary ran out: {e} in total.
+"Ya es otra película, sobrino: con la licencia, {n} te compra hasta {kg} al día, sin patrulleras y por el banco. Ven a verme.","Whole new ball game, kid: with the licence, {n} buys up to {kg} a day from you, no patrol boats and through the bank. Come see me."
+"Tu club, jefe. En el dispensario quedan {g} de {n}, a {p} € el gramo. Llevamos {e}.","Your club, boss. The dispensary has {g} of {n} left, at {p} € a gram. We've taken {e}."
+Bienvenido a KAIA. Aquí el dispensario lo llenas tú: déjame {g} g o más y los socios retiran {d} al día.,Welcome to KAIA. You stock the dispensary here: leave me {g} g or more and members take {d} a day.
+¿Qué lote?,Which batch?
+{n} a {p} € el gramo para los socios. ¿Cuánto dejas?,{n} at {p} € a gram for members. How much do you leave?
+"Al dispensario. Cada mañana, {g} para los socios.","Into the dispensary. Every morning, {g} for the members."
+"La licencia de cultivo y distribución: {p} por transferencia. Con ella, {n} te compra hasta {kg} al día, sin calor. ¿La sacas?","The growing and distribution licence: {p} by transfer. With it, {n} buys up to {kg} a day from you, no heat. Get it?"
+Licencia · cannabis,Licence · cannabis
+En la cuenta no llega. El ministerio no fía.,Your account won't cover it. The ministry gives no credit.
+Con papeles. Treinta años escondiéndonos y ahora te dan un sello. Maite se partiría de risa.,All legal. Thirty years hiding and now they give you a stamp. Maite would be in stitches.
+"Por hoy, {n} no quiere más. Mañana, otros {kg}.","{n} won't take more today. Tomorrow, another {kg}."
+"{n} compra de 100 g para arriba, en cogollo curado o sin curar.","{n} buys 100 g and up, buds cured or uncured."
+"{n} · hoy, hasta {kg}","{n} · today, up to {kg}"
+Venta · {n},Sale · {n}
+"{kg} de {l}, con factura: {e} a la cuenta.","{kg} of {l}, invoiced: {e} to your account."
+Descargar,Unload
+"Lo de la bodega, otra vez encima (lo que te quepa).","What's in the hold, back on you (whatever fits)."
+Dejarlo cargado,Leave it loaded
+Sacas {g} de la bodega.,You take {g} out of the hold.
+No te cabe todo: el resto se queda a bordo.,Not everything fits: the rest stays on board.
+"Lo dejas en la bodega: {kg} a bordo de {b}, listos para zarpar cuando vuelvas.","You leave it in the hold: {kg} on board {b}, ready to sail when you come back."

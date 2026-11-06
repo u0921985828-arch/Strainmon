@@ -1,0 +1,28 @@
+{
+  "grupo": "carpas-vista",
+  "celda": [
+    104,
+    136
+  ],
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 6.43,
+  "colores_finales": 15,
+  "fundidos": [
+    "carpa-g150-vista: #6a7480→#6c7482",
+    "carpa-g150-vista: #7e8694→#747c8c",
+    "carpa-g150-vista: #5a6070→#6c7482",
+    "carpa-m100-vista: #7e8694→#747c8c",
+    "carpa-m100-vista: #5a6070→#6a7480",
+    "carpa-m100-vista: #6c7482→#6a7480",
+    "carpa-p60-vista: #6a7480→#6c7482",
+    "carpa-p60-vista: #5a6070→#6c7482",
+    "carpa-p60-vista: #a0a0b0→#a2a9b6"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

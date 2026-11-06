@@ -1,0 +1,21 @@
+{
+  "grupo": "carpa-c-extras",
+  "celda": [
+    48,
+    48
+  ],
+  "tope_colores": 15,
+  "secuencias": 9,
+  "fotogramas": 12,
+  "semitransparentes": 0,
+  "en_paleta_antes": 17.9,
+  "distancia_media": 0,
+  "colores_finales": 12,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "extra-c-vent/unica": 0
+  },
+  "errores": [],
+  "avisos": []
+}

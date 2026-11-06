@@ -1,0 +1,26 @@
+{
+  "grupo": "begona",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 9,
+  "fotogramas": 28,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0.1,
+  "distancia_media": 25.56,
+  "colores_finales": 13,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "cotillear/south": 0,
+    "idle/south": 0,
+    "walk/east": 0,
+    "walk/north": 1,
+    "walk/south": 1
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #26262e≈#2a2a30"
+  ]
+}

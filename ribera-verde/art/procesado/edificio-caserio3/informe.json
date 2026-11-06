@@ -1,0 +1,21 @@
+{
+  "grupo": "edificio-caserio3",
+  "celda": [
+    96,
+    80
+  ],
+  "tope_colores": 15,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 21.2,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [
+    "base: #c8b070→#c89a5a"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

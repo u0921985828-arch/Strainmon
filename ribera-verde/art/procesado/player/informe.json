@@ -1,0 +1,53 @@
+{
+  "grupo": "player",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 35,
+  "fotogramas": 194,
+  "semitransparentes": 0,
+  "en_paleta_antes": 82.3,
+  "distancia_media": 3.29,
+  "colores_finales": 13,
+  "fundidos": [],
+  "huerfanos_quitados": 3,
+  "deriva_pies": {
+    "cosechar/east": 0,
+    "cosechar/north": 0,
+    "cosechar/south": 0,
+    "cosechar/west": 0,
+    "cruzar/north": 0,
+    "idle/east": 0,
+    "idle/north": 1,
+    "idle/south": 0,
+    "idle/west": 0,
+    "oler/south": 0,
+    "plantar/east": 0,
+    "plantar/north": 0,
+    "plantar/south": 1,
+    "plantar/west": 0,
+    "regar/east": 0,
+    "regar/north": 0,
+    "regar/south": 0,
+    "regar/west": 0,
+    "run/east": 0,
+    "run/north": 2,
+    "run/south": 0,
+    "run/west": 0,
+    "telefono/south": 0,
+    "vender/east": 0,
+    "vender/north": 0,
+    "vender/south": 0,
+    "vender/west": 0,
+    "walk/east": 0,
+    "walk/north": 0,
+    "walk/south": 0,
+    "walk/west": 0
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #26262e≈#2a2a30",
+    "vender/south: encuadrado con la caja de todos los fotogramas (el primero no basta)"
+  ]
+}

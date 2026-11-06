@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fase 6: el plugin LandracePlay (v2) y lo que necesita: el aviso de la cosecha (POST_NOTIFICATIONS solo se pide al activarlo en
+     OPCIONES) y Sentry sin arrancar solo (solo con el opt-in de INFORMES DE ERRORES). El APP_ID de Play Games lo pone el plugin de
+     exportación (export_plugin.gd) desde godot/datos/play_games.json. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <application>
+        <meta-data android:name="org.godotengine.plugin.v2.LandracePlay" android:value="com.landracehunters.play.LandracePlay" />
+        <meta-data android:name="io.sentry.auto-init" android:value="false" />
+        <receiver android:name="com.landracehunters.play.Aviso" android:exported="false" />
+    </application>
+</manifest>

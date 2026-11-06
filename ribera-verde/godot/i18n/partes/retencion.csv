@@ -1,0 +1,28 @@
+es,en
+MIENTRAS ESTABAS FUERA,WHILE YOU WERE AWAY
+Has estado fuera {h} h (cuenta como mucho {t} h).,You've been away {h} h (counts {t} h at most).
+Has estado fuera {m} min (cuenta como mucho {t} h).,You've been away {m} min (counts {t} h at most).
+Has estado fuera {h} h.,You've been away {h} h.
+Has estado fuera {m} min.,You've been away {m} min.
+"Tus plantas han seguido creciendo: {n} planta, como {h} h de juego.","Your plants kept growing: {n} plant, like {h} h of play."
+"Tus plantas han seguido creciendo: {n} plantas, como {h} h de juego.","Your plants kept growing: {n} plants, like {h} h of play."
+{n} está lista para cosechar.,{n} is ready to harvest.
+{n} están listas para cosechar.,{n} are ready to harvest.
+"El reloj del juego, la deuda y lo demás no han corrido.","The game clock, the debt and the rest haven't moved."
+Landrace Hunters,Landrace Hunters
+Tienes plantas listas para cosechar.,You have plants ready to harvest.
+<small>OBJETIVO DIARIO</small>{t} · +1 abono,<small>DAILY GOAL</small>{t} · +1 nutrient
+HECHO,DONE
+Cada objetivo hecho da un abono. Cambian cada día (la fecha del móvil).,Each goal done gives you a nutrient. They change every day (by the phone date).
+Volver,Back
+OBJETIVOS DIARIOS,DAILY GOALS
+"FIN DE LA DEMO
+Los capítulos {c} a 8 vienen con el juego completo: una compra única, sin anuncios ni pagos dentro. La partida te espera aquí.","END OF THE DEMO
+Chapters {c} to 8 come with the full game: a one-time purchase, no ads or in-app payments. Your save will be waiting here."
+Comprar el juego completo,Buy the full game
+Más tarde,Later
+Cuando quieras: START · JUEGO COMPLETO.,Whenever you like: START · FULL GAME.
+¡Gracias! Ya tienes el juego completo.,Thanks! You now have the full game.
+"La compra está pendiente. Cuando se confirme, sigue desde START · JUEGO COMPLETO.","The purchase is pending. Once confirmed, carry on from START · FULL GAME."
+Compra cancelada.,Purchase cancelled.
+No se ha podido hacer la compra. Inténtalo más tarde.,The purchase couldn't go through. Try again later.

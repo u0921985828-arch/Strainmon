@@ -1,0 +1,8 @@
+arranque (datos, atlas, fuentes, sonido y primer fotograma): 262 ms
+memoria estática tras arrancar: 96.9 MB
+town: 407 draw calls/fotograma · 1.00 redibujos/fotograma · proceso 48.72 ms · fotograma 35.37 ms
+town con el menú START: 446 draw calls/fotograma · 1.00 redibujos/fotograma · proceso 44.97 ms
+carpa g150 con 6 plantas: 78 draw calls/fotograma · 1.00 redibujos/fotograma · proceso 55.34 ms
+memoria estática tras cada vuelta por las escenas: 143.0, 143.2, 143.3, 143.4 MB (+0.2 % de la 1.ª a la 4.ª)
+escala a (1280.0, 720.0): 3.933 (fraccionaria)
+max_fps: 0

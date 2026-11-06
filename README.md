@@ -1,7 +1,7 @@
 # 🌱 Strainmon
 
-Un RPG de exploración y **genética vegetal** parodia de coleccionismo tipo Pokémon centrada en cepas landrace de cannabis y sus linajes, inspirado en los
-clásicos RPG de Game Boy Advance — pero **sin combates**. Aquí no capturas criaturas:
+Un RPG de exploración y **genética vegetal** parodia de coleccionismo clásico centrada en cepas landrace de cannabis y sus linajes, inspirado en los
+clásicos RPG de portátil de 16 bits — pero **sin combates**. Aquí no capturas criaturas:
 recorres biomas, descubres variedades vegetales salvajes, las recolectas con distintas
 herramientas, las almacenas en tu **banco genético** y las **cruzas** para crear fenotipos,
 colores y mutaciones que nadie había visto. Tu meta es reunir el mayor **catálogo genético

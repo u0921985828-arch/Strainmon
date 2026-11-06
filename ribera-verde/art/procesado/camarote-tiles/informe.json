@@ -1,0 +1,19 @@
+{
+  "grupo": "camarote-tiles",
+  "celda": [
+    16,
+    16
+  ],
+  "tope_colores": 32,
+  "secuencias": 5,
+  "fotogramas": 5,
+  "semitransparentes": 0,
+  "en_paleta_antes": 1.7,
+  "distancia_media": 0,
+  "colores_finales": 14,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

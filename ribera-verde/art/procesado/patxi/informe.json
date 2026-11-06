@@ -1,0 +1,24 @@
+{
+  "grupo": "patxi",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 7,
+  "fotogramas": 24,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 20.28,
+  "colores_finales": 14,
+  "fundidos": [],
+  "huerfanos_quitados": 1,
+  "deriva_pies": {
+    "idle/south": 0,
+    "palomas/north": 0,
+    "palomas/south": 1
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #26262e≈#2a2a30"
+  ]
+}

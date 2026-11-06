@@ -1,0 +1,22 @@
+{
+  "grupo": "edificio-casco",
+  "celda": [
+    64,
+    96
+  ],
+  "tope_colores": 15,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 10.6,
+  "distancia_media": 0,
+  "colores_finales": 15,
+  "fundidos": [
+    "base: #e0b040→#c89a52",
+    "base: #e04848→#d06a44"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

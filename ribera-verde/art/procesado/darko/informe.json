@@ -1,0 +1,24 @@
+{
+  "grupo": "darko",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 7,
+  "fotogramas": 28,
+  "semitransparentes": 0,
+  "en_paleta_antes": 0,
+  "distancia_media": 8.4,
+  "colores_finales": 12,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "idle/south": 0,
+    "vapear/north": 0,
+    "vapear/south": 0
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #26262e≈#2a2a30"
+  ]
+}

@@ -1,0 +1,142 @@
+{
+ "gs-regar": [
+  76,
+  49
+ ],
+ "acc-llave-0": [
+  73,
+  27
+ ],
+ "acc-llave-1": [
+  71,
+  28
+ ],
+ "acc-llave-v0": [
+  27,
+  73
+ ],
+ "acc-llave-v1": [
+  28,
+  71
+ ],
+ "acc-dedo": [
+  54,
+  59
+ ],
+ "gm-regar": [
+  52,
+  43
+ ],
+ "gm-spray": [
+  46,
+  53
+ ],
+ "gm-abono": [
+  46,
+  58
+ ],
+ "gm-tij-a": [
+  57,
+  61
+ ],
+ "gm-tij-c": [
+  57,
+  61
+ ],
+ "gm-semilla": [
+  52,
+  57
+ ],
+ "gm-vacia": [
+  48,
+  48
+ ],
+ "gm-porro": [
+  54,
+  47
+ ],
+ "gm-pipa": [
+  51,
+  50
+ ],
+ "gm-vapo": [
+  48,
+  59
+ ],
+ "gm-billete": [
+  60,
+  57
+ ],
+ "gm-bolsita": [
+  49,
+  49
+ ],
+ "gm-pincel": [
+  63,
+  50
+ ],
+ "gm-billete-i": [
+  60,
+  57
+ ],
+ "gm-bolsita-i": [
+  49,
+  49
+ ],
+ "gm-mech1-ab": [
+  46,
+  54
+ ],
+ "gm-mech0-ab": [
+  46,
+  54
+ ],
+ "acc-llave-portal-0": [
+  73,
+  27
+ ],
+ "acc-llave-portal-1": [
+  71,
+  28
+ ],
+ "acc-llave-local-0": [
+  73,
+  27
+ ],
+ "acc-llave-local-1": [
+  71,
+  28
+ ],
+ "acc-llave-club-0": [
+  73,
+  27
+ ],
+ "acc-llave-club-1": [
+  71,
+  28
+ ],
+ "acc-llave-franco-0": [
+  73,
+  27
+ ],
+ "acc-llave-franco-1": [
+  71,
+  28
+ ],
+ "acc-llave-nave-v0": [
+  27,
+  73
+ ],
+ "acc-llave-nave-v1": [
+  28,
+  71
+ ],
+ "acc-llave-setas-v0": [
+  27,
+  73
+ ],
+ "acc-llave-setas-v1": [
+  28,
+  71
+ ]
+}

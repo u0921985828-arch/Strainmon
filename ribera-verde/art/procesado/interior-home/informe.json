@@ -1,0 +1,20 @@
+{
+  "grupo": "interior-home",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 3,
+  "fotogramas": 3,
+  "semitransparentes": 0,
+  "en_paleta_antes": 74.6,
+  "distancia_media": 2.73,
+  "colores_finales": 6,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #ae9c78≈#ac9a76"
+  ]
+}

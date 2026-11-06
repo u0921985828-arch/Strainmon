@@ -1,0 +1,49 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__pixellab",
+      "mcp__pixellab-mcp"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "pixellab",
+    "pixellab-mcp"
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-start 2>/dev/null || python \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-start",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-precompact 2>/dev/null || python \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-precompact",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-prompt 2>/dev/null || python \"$CLAUDE_PROJECT_DIR/.claude/skills/modo-absoluto/scripts/ma.py\" hook-prompt",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

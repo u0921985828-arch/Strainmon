@@ -1,0 +1,20 @@
+{
+  "grupo": "vfx-golpe",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 1,
+  "fotogramas": 4,
+  "semitransparentes": 0,
+  "en_paleta_antes": 23.7,
+  "distancia_media": 24.58,
+  "colores_finales": 14,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "efecto/unica": 4
+  },
+  "errores": [],
+  "avisos": []
+}

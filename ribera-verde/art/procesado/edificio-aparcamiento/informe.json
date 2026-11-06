@@ -1,0 +1,19 @@
+{
+  "grupo": "edificio-aparcamiento",
+  "celda": [
+    48,
+    64
+  ],
+  "tope_colores": 16,
+  "secuencias": 1,
+  "fotogramas": 1,
+  "semitransparentes": 0,
+  "en_paleta_antes": 11,
+  "distancia_media": 0,
+  "colores_finales": 8,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

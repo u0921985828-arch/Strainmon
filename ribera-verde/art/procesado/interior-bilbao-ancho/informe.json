@@ -1,0 +1,19 @@
+{
+  "grupo": "interior-bilbao-ancho",
+  "celda": [
+    48,
+    48
+  ],
+  "tope_colores": 32,
+  "secuencias": 19,
+  "fotogramas": 19,
+  "semitransparentes": 0,
+  "en_paleta_antes": 19.7,
+  "distancia_media": 0,
+  "colores_finales": 19,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}

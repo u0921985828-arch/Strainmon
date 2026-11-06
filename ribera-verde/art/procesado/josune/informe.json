@@ -1,0 +1,26 @@
+{
+  "grupo": "josune",
+  "celda": [
+    32,
+    32
+  ],
+  "secuencias": 9,
+  "fotogramas": 32,
+  "semitransparentes": 0,
+  "en_paleta_antes": 10.3,
+  "distancia_media": 10.55,
+  "colores_finales": 14,
+  "fundidos": [],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {
+    "idle/east": 0,
+    "idle/north": 0,
+    "idle/south": 0,
+    "secar_vaso/south": 0,
+    "servir/south": 0
+  },
+  "errores": [],
+  "avisos": [
+    "colores de identidad casi iguales (pueden confundirse): #2a2a30≈#26262e"
+  ]
+}

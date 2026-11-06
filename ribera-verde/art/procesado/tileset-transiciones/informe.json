@@ -1,0 +1,27 @@
+{
+  "grupo": "tileset-transiciones",
+  "celda": [
+    16,
+    16
+  ],
+  "secuencias": 42,
+  "fotogramas": 42,
+  "semitransparentes": 0,
+  "en_paleta_antes": 85.9,
+  "distancia_media": 4.11,
+  "colores_finales": 15,
+  "fundidos": [
+    "agua-03: #684828→#483e36",
+    "agua-03: #535b6b→#483e36",
+    "agua-03: #6a3018→#4a3220",
+    "agua-03: #3474c4→#4a92e0",
+    "agua-09: #58d49c→#84cc6c",
+    "agua-09: #483e36→#3c3434",
+    "agua-11: #684828→#483e36",
+    "agua-11: #483e36→#4a3220"
+  ],
+  "huerfanos_quitados": 0,
+  "deriva_pies": {},
+  "errores": [],
+  "avisos": []
+}
