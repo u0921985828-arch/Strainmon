@@ -1209,6 +1209,29 @@ func _ol_setas(x: int, o) -> bool:
 				txt = K("Cajas de bandejas vacías de Txomin, apiladas.")
 			"cuboS":
 				txt = K("Un cubo y un cepillo. Lo que se echa a perder, fuera.")
+			"labFlujo", "labFlujo2":   # el bajo profesional: la campana, donde se cruzan micelios   # i18n-no
+				await cruzar_micelios()
+				return true
+			"labEstufa":   # i18n-no
+				txt = K("La estufa de incubación, a oscuras y templada: los panes de micelio prenden antes aquí que en la balda.")
+			"labMicro", "labMicro2":   # i18n-no
+				txt = K("El microscopio de Txomin, de segunda mano. Con él se mira si el micelio de un pan es el que debe ser o se ha colado otro.")
+			"labBalanza", "labBalanza2":   # i18n-no
+				txt = K("La balanza de precisión, en su cajón de cristal. Lo seco se pesa aquí antes de venderlo.")
+			"labPila":   # i18n-no
+				txt = K("El lavamanos de pedal, con jabón y papel. Aquí dentro se entra con las manos limpias.")
+			"labAutoclave":   # i18n-no
+				txt = K("La olla de presión grande, para que lo que entra en la campana no lleve nada de fuera.")
+			"labResiduos":   # i18n-no
+				txt = K("El contenedor de lo contaminado, con tapa y pedal. Lo que se echa a perder va aquí, no al cubo.")
+			"labTaburete":   # i18n-no
+				txt = K("Un taburete de laboratorio, de los que suben y bajan.")
+			"labNormas":   # i18n-no
+				txt = K("Una hoja plastificada con la letra de Txomin: manos limpias, el cristal bajado, lo contaminado al contenedor y cada pan con su fecha.")
+			"labExtintor":   # i18n-no
+				txt = K("El extintor, con la revisión al día.")
+			"labBotiquin":   # i18n-no
+				txt = K("El botiquín de la pared: tiritas, gasas y poco más.")
 	if txt == "":
 		return false
 	await say(txt)

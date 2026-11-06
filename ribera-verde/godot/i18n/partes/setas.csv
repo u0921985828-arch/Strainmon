@@ -228,3 +228,33 @@ B: cerrar.","Dried mushrooms: {g}{c} · microdoses: {m} · edibles: {k}.{s}
 B: close."
 "Secándose, {g}.","Drying, {g}."
 EL ARMARIO,THE CUPBOARD
+Tu cruce de {a} con {b}: {f} que rinde ×{g} y se paga ×{p}.,Your own cross of {a} with {b}: a {f} that yields ×{g} and sells for ×{p}.
+"La campana de flujo, limpia y con el cristal bajado. Sin panes de micelio no hay nada que cruzar.","The flow hood, clean and with the glass down. With no mycelium blocks there is nothing to cross."
+En la campana ya has sacado tus {n} cepas. De ahí no pasa: el cuaderno está lleno de tus propias líneas.,You have already got your {n} strains out of the hood. That is the limit: the notebook is full of your own lines.
+La campana de flujo: aquí sale lo que la mesa no junta. El primer pan.,The flow hood: what the bench won't join comes out here. The first block.
+Hace falta un pan de otra cepa para cruzarlo con el de {n}.,You need a block of another strain to cross with the {n} one.
+Cruzar {n} con…,Cross {n} with…
+{a} y {b} no se juntan ni en la campana: un {fa} y una {fb} se repelen. No gastas nada.,{a} and {b} won't join even in the hood: a {fa} and a {fb} repel each other. You spend nothing.
+"{a} con {b} está en el cuaderno: eso se junta en la mesa de trabajo, sin gastar la campana.","{a} with {b} is in the notebook: that one is joined at the work bench, without using the hood."
+"Cruzar {a} con {b} en la campana: gastas los dos panes y sale una cepa tuya, nueva.",Cross {a} with {b} in the hood: you spend both blocks and a new strain of your own comes out.
+"Pasas las dos cepas a un pan nuevo y, a los días, prende: {n} panes de {c}. {d}","You pass both strains onto a new block and, days later, it takes: {n} blocks of {c}. {d}"
+Vuelve a prender lo mismo: {n} panes de {c}.,The same one takes again: {n} blocks of {c}.
+Tuya: sale de cruzar {a} con {b} en la campana.,Yours: it comes from crossing {a} with {b} in the hood.
+"La estufa de incubación, a oscuras y templada: los panes de micelio prenden antes aquí que en la balda.","The incubator, dark and warm: mycelium blocks take faster in here than on the shelf."
+"El microscopio de Txomin, de segunda mano. Con él se mira si el micelio de un pan es el que debe ser o se ha colado otro.",Txomin's second-hand microscope. With it you check whether a block's mycelium is the right one or something else got in.
+"La balanza de precisión, en su cajón de cristal. Lo seco se pesa aquí antes de venderlo.","The precision scales, in their glass case. Dried goods are weighed here before being sold."
+"El lavamanos de pedal, con jabón y papel. Aquí dentro se entra con las manos limpias.","The foot-pedal sink, with soap and paper. In here you come in with clean hands."
+"La olla de presión grande, para que lo que entra en la campana no lleve nada de fuera.","The big pressure cooker, so that what goes into the hood carries nothing from outside."
+"El contenedor de lo contaminado, con tapa y pedal. Lo que se echa a perder va aquí, no al cubo.","The bin for contaminated stuff, with a lid and a pedal. Anything spoiled goes here, not in the bucket."
+"Un taburete de laboratorio, de los que suben y bajan.","A lab stool, one of the kind that goes up and down."
+"Una hoja plastificada con la letra de Txomin: manos limpias, el cristal bajado, lo contaminado al contenedor y cada pan con su fecha.","A laminated sheet in Txomin's handwriting: clean hands, glass down, contaminated stuff in the bin and every block dated."
+"El extintor, con la revisión al día.","The fire extinguisher, with its inspection up to date."
+"El botiquín de la pared: tiritas, gasas y poco más.","The first-aid box on the wall: plasters, gauze and little else."
+Berri,Berri
+Bikoitz,Bikoitz
+Hirukoitz,Hirukoitz
+Laukoitz,Laukoitz
+Bostkoitz,Bostkoitz
+Seikoitz,Seikoitz
+Zazpikoitz,Zazpikoitz
+Zortzikoitz,Zortzikoitz

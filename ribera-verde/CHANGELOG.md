@@ -2,6 +2,24 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### El bajo de Txomin, profesional y el doble de grande (0.85, lo pidió el usuario: «el lugar donde está, en el sótano, las setas, en el sótano de la casa, debería de ser el mismo mapa o algo más grande, el doble de grande molaría, y mejor organizado todo, que sea el bajo de Txomin, donde ahí pues sea más profesional el cultivo de setas, que también se pueda cruzar micelios para crear nuevas variedades de setas»)
+
+- **El mapa**, de 18 × 7 a **22 × 12** (126 → 264 casillas, más del doble), organizado en dos bandas separadas por un
+  tabique con su hueco de paso (`tools/bajo_pro.py` → `MAPS["setas-g"]`): arriba, el obrador (armario de almacén,
+  malla de secado, deshidratador y mesa de trabajo) y, con su suelo técnico, el laboratorio de Txomin (lavamanos
+  de pedal, autoclave, estufa de incubación, campana de flujo, microscopio, balanza, contenedor de lo
+  contaminado, extintor y botiquín, con el arte que ya tenía el banco de la tía); abajo, la nave de cultivo con
+  **catorce estanterías de rejilla (28 bandejas**, antes 18), el pulverizador y la mesa de Ekaitz.
+- La planta pasa a `MAPS["setas"]` de una vez, con el alto y las salidas, y la puerta del callejón se apunta a la
+  fila de delante de la suya (`setas_grande` en `src/mundo.gd`, al entrar a cualquier mapa). Sin `Datos.CAL`, el
+  bajo de antes.
+- **Cruzar micelios en la campana** (`CEPAS.cruce`, `cruzar_micelios` en `src/setas.gd`): lo que la mesa no junta
+  porque no está en el cuaderno, aquí sí, y lo que sale es una **cepa tuya**, con nombre propio en euskera, su
+  forma, su color y sus números heredados de las dos (`S.setas.mis`, hasta 8 por partida; lo del cuaderno se
+  sigue juntando en la mesa y lo que se repele, tampoco aquí). Las cepas propias entran en el cuaderno con las
+  demás (`cepa_v`, `cepa_hay`, `cepas_ks`). Nada de método ni de dosis.
+- Prueba: `tests/bajo_pro.gd` (24), y `tests/sotano.gd` al día.
+
 ### El sótano, una habitación para cada cosa (lo dijo el usuario: «usamos el mismo mapa, o sea, la misma habitación para poner tanto unos como otros… te dije que copiaras la sala, pero que una fuese una cosa y la otra fuese otra. Lo lógico y normal»)
 
 - El mapa `sotano` servía a la vez para dos cosas: el cultivo de setas (la obra de `SOTANO`, fuera de Play) y

@@ -1114,17 +1114,33 @@ var _setas0 = null
 
 var _setas_g := false
 
+# el bajo grande, que es otro mapa (el doble y por zonas: tools/bajo_pro.py): su planta pasa a «setas» de una vez, con el alto y las
+# salidas, y la puerta del callejón se apunta a la fila de delante de la suya. Se llama al entrar a cualquier mapa, para que la puerta
+# ya esté bien la primera vez que se usa.
+func setas_grande() -> void:
+	if not Datos.CAL or _setas_g or not MAPS.has("setas-g") or not MAPS.has("setas"):
+		return
+	_setas_g = true
+	var m: Dictionary = MAPS["setas"]
+	var G: Dictionary = MAPS["setas-g"]
+	m.w = int(G.w)
+	m.h = int(G.h)
+	m.g = G.g.duplicate(true)
+	m.o = G.o.duplicate(true)
+	m.exits = G.exits.duplicate(true)
+	_setas0 = null
+	var pc = MAPS["callejon"].doors.get("19,7") if MAPS.has("callejon") else null
+	if pc != null and String(pc.get("to", "")) == "setas" and D.CEPAS.get("cruce") is Dictionary:
+		var e: Array = D.CEPAS.cruce.get("entra", [])
+		if e.size() == 2:
+			pc.x = int(e[0])
+			pc.y = int(e[1])
+
 func montar_setas() -> void:
 	var m = MAPS.get("setas")
 	if m == null:
 		return
-	if Datos.CAL and not _setas_g and MAPS.has("setas-g"):   # 1.51 (lo pidió el usuario: «que sea más grande y que se cultive como la nave»)
-		_setas_g = true
-		var G: Dictionary = MAPS["setas-g"]
-		m.w = int(G.w)
-		m.g = G.g.duplicate(true)
-		m.o = G.o.duplicate(true)
-		_setas0 = null
+	setas_grande()
 	if _setas0 == null:
 		_setas0 = m.o.duplicate(true)
 	for y in int(m.h):
@@ -2297,6 +2313,7 @@ static func _pisa(a: Image, pa: Vector2i, b: Image, pb: Vector2i) -> bool:
 
 func enter_map(name_: String, x: int, y: int, dir = null) -> void:
 	SENT = null   # 1.49: al cambiar de sitio, de pie
+	setas_grande()   # el bajo grande, antes de nada: la puerta del callejón lleva a su fila
 	S.map = name_
 	mapas_bilbao(name_)
 	montar_huerta(name_)   # con CAL, la huerta de la tía (campo.gd): la cancilla del pueblo y su mapa

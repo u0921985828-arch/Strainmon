@@ -2012,7 +2012,7 @@ func es_sot() -> bool:
 	return S.map == "sotano" or _SOT
 
 func nom_cepa(k: String) -> String:
-	return D.CEPAS.v[k].n
+	return cepa_v(k).n
 
 # ---------- la caja fuerte y la nevera por dentro (1.36, 11m-almacen) ----------
 # Al abrirlas se ven por dentro (pinta.gd, _encima): en la caja, los fajos y los tarros de cogollos según lo lleno que está (por
@@ -2230,6 +2230,18 @@ func bajo_menu(T: String) -> void:   # → setas.gd
 
 func balda_i(x: int) -> int:   # → setas.gd
 	return 0
+
+func cruzar_micelios() -> void:   # → setas.gd
+	pass
+
+func cepa_v(_k: String) -> Dictionary:   # → setas.gd
+	return {}
+
+func cepa_hay(_k: String) -> bool:   # → setas.gd
+	return false
+
+func cepas_ks() -> Array:   # → setas.gd
+	return []
 
 func bandejas_listas() -> Array:   # → eventos.gd
 	return []

@@ -206,12 +206,12 @@ func _corre() -> void:
 	QUIERO = ["El bajo", "Alquilarlo"]
 	chk(corre(func(): await J.talk_txomin()) and S.get("setas") is Dictionary, "alquilar el bajo")
 	entra("setas", 5, 4)
-	chk(int(J.MAPS.setas.w) == 18 and J.n_baldas() == 9 and J.max_bandejas() == 18, "el bajo, más grande: %d × %d, %d baldas" % [J.MAPS.setas.w, J.MAPS.setas.h, J.n_baldas()])
-	chk(J.balda_i(2) == 2 and J.balda_i(11) == 3 and J.balda_i(16) == 8, "las estanterías, en orden")
-	chk(J.MAPS.setas.o[2][3] == "armS" and J.MAPS.setas.o[5][7] == "mesaS", "el armario y la mesa, donde estaban")
+	chk(int(J.MAPS.setas.w) == 22 and int(J.MAPS.setas.h) == 12 and J.n_baldas() == 14 and J.max_bandejas() == 28, "el bajo, más grande: %d × %d, %d baldas" % [J.MAPS.setas.w, J.MAPS.setas.h, J.n_baldas()])
+	chk(J.balda_i(2) == 2 and J.balda_i(8) == 8 and J.balda_i(16) == 13, "las estanterías, en orden")
+	chk(J.MAPS.setas.o[2][0] == "armS" and J.MAPS.setas.o[2][5] == "mesaS", "el armario y la mesa, donde están")
 	var V := {"i": 4}
 	chk(J.mueve_bajo(V, "right") and V.i == 6, "a la segunda estantería de la derecha: %s" % V)
-	var mx := {"i": 16}
+	var mx := {"i": 26}
 	chk(J.mueve_bajo(mx, "right") == false, "la última no sigue")
 	var rr: Array = J.rects_bajo({"i": 12})
 	chk(rr.filter(func(r): return r is Array and r.size() == 5 and r[4] == "#f8d040" and r[2] == 4).size() == 1, "la página que se ve, marcada")

@@ -48,7 +48,7 @@ func fase_seta(b: Dictionary) -> String:
 # se repelen (CEPAS.veta). Nada de método ni de dosis.
 func cepa_de(b) -> String:
 	var v = b.get("v") if b is Dictionary else null
-	return str(v) if v != null and D.CEPAS.v.has(str(v)) else "txuria"
+	return str(v) if v != null and cepa_hay(str(v)) else "txuria"
 
 func receta_cepa(a: String, b: String) -> String:
 	for r in D.CEPAS.r:
@@ -57,12 +57,29 @@ func receta_cepa(a: String, b: String) -> String:
 	return ""
 
 func veta_cepa(a: String, b: String) -> bool:
-	var fa: String = D.CEPAS.v[a].f
-	var fb: String = D.CEPAS.v[b].f
+	var fa: String = cepa_v(a).f
+	var fb: String = cepa_v(b).f
 	for v in D.CEPAS.veta:
 		if (v[0] == fa and v[1] == fb) or (v[0] == fb and v[1] == fa):
 			return true
 	return false
+
+# las cepas que hay: las del cuaderno (CEPAS.v) y las tuyas, las que han salido de cruzar micelios en la campana (S.setas.mis)
+func mis_cepas() -> Dictionary:
+	var L = SL()
+	return L.mis if L is Dictionary and L.get("mis") is Dictionary else {}
+
+func cepas_ks() -> Array:
+	return D.CEPAS.v.keys() + mis_cepas().keys()
+
+func cepa_hay(k: String) -> bool:
+	return D.CEPAS.v.has(k) or mis_cepas().has(k)
+
+func cepa_v(k: String) -> Dictionary:
+	if D.CEPAS.v.has(k):
+		return D.CEPAS.v[k]
+	var M := mis_cepas()
+	return M[k] if M.has(k) else D.CEPAS.v.txuria
 
 func gv_setas(L: Dictionary) -> Dictionary:
 	var gv: Dictionary = L.get("gv", {}).duplicate() if L.get("gv") is Dictionary else {}
@@ -109,8 +126,8 @@ func panes_txomin(T: String) -> void:
 	while true:
 		var ks := []
 		var ops := []
-		for k in D.CEPAS.v:
-			var c: Dictionary = D.CEPAS.v[k]
+		for k in cepas_ks():
+			var c: Dictionary = cepa_v(k)
 			if c.has("pan"):
 				ks.append(k)
 				ops.append("%s · %s (%s)" % [c.n, I18n.v(D.CEPAS.fam[c.f]), Datos.eur(c.pan)])
@@ -119,7 +136,7 @@ func panes_txomin(T: String) -> void:
 		if oi < 0 or oi >= ks.size():
 			return
 		var k: String = ks[oi]
-		var pz: int = int(D.CEPAS.v[k].pan)
+		var pz: int = int(cepa_v(k).pan)
 		if S.money < pz:
 			sfx("bad")
 			await say(I18n.T("Sin {e} no hay pan.", {"e": Datos.eur(pz)}), T)
@@ -130,13 +147,13 @@ func panes_txomin(T: String) -> void:
 		L.panes[k] = int(L.panes.get(k, 0)) + 1
 		descubre_cepa(L, k)
 		sfx("coin")
-		await say(I18n.T("Un pan de {n}: {d}", {"n": nom_cepa(k), "d": D.CEPAS.v[k].d}), T)
+		await say(I18n.T("Un pan de {n}: {d}", {"n": nom_cepa(k), "d": cepa_v(k).d}), T)
 
 # los panes que tienes, para elegir uno (sin el excluido): [[k, "Nombre (n)"]]
 func mis_panes(L: Dictionary, sin := "") -> Array:
 	var o := []
 	var P: Dictionary = L.get("panes", {}) if L.get("panes") is Dictionary else {}
-	for k in D.CEPAS.v:
+	for k in cepas_ks():
 		if int(P.get(k, 0)) > 0 and k != sin:
 			o.append([k, "%s (%d)" % [nom_cepa(k), int(P[k])]])
 	return o
@@ -162,7 +179,7 @@ func juntar_micelios() -> void:
 	var b: String = B[ob][0]
 	if veta_cepa(a, b):
 		sfx("bad")
-		await say(T("{a} y {b} no se juntan: un {fa} y una {fb} se repelen, las hifas no se tocan. No gastas nada.", {"a": nom_cepa(a), "b": nom_cepa(b), "fa": D.CEPAS.fam[D.CEPAS.v[a].f], "fb": D.CEPAS.fam[D.CEPAS.v[b].f]}))
+		await say(T("{a} y {b} no se juntan: un {fa} y una {fb} se repelen, las hifas no se tocan. No gastas nada.", {"a": nom_cepa(a), "b": nom_cepa(b), "fa": D.CEPAS.fam[cepa_v(a).f], "fb": D.CEPAS.fam[cepa_v(b).f]}))
 		return
 	var r: String = receta_cepa(a, b)
 	if r == "":
@@ -177,16 +194,99 @@ func juntar_micelios() -> void:
 	advance_time(int(D.CEPAS.min))
 	update_hud()
 	sfx("get")
-	await say(T("Juntas los dos micelios en un pan nuevo y, al rato, prende: {n} panes de {c}. ¡Nueva en tu cuaderno! {d}", {"n": int(D.CEPAS.sale), "c": nom_cepa(r), "d": D.CEPAS.v[r].d}) if nueva else T("Juntas los dos micelios en un pan nuevo y, al rato, prende: {n} panes de {c}.", {"n": int(D.CEPAS.sale), "c": nom_cepa(r)}))
+	await say(T("Juntas los dos micelios en un pan nuevo y, al rato, prende: {n} panes de {c}. ¡Nueva en tu cuaderno! {d}", {"n": int(D.CEPAS.sale), "c": nom_cepa(r), "d": cepa_v(r).d}) if nueva else T("Juntas los dos micelios en un pan nuevo y, al rato, prende: {n} panes de {c}.", {"n": int(D.CEPAS.sale), "c": nom_cepa(r)}))
+
+# cruzar micelios en la campana del bajo (lo pidió el usuario: «que también se pueda cruzar micelios para crear nuevas variedades de
+# setas»; CEPAS.cruce): lo que la mesa no junta porque no está en el cuaderno, aquí sí, y lo que sale es una cepa tuya, con su nombre
+# y sus números heredados de las dos (S.setas.mis). Lo del cuaderno se sigue haciendo en la mesa. Nada de método ni de dosis.
+func cepa_id(a: String, b: String) -> String:
+	var ks := [a, b]
+	ks.sort()
+	return "c" + Datos.b36(Datos.hash_str("cepa|%s|%s" % [ks[0], ks[1]]))
+
+func cepa_cruce(L: Dictionary, a: String, b: String) -> String:
+	var E: Dictionary = D.CEPAS.cruce
+	var id := cepa_id(a, b)
+	if not (L.get("mis") is Dictionary):
+		L.mis = {}
+	if L.mis.has(id):
+		return id
+	var A := cepa_v(a)
+	var B := cepa_v(b)
+	var R := Datos.rng_seed(Datos.hash_str(id))
+	var n: int = L.mis.size() + 1
+	var madre := A if float(A.p) >= float(B.p) else B
+	var C := {"f": String(A.f if R.sig() < 0.5 else B.f), "gen": int(E.gen), "pa": [a, b]}
+	C.n = nombre_cepa(String(madre.n), n)
+	C.g = Datos.jsround(((float(A.g) + float(B.g)) / 2.0 + R.sig() * 0.2 - 0.1) * 100) / 100.0
+	C.p = Datos.jsround(((float(A.p) + float(B.p)) / 2.0 + R.sig() * 0.3 - 0.1) * 100) / 100.0
+	var cs := []
+	for i in 3:
+		cs.append(Datos.mix(String(A.c[i]), String(B.c[i]), 0.5))
+	C.c = cs
+	C.pie = String(madre.pie)
+	C.d = I18n.T("Tu cruce de {a} con {b}: {f} que rinde ×{g} y se paga ×{p}.", {"a": String(A.n), "b": String(B.n), "f": I18n.v(D.CEPAS.fam[C.f]), "g": str(C.g), "p": str(C.p)})
+	L.mis[id] = C
+	return id
+
+func nombre_cepa(base: String, n: int) -> String:
+	var suf: Array = D.CEPAS.cruce.suf
+	var sf := " " + String(suf[(n - 1) % suf.size()])
+	var nm := base
+	while nm.length() + sf.length() > 20 and nm.length() > 3:
+		nm = nm.substr(0, nm.length() - 1).strip_edges()
+	return nm + sf
+
+func cruzar_micelios() -> void:
+	var L: Dictionary = SL()
+	var E: Dictionary = D.CEPAS.cruce
+	var A := mis_panes(L)
+	if A.is_empty():
+		await say(K("La campana de flujo, limpia y con el cristal bajado. Sin panes de micelio no hay nada que cruzar."))
+		return
+	if mis_cepas().size() >= int(E.max):
+		await say(T("En la campana ya has sacado tus {n} cepas. De ahí no pasa: el cuaderno está lleno de tus propias líneas.", {"n": int(E.max)}))
+		return
+	var oa: int = await ask(K("La campana de flujo: aquí sale lo que la mesa no junta. El primer pan."), A.map(func(x): return x[1]) + [K("Nada")])
+	if oa < 0 or oa >= A.size():
+		return
+	var a: String = A[oa][0]
+	var B := mis_panes(L, a)
+	if B.is_empty():
+		await say(T("Hace falta un pan de otra cepa para cruzarlo con el de {n}.", {"n": nom_cepa(a)}))
+		return
+	var ob: int = await ask(T("Cruzar {n} con…", {"n": nom_cepa(a)}), B.map(func(x): return x[1]) + [K("Nada")])
+	if ob < 0 or ob >= B.size():
+		return
+	var b: String = B[ob][0]
+	if veta_cepa(a, b):
+		sfx("bad")
+		await say(T("{a} y {b} no se juntan ni en la campana: un {fa} y una {fb} se repelen. No gastas nada.", {"a": nom_cepa(a), "b": nom_cepa(b), "fa": D.CEPAS.fam[cepa_v(a).f], "fb": D.CEPAS.fam[cepa_v(b).f]}))
+		return
+	if receta_cepa(a, b) != "":
+		await say(T("{a} con {b} está en el cuaderno: eso se junta en la mesa de trabajo, sin gastar la campana.", {"a": nom_cepa(a), "b": nom_cepa(b)}))
+		return
+	if await ask(T("Cruzar {a} con {b} en la campana: gastas los dos panes y sale una cepa tuya, nueva.", {"a": nom_cepa(a), "b": nom_cepa(b)}), [K("Cruzar"), K("Nada")]) != 0:
+		return
+	L.panes[a] = int(L.panes[a]) - 1
+	L.panes[b] = int(L.panes[b]) - 1
+	var r := cepa_cruce(L, a, b)
+	var nueva: bool = not cepa_ya(L, r)
+	L.panes[r] = int(L.panes.get(r, 0)) + int(E.sale)
+	descubre_cepa(L, r)
+	advance_time(int(E.min))
+	update_hud()
+	sfx("get")
+	await say(T("Pasas las dos cepas a un pan nuevo y, a los días, prende: {n} panes de {c}. {d}", {"n": int(E.sale), "c": nom_cepa(r), "d": cepa_v(r).d}) if nueva else T("Vuelve a prender lo mismo: {n} panes de {c}.", {"n": int(E.sale), "c": nom_cepa(r)}))
 
 # el cuaderno de las cepas: cada una con su forma, de dónde sale y si ya la tienes; y lo que no se junta
 func cuaderno_setas() -> void:
 	var L: Dictionary = S.setas
-	var ks: Array = D.CEPAS.v.keys()
+	var ks: Array = cepas_ks()
 	while true:
 		var ops := []
 		for k in ks:
-			ops.append("%s%s · %s" % ["✓ " if cepa_ya(L, k) else "", nom_cepa(k), I18n.v(D.CEPAS.fam[D.CEPAS.v[k].f])])
+			ops.append("%s%s · %s" % ["✓ " if cepa_ya(L, k) else "", nom_cepa(k), I18n.v(D.CEPAS.fam[cepa_v(k).f])])
 		ops.append(K("Lo que no se junta"))
 		ops.append(K("Nada"))
 		var n_ya: int = ks.filter(func(k): return cepa_ya(L, k)).size()
@@ -200,8 +300,10 @@ func cuaderno_setas() -> void:
 			await say(T("No se juntan: {t}; se repelen. Y lo que no está en el cuaderno no prende.", {"t": (" " + T("ni") + " ").join(PackedStringArray(t))}))
 			continue
 		var k: String = ks[oi]
-		var c: Dictionary = D.CEPAS.v[k]
+		var c: Dictionary = cepa_v(k)
 		var de := T("La vende Txomin ({e} el pan).", {"e": Datos.eur(c.pan)}) if c.has("pan") else ""
+		if c.get("pa") is Array and c.pa.size() == 2:   # una cepa tuya, de la campana
+			de = T("Tuya: sale de cruzar {a} con {b} en la campana.", {"a": nom_cepa(String(c.pa[0])), "b": nom_cepa(String(c.pa[1]))})
 		for r in D.CEPAS.r:
 			if r[2] == k:
 				de = T("Sale de juntar {a} con {b}.", {"a": nom_cepa(r[0]), "b": nom_cepa(r[1])})
@@ -267,7 +369,7 @@ func ayudante_setas(L: Dictionary) -> void:
 		if b.get("mala"):
 			continue   # las malas las deja: las tiras tú
 		if fase_seta(b) == "lista":
-			var x: int = roundi(ri(int(Z.g[0]), int(Z.g[1])) * float(D.CEPAS.v[cepa_de(b)].g))
+			var x: int = roundi(ri(int(Z.g[0]), int(Z.g[1])) * float(cepa_v(cepa_de(b)).g))
 			L.fr = L.get("fr", []) + [{"g": x, "d": S.day, "v": cepa_de(b)}]
 			g += x
 		else:
@@ -456,7 +558,7 @@ func bajo_menu(T: String) -> void:
 				else:
 					var x: int = ri(int(Z.g[0]), int(Z.g[1]))
 					if Datos.CAL:
-						x = roundi(x * float(D.CEPAS.v[cepa_de(b)].g))
+						x = roundi(x * float(cepa_v(cepa_de(b)).g))
 						pv[cepa_de(b)] = int(pv.get(cepa_de(b), 0)) + x
 					g += x
 			L.bandejas = quedan
@@ -509,7 +611,7 @@ func bajo_menu(T: String) -> void:
 				var gv := gv_setas(L)
 				var ev := 0.0
 				for k in gv:
-					ev += float(gv[k]) * float(Z.precio) * float(D.CEPAS.v[k].p if D.CEPAS.v.has(k) else 1)
+					ev += float(gv[k]) * float(Z.precio) * float(cepa_v(k).p if cepa_hay(k) else 1)
 				e = roundi(ev * g / maxf(float(L.g), 0.001))
 			L.g -= g
 			if Datos.CAL:
@@ -1737,7 +1839,7 @@ func _bandeja_seta(o: Array, b, x: int, y: int, u: int, sid: int) -> void:
 		var fr: float = 1.0 if f == "lista" else clampf((t - Z.colon) / Z.fruto, 0, 1) if f == "fructificando" else -1.0
 		if fr >= 0:
 			# Cada cepa con su forma y sus colores (CEPAS.v): cúpula (la de siempre), campana, plato o racimo
-			var cp: Dictionary = D.CEPAS.v[cepa_de(b)] if Datos.CAL else D.CEPAS.v.txuria
+			var cp: Dictionary = cepa_v(cepa_de(b)) if Datos.CAL else cepa_v("txuria")
 			var C0: String = cp.c[0]
 			var C1: String = cp.c[1]
 			var C2: String = cp.c[2]
