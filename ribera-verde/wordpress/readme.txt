@@ -1,11 +1,11 @@
 === Landrace Hunters ===
-Version: 1.7.7
+Version: 1.7.8
 Autor: WOLFCADE
 
 Juego «Landrace Hunters» (Godot 4.3, exportación web sin hilos) servido desde el plugin.
 
-Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.7.6.zip → Activar.
-Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.7.6-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
+Instalar: Plugins → Añadir nuevo → Subir plugin → landrace-hunters-1.7.8.zip → Activar.
+Si el servidor no deja subir 30 MB («413 Request Entity Too Large»): sube landrace-hunters-1.7.8-ligero.zip (menos de 1 MB), actívalo y pulsa «Descargar el juego» en el aviso o en Ajustes → Landrace Hunters; el servidor lo baja él solo.
 Jugar: /landrace-hunters/ (cambiable en Ajustes → Landrace Hunters).
 Incrustar: [landrace_hunters alto="80vh"].
 
@@ -19,6 +19,8 @@ El plugin deja en game/ la copia comprimida del motor (index.wasm.gz e index.js.
 (o «gzip_static on;» en el bloque del servidor). Sin eso el juego funciona igual, solo se baja más grande.
 
 Cambios
+1.7.8 — Landrace Hunters 0.85.0: el bajo de Txomin, al doble de grande y mejor repartido. El local pasa de 18 × 7 a 22 × 12 casillas, con un tabique y su hueco de paso: arriba el obrador (armario, malla de secado, deshidratador y mesa de trabajo) y el laboratorio de Txomin, con su suelo técnico, lavamanos, autoclave, estufa de incubación, campana de flujo, microscopio, balanza, contenedor, extintor y botiquín; abajo la nave de cultivo, con catorce estanterías (veintiocho bandejas), el pulverizador y la mesa de Ekaitz. En la campana se juntan dos micelios que no estén en el cuaderno y sale una cepa tuya, con nombre propio, forma, color y rendimiento heredados de las dos (hasta ocho). Y el sótano del piso deja de valer para dos cosas a la vez: o es el cultivo de setas, o es el trastero de la sala fría, cada uno con su atrezo.
+1.7.7 — Landrace Hunters 0.84.0: el catálogo de variedades al día (ciento dieciséis, todas reales y con su linaje publicado) y los textos en inglés repasados.
 1.7.6 — La primera carga, la mitad: el motor del juego (index.wasm, 36,7 MB) se guarda también comprimido en el servidor (9,3 MB) y se sirve así al navegador, y el juego ya no se descarga dos veces la primera vez (el trabajador que lo guarda en el aparato se queda con la misma descarga con la que arranca el juego, en vez de pedirlo todo otra vez). De 119,7 MB a 32,3 la primera visita; la segunda, cero: todo sale de lo guardado.
 1.7.5 — Instalación a medias, avisada: si una pieza del juego llega cortada (una subida por FTP que se corta, una descarga a medias), el plugin lo dice en Ajustes → Landrace Hunters con el tamaño que tiene y el que debe tener, y la dirección del juego responde con el mismo aviso en vez de dejar la pantalla en negro con «Failed loading file 'index.pck'»; y el juego guardado en el navegador no se queda con la pieza mala: solo guarda lo que llega entero, y mientras no esté entero no borra la copia buena de antes.
 1.7.4 — Landrace Hunters 0.79.0: el juego pinta la calle más rápido (el pueblo, de 24 a 41 fotogramas por segundo en un ordenador sin tarjeta gráfica; el piso, 52), con el suelo y los objetos de cada mapa guardados en su textura y las cachés del arte por generaciones, y los dibujos del juego recomprimidos sin perder un píxel (2,5 MB menos de descarga).

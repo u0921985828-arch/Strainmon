@@ -1,5 +1,12 @@
 # Cambios
 
+## WordPress 1.7.8
+
+- Plugin `landrace-hunters` 1.7.8 con el juego de la 0.85.0 (el bajo de Txomin, profesional y el doble de grande,
+  con el cruce de micelios en la campana, y el sótano del piso con una sala para cada cosa).
+- `descargas/landrace-hunters-1.7.8.zip` y `-ligero.zip` (`node tools/wordpress.js`), con la entrada de cambios
+  del readme escrita para quien instala el plugin.
+
 ## 1.58 · Google Play (en curso, por fases del plan)
 
 ### El bajo de Txomin, profesional y el doble de grande (0.85, lo pidió el usuario: «el lugar donde está, en el sótano, las setas, en el sótano de la casa, debería de ser el mismo mapa o algo más grande, el doble de grande molaría, y mejor organizado todo, que sea el bajo de Txomin, donde ahí pues sea más profesional el cultivo de setas, que también se pueda cruzar micelios para crear nuevas variedades de setas»)
