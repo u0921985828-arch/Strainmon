@@ -49,7 +49,7 @@ static func pon(J) -> void:
 		S.catas = {}
 	if not (S.get("iv") is Dictionary):
 		S.iv = {}
-	for sid in D.STRAINS:                  # las 104: las 87 de D.DEX y las 17 de D.AUTO.dex
+	for sid in D.STRAINS:                  # todas: las de D.DEX y las de D.AUTO.dex
 		S.disc[sid] = true
 		S.seeds[sid] = maxi(int(S.seeds.get(sid, 0)), 50)
 		S.cult[sid] = hoy                  # cosechada: completa las 10 FAMILIAS y sus bonos
