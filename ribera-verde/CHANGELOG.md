@@ -2,6 +2,24 @@
 
 ## 1.58 · Google Play (en curso, por fases del plan)
 
+### Genéticas actuales: 130 variedades (lo pidió el usuario: «me refería a genéticas más actuales»)
+
+- **Quince variedades modernas más** (`tools/catalogo3.py`, al final de `STRAINS`), en cadena para que cada una
+  salga de padres que ya están en el juego: OG Kush, GSC, Granddaddy Purple, Cherry Pie, Wedding Cake, Sunset
+  Sherbet, Gelato, Do-Si-Dos, Original Glue, Lemon Tree, Purple Punch y Forbidden Fruit, y las autoflorecientes
+  GSC Auto, Gelato Auto y Wedding Cake Auto.
+- **Marcas y alusiones.** El nombre de una variedad no es obra con derechos de autor, pero sí puede ser marca
+  registrada: fuera las que están o estuvieron en litigio de marca (de ahí «GSC» y «Original Glue», como en la
+  industria) y fuera cualquier nombre que aluda a una franquicia o a una persona. Sin criadores ni bancos, como
+  siempre, y «≈» donde el linaje publicado no está claro (OG Kush, Granddaddy Purple, Sunset Sherbet, Do-Si-Dos,
+  Original Glue, Purple Punch).
+- **Familia nueva en el RECETARIO y en la CannaDex**: «Las de ahora» (`FAMILIAS.modernas`), con las doce de
+  fotoperiodo; las tres autos, a la familia de las autoflorecientes.
+- **Los números siguen saliendo de los padres**, con la misma regla que la tanda anterior, y las recetas se
+  comprueban contra las que ya había para que ninguna choque.
+- **Contadores**: 130 variedades, 105 sin contar las autoflorecientes y 25 autoflorecientes.
+- Textos nuevos traducidos (`godot/i18n/partes/catalogo3.csv`, 46 filas).
+
 ### Más descendencias en el catálogo: 115 variedades (lo pidió el usuario: «Ampliarlo»)
 
 - **Once variedades reales más** (`tools/catalogo2.py`, al final de `STRAINS` para no mover los números de antes):

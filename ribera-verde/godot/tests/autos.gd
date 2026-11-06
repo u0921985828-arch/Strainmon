@@ -33,9 +33,9 @@ func _corre() -> void:
 	var D := Datos.carga()
 	var A: Array = D.AUTO.dex
 	# 1 · las variedades: la Ruderalis en el banco, la Lowryder y quince «Auto» de genéticas que ya estaban
-	chk(A.size() == 22 and A.has("ruderalis") and A.has("lowryder"), "22 autoflorecientes (%d)" % A.size())
+	chk(A.size() == 25 and A.has("ruderalis") and A.has("lowryder"), "25 autoflorecientes (%d)" % A.size())
 	chk(A.all(func(k): return D.STRAINS.has(k) and D.STRAINS[k].get("auto") and D.DIARIO.has(k)), "todas con auto y su nota en el diario")
-	chk(D.DEX.size() == 115 and A.all(func(k): return D.DEX.has(k)), "en la Genoteca: %d" % D.DEX.size())
+	chk(D.DEX.size() == 130 and A.all(func(k): return D.DEX.has(k)), "en la Genoteca: %d" % D.DEX.size())
 	chk(D.BANCO.any(func(b): return b[0] == "ruderalis"), "la Ruderalis en el banco del PC")
 	var malas := ["dinafem", "clarks", "boveda", "seeds", "genetics", "sensi", "dutch passion", "barney", "royal queen", "fastbuds", "joint doctor", "critical auto"]
 	var txt := ""
@@ -71,11 +71,11 @@ func _corre() -> void:
 	# 5 · sin CAL, como el HTML: ni Genoteca, ni receta, ni banco, ni edad
 	Datos.CAL = false
 	D = Datos.carga()
-	chk(D.DEX.size() == 93 and not D.BANCO.any(func(b): return b[0] == "ruderalis") and Datos.receta_de({"custom": {}}, "nl", "ruderalis") == null, "sin CAL, las 93 de antes")
+	chk(D.DEX.size() == 105 and not D.BANCO.any(func(b): return b[0] == "ruderalis") and Datos.receta_de({"custom": {}}, "nl", "ruderalis") == null, "sin CAL, las 105 de antes")
 	chk(crece("nlauto", "veg", 6).prog < .65, "sin CAL, a 18/6 no florece")
 	Datos.CAL = true
 	D = Datos.carga()
-	chk(D.DEX.size() == 115, "con CAL otra vez, 115")
+	chk(D.DEX.size() == 130, "con CAL otra vez, 115")
 	print("autos: %d comprobaciones, %d fallos" % [n, fallos.size()])
 	for f in fallos:
 		print("  FALLO: ", f)
